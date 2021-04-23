@@ -1841,7 +1841,7 @@ order by date desc, segmentId asc limit 1';
      */
     public function getFieldTags($field) : ?editor_Segment_FieldTags {
         $editField = $this->segmentFieldManager->getEditIndex($field);
-        error_log('getFieldTags: '.$field.' / '.$editField);
+        // error_log('getFieldTags: '.$field.' / '.$editField);
         // TODO: edit field may be null
         $location = $this->segmentFieldManager->getDataLocationByKey($editField);
         if($location !== false && array_key_exists($location['field'], $this->segmentdata)) {

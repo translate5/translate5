@@ -320,22 +320,21 @@ class editor_TaskController extends ZfExtended_RestController {
 
     /**
      * returns all (filtered) tasks with added user data
-     * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
-     * set mqmEnabled for all rows
+     * uses $this->entity->loadAll
      */
     protected function loadAllForProjectOverview() {
         $rows = $this->loadAll();
         $customerData = $this->getCustomersForRendering($rows);
         foreach ($rows as &$row) {
+            unset($row['qmSubsegmentFlags']); // unneccessary in the project overview
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
         }
         return $rows;
     }
     
     /**
-     * returns all (filtered) tasks with added user data
-     * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
-     * set mqmEnabled for all rows
+     * returns all (filtered) tasks with added user data and quality data
+     * uses $this->entity->loadAll
      */
     protected function loadAllForTaskOverview() {
         $rows = $this->loadAll();
@@ -369,15 +368,13 @@ class editor_TaskController extends ZfExtended_RestController {
         $customerData = $this->getCustomersForRendering($rows);
 
         if($isMailTo){
-            $userData=$this->getUsersForRendering($rows);
+            $userData = $this->getUsersForRendering($rows);
         }
 
         foreach ($rows as &$row) {
             $row['lastErrors'] = $this->getLastErrorMessage($row['taskGuid'], $row['state']);
             $this->initWorkflow($row['workflow']);
-            
-            unset($row['qmSubsegmentFlags']);
-
+    
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
 
             $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
@@ -399,18 +396,29 @@ class editor_TaskController extends ZfExtended_RestController {
             if(empty($this->entity->getTaskGuid())){
                 $this->entity->init($row);
             }
-            //TODO: for now we leave this as it is, if this produces performance problems, find better way for loading this config
-            $taskConfig = $this->entity->getConfig();
-            //adding QM SubSegment Infos to each Task
-            $row['mqmEnabled'] = false;
-            if($taskConfig->runtimeOptions->autoQA->enableMqmTags && !empty($row['qmSubsegmentFlags'])){
-                $row['mqmEnabled'] = true;
-            }
+            // add quality related stuff
+            $this->addQualitiesToResult($row);
+            // add user-segment assocs
             $this->addMissingSegmentrangesToResult($row);
         }
         return $rows;
     }
-    
+    /**
+     * Adds the quality related props to the task model for the task overview (not project overview)
+     * @param array $row
+     */
+    protected function addQualitiesToResult(array &$row){
+        //TODO: for now we leave this as it is, if this produces performance problems, find better way for loading this config
+        $taskConfig = $this->entity->getConfig();
+        $qualityProps = editor_Models_Db_SegmentQuality::getNumQualitiesAndFaultsForTask($row['taskGuid']);
+        // adding number of quality errors, evaluated in the export actions
+        $row['qualityErrorCount'] = $qualityProps->numQualities;
+        // adding if the task has internal tag errors, will prevent xliff exports
+        $row['qualityHasFaults'] = ($qualityProps->numFaults > 0);
+        // adding QM SubSegment Infos to each Task, evaluated in the export actions
+        $row['qualityHasMqm'] = ($taskConfig->runtimeOptions->autoQA->enableMqmTags && !empty($row['qmSubsegmentFlags']));
+        unset($row['qmSubsegmentFlags']); // unneccessary in the task overview
+    }
     /**
      * Add the number of segments that are not assigned to a user
      * although some other segments ARE assigned to users of this role.
@@ -1458,13 +1466,13 @@ class editor_TaskController extends ZfExtended_RestController {
      * Not usable for indexAction, must be called after entity->save and this->view->rows = Data
      */
     protected function addMqmQualities() {
-        $mqmFlags = $this->entity->getQmSubsegmentFlags();
-        $this->view->rows->mqmEnabled = false;
+        $qualityMqmCategories = $this->entity->getQmSubsegmentFlags();
+        $this->view->rows->qualityHasMqm = false;
         $taskConfig = $this->entity->getConfig();
-        if($taskConfig->runtimeOptions->autoQA->enableMqmTags && !empty($mqmFlags)) {
-            $this->view->rows->mqmFlags = $this->entity->getMqmTypesTranslated(false);
-            $this->view->rows->mqmSeverities = $this->entity->getMqmSeveritiesTranslated(false);
-            $this->view->rows->mqmEnabled = true;
+        if($taskConfig->runtimeOptions->autoQA->enableMqmTags && !empty($qualityMqmCategories)) {
+            $this->view->rows->qualityMqmCategories = $this->entity->getMqmTypesTranslated(false);
+            $this->view->rows->qualityMqmSeverities = $this->entity->getMqmSeveritiesTranslated(false);
+            $this->view->rows->qualityHasMqm = true;
         }
     }
 

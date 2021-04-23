@@ -86,9 +86,11 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'edit100PercentMatch', type: 'boolean'},
     {name: 'lockLocked', type: 'boolean'},
     {name: 'enableSourceEditing', type: 'boolean'},
-    {name: 'mqmEnabled', type: 'boolean'},
-    {name: 'mqmFlags', type: 'auto'},
-    {name: 'mqmSeverities', type: 'auto'},
+    {name: 'qualityErrorCount', type: 'integer', defaultValue: 0},
+    {name: 'qualityHasFaults', type: 'boolean'},
+    {name: 'qualityHasMqm', type: 'boolean'},
+    {name: 'qualityMqmCategories', type: 'auto'},
+    {name: 'qualityMqmSeverities', type: 'auto'},
     {name: 'lastErrors', type: 'auto'},
     {name: 'emptyTargets', type: 'boolean', persist: false},
     {name: 'userState', type: 'string', isEqual: function() {
@@ -136,11 +138,31 @@ Ext.define('Editor.model.admin.Task', {
     }
   },
   /**
-   * returns if QM Subsegments are enabled for this task
-   * @returns
+   * returns if MQM qualities are enabled for this task
+   * @return {Boolean}
    */
   hasMqm: function() {
-      return this.get('mqmEnabled');
+      return this.get('qualityHasMqm');
+  },
+  /**
+   * returns if MQM qualities are enabled for this task
+   * @return {Array}
+   */
+  getMqmCategories: function() {
+      if(this.get('qualityMqmCategories')){
+          return this.get('qualityMqmCategories');
+      }
+      return [];
+  },
+  /**
+   * returns if MQM qualities are enabled for this task
+   * @return {Array}
+   */
+  getMqmSeverities: function() {
+      if(this.get('qualityMqmSeverities')){
+          return this.get('qualityMqmSeverities');
+      }
+      return [];
   },
   /**
    * returns if task is editable depending on task locking and usagemode

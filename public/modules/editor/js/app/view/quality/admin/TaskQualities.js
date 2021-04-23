@@ -54,7 +54,7 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
         completeTipCaption: '#UT#Vollständig analysiert',
         incompleteTipCaption: '#UT#Unvollständig analysiert',
         incompleteTipText: '#UT#Die Qualität wurde nicht oder nur unvollständig analysiert. Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben',
-        faultyTipCaption: '#UT#Interner Tag Fehler',
+        faultyTipCaption: '#UT#Interne Tag Fehler',
         faultyTipText: '#UT#Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern',
         newAnalysis: '#UT#Neu analysieren',
     },
@@ -133,11 +133,11 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                             if(isComplete){
                                 html = '<span class="x-grid-symbol t5-quality-complete" data-qtip="'
                                     + '<b>' + me.strings.completeTipCaption +'</b>">'
-                                    + Ext.String.fromCodePoint(parseInt('0xf00c', 16)) + '</span> ';
+                                    + Ext.String.fromCodePoint(parseInt('0xf00c', 16)) + '</span>';
                             } else {
                                 html = '<span class="x-grid-symbol t5-quality-incomplete" data-qtip="'
                                     + '<b>' + me.strings.incompleteTipCaption +'</b><br/>' + me.strings.incompleteTipText + '">'
-                                    + Ext.String.fromCodePoint(parseInt('0xf071', 16)) + '</span> ';
+                                    + Ext.String.fromCodePoint(parseInt('0xf071', 16)) + '</span>';
                                 // somehow ugly: adjusting the view from a column renderer.
                                 // The store load-event comes to early and this is the easiest way, this one detail does not really justify an own view-controller
                                 if(me.reAnalysisHidden){
@@ -149,7 +149,7 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                             if(record.get('qfaulty') == true){
                                 html += ' <span class="x-grid-symbol t5-quality-faulty" data-qtip="'
                                     + '<b>' + me.strings.faultyTipCaption +'</b><br/>' + me.strings.faultyTipText + '">'
-                                    + Ext.String.fromCodePoint(parseInt('0xf057', 16)) + '</span> ';
+                                    + Ext.String.fromCodePoint(parseInt('0xf057', 16)) + '</span>';
                             }
                             return html;
                         },

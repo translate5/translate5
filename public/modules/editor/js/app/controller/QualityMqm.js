@@ -88,7 +88,7 @@ Ext.define('Editor.controller.QualityMqm', {
             sevStore = Ext.create('Ext.data.Store', {
                 fields: ['id', 'text'],
                 storeId: 'Severities',
-                data: Editor.data.task.get('mqmSeverities')
+                data: Editor.data.task.getMqmSeverities()
             });
         if(!combo){
             return;
@@ -163,7 +163,7 @@ Ext.define('Editor.controller.QualityMqm', {
 			}
 			return result;
 		};
-		return iterate(Editor.data.task.get('mqmFlags'));
+		return iterate(Editor.data.task.getMqmCategories());
 	},
     /**
      * Inserts the QM Issue Tag in the Editor by key shortcut

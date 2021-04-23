@@ -36,6 +36,17 @@
  * Compares two field-tags if they have the same amount of internal tags in the same order
  */
 class editor_Segment_Internal_TagComparision {
+    
+    /**
+     * Evaluates if the given quality type & cateogory represents a fault
+     * This is to keep the code flexible in terms of evaluating if a task or segment has faulty internal tags
+     * @param string $type
+     * @param string $category
+     * @return bool
+     */
+    public static function isFault(string $type, string $category) : bool {
+        return ($type == editor_Segment_Tag::TYPE_INTERNAL && $category == self::TAG_STRUCTURE_FAULTY);
+    }
     /**
      * @var string
      */

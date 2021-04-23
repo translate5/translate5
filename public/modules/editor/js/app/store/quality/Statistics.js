@@ -73,7 +73,7 @@ Ext.define('Editor.store.quality.Statistics', {
                 name: 'qmtype',
                 type: 'integer'
             }],
-            sev = Editor.data.task.get('mqmSeverities');
+            sev = Editor.data.task.getMqmSeverities();
         Ext.each(sev, function(severity,index, myself) {
             sevCols.push({
                 name: 'total'+ severity.text.charAt(0).toUpperCase() + severity.text.slice(1).toLowerCase(),

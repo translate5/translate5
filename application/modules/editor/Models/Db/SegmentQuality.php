@@ -71,18 +71,22 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         }
     }
     /**
-     * 
+     * Checks whether a certain quality of the given type and category exists for he task. If category is not provided checks only for type
      * @param string $taskGuid
      * @param string $type
-     * @return boolean
+     * @param string $category
+     * @return bool
      */
-    public static function hasTypeForTask(string $taskGuid, string $type) : bool {
+    public static function hasTypeCategoryForTask(string $taskGuid, string $type, string $category=NULL) : bool {
         $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
         /* @var $table editor_Models_Db_SegmentQuality */
         $where = $table->select()
             ->from($table->getName(), ['id'])
             ->where('taskGuid = ?', $taskGuid)
             ->where('type = ?', $type);
+        if($category != NULL){
+            $where->where('category = ?', $category);
+        }
         return (count($table->fetchAll($where)) > 0);
     }
     /**
@@ -158,6 +162,30 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         }
         return $result;
     }
+    /**
+     * Retrieves the important quality props for a task as relevant for the task overview
+     * This is the amount of non false-positive qualities and the number of faults
+     * @param string $taskGuid
+     * @return stdClass: model with the two props numQualities & numFaults
+     */
+    public static function getNumQualitiesAndFaultsForTask(string $taskGuid) : stdClass {
+        $result = new stdClass();
+        $result->numQualities = 0;
+        $result->numFaults = 0;
+        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
+        /* @var $table editor_Models_Db_SegmentQuality */
+        $db = $table->getAdapter();
+        $sql = $db->quoteInto('SELECT `type`, `category`, `falsePositive` FROM '.$db->quoteIdentifier($table->getName()).' WHERE taskGuid = ?', $taskGuid);
+        foreach($db->fetchAll($sql, [], Zend_Db::FETCH_ASSOC) as $row){
+            if($row['falsePositive'] == 0){
+                $result->numQualities++;
+            }
+            if(editor_Segment_Internal_TagComparision::isFault($row['type'], $row['category'])){
+                $result->numFaults++;
+            }
+        }
+        return $result;
+    }    
 
     protected $_name  = 'LEK_segment_quality';
     
