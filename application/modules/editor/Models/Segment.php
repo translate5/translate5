@@ -1430,7 +1430,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     }
 
 
-    public function getRepetitions($taskGuid)
+    public function getRepeatedSegments($taskGuid)
     {
         $this->segmentFieldManager->initFields($taskGuid);
         //if we are using alternates we cant use change alikes, that means we return an empty list here
@@ -1442,14 +1442,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $stmt = $this->db->getAdapter()->query($sql);
         $repetitions = $stmt->fetchAll();
 
-        $hasIdFiltered = $this->getIdsAfterFilter($segmentsViewName, $taskGuid);
-        foreach ($repetitions as $key => $alike) {
-            $repetitions[$key]['infilter'] = isset($hasIdFiltered[$alike['id']]);
-            if ($alike['id'] == $this->get('id')) {
-                unset($repetitions[$key]);
-            }
-        }
-        return array_values($repetitions);
+
+        return $repetitions;
     }
 
     /**

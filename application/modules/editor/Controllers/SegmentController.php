@@ -92,13 +92,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                 return ($var['name'] == $filterBy);
             });
         }
-        echo '<pre>';
-        print_r($new);
-        die;
+
         $this->addIsWatchedFlag();
         $this->addFirstEditable();
         $this->addIsFirstFileInfo($taskGuid);
         $this->addJumpToSegmentIndex();
+        $this->addIsRepeated();
         
         // ----- Specific handling of rows (start) -----
 
@@ -302,7 +301,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     protected function addIsRepeated() {
 
         $taskGuid = $this->session->taskGuid;
-        $rows = $this->entity->getAlikes($taskGuid);
+        $rows = $this->entity->getRepeatedSegments($taskGuid);
         $this->view->total = count($this->view->rows);
         //get all segment IDs to be returned
     }
