@@ -1908,7 +1908,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='SW50ZXJuZSBUYWcgRmVobGVy'><source>Interne Tag Fehler</source><target>Interne Tag Fehler</target></trans-unit>
 <trans-unit id='RXMgZ2lidCBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIGVpbmVuIGZlaGxlcmZyZWllbiBFeHBvcnQgZGVyIEF1ZmdhYmUgdmVyaGluZGVybg=='><source>Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern</source><target>Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern</target></trans-unit>
 <trans-unit id='UUEgRmVobGVy'><source>QA Fehler</source><target>QA Fehler</target></trans-unit>
-<trans-unit id='TG9hZGluZy4uLg=='><source>Loading...</source><target>Lade...</target></trans-unit>
+<trans-unit id='TGFkZS4uLg=='><source>Lade...</source><target>Lade...</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>
 <trans-unit id='Q29udGVudA=='><source>Content</source><target>Content</target></trans-unit>
 <trans-unit id='U3R5bGU='><source>Style</source><target>Style</target></trans-unit>
