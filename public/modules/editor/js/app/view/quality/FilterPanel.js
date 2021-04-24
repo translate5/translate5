@@ -43,6 +43,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
     cls: 'qualityFilterPanel',
     title: '#UT#Qualitätssicherung',
     rootVisible: false,
+    isQualityManager: false,
     reAnalysisHidden: true, // quirky: this prop is set by the column-renderer and after tfhe store's "load" event it is evaluated in "afterLoad" where it steers the visibility of our footer
     useArrows: true,
     // we catch the beforestaterestore event to load the store when the panel is initially open
@@ -59,10 +60,12 @@ Ext.define('Editor.view.quality.FilterPanel', {
         modeErrors: '#UT#Nur Fehler',
         modeFalsePositives: '#UT#Nur Falsch-Positive',
         incompleteCatCaption: '#UT#Unvollständig analysiert',
-        incompleteCatText: '#UT#Die Qualität wurde nicht oder nur unvollständig analysiert. Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben',
+        incompleteCatText: '#UT#Diese Kategorie wurde nicht oder nur unvollständig analysiert',
+        startAnalysisHint: '#UT#Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben',
         newAnalysis: '#UT#Neu analysieren',
     },
     initConfig: function(instanceConfig) {
+        this.isQualityManager = Editor.app.authenticatedUser.hasRoles(['pm','admin']);
         var me = this,
         filterMode = Editor.app.getController('Quality').getFilterMode(),
         config = {
@@ -86,9 +89,12 @@ Ext.define('Editor.view.quality.FilterPanel', {
                     // special for rubrics: add icon for incompletely tagged quality types
                     if(record.isIncomplete()){
                         symbol += '<span class="x-tree-symbol t5-quality-incomplete" data-qtip="'
-                            + '<b>' + me.strings.incompleteCatCaption +'</b><br/>' + me.strings.incompleteCatText + '">'
-                            + Ext.String.fromCodePoint(parseInt('0xf071', 16)) + '</span> ';
-                        me.reAnalysisHidden = false; // triggers the showing of the re-analysis toolbar/button
+                            + '<b>' + me.strings.incompleteCatCaption +'</b><br/>' + me.strings.incompleteCatText;
+                        if(me.isQualityManager){
+                            symbol += '. ' + me.strings.startAnalysisHint;
+                            me.reAnalysisHidden = false;
+                        }
+                        symbol += '">' + Ext.String.fromCodePoint(parseInt('0xf071', 16)) + '</span> ';
                     }
                     // special for mqm: add category-index / mqm-id
                     if(record.get('qtype') == 'mqm' && record.get('qcatidx') > -1){

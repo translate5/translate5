@@ -67,10 +67,8 @@ class editor_Models_Quality_RequestState {
             }
         }
         //  our user restriction, depends on if the user is a normal editor or pm/admin
-        // TODO FIXME: This is so DIRTY, why is there no global user object (singleton) with API to provide such info ?
-        $sessionUser = new Zend_Session_Namespace('user');
-        if(!($sessionUser->data->roles && (in_array(ACL_ROLE_PM, $sessionUser->data->roles) || in_array(ACL_ROLE_ADMIN, $sessionUser->data->roles)))){
-            $this->userGuid = $sessionUser->data->userGuid;
+        if(!editor_User::instance()->isA([ ACL_ROLE_PM, ACL_ROLE_ADMIN ])){
+            $this->userGuid = editor_User::instance()->getGuid();
         }
     }
     /**

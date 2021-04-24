@@ -35,10 +35,10 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
     alias: 'widget.taskQualities',
     // controller: 'taskQualities',
     itemId:'taskQualities',
-    extraParams : [], // Extra params property used for store proxy binding
-    title:'#UT#Qualitätssicherung',
+    extraParams: [], // Extra params property used for store proxy binding
+    title: '#UT#Qualitätssicherung',
     //card type, used for card display order
-    importType:'postimport',
+    importType: 'postimport',
     store: null,
     reAnalysisHidden: true,
     // autoScroll: true,
@@ -53,7 +53,8 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
         status: '#UT#Status',
         completeTipCaption: '#UT#Vollständig analysiert',
         incompleteTipCaption: '#UT#Unvollständig analysiert',
-        incompleteTipText: '#UT#Die Qualität wurde nicht oder nur unvollständig analysiert. Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben',
+        incompleteTipText: '#UT#Diese Kategorie wurde nicht oder nur unvollständig analysiert',
+        startAnalysisHint: '#UT#Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben',
         faultyTipCaption: '#UT#Interne Tag Fehler',
         faultyTipText: '#UT#Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern',
         newAnalysis: '#UT#Neu analysieren',
@@ -136,8 +137,9 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                                     + Ext.String.fromCodePoint(parseInt('0xf00c', 16)) + '</span>';
                             } else {
                                 html = '<span class="x-grid-symbol t5-quality-incomplete" data-qtip="'
-                                    + '<b>' + me.strings.incompleteTipCaption +'</b><br/>' + me.strings.incompleteTipText + '">'
-                                    + Ext.String.fromCodePoint(parseInt('0xf071', 16)) + '</span>';
+                                    + '<b>' + me.strings.incompleteTipCaption +'</b><br/>'
+                                    + me.strings.incompleteTipText + '. ' + me.strings.startAnalysisHint
+                                    + '">'+ Ext.String.fromCodePoint(parseInt('0xf071', 16)) + '</span>';
                                 // somehow ugly: adjusting the view from a column renderer.
                                 // The store load-event comes to early and this is the easiest way, this one detail does not really justify an own view-controller
                                 if(me.reAnalysisHidden){
