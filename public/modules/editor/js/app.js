@@ -131,7 +131,7 @@ Ext.application({
         });
         //init the plugins namespace
         Ext.ns('Editor.plugins');
-        
+  
         //create and set the application state provider
         var provider = Ext.create('Editor.util.HttpStateProvider');
         //load the store data directly. With this no initial store load is required (the app state can be applied directly)

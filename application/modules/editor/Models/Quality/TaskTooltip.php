@@ -27,18 +27,85 @@
  */
 
 /**
- *
+ * Provides the Markup for the Quality Tooltip of the Task Grid, a short summary of our qualities
  */
 class editor_Models_Quality_TaskTooltip extends editor_Models_Quality_AbstractView {
     
+    /**
+     * hexadecimal representation of the character to use for an incomplete quality
+     * @var string
+     */
+    CONST HEX_INCOMPLETE = '"\uF071"';
+    /**
+     * hexadecimal representation of the character to use for an faulty quality
+     * @var string
+     */
+    CONST HEX_FAULTY = '"\uF057"';
     /**
      * Forces only not false positive qualities to be fetched
      * @var integer
      */
     protected $falsePositiveRestriction = 0;
     
-    public function getMarkup(){
+    /**
+     * 
+     * @return string
+     */
+    public function getMarkup() : string {
+        $html = '<table class=""><tbody>';
+        $hasIncomplete = false;
+        $hasFaults = false;
+        foreach($this->rows as $row){
+            // $row: qid, qtype, qcount, qcomplete, qfaulty, text
+            $html .=
+                '<tr>'
+                .'<td>'.$row->text.':</td>'
+                .'<td>'.strval($row->qcount).'</td>'
+                .'<td>';
+            if(property_exists($row, 'qcomplete') && $row->qcomplete == false){
+                $html .= ' '.$this->getStatusSymbol('incomplete');
+                $hasIncomplete = true;
+            }
+            if(property_exists($row, 'qfaulty') && $row->qfaulty == true){
+                $html .= ' '.$this->getStatusSymbol('faulty');
+                $hasFaults = true;
+            }
+            $html .= '</td></tr>';
+        }
+        if($hasIncomplete || $hasFaults){
+            $html .= '<tr><td colspan="3">';
+            if($hasIncomplete){
+                $html .=
+                    '<br>'.$this->getStatusSymbol('incomplete').' '
+                    .$this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig analysiert');
+            }
+            if($hasIncomplete){
+                $html .=
+                    '<br>'.$this->getStatusSymbol('faulty').' '
+                    .$this->translate->_('Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern');
+            }
+            $html .= '</td></tr>';
+        }
+        $html .= '</tbody></table>';
         
-        return "<b>JUST A TEST!</b>";
+        error_log('ICON:'.$this->getStatusSymbol('faulty'));
+        return $html;
+    }
+    /**
+     * 
+     * @param string $type
+     * @return string
+     */
+    private function getStatusSymbol(string $type) : string {
+        switch($type){            
+            case 'incomplete':
+                return '<span class="x-grid-symbol t5-quality-incomplete">'.json_decode(self::HEX_INCOMPLETE).'</span>';
+                
+            case 'faulty':
+                return '<span class="x-grid-symbol t5-quality-faulty">'.json_decode(self::HEX_FAULTY).'</span>';
+                
+            default:
+                return '';
+        }
     }
 }

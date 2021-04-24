@@ -79,8 +79,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
         
-        // TODO AUTOQA: who should see the task's quality info ?
-        if(true) {
+        if(Editor.app.authenticatedUser.hasRoles(['pm','admin'])) {
             tabs.push({
                 xtype: 'taskQualities',
                 bind:{
