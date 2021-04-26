@@ -361,7 +361,6 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
                         'action' => 'export'
                 ));
         $r->addRoute('plugins_matchanalysis_export', $exportAnalysis);
-//        $r->addRoute('plugins_matchanalysis_export', $exportAnalysis);
     }
     
     /***
