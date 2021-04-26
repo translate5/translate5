@@ -1439,20 +1439,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         return array_values($alikes); //neues numerisches Array für JSON Rückgabe, durch das unset oben macht json_decode ein Object draus
     }
 
-
-    public function getRepeatedSegments($taskGuid)
-    {
-        $adapter = $this->db->getAdapter();
-        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
-        /* @var $mv editor_Models_Segment_MaterializedView */
-        $mv->setTaskGuid($taskGuid);
-        $viewName = $mv->getName();
-
-        $sql = $this->_getRepetitionSql($viewName);
-
-        return $adapter->query($sql)->fetchAll();
-    }
-
     /**
      * reset the internal used db object to the view to the given taskGuid
      * @param string $taskGuid
