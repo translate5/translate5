@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * Class editor_Plugins_MatchAnalysis_Export_ExportExcel
+ * Export the match analyse result into Excel
+ */
 class editor_Plugins_MatchAnalysis_Export_ExportExcel extends ZfExtended_Models_Entity_Abstract {
 
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_BatchResult';

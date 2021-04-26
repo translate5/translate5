@@ -26,6 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+
+/**
+ * Class editor_Plugins_MatchAnalysis_Export_ExportXml
+ * Export the match analyse result into XML
+ */
 class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_Entity_Abstract
 {
 
