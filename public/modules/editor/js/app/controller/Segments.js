@@ -101,8 +101,8 @@ Ext.define('Editor.controller.Segments', {
         ref: 'watchListFilterBtn',
         selector: '#watchListFilterBtn'
     }, {
-        ref: 'watchListFilterBtnRepeated',
-        selector: '#watchListFilterBtnRepeated'
+        ref: 'filterBtnRepeated',
+        selector: '#filterBtnRepeated'
     }, {
         ref: 'segmentsToolbar',
         selector: 'segmentsToolbar'
@@ -142,7 +142,7 @@ Ext.define('Editor.controller.Segments', {
             'segmentsToolbar #watchListFilterBtn': {
                 click: 'watchListFilter'
             },
-            'segmentsToolbar #watchListFilterBtnRepeated': {
+            'segmentsToolbar #filterBtnRepeated': {
                 click: 'repeatedFilter'
             }
         },
