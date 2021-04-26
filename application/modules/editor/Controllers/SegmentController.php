@@ -302,12 +302,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         }
     }
 
-    protected function addIsRepeated($taskGuid)
-    {
-        $this->view->rows = $this->entity->getRepeatedSegments($taskGuid);
-        $this->view->total = count($this->view->rows);
-    }
-
     public function putAction()
     {
         $sessionUser = new Zend_Session_Namespace('user');
