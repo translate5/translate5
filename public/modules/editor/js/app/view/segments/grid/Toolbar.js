@@ -184,7 +184,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     icon: Editor.data.moduleFolder+'images/show_bookmarks.png'
                 },{
                     xtype: 'button',
-                    itemId: 'watchListFilterBtnRepeated',
+                    itemId: 'filterBtnRepeated',
                     enableToggle: true,
                     tooltip: {
                         text: me.item_showRepeatedSegments,
