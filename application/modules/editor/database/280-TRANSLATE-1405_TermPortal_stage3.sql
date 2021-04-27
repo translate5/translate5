@@ -18,8 +18,8 @@ create table if not exists terms_attributes
     internalCount int null,
     userGuid varchar(38) null,
     userName varchar(255) null,
-    created timestamp default CURRENT_TIMESTAMP not null,
-    updated timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    created timestamp default '0000-00-00 00:00:00' not null,
+    updated timestamp default '0000-00-00 00:00:00' not null on update CURRENT_TIMESTAMP,
     processStatus varchar(128) default 'finalized' null comment 'old term processStatus',
     constraint terms_attributes_guid_uindex
         unique (guid)
@@ -27,6 +27,9 @@ create table if not exists terms_attributes
 
 create index collectionId_idx
     on terms_attributes (collectionId);
+
+create index termId_idx
+    on terms_attributes (termId);
 
 create index termEntryId_idx
     on terms_attributes (termEntryId);
@@ -65,8 +68,8 @@ create table if not exists terms_term
     definition mediumtext null,
     userGuid varchar(38) not null,
     userName varchar(128) default 'finalized' null,
-    created timestamp default CURRENT_TIMESTAMP not null,
-    updated timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    created timestamp default '0000-00-00 00:00:00' not null,
+    updated timestamp default '0000-00-00 00:00:00' not null on update CURRENT_TIMESTAMP,
     constraint terms_term_guid_uindex
         unique (guid)
 );
@@ -96,6 +99,9 @@ create index collectionId_idx
 create index termEntryTbxId_idx
     on terms_term_entry (termEntryTbxId);
 
+create index termEntryGuid_idx
+    on terms_term_entry (entryGuid);
+
 create table if not exists terms_transacgrp
 (
     id int auto_increment
@@ -123,32 +129,3 @@ create index collectionId_idx
 
 create index termEntryId_idx
     on terms_transacgrp (termEntryId);
-
-
-alter table LEK_term_attribute_proposal drop foreign key LEK_term_attribute_proposal_ibfk_1;
-alter table LEK_term_attribute_proposal
-    add constraint LEK_term_attribute_proposal_ibfk_1
-        foreign key (attributeId) references terms_attributes (id)
-            on update cascade on delete cascade;
-
-
-alter table LEK_term_proposal drop foreign key LEK_term_proposal_ibfk_1;
-alter table LEK_term_proposal
-    add constraint LEK_term_proposal_ibfk_1
-        foreign key (termId) references terms_term (id)
-            on update cascade on delete cascade;
-
-
-alter table LEK_term_attribute_history drop foreign key LEK_term_attribute_history_ibfk_1;
-alter table LEK_term_attribute_history
-    add constraint LEK_term_attribute_history_ibfk_1
-        foreign key (attributeId) references terms_attributes (id)
-            on update cascade on delete cascade;
-
-
-alter table LEK_term_history drop foreign key LEK_term_history_ibfk_1;
-alter table LEK_term_history
-    add constraint LEK_term_history_ibfk_1
-        foreign key (termId) references terms_term (id)
-            on update cascade on delete cascade;
-

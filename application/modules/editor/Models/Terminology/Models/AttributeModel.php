@@ -158,9 +158,9 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
      */
     public function updateModificationGroupDate(array $attributes, array $termProposal): array
     {
-        if (empty($attributes) || empty($termProposal) || empty($termProposal['created']) || empty($termProposal['userName'])) {
-            return $attributes;
-        }
+//        if (empty($attributes) || empty($termProposal) || empty($termProposal['created']) || empty($termProposal['userName'])) {
+//            return $attributes;
+//        }
 
         //foreach term attribute check, find the transac modification attribute
         foreach ($attributes as &$attribute) {
@@ -170,16 +170,16 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             }
 
             //ignore non modification tags
-            if ($attribute['name'] != 'transac' || $attribute['attrType'] != 'modification') {
-                continue;
-            }
+//            if ($attribute['name'] != 'transac' || $attribute['attrType'] != 'modification') {
+//                continue;
+//            }
 
             foreach ($attribute['children'] as &$child) {
-                if ($child['name'] == 'date') {
+                if ($child['name'] === 'tig' || $child['name'] === 'langSet' || $child['name'] === 'transac') {
                     //convert the date to unix timestamp
                     $child['attrValue'] = strtotime($termProposal['created']);
                 }
-                if ($child['name'] == 'transacNote' && $this->isResponsablePersonAttribute($child['attrType'])) {
+                if ($child['name'] === 'transacNote' && $this->isResponsablePersonAttribute($child['attrType'])) {
                     $child['attrValue'] = $termProposal['userName'];
                 }
             }
@@ -206,6 +206,85 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         return false;
     }
 
+    /***
+     * Group the attributes by parent-child
+     *
+     * @param array $list
+     * @param int $parentId
+     * @return array
+     */
+    public function createChildTree(array $list, $parentId = 0): array
+    {
+        $transacGrpModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+        /* @var $transacGrpModel editor_Models_Terminology_Models_TransacgrpModel */
+
+        $attCols = [
+            'id AS attributeId',
+            'elementName AS name',
+            'transacType AS attrType',
+            'guid AS attrId',
+            'transac AS attrValue',
+            'date AS date',
+            'adminType AS attrDataType',
+            new Zend_Db_Expr('"termAttribute" as attributeOriginType')//this is needed as fixed value
+        ];
+
+        $cols = [
+            'id AS transacGrpId',
+            'elementName AS name',
+            'transac AS transacType',
+            'transacNote AS attrValue',
+            'date AS date',
+            'transacType AS attrType'
+            ];
+
+        $tree = [];
+        foreach ($list as $element) {
+            if ($element['transacGrpId']) {
+//                $select = $transacGrpModel->db->select()
+//                    ->from($transacGrpModel->db, $attCols)
+//                    ->where('terms_transacgrp.id = ?', $element['transacGrpId'])
+//                    ->group('terms_transacgrp.id');
+//                $rows = $this->db->fetchAll($select)->toArray();
+                $rows = $transacGrpModel->db->find($element['transacGrpId'])->toArray();
+
+                if ($rows) {
+                    $element['children'] = $this->prepareTransacGrpChild($rows);
+                } else {
+                    $element['children'] = [];
+                }
+
+                $tree[] = $element;
+            }
+        }
+
+        return $tree;
+    }
+
+    private function prepareTransacGrpChild(array $transacGrp): array
+    {
+        $transacGrpChild = [];
+
+        foreach ($transacGrp as $tGrp) {
+            $transacGrpChild['id'] = $tGrp['id'];
+//            $transacGrpChild['name'] = $tGrp['elementName'];
+            $transacGrpChild['attributeId'] = $tGrp['transac'];
+            $transacGrpChild['labelId'] = $tGrp['date'];
+            $transacGrpChild['termEntryId'] = $tGrp['adminType'];
+            $transacGrpChild['internalCount'] = $tGrp['adminValue'];
+            $transacGrpChild['language'] = $tGrp['transacNote'];
+            $transacGrpChild['name'] = $tGrp['transacType'];
+            $transacGrpChild['attrType'] = $tGrp['ifDescripgrp'];
+            $transacGrpChild['attrDataType'] = $tGrp['collectionId'];
+            $transacGrpChild['attrTarget'] = $tGrp['termEntryId'];
+            $transacGrpChild['attrId'] = $tGrp['termId'];
+            $transacGrpChild['attrValue'] = $tGrp['termEntryGuid'];
+            $transacGrpChild['attrCreated'] = $tGrp['langSetGuid'];
+            $transacGrpChild['attrUpdated'] = $tGrp['guid'];
+        }
+
+        return $transacGrpChild;
+    }
     /**
      * returns true if the attribute is proposable according to its values.
      * Additional ACL checks must be done outside (in the controllers)

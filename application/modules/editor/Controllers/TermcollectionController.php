@@ -173,7 +173,9 @@ class editor_TermcollectionController extends ZfExtended_RestController
         /* @var $model editor_Models_Terminology_Models_TermModel */
 
         if (isset($params['termEntryId'])) {
-            $responseArray['termAttributes'] = $model->groupTermsAndAttributes($model->searchTermAttributesInTermEntry($params['termEntryId'], $collectionIds));
+
+            $termAttributesInTermEntry = $model->searchTermAttributesInTermEntry($params['termEntryId'], $collectionIds);
+            $responseArray['termAttributes'] = $model->groupTermsAndAttributes($termAttributesInTermEntry);
 
             $entryAttr = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
             /* @var $entryAttr editor_Models_Terminology_Models_AttributeModel */

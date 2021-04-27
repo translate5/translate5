@@ -491,7 +491,6 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                 $map[$termKey]['attributes'] = [];
 
                 if (isset($oldKey) && isset($map[$oldKey])) {
-//                    $map[$oldKey]['attributes'] = $attribute->createChildTree($map[$oldKey]['attributes']);
                     $groupOldKey = true;
 
                     $map[$oldKey]['proposable'] = $isTermProposalAllowed;
@@ -546,12 +545,12 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         //if not grouped after foreach, group the last result
         if (!$groupOldKey) {
             $map[$oldKey]['proposable'] = $isTermProposalAllowed;
-//            $map[$oldKey]['attributes'] = $attribute->createChildTree($map[$oldKey]['attributes']);
+            $map[$oldKey]['attributes'] = $attribute->createChildTree($map[$oldKey]['attributes']);
 
             //collect the term proposal data if the user is allowed to
             if ($isTermProposalAllowed) {
                 $map[$oldKey]['proposal'] = !empty($termProposalData['term']) ? $termProposalData : null;
-                $map[$oldKey]['attributes'] = $attribute->updateModificationGroupDate($map[$oldKey]['attributes'],isset($map[$oldKey]['proposal'])?$map[$oldKey]['proposal']:[]);
+                $map[$oldKey]['attributes'] = $attribute->updateModificationGroupDate($map[$oldKey]['attributes'],isset($map[$oldKey]['proposal']) ? $map[$oldKey]['proposal'] : []);
             }
         }
 
@@ -615,7 +614,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             'terms_attributes.created AS attrCreated',
             'terms_attributes.updated AS attrUpdated',
 //            'terms_attributes.attrDataType AS attrDataType',
-//            'terms_attributes.processStatus AS attrProcessStatus',
+            'terms_attributes.processStatus AS attrProcessStatus',
             new Zend_Db_Expr('"termAttribute" as attributeOriginType')//this is needed as fixed value
         ];
 
@@ -640,6 +639,12 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ->joinLeft('terms_attributes', 'terms_attributes.termId = terms_term.termId AND terms_attributes.collectionId = terms_term.collectionId ', $attCols)
             ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = terms_attributes.labelId',['LEK_term_attributes_label.labelText as headerText'])
             ->join('LEK_languages', 'terms_term.languageId = LEK_languages.id', ['LEK_languages.rfc5646 AS language']);
+
+
+        $s->join('terms_transacgrp', 'terms_transacgrp.termId = terms_term.termId AND terms_transacgrp.collectionId = terms_term.collectionId',[
+            'terms_transacgrp.id as transacGrpId'
+        ]);
+
 
         if($this->isProposableAllowed()){
             $s->joinLeft('LEK_term_proposal', 'LEK_term_proposal.termId = terms_term.id',[
