@@ -6,6 +6,7 @@ data/dummyTm_*
 /nbproject/
 .buildpath
 .project
+.metadata
 .settings/
 .vscode/*
 #needed for automated tests on server:
@@ -16,4 +17,4 @@ public/scheduled-tests/*
 # needed for ./translate5.sh release:notes
 /jira-cookie.txt
 cghooks.lock
-
+_mails
