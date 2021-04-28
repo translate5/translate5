@@ -109,7 +109,7 @@ class ProjectTaskTest extends \ZfExtended_Test_ApiTestcase {
         //open the task for editing. This is the only way to load the segments via the api
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'edit', 'id' => $task->id]);
 
-        $fileName = str_replace('/','_',$task->taskName.'.json');
+        $fileName = str_replace(['/','::'],'_',$task->taskName.'.json');
         
         //load all segments for the current opened task
         $segments = self::$api->requestJson('editor/segment?page=1&start=0&limit=200');
