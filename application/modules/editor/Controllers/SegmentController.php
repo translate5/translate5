@@ -683,6 +683,24 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         echo Zend_Json::encode($db->fetchAll($sql)->toArray(), Zend_Json::TYPE_ARRAY);
     }
+    /**
+     * Sets the stateId asynchronously. This enables the segment meta panel to be independent from saving or canceling the segment text
+     */
+    public function stateidAction(){
+        $this->entity->load($this->_getParam('id'));
+        $session = new Zend_Session_Namespace();
+        if ($session->taskGuid !== $this->entity->getTaskGuid()) {
+            //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        $stateId = intval($this->_getParam('stateId', -1));
+        if($stateId < 0){
+            throw new ZfExtended_Models_Entity_NotFoundException('parameter stateId is required.');
+        }
+        $this->entity->setStateId($stateId);
+        $this->entity->save();
+        $this->view->success = 1;
+    }
     
     /***
      * Check if the search string length is in between 0 and 1024 characters long
@@ -702,7 +720,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         }
         
         $length=strlen(utf8_decode($searchField));
-        if($length>1024){
+        if($length > 1024){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
             /* @var $t ZfExtended_Zendoverwrites_Translate */
             

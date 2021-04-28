@@ -40,16 +40,14 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.MetaPanel', {
     alias: 'widget.segmentsMetapanel',
     extend: 'Ext.panel.Panel',
-
     bodyPadding: 10,
     scrollable: 'y',
     frameHeader: false,
     id: 'segment-metadata',
-    itemId:'editorSegmentsMetaData',
     strings:{
         title: '#UT#Segment-Metadaten',
     },
-
+    segmentStateId: -1, // caches the segment state to safely capture user originating radio changes. ExtJs suspendEvent && resumeEvent do not work for radios :-(
     layout: 'auto',
 
     item_metaTerms_title: '#UT#Terminologie',
@@ -108,30 +106,54 @@ Ext.define('Editor.view.segments.MetaPanel', {
       });
 
       me.callParent(arguments);
-      me.addStateFlags();
+      me.addSegmentStateFlags();
     },
     /**
      * Fügt anhand der php2js Daten die Status Felder hinzu
      */
-    addStateFlags: function() {
+    addSegmentStateFlags: function() {
         var me = this,
             stati = me.down('#metaStates'),
             flags = Editor.data.segments.stateFlags,
             counter = 1;
         
         Ext.each(flags, function(item){
-            var tooltip; 
+            var tooltip;
             if(counter < 10) {
                 tooltip = Ext.String.format(me.item_metaStates_tooltip, counter++);
             } else {
                 tooltip = me.item_metaStates_tooltip_nokey;
             }
             stati.add({
+                xtype: 'radio',
                 name: 'stateId',
                 anchor: '100%',
                 inputValue: item.id,
-                boxLabel: '<span data-qtip="'+tooltip+'">'+item.label+'</span>'
+                boxLabel: '<span data-qtip="'+tooltip+'">'+item.label+'</span>',
+                listeners:{
+                    change: function(control, checked){
+                        if(checked && me.segmentStateId != control.inputValue){
+                            me.fireEvent('segmentStateChanged', control.inputValue, me.segmentStateId);
+                            me.segmentStateId = control.inputValue;
+                        }
+                    }
+                }
             });
+        });
+    },
+    /**
+     * Has to be called before our form's record update to be able to distinguish user generated change events from programmatical ones. Sadly, suspending/resuming change events does not work
+     */
+    setSegmentStateId: function(stateId){
+        this.segmentStateId = stateId;
+    },
+    /**
+     * Sets the state by keyboard value
+     */
+    showSegmentStateId: function(stateId){
+        var boxes = this.query('#metaStates radio');
+        Ext.each(boxes, function(box){
+            box.setValue(box.inputValue == stateId);
         });
     }
   });

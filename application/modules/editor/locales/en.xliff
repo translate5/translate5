@@ -4030,6 +4030,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 	<target>There are problems with internal tags that prevent exporting this task</target>
 </trans-unit>
 <trans-unit id='UUEgRmVobGVy'><source>QA Fehler</source><target>QA Errors</target></trans-unit>
+<trans-unit id='RGVyIFNlZ21lbnQgU3RhdHVzIHd1cmRlIGdlc3BlaWNoZXJ0'><source>Der Segment Status wurde gespeichert</source><target>The segment‘s state has been saved</target></trans-unit>
+<trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Die Qualität wurde hinzugefügt</source><target>The quality has been added</target></trans-unit>
+<trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBlbnRmZXJudA=='><source>Die Qualität wurde entfernt</source><target>The quality has been removed</target></trans-unit>
+<trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='><source>Der False-Positive Status wurde aktualisiert</source><target>The false-positive state has been updated</target></trans-unit>
 <trans-unit id='TGFkZS4uLg=='><source>Lade...</source><target>Loading...</target></trans-unit>
 <trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='>
   <source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source>

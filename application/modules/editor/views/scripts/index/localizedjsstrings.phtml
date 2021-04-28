@@ -35,9 +35,7 @@ $this->translate->setJsonEncode(true);
   //mehrfachverwendete Strings:
   $yes = $this->translate->_('Ja');
   $no  = $this->translate->_('Nein');
-  
-  $config = Zend_Registry::get('config');
-?>
+ ?>
 /*
 Editor Translation Files
 */
@@ -66,7 +64,9 @@ Ext.define('Editor.controller.Localizer', {
       otherFiltersActive: '<?php echo $this->translate->_('ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind');?>',
       noSegmentToFilter: '<?php echo $this->translate->_('Kein Segment dieser Datei entspricht den Filterkriterien');?>'
     };
-
+    Editor.controller.MetaPanel.prototype.messages = {
+    	stateIdSaved: '<?php echo $this->translate->_('Der Segment Status wurde gespeichert');?>'
+    };
     Editor.controller.ServerException.prototype.strings = {
         "401_title": '<?php echo $this->translate->_('Erneute Anmeldung');?>',
         "401_msg": '<?php echo $this->translate->_('Ihre Sitzungsdaten sind abgelaufen. Sie werden nun zur Anmeldeseite weitergeleitet.');?>',
@@ -273,7 +273,14 @@ Ext.define('Editor.controller.Localizer', {
     	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
     };
     Editor.view.quality.SegmentQm.prototype.title = '<?php echo $this->translate->_('QM');?>';
+    Editor.view.quality.SegmentQmController.prototype.messages = {
+        qmHasBeenAdded: '<?php echo $this->translate->_('Die Qualität wurde hinzugefügt');?>',
+        qmHasBeenRemoved: '<?php echo $this->translate->_('Die Qualität wurde entfernt');?>'
+    };
     Editor.view.quality.FalsePositives.prototype.title = '<?php echo $this->translate->_('QA: Falsch-Positive');?>';
+    Editor.view.quality.FalsePositivesController.prototype.messages = {
+    	falsePositiveUpdated: '<?php echo $this->translate->_('Der False-Positive Status wurde aktualisiert');?>'
+    };
     Editor.view.quality.admin.TaskQualities.prototype.title = '<?php echo $this->translate->_('Qualitätssicherung');?>';
   	Editor.view.quality.admin.TaskQualities.prototype.strings = {
 		category: '<?php echo $this->translate->_('Kategorie');?>',

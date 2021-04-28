@@ -33,11 +33,15 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.quality.SegmentQmController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.segmentQm',
+    messages: {
+        qmHasBeenAdded: '#UT#Die Qualität wurde hinzugefügt',
+        qmHasBeenRemoved: '#UT#Die Qualität wurde entfernt'
+    },
     /**
      * Handler to sync the new state with the server
      */
     onQmChanged: function(checkbox, checked){
-        var params = { segmentId: checkbox.segmentId, categoryIndex: checkbox.inputValue, qmaction: (checked ? 'add' : 'remove') };
+        var me = this, params = { segmentId: checkbox.segmentId, categoryIndex: checkbox.inputValue, qmaction: (checked ? 'add' : 'remove') };
         Ext.Ajax.request({
             url: Editor.data.restpath+'quality/segmentqm',
             method: 'GET',
@@ -57,9 +61,12 @@ Ext.define('Editor.view.quality.SegmentQmController', {
                         if(record){
                             store.remove(record);
                         }
+                        Editor.MessageBox.addSuccess(me.messages.qmHasBeenRemoved);
+                        
                     } else if(response.action == 'add'){
                         record = Ext.create('Editor.model.quality.Segment', response.row);
                         record = store.add(record);
+                        Editor.MessageBox.addSuccess(me.messages.qmHasBeenAdded);
                     }
                 }
             },
