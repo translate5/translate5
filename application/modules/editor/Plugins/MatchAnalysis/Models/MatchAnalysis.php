@@ -34,10 +34,6 @@ END LICENSE AND COPYRIGHT
  *
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
- *
- * @method string getTaskUuid() getTaskUuid()
- * @method void setTaskUuid() setTaskUuid(string $taskUuid)
- *
  * @method integer getSegmentId() getSegmentId()
  * @method void setSegmentId() setSegmentId(int $segmentId)
  *

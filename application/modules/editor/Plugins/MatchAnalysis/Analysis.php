@@ -445,14 +445,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
 
-
+        $languageresource->load($languageResourceid);
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
         $resource = $manager->getResource($languageresource);
-        if ($languageresource->isMT()) {
-            $type = editor_Models_Segment_MatchRateType::TYPE_MT;
-        }
-        $matchAnalysis->setType($type);
+
+        $matchAnalysis->setType($languageresource->getResourceType());
         $isFuzzy = false;
         $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
         if (isset($matchRateResult) && is_object($matchRateResult)) {

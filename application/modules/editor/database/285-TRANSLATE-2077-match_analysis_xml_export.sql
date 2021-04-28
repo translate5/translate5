@@ -23,4 +23,4 @@
 
 ALTER TABLE `LEK_match_analysis` ADD COLUMN `type` varchar (64);
 ALTER TABLE `LEK_match_analysis_taskassoc` ADD COLUMN `uuid` varchar (64);
-ALTER TABLE translate5.LEK_match_analysis_taskassoc ADD finishedAt DATETIME DEFAULT CURRENT_TIMESTAMP NULL;
+ALTER TABLE `LEK_match_analysis_taskassoc` ADD finishedAt DATETIME DEFAULT CURRENT_TIMESTAMP NULL;
