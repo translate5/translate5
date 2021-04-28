@@ -250,6 +250,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                         'action' => 'replaceall'
                 ));
         $this->front->getRouter()->addRoute('editorReplaceallSegment', $replaceAllRoute);
+        
+        $replaceAllRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/segment/stateid/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'segment',
+                'action' => 'stateid'
+            ));
+        $this->front->getRouter()->addRoute('editorSegmentStateId', $replaceAllRoute);
 
         $authUserRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/user/authenticated/*',

@@ -46,40 +46,46 @@ Ext.define('Editor.controller.MetaPanel', {
       'Editor.store.quality.Segment' ],
   models: ['SegmentUserAssoc'],
   messages: {
+      stateIdSaved: '#UT#Der Segment Status wurde gespeichert'
   },
-  refs : [{
-    ref : 'metaPanel',
-    selector : '#metapanel'
+  refs: [{
+    ref: 'metaPanel',
+    selector: '#metapanel'
   },{
-    ref : 'metaTermPanel',
-    selector : '#metapanel #metaTermPanel'
+    ref: 'metaTermPanel',
+    selector: '#metapanel #metaTermPanel'
   },{
-    ref : 'metaQmPanel',
-    selector : '#metapanel #segmentQm'
+    ref: 'metaQmPanel',
+    selector: '#metapanel #segmentQm'
   },{
-    ref : 'metaFalPosPanel',
-    selector : '#metapanel #falsePositives'
+    ref: 'metaFalPosPanel',
+    selector: '#metapanel #falsePositives'
   },{
-    ref : 'segmentMeta',
-    selector : '#metapanel segmentsMetapanel'
+      ref: 'metaInfoForm',
+      selector: '#metapanel #metaInfoForm'
   },{
-    ref : 'leftBtn',
-    selector : '#metapanel #goAlternateLeftBtn'
+    ref: 'segmentMeta',
+    selector: '#metapanel segmentsMetapanel'
   },{
-    ref : 'rightBtn',
-    selector : '#metapanel #goAlternateRightBtn'
+    ref: 'leftBtn',
+    selector: '#metapanel #goAlternateLeftBtn'
   },{
-      ref : 'navi',
-      selector : '#metapanel #naviToolbar'
+    ref: 'rightBtn',
+    selector: '#metapanel #goAlternateRightBtn'
   },{
-    ref : 'segmentGrid',
-    selector : '#segmentgrid'
+      ref: 'navi',
+      selector: '#metapanel #naviToolbar'
+  },{
+    ref: 'segmentGrid',
+    selector: '#segmentgrid'
   }],
-  
   listen: {
       component: {
           '#metapanel #metaTermPanel': {
               afterrender: 'initMetaTermHandler'
+          },
+          '#metapanel segmentsMetapanel': {
+              segmentStateChanged: 'onSegmentStateChanged'
           },
           '#segmentgrid': {
               selectionchange: 'handleSegmentSelectionChange',
@@ -91,7 +97,7 @@ Ext.define('Editor.controller.MetaPanel', {
       },
       controller: {
           '#Editor': {
-              changeState: 'changeState'
+              changeSegmentState: 'onChangeSegmentState'
           }
       },
       store: {
@@ -176,6 +182,7 @@ Ext.define('Editor.controller.MetaPanel', {
         text: tooltip
     });
     me.record = record;
+    me.recordStateId = record.get('stateId');
     me.loadTermPanel(segmentId);
     me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
     // our component controllers are listening for the load event & create their views
@@ -236,6 +243,7 @@ Ext.define('Editor.controller.MetaPanel', {
       mp = me.getMetaPanel();
       me.editingMode = 'readonly';
       me.record = record;
+      me.recordStateId = record.get('stateId');
       me.getSegmentMeta().hide();
       mp.enable();
       me.getNavi().hide();
@@ -245,23 +253,18 @@ Ext.define('Editor.controller.MetaPanel', {
    * @param {Ext.data.Model} record
    */
   loadRecord: function(record) {
-      var metaPanel = this.getMetaPanel(),
-          metaForm = metaPanel.down('#metaInfoForm'),    
-          statBoxes = metaPanel.query('#metaStates radio');
-      Ext.each(statBoxes, function(box){
-          box.setValue(false);
-      });
-      metaForm.loadRecord(record);
+      // this is only done to be able in the component to detect if a change was done programmatically or user generated
+      // the afterwards loading of the recordstriggers the onChange in the radio controls
+      this.getSegmentMeta().setSegmentStateId(record.get('stateId'));
+      this.getMetaInfoForm().loadRecord(record);
   },
   /**
    * Editor.view.segments.RowEditing edit handler, Speichert die Daten aus dem MetaPanel im record
    */
   saveEdit: function() {
-      var metaPanel = this.getMetaPanel(),
-          metaForm = metaPanel.down('#metaInfoForm');
-      this.record.set('stateId', metaForm.getValues().stateId);
+      this.record.set('stateId', this.getMetaInfoForm().getValues().stateId);
       //close the metapanel
-      metaPanel.disable();
+      this.getMetaPanel().disable();
       this.getMetaFalPosPanel().endEditing(true, true);
       this.getMetaQmPanel().endEditing(this.hasQmQualities, true);
       this.getQualitiesStore().removeAll(true);
@@ -272,6 +275,12 @@ Ext.define('Editor.controller.MetaPanel', {
    * @hint metapanel
    */
   cancelEdit: function() {
+      // the record may not be set since cancelEdit is "misused" from the comment Panel to deactivate the view
+      // this is SOO Ugly, the record is reset when editing is canceled and we have to reset the segments stateId when it was changed by our
+      // TODO FIXME: how can we prevent the stateId is reset when canceling editing ?
+      if(this.record && this.recordStateId !== undefined && this.recordStateId != this.record.get('stateId')){
+          this.record.set('stateId', this.recordStateId);
+      }
       this.getMetaPanel().disable();
       this.getMetaFalPosPanel().endEditing(true, false);
       this.getMetaQmPanel().endEditing(this.hasQmQualities, false);
@@ -280,17 +289,37 @@ Ext.define('Editor.controller.MetaPanel', {
   },
   /**
    * Changes the state box by keyboard shortcut instead of mouseclick
+   * we do no set the stateId before to trigger a change event
    * @param {Ext.Number} param
    */
-  changeState: function(param) {
-    var me = this,
-        mp = me.getMetaPanel(),
-        index = 1,
-        statBoxes = mp.query('#metaStates radio');
-    Ext.each(statBoxes, function(box){
-        if (index++ == param){
-            box.setValue(true);
-        }
-    });
-  }  
+  onChangeSegmentState: function(stateId) {
+      this.getSegmentMeta().showSegmentStateId(stateId);
+  },
+  /**
+   * Listenes for segment state changes thrown from MetaPanel.js
+   */
+  onSegmentStateChanged: function(stateId, oldStateId){
+      var me = this;
+      Ext.Ajax.request({
+          url: Editor.data.restpath+'segment/stateid',
+          method: 'GET',
+          params: { id: me.record.get('id'), stateId: stateId },
+          success: function(response){
+              response = Ext.util.JSON.decode(response.responseText);
+              if(response.success){
+                  me.record.set('stateId', stateId);
+                  me.recordStateId = stateId;
+                  Editor.MessageBox.addSuccess(me.messages.stateIdSaved);
+              } else {
+                  console.log("Changing segments stateId via Ajax failed!");
+                  var statePanel = me.getSegmentMeta();
+                  statePanel.setSegmentStateId(oldStateId);
+                  statePanel.showSegmentStateId(oldStateId);
+              }
+          },
+          failure: function(response){
+              Editor.app.getController('ServerException').handleException(response);
+          }
+      });
+  }
 });

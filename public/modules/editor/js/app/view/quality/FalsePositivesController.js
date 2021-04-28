@@ -43,6 +43,9 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
             }
         }
     },
+    messages: {
+        falsePositiveUpdated: '#UT#Der False-Positive Status wurde aktualisiert'
+    },
     falsePositiveCssClass: 't5qfalpos', // as defined in editor_segment_Tag::CSS_CLASS_FALSEPOSITIVE. TODO FIXME: better add to Editor.data ?
     qualityIdDataName: 't5qid', // as defined in editor_segment_Tag::DATA_NAME_QUALITYID. TODO FIXME: better add to Editor.data ?
     /**
@@ -55,7 +58,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
      * Handler to sync the new state with the server (to catch false positives without tags) & add decorations in the editor
      */
     onFalsePositiveChanged: function(checkbox, checked){
-        var qualityId = checkbox.inputValue, record = checkbox.qrecord, falsePositiveVal = (checked) ? 1 : 0;
+        var me = this, qualityId = checkbox.inputValue, record = checkbox.qrecord, falsePositiveVal = (checked) ? 1 : 0;
         // if there are tags in the editor we need to decorate them (otherwise saving the editor would set the falsePositive value back to it's original state!)
         if(record.get('hasTag') && !this.decorateFalsePositive(record, qualityId, checked)){
             // TODO AutoQA: what to do here ?
@@ -67,6 +70,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
             params: { id: qualityId, falsePositive: falsePositiveVal },
             success: function(response){
                 record.set('falsePositive', falsePositiveVal); // updating store is currently meaningless but that may changes later on ...
+                Editor.MessageBox.addSuccess(me.messages.falsePositiveUpdated);
             },
             failure: function(response){
                 Editor.app.getController('ServerException').handleException(response);

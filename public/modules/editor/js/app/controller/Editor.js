@@ -1005,7 +1005,7 @@ Ext.define('Editor.controller.Editor', {
         if(param === 0){
             return false;
         }
-        this.fireEvent('changeState', param);
+        this.fireEvent('changeSegmentState', param);
         e.stopEvent();
         return false;
     },
