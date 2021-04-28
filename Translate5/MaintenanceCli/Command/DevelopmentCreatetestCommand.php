@@ -306,7 +306,6 @@ $json = <<<EOF
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;empty",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "4",
         "fileOrder": "0",

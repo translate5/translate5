@@ -295,8 +295,6 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
             throw new Zend_Exception('MQM Tag found, but no quality-id (data-t5qid) was set in: '.$this->renderStart());
         } else if($this->categoryIndex == -1){
             throw new Zend_Exception('MQM Tag found, but no type index was set in: '.$this->renderStart());
-        } else if($this->severity == ''){
-            throw new Zend_Exception('MQM Tag found, but no severity was set in: '.$this->renderStart());
         }
     }
     /**
