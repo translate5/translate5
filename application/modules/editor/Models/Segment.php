@@ -1132,6 +1132,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         }
     }
 
+    public function resetRepeatedfilter()
+    {
+        if($repetiton = $this->entity->getFilter()->hasFilter('repetiton',$repetiton)){
+            $this->entity->getFilter()->deleteFilter('repetiton');
+        }
+    }
+
     /**
      * encapsulate the load by taskGuid code.
      * @param string $taskGuid
@@ -1164,16 +1171,23 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
 
-
         if($repetition){
-
             $s->where($this->tableName . '.sourceMd5 IN((select sourceMd5 from '.$this->tableName.' group by sourceMd5 having count(*) > 1))');
+            $s->orWhere($this->tableName . '.targetMd5 IN((select targetMd5 from '.$this->tableName.' group by targetMd5 having count(*) > 1))');
         }
+
         if (!empty($callback)) {
             $callback($s, $this->tableName);
         }
 
         return parent::loadFilterdCustom($s);
+    }
+
+    public function resetRepetition($repetiton){
+        if($repetiton = $this->getFilter()->hasFilter('repetiton',$repetiton)){
+            $this->getFilter()->deleteFilter('repetiton');
+        }
+        return $repetiton;
     }
 
     /**
@@ -1525,14 +1539,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         or (targetMd5 = ? and target != \'\' and target IS NOT NULL))
         and taskGuid = ? and editable = 1
     order by fileOrder, id';
-    }
-
-
-    protected function _getRepetitionSql(string $viewName)
-    {
-        $sql = 'select * from  ' . $viewName . '
-        where sourceMd5 in (select sourceMd5 from  ' . $viewName . ' group by sourceMd5 having count(*) > 1);';
-        return $sql;
     }
 
     /**

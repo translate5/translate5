@@ -184,6 +184,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     icon: Editor.data.moduleFolder+'images/show_bookmarks.png'
                 },{
                     xtype: 'button',
+                    glyph: 'f01e@FontAwesome5FreeSolid',
                     itemId: 'filterBtnRepeated',
                     enableToggle: true,
                     tooltip: {
