@@ -75,7 +75,6 @@ Ext.define('Editor.controller.Segments', {
         noSegmentToFilter: 'Kein Segment dieser Datei entspricht den Filterkriterien',
         otherFiltersActive: '#UT#ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind'
     },
-    repeatedSegmentsUrl: '',
     /**
      * Cache der Zuordnung fileId => Grid Index des ersten Segments der Datei.
      */
@@ -320,14 +319,7 @@ Ext.define('Editor.controller.Segments', {
             store = me.getStore('Segments'),
             segmentStore = me.getSegmentGrid().getStore(),
             segmentsProxy = segmentStore.getProxy();
-        console.log(me.repetitions);
-        if (!me.repetitions) {
-            me.repetitions = true;
-            params = {repetiton: true};
-        } else {
-            me.repetitions = false;
-            params = {repetiton: false};
-        }
+            params = {};
 
 
         if (me.isDisabled) {
@@ -338,13 +330,16 @@ Ext.define('Editor.controller.Segments', {
         params[segmentsProxy.getSortParam()] = segmentsProxy.encodeSorters(segmentStore.getSorters().items);
         //stop loading first!
         store.getProxy().abort();
-        store.load({
-            url: me.repeatedSedmentsUrl,
-            params: params,
-            //prevent default ServerException handling
-            preventDefaultHandler: true,
-
-        });
+        if(me.repetitions){
+            store.removeFilter('repetiton');
+        }else{
+            store.addFilter({
+                "operator":"eq",
+                "value":me.repetitions,
+                "property":"repetiton"
+            });
+        }
+        store.load();
 
     },
     /**
