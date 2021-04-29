@@ -1,8 +1,5 @@
-DELETE FROM LEK_terms WHERE termEntryId IS NULL;
-DELETE lekTerms FROM LEK_terms lekTerms
-LEFT JOIN LEK_languageresources leklang ON leklang.id = lekTerms.collectionId
-WHERE leklang.id IS NULL;
-
+# DELETE FROM LEK_terms WHERE termEntryId IS NULL;
+# No delete  all termEntries without termEntryId,-> create new termEntries in LEK_term_entry and associate to Lek_Term table???
 ALTER TABLE terms_term_entry ADD tmpOldId int(11) NOT NULL;
 CREATE INDEX idx_tmpOldId_te ON terms_term_entry (tmpOldId);
 
