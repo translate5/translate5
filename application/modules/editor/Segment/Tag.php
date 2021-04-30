@@ -83,7 +83,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @throws Exception
      * @return editor_Segment_Tag
      */
-    public static function fromJson($jsonString) : editor_Segment_Tag {
+    public static function fromJson(string $jsonString) : editor_Segment_Tag {
         try {
             $data = json_decode($jsonString);
             return editor_Segment_TagCreator::instance()->fromJsonData($data);
@@ -572,5 +572,13 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
                 }
             }
         }
+    }
+    /**
+     * This API finishes the Field Tags generation. It is the final step and finishing work can be made here, e.g. the evaluation of task specific data
+     * @param editor_Segment_FieldTags $tags
+     * @param editor_Models_task $task
+     */
+    public function finalize(editor_Segment_FieldTags $tags, editor_Models_task $task){
+        
     }
 }

@@ -12,7 +12,7 @@
   "comments": null,
   "workflowStepNr": "1",
   "workflowStep": "reviewing",
-  "source": "<div title=\"\" class=\"term preferredTerm exact transNotDefined\" data-tbxid=\"term_NOT_TESTABLE\">Apache</div> 2.x on Unix systems",
+  "source": "<div title=\"\" class=\"term preferredTerm exact transNotDefined\">Apache</div> 2.x on Unix systems",
   "sourceMd5": "7c672e73fab402d8d99addec970a47b6",
   "sourceToSort": "Apache 2.x on Unix systems",
   "target": "",

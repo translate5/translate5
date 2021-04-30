@@ -184,13 +184,13 @@ class editor_Segment_Tags implements JsonSerializable {
         $hasOriginalSource = ($sourceEditingEnabled) ? (!$this->isImport || $this->segment->get($sourceFieldEditIndex) != $this->segment->get($sourceField)) : false;
         if($hasOriginalSource){
             // original source (what is the source in all other cases)
-            $this->sourceOriginal = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $sourceField, 'SourceOriginal');
+            $this->sourceOriginal = new editor_Segment_FieldTags($this->task, $this->segmentId, $sourceField, $this->segment->get($sourceField), $sourceField, 'SourceOriginal');
             // source here is the editable source
-            $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
+            $this->source = new editor_Segment_FieldTags($this->task, $this->segmentId, $sourceField, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
         } else {
             // on import with enabled source editing, we copy the source as editedSource as well
             $saveTo = ($sourceEditingEnabled) ? [$sourceField, $sourceFieldEditIndex] : $sourceField;
-            $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $saveTo, $sourceField);
+            $this->source = new editor_Segment_FieldTags($this->task, $this->segmentId, $sourceField, $this->segment->get($sourceField), $saveTo, $sourceField);
         }
         $this->targets = [];
         
@@ -200,7 +200,7 @@ class editor_Segment_Tags implements JsonSerializable {
             // TODO: this is not compliant with the multitarget tasks but can only be changed when the code in the AlikesegmentConroller is multifield capable
             $firstTarget = $fieldManager->getFirstTargetName();
             $editIndex = $fieldManager->getEditIndex($firstTarget);
-            $target = new editor_Segment_FieldTags($this->segmentId, $firstTarget, $this->segment->get($editIndex), $editIndex, $editIndex);
+            $target = new editor_Segment_FieldTags($this->task, $this->segmentId, $firstTarget, $this->segment->get($editIndex), $editIndex, $editIndex);
             $this->targets[] = $target;
             $this->targetOriginal = $target;
             $this->targetOriginalIdx = 0;
@@ -213,22 +213,22 @@ class editor_Segment_Tags implements JsonSerializable {
                     $editIndex = $fieldManager->getEditIndex($field->name);
                     // special when we have an import but the fields are different this might is
                     if($this->isImport && $this->segment->get($field->name) != $this->segment->get($editIndex)){
-                        $target = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
+                        $target = new editor_Segment_FieldTags($this->task, $this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
                         $this->targets[] = $target;
                         if($this->targetOriginal == null){
                             $this->targetOriginal = $target;
                             $this->targetOriginalIdx = count($this->targets);
                         }
-                        $this->targets[] = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($editIndex), $editIndex, $editIndex);
+                        $this->targets[] = new editor_Segment_FieldTags($this->task, $this->segmentId, $field->name, $this->segment->get($editIndex), $editIndex, $editIndex);
                     } else {
                         // when importing, the field will be saved as edit field & as normal field
                         $saveTo = ($this->isImport) ? [$field->name, $editIndex] : $editIndex;
                         // the field name sent to the termtagger differs between import and editing (WHY?)
                         $ttField = ($this->isImport) ? $field->name : $editIndex;
-                        $this->targets[] = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($editIndex), $saveTo, $ttField);
+                        $this->targets[] = new editor_Segment_FieldTags($this->task, $this->segmentId, $field->name, $this->segment->get($editIndex), $saveTo, $ttField);
                         // the first target will be the original target as needed for some Quality checks
                         if($this->targetOriginal == null){
-                            $this->targetOriginal = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
+                            $this->targetOriginal = new editor_Segment_FieldTags($this->task, $this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
                         }
                     }
                 }
@@ -558,19 +558,19 @@ class editor_Segment_Tags implements JsonSerializable {
     private function initFromJson(stdClass $data){
         try {
             $this->segmentId = $data->segmentId;
-            $this->source = ($data->source) ? editor_Segment_FieldTags::fromJsonData($data->source) : NULL;
+            $this->source = ($data->source) ? editor_Segment_FieldTags::fromJsonData($this->task, $data->source) : NULL;
             $this->targets = [];
             foreach($data->targets as $targetData){
-                $this->targets[] = editor_Segment_FieldTags::fromJsonData($targetData);
+                $this->targets[] = editor_Segment_FieldTags::fromJsonData($this->task, $targetData);
             }
             if(!$this->isImport && $this->task->getEnableSourceEditing() && $data->sourceOriginal){
-                $this->sourceOriginal = editor_Segment_FieldTags::fromJsonData($data->sourceOriginal);
+                $this->sourceOriginal = editor_Segment_FieldTags::fromJsonData($this->task, $data->sourceOriginal);
             }
             if(property_exists($data, 'targetOriginalIdx')){
                 $this->targetOriginalIdx = $data->targetOriginalIdx;
                 $this->targetOriginal = $this->targets[$this->targetOriginalIdx];
             } else if(property_exists($data, 'targetOriginal')){
-                $this->targetOriginal = editor_Segment_FieldTags::fromJsonData($data->targetOriginal);
+                $this->targetOriginal = editor_Segment_FieldTags::fromJsonData($this->task, $data->targetOriginal);
             }
         } catch (Exception $e) {
             throw new Exception('Deserialization of editor_Segment_Tags from JSON-Object failed because of invalid data: '.json_encode($data));

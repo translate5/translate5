@@ -26,11 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/*
+
+critical qmflag ownttip open => open critical qmflag ownttip
+critical qmflag ownttip close => close critical qmflag ownttip
+
+
+*/
 /**
  * BasicSegmentEditingTest imports a simple task, checks imported values,
  * edits segments and checks then the edited ones again on correct content
  */
-class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
+class BasicSegmentEditingTest extends editor_Test_Segment {
+    
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
@@ -98,8 +106,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
             $this->assertEquals('manager test', $segment->userName);
             if($segment->mid === '4'){
                 $this->assertEquals('0', $segment->editable);
-            }
-            else{
+            } else {
                 $this->assertEquals('1', $segment->editable);
             }
             $this->assertEquals(0, $segment->stateId);
@@ -111,11 +118,10 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
             $this->assertObjectNotHasAttribute('sourceEditToSort', $segment);
         }
         
-        $firstSegment = $this->api()->removeUntestableSegmentContent(reset($segments));
+        $firstSegment = $this->cleanSegmentObject(reset($segments));
         $this->assertEquals(1, $firstSegment->segmentNrInTask);
         $this->assertEquals(1, $firstSegment->mid);
-        
-        $this->assertEquals('This file is <div title="" class="term preferredTerm exact transNotFound" data-tbxid="term_NOT_TESTABLE">a</div> based on <div title="" class="term preferredTerm exact transNotFound" data-tbxid="term_NOT_TESTABLE">a</div> part of the php-online-Documentation. It\'s translation is done by <div title="" class="term preferredTerm exact transNotFound" data-tbxid="term_NOT_TESTABLE">a</div> pretranslation based on <div title="" class="term preferredTerm exact transNotFound" data-tbxid="term_NOT_TESTABLE">a</div> very fast winalign-Project and is not at all state of the translation art. It\'s only purpose is the generation of demo-data for translate5.', $firstSegment->source);
+        $this->assertFieldTextEquals('This file is <div title="" class="term preferredTerm exact transNotFound">a</div> based on <div title="" class="term preferredTerm exact transNotFound">a</div> part of the php-online-Documentation. It\'s translation is done by <div title="" class="term preferredTerm exact transNotFound">a</div> pretranslation based on <div title="" class="term preferredTerm exact transNotFound">a</div> very fast winalign-Project and is not at all state of the translation art. It\'s only purpose is the generation of demo-data for translate5.', $firstSegment->source);
         $this->assertEquals('da37e24323d2953c3b48c82cd6e50d71', $firstSegment->sourceMd5);
         $this->assertEquals("This file is a based on a part of the php-online-Documentation. It's translation is done by a pretranslation based on a very fast winalign-Project and is not at all state of the translation art. It's only purpose is the generation of demo-data for translate5.", $firstSegment->sourceToSort);
         $this->assertEquals('Diese Datei ist Teil der php-online-Dokumentation. Ihre Übersetzung ist durch eine Vorübersetzung entstanden, die auf einem sehr schnell durchgeführten winalign-Project basiert und in keiner Art und Weise dem State of the Art eines Übersetzungsprojekts entspricht. Sein einziger Zweck ist die Erzeugung von Demo-Daten für translate5. ',$firstSegment->target);
@@ -124,9 +130,9 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals($firstSegment->targetToSort, $firstSegment->targetEditToSort);
         $this->assertEquals('74d85bd308aa69f558af1a3a9f1f2dae', $firstSegment->targetMd5);
         
-        $tenthSegment = $this->api()->removeUntestableSegmentContent($segments[9]);
+        $tenthSegment = $this->cleanSegmentObject($segments[9]);
         
-        $this->assertEquals('<div title="" class="term preferredTerm exact transNotDefined" data-tbxid="term_NOT_TESTABLE">Apache</div> 2.x on Unix systems.', $tenthSegment->source);
+        $this->assertFieldTextEquals('<div title="" class="term preferredTerm exact transNotDefined">Apache</div> 2.x on Unix systems.', $tenthSegment->source);
         $this->assertEquals('3471de7d2538cd261d744f828d9231c5', $tenthSegment->sourceMd5);
         $this->assertEquals('Apache 2.x on Unix systems.', $tenthSegment->sourceToSort);
         $this->assertEmpty($tenthSegment->target);
@@ -135,15 +141,15 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEmpty($tenthSegment->targetEditToSort);
         $this->assertEquals('d41d8cd98f00b204e9800998ecf8427e', $tenthSegment->targetMd5);
         
-        $spaceTestSegment = $this->api()->removeUntestableSegmentContent($segments[10]);
+        $spaceTestSegment = $this->cleanSegmentObject($segments[10]);
         $this->assertEquals(11, $spaceTestSegment->segmentNrInTask);
         $this->assertEquals(11, $spaceTestSegment->mid);
-        $this->assertEquals('Test multiple <div class="single 73706163652074733d223230323022206c656e6774683d2232222f space internal-tag ownttip"><span title="&lt;1/&gt;: 2 whitespace characters" class="short">&lt;1/&gt;</span><span data-originalid="space" data-length="2" class="full">··</span></div>Spaces<div class="single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip"><span title="&lt;2/&gt;: 1 tab character" class="short">&lt;2/&gt;</span><span data-originalid="tab" data-length="1" class="full">→</span></div>and<div class="single 7461622074733d223039303922206c656e6774683d2232222f tab internal-tag ownttip"><span title="&lt;3/&gt;: 2 tab characters" class="short">&lt;3/&gt;</span><span data-originalid="tab" data-length="2" class="full">→→</span></div>tabs <div class="single 73706163652074733d22323022206c656e6774683d2231222f space internal-tag ownttip"><span title="&lt;4/&gt;: 1 whitespace character" class="short">&lt;4/&gt;</span><span data-originalid="space" data-length="1" class="full">·</span></div>in <div class="single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip"><span title="&lt;5/&gt;: 1 tab character" class="short">&lt;5/&gt;</span><span data-originalid="tab" data-length="1" class="full">→</span></div>different combinations!', $spaceTestSegment->source);
+        $this->assertFieldTextEquals('Test multiple <div class="single 73706163652074733d223230323022206c656e6774683d2232222f space internal-tag ownttip"><span title="&lt;1/&gt;: 2 whitespace characters" class="short">&lt;1/&gt;</span><span data-originalid="space" data-length="2" class="full">··</span></div>Spaces<div class="single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip"><span title="&lt;2/&gt;: 1 tab character" class="short">&lt;2/&gt;</span><span data-originalid="tab" data-length="1" class="full">→</span></div>and<div class="single 7461622074733d223039303922206c656e6774683d2232222f tab internal-tag ownttip"><span title="&lt;3/&gt;: 2 tab characters" class="short">&lt;3/&gt;</span><span data-originalid="tab" data-length="2" class="full">→→</span></div>tabs <div class="single 73706163652074733d22323022206c656e6774683d2231222f space internal-tag ownttip"><span title="&lt;4/&gt;: 1 whitespace character" class="short">&lt;4/&gt;</span><span data-originalid="space" data-length="1" class="full">·</span></div>in <div class="single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip"><span title="&lt;5/&gt;: 1 tab character" class="short">&lt;5/&gt;</span><span data-originalid="tab" data-length="1" class="full">→</span></div>different combinations!', $spaceTestSegment->source);
         $this->assertEquals('1eae32504f33d67ff128325a3d576658', $spaceTestSegment->sourceMd5);
         $this->assertEquals('Test multiple Spacesandtabs in different combinations!', $spaceTestSegment->sourceToSort);
-        $this->assertEquals('Teste mehrere <div class="single 73706163652074733d223230323022206c656e6774683d2232222f space internal-tag ownttip"><span title="&lt;1/&gt;: 2 whitespace characters" class="short">&lt;1/&gt;</span><span data-originalid="space" data-length="2" class="full">··</span></div>Leerzeichen<div class="single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip"><span title="&lt;2/&gt;: 1 tab character" class="short">&lt;2/&gt;</span><span data-originalid="tab" data-length="1" class="full">→</span></div>und<div class="single 7461622074733d223039303922206c656e6774683d2232222f tab internal-tag ownttip"><span title="&lt;3/&gt;: 2 tab characters" class="short">&lt;3/&gt;</span><span data-originalid="tab" data-length="2" class="full">→→</span></div>Tabulatoren <div class="single 73706163652074733d22323022206c656e6774683d2231222f space internal-tag ownttip"><span title="&lt;4/&gt;: 1 whitespace character" class="short">&lt;4/&gt;</span><span data-originalid="space" data-length="1" class="full">·</span></div>in <div class="single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip"><span title="&lt;5/&gt;: 1 tab character" class="short">&lt;5/&gt;</span><span data-originalid="tab" data-length="1" class="full">→</span></div>verschiedenen Kombinationen!', $spaceTestSegment->target);
+        $this->assertFieldTextEquals('Teste mehrere <div class="single 73706163652074733d223230323022206c656e6774683d2232222f space internal-tag ownttip"><span title="&lt;1/&gt;: 2 whitespace characters" class="short">&lt;1/&gt;</span><span data-originalid="space" data-length="2" class="full">··</span></div>Leerzeichen<div class="single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip"><span title="&lt;2/&gt;: 1 tab character" class="short">&lt;2/&gt;</span><span data-originalid="tab" data-length="1" class="full">→</span></div>und<div class="single 7461622074733d223039303922206c656e6774683d2232222f tab internal-tag ownttip"><span title="&lt;3/&gt;: 2 tab characters" class="short">&lt;3/&gt;</span><span data-originalid="tab" data-length="2" class="full">→→</span></div>Tabulatoren <div class="single 73706163652074733d22323022206c656e6774683d2231222f space internal-tag ownttip"><span title="&lt;4/&gt;: 1 whitespace character" class="short">&lt;4/&gt;</span><span data-originalid="space" data-length="1" class="full">·</span></div>in <div class="single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip"><span title="&lt;5/&gt;: 1 tab character" class="short">&lt;5/&gt;</span><span data-originalid="tab" data-length="1" class="full">→</span></div>verschiedenen Kombinationen!', $spaceTestSegment->target);
         $this->assertEquals('Teste mehrere LeerzeichenundTabulatoren in verschiedenen Kombinationen!', $spaceTestSegment->targetToSort);
-        $this->assertEquals('Teste mehrere <div class="single 73706163652074733d223230323022206c656e6774683d2232222f space internal-tag ownttip"><span title="&lt;1/&gt;: 2 whitespace characters" class="short">&lt;1/&gt;</span><span data-originalid="space" data-length="2" class="full">··</span></div>Leerzeichen<div class="single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip"><span title="&lt;2/&gt;: 1 tab character" class="short">&lt;2/&gt;</span><span data-originalid="tab" data-length="1" class="full">→</span></div>und<div class="single 7461622074733d223039303922206c656e6774683d2232222f tab internal-tag ownttip"><span title="&lt;3/&gt;: 2 tab characters" class="short">&lt;3/&gt;</span><span data-originalid="tab" data-length="2" class="full">→→</span></div>Tabulatoren <div class="single 73706163652074733d22323022206c656e6774683d2231222f space internal-tag ownttip"><span title="&lt;4/&gt;: 1 whitespace character" class="short">&lt;4/&gt;</span><span data-originalid="space" data-length="1" class="full">·</span></div>in <div class="single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip"><span title="&lt;5/&gt;: 1 tab character" class="short">&lt;5/&gt;</span><span data-originalid="tab" data-length="1" class="full">→</span></div>verschiedenen Kombinationen!', $spaceTestSegment->targetEdit);
+        $this->assertFieldTextEquals('Teste mehrere <div class="single 73706163652074733d223230323022206c656e6774683d2232222f space internal-tag ownttip"><span title="&lt;1/&gt;: 2 whitespace characters" class="short">&lt;1/&gt;</span><span data-originalid="space" data-length="2" class="full">··</span></div>Leerzeichen<div class="single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip"><span title="&lt;2/&gt;: 1 tab character" class="short">&lt;2/&gt;</span><span data-originalid="tab" data-length="1" class="full">→</span></div>und<div class="single 7461622074733d223039303922206c656e6774683d2232222f tab internal-tag ownttip"><span title="&lt;3/&gt;: 2 tab characters" class="short">&lt;3/&gt;</span><span data-originalid="tab" data-length="2" class="full">→→</span></div>Tabulatoren <div class="single 73706163652074733d22323022206c656e6774683d2231222f space internal-tag ownttip"><span title="&lt;4/&gt;: 1 whitespace character" class="short">&lt;4/&gt;</span><span data-originalid="space" data-length="1" class="full">·</span></div>in <div class="single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip"><span title="&lt;5/&gt;: 1 tab character" class="short">&lt;5/&gt;</span><span data-originalid="tab" data-length="1" class="full">→</span></div>verschiedenen Kombinationen!', $spaceTestSegment->targetEdit);
         $this->assertEquals('Teste mehrere LeerzeichenundTabulatoren in verschiedenen Kombinationen!', $spaceTestSegment->targetEditToSort);
         $this->assertEquals('d58e6850103721a3c3122b6536f0ec79', $spaceTestSegment->targetMd5);
         
@@ -165,11 +171,11 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
         //check direct PUT result
-        $this->assertSegmentContentToFile('testSegmentEditing-assert-seg3.json', $segment);
+        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg3.json', $segment);
         
         //check again with GET fresh from server
         $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id);
-        $this->assertSegmentContentToFile('testSegmentEditing-assert-seg3.json', $segment);
+        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg3.json', $segment);
         
         //test editing an empty segment
         $segToTest = $segments[6];
@@ -177,27 +183,27 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
         //check direct PUT result
-        $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7.json', $segment);
+        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7.json', $segment);
         
         //check again with GET fresh from server
         $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id);
-        $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7.json', $segment);
+        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7.json', $segment);
         
-        // check correction of overpapped QM Tags (only when there is no contents between them)
+        // check correction of overpapped QM Tags (only when there is no contents between them) For this, proper t5qid's are required
         $segToTest = $segments[6];
-        $tag1_open = '<img class="critical qmflag ownttip open qmflag-19" data-t5qid="497" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" />';
-        $tag1_close = '<img class="critical qmflag ownttip close qmflag-19" data-t5qid="497" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" />';
-        $tag2_open = '<img class="critical qmflag ownttip open qmflag-4" data-t5qid="498" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" />';
-        $tag2_close = '<img class="critical qmflag ownttip close qmflag-4" data-t5qid="498" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
+        $tag1_open = '<img class="open critical qmflag ownttip qmflag-19" data-t5qid="1" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" />';
+        $tag1_close = '<img class="close critical qmflag ownttip qmflag-19" data-t5qid="1" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" />';
+        $tag2_open = '<img class="open critical qmflag ownttip qmflag-4" data-t5qid="2" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" />';
+        $tag2_close = '<img class="close critical qmflag ownttip qmflag-4" data-t5qid="2" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $tag1_open.'Apache 2.x'.$tag2_open.$tag1_close.' auf'.$tag2_close.' Unix-Systemen', $segToTest->id);
         $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
         //check direct PUT result
-        $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7-a.json', $segment);
+        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-a.json', $segment);
         
         //check again with GET fresh from server
         $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id);
-        $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7-a.json', $segment);
+        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-a.json', $segment);
         
         // check for overpapped QM Tags with contents between them. They must be not corrected on saving.
         $segToTest = $segments[6];
@@ -205,11 +211,11 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
         //check direct PUT result
-        $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7-b.json', $segment);
+        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-b.json', $segment);
         
         //check again with GET fresh from server
         $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id);
-        $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7-b.json', $segment);
+        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-b.json', $segment);
         
         $segToTest = $segments[7];
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'edited by a test', $segToTest->id);

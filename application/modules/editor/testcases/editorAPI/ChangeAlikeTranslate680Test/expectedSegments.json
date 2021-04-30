@@ -334,7 +334,7 @@
         "targetToSort": "",
         "targetEdit": "<div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;1\/&gt;: Newline\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"softReturn\" data-length=\"1\" class=\"full\">\u21b5<\/span><\/div>Test",
         "targetEditToSort": "Test",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_13\":{\"nr\":\"13\",\"length\":{\"targetEdit\":5}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_13\":{\"nr\":\"13\",\"length\":{\"targetEdit\":4}}}}",
         "isWatched": false
     },
     {
@@ -386,7 +386,7 @@
         "targetToSort": "",
         "targetEdit": "<div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;1\/&gt;: Newline\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"softReturn\" data-length=\"1\" class=\"full\">\u21b5<\/span><\/div>Test",
         "targetEditToSort": "Test",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_15\":{\"nr\":\"15\",\"length\":{\"targetEdit\":5}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_15\":{\"nr\":\"15\",\"length\":{\"targetEdit\":4}}}}",
         "isWatched": false
     },
     {
@@ -464,7 +464,7 @@
         "targetToSort": "Testword",
         "targetEdit": "<div class=\"open 70 internal-tag ownttip\"><span title=\"&lt;p&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;p&gt;<\/span><\/div>Test<div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Non breaking space\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div>word<div class=\"close 2f70 internal-tag ownttip\"><span title=\"&lt;\/p&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;\/p&gt;<\/span><\/div>",
         "targetEditToSort": "Testword",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_18\":{\"nr\":\"18\",\"length\":{\"targetEdit\":9}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_18\":{\"nr\":\"18\",\"length\":{\"targetEdit\":8}}}}",
         "isWatched": false
     },
     {
@@ -490,7 +490,7 @@
         "targetToSort": "Testword",
         "targetEdit": "<div class=\"open 62 internal-tag ownttip\"><span title=\"&lt;b&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;b&gt;<\/span><\/div>Test<div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Non breaking space\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div>word<div class=\"close 2f62 internal-tag ownttip\"><span title=\"&lt;\/b&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;\/b&gt;<\/span><\/div>",
         "targetEditToSort": "Testword",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_19\":{\"nr\":\"19\",\"length\":{\"targetEdit\":9}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_19\":{\"nr\":\"19\",\"length\":{\"targetEdit\":8}}}}",
         "isWatched": false
     },
     {

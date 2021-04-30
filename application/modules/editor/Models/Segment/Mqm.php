@@ -66,6 +66,7 @@ class editor_Models_Segment_Mqm {
                 continue;
             }
             //<img  class="critical qmflag ownttip open qmflag-1" data-t5qid="412" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-left.png" />
+            $matches = [];
             preg_match('#<img[^>]+(class="([^"]*(qmflag-([0-9]+)[^"]*))"[^>]+data-comment="([^"]*)")|(data-comment="([^"]*)"[^>]+class="([^"]*(qmflag-([0-9]+)[^"]*))")[^>]*>#i', $part, $matches);
             $cnt = count($matches);
             if($cnt < 6) {

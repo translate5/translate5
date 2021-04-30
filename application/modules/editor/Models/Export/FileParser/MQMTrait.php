@@ -38,15 +38,6 @@ trait editor_Models_Export_FileParser_MQMTrait {
      * @var string
      */
     private  $_user;
-    
-    
-    /**
-     * Set in convertQmTags2XliffFormat() and used by _addXlifQmTag()
-     * 
-     * @var array 
-     */
-    private  $_issues = array();
-    
     /**
      * Set in convertQmTags2XliffFormat() and used by it and id's calees
      *
@@ -96,8 +87,7 @@ trait editor_Models_Export_FileParser_MQMTrait {
      * @return string
      */
     protected function convertQmTags2XliffFormat($segment){
-        $flags = $this->_task->getQmSubsegmentFlags();
-        if(empty($flags)){
+        if(editor_Segment_Mqm_Configuration::instance($this->_task)->isEmpty()){
             return $segment;
         }
         $split = preg_split('"(<img[^>]+class=\"[^\"]*qmflag[^\"]*\"[^>]*>)"', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
@@ -113,8 +103,6 @@ trait editor_Models_Export_FileParser_MQMTrait {
             }
             return implode('', $split);
         }
-
-        $this->_issues = $this->_task->getMqmTypesFlat();
         $this->_user = $this->_segmentEntity->getUserName();
         $this->_stack = array();
         
@@ -252,9 +240,11 @@ trait editor_Models_Export_FileParser_MQMTrait {
     	$data['type'] = ($this->_isImageTag($img, 'open')) ? 'open' : 'close';
     	$data['id'] = $this->_getImgTagAttr($img, 'data-t5qid', true);
     	if ($data['type'] == 'open') {
-            $data['class'] = $this->_getImgTagAttr($img, 'class');
+    	    $classes = array_map('trim', explode(' ', $this->_getImgTagAttr($img, 'class')));
+    	    $data['class'] = implode(' ', $classes);
             $data['comment'] = $this->_getImgTagAttr($img, 'data-comment', false, false);
             $data['severity'] = preg_replace('"^\s*([^ ]+) .*$"', '\\1', $data['class']);
+            $data['severity'] = editor_Segment_Mqm_Configuration::instance($this->_task)->findMqmSeverity($classes);
             $this->_checkImageTag('severity', $data['severity'], $data['class']);
             $data['issueId'] = preg_replace('"^.*qmflag-(\d+).*$"', '\\1', $data['class']);
             $this->_checkImageTag('issueId', $data['issueId'], $data['class']);
@@ -274,12 +264,12 @@ trait editor_Models_Export_FileParser_MQMTrait {
             'data' => $data
     	];
     	if($data['type'] == 'open') {
-            $issue = $this->_issues[$data['issueId']];
+            $mqmType = editor_Segment_Mqm_Configuration::instance($this->_task)->getMqmTypeForId($data['issueId']);
             $out['tag'] = '<mqm:issue xml:id="x'.$data['id'].'"';
             if($idref) {
                 $out['tag'] .= ' idref="'.$idref.'"';
             }
-            $out['tag'] .= ' type="'.$issue.'" severity="'.$data['severity'].
+            $out['tag'] .= ' type="'.$mqmType.'" severity="'.$data['severity'].
             '" note="'.$data['comment'].'" agent="'.$this->_user.'">';
     	}
     	return $out;
@@ -444,8 +434,8 @@ trait editor_Models_Export_FileParser_MQMTrait {
         
         //adjust the id of the corresponding closing tag to match the newly inserted one - but only the currently surrounded opening tag is the last one, that is not closed again before the corresponding closing tag
         $this->setArrayPointer($this->_stack, $curPointerIndex+2);//array_splice resets the array-pointer. Set it at the tag, which just had been surronded
-        if(end($this->_openTagsInLoop)===$curId){
-            while (current($this->_stack)!==false) {
+        if(end($this->_openTagsInLoop) === $curId){
+            while (current($this->_stack) !== false) {
                 $current = next($this->_stack);
                 if(is_array($current) && $current['data']['id'] === $correspondingTagId 
                         && $current['data']['type'] === 'close'){
@@ -464,7 +454,7 @@ trait editor_Models_Export_FileParser_MQMTrait {
         $this->setArrayPointer($a, $curId);
         $a[key($a)] = $a[key($a)]+2;
         next($a);
-        while (current($a)!==false) {
+        while (current($a) !== false) {
             $a[key($a)] = $a[key($a)]+4;
             next($a);
         }

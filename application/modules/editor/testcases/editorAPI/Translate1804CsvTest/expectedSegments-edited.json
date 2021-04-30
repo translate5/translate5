@@ -202,7 +202,7 @@
         "target": "",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
-        "targetEdit": "<ins class=\"trackchanges ownttip\" data-usertrackingid=\"NOT_TESTABLE\" data-usercssnr=\"usernr1\" data-workflowstep=\"no workflow1\" data-timestamp=\"NOT_TESTABLE\">0<\/ins>",
+        "targetEdit": "<ins class=\"trackchanges ownttip\" data-usercssnr=\"usernr1\" data-workflowstep=\"no workflow1\" >0<\/ins>",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":1}}}}",
         "isWatched": false

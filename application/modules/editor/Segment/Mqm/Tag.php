@@ -60,18 +60,6 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     /**
      * @var string
      */
-    const CSS_CLASS_CRITICAL = 'critical';
-    /**
-     * @var string
-     */
-    const CSS_CLASS_MAJOR = 'major';
-    /**
-     * @var string
-     */
-    const CSS_CLASS_MINOR = 'minor';
-    /**
-     * @var string
-     */
     const PATTERN_INDEX = '~qmsubsegment-([0-9]+)-(left|right)\.png~';
     /**
      * @var string
@@ -84,6 +72,14 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      */
     public static function createCategoryVal(int $categoryIndex) : string {
         return editor_Segment_Tag::TYPE_MQM.'_'.strval($categoryIndex);
+    }
+    
+    public static function getSeverityFromCssClasses(array $classes){
+        
+    }
+    
+    public static function getPositionFromCssClasses(array $classes){
+        
     }
 
     protected static $type = editor_Segment_Tag::TYPE_MQM;
@@ -106,10 +102,6 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      * @return string
      */
     private static function createImageSrcTemplate(){
-        // when Testing, Zend_Config is not available. TODO: better setup/bootstrapping for classic unit test
-        if(defined('T5_IS_UNIT_TEST')){
-            return '/modules/editor/images/imageTags/'.self::IMAGE_SRC;
-        }
         if(self::$imgSrcTemplate == NULL){
             $conf = Zend_Registry::get('config');
             self::$imgSrcTemplate = APPLICATION_RUNDIR.'/'.$conf->runtimeOptions->dir->tagImagesBasePath.'/'.self::IMAGE_SRC;
@@ -281,7 +273,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     
     public function isObsolete() : bool {
         // we discard any invalid mqm tags, e.g. those spanning no text
-        return (!$this->paired || $this->startIndex == $this->endIndex || $this->categoryIndex == -1 || $this->severity == '');
+        return (!$this->paired || $this->startIndex == $this->endIndex || $this->categoryIndex == -1);
     }
     
     public function onConsolidationRemoval() {
@@ -314,13 +306,6 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         $this->singular = false;
         $this->endIndex = $tag->startIndex;
         $this->removeClass(self::CSS_CLASS_OPEN)->removeClass(self::CSS_CLASS_OPEN);
-        if($this->hasClass(self::CSS_CLASS_CRITICAL)){
-            $this->severity = self::CSS_CLASS_CRITICAL;
-        } else if($this->hasClass(self::CSS_CLASS_MAJOR)){
-            $this->severity = self::CSS_CLASS_MAJOR;
-        } else if($this->hasClass(self::CSS_CLASS_MINOR)){
-            $this->severity = self::CSS_CLASS_MINOR;
-        }
         $src = $this->getAttribute('src');
         $matches = array();
         if(preg_match(self::PATTERN_INDEX, $src, $matches)){
@@ -329,6 +314,11 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         $this->comment = htmlspecialchars_decode($this->getData('comment'));
  
         return true;
+    }
+    
+    public function finalize(editor_Segment_FieldTags $tags, editor_Models_task $task){
+        // finds our severity in our cclasses via the tasks MQM configuration
+        $this->severity = editor_Segment_Mqm_Configuration::instance($task)->findMqmSeverity($this->classes, '');
     }
     
     protected function furtherSerialize(stdClass $data){

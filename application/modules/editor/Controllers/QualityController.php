@@ -92,6 +92,7 @@ class editor_QualityController extends ZfExtended_RestController {
      * Sets the false-positive for a segment
      */
     public function falsepositiveAction(){
+        $task = $this->fetchTask();
         $falsePositive = $this->getRequest()->getParam('falsePositive', NULL);
         $this->entityLoad();
         $tagAdjusted = true;
@@ -105,7 +106,7 @@ class editor_QualityController extends ZfExtended_RestController {
                 $segment = ZfExtended_Factory::get('editor_Models_Segment');
                 /* @var $segment editor_Models_Segment */
                 $segment->load($this->entity->getSegmentId());
-                $fieldTags = $segment->getFieldTags($this->entity->getField());
+                $fieldTags = $segment->getFieldTags($task, $this->entity->getField());
                 if($fieldTags != NULL){
                     $tags = $fieldTags->getByType($this->entity->getType());
                     foreach($tags as $tag){

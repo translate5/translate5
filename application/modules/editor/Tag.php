@@ -266,7 +266,9 @@ class editor_Tag {
     public static function createDomParser(){
         $dom = new Dom();
         $options = new Options();
-        $options->isCleanupInput(false);
+        $options->setCleanupInput(false);
+        $options->setRemoveDoubleSpace(false);
+        $options->setPreserveLineBreaks(true);
         $dom->setOptions($options);
         return $dom;
     }
