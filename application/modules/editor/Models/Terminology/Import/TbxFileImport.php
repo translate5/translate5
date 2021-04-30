@@ -382,8 +382,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->logUnknownLanguages();
         }
 
-        $this->log($statisticEntry);
-
         return $this->attributes;
     }
 
@@ -429,6 +427,14 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     {
         $this->termEntryTbxId = $this->getIdOrGenerate($termEntry, $this->tbxMap[$this::TBX_TERM_ENTRY]);
         $this->termEntryGuid = $this->getGuid();
+
+//        $allObjectsFromTbxElement = get_object_vars($termEntry);
+//        foreach($termEntry->rows->row as $name => $row)
+//        {
+//            if (!$name->{$name}) {
+////                Store unknown element to DB
+//            }
+//        }
 
         /** @var editor_Models_Terminology_TbxObjects_TermEntry $newEntry */
         $newEntry = new $this->termEntryObject;
@@ -738,6 +744,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->log("Unable to import terms in this language set. Invalid Rfc5646 language code. Language code: " . $key);
         }
     }
+
     /**
      * - $this->getIdOrGenerate($elementName, 'term')
      * this will return 'id' attribute as string from given element,
