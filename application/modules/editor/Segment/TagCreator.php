@@ -195,13 +195,10 @@ final class editor_Segment_TagCreator {
                 return $tagProvider->createSegmentTag($startIndex, $startIndex, $nodeName, $classNames);
             }
         }
-        // for Unit tests we disable the general manager, this works only with a complete bootstrap
-        if(!defined('T5_IS_UNIT_TEST')){
-            // try to let the quality manager find a tag
-            $tag = editor_Segment_Quality_Manager::instance()->evaluateInternalTag($type, $nodeName, $classNames, $attributes, $startIndex, $startIndex);
-            if($tag != null){
-                return $tag;
-            }
+        // try to let the quality manager find a tag
+        $tag = editor_Segment_Quality_Manager::instance()->evaluateInternalTag($type, $nodeName, $classNames, $attributes, $startIndex, $startIndex);
+        if($tag != null){
+            return $tag;
         }
         // the default is the "any" tag
         return new editor_Segment_AnyTag($startIndex, $startIndex, '', $nodeName);

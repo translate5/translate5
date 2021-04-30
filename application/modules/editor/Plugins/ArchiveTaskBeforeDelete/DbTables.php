@@ -154,6 +154,14 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
         $instance = ZfExtended_Factory::get(__CLASS__);
         return $instance->checkMissingInList();
     }
+    /**
+     * Runs our check for unit-test
+     * @return array
+     */
+    public static function runTest(): array {
+        $instance = ZfExtended_Factory::get(__CLASS__);
+        return $instance->checkMissingInList();
+    }
     
     protected function checkMissingInList(): array {
         $config = Zend_Registry::get('config');

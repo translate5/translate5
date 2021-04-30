@@ -50,31 +50,34 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * Can be used to validate the unparsing-process. Use only for Development !!
      * @var boolean
      */
-    const VALIDATION_MODE = true;       
+    const VALIDATION_MODE = true; // TODO AUTOQA: disable
     /**
      * The counterpart to ::toJson: creates the tags from the serialized JSON data
+     * @param editor_Models_Task $task
      * @param string $jsonString
      * @throws Exception
      * @return editor_Segment_FieldTags
      */
-    public static function fromJson($jsonString) : editor_Segment_FieldTags {
+    public static function fromJson(editor_Models_Task $task, string $jsonString) : editor_Segment_FieldTags {
         try {
-            return self::fromJsonData(json_decode($jsonString));
+            return self::fromJsonData($task, json_decode($jsonString));
         } catch (Exception $e) {
             throw new Exception('Could not deserialize editor_Segment_FieldTags from JSON '.$jsonString);
         }
     }
     /**
      * Creates the tags from deserialized JSON data
+     * @param editor_Models_Task $task
      * @param stdClass $data
      * @throws Exception
      * @return editor_Segment_FieldTags
      */
-    public static function fromJsonData(stdClass $data) : editor_Segment_FieldTags {
+    public static function fromJsonData(editor_Models_Task $task, stdClass $data) : editor_Segment_FieldTags {
         try {
-            $tags = new editor_Segment_FieldTags($data->segmentId, $data->field, $data->fieldText, $data->saveTo, $data->ttName);
+            $tags = new editor_Segment_FieldTags($task, $data->segmentId, $data->field, $data->fieldText, $data->saveTo, $data->ttName);
+            $creator = editor_Segment_TagCreator::instance();
             foreach($data->tags as $tag){
-                $tags->addTag(editor_Segment_TagCreator::instance()->fromJsonData($tag));
+                $tags->addTag($creator->fromJsonData($tag));
             }
             return $tags;
         } catch (Exception $e) {
@@ -99,6 +102,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
         return $a->startIndex - $b->startIndex;
     }
+    /**
+     * The task the segments belong to
+     * @var editor_Models_Task
+     */
+    private $task;
     /**
      * The id of the segment we refer to
      * @var int
@@ -132,14 +140,15 @@ class editor_Segment_FieldTags implements JsonSerializable {
     private $tags = [];
     
     /**
-     * 
+     * @param editor_Models_Task $task
      * @param int $segmentId
      * @param string $field
      * @param string $fieldText
      * @param string | string[] $saveTo
      * @param string $ttName
      */
-    public function __construct(int $segmentId, string $field, ?string $fieldText, $saveTo, string $ttName=null) {
+    public function __construct(editor_Models_Task $task, int $segmentId, string $field, ?string $fieldText, $saveTo, string $ttName=null) {
+        $this->task = $task;
         $this->segmentId = $segmentId;
         $this->field = $field;
         $this->fieldText = '';
@@ -669,7 +678,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
     }
     /**
-     * Adds the 'isFullLength' and 'field' prop to the tags, which are needed by consuming APIs
+     * Adds the 'isFullLength' and 'field' prop to the tags, which are needed by consuming APIs and calls the finalize for the tags indicate, the tag creation phase is finished
      */
     private function addTagProps(){
         $num = count($this->tags);
@@ -679,6 +688,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= $textLength);
             $tag->field = $this->field;
             $tag->content = $this->getFieldTextPart($tag->startIndex, $tag->endIndex);
+            $tag->finalize($this, $this->task);
         }
     }
 }

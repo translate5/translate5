@@ -1732,13 +1732,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         /* @var $mv editor_Models_Segment_MaterializedView  */
         $mv->setTaskGuid($taskGuid);
         $viewName=$mv->getName();
-        $sql='SELECT v1.id,v1.sourceMd5 FROM '.$viewName.' v1, (
+        $sql = 'SELECT v1.id,v1.sourceMd5 FROM '.$viewName.' v1, (
 	          SELECT sourceMd5, count(sourceMd5) cnt
                FROM '.$viewName.'
                GROUP BY sourceMd5
               ) v2
               WHERE v2.cnt > 1 and v1.sourceMd5 = v2.sourceMd5
-              ORDER by v1.id';
+              ORDER BY v1.id';
         return $adapter->query($sql)->fetchAll();
     }
     
@@ -1797,17 +1797,17 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->reInitDb($taskGuid);
         $mv = $this->segmentFieldManager->getView();
         //find the last edited segment for the user from the segment view table and the segments history
-        $sql = 'select * from (
-    select id as "segmentId",userGuid,timestamp as "date" from '.$mv->getName().'
-    where taskGuid = ?
-union
-    select segmentId,userGuid,created as "date" from
-    LEK_segment_history
-    where taskGuid = ?
-) as merged
-where userGuid = ?
-order by date desc, segmentId asc limit 1';
-        $stmt = $this->db->getAdapter()->query($sql,[$taskGuid,$taskGuid,$userGuid]);
+        $sql = 'SELECT * FROM (
+                    SELECT id AS "segmentId",userGuid,timestamp AS "date" FROM '.$mv->getName().'
+                    WHERE taskGuid = ?
+                UNION
+                    SELECT segmentId, userGuid, created AS "date" FROM
+                    LEK_segment_history
+                    WHERE taskGuid = ?
+                ) AS merged
+                WHERE userGuid = ?
+                ORDER BY date DESC, segmentId ASC LIMIT 1';
+        $stmt = $this->db->getAdapter()->query($sql, [$taskGuid, $taskGuid, $userGuid]);
         $result = $stmt->fetchAll();
         return $result[0]['segmentId'] ?? -1;
     }
@@ -1836,17 +1836,18 @@ order by date desc, segmentId asc limit 1';
     /**
      * Retrieves the Field-tags for a certain field
      * Keep in mind that the saveTo & termTaggerName fields will be set simply with the field name
+     * @param editor_Models_Task $task
      * @param string $field
      * @return editor_Segment_FieldTags|NULL
      */
-    public function getFieldTags($field) : ?editor_Segment_FieldTags {
+    public function getFieldTags(editor_Models_Task $task, string $field) : ?editor_Segment_FieldTags {
         $editField = $this->segmentFieldManager->getEditIndex($field);
         // error_log('getFieldTags: '.$field.' / '.$editField);
         // TODO: edit field may be null
         $location = $this->segmentFieldManager->getDataLocationByKey($editField);
         if($location !== false && array_key_exists($location['field'], $this->segmentdata)) {
             $fieldText = $this->segmentdata[$location['field']]->__get($location['column']);
-            return new editor_Segment_FieldTags($this->getId(), $location['field'], $fieldText, $editField);
+            return new editor_Segment_FieldTags($task, $this->getId(), $location['field'], $fieldText, $editField);
         }
         return NULL;
     }

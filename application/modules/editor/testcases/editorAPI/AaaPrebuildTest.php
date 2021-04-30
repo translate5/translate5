@@ -39,13 +39,9 @@ class AaaPrebuildTest extends \ZfExtended_Test_ApiTestcase {
     }
     
     public function testTables() {
-        
-        $zend = self::$appRoot.'/vendor/shardj/zf1-future/library/';
-        $dbTables = self::$appRoot.'/application/modules/editor/Plugins/ArchiveTaskBeforeDelete/DbTables.php';
-        require $dbTables;
-        $result = editor_Plugins_ArchiveTaskBeforeDelete_DbTables::run(self::$appRoot, $zend);
+        $result = editor_Plugins_ArchiveTaskBeforeDelete_DbTables::runTest();
         $msg = 'The following tables are not in sync with the table list in editor_Plugins_ArchiveTaskBeforeDelete_DbTables!';
-        $msg .= "\n".print_r($result,1);
+        $msg .= "\n".print_r($result, true);
         $this->assertEmpty($result, $msg);
     }
     

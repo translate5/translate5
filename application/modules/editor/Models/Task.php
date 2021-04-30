@@ -427,17 +427,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return $qmFlagTree;
     }
     /**
-     * @return array qm-flags as tree array of objects; example in json-notation:
-     *      [{"text":"Accuracy","id":1,"children":[{"text":"Terminology","id":2,"children":[]}]}]
-     */
-    public function getMqmTypes(){
-        $tree = Zend_Json::decode($this->row->qmSubsegmentFlags, Zend_Json::TYPE_OBJECT);
-        if(!isset($tree->qmSubsegmentFlags)){
-            throw new Zend_Exception('qmSubsegmentFlags JSON Structure not OK, missing field qmSubsegmentFlags');
-        }
-        return $tree->qmSubsegmentFlags;
-    }
-    /**
      * @return array('issueId'=>'issueText',...)
      */
     public function getMqmTypesFlat(){
@@ -446,11 +435,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             foreach ($qmFlagTree as $node) {
                 $flatTree[$node->id] = $node->text;
                 if(isset($node->children) && is_array($node->children)){
-                  $walk($node->children);
+                    $walk($node->children);
                 }
             }
         };
-        $walk($this->getMqmTypes());
+        $tree = Zend_Json::decode($this->row->qmSubsegmentFlags, Zend_Json::TYPE_OBJECT);
+        if(!isset($tree->qmSubsegmentFlags)){
+            throw new Zend_Exception('qmSubsegmentFlags JSON Structure not OK, missing field qmSubsegmentFlags');
+        }
+        $walk($tree->qmSubsegmentFlags);
         return $flatTree;
     }
     /**
@@ -463,7 +456,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return $tree->severities;
     }
-
     /**
      * returns all configured Severities as JSON or PHP Data Structure:
      * [{
