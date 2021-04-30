@@ -29,14 +29,15 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
     const TABLE_FIELDS = [
         'transac' => true,
         'date' => true,
-        'adminType' => true,
-        'adminValue' => true,
+        'language' => false,
+        'attrLang' => false,
         'transacNote' => true,
         'transacType' => true,
         'ifDescripgrp' => false,
         'collectionId' => false,
         'termEntryId' => false,
         'termId' => false,
+        'termGuid' => false,
         'termEntryGuid' => false,
         'langSetGuid' => false,
         'guid' => false,
@@ -45,14 +46,14 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
     protected int $collectionId = 0;
     protected string $termEntryId = '';
     protected string $termId = '';
+    protected string $termGuid = '';
     protected string $termEntryGuid = '';
     protected string $langSetGuid = '';
     protected string $descripGrpGuid = '';
     protected string $guid = '';
     protected string $elementName = '';
     protected string $language = '';
-    protected string $adminValue = '';
-    protected string $adminType = '';
+    protected string $attrLang = '';
     protected string $transac = '';
     protected string $date = '';
     protected string $transacNote = '';
@@ -118,6 +119,24 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
     public function setTermId(string $termId): self
     {
         $this->termId = $termId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTermGuid(): string
+    {
+        return $this->termGuid;
+    }
+
+    /**
+     * @param string $termGuid
+     * @return editor_Models_Terminology_TbxObjects_TransacGrp
+     */
+    public function setTermGuid(string $termGuid): self
+    {
+        $this->termGuid = $termGuid;
         return $this;
     }
 
@@ -232,36 +251,18 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
     /**
      * @return string
      */
-    public function getAdminValue(): string
+    public function getAttrLang(): string
     {
-        return $this->adminValue;
+        return $this->attrLang;
     }
 
     /**
-     * @param string $adminValue
+     * @param string $attrLang
      * @return editor_Models_Terminology_TbxObjects_TransacGrp
      */
-    public function setAdminValue(string $adminValue): self
+    public function setAttrLang(string $attrLang): self
     {
-        $this->adminValue = $adminValue;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAdminType(): string
-    {
-        return $this->adminType;
-    }
-
-    /**
-     * @param string $adminType
-     * @return editor_Models_Terminology_TbxObjects_TransacGrp
-     */
-    public function setAdminType(string $adminType): self
-    {
-        $this->adminType = $adminType;
+        $this->attrLang = $attrLang;
         return $this;
     }
 

@@ -41,8 +41,12 @@ END LICENSE AND COPYRIGHT
  * @method string setElementName() setElementName(string $elementName)
  * @method string getTarget() getTarget()
  * @method string setTarget() setTarget(string $target)
- * @method string getTermId() getTermId()
- * @method string setTermId() setTermId(string $termId)
+ * @method int getTermId() getTermId()
+ * @method int setTermId() setTermId(int $termId)
+ * @method string getTermGuid() getTermGuid()
+ * @method string setTermGuid() setTermGuid(string $termGuid)
+ * @method string getAttrLang() getAttrLang()
+ * @method string setAttrLang() setAttrLang(string $attrLang)
  * @method string getValue() getValue()
  * @method string setValue() setValue(string $value)
  * @method integer getCollectionId() getCollectionId()
@@ -55,8 +59,6 @@ END LICENSE AND COPYRIGHT
  * @method string setTermEntryGuid() setTermEntryGuid(string $termEntryGuid)
  * @method string getLangSetGuid() getLangSetGuid()
  * @method string setLangSetGuid() setLangSetGuid(string $langSetGuid)
- * @method string getTermGuid() getTermGuid()
- * @method string setTermGuid() setTermGuid(string $termGuid)
  * @method string getUserName() getUserName()
  * @method string setUserName() setUserName(string $userName)
  * @method string getUserGuid() getUserGuid()
@@ -384,9 +386,9 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
 
     /***
      * Check if for the current term there is a processStatus attribute. When there is no one, create it.
-     * @param string $termId
+     * @param int $termId
      */
-    public function checkOrCreateProcessStatus(string $termId)
+    public function checkOrCreateProcessStatus(int $termId)
     {
         $s=$this->db->select()
             ->where('termId=?',$termId)

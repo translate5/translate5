@@ -29,6 +29,7 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     const TABLE_FIELDS = [
         'elementName' => true,
         'language' => true,
+        'attrLang' => false,
         'value' => true,
         'type' => true,
         'target' => true,
@@ -37,6 +38,7 @@ class editor_Models_Terminology_TbxObjects_Attribute {
         'termEntryGuid' => false,
         'langSetGuid' => false,
         'termId' => false,
+        'termGuid' => false,
         'labelId' => false,
         'guid' => false,
         'userGuid' => true,
@@ -47,10 +49,12 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     protected int $termEntryId = 0;
     protected string $termEntryGuid = '';
     protected string $langSetGuid = '';
-    protected string $termId = '';
+    protected string $attrLang = '';
+    protected int $termId = 0;
+    protected string $termGuid = '';
     protected string $guid = '';
     protected string $elementName = '';
-    protected string $language = '';
+    protected ?string $language = '';
     protected string $value = '';
     protected string $target = '';
     protected string $type = '';
@@ -142,18 +146,54 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     /**
      * @return string
      */
-    public function getTermId(): string
+    public function getAttrLang(): string
+    {
+        return $this->attrLang;
+    }
+
+    /**
+     * @param string $attrLang
+     * @return editor_Models_Terminology_TbxObjects_Attribute
+     */
+    public function setAttrLang(string $attrLang): self
+    {
+        $this->attrLang = $attrLang;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTermId(): int
     {
         return $this->termId;
     }
 
     /**
-     * @param string $termId
+     * @param int $termId
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setTermId(string $termId): self
+    public function setTermId(int $termId): self
     {
         $this->termId = $termId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTermGuid(): string
+    {
+        return $this->termGuid;
+    }
+
+    /**
+     * @param string $termGuid
+     * @return editor_Models_Terminology_TbxObjects_Attribute
+     */
+    public function setTermGuid(string $termGuid): self
+    {
+        $this->termGuid = $termGuid;
         return $this;
     }
 
@@ -212,18 +252,18 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getLanguage(): string
+    public function getLanguage(): ?string
     {
         return $this->language;
     }
 
     /**
-     * @param string $language
+     * @param string|null $language
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setLanguage(string $language): self
+    public function setLanguage(?string $language): self
     {
         $this->language = $language;
         return $this;

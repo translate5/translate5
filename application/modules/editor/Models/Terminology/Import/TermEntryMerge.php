@@ -53,15 +53,15 @@ class editor_Models_Terminology_Import_TermEntryMerge
         if (isset($entryCollection[$collectionKey])) {
             $exploded = explode('-', $entryCollection[$collectionKey]);
             $id = $exploded[0];
-            $descrip = $exploded[1];
+//            $descrip = $exploded[1];
 
-            if ($parsedTermEntry->getDescrip() !== $descrip) {
-                $this->termEntryModel->updateTermEntryRecord([
-                    'id' => $id,
-                    'descrip' => $parsedTermEntry->getDescrip(),
-                    'entryGuid' => $parsedTermEntry->getEntryGuid()
-                ]);
-            }
+//            if ($parsedTermEntry->getDescrip() !== $descrip) {
+//                $this->termEntryModel->updateTermEntryRecord([
+//                    'id' => $id,
+//                    'descrip' => $parsedTermEntry->getDescrip(),
+//                    'entryGuid' => $parsedTermEntry->getEntryGuid()
+//                ]);
+//            }
         } else {
              $this->termEntryModel->init([
                 'collectionId' =>$parsedTermEntry->getCollectionId(),

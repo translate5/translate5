@@ -26,22 +26,15 @@ INSERT INTO terms_term_entry (
     collectionId,
     termEntryTbxId,
     isProposal,
-    descrip,
     entryGuid,
     tmpOldId
 )
 SELECT old_term_entry.collectionId,
        old_term_entry.groupId AS termEntryTbxId,
        old_term_entry.isProposal AS isProposal,
-       'definition',
        UUID() AS guid,
        old_term_entry.id
 FROM LEK_term_entry old_term_entry;
-
-UPDATE terms_term_entry termEntry
-    JOIN LEK_term_attributes ta on termEntry.tmpOldId = ta.termEntryId
-SET termEntry.descrip = ta.value
-WHERE termEntry.tmpOldId = ta.termEntryId;
 
 # INSERT FOR TERMS
 INSERT INTO terms_term (
@@ -55,9 +48,6 @@ INSERT INTO terms_term (
     languageId,
     language,
     term,
-    descrip,
-    descripType,
-    descripTarget,
     status,
     processStatus,
     definition,
@@ -78,9 +68,6 @@ SELECT old_terms.mid AS termId,
        old_terms.language AS languageId,
        'none',
        old_terms.term,
-       old_terms.definition,
-       '' AS descripType,
-       '' AS descripTarget,
        old_terms.status,
        old_terms.processStatus,
        old_terms.definition,
@@ -108,6 +95,7 @@ WHERE lng.id = terms.languageId;
 INSERT INTO terms_attributes (
     elementName,
     language,
+    attrLang,
     value,
     type,
     target,
@@ -130,6 +118,7 @@ INSERT INTO terms_attributes (
 )
 SELECT old_term_attributes.name,
        LOWER(old_term_attributes.language),
+       old_term_attributes.attrLang,
        old_term_attributes.value,
        old_term_attributes.attrType,
        old_term_attributes.attrTarget,
@@ -163,16 +152,22 @@ WHERE termAtt.tmpOldTermEntryId = tte.tmpOldId;
 
 UPDATE terms_attributes termAtt
     JOIN terms_term lt on termAtt.tmpOldTermId = lt.tmpOldId
-SET termAtt.termId = lt.termId
+SET termAtt.termId = lt.id,
+    termAtt.termGuid = lt.guid
 WHERE termAtt.tmpOldTermId = lt.tmpOldId;
+
+UPDATE terms_attributes termAtt
+    JOIN LEK_term_attributes lta on termAtt.tmpOldId = lta.parentId
+SET termAtt.langSetGuid = IF(lta.termId IS NULL AND lta.attrLang IS NOT NULL, UUID(), '')
+WHERE termAtt.tmpOldId = lta.parentId;
 
 # INSERT FOR TRANSACGRP
 INSERT INTO terms_transacgrp (
     elementName,
     transac,
     date,
-    adminType,
-    adminValue,
+    language,
+    attrLang,
     transacNote,
     transacType,
     ifDescripgrp,
@@ -189,10 +184,10 @@ INSERT INTO terms_transacgrp (
 SELECT t1.name AS elementName,
        attrType AS transac,
        '' AS date,
-       t1.attrType AS adminType,
-       t1.attrDataType AS adminValue,
+       language AS language,
+       attrLang AS attrLang,
        '' AS transacNote,
-       'responsiblePerson' AS transacType,
+       attrType AS transacType,
        if(t1.parentId = NULL, 1, 0) AS ifDescripgrp,
        t1.collectionId AS collectionId,
        '' AS termEntryId,
@@ -215,7 +210,7 @@ WHERE termAtt.tmpOldTermEntryId = tte.tmpOldId;
 
 UPDATE terms_transacgrp termTrg
     JOIN LEK_terms lta on termTrg.tmpOldTermId = lta.id
-SET termTrg.termId = lta.mid
+SET termTrg.termId = lta.id
 WHERE termTrg.tmpOldTermId = lta.id;
 
 UPDATE terms_transacgrp termTrg
@@ -227,6 +222,12 @@ UPDATE terms_transacgrp termTrg
     JOIN LEK_term_attributes lta on termTrg.tmpOldId = lta.parentId
 SET termTrg.transacNote = lta.value
 WHERE lta.attrType = 'responsiblePerson';
+
+UPDATE terms_transacgrp termTrg
+    JOIN LEK_term_attributes lta on termTrg.tmpOldId = lta.parentId
+SET termTrg.langSetGuid = IF(lta.termId = 0, UUID(), ''),
+    termTrg.elementName = IF(lta.termId = 0, 'langSet', '')
+WHERE termTrg.tmpOldId = lta.parentId;
 
 # before we can update new termId we must drop foreign key, after update we add new FK
 alter table LEK_term_proposal drop foreign key LEK_term_proposal_ibfk_1;
@@ -263,12 +264,12 @@ alter table LEK_term_history
         foreign key (termId) references terms_term (id)
             on update cascade on delete cascade;
 
-ALTER TABLE terms_term_entry DROP COLUMN tmpOldId;
-ALTER TABLE terms_term DROP COLUMN tmpOldId;
-ALTER TABLE terms_term DROP COLUMN tmpOldTermEntryId;
-ALTER TABLE terms_attributes DROP COLUMN tmpOldId;
-ALTER TABLE terms_attributes DROP COLUMN tmpOldTermId;
-ALTER TABLE terms_attributes DROP COLUMN tmpOldTermEntryId;
-ALTER TABLE terms_transacgrp DROP COLUMN tmpOldId;
-ALTER TABLE terms_transacgrp DROP COLUMN tmpOldTermId;
-ALTER TABLE terms_transacgrp DROP COLUMN tmpOldTermEntryId;
+# ALTER TABLE terms_term_entry DROP COLUMN tmpOldId;
+# ALTER TABLE terms_term DROP COLUMN tmpOldId;
+# ALTER TABLE terms_term DROP COLUMN tmpOldTermEntryId;
+# ALTER TABLE terms_attributes DROP COLUMN tmpOldId;
+# ALTER TABLE terms_attributes DROP COLUMN tmpOldTermId;
+# ALTER TABLE terms_attributes DROP COLUMN tmpOldTermEntryId;
+# ALTER TABLE terms_transacgrp DROP COLUMN tmpOldId;
+# ALTER TABLE terms_transacgrp DROP COLUMN tmpOldTermId;
+# ALTER TABLE terms_transacgrp DROP COLUMN tmpOldTermEntryId;

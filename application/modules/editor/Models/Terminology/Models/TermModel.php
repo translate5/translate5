@@ -37,6 +37,8 @@ END LICENSE AND COPYRIGHT
  * @method string setLanguage() setLanguage(string $language)
  * @method string getTermId() getTermId()
  * @method string setTermId() setTermId(string $termId)
+ * @method string getTermTbxId() getTermTbxId()
+ * @method string setTermTbxId() setTermTbxId(string $termTbxId)
  * @method string getTerm() getTerm()
  * @method string setTerm() setTerm(string $term)
  * @method integer getCollectionId() getCollectionId()
@@ -47,12 +49,6 @@ END LICENSE AND COPYRIGHT
  * @method string setTermEntryTbxId() setTermEntryTbxId(string $termEntryTbxId)
  * @method string getTermEntryGuid() getTermEntryGuid()
  * @method string setTermEntryGuid() setTermEntryGuid(string $entryGuid)
- * @method string getDescrip() getDescrip()
- * @method string setDescrip() setDescrip(string $descrip)
- * @method string getDescripType() getDescripType()
- * @method string setDescripType() setDescripType(string $descripType)
- * @method string getDescripTarget() getDescripTarget()
- * @method string setDescripTarget() setDescripTarget(string $descripTarget)
  * @method string getStatus() getStatus()
  * @method string setStatus() setStatus(string $Status)
  * @method string getProcessStatus() getProcessStatus()
@@ -1526,5 +1522,23 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     public function getTermInfosFromSegment(string $seg): array
     {
         return $this->tagHelper->getInfos($seg);
+    }
+
+    public function updateAttributeAndTransacTermIdAfterImport($collectionId)
+    {
+        $sqlAttribute = 'UPDATE terms_attributes termsAtt
+                            JOIN terms_term tt on termsAtt.termGuid = tt.guid
+                        SET termsAtt.termId = tt.id
+                        WHERE termsAtt.termGuid = tt.guid
+                        AND termsAtt.collectionId = :collectionId';
+
+        $sqlTransacGrp = 'UPDATE terms_transacgrp termsTrg
+                            JOIN terms_term tt on termsTrg.termGuid = tt.guid
+                        SET termsTrg.termId = tt.id
+                        WHERE termsTrg.termGuid = tt.guid
+                        AND termsTrg.collectionId = :collectionId';
+
+        $queryResultsAtt = $this->db->getAdapter()->query($sqlAttribute, ['collectionId' => $collectionId]);
+        $queryResultsTrc = $this->db->getAdapter()->query($sqlTransacGrp, ['collectionId' => $collectionId]);
     }
 }

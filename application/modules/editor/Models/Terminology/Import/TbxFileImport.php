@@ -107,6 +107,11 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     protected string $langSetGuid;
     /**
+     * Unique Guid for each Term
+     * @var string
+     */
+    protected string $termGuid;
+    /**
      * Unique Guid for each term
      * @var string
      */
@@ -363,8 +368,10 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
                     foreach ($languageGroup->{$this->tbxMap[$this::TBX_TIG]} as $termGroup) {
                         $this->termId = '';
+                        $this->termGuid = '';
                         $this->handleTermGroup($termGroup, $parsedLangSet);
                         $this->termId = '';
+                        $this->termGuid = '';
                     }
                 }
             }
@@ -375,12 +382,15 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->getTbxImages($tbxAsSimpleXml->text->back->refObjectList);
         }
 
+
         $statisticEntry = "ENTRY sec.: " . (microtime(true) - $startEntryTime)
             . " - Memory usage: " . ((memory_get_usage() / 1024) / 1024) .' MB';
 
         if ($this->unknownLanguages) {
             $this->logUnknownLanguages();
         }
+
+        $termSelect = $this->termModel->updateAttributeAndTransacTermIdAfterImport($this->collectionId);
 
         return $this->attributes;
     }
@@ -392,6 +402,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->termEntryGuid = '';
         $this->langSetGuid = '';
         $this->descripGrpGuid = '';
+        $this->termGuid = '';
         $this->transacGrps = [];
         $this->termId = '';
     }
@@ -442,18 +453,18 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $newEntry->setTermEntryTbxId($this->termEntryTbxId);
         $newEntry->setEntryGuid($this->termEntryGuid);
 
-        if ($termEntry->descrip) {
-            $newEntry->setDescrip($this->setAttributeTypes($termEntry->descrip, false));
-        }
+//        if ($termEntry->descrip) {
+//            $newEntry->setDescrip($this->setAttributeTypes($termEntry->descrip, false));
+//        }
 
         // Before setting first attribute we retrieve actual termEntryDbId fom table
         /** @var editor_Models_Terminology_Models_TermEntryModel $actualTermEntry */
         $this->termEntryDbId = $this->termEntryMerge->createOrUpdateTermEntry($newEntry, $this->termEntriesCollection);
 
-        if ($termEntry->descrip) {
+        if (isset($termEntry->descrip)) {
             $newEntry->setDescrip($this->setAttributeTypes($termEntry->descrip));
-            $newEntry->setDescripValue((string)$termEntry->descrip);
         }
+
         if (isset($transacGrp)) {
             foreach ($termEntry->transacGrp as $transacGrp) {
                 $newEntry->setTransacGrp($this->setTransacAttributes($transacGrp, false, 'termEntry'));
@@ -491,6 +502,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
         foreach ($languageGroup->descripGrp as $descripGrp) {
             $this->descripGrpGuid = $this->getGuid();
+            $this->setAttributeTypes($descripGrp->descrip);
             $newLangSet->setDescripGrpGuid($this->descripGrpGuid);
             $newLangSet->setDescrip((string)$descripGrp->descrip);
             $newLangSet->setDescripTarget((string)$descripGrp->descrip->attributes()->{'target'});
@@ -519,6 +531,8 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         } else {
             $tig = $tigElement;
         }
+
+        $this->termGuid = $this->getGuid();
         /** SimpleXMLElement $tig */
         /** @var editor_Models_Terminology_TbxObjects_Term $newTerm */
         $newTerm = new $this->termObject;
@@ -528,7 +542,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $newTerm->setTermEntryTbxId($this->termEntryTbxId);
         $newTerm->setTermEntryGuid($this->termEntryGuid);
         $newTerm->setLangSetGuid($this->langSetGuid);
-        $newTerm->setGuid($this->getGuid());
+        $newTerm->setGuid($this->termGuid);
         $newTerm->setLanguage($this->language['language']);
         $newTerm->setLanguageId((int)$this->language['id']);
         $newTerm->setTerm((string)$tig->term);
@@ -587,7 +601,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     private function setAttributeTypes(SimpleXMLElement $element, bool $addToAttributesCollection = true): array
     {
         if (!isset($this->language['language'])) {
-            $this->language['language'] = 'none';
+            $this->language['language'] = null;
         }
         $attributes = [];
         $newLabelId = $this->attributeLabel;
@@ -599,12 +613,13 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $attribute->setTermEntryId($this->termEntryDbId);
             $attribute->setTermEntryGuid($this->termEntryGuid);
             $attribute->setLangSetGuid($this->langSetGuid);
-            $attribute->setTermId($this->termId);
+            $attribute->setTermGuid($this->termGuid);
             $attribute->setGuid($this->getGuid());
             $attribute->setLanguage($this->language['language']);
             $attribute->setValue((string)$value);
             $attribute->setType((string)$value->attributes()->{'type'});
             $attribute->setTarget((string)$value->attributes()->{'target'});
+            $attribute->setAttrLang($this->getActualLanguageAttribute($value));
 
             if (isset($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()])) {
                 $attribute->setLabelId($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()]);
@@ -633,15 +648,14 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $transacGrpObject->setCollectionId($this->collectionId);
             $transacGrpObject->setTermEntryId($this->termEntryDbId);
             $transacGrpObject->setTermId($this->termId);
+            $transacGrpObject->setTermGuid($this->termGuid);
             $transacGrpObject->setTermEntryGuid($this->termEntryGuid);
             $transacGrpObject->setLangSetGuid($this->langSetGuid);
             $transacGrpObject->setDescripGrpGuid($this->descripGrpGuid);
             $transacGrpObject->setGuid($this->getGuid());
             $transacGrpObject->setElementName($elementName);
             $transacGrpObject->setLanguage($this->language['language']);
-            $transacGrpObject->setAdminValue('');
-            $transacGrpObject->setAdminType('');
-
+            $transacGrpObject->setAttrLang($this->getActualLanguageAttribute($transacGrp));
             if (isset($transacGrp->transac)) {
                 $transacGrpObject->setTransac((string)$transacGrp->transac);
             }
