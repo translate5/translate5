@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * ExcelExandImportTest.php imports a simple task, checks export of excel and reimport then
  */
-class ExcelExandImportTest extends \ZfExtended_Test_ApiTestcase {
+class ExcelExandImportTest extends editor_Test_Segment {
     
     /**
      * @var string contains the file name to the downloaded excel
@@ -114,9 +114,8 @@ class ExcelExandImportTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
         
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=47');
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/ExcelExandImportTest/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
+        
+        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
     }
     
     public static function tearDownAfterClass(): void {

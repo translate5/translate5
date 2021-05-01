@@ -78,7 +78,7 @@ class AaaPrebuildTest extends \ZfExtended_Test_ApiTestcase {
         $notFoundInDocu = array_diff($collectedCodes, $documentedCodes);
         
         if(!empty($unusedInDocu)) {
-            $this->addWarning("\n\nWarning: the following Errorcodes are in the docu, but not in the PHP code:\n".print_r($unusedInDocu,1));
+            $this->addWarning("\n\nWarning: the following Errorcodes are in the documentation, but not in the PHP code:\n".print_r($unusedInDocu, true));
         }
         
         if(!empty($notFoundInDocu)) {

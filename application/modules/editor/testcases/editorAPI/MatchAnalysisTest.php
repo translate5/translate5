@@ -74,7 +74,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testValidateResults(){
         $analysis=$this->api()->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
-            'taskGuid'=>$this->api()->getTask()->taskGuid
+            'taskGuid'=> $this->api()->getTask()->taskGuid
         ]);
         
         $this->assertNotEmpty($analysis,'No results found for the matchanalysis.');
@@ -92,9 +92,9 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         
         
         //not test all results and matches
-        $analysis=$this->api()->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
-            'taskGuid'=>$this->api()->getTask()->taskGuid,
-            'notGrouped'=>$this->api()->getTask()->taskGuid
+        $analysis = $this->api()->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
+            'taskGuid' => $this->api()->getTask()->taskGuid,
+            'notGrouped' => $this->api()->getTask()->taskGuid
         ]);
         $this->assertNotEmpty($analysis,'No results found for the matchanalysis.');
         //remove some of the unneeded columns
