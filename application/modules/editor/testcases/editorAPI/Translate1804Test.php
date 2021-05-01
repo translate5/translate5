@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Testcase for TRANSLATE-1804 Segments containing only 0 are not imported
  */
-class Translate1804Test extends \ZfExtended_Test_ApiTestcase {
+class Translate1804Test extends editor_Test_Segment {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(get_called_class());
         
@@ -75,13 +75,11 @@ class Translate1804Test extends \ZfExtended_Test_ApiTestcase {
     public function testSegmentValuesAfterImport() {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
         
-        //we need a copy of the segmentIds, since removeUntestableSegmentContent would remove them
+        //we need a copy of the segmentIds, since assertSegmentsEqualsJsonFile would remove them
         $ids = array_column($segments, 'id');
         
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents($this->api()->getFile('expectedSegments-new.json', null, false), json_encode($data, JSON_PRETTY_PRINT));
+        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
         
-        $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
         $testContent = '<ins class="trackchanges ownttip" data-usertrackingid="2330" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2020-05-14T12:30:33+02:00">0</ins>';
         
         //saving a plain 0
@@ -100,11 +98,8 @@ class Translate1804Test extends \ZfExtended_Test_ApiTestcase {
         $this->api()->requestJson('editor/segment/'.$ids[7], 'PUT', $segment);
         
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
-        
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents($this->api()->getFile('expectedSegments-edited-new.json', null, false), json_encode($data, JSON_PRETTY_PRINT));
-        
-        $this->assertEquals(self::$api->getFileContent('expectedSegments-edited.json'), $data, 'Imported segments are not as expected!');
+
+        $this->assertSegmentsEqualsJsonFile('expectedSegments-edited.json', $segments, 'Edited segments are not as expected!');
     }
     
     /**

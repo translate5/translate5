@@ -46,20 +46,22 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
      * @param string $fileToCompare
      * @param stdClass $segment
      * @param string $message
+     * @param boolean $keepComments
      */
-    public function assertSegmentEqualsJsonFile(string $fileToCompare, stdClass $segment, string $message=''){
-        $this->assertSegmentEqualsObject(self::$api->getFileContent($fileToCompare), $segment, $message);
+    public function assertSegmentEqualsJsonFile(string $fileToCompare, stdClass $segment, string $message='', bool $keepComments=true){
+        $this->assertSegmentEqualsObject(self::$api->getFileContent($fileToCompare), $segment, $message, $keepComments);
     }
     /**
      * compares the given segment content with an expectation object
      * @param stdClass $expectedObj
      * @param stdClass $segment
      * @param string $message
+     * @param boolean $keepComments
      */
-    public function assertSegmentEqualsObject(stdClass $expectedObj, stdClass $segment, string $message=''){
+    public function assertSegmentEqualsObject(stdClass $expectedObj, stdClass $segment, string $message='', bool $keepComments=true){
         $this->assertEquals(
             $this->cleanSegmentJson($expectedObj),
-            $this->cleanSegmentObject($segment),
+            $this->cleanSegmentObject($segment, $keepComments),
             $message);
     }
     /**
@@ -67,25 +69,28 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
      * @param string $fileToCompare
      * @param stdClass[] $segments
      * @param string $message
+     * @param boolean $keepComments
      */
-    public function assertSegmentsEqualsJsonFile(string $fileToCompare, array $segments, string $message=''){
+    public function assertSegmentsEqualsJsonFile(string $fileToCompare, array $segments, string $message='', bool $keepComments=true){
         $expectations = self::$api->getFileContent($fileToCompare);
         $numSegments = count($segments);
         if($numSegments != count($expectations)){
             $this->assertEquals($numSegments, count($expectations), $message.' [Number of segments does not match the expectations]');
         } else {
             for($i=0; $i < $numSegments; $i++){
-                $this->assertSegmentEqualsObject($expectations[$i], $segments[$i], $message.' [Segment '.($i + 1).']');
+                $msg = (empty($message)) ? '' : $message.' [Segment '.($i + 1).']';
+                $this->assertSegmentEqualsObject($expectations[$i], $segments[$i], $msg, $keepComments);
             }
         }
     }
     /**
-     * 
+     * Cleans a segment originating from the T5 API
      * @param stdClass $segment
+     * @param boolean $keepComments
      * @param boolean $keepId
      * @return stdClass
      */
-    public function cleanSegmentObject(stdClass $segment, bool $keepId=false) : stdClass {
+    public function cleanSegmentObject(stdClass $segment, bool $keepComments=true, bool $keepId=false) : stdClass {
         if(!$keepId) {
             unset($segment->id);
         }
@@ -104,8 +109,10 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
             }
             $segment->metaCache = json_encode($meta, JSON_FORCE_OBJECT);
         }
-        if(!empty($segment->comments)) {
-            $segment->comments = preg_replace('/<span class="modified">[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}</', '<span class="modified">NOT_TESTABLE<', $segment->comments);
+        if(!$keepComments){
+            $segment->comments = NULL;
+        } else if(!empty($segment->comments)) {
+            $segment->comments = $this->_adjustComments($segment->comments);
         }
         foreach(self::$segmentFields as $field){
             if(property_exists($segment, $field)) {
@@ -115,11 +122,14 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
         return $segment;
     }
     /**
-     * 
+     * Cleans a segment originating from an comparision-file
      * @param stdClass $jsonSegment
      * @return stdClass
      */
     public function cleanSegmentJson(stdClass $jsonSegment) : stdClass {
+        if(!empty($jsonSegment->comments)) {
+            $jsonSegment->comments = $this->_adjustComments($jsonSegment->comments);
+        }
         foreach(self::$segmentFields as $field){
             if(property_exists($jsonSegment, $field)) {
                 $jsonSegment->$field = $this->_adjustFieldText($jsonSegment->$field);
@@ -127,6 +137,74 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
         }
         return $jsonSegment;
     }
+    /**
+     * Compares an 2-dimensional array of comments with a file (which must contain those comments as json-array)
+     * @param string $fileToCompare
+     * @param stdClass[] $comments
+     * @param string $message
+     * @param boolean $removeDates
+     */
+    public function assertCommentsEqualsJsonFile(string $fileToCompare, array $comments, string $message='', bool $removeDates=false){
+        $expectations = self::$api->getFileContent($fileToCompare);
+        $numComments = count($comments);
+        if($numComments != count($expectations)){
+            $this->assertEquals($numComments, count($expectations), $message.' [Number of comments does not match the expectations]');
+        } else {
+            for($i=0; $i < $numComments; $i++){
+                $msg = (empty($message)) ? '' : $message.' [Segment '.($i + 1).']';
+                // the comments per segment are an array again ...
+                $segmentComments = $comments[$i];
+                $segmentExpectations = $expectations[$i];
+                $numSegmentComments = count($segmentComments);
+                if($numSegmentComments != count($segmentComments)){
+                    $this->assertEquals($numComments, count($expectations), $message.' [Number of segment comments does not match the expectations for segment '.($i + 1).']');
+                } else {
+                    for($j=0; $j < $numSegmentComments; $j++){
+                        $msg = (empty($message)) ? '' : $message.' [Segment '.($i + 1).', comment '.($j + 1).']';
+                        $this->assertCommentEqualsObject($segmentExpectations[$j], $segmentComments[$j], $msg, $removeDates);
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * compares the given segment content with an expectation object
+     * @param stdClass $expectedObj
+     * @param stdClass $segment
+     * @param string $message
+     * @param boolean $keepComments
+     */
+    public function assertCommentEqualsObject(stdClass $expectedObj, stdClass $comment, string $message='', bool $removeDates=false){
+        $this->assertEquals(
+            $this->cleanCommentJson($expectedObj),
+            $this->cleanCommentObject($comment, $removeDates),
+            $message);
+    }
+    /**
+     * Cleans a comment originating from the T5 API
+     * @param stdClass $comment
+     * @param bool $removeDates
+     * @return stdClass
+     */
+    public function cleanCommentObject(stdClass $comment, bool $removeDates=false) : stdClass {
+        unset($comment->id);
+        unset($comment->segmentId);
+        unset($comment->taskGuid);
+        if($removeDates) {
+            unset($comment->modified);
+            unset($comment->created);
+        }
+        return $comment;
+    }
+    /**
+     * Cleans a comment originating from an comparision-file
+     * @param stdClass $comment
+     * @return stdClass
+     */
+    public function cleanCommentJson(stdClass $comment) : stdClass {
+        return $comment;
+    }
+    
     /**
      * Adjuts the passed tests to clean up field tags for comparision
      * @param string $expected
@@ -146,6 +224,15 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
             return $text;
         }
         return preg_replace_callback('~<([a-z]+[0-9]*)[^>]*>~', array($this, '_replaceFieldTags'), $text);
+    }
+    /**
+     *
+     * @param string $text
+     * @return string
+     */
+    protected function _adjustComments(string $text){
+        // <span class="modified">2019-08-27 17:44:36</span>
+        return preg_replace('/<span class="modified">[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}</', '<span class="modified">NOT_TESTABLE<', $text);
     }
     /**
      *
