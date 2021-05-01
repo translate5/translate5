@@ -48,9 +48,19 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
      * @param string $message
      */
     public function assertSegmentEqualsJsonFile(string $fileToCompare, stdClass $segment, string $message=''){
-        $actual = $this->cleanSegmentObject($segment);
-        $expected = $this->cleanSegmentJson(self::$api->getFileContent($fileToCompare));
-        $this->assertEquals($expected, $actual, $message);
+        $this->assertSegmentEqualsObject(self::$api->getFileContent($fileToCompare), $segment, $message);
+    }
+    /**
+     * compares the given segment content with an expectation object
+     * @param stdClass $expectedObj
+     * @param stdClass $segment
+     * @param string $message
+     */
+    public function assertSegmentEqualsObject(stdClass $expectedObj, stdClass $segment, string $message=''){
+        $this->assertEquals(
+            $this->cleanSegmentJson($expectedObj),
+            $this->cleanSegmentObject($segment),
+            $message);
     }
     /**
      * Compares an array of segments with a file (which must contain those segments as json-array)
@@ -59,14 +69,15 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
      * @param string $message
      */
     public function assertSegmentsEqualsJsonFile(string $fileToCompare, array $segments, string $message=''){
-        foreach($segments as $segment){
-            $this->cleanSegmentObject($segment);
-        }
         $expectations = self::$api->getFileContent($fileToCompare);
-        foreach($expectations as $expectation){
-            $this->cleanSegmentJson($expectation);
+        $numSegments = count($segments);
+        if($numSegments != count($expectations)){
+            $this->assertEquals($numSegments, count($expectations), $message.' [Number of segments does not match the expectations]');
+        } else {
+            for($i=0; $i < $numSegments; $i++){
+                $this->assertSegmentEqualsObject($expectations[$i], $segments[$i], $message.' [Segment '.($i + 1).']');
+            }
         }
-        $this->assertEquals($expectations, $segments, $message);
     }
     /**
      * 
@@ -131,6 +142,9 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
      * @return string
      */
     protected function _adjustFieldText(string $text){
+        if(strip_tags($text) == $text){
+            return $text;
+        }
         return preg_replace_callback('~<([a-z]+[0-9]*)[^>]*>~', array($this, '_replaceFieldTags'), $text);
     }
     /**
@@ -139,6 +153,9 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
      * @return string
      */
     protected function _replaceFieldTags($matches){
+        
+        // error_log('REPLACE FIELD TAGS: '.print_r($matches));
+        
         if(count($matches) > 1){
             $isSingle = (substr(trim(rtrim($matches[0], '>')), -1) == '/');
             $tag = ($isSingle) ? editor_Tag::unparse($matches[0]) : editor_Tag::unparse($matches[0].'</'.$matches[1].'>');
