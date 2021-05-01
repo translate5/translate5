@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * SegmentCommentRoundtripTest imports a SDLXLIFF file with comments, adds new comments and export the file again
  */
-class SegmentCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
+class SegmentCommentRoundtripTest extends editor_Test_Segment {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
 
@@ -75,13 +75,12 @@ class SegmentCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
     public function testImportedContent() {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=100');
         $segmentIds = array_column($segments, 'id');
-        $segments = $this->prepareSegmentsForTest($segments);
-        //file_put_contents($this->api()->getFile('/expectedSegments.json', null, false), json_encode($segments,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $segments, 'Imported segments are not as expected!');
+        
+        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
 
         $comments = $this->getCommentsForTest($segmentIds);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/SegmentCommentRoundtripTest/expectedComments-new.json", json_encode($comments,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedComments.json'), $comments, 'Imported comments are not as expected!');
+        
+        $this->assertCommentsEqualsJsonFile('expectedComments.json', $comments, 'Imported comments are not as expected!');
     }
 
     /**
@@ -89,41 +88,13 @@ class SegmentCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
      * @param array $segmentIds
      * @return array
      */
-    protected function getCommentsForTest(array $segmentIds, $removeDates = false) {
+    protected function getCommentsForTest(array $segmentIds) {
         $comments = [];
         foreach($segmentIds as $id) {
             $commentsBySegment = $this->api()->requestJson('editor/comment?segmentId='.$id);
-            //we loop over the $commentsBySegment array and store that modified array again
-            array_map(function($comment) use ($removeDates){
-                unset($comment->id);
-                unset($comment->segmentId);
-                unset($comment->taskGuid);
-                if($removeDates) {
-                    unset($comment->modified);
-                    unset($comment->created);
-                }
-                return $comment;
-            }, $commentsBySegment);
             $comments[] = $commentsBySegment;
         }
         return $comments;
-    }
-
-    /**
-     * prepares the given segment list for testing
-     * @param array $segments
-     * @return array
-     */
-    protected function prepareSegmentsForTest(array $segments) {
-        //remove untestable content but keep comments here
-        return array_map(function($segment) {
-            //since we want to test the imported comment values we have to protect them to be removed from removeUntestableSegmentContent
-            $segment->MASKEDcomments = $segment->comments;
-            self::$api->removeUntestableSegmentContent($segment);
-            $segment->comments = $segment->MASKEDcomments;
-            unset($segment->MASKEDcomments);
-            return $segment;
-        }, $segments);
     }
 
     /**
@@ -143,13 +114,12 @@ class SegmentCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
 
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=100');
         $segmentIds = array_column($segments, 'id');
-        $segments = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents($this->api()->getFile('/expectedSegmentsAfterAdd.json', null, false), json_encode($segments,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedSegmentsAfterAdd.json'), $segments, 'Imported segments are not as expected!');
+        
+        $this->assertSegmentsEqualsJsonFile('expectedSegmentsAfterAdd.json', $segments, 'Imported segments are not as expected!');
 
-        $comments = $this->getCommentsForTest($segmentIds, true);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/SegmentCommentRoundtripTest/expectedCommentsAfterAdd-new.json", json_encode($comments,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedCommentsAfterAdd.json'), $comments, 'Imported comments are not as expected!');
+        $comments = $this->getCommentsForTest($segmentIds);
+        
+        $this->assertCommentsEqualsJsonFile('expectedCommentsAfterAdd.json', $comments, 'Imported comments are not as expected!', true);
     }
 
     /**

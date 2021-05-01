@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Testcase for TRANSLATE-2282 Mixing XLF id and rid values led to wrong tag numbering
  * For details see the issue.
  */
-class Translate2282Test extends \ZfExtended_Test_ApiTestcase {
+class Translate2282Test extends editor_Test_Segment {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
@@ -75,9 +75,7 @@ class Translate2282Test extends \ZfExtended_Test_ApiTestcase {
     public function testSegmentValuesAfterImport() {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
         
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents($this->api()->getFile('/expectedSegments.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
+        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
     }
     
     public static function tearDownAfterClass(): void {

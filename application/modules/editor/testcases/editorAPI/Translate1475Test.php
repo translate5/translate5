@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Testcase for TRANSLATE-1475 Merging of term tagger result and track changes content leads to several errors
  */
-class Translate1475Test extends \ZfExtended_Test_ApiTestcase {
+class Translate1475Test extends editor_Test_Segment {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
@@ -72,10 +72,7 @@ class Translate1475Test extends \ZfExtended_Test_ApiTestcase {
      */
     public function testSegmentValuesAfterImport() {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
-        
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/Translate1475Test/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
+        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
     }
     
     /**
@@ -113,10 +110,8 @@ class Translate1475Test extends \ZfExtended_Test_ApiTestcase {
         }
         
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/Translate1475Test/expectedSegmentsEdited-new.json", json_encode($data,JSON_PRETTY_PRINT));
         
-        $this->assertEquals(self::$api->getFileContent('expectedSegmentsEdited.json'), $data, 'Imported segments are not as expected!');
+        $this->assertSegmentsEqualsJsonFile('expectedSegmentsEdited.json', $segments, 'Edited segments are not as expected!');
     }
     
     public static function tearDownAfterClass(): void {
