@@ -115,7 +115,7 @@ class ProjectTaskTest extends editor_Test_Segment {
         $segments = self::$api->requestJson('editor/segment?page=1&start=0&limit=200');
         
         // compare segments (this API will strip/adjust segment contents)
-        $this->assertSegmentsEqualsJsonFile($fileName, $segments, 'Imported segments are not as expected!');
+        $this->assertSegmentsEqualsJsonFile($fileName, $segments, 'Imported segments are not as expected in '.basename($fileName).'!');
         
         //close the task for editing
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
@@ -128,15 +128,15 @@ class ProjectTaskTest extends editor_Test_Segment {
     protected function addTermCollection() {
         $params=[];
         //create the resource 3 and import the file
-        $params['name']='API Testing::TermCollection_'.__CLASS__;
-        $params['resourceId']='editor_Services_TermCollection';
-        $params['serviceType']='editor_Services_TermCollection';
+        $params['name'] = 'API Testing::TermCollection_'.__CLASS__;
+        $params['resourceId'] = 'editor_Services_TermCollection';
+        $params['serviceType'] = 'editor_Services_TermCollection';
         $params['customerIds'] = [self::$customerTest->id];
         $params['customerUseAsDefaultIds'] = [self::$customerTest->id];
-        $params['serviceName']='TermCollection';
-        $params['mergeTerms']=false;
+        $params['serviceName'] = 'TermCollection';
+        $params['mergeTerms'] = false;
         
-        self::$api->addResource($params,'collection.tbx');
+        self::$api->addResource($params, 'collection.tbx', true);
     }
     
     /***

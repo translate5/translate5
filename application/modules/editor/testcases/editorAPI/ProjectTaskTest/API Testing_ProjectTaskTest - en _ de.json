@@ -1010,7 +1010,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_39\":{\"nr\":\"39\",\"length\":{\"targetEdit\":0}},\"fakeSegId_40\":{\"nr\":\"40\",\"length\":{\"targetEdit\":141}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_39\":{\"nr\":\"39\",\"length\":{\"targetEdit\":0}},\"fakeSegId_40\":{\"nr\":\"40\",\"length\":{\"targetEdit\":140}}}}",
         "isWatched": false
     },
     {
@@ -1036,7 +1036,7 @@
         "targetToSort": "Es wird empfohlen, einen Blick auf die \u00bbApache Dokumentation zu werfen, um ein grundlegendes Verst\u00e4ndnis des Apache 2.0 Servers zu erhalten.",
         "targetEdit": "Es wird empfohlen, einen Blick auf die \u00bb<div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;1\/&gt;: Non breaking space\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div>Apache Dokumentation zu werfen, um <div title=\"\" class=\"term preferredTerm exact\">ein<\/div> grundlegendes Verst\u00e4ndnis des Apache 2.0 Servers zu erhalten.",
         "targetEditToSort": "Es wird empfohlen, einen Blick auf die \u00bbApache Dokumentation zu werfen, um ein grundlegendes Verst\u00e4ndnis des Apache 2.0 Servers zu erhalten.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_39\":{\"nr\":\"39\",\"length\":{\"targetEdit\":0}},\"fakeSegId_40\":{\"nr\":\"40\",\"length\":{\"targetEdit\":141}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_39\":{\"nr\":\"39\",\"length\":{\"targetEdit\":0}},\"fakeSegId_40\":{\"nr\":\"40\",\"length\":{\"targetEdit\":140}}}}",
         "isWatched": false
     },
     {
