@@ -182,7 +182,6 @@ Ext.define('Editor.controller.MetaPanel', {
         text: tooltip
     });
     me.record = record;
-    me.recordStateId = record.get('stateId');
     me.loadTermPanel(segmentId);
     me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
     // our component controllers are listening for the load event & create their views
@@ -243,7 +242,6 @@ Ext.define('Editor.controller.MetaPanel', {
       mp = me.getMetaPanel();
       me.editingMode = 'readonly';
       me.record = record;
-      me.recordStateId = record.get('stateId');
       me.getSegmentMeta().hide();
       mp.enable();
       me.getNavi().hide();
@@ -275,13 +273,6 @@ Ext.define('Editor.controller.MetaPanel', {
    * @hint metapanel
    */
   cancelEdit: function() {
-      // the record may not be set since cancelEdit is "misused" from the comment Panel to deactivate the view
-      // this is SOO Ugly, the record is reset when editing is canceled and we have to reset the segments stateId when it was changed by our
-      // TODO FIXME: how can we prevent the stateId is reset when canceling editing ?
-      if(this.record && this.recordStateId !== undefined && this.recordStateId != this.record.get('stateId')){
-          this.record.set('stateId', this.recordStateId);
-          console.log("SEGMENT STATE NEEDED TO BE RE-SET");
-      }
       this.getMetaPanel().disable();
       this.getMetaFalPosPanel().endEditing(true, false);
       this.getMetaQmPanel().endEditing(this.hasQmQualities, false);
@@ -309,8 +300,8 @@ Ext.define('Editor.controller.MetaPanel', {
               response = Ext.util.JSON.decode(response.responseText);
               if(response.success){
                   me.record.set('stateId', stateId);
+                  // commit silently, oherwise the changed state gets lost on next edit of the segment
                   me.record.commit(true);
-                  me.recordStateId = stateId;
                   Editor.MessageBox.addSuccess(me.messages.stateIdSaved);
               } else {
                   console.log("Changing segments stateId via Ajax failed!");
