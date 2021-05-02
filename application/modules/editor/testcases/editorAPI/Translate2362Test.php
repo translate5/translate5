@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Testcase for TRANSLATE-2362 Mixing XLF id and rid values led to wrong tag numbering
  * For details see the issue.
  */
-class Translate2362Test extends editor_Test_Segment {
+class Translate2362Test extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         

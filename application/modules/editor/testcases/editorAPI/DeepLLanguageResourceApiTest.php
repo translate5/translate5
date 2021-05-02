@@ -35,7 +35,7 @@
  *
  * Testing what users can do with LanguageResources in addition is NOT part of this test.
  */
-class DeepLLanguageResourceApiTest extends editor_Test_Segment {
+class DeepLLanguageResourceApiTest extends editor_Test_JsonTest {
     
     /**
      * ServiceType according the Service's namespace.
@@ -142,7 +142,7 @@ class DeepLLanguageResourceApiTest extends editor_Test_Segment {
      */
     public function assertSourceExists($source, $data, $msg){
         foreach($data as $item){
-            if($this->_adjustFieldText($item['source']) == $this->_adjustFieldText($source)){
+            if(editor_Test_Sanitizer::fieldtext($item['source']) == editor_Test_Sanitizer::fieldtext($source)){
                 $this->assertTrue(true, $msg);
                 return;
             }
@@ -158,8 +158,8 @@ class DeepLLanguageResourceApiTest extends editor_Test_Segment {
      */
     public function assertTranslationExists($source, $translation, $data, $msg){
         foreach($data as $item){
-            if($this->_adjustFieldText($item['source']) == $this->_adjustFieldText($source)){
-                $this->assertEquals($this->_adjustFieldText($item['translation']), $this->_adjustFieldText($translation), $msg);
+            if(editor_Test_Sanitizer::fieldtext($item['source']) == editor_Test_Sanitizer::fieldtext($source)){
+                $this->assertEquals(editor_Test_Sanitizer::fieldtext($item['translation']), editor_Test_Sanitizer::fieldtext($translation), $msg);
                 return;
             }
         }

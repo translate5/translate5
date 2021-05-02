@@ -31,16 +31,20 @@ END LICENSE AND COPYRIGHT
  * This solves the problem, that Tags in segment text are enriched with quality-id's in some cases that contain auto-increment id's and thus have to be stripped
  * Also, the attributes in tags may be in a different order because historically there have been different attribute orders for differen tags
  */
-abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
-    
+abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
+
     /**
-     * These attributes will be deleted from all tags
-     * @var array
+     * Adjuts the passed texts to clean up field tags for comparision
+     * @param string $expected
+     * @param string $actual
+     * @param string $message
      */
-    protected static $attributesToDelete = [ 'data-t5qid', 'data-seq', 'data-usertrackingid', 'data-timestamp', 'data-tbxid' ];
-    
-    protected static $segmentFields = [ 'source', 'sourceEdit', 'target', 'targetEdit' ];
-    
+    public function assertFieldTextEquals(string $expected, string $actual, string $message=''){
+        return $this->assertEquals(
+            editor_Test_Sanitizer::fieldtext($expected),
+            editor_Test_Sanitizer::fieldtext($actual),
+            $message);
+    }
     /**
      * compares the given segment content to the content in the given assert file
      * @param string $fileToCompare
@@ -59,10 +63,11 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
      * @param boolean $keepComments
      */
     public function assertSegmentEqualsObject(stdClass $expectedObj, stdClass $segment, string $message='', bool $keepComments=true){
-        $this->assertEquals(
-            $this->cleanSegmentJson($expectedObj),
-            $this->cleanSegmentObject($segment, $keepComments),
-            $message);
+        $model = editor_Test_Model_Abstract::create($segment, 'segment');
+        if(!$keepComments){
+            $model->removeComparedField('comments');
+        }
+        $model->compare($this, $expectedObj, $message);
     }
     /**
      * Compares an array of segments with a file (which must contain those segments as json-array)
@@ -82,60 +87,6 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
                 $this->assertSegmentEqualsObject($expectations[$i], $segments[$i], $msg, $keepComments);
             }
         }
-    }
-    /**
-     * Cleans a segment originating from the T5 API
-     * @param stdClass $segment
-     * @param boolean $keepComments
-     * @param boolean $keepId
-     * @return stdClass
-     */
-    public function cleanSegmentObject(stdClass $segment, bool $keepComments=true, bool $keepId=false) : stdClass {
-        if(!$keepId) {
-            unset($segment->id);
-        }
-        unset($segment->fileId);
-        unset($segment->taskGuid);
-        unset($segment->timestamp);
-        if(isset($segment->metaCache)) {
-            $meta = json_decode($segment->metaCache, true);
-            if(!empty($meta['siblingData'])) {
-                $data = [];
-                foreach($meta['siblingData'] as $sibling) {
-                    $data['fakeSegId_'.$sibling['nr']] = $sibling;
-                }
-                ksort($data);
-                $meta['siblingData'] = $data;
-            }
-            $segment->metaCache = json_encode($meta, JSON_FORCE_OBJECT);
-        }
-        if(!$keepComments){
-            $segment->comments = NULL;
-        } else if(!empty($segment->comments)) {
-            $segment->comments = $this->_adjustComments($segment->comments);
-        }
-        foreach(self::$segmentFields as $field){
-            if(property_exists($segment, $field)) {
-                $segment->$field = $this->_adjustFieldText($segment->$field);
-            }
-        }
-        return $segment;
-    }
-    /**
-     * Cleans a segment originating from an comparision-file
-     * @param stdClass $jsonSegment
-     * @return stdClass
-     */
-    public function cleanSegmentJson(stdClass $jsonSegment) : stdClass {
-        if(!empty($jsonSegment->comments)) {
-            $jsonSegment->comments = $this->_adjustComments($jsonSegment->comments);
-        }
-        foreach(self::$segmentFields as $field){
-            if(property_exists($jsonSegment, $field)) {
-                $jsonSegment->$field = $this->_adjustFieldText($jsonSegment->$field);
-            }
-        }
-        return $jsonSegment;
     }
     /**
      * Compares an 2-dimensional array of comments with a file (which must contain those comments as json-array)
@@ -175,88 +126,10 @@ abstract class editor_Test_Segment extends \ZfExtended_Test_ApiTestcase {
      * @param boolean $keepComments
      */
     public function assertCommentEqualsObject(stdClass $expectedObj, stdClass $comment, string $message='', bool $removeDates=false){
-        $this->assertEquals(
-            $this->cleanCommentJson($expectedObj),
-            $this->cleanCommentObject($comment, $removeDates),
-            $message);
-    }
-    /**
-     * Cleans a comment originating from the T5 API
-     * @param stdClass $comment
-     * @param bool $removeDates
-     * @return stdClass
-     */
-    public function cleanCommentObject(stdClass $comment, bool $removeDates=false) : stdClass {
-        unset($comment->id);
-        unset($comment->segmentId);
-        unset($comment->taskGuid);
-        if($removeDates) {
-            unset($comment->modified);
-            unset($comment->created);
+        $model = editor_Test_Model_Abstract::create($comment, 'comment');
+        if($removeDates){
+            $model->removeComparedField('created')->removeComparedField('modified');
         }
-        return $comment;
-    }
-    /**
-     * Cleans a comment originating from an comparision-file
-     * @param stdClass $comment
-     * @return stdClass
-     */
-    public function cleanCommentJson(stdClass $comment) : stdClass {
-        return $comment;
-    }
-    
-    /**
-     * Adjuts the passed tests to clean up field tags for comparision
-     * @param string $expected
-     * @param string $actual
-     * @param string $message
-     */
-    public function assertFieldTextEquals(string $expected, string $actual, string $message=''){
-        return $this->assertEquals($this->_adjustFieldText($expected), $this->_adjustFieldText($actual), $message);
-    }
-    /**
-     *
-     * @param string $text
-     * @return string
-     */
-    protected function _adjustFieldText(string $text){
-        if(strip_tags($text) == $text){
-            return $text;
-        }
-        return preg_replace_callback('~<([a-z]+[0-9]*)[^>]*>~', array($this, '_replaceFieldTags'), $text);
-    }
-    /**
-     *
-     * @param string $text
-     * @return string
-     */
-    protected function _adjustComments(string $text){
-        // <span class="modified">2019-08-27 17:44:36</span>
-        return preg_replace('/<span class="modified">[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}</', '<span class="modified">NOT_TESTABLE<', $text);
-    }
-    /**
-     *
-     * @param array $matches
-     * @return string
-     */
-    protected function _replaceFieldTags($matches){
-        
-        // error_log('REPLACE FIELD TAGS: '.print_r($matches));
-        
-        if(count($matches) > 1){
-            $isSingle = (substr(trim(rtrim($matches[0], '>')), -1) == '/');
-            $tag = ($isSingle) ? editor_Tag::unparse($matches[0]) : editor_Tag::unparse($matches[0].'</'.$matches[1].'>');
-            if($tag == NULL){
-                return $matches[0];
-            }
-            foreach(self::$attributesToDelete as $attrName){
-                $tag->unsetAttribute($attrName);
-            }
-            if($isSingle){
-                return $tag->render();
-            }
-            return $tag->start();
-        }
-        return $matches[0];
+        $model->compare($this, $expectedObj, $message);
     }
 }

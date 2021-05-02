@@ -47,7 +47,7 @@ END LICENSE AND COPYRIGHT
  *   - Segments to be changed with the repetition editor are getting the edited target and the edited source and the autostates of the master segment
  *   - In Source Original the transFound states are recalculated
  */
-class ChangeAlikeTranslate683Test extends editor_Test_Segment {
+class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
     protected static $useSourceEditing = false;
     
     /**
@@ -117,7 +117,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_Segment {
         $isSE = $this->api()->getTask()->enableSourceEditing;
         
         //test editing a prefilled segment
-        $segToTest = $this->cleanSegmentObject($segments[1], true, true);
+        $segToTest = $segments[1];
         
         if($isSE) {
             $this->assertFieldTextEquals($this->toCompareSource['sourceBeforeEdit'], $segToTest->sourceEdit);
@@ -135,8 +135,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_Segment {
             $segmentData = $this->api()->prepareSegmentPut('sourceEdit', 'Ich wiederhole mich in der Quelle - edited', $segToTest->id);
             $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         }
-        $segment = $this->cleanSegmentObject($segment);
-        
+      
         //assert source / target after editing
         $this->assertFieldTextEquals($this->toCompareSource['sourceAfterEdit'], $segment->source);
         $this->assertFieldTextEquals($this->toCompareSource['targetBeforeEdit'], $segment->target); //not changed the target original
@@ -165,7 +164,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_Segment {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         
         //check the alike were the ChangeAlikes handler only changed the autoState, the content was already correct
-        $segment = $this->cleanSegmentObject($segments[0]);
+        $segment = $segments[0];
         $this->assertEquals($isSE ? 11 : 13, $segment->autoStateId);
         $this->assertFieldTextEquals($this->toCompareSource['sourceAfterEdit'], $segment->source);
         //this changealike was prefilled with the correct segment data, so targetEditAfterEdit == targetBeforeEdit
@@ -173,14 +172,14 @@ class ChangeAlikeTranslate683Test extends editor_Test_Segment {
         $this->assertFieldTextEquals($this->toCompareSource['targetEditAfterEdit'], $segment->targetEdit);
         
         //retest the master segment, if the edited content remains and the autostate is correct
-        $segment = $this->cleanSegmentObject($segments[1]);
+        $segment = $segments[1];
         $this->assertEquals(10, $segment->autoStateId);
         $this->assertFieldTextEquals($this->toCompareSource['sourceAfterEdit'], $segment->source);
         $this->assertFieldTextEquals($this->toCompareSource['targetBeforeEdit'], $segment->target);
         $this->assertFieldTextEquals($this->toCompareSource['targetEditAfterEdit'], $segment->targetEdit);
         
         //test the alike were changed content and autostate
-        $segment = $this->cleanSegmentObject($segments[2]);
+        $segment = $segments[2];
         $this->assertEquals(11, $segment->autoStateId);
         $this->assertFieldTextEquals($this->toCompareSource['sourceAfterEdit'], $segment->source);
         $this->assertFieldTextEquals($this->toCompareSource['targetBeforeEdit'], $segment->target);
@@ -199,7 +198,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_Segment {
         $isSE = $this->api()->getTask()->enableSourceEditing;
         
         //test editing a prefilled segment
-        $segToTest = $this->cleanSegmentObject($segments[4], true, true);
+        $segToTest = $segments[4];
         if($isSE) {
             $this->assertFieldTextEquals($this->toCompareTarget['sourceBeforeEdit5'], $segToTest->sourceEdit);
         }
@@ -216,8 +215,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_Segment {
             $segmentData = $this->api()->prepareSegmentPut('sourceEdit', 'Ich wiederhole mich im Zieltext - edited', $segToTest->id);
             $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         }
-        $segment = $this->cleanSegmentObject($segment);
-        
+         
         //assert source / target after editing
         $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit5'], $segment->source);
         $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target); //not changed the target original
@@ -246,28 +244,28 @@ class ChangeAlikeTranslate683Test extends editor_Test_Segment {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         
         //check the alike were the ChangeAlikes handler only changed the autoState, the content was already correct
-        $segment = $this->cleanSegmentObject($segments[3]);
+        $segment = $segments[3];
         $this->assertEquals(11, $segment->autoStateId);
         $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit4'], $segment->source);
         $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target);
         $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
         
         //retest the master segment, if the edited content remains and the autostate is correct
-        $segment = $this->cleanSegmentObject($segments[4]);
+        $segment = $segments[4];
         $this->assertEquals(10, $segment->autoStateId);
         $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit5'], $segment->source);
         $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target);
         $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
         
         //test the alike were changed content and autostate
-        $segment = $this->cleanSegmentObject($segments[5]);
+        $segment = $segments[5];
         $this->assertEquals($isSE ? 11 : 13, $segment->autoStateId);
         $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit6'], $segment->source);
         $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit6'], $segment->target);
         $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
         
         //test the alike were changed content and autostate
-        $segment = $this->cleanSegmentObject($segments[6]);
+        $segment = $segments[6];
         $this->assertEquals(11, $segment->autoStateId);
         $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit7'], $segment->source);
         $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target);
@@ -290,17 +288,14 @@ class ChangeAlikeTranslate683Test extends editor_Test_Segment {
         
         $sourceCompareString = $this->toCompareSource['sourceAfterEdit'].' - edited';
         $targetCompareString = $this->toCompareTarget['sourceAfterEdit6'].' - edited';
-        foreach($segments as $segment) {
-            //since objects are used by reference, using return value is not needed  
-            $this->cleanSegmentObject($segment);
-        }
-        $this->assertEquals($sourceCompareString, $segments[0]->sourceEdit);
-        $this->assertEquals($sourceCompareString, $segments[1]->sourceEdit);
-        $this->assertEquals($sourceCompareString, $segments[2]->sourceEdit);
-        $this->assertEquals($targetCompareString, $segments[3]->sourceEdit);
-        $this->assertEquals($targetCompareString, $segments[4]->sourceEdit);
-        $this->assertEquals($targetCompareString, $segments[5]->sourceEdit);
-        $this->assertEquals($targetCompareString, $segments[6]->sourceEdit);
+
+        $this->assertFieldTextEquals($sourceCompareString, $segments[0]->sourceEdit);
+        $this->assertFieldTextEquals($sourceCompareString, $segments[1]->sourceEdit);
+        $this->assertFieldTextEquals($sourceCompareString, $segments[2]->sourceEdit);
+        $this->assertFieldTextEquals($targetCompareString, $segments[3]->sourceEdit);
+        $this->assertFieldTextEquals($targetCompareString, $segments[4]->sourceEdit);
+        $this->assertFieldTextEquals($targetCompareString, $segments[5]->sourceEdit);
+        $this->assertFieldTextEquals($targetCompareString, $segments[6]->sourceEdit);
     }
     
     public static function tearDownAfterClass(): void {

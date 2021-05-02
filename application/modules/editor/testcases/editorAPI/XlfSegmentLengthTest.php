@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * XlfSegmentLengthTest imports a simple task and checks imported values about the segment lengths
  * edits segments and checks then the edited ones again on correct content
  */
-class XlfSegmentLengthTest extends editor_Test_Segment {
+class XlfSegmentLengthTest extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         

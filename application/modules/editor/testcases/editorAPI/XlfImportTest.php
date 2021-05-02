@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * BasicSegmentEditingTest imports a simple task, checks imported values,
  * edits segments and checks then the edited ones again on correct content
  */
-class XlfImportTest extends editor_Test_Segment {
+class XlfImportTest extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         

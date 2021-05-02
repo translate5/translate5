@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  *  instead of the correct one:
  *    Text der von extern kommt zu ersetzen “<1>damit wir keine Probleme mit dem Urheberrecht bekommen”.</1>
  */
-class Translate2149Test extends editor_Test_Segment {
+class Translate2149Test extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         

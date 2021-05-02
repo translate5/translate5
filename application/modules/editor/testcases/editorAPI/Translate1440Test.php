@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Testcase for TRANSLATE-1440 xlf tag numbering mismatch between source and target
  */
-class Translate1440Test extends editor_Test_Segment {
+class Translate1440Test extends editor_Test_JsonTest {
     
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);

@@ -57,8 +57,8 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      * Import all required resources and task before the validation
      */
     public function testSetupData(){
-        $this->addTm('resource1.tmx',$this->getLrRenderName('resource1'));
-        $this->addTm('resource2.tmx',$this->getLrRenderName('resource2'));
+        $this->addTm('resource1.tmx', $this->getLrRenderName('resource1'));
+        $this->addTm('resource2.tmx', $this->getLrRenderName('resource2'));
         $this->addTermCollection('collection.tbx', $this->getLrRenderName('resource3'));
         $this->createTask();
         $this->addTaskAssoc();

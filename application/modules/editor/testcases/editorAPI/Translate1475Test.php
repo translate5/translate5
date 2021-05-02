@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Testcase for TRANSLATE-1475 Merging of term tagger result and track changes content leads to several errors
  */
-class Translate1475Test extends editor_Test_Segment {
+class Translate1475Test extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
