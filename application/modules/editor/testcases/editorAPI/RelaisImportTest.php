@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Tests if Relais Files are imported correctly, inclusive our alignment checks 
  */
-class RelaisImportTest extends editor_Test_Segment {
+class RelaisImportTest extends editor_Test_JsonTest {
     
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);

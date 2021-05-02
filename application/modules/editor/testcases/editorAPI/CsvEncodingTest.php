@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * The test task will be edited and exported. The generated changes.xml and
  * exported file will then be checked for correct encoded content.
  */
-class CsvEncodingTest extends editor_Test_Segment {
+class CsvEncodingTest extends editor_Test_JsonTest {
     /**
      * Setting up the test task by fresh import, adds the lector and translator users
      */

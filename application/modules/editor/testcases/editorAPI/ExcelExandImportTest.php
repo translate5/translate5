@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * ExcelExandImportTest.php imports a simple task, checks export of excel and reimport then
  */
-class ExcelExandImportTest extends editor_Test_Segment {
+class ExcelExandImportTest extends editor_Test_JsonTest {
     
     /**
      * @var string contains the file name to the downloaded excel

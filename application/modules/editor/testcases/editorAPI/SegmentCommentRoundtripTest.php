@@ -29,7 +29,8 @@ END LICENSE AND COPYRIGHT
 /**
  * SegmentCommentRoundtripTest imports a SDLXLIFF file with comments, adds new comments and export the file again
  */
-class SegmentCommentRoundtripTest extends editor_Test_Segment {
+class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
+    
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
 

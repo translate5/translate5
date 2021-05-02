@@ -33,7 +33,7 @@
  * 4. Compare the segment content after term tagging for each project task.
  *
  */
-class ProjectTaskTest extends editor_Test_Segment {
+class ProjectTaskTest extends editor_Test_JsonTest {
     
     protected static $customerTest;
     protected static $sourceLangRfc = 'en';

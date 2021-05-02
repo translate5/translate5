@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  *   Tag Content and position does not matter, only the tag count must be
  *   equal in the segments (and the text of course) to be recognized as repetition.
  */
-class ChangeAlikeTranslate680Test extends editor_Test_Segment {
+class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
     protected static $useSourceEditing = false;
     
     /**

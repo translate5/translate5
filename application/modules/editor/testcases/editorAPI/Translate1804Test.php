@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Testcase for TRANSLATE-1804 Segments containing only 0 are not imported
  */
-class Translate1804Test extends editor_Test_Segment {
+class Translate1804Test extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(get_called_class());
         
