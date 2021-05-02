@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Bootstrapping the API tests
  */
 
-$APPLICATION_ROOT = getenv('APPLICATION_ROOT');
+$APPLICATION_ROOT = rtrim(getenv('APPLICATION_ROOT'), '/');
 $zendLib = $APPLICATION_ROOT.'/vendor/shardj/zf1-future/library/';
 
 //include optional composer vendor autoloader. TODO FIXME: why needs this to be done here, shouldn't the bootstarpper make that happen 
@@ -45,6 +45,7 @@ set_include_path($APPLICATION_ROOT.PATH_SEPARATOR.$path.PATH_SEPARATOR.$zendLib)
 $_SERVER['REQUEST_URI'] = '/';
 $_SERVER['SERVER_NAME'] = 'localhost';
 $_SERVER['HTTP_HOST'] = 'localhost';
+define('APPLICATION_ROOT', $APPLICATION_ROOT);
 define('APPLICATION_PATH', $APPLICATION_ROOT.DIRECTORY_SEPARATOR.'application');
 define('APPLICATION_ENV', 'application');
 // define a general marker for unit tests
@@ -59,14 +60,14 @@ $index = ZfExtended_BaseIndex::getInstance();
 $index->initApplication()->bootstrap();
 $index->addModuleOptions('default');
 
-// TODO FIXME: get rid of these globals
-global $T5_API_URL;
-$T5_API_URL = getenv('API_URL');
-//FIXME the next two variables could be get by api call to editor/config, this would imply a testmanager login before each testcase!
-global $T5_DATA_DIR;
-$T5_DATA_DIR = getenv('DATA_DIR');
-global $T5_LOGOUT_PATH;
-$T5_LOGOUT_PATH = getenv('LOGOUT_PATH');
+// runtimeOptions.dir.taskData
+$config = Zend_Registry::get('config');
+$API_URL = $config->runtimeOptions->server->protocol.$config->runtimeOptions->server->name;
+$DATA_DIR = $config->runtimeOptions->dir->taskData;
+$LOGOUT_PATH = $config->runtimeOptions->loginUrl;
+
+// crucial: setup the test-API with the neccessary pathes & url's
+ZfExtended_Test_ApiHelper::setup($API_URL, $DATA_DIR, $LOGOUT_PATH);
 
 //forcing cwd to testcases dir
 chdir(dirname(__FILE__));

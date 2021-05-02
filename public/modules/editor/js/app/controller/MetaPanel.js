@@ -280,6 +280,7 @@ Ext.define('Editor.controller.MetaPanel', {
       // TODO FIXME: how can we prevent the stateId is reset when canceling editing ?
       if(this.record && this.recordStateId !== undefined && this.recordStateId != this.record.get('stateId')){
           this.record.set('stateId', this.recordStateId);
+          console.log("SEGMENT STATE NEEDED TO BE RE-SET");
       }
       this.getMetaPanel().disable();
       this.getMetaFalPosPanel().endEditing(true, false);
@@ -308,6 +309,7 @@ Ext.define('Editor.controller.MetaPanel', {
               response = Ext.util.JSON.decode(response.responseText);
               if(response.success){
                   me.record.set('stateId', stateId);
+                  me.record.commit(true);
                   me.recordStateId = stateId;
                   Editor.MessageBox.addSuccess(me.messages.stateIdSaved);
               } else {
