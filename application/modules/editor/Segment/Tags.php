@@ -468,7 +468,7 @@ class editor_Segment_Tags implements JsonSerializable {
      */
     public function addAllTargetsQuality(string $type, string $category){
         foreach($this->getAllTargetFields() as $field){
-            $this->getQualities()->add($field, $type, $category);
+            $this->getQualities()->add($field, $type, $category, 0, -1);
         }
     }
     /**
