@@ -753,9 +753,18 @@ abstract class editor_Workflow_Abstract {
      * @param editor_Models_Task $task
      */
     public function beforeSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
-        $updateAutoStates = function($autostates, $segment, $tua) {
+        $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, editor_Models_Segment $segment, $tua) {
             //sets the calculated autoStateId
-            $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua));
+            $oldAutoState = $segment->getAutoStateId();
+            $newAutoState = $autostates->calculateSegmentState($segment, $tua);
+            $isChanged = $oldAutoState != $newAutoState;
+            
+            //if a segment with PRETRANS_INITIAL is saved by a translator, it is confirmed by setting it to PRETRANS_TRANSLATED
+            // this is needed to restore the auto_state later in things like segmentsSetInitialState
+            if($segment->getPretrans() == $segment::PRETRANS_INITIAL && $autostates->isTranslationState($newAutoState) && $isChanged) {
+                $segment->setPretrans($segment::PRETRANS_TRANSLATED);
+            }
+            $segment->setAutoStateId($newAutoState);
         };
         $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates, $task);
     }
