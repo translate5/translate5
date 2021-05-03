@@ -89,7 +89,6 @@ class editor_Models_Segment_Updater {
         
         $this->segment->validate();
         
-        //TODO: Introduced with TRANSLATE-885, but is more a hack as a solution. See Issue comments for more information!
         $this->updateTargetHashAndOriginal($this->task);
 
         // Update the Quality Tags
@@ -125,12 +124,11 @@ class editor_Models_Segment_Updater {
         //TODO: also a check is missing, if task has alternate targets or not.
         // With alternates no recalc is needed at all, since no repetition editor can be used
         
+        //FIXME: it is currently in discussion with the community if the setTargetMd5 is done always on segment save!
         if($this->task->getWorkflowStep() == 1 && (bool) $this->task->getEmptyTargets()){
             $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$this->task]);
             /* @var $hasher editor_Models_Segment_RepetitionHash */
             $this->segment->setTargetMd5($hasher->hashTarget($this->segment->getTargetEdit(), $this->segment->getSource()));
-            $this->segment->setTarget($this->segment->getTargetEdit());
-            $this->segment->updateToSort('target');
         }
     }
     
@@ -239,7 +237,7 @@ class editor_Models_Segment_Updater {
     
     /***
      * This will write a log entry of how many characters are send to the adapter for translation.
-     * 
+     *
      * @param editor_Models_LanguageResources_LanguageResource $adapter
      */
     protected function logAdapterUsageOnSegmentEdit(editor_Models_LanguageResources_LanguageResource $adapter) {

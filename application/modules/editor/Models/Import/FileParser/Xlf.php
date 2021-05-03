@@ -42,6 +42,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     const MISSING_MRK = 'missing-mrk';
     
     /**
+     * The XLF target states which are to be considered as pretranslated only, as defined in TRANSLATE-1643
+     * @var array
+     */
+    const PRE_TRANS_STATES = ['needs-adaption', 'needs-l10n'];
+    
+    /**
      * defines if the content parser should reparse the chunks
      * false default, better performance
      * true used in subclasses, sometimes thats needed because of changes done in the XML structure
@@ -624,7 +630,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * @param int $mid MRK tag mid or 0 if no mrk mtype seg used
      * @return editor_Models_Import_FileParser_SegmentAttributes
      */
-    protected function parseSegmentAttributes($attributes, $mid) {
+    protected function parseSegmentAttributes($attributes, $mid): editor_Models_Import_FileParser_SegmentAttributes {
         //build mid from id of segment plus segmentCount, because xlf-file can have more than one file in it with repeatingly the same ids.
         // and one trans-unit (where the id comes from) can contain multiple mrk type seg tags, which are all converted into single segments.
         // instead of using mid from the mrk type seg element, the segmentCount as additional ID part is fine.
@@ -642,6 +648,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         if(!empty($this->currentPlainTarget) && $state = $this->xmlparser->getAttribute($this->currentPlainTarget['openerMeta']['attributes'], 'state')) {
             $segmentAttributes->targetState = $state;
+            $segmentAttributes->isPreTranslated = in_array($state, self::PRE_TRANS_STATES);
         }
         
         if(!$this->processSegment) {

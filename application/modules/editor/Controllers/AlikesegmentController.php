@@ -222,7 +222,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         //TODO: change to websocket
         //the alike segment save does not use the segment saver
         //the segment finish count needs to be updated after the allike segments save
-        $task->updateSegmentFinishCount($task);
+        $task->updateSegmentFinishCount();
         //reload the task
         $task->load($task->getId());
         $this->view->segmentFinishCount=$task->getSegmentFinishCount();
@@ -250,8 +250,8 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      */
     protected function updateTargetHashAndOriginal(editor_Models_Segment $segment, editor_Models_Segment_RepetitionHash $hasher = null) {
         if($hasher) {
+            //FIXME: it is currently in discussion with the community if the setTargetMd5 is done always on segment save!
             $segment->setTargetMd5($hasher->hashTarget($segment->getTargetEdit(), $segment->getSource()));
-            $segment->setTarget($segment->getTargetEdit());
         }
     }
     

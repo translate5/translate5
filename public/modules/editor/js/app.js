@@ -316,21 +316,28 @@ Ext.application({
             }
             return;
         }
-        var loadBox = Ext.select("body > div.loading"),
-            msg = '<div id="head-panel"></div>',
-            response = op.error.response,
+        var response = op.error.response,
             title = 'Uups... The requested task could not be opened',
             respText = response && response.responseText;
 
         if(op.error.status == 404 && record.get('taskGuid') == '') {
-            msg += '<h1>'+title+'</h1>The requested task does not exist anymore.';
+            this.showInlineError('The requested task does not exist anymore.', title);
         }else if(respText) {
-            msg += Editor.app.getController('ServerException').renderHtmlMessage(title, Ext.JSON.decode(respText));
+            this.showInlineError(Editor.app.getController('ServerException').renderHtmlMessage(title, Ext.JSON.decode(respText)));
         }
-        
+    },
+    /**
+     * shows a nice inline error
+     */
+    showInlineError: function(text, title) {
+        var loadBox = Ext.select("body > div.loading"),
+            msg = '<div id="head-panel"></div>';
+        if(title) {
+            msg += '<h1>'+title+'</h1>';
+        }
         if(loadBox) {
             loadBox.setCls('loading-error');
-            loadBox.update(msg);
+            loadBox.update(msg + text);
         }
     },
     /**
