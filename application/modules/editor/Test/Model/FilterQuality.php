@@ -26,11 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Test_Model_Quality extends editor_Test_Model_Abstract {
+class editor_Test_Model_FilterQuality extends editor_Test_Model_Abstract {
     
-    protected $compared = [];
+    protected $compared = [ 'text', 'qtype', 'qcount', 'qtotal', 'qcategory', 'qcatidx', 'qcomplete', 'qfaulty', 'changed' ];
 
-    protected $sanitized = [];
+    protected $tree = 'children';
 
-    protected $messageField = 'id';
+    protected $messageField = 'qid';
 }
