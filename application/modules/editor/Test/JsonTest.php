@@ -33,6 +33,8 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
 
+    /* Segment model specific API */
+    
     /**
      * Adjuts the passed texts to clean up field tags for comparision
      * @param string $expected
@@ -88,6 +90,9 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
             }
         }
     }
+    
+    /* Comment model specific API */
+    
     /**
      * Compares an 2-dimensional array of comments with a file (which must contain those comments as json-array)
      * @param string $fileToCompare
@@ -131,5 +136,48 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
             $model->removeComparedField('created')->removeComparedField('modified');
         }
         $model->compare($this, $expectedObj, $message);
+    }
+    
+    /* General model specific API */
+    
+    /**
+     * Compares a list of models of the given type/name with a list of expected models encoded as JSON array of objects in a file
+     * @param string $modelName
+     * @param string $fileToCompare
+     * @param array $actualModels
+     * @param string $message
+     */
+    public function assertModelsEqualsJsonFile(string $modelName, string $fileToCompare, array $actualModels, string $message=''){
+        $expectedModels = self::$api->getFileContent($fileToCompare);
+        $numModels = count($actualModels);
+        if($numModels != count($expectedModels)){
+            $this->assertEquals($numModels, count($expectedModels), $message.' [Number of '.ucfirst($modelName).'s does not match the expectations]');
+        } else {
+            for($i=0; $i < $numModels; $i++){
+                $msg = (empty($message)) ? '' : $message.' ['.ucfirst($modelName).' '.($i + 1).']';
+                $this->assertModelEqualsObject($modelName, $expectedModels[$i], $actualModels[$i], $msg);
+            }
+        }
+    }
+    /**
+     * Compares a model of the given type/name with an expected model encoded as JSON object in a file
+     * @param string $modelName
+     * @param string $fileToCompare
+     * @param stdClass $actualModel
+     * @param string $message
+     */
+    public function assertModelEqualsJsonFile(string $modelName, string $fileToCompare, stdClass $actualModel, string $message=''){
+        $this->assertModelEqualsObject($modelName, self::$api->getFileContent($fileToCompare), $actualModel, $message);
+    }
+    /**
+     * Compares an expected with an actual model of the given type/name
+     * @param string $modelName
+     * @param stdClass $expectedModel
+     * @param stdClass $actualModel
+     * @param string $message
+     */
+    public function assertModelEqualsObject(string $modelName, stdClass $expectedModel, stdClass $actualModel, string $message=''){
+        $model = editor_Test_Model_Abstract::create($actualModel, $modelName);
+        $model->compare($this, $expectedModel, $message);
     }
 }

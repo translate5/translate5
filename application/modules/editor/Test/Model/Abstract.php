@@ -54,6 +54,13 @@ abstract class editor_Test_Model_Abstract {
      */
     protected $sanitized = [];
     /**
+     * This Field defines the children field for a tree (in ExtJs 'children')
+     * If set, the tree will be created recursively and the tree can be compared by comparing the root element or any branch can be compared as well
+     * This field MUST not appear in $compared, otherwise the original data may will be manipulated
+     * @var array
+     */
+    protected $tree = null;
+    /**
      * This defines a field that will be added to the default message to identify the model
      * This can be a field not added to the equation
      * @var string
@@ -140,6 +147,14 @@ abstract class editor_Test_Model_Abstract {
                 } else {
                     $result->$field = NULL;
                 }
+            }
+        }
+        // recursive tree processing
+        if(!empty($this->tree) && property_exists($data, $this->tree)){
+            $children = $this->tree;
+            $result->$children = [];
+            foreach($data->$children as $child){
+                $result->$children[] = $this->copy($child);
             }
         }
         return $result;
