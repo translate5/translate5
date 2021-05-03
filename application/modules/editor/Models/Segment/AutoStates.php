@@ -126,6 +126,13 @@ class editor_Models_Segment_AutoStates {
     const TRANSLATED_AUTO = 14;
     
     /**
+     * segments pretranslated by translate5 (or external tool and imported with status pretranslated)
+     * This status is a kind of initial status, so it does not belong to role/workflow step translation!
+     * @var integer
+     */
+    const PRETRANSLATED = 15;
+    
+    /**
      * Internal state used to show segment is pending
      * @var integer
      */
@@ -153,6 +160,7 @@ class editor_Models_Segment_AutoStates {
         self::REVIEWED_PM_AUTO => 'PM lektoriert, auto',
         self::REVIEWED_PM_UNCHANGED => 'PM lektoriert, unverändert',
         self::REVIEWED_PM_UNCHANGED_AUTO => 'PM lektoriert, unverändert, auto',
+        self::PRETRANSLATED => 'Vorübersetzt'
     );
     
     /**
@@ -195,8 +203,9 @@ class editor_Models_Segment_AutoStates {
             self::REVIEWED_PM_UNCHANGED_AUTO,
           ),
           editor_Workflow_Abstract::ROLE_TRANSLATOR => [
-            self::TRANSLATED,
-            self::TRANSLATED_AUTO,
+              // may not contain the state PRETRANSLATED, since PRETRANSLATED does not belong (in statistics, workflow etc) to the translators!
+              self::TRANSLATED,
+              self::TRANSLATED_AUTO,
           ],
           editor_Workflow_Abstract::ROLE_REVIEWER => array(
             self::REVIEWED,
@@ -254,18 +263,68 @@ class editor_Models_Segment_AutoStates {
     
     /**
      * calculates the initial autoStateId of an segment in the import process
+     * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes
+     * @return integer
+     */
+    public function calculateImportState(editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes): int
+    {
+        if(! $segmentAttributes->editable) {
+            return self::BLOCKED;
+        }
+        if($segmentAttributes->isPreTranslated) {
+            return self::PRETRANSLATED;
+        }
+        if($segmentAttributes->isTranslated) {
+            return self::TRANSLATED;
+        }
+        return self::NOT_TRANSLATED;
+    }
+    
+    /**
+     * re calculates the autoStateId on un block of fullmatches
      * @param bool $isEditable
      * @param bool $isTranslated
      * @return integer
      */
-    public function calculateImportState($isEditable, $isTranslated) {
+    public function recalculateUnBlocked(bool $isTranslated, bool $preTranslated): int
+    {
+        if(! $isTranslated) {
+            return self::NOT_TRANSLATED;
+        }
+        return $preTranslated ? self::PRETRANSLATED : self::TRANSLATED;
+    }
+
+    /**
+     * re calculates the autoStateId on blocking of fullmatches
+     * @param int $isTranslated
+     */
+    public function recalculateBlocked(int $previousState): int
+    {
+        switch ($previousState) {
+            case self::TRANSLATED:
+            case self::REVIEWED_UNTOUCHED:
+            case self::REVIEWED_UNCHANGED:
+            case self::REVIEWED_UNCHANGED_AUTO:
+            case self::REVIEWED_PM_UNCHANGED:
+            case self::REVIEWED_PM_UNCHANGED_AUTO:
+            case self::PRETRANSLATED:
+                return self::BLOCKED;
+            default:
+                return $previousState;
+        }
+    }
+    
+    /**
+     * calculates the initial autoStateId of an segment in the import process
+     * @param bool $isEditable
+     * @return integer
+     */
+    public function calculatePretranslationState(bool $isEditable): int
+    {
         if(! $isEditable) {
             return self::BLOCKED;
         }
-        if($isTranslated) {
-            return self::TRANSLATED;
-        }
-        return self::NOT_TRANSLATED;
+        return self::PRETRANSLATED;
     }
     
     /**
@@ -302,16 +361,15 @@ class editor_Models_Segment_AutoStates {
     }
     
     /**
-     * sets the untouched state for a given taskGuid
+     * sets the reviewer untouched state for a given taskGuid
      *
      * @param string $taskGuid
      */
     public function setUntouchedState(string $taskGuid, ZfExtended_Models_User $user) {
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
-        
-        $segment->setUserGuid($user->getUserGuid());
-        $segment->setUserName($user->getUserName());
+        $bulkUpdater = ZfExtended_Factory::get('editor_Models_Segment_AutoStates_BulkUpdater',[
+            $user
+        ]);
+        /* @var $bulkUpdater editor_Models_Segment_AutoStates_BulkUpdater */
         
         $history  = ZfExtended_Factory::get('editor_Models_SegmentHistory');
         /* @var $history editor_Models_SegmentHistory */
@@ -320,10 +378,18 @@ class editor_Models_Segment_AutoStates {
         //there is no related data change for this table
         
         //add record in the segment history
-        $history->createHistoryByAutoState($taskGuid,[self::TRANSLATED,self::NOT_TRANSLATED]);
+        $toBeUntouched = [
+            self::TRANSLATED,
+            self::TRANSLATED_AUTO,
+            self::NOT_TRANSLATED,
+            self::PRETRANSLATED
+        ];
         
-        $segment->updateAutoState($taskGuid, self::TRANSLATED, self::REVIEWED_UNTOUCHED);
-        $segment->updateAutoState($taskGuid, self::NOT_TRANSLATED, self::REVIEWED_UNTOUCHED);
+        $history->createHistoryByAutoState($taskGuid, $toBeUntouched);
+        
+        foreach($toBeUntouched as $state) {
+            $bulkUpdater->updateAutoState($taskGuid, $state, self::REVIEWED_UNTOUCHED);
+        }
     }
     
     /**
@@ -332,8 +398,8 @@ class editor_Models_Segment_AutoStates {
      * @param string $taskGuid
      */
     public function setInitialStates(string $taskGuid) {
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
+        $bulkUpdater = ZfExtended_Factory::get('editor_Models_Segment_AutoStates_BulkUpdater');
+        /* @var $bulkUpdater editor_Models_Segment_AutoStates_BulkUpdater */
         
         $history  = ZfExtended_Factory::get('editor_Models_SegmentHistory');
         /* @var $history editor_Models_SegmentHistory */
@@ -341,9 +407,7 @@ class editor_Models_Segment_AutoStates {
         //there is no related data change for this table
         $history->createHistoryByAutoState($taskGuid,[self::REVIEWED_UNTOUCHED]);
         
-        $segment->updateLastAuthorFromHistory($taskGuid, self::REVIEWED_UNTOUCHED);
-        $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::NOT_TRANSLATED, true);
-        $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::TRANSLATED);
+        $bulkUpdater->resetUntouchedFromHistory($taskGuid, self::REVIEWED_UNTOUCHED);
         
     }
     
@@ -426,5 +490,15 @@ class editor_Models_Segment_AutoStates {
             ]);
         }
         return $autoStates;
+    }
+    
+    /**
+     * returns true if the given state is state produced by a translator
+     * @param int $autoState
+     * @return bool
+     */
+    public function isTranslationState(int $autoState): bool
+    {
+        return in_array($autoState, [self::TRANSLATED, self::TRANSLATED_AUTO]);
     }
 }

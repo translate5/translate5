@@ -1805,7 +1805,7 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
 
-        if(store.proxy.reader.metaData.jumpToSegmentIndex && store.proxy.reader.metaData.jumpToSegmentIndex > -1){
+        if(store.proxy.reader.metaData && store.proxy.reader.metaData.jumpToSegmentIndex > -1){
             me.getSegmentGrid().scrollTo(store.proxy.reader.metaData.jumpToSegmentIndex);
             return;
         }

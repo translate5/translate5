@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  * @property-read editor_Models_Segment_Whitespace $whitespace Whitespace instance
  * @property-read editor_Models_Segment_InternalTag $internalTag InternalTag Helper instance
  * @property-read editor_Models_Segment_TermTag $termTag TermTag Helper instance
+ * @property-read editor_Models_Segment_TrackChangeTag $trackChangeTag TrackChangesTag Helper instance
  */
 class editor_Models_Segment_UtilityBroker {
     /**
@@ -44,6 +45,7 @@ class editor_Models_Segment_UtilityBroker {
         'whitespace' => 'editor_Models_Segment_Whitespace',
         'internalTag' => 'editor_Models_Segment_InternalTag',
         'termTag' => 'editor_Models_Segment_TermTag',
+        'trackChangeTag' => 'editor_Models_Segment_TrackChangeTag',
     ];
     
     /**
