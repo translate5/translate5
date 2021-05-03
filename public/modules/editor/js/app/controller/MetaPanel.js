@@ -280,7 +280,7 @@ Ext.define('Editor.controller.MetaPanel', {
       this.editingMode = 'none';
   },
   /**
-   * Changes the state box by keyboard shortcut instead of mouseclick
+   * Changes the state box by keyboard shortcut instead of mouseclick 
    * we do no set the stateId before to trigger a change event
    * @param {Ext.Number} param
    */
@@ -288,7 +288,7 @@ Ext.define('Editor.controller.MetaPanel', {
       this.getSegmentMeta().showSegmentStateId(stateId);
   },
   /**
-   * Listenes for segment state changes thrown from MetaPanel.js
+   * Listenes for segment state changes thrown from segments metapanel view
    */
   onSegmentStateChanged: function(stateId, oldStateId){
       var me = this;

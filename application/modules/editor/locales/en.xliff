@@ -4034,6 +4034,8 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Die Qualität wurde hinzugefügt</source><target>The quality has been added</target></trans-unit>
 <trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBlbnRmZXJudA=='><source>Die Qualität wurde entfernt</source><target>The quality has been removed</target></trans-unit>
 <trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='><source>Der False-Positive Status wurde aktualisiert</source><target>The false-positive state has been updated</target></trans-unit>
+<trans-unit id='QWNodHVuZw=='><source>Achtung</source><target>Warning</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBpbiBkaWVzZXIgQXVmZ2FiZSBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIHUuVS4gZWluZW4gZmVobGVyZnJlaWVuIEV4cG9ydCBkZXIgQXVmZ2FiZSB2ZXJoaW5kZXJu'><source>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</source><target>There are problems with internal tags in this task that may prevent exporting this task properly</target></trans-unit>
 <trans-unit id='TGFkZS4uLg=='><source>Lade...</source><target>Loading...</target></trans-unit>
 <trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='>
   <source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source>
