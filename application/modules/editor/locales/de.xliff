@@ -1912,6 +1912,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Die Qualität wurde hinzugefügt</source><target>Die Qualität wurde hinzugefügt</target></trans-unit>
 <trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBlbnRmZXJudA=='><source>Die Qualität wurde entfernt</source><target>Die Qualität wurde entfernt</target></trans-unit>
 <trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='><source>Der False-Positive Status wurde aktualisiert</source><target>Der False-Positive Status wurde aktualisiert</target></trans-unit>
+<trans-unit id='QWNodHVuZw=='><source>Achtung</source><target>Achtung</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBpbiBkaWVzZXIgQXVmZ2FiZSBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIHUuVS4gZWluZW4gZmVobGVyZnJlaWVuIEV4cG9ydCBkZXIgQXVmZ2FiZSB2ZXJoaW5kZXJu'><source>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</source><target>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</target></trans-unit>
 <trans-unit id='TGFkZS4uLg=='><source>Lade...</source><target>Lade...</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>
 <trans-unit id='Q29udGVudA=='><source>Content</source><target>Content</target></trans-unit>

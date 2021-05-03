@@ -413,8 +413,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $qualityProps = editor_Models_Db_SegmentQuality::getNumQualitiesAndFaultsForTask($row['taskGuid']);
         // adding number of quality errors, evaluated in the export actions
         $row['qualityErrorCount'] = $qualityProps->numQualities;
-        // adding if the task has internal tag errors, will prevent xliff exports
-        $row['qualityHasFaults'] = ($qualityProps->numFaults > 0);
+        // adding if the task has internal tag errors, will prevent xliff exports (Note: this can be emulated for dev, see editor_Models_Quality_AbstractView::EMULATE_PROBLEMS
+        $row['qualityHasFaults'] = (editor_Models_Quality_AbstractView::EMULATE_PROBLEMS) ? true : ($qualityProps->numFaults > 0);
         // adding QM SubSegment Infos to each Task, evaluated in the export actions
         $row['qualityHasMqm'] = ($taskConfig->runtimeOptions->autoQA->enableMqmTags && !empty($row['qmSubsegmentFlags']));
         unset($row['qmSubsegmentFlags']); // unneccessary in the task overview
