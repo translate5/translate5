@@ -56,57 +56,57 @@ Ext.define('Editor.view.segments.MetaPanel', {
     item_metaStates_tooltip_nokey: '#UT#Segment auf den ausgewählten Status setzen',
     
     initComponent: function() {
-      var me = this,
-          showStatus = Editor.app.getTaskConfig('segments.showStatus');
-          
-      Ext.applyIf(me, {
-        title:me.title,
-        items: [
-          {
-            xtype: 'form',
-            border: 0,
-            itemId: 'metaInfoForm',
-            items: [{
-                  xtype: 'fieldset',
-                  itemId: 'metaTerms',
-                  collapsible: true,
-                  title: me.item_metaTerms_title,
-                  anchor: '100%',
-                  items: [{
-                      autoScroll: true,
-                      xtype: 'panel',
-                      border: 0,
-                      minHeight: 60, //needed so that loader is fully shown on segments without terms
-                      itemId: 'metaTermPanel',
-                      cls: 'metaTermPanel',
-                      loader: {
-                          url: Editor.data.restpath+'segment/terms',
-                          loadMask: true,
-                          renderer: 'html'
-                      }
+        var me = this,
+              showStatus = Editor.app.getTaskConfig('segments.showStatus');
+              
+        Ext.applyIf(me, {
+            title:me.title,
+            items: [
+              {
+                xtype: 'form',
+                border: 0,
+                itemId: 'metaInfoForm',
+                items: [{
+                      xtype: 'fieldset',
+                      itemId: 'metaTerms',
+                      collapsible: true,
+                      title: me.item_metaTerms_title,
+                      anchor: '100%',
+                      items: [{
+                          autoScroll: true,
+                          xtype: 'panel',
+                          border: 0,
+                          minHeight: 60, //needed so that loader is fully shown on segments without terms
+                          itemId: 'metaTermPanel',
+                          cls: 'metaTermPanel',
+                          loader: {
+                              url: Editor.data.restpath+'segment/terms',
+                              loadMask: true,
+                              renderer: 'html'
+                          }
+                      }]
+                  },{
+                      xtype: 'segmentQm',
+                      itemId: 'segmentQm',
+                      collapsible: true
+                  },{
+                      xtype: 'falsePositives',
+                      itemId: 'falsePositives',
+                      collapsible: true
+                  },{
+                      xtype: 'fieldset',
+                      itemId: 'metaStates',
+                      collapsible: true,
+                      defaultType: 'radio',
+                      hidden:  !showStatus,
+                      title: me.item_metaStates_title
                   }]
-              },{
-                  xtype: 'segmentQm',
-                  itemId: 'segmentQm',
-                  collapsible: true
-              },{
-                  xtype: 'falsePositives',
-                  itemId: 'falsePositives',
-                  collapsible: true
-              },{
-                  xtype: 'fieldset',
-                  itemId: 'metaStates',
-                  collapsible: true,
-                  defaultType: 'radio',
-                  hidden:  !showStatus,
-                  title: me.item_metaStates_title
-              }]
-          }
-        ]
+              }
+          ]
       });
-
       me.callParent(arguments);
       me.addSegmentStateFlags();
+      me.down('#segmentQm').startTaskEditing();
     },
     /**
      * Fügt anhand der php2js Daten die Status Felder hinzu

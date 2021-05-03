@@ -102,8 +102,8 @@ Ext.define('Editor.view.ViewPortEditor', {
               xtype: 'segments.grid',
               itemId: 'segmentgrid',
               stateful: {
-                  segmentSize:true,
-                  columns:true,
+                  segmentSize: true,
+                  columns: true,
                   sorters: false,
                   filters: false,
                   grouper: false,
@@ -127,36 +127,35 @@ Ext.define('Editor.view.ViewPortEditor', {
             	  height:49,
               },
               items:[
-            	  	me.getBrandConfig()
-            	  ,{
-                  xtype: 'panel',
-                  region: 'center',
-                  listeners: {
-                      afterrender: function() {
-                          this.disable();
-                      }
-                  },
-                  preventHeader: true,
-                  border:0,
-                  itemId: 'metapanel',
-                  layout: {type:'accordion'},
-                  dockedItems: [{
-                      xtype: 'metapanelNavi',
-                      dock: 'top'
-                  }],
-                  items: [{
-                      xtype: 'segmentsMetapanel',
-                      stateId: 'editor.eastPanelSegmentsMetapanel',
-                      stateEvents: ['collapse', 'expand'],
-                      stateful:true
-                  },{
-                      xtype: 'commentPanel',
-                      stateId: 'editor.eastPanelCommentPanel',
-                      stateEvents: ['collapse', 'expand'],
-                      stateful:true
+                  me.getBrandConfig(), {
+                      xtype: 'panel',
+                      region: 'center',
+                      listeners: {
+                          afterrender: function() {
+                              this.disable();
+                          }
+                      },
+                      preventHeader: true,
+                      border:0,
+                      itemId: 'metapanel',
+                      layout: { type:'accordion' },
+                      dockedItems: [{
+                          xtype: 'metapanelNavi',
+                          dock: 'top'
+                      }],
+                      items: [{
+                          xtype: 'segmentsMetapanel',
+                          stateId: 'editor.eastPanelSegmentsMetapanel',
+                          stateEvents: ['collapse', 'expand'],
+                          stateful:true
+                      },{
+                          xtype: 'commentPanel',
+                          stateId: 'editor.eastPanelCommentPanel',
+                          stateEvents: ['collapse', 'expand'],
+                          stateful:true
+                      }]
                   }]
-              }]
-          }];
+              }];
       //},{
       //example of adding an additional south panel with width 100%, 
       // as heigher the weight of the region, as "outer" it is rendererd, 
