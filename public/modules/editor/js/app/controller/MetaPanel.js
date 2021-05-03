@@ -166,33 +166,34 @@ Ext.define('Editor.controller.MetaPanel', {
    * @param {Object} editingPlugin
    */
   startEdit: function(editingPlugin, context) {
-    var me = this,
-        mp = me.getMetaPanel(),
-        record = context.record,
-        segmentId = record.get('id'),
-        isWatched = Boolean(record.get('isWatched')),
-        segmentUserAssocId = record.get('segmentUserAssocId'),
-        navi = me.getNavi(),
-        but = Ext.getCmp('watchSegmentBtn'),
-        tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
-    me.editingMode = 'edit';
-    but.toggle(isWatched, true);
-    but.setTooltip({
-        dismissDelay: 0,
-        text: tooltip
-    });
-    me.record = record;
-    me.loadTermPanel(segmentId);
-    me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
-    // our component controllers are listening for the load event & create their views
-    me.getQualitiesStore().load({
-        params: { segmentId: segmentId }
-    });
-    me.loadRecord(me.record);
-    navi.show();
-    navi.enable();
-    me.getSegmentMeta().show();
-    mp.enable();
+      var me = this,
+          mp = me.getMetaPanel(),
+          record = context.record,
+          segmentId = record.get('id'),
+          isWatched = Boolean(record.get('isWatched')),
+          segmentUserAssocId = record.get('segmentUserAssocId'),
+          navi = me.getNavi(),
+          but = Ext.getCmp('watchSegmentBtn'),
+          tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
+      me.editingMode = 'edit';
+      but.toggle(isWatched, true);
+      but.setTooltip({
+          dismissDelay: 0,
+          text: tooltip
+      });
+      me.record = record;
+      me.loadTermPanel(segmentId);
+      me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
+      // our component controllers are listening for the load event & create their views
+      me.getQualitiesStore().load({
+          params: { segmentId: segmentId }
+      });
+      me.loadRecord(me.record);
+      navi.show();
+      navi.enable();
+      me.getSegmentMeta().show();
+      mp.enable();
+      
   },
   /**
    * Starts the creation of the segment's quality related GUIs

@@ -43,7 +43,7 @@ Ext.define('Editor.view.quality.SegmentQmController', {
     onQmChanged: function(checkbox, checked){
         var me = this, params = { segmentId: checkbox.segmentId, categoryIndex: checkbox.inputValue, qmaction: (checked ? 'add' : 'remove') };
         Ext.Ajax.request({
-            url: Editor.data.restpath+'quality/segmentqm',
+            url: Editor.data.restpath + 'quality/segmentqm',
             method: 'GET',
             params: params,
             success: function(response){

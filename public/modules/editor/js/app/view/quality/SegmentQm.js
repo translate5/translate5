@@ -39,7 +39,6 @@ Ext.define('Editor.view.quality.SegmentQm', {
     controller: 'segmentQm',
     cls: 'segmentQM',
     defaultType: 'checkbox',
-    hidden: true,
     initConfig: function(instanceConfig) {
         var config = {
             title: this.title
@@ -57,6 +56,8 @@ Ext.define('Editor.view.quality.SegmentQm', {
      */
     startEditing: function(records, segmentId, isActive){
         if(isActive){
+            this.labels = [];
+            this.removeAll();
             var selectedIds = [];
             Ext.each(records, function(record){
                 if(record.get('type') == 'qm'){
@@ -77,16 +78,33 @@ Ext.define('Editor.view.quality.SegmentQm', {
                     }
                 });
             }, this);
-            this.setHidden(false);
         }
     },
+    startTaskEditing: function(){
+        this.createInactiveCheckBoxes();
+    },
     /**
-     * Ends editing, remove our checkboxes
+     * Ends editing, invalidates our checkboxes (by adding new checkboxes without listeners. It was not possible, to remove a listener that was autoconnected to our ViewControler...
      */
     endEditing: function(isActive, isSaving){
         if(isActive){
             this.removeAll();
+            this.createInactiveCheckBoxes();
         }
+    },
+    /**
+     * Creates the boxes that represent the QMs in the inactive state
+     */
+    createInactiveCheckBoxes: function(){
+        Ext.each(Editor.data.segments.qualityFlags, function(item){
+            this.add({
+                xtype: 'checkbox',
+                anchor: '100%',
+                checked: false,
+                boxLabel: item.label,
+                disabled: true
+            });
+        }, this);
     }
 });
 
