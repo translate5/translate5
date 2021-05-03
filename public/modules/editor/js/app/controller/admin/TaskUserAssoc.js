@@ -236,29 +236,32 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       var me = this,
           form = me.getUserAssocForm(),
           task = me.getPrefWindow().getCurrentTask(),
-          store = me.getUserAssocGrid().store,
+          grid = me.getUserAssocGrid(),
+          win = me.getPrefWindow(),
+          store = grid.store,
           rec = form.getRecord();
       form.getForm().updateRecord(rec);
       if(! form.getForm().isValid()) {
           return;
       }
-      me.getPrefWindow().setLoading(true);
-      me.getPrefWindow().lookupViewModel().set('userAssocDirty', true);
+      win.setLoading(true);
+      win.lookupViewModel().set('userAssocDirty', true);
       rec.saveVersioned(task, {
           success: function(savedRec, op) {
               me.handleCancel();
               if(!rec.store) {
                   store.insert(0,rec);
+                  grid.getSelectionModel().select(rec);
                   me.fireEvent('addUserAssoc', me, rec, store);
               }
               task.load();//reload only the task, not the whole task prefs, should be OK
               Editor.MessageBox.addByOperation(op);
               Editor.MessageBox.addSuccess(me.messages.assocSave);
-              me.getPrefWindow().setLoading(false);
+              win.setLoading(false);
           },
           failure: function() {
               store.load();
-              me.getPrefWindow().setLoading(false);
+              win.setLoading(false);
           }
       });
   },
@@ -266,6 +269,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   reloadTaskUserAssocGrid:function(){
       var me = this,
         store = me.getUserAssocGrid().getStore();
+        me.getUserAssocGrid().getSelectionModel().deselectAll();
       store.load();
   },
   

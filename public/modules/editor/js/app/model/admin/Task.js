@@ -58,7 +58,7 @@ Ext.define('Editor.model.admin.Task', {
   WORKFLOW_STEP_NO_WORKFLOW:'no workflow',//default workflow step constant
   WORKFLOW_STEP_TRANSLATION:'translation',//default workflow step constant
   WORKFLOW_STEP_REVIEWING:'reviewing',//default workflow step constant
-  
+  WORKFLOW_STEP_TRANSLATORCHECK:'translatorCheck',//default workflow step constant
   WORKFLOW_USER_ROLE_TRANSLATOR:'translator',//TODO: when needed add the other constants
   fields: [
     {name: 'id', type: 'int'},

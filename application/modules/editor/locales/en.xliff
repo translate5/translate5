@@ -434,23 +434,27 @@
       </trans-unit>
       <trans-unit id='UE0gbGVrdG9yaWVydA=='>
         <source>PM lektoriert</source>
-	<target>PM reviewed</target>
+        <target>PM reviewed</target>
       </trans-unit>
       <trans-unit id='UE0gbGVrdG9yaWVydCwgYXV0bw=='>
         <source>PM lektoriert, auto</source>
-	<target>PM reviewed, auto-set</target>
+        <target>PM reviewed, auto-set</target>
       </trans-unit>
       <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0'>
         <source>PM lektoriert, unverändert</source>
-	<target>PM reviewed, unchanged</target>
+        <target>PM reviewed, unchanged</target>
       </trans-unit>
       <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv='>
         <source>PM lektoriert, unverändert, auto</source>
-	<target>PM reviewed, unchanged, auto-set</target>
+        <target>PM reviewed, unchanged, auto-set</target>
+      </trans-unit>
+      <trans-unit id='Vm9yw7xiZXJzZXR6dA=='>
+        <source>Vorübersetzt</source>
+        <target>Pre-translated</target>
       </trans-unit>
       <trans-unit id='UE0gUHLDvGZ1bmc='>
         <source>PM Prüfung</source>
-	<target>PM review</target>
+        <target>PM review</target>
       </trans-unit>
       <trans-unit id="QnVsZ2FyaXNjaA==">
         <source>Bulgarisch</source>
@@ -3615,6 +3619,10 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>In Bearbeitung</source>
     <target>In process</target>
 </trans-unit>
+<trans-unit id='dW52ZXLDpG5kZXJ0ZSAxMDAlIFRNIE1hdGNoZXMgc2luZCBlZGl0aWVyYmFy'>
+  <source>unveränderte 100% TM Matches sind editierbar</source>
+  <target>edit unchanged 100% TM matches</target>
+</trans-unit>
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Delete proposals older than current import</target></trans-unit>
 <trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Log out</target></trans-unit>
@@ -3992,6 +4000,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='SW0gZm9sZ2VuZGVuIGRpZSBnZXTDpHRpZ3RlbiDDhG5kZXJ1bmdlbiBkZXIgdm9yaGVyZ2VoZW5kZW4gUm9sbGUgPGI+e3ByZXZpb3VzUm9sZX08L2I+OjxiciAvPg=='>
   <source>Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br /></source>
   <target>The changes made by the formerly active role <b>{previousRole}</b> are listed below:<br /></target>
+</trans-unit>
+<trans-unit id='QW53ZW5kdW5nIHZlcmxhc3Nlbg=='>
+    <source>Anwendung verlassen</source>
+    <target>Leave application</target>
 </trans-unit>
 <trans-unit id='V2VubiBha3RpdmllcnQsIHdlcmRlbiBibG9ja2llcnRlIFNlZ21lbnRlIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4='>
   <source>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</source>

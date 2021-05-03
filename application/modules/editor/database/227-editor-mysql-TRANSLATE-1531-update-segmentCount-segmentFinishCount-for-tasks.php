@@ -79,7 +79,7 @@ foreach ($allTasks as $t){
         $db->query($sql,[$segmentCount,$task->getTaskGuid()]);
     }
     //update the segment finish count
-    $task->updateSegmentFinishCount($task);
+    $task->updateSegmentFinishCount();
 }
 
 

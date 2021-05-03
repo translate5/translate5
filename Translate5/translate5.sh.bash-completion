@@ -25,8 +25,12 @@ _translate5.sh()
 
         case "$com" in
 
+            changelog)
+            opts="${opts} --important"
+            ;;
+
             config)
-            opts="${opts} --detail --modified --empty"
+            opts="${opts} --detail --modified --empty --comment"
             ;;
 
             help)
@@ -42,23 +46,79 @@ _translate5.sh()
             ;;
 
             database:update)
-            opts="${opts} --import"
+            opts="${opts} --import --assume-imported"
+            ;;
+
+            dev:createtest)
+            opts="${opts} --name"
+            ;;
+
+            dev:githook)
+            opts="${opts} "
+            ;;
+
+            dev:newdbchange)
+            opts="${opts} --php --name"
+            ;;
+
+            dev:newmodel)
+            opts="${opts} --name --table --plugin"
+            ;;
+
+            maintenance:announce)
+            opts="${opts} --message"
+            ;;
+
+            maintenance:disable)
+            opts="${opts} "
+            ;;
+
+            maintenance:message)
+            opts="${opts} "
+            ;;
+
+            maintenance:set)
+            opts="${opts} --message --announce"
+            ;;
+
+            maintenance:status)
+            opts="${opts} "
+            ;;
+
+            plugin:disable)
+            opts="${opts} "
+            ;;
+
+            plugin:enable)
+            opts="${opts} "
+            ;;
+
+            plugin:list)
+            opts="${opts} "
             ;;
 
             release:notes)
             opts="${opts} "
             ;;
 
+            segment:history)
+            opts="${opts} --task"
+            ;;
+
             session:impersonate)
-            opts="${opts} "
+            opts="${opts} --segment-id"
+            ;;
+
+            system:check)
+            opts="${opts} --pre-installation"
             ;;
 
             task:clean)
-            opts="${opts} --delete-error --delete-import --delete-data"
+            opts="${opts} --delete-error --delete-import --set-to-error --delete-data"
             ;;
 
             worker:list)
-            opts="${opts} "
+            opts="${opts} --all"
             ;;
 
         esac
@@ -71,7 +131,7 @@ _translate5.sh()
 
     # completing for a command
     if [[ $cur == $com ]]; then
-        coms="config help list log database:update release:notes session:impersonate task:clean worker:list"
+        coms="changelog config help list log database:update dev:createtest dev:githook dev:newdbchange dev:newmodel maintenance:announce maintenance:disable maintenance:message maintenance:set maintenance:status plugin:disable plugin:enable plugin:list release:notes segment:history session:impersonate system:check task:clean worker:list"
 
         COMPREPLY=($(compgen -W "${coms}" -- ${cur}))
         __ltrim_colon_completions "$cur"
