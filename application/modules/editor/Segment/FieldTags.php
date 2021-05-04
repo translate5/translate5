@@ -35,14 +35,43 @@
 use PHPHtmlParser\Dom\Node\HtmlNode;
 
 /**
- * Abstraction to bundle the segment's text and it's internal tags
+ * Abstraction to bundle the segment's text and it's internal tags to an OOP accessible structure
  * The structure of the tags in this class is a simple sequence, any nesting / interleaving is covered with rendering / unparsing
  * The rendering will take care about interleaving and nested tags and may part a tag into chunks
- * When Markup is unserialized multiple chunks in a row of an internal tag will be joined to a single tag and the structure will be re-sequencialized
+ * When Markup is unserialized multiple chunks in a row of an internal tag will be joined to a single tag and the structure will be re-sequenced
  * Keep in mind that start & end-index work just like counting chars or the substr API in php, the tag starts BEFORE the start index and ends BEFORE the index of the end index, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
+ * tags that are immediate siblings can be identified by having the same end/start index
  * To identify the Types of Internal tags a general API editor_Segment_TagCreator is provided
+ * Tag types can be registered via the Quality Provider registry in editor_Segment_Quality_Manager or (if not quality related) directly in the editor_Segment_TagCreator registry
+ * Most existing segment tags are known by the editor_Segment_TagCreator evaluation API
  * 
- * TODO/FIXME the prop "ttName" (representing the source field of the text in the datamodel) is used by the Termtagger only. Neccessary ??
+ * The creation of the internal tags is done in 3 phases
+ * - the unparsing starts either on instantiation (setting the markup from a segment's field text - thus the class-name - or by calling setTagsByText($markup)
+ * - the passed markup is unparsed with either PHPHtmlParser or DOMDocument as configured in editor_Tag
+ * - this creates a deep nested tag structure => Phase I
+ * - the nested Dom Tags then are converted into segment-tags as direct children of this class. These tags represent their position in the markup by start/end indexes pointing to the pure text-content of the markup (represented by the fieldText prop) => Phase II
+ * - usually all DOM tags represent a segment tag as all markup should be encapsulated by internal tags
+ * - Note that in this class the fieldText also contains the visible Markup of the internal Tags (=> length of FieldTags) whilst in the Segment entities API those chars do not count as textual content of the segment obviously
+ * - All Tags, that can not be converted to an actual segnment-tag will end up as "any" internal tag "editor_Segment_AnyTag" Those tags will not be consolidated so they will be renderd the way they are and no further processing is applied
+ * - After "flattening" all tags of the same type with the same properties (category, as defined in the corresponding tag classes) are joined to one tag. This is the consolidation Phase => Phase III
+ * - In the consolidation phase those tags representing a "virtual tag" by consisting of two singular tags (img) with "open" and "close" classes (-> e.g. MQM) are identified and united as a single tag (pairing API)
+ * - After the consolidation the properties of the segment tags we hold are consumable for other APIs
+ * 
+ * Rendering
+ * - When rendering the markup the contained segment tags are maybe broken up into several parts because they may overlap.
+ * - In this process usually the left overlapping tag will be broken into parts. Some tags like the internal tags can not be splitted (isSplitable API)
+ * - that means, in the frontend we may have multiple chunks representing one segment tag !
+ * - it is possible, that overlapping tags in the frontend (-> MQM), where the order is "user defined", may have a different branching after being processed. This can also happen, when more tags are added (Termtagger, ...)
+ * - To retrieve a proper Markup - especially with the singular tags to be in a useful order - sorting the tags is crucial and ensures a correct structure
+ * 
+ * Compatibility Problems
+ * - generally the AutoQA adds some data-attributes to existing classes
+ * - The generated markup may be different then in earlier times (order of attributes!)
+ * - This may creates problems with regex-based tag processing that relies on a fixed order of attributes or css-classes
+ * - Generally, RegEx based processing of Markup often fails with nested Markup (especially when the expressions cover the start and end tag) and should be replaced with OOP code
+ * 
+ * 
+ * TODO/FIXME the prop "ttName" (representing the source field of the text in the datamodel) is used by the Termtagger only. Investigate, if this is really neccessary...
  */
 class editor_Segment_FieldTags implements JsonSerializable {
     
@@ -50,7 +79,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * Can be used to validate the unparsing-process. Use only for Development !!
      * @var boolean
      */
-    const VALIDATION_MODE = true; // TODO AUTOQA: disable
+    const VALIDATION_MODE = false;
     /**
      * The counterpart to ::toJson: creates the tags from the serialized JSON data
      * @param editor_Models_Task $task
@@ -241,7 +270,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * 
      * @param string $fieldName
      */
-    public function addSaveToField($fieldName){
+    public function addSaveToField(string $fieldName){
         $fields = $this->getSaveToFields();
         $fields[] = $fieldName;
         $this->saveTo = implode(',', $fields);
@@ -258,11 +287,10 @@ class editor_Segment_FieldTags implements JsonSerializable {
         $this->unparse($text);
         // this checks if the new Tags may changed the text-content which must not happen during quality checks
         if($this->fieldText != $textBefore){
-            // TODO AUTOQA: add proper ERROR_CODE
             $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.fieldtags');
             $logger->warn(
-                'E9999',
-                'setting the FieldTags tags by text led to a changed text-content !',
+                'E1343',
+                'Setting the FieldTags tags by text led to a changed text-content presumably because the encoded tags have been improperly processed',
                 ['segmentId' => $this->segmentId, 'textBefore' => $textBefore, 'textAfter' => $this->fieldText ]
             );
         }

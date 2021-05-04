@@ -363,7 +363,7 @@ abstract class editor_Models_Export_FileParser {
     
     /**
      * Compares the real tags (ignores whitespace tags) of a source and target string, track the differences between the both along the segmentNrInTask
-     * TODO AUTOQA: this can be done more precise with editor_Segment_FieldTags and editor_Segment_Internal_TagComparision
+     * TODO FIXME: this can be done more precise with editor_Segment_FieldTags and editor_Segment_Internal_TagComparision
      * @param editor_Models_Segment $segment
      * @param string $target
      */

@@ -35,6 +35,7 @@
 /**
  * Abstraction for an Internal tag of variable type. This usually covers Tags, that are no real internal tags or even markup of other source
  * The main use for this class is for testing purposes
+ * In "real life" there should be no unknown segment tags and we could add error logging here to detect such mishaps
  * 
  * @method editor_Segment_AnyTag clone(boolean $withDataAttribs)
  * @method editor_Segment_AnyTag createBaseClone()
