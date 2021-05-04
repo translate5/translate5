@@ -1179,6 +1179,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         return parent::loadFilterdCustom($s);
     }
 
+    /**
+     * @param $repetiton
+     * @param $s
+     * @return mixed
+     */
+
     public function resetRepetition($repetiton, $s){
         if($repetiton){
             $s->where($this->tableName . '.sourceMd5 IN((select sourceMd5 from '.$this->tableName.' group by sourceMd5 having count(*) > 1))');
