@@ -174,8 +174,8 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($this->task->getTaskGuid());
         $analysisAssoc->setFinishedAt(date('Y-m-d H:i:s'));
-        $analysisAssoc->save();
         $analysisAssoc->setUuid(ZfExtended_Utils::uuid());
+        $analysisAssoc->save();
 
         $this->task->unlock();
         return $return;
