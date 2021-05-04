@@ -30,22 +30,22 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_RestController
 {
-
-    protected $entityClass = 'editor_Plugins_MatchAnalysis_Models_MatchAnalysis';
-    protected $helperExcelClass = 'editor_Plugins_MatchAnalysis_Export_ExportExcel';
-    protected $helperXMLClass = 'editor_Plugins_MatchAnalysis_Export_ExportXml';
-
     /**
      * @var editor_Plugins_MatchAnalysis_Models_MatchAnalysis
      */
+    protected $entityClass = 'editor_Plugins_MatchAnalysis_Models_MatchAnalysis';
 
     /**
      * @var editor_Plugins_MatchAnalysis_Export_ExportExcel
      */
+    protected $helperExcelClass = 'editor_Plugins_MatchAnalysis_Export_ExportExcel';
 
     /**
      * @var editor_Plugins_MatchAnalysis_Export_ExportXml
      */
+    protected $helperXMLClass = 'editor_Plugins_MatchAnalysis_Export_ExportXml';
+
+
     protected $entity;
 
     public function indexAction()
