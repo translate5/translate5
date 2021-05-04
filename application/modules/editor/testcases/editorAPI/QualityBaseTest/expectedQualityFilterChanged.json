@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 487,
-    "qtotal": 487,
+    "qcount": 489,
+    "qtotal": 489,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -46,7 +46,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "9469",
+                            "qid": "22543",
                             "qtype": "mqm",
                             "qcount": 171,
                             "qcomplete": true,
@@ -58,7 +58,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "9464",
+                            "qid": "22538",
                             "qtype": "mqm",
                             "qcount": 105,
                             "qcomplete": true,
@@ -70,7 +70,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "9595",
+                            "qid": "22669",
                             "qtype": "mqm",
                             "qcount": 12,
                             "qcomplete": true,
@@ -82,7 +82,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "9468",
+                            "qid": "22542",
                             "qtype": "mqm",
                             "qcount": 3,
                             "qcomplete": true,
@@ -94,7 +94,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "9458",
+                            "qid": "22532",
                             "qtype": "mqm",
                             "qcount": 13,
                             "qcomplete": true,
@@ -120,25 +120,25 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "9461",
+                            "qid": "22535",
                             "qtype": "mqm",
                             "qcount": 21,
                             "qcomplete": true,
                             "qcategory": "mqm_8",
                             "qcatidx": "8",
-                            "text": "Style/register",
+                            "text": "Style\/register",
                             "qtotal": 21,
                             "leaf": true,
                             "checked": false
                         },
                         {
-                            "qid": "9598",
+                            "qid": "22672",
                             "qtype": "mqm",
                             "qcount": 6,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "9457",
+                                    "qid": "22531",
                                     "qtype": "mqm",
                                     "qcount": 12,
                                     "qcomplete": true,
@@ -158,13 +158,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "9492",
+                            "qid": "22566",
                             "qtype": "mqm",
                             "qcount": 2,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "9505",
+                                    "qid": "22579",
                                     "qtype": "mqm",
                                     "qcount": 4,
                                     "qcomplete": true,
@@ -184,13 +184,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "9486",
+                            "qid": "22560",
                             "qtype": "mqm",
                             "qcount": 10,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "9459",
+                                    "qid": "22533",
                                     "qtype": "mqm",
                                     "qcount": 32,
                                     "qcomplete": true,
@@ -202,7 +202,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "9475",
+                                    "qid": "22549",
                                     "qtype": "mqm",
                                     "qcount": 28,
                                     "qcomplete": true,
@@ -214,7 +214,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "9467",
+                                    "qid": "22541",
                                     "qtype": "mqm",
                                     "qcount": 51,
                                     "qcomplete": true,
@@ -226,13 +226,13 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "9619",
+                                    "qid": "22693",
                                     "qtype": "mqm",
                                     "qcount": 17,
                                     "qcomplete": true,
                                     "qcategory": "mqm_19",
                                     "qcatidx": "19",
-                                    "text": "Tense/aspect/mood",
+                                    "text": "Tense\/aspect\/mood",
                                     "qtotal": 17,
                                     "leaf": true,
                                     "checked": false
@@ -263,12 +263,36 @@
         {
             "qid": -1,
             "qtype": "qm",
-            "qcount": 0,
+            "qcount": 2,
             "qcomplete": true,
+            "children": [
+                {
+                    "qid": "23019",
+                    "qtype": "qm",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "qm_1",
+                    "qcatidx": "1",
+                    "text": "Demo QM error 1",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "23020",
+                    "qtype": "qm",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "qm_3",
+                    "qcatidx": "3",
+                    "text": "Terminology problem",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
             "qcategory": null,
             "text": "QA",
-            "qtotal": 0,
-            "leaf": true,
+            "qtotal": 2,
+            "expanded": true,
             "checked": false
         },
         {

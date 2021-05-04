@@ -30,9 +30,7 @@ class editor_Test_Model_FilterQuality extends editor_Test_Model_Abstract {
     
     protected $compared = [ 'text', 'qtype', 'qcount', 'qtotal', 'qcategory', 'qcatidx', 'qcomplete', 'qfaulty', 'changed' ];
 
-    protected $tree = 'children';
-    
-    protected $firstChildIsRoot = true;
+    protected $isTree = true;
 
     protected $messageField = 'text';
 }

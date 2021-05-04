@@ -27,15 +27,16 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Testcase for QualityBaseTest Mixing XLF id and rid values led to wrong tag numbering
- * For details see the issue.
+ * Testcase for all endpoints of the AutoQA feature
  */
 class QualityBaseTest extends editor_Test_JsonTest {
+    
+    static $segments = [];
     
     public static function setUpBeforeClass(): void {
        
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+
         $task = array(
             'sourceLang' => 'en',
             'targetLang' => 'de',
@@ -66,71 +67,132 @@ class QualityBaseTest extends editor_Test_JsonTest {
         $api->login('testlector');
         
         $task = $api->getTask();
-        //open task for whole testcase
+           //open task for whole testcase
         $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        
+        // we need some segments to play with
+        static::$segments = $api->requestJson('editor/segment?page=1&start=0&limit=10');
+        
+        static::assertEquals(count(static::$segments), 10, 'Not enough segments in the imported task');
     }
+   
     /**
      * Tests the generally availability and validity of the filter tree
      */
     public function testFilterQualityTree(){
-        $tree = $this->api()->requestJson('/editor/quality');
-        // file_put_contents($this->api()->getFile('/expectedQualityFilter.json', null, false), json_encode($tree, JSON_PRETTY_PRINT));
+
+        $tree = $this->api()->requestJson('/editor/quality', 'GET', [], [], true);
+        // file_put_contents($this->api()->getFile('expectedQualityFilter.json', null, false), json_encode($tree, JSON_PRETTY_PRINT));
         $this->assertModelEqualsJsonFile('FilterQuality', 'expectedQualityFilter.json', $tree);
     }
-    
-    
-    
     /**
+     * Checks the validity of the task qualities
+     */
+    public function testTaskQualities(){
 
-    public function testSegmentValuesAfterImport(){
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
-
-        file_put_contents($this->api()->getFile('/expectedSegments.json', null, false), json_encode($data, JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
+        $qualities = $this->api()->requestJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
+        // file_put_contents($this->api()->getFile('expectedTaskQualities.json', null, false), json_encode($qualities, JSON_PRETTY_PRINT));
+        $this->assertModelsEqualsJsonFile('TaskQuality', 'expectedTaskQualities.json', $qualities);
     }
-    
-
-    public function testSegmentEditing() {
-        //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
+    /**
+     * Tests the task-Tooltip of the Task-Grid
+     */
+    public function testTaskTooltip(){
         
-        //test editing a prefilled segment
-        $segToTest = $segments[0];
-        
-        $segToTest->targetEdit = str_replace(['cool.', 'is &lt; a'], ['cool &amp; cööler.', 'is &gt; a'], $segToTest->targetEdit);
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit, $segToTest->id);
-        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
-        
-        //check direct PUT result
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
-
-        file_put_contents($this->api()->getFile('/expectedSegments-edited.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedSegments-edited.json'), $data, 'Edited segments are not as expected!');
+        $file = $this->api()->getFile('expectedTaskToolTip.html', null, false);
+        $response = $this->api()->request('editor/quality/tasktooltip?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
+        $markup = $response->getBody();
+        // file_put_contents($file, $markup);
+        $this->assertEquals(file_get_contents($file), $markup, 'Task Qualities ToolTip Markup does not match');
     }
-    
-
-    public function testExport() {
-        self::$api->login('testmanager');
-        $task = $this->api()->getTask();
-        //start task export
+    /**
+     * Tests the qualities fetched for a segment
+     */
+    public function testSegmentQualities(){
         
-        $this->api()->request('editor/task/export/id/'.$task->id);
+        $qualities = $this->api()->requestJson('/editor/quality/segment?segmentId='.static::$segments[0]->id);
+        // file_put_contents($this->api()->getFile('expectedSegmentQualities0.json', null, false), json_encode($qualities, JSON_PRETTY_PRINT));
+        $this->assertModelsEqualsJsonFile('SegmentQuality', 'expectedSegmentQualities0.json', $qualities);
         
-        //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
-        $pathToZip = $path.'export.zip';
-        $this->assertFileExists($pathToZip);
+        $qualities = $this->api()->requestJson('/editor/quality/segment?segmentId='.static::$segments[4]->id);
+        // file_put_contents($this->api()->getFile('expectedSegmentQualities4.json', null, false), json_encode($qualities, JSON_PRETTY_PRINT));
+        $this->assertModelsEqualsJsonFile('SegmentQuality', 'expectedSegmentQualities4.json', $qualities);
         
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/QualityBaseTest-de-en.xlf');
-
-        file_put_contents($this->api()->getFile('export-QualityBaseTest-de-en.xlf', null, false), $exportedFile);
-        $expectedResult = $this->api()->getFileContent('export-QualityBaseTest-de-en.xlf');
-        
-        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-QualityBaseTest-de-en.xlf');
+        $qualities = $this->api()->requestJson('/editor/quality/segment?segmentId='.static::$segments[9]->id);
+        // file_put_contents($this->api()->getFile('expectedSegmentQualities9.json', null, false), json_encode($qualities, JSON_PRETTY_PRINT));
+        $this->assertModelsEqualsJsonFile('SegmentQuality', 'expectedSegmentQualities9.json', $qualities);
     }
-    
-    */
+    /**
+     * Tests the adding / removal of QM qualities
+     */
+    public function testSetUnsetQm(){
+        
+        $actual = $this->api()->requestJson('/editor/quality/segmentqm?segmentId='.static::$segments[0]->id.'&categoryIndex=4&qmaction=add');
+        // file_put_contents($this->api()->getFile('expectedSetSegmentQmAdd0.json', null, false), json_encode($actual, JSON_PRETTY_PRINT));
+        $expected = $this->api()->getFileContent('expectedSetSegmentQmAdd0.json');
+        $this->assertModelEqualsObject('SegmentQuality', $expected->row, $actual->row);
+        
+        $actual = $this->api()->requestJson('/editor/quality/segmentqm?segmentId='.static::$segments[4]->id.'&categoryIndex=1&qmaction=add');
+        // file_put_contents($this->api()->getFile('expectedSetSegmentQmAdd4.json', null, false), json_encode($actual, JSON_PRETTY_PRINT));
+        $expected = $this->api()->getFileContent('expectedSetSegmentQmAdd4.json');
+        $this->assertModelEqualsObject('SegmentQuality', $expected->row, $actual->row);
+        
+        $actual = $this->api()->requestJson('/editor/quality/segmentqm?segmentId='.static::$segments[9]->id.'&categoryIndex=3&qmaction=add');
+        // file_put_contents($this->api()->getFile('expectedSetSegmentQmAdd9.json', null, false), json_encode($actual, JSON_PRETTY_PRINT));
+        $expected = $this->api()->getFileContent('expectedSetSegmentQmAdd9.json');
+        $this->assertModelEqualsObject('SegmentQuality', $expected->row, $actual->row);
+        
+        $actual = $this->api()->requestJson('/editor/quality/segmentqm?segmentId='.static::$segments[0]->id.'&categoryIndex=4&qmaction=remove');
+        // file_put_contents($this->api()->getFile('expectedSetSegmentQmRemove0.json', null, false), json_encode($actual, JSON_PRETTY_PRINT));
+        $expected = $this->api()->getFileContent('expectedSetSegmentQmRemove0.json');
+        $this->assertModelEqualsObject('SegmentQuality', $expected->row, $actual->row);
+    }
+    /**
+     * Tests setting a quality to false positive
+     * @depends testSetUnsetQm
+     */
+    public function testSetFalsePositive(){
+        // http://translate5.local/editor/quality/falsepositive?_dc=1620166854404&id=13158&falsePositive=1
+        $qualities = $this->api()->requestJson('/editor/quality/segment?segmentId='.static::$segments[0]->id);
+        $qualityId = $qualities[0]->id;
+        
+        $actual = $this->api()->requestJson('/editor/quality/falsepositive?id='.$qualities[0]->id.'&falsePositive=1');
+        // file_put_contents($this->api()->getFile('expectedFalsePositive0-0.json', null, false), json_encode($actual, JSON_PRETTY_PRINT));
+        $this->assertObjectEqualsJsonFile('expectedFalsePositive0-0.json', $actual);
+        
+        $actual = $this->api()->requestJson('/editor/quality/falsepositive?id='.$qualities[1]->id.'&falsePositive=1');
+        // file_put_contents($this->api()->getFile('expectedFalsePositive0-1.json', null, false), json_encode($actual, JSON_PRETTY_PRINT));
+        $this->assertObjectEqualsJsonFile('expectedFalsePositive0-1.json', $actual);
+        
+        $actual = $this->api()->requestJson('/editor/quality/falsepositive?id='.$qualities[2]->id.'&falsePositive=1');
+        // file_put_contents($this->api()->getFile('expectedFalsePositive0-2.json', null, false), json_encode($actual, JSON_PRETTY_PRINT));
+        $this->assertObjectEqualsJsonFile('expectedFalsePositive0-2.json', $actual);
+        
+        $qualities = $this->api()->requestJson('/editor/quality/segment?segmentId='.static::$segments[9]->id);
+        
+        $actual = $this->api()->requestJson('/editor/quality/falsepositive?id='.$qualities[0]->id.'&falsePositive=1');
+        // file_put_contents($this->api()->getFile('expectedFalsePositive9-0.json', null, false), json_encode($actual, JSON_PRETTY_PRINT));
+        $this->assertObjectEqualsJsonFile('expectedFalsePositive9-0.json', $actual);
+        
+        $actual = $this->api()->requestJson('/editor/quality/falsepositive?id='.$qualityId.'&falsePositive=0');
+        // file_put_contents($this->api()->getFile('expectedNotFalsePositive0-0.json', null, false), json_encode($actual, JSON_PRETTY_PRINT));
+        $this->assertObjectEqualsJsonFile('expectedNotFalsePositive0-0.json', $actual);
+    }
+    /**
+     * Tests the filter & task model again after the added Qms & added falsePositives
+     * @depends testSetUnsetQm
+     * @depends testSetFalsePositive
+     */
+    public function testFilterAndTaskAfterChanges(){
+        
+        $tree = $this->api()->requestJson('/editor/quality', 'GET', [], [], true);
+        // file_put_contents($this->api()->getFile('expectedQualityFilterChanged.json', null, false), json_encode($tree, JSON_PRETTY_PRINT));
+        $this->assertModelEqualsJsonFile('FilterQuality', 'expectedQualityFilterChanged.json', $tree);
+        
+        $qualities = $this->api()->requestJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
+        // file_put_contents($this->api()->getFile('expectedTaskQualitiesChanged.json', null, false), json_encode($qualities, JSON_PRETTY_PRINT));
+        $this->assertModelsEqualsJsonFile('TaskQuality', 'expectedTaskQualitiesChanged.json', $qualities);
+    }
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();

@@ -54,17 +54,12 @@ abstract class editor_Test_Model_Abstract {
      */
     protected $sanitized = [];
     /**
-     * This Field defines the children field for a tree (in ExtJs 'children')
+     * This Field defines if this is a tree (as ExtJs uses them)
      * If set, the tree will be created recursively and the tree can be compared by comparing the root element or any branch can be compared as well
      * This field MUST not appear in $compared, otherwise the original data may will be manipulated
-     * @var array
-     */
-    protected $tree = null;
-    /**
-     * Further configuration for trees: usually the root node is the first child of the request-object's children array and has the property "root" set (ExtJS-speciality)
      * @var boolean
      */
-    protected $firstChildIsRoot = false;
+    protected $isTree = false;
     /**
      * This defines a field that will be added to the default message to identify the model
      * This can be a field not added to the equation
@@ -155,32 +150,13 @@ abstract class editor_Test_Model_Abstract {
             }
         }
         // recursive tree processing
-        if(!empty($this->tree) && property_exists($data, $this->tree)){
-            $children = $this->tree;
-            $result->$children = [];
-            foreach($data->$children as $child){
-                $result->$children[] = $this->copy($child);
+        if($this->isTree && property_exists($data, 'children')){
+            $result->children = [];
+            foreach($data->children as $child){
+                $result->children[] = $this->copy($child);
             }
         }
         return $result;
-    }
-    /**
-     * Creates the comparable object out of the given data
-     * @param stdClass $data
-     * @return stdClass
-     */
-    protected function createComparableData(stdClass $data){
-        if($this->tree != NULL && $this->firstChildIsRoot){
-            $children = $this->tree;
-            if(property_exists($data, $children) && is_array($data->$children) && count($data->$children) > 0){
-                return $this->copy($data->$children[0]);
-            } else {
-                $result = new stdClass();
-                $result->error = 'The passed data had no children in the root object';
-                return $result;
-            }
-        }
-        return $this->copy($data);
     }
     /**
      * Generates a default message
@@ -211,7 +187,7 @@ abstract class editor_Test_Model_Abstract {
      * @param string $message
      */
     public function compareExpectation(editor_Test_JsonTest $testCase, stdClass $expected, string $message=''){
-        $testCase->assertEquals($this->createComparableData($expected), $this->createComparableData($this->_data), $message);
+        $testCase->assertEquals($this->copy($expected), $this->copy($this->_data), $message);
     }
     /**
      * Since test-models can act as expectation or actual data we provide both directions of comparision (a test-model is expected to represent real API data though)
@@ -220,13 +196,13 @@ abstract class editor_Test_Model_Abstract {
      * @param string $message
      */
     public function compareActual(editor_Test_JsonTest $testCase, stdClass $actual, string $message=''){
-        $testCase->assertEquals($this->createComparableData($this->_data), $this->createComparableData($actual), $message);
+        $testCase->assertEquals($this->copy($this->_data), $this->copy($actual), $message);
     }
     /**
      * Retrieves the transformed data for comparision
      * @return stdClass
      */
     public function getComparableData(){
-        return $this->createComparableData($this->_data);
+        return $this->copy($this->_data);
     }
 }

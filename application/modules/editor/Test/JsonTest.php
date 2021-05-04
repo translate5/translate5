@@ -180,4 +180,14 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
         $model = editor_Test_Model_Abstract::create($actualModel, $modelName);
         $model->compare($this, $expectedModel, $message);
     }
+    /**
+     * Compares an actual stdClass objects with the decoded contents of a file
+     * @param string $fileToCompare
+     * @param stdClass $actualObject
+     * @param string $message
+     */
+    public function assertObjectEqualsJsonFile(string $fileToCompare, stdClass $actualObject, string $message=''){
+        $expectedObject = self::$api->getFileContent($fileToCompare);
+        $this->assertEquals($expectedObject, $actualObject, $message);
+    }
 }

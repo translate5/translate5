@@ -1,0 +1,42 @@
+[
+    {
+        "qid": -1,
+        "qtype": "internal",
+        "qcount": 0,
+        "qcomplete": true,
+        "qcountfp": 0,
+        "text": "Internal tags"
+    },
+    {
+        "qid": -1,
+        "qtype": "matchrate",
+        "qcount": 0,
+        "qcomplete": true,
+        "qcountfp": 0,
+        "text": "Match analysis"
+    },
+    {
+        "qid": -1,
+        "qtype": "mqm",
+        "qcount": 487,
+        "qcomplete": true,
+        "qcountfp": 3,
+        "text": "MQM"
+    },
+    {
+        "qid": -1,
+        "qtype": "qm",
+        "qcount": 2,
+        "qcomplete": true,
+        "qcountfp": 0,
+        "text": "QA"
+    },
+    {
+        "qid": -1,
+        "qtype": "term",
+        "qcount": 0,
+        "qcomplete": true,
+        "qcountfp": 0,
+        "text": "Terminology"
+    }
+]
