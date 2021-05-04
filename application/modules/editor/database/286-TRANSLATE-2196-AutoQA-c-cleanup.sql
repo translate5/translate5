@@ -25,6 +25,12 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
+-- change already existing quality-id attributes to the new unified naming scheme
+UPDATE LEK_segment_data SET original = REPLACE(original, ' data-seq="', ' data-t5qid="') WHERE original LIKE '% data-seq="%';
+UPDATE LEK_segment_data SET edited = REPLACE(edited, ' data-seq="', ' data-t5qid="') WHERE edited LIKE '% data-seq="%';
+UPDATE LEK_segment_data SET original = REPLACE(original, ' data-seq=\'', ' data-t5qid=\'') WHERE original LIKE '% data-seq=\'%';
+UPDATE LEK_segment_data SET edited = REPLACE(edited, ' data-seq=\'', ' data-t5qid=\'') WHERE edited LIKE '% data-seq=\'%';
+
 -- Remove quality column from segments model
 ALTER TABLE `LEK_segments` DROP `qmId`;
 -- Remove old statistics Endpoint

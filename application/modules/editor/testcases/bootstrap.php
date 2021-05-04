@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
 $APPLICATION_ROOT = rtrim(getenv('APPLICATION_ROOT'), '/');
 $zendLib = $APPLICATION_ROOT.'/vendor/shardj/zf1-future/library/';
 
-//include optional composer vendor autoloader. TODO FIXME: why needs this to be done here, shouldn't the bootstarpper make that happen 
+//include optional composer vendor autoloader. TODO FIXME: why needs this to be done here, shouldn't the bootstarpper make that happen ?
 if(file_exists($APPLICATION_ROOT.'/vendor/autoload.php')) {
     require_once $APPLICATION_ROOT.'/vendor/autoload.php';
 }
