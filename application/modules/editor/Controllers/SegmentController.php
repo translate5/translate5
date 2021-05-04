@@ -85,7 +85,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     public function indexAction()
     {
         $repetiton = $this->getParam('repetiton');
-        $this->entity->resetRepetition($repetiton);
         $taskGuid = $this->session->taskGuid;
         $rows = $this->entity->loadByTaskGuid($taskGuid, $repetiton);
         $this->view->rows = $rows;
