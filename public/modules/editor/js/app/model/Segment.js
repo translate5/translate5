@@ -66,6 +66,7 @@ Ext.define('Editor.model.Segment', {
         {name: 'userName', type: 'string'},
         {name: 'timestamp', type: 'date'},
         {name: 'editable', type: 'boolean', persist: false},
+        {name: 'pretrans', type: 'boolean', persist: false},
         {name: 'autoStateId', type: 'int'},
         {name: 'workflowStep', type: 'string'},
         {name: 'workflowStepNr', type: 'integer', persist: false},

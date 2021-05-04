@@ -102,12 +102,30 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * The default field when no search field is provided by search and repalce
      * @var string
      */
-    const DEFAULT_SEARCH_FIELD = 'source';
-
-
-    protected $dbInstanceClass = 'editor_Models_Db_Segments';
-    protected $validatorInstanceClass = 'editor_Models_Validator_Segment';
-
+    const DEFAULT_SEARCH_FIELD='source';
+    
+    /**
+     * if a segment was NOT pretranslated, use this value as pretrans
+     * @var integer
+     */
+    const PRETRANS_NOTDONE = 0;
+    
+    /**
+     * if a segment was pretranslated, use this value as initial pretrans value
+     * @var integer
+     */
+    const PRETRANS_INITIAL = 1;
+    
+    /**
+     * if translator confirms actively, or changes a pre-translated segment, the pretrans flag must be set to this value
+     * @var integer
+     */
+    const PRETRANS_TRANSLATED = 2;
+    
+    
+    protected $dbInstanceClass          = 'editor_Models_Db_Segments';
+    protected $validatorInstanceClass   = 'editor_Models_Validator_Segment';
+    
     /**
      * @var Zend_Config
      */
@@ -1118,27 +1136,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $row = $this->db->fetchRow($s);
         return $row->cnt;
     }
-
-    /**
-     * If the given exception was thrown because of a missing view do nothing.
-     * If it was another Db Exception throw it!
-     * @param Zend_Db_Statement_Exception $e
-     */
-    protected function catchMissingView(Zend_Db_Statement_Exception $e)
-    {
-        $m = $e->getMessage();
-        if (strpos($m, 'SQLSTATE') !== 0 || strpos($m, 'Base table or view not found') === false) {
-            throw $e;
-        }
-    }
-
-    public function resetRepeatedfilter()
-    {
-        if($repetiton = $this->entity->getFilter()->hasFilter('repetiton',$repetiton)){
-            $this->entity->getFilter()->deleteFilter('repetiton');
-        }
-    }
-
+    
     /**
      * encapsulate the load by taskGuid code.
      * @param string $taskGuid
@@ -1570,114 +1568,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $correctedOverlappedTags = $qmsubsegments->correctQmSubSegmentsOverlappedTags($withQm);
         $this->set($dataindex, $correctedOverlappedTags);
     }
-
-    /**
-     * Bulk updating a specific autoState of a task, affects only non edited segments
-     * If userGuid and username are set in this segment instance, the this values are also set in the affected segments
-     * FIXME test me for translation workflow!
-     * @param string $taskGuid
-     * @param int $oldState
-     * @param int $newState
-     * @param bool $emptyEditedOnly if true only segments where all alternative targets are empty are affected
-     */
-    public function updateAutoState(string $taskGuid, int $oldState, int $newState, $emptyEditedOnly = false)
-    {
-        $sfm = $this->segmentFieldManager;
-        $sfm->initFields($taskGuid);
-        $db = $this->db;
-        $segTable = $db->info($db::NAME);
-        $viewName = $sfm->getView()->getName();
-
-        //if this segment instance have a userGuid and userName he segments are also changed with that data
-        $userGuid = $this->getUserGuid();
-        $username = $this->getUserName();
-
-        $changeUser = !empty($userGuid) && !empty($username);
-        if ($changeUser) {
-            $sql_tpl = 'UPDATE `%s` set autoStateId = ?, userGuid = ?, userName = ? where autoStateId = ? and taskGuid = ?';
-            $bind = array($newState, $userGuid, $username, $oldState, $taskGuid);
-        } else {
-            $sql_tpl = 'UPDATE `%s` set autoStateId = ? where autoStateId = ? and taskGuid = ?';
-            $bind = array($newState, $oldState, $taskGuid);
-        }
-        $sql = sprintf($sql_tpl, $segTable);
-        $sql_view = sprintf($sql_tpl, $viewName);
-
-        $db->getAdapter()->beginTransaction();
-
-        if (!$emptyEditedOnly) {
-            //updates the view (if existing)
-            $this->queryWithExistingView($sql_view, $bind);
-            //updates LEK_segments directly
-            $db->getAdapter()->query($sql, $bind);
-            $db->getAdapter()->commit();
-            return;
-        }
-
-        $sfm->initFields($taskGuid);
-        $fields = $sfm->getFieldList();
-        $affectedFieldNames = array();
-        foreach ($fields as $field) {
-            if ($field->type == editor_Models_SegmentField::TYPE_TARGET && $field->editable) {
-                $sql_view .= ' and ' . $sfm->getEditIndex($field->name) . " = ''";
-                $affectedFieldNames[] = $field->name;
-            }
-        }
-        //updates the view (if existing)
-        $this->queryWithExistingView($sql_view, $bind);
-
-        //updates LEK_segments directly, but only where all above requested fields are empty
-        $sql = 'UPDATE `%s` segment, %s subquery set segment.autoStateId = ? ';
-        if ($changeUser) {
-            $bind = array($taskGuid, $newState, $userGuid, $username, $oldState, $taskGuid);
-            $sql .= ', segment.userGuid = ?, segment.userName = ? ';
-        } else {
-            $bind = array($taskGuid, $newState, $oldState, $taskGuid);
-        }
-        $sql .= 'where segment.autoStateId = ? and segment.taskGuid = ? ';
-        $sql .= 'and subquery.segmentId = segment.id and subquery.cnt = %s';
-
-        //subQuery to get the count of empty fields, fields as requested above
-        //if empty field count equals the the count of requested fiels,
-        //that means all fields are empty and the corresponding segment has to be changed.
-        $subQuery = '(select segmentId, count(*) cnt from LEK_segment_data where taskGuid = ? and ';
-        $subQuery .= "edited = '' and name in ('" . join("','", $affectedFieldNames) . "') group by segmentId)";
-
-        $sql = sprintf($sql, $segTable, $subQuery, count($affectedFieldNames));
-        $db->getAdapter()->query($sql, $bind);
-        $db->getAdapter()->commit();
-    }
-
-    /***
-     * Find last editor from segment history, and update it in the lek segment table
-     * @param string $taskGuid
-     * @param int $autoState
-     */
-    public function updateLastAuthorFromHistory(string $taskGuid, int $autoState)
-    {
-        if (empty($taskGuid) || empty($autoState)) {
-            return;
-        }
-        $adapter = $this->db->getAdapter();
-        $bind = array(
-            $taskGuid,
-            $autoState
-        );
-        $sql = 'UPDATE LEK_segments as seg,
-            (
-                SELECT hist.id,hist.userGuid,hist.userName,hist.segmentId
-                FROM LEK_segment_history hist
-                INNER JOIN LEK_segments s
-                ON s.id = hist.segmentId
-                WHERE s.taskGuid=?
-                AND s.autoStateId=?
-                AND hist.id= (SELECT id FROM LEK_segment_history WHERE segmentId=s.id ORDER BY created DESC LIMIT 1 )
-            ) as h
-            SET seg.userGuid = h.userGuid,seg.userName = h.userName WHERE seg.id=h.segmentId';
-
-        $adapter->query($sql, $bind);
-    }
-
+    
     /**
      * @param string $taskGuid
      * @return array
@@ -1689,26 +1580,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             ->group('autoStateId');
         return $this->db->fetchAll($s)->toArray();
     }
-
-    /**
-     * shortcut to db->query catching errors complaining missing segment view
-     * returns true if query was successfull, returns false if view was missing
-     * @param string $sql
-     * @param array $bind
-     * @return boolean
-     */
-    protected function queryWithExistingView($sql, array $bind)
-    {
-        try {
-            $this->db->getAdapter()->query($sql, $bind);
-            return true;
-        } catch (Zend_Db_Statement_Exception $e) {
-            $this->catchMissingView($e);
-        }
-        return false;
-    }
-
-
+    
     /**
      * includes the fluent segment data
      * (non-PHPdoc)
