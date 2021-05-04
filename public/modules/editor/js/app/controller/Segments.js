@@ -325,21 +325,25 @@ Ext.define('Editor.controller.Segments', {
         if (me.isDisabled) {
             return;
         }
+        repeated = false;
+        filters.each(function (filter, index, len) {
+            var repeated = filter.getProperty() == 'repetiton';
+        });
 
         params[segmentsProxy.getFilterParam()] = segmentsProxy.encodeFilters(segmentStore.getFilters().items);
         params[segmentsProxy.getSortParam()] = segmentsProxy.encodeSorters(segmentStore.getSorters().items);
         //stop loading first!
         store.getProxy().abort();
-        if(me.repetitions){
+        if(repeated){
             store.removeFilter('repetiton');
         }else{
+            repeated = true;
             store.addFilter({
                 "operator":"eq",
-                "value":me.repetitions,
+                "value":repeated,
                 "property":"repetiton"
             });
         }
-        store.load();
 
     },
     /**

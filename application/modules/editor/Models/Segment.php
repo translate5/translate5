@@ -1170,11 +1170,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $s->from($this->db, $cols);
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
+        $s = $this->entity->resetRepetition($repetition, $s);
 
-        if($repetition){
-            $s->where($this->tableName . '.sourceMd5 IN((select sourceMd5 from '.$this->tableName.' group by sourceMd5 having count(*) > 1))');
-            $s->orWhere($this->tableName . '.targetMd5 IN((select targetMd5 from '.$this->tableName.' group by targetMd5 having count(*) > 1))');
-        }
+
 
         if (!empty($callback)) {
             $callback($s, $this->tableName);
@@ -1183,11 +1181,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         return parent::loadFilterdCustom($s);
     }
 
-    public function resetRepetition($repetiton){
+    public function resetRepetition($repetiton, $s){
+        if($repetiton){
+            $s->where($this->tableName . '.sourceMd5 IN((select sourceMd5 from '.$this->tableName.' group by sourceMd5 having count(*) > 1))');
+            $s->orWhere($this->tableName . '.targetMd5 IN((select targetMd5 from '.$this->tableName.' group by targetMd5 having count(*) > 1))');
+        }
         if($repetiton = $this->getFilter()->hasFilter('repetiton',$repetiton)){
             $this->getFilter()->deleteFilter('repetiton');
         }
-        return $repetiton;
+        return $s;
     }
 
     /**
