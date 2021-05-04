@@ -446,10 +446,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
 
         $languageresource->load($languageResourceid);
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $manager editor_Services_Manager */
-        $resource = $manager->getResource($languageresource);
-
         $matchAnalysis->setType($languageresource->getResourceType());
         $isFuzzy = false;
         $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());

@@ -29,23 +29,22 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.matchAnalysisPanel',
-    
-    onExcelExportClick:function(){
-        var me=this,
-        	params = {},
-            task= me.getView().lookupViewModel(true).get('currentTask');
-        params["taskGuid"] = task.get('taskGuid');
-        params["type"] = "excel"
-        window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
-    },
 
-    onXmlExportClick:function(){
-        var me=this,
+    exportAction:function (type, _this){
+        var me= _this,
             params = {},
             task= me.getView().lookupViewModel(true).get('currentTask');
         params["taskGuid"] = task.get('taskGuid');
-        params["type"] = "xml"
+        params["type"] = type;
         window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
+    }
+
+    onExcelExportClick:function(){
+        exportAction("excel", this);
+    },
+
+    onXmlExportClick:function(){
+        exportAction("xml", this);
     },
 
     /***
