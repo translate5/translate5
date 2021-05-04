@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 class editor_Test_Model_TaskQuality extends editor_Test_Model_Abstract {
     
-    protected $compared = [ 'text', 'qtype', 'qcategory', 'qcount', 'qcountfp', 'qcomplete', 'qfaulty' ];
+    protected $compared = [ 'text', 'qtype', 'qcount', 'qcountfp', 'qcomplete', 'qfaulty' ];
 
     protected $messageField = 'qid';
 }

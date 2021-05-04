@@ -1,0 +1,20 @@
+{
+    "success": 1,
+    "row": {
+        "id": "21059",
+        "segmentId": "1056804",
+        "field": "",
+        "type": "qm",
+        "category": "qm_1",
+        "categoryIndex": "1",
+        "falsePositive": "0",
+        "typeText": "QA",
+        "text": "Demo QM error 1",
+        "filterable": true,
+        "falsifiable": true,
+        "hasTag": false,
+        "tagName": "",
+        "cssClass": ""
+    },
+    "action": "add"
+}

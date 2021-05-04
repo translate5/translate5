@@ -1,0 +1,34 @@
+[
+    {
+        "id": "17661",
+        "segmentId": "1055004",
+        "field": "target",
+        "type": "mqm",
+        "category": "mqm_3",
+        "categoryIndex": "3",
+        "falsePositive": "0",
+        "typeText": "MQM",
+        "text": "Mistranslation",
+        "filterable": true,
+        "falsifiable": true,
+        "hasTag": true,
+        "tagName": "img",
+        "cssClass": "qmflag"
+    },
+    {
+        "id": "17660",
+        "segmentId": "1055004",
+        "field": "target",
+        "type": "mqm",
+        "category": "mqm_2",
+        "categoryIndex": "2",
+        "falsePositive": "0",
+        "typeText": "MQM",
+        "text": "Terminology",
+        "filterable": true,
+        "falsifiable": true,
+        "hasTag": true,
+        "tagName": "img",
+        "cssClass": "qmflag"
+    }
+]

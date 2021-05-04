@@ -85,9 +85,9 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         
         //bulk check of all pretrans fields
         $pretrans = array_map(function($item){
-            return intval($item->pretrans);
+            return $item->pretrans;
         }, $segments);
-        $this->assertEquals(array(1,1,1,1,1,1,0,0,0,0,0,0,0), $pretrans);
+        $this->assertEquals(array('1','1','1','1','1','1','0','0','0','0','0','0','0'), $pretrans);
         
         //bulk check of all pretrans fields
         $matchRates = array_map(function($item){
