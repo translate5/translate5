@@ -34,7 +34,9 @@
 
 /**
  * The central Quality Manager
- * Orchestrates all Quaities via the editor_Segment_Quality_Provider registry
+ * Orchestrates all Quaities via the editor_Segment_Quality_Provider registry and API
+ * All plugins that provide Quality relevant APIs have to register a Quality Provider in the Plugin Init/Bootstrap
+ * The first use of the Quality manager instance will lock the registry thus registration of providers in a later phase will lead to exceptions
  *
  */
 final class editor_Segment_Quality_Manager {
@@ -59,7 +61,7 @@ final class editor_Segment_Quality_Manager {
      */
     public static function registerProvider($className){
         if(self::$_locked){
-            throw new ZfExtended_Exception('Adding Quality Provider after app bootstrapping is not allowed.');
+            throw new ZfExtended_Exception('Adding a Quality Provider after app bootstrapping is not allowed.');
         }
         if(!in_array($className, self::$_provider)){
             self::$_provider[] = $className;

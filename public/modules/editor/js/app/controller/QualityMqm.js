@@ -100,7 +100,7 @@ Ext.define('Editor.controller.QualityMqm', {
     },
     /**
      * initialises the QM SubSegment Fieldset in the MetaPanel
-     * TODO AUTOQA: should be a real panel with controller & this class here a view controller
+     * TODO FIXME: The MQM panel should be an own view with & this class here it's view controller
      */
     initFieldSet: function() {
     	if(!Editor.data.task.hasMqm()){

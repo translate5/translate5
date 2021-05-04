@@ -118,9 +118,6 @@ class editor_QualityController extends ZfExtended_RestController {
                         }
                     }
                 }
-                if(!$tagAdjusted){
-                    // TODO AUTOQA: we should write some kind of warning here
-                }
             }
             $this->view->segmentTagAdjusted = ($tagAdjusted) ? 1 : 0;
             $this->view->success = 1;

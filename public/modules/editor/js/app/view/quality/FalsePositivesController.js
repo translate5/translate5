@@ -61,8 +61,8 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
         var me = this, qualityId = checkbox.inputValue, record = checkbox.qrecord, falsePositiveVal = (checked) ? 1 : 0;
         // if there are tags in the editor we need to decorate them (otherwise saving the editor would set the falsePositive value back to it's original state!)
         if(record.get('hasTag') && !this.decorateFalsePositive(record, qualityId, checked)){
-            // TODO AutoQA: what to do here ?
-            console.log('DECORATE FALSE POSITIVE FAILED: ', qualityId, falsePositiveVal, record);
+            // This will be a rare case, mostly whith transitional tasks being imported before the rollout of the AutoQA but used thereafter
+            console.log('Decorating a false positive tag failes: ', qualityId, falsePositiveVal, record);
         }
         Ext.Ajax.request({
             url: Editor.data.restpath+'quality/falsepositive',

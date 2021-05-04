@@ -62,7 +62,7 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
      * {@inheritDoc}
      * @see editor_Segment_Tag::setCategory()
      */
-    public function setCategory(string $category) : string {
+    public function setCategory(string $category) : editor_Segment_Tag {
         $this
             ->removeClass($this->category)
             ->addClass($category);

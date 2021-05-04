@@ -268,7 +268,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @param string $category
      * @return string
      */
-    public function setCategory(string $category) : string {
+    public function setCategory(string $category) : editor_Segment_Tag {
         $this->category = $category;
         return $this;
     }
@@ -308,10 +308,10 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     /**
      * 
      * @param int $qualityId
-     * @return editor_Tag|editor_Segment_Tag
+     * @return editor_Segment_Tag
      */
-    public function setQualityId(int $qualityId) {
-        return $this->setData(self::DATA_NAME_QUALITYID, strval($qualityId));
+    public function setQualityId(int $qualityId) : editor_Segment_Tag {
+        $this->setData(self::DATA_NAME_QUALITYID, strval($qualityId));
         return $this;
     }
     /**
@@ -382,7 +382,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @param int $falsePositive: database value as from LEK_segment_quality
      * @return editor_Segment_Tag
      */
-    public function setFalsePositive(int $falsePositive=1) {
+    public function setFalsePositive(int $falsePositive=1) : editor_Segment_Tag {
         if($falsePositive == 1){
             $this->addClass(self::CSS_CLASS_FALSEPOSITIVE);
         } else {
@@ -496,7 +496,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @param editor_Segment_Tag $tag
      * @return boolean
      */
-    public function canContain(editor_Segment_Tag $tag){
+    public function canContain(editor_Segment_Tag $tag) : bool {
         if(!$this->isSingular()){
             if($this->startIndex <= $tag->startIndex && $this->endIndex >= $tag->endIndex){
                 return true;
@@ -510,7 +510,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @param editor_Segment_Tag $tag
      * @return editor_Segment_Tag|NULL
      */
-    public function getNearestContainer(editor_Segment_Tag $tag){
+    public function getNearestContainer(editor_Segment_Tag $tag) : ?editor_Segment_Tag {
         if($this->canContain($tag)){
             return $this;
         }

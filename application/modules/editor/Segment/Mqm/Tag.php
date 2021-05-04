@@ -198,9 +198,9 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         return self::createCategoryVal($this->categoryIndex);
     }
 
-    public function setCategory(string $category) : string {
-        // TODO AUTOQA: we may should raise an exception if this api is called unwantedly
-        return $this;
+    public function setCategory(string $category) : editor_Segment_Tag {
+        // we do not want to have this API used with MQM Tags
+        throw new ZfExtended_Exception('Calling setCategory on a MQM Tag is forbidden since the category is represented by the category index. use setCategoryIndex instead!');
     }
     
     protected function isQualityGenerallyEqual(editor_Models_Db_SegmentQualityRow $quality) : bool {
@@ -281,7 +281,6 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         if($this->startIndex == $this->endIndex || defined('T5_IS_UNIT_TEST')){
             return;
         }
-        // TODO AUTOQA: Code is copied from editor_Models_Qmsubsegments, needed ??
         // tags spanning no text will be removed silently
         if($this->getQualityId() == null){
             throw new Zend_Exception('MQM Tag found, but no quality-id (data-t5qid) was set in: '.$this->renderStart());

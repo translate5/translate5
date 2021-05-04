@@ -39,6 +39,7 @@ use PHPHtmlParser\DTO\Tag\AttributeDTO;
  * This API creates the types of Internal tags either from a Dom Node or JSON serialization
  * Basic tags will be found in this class (InternalTag, TrackChangesTag)
  * Tags from Plugins can be added with the QualityProvider-API or by registering a TagProvider with the ::registerProvider API within this class
+ * The registration of tags has to be done in the Init/Bootstrap phase of a Plugin, a later registration will lead to Exception as the registry is locked after class instantiation
  */
 final class editor_Segment_TagCreator {
     
@@ -61,7 +62,7 @@ final class editor_Segment_TagCreator {
      */
     public static function registerProvider(editor_Segment_TagProviderInterface $provider){
         if(self::$_locked){
-            throw new ZfExtended_Exception('Registering Segment tag Providers after app bootstrapping is not allowed.');
+            throw new ZfExtended_Exception('Registering Segment Tag Providers after app bootstrapping is not allowed.');
         }
         self::$_provider[$provider->getTagType()] = $provider;
     }

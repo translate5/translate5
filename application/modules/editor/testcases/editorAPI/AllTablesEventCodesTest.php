@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Tests the User Auth API
  */
-class AaaPrebuildTest extends \ZfExtended_Test_ApiTestcase {
+class AllTablesEventCodesTest extends \ZfExtended_Test_ApiTestcase {
     
     protected static $appRoot;
     
