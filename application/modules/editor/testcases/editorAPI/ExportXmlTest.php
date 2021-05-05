@@ -60,7 +60,7 @@ class ExportXmlTest extends \ZfExtended_Test_ApiTestcase
     {
 
         $result = self::$api->requestJson('/editor/plugins_matchanalysis_matchanalysis/export', 'GET', [
-            'taskGuid' => '{8f80d256-1883-4c5a-9333-f5e7e6ab5d50}',
+            'taskGuid' =>self::$api->getTask()->taskGuid,
             'type' => 'xml'
         ]);
 

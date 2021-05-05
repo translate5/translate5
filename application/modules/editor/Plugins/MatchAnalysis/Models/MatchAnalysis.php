@@ -136,7 +136,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 WHERE t2.segmentId IS NULL AND t1.analysisId = ? AND t1.internalFuzzy = 1
             ) bestRates GROUP BY bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate;';
         */
-        $sqlV3 = 'SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.wordCount) wordCount, wordCount, type  FROM (
+        $sqlV3 = 'SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.wordCount) wordCount, type  FROM (
                 SELECT t1.*
                     FROM LEK_match_analysis AS t1 '
             . $blockedFilter .

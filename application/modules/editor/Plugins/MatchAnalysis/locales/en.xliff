@@ -134,7 +134,7 @@
 		<trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgbmljaHQgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse nicht enthalten</source><target>Blocked segments are not included in the analysis</target></trans-unit>
         <trans-unit id='RXhwb3J0IFhNTA=='>
             <source>Export XML</source>
-            <target>Export</target>
+            <target>Export XML</target>
         </trans-unit>
     </body>
   </file>
