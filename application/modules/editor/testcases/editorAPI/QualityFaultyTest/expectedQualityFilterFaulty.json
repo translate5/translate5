@@ -1,0 +1,130 @@
+{
+    "qid": -1,
+    "qtype": "root",
+    "qcount": 12,
+    "qtotal": 12,
+    "qcategory": null,
+    "qcomplete": true,
+    "expanded": true,
+    "expandable": false,
+    "checked": false,
+    "text": "All categories",
+    "segmentIds": [],
+    "children": [
+        {
+            "qid": -1,
+            "qtype": "internal",
+            "qcount": 2,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "25230",
+                    "qtype": "internal",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "internal_tag_structure_faulty",
+                    "qcatidx": "-1",
+                    "text": "The internal tags have an incorrect structure",
+                    "leaf": true,
+                    "checked": false,
+                    "qfaulty": true
+                },
+                {
+                    "qid": "25231",
+                    "qtype": "internal",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "internal_tags_missing",
+                    "qcatidx": "-1",
+                    "text": "Internal tags are missing",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "text": "Internal tags",
+            "qtotal": 2,
+            "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "matchrate",
+            "qcount": 0,
+            "qcomplete": true,
+            "qcategory": null,
+            "text": "Match analysis",
+            "qtotal": 0,
+            "leaf": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "mqm",
+            "qcount": 0,
+            "qcomplete": true,
+            "qcategory": null,
+            "text": "MQM",
+            "qtotal": 0,
+            "leaf": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "qm",
+            "qcount": 0,
+            "qcomplete": true,
+            "qcategory": null,
+            "text": "QA",
+            "qtotal": 0,
+            "leaf": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "term",
+            "qcount": 10,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "25223",
+                    "qtype": "term",
+                    "qcount": 2,
+                    "qcomplete": true,
+                    "qcategory": "supersededTerm",
+                    "qcatidx": "-1",
+                    "text": "Term superseded, deprecated or forbidden in target language",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "25219",
+                    "qtype": "term",
+                    "qcount": 7,
+                    "qcomplete": true,
+                    "qcategory": "transNotDefined",
+                    "qcatidx": "-1",
+                    "text": "Term not defined in target language",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "25225",
+                    "qtype": "term",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "transNotFound",
+                    "qcatidx": "-1",
+                    "text": "Term not found in target language",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "text": "Terminology",
+            "qtotal": 10,
+            "expanded": true,
+            "checked": false
+        }
+    ]
+}
