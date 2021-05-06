@@ -1085,11 +1085,29 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         return $seg;
     }
 
+    /**
+     * @param $newHash
+     * @param $oldHash
+     */
+
     public function updateIsRepeated($newHash, $oldHash)
     {
-        $s = "update " . $this->tableName ." set isRepeated=1";
+        $s = "update " . $this->tableName . " set isRepeated=1";
+
         $s->where('(' . $this->tableName . '.sourceMd5 ' . $this->_getSqlTextCompareOp() . ' ?', $oldHash)
             ->orWhere($this->tableName . '.targetMd5 ' . $this->_getSqlTextCompareOp() . ' ?)', $oldHash);
+    }
+
+    /**
+     * checked if there is a repeitions and updates the column
+     */
+
+    public function insertRepetition()
+    {
+        $s = "update " . $this->tableName . " set isRepeated=1";
+
+        $s->where($this->tableName . '.sourceMd5 IN((select sourceMd5 from ' . $this->tableName . ' group by sourceMd5 having count(*) > 1))');
+        $s->orWhere($this->tableName . '.targetMd5 IN((select targetMd5 from ' . $this->tableName . ' group by targetMd5 having count(*) > 1))');
     }
 
     /**
@@ -1194,8 +1212,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     public function resetRepetition($repetiton, $s)
     {
         if ($repetiton) {
-            $s->where($this->tableName . '.sourceMd5 IN((select sourceMd5 from ' . $this->tableName . ' group by sourceMd5 having count(*) > 1))');
-            $s->orWhere($this->tableName . '.targetMd5 IN((select targetMd5 from ' . $this->tableName . ' group by targetMd5 having count(*) > 1))');
+            $s->where('isRepeated = 1');
         }
         if ($repetiton = $this->getFilter()->hasFilter('repetiton', $repetiton)) {
             $this->getFilter()->deleteFilter('repetiton');
