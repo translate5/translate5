@@ -27,7 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Encapsulates the Default Actions triggered by the Workflow
+ * Encapsulates the Default Actions triggered by the Workflow.
+ * Warning: the here listed public methods are called as configured in LEK_workflow_action table!
  */
 class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     /**

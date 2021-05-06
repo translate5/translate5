@@ -61,7 +61,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         relaisLangLabel: '#UT#Relaissprache',
         numberFieldLabel: '#UT#Anzahl Wörter',
         orderdate: '#UT#Bestelldatum',
-        fullMatchLabel: '#UT#100% Matches sind editierbar',
+        fullMatchLabel: '#UT#unveränderte 100% TM Matches sind editierbar',
         lockLockedLabel: '#UT#Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
         sourceEditLabel: '#UT#Ausgangstext ist editierbar',
         bottomInfo: '#UT# ¹ Diese Angaben / Daten werden für den Import zwingend benötigt.',

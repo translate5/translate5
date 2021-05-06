@@ -1028,7 +1028,7 @@ class editor_TaskController extends ZfExtended_RestController {
             ]);
         }
         
-        // check if the user is allowed to open the task based on the session. The user is not able to open 2 different task in same time. 
+        // check if the user is allowed to open the task based on the session. The user is not able to open 2 different task in same time.
         $this->checkUserSessionAllowsOpen($this->entity->getTaskGuid());
 
         //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
@@ -1092,7 +1092,9 @@ class editor_TaskController extends ZfExtended_RestController {
 
         //if the edit100PercentMatch is changed, update the value for all segments in the task
         if(isset($this->data->edit100PercentMatch)){
-            $this->entity->updateSegmentsEdit100PercentMatch($this->entity, (boolean)$this->data->edit100PercentMatch);
+            $bulkUpdater = ZfExtended_Factory::get('editor_Models_Segment_AutoStates_BulkUpdater');
+            /* @var editor_Models_Segment_Utility $bulkUpdater */
+            $bulkUpdater->updateSegmentsEdit100PercentMatch($this->entity, (boolean)$this->data->edit100PercentMatch);
         }
 
         //if the totals segment count is not set, update it before the entity is saved
@@ -1525,6 +1527,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //to access a task the user must either have the loadAllTasks right, or must be the tasks PM, or must be associated to the task
         $isTaskAccessable = $this->isAllowed('backend', 'loadAllTasks') || $isTaskPm || !is_null($tua);
         if(!$isTaskAccessable) {
+            unset($this->view->rows);
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
@@ -1975,9 +1978,9 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /***
-     * Handle the task usage log for given entity. This will update the sum counter or insert new record 
-     * based on the unique key of `taskType`,`customerId`,`yearAndMonth` 
-     * 
+     * Handle the task usage log for given entity. This will update the sum counter or insert new record
+     * based on the unique key of `taskType`,`customerId`,`yearAndMonth`
+     *
      * @param editor_Models_task $task
      */
     protected function insertTaskUsageLog(editor_Models_task $task) {

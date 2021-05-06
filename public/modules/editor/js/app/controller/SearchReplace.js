@@ -556,6 +556,7 @@ Ext.define('Editor.controller.SearchReplace', {
         replaceTab.insert(1,{
             xtype:'textfield',
             itemId:'replaceField',
+            name:'replaceField',
             focusable:true,
             fieldLabel:this.strings.comboFieldLabel,
         });

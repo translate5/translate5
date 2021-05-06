@@ -434,23 +434,27 @@
       </trans-unit>
       <trans-unit id='UE0gbGVrdG9yaWVydA=='>
         <source>PM lektoriert</source>
-	<target>PM reviewed</target>
+        <target>PM reviewed</target>
       </trans-unit>
       <trans-unit id='UE0gbGVrdG9yaWVydCwgYXV0bw=='>
         <source>PM lektoriert, auto</source>
-	<target>PM reviewed, auto-set</target>
+        <target>PM reviewed, auto-set</target>
       </trans-unit>
       <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0'>
         <source>PM lektoriert, unverändert</source>
-	<target>PM reviewed, unchanged</target>
+        <target>PM reviewed, unchanged</target>
       </trans-unit>
       <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv='>
         <source>PM lektoriert, unverändert, auto</source>
-	<target>PM reviewed, unchanged, auto-set</target>
+        <target>PM reviewed, unchanged, auto-set</target>
+      </trans-unit>
+      <trans-unit id='Vm9yw7xiZXJzZXR6dA=='>
+        <source>Vorübersetzt</source>
+        <target>Pre-translated</target>
       </trans-unit>
       <trans-unit id='UE0gUHLDvGZ1bmc='>
         <source>PM Prüfung</source>
-	<target>PM review</target>
+        <target>PM review</target>
       </trans-unit>
       <trans-unit id="QnVsZ2FyaXNjaA==">
         <source>Bulgarisch</source>
@@ -3615,6 +3619,10 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>In Bearbeitung</source>
     <target>In process</target>
 </trans-unit>
+<trans-unit id='dW52ZXLDpG5kZXJ0ZSAxMDAlIFRNIE1hdGNoZXMgc2luZCBlZGl0aWVyYmFy'>
+  <source>unveränderte 100% TM Matches sind editierbar</source>
+  <target>edit unchanged 100% TM matches</target>
+</trans-unit>
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Delete proposals older than current import</target></trans-unit>
 <trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Log out</target></trans-unit>
@@ -3993,6 +4001,10 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br /></source>
   <target>The changes made by the formerly active role <b>{previousRole}</b> are listed below:<br /></target>
 </trans-unit>
+<trans-unit id='QW53ZW5kdW5nIHZlcmxhc3Nlbg=='>
+    <source>Anwendung verlassen</source>
+    <target>Leave application</target>
+</trans-unit>
 <trans-unit id='V2VubiBha3RpdmllcnQsIHdlcmRlbiBibG9ja2llcnRlIFNlZ21lbnRlIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4='>
   <source>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</source>
   <target>If enabled, blocked segments are included in the analysis and word count</target>
@@ -4005,6 +4017,15 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source>
   <target>The parameter login containing the desired username is missing.</target>
 </trans-unit>
+<trans-unit id='U2VyYmlzY2ggKExhdGVpbiBTZXJiaWVuKQ=='><source>Serbisch (Latein Serbien)</source><target>Serbian (Latin Serbia)</target></trans-unit>
+<trans-unit id='U29tYWxpIChTb21hbGlhKQ=='><source>Somali (Somalia)</source><target>Somali (Somalia)</target></trans-unit>
+<trans-unit id='QW1oYXJpc2NoICjDhHRoaW9waWVuKQ=='><source>Amharisch (Äthiopien)</source><target>Amharic (Ethiopia)</target></trans-unit>
+<trans-unit id='UsOkdG9yb21hbmlzY2ggKFNjaHdlaXop'><source>Rätoromanisch (Schweiz)</source><target>Romansh (Switzerland)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFZlcmVpbmlndGUgU3RhYXRlbik='><source>Spanisch (Vereinigte Staaten)</source><target>Spanish (United States)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKExhdGVpbmFtZXJpa2EgdW5kIEthcmliaWsp'><source>Spanisch (Lateinamerika und Karibik)</source><target>Spanish (Latin America and the Caribbean)</target></trans-unit>
+<trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbiBBc2VyYmFpZHNjaGFuKQ=='><source>Aserbaidschanisch (Latein Aserbaidschan)</source><target>Azerbaijani (Latin Azerbaijan)</target></trans-unit>
+<trans-unit id='VXNiZWtpc2NoIChMYXRlaW4gVXNiZWtpc3Rhbik='><source>Usbekisch (Latein Usbekistan)</source><target>Uzbek (Latin Uzbekistan)</target></trans-unit>
+<trans-unit id='Qm9zbmlzY2ggKExhdGVpbiBCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Bosnisch (Latein Bosnien und Herzegowina)</source><target>Bosnian (Latin Bosnia and Herzegovina)</target></trans-unit>
 </body>
   </file>
 </xliff>

@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -34,7 +34,7 @@ class editor_Models_SegmentFieldManager {
      * This are the default labels, they are translated on sending the output (in SegmentfieldController)
      */
     const LABEL_SOURCE = 'Ausgangstext';
-    const LABEL_TARGET = 'Zieltext'; 
+    const LABEL_TARGET = 'Zieltext';
     const LABEL_RELAIS = 'Relaissprache';
     
     const _MAP_DELIM = '#';
@@ -82,7 +82,7 @@ class editor_Models_SegmentFieldManager {
     protected static $instances = array();
     
     /**
-     * Since SegmentFieldManager is used frequently at different places, 
+     * Since SegmentFieldManager is used frequently at different places,
      * we provide an internal cache of already initialized Instances for specific taskGuids
      * @param string $taskGuid
      * @return editor_Models_SegmentFieldManager
@@ -350,11 +350,11 @@ class editor_Models_SegmentFieldManager {
     
     /**
      * calls the $walker function for each field column combination,
-     * Parameters for $walker are: 
+     * Parameters for $walker are:
      *     $name     -> Name of the Field
      *     $suffix   -> Suffix for the View Column name
      *     $realCol  -> Real Name of the Column in the SegmentData table
-     * The results of $walker are collected and returned as array. 
+     * The results of $walker are collected and returned as array.
      * @param Closure $walker
      */
     public function walkFields(Closure $walker) {
@@ -373,7 +373,7 @@ class editor_Models_SegmentFieldManager {
     }
     
     /**
-     * generates all needed data attributes for the segment fields and fills them up with the given data. 
+     * generates all needed data attributes for the segment fields and fills them up with the given data.
      * Attributes are merged into the given resultObject. Since the object is given by reference no return value is used.
      * @param array $segmentData
      * @param stdClass $resultObj
@@ -382,14 +382,14 @@ class editor_Models_SegmentFieldManager {
         //loop over all available segment fields for this task
         foreach($this->segmentfields as $field) {
             $name = $field->name;
-            //if we have a missing index here, that means, 
+            //if we have a missing index here, that means,
             //the data field ist not existing yet, since the field itself was defined by another file!
             //so returning an empty string is OK here.
             if(empty($segmentData[$name])) {
                 $data = false;
             }
             else {
-                $data = $segmentData[$name]; 
+                $data = $segmentData[$name];
             }
             //loop over our available base data columns and generate them
             foreach($this->baseFieldColMap as $k => $v) {
@@ -411,5 +411,16 @@ class editor_Models_SegmentFieldManager {
      */
     public function getView() {
         return ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($this->taskGuid));
+    }
+    
+    /**
+     * returns true if the given Zend_DB exception was complaining about a missing segment view table
+     * @param Zend_Db_Statement_Exception $e
+     * @return bool
+     */
+    public function isMissingViewException(Throwable $e): bool
+    {
+        $m = $e->getMessage();
+        return ($e instanceof Zend_Db_Statement_Exception) && strpos($m,'SQLSTATE') === 0 && strpos($m,'Base table or view not found') !== false;
     }
 }
