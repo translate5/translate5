@@ -1308,10 +1308,21 @@ Ext.override(Ext.grid.column.Column, {
  * We use an empty {} as default value, but Window applyState crash when called with an empty object.
  */
 Ext.override(Ext.window.Window, {
+    preventWindowMinYPos: function(state) {
+        if(state && state.pos && Ext.isNumeric(state.pos[1])) {
+            state.pos[1] = Math.max(parseInt(state.pos[1]), 0);
+        }
+    },
     applyState: function(state) {
+        this.preventWindowMinYPos(state);
         if(!Ext.Object.isEmpty(state)) {
             this.callParent([state]);
         }
+    },
+    getState: function() {
+        var state = this.callParent();
+        this.preventWindowMinYPos(state);
+        return state;
     }
 });
 
