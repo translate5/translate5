@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file original="word/document.xml" source-language="de" target-language="en" datatype="x-undefined">
+<body>
+<trans-unit id="NFDBB2FA9-tu1" xml:space="preserve">
+<source xml:lang="de">Das ist ein Test</source>
+<seg-source><mrk mid="0" mtype="seg">Das ist ein Test</mrk></seg-source>
+<target xml:lang="en">This is a test</target>
+</trans-unit>
+</body>
+</file>
+</xliff>
