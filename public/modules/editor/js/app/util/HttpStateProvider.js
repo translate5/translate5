@@ -114,7 +114,8 @@ Ext.define('Editor.util.HttpStateProvider',{
         row = me.store.getAt(pos);
         val = row.get('value');
         //if the store value is empty, this config is disabled (the default value in zf_config is empty)
-        if(Ext.isEmpty(val)){
+        // or if there is no change the sync is ignored too. Since the values are objects we have to compare them on string level
+        if(Ext.isEmpty(val) || Ext.JSON.encode(val) === Ext.JSON.encode(value)){
             return;
         }
         row.set('value', value);
@@ -133,7 +134,8 @@ Ext.define('Editor.util.HttpStateProvider',{
             return defaultValue;
         }
         row = me.store.getAt(pos);
-        return row.get('value');
+        //we have to return here a deep copy otherwise the value in the store is modified unwantedly by direct object reference access
+        return Ext.JSON.decode(Ext.JSON.encode(row.get('value')));
     },
 
     /***
