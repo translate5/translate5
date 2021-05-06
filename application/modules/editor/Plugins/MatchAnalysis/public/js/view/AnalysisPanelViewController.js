@@ -37,7 +37,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
         params["taskGuid"] = task.get('taskGuid');
         params["type"] = type;
         window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
-    }
+    },
 
     onExcelExportClick:function(){
         exportAction("excel", this);
