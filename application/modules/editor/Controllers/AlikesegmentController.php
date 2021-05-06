@@ -149,7 +149,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity = ZfExtended_Factory::get($this->entityClass);
                 //Load alike segment, create a history entry, and overwrite with the data of the target segment
                 $entity->load($id);
-                
+                $oldHash = $entity->getTargetMd5();
                 if(! $this->isValidSegment($entity, $editedSegmentId, $hasher)) {
                     error_log('Falsche Segmente per WDHE bearbeitet: MasterSegment:'.$editedSegmentId.' per PUT übergebene Ids:'.print_r($ids, 1).' IP:'.$_SERVER['REMOTE_ADDR']);
                     continue;
@@ -212,6 +212,8 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $history->save();
                 $entity->setTimestamp(NOW_ISO); //see TRANSLATE-922
                 $entity->save();
+                $entity->updateIsRepeatead($entity->getTargetMd5(), $oldHash);
+
             }
             catch (Exception $e) {
                 /**

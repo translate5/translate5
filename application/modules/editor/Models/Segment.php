@@ -102,30 +102,30 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * The default field when no search field is provided by search and repalce
      * @var string
      */
-    const DEFAULT_SEARCH_FIELD='source';
-    
+    const DEFAULT_SEARCH_FIELD = 'source';
+
     /**
      * if a segment was NOT pretranslated, use this value as pretrans
      * @var integer
      */
     const PRETRANS_NOTDONE = 0;
-    
+
     /**
      * if a segment was pretranslated, use this value as initial pretrans value
      * @var integer
      */
     const PRETRANS_INITIAL = 1;
-    
+
     /**
      * if translator confirms actively, or changes a pre-translated segment, the pretrans flag must be set to this value
      * @var integer
      */
     const PRETRANS_TRANSLATED = 2;
-    
-    
-    protected $dbInstanceClass          = 'editor_Models_Db_Segments';
-    protected $validatorInstanceClass   = 'editor_Models_Validator_Segment';
-    
+
+
+    protected $dbInstanceClass = 'editor_Models_Db_Segments';
+    protected $validatorInstanceClass = 'editor_Models_Validator_Segment';
+
     /**
      * @var Zend_Config
      */
@@ -996,7 +996,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     {
 
         try {
-            return $this->_loadByTaskGuid($taskGuid, $callback,  $repetition);
+            return $this->_loadByTaskGuid($taskGuid, $callback, $repetition);
         } catch (Zend_Db_Statement_Exception $e) {
             $this->catchMissingView($e);
         }
@@ -1085,6 +1085,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         return $seg;
     }
 
+    public function updateIsRepeated($newHash, $oldHash)
+    {
+        $s = "update " . $this->tableName ." set isRepeated=1";
+        $s->where('(' . $this->tableName . '.sourceMd5 ' . $this->_getSqlTextCompareOp() . ' ?', $oldHash)
+            ->orWhere($this->tableName . '.targetMd5 ' . $this->_getSqlTextCompareOp() . ' ?)', $oldHash);
+    }
+
     /**
      * Loads the next segment after the given id from the given taskGuid
      * next is defined as the segment with the next higher segmentId
@@ -1136,7 +1143,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $row = $this->db->fetchRow($s);
         return $row->cnt;
     }
-    
+
     /**
      * encapsulate the load by taskGuid code.
      * @param string $taskGuid
@@ -1171,7 +1178,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $s = $this->entity->resetRepetition($repetition, $s);
 
 
-
         if (!empty($callback)) {
             $callback($s, $this->tableName);
         }
@@ -1185,12 +1191,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @return mixed
      */
 
-    public function resetRepetition($repetiton, $s){
-        if($repetiton){
-            $s->where($this->tableName . '.sourceMd5 IN((select sourceMd5 from '.$this->tableName.' group by sourceMd5 having count(*) > 1))');
-            $s->orWhere($this->tableName . '.targetMd5 IN((select targetMd5 from '.$this->tableName.' group by targetMd5 having count(*) > 1))');
+    public function resetRepetition($repetiton, $s)
+    {
+        if ($repetiton) {
+            $s->where($this->tableName . '.sourceMd5 IN((select sourceMd5 from ' . $this->tableName . ' group by sourceMd5 having count(*) > 1))');
+            $s->orWhere($this->tableName . '.targetMd5 IN((select targetMd5 from ' . $this->tableName . ' group by targetMd5 having count(*) > 1))');
         }
-        if($repetiton = $this->getFilter()->hasFilter('repetiton',$repetiton)){
+        if ($repetiton = $this->getFilter()->hasFilter('repetiton', $repetiton)) {
             $this->getFilter()->deleteFilter('repetiton');
         }
         return $s;
@@ -1423,6 +1430,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         return 'update ' . $segmentsTable . ' s, ' . $filesTable . ' f set s.fileOrder = f.fileOrder where s.fileId = f.id and f.taskGuid = ?';
     }
 
+
     /**
      * fetch the alikes of the actually loaded segment
      *
@@ -1574,7 +1582,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $correctedOverlappedTags = $qmsubsegments->correctQmSubSegmentsOverlappedTags($withQm);
         $this->set($dataindex, $correctedOverlappedTags);
     }
-    
+
     /**
      * @param string $taskGuid
      * @return array
@@ -1586,7 +1594,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             ->group('autoStateId');
         return $this->db->fetchAll($s)->toArray();
     }
-    
+
     /**
      * includes the fluent segment data
      * (non-PHPdoc)

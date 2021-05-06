@@ -66,7 +66,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.Segments', {
     extend: 'Ext.app.Controller',
     stores: ['Segments'],
-    repetitions: false,
     //views: ['segments.Scroller', 'segments.RowEditing', 'segments.HtmlEditor', 'segments.GridFilter'],
     views: ['segments.RowEditing', 'segments.HtmlEditor', 'ToolTip'],
     messages: {
