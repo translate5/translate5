@@ -228,23 +228,15 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                     dockedItems: [{
                         xtype: 'toolbar',
                         dock: 'bottom',
-                        layout: {
-                            type: 'vbox',
-                            align: 'left'
-                        },
-                        items: [{
-                            xtype: 'container',
-                            padding: '10',
-                            html:"¹ "+me.strings.noAnalysis,
-                            dock : 'bottom'
-                        },{ 
+                        items: [{ 
                             xtype: 'button',
                             glyph: 'f1c3@FontAwesome5FreeSolid',
                             itemId:'exportExcel',
                             text:me.strings.exportAnalysis,
                             listeners:{
                                 click:'onExcelExportClick'
-                            }},{
+                            }
+                        },{
                             xtype: 'button',
                             glyph: 'f1c3@FontAwesome5FreeSolid',
                             itemId:'exportXml',
@@ -253,6 +245,11 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                                 click:'onXmlExportClick'
                             }
                         }]
+                    },{
+                        xtype: 'container',
+                        padding: '10',
+                        html:"¹ "+me.strings.noAnalysis,
+                        dock : 'bottom'
                     },{
                         xtype: 'toolbar',
                         dock: 'top',
