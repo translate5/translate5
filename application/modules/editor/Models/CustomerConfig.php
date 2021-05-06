@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -81,5 +81,26 @@ class editor_Models_CustomerConfig extends ZfExtended_Models_Entity_Abstract {
             " VALUES (?,?,?) ".
             " ON DUPLICATE KEY UPDATE value = ? ";
         return $this->db->getAdapter()->query($sql,[$customerId,$name,$value,$value]);
+    }
+    
+    /**
+     * returns a specific config value for a specific customer
+     * @param string $userGuid
+     * @param string $name
+     * @return string|NULL
+     */
+    public function getCurrentValue(int $customerId, string $name): ?string {
+        try {
+            $s = $this->db->select()
+            ->where('customerId = ?', $customerId)
+            ->where('name = ?', $name);
+            $row = $this->db->fetchRow($s);
+        } catch (Exception $e) {
+            return null;
+        }
+        if (!$row) {
+            return null;
+        }
+        return $row['value'];
     }
 }
