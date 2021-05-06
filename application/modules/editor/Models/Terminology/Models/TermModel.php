@@ -35,8 +35,6 @@ END LICENSE AND COPYRIGHT
  * @method integer setLanguageId() setLanguageId(integer $languageId)
  * @method string getLanguage() getLanguage()
  * @method string setLanguage() setLanguage(string $language)
- * @method string getTermId() getTermId()
- * @method string setTermId() setTermId(string $termId)
  * @method string getTermTbxId() getTermTbxId()
  * @method string setTermTbxId() setTermTbxId(string $termTbxId)
  * @method string getTerm() getTerm()
@@ -165,7 +163,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $select = $this->db->select()
             ->from($this->db, array('termEntryTbxId', 'term'))
             ->where('collectionId IN(?)', $collectionIds)
-            ->where('termId = ?', $termId);
+            ->where('termTbxId = ?', $termId);
         $res = $this->db->fetchRow($select);
         if (empty($res)) {
             return $res;
@@ -207,7 +205,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     {
         $s = $this->db->select()
             ->where('termEntryTbxId = ?', $termEntryTbxId)
-            ->where('termId != ?', $termId)
+            ->where('termTbxId != ?', $termId)
             ->where('collectionId = ?',$collectionId);
 
         return $this->db->fetchAll($s);
@@ -335,7 +333,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      */
     public function isProposableAllowed(): bool
     {
-        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         return $user->hasRole('termProposer');
     }
@@ -398,6 +396,11 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         return $result;
     }
 
+    public function groupTerms(array $data): ?array
+    {
+
+    }
+
     /***
      * Group term and term attributes data by term. Each row will represent one term and its attributes in attributes array.
      * The term attributes itself will be grouped in parent-child structure
@@ -412,16 +415,17 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $map = [];
         $termColumns = [
             'definition',
-            'termEntryTbxId',
+            'groupId',
             'label',
             'value',
             'desc',
             'termStatus',
             'processStatus',
-            'termId',
+            'termTbxId',
             'termEntryId',
             'collectionId',
             'languageId',
+            'langSetGuid',
             'term'
         ];
         //available term proposal columns
@@ -487,6 +491,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                 $map[$termKey]['attributes'] = [];
 
                 if (isset($oldKey) && isset($map[$oldKey])) {
+//                    $map[$oldKey]['attributes'] = $attribute->createChildTree($map[$oldKey]['attributes']);
                     $groupOldKey = true;
 
                     $map[$oldKey]['proposable'] = $isTermProposalAllowed;
@@ -522,18 +527,28 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                 if ($key == 'headerText') {
                     $value = $translate->_($value);
                 }
+
                 //it is attribute column
                 $atr[$key] = $value;
+
             }
 
             //is attribute proposable (is user attribute proposal allowed and the attribute is proposal whitelisted)
-            $atr['proposable'] = $isAttributeProposalAllowed && $attribute->isProposable($atr['name'],$atr['attrType']);
+            $atr['proposable'] = $isAttributeProposalAllowed && $attribute->isProposable($atr['name'], $atr['attrType']);
             if ($isAttributeProposalAllowed) {
                 $atr['proposal'] = !empty($attProposal['id']) ? $attProposal : null;
                 $attProposal = [];
             }
 
-            array_push($map[$termKey]['attributes'], $atr);
+//            $newAttributes = $attributeModel->load($tmp['attributeId'])->toArray();
+//            $atr = $this->createNewAttributeTermArray($newAttributes);
+//
+//            if ($atr) {
+                array_push($map[$termKey]['attributes'], $atr);
+//            }
+
+
+
             $oldKey = $indexKeyMap($tmp['termId']);
             $groupOldKey = false;
         }
@@ -541,12 +556,12 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         //if not grouped after foreach, group the last result
         if (!$groupOldKey) {
             $map[$oldKey]['proposable'] = $isTermProposalAllowed;
-            $map[$oldKey]['attributes'] = $attribute->createChildTree($map[$oldKey]['attributes']);
+//            $map[$oldKey]['attributes'] = $attribute->createChildTree($map[$oldKey]['attributes']);
 
             //collect the term proposal data if the user is allowed to
             if ($isTermProposalAllowed) {
                 $map[$oldKey]['proposal'] = !empty($termProposalData['term']) ? $termProposalData : null;
-                $map[$oldKey]['attributes'] = $attribute->updateModificationGroupDate($map[$oldKey]['attributes'],isset($map[$oldKey]['proposal']) ? $map[$oldKey]['proposal'] : []);
+//                $map[$oldKey]['attributes'] = $attribute->updateModificationGroupDate($map[$oldKey]['attributes'],isset($map[$oldKey]['proposal']) ? $map[$oldKey]['proposal'] : []);
             }
         }
 
@@ -557,6 +572,56 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         return $map;
     }
 
+    private function createNewAttributeTermArray(array $termArray): array
+    {
+        $attributeColumns = [
+            'attrCreated',
+            'attrDataType',
+            'attrId',
+            'attrLang',
+            'attrProcessStatus',
+            'attrTarget',
+            'attrType',
+            'attrUpdated',
+            'attrValue',
+            'attributeId',
+            'attributeOriginType',
+            'children',
+            'headerText',
+            'internalCount',
+            'labelId',
+            'language',
+            'name',
+            'parentId',
+            'proposable'
+        ];
+        $attNew = [];
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+
+if($termArray['language'] !== null) {
+    $attNew['attrCreated'] = $termArray['created'];
+    $attNew['attrDataType'] = $termArray['dataType'];
+    $attNew['attrId'] = $termArray['id'];
+    $attNew['attrLang'] = $termArray['language'];
+    $attNew['attrProcessStatus'] = $termArray['processStatus'];
+    $attNew['attrTarget'] = $termArray['target'];
+    $attNew['attrType'] = $termArray['type'];
+    $attNew['attrUpdated'] = $termArray['updated'];
+    $attNew['attrValue'] = $termArray['value'];
+    $attNew['attributeId'] = $termArray['id'];
+    $attNew['attributeOriginType'] = 'termAttribute';
+    $attNew['children'] = [];
+    $attNew['headerText'] = $translate->_($termArray['type']);
+    $attNew['internalCount'] = '';
+    $attNew['labelId'] = '';
+    $attNew['language'] = $termArray['language'];
+    $attNew['name'] = $termArray['elementName'];
+    $attNew['parentId'] = '';
+    $attNew['proposable'] = true;
+}
+
+        return $attNew;
+    }
     /**
      * Find term in collection by given language and term value
      * @param string $termText
@@ -582,7 +647,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     public function findTermAndAttributes(int $termId): array
     {
         $s = $this->getSearchTermSelect();
-        $s->where('terms_term.termId=?', $termId);
+        $s->where('terms_term.termTbxId=?', $termId);
             $s->order('LEK_languages.rfc5646')
             ->order('terms_term.term');
 
@@ -609,14 +674,16 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             'terms_attributes.value AS attrValue',
             'terms_attributes.created AS attrCreated',
             'terms_attributes.updated AS attrUpdated',
-//            'terms_attributes.attrDataType AS attrDataType',
+            'terms_attributes.dataType AS attrDataType',
             'terms_attributes.processStatus AS attrProcessStatus',
-            new Zend_Db_Expr('"termAttribute" as attributeOriginType')//this is needed as fixed value
+            'terms_attributes.termId AS termGuid',
+            'terms_attributes.langSetGuid AS langSetGuid',
+            new Zend_Db_Expr('"termAttribute" as attributeOriginType') //this is needed as fixed value
         ];
 
         $cols = [
             'definition',
-            'termEntryTbxId',
+            'termEntryTbxId as groupId',
             'term as label',
             'term as term',//for consistency
             'id as value',
@@ -626,21 +693,16 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             'id as termId',
             'termEntryId',
             'collectionId',
+            'langSetGuid',
             'languageId as languageId'
         ];
 
         $s = $this->db->select()
             ->setIntegrityCheck(false)
             ->from($this->db, $cols)
-            ->joinLeft('terms_attributes', 'terms_attributes.termId = terms_term.termId AND terms_attributes.collectionId = terms_term.collectionId ', $attCols)
+            ->joinLeft('terms_attributes', 'terms_attributes.termId = terms_term.id ', $attCols)
             ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = terms_attributes.labelId',['LEK_term_attributes_label.labelText as headerText'])
             ->join('LEK_languages', 'terms_term.languageId = LEK_languages.id', ['LEK_languages.rfc5646 AS language']);
-
-
-        $s->join('terms_transacgrp', 'terms_transacgrp.termId = terms_term.termId AND terms_transacgrp.collectionId = terms_term.collectionId',[
-            'terms_transacgrp.id as transacGrpId'
-        ]);
-
 
         if($this->isProposableAllowed()){
             $s->joinLeft('LEK_term_proposal', 'LEK_term_proposal.termId = terms_term.id',[
@@ -677,7 +739,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     public function searchTermAttributesInTermEntry(string $termEntryId, array $collectionIds): array
     {
         $s = $this->getSearchTermSelect();
-        $s->where('terms_term.termEntryId = ?', $termEntryId)
+        $s->where('terms_term.termEntryId = ?', (int)$termEntryId)
             ->where('terms_term.collectionId IN(?)', $collectionIds)
             ->order('LEK_languages.rfc5646')
             ->order('terms_term.term')
@@ -829,7 +891,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $excel->setLabel('termEntryId', $t->_('Eintrag'));
         $excel->setLabel('definition', $t->_('Definition'));
         $excel->setLabel('language', $t->_('Sprache'));
-        $excel->setLabel('termId', $t->_('Term-Id'));
+        $excel->setLabel('termTbxId', $t->_('Term-Id'));
         $excel->setLabel('term', $t->_('Term'));
         $excel->setLabel('termProposal', $t->_('Änderung zu bestehendem Term'));
         $excel->setLabel('processStatus', $t->_('Prozess-Status'));
@@ -1130,7 +1192,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ->join(['l' =>'LEK_languages'], 't2.languageId = l.id', 'rtl')
             ->where('t1.collectionId IN(?)', $collectionIds)
             //->where('t2.collectionId IN(?)', $collectionIds)
-            ->where('t1.termId IN(?)', $allIds)
+            ->where('t1.termTbxId IN(?)', $allIds)
             ->where('t1.languageId IN (?)', $allLanguages)
             ->where('t2.languageId IN (?)', $allLanguages);
 
@@ -1470,7 +1532,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     {
         $s = $this->db->select(false);
         $s->from($this->db);
-        $s->where('collectionId IN(?)', $collectionIds)->where('termId = ?', $termId);
+        $s->where('collectionId IN(?)', $collectionIds)->where('termTbxId = ?', $termId);
 
         $this->row = $this->db->fetchRow($s);
         if (empty($this->row)) {
@@ -1538,7 +1600,8 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                         WHERE termsTrg.termGuid = tt.guid
                         AND termsTrg.collectionId = :collectionId';
 
-        $queryResultsAtt = $this->db->getAdapter()->query($sqlAttribute, ['collectionId' => $collectionId]);
-        $queryResultsTrc = $this->db->getAdapter()->query($sqlTransacGrp, ['collectionId' => $collectionId]);
+        $this->db->getAdapter()->query($sqlAttribute, ['collectionId' => $collectionId]);
+        $this->db->getAdapter()->query($sqlTransacGrp, ['collectionId' => $collectionId]);
     }
+
 }

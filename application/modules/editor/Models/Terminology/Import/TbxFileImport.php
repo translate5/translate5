@@ -98,29 +98,39 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     protected string $termEntryTbxId;
     /**
      * Unique Guid for each termEntry
-     * @var string
+     * @var string|null
      */
-    protected string $termEntryGuid;
+    protected ?string $termEntryGuid;
     /**
      * Unique Guid for each LangSet
-     * @var string
+     * @var string|null
      */
-    protected string $langSetGuid;
+    protected ?string $langSetGuid;
     /**
      * Unique Guid for each Term
-     * @var string
+     * @var string|null
      */
-    protected string $termGuid;
+    protected ?string $termGuid;
     /**
-     * Unique Guid for each term
+     * id for each term
+     * @var int|null
+     */
+    protected ?int $termId;
+    /**
+     * TBX id for each term
      * @var string
      */
-    protected string $termId;
+    protected string $termTigId;
+    /**
+     * file path for collection
+     * @var string
+     */
+    protected string $tbxFilePath;
     /**
      * Unique Guid for each descripGrpGuid
-     * @var string
+     * @var string|null
      */
-    protected string $descripGrpGuid;
+    protected ?string $descripGrpGuid;
     /**
      * Actual language from langSet method checkIfLanguageIsForProceed()
      * $this->language['language'] or $this->language['id']
@@ -275,7 +285,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     public function importXmlFile(string $tbxFilePath, editor_Models_TermCollection_TermCollection $collection, ZfExtended_Models_User $user, bool $mergeTerms): array
     {
         $termEntries = [];
-        $tbxAsSimpleXml = null;
+        $this->tbxFilePath = $tbxFilePath;
 
         try {
             $tbxAsSimpleXml = new SimpleXMLElement(file_get_contents($tbxFilePath), LIBXML_NOERROR);
@@ -302,6 +312,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->user = $user;
         $this->collectionId = $collection->getId();
         $this->mergeTerms = $mergeTerms;
+        $this->attributeLabel = [];
 
         $this->tbxMap[$this::TBX_TERM_ENTRY] = 'termEntry';
         $this->tbxMap[$this::TBX_LANGSET] = 'langSet';
@@ -322,7 +333,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->attributeLabel[$attributeLabel['label'].'-'.$attributeLabel['type']] = $attributeLabel['id'];
         }
 
-        $this->attributeLabel = [];
         if ($mergeTerms) {
             $this->termEntriesCollection = $this->termEntryModel->getAllTermEntryAndCollection($this->collectionId);
             $this->attributesCollection = $this->attributeModel->getAttributeByCollectionId($this->collectionId);
@@ -351,7 +361,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     private function importTbx(SimpleXMLElement $tbxAsSimpleXml): array
     {
-        $startEntryTime = microtime(true);
         $this->tbxMap[$this::TBX_TERM_ENTRY] = $tbxAsSimpleXml->text->body->termEntry ? 'termEntry' : 'conceptEntry';
 
         foreach ($tbxAsSimpleXml->text->body->{$this->tbxMap[$this::TBX_TERM_ENTRY]} as $termEntry) {
@@ -359,7 +368,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->emptyVariables();
             $parsedEntry = $this->handleTermEntry($termEntry);
             foreach ($termEntry->{$this->tbxMap[$this::TBX_LANGSET]} as $languageGroup) {
-                $this->langSetGuid = '';
+                $this->langSetGuid = null;
                 $this->language = $this->checkIfLanguageIsProceed($languageGroup);
 
                 if (isset($this->language['language'])) {
@@ -367,11 +376,11 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
                     $parsedLangSet = $this->handleLanguageGroup($languageGroup, $parsedEntry);
 
                     foreach ($languageGroup->{$this->tbxMap[$this::TBX_TIG]} as $termGroup) {
-                        $this->termId = '';
-                        $this->termGuid = '';
+                        $this->termId = null;
+                        $this->termGuid = null;
                         $this->handleTermGroup($termGroup, $parsedLangSet);
-                        $this->termId = '';
-                        $this->termGuid = '';
+                        $this->termId = null;
+                        $this->termGuid = null;
                     }
                 }
             }
@@ -380,11 +389,8 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
         if ($tbxAsSimpleXml->text->back->refObjectList) {
             $this->getTbxImages($tbxAsSimpleXml->text->back->refObjectList);
+            $this->getTbxRespUserBack($tbxAsSimpleXml->text->back->refObjectList);
         }
-
-
-        $statisticEntry = "ENTRY sec.: " . (microtime(true) - $startEntryTime)
-            . " - Memory usage: " . ((memory_get_usage() / 1024) / 1024) .' MB';
 
         if ($this->unknownLanguages) {
             $this->logUnknownLanguages();
@@ -399,12 +405,12 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     {
         $this->termEntryDbId = 0;
         $this->termEntryTbxId = '';
-        $this->termEntryGuid = '';
-        $this->langSetGuid = '';
-        $this->descripGrpGuid = '';
-        $this->termGuid = '';
+        $this->termEntryGuid = null;
+        $this->langSetGuid = null;
+        $this->descripGrpGuid = null;
+        $this->termGuid = null;
         $this->transacGrps = [];
-        $this->termId = '';
+        $this->termId = null;
     }
 
     /**
@@ -452,10 +458,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $newEntry->setCollectionId($this->collectionId);
         $newEntry->setTermEntryTbxId($this->termEntryTbxId);
         $newEntry->setEntryGuid($this->termEntryGuid);
-
-//        if ($termEntry->descrip) {
-//            $newEntry->setDescrip($this->setAttributeTypes($termEntry->descrip, false));
-//        }
 
         // Before setting first attribute we retrieve actual termEntryDbId fom table
         /** @var editor_Models_Terminology_Models_TermEntryModel $actualTermEntry */
@@ -536,7 +538,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         /** SimpleXMLElement $tig */
         /** @var editor_Models_Terminology_TbxObjects_Term $newTerm */
         $newTerm = new $this->termObject;
-        $newTerm->setTermId($this->getIdOrGenerate($tig->term, $this->tbxMap[$this::TBX_TIG]));
+        $newTerm->setTermTbxId($this->getIdOrGenerate($tig->term, $this->tbxMap[$this::TBX_TIG]));
         $newTerm->setCollectionId($this->collectionId);
         $newTerm->setTermEntryId($this->termEntryDbId);
         $newTerm->setTermEntryTbxId($this->termEntryTbxId);
@@ -551,8 +553,9 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $newTerm->setDescripType($parsedLangSet->getDescripType());
         $newTerm->setUserGuid($this->user->getUserGuid());
         $newTerm->setUserName($this->user->getUserName());
+        $newTerm->setCreated(NOW_ISO);
 
-        $this->termId = $newTerm->getTermId();
+        $this->termTigId = $newTerm->getTermTbxId();
 
         if (strtolower($parsedLangSet->getDescripType()) === $newTerm::TERM_DEFINITION) {
             $newTerm->setDefinition($parsedLangSet->getDescrip());
@@ -604,7 +607,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->language['language'] = null;
         }
         $attributes = [];
-        $newLabelId = $this->attributeLabel;
+        /** @var SimpleXMLElement $value */
         foreach ($element as $key => $value) {
             /** @var editor_Models_Terminology_TbxObjects_Attribute $attribute */
             $attribute = new $this->attributesObject;
@@ -619,12 +622,24 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $attribute->setValue((string)$value);
             $attribute->setType((string)$value->attributes()->{'type'});
             $attribute->setTarget((string)$value->attributes()->{'target'});
-            $attribute->setAttrLang($this->getActualLanguageAttribute($value));
+//            $attribute->setAttrLang($this->getActualLanguageAttribute($value));
+            $attribute->setAttrLang($this->language['language'] ? $this->language['language'] : '');
+            $attribute->setUserGuid($this->user->getUserGuid());
+            $attribute->setUserName($this->user->getUserName());
+            $attribute->setCreated(NOW_ISO);
 
             if (isset($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()])) {
                 $attribute->setLabelId($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()]);
+            } else {
+                $this->attributeLabelModel->loadOrCreate($attribute->getElementName(), $attribute->getType());
+                $attributeLabels = $this->attributeLabelModel->loadAllTranslated();
+                foreach ($attributeLabels as $attributeLabel) {
+                    $this->attributeLabel[$attributeLabel['label'].'-'.$attributeLabel['type']] = $attributeLabel['id'];
+                }
+                $attribute->setLabelId($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()]);
             }
             $attributes[] = $attribute;
+
             if ($addToAttributesCollection) {
                 $this->attributes[] = $attribute;
             }
@@ -656,6 +671,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $transacGrpObject->setElementName($elementName);
             $transacGrpObject->setLanguage($this->language['language']);
             $transacGrpObject->setAttrLang($this->getActualLanguageAttribute($transacGrp));
+
             if (isset($transacGrp->transac)) {
                 $transacGrpObject->setTransac((string)$transacGrp->transac);
             }
@@ -714,13 +730,19 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         return [];
     }
 
+    /**
+     * @param SimpleXMLElement $element
+     * @return array
+     */
     private function getTbxImages(SimpleXMLElement $element): array
     {
         $parsedTbxImages = [];
         $tbxImagesAsObject = [];
+        /** @var SimpleXMLElement $refObjectList */
         foreach ($element as $refObjectList) {
             if ((string)$refObjectList->attributes()->{'type'} === 'binaryData') {
                 $count = 0;
+                /** @var SimpleXMLElement $refObject */
                 foreach ($refObjectList as $refObject) {
                     $parsedTbxImages[$count]['id'] = (string)$refObject->attributes()->{'id'};
                     foreach ($refObject->item as $key => $item) {
@@ -729,15 +751,40 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
                     /** @var editor_Models_Terminology_TbxObjects_Image $tbxImage */
                     $tbxImage = new $this->tbxImageObject;
                     $tbxImage->setTargetId((string)$refObject->attributes()->{'id'});
-                    $tbxImage->setName($parsedTbxImages[$count]['name']);
-                    $tbxImage->setEncoding($parsedTbxImages[$count]['encoding']);
+//                    $tbxImage->setName($parsedTbxImages[$count]['name']);
+//                    $tbxImage->setEncoding($parsedTbxImages[$count]['encoding']);
+
+                    if (isset($parsedTbxImages[$count]['encoding'])) {
+                        $tbxImage->setName($parsedTbxImages[$count]['name']);
+                        $tbxImage->setEncoding($parsedTbxImages[$count]['encoding']);
+                    } else {
+                        $tbxImage->setName((string)$refObject->attributes()->{'id'}.'.'.$parsedTbxImages[$count]['format']);
+                        $tbxImage->setEncoding($parsedTbxImages[$count]['codePage']);
+                    }
+
                     $tbxImage->setFormat($parsedTbxImages[$count]['format']);
-                    $tbxImage->setXbase($parsedTbxImages[$count]['data']);
+//                    $tbxImage->setXbase('');
+                    $tbxImage->setHexOrXbaseValue($parsedTbxImages[$count]['data']);
+
                     $tbxImage->setCollectionId($this->collectionId);
                     $tbxImagesAsObject[] = $tbxImage;
                     $count++;
 
                     if ($tbxImagesAsObject) {
+                        foreach ($tbxImagesAsObject as $image) {
+                            $hexOrXbaseWithoutSpace = str_replace(' ', '', $image->getHexOrXbaseValue());
+                            if ($image->getEncoding() === 'hex') {
+                                # convert the hex string to binary
+                                $img = hex2bin($hexOrXbaseWithoutSpace);
+                            } else {
+                                # convert the base64 string to binary
+                                $img = base64_decode($hexOrXbaseWithoutSpace);
+                            }
+
+                            $image->setHexOrXbaseValue('');
+                            $this->saveFileLocal($this->tbxFilePath, $image->getName(), $img);
+                        }
+
                         $this->createOrUpdateElement($this->tbxImagesModel, $tbxImagesAsObject, $this->tbxImagesCollection, $this->mergeTerms);
                         $tbxImagesAsObject = [];
                     }
@@ -745,8 +792,35 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             }
         }
 
-
         return $tbxImagesAsObject;
+    }
+
+    /**
+     * @param SimpleXMLElement $element
+     * @return array
+     */
+    private function getTbxRespUserBack(SimpleXMLElement $element): array
+    {
+        $parsedTbxRespUser = [];
+        /** @var SimpleXMLElement $refObjectList */
+        foreach ($element as $refObjectList) {
+            if ((string)$refObjectList->attributes()->{'type'} === 'respPerson') {
+                $count = 0;
+                /** @var SimpleXMLElement $refObject */
+                foreach ($refObjectList as $refObject) {
+                    $parsedTbxRespUser[$count]['target'] = (string)$refObject->attributes()->{'id'};
+                    foreach ($refObject->item as $key => $item) {
+                        $parsedTbxRespUser[$count][(string)$item->attributes()->{'type'}] = (string)$item;
+                    }
+                    $count++;
+                }
+            }
+        }
+
+        // ToDo: Sinisa, Update user in table... define how and what is mean in: TRANSLATE-1274
+        $testUsers = $parsedTbxRespUser;
+
+        return $parsedTbxRespUser;
     }
 
     /**
@@ -864,5 +938,39 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $data['userGuid'] = $this->user->getUserGuid();
         $data['userName'] = $this->user->getUserName();
         $this->logger->info($code, $logMessage, $data);
+    }
+
+
+    /***
+     * Save the imported file to the disk.
+     * The file location will be "trasnalte5 parh" /data/tbx-import/tbx-for-filesystem-import/tc_"collectionId"/the file"
+     *
+     * @param string $filepath: source file location
+     * @param string|null $name: source file name
+     */
+    private function saveFileLocal(string $filepath, string $name, $image)
+    {
+        $tbxImportDirectoryPath = APPLICATION_PATH.'/../data/tbx-import/';
+        $newFilePath = $tbxImportDirectoryPath.'tbx-for-filesystem-import/tc_'.$this->collectionId.'/images';
+
+        //check if the directory exist and it is writable
+        if (is_dir($tbxImportDirectoryPath) && !is_writable($tbxImportDirectoryPath)) {
+            $this->log("Unable to save the tbx file to the tbx import path. The file is not writable. Import path: ".$tbxImportDirectoryPath." , termcollectionId: ".$this->collectionId);
+            return;
+        }
+
+        try {
+            if (!file_exists($newFilePath) && !@mkdir($newFilePath, 0777, true)) {
+                $this->log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$this->collectionId);
+                return;
+            }
+        } catch (Exception $e) {
+            $this->log("Unable to create directory for imported image files. Directory path: ".$newFilePath." , termcollectionId: ".$this->collectionId);
+            return;
+        }
+
+        $newFileName = $newFilePath.'/'.$name;
+
+        file_put_contents($newFileName, $image);
     }
 }

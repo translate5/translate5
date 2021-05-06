@@ -26,6 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 class editor_Models_Terminology_TbxObjects_TermEntry {
+    /**
+     * Table field for insert or update.
+     * If:
+     * 'fieldName' => false -> only insert no check for update attribute
+     * 'fieldName' => true -> insert and update
+     */
     const TABLE_FIELDS = [
         'collectionId',
         'termEntryId',
@@ -35,7 +41,7 @@ class editor_Models_Terminology_TbxObjects_TermEntry {
     ];
     protected int $collectionId = 0;
     protected string $termEntryTbxId = '';
-    protected string $entryGuid = '';
+    protected ?string $entryGuid = null;
     protected array $descrip = [];
     protected string $descripValue = '';
     protected array $transacGrp = [];
@@ -79,18 +85,18 @@ class editor_Models_Terminology_TbxObjects_TermEntry {
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getEntryGuid(): string
+    public function getEntryGuid(): ?string
     {
         return $this->entryGuid;
     }
 
     /**
-     * @param string $entryGuid
+     * @param string|null $entryGuid
      * @return editor_Models_Terminology_TbxObjects_TermEntry
      */
-    public function setEntryGuid(string $entryGuid): self
+    public function setEntryGuid(?string $entryGuid): self
     {
         $this->entryGuid = $entryGuid;
         return $this;

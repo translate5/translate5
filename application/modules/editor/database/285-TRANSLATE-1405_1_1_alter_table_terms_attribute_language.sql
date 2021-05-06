@@ -25,20 +25,31 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-alter table terms_attributes alter column language set default null;
 alter table terms_term drop column descrip;
 alter table terms_term drop column descripType;
 alter table terms_term drop column descripTarget;
+alter table terms_term modify langSetGuid varchar(36) null;
+alter table terms_term modify termEntryGuid varchar(36) null;
+alter table terms_term modify termEntryId int null;
+alter table terms_term modify language varchar(36) null;
+
 alter table terms_transacgrp drop column adminType;
 alter table terms_transacgrp drop column adminValue;
-
 alter table terms_transacgrp modify termId int null;
 alter table terms_transacgrp add termGuid varchar(36) null after termId;
 
+alter table terms_attributes alter column language set default null;
 alter table terms_attributes modify termId int null;
+alter table terms_attributes modify termEntryId int null;
+alter table terms_attributes modify termEntryGuid varchar(36) null;
+alter table terms_attributes modify langSetGuid varchar(36) null;
 alter table terms_attributes add termGuid varchar(36) null after termId;
 alter table terms_attributes add attrLang varchar(36) null after language;
 
 alter table terms_transacgrp add language varchar(12) null after transacType;
 alter table terms_transacgrp add attrLang varchar(12) null after language;
+alter table terms_transacgrp modify langSetGuid varchar(36) null;
+alter table terms_transacgrp modify termEntryGuid varchar(36) null;
+alter table terms_transacgrp modify termEntryId int null;
 
+alter table terms_images drop column xbase;

@@ -39,28 +39,30 @@ class editor_Models_Terminology_TbxObjects_Attribute {
         'langSetGuid' => false,
         'termId' => false,
         'termGuid' => false,
-        'labelId' => false,
+        'labelId' => true,
         'guid' => false,
         'userGuid' => true,
-        'userName' => true
+        'userName' => true,
+        'created' => false
     ];
 
     protected int $collectionId = 0;
-    protected int $termEntryId = 0;
-    protected string $termEntryGuid = '';
-    protected string $langSetGuid = '';
+    protected ?int $termEntryId = null;
+    protected ?string $termEntryGuid = null;
+    protected ?string $langSetGuid = null;
     protected string $attrLang = '';
-    protected int $termId = 0;
-    protected string $termGuid = '';
-    protected string $guid = '';
+    protected ?int $termId = null;
+    protected ?string $termGuid = null;
+    protected ?string $guid = null;
     protected string $elementName = '';
     protected ?string $language = '';
     protected string $value = '';
     protected string $target = '';
     protected string $type = '';
-    protected string $labelId = '';
+    protected int $labelId = 0;
     protected string $userGuid = '';
     protected string $userName = '';
+    protected string $created = '';
 
     /**
      * @param editor_Models_Terminology_TbxObjects_Attribute $element
@@ -90,54 +92,54 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getTermEntryId(): int
+    public function getTermEntryId(): ?int
     {
         return $this->termEntryId;
     }
 
     /**
-     * @param int $termEntryId
+     * @param int|null $termEntryId
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setTermEntryId(int $termEntryId): self
+    public function setTermEntryId(?int $termEntryId): self
     {
         $this->termEntryId = $termEntryId;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTermEntryGuid(): string
+    public function getTermEntryGuid(): ?string
     {
         return $this->termEntryGuid;
     }
 
     /**
-     * @param string $termEntryGuid
+     * @param string|null $termEntryGuid
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setTermEntryGuid(string $termEntryGuid): self
+    public function setTermEntryGuid(?string $termEntryGuid): self
     {
         $this->termEntryGuid = $termEntryGuid;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getLangSetGuid(): string
+    public function getLangSetGuid(): ?string
     {
         return $this->langSetGuid;
     }
 
     /**
-     * @param string $langSetGuid
+     * @param string|null $langSetGuid
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setLangSetGuid(string $langSetGuid): self
+    public function setLangSetGuid(?string $langSetGuid): self
     {
         $this->langSetGuid = $langSetGuid;
         return $this;
@@ -162,72 +164,72 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getTermId(): int
+    public function getTermId(): ?int
     {
         return $this->termId;
     }
 
     /**
-     * @param int $termId
+     * @param int|null $termId
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setTermId(int $termId): self
+    public function setTermId(?int $termId): self
     {
         $this->termId = $termId;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTermGuid(): string
+    public function getTermGuid(): ?string
     {
         return $this->termGuid;
     }
 
     /**
-     * @param string $termGuid
+     * @param string|null $termGuid
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setTermGuid(string $termGuid): self
+    public function setTermGuid(?string $termGuid): self
     {
         $this->termGuid = $termGuid;
         return $this;
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getLabelId(): string
+    public function getLabelId(): int
     {
         return $this->labelId;
     }
 
     /**
-     * @param string $labelId
+     * @param int $labelId
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setLabelId(string $labelId): self
+    public function setLabelId(int $labelId): self
     {
         $this->labelId = $labelId;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getGuid(): string
+    public function getGuid(): ?string
     {
         return $this->guid;
     }
 
     /**
-     * @param string $guid
+     * @param string|null $guid
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setGuid(string $guid): self
+    public function setGuid(?string $guid): self
     {
         $this->guid = $guid;
         return $this;
@@ -356,6 +358,24 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     public function setUserName(string $userName): self
     {
         $this->userName = $userName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreated(): string
+    {
+        return $this->created;
+    }
+
+    /**
+     * @param string $created
+     * @return editor_Models_Terminology_TbxObjects_Attribute
+     */
+    public function setCreated(string $created): self
+    {
+        $this->created = $created;
         return $this;
     }
 }

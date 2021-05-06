@@ -50,7 +50,7 @@ create table if not exists terms_term
 (
     id int auto_increment
         primary key,
-    termId varchar(100) null,
+    termTbxId varchar(100) null,
     collectionId int not null,
     termEntryId int not null,
     termEntryTbxId varchar(100) null,
