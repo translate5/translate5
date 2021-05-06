@@ -133,4 +133,25 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
         FROM  LEK_task_config WHERE taskGuid = ".$adapter->quote($odlTaskGuid)."; ";
         $adapter->query($sql);
     }
+    
+    /**
+     * returns a specific config value for a specific task
+     * @param string $taskGuid
+     * @param string $name
+     * @return string|NULL
+     */
+    public function getCurrentValue(string $taskGuid, string $name): ?string {
+        try {
+            $s = $this->db->select()
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('name = ?', $name);
+            $row = $this->db->fetchRow($s);
+        } catch (Exception $e) {
+            return null;
+        }
+        if (!$row) {
+            return null;
+        }
+        return $row['value'];
+    }
 }

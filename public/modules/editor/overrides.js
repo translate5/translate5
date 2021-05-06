@@ -1267,7 +1267,7 @@ Ext.override(Ext.grid.column.Column, {
     // On column reset the column is set back to flex - if defined
     // That means if there is a flex value, the width has to be deleted and the flex must be kept
     getColumnState: function() {
-        var state = this.callParent();        
+        var state = this.callParent();
         //first we restore the flex state
         this.savePropToState('flex', state);
         if (state) {
