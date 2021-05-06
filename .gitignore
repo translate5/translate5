@@ -1,6 +1,7 @@
 client-specific
 application/config/installation.ini
-data/editorImportedTasks/*
+data/editorImportedTasks*
+data/editorVisualReviewFonts*
 data/tbx-import/*
 data/dummyTm_*
 /nbproject/
