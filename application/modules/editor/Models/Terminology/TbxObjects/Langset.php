@@ -38,9 +38,9 @@ class editor_Models_Terminology_TbxObjects_Langset {
     ];
     protected int $collectionId = 0;
     protected int $entryId = 0;
-    protected string $termEntryGuid = '';
-    protected string $langSetGuid = '';
-    protected string $descripGrpGuid = '';
+    protected ?string $termEntryGuid = null;
+    protected ?string $langSetGuid = null;
+    protected ?string $descripGrpGuid = null;
     protected string $language = '';
     protected string $languageId = '';
     protected string $descrip = '';
@@ -85,54 +85,54 @@ class editor_Models_Terminology_TbxObjects_Langset {
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTermEntryGuid(): string
+    public function getTermEntryGuid(): ?string
     {
         return $this->termEntryGuid;
     }
 
     /**
-     * @param string $termEntryGuid
+     * @param string|null $termEntryGuid
      * @return editor_Models_Terminology_TbxObjects_Langset
      */
-    public function setTermEntryGuid(string $termEntryGuid): self
+    public function setTermEntryGuid(?string $termEntryGuid): self
     {
         $this->termEntryGuid = $termEntryGuid;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getLangSetGuid(): string
+    public function getLangSetGuid(): ?string
     {
         return $this->langSetGuid;
     }
 
     /**
-     * @param string $langSetGuid
+     * @param string|null $langSetGuid
      * @return editor_Models_Terminology_TbxObjects_Langset
      */
-    public function setLangSetGuid(string $langSetGuid): self
+    public function setLangSetGuid(?string $langSetGuid): self
     {
         $this->langSetGuid = $langSetGuid;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDescripGrpGuid(): string
+    public function getDescripGrpGuid(): ?string
     {
         return $this->descripGrpGuid;
     }
 
     /**
-     * @param string $descripGrpGuid
+     * @param string|null $descripGrpGuid
      * @return editor_Models_Terminology_TbxObjects_Langset
      */
-    public function setDescripGrpGuid(string $descripGrpGuid): self
+    public function setDescripGrpGuid(?string $descripGrpGuid): self
     {
         $this->descripGrpGuid = $descripGrpGuid;
         return $this;

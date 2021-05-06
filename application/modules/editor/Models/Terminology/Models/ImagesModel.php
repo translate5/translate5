@@ -40,8 +40,6 @@ END LICENSE AND COPYRIGHT
  * @method string setEncoding() setEncoding(string $encoding)
  * @method string getFormat() getFormat()
  * @method string setFormat() setFormat(string $format)
- * @method string getXbase() getXbase()
- * @method string setXbase() setXbase(string $xbase)
  * @method integer getCollectionId() getCollectionId()
  * @method integer setCollectionId() setCollectionId(integer $collectionId)
  */

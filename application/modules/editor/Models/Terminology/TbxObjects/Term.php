@@ -26,8 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 class editor_Models_Terminology_TbxObjects_Term {
+    /**
+     * Table field for insert or update.
+     * If:
+     * 'fieldName' => false -> only insert no check for update attribute
+     * 'fieldName' => true -> insert and update
+     */
     const TABLE_FIELDS = [
-        'termId' => false,
+        'termTbxId' => false,
         'collectionId' => false,
         'termEntryId' => false,
         'termEntryTbxId' => false,
@@ -41,6 +47,7 @@ class editor_Models_Terminology_TbxObjects_Term {
         'processStatus' => false,
         'definition' => false,
         'userGuid' => true,
+        'created' => true,
         'userName' => true
     ];
 
@@ -60,7 +67,7 @@ class editor_Models_Terminology_TbxObjects_Term {
     const CSS_TERM_IDENTIFIER = 'term';
 
     protected string $term = '';
-    protected string $termId = '';
+    protected string $termTbxId = '';
     protected string $language = '';
     protected int $languageId = 0;
     protected string $descrip = '';
@@ -79,11 +86,12 @@ class editor_Models_Terminology_TbxObjects_Term {
     protected array $note = [];
     protected int $termEntryId = 0;
     protected string $termEntryTbxId = '';
-    protected string $termEntryGuid = '';
-    protected string $langSetGuid = '';
-    protected string $guid = '';
+    protected ?string $termEntryGuid = null;
+    protected ?string $langSetGuid = null;
+    protected ?string $guid = null;
     protected string $userGuid = '';
     protected string $userName = '';
+    protected string $created = '';
 
     /**
      * @param editor_Models_Terminology_TbxObjects_Term $element
@@ -91,7 +99,7 @@ class editor_Models_Terminology_TbxObjects_Term {
      */
     public function getCollectionKey(editor_Models_Terminology_TbxObjects_Term $element): string
     {
-        return $element->getTermEntryId().'-'.$element->getLanguage().'-'.$element->getTermId();
+        return $element->getTermEntryId().'-'.$element->getLanguage().'-'.$element->getTermTbxId();
     }
 
     /**
@@ -115,18 +123,18 @@ class editor_Models_Terminology_TbxObjects_Term {
     /**
      * @return string
      */
-    public function getTermId(): string
+    public function getTermTbxId(): string
     {
-        return $this->termId;
+        return $this->termTbxId;
     }
 
     /**
-     * @param string $termId
+     * @param string $termTbxId
      * @return editor_Models_Terminology_TbxObjects_Term
      */
-    public function setTermId(string $termId): self
+    public function setTermTbxId(string $termTbxId): self
     {
-        $this->termId = $termId;
+        $this->termTbxId = $termTbxId;
         return $this;
     }
 
@@ -455,54 +463,54 @@ class editor_Models_Terminology_TbxObjects_Term {
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTermEntryGuid(): string
+    public function getTermEntryGuid(): ?string
     {
         return $this->termEntryGuid;
     }
 
     /**
-     * @param string $termEntryGuid
+     * @param string|null $termEntryGuid
      * @return editor_Models_Terminology_TbxObjects_Term
      */
-    public function setTermEntryGuid(string $termEntryGuid): self
+    public function setTermEntryGuid(?string $termEntryGuid): self
     {
         $this->termEntryGuid = $termEntryGuid;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getLangSetGuid(): string
+    public function getLangSetGuid(): ?string
     {
         return $this->langSetGuid;
     }
 
     /**
-     * @param string $langSetGuid
+     * @param string|null $langSetGuid
      * @return editor_Models_Terminology_TbxObjects_Term
      */
-    public function setLangSetGuid(string $langSetGuid): self
+    public function setLangSetGuid(?string $langSetGuid): self
     {
         $this->langSetGuid = $langSetGuid;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getGuid(): string
+    public function getGuid(): ?string
     {
         return $this->guid;
     }
 
     /**
-     * @param string $guid
+     * @param string|null $guid
      * @return editor_Models_Terminology_TbxObjects_Term
      */
-    public function setGuid(string $guid): self
+    public function setGuid(?string $guid): self
     {
         $this->guid = $guid;
         return $this;
@@ -541,6 +549,24 @@ class editor_Models_Terminology_TbxObjects_Term {
     public function setUserName(string $userName): self
     {
         $this->userName = $userName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreated(): string
+    {
+        return $this->created;
+    }
+
+    /**
+     * @param string $created
+     * @return editor_Models_Terminology_TbxObjects_Term
+     */
+    public function setCreated(string $created): self
+    {
+        $this->created = $created;
         return $this;
     }
 

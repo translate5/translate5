@@ -38,7 +38,7 @@ FROM LEK_term_entry old_term_entry;
 
 # INSERT FOR TERMS
 INSERT INTO terms_term (
-    termId,
+    termTbxId,
     collectionId,
     termEntryId,
     termEntryTbxId,
@@ -60,13 +60,13 @@ INSERT INTO terms_term (
 )
 SELECT old_terms.mid AS termId,
        old_terms.collectionId,
-       0,
-       'tmp' AS termEntryTbxId,
-       'tmp' AS termEntryGuid,
-       'old table no UUID()' AS langSetGuid,
+       null,
+       old_terms.groupId AS termEntryTbxId,
+       null AS termEntryGuid,
+       null AS langSetGuid,
        UUID() AS guid,
        old_terms.language AS languageId,
-       'none',
+       null,
        old_terms.term,
        old_terms.status,
        old_terms.processStatus,
@@ -79,6 +79,9 @@ SELECT old_terms.mid AS termId,
        old_terms.termEntryId
 FROM LEK_terms old_terms;
 
+# ToDo: it is ok to update termEntryTbxId (groupId) twice?
+#  in corrupt LEK_term table it's possible that groupId is null,
+#  but in terms_term_entry (LEK_term_entry) groupId exist, that reason why i check with this update.
 UPDATE terms_term terms
     JOIN terms_term_entry tte on terms.tmpOldTermEntryId = tte.tmpOldId
 SET terms.termEntryId = tte.id,
@@ -124,10 +127,10 @@ SELECT old_term_attributes.name,
        old_term_attributes.attrTarget,
        old_term_attributes.attrDataType,
        old_term_attributes.collectionid,
-       0,
-       '' AS termEntryGuid,
-       'old table no UUID()' AS langSetGuid,
-       'termId',
+       null,
+       null AS termEntryGuid,
+       null AS langSetGuid,
+       null,
        old_term_attributes.labelId,
        UUID() AS guid,
        old_term_attributes.internalCount,
@@ -157,9 +160,10 @@ SET termAtt.termId = lt.id,
 WHERE termAtt.tmpOldTermId = lt.tmpOldId;
 
 UPDATE terms_attributes termAtt
-    JOIN LEK_term_attributes lta on termAtt.tmpOldId = lta.parentId
-SET termAtt.langSetGuid = IF(lta.termId IS NULL AND lta.attrLang IS NOT NULL, UUID(), '')
-WHERE termAtt.tmpOldId = lta.parentId;
+    JOIN LEK_term_attributes lta on termAtt.collectionId = lta.collectionId
+SET termAtt.langSetGuid = lta.tmpLangSetGuid
+WHERE termAtt.tmpOldId = lta.id;
+
 
 # INSERT FOR TRANSACGRP
 INSERT INTO terms_transacgrp (
@@ -190,10 +194,10 @@ SELECT t1.name AS elementName,
        attrType AS transacType,
        if(t1.parentId = NULL, 1, 0) AS ifDescripgrp,
        t1.collectionId AS collectionId,
-       '' AS termEntryId,
+       null AS termEntryId,
        null as termIdOld,
-       '' AS termEntryGuid,
-       'langSetGuid',
+       null AS termEntryGuid,
+       null AS langSetGuid,
        UUID(),
        t1.id AS oldId,
        t1.termId AS termId,
@@ -220,14 +224,23 @@ WHERE lta.name = 'date';
 
 UPDATE terms_transacgrp termTrg
     JOIN LEK_term_attributes lta on termTrg.tmpOldId = lta.parentId
+SET termTrg.elementName = lta.name
+WHERE termTrg.tmpOldId = lta.parentId;
+
+UPDATE terms_transacgrp termTrg
+    JOIN LEK_term_attributes lta on termTrg.tmpOldId = lta.parentId
 SET termTrg.transacNote = lta.value
 WHERE lta.attrType = 'responsiblePerson';
 
 UPDATE terms_transacgrp termTrg
-    JOIN LEK_term_attributes lta on termTrg.tmpOldId = lta.parentId
-SET termTrg.langSetGuid = IF(lta.termId = 0, UUID(), ''),
-    termTrg.elementName = IF(lta.termId = 0, 'langSet', '')
-WHERE termTrg.tmpOldId = lta.parentId;
+    JOIN LEK_term_attributes lta on termTrg.collectionId = lta.collectionId
+SET termTrg.langSetGuid = lta.tmpLangSetGuid
+WHERE termTrg.tmpOldId = lta.id;
+
+UPDATE terms_term tt
+    JOIN LEK_term_attributes lta on tt.collectionId = lta.collectionId
+SET tt.langSetGuid = lta.tmpLangSetGuid
+WHERE tt.id = lta.termId;
 
 # before we can update new termId we must drop foreign key, after update we add new FK
 alter table LEK_term_proposal drop foreign key LEK_term_proposal_ibfk_1;
@@ -247,10 +260,8 @@ alter table LEK_term_attribute_proposal
     add constraint LEK_term_attribute_proposal_attributeId_ibfk_1
         foreign key (attributeId) references terms_attributes (id)
             on update cascade on delete cascade;
-#
-#
-#
-#
+
+
 alter table LEK_term_attribute_history drop foreign key LEK_term_attribute_history_ibfk_1;
 alter table LEK_term_attribute_history
     add constraint LEK_term_attribute_history_ibfk_1

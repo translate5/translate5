@@ -176,15 +176,15 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
 //                continue;
 //            }
 
-            foreach ($attribute['children'] as &$child) {
-                if ($child['name'] === 'tig' || $child['name'] === 'langSet' || $child['name'] === 'transac') {
-                    //convert the date to unix timestamp
-                    $child['attrValue'] = strtotime($termProposal['created']);
-                }
-                if ($child['name'] === 'transacNote' && $this->isResponsablePersonAttribute($child['attrType'])) {
-                    $child['attrValue'] = $termProposal['userName'];
-                }
-            }
+//            foreach ($attribute['children'] as &$child) {
+//                if ($child['name'] === 'tig' || $child['name'] === 'langSet' || $child['name'] === 'transac') {
+//                    //convert the date to unix timestamp
+//                    $child['attrValue'] = strtotime($termProposal['created']);
+//                }
+//                if ($child['name'] === 'transacNote' && $this->isResponsablePersonAttribute($child['attrType'])) {
+//                    $child['attrValue'] = $termProposal['userName'];
+//                }
+//            }
         }
 
         return $attributes;

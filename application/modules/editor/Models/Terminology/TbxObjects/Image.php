@@ -26,21 +26,51 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 class editor_Models_Terminology_TbxObjects_Image {
+    /**
+     * Table field for insert or update.
+     * If:
+     * 'fieldName' => false -> only insert no check for update attribute
+     * 'fieldName' => true -> insert and update
+     */
     const TABLE_FIELDS = [
         'collectionId' => false,
         'targetId' => false,
         'name' => true,
         'encoding' => true,
-        'format' => true,
-        'xbase' => true
+        'format' => true
     ];
 
     protected int $collectionId = 0;
+
+    /**
+     * Unique, points to the target element where image will be displayed
+     * @var string $targetId
+     */
     protected string $targetId = '';
+
+    /**
+     * name of image
+     * @var string
+     */
     protected string $name = '';
+
+    /**
+     * what encoding format is used (HEX or xBase64)
+     * @var string
+     */
     protected string $encoding = '';
+
+    /**
+     * what format is the image (image/png, image/gif, image/jpg...)
+     * @var string
+     */
     protected string $format = '';
-    protected string $xbase = '';
+
+    /**
+     * hex or xBase value from TBX
+     * @var string
+     */
+    protected string $hexOrXbaseValue = '';
 
     /**
      * @param editor_Models_Terminology_TbxObjects_Image $element
@@ -66,24 +96,6 @@ class editor_Models_Terminology_TbxObjects_Image {
     public function setCollectionId(int $collectionId): self
     {
         $this->collectionId = $collectionId;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEntryId(): string
-    {
-        return $this->entryId;
-    }
-
-    /**
-     * @param string $entryId
-     * @return editor_Models_Terminology_TbxObjects_Image
-     */
-    public function setEntryId(string $entryId): self
-    {
-        $this->entryId = $entryId;
         return $this;
     }
 
@@ -160,20 +172,21 @@ class editor_Models_Terminology_TbxObjects_Image {
     }
 
     /**
+     * temporary save hex or xBase string
      * @return string
      */
-    public function getXbase(): string
+    public function getHexOrXbaseValue(): string
     {
-        return $this->xbase;
+        return $this->hexOrXbaseValue;
     }
 
     /**
-     * @param string $xbase
+     * @param string $hexOrXbaseValue
      * @return editor_Models_Terminology_TbxObjects_Image
      */
-    public function setXbase(string $xbase): self
+    public function setHexOrXbaseValue(string $hexOrXbaseValue): self
     {
-        $this->xbase = $xbase;
+        $this->hexOrXbaseValue = $hexOrXbaseValue;
         return $this;
     }
 }
