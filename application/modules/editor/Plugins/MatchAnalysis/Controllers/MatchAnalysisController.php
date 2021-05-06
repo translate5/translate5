@@ -28,152 +28,67 @@ END LICENSE AND COPYRIGHT
 
 /**
  */
-class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_RestController {
-
-    protected $entityClass = 'editor_Plugins_MatchAnalysis_Models_MatchAnalysis';
-
+class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_RestController
+{
     /**
      * @var editor_Plugins_MatchAnalysis_Models_MatchAnalysis
      */
+    protected $entityClass = 'editor_Plugins_MatchAnalysis_Models_MatchAnalysis';
+
+    /**
+     * @var editor_Plugins_MatchAnalysis_Export_ExportExcel
+     */
+    protected $helperExcelClass = 'editor_Plugins_MatchAnalysis_Export_ExportExcel';
+
+    /**
+     * @var editor_Plugins_MatchAnalysis_Export_ExportXml
+     */
+    protected $helperXMLClass = 'editor_Plugins_MatchAnalysis_Export_ExportXml';
+
+
     protected $entity;
-    
-    public function indexAction(){
+
+    public function indexAction()
+    {
         $taskGuid = $this->getParam('taskGuid', false);
-        if(empty($taskGuid)){
+        if (empty($taskGuid)) {
             //check if the taskGuid is provided via filter
-            $this->entity->getFilter()->hasFilter('taskGuid',$taskGuid);
-            $taskGuid=$taskGuid->value ?? null;
+            $this->entity->getFilter()->hasFilter('taskGuid', $taskGuid);
+            $taskGuid = $taskGuid->value ?? null;
         }
-        if(empty($taskGuid)) {
+        if (empty($taskGuid)) {
             // MatchAnalysis Plug-In: tried to load analysis data without providing a valid taskGuid
             // Reason is unfixed: TRANSLATE-1637: MatchAnalysis: Errors in Frontend when analysing multiple tasks
             throw new editor_Plugins_MatchAnalysis_Exception("E1103");
         }
-        
+
         //INFO: this is a non api property. It is used only for the tests
         //if not grouped is set, load all analysis records (only the last analysis) for the task guid
-        $notGrouped=$this->getParam('notGrouped', false);
-        if($notGrouped){
-            $this->view->rows=$this->entity->loadLastByTaskGuid($taskGuid);
+        $notGrouped = $this->getParam('notGrouped', false);
+        if ($notGrouped) {
+            $this->view->rows = $this->entity->loadLastByTaskGuid($taskGuid);
             return;
         }
-        $this->view->rows=$this->entity->loadByBestMatchRate($taskGuid);
+        $this->view->rows = $this->entity->loadByBestMatchRate($taskGuid);
     }
-    
-    public function exportAction(){
-        $params=$this->getAllParams();
 
-        //load the export data
-        $rows=$this->entity->loadByBestMatchRate($params['taskGuid'],true);
-        
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        
-        $createdDate=null;
-        $internalFuzzy=null;
-        //add to all groups 'Group' sufix, php excel does not handle integer keys
-        foreach ($rows as $rowKey=>$row){
-            $newRows=[];
-            $wordCountTotal=0;
-            foreach ($row as $key=>$value){
-                $newKey=$key;
-                if($key=="created"){
-                    $createdDate=$value;
-                    continue;
-                }
-                if($key=="internalFuzzy"){
-                    $internalFuzzy=$value;
-                    continue;
-                }
-                if($key=="pretranslateMatchrate"){
-                    continue;
-                }
-                //do not use resourceColor in export
-                if($key=="resourceColor"){
-                    continue;
-                }
-                
-                if($key=="resourceName" && $value==""){
-                    $value=$translate->_("Repetitions");
-                }
-                
-                //change the key to $key+Group, since the excel export does not accepts numerical keys
-                if(is_numeric($key)){
-                    $newKey=$key.'Group';
-                }
-                
-                //update the totals when collectable group is found
-                if(is_numeric($key) || $key=="noMatch"){
-                    $wordCountTotal+=$value;
-                }
-                $newRows[$newKey]=$value;
-            }
-            $newRows['wordCountTotal']=$wordCountTotal;
-            $newRows['internalFuzzy']=$internalFuzzy;
-            $newRows['created']=$createdDate;
-            
-            unset($rows[$rowKey]);
-            $rows[$rowKey]=$newRows;
+
+    public function exportAction()
+    {
+        $params = $this->getAllParams();
+
+        $rows = $this->entity->loadByBestMatchRate($params['taskGuid'], true);
+
+
+        switch ($params["type"]) {
+            case "excel":
+                ZfExtended_Factory::get($this->helperExcelClass)->generateExcel($rows);
+                break;
+            case "xml":
+                $x = ZfExtended_Factory::get($this->helperXMLClass)->generateXML($rows, $params['taskGuid']);
+                echo $x->asXML();
+
+                break;
         }
-        $spreadsheet = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
-        /* @var $excel ZfExtended_Models_Entity_ExcelExport */
-        
-        $spreadsheet->setPreCalculateFormulas(true);
-        
-        // set property for export-filename
-        $spreadsheet->setProperty('filename', $translate->_('Trefferanalyse'));
-        
-        //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
-        //[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59'];
-        $spreadsheet->setLabel('resourceName', $translate->_("Name"));
-        $spreadsheet->setLabel('104Group', $translate->_("TermCollection Treffer (104%)"));
-        $spreadsheet->setLabel('103Group', $translate->_("Kontext Treffer (103%)"));
-        $spreadsheet->setLabel('102Group', $translate->_("Wiederholung (102%)"));
-        $spreadsheet->setLabel('101Group', $translate->_("Exact-exact Treffer (101%)"));
-        $spreadsheet->setLabel('100Group', '100%');
-        $spreadsheet->setLabel('99Group', '99%-90%');
-        $spreadsheet->setLabel('89Group', '89%-80%');
-        $spreadsheet->setLabel('79Group', '79%-70%');
-        $spreadsheet->setLabel('69Group', '69%-60%');
-        $spreadsheet->setLabel('59Group', '59%-51%');
-        $spreadsheet->setLabel('noMatch', '50%-0%');
-        $spreadsheet->setLabel('wordCountTotal', $translate->_("Summe Wörter"));
-        $spreadsheet->setLabel('created', $translate->_("Erstellungsdatum"));
-        $spreadsheet->setLabel('internalFuzzy', $translate->_("Interner Fuzzy aktiv"));
-
-        $rowsCount=count($rows);
-        $rowIndex=$rowsCount+2;
-        
-        
-        $sheet=$spreadsheet->getSpreadsheet()->getActiveSheet();
-        
-        $sheet->setCellValue("A".$rowIndex,$translate->_("Summe"));
-        $sheet->setCellValue("B".$rowIndex, "=SUM(B2:B".($rowIndex-1).")");
-        $sheet->setCellValue("C".$rowIndex, "=SUM(C2:C".($rowIndex-1).")");
-        $sheet->setCellValue("D".$rowIndex, "=SUM(D2:D".($rowIndex-1).")");
-        $sheet->setCellValue("E".$rowIndex, "=SUM(E2:E".($rowIndex-1).")");
-        $sheet->setCellValue("F".$rowIndex, "=SUM(F2:F".($rowIndex-1).")");
-        $sheet->setCellValue("G".$rowIndex, "=SUM(G2:G".($rowIndex-1).")");
-        $sheet->setCellValue("H".$rowIndex, "=SUM(H2:H".($rowIndex-1).")");
-        $sheet->setCellValue("I".$rowIndex, "=SUM(I2:I".($rowIndex-1).")");
-        $sheet->setCellValue("J".$rowIndex, "=SUM(J2:J".($rowIndex-1).")");
-        $sheet->setCellValue("K".$rowIndex, "=SUM(K2:K".($rowIndex-1).")");
-        $sheet->setCellValue("L".$rowIndex, "=SUM(L2:L".($rowIndex-1).")");
-        $sheet->setCellValue("M".$rowIndex, "=SUM(M2:M".($rowIndex-1).")");
-        
-        //set the cell autosize
-        $spreadsheet->simpleArrayToExcel($rows,function($phpSpreadsheet){
-            foreach ($phpSpreadsheet->getWorksheetIterator() as $worksheet) {
-
-                $phpSpreadsheet->setActiveSheetIndex($phpSpreadsheet->getIndex($worksheet));
-                
-                $sheet = $phpSpreadsheet->getActiveSheet();
-                $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
-                $cellIterator->setIterateOnlyExistingCells(true);
-                /** @var PhpOffice\PhpSpreadsheet\Cell\Cell $cell */
-                foreach ($cellIterator as $cell) {
-                    $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
-                }
-            }
-        });
     }
 }

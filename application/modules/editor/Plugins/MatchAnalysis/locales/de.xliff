@@ -130,6 +130,8 @@
 		
 		<trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse enthalten</source><target>Gesperrte Segmente sind in der Analyse enthalten</target></trans-unit>
 		<trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgbmljaHQgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse nicht enthalten</source><target>Gesperrte Segmente sind in der Analyse nicht enthalten</target></trans-unit>
+        <trans-unit id='RXhwb3J0IFhNTA=='><source>Export XML</source><target>Export XML</target></trans-unit>
+
     </body>
   </file>
 </xliff>
