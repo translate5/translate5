@@ -1104,10 +1104,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     public function insertRepetition()
     {
-        $s = "update " . $this->tableName . " set isRepeated=1";
-
-        $s->where($this->tableName . '.sourceMd5 IN((select sourceMd5 from ' . $this->tableName . ' group by sourceMd5 having count(*) > 1))');
-        $s->orWhere($this->tableName . '.targetMd5 IN((select targetMd5 from ' . $this->tableName . ' group by targetMd5 having count(*) > 1))');
+        $where = $this->tableName . '.sourceMd5 IN(Select * from (select sourceMd5 from ' . "$this->tableName" . ' group by sourceMd5 having count(*) > 1) as a)';
+        $where .= " or ". $this->tableName . '.targetMd5 IN(Select * from (select targetMd5 from ' . "$this->tableName" . ' group by targetMd5 having count(*) > 1) as b)';
+        $this->db->update(array('isRepeated' => 1, ), $where);
     }
 
     /**
@@ -1193,7 +1192,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $s->from($this->db, $cols);
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
-        $s = $this->entity->resetRepetition($repetition, $s);
+//        $s = $this->resetRepetition($repetition, $s);
 
 
         if (!empty($callback)) {
@@ -1212,11 +1211,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     public function resetRepetition($repetiton, $s)
     {
         if ($repetiton) {
-            $s->where('isRepeated = 1');
+            $s .= 'AND isRepeated = 1';
         }
-        if ($repetiton = $this->getFilter()->hasFilter('repetiton', $repetiton)) {
-            $this->getFilter()->deleteFilter('repetiton');
-        }
+
         return $s;
     }
 

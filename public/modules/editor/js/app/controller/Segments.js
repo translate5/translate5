@@ -314,6 +314,7 @@ Ext.define('Editor.controller.Segments', {
      * Toggle filtering by repeated segments list.
      */
     repeatedFilter: function () {
+        alert(1);
         var me = this,
             grid = me.getSegmentGrid(),
             gridFilters = grid.filters,
@@ -321,6 +322,7 @@ Ext.define('Editor.controller.Segments', {
             found = false,
             otherFound = false,
             column;
+        console.log(filters);
         filters.each(function (filter, index, len) {
             var isWatched = filter.getProperty() == 'isRepeated';
             found = found || isWatched;
