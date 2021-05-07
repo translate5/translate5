@@ -111,11 +111,6 @@ class editor_Models_Import_Worker_Import {
         /* @var $task editor_Models_Segment */
         $segment->loadByTaskGuid($this->task->getTaskGuid());
         $segment->insertRepetition();
-
-
-        $this->
-        $s->where($this->tableName . '.sourceMd5 IN((select sourceMd5 from ' . $this->tableName . ' group by sourceMd5 having count(*) > 1))');
-        $s->orWhere($this->tableName . '.targetMd5 IN((select targetMd5 from ' . $this->tableName . ' group by targetMd5 having count(*) > 1))');
         
         //init default user prefs
         $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
