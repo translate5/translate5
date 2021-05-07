@@ -35,5 +35,7 @@ class editor_Plugins_MatchAnalysis_Models_Validator_TaskAssoc extends ZfExtended
     protected function defineValidators() {
         $this->addValidator('id', 'int');
         $this->addValidator('taskGuid', 'guid');
+        $this->addValidator('uuid', 'varchar');
+        $this->addValidator('finishedAt', 'timestamp');
     }
 }
