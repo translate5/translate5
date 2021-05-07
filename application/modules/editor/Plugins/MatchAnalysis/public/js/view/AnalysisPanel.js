@@ -243,14 +243,14 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                             itemId:'exportExcel',
                             text:me.strings.exportAnalysis,
                             listeners:{
-                                click:'onExcelExportClick'
+                                click:{fn: 'exportAction', extraArg: 'excel'}
                             }},{
                             xtype: 'button',
                             glyph: 'f1c3@FontAwesome5FreeSolid',
                             itemId:'exportXml',
                             text:me.strings.exportAnalysisXML,
                             listeners:{
-                                click:'onXmlExportClick'
+                                click:{fn: 'exportAction', extraArg: 'xml'}
                             }
                         }]
                     },{
