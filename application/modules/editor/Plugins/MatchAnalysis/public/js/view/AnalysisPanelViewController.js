@@ -31,10 +31,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
     alias: 'controller.matchAnalysisPanel',
 
     exportAction:function (type){
-        console.log(type)
         var me= this,
             params = {},
-            task= me.getView().lookupViewModel(true).get('currentTask');
+            task = me.getView().lookupViewModel(true).get('currentTask');
         params["taskGuid"] = task.get('taskGuid');
         params["type"] = type.itemId;
         window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
