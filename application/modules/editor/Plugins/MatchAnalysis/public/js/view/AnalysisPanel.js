@@ -254,6 +254,11 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                             }
                         }]
                     },{
+                        xtype: 'container',
+                        padding: '10',
+                        html:"¹ "+me.strings.noAnalysis,
+                        dock : 'bottom'
+                    },{
                         xtype: 'toolbar',
                         dock: 'top',
                         layout: {
