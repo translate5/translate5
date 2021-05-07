@@ -160,9 +160,18 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         $customer = ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $customer editor_Models_Customer */
         $customerData = $customer->loadByIds([$task->getCustomerId()]);
+
         $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
         $assocs = $languageResource->loadByAssociatedTaskGuid($task->getTaskGuid());
+        $languageResource->load($assocs[0]['id']);
+
+        $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languagesModel editor_Models_Languages */
+        $sourceLangIds = $languageResource->getSourceLang();
+        $sourceLangIds = implode(',', $sourceLangIds);
+        $sourceLanguages = $languagesModel->getFuzzyLanguages($task->getSourceLang(),'langName',true);
+        $sourceLanguages = implode(',', $sourceLanguages);
 
         $renderData = [
             'resourceName' => '',
@@ -218,17 +227,17 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         $xml = new SimpleXMLElement($xml_header);
 
         $subnode1 = $xml->addChild('taskInfo');
-        $subnode1->addAttribute('taskId', $taskGuid);
-        $subnode1->addAttribute('runAt', $task->getOrderdate());
+        $subnode1->addAttribute('taskId', $analysisAssoc['uuid']);
+        $subnode1->addAttribute('runAt', date('Y-m-d H:i:s', strtotime($task->getOrderdate())));
         $subnode1->addAttribute('runTime', $difference. ' seconds');
 
         $subnode2 = $subnode1->addchild('project');
         $subnode2->addAttribute('name', $task->getTaskName());
-        $subnode2->addAttribute('number', $task->getId());
+        $subnode2->addAttribute('number', $taskGuid);
 
         $innerNode1 = $subnode1->addChild('language');
-        $innerNode1->addAttribute('lcid', '1.2.1');
-        $innerNode1->addAttribute('name', 'English');
+        $innerNode1->addAttribute('lcid', $sourceLangIds);
+        $innerNode1->addAttribute('name', $sourceLanguages);
 
         $innerNode2 = $subnode1->addChild('customer');
         $innerNode2->addAttribute('name', $customerData[0]['name']);
@@ -242,7 +251,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         $innerNode4->addAttribute('reportInternalFuzzyLeverage', $internalFuzzy);
         $innerNode4->addAttribute('reportLockedSegmentsSeparately', 'no');
         $innerNode4->addAttribute('reportCrossFileRepetitions', 'yes');
-        $innerNode4->addAttribute('minimumMatchScore', 'lowestFuzzyValueThatIsConfiguredToBeShownInTranslate5');
+        $innerNode4->addAttribute('minimumMatchScore', '50');
         $innerNode4->addAttribute('searchMode', 'bestWins');
         $innerNode4->addAttribute('missingFormattingPenalty', '1');
         $innerNode4->addAttribute('differentFormattingPenalty', '1');
@@ -257,7 +266,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
 
         $batchTotal = $xml->addChild('batchTotal');
         $batchTotal->addChild('analyse');
-        $fileName = 'report'. date('Y-m-d H:i:s').'.xml';
+        $fileName = 'Match-analysis'. date('Y-m-d H:i:s').'.xml';
 
         header('Content-disposition: attachment; filename='.$fileName);
         header ("Content-Type:text/xml");
