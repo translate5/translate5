@@ -70,15 +70,6 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
         
-        if(auth.isAllowed('editorEditTaskPm') || 
-            auth.isAllowed('editorEditTaskOrderDate') ||
-            auth.isAllowed('editorEditTaskTaskName')||
-            auth.isAllowed('editorEditTaskEdit100PercentMatch')){
-            tabs.push({
-                xtype: 'taskattributes'
-            });
-        }
-        
         if(Editor.app.authenticatedUser.hasRoles(['pm','admin'])) {
             tabs.push({
                 xtype: 'taskQualities',
@@ -89,7 +80,16 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                     }
                 }
             });
-        }        
+        } 
+        
+        if(auth.isAllowed('editorEditTaskPm') || 
+            auth.isAllowed('editorEditTaskOrderDate') ||
+            auth.isAllowed('editorEditTaskTaskName')||
+            auth.isAllowed('editorEditTaskEdit100PercentMatch')){
+            tabs.push({
+                xtype: 'taskattributes'
+            });
+        }
         
         if(auth.isAllowed('configOverwriteGrid')) {
             tabs.push({

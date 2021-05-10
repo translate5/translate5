@@ -495,15 +495,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         
         // quality subroutes
         $this->front->getRouter()->addRoute(
-            'editorQualityStatistics',
-            new ZfExtended_Controller_RestLikeRoute(
-                'editor/quality/statistics/*',
-                array(
-                    'module' => 'editor',
-                    'controller' => 'quality',
-                    'action' => 'statistics'
-                )));
-        $this->front->getRouter()->addRoute(
             'editorQualityDownloadStatistics',
             new ZfExtended_Controller_RestLikeRoute(
                 'editor/quality/downloadstatistics/*',

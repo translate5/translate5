@@ -63,23 +63,36 @@ class editor_Segment_Qm_Provider extends editor_Segment_Quality_Provider {
     }
     
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
-        return $translate->_('QM');
+        return $translate->_('Manuelle QS (ganzes Segment)');
     }
     
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
-        if($this->typesByIndex == null){
-            $config =Zend_Registry::get('config');
-            $this->typesByIndex = $config->runtimeOptions->segments->qualityFlags->toArray();
-        }
+        $typesByIndex = $this->getTypesByIndex();
         $categoryIndex = intval(str_replace(editor_Segment_Tag::TYPE_QM.'_', '', $category)); // see editor_Models_Db_SegmentQuality::addMqm how we evaluate the index from the category
-        if(isset($this->typesByIndex[$categoryIndex])){
-            return $translate->_($this->typesByIndex[$categoryIndex]);
+        if(isset($typesByIndex[$categoryIndex])){
+            return $translate->_($typesByIndex[$categoryIndex]);
         }
         // not worth an exception, should not happen if configuration correct
-        return 'UNKNOWN QM-TYPE '.$categoryIndex;
+        return 'UNKNOWN QM-TYPE-ID '.$categoryIndex;
+    }
+    
+    public function getAllCategories(editor_Models_Task $task) : array {
+        $typesByIndex = $this->getTypesByIndex();
+        return array_map(function ($id){ return editor_Segment_Qm_Provider::createCategoryVal($id); }, $typesByIndex);
     }
     
     public function hasSegmentTags() : bool {
         return false;
+    }
+    /**
+     * 
+     * @return string[]
+     */
+    private function getTypesByIndex() : array {
+        if($this->typesByIndex == null){
+            $config =Zend_Registry::get('config');
+            $this->typesByIndex = $config->runtimeOptions->segments->qualityFlags->toArray();
+        }
+        return $this->typesByIndex;
     }
 }

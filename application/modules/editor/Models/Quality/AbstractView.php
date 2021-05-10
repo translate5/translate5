@@ -146,9 +146,8 @@ abstract class editor_Models_Quality_AbstractView {
      * @param bool $onlyFilterTypes
      * @param string $currentState: The format of the value equals that of the filter-value $type:$category for the qualities-grid-filter but may has additional entries for types only
      * @param bool $excludeMQM: only needed for Statistics view
-     * @param string $field: only needed for Statistics view
      */
-    public function __construct(editor_Models_Task $task, int $segmentId=NULL, bool $onlyFilterTypes=false, string $currentState=NULL, bool $excludeMQM=false, $field=NULL){
+    public function __construct(editor_Models_Task $task, int $segmentId=NULL, bool $onlyFilterTypes=false, string $currentState=NULL, bool $excludeMQM=false){
         $this->task = $task;
         $this->taskConfig = $this->task->getConfig();
         $this->manager = editor_Segment_Quality_Manager::instance();
@@ -184,12 +183,12 @@ abstract class editor_Models_Quality_AbstractView {
         $this->dbRows = $this->table->fetchFiltered(
             $task->getTaskGuid(),
             $segmentId,
-            $field,
             $blacklist,
             true,
             NULL,
             $this->falsePositiveRestriction,
             $this->segmentNrRestriction,
+            NULL,
             ['type ASC','category ASC']);
         
         // error_log('PRESETS: '.print_r($this->checkedQualities, true).' / falsePositives:'.$this->falsePositiveRestriction.' / DBrows: '.count($this->dbRows));

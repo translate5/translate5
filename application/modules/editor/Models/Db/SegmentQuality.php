@@ -138,7 +138,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         /* @var $table editor_Models_Db_SegmentQuality */
         $category = editor_Segment_Qm_Provider::createCategoryVal($qmCategoryIndex);
         if($action == 'remove'){
-            $rows = $table->fetchFiltered($task->getTaskGuid(), $segmentId, NULL, editor_Segment_Tag::TYPE_QM, false, $category);
+            $rows = $table->fetchFiltered($task->getTaskGuid(), $segmentId, editor_Segment_Tag::TYPE_QM, false, $category);
             if(count($rows) == 1){
                 $result->qualityId = $rows[0]->id;
                 $result->success = true;
@@ -197,16 +197,16 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * 
      * @param string $taskGuid
      * @param int|array $segmentIds
-     * @param string $field
      * @param string|array $types
      * @param bool $typesIsBlacklist
      * @param string|array $categories
      * @param int $falsePositive
      * @param string $userGuid
+     * @param string $field
      * @param string|array $order
      * @return Zend_Db_Table_Rowset_Abstract
      */
-    public function fetchFiltered(string $taskGuid=NULL, $segmentIds=NULL, string $field=NULL, $types=NULL, bool $typesIsBlacklist=false, $categories=NULL, int $falsePositive=NULL, array $segmentNrs=NULL, $order=NULL) : Zend_Db_Table_Rowset_Abstract {
+    public function fetchFiltered(string $taskGuid=NULL, $segmentIds=NULL, $types=NULL, bool $typesIsBlacklist=false, $categories=NULL, int $falsePositive=NULL, array $segmentNrs=NULL, string $field=NULL, $order=NULL) : Zend_Db_Table_Rowset_Abstract {
         $prefix = '';
         $select = $this->select();
         // if a segmentNrs restriction is set we have to join with the segment table

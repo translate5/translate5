@@ -82,6 +82,10 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
         }
         return NULL;
     }
+    
+    public function getAllCategories(editor_Models_Task $task) : array {
+        return [ editor_Segment_Internal_TagComparision::TAGS_MISSING, editor_Segment_Internal_TagComparision::TAGS_ADDED, editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY ];
+    }
     /**
      * The structure of internal tags can not be a false positive
      * {@inheritDoc}

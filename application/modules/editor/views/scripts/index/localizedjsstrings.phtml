@@ -123,7 +123,7 @@ Ext.define('Editor.controller.Localizer', {
 		loading: '<?php echo $this->translate->_('Lade...');?>'
 	};
 
-    Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien und QA');?>';
+    Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('QS &amp; Dateien');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
   	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_(' - [LESEMODUS]');?>';
   	Editor.view.segments.Grid.prototype.title_addition_unconfirmed = '<?php echo $this->translate->_(' - [AUFGABE UNBESTÄTIGT]');?>';
@@ -149,8 +149,6 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>';
   	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
   	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
-  	gridToolbar.item_qualityStatisticsBtn = '<?php echo $this->translate->_('QA');?>';
-  	gridToolbar.item_qualityStatisticsTip = '<?php echo $this->translate->_('QA Statistik');?>';
   	gridToolbar.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>';
   	gridToolbar.item_zoomIn = '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>';
   	gridToolbar.item_zoomOut = '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>';
@@ -247,20 +245,15 @@ Ext.define('Editor.controller.Localizer', {
 
   	Editor.view.preferences.Window.prototype.title = '<?php echo $this->translate->_('Einstellungen');?>';
     
-    Editor.view.quality.statistics.Window.prototype.title = '<?php echo $this->translate->_('QA Statistik');?>';
-  	Editor.view.quality.statistics.Window.prototype.tab_title_field = '<?php echo $this->translate->_('In Feld: {0}');?>';
-  	Editor.view.quality.statistics.Tree.prototype.treepanel_text = '<?php echo $this->translate->_('Fehlertyp');?>';
-  	Editor.view.quality.statistics.Tree.prototype.treepanel_totalTotal = '<?php echo $this->translate->_('Gesamt');?>';
-  	Editor.view.quality.statistics.Tree.prototype.treepanel_total = '<?php echo $this->translate->_('Summe');?>';
-  	Editor.view.quality.FilterPanel.prototype.title = '<?php echo $this->translate->_('Qualitätssicherung');?>';
+  	Editor.view.quality.FilterPanel.prototype.title = '<?php echo $this->translate->_('QS Statistik');?>';
   	Editor.view.quality.FilterPanel.prototype.strings = {
 		modeAll: '<?php echo $this->translate->_('Alle zeigen');?>',
 		modeErrors: '<?php echo $this->translate->_('Nur Fehler');?>',
 		modeFalsePositives: '<?php echo $this->translate->_('Nur Falsch-Positive');?>',
-		incompleteCatCaption: '<?php echo $this->translate->_('Unvollständig analysiert');?>',
-		incompleteCatText: '<?php echo $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig analysiert');?>',
-		startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben');?>',
-        newAnalysis: '<?php echo $this->translate->_('Neu analysieren');?>'
+		incompleteCatCaption: '<?php echo $this->translate->_('Segmente unvollständig geprüft');?>',
+		incompleteCatText: '<?php echo $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig geprüft');?>',
+		startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
+        newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
 	};
   	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('MQM');?>';
   	Editor.view.quality.mqm.Fieldset.prototype.strings = {
@@ -286,15 +279,15 @@ Ext.define('Editor.controller.Localizer', {
 		category: '<?php echo $this->translate->_('Kategorie');?>',
         total: '<?php echo $this->translate->_('Anzahl');?>',
         errors: '<?php echo $this->translate->_('Fehler');?>',
-        falsePositives: '<?php echo $this->translate->_('Falsch positive');?>',
+        falsePositives: '<?php echo $this->translate->_('Falsch erkannte Fehler');?>',
         status: '<?php echo $this->translate->_('Status');?>',
-        completeTipCaption: '<?php echo $this->translate->_('Vollständig analysiert');?>',
-        incompleteTipCaption: '<?php echo $this->translate->_('Unvollständig analysiert');?>',
-        incompleteTipText: '<?php echo $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig analysiert');?>',
-        startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben');?>',
+        completeTipCaption: '<?php echo $this->translate->_('Alle Segmente wurden seit der letzten Änderung geprüft');?>',
+        incompleteTipCaption: '<?php echo $this->translate->_('Segmente unvollständig geprüft');?>',
+        incompleteTipText: '<?php echo $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig geprüft');?>',
+        startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
         faultyTipCaption: '<?php echo $this->translate->_('Interne Tag Fehler');?>',
         faultyTipText: '<?php echo $this->translate->_('Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern');?>',
-        newAnalysis: '<?php echo $this->translate->_('Neu analysieren');?>'
+        newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
 	};
     
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
@@ -564,7 +557,7 @@ Ext.define('Editor.controller.Localizer', {
             finishedDateHeader: '<?php echo $this->translate->_('Abschlussdatum');?>',
             deadlineDateHeader: '<?php echo $this->translate->_('Deadline Datum');?>',
             exelExportedTooltip: '<?php echo $this->translate->_('Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.');?>',
-            qualityErrorCount: '<?php echo $this->translate->_('QA Fehler');?>'
+            qualityErrorCount: '<?php echo $this->translate->_('QS Fehler');?>'
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',

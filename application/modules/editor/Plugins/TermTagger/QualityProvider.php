@@ -132,16 +132,20 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
         switch($category){
             case editor_Models_Term::TRANSSTAT_NOT_FOUND:
-                return $translate->_('Term wurde in der Zielsprache nicht gefunden');
+                return $translate->_('Nicht gefunden in Ziel');
                 
             case editor_Models_Term::TRANSSTAT_NOT_DEFINED:
-                return $translate->_('Term ist in der Zielsprache nicht definiert');
+                return $translate->_('Nicht definiert in zielsprachl. Terminologie');
                 
             case editor_Models_Term::STAT_SUPERSEDED:
             case editor_Models_Term::STAT_DEPRECATED:                
-                return $translate->_('Term ist in der Zielsprache ersetzt, veraltet oder verboten');
+                return $translate->_('Verboten in Ziel');
         }
         return NULL;
+    }
+    
+    public function getAllCategories(editor_Models_Task $task) : array {
+        return [ editor_Models_Term::TRANSSTAT_NOT_FOUND, editor_Models_Term::TRANSSTAT_NOT_DEFINED, editor_Models_Term::STAT_SUPERSEDED, editor_Models_Term::STAT_DEPRECATED ];
     }
 
     public function isSegmentTag(string $type, string $nodeName, array $classNames, array $attributes) : bool {

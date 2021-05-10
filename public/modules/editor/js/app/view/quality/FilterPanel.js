@@ -41,7 +41,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
     alias: 'widget.qualityFilterPanel',
     itemId: 'qualityFilterPanel',
     cls: 'qualityFilterPanel',
-    title: '#UT#Qualitätssicherung',
+    title: '#UT#QS Statistik',
     rootVisible: false,
     isQualityManager: false,
     reAnalysisHidden: true, // quirky: this prop is set by the column-renderer and after tfhe store's "load" event it is evaluated in "afterLoad" where it steers the visibility of our footer
@@ -59,10 +59,10 @@ Ext.define('Editor.view.quality.FilterPanel', {
         modeAll: '#UT#Alle zeigen',
         modeErrors: '#UT#Nur Fehler',
         modeFalsePositives: '#UT#Nur Falsch-Positive',
-        incompleteCatCaption: '#UT#Unvollständig analysiert',
-        incompleteCatText: '#UT#Diese Kategorie wurde nicht oder nur unvollständig analysiert',
-        startAnalysisHint: '#UT#Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben',
-        newAnalysis: '#UT#Neu analysieren',
+        incompleteCatCaption: '#UT#Segmente unvollständig geprüft',
+        incompleteCatText: '#UT#Diese Kategorie wurde nicht oder nur unvollständig geprüft',
+        startAnalysisHint: '#UT#Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben',
+        newAnalysis: '#UT#Neu überprüfen',
     },
     initConfig: function(instanceConfig) {
         this.isQualityManager = Editor.app.authenticatedUser.hasRoles(['pm','admin']);

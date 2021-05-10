@@ -32,32 +32,15 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.Quality', {
     extend : 'Ext.app.Controller',
-    views: ['quality.statistics.Window'],
-    requires: ['Editor.store.quality.Statistics'], // Statistics Store in "requires" instead "stores" to prevent automatic instantiation
     models: ['Editor.model.quality.Filter'],
     stores: ['Editor.store.quality.Filter'],
     filterPanelMode: 'all', // the initial filter mode of the filter panel. Can be 'all' | 'error' | 'falsepositive'
-    refs:[{
-        ref : 'statisticsWindow',
-        selector : '#qualityStatisticsWindow',
-        autoCreate: true,
-        xtype: 'qualityStatisticsWindow'
-    }],
     listen: {
         component: {
-            '#segmentgrid #qualityStatisticsBtn': {
-                click:'onShowStatistics'
-            },
             '#qualityFilterPanel #modeSelector': {
                 change:'onFilterModeChanged'
             }
         }
-    },
-    /**
-     * displays the Statistics Window
-     */
-    onShowStatistics: function() {
-        this.getStatisticsWindow().show();
     },
     /**
      * Changes the globally managed filter mode to ensure persistence

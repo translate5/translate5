@@ -1880,35 +1880,37 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='><source>Kunden bearbeiten</source><target>Kunden bearbeiten</target></trans-unit>
 <trans-unit id='V2VubiBha3RpdmllcnQsIHdlcmRlbiBibG9ja2llcnRlIFNlZ21lbnRlIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4='><source>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</source><target>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</target></trans-unit>
 <trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGJsb2NraWVydGUgU2VnbWVudGUgbmljaHQgaW4gZGllIEFuYWx5c2UgdW5kIFdvcnRhbnphaGwgZWluYmV6b2dlbg=='><source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source><target>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</target></trans-unit>
-<trans-unit id='UUEgU3RhdGlzdGlr'><source>QA Statistik</source><target>QA Statistik</target></trans-unit>
+<trans-unit id='UVMgU3RhdGlzdGlr'><source>QS Statistik</source><target>QS Statistik</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Interne Tags</target></trans-unit>
-<trans-unit id='VGVybSBpc3QgaW4gZGVyIFppZWxzcHJhY2hlIGVyc2V0enQsIHZlcmFsdGV0IG9kZXIgdmVyYm90ZW4='><source>Term ist in der Zielsprache ersetzt, veraltet oder verboten</source><target>Term ist in der Zielsprache ersetzt, veraltet oder verboten</target></trans-unit>
+<trans-unit id='VmVyYm90ZW4gaW4gWmllbA=='><source>Verboten in Ziel</source><target>Verboten in Ziel</target></trans-unit>
 <trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unbearbeiteter Fuzzy</target></trans-unit>
 <trans-unit id='QmVhcmJlaXRldGVyIDEwMCUgTWF0Y2g='><source>Bearbeiteter 100% Match</source><target>Bearbeiteter 100% Match</target></trans-unit>
-<trans-unit id='VGVybSB3dXJkZSBpbiBkZXIgWmllbHNwcmFjaGUgbmljaHQgZ2VmdW5kZW4='><source>Term wurde in der Zielsprache nicht gefunden</source><target>Term wurde in der Zielsprache nicht gefunden</target></trans-unit>
-<trans-unit id='VGVybSBpc3QgaW4gZGVyIFppZWxzcHJhY2hlIG5pY2h0IGRlZmluaWVydA=='><source>Term ist in der Zielsprache nicht definiert</source><target>Term ist in der Zielsprache nicht definiert</target></trans-unit>
+<trans-unit id='TmljaHQgZ2VmdW5kZW4gaW4gWmllbA=='><source>Nicht gefunden in Ziel</source><target>Nicht gefunden in Ziel</target></trans-unit>
+<trans-unit id='TmljaHQgZGVmaW5pZXJ0IGluIHppZWxzcHJhY2hsLiBUZXJtaW5vbG9naWU='><source>Nicht definiert in zielsprachl. Terminologie</source><target>Nicht definiert in zielsprachl. Terminologie</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdzIGZlaGxlbg=='><source>Interne Tags fehlen</source><target>Interne Tags fehlen</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdzIHd1cmRlbiBoaW56dWdlZsO8Z3Q='><source>Interne Tags wurden hinzugefügt</source><target>Interne Tags wurden hinzugefügt</target></trans-unit>
 <trans-unit id='RGllIEludGVybmVuIFRhZ3MgaGFiZW4gZWluZSB1bmfDvGx0aWdlIFN0cnVrdHVy'><source>Die Internen Tags haben eine ungültige Struktur</source><target>Die Internen Tags haben eine ungültige Struktur</target></trans-unit>
-<trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGFuYWx5c2llcnQ='><source>Diese Kategorie wurde nicht oder nur unvollständig analysiert</source><target>Diese Kategorie wurde nicht oder nur unvollständig analysiert</target></trans-unit>
-<trans-unit id='Qml0dGUgc3Rvw59lbiBTaWUgdW50ZW4gZWluZSBuZXVlIEFuYWx5c2UgYW4gdW0gZGFzIFByb2JsZW0genUgYmVoZWJlbg=='><source>Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben</source><target>Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben</target></trans-unit>
-<trans-unit id='RGF0ZWllbiB1bmQgUUE='><source>Dateien und QA</source><target>Dateien und QA</target></trans-unit>
-<trans-unit id='UUE='><source>QA</source><target>QA</target></trans-unit>
+<trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGFuYWx5c2llcnQ='><source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source><target>Diese Kategorie wurde nicht oder nur unvollständig geprüft</target></trans-unit>
+<trans-unit id='Qml0dGUgc3Rvw59lbiBTaWUgdW50ZW4gZWluZSBuZXVlIFByw7xmdW5nIGFuIHVtIGRhcyBQcm9ibGVtIHp1IGJlaGViZW4='><source>Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben</source><target>Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben</target></trans-unit>
+<trans-unit id='UVMgJmFtcDsgRGF0ZWllbg=='><source>QS &amp; Dateien</source><target>QS &amp; Dateien</target></trans-unit>
+<trans-unit id='TnV0enVuZyB2b24gVE0tVHJlZmZlcm4='><source>Nutzung von TM-Treffern</source><target>Nutzung von TM-Treffern</target></trans-unit>
+<trans-unit id='TWFudWVsbGUgUVMgKGltIFNlZ21lbnQp'><source>Manuelle QS (im Segment)</source><target>Manuelle QS (im Segment)</target></trans-unit>
+<trans-unit id='TWFudWVsbGUgUVMgKGdhbnplcyBTZWdtZW50KQ=='><source>Manuelle QS (ganzes Segment)</source><target>Manuelle QS (ganzes Segment)</target></trans-unit>
+<trans-unit id='QWxsZSBTZWdtZW50ZSB3dXJkZW4gc2VpdCBkZXIgbGV0enRlbiDDhG5kZXJ1bmcgZ2VwcsO8ZnQ='><source>Alle Segmente wurden seit der letzten Änderung geprüft</source><target>Alle Segmente wurden seit der letzten Änderung geprüft</target></trans-unit>
 <trans-unit id='UXVhbGl0w6R0c3NpY2hlcnVuZw=='><source>Qualitätssicherung</source><target>Qualitätssicherung</target></trans-unit>
 <trans-unit id='QWxsZSB6ZWlnZW4='><source>Alle zeigen</source><target>Alle zeigen</target></trans-unit>
 <trans-unit id='TnVyIEZlaGxlcg=='><source>Nur Fehler</source><target>Nur Fehler</target></trans-unit>
 <trans-unit id='TnVyIEZhbHNjaC1Qb3NpdGl2ZQ=='><source>Nur Falsch-Positive</source><target>Nur Falsch-Positive</target></trans-unit>
-<trans-unit id='VW52b2xsc3TDpG5kaWcgYW5hbHlzaWVydA=='><source>Unvollständig analysiert</source><target>Unvollständig analysiert</target></trans-unit>
-<trans-unit id='TmV1IGFuYWx5c2llcmVu'><source>Neu analysieren</source><target>Neu analysieren</target></trans-unit>
+<trans-unit id='VW52b2xsc3TDpG5kaWcgYW5hbHlzaWVydA=='><source>Segmente unvollständig geprüft</source><target>Segmente unvollständig geprüft</target></trans-unit>
+<trans-unit id='TmV1IMO8YmVycHLDvGZlbg=='><source>Neu überprüfen</source><target>Neu überprüfen</target></trans-unit>
 <trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>Alle Kategorien</target></trans-unit>
 <trans-unit id='UUE6IEZhbHNjaC1Qb3NpdGl2ZQ=='><source>QA: Falsch-Positive</source><target>QA: Falsch-Positive</target></trans-unit>
 <trans-unit id='S2F0ZWdvcmll'><source>Kategorie</source><target>Kategorie</target></trans-unit>
 <trans-unit id='QW56YWhs'><source>Anzahl</source><target>Anzahl</target></trans-unit>
-<trans-unit id='RmFsc2NoIHBvc2l0aXZl'><source>Falsch positive</source><target>Falsch positive</target></trans-unit>
-<trans-unit id='Vm9sbHN0w6RuZGlnIGFuYWx5c2llcnQ='><source>Vollständig analysiert</source><target>Vollständig analysiert</target></trans-unit>
+<trans-unit id='RmFsc2NoIGVya2FubnRlIEZlaGxlcg=='><source>Falsch erkannte Fehler</source><target>Falsch erkannte Fehler</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWcgRmVobGVy'><source>Interne Tag Fehler</source><target>Interne Tag Fehler</target></trans-unit>
 <trans-unit id='RXMgZ2lidCBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIGVpbmVuIGZlaGxlcmZyZWllbiBFeHBvcnQgZGVyIEF1ZmdhYmUgdmVyaGluZGVybg=='><source>Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern</source><target>Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern</target></trans-unit>
-<trans-unit id='UUEgRmVobGVy'><source>QA Fehler</source><target>QA Fehler</target></trans-unit>
+<trans-unit id='UVMgRmVobGVy'><source>QS Fehler</source><target>QS Fehler</target></trans-unit>
 <trans-unit id='RGVyIFNlZ21lbnQgU3RhdHVzIHd1cmRlIGdlc3BlaWNoZXJ0'><source>Der Segment Status wurde gespeichert</source><target>Der Segment Status wurde gespeichert</target></trans-unit>
 <trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Die Qualität wurde hinzugefügt</source><target>Die Qualität wurde hinzugefügt</target></trans-unit>
 <trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBlbnRmZXJudA=='><source>Die Qualität wurde entfernt</source><target>Die Qualität wurde entfernt</target></trans-unit>
@@ -1961,6 +1963,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbiBBc2VyYmFpZHNjaGFuKQ=='><source>Aserbaidschanisch (Latein Aserbaidschan)</source><target>Aserbaidschanisch (Latein Aserbaidschan)</target></trans-unit>
 <trans-unit id='VXNiZWtpc2NoIChMYXRlaW4gVXNiZWtpc3Rhbik='><source>Usbekisch (Latein Usbekistan)</source><target>Usbekisch (Latein Usbekistan)</target></trans-unit>
 <trans-unit id='Qm9zbmlzY2ggKExhdGVpbiBCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Bosnisch (Latein Bosnien und Herzegowina)</source><target>Bosnisch (Latein Bosnien und Herzegowina)</target></trans-unit>
+<trans-unit id='RXhwb3J0IFhNTA=='><source>Export XML</source><target>Export XML</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgdW52b2xsc3TDpG5kaWcgZ2VwcsO8ZnQ='><source>Segmente unvollständig geprüft</source><target>Segmente unvollständig geprüft</target></trans-unit>
+<trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGdlcHLDvGZ0'><source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source><target>Diese Kategorie wurde nicht oder nur unvollständig geprüft</target></trans-unit>
   </body>
  </file>
 </xliff>

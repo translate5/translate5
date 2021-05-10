@@ -55,22 +55,11 @@ class editor_QualityController extends ZfExtended_RestController {
         $this->view->metaData = $view->getMetaData();
     }
     /**
-     * Retrieves the data for the statistics panel (which is currently not accessible /active)
-     */
-    public function statisticsAction(){        
-        $task = $this->fetchTask();
-        $field = $this->getRequest()->getParam('type');
-        $statisticsProvider = new editor_Models_Quality_StatisticsView($task, $field);
-        $this->view->text = $task->getTaskGuid();
-        $this->view->children = $statisticsProvider->getTree();
-    }
-    /**
-     * Retrieves the data for the statistics panel
+     * Retrieves the data for the quality statistics download
      */
     public function downloadstatisticsAction(){
         $task = $this->fetchTask();
-        $field = $this->getRequest()->getParam('type');
-        $statisticsProvider = new editor_Models_Quality_StatisticsView($task, $field);
+        $statisticsProvider = new editor_Models_Quality_StatisticsView($task);
 
         header('Content-disposition: attachment; filename="'.$statisticsProvider->getDownloadName().'"');
         header('Content-type: "text/xml"; charset="utf8"', TRUE);

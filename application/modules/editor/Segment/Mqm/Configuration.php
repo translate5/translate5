@@ -125,6 +125,13 @@ final class editor_Segment_Mqm_Configuration {
         if(array_key_exists($id, $this->mqmTypes)){
             return $this->mqmTypes[$id];
         }
-        return null;
+        return NULL;
+    }
+    /**
+     * Returns all possible mqm type indices/ids
+     * @return number[]
+     */
+    public function getAllIds(){
+        return $this->mqmTypeIds;
     }
 }
