@@ -678,8 +678,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
     
     /**
->>>>>>> origin/develop
-     * Imports an additional file which is transfered to the desired languageResource
+     * Imports an additional file which is transferred to the desired languageResource
      */
     public function importAction(){
         $this->getAction();
