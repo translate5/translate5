@@ -43,12 +43,6 @@ class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider {
     
     protected static $segmentTagClass = 'editor_Segment_Mqm_Tag';
 
-    /**
-     * 
-     * @var array
-     */
-    private $typesByIndex = NULL;
-    
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
         if($qualityConfig->enableMqmTags == 1){
@@ -63,18 +57,22 @@ class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider {
     }
     
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
-        return $translate->_('MQM');
+        return $translate->_('Manuelle QS (im Segment)');
     }
     
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
-        if($this->typesByIndex == NULL){
-            $this->typesByIndex = $task->getMqmTypesFlat();
-        }
-        $categoryIndex = intval(str_replace(editor_Segment_Tag::TYPE_MQM.'_', '', $category)); // see editor_Models_Db_SegmentQuality::addMqm how we evaluate the index from the category
-        if(isset($this->typesByIndex[$categoryIndex])){
-            return $translate->_($this->typesByIndex[$categoryIndex]);
+        $mqmIndex = intval(str_replace(editor_Segment_Tag::TYPE_MQM.'_', '', $category)); // see editor_Segment_Mqm_Tag::createCategoryVal how we evaluate the index from the category
+        $mqmConfig = editor_Segment_Mqm_Configuration::instance($task);
+        $mqmType = $mqmConfig->getMqmTypeForId($mqmIndex);
+        if($mqmType != NULL){
+            return $translate->_($mqmType);
         }
         // not worth an exception, should not happen if configuration correct
-        return 'UNKNOWN MQM-TYPE '.$categoryIndex;
+        return 'UNKNOWN MQM-TYPE-ID '.$mqmIndex;
+    }
+    
+    public function getAllCategories(editor_Models_Task $task) : array {
+        $mqmConfig = editor_Segment_Mqm_Configuration::instance($task);
+        return array_map(function ($id){ return editor_Segment_Mqm_Tag::createCategoryVal($id); }, $mqmConfig->getAllIds());
     }
 }

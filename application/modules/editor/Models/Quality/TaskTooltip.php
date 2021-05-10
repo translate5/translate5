@@ -77,7 +77,7 @@ class editor_Models_Quality_TaskTooltip extends editor_Models_Quality_AbstractVi
             if($hasIncomplete){
                 $html .=
                     '<br>'.$this->getStatusSymbol('incomplete').' '
-                    .$this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig analysiert');
+                    .$this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig geprüft');
             }
             if($hasIncomplete){
                 $html .=

@@ -116,7 +116,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       addFilterText:'#UT#Erweiterte Filter',
       jobStatus:'#UT#Job-Status',
       exelExportedTooltip:'#UT#Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.',
-      qualityErrorCount: '#UT#QA Fehler'
+      qualityErrorCount: '#UT#QS Fehler'
   },
   states: {
       open: '#UT#offen',

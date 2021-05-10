@@ -60,7 +60,7 @@ Ext.define('Editor.view.ViewPortEditor', {
 
     //Item Strings:
     items_north_title: 'Header',
-    items_west_title: '#UT#Dateien und QA',
+    items_west_title: '#UT#QS &amp; Dateien',
     initComponent: function() {
       var me = this,
           task = Editor.data.task,
@@ -81,6 +81,11 @@ Ext.define('Editor.view.ViewPortEditor', {
               animCollapse: true,
               itemId: 'filepanel',
               items: [{
+                  xtype: 'qualityFilterPanel',
+                  stateId: 'editor.westPanelQualityFilter',
+                  stateEvents: ['collapse', 'expand'],
+                  stateful: true
+              },{
                   xtype: 'fileorder.tree',
                   stateId: 'editor.westPanelFileorderTree',
                   stateEvents: ['collapse', 'expand'],
@@ -88,11 +93,6 @@ Ext.define('Editor.view.ViewPortEditor', {
               },{
                   xtype: 'referenceFileTree',
                   stateId: 'editor.westPanelReferenceFileTree',
-                  stateEvents: ['collapse', 'expand'],
-                  stateful: true
-              },{
-                  xtype: 'qualityFilterPanel',
-                  stateId: 'editor.westPanelQualityFilter',
                   stateEvents: ['collapse', 'expand'],
                   stateful: true
               }]

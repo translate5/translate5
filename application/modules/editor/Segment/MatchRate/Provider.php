@@ -33,9 +33,7 @@
  */
 
 /**
- * TODO ANNOTATE
- * enableUneditedFuzzyMatchCheck
- * enableEdited100MatchCheck
+ * Provides Qualities for TM usage, what is pretty simple: We just have the direct use of a 100% match and the non-edited fuzzy match
  */
 class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider {
     
@@ -78,7 +76,7 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
     }
     
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
-        return $translate->_('Match-Analyse');
+        return $translate->_('Nutzung von TM-Treffern');
     }
     
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
@@ -90,6 +88,10 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
                 return $translate->_('Bearbeiteter 100% Match');
         }
         return NULL;
+    }
+    
+    public function getAllCategories(editor_Models_Task $task) : array {
+        return [ editor_Segment_MatchRate_Provider::UNEDITED_FUZZY_MATCH, editor_Segment_MatchRate_Provider::EDITED_100PERCENT_MATCH ];
     }
     
     public function isFullyChecked(Zend_Config $qualityConfig) : bool {

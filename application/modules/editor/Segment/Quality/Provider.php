@@ -140,7 +140,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * Retrieves, if the given category can be a false positive
      * @param string $category
      * @return bool
-     */
+     */        
     public function canBeFalsePositiveCategory(string $category) : bool {
         return true;
     }
@@ -151,6 +151,14 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      */
     public function isFullyChecked(Zend_Config $qualityConfig) : bool {
         return true;
+    }
+    /**
+     * Retrieves all Categories a quality can have
+     * @param editor_Models_Task $task
+     * @return array
+     */
+    public function getAllCategories(editor_Models_Task $task) : array {
+        return [];
     }
     
     /* *************** Tag provider API *************** */
