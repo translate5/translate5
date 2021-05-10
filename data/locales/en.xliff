@@ -564,14 +564,6 @@
                 <source>Nicht aber die Sprachen "en-US" oder "en-GB".</source>
                 <target>But not the languages "en-US" or "en-GB".</target>
             </trans-unit>
-            <trans-unit id="MTAwJSBNYXRjaGVzIHNpbmQgZWRpdGllcmJhcg==">
-                <source>100% Matches sind editierbar</source>
-                <target>100% matches can be edited</target>
-            </trans-unit>
-            <trans-unit id="RGllc2UgRWluc3RlbGx1bmcgZ2lidCBhbiwgb2IgMTAwJSBNYXRjaGVzIGltIExla3RvcmF0IGdlc3BlcnJ0IG9kZXIgZWRpdGllcmJhciBzaW5kLg==">
-                <source>Diese Einstellung gibt an, ob 100% Matches im Lektorat gesperrt oder editierbar sind.</source>
-                <target>This setting determines whether 100% matches are blocked or can be edited.</target>
-            </trans-unit>
             <trans-unit id="SGlud2Vpc2UgenVtIExla3RvcmF0">
                 <source>Hinweise zum Lektorat</source>
                 <target>Notes on editing</target>
