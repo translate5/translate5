@@ -179,7 +179,7 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
      * @param string $userGuid
      * @return boolean
      */
-    public function isIpBasedUser(string $userGuid) {
+    public function isIpBasedUser(string $userGuid): bool{
         try {
             $this->loadByGuid($userGuid);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
@@ -191,13 +191,22 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
         }
         return $this->getLogin() == $this->generateIpBasedLogin();
     }
-    
+
     /***
-     * Check if the current request ip is alowed/configured for ip based authentication
+     * Get the configured ip addresses in zf configuration
+     * @return array
+     */
+    public function getConfiguredIps(): array{
+        return $this->config->runtimeOptions->authentication->ipbased->IpAddresses->toArray() ?? [];
+    }
+
+
+    /***
+     * Check if the current request ip is allowed/configured for ip based authentication
      * @return boolean
      */
-    public function isIpBasedRequest(){
-        $ipConfig = $this->config->runtimeOptions->authentication->ipbased->IpAddresses->toArray();
+    public function isIpBasedRequest(): bool{
+        $ipConfig = $this->getConfiguredIps();
         return !empty($ipConfig) && in_array($this->ip, $ipConfig);
     }
     
@@ -205,7 +214,7 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
      * Generate user login from the current ip address and the current session id
      * @return string
      */
-    public function generateIpBasedLogin(){
+    public function generateIpBasedLogin(): string{
         return self::IP_BASED_USER_LOGIN_PREFIX.$this->_session->internalSessionUniqId;
     }
     
@@ -213,7 +222,7 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
      * returns the currently used IP Adress
      * @return string
      */
-    public function getIp() {
+    public function getIp(): string{
         return $this->ip;
     }
 }
