@@ -43,6 +43,7 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
     },
     minHeight : 350,
     width : 370,
+    constrainHeader: true,
     autoHeight: true,
     layout:'fit',
     x: 10,

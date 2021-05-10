@@ -28,9 +28,9 @@ END LICENSE AND COPYRIGHT
 
 /* @var $this Zend_View */
 ?>
-  
+
 Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
-    
+
     Ext.define("Editor.locale.plugins.MatchAnalysis.controller.MatchAnalysis", {
         override: "Editor.plugins.MatchAnalysis.controller.MatchAnalysis",
         strings: {
@@ -52,7 +52,7 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
             analysisLoadingMsg:'<?php echo $this->translate->_("Analyse läuft");?>'
         }
     });
-    
+
     Ext.define("Editor.locale.plugins.MatchAnalysis.view.AnalysisPanel", {
         override: "Editor.plugins.MatchAnalysis.view.AnalysisPanel",
         strings: {
@@ -60,6 +60,7 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
             matchCount:'<?php echo $this->translate->_("Gesamtzahl der Wörter");?>',
             tabTitle:'<?php echo $this->translate->_("Analyse");?>',
             exportAnalysis:'<?php echo $this->translate->_("Export");?>',
+            exportAnalysisXML:'<?php echo $this->translate->_("Export XML");?>',
             noAnalysis:'<?php echo $this->translate->_("Start der Analyse im Tab “Sprachressourcen zuweisen“");?>',
             languageResources:'<?php echo $this->translate->_("Sprachressourcen");?>',
             analysisDate:'<?php echo $this->translate->_("Datum");?>',
@@ -72,7 +73,7 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
             edit100PercentMatchDisabledMessage:'<?php echo $this->translate->_("Gesperrte Segmente sind in der Analyse nicht enthalten");?>'
         }
     });
-    
+
     Ext.define("Editor.locale.plugins.MatchAnalysis.view.LanguageResources", {
         override: "Editor.plugins.MatchAnalysis.view.LanguageResources",
         strings: {

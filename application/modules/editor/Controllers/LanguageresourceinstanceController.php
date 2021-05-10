@@ -562,6 +562,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->init();
         $this->data = $this->getAllParams(); //since its a fileupload, this is a normal POST
         $this->setDataInEntity($this->postBlacklist);
+        $this->entity->createLangResUuid();
         
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
@@ -668,6 +669,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     /**
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::decodePutData()
+     */
+    protected function decodePutData() {
+        parent::decodePutData();
+        unset($this->data->langResUuid);
+    }
+    
+    /**
+>>>>>>> origin/develop
      * Imports an additional file which is transfered to the desired languageResource
      */
     public function importAction(){

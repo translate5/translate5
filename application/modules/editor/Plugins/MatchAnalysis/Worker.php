@@ -118,7 +118,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             $this->task->save();
         //else check if we are in import, then no separate lock is needed. Therefore if we are not in import this is an error
         } elseif($this->task->getState() != editor_Models_Task::STATE_IMPORT) {
-            $this->log->error('E1167', 'MatchAnalysis Plug-In: analysis and pre-translation cannot be run.', [
+            $this->log->error('E1167', 'MatchAnalysis Plug-In: task can not be locked for analysis and pre-translation.', [
                 'task' => $this->task
             ]);
             $this->task->setState($this->taskOldState);
@@ -146,7 +146,9 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         $this->analysis->setPretranslateMt($params['pretranslateMt']);
         $this->analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
         $this->analysis->setBatchQuery($params['batchQuery']);
-        
+        $type = $params['pretranslateMt'] == 1 ? "MT" : "";
+        $this->analysis->setType($type);
+
         $updateCounter = 0;
         $lastProgress=0;
         $return=$this->analysis->calculateMatchrate(function($progress) use (&$updateCounter,&$lastProgress){
@@ -167,6 +169,14 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             $this->task->setState($this->taskOldState);
             $this->task->save();
         }
+
+        $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
+        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
+        $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($this->task->getTaskGuid());
+        $analysisAssoc->setFinishedAt(date('Y-m-d H:i:s'));
+        $analysisAssoc->setUuid(ZfExtended_Utils::uuid());
+        $analysisAssoc->save();
+
         $this->task->unlock();
         return $return;
     }

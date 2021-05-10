@@ -91,6 +91,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
               task.set('state', 'ExcelExported');
           }
       });
+     
   },
   /**
    * Add export Links to item list

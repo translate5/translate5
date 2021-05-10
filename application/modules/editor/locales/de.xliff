@@ -52,6 +52,7 @@
 <trans-unit id='UE0gbGVrdG9yaWVydCwgYXV0bw=='><source>PM lektoriert, auto</source><target>PM lektoriert, auto</target></trans-unit>
 <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0'><source>PM lektoriert, unverändert</source><target>PM lektoriert, unverändert</target></trans-unit>
 <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv'><source>PM lektoriert, unverändert, auto</source><target>PM lektoriert, unverändert, auto</target></trans-unit>
+<trans-unit id='Vm9yw7xiZXJzZXR6dA=='><source>Vorübersetzt</source><target>Vorübersetzt</target></trans-unit>
 <trans-unit id='d2lyZCBlcm1pdHRlbHQuLi4='><source>wird ermittelt...</source><target>wird ermittelt...</target></trans-unit>
 <trans-unit id='TGVrdG9y'><source>Lektor</source><target>Lektor</target></trans-unit>
 <trans-unit id='w5xiZXJzZXR6ZXI='><source>Übersetzer</source><target>Übersetzer</target></trans-unit>
@@ -236,7 +237,7 @@
 <trans-unit id='TGllZmVyZGF0dW0gKHNvbGwp'><source>Lieferdatum (soll)</source><target>Lieferdatum (soll)</target></trans-unit>
 <trans-unit id='TGllZmVyZGF0dW0gKGlzdCk='><source>Lieferdatum (ist)</source><target>Lieferdatum (ist)</target></trans-unit>
 <trans-unit id='UmVmZXJlbnpkYXRlaWVu'><source>Referenzdateien</source><target>Referenzdateien</target></trans-unit>
-<trans-unit id='MTAwJSBNYXRjaGVzIHNpbmQgZWRpdGllcmJhcg=='><source>100% Matches sind editierbar</source><target>100% Matches sind editierbar</target></trans-unit>
+<trans-unit id='dW52ZXLDpG5kZXJ0ZSAxMDAlIFRNIE1hdGNoZXMgc2luZCBlZGl0aWVyYmFy'><source>unveränderte 100% TM Matches sind editierbar</source><target>unveränderte 100% TM Matches sind editierbar</target></trans-unit>
 <trans-unit id='QmVzdGVsbGRhdHVt'><source>Bestelldatum</source><target>Bestelldatum</target></trans-unit>
 <trans-unit id='UXVlbGxzcHJhY2hlIGJlYXJiZWl0YmFy'><source>Quellsprache bearbeitbar</source><target>Quellsprache bearbeitbar</target></trans-unit>
 <trans-unit id='UHJvamVrdCBlcnN0ZWxsZW4='><source>Projekt erstellen</source><target>Projekt erstellen</target></trans-unit>
@@ -1919,6 +1920,15 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgbmljaHQgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse nicht enthalten</source><target>Gesperrte Segmente sind in der Analyse nicht enthalten</target></trans-unit>
 <trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='><source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source><target>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</target></trans-unit>
 <trans-unit id='U2NocmVpYnJlY2h0ZSBzdGFuZGFyZG3DpMOfaWc='><source>Schreibrechte standardmäßig</source><target>Schreibrechte standardmäßig</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKExhdGVpbiBTZXJiaWVuKQ=='><source>Serbisch (Latein Serbien)</source><target>Serbisch (Latein Serbien)</target></trans-unit>
+<trans-unit id='U29tYWxpIChTb21hbGlhKQ=='><source>Somali (Somalia)</source><target>Somali (Somalia)</target></trans-unit>
+<trans-unit id='QW1oYXJpc2NoICjDhHRoaW9waWVuKQ=='><source>Amharisch (Äthiopien)</source><target>Amharisch (Äthiopien)</target></trans-unit>
+<trans-unit id='UsOkdG9yb21hbmlzY2ggKFNjaHdlaXop'><source>Rätoromanisch (Schweiz)</source><target>Rätoromanisch (Schweiz)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFZlcmVpbmlndGUgU3RhYXRlbik='><source>Spanisch (Vereinigte Staaten)</source><target>Spanisch (Vereinigte Staaten)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKExhdGVpbmFtZXJpa2EgdW5kIEthcmliaWsp'><source>Spanisch (Lateinamerika und Karibik)</source><target>Spanisch (Lateinamerika und Karibik)</target></trans-unit>
+<trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbiBBc2VyYmFpZHNjaGFuKQ=='><source>Aserbaidschanisch (Latein Aserbaidschan)</source><target>Aserbaidschanisch (Latein Aserbaidschan)</target></trans-unit>
+<trans-unit id='VXNiZWtpc2NoIChMYXRlaW4gVXNiZWtpc3Rhbik='><source>Usbekisch (Latein Usbekistan)</source><target>Usbekisch (Latein Usbekistan)</target></trans-unit>
+<trans-unit id='Qm9zbmlzY2ggKExhdGVpbiBCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Bosnisch (Latein Bosnien und Herzegowina)</source><target>Bosnisch (Latein Bosnien und Herzegowina)</target></trans-unit>
   </body>
  </file>
 </xliff>
