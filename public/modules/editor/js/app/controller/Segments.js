@@ -309,44 +309,40 @@ Ext.define('Editor.controller.Segments', {
         }
     },
 
-
-    /**
-     * Toggle filtering by repeated segments list.
-     */
     repeatedFilter: function () {
-        alert(1);
         var me = this,
             grid = me.getSegmentGrid(),
+            //id des bearbeiteten Segments
             gridFilters = grid.filters,
             filters = gridFilters.store.filters,
-            found = false,
-            otherFound = false,
-            column;
-        console.log(filters);
-        filters.each(function (filter, index, len) {
-            var isWatched = filter.getProperty() == 'isRepeated';
-            found = found || isWatched;
-            otherFound = otherFound || !isWatched && filter.getDisabled() === false;
-        });
-        //remove watchlist filter
-        if (found) {
-            column = grid.columnManager.getHeaderByDataIndex('isRepeated');
-            if (column && column.filter && column.filter.isGridFilter) {
-                column.filter.setActive(false);
-            }
+            segmentStore = me.getSegmentGrid().getStore(),
+            segmentsProxy = segmentStore.getProxy();
+            params = {};
+
+
+        if (me.isDisabled) {
             return;
         }
-        //add watchlist filter
-        gridFilters.addFilter({
-            dataIndex: 'isRepeated',
-            type: 'boolean',
-            value: true,
-            disabled: false
+        repeated = false;
+        filters.each(function (filter, index, len) {
+            repeated = filter.getProperty() == 'isRepeated';
         });
-        // currently enabled at least one more filter:
-        if (otherFound) {
-            Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
+
+        params[segmentsProxy.getFilterParam()] = segmentsProxy.encodeFilters(segmentStore.getFilters().items);
+        params[segmentsProxy.getSortParam()] = segmentsProxy.encodeSorters(segmentStore.getSorters().items);
+        //stop loading first!
+        segmentStore.getProxy().abort();
+        if(repeated){
+            segmentStore.removeFilter('isRepeated');
+        }else{
+            repeated = true;
+            segmentStore.addFilter({
+                "operator":"eq",
+                "value":repeated,
+                "property":"isRepeated"
+            });
         }
+
     },
 
     /**
