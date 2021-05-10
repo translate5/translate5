@@ -1,5 +1,26 @@
 # DELETE FROM LEK_terms WHERE termEntryId IS NULL;
 # No delete  all termEntries without termEntryId,-> create new termEntries in LEK_term_entry and associate to Lek_Term table???
+
+ALTER TABLE LEK_term_entry ADD tmpTermId LONGTEXT;
+ALTER TABLE LEK_term_attributes ADD tmpLangSetGuid LONGTEXT;
+DELETE FROM LEK_terms WHERE term IS NULL OR term = '';
+
+# UUID for new terms and attributes before migration
+UPDATE LEK_term_attributes t1, (
+    SELECT collectionId, termEntryId, attrLang, UUID() newLangSetUuid -- oder language, evaluieren welches.
+    FROM LEK_term_attributes
+    WHERE NOT attrLang IS NULL -- a langset entry must have a language
+    AND not termEntryId IS NULL -- why are there attributes with termEntry = null, must not be, should be solved first by filling termEntryId via termId
+    GROUP BY collectionId, termEntryId, attrLang) t2
+SET t1.tmpLangSetGuid = t2.newLangSetUuid
+WHERE t1.collectionId = t2.collectionId
+  AND t1.termEntryId = t2.termEntryId
+  AND t1.attrLang = t2.attrLang;
+
+
+# END UUID migration
+
+
 ALTER TABLE terms_term_entry ADD tmpOldId int(11) NOT NULL;
 CREATE INDEX idx_tmpOldId_te ON terms_term_entry (tmpOldId);
 
@@ -93,6 +114,11 @@ UPDATE terms_term terms
     JOIN LEK_languages lng on lng.id = terms.languageId
 SET terms.language = LOWER(lng.rfc5646)
 WHERE lng.id = terms.languageId;
+
+UPDATE terms_term terms
+    JOIN LEK_term_attributes LekT on LekT.termEntryId = terms.termEntryId
+SET terms.langSetGuid = LekT.tmpLangSetGuid
+WHERE LekT.termId = terms.tmpOldId;
 
 # INSERT FOR ATTRIBUTES
 INSERT INTO terms_attributes (
@@ -237,10 +263,11 @@ UPDATE terms_transacgrp termTrg
 SET termTrg.langSetGuid = lta.tmpLangSetGuid
 WHERE termTrg.tmpOldId = lta.id;
 
-UPDATE terms_term tt
-    JOIN LEK_term_attributes lta on tt.collectionId = lta.collectionId
-SET tt.langSetGuid = lta.tmpLangSetGuid
-WHERE tt.id = lta.termId;
+UPDATE terms_transacgrp termTrg
+    JOIN terms_term lta on termTrg.collectionId = lta.collectionId
+SET termTrg.termId = lta.id
+WHERE termTrg.tmpOldTermId = lta.tmpOldId;
+
 
 # before we can update new termId we must drop foreign key, after update we add new FK
 alter table LEK_term_proposal drop foreign key LEK_term_proposal_ibfk_1;
@@ -248,11 +275,11 @@ UPDATE LEK_term_proposal termProposal
     JOIN terms_term lt on termProposal.termId = lt.tmpOldId
 SET termProposal.termId = lt.id
 WHERE termProposal.termId = lt.tmpOldId;
+
 alter table LEK_term_proposal
     add constraint LEK_term_proposal_ibfk_1
         foreign key (termId) references terms_term (id)
             on update cascade on delete cascade;
-
 
 
 alter table LEK_term_attribute_proposal drop foreign key LEK_term_attribute_proposal_ibfk_1;
@@ -275,9 +302,55 @@ alter table LEK_term_history
         foreign key (termId) references terms_term (id)
             on update cascade on delete cascade;
 
-# ALTER TABLE terms_term_entry DROP COLUMN tmpOldId;
+
+alter table terms_term
+    add constraint terms_termentry_ibfk_1
+        foreign key (termEntryId) references terms_term_entry (id)
+            on update cascade on delete cascade;
+
+alter table terms_term
+    add constraint terms_term_entry_ibfk_1
+        foreign key (termEntryId) references terms_term_entry (id)
+            on update cascade on delete cascade;
+
+alter table terms_term
+    add constraint terms_term_collection_ibfk_1
+        foreign key (collectionId) references LEK_languageresources (id)
+            on update cascade on delete cascade;
+
+alter table terms_attributes
+    add constraint terms_term_ibfk_1
+        foreign key (termId) references terms_term (id)
+            on update cascade on delete cascade;
+
+alter table terms_attributes
+    add constraint terms_entry_ibfk_1
+        foreign key (termEntryId) references terms_term_entry (id)
+            on update cascade on delete cascade;
+
+alter table terms_attributes
+    add constraint terms_collection_ibfk_1
+        foreign key (collectionId) references LEK_languageresources (id)
+            on update cascade on delete cascade;
+
+alter table terms_transacgrp
+    add constraint terms_tgrp_term_ibfk_1
+        foreign key (termId) references terms_term (id)
+            on update cascade on delete cascade;
+
+alter table terms_transacgrp
+    add constraint terms_tgrp_entry_ibfk_1
+        foreign key (termEntryId) references terms_term_entry (id)
+            on update cascade on delete cascade;
+
+alter table terms_transacgrp
+    add constraint terms_tgrp_collection_ibfk_1
+        foreign key (collectionId) references LEK_languageresources (id)
+            on update cascade on delete cascade;
+
 # ALTER TABLE terms_term DROP COLUMN tmpOldId;
 # ALTER TABLE terms_term DROP COLUMN tmpOldTermEntryId;
+# ALTER TABLE terms_term_entry DROP COLUMN tmpOldId;
 # ALTER TABLE terms_attributes DROP COLUMN tmpOldId;
 # ALTER TABLE terms_attributes DROP COLUMN tmpOldTermId;
 # ALTER TABLE terms_attributes DROP COLUMN tmpOldTermEntryId;
