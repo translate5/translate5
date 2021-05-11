@@ -175,9 +175,10 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     /***
      * Get all TermCollections ids assigned to the given customers.
      * @param array $customerIds
+     * @param bool $dict
      * @return array
      */
-    public function getCollectionsIdsForCustomer(array $customerIds): array
+    public function getCollectionsIdsForCustomer(array $customerIds, bool $dict = false): array
     {
         $service = ZfExtended_Factory::get('editor_Services_TermCollection_Service');
         /* @var $service editor_Services_TermCollection_Service */
@@ -191,9 +192,9 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         ->group('lr.id');
         $rows = $this->db->fetchAll($s)->toArray();
 
-        if (!empty($rows)) {
-            return array_column($rows, 'id');
-        }
+        if (!empty($rows)) return $dict
+            ? array_combine(array_column($rows, 'id'), array_column($rows, 'name'))
+            : array_column($rows, 'name');
 
         return [];
     }
@@ -319,18 +320,27 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
     /***
      * Get the available collections for the currently logged user
+     *
+     * @param bool $dict
+     * @param string|array $clientIds
      * @return array
      */
-    public function getCollectionForAuthenticatedUser(): array
+    public function getCollectionForAuthenticatedUser($dict = null, $clientIds = ''): array
     {
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
         $customers = $userModel->getUserCustomersFromSession();
+
+        // If $clientIds arg is given - use intersection
+        if ($clientIds) $customers = array_intersect($customers,
+            is_array($clientIds) ? $clientIds : explode(',', $clientIds)
+        );
+
         if (empty($customers)) {
             return [];
         }
 
-        return $this->getCollectionsIdsForCustomer($customers);
+        return $this->getCollectionsIdsForCustomer($customers, $dict);
     }
 
     /***

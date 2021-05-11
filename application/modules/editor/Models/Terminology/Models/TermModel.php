@@ -267,9 +267,10 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      * @param array $collectionIds
      * @param mixed $limit
      * @param array $processStats
+     * @param bool $total
      * @return array
      */
-    public function searchTermByLanguage(string $queryString, string $languages, array $collectionIds, $limit = null, array $processStats): array
+    public function searchTermByLanguage(string $queryString, string $languages, array $collectionIds, $limit = null, array $processStats, &$total = null): array
     {
         $termObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_Term');
 
@@ -293,18 +294,23 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $tableProposal = (new editor_Models_Db_Term_Proposal())->info($this->db::NAME);
         $s = $this->db->select()
             ->setIntegrityCheck(false)
-            ->from($tableTerm, ['term as label', 'id as value', 'term as desc', 'definition', 'termEntryTbxId', 'collectionId', 'termEntryId', 'languageId'])
+            ->from($tableTerm, ['term as label', 'id as value', 'id', 'processStatus', 'status', 'term as desc', 'definition', 'termEntryTbxId', 'collectionId', 'termEntryId', 'languageId'])
             ->where('lower(`'.$tableTerm.'`.term) like lower(?) COLLATE utf8mb4_bin',$queryString)
             ->where('`'.$tableTerm.'`.languageId IN(?)', explode(',', $languages))
             ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
             ->where('`'.$tableTerm.'`.processStatus IN(?)',$processStats);
         $s->order($tableTerm.'.term asc');
 
-        if ($limit) {
-            $s->limit($limit);
-        }
+        // Assume limit arg can be comma-separated string containing '<LIMIT>,<OFFSET>'
+        if ($limit) list($limit, $offset) = explode(',', $limit);
 
+        //
         if (!$isProposalAllowed || !in_array(self::PROCESS_STATUS_UNPROCESSED, $processStats)) {
+
+            // Set LIMIT clause
+            if ($limit) $s->limit($limit, $offset ?: 0);
+
+            // Return results
             return $this->db->fetchAll($s)->toArray();
         }
 
@@ -312,18 +318,33 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $tableProposal = (new editor_Models_Db_Term_Proposal())->info($this->db::NAME);
         $sp = $this->db->select()
             ->setIntegrityCheck(false)
-            ->from($tableProposal, ['term as label', 'termId as value', 'term as desc'])
-            ->joinInner($tableTerm, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['definition', 'termEntryTbxId', 'collectionId', 'termEntryId', 'languageId'])
+            ->from($tableProposal, ['term as label', 'termId as value', 'termId as id', 'term as desc'])
+            ->joinInner($tableTerm, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['definition', 'termEntryTbxId', 'collectionId', 'termEntryId', 'languageId', 'processStatus', 'status'])
             ->where('lower(`'.$tableProposal.'`.term) like lower(?) COLLATE utf8mb4_bin', $queryString)
             ->where('`'.$tableTerm.'`.languageId IN(?)', explode(',', $languages))
             ->where('`'.$tableTerm.'`.collectionId IN(?)', $collectionIds)
             ->order($tableTerm.'.term asc');
-        if ($limit) {
-            $sp->limit($limit);
+
+        // Build LIMIT clause
+        $limit = rif($limit, 'LIMIT ' . rif($offset, '$1,') . '$1', '');
+
+        // Append LIMIT clause to the UNION-ed query
+        $sql = '(' . $s->assemble() . ') UNION (' . $sp->assemble() . ') ' . $limit;
+
+        // If $total arg is given
+        if (func_num_args() == 6) {
+
+            // Replace columns with 'COUNT(*)' for both *_Select instances
+            $s->reset(Zend_Db_Select::COLUMNS)->columns(['COUNT(*)']);
+            $sp->reset(Zend_Db_Select::COLUMNS)->columns(['COUNT(*)']);
+
+            // Get total
+            $total = $this->db->getAdapter()->query(
+              'SELECT (' . $s->assemble() . ') + (' . $sp->assemble() . ') AS `total`'
+            )->fetchColumn();
         }
 
-        $sql = '('.$s->assemble().') UNION ('.$sp->assemble().')';
-
+        // Fetch and return results
         return $this->db->getAdapter()->query($sql)->fetchAll();
     }
 
