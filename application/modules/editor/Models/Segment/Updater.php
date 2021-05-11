@@ -109,10 +109,10 @@ class editor_Models_Segment_Updater {
         $history->save();
         $this->segment->setTimestamp(NOW_ISO); //see TRANSLATE-922
         $this->segment->save();
+        $this->segment->updateIsRepeated($this->segment->getTargetMd5(), $oldHash);
         //call after segment put handler
         $this->updateLanguageResources();
-        $this->segment->updateIsRepeatead($this->segment->getTargetMd5(), $oldHash);
-        
+
         //update the segment finish count for the current workflow step
         $this->task->changeSegmentFinishCount($this->task, $segment->getAutoStateId(), $history->getAutoStateId());
     }

@@ -84,9 +84,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
 
     public function indexAction()
     {
-        $repetiton = false;
         $taskGuid = $this->session->taskGuid;
-        $rows = $this->entity->loadByTaskGuid($taskGuid, $repetiton);
+        $rows = $this->entity->loadByTaskGuid($taskGuid);
         $this->view->rows = $rows;
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
 

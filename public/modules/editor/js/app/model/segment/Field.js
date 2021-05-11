@@ -75,7 +75,9 @@ Ext.define('Editor.model.segment.Field', {
     {name: 'width', type: 'integer'},
     {name: 'type', type: 'string'},
     {name: 'rankable', type: 'boolean'},
-    {name: 'editable', type: 'boolean'}
+    {name: 'editable', type: 'boolean'},
+    {name: 'isWatched', type: 'boolean'},
+    {name: 'isRepeated', type: 'boolean'}
   ],
   idProperty: 'id',
   isTarget: function() {
