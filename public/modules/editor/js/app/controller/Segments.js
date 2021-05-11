@@ -312,37 +312,34 @@ Ext.define('Editor.controller.Segments', {
     repeatedFilter: function () {
         var me = this,
             grid = me.getSegmentGrid(),
-            //id des bearbeiteten Segments
             gridFilters = grid.filters,
             filters = gridFilters.store.filters,
-            segmentStore = me.getSegmentGrid().getStore(),
-            segmentsProxy = segmentStore.getProxy();
-            params = {};
-
-
-        if (me.isDisabled) {
+            found = false,
+            otherFound = false,
+            column;
+        filters.each(function (filter, index, len) {
+            var isWatched = filter.getProperty() == 'isRepeated';
+            found = found || isWatched;
+            otherFound = otherFound || !isWatched && filter.getDisabled() === false;
+        });
+        //remove watchlist filter
+        if (found) {
+            column = grid.columnManager.getHeaderByDataIndex('isRepeated');
+            if (column && column.filter && column.filter.isGridFilter) {
+                column.filter.setActive(false);
+            }
             return;
         }
-        repeated = false;
-        filters.each(function (filter, index, len) {
-            repeated = filter.getProperty() == 'isRepeated';
+        gridFilters.addFilter({
+            dataIndex: 'isRepeated',
+            type: 'boolean',
+            value: true,
+            disabled: false
         });
-
-        params[segmentsProxy.getFilterParam()] = segmentsProxy.encodeFilters(segmentStore.getFilters().items);
-        params[segmentsProxy.getSortParam()] = segmentsProxy.encodeSorters(segmentStore.getSorters().items);
-        //stop loading first!
-        segmentStore.getProxy().abort();
-        if(repeated){
-            segmentStore.removeFilter('isRepeated');
-        }else{
-            repeated = true;
-            segmentStore.addFilter({
-                "operator":"eq",
-                "value":repeated,
-                "property":"isRepeated"
-            });
+        // currently enabled at least one more filter:
+        if (otherFound) {
+            Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
         }
-
     },
 
     /**
@@ -393,7 +390,7 @@ Ext.define('Editor.controller.Segments', {
             params = {};
 
         filters.each(function (filter, index, len) {
-            found = found || (filter.getProperty() == 'isWatched');
+            found = found || (filter.getProperty() == 'isWatched') || (filter.getProperty() == 'isRepeated');
         });
         btn.toggle(found);
 

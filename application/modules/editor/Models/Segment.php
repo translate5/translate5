@@ -988,22 +988,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     /**
      * Load segments by taskGuid.
      * @param string $taskGuid
-     * @param bool $repetition
      * @param Closure $callback is called with the select statement as parameter before passing it to loadFilterdCustom Param: Zend_Db_Table_Select
      * @return array
      */
-    public function loadByTaskGuid($taskGuid, $repetition = false, Closure $callback = null)
+    public function loadByTaskGuid($taskGuid, Closure $callback = null)
     {
 
         try {
-            return $this->_loadByTaskGuid($taskGuid, $callback, $repetition);
+            return $this->_loadByTaskGuid($taskGuid, $callback);
         } catch (Zend_Db_Statement_Exception $e) {
             $this->catchMissingView($e);
         }
         //fallback mechanism for not existing views. If not exists, we are trying to create it.
         $this->segmentFieldManager->initFields($taskGuid);
         $this->segmentFieldManager->getView()->create();
-        return $this->_loadByTaskGuid($taskGuid, $callback, $repetition);
+        return $this->_loadByTaskGuid($taskGuid, $callback);
     }
 
     /**
@@ -1092,10 +1091,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     public function updateIsRepeated($newHash, $oldHash)
     {
-        $s = "update " . $this->tableName . " set isRepeated=1";
-
-        $s->where('(' . $this->tableName . '.sourceMd5 ' . $this->_getSqlTextCompareOp() . ' ?', $oldHash)
-            ->orWhere($this->tableName . '.targetMd5 ' . $this->_getSqlTextCompareOp() . ' ?)', $oldHash);
+        if($newHash == $oldHash){
+            return true;
+        }
+        $where = $this->tableName . '.sourceMd5 ='.$newHash;
+        $where .= " or ". $this->tableName . '.targetMd5 ='.$newHash;
+        return $this->db->update(array('isRepeated' => 1, ), $where);
     }
 
     /**
@@ -1104,8 +1105,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     public function insertRepetition()
     {
-        $where = $this->tableName . '.sourceMd5 IN(Select * from (select sourceMd5 from ' . "$this->tableName" . ' group by sourceMd5 having count(*) > 1) as a)';
-        $where .= " or ". $this->tableName . '.targetMd5 IN(Select * from (select targetMd5 from ' . "$this->tableName" . ' group by targetMd5 having count(*) > 1) as b)';
+        $where = $this->tableName . '.sourceMd5 IN(Select * from (select sourceMd5 from ' . "$this->tableName" . ' where source != "" and source is not null group by sourceMd5 having count(*) > 1) as a)';
+        $where .= " or ". $this->tableName . '.targetMd5 IN(Select * from (select targetMd5 from ' . "$this->tableName" . ' where target != "" and target is not null group by targetMd5 having count(*) > 1) as b)';
         $this->db->update(array('isRepeated' => 1, ), $where);
     }
 
@@ -1165,10 +1166,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * encapsulate the load by taskGuid code.
      * @param string $taskGuid
      * @param Closure $callback is called with the select statement as parameter before passing it to loadFilterdCustom Param: Zend_Db_Table_Select
-     * @param bool $repetition
      * @return array
      */
-    protected function _loadByTaskGuid($taskGuid, Closure $callback = null, $repetition = false)
+    protected function _loadByTaskGuid($taskGuid, Closure $callback = null)
     {
 
         $this->segmentFieldManager->initFields($taskGuid);
@@ -1192,29 +1192,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $s->from($this->db, $cols);
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
-//        $s = $this->resetRepetition($repetition, $s);
-
 
         if (!empty($callback)) {
             $callback($s, $this->tableName);
         }
 
         return parent::loadFilterdCustom($s);
-    }
-
-    /**
-     * @param $repetiton
-     * @param $s
-     * @return mixed
-     */
-
-    public function resetRepetition($repetiton, $s)
-    {
-        if ($repetiton) {
-            $s .= 'AND isRepeated = 1';
-        }
-
-        return $s;
     }
 
     /**
