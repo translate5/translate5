@@ -230,7 +230,7 @@ Ext.define('Editor.controller.TmOverview', {
     
     handleSaveEditClick: function(button){
         var me = this,
-            window = button.up('window');
+            window = button.up('window'),
             form = window.down('form'),
             record = form.getRecord();
 
@@ -358,33 +358,34 @@ Ext.define('Editor.controller.TmOverview', {
         var me = this,
             grid=view.up('tmOverviewPanel'),
             f = ev.getTarget().className.match(/ico-tm-([^ ]+)/);
-        
-        //call the selection row handler
-        grid.onGridRowSelect(grid,[record]);
 
-        switch(f && f[1] || '') {
-            case 'edit':
-                me.handleEditTm(view,cell,col,record);
-                break;
-            case 'tasks':
-                me.handleShowTasks(view,cell,col,record);
-                break;
-            case 'import':
-                me.handleImportTm(view,cell,col,record);
-                break;
-            case 'download':
-                me.handleDownloadTm(view,cell,col,record, ev);
-                break;
-            case 'delete':
-                me.handleDeleteTm(view,cell,col,record);
-                break;
-            case 'export':
-                me.handleExportProposalClick(view,cell,col,record);
-                break;
-            case 'log':
-                me.handleLogTm(view,cell,col,record);
-                break;
-        }
+
+        // call the selection row handler. This will also fetch fresh record version
+        grid.onGridRowSelect(grid,[record],function (newRecord){
+            switch(f && f[1]) {
+                case 'edit':
+                    me.handleEditTm(view,cell,col,newRecord);
+                    break;
+                case 'tasks':
+                    me.handleShowTasks(view,cell,col,newRecord);
+                    break;
+                case 'import':
+                    me.handleImportTm(view,cell,col,newRecord);
+                    break;
+                case 'download':
+                    me.handleDownloadTm(view,cell,col,newRecord, ev);
+                    break;
+                case 'delete':
+                    me.handleDeleteTm(view,cell,col,newRecord);
+                    break;
+                case 'export':
+                    me.handleExportProposalClick(view,cell,col,newRecord);
+                    break;
+                case 'log':
+                    me.handleLogTm(view,cell,col,newRecord);
+                    break;
+            }
+        });
     },
     handleDownloadTm : function(view, cell, cellIdx, rec, ev){
         var me = this,

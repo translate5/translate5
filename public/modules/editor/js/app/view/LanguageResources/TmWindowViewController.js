@@ -68,6 +68,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
             view=me.getView(),
             uploadField=view.down('filefield[name="tmUpload"]'),
             serviceName=field.getSelection() && field.getSelection().get('serviceName'),
+            resourceType=field.getSelection() && field.getSelection().get('resourceType'),
             helppage = field.getSelection() && field.getSelection().get('helppage'),
             vm=view.getViewModel(),
             sdlEngineCombo=view.down('#sdlEngine');
@@ -77,6 +78,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         }
         
         vm.set('serviceName',serviceName);
+        vm.set('resourceType',resourceType);
 
         var resourcesStore=Ext.StoreManager.get('Editor.store.LanguageResources.Resources'),
             isSdl=me.isSdlResource(),
@@ -172,18 +174,9 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         me.filterEngines();
     },
 
-    onCustomersTagFieldChange:function(field,newValue,oldValue,eOpts){
-        this.getViewModel().set('selectedCustomers',newValue);
-    },
-
-    onCustomersReadTagFieldChange:function(field,newValue,oldValue,eOpts){
-        this.getViewModel().set('selectedCustomersRead',newValue);
-    },
-
     onCustomersWriteTagFieldChange:function(field,newValue,oldValue,eOpts){
-        this.getViewModel().set('selectedCustomersWrite',newValue);
-    },
 
+    },
     /**
      * Filter the engines store, when source or target language is selected
      */
@@ -209,14 +202,14 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
 
         //preselect when only one result is filtered
         engineComboStore.on({
-            filterchange:function (sdlstore,filters,eOpts){
-                if(sdlstore.getData().length==1){
+            filterchange:function (sdlstore){
+                if(sdlstore.getData().length === 1){
                     engineComboField.suspendEvents();
                     engineComboField.setSelection(sdlstore.getAt(0));
                     engineComboField.resumeEvents();
                 }
             }
-        })
+        });
 
         //clean the selected value in the sdl combo
         engineComboField.suspendEvents();

@@ -400,22 +400,27 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     },
 
     /***
-     * Grid row select handler
+     * TmOverview grid row select handler
+     * @param grid TmOverview grid
+     * @param selected Selected grid record. This record will also be reloaded.
+     * @param callback Callback function called after record reload. On load failure, the record will be with status error.
      */
-    onGridRowSelect:function(grid,selected){
+    onGridRowSelect:function(grid,selected,callback){
         if(selected.length<1){
             return;
         }
         var record = selected[0],
             status = record.get('status');
-        if(status != record.STATUS_NOTCHECKED){
+        if(status !== record.STATUS_NOTCHECKED){
             return;
         }
         record.set('status',record.STATUS_LOADING);
         record.load({
-            failure: function(record, operation) {
-                record.set('status',record.STATUS_ERROR);
-           }
+            failure: function(newRecord) {
+                record.set('status',newRecord.STATUS_ERROR);
+                callback(record);
+            },
+            success:callback
         });
     }
     

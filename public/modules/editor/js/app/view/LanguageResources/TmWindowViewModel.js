@@ -35,10 +35,9 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
     alias: 'viewmodel.tmwindow',
     data: {
         serviceName: false,
+        resourceType: false,
         uploadLabel:null,
-        selectedCustomers : [],
-        selectedCustomersRead : [],
-        selectedCustomersWrite : []
+        record:false
     },
     stores: {
         customers: {
@@ -47,19 +46,21 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
         },
         customersDefaultRead: {
             source: '{customers}',
-            filters: [{
-                property: 'id',
-                value: '{selectedCustomers}',
-                operator: 'in'
-            }],
+            filters : {
+                property : 'id',
+                operator : "in",
+                //value : '{resourcesCustomers.value}'
+                value: '{record.customerIds}'
+            }
         },
-        customersDefaultWrite:{
-            source: '{customers}',
-            filters: [{
-                property: 'id',
-                value: '{selectedCustomersRead}',
-                operator: 'in'
-            }]
+        customersDefaultWrite: {
+            source: '{customersDefaultRead}',
+            filters : {
+                property : 'id',
+                operator : "in",
+                //value : '{useAsDefault.value}'
+                value: '{record.customerUseAsDefaultIds}'
+            }
         }
     },
     formulas: {
@@ -68,6 +69,9 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
         },
         isTermCollectionResource:function(get){
             return get('serviceName') == Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
+        },
+        isTmResourceType:function(get){
+            return get('resourceType') == Editor.util.LanguageResources.resourceType.TM;
         }
     }
 });
