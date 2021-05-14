@@ -89,27 +89,6 @@ function d($value) {
 }
 
 /**
- * Shortcut function for ZfExtended_Factory::get(...)
- *
- * @param $class
- * @return mixed
- */
-function m($class) {
-    return ZfExtended_Factory::get($class);
-}
-
-/**
- * Shortcut for implode() function, but with the reversed order of arguments
- *
- * @param $array
- * @param string $separator
- * @return string
- */
-function im(array $array, $separator = ',') {
-    return implode($separator, $array);
-}
-
-/**
  * Comma-separated values to array converter
  *
  * @param $items
@@ -157,16 +136,7 @@ function ar($items, $allowEmpty = false) {
 }
 
 /**
- * Shortcut fn to Zend_Registry::get('config')
- *
- * @return mixed
- */
-function cfg() {
-    return Zend_Registry::get('config');
-}
-
-/**
- * Return $then or $else arg depending on whether $if arg is true
+ * Return $then or $else arg depending on whether $if arg is truthy
  *
  * @param bool $if
  * @param string $then
@@ -175,4 +145,11 @@ function cfg() {
  */
 function rif($if, $then, $else = '') {
     return $if ? str_replace('$1', is_scalar($if) ? $if : '$1', $then) : $else;
+}
+
+/**
+ * @return Zend_Db_Adapter_Abstract
+ */
+function db() {
+    return Zend_Db_Table_Abstract::getDefaultAdapter();
 }

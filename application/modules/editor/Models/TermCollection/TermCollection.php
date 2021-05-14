@@ -196,7 +196,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
         if (!empty($rows)) return $dict
             ? array_combine(array_column($rows, 'id'), array_column($rows, 'name'))
-            : array_column($rows, 'name');
+            : array_column($rows, 'id');
 
         return [];
     }
