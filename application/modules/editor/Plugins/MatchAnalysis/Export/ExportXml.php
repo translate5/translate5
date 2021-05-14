@@ -98,6 +98,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
      */
     public static function addAttributes(SimpleXMLElement $child, $data): SimpleXMLElement
     {
+
         foreach (self::$ATTRIBUTES as $attr) {
             $child->addAttribute($attr, '0');
             if ($attr == 'words' && $child->getName() == 'fuzzy') {
@@ -105,6 +106,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
 
                 $child->addAttribute($attr, $data[$attrib[0]]);
             }
+
         }
 
         return $child;
@@ -124,7 +126,9 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             } else {
                 $child = $object->batchTotal->analyse->addChild($node);
                 foreach (self::$ATTRIBUTES as $attr) {
-
+                    if($node == 'total' && $attr == 'words'){
+                        $child->addAttribute('words', $data['total']);
+                    }else
                     if ($attr == 'words' && $child->getName() == 'crossFileRepeated') {
                         //crossFileRepeated are translate5s repetitions (which are represented by 102% matches)
                         $child->addAttribute($attr, $data['102']);
@@ -152,7 +156,6 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
 
     public static function generateXML($rows, $taskGuid): SimpleXMLElement
     {
-
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
@@ -165,13 +168,14 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
         $assocs = $languageResource->loadByAssociatedTaskGuid($task->getTaskGuid());
         $languageResource->load($assocs[0]['id']);
+        $sourceLangIds = $languageResource->getSourceLang();
 
         $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languagesModel editor_Models_Languages */
-        $sourceLangIds = $languageResource->getSourceLang();
-        $sourceLangIds = implode(',', $sourceLangIds);
-        $sourceLanguages = $languagesModel->getFuzzyLanguages($task->getSourceLang(),'langName',true);
-        $sourceLanguages = implode(',', $sourceLanguages);
+        $languagesModel->load($sourceLangIds[0]);
+        $langName = $languagesModel->getLangName();
+        $lcid = $languagesModel->getLcid();
+
 
         $renderData = [
             'resourceName' => '',
@@ -190,11 +194,12 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             '59' => 0,
             'noMatch' => 0,
             'wordCount' => 0,
-            'type' => ''
+            'type' => '',
+            'total' => 0
         ];
 
         foreach ($rows as $row) {
-            $renderData['resourceName'] .= $row['resourceName'].', ';
+            $renderData['resourceName'] = !empty($row['resourceName']) ? $row['resourceName'] : $renderData['resourceName'];
             if($row['internalFuzzy'] == 'Yes'){
                 $renderData['internalFuzzy'] = 'Yes';
             }
@@ -209,14 +214,14 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             $renderData['69'] += $row['69'];
             $renderData['59'] += $row['59'];
             $renderData['wordCount'] += $row['wordCount'];
+            $renderData['total'] += (int)$row['104'] +(int)$row['103'] + (int)$row['102'] + (int)$row['101'] + (int)$row['100'] + (int)$row['99'] + (int)$row['89'] + (int)$row['79'] + (int)$row['69'] + (int)$row['59'];
 
         }
-
 
         $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($taskGuid);
-        $to_time = strtotime( $task->getOrderdate());
+        $to_time = strtotime( $analysisAssoc['created']);
 
         $from_time = strtotime($analysisAssoc['finishedAt']);
         $difference = round(abs($to_time - $from_time) / 3600,2); //seconds
@@ -228,7 +233,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
 
         $subnode1 = $xml->addChild('taskInfo');
         $subnode1->addAttribute('taskId', $analysisAssoc['uuid']);
-        $subnode1->addAttribute('runAt', date('Y-m-d H:i:s', strtotime($task->getOrderdate())));
+        $subnode1->addAttribute('runAt', date('Y-m-d H:i:s', strtotime( $analysisAssoc['created'])));
         $subnode1->addAttribute('runTime', $difference. ' seconds');
 
         $subnode2 = $subnode1->addchild('project');
@@ -236,8 +241,8 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         $subnode2->addAttribute('number', $taskGuid);
 
         $innerNode1 = $subnode1->addChild('language');
-        $innerNode1->addAttribute('lcid', $sourceLangIds);
-        $innerNode1->addAttribute('name', $sourceLanguages);
+        $innerNode1->addAttribute('lcid', $lcid);
+        $innerNode1->addAttribute('name', $langName);
 
         $innerNode2 = $subnode1->addChild('customer');
         $innerNode2->addAttribute('name', $customerData[0]['name']);

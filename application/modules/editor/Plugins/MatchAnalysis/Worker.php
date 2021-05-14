@@ -138,6 +138,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         $analysisAssoc->setInternalFuzzy($params['internalFuzzy']);
         //set pretranslation matchrate used for the anlysis
         $analysisAssoc->setPretranslateMatchrate($params['pretranslateMatchrate']);
+        $analysisAssoc->setUuid(ZfExtended_Utils::uuid());
 
         $analysisId = $analysisAssoc->save();
 
@@ -151,7 +152,11 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         $this->analysis->setPretranslateMt($params['pretranslateMt']);
         $this->analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
         $this->analysis->setBatchQuery($params['batchQuery']);
-        $type = $params['pretranslateMt'] == 1 ? "MT" : "";
+        $type = '';
+        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
+
+        $languageresource->loadByAssociatedTaskGuid($this->task->getTaskGuid());
 
         $matchAnalysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
         $matchAnalysis->setType($type);
@@ -178,11 +183,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             $this->task->save();
         }
 
-        $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
-        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
-        $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($this->task->getTaskGuid());
-        $analysisAssoc->setFinishedAt(date('Y-m-d H:i:s'));
-        $analysisAssoc->setUuid(ZfExtended_Utils::uuid());
+        $analysisAssoc->setFinishedAt(NOW_ISO);
         $analysisAssoc->save();
 
         $this->task->unlock();

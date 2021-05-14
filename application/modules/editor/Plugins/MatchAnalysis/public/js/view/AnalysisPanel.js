@@ -227,67 +227,78 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                     dockedItems: [{
                         xtype: 'toolbar',
                         dock: 'bottom',
-                        layout: {
-                            type: 'vbox',
-                            align: 'left'
-                        },
+
                         items: [{
                             xtype: 'container',
+                            layout: 'hbox',
                             padding: '5',
                             html: "¹ " + me.strings.noAnalysis,
-                            dock: 'bottom'
-                        }, {
-                            xtype: 'button',
-                            flex: 2,
-                            glyph: 'f1c3@FontAwesome5FreeSolid',
-                            itemId: 'exportExcel',
-                            text: me.strings.exportAnalysis,
-                            listeners: {
-                                click: {fn: 'exportAction', extraArg: 'excel'}
-                            }
-                        },
-                            {
+                            dock: 'bottom',
+
+                            items: [{
                                 xtype: 'button',
-                                margin: '10 0 0 0',
+                                flex: 2,
                                 glyph: 'f1c3@FontAwesome5FreeSolid',
-                                itemId: 'exportXml',
-                                text: me.strings.exportAnalysisXML,
+                                itemId: 'exportExcel',
+                                text: me.strings.exportAnalysis,
+                                margin: '50 0 0 0',
+
                                 listeners: {
-                                    click: {fn: 'exportAction', extraArg: 'xml'}
-                                }
-                            }]
-                    }, {
-                        xtype: 'container',
-                        padding: '10',
-                        html: "¹ " + me.strings.noAnalysis,
-                        dock: 'bottom'
-                    }, {
-                        xtype: 'toolbar',
-                        dock: 'top',
-                        layout: {
-                            type: 'vbox',
-                            align: 'left'
-                        },
-                        items: [{
-                            xtype: 'displayfield',
-                            fieldLabel: me.strings.analysisDate,
-                            itemId: 'analysisDatum'
-                        }, {
-                            xtype: 'displayfield',
-                            fieldLabel: me.strings.internalFuzzy,
-                            itemId: 'internalFuzzy'
-                        }, {
-                            xtype: 'displayfield',
-                            bind: {
-                                value: '{getEdit100PercentMatchLableText}',
+                                    click: {fn: 'exportAction', extraArg: 'excel'}
+                                },
                             },
-                            itemId: 'edit100PercentMatchLableText'
-                        }]
+                                {
+                                    xtype: 'button',
+                                    glyph: 'f1c3@FontAwesome5FreeSolid',
+                                    itemId: 'exportXml',
+                                    text: me.strings.exportAnalysisXML,
+                                    margin: '50 0 0 10',
 
-                    }]
+                                    listeners: {
+                                        click: {fn: 'exportAction', extraArg: 'xml'}
+                                    },
 
-                }]
-            };
+                                }
+                            ]
+                        }
+                        ]
+                    },
+                        {
+                            xtype: 'toolbar',
+                            dock
+    :
+        'top',
+            layout
+    :
+        {
+            type: 'vbox',
+                align
+        :
+            'left'
+        }
+    ,
+        items: [{
+            xtype: 'displayfield',
+            fieldLabel: me.strings.analysisDate,
+            itemId: 'analysisDatum'
+        }, {
+            xtype: 'displayfield',
+            fieldLabel: me.strings.internalFuzzy,
+            itemId: 'internalFuzzy'
+        }, {
+            xtype: 'displayfield',
+            bind: {
+                value: '{getEdit100PercentMatchLableText}',
+            },
+            itemId: 'edit100PercentMatchLableText'
+        }]
+
+    }
+    ]
+
+    }]
+    }
+        ;
 
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
