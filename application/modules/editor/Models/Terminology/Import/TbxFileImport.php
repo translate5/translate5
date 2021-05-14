@@ -418,17 +418,17 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     private function saveParsedTbx()
     {
-        if ($this->terms) {
+        if (!empty($this->terms)) {
             $this->createOrUpdateElement($this->termModel, $this->terms, $this->termCollection, $this->mergeTerms);
             $this->terms = [];
         }
 
-        if ($this->attributes) {
+        if (!empty($this->attributes)) {
             $this->createOrUpdateElement($this->attributeModel, $this->attributes, $this->attributesCollection, $this->mergeTerms);
             $this->attributes = [];
         }
 
-        if ($this->transacGrps) {
+        if (!empty($this->transacGrps)) {
             $this->createOrUpdateElement($this->transacGrpModel, $this->transacGrps, $this->transacGrpCollection, $this->mergeTerms);
             $this->transacGrps = [];
         }

@@ -59,6 +59,15 @@ class editor_TermcollectionController extends ZfExtended_RestController
             $this->view->rows = $this->entity->getDataObject();
         }
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::decodePutData()
+     */
+    protected function decodePutData() {
+        parent::decodePutData();
+        unset($this->data->langResUuid);
+    }
 
     /***
      * Info: function incomplete!
@@ -221,6 +230,8 @@ class editor_TermcollectionController extends ZfExtended_RestController
 
     /***
      * Return the uploaded tbx files paths
+     *
+     * @throws ZfExtended_FileUploadException
      * @return array
      */
     private function getUploadedTbxFilePaths(): array

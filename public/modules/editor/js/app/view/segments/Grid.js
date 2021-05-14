@@ -392,7 +392,6 @@ Ext.define('Editor.view.segments.Grid', {
      */
     scrollTo: function(rowindex, config) {
         var me = this,
-            view = me.getView(),
             options = {
                 animate: false //may not be animated, to place the callback at the correct place 
             };

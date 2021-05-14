@@ -31,6 +31,8 @@ END LICENSE AND COPYRIGHT
  *
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
+ * @method string getLangResUuid() getLangResUuid()
+ * @method void setLangResUuid() setLangResUuid(string $guid)
  * @method string getName() getName()
  * @method void setName() setName(string $name)
  * @method string getColor() getColor()
@@ -368,6 +370,13 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             $this->targetLang=$this->getLanguageByField('targetLang');
         }
         return $this->targetLang;
+    }
+    
+    /**
+     * creates and sets a random uuid
+     */
+    public function createLangResUuid() {
+        $this->setLangResUuid(ZfExtended_Utils::uuid());
     }
     
     /***

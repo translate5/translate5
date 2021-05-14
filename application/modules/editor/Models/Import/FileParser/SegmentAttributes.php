@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Segment Attributes
  * This class is just used as datatype struct in the import fileparser to have IDE completion here
- * if we have new attrbiutes in the core code, they should be added here. 
+ * if we have new attrbiutes in the core code, they should be added here.
  * For Plugin purposes and flexible extension there exist the customMetaAttributes array as dynamic container
  */
 class editor_Models_Import_FileParser_SegmentAttributes {
@@ -68,7 +68,7 @@ class editor_Models_Import_FileParser_SegmentAttributes {
      * pretranslated state of the segment, calculated by the fileparser
      * @var boolean
      */
-    public $pretrans = false;
+    public $isPreTranslated = false;
     
     /**
      * autostateid of the segment, calculated by the fileparser
@@ -92,7 +92,7 @@ class editor_Models_Import_FileParser_SegmentAttributes {
      * Stores some state information about the target segment
      * @var string
      */
-    public $targetState; 
+    public $targetState;
     
     /**
      * Min Width of a segment (characters or pixel)
@@ -147,10 +147,10 @@ class editor_Models_Import_FileParser_SegmentAttributes {
     
     /**
      * The transunitId and fileId (or in general group id) if some segments are belonging together.
-     * For example in XLF there is one transunit with multiple mrk tags. 
+     * For example in XLF there is one transunit with multiple mrk tags.
      * Each MRK tag is one segment in translate5, through the transunitId the segments are grouped.
      * The value is fileId_transunitId
-     *  
+     *
      * @var string
      */
     public $transunitId;

@@ -104,6 +104,7 @@ class editor_ConfigController extends ZfExtended_RestController {
             case $this->entity::CONFIG_LEVEL_USER:
                 $userConfig=ZfExtended_Factory::get('editor_Models_UserConfig');
                 /* @var $userConfig editor_Models_UserConfig */
+                $oldValue = $userConfig->getCurrentValue($userGuid, $this->data->name);
                 $userConfig->updateInsertConfig($userGuid,$this->data->name,$value);
                 //this value may not be saved! It is just for setting the return value to the gui.
                 $this->entity->setValue($value);
@@ -123,7 +124,7 @@ class editor_ConfigController extends ZfExtended_RestController {
                 
                 $projectTasks= [$taskGuid];
                 if($task->isProject()){
-                    //if the current change is for project, load all task project, and set 
+                    //if the current change is for project, load all task project, and set
                     //this config for all project tasks
                     $projectTasks = $task->loadProjectTasks($task->getProjectId(),true);
                     $projectTasks = array_column($projectTasks, 'taskGuid');
@@ -131,6 +132,9 @@ class editor_ConfigController extends ZfExtended_RestController {
                 foreach ($projectTasks as $projectTask){
                     $taskConfig=ZfExtended_Factory::get('editor_Models_TaskConfig');
                     /* @var $taskConfig editor_Models_TaskConfig */
+                    if(!isset($oldValue)) {
+                        $oldValue = $taskConfig->getCurrentValue($projectTask, $this->data->name);
+                    }
                     $taskConfig->updateInsertConfig($projectTask,$this->data->name,$value);
                 }
                 
@@ -146,6 +150,7 @@ class editor_ConfigController extends ZfExtended_RestController {
             case $this->entity::CONFIG_LEVEL_CUSTOMER:
                 $customerConfig=ZfExtended_Factory::get('editor_Models_CustomerConfig');
                 /* @var $customerConfig editor_Models_CustomerConfig */
+                $oldValue = $customerConfig->getCurrentValue($customerId, $this->data->name);
                 $customerConfig->updateInsertConfig($customerId,$this->data->name,$value);
                 //this value may not be saved! It is just for setting the return value to the gui.
                 $this->entity->setValue($value);
@@ -174,7 +179,7 @@ class editor_ConfigController extends ZfExtended_RestController {
                 array_merge([
                     'name' => $this->data->name,
                     'value' => $value,
-                    'oldValue' => $this->entity->getOldValue('value')
+                    'oldValue' => $oldValue ?? $this->entity->getOldValue('value')
                 ],$logData));
         }
         
@@ -276,7 +281,7 @@ class editor_ConfigController extends ZfExtended_RestController {
      * When customerId exist in the requested params -> load customer specific config
      * When userGuid exist in the requested params -> load user specific config
      * When no param is provided -> load what the current user is allowed to load
-     * 
+     *
      * @return array
      */
     protected function loadConfig() {
