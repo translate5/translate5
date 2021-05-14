@@ -32,7 +32,8 @@ END LICENSE AND COPYRIGHT
  * Out of this table all desired analysis are calculated.
  *
  */
-class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis_Pretranslation {
+class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis_Pretranslation
+{
     const MAX_ERROR_PER_CONNECTOR = 2;
 
     /***
@@ -47,13 +48,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * Flag if pretranslations is active
      * @var string
      */
-    protected $pretranslate=false;
+    protected $pretranslate = false;
 
     /***
      * Flag if internal fuzzy will be calculated
      * @var string
      */
-    protected $internalFuzzy=false;
+    protected $internalFuzzy = false;
 
     protected $connectorErrorCount = [];
 
@@ -86,9 +87,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param integer $analysisId
      * @param string $taskState the real state of the task, the state in the Task Model will be matchanalysis
      */
-    public function __construct(editor_Models_Task $task, $analysisId, string $taskState){
+    public function __construct(editor_Models_Task $task, $analysisId, string $taskState)
+    {
         $this->task = $task;
-        $this->analysisId=$analysisId;
+        $this->analysisId = $analysisId;
         $this->taskState = $taskState;
         $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         parent::__construct($analysisId);
@@ -100,7 +102,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param Closure $progressCallback : call to update the workerModel progress. It expects progress as argument (progress = 100 / task segment count)
      * @return boolean
      */
-    public function calculateMatchrate(Closure $progressCallback = null){
+    public function calculateMatchrate(Closure $progressCallback = null)
+    {
 
         // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$this->task->getTaskGuid()]);
@@ -108,14 +111,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         $this->initConnectors();
 
-        if(empty($this->connectors)){
+        if (empty($this->connectors)) {
             return false;
         }
         $this->initRepetitions();
 
         $segmentCounter = 0;
 
-        foreach($segments as $segment) {
+        foreach ($segments as $segment) {
             /* @var $segment editor_Models_Segment */
 
             $segmentCounter++;
@@ -126,39 +129,39 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             //get the best match rate, respecting repetitions
             $bestMatchRateResult = $this->handleRepetition($segment);
 
-            if(!$this->pretranslate){
+            if (!$this->pretranslate) {
                 //report progress update
                 $progressCallback && $progressCallback($progress);
                 continue;
             }
             //if TM and Term pretranslation should not be used, we set it null here to trigger MT (if enabled)
-            if(!$this->usePretranslateTMAndTerm) {
+            if (!$this->usePretranslateTMAndTerm) {
                 $bestMatchRateResult = null;
             }
             $useMt = empty($bestMatchRateResult) || $bestMatchRateResult->matchrate < $this->pretranslateMatchrate;
-            $mtUsed=$this->usePretranslateMT && $useMt;
-            if($mtUsed) {
+            $mtUsed = $this->usePretranslateMT && $useMt;
+            if ($mtUsed) {
 
                 $bestMatchRateResult = $this->getMtResult($segment);
 
-                if(!empty($bestMatchRateResult)){
+                if (!empty($bestMatchRateResult)) {
                     //store the result for the repetitions, but only if there is not already a repeated result
-                    if(empty($this->repetitionByHash[$segment->getSourceMd5()])) {
+                    if (empty($this->repetitionByHash[$segment->getSourceMd5()])) {
                         $this->repetitionByHash[$segment->getSourceMd5()] = $bestMatchRateResult;
                         $segment->setTargetEdit($bestMatchRateResult->target);
                         $this->repetitionMasterSegments[$segment->getSourceMd5()] = $segment;
                     }
-                }else{
-                    $bestMatchRateResult=null;
+                } else {
+                    $bestMatchRateResult = null;
                 }
             }
             //if no mt is used but the matchrate is lower than the pretranslateMatchrate (match lower than pretranslateMatchrate comming from the TM)
-            if(!$mtUsed && !empty($bestMatchRateResult) && $bestMatchRateResult->matchrate < $this->pretranslateMatchrate){
-                $bestMatchRateResult=null;
+            if (!$mtUsed && !empty($bestMatchRateResult) && $bestMatchRateResult->matchrate < $this->pretranslateMatchrate) {
+                $bestMatchRateResult = null;
             }
 
             //if best matchrate results are found
-            if(!empty($bestMatchRateResult)) {
+            if (!empty($bestMatchRateResult)) {
                 $this->updateSegment($segment, $bestMatchRateResult);
             }
             //report progress update
@@ -175,13 +178,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param editor_Models_Segment $segment
      * @return stdClass
      */
-    protected function handleRepetition(editor_Models_Segment $segment) {
+    protected function handleRepetition(editor_Models_Segment $segment)
+    {
         //calculate and set segment hash
         $segmentHash = $segment->getSourceMd5();
 
         //lazy init, we need only instance, the here given $segment will be overwritten wuth the updateRepetition call
-        if(empty($this->repetitionUpdater)) {
-            $this->repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [$segment,$this->task->getConfig()]);
+        if (empty($this->repetitionUpdater)) {
+            $this->repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [$segment, $this->task->getConfig()]);
         }
 
         //check if the segment source hash exist in the repetition array
@@ -189,9 +193,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         //segment does not exist in repetition array -> query the tm save the best match rate per tm
         $hasRepetitions = in_array($segment->getId(), $this->segmentIdsWithRepetitions);
         $isRepetition = $hasRepetitions && array_key_exists($segmentHash, $this->repetitionMasterSegments);
-        if(! $isRepetition) {
-            $bestResult = $this->getBestResult($segment,true);
-            if(!$hasRepetitions) {
+        if (!$isRepetition) {
+            $bestResult = $this->getBestResult($segment, true);
+            if (!$hasRepetitions) {
                 // if the segment has no repetitions at all we just return the found result
                 return $bestResult;
             }
@@ -201,21 +205,21 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             return $this->repetitionByHash[$segmentHash] = $bestResult;
         }
         $masterHasResult = !empty($this->repetitionByHash[$segmentHash]);
-        if($masterHasResult && !$this->repetitionUpdater->updateRepetition($this->repetitionMasterSegments[$segmentHash], $segment)) {
+        if ($masterHasResult && !$this->repetitionUpdater->updateRepetition($this->repetitionMasterSegments[$segmentHash], $segment)) {
             //if repetition could not be updated, handle segment as it is a segment without repetitions,
             // we may not update the repetitionHash, this would interfer with the other repetitions
-            return $this->getBestResult($segment,true);
+            return $this->getBestResult($segment, true);
         }
         $repetitionRate = editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE;
         //get the best match rate for the repetition segment,
         // it can be context match (103%) which is better as the 102% repetition one
         // or the one stored for the repetition could be from a MT. So recalc here always.
-        $bestResult = $this->getBestResult($segment,false);
+        $bestResult = $this->getBestResult($segment, false);
         //save the repetition analysis with either 102% or 103% matchrate
         $this->saveAnalysis($segment, max($repetitionRate, $bestResult->matchrate ?? 0), 0);
 
         //if there is no match we can not update the target below
-        if(!$masterHasResult) {
+        if (!$masterHasResult) {
             //this means returning null:
             return $this->repetitionByHash[$segmentHash];
         }
@@ -242,15 +246,15 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $bestMatchRate=null;
 
         //query the segment for each assigned tm
-        foreach ($this->connectors as $languageResourceid => $connector){
+        foreach ($this->connectors as $languageResourceid => $connector) {
             /* @var $connector editor_Services_Connector */
 
-            if($this->isDisabledDueErrors($connector, $languageResourceid)) {
+            if ($this->isDisabledDueErrors($connector, $languageResourceid)) {
                 continue;
             }
 
             //if the current connector supports batch query, enable the batch query for this connector
-            if($connector->isBatchQuery() && $this->batchQuery){
+            if ($connector->isBatchQuery() && $this->batchQuery) {
                 $connector->enableBatch();
             }
 
@@ -259,8 +263,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
             try {
                 $matches = $this->getMatches($connector, $segment, $isMtResource);
-            }
-            catch(Exception $e) {
+            } catch (Exception $e) {
                 $this->handleConnectionError($e, $languageResourceid);
                 // in case of an error we produce an empty result container for that query and log the error so that the analysis can proceed
                 $matches = ZfExtended_Factory::get('editor_Services_ServiceResult');
@@ -268,11 +271,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
             $matchResults = $matches->getResult();
 
-            $matchRateInternal=new stdClass();
-            $matchRateInternal->matchrate=null;
+            $matchRateInternal = new stdClass();
+            $matchRateInternal->matchrate = null;
             //for each match, find the best match rate, and save it
-            foreach ($matchResults as $match){
-                if($matchRateInternal->matchrate > $match->matchrate){
+            foreach ($matchResults as $match) {
+                if ($matchRateInternal->matchrate > $match->matchrate) {
                     continue;
                 }
 
@@ -300,17 +303,16 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                     }
                 }
 
-                $matchRateInternal=$match;
-
+                $matchRateInternal = $match;
                 //store best match rate results(do not compare agains the mt results)
-                if($matchRateInternal->matchrate>$bestMatchRate && !$isMtResource){
-                    $bestMatchRateResult=$match;
-                    $bestMatchRateResult->internalLanguageResourceid=$languageResourceid;
+                if ($matchRateInternal->matchrate > $bestMatchRate && !$isMtResource) {
+                    $bestMatchRateResult = $match;
+                    $bestMatchRateResult->internalLanguageResourceid = $languageResourceid;
                 }
             }
 
             //no match rate is found in the languageResource result
-            if($matchRateInternal->matchrate==null){
+            if ($matchRateInternal->matchrate == null) {
                 $saveAnalysis && $this->saveAnalysis($segment, 0, $languageResourceid);
                 $matches->resetResult();
                 continue;
@@ -318,8 +320,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
             //$matchRateInternal contains always the highest matchrate from $matchResults
             //update the bestmatchrate if $matchRateInternal contains highest matchrate
-            if($matchRateInternal->matchrate>$bestMatchRate){
-                $bestMatchRate=$matchRateInternal->matchrate;
+            if ($matchRateInternal->matchrate > $bestMatchRate) {
+                $bestMatchRate = $matchRateInternal->matchrate;
             }
 
             //save the match analyses if needed
@@ -338,18 +340,19 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param integer $id
      * @return boolean
      */
-    protected function isDisabledDueErrors($connector, $id) {
+    protected function isDisabledDueErrors($connector, $id)
+    {
         //check if the connector itself is disabled
-        if($this->connectors[$id]->isDisabled()){
+        if ($this->connectors[$id]->isDisabled()) {
             return true;
         }
 
-        if(!isset($this->connectorErrorCount[$id]) || $this->connectorErrorCount[$id] <= self::MAX_ERROR_PER_CONNECTOR) {
+        if (!isset($this->connectorErrorCount[$id]) || $this->connectorErrorCount[$id] <= self::MAX_ERROR_PER_CONNECTOR) {
             return false;
         }
 
         $langRes = $connector->getLanguageResource();
-        $this->log->warn('E1101', 'Disabled Language Resource {name} ({service}) for analysing and pretranslation due too much errors.',[
+        $this->log->warn('E1101', 'Disabled Language Resource {name} ({service}) for analysing and pretranslation due too much errors.', [
             'task' => $this->task,
             'languageResource' => $langRes,
             'name' => $langRes->getName(),
@@ -364,7 +367,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param Exception $e
      * @param int $id
      */
-    protected function handleConnectionError(Exception $e, $id) {
+    protected function handleConnectionError(Exception $e, $id)
+    {
         $this->log->exception($e, [
             'level' => $this->log::LEVEL_WARN,
             'domain' => $this->log->getDomain(),
@@ -379,8 +383,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param bool $isMtResource
      * @return editor_Services_ServiceResult
      */
-    protected function getMatches(editor_Services_Connector $connector, editor_Models_Segment $segment, $isMtResource) {
-        if($isMtResource){
+    protected function getMatches(editor_Services_Connector $connector, editor_Models_Segment $segment, $isMtResource)
+    {
+        if ($isMtResource) {
             //the resource is of type mt, so we do not need to query the mt for results, since we will receive always the default MT defined matchrate
             //the mt resource only will be searched when pretranslating
 
@@ -390,12 +395,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
             /* @var $internalTag editor_Models_Segment_InternalTag */
             $queryString = $internalTag->toXliffPaired($queryString, true);
-            $matches=ZfExtended_Factory::get('editor_Services_ServiceResult',[
+            $matches = ZfExtended_Factory::get('editor_Services_ServiceResult', [
                 $queryString
             ]);
             /* @var $dummyResult editor_Services_ServiceResult */
             $matches->setLanguageResource($connector->getLanguageResource());
-            $matches->addResult('',$connector->getDefaultMatchRate());
+            $matches->addResult('', $connector->getDefaultMatchRate());
             return $matches;
         }
 
@@ -403,7 +408,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matches = $connector->query($segment);
 
         //update the segment with custom target in fuzzy tm
-        if($this->internalFuzzy && $connector->isInternalFuzzy()){
+        if ($this->internalFuzzy && $connector->isInternalFuzzy()) {
             $origTarget = $segment->getTargetEdit();
             $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
             $segment->setTargetEdit($dummyTargetText);
@@ -420,8 +425,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param mixed $matchRateResult : it can be stdClass (opentm2 match result) or int (only the matchrate)
      * @param int $languageResourceid
      */
-    protected function saveAnalysis($segment,$matchRateResult,$languageResourceid){
-        $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
+    protected function saveAnalysis($segment, $matchRateResult, $languageResourceid)
+    {
+
+        $matchAnalysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
         /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
         $matchAnalysis->setSegmentId($segment->getId());
         $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
@@ -430,27 +437,35 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setLanguageResourceid($languageResourceid);
         $matchAnalysis->setWordCount($segment->meta()->getSourceWordCount());
         $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
+        $matchAnalysis->setUuid(ZfExtended_Utils::uuid());
 
-        $isFuzzy=false;
+        $type = '';
+        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
+
+        $languageresource->load($languageResourceid);
+        $matchAnalysis->setType($languageresource->getResourceType());
+        $isFuzzy = false;
         $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
-        if(isset($matchRateResult) && is_object($matchRateResult)){
+        if (isset($matchRateResult) && is_object($matchRateResult)) {
             //ignore internal fuzzy match target
             $isFuzzy = strpos($matchRateResult->target, $dummyTargetText) !== false;
         }
-        $matchAnalysis->setInternalFuzzy($isFuzzy  ? 1 : 0);
+        $matchAnalysis->setInternalFuzzy($isFuzzy ? 1 : 0);
         $matchAnalysis->save();
     }
 
     /**
      * Inits data for repetition handling
      */
-    protected function initRepetitions(){
-        $segmentModel=ZfExtended_Factory::get('editor_Models_Segment');
+    protected function initRepetitions()
+    {
+        $segmentModel = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segmentModel editor_Models_Segment */
-        $results=$segmentModel->getRepetitions($this->task->getTaskGuid());
+        $results = $segmentModel->getRepetitions($this->task->getTaskGuid());
         $this->segmentIdsWithRepetitions = array_column($results, 'id');
         $this->repetitionByHash = [];
-        $this->repetitionMasterSegments= [];
+        $this->repetitionMasterSegments = [];
     }
 
     /***
@@ -458,10 +473,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      *
      * @return array
      */
-    protected function initConnectors(){
-        $languageResources=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+    protected function initConnectors()
+    {
+        $languageResources = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
-        $assocs=$languageResources->loadByAssociatedTaskGuid($this->task->getTaskGuid());
+        $assocs = $languageResources->loadByAssociatedTaskGuid($this->task->getTaskGuid());
 
         $availableConnectorStatus = [
             editor_Services_Connector_Abstract::STATUS_AVAILABLE,
@@ -469,13 +485,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             editor_Services_Connector_FilebasedAbstract::STATUS_NOT_LOADED
         ];
 
-        if(empty($assocs)){
+        if (empty($assocs)) {
             return array();
         }
 
-        foreach ($assocs as $assoc){
-            $languageresource=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-            /* @var $languageresource editor_Models_LanguageResources_LanguageResource  */
+        foreach ($assocs as $assoc) {
+            $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
 
             $languageresource->load($assoc['id']);
 
@@ -483,14 +499,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             /* @var $manager editor_Services_Manager */
             $resource = $manager->getResource($languageresource);
 
-            $connector=null;
+            $connector = null;
             try {
-                $connector=$manager->getConnector($languageresource,$this->task->getSourceLang(),$this->task->getTargetLang(),$this->task->getConfig());
+                $connector = $manager->getConnector($languageresource, $this->task->getSourceLang(), $this->task->getTargetLang(), $this->task->getConfig());
 
                 //throw a worning if the language resource is not available
                 $status = $connector->getStatus($resource);
-                if(!in_array($status, $availableConnectorStatus)){
-                    $this->log->warn('E1239','MatchAnalysis Plug-In: Language resource "{name}" has status "{status}" and is not available for match analysis and pre-translations.',[
+                if (!in_array($status, $availableConnectorStatus)) {
+                    $this->log->warn('E1239', 'MatchAnalysis Plug-In: Language resource "{name}" has status "{status}" and is not available for match analysis and pre-translations.', [
                         'task' => $this->task,
                         'name' => $languageresource->getName(),
                         'status' => $status,
@@ -501,26 +517,26 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 }
                 //collect the mt resource, so it can be used for pretranslations if needed
                 //collect only if it has matchrate >= of the current set pretranslationMatchrate
-                if($resource->getType()==editor_Models_Segment_MatchRateType::TYPE_MT){
-                    $this->mtConnectors[]=$connector;
+                if ($resource->getType() == editor_Models_Segment_MatchRateType::TYPE_MT) {
+                    $this->mtConnectors[] = $connector;
                 }
                 //store the languageResource
                 $this->resources[$languageresource->getId()] = $languageresource;
             } catch (Exception $e) {
 
-    //FIXME this try catch should not be needed anymore, after refactoring of December 2020
+                //FIXME this try catch should not be needed anymore, after refactoring of December 2020
 
                 $errors = [];
                 //if the exception is of type ZfExtended_ErrorCodeException, get the additional exception info, and log it
-                if($e instanceof ZfExtended_ErrorCodeException){
+                if ($e instanceof ZfExtended_ErrorCodeException) {
                     $errors = $e->getErrors() ?? [];
                 }
-                $this->log->warn('E1102', 'Unable to use connector from Language Resource "{name}". Error was: "{msg}".',array_merge( [
+                $this->log->warn('E1102', 'Unable to use connector from Language Resource "{name}". Error was: "{msg}".', array_merge([
                     'task' => $this->task,
                     'name' => $languageresource->getName(),
                     'msg' => $e->getMessage(),
                     'languageResource' => $languageresource,
-                ],$errors));
+                ], $errors));
                 $this->log->exception($e, [
                     'task' => $this->task,
                     'level' => $this->log::LEVEL_WARN,
@@ -530,17 +546,17 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             }
 
             //ignore non analysable resources
-            if(!$resource->getAnalysable()){
+            if (!$resource->getAnalysable()) {
                 continue;
             }
 
-            $this->connectors[$assoc['id']]=[];
+            $this->connectors[$assoc['id']] = [];
 
             //if internal fuzzy is active and the connector supports the internal fuzzy calculation, get the fuzzy connector
-            if($this->internalFuzzy){
-                $this->connectors[$assoc['id']]=$connector->initForFuzzyAnalysis($this->analysisId);
-            }else{
-                $this->connectors[$assoc['id']]=$connector;
+            if ($this->internalFuzzy) {
+                $this->connectors[$assoc['id']] = $connector->initForFuzzyAnalysis($this->analysisId);
+            } else {
+                $this->connectors[$assoc['id']] = $connector;
             }
         }
         return $this->connectors;
@@ -549,13 +565,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     /***
      * Remove fuzzy resources from the opentm2
      */
-    protected function removeFuzzyResources(){
-        if(empty($this->connectors)){
+    protected function removeFuzzyResources()
+    {
+        if (empty($this->connectors)) {
             return;
         }
 
-        foreach($this->connectors as $connector){
-            if($connector->isInternalFuzzy()){
+        foreach ($this->connectors as $connector) {
+            if ($connector->isInternalFuzzy()) {
                 $connector->delete();
             }
         }
@@ -564,14 +581,15 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     /***
      * Remove batch cache for all batch connectors if the batch query is enabled
      */
-    protected function removeBatchCache(){
-        if(empty($this->connectors) || !$this->batchQuery){
+    protected function removeBatchCache()
+    {
+        if (empty($this->connectors) || !$this->batchQuery) {
             return;
         }
         $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
         /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */
-        foreach($this->connectors as $connector){
-            if($connector->isBatchQuery()){
+        foreach ($this->connectors as $connector) {
+            if ($connector->isBatchQuery()) {
                 $model->deleteForLanguageresource($connector->getLanguageResource()->getId());
             }
         }
@@ -580,7 +598,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     /***
      * Remove not required analysis object and data
      */
-    public function clean(){
+    public function clean()
+    {
         //remove fuzzy languageResource from opentm2
         $this->removeFuzzyResources();
         //clean the batch query cache if there is one
@@ -589,15 +608,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->connectors = null;
     }
 
-    public function setPretranslate($pretranslate){
-        $this->pretranslate=$pretranslate;
+    public function setPretranslate($pretranslate)
+    {
+        $this->pretranslate = $pretranslate;
     }
 
-    public function setInternalFuzzy($internalFuzzy) {
-        $this->internalFuzzy=$internalFuzzy;
+    public function setInternalFuzzy($internalFuzzy)
+    {
+        $this->internalFuzzy = $internalFuzzy;
     }
 
-    public function setBatchQuery(bool $batchQuery) {
+    public function setBatchQuery(bool $batchQuery)
+    {
         $this->batchQuery = $batchQuery;
     }
 }

@@ -19,7 +19,7 @@ _translate5.sh()
         opts=("--help:Display this help message" "--quiet:Do not output any message" "--verbose:Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug" "--version:Display this application version" "--ansi:Force ANSI output" "--no-ansi:Disable ANSI output" "--no-interaction:Do not ask any interactive question")
     elif [[ $cur == $com ]]; then
         state="command"
-        coms=("config:List, get and set translate5 configuration values." "help:Displays help for a command" "list:Lists commands" "log:Query the translate5 log" "database\:update:Maintain database updates." "release\:notes:Updates the release notes, only usable in development installations." "session\:impersonate:Returns a URL to authenticate password less as the given user." "task\:clean:provides information about and the possibility to delete hanging import / erroneous tasks and orphaned task data directories" "worker\:list:Prints a list of current workers or details about one worker")
+        coms=("changelog:Show the last changelog entries." "config:List, get and set translate5 configuration values." "help:Displays help for a command" "list:Lists commands" "log:Query the translate5 log" "database\:update:Maintain database updates." "dev\:createtest:Development: Creates a new API test, gets the name \(ISSUE-XXX\) from the current branch." "dev\:githook:Development: Executes code checks invoked by git hooks. The checks are implemented in here." "dev\:newdbchange:Development: Creates a new DB alter file, gets the filename from the current branch." "dev\:newmodel:Development: Creates a new model php file." "maintenance\:announce:Sends an announcement via email with the given time and message to the configured users." "maintenance\:disable:Disable the maintenance mode." "maintenance\:message:Sets just a message in the maintenance announce message box to application users." "maintenance\:set:Sets the maintenance mode." "maintenance\:status:Returns information about the maintenance mode." "plugin\:disable:Deactivate one or more plug-ins." "plugin\:enable:Activate one or more plug-ins." "plugin\:list:List all installed plugins." "release\:notes:Updates the release notes, only usable in development installations." "segment\:history:Shows the segment editing history, from the oldest to the current version." "session\:impersonate:Returns a URL to authenticate password less as the given user." "system\:check:Checks the system requirements." "task\:clean:provides information about and the possibility to delete hanging import / erroneous tasks and orphaned task data directories" "worker\:list:Prints a list of current workers or details about one worker")
     fi
 
     case $state in
@@ -29,8 +29,12 @@ _translate5.sh()
         option)
             case "$com" in
 
+            changelog)
+            opts+=("--important:Show the important release notes only.")
+            ;;
+
             config)
-            opts+=("--detail:Show config details on listing" "--modified:Show only modified values on listing" "--empty:Set the value to an empty string \(which can not be given as set argument\).")
+            opts+=("--detail:Show config details on listing" "--modified:Show only modified values on listing" "--empty:Set the value to an empty string \(which can not be given as set argument\)." "--comment:Add a comment for this config value")
             ;;
 
             help)
@@ -46,23 +50,79 @@ _translate5.sh()
             ;;
 
             database:update)
-            opts+=("--import:Imports all new database files or a single file if a filename / hash was given.")
+            opts+=("--import:Imports all new database files or a single file if a filename / hash was given." "--assume-imported:WARNING: Instead of importing the selected file it is just marked as imported without applying the content to the DB!")
+            ;;
+
+            dev:createtest)
+            opts+=("--name:Force a name \(must end with Test!\) instead of getting it from the branch.")
+            ;;
+
+            dev:githook)
+            opts+=()
+            ;;
+
+            dev:newdbchange)
+            opts+=("--php:Creates a PHP instead of a SQL file." "--name:Force a name instead of getting it from the branch.")
+            ;;
+
+            dev:newmodel)
+            opts+=("--name:Force to enter Model name" "--table:Force to enter database table name" "--plugin:Plugin name when the current files are create in plugin contenxt.")
+            ;;
+
+            maintenance:announce)
+            opts+=("--message:Sets the message announced to the users about the maintenance.")
+            ;;
+
+            maintenance:disable)
+            opts+=()
+            ;;
+
+            maintenance:message)
+            opts+=()
+            ;;
+
+            maintenance:set)
+            opts+=("--message:Sets the message shown to the users about the maintenance." "--announce:Also send an announcement about the set maintenance. See maintenance:announce for details.")
+            ;;
+
+            maintenance:status)
+            opts+=()
+            ;;
+
+            plugin:disable)
+            opts+=()
+            ;;
+
+            plugin:enable)
+            opts+=()
+            ;;
+
+            plugin:list)
+            opts+=()
             ;;
 
             release:notes)
             opts+=()
             ;;
 
+            segment:history)
+            opts+=("--task:Give a task ID or taskGuid here, then the argument "segment" is interpreted as segment nr in that task instead as a unique segment id.")
+            ;;
+
             session:impersonate)
-            opts+=()
+            opts+=("--segment-id:Give a segment ID to generate a URL pointing directly to that segment.")
+            ;;
+
+            system:check)
+            opts+=("--pre-installation:In installation mode only the basic environment check \(or the given module\) is called and the Zend Application is not initialized")
             ;;
 
             task:clean)
-            opts+=("--delete-error:deletes one \(with ID\) or all tasks with errors" "--delete-import:deletes one task in state import" "--delete-data:deletes all orphaned data folders")
+            opts+=("--delete-error:deletes one \(with ID\) or all tasks with errors" "--delete-import:deletes one task in state import" "--set-to-error:sets a task to status error \(for example to gain access to clone/delete/download of a hanging import task\)" "--delete-data:deletes all orphaned data folders")
             ;;
 
             worker:list)
-            opts+=()
+            opts+=("--all:List also done and defunc workers.")
             ;;
 
             esac

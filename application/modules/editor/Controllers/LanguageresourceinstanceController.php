@@ -540,6 +540,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->data = $this->getAllParams(); //since its a fileupload, this is a normal POST
         $this->convertAndWarnOldData();
         $this->setDataInEntity($this->postBlacklist);
+        $this->entity->createLangResUuid();
 
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
@@ -668,6 +669,15 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->log->warn('E9999','The resourcesCustomersHidden field is deprecated! See https://confluence.translate5.net/display/TAD/LanguageResources%3A+Instance');
     }
 
+    /**
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::decodePutData()
+     */
+    protected function decodePutData() {
+        parent::decodePutData();
+        unset($this->data->langResUuid);
+    }
+    
     /**
      * Imports an additional file which is transfered to the desired languageResource
      */

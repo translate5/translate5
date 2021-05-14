@@ -30,6 +30,7 @@ END LICENSE AND COPYRIGHT
  * Encapsulates the Default Notifications triggered by the Workflow
  * Basicly the Notifications are E-Mail based. But this class can be overwritten
  * to redirect the generated mailer texts to over notification channels
+ * Warning: the here listed public methods are called as configured in LEK_workflow_action table!
  */
 class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
 

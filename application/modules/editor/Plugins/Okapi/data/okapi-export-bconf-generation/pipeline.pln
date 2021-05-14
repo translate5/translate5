@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rainbowPipeline version="1"><step class="net.sf.okapi.steps.common.RawDocumentToFilterEventsStep"></step>
+<step class="net.sf.okapi.steps.rainbowkit.postprocess.MergingStep">#v1
+preserveSegmentation.b=false
+returnRawDocument.b=false
+forceTargetLocale.b=false
+overrideOutputPath=</step>
+</rainbowPipeline>

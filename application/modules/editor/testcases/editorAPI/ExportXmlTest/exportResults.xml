@@ -1,0 +1,28 @@
+<task name="analyse">
+<taskInfo taskId="{d146ff9a-ff84-47e8-b5eb-8946b6726d8c}" runAt="2021-04-15 00:00:00" runTime="110.19 seconds">
+<project name="testfile-ohne-terme" number="9"/>
+<language lcid="1.2.1" name="English"/>
+<customer name="defaultcustomer"/>
+<tm name="dummy, dummy - internal Fuzzies, test2, termCollection, , "/>
+<settings reportInternalFuzzyLeverage="Yes" reportLockedSegmentsSeparately="no" reportCrossFileRepetitions="yes" minimumMatchScore="lowestFuzzyValueThatIsConfiguredToBeShownInTranslate5" searchMode="bestWins" missingFormattingPenalty="1" differentFormattingPenalty="1" multipleTranslationsPenalty="1" autoLocalizationPenalty="0" textReplacementPenalty="0" fullRecallMatchedWords="2" partialRecallMatchedWords="n/a" fullRecallSignificantWords="2" partialRecallSignificantWords="n/a"/>
+</taskInfo>
+<batchTotal>
+<analyse>
+<perfect words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<inContextExact words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<exact words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<locked words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<crossFileRepeated words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<repeated words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<total words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<new words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<newBaseline words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<newLearnings words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<fuzzy min="50" max="59" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<fuzzy min="60" max="69" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<fuzzy min="70" max="79" words="7" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<fuzzy min="80" max="89" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+<fuzzy min="90" max="99" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+</analyse>
+</batchTotal>
+</task>
