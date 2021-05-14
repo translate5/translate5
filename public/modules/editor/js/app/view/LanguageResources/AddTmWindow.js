@@ -151,48 +151,46 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                 },{
                     xtype:'customers',
                     name:'customerIds[]',
-                    listeners:{
-                        change:'onCustomersTagFieldChange'
-                    },
+                    itemId:'resourcesCustomers',
+                    dataIndex:'customerIds',
+                    reference:'resourcesCustomers',
+                    publishes: 'value',
                     bind:{
                         store:'{customers}'
                     },
                     fieldLabel:me.strings.customers,
-                    itemId:'resourcesCustomers',
-                    dataIndex:'customerIds',
-                    allowBlank: false,
-                    reference:'resourcesCustomers',
+                    allowBlank: false
                 },{
                     xtype:'tagfield',
                     name:'customerUseAsDefaultIds[]',
-                    listeners:{
-                        change:'onCustomersReadTagFieldChange'
-                    },
                     itemId:'useAsDefault',
+                    dataIndex:'customerUseAsDefaultIds',
+                    reference:'useAsDefault',
+                    publishes: 'value',
                     bind:{
                         store:'{customersDefaultRead}'
                     },
-                    fieldLabel:me.strings.useAsDefault,
-                    reference:'useAsDefault',
-                    displayField: 'name', 
-                    valueField: 'id', 
-                    queryMode: 'local', 
-                    dataIndex:'customerUseAsDefaultIds'
+                    queryMode: 'local',
+                    displayField: 'name',
+                    valueField: 'id',
+                    fieldLabel:me.strings.useAsDefault
                 },{
                     xtype:'tagfield',
                     name:'customerWriteAsDefaultIds[]',
+                    itemId:'writeAsDefault',
+                    dataIndex:'customerWriteAsDefaultIds',
+                    bind:{
+                        store:'{customersDefaultWrite}',
+                        hidden:'{!isTmResourceType}',
+                        disabled:'{!isTmResourceType}'
+                    },
                     listeners:{
                         change:'onCustomersWriteTagFieldChange'
                     },
-                    itemId:'writeAsDefault',
                     fieldLabel:me.strings.writeAsDefault,
-                    bind:{
-                        store:'{customersDefaultWrite}'
-                    },
-                    displayField: 'name', 
-                    valueField: 'id', 
-                    queryMode: 'local', 
-                    dataIndex:'customerWriteAsDefaultIds'
+                    displayField: 'name',
+                    valueField: 'id',
+                    queryMode: 'local'
                 },{
                     xtype: 'hiddenfield',
                     name: 'serviceType',

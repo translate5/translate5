@@ -66,10 +66,10 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
             $customers[] = $customer->getId();
         }
         
-        // ensure that only useAsDefault customers are used, which are added also as ccustomers
+        // ensure that only useAsDefault customers are used, which are added also as customers
         $useAsDefault = array_intersect($useAsDefault, $customers);
 
-        // ensure that only writeAsDefault customers are used, which are added also as ccustomers
+        // ensure that only writeAsDefault customers are used, which are added also as useAsDefault(read as default)
         $writeAsDefault = array_intersect($writeAsDefault, $customers);
         
         $this->addAssocs($id, $customers, $useAsDefault,$writeAsDefault);
