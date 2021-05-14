@@ -84,6 +84,7 @@ abstract class editor_Models_Terminology_Import_AbstractTerminology
                     $sqlInsert = $this->prepareSqlInsert($element, $count);
                     $sqlParam .= $sqlInsert['tableParam'];
                 }
+
             } else {
                 $sqlInsert = $this->prepareSqlInsert($element, $count);
                 $sqlParam .= $sqlInsert['tableParam'];
