@@ -439,14 +439,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setLanguageResourceid($languageResourceid);
         $matchAnalysis->setWordCount($segment->meta()->getSourceWordCount());
         $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
-        $matchAnalysis->setUuid(ZfExtended_Utils::uuid());
 
-        $type = '';
-        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
-
-        $languageresource->load($languageResourceid);
-        $matchAnalysis->setType($languageresource->getResourceType());
         $isFuzzy = false;
         $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
         if (isset($matchRateResult) && is_object($matchRateResult)) {

@@ -48,6 +48,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
             noRecords=!record;
         
         view.down('#exportExcel').setDisabled(noRecords);
+        view.down('#exportXml').setDisabled(noRecords);
     	if(noRecords){
     		return;
     	}
