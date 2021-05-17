@@ -152,15 +152,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         $this->analysis->setPretranslateMt($params['pretranslateMt']);
         $this->analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
         $this->analysis->setBatchQuery($params['batchQuery']);
-        $type = '';
-        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
 
-        $languageresource->loadByAssociatedTaskGuid($this->task->getTaskGuid());
-
-        $matchAnalysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
-        $matchAnalysis->setType($type);
-        $matchAnalysis->save();
 
         $updateCounter = 0;
         $lastProgress = 0;
