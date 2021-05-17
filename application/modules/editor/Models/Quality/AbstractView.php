@@ -112,10 +112,15 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $hasNumFalsePositives = false;
     /**
-     * Configures the generated data (currently unused)
+     * Configures if we show all categories if they're empty or not
      * @var boolean
      */
-    protected $hasSegmentIds = false;
+    protected $hasEmptyCategories = false;
+    /**
+     * Configures if the mqm are shown flat or as deeper nested tree
+     * @var boolean
+     */
+    protected $mqmIsFlat = false;
     /**
      * @var boolean
      */
@@ -208,10 +213,9 @@ abstract class editor_Models_Quality_AbstractView {
         $root->qcategory = null;
         $root->qcomplete = true;        
         $root->expanded = true;
-        $root->expandable = false;
+        $root->expandable = false; // removes the error in front of the root node
         $root->checked = $this->getCheckedVal($root->qtype, $root->qcategory);
         $root->text = $this->manager->getTranslate()->_('Alle Kategorien');
-        $root->segmentIds = [];
         $root->children = $this->rows;
         return [ $root ];
     }
@@ -248,6 +252,7 @@ abstract class editor_Models_Quality_AbstractView {
         foreach($this->manager->getAllTypes() as $type){
             if(!$this->excludeMQM || $type != editor_Segment_Tag::TYPE_MQM){
                 $rubrics[] = $this->createRubricRow($type);
+                
             }
         }
         usort($rubrics, 'editor_Models_Quality_AbstractView::compareByTitle');
@@ -269,9 +274,6 @@ abstract class editor_Models_Quality_AbstractView {
                         $this->rowsByType[$row->type][$row->category] = $this->createCategoryRow($row, false);
                     }
                     $this->rowsByType[$row->type][$row->category]->qcount++;
-                    if($this->hasSegmentIds){
-                        $this->rowsByType[$row->type][$row->category]->segmentIds[] = $row->segmentId;
-                    }
                     if($this->hasNumFalsePositives && $row->falsePositive == 1){
                         $this->rowsByType[$row->type][$row->category]->qcountfp++;
                     }
@@ -295,15 +297,22 @@ abstract class editor_Models_Quality_AbstractView {
                 $rubric->qtotal = $rubric->qcount;
                 if($rubric->qtype == editor_Segment_Tag::TYPE_MQM){
                     // create mqm-subtree if we have mqms
-                    if($rubric->qcount > 0){
+                    if($rubric->qcount > 0 || $this->hasEmptyCategories){
                         $this->addMqmRows($rubric, $this->rowsByType[$rubric->qtype]);
                     }
                 } else {
                     $rubric->children = [];
-                    ksort($this->rowsByType[$rubric->qtype]);
-                    foreach($this->rowsByType[$rubric->qtype] as $category => $row){
+                    $qualityProvider = $this->manager->getProvider($rubric->qtype);
+                    $rubricCats = ($this->hasEmptyCategories) ? $qualityProvider->getAllCategories($this->task) : array_keys($this->rowsByType[$rubric->qtype]);
+                    ksort($rubricCats);
+                    foreach($rubricCats as $category){
                         if($category != self::RUBRIC){
-                            $rubric->children[] = $row;
+                            if(array_key_exists($category, $this->rowsByType[$rubric->qtype])){
+                                $rubric->children[] = $this->rowsByType[$rubric->qtype][$category];
+                            } else {
+                                $row = $this->createNonDbRow($qualityProvider->translateCategory($this->translate, $category, $this->task), $rubric->qtype);
+                                $rubric->children[] = $row;
+                            }
                         }
                     }
                 } 
@@ -328,7 +337,7 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected function finalizeTree(stdClass $row, $isRubric=true){
         if(property_exists($row, 'children') && count($row->children) > 0){
-            $row->expanded = true;
+            $row->expanded = ($this->hasEmptyCategories) ? ((property_exists($row, 'qtotal') && $row->qtotal > 0)) : true;
             foreach($row->children as $child){
                 $this->finalizeTree($child, false);
             }
@@ -377,9 +386,6 @@ abstract class editor_Models_Quality_AbstractView {
             $row->children = [];
             $row->qcategory = NULL;
         }
-        if($this->hasSegmentIds){
-            $row->segmentIds = [];
-        }
         if($this->hasNumFalsePositives){
             $row->qcountfp = 0;
         }
@@ -401,9 +407,6 @@ abstract class editor_Models_Quality_AbstractView {
             $row->children = [];
             $row->qcategory = $dbRow->category;
             $row->qcatidx = $dbRow->categoryIndex;
-        }
-        if($this->hasSegmentIds){
-            $row->segmentIds = [];
         }
         if($this->hasNumFalsePositives){
             $row->qcountfp = 0;
@@ -427,9 +430,6 @@ abstract class editor_Models_Quality_AbstractView {
         if($this->isTree){
             $row->children = [];
             $row->qcategory = $category;
-        }
-        if($this->hasSegmentIds){
-            $row->segmentIds = [];
         }
         if($this->hasNumFalsePositives){
             $row->qcountfp = 0;
@@ -464,7 +464,7 @@ abstract class editor_Models_Quality_AbstractView {
         foreach($mqmNodes as $mqmNode){
             $child = $this->createMqmRowFromNode($mqmNode);
             // only add mqm-children that have segments
-            if($child->qtotal > 0){
+            if($child->qtotal > 0 || $this->hasEmptyCategories){
                 $rubric->children[] = $child;
             }
         }
@@ -486,7 +486,7 @@ abstract class editor_Models_Quality_AbstractView {
             $addTotal = 0;
             foreach($mqmNode->children as $mqmChild){
                 $child = $this->createMqmRowFromNode($mqmChild);
-                if($child->qtotal > 0){
+                if($child->qtotal > 0 || $this->hasEmptyCategories){
                     $addTotal += $child->qtotal;
                     $row->children[] = $child;
                 }

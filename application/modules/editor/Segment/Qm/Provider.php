@@ -77,7 +77,7 @@ class editor_Segment_Qm_Provider extends editor_Segment_Quality_Provider {
     }
     
     public function getAllCategories(editor_Models_Task $task) : array {
-        $typesByIndex = $this->getTypesByIndex();
+        $typesByIndex = array_keys($this->getTypesByIndex());
         return array_map(function ($id){ return editor_Segment_Qm_Provider::createCategoryVal($id); }, $typesByIndex);
     }
     
