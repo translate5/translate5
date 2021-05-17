@@ -31,22 +31,13 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
     alias: 'controller.matchAnalysisPanel',
 
     exportAction:function (type){
-        var me = this,
+        var me= this,
             params = {},
             task = me.getView().lookupViewModel(true).get('currentTask');
         params["taskGuid"] = task.get('taskGuid');
-        params["type"] = type;
+        params["type"] = type.itemId;
         window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
     },
-
-    onExcelExportClick:function(){
-        this.exportAction("excel");
-    },
-
-    onXmlExportClick:function(){
-        this.exportAction("xml");
-    },
-
     /***
      * On match analysis record is loaded in the store
      */
@@ -57,6 +48,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
             noRecords=!record;
         
         view.down('#exportExcel').setDisabled(noRecords);
+        view.down('#exportXml').setDisabled(noRecords);
     	if(noRecords){
     		return;
     	}
