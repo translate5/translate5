@@ -164,17 +164,15 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         /* @var $customer editor_Models_Customer */
         $customerData = $customer->loadByIds([$task->getCustomerId()]);
 
-        $sourceLangIds = $task->getSourceLang();
-
         $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languagesModel editor_Models_Languages */
-        $languagesModel->load($sourceLangIds[0]);
+        $languagesModel->load($task->getSourceLang());
         $langName = $languagesModel->getLangName();
         $lcid = $languagesModel->getLcid();
 
 
         $renderData = [
-            'resourceName' => '',
+            'resourceName' => [],
             'resourceColor' => '',
             'created' => '',
             'internalFuzzy' => 'No',
@@ -196,7 +194,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         $i = 0;
         foreach ($rows as $row) {
             if(!empty($row['resourceName']) ){
-                $renderData['resourceName']  .= !empty($renderData['resourceName']) ? ', '.$row['resourceName'] : $row['resourceName'];
+                $renderData['resourceName'][] = $row['resourceName'];
             }
 
 
@@ -228,10 +226,10 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
 
 
 
-        $xml_header = '<?xml version="1.0" encoding="UTF-8"?><task name="analyse"></task><!-- 
-The format of the file should look structurally like - 
+        $xml_header = '<?xml version="1.0" encoding="UTF-8"?><task name="analyse"></task><!--
+The format of the file should look structurally like -
 no file elements, since translate5 does not support a file specific analysis right now
-for the settings element the following values should be set: 
+for the settings element the following values should be set:
 reportInternalFuzzyLeverage="translate5Value" reportLockedSegmentsSeparately="no" reportCrossFileRepetitions="yes" minimumMatchScore="lowestFuzzyValueThatIsConfiguredToBeShownInTranslate5" searchMode="bestWins"
 In the batchTotal analysis section the following applies
 For the following elements all numeric attributes are always set to "0", because they have no analogon currently in translate5:
@@ -268,7 +266,7 @@ segments-->';
         $innerNode2->addAttribute('name', $customerData[0]['name']);
 
         $inner_node3 = $subnode1->addChild('tm');
-        $inner_node3->addAttribute('name', $renderData['resourceName']);
+        $inner_node3->addAttribute('name', join(',', $renderData['resourceName']));
 
         $internalFuzzy = $renderData['internalFuzzy'];
         $innerNode4 = $subnode1->addChild('settings');
