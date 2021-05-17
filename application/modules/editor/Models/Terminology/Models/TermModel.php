@@ -268,9 +268,10 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      * @param mixed $limit
      * @param array $processStats
      * @param bool $total
+     * @param int $noTermDefinedFor
      * @return array
      */
-    public function searchTermByLanguage(string $queryString, string $languages, array $collectionIds, $limit = null, array $processStats, &$total = null): array
+    public function searchTermByLanguage(string $queryString, string $languages, array $collectionIds, $limit = null, array $processStats, &$total = null, $noTermDefinedFor = null): array
     {
         $termObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_Term');
 
@@ -299,6 +300,11 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ->where('`'.$tableTerm.'`.languageId IN(?)', explode(',', $languages))
             ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
             ->where('`'.$tableTerm.'`.processStatus IN(?)',$processStats);
+
+        if ($noTermDefinedFor) {
+            $s->joinLeft(['t2' => $tableTerm], '`'.$tableTerm.'`.`termEntryId` = `t2`.`termEntryId` AND `t2`.`languageId` = "' . $noTermDefinedFor . '"', '');
+            $s->where('ISNULL(`t2`.`term`)');
+        }
         $s->order($tableTerm.'.term asc');
 
         // Assume limit arg can be comma-separated string containing '<LIMIT>,<OFFSET>'
@@ -327,12 +333,12 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
         // Build LIMIT clause
         $limit = rif($limit, 'LIMIT ' . rif($offset, '$1,') . '$1', '');
-
+        //d($s->assemble());
         // Append LIMIT clause to the UNION-ed query
         $sql = '(' . $s->assemble() . ') UNION (' . $sp->assemble() . ') ' . $limit;
 
         // If $total arg is given
-        if (func_num_args() == 6) {
+        if (func_num_args() >= 6) {
 
             // Replace columns with 'COUNT(*)' for both *_Select instances
             $s->reset(Zend_Db_Select::COLUMNS)->columns(['COUNT(*)']);
