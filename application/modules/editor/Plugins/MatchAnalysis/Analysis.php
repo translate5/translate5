@@ -439,6 +439,24 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setLanguageResourceid($languageResourceid);
         $matchAnalysis->setWordCount($segment->meta()->getSourceWordCount());
         $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
+        $type = '';
+        $languageresources = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
+
+        $assocs = $languageresources->loadByAssociatedTaskGuid($this->task->getTaskGuid());
+
+        if(!empty($assocs)){
+            $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
+            $languageresource->load($assocs[0]['id']);
+
+            $manager = ZfExtended_Factory::get('editor_Services_Manager');
+            /* @var $manager editor_Services_Manager */
+            $resource = $manager->getResource($languageresource);
+
+            $type = $resource->getType();
+        }
+        $matchAnalysis->setType($type);
 
         $isFuzzy = false;
         $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
