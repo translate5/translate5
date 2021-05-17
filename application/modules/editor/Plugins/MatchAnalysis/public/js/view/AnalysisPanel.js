@@ -249,7 +249,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                             },
                                 {
                                     xtype: 'button',
-                                    glyph: 'f1c3@FontAwesome5FreeSolid',
+                                    glyph: 'f1c9@FontAwesome5FreeSolid',
                                     itemId: 'exportXml',
                                     text: me.strings.exportAnalysisXML,
                                     margin: '50 0 0 10',

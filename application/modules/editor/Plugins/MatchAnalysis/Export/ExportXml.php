@@ -35,7 +35,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
 {
 
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_BatchResult';
-    public static $ATTRIBUTES = [
+    const ATTRIBUTES = [
         'words',
         'characters',
         'placeables',
@@ -48,7 +48,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         'baselineWords'
     ];
 
-    public static $NODES = [
+    const NODES = [
         'perfect',
         'inContextExact',
         'exact',
@@ -61,7 +61,8 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         'newLearnings',
         'fuzzy'
     ];
-    public static $FUZZY_RANGES = [
+    
+    protected $FUZZY_RANGES = [
         '50' => '59',
         '60' => '69',
         '70' => '79',
@@ -74,13 +75,13 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
      * @param $data
      * @return SimpleXMLElement
      */
-    public static function addFuzzyChilds(SimpleXMLElement $object, $data, $childName = 'fuzzy'): SimpleXMLElement
+    protected function addFuzzyChilds(SimpleXMLElement $object, $data, $childName = 'fuzzy'): SimpleXMLElement
     {
-        foreach (self::$FUZZY_RANGES as $min => $max) {
+        foreach ($this->FUZZY_RANGES as $min => $max) {
             $child = $object->batchTotal->analyse->addChild($childName);
             $child->addAttribute('min', $min);
             $child->addAttribute('max', $max);
-            foreach (self::$ATTRIBUTES as $attr) {
+            foreach (self::ATTRIBUTES as $attr) {
                 if ($attr == 'words') {
                     $child->addAttribute($attr, $data[$max]);
                 }else{
@@ -96,10 +97,10 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
      * @param $data
      * @return SimpleXMLElement
      */
-    public static function addAttributes(SimpleXMLElement $child, $data): SimpleXMLElement
+    protected function addAttributes(SimpleXMLElement $child, $data): SimpleXMLElement
     {
 
-        foreach (self::$ATTRIBUTES as $attr) {
+        foreach (self::ATTRIBUTES as $attr) {
             $child->addAttribute($attr, '0');
             if ($attr == 'words' && $child->getName() == 'fuzzy') {
                 $attrib = (array)$child->attributes()->max;
@@ -117,15 +118,14 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
      * @param $data
      * @return SimpleXMLElement
      */
-    public static function generateNodesWithAttributes(SimpleXMLElement $object, $data): SimpleXMLElement
+    protected function generateNodesWithAttributes(SimpleXMLElement $object, $data): SimpleXMLElement
     {
-
-        foreach (self::$NODES as $node) {
+        foreach (self::NODES as $node) {
             if ($node == 'fuzzy') {
                 $object = self::addFuzzyChilds($object, $data);
             } else {
                 $child = $object->batchTotal->analyse->addChild($node);
-                foreach (self::$ATTRIBUTES as $attr) {
+                foreach (self::ATTRIBUTES as $attr) {
                     if($node == 'total' && $attr == 'words'){
                         $child->addAttribute('words', $data['total']);
                     }else
@@ -139,6 +139,8 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
                         //exact are 100% and 101% and 104%-Matches from translate5, since Trados does not know our 101 and 104%-Matches
                         $value = $data['100'] + $data['101'] + $data['104'];
                         $child->addAttribute($attr, $value);
+                    }elseif($node == 'new' && $attr == 'words'){
+                        $child->addAttribute('words', $data['wordCountMT']);
                     }else{
                         $child->addAttribute($attr, '0');
                     }
@@ -154,7 +156,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
      * @throws Exception
      */
 
-    public static function generateXML($rows, $taskGuid): SimpleXMLElement
+    public function generateXML($rows, $taskGuid): SimpleXMLElement
     {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
@@ -187,6 +189,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             '69' => 0,
             '59' => 0,
             'noMatch' => 0,
+            'wordCountMT' => 0,
             'wordCount' => 0,
             'type' => '',
             'total' => 0
@@ -196,7 +199,6 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             if(!empty($row['resourceName']) ){
                 $renderData['resourceName'][] = $row['resourceName'];
             }
-
 
             if($row['internalFuzzy'] == 'Yes'){
                 $renderData['internalFuzzy'] = 'Yes';
@@ -211,8 +213,13 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             $renderData['79'] += $row['79'];
             $renderData['69'] += $row['69'];
             $renderData['59'] += $row['59'];
-            $renderData['wordCount'] += $row['wordCount'];
-            $renderData['total'] += (int)$row['104'] +(int)$row['103'] + (int)$row['102'] + (int)$row['101'] + (int)$row['100'] + (int)$row['99'] + (int)$row['89'] + (int)$row['79'] + (int)$row['69'] + (int)$row['59'];
+            $renderData['noMatch'] += $row['noMatch'];
+            $rowTotal = (int)$row['104'] +(int)$row['103'] + (int)$row['102'] + (int)$row['101'] + (int)$row['100'] + (int)$row['99'] + (int)$row['89'] + (int)$row['79'] + (int)$row['69'] + (int)$row['59'] + (int)$row['noMatch'];
+            $renderData['total'] += $rowTotal;
+            
+            if($row['resourceType'] == editor_Models_Segment_MatchRateType::TYPE_MT){
+                $renderData['wordCountMT'] += $rowTotal;
+            }
             $i++;
         }
 
@@ -308,12 +315,10 @@ This file was generated with translate5.
 
         header('Content-disposition: attachment; filename='.$fileName);
         header ("Content-Type:text/xml");
-//output the XML data
-        echo  $xml;
         // if you want to directly download then set expires time
         header("Expires: 0");
 
-        return self::generateNodesWithAttributes($xml, $renderData);
+        return $this->generateNodesWithAttributes($xml, $renderData);
     }
 }
 
