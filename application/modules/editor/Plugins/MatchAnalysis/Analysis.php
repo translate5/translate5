@@ -281,14 +281,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 }
 
                 // If the matchrate is the same, we only check for a new best match if it is from a termcollection
-                if ($matchRateInternal->matchrate == $match->matchrate && $match->languageResourceType != 'termcollection') {
+                if ($matchRateInternal->matchrate == $match->matchrate && $match->languageResourceType != editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
                     continue;
                 }
 
-                if ($match->languageResourceType == 'termcollection') {
+                if ($match->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
                     // - preferred terms > permitted terms
                     // - if multiple permitted terms: take the first
-                    if (!is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == 'termcollection') {
+                    if (!is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
                         $bestMatchMetaData = $bestMatchRateResult->metaData;
                         $bestMatchIsPreferredTerm = editor_Models_Term::isPreferredTerm($bestMatchMetaData['status']);
                         if ($bestMatchIsPreferredTerm) {
@@ -439,23 +439,17 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setLanguageResourceid($languageResourceid);
         $matchAnalysis->setWordCount($segment->meta()->getSourceWordCount());
         $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
-        $type = '';
-        $languageresources = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
-
-        $assocs = $languageresources->loadByAssociatedTaskGuid($this->task->getTaskGuid());
-
-        if(!empty($assocs)){
-            $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-            /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
-            $languageresource->load($assocs[0]['id']);
-
-            $manager = ZfExtended_Factory::get('editor_Services_Manager');
-            /* @var $manager editor_Services_Manager */
-            $resource = $manager->getResource($languageresource);
-
-            $type = $resource->getType();
+        
+        if($languageResourceid === 0) {
+            $type = editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED;
         }
+        elseif(array_key_exists($languageResourceid, $this->resources)) {
+            $type = $this->resources[$languageResourceid]->getResourceType();
+        }
+        else {
+            $type = editor_Models_Segment_MatchRateType::TYPE_UNKNOWN;
+        }
+        
         $matchAnalysis->setType($type);
 
         $isFuzzy = false;

@@ -64,6 +64,7 @@ Ext.define('Editor.plugins.MatchAnalysis.model.MatchAnalysis', {
     		var ignoreSumColumns=[
     			  "created",
     			  "id",
+    			  "resourceType",
     			  "resourceName",
     			  "resourceColor",
     			  "pretranslateMatchrate",
