@@ -81,10 +81,10 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
 
 
         switch ($params["type"]) {
-            case "excel":
+            case "exportExcel":
                 ZfExtended_Factory::get($this->helperExcelClass)->generateExcel($rows);
                 break;
-            case "xml":
+            case "exportXml":
                 $x = ZfExtended_Factory::get($this->helperXMLClass)->generateXML($rows, $params['taskGuid']);
                 echo $x->asXML();
 

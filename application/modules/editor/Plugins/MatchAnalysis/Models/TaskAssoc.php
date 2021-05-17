@@ -35,8 +35,8 @@ END LICENSE AND COPYRIGHT
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  *
- * @method string getTaskUuid() getTaskUuid()
- * @method void setTaskUuid() setTaskUuid(string $taskUuid)
+ * @method string getUuid() getUuid()
+ * @method void setUuid() setUuid(string $taskUuid)
  *
  * @method boolean getInternalFuzzy() getInternalFuzzy()
  * @method void setInternalFuzzy() setInternalFuzzy(bool $internalFuzzy)

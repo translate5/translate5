@@ -98,6 +98,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
      */
     public static function addAttributes(SimpleXMLElement $child, $data): SimpleXMLElement
     {
+
         foreach (self::$ATTRIBUTES as $attr) {
             $child->addAttribute($attr, '0');
             if ($attr == 'words' && $child->getName() == 'fuzzy') {
@@ -105,6 +106,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
 
                 $child->addAttribute($attr, $data[$attrib[0]]);
             }
+
         }
 
         return $child;
@@ -124,7 +126,9 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             } else {
                 $child = $object->batchTotal->analyse->addChild($node);
                 foreach (self::$ATTRIBUTES as $attr) {
-
+                    if($node == 'total' && $attr == 'words'){
+                        $child->addAttribute('words', $data['total']);
+                    }else
                     if ($attr == 'words' && $child->getName() == 'crossFileRepeated') {
                         //crossFileRepeated are translate5s repetitions (which are represented by 102% matches)
                         $child->addAttribute($attr, $data['102']);
@@ -152,7 +156,6 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
 
     public static function generateXML($rows, $taskGuid): SimpleXMLElement
     {
-
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
@@ -160,9 +163,15 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         $customer = ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $customer editor_Models_Customer */
         $customerData = $customer->loadByIds([$task->getCustomerId()]);
-        $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
-        $assocs = $languageResource->loadByAssociatedTaskGuid($task->getTaskGuid());
+
+        $sourceLangIds = $task->getSourceLang();
+
+        $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languagesModel editor_Models_Languages */
+        $languagesModel->load($sourceLangIds[0]);
+        $langName = $languagesModel->getLangName();
+        $lcid = $languagesModel->getLcid();
+
 
         $renderData = [
             'resourceName' => '',
@@ -181,11 +190,16 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             '59' => 0,
             'noMatch' => 0,
             'wordCount' => 0,
-            'type' => ''
+            'type' => '',
+            'total' => 0
         ];
-
+        $i = 0;
         foreach ($rows as $row) {
-            $renderData['resourceName'] .= $row['resourceName'].', ';
+            if(!empty($row['resourceName']) ){
+                $renderData['resourceName']  .= !empty($renderData['resourceName']) ? ', '.$row['resourceName'] : $row['resourceName'];
+            }
+
+
             if($row['internalFuzzy'] == 'Yes'){
                 $renderData['internalFuzzy'] = 'Yes';
             }
@@ -200,35 +214,55 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             $renderData['69'] += $row['69'];
             $renderData['59'] += $row['59'];
             $renderData['wordCount'] += $row['wordCount'];
-
+            $renderData['total'] += (int)$row['104'] +(int)$row['103'] + (int)$row['102'] + (int)$row['101'] + (int)$row['100'] + (int)$row['99'] + (int)$row['89'] + (int)$row['79'] + (int)$row['69'] + (int)$row['59'];
+            $i++;
         }
-
 
         $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($taskGuid);
-        $to_time = strtotime( $task->getOrderdate());
+        $to_time = strtotime( $analysisAssoc['created']);
 
         $from_time = strtotime($analysisAssoc['finishedAt']);
         $difference = round(abs($to_time - $from_time) / 3600,2); //seconds
 
 
 
-        $xml_header = '<?xml version="1.0" encoding="UTF-8"?><task name="analyse"></task>';
+        $xml_header = '<?xml version="1.0" encoding="UTF-8"?><task name="analyse"></task><!-- 
+The format of the file should look structurally like - 
+no file elements, since translate5 does not support a file specific analysis right now
+for the settings element the following values should be set: 
+reportInternalFuzzyLeverage="translate5Value" reportLockedSegmentsSeparately="no" reportCrossFileRepetitions="yes" minimumMatchScore="lowestFuzzyValueThatIsConfiguredToBeShownInTranslate5" searchMode="bestWins"
+In the batchTotal analysis section the following applies
+For the following elements all numeric attributes are always set to "0", because they have no analogon currently in translate5:
+locked
+perfect
+repeated (we only have crossFileRepeated)
+newBaseline (this is specific to SDL MT)
+newLearnings (this is specific to SDL MT)
+the number and definitions of fuzzy elements will reflect the fuzzy ranges as defineable with TRANSLATE-2076
+all MT matches will always be counted within "new"
+crossFileRepeated are translate5s repetitions (which are represented by 102% matches)
+exact are 100% and 101% and 104%-Matches from translate5, since Trados does not know our 101 and 104%-Matches
+inContextExact are 103%-Matches from translate5
+The following attributes will always have the value "0", since translate5 does not support them right now:
+characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"
+The following attributes will be ommitted, because translate5 does not support them so far:
+segments-->';
         $xml = new SimpleXMLElement($xml_header);
 
         $subnode1 = $xml->addChild('taskInfo');
-        $subnode1->addAttribute('taskId', $taskGuid);
-        $subnode1->addAttribute('runAt', $task->getOrderdate());
+        $subnode1->addAttribute('taskId', $analysisAssoc['uuid']);
+        $subnode1->addAttribute('runAt', date('Y-m-d H:i:s', strtotime( $analysisAssoc['created'])));
         $subnode1->addAttribute('runTime', $difference. ' seconds');
 
         $subnode2 = $subnode1->addchild('project');
         $subnode2->addAttribute('name', $task->getTaskName());
-        $subnode2->addAttribute('number', $task->getId());
+        $subnode2->addAttribute('number', $taskGuid);
 
         $innerNode1 = $subnode1->addChild('language');
-        $innerNode1->addAttribute('lcid', '1.2.1');
-        $innerNode1->addAttribute('name', 'English');
+        $innerNode1->addAttribute('lcid', $lcid);
+        $innerNode1->addAttribute('name', $langName);
 
         $innerNode2 = $subnode1->addChild('customer');
         $innerNode2->addAttribute('name', $customerData[0]['name']);
@@ -237,12 +271,12 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         $inner_node3->addAttribute('name', $renderData['resourceName']);
 
         $internalFuzzy = $renderData['internalFuzzy'];
-
         $innerNode4 = $subnode1->addChild('settings');
+
         $innerNode4->addAttribute('reportInternalFuzzyLeverage', $internalFuzzy);
         $innerNode4->addAttribute('reportLockedSegmentsSeparately', 'no');
         $innerNode4->addAttribute('reportCrossFileRepetitions', 'yes');
-        $innerNode4->addAttribute('minimumMatchScore', 'lowestFuzzyValueThatIsConfiguredToBeShownInTranslate5');
+        $innerNode4->addAttribute('minimumMatchScore', '50'); // Currently the value of minimum score is hardcoded, but will be changed in the future to dynamic
         $innerNode4->addAttribute('searchMode', 'bestWins');
         $innerNode4->addAttribute('missingFormattingPenalty', '1');
         $innerNode4->addAttribute('differentFormattingPenalty', '1');
@@ -257,7 +291,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
 
         $batchTotal = $xml->addChild('batchTotal');
         $batchTotal->addChild('analyse');
-        $fileName = 'report'. date('Y-m-d H:i:s').'.xml';
+        $fileName = 'Match-analysis-'. date('Y-m-d').'.xml';
 
         header('Content-disposition: attachment; filename='.$fileName);
         header ("Content-Type:text/xml");
