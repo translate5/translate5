@@ -227,26 +227,40 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
 
 
         $xml_header = '<?xml version="1.0" encoding="UTF-8"?><task name="analyse"></task><!--
-The format of the file should look structurally like -
-no file elements, since translate5 does not support a file specific analysis right now
-for the settings element the following values should be set:
-reportInternalFuzzyLeverage="translate5Value" reportLockedSegmentsSeparately="no" reportCrossFileRepetitions="yes" minimumMatchScore="lowestFuzzyValueThatIsConfiguredToBeShownInTranslate5" searchMode="bestWins"
-In the batchTotal analysis section the following applies
-For the following elements all numeric attributes are always set to "0", because they have no analogon currently in translate5:
-locked
-perfect
-repeated (we only have crossFileRepeated)
-newBaseline (this is specific to SDL MT)
-newLearnings (this is specific to SDL MT)
-the number and definitions of fuzzy elements will reflect the fuzzy ranges as defineable with TRANSLATE-2076
-all MT matches will always be counted within "new"
-crossFileRepeated are translate5s repetitions (which are represented by 102% matches)
-exact are 100% and 101% and 104%-Matches from translate5, since Trados does not know our 101 and 104%-Matches
-inContextExact are 103%-Matches from translate5
-The following attributes will always have the value "0", since translate5 does not support them right now:
-characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"
-The following attributes will be ommitted, because translate5 does not support them so far:
-segments-->';
+This file was generated with translate5.
+- there no file elements are added, since translate5 does not support a file specific analysis right now
+- for the settings element the following values are set:
+  reportInternalFuzzyLeverage="AS SET IN Translate5"
+  reportLockedSegmentsSeparately="no"
+  reportCrossFileRepetitions="yes"
+  minimumMatchScore="lowestFuzzyValueThatIsConfiguredToBeShownInTranslate5"
+  searchMode="bestWins"
+- In the batchTotal analysis section the following applies:
+  For the following elements all numeric attributes are always set to "0",
+  because they have no analogon currently in translate5:
+    # locked
+    # perfect
+    # repeated (translate5 will only have crossFileRepeated)
+    # newBaseline (this is specific to SDL MT)
+    # newLearnings (this is specific to SDL MT)
+- the number and definitions of fuzzy elements will reflect the fuzzy ranges as defined in translate5
+- all MT matches will always be counted within "new"
+- crossFileRepeated are translate5s repetitions (which are represented by 102% matches)
+- exact are 100% and 101% and 104%-Matches from translate5
+- inContextExact are 103%-Matches from translate5
+- The following attributes will always have the value "0", since translate5 does not support them right now:
+  # characters="0"
+  # placeables="0"
+  # tags="0"
+  # repairWords="0"
+  # fullRecallWords="0"
+  # partialRecallWords="0"
+  # edits="0"
+  # adaptiveWords="0"
+  # baselineWords="0"
+- The following attributes will be ommitted, because translate5 does not support them so far:
+  # segments
+-->';
         $xml = new SimpleXMLElement($xml_header);
 
         $subnode1 = $xml->addChild('taskInfo');
@@ -274,7 +288,8 @@ segments-->';
         $innerNode4->addAttribute('reportInternalFuzzyLeverage', $internalFuzzy);
         $innerNode4->addAttribute('reportLockedSegmentsSeparately', 'no');
         $innerNode4->addAttribute('reportCrossFileRepetitions', 'yes');
-        $innerNode4->addAttribute('minimumMatchScore', '50'); // Currently the value of minimum score is hardcoded, but will be changed in the future to dynamic
+        // Currently the value of minimum score is hardcoded, but will be changed in the future to dynamic (with TRANSLATE-2076)
+        $innerNode4->addAttribute('minimumMatchScore', '50');
         $innerNode4->addAttribute('searchMode', 'bestWins');
         $innerNode4->addAttribute('missingFormattingPenalty', '1');
         $innerNode4->addAttribute('differentFormattingPenalty', '1');
