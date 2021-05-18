@@ -79,7 +79,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $pretrans = array_map(function($item){
             return $item->pretrans;
         }, $segments);
-        $this->assertEquals(array(1,1,1,1,1,1,0,0,0,0,0,0,0), $pretrans);
+        $this->assertEquals([0,0,0,0,0,0,0,0,0,0,0,0,0], $pretrans);
         
         //bulk check of all pretrans fields
         $matchRates = array_map(function($item){
