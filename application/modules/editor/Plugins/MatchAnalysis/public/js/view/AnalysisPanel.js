@@ -89,6 +89,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
 
             config = {
                 title: me.strings.tabTitle,
+                scrollable: true,
                 items: [{
                     xtype: 'grid',
                     itemId: 'matchAnalysisGrid',
