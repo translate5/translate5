@@ -175,8 +175,8 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             $this->task->save();
         }
 
-        $analysisAssoc->setFinishedAt(NOW_ISO);
-        $analysisAssoc->save();
+        //setting null takes the current date from DB
+        $analysisAssoc->finishNow();
 
         $this->task->unlock();
         return $return;

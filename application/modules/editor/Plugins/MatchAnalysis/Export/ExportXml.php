@@ -229,7 +229,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         $to_time = strtotime( $analysisAssoc['created']);
 
         $from_time = strtotime($analysisAssoc['finishedAt']);
-        $difference = round(abs($to_time - $from_time) / 3600,2); //seconds
+        $difference = abs($to_time - $from_time); //seconds
 
 
 

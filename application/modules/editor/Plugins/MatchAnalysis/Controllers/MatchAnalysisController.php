@@ -92,6 +92,8 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
                 echo $x->asXML();
 
                 break;
+            default :
+                throw new ZfExtended_NotFoundException('No analysis for given type found');
         }
     }
 }
