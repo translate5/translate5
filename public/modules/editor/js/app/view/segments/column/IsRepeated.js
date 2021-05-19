@@ -91,8 +91,8 @@ Ext.define('Editor.view.segments.column.IsRepeated', {
         }
         return me.callParent([config]);
     },
-    renderer: function(value,t,record){
-        var str = this.strings.col;
+    renderer: function(value,context,record){
+        var str = context.column.strings.col;
         switch(value) {
             case 3:
                 return str.both;
