@@ -174,18 +174,14 @@ Ext.define('Editor.controller.Segments', {
             newTotal = store.totalCount,
             cls = 'activated',
             btn = me.getResetFilterBtn(),
-            btnWatchList = me.getWatchListFilterBtn(),
-            btnWatchListRepeated = me.getWatchListFilterBtn(),
             filters = store.filters;
 
         me.updateFilteredCountDisplay(newTotal);
-
 
         if (filters.length > 0) {
             btn.addCls(cls);
         } else {
             btn.removeCls(cls);
-            btnWatchList.removeCls(cls);
         }
     },
     /**
@@ -275,70 +271,49 @@ Ext.define('Editor.controller.Segments', {
     /**
      * Toggle filtering by watch list.
      */
-    watchListFilter: function () {
+    watchListFilter: function (btn) {
         var me = this,
             grid = me.getSegmentGrid(),
             gridFilters = grid.filters,
             filters = gridFilters.store.filters,
-            found = false,
             otherFound = false,
-            column;
+            column = grid.down('[dataIndex=isWatched]');
+            
         filters.each(function (filter, index, len) {
             var isWatched = filter.getProperty() == 'isWatched';
-            found = found || isWatched;
             otherFound = otherFound || !isWatched && filter.getDisabled() === false;
         });
-        //remove watchlist filter
-        if (found) {
-            column = grid.columnManager.getHeaderByDataIndex('isWatched');
-            if (column && column.filter && column.filter.isGridFilter) {
+        
+        if(column && column.filter) {
+            if(btn.pressed) {
+                column.filter.filter.setValue(true);
+                column.filter.setActive(true);
+            }
+            else {
                 column.filter.setActive(false);
             }
-            return;
         }
-        //add watchlist filter
-        gridFilters.addFilter({
-            dataIndex: 'isWatched',
-            type: 'boolean',
-            value: true,
-            disabled: false
-        });
+        
         // currently enabled at least one more filter:
-        if (otherFound) {
+        if (btn.pressed && otherFound) {
             Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
         }
     },
 
-    repeatedFilter: function () {
+    repeatedFilter: function (btn) {
         var me = this,
             grid = me.getSegmentGrid(),
-            gridFilters = grid.filters,
-            filters = gridFilters.store.filters,
-            found = false,
-            otherFound = false,
-            column;
-        filters.each(function (filter, index, len) {
-            var isWatched = filter.getProperty() == 'isRepeated';
-            found = found || isWatched;
-            otherFound = otherFound || !isWatched && filter.getDisabled() === false;
-        });
-        //remove watchlist filter
-        if (found) {
-            column = grid.columnManager.getHeaderByDataIndex('isRepeated');
-            if (column && column.filter && column.filter.isGridFilter) {
+            column = grid.down('[dataIndex=isRepeated]');
+        
+        if(column && column.filter) {
+            if(btn.pressed) {
+                column.filter.setActive(true);
+                //1,2,3 contain in filter source only (1), target only (2), and segments repeatead in both (3)
+                column.filter.filter.setValue([1,2,3]);
+            }
+            else {
                 column.filter.setActive(false);
             }
-            return;
-        }
-        gridFilters.addFilter({
-            dataIndex: 'isRepeated',
-            type: 'boolean',
-            value: true,
-            disabled: false
-        });
-        // currently enabled at least one more filter:
-        if (otherFound) {
-            Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
         }
     },
 
@@ -385,14 +360,18 @@ Ext.define('Editor.controller.Segments', {
             store = gridFilters.store,
             filters = store.filters,
             proxy = store.getProxy(),
-            btn = me.getWatchListFilterBtn(),
-            found = false,
+            tbar = me.getSegmentsToolbar(),
+            watchListFound = false,
+            isRepeatedFound = false,
             params = {};
 
         filters.each(function (filter, index, len) {
-            found = found || (filter.getProperty() == 'isWatched') || (filter.getProperty() == 'isRepeated');
+            watchListFound = watchListFound || filter.getProperty() == 'isWatched';
+            isRepeatedFound = isRepeatedFound || filter.getProperty() == 'isRepeated';
         });
-        btn.toggle(found);
+        
+        tbar.down('#watchListFilterBtn').toggle(watchListFound, false);
+        tbar.down('#filterBtnRepeated').toggle(isRepeatedFound, false);
 
         params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
 

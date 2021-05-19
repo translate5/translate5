@@ -167,6 +167,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             //report progress update
             $progressCallback && $progressCallback($progress);
         }
+        
+        if(!empty($segment)) {
+            $segment->syncRepetitions($this->task->getTaskGuid());
+        }
 
         $this->clean();
 

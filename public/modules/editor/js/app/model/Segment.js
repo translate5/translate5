@@ -87,7 +87,7 @@ Ext.define('Editor.model.Segment', {
             return Ext.JSON.decode(val);
         }, persist: false},
         {name: 'isWatched', type: 'boolean', persist: false},
-        {name: 'isRepeated', type: 'boolean', persist: true},
+        {name: 'isRepeated', type: 'int', persist: false},
         {name: 'segmentUserAssocId', type: 'int', persist: false}
     ],
     idProperty: 'id',

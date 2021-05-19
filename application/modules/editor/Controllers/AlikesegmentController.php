@@ -212,7 +212,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $history->save();
                 $entity->setTimestamp(NOW_ISO); //see TRANSLATE-922
                 $entity->save();
-                $entity->updateIsRepeatead($entity->getTargetMd5(), $oldHash);
+                $entity->updateIsTargetRepeated($entity->getTargetMd5(), $oldHash);
 
             }
             catch (Exception $e) {

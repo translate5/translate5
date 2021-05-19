@@ -1930,6 +1930,15 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='Qm9zbmlzY2ggKExhdGVpbiBCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Bosnisch (Latein Bosnien und Herzegowina)</source><target>Bosnisch (Latein Bosnien und Herzegowina)</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbg=='><source>Nur Segmente mit Wiederholungen anzeigen</source><target>Nur Segmente mit Wiederholungen anzeigen</target></trans-unit>
 <trans-unit id='RXhwb3J0IFhNTA=='><source>Export XML</source><target>Export XML</target></trans-unit>
+<trans-unit id='TWl0IFdpZWRlcmhvbHVuZ2Vu'><source>Mit Wiederholungen</source><target>Mit Wiederholungen</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgb2huZSBXaWVkZXJob2x1bmdlbg=='><source>Segmente ohne Wiederholungen</source><target>Segmente ohne Wiederholungen</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgUXVlbGxzcHJhY2hl'><source>Segmente mit Wiederholungen nur in der Quellsprache</source><target>Segmente mit Wiederholungen nur in der Quellsprache</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgWmllbHNwcmFjaGU='><source>Segmente mit Wiederholungen nur in der Zielsprache</source><target>Segmente mit Wiederholungen nur in der Zielsprache</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIGluIGRlciBRdWVsbC0gdW5kIFppZWxzcHJhY2hl'><source>Segmente mit Wiederholungen in der Quell- und Zielsprache</source><target>Segmente mit Wiederholungen in der Quell- und Zielsprache</target></trans-unit>
+<trans-unit id='LQ=='><source>-</source><target>-</target></trans-unit>
+<trans-unit id='TnVyIFF1ZWxsZQ=='><source>Nur Quelle</source><target>Nur Quelle</target></trans-unit>
+<trans-unit id='TnVyIFppZWw='><source>Nur Ziel</source><target>Nur Ziel</target></trans-unit>
+<trans-unit id='QmVpZGVz'><source>Beides</source><target>Beides</target></trans-unit>
   </body>
  </file>
 </xliff>
