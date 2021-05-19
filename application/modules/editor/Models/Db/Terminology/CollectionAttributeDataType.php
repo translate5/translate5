@@ -26,14 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TermCollection_TermAttributesLabel extends ZfExtended_Models_Validator_Abstract {
-  
-  /**
-   * Validators for Term Collection
-   */
-  protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible 
-    $this->addValidator('id', 'int');
-    $this->addValidator('label', 'stringLength', array('min' => 0, 'max' => 100));
-  }
+class editor_Models_Db_Terminology_CollectionAttributeDataType extends Zend_Db_Table_Abstract {
+    protected $_name    = 'terms_collection_attribute_datatype';
+    public $_primary = 'id';
 }

@@ -589,7 +589,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             'children',
             'headerText',
             'internalCount',
-            'labelId',
+            'dataTypeId',
             'language',
             'name',
             'parentId',
@@ -613,7 +613,7 @@ if($termArray['language'] !== null) {
     $attNew['children'] = [];
     $attNew['headerText'] = $translate->_($termArray['type']);
     $attNew['internalCount'] = '';
-    $attNew['labelId'] = '';
+    $attNew['dataTypeId'] = '';
     $attNew['language'] = $termArray['language'];
     $attNew['name'] = $termArray['elementName'];
     $attNew['parentId'] = '';
@@ -662,7 +662,7 @@ if($termArray['language'] !== null) {
     protected function getSearchTermSelect(): Zend_Db_Select
     {
         $attCols = [
-            'terms_attributes.labelId as labelId',
+            'terms_attributes.dataTypeId as dataTypeId',
             'terms_attributes.id AS attributeId',
 //            'terms_attributes.parentId AS parentId',
             'terms_attributes.internalCount AS internalCount',
@@ -701,7 +701,7 @@ if($termArray['language'] !== null) {
             ->setIntegrityCheck(false)
             ->from($this->db, $cols)
             ->joinLeft('terms_attributes', 'terms_attributes.termId = terms_term.id ', $attCols)
-            ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = terms_attributes.labelId',['LEK_term_attributes_label.labelText as headerText'])
+            ->joinLeft('terms_attributes_datatype', 'terms_attributes_datatype.id = terms_attributes.dataTypeId',['terms_attributes_datatype.labelText as headerText'])
             ->join('LEK_languages', 'terms_term.languageId = LEK_languages.id', ['LEK_languages.rfc5646 AS language']);
 
         if($this->isProposableAllowed()){

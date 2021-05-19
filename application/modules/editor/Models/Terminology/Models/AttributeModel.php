@@ -53,8 +53,8 @@ END LICENSE AND COPYRIGHT
  * @method integer setCollectionId() setCollectionId(integer $collectionId)
  * @method string getTermEntryId() getTermEntryId()
  * @method string setTermEntryId() setTermEntryId(string $termEntryId)
- * @method string getLabelId() getLabelId()
- * @method string setLabelId() setLabelId(string $labelId)
+ * @method string getDataTypeId() getDataTypeId()
+ * @method string setDataTypeId() setDataTypeId(string $dataTypeId)
  * @method string getTermEntryGuid() getTermEntryGuid()
  * @method string setTermEntryGuid() setTermEntryGuid(string $termEntryGuid)
  * @method string getLangSetGuid() getLangSetGuid()
@@ -271,7 +271,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             $transacGrpChild['id'] = $tGrp['id'];
 //            $transacGrpChild['name'] = $tGrp['elementName'];
             $transacGrpChild['attributeId'] = $tGrp['transac'];
-            $transacGrpChild['labelId'] = $tGrp['date'];
+            $transacGrpChild['dataTypeId'] = $tGrp['date'];
             $transacGrpChild['termEntryId'] = $tGrp['adminType'];
             $transacGrpChild['internalCount'] = $tGrp['adminValue'];
             $transacGrpChild['language'] = $tGrp['transacNote'];
@@ -314,7 +314,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
     {
         $cols = [
             'terms_attributes.id AS attributeId',
-            'terms_attributes.labelId as labelId',
+            'terms_attributes.dataTypeId as dataTypeId',
             'terms_attributes.termEntryId AS termEntryId',
             'terms_attributes.internalCount AS internalCount',
             'terms_attributes.language AS language',
@@ -333,7 +333,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $s = $this->db->select()
             ->from($this->db,[])
             ->join('terms_term_entry', 'terms_term_entry.id = terms_attributes.termEntryId', $cols)
-            ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = terms_attributes.labelId', ['LEK_term_attributes_label.labelText as headerText']);
+            ->joinLeft('terms_attributes_datatype', 'terms_attributes_datatype.id = terms_attributes.dataTypeId', ['terms_attributes_datatype.labelText as headerText']);
 
         $s->join('terms_transacgrp', 'terms_transacgrp.termEntryId = terms_term_entry.id',[
             'terms_transacgrp.transac as transac',
@@ -419,10 +419,10 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $this->setElementName('termNote');
         $this->setType('processStatus');
 
-        $label = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
-        /* @var $label editor_Models_TermCollection_TermAttributesLabel */
+        $label = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
+        /* @var $label editor_Models_Terminology_Models_AttributeDataType */
         $label->loadOrCreate('termNote', 'processStatus');
-        $this->setLabelId($label->getId());
+        $this->setDataTypeId($label->getId());
 
 //        $this->setAttrLang($language->getRfc5646());
 
@@ -482,8 +482,8 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         /* @var $lang editor_Models_Languages */
         $lang->loadById($term->getLanguageId());
 
-        $label = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
-        /* @var $label editor_Models_TermCollection_TermAttributesLabel */
+        $label = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
+        /* @var $label editor_Models_Terminology_Models_AttributeDataType */
         $label->loadOrCreate('note');
 
         $this->init([
@@ -497,7 +497,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             'langSetGuid' => $term->getLangSetGuid(),
             'guid' => ZfExtended_Utils::guid(),
             'language' => strtolower($lang->getRfc5646()),
-            'labelId' => $label->getId(),
+            'dataTypeId' => $label->getId(),
             'processStatus' => editor_Models_Terminology_Models_TermModel::PROCESS_STATUS_UNPROCESSED
         ]);
         $this->setValue(trim($termText));

@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_TermAttributesLabel extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermAttributesLabel';
-    protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermAttributesLabel';
+class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Models_Db_Terminology_AttributeDatatype';
+    protected $validatorInstanceClass   = 'editor_Models_Validator_Term_AttributeDatatype';
 
     /**
      * Loads the label with given name and type, if it does not exist, the label will be created

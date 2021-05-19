@@ -39,7 +39,7 @@ class editor_Models_Terminology_TbxObjects_Attribute {
         'langSetGuid' => false,
         'termId' => false,
         'termGuid' => false,
-        'labelId' => true,
+        'dataTypeId' => true,
         'guid' => false,
         'userGuid' => true,
         'userName' => true,
@@ -59,7 +59,7 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     protected string $value = '';
     protected string $target = '';
     protected string $type = '';
-    protected int $labelId = 0;
+    protected int $dataTypeId = 0;
     protected string $userGuid = '';
     protected string $userName = '';
     protected string $created = '';
@@ -202,18 +202,18 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     /**
      * @return int
      */
-    public function getLabelId(): int
+    public function getDataTypeId(): int
     {
-        return $this->labelId;
+        return $this->dataTypeId;
     }
 
     /**
-     * @param int $labelId
+     * @param int $dataTypeId
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setLabelId(int $labelId): self
+    public function setDataTypeId(int $dataTypeId): self
     {
-        $this->labelId = $labelId;
+        $this->dataTypeId = $dataTypeId;
         return $this;
     }
 

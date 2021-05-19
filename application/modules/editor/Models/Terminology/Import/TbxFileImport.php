@@ -66,8 +66,8 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     /** @var editor_Models_Terminology_Models_ImagesModel */
     protected editor_Models_Terminology_Models_ImagesModel $tbxImagesModel;
 
-    /** @var editor_Models_TermCollection_TermAttributesLabel */
-    protected editor_Models_TermCollection_TermAttributesLabel $attributeLabelModel;
+    /** @var editor_Models_Terminology_Models_AttributeDataType */
+    protected editor_Models_Terminology_Models_AttributeDataType $attributeLabelModel;
 
     /**
      * $tbxMap = segment names for different TBX standards
@@ -259,7 +259,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->termEntryModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
         $this->termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         $this->attributeModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        $this->attributeLabelModel = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
+        $this->attributeLabelModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
         $this->transacGrpModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
         $this->tbxImagesModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
@@ -629,14 +629,14 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $attribute->setCreated(NOW_ISO);
 
             if (isset($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()])) {
-                $attribute->setLabelId($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()]);
+                $attribute->setDataTypeId($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()]);
             } else {
                 $this->attributeLabelModel->loadOrCreate($attribute->getElementName(), $attribute->getType());
                 $attributeLabels = $this->attributeLabelModel->loadAllTranslated();
                 foreach ($attributeLabels as $attributeLabel) {
                     $this->attributeLabel[$attributeLabel['label'].'-'.$attributeLabel['type']] = $attributeLabel['id'];
                 }
-                $attribute->setLabelId($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()]);
+                $attribute->setDataTypeId($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()]);
             }
             $attributes[] = $attribute;
 
