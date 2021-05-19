@@ -60,6 +60,9 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel extends ZfExtended_Models_
                 if($key=="resourceColor"){
                     continue;
                 }
+                if($key=="resourceType"){
+                    continue;
+                }
 
                 if($key=="resourceName" && $value==""){
                     $value=$translate->_("Repetitions");
