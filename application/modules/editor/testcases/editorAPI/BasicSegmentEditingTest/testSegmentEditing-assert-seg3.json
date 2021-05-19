@@ -4,7 +4,7 @@
   "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
   "userName": "lector test",
   "editable": "1",
-  "pretrans": "1",
+  "pretrans": "0",
   "matchRate": "100",
   "qmId": null,
   "stateId": "0",

@@ -21,6 +21,22 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-ALTER TABLE `LEK_match_analysis` ADD COLUMN `type` varchar (64);
-ALTER TABLE `LEK_match_analysis_taskassoc` ADD COLUMN `uuid` varchar (64);
-ALTER TABLE `LEK_match_analysis_taskassoc` ADD finishedAt DATETIME DEFAULT CURRENT_TIMESTAMP NULL;
+-- to prevent duplicate column errors, since this alter file was moved and is now recognized as new again
+DELIMITER ;;
+CREATE PROCEDURE ALTER_MATCH_ANALYSIS()
+BEGIN
+    DECLARE CONTINUE HANDLER FOR 1060 BEGIN END;
+    ALTER TABLE `LEK_match_analysis` ADD COLUMN `type` varchar (64);
+    ALTER TABLE `LEK_match_analysis_taskassoc` ADD COLUMN `uuid` varchar (64);
+    ALTER TABLE `LEK_match_analysis_taskassoc` ADD `finishedAt` DATETIME DEFAULT CURRENT_TIMESTAMP NULL;
+END;;
+DELIMITER ;
+CALL ALTER_MATCH_ANALYSIS();
+DROP PROCEDURE ALTER_MATCH_ANALYSIS;
+
+-- first fix all finishedAt values for legacy data
+UPDATE `LEK_match_analysis_taskassoc`
+SET finishedAt = created; 
+
+-- now disallow null values
+ALTER TABLE `LEK_match_analysis_taskassoc` MODIFY COLUMN `finishedAt` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL;
