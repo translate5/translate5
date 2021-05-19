@@ -63,6 +63,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_watchListFilterBtn: '#UT#Lesezeichen',
     item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
     item_showBookmarkedSegments: '#UT#Nur Segmente mit Lesezeichen anzeigen',
+    item_showRepeatedSegments: '#UT#Nur Segmente mit Repeated anzeigen',
     strings:{
     	interfaceTranslation:'#UT#Oberfläche'
     },
@@ -182,6 +183,15 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         showDelay: 0
                     },
                     icon: Editor.data.moduleFolder+'images/show_bookmarks.png'
+                },{
+                    xtype: 'button',
+                    glyph: 'f01e@FontAwesome5FreeSolid',
+                    itemId: 'filterBtnRepeated',
+                    enableToggle: true,
+                    tooltip: {
+                        text: me.item_showRepeatedSegments,
+                        showDelay: 0
+                    },
                 },{
                     xtype: 'tbseparator',
                     hidden: !Editor.data.task.hasQmSub()
