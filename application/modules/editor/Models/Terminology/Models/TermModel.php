@@ -295,7 +295,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $tableProposal = (new editor_Models_Db_Term_Proposal())->info($this->db::NAME);
         $s = $this->db->select()
             ->setIntegrityCheck(false)
-            ->from($tableTerm, ['term as label', 'id as value', 'id', 'processStatus', 'status', 'term as desc', 'definition', 'termEntryTbxId', 'collectionId', 'termEntryId', 'languageId'])
+            ->from($tableTerm, ['term as label', 'id as value', 'id', 'term as desc', 'processStatus', 'status', 'definition', 'termEntryTbxId', 'collectionId', 'termEntryId', 'languageId'])
             ->where('lower(`'.$tableTerm.'`.term) like lower(?) COLLATE utf8mb4_bin',$queryString)
             ->where('`'.$tableTerm.'`.languageId IN(?)', explode(',', $languages))
             ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
@@ -325,7 +325,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $sp = $this->db->select()
             ->setIntegrityCheck(false)
             ->from($tableProposal, ['term as label', 'termId as value', 'termId as id', 'term as desc'])
-            ->joinInner($tableTerm, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['definition', 'termEntryTbxId', 'collectionId', 'termEntryId', 'languageId', 'processStatus', 'status'])
+            ->joinInner($tableTerm, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['processStatus', 'status', 'definition', 'termEntryTbxId', 'collectionId', 'termEntryId', 'languageId'])
             ->where('lower(`'.$tableProposal.'`.term) like lower(?) COLLATE utf8mb4_bin', $queryString)
             ->where('`'.$tableTerm.'`.languageId IN(?)', explode(',', $languages))
             ->where('`'.$tableTerm.'`.collectionId IN(?)', $collectionIds)
