@@ -101,16 +101,12 @@ class editor_Models_Import_Worker_Import {
         
         //call import Methods:
         $this->importFiles();
-        $this->syncFileOrder();
+        $this->syncFileOrderAndRepetitions();
         $this->importRelaisFiles();
         $this->task->createMaterializedView();
         $this->calculateMetrics();
         //saving task twice is the simplest way to do this. has meta data is only available after import.
         $this->task->save();
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $task editor_Models_Segment */
-        $segment->loadByTaskGuid($this->task->getTaskGuid());
-        $segment->insertRepetition();
         
         //init default user prefs
         $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
@@ -279,11 +275,12 @@ class editor_Models_Import_Worker_Import {
         $mqmProc->handleErrors();
     }
     
-    protected function syncFileOrder() {
+    protected function syncFileOrderAndRepetitions() {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         //dont update view here, since it is not existing yet!
         $segment->syncFileOrderFromFiles($this->task->getTaskGuid(), true);
+        $segment->syncRepetitions($this->task->getTaskGuid(), false);
     }
     
     /***

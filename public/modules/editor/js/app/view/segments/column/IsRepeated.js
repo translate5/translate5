@@ -33,31 +33,75 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * @class Editor.view.segments.column.IsRepeated
- * @extends Editor.view.ui.segments.column.IsRepeated
- * @initalGenerated
+ * @extends Ext.grid.column.Column
  */
 Ext.define('Editor.view.segments.column.IsRepeated', {
-    extend: 'Ext.grid.column.Check',
+    extend: 'Ext.grid.column.Column',
     alias: 'widget.isRepeatedColumn',
     mixins: ['Editor.view.segments.column.BaseMixin'],
-
     dataIndex: 'isRepeated',
-    text: 'Repeated',
-
-    filter: {
-        type: 'boolean',
-    },
-    editor: {
-        xtype: 'displayfield',
-        cls: 'isRepeated',
-        //dummy Method, mit der Orginal Methode funktioniert die Anzeige der Checkbox nicht richtig
-        getModelData: function () {
-            return null;
+    text: '#UT#Mit Wiederholungen',
+    strings: {
+        filter: {
+            none: '#UT#Segmente ohne Wiederholungen',
+            source: '#UT#Segmente mit Wiederholungen nur in der Quellsprache',
+            target: '#UT#Segmente mit Wiederholungen nur in der Zielsprache',
+            both: '#UT#Segmente mit Wiederholungen in der Quell- und Zielsprache',
+        },
+        col: {
+            none: '#UT#-',
+            source: '#UT#Nur Quelle',
+            target: '#UT#Nur Ziel',
+            both: '#UT#Beides'
         }
     },
     initComponent: function () {
         var me = this;
         me.initBaseMixin();
         me.callParent(arguments);
+    },
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config = {
+                editor: {
+                    xtype: 'displayfield',
+                    cls: 'isRepeated'
+                },
+                filter: {
+                    type: 'list',
+                    labelField: 'label',
+                    phpMode: false,
+                    options: [{
+                        id: 0,
+                        label: me.strings.filter.none
+                    },{
+                        id: 1,
+                        label: me.strings.filter.source
+                    },{
+                        id: 2,
+                        label: me.strings.filter.target
+                    },{
+                        id: 3,
+                        label: me.strings.filter.both
+                    }]
+                }
+            };
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    },
+    renderer: function(value,t,record){
+        var str = this.strings.col;
+        switch(value) {
+            case 3:
+                return str.both;
+            case 2:
+                return str.target;
+            case 1:
+                return str.source;
+            default:
+                return str.none;
+        }
     }
 });

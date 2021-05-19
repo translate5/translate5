@@ -4028,7 +4028,43 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='Qm9zbmlzY2ggKExhdGVpbiBCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Bosnisch (Latein Bosnien und Herzegowina)</source><target>Bosnian (Latin Bosnia and Herzegovina)</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbg=='>
   <source>Nur Segmente mit Wiederholungen anzeigen</source>
-  <target>Show only bookmarked segments</target>
+  <target>Show only repeated segments</target>
+</trans-unit>
+<trans-unit id='TWl0IFdpZWRlcmhvbHVuZ2Vu'>
+    <source>Mit Wiederholungen</source>
+    <target>With repetitions</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgb2huZSBXaWVkZXJob2x1bmdlbg=='>
+    <source>Segmente ohne Wiederholungen</source>
+    <target>Segments without repetitions</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgUXVlbGxzcHJhY2hl'>
+    <source>Segmente mit Wiederholungen nur in der Quellsprache</source>
+    <target>Segments with repetitions in the source text</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgWmllbHNwcmFjaGU='>
+    <source>Segmente mit Wiederholungen nur in der Zielsprache</source>
+    <target>Segments with repetitions in the target text</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIGluIGRlciBRdWVsbC0gdW5kIFppZWxzcHJhY2hl'>
+    <source>Segmente mit Wiederholungen in der Quell- und Zielsprache</source>
+    <target>Segments with repetitions in source and target text</target>
+</trans-unit>
+<trans-unit id='LQ=='>
+    <source>-</source>
+    <target>-</target>
+</trans-unit>
+<trans-unit id='TnVyIFF1ZWxsZQ=='>
+    <source>Nur Quelle</source>
+    <target>source only</target>
+</trans-unit>
+<trans-unit id='TnVyIFppZWw='>
+    <source>Nur Ziel</source>
+    <target>target only</target>
+</trans-unit>
+<trans-unit id='QmVpZGVz'>
+    <source>Beides</source>
+    <target>both</target>
 </trans-unit>
 </body>
   </file>

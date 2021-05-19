@@ -109,7 +109,7 @@ class editor_Models_Segment_Updater {
         $history->save();
         $this->segment->setTimestamp(NOW_ISO); //see TRANSLATE-922
         $this->segment->save();
-        $this->segment->updateIsRepeated($this->segment->getTargetMd5(), $oldHash);
+        $this->segment->updateIsTargetRepeated($this->segment->getTargetMd5(), $oldHash);
         //call after segment put handler
         $this->updateLanguageResources();
 

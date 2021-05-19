@@ -1085,29 +1085,82 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * @param $newHash
-     * @param $oldHash
+     * recalculates the isRepeated flag for the given target hashes
+     * @param string $newHash
+     * @param string $oldHash
+     * @return boolean
      */
-
-    public function updateIsRepeated($newHash, $oldHash)
+    public function updateIsTargetRepeated(string $newHash, string $oldHash)
     {
-        if($newHash == $oldHash){
-            return true;
+        //no change, so do nothing
+        $emptyHash = 'd41d8cd98f00b204e9800998ecf8427e'; //md5('');
+        if($newHash == $emptyHash) {
+            $newHash = 'this-may-not-be-a-repetition';
         }
-        $where = $this->tableName . '.sourceMd5 ='.$newHash;
-        $where .= " or ". $this->tableName . '.targetMd5 ='.$newHash;
-        return $this->db->update(array('isRepeated' => 1, ), $where);
+        if($oldHash == $emptyHash) {
+            $oldHash = 'this-may-not-be-a-repetition';
+        }
+        if($newHash == $oldHash){
+            return;
+        }
+        
+        //updates the isRepeated flag for segments with
+        //  the same old hash (remove target info from isRepeated)
+        //  the same new hash (add target info to isRepeated if there are any repetitions)
+        
+        //IF count(targetMd5) > 1
+        // THEN SET isRepeated = isRepeated | 2     calc 2 in
+        // ELSE SET isRepeated = isRepeated & ~2    calc 2 out
+        
+        $sql = 'UPDATE %1$s v, LEK_segments s, (
+            SELECT targetMd5, count(targetMd5) > 1 isRepeated
+            FROM %1$s
+            WHERE targetMd5 IN (?, ?)
+            GROUP BY targetMd5
+            ) srep
+        SET v.isRepeated = IF(srep.isRepeated, v.isRepeated | 2, v.isRepeated & ~2)
+        WHERE v.targetMd5 = srep.targetMd5
+        AND v.id = s.id';
+        
+        $this->db->getAdapter()->query(sprintf($sql, $this->segmentFieldManager->getView()->getName()),[$newHash, $oldHash]);
     }
 
     /**
-     * checked if there is a repeitions and updates the column
+     * synchronizes the isRepeated flag depending on if there are repetitions or not.
+     * @param string $taskGuid
+     * @param bool $resetIsRepeated by default true, not needed on import, since there are all flags already false
      */
-
-    public function insertRepetition()
+    public function syncRepetitions(string $taskGuid, bool $resetIsRepeated = true)
     {
-        $where = $this->tableName . '.sourceMd5 IN(Select * from (select sourceMd5 from ' . "$this->tableName" . ' where source != "" and source is not null group by sourceMd5 having count(*) > 1) as a)';
-        $where .= " or ". $this->tableName . '.targetMd5 IN(Select * from (select targetMd5 from ' . "$this->tableName" . ' where target != "" and target is not null group by targetMd5 having count(*) > 1) as b)';
-        $this->db->update(array('isRepeated' => 1, ), $where);
+        if($resetIsRepeated) {
+            $this->db->getAdapter()->query('UPDATE LEK_segments SET isRepeated = 0 WHERE taskGuid = ?', [$taskGuid]);
+        }
+        
+        $sql = 'UPDATE LEK_segments s, LEK_segment_data d
+        SET s.isRepeated = s.isRepeated | %1$s
+        WHERE d.originalMd5 IN (
+            SELECT originalMd5
+            FROM LEK_segment_data
+            WHERE taskGuid = ? AND
+            original != "" AND original IS NOT NULL AND name = "%2$s" GROUP BY originalMd5 HAVING count(segmentId) > 1
+        )
+        AND s.id = d.segmentId AND d.taskGuid = ?';
+        
+        //update isRepeated for source repetitions add bit value of 1
+        $this->db->getAdapter()->query(sprintf($sql, '1', 'source'),[$taskGuid, $taskGuid]);
+        
+        //update isRepeated for target repetitions add bit value of 2
+        $this->db->getAdapter()->query(sprintf($sql, '2', 'target'),[$taskGuid, $taskGuid]);
+        
+        //sync the view too, if it exists
+        $this->segmentFieldManager->initFields($taskGuid);
+        $view = $this->segmentFieldManager->getView();
+        if($view->exists()) {
+            $segmentsViewName = $view->getName();
+            $this->db->getAdapter()->query('UPDATE '.$segmentsViewName.' v, LEK_segments s
+            SET v.isRepeated = s.isRepeated
+            WHERE v.id = s.id AND s.taskGuid = ?', [$taskGuid]);
+        }
     }
 
     /**
