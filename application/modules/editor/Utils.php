@@ -276,3 +276,8 @@ class editor_Utils {
         return $segment;
     }
 }
+
+/**
+ * Include functions file
+ */
+include __DIR__ . '/Utils/func.php';
