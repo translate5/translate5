@@ -129,8 +129,6 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      */
     public function createTrackChangesNode($nodeName,$nodeText){
         
-        $sessionUser = new Zend_Session_Namespace('user');
-        
         $node=[];
         $node[]='<'.$nodeName;
         $node[]='class="'.$this->getTrackChangesCss($nodeName).'"';

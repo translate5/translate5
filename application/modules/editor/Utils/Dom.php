@@ -25,8 +25,33 @@ END LICENSE AND COPYRIGHT
 /**
  * A simple extension of the DOMDocument class to be able to capture the errors that may occur in the process of loading HTML/XML
  * To not change the original API we do not throw exceptions but collect the errors instead of reporting them and make them accessible
+ * Also an added API makes it simpler to load Unicode HTML (only XML will be loaded as UTF-8 by default) properly
  */
 class editor_Utils_Dom extends DOMDocument {
+    
+    /**
+     * Used to set UTF-8 encoding for Documents
+     * @var string
+     */
+    const UTF8_PROCESSINGINSTRUCTION = '<?xml encoding="UTF-8">';
+    /**
+     * Used to set UTF-8 encoding for Markup
+     * @var string
+     */
+    const UTF8_METATAG = '<meta http-equiv="content-type" content="text/html;charset=utf-8" />';
+    
+    /**
+     * Helper to retrieve the inner HTML of a DOM Node
+     * @param DOMNode $element
+     * @return string
+     */
+    public static function innerHTML(DOMNode $element) : string {
+        $html = '';
+        foreach ($element->childNodes as $child){
+            $html .= $element->ownerDocument->saveHTML($child);
+        }
+        return $html;
+    }
     /**
      * 
      * @var libXMLError[]
@@ -44,7 +69,7 @@ class editor_Utils_Dom extends DOMDocument {
         $this->strictErrorChecking = false;
     }
 
-    public function load (string $filename, int $options=0){
+    public function load ($filename, $options=NULL){
         $filename = realpath($filename);
         $this->domErrors = [];
         libxml_clear_errors();
@@ -61,7 +86,7 @@ class editor_Utils_Dom extends DOMDocument {
         return $result;
     }
     
-    public function loadXML (string $source, int $options=0){
+    public function loadXML ($source, $options=NULL){
         $this->domErrors = [];
         libxml_clear_errors();
         $useErrors = libxml_use_internal_errors(true);
@@ -77,7 +102,7 @@ class editor_Utils_Dom extends DOMDocument {
         return $result;
     }
 
-    public function loadHTML (string $source, int $options=0){
+    public function loadHTML ($source, $options=NULL){
         $this->domErrors = [];
         libxml_clear_errors();
         $useErrors = libxml_use_internal_errors(true);
@@ -92,8 +117,43 @@ class editor_Utils_Dom extends DOMDocument {
         $this->traceWarningsAndErrors();
         return $result;
     }
+    /**
+     * Loads an HTML-String and forces a proper UTF-8 Encoding, returns the DOMNode-children representing the passed Markup
+     * @param string $source
+     * @return DOMNodeList|NULL
+     */
+    public function loadUnicodeMarkup (string $source){
+        $result = $this->loadHTML('<html><head>'.self::UTF8_METATAG.'</head><body>'.$source.'</body>');
+        if($result){
+            $this->encoding = 'UTF-8';
+            $body = $this->getElementsByTagName('body');
+            if($body->length > 0 && $body->item(0)->hasChildNodes()){
+                return $body->item(0)->childNodes;
+            }
+            return new DOMNodeList();
+        }        
+        return NULL;
+    }
+    /**
+     * Loads an HTML-String and forces a proper UTF-8 Encoding, returns the DOMNode-children representing the passed Element Markup
+     * Note that if multiple nodes/elements are passed, this will return the first Element
+     * @param string $source
+     * @return DOMElement|NULL
+     */
+    public function loadUnicodeElement (string $source){
+        $nodes = $this->loadUnicodeMarkup($source);
+        if($nodes != NULL){
+            for($i=0; $i < $nodes->length; $i++){
+                $node = $nodes->item($i);
+                if($node->nodeType == XML_ELEMENT_NODE){
+                    return $node;
+                }
+            }
+        }
+        return NULL;
+    }
     
-    public function loadHTMLFile (string $filename, int $options=0){
+    public function loadHTMLFile ($filename, $options=NULL){
         $filename = realpath($filename);
         $this->domErrors = [];
         libxml_clear_errors();

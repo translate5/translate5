@@ -199,14 +199,13 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         $meta->addMeta('termtagState', $meta::META_TYPE_STRING, $worker::SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
 
         // init worker and queue it
-        if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
+        if (!$worker->init($taskGuid, array('resourcePool' => 'import', 'processingMode' => editor_Segment_Processing::ANALYSIS))) {
             $this->log->error('E1168', 'MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized.', ['task' => $this->task]);
             return false;
         }
         $worker->queue($workerId);
         return true;
     }
-
     /***
      * Match analysis and pretranslation takes 92 % of the import time
      * {@inheritDoc}

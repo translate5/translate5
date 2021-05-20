@@ -404,14 +404,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param bool $asJson if true, json is returned, otherwhise assoc-array
      * @return mixed depending on $asJson
      */
-    public function getQmSubsegmentIssuesTranslated($asJson = true){
+    public function getMqmTypesTranslated($asJson = true){
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
-        $walk = function(array $qmFlagTree)use ($translate,&$walk){
+        $walk = function(array $qmFlagTree) use ($translate, &$walk){
             foreach ($qmFlagTree as $node) {
                 $node->text = $translate->_($node->text);
                 if(isset($node->children) && is_array($node->children)){
-                  $walk($node->children, $walk);
+                    $walk($node->children, $walk);
                 }
             }
             return $qmFlagTree;
@@ -427,43 +427,35 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return $qmFlagTree;
     }
     /**
-     * @return array qm-flags as tree array of objects; example in json-notation:
-     *      [{"text":"Accuracy","id":1,"children":[{"text":"Terminology","id":2,"children":[]}]}]
+     * @return array('issueId'=>'issueText',...)
      */
-    public function getQmSubsegmentIssues(){
+    public function getMqmTypesFlat(){
+        $flatTree = array();
+        $walk = function(array $qmFlagTree)use (&$walk, &$flatTree){
+            foreach ($qmFlagTree as $node) {
+                $flatTree[$node->id] = $node->text;
+                if(isset($node->children) && is_array($node->children)){
+                    $walk($node->children);
+                }
+            }
+        };
         $tree = Zend_Json::decode($this->row->qmSubsegmentFlags, Zend_Json::TYPE_OBJECT);
         if(!isset($tree->qmSubsegmentFlags)){
             throw new Zend_Exception('qmSubsegmentFlags JSON Structure not OK, missing field qmSubsegmentFlags');
         }
-        return $tree->qmSubsegmentFlags;
-    }
-    /**
-     * @return array('issueId'=>'issueText',...)
-     */
-    public function getQmSubsegmentIssuesFlat(){
-        $flatTree = array();
-        $walk = function(array $qmFlagTree)use (&$walk,&$flatTree){
-            foreach ($qmFlagTree as $node) {
-                $flatTree[$node->id] = $node->text;
-                if(isset($node->children) && is_array($node->children)){
-                  $walk($node->children);
-                }
-            }
-        };
-        $walk($this->getQmSubsegmentIssues());
+        $walk($tree->qmSubsegmentFlags);
         return $flatTree;
     }
     /**
      * @return stdClass
      */
-    public function getQmSubsegmentSeverities(){
+    public function getMqmSeverities(){
         $tree = Zend_Json::decode($this->row->qmSubsegmentFlags, Zend_Json::TYPE_OBJECT);
         if(!isset($tree->severities)){
             throw new Zend_Exception('qmSubsegmentFlags JSON Structure not OK, missing field severities');
         }
         return $tree->severities;
     }
-
     /**
      * returns all configured Severities as JSON or PHP Data Structure:
      * [{
@@ -477,7 +469,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param Zend_Db_Table_Row_Abstract $row | null - if null, $this->row is used
      * @return string|array depends on $asJson
      */
-    public function getQmSubsegmentSeveritiesTranslated($asJson = true, array $row = null) {
+    public function getMqmSeveritiesTranslated($asJson = true, array $row = null) {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */
         if(is_null($row)) {
@@ -641,7 +633,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $session = new Zend_Session_Namespace();
         return !empty($session->taskGuid) && $session->taskGuid == $this->getTaskGuid();
     }
-
+    /**
+     * Convenience API
+     * @return boolean
+     */
+    public function isTranslation() {
+        return $this->getEmptyTargets();
+    }
     /**
      * unlocks all tasks, where the associated session is invalid
      */

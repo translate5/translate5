@@ -304,8 +304,9 @@ class editor_Plugins_TermTagger_Service {
      * @return Zend_Http_Response or null on error
      */
     public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
+
         $data = $this->encodeSegments($data);
-        
+    
         //test term tagger errors, start a dummy netcat server in the commandline: nc -l -p 8080
         // if the request was received in the commandline, just kill nc to simulate a termtagger crash.
         //$url = 'http://michgibtesdefinitivnichtalsdomain.com:8080'; // this is the nc dummy URL then.

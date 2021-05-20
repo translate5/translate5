@@ -51,7 +51,6 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
             'timestamp',
             'editable',
             'pretrans',
-            'qmId',
             'stateId',
             'autoStateId',
             'workflowStep',

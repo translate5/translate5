@@ -155,16 +155,4 @@ class editor_Models_Segment_TermTag {
         }
         return array('mid' => $mid, 'classes' => explode(' ', $classes));
     }
-    
-    /**
-     * categorizes the given css classes, removes the default "term" class
-     * @param array $classes
-     */
-    public function parseClasses(array $classes) {
-        $result = [
-            'status',
-            'translated',
-            'other',
-        ];
-    }
 }

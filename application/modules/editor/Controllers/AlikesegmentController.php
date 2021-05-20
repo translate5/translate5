@@ -49,21 +49,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      */
     protected $entity;
     
-    /**
-     * mappt einen eingehenden Filtertyp auf einen anderen Filtertyp für ein bestimmtes
-     * Feld.
-     * @var array array($field => array(origType => newType),...)
-     */
-    protected $_filterTypeMap = [
-        'qmId' => ['list' => 'listAsString']
-    ];
-    
-    
     public function preDispatch() {
         parent::preDispatch();
         $this->entity->setEnableWatchlistJoin();
     }
-    
     /**
      * lädt das Zielsegment, und übergibt die Alikes zu diesem Segment an die View zur JSON Rückgabe
      * @see ZfExtended_RestController::getAction()
@@ -116,30 +105,17 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         /* @var $entity editor_Models_Segment */
         $result = array();
         
-        $config = $task->getConfig();
-        $qmSubsegmentAlikes = array();
-        if($config->runtimeOptions->editor->enableQmSubSegments) {
-            $qmSubsegmentAlikes = $this->fieldLoop(function($field, $editField, $getter, $setter) use ($editedSegmentId){
-                $qmSubsegmentAlikes = ZfExtended_Factory::get('editor_Models_QmsubsegmentAlikes');
-                /* @var $qmSubsegmentAlikesSource editor_Models_QmsubsegmentAlikes */
-                $qmSubsegmentAlikes->parseSegment($this->entity->{$getter}(), $editedSegmentId);
-                return $qmSubsegmentAlikes;
-            });
-        }
-        
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         
         $userGuid = (new Zend_Session_Namespace('user'))->data->userGuid;
         
-        $tua=editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $task);
+        $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $task);
         
-        $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [
-            $this->entity,
-            $config,
-            $qmSubsegmentAlikes
-        ]);
+        $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [ $this->entity, $task->getConfig() ]);
         /* @var $repetitionUpdater editor_Models_Segment_RepetitionUpdater */
+        
+        $alikeQualities = new editor_Segment_Alike_Qualities($this->entity->getId());
         
         $alikeCount = count($ids);
         foreach($ids as $id) {
@@ -172,8 +148,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     //the segment has to be ignored!
                     continue;
                 }
-                
-                $entity->setQmId((string) $this->entity->getQmId());
+                // process all quality related stuff
+                editor_Segment_Quality_Manager::instance()->processAlikeSegment($entity, $task, $alikeQualities);
+  
                 if(!is_null($this->entity->getStateId())) {
                     $entity->setStateId($this->entity->getStateId());
                 }

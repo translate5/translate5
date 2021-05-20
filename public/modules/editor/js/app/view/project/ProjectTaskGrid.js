@@ -41,6 +41,7 @@ Ext.define('Editor.view.project.ProjectTaskGrid', {
 		'state',
 		'workflowStepName',
 		'segmentFinishCount',
+		'qualityErrorCount',
 		'wordCount',
 		'taskName',
 		'relaisLang',

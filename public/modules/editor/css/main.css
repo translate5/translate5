@@ -233,7 +233,7 @@ div.single + div {
 
 /* Term Tags, der folgende Code ist im HtmlEditor body css redundant vorhanden. Ebenso im Helper View_Helper_WorkflowNotifyHtmlMailSegmentList */
 .segment-tag-column div.x-grid-cell-inner div.term,
-.segment-tag-container div.term {background:transparent;border-bottom:1px solid #0000ff;}
+.segment-tag-container div.term { background:transparent; border-bottom:1px solid #0000ff; }
 
 #change-alike-window div.transNotFound,
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound,
@@ -248,15 +248,32 @@ div.single + div {
 .segment-tag-column div.x-grid-cell-inner div.supersededTerm,
 .segment-tag-container div.supersededTerm,
 .segment-tag-column div.x-grid-cell-inner div.deprecatedTerm,
-.segment-tag-container div.deprecatedTerm
-{border-bottom:none;background-color:#fa51ff;}
+.segment-tag-container div.deprecatedTerm {border-bottom:none;background-color:#fa51ff;}
+
+/* false positive term tags */
+.segment-tag-column div.x-grid-cell-inner div.term.t5qfalpos,
+.segment-tag-container div.term.t5qfalpos { background:transparent; border-bottom:1px solid #8282FF; }
+#change-alike-window div.transNotFound.t5qfalpos,
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound.t5qfalpos,
+.segment-tag-container.type-source div.transNotFound.t5qfalpos { border-bottom-color:#FF8888; }
+#change-alike-window div.transNotDefined,.t5qfalpos
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotDefined.t5qfalpos,
+.segment-tag-container.type-source div.transNotDefined.t5qfalpos { border-bottom-color:#C2A8A8; }
+.segment-tag-column div.x-grid-cell-inner div.notRecommended.t5qfalpos,
+.segment-tag-container div.notRecommended.t5qfalpos,
+.segment-tag-column div.x-grid-cell-inner div.supersededTerm.t5qfalpos,
+.segment-tag-container div.supersededTerm.t5qfalpos,
+.segment-tag-column div.x-grid-cell-inner div.deprecatedTerm.t5qfalpos,
+.segment-tag-container div.deprecatedTerm.t5qfalpos { background-color:#FDC4FF; }
 
 /*qmflags*/
-#segment-grid-body img.qmflag {width: auto !important;height: 14px !important; vertical-align:middle;margin-left:1px;margin-right:1px;}
+#segment-grid-body img.qmflag { width: auto !important;height: 14px !important; vertical-align:middle;margin-left:1px;margin-right:1px; }
 .qmflag-menu .x-menu-item-link {padding-right:2px; padding-left:22px;margin-right:36px;}
 .qmflag-menu .x-menu-item-link .x-menu-item-text {padding: 0px !important; margin: 0px 17px 0px 0px !important; width: auto !important; height: auto !important}
 .qmflag-menu .x-menu-item-icon {right:2px;left:auto;height:14px;width: 22px !important}
 .qmflag-menu .x-menu-icon-separator {right:34px;left:auto;}
+/* false positive qmflags */
+#segment-grid-body img.qmflag.t5qfalpos { opacity:60%; }
 
 .qmflag-menu .x-menu-item-arrow {
     right: auto;
@@ -270,7 +287,7 @@ div.single + div {
 /*.x-tip .x-tip-body {white-space: nowrap;}*/
  /* END Fix for TRANSLATE-237 recheck on ExtJS update */
 
-/*qmsummary*/
+/*qmsummary TODO AUTO-QA: this seems to manipulate all trees ?*/
 .x-tree-view .x-grid-item:nth-of-type(odd) .x-grid-cell {
 background-color: #EAF1FB;
 }
@@ -279,6 +296,9 @@ background-color: #EAF1FB;
 }
 .x-tree-view .x-column-header-align-right .x-column-header-text {
     padding-right: 7px;
+}
+.x-tree-noicon {
+	display:none !important;
 }
 
 /*messagebox*/
@@ -804,6 +824,20 @@ a.x-btn span.task-confirmation {
     text-indent: 100%;
     white-space: nowrap;
 }
+
+img.x-tree-symbol, img.x-grid-symbol, label img.x-label-symbol { vertical-align:middle; height:12px; }
+span.x-tree-symbol, span.x-grid-symbol, label span.x-label-symbol { font-family:FontAwesome; color:#5fa2dd; }
+span.x-tree-symbol.t5-quality-complete, span.x-grid-symbol.t5-quality-complete { color:#59a051; }
+span.x-tree-symbol.t5-quality-incomplete, span.x-grid-symbol.t5-quality-incomplete { color:#fbbc28; }
+span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { color:#ee0000; }
+.qualityFilterPanel .x-grid-cell-inner-treecolumn > .x-tree-elbow-empty:first-child { display:none; }
+.qualityFilterPanel .x-tree-root .x-grid-cell-inner-treecolumn > .x-tree-elbow-img.x-tree-elbow-end { display:none; }
+.qualityFilterPanel .x-tree-check-disabled .x-tree-checkbox { color:#acacac; }
+.qualityFilterPanel .x-grid-cell-inner { display:flex; white-space:normal; }
+.qualityFilterPanel .x-grid-cell-inner > div { flex:none; }
+.qualityFilterPanel .x-grid-cell-inner .x-tree-node-text { padding-left:0; white-space:normal; }
+.qualityFilterPanel .x-tree-faulty .x-tree-node-text { color:#ee0000; }
+.taskQualities .x-grid-faulty { color:#ee0000; }
 
 /**
  * FIXME must be removed with next ext update, fixes T5DEV-181 / https://www.sencha.com/forum/showthread.php?330718-6-2-ColorField-color-preview-doesn-t-match-color

@@ -47,7 +47,7 @@ END LICENSE AND COPYRIGHT
  *   - Segments to be changed with the repetition editor are getting the edited target and the edited source and the autostates of the master segment
  *   - In Source Original the transFound states are recalculated
  */
-class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
+class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
     protected static $useSourceEditing = false;
     
     /**
@@ -55,10 +55,10 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
      * @var array
      */
     protected $toCompareSource = array(
-        'sourceBeforeEdit' => 'Ich wiederhole mich in der <div title="" class="term preferredTerm exact transNotFound" data-tbxid="term_NOT_TESTABLE">Quelle</div>',
-        'targetBeforeEdit' => 'I repeat <div title="" class="term preferredTerm exact" data-tbxid="term_NOT_TESTABLE">me</div> in the spring',
-        'sourceAfterEdit' => 'Ich wiederhole mich in der <div title="" class="term preferredTerm exact transFound" data-tbxid="term_NOT_TESTABLE">Quelle</div>',
-        'targetEditAfterEdit' => 'I repeat <div title="" class="term preferredTerm exact" data-tbxid="term_NOT_TESTABLE">me</div> in the <div title="" class="term preferredTerm exact" data-tbxid="term_NOT_TESTABLE">source</div>',
+        'sourceBeforeEdit' => 'Ich wiederhole mich in der <div title="" class="term preferredTerm exact transNotFound">Quelle</div>',
+        'targetBeforeEdit' => 'I repeat <div title="" class="term preferredTerm exact">me</div> in the spring',
+        'sourceAfterEdit' => 'Ich wiederhole mich in der <div title="" class="term preferredTerm exact transFound">Quelle</div>',
+        'targetEditAfterEdit' => 'I repeat <div title="" class="term preferredTerm exact">me</div> in the <div title="" class="term preferredTerm exact">source</div>',
     );
     
     /**
@@ -66,16 +66,16 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
      * @var array
      */
     protected $toCompareTarget = array(
-        'sourceBeforeEdit5' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transNotFound" data-tbxid="term_NOT_TESTABLE">Zieltext</div>',
-        'targetBeforeEdit' => 'I repeat <div title="" class="term preferredTerm exact" data-tbxid="term_NOT_TESTABLE">me</div> in the destinationtext',
-        'targetBeforeEdit6' => 'I repeat <div title="" class="term preferredTerm exact" data-tbxid="term_NOT_TESTABLE">me</div> in the <div title="" class="term preferredTerm exact" data-tbxid="term_NOT_TESTABLE">targettext</div>',
+        'sourceBeforeEdit5' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transNotFound">Zieltext</div>',
+        'targetBeforeEdit' => 'I repeat <div title="" class="term preferredTerm exact">me</div> in the destinationtext',
+        'targetBeforeEdit6' => 'I repeat <div title="" class="term preferredTerm exact">me</div> in the <div title="" class="term preferredTerm exact">targettext</div>',
             
         'sourceAfterEdit4' => 'Ich wiederhole mich im Targettext',
-        'sourceAfterEdit6' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transFound" data-tbxid="term_NOT_TESTABLE">Zieltext</div>',
-        'sourceAfterEdit5' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transFound" data-tbxid="term_NOT_TESTABLE">Zieltext</div>',
-        'sourceAfterEdit7' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transFound" data-tbxid="term_NOT_TESTABLE">Zieltext</div> und bin in der <div title="" class="term preferredTerm exact transNotFound" data-tbxid="term_NOT_TESTABLE">Quelle</div> <div title="" class="term preferredTerm exact transNotDefined" data-tbxid="term_NOT_TESTABLE">unterschiedlich</div>',
+        'sourceAfterEdit6' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transFound">Zieltext</div>',
+        'sourceAfterEdit5' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transFound">Zieltext</div>',
+        'sourceAfterEdit7' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transFound">Zieltext</div> und bin in der <div title="" class="term preferredTerm exact transNotFound">Quelle</div> <div title="" class="term preferredTerm exact transNotDefined">unterschiedlich</div>',
             
-        'targetAfterEdit' => 'I repeat <div title="" class="term preferredTerm exact" data-tbxid="term_NOT_TESTABLE">me</div> in the <div title="" class="term preferredTerm exact" data-tbxid="term_NOT_TESTABLE">targettext</div>',
+        'targetAfterEdit' => 'I repeat <div title="" class="term preferredTerm exact">me</div> in the <div title="" class="term preferredTerm exact">targettext</div>',
     );
     
     public static function setUpBeforeClass():void {
@@ -117,14 +117,14 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
         $isSE = $this->api()->getTask()->enableSourceEditing;
         
         //test editing a prefilled segment
-        $segToTest = $this->api()->removeUntestableSegmentContent($segments[1], true);
+        $segToTest = $segments[1];
         
         if($isSE) {
-            $this->assertEquals($this->toCompareSource['sourceBeforeEdit'], $segToTest->sourceEdit);
+            $this->assertFieldTextEquals($this->toCompareSource['sourceBeforeEdit'], $segToTest->sourceEdit);
         }
-        $this->assertEquals($this->toCompareSource['sourceBeforeEdit'], $segToTest->source);
-        $this->assertEquals($this->toCompareSource['targetBeforeEdit'], $segToTest->targetEdit);
-        $this->assertEquals($this->toCompareSource['targetBeforeEdit'], $segToTest->target);
+        $this->assertFieldTextEquals($this->toCompareSource['sourceBeforeEdit'], $segToTest->source);
+        $this->assertFieldTextEquals($this->toCompareSource['targetBeforeEdit'], $segToTest->targetEdit);
+        $this->assertFieldTextEquals($this->toCompareSource['targetBeforeEdit'], $segToTest->target);
         
         //edit one segment
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'I repeat me in the source', $segToTest->id);
@@ -135,12 +135,11 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
             $segmentData = $this->api()->prepareSegmentPut('sourceEdit', 'Ich wiederhole mich in der Quelle - edited', $segToTest->id);
             $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         }
-        $segment = $this->api()->removeUntestableSegmentContent($segment);
-        
+      
         //assert source / target after editing
-        $this->assertEquals($this->toCompareSource['sourceAfterEdit'], $segment->source);
-        $this->assertEquals($this->toCompareSource['targetBeforeEdit'], $segment->target); //not changed the target original
-        $this->assertEquals($this->toCompareSource['targetEditAfterEdit'], $segment->targetEdit);
+        $this->assertFieldTextEquals($this->toCompareSource['sourceAfterEdit'], $segment->source);
+        $this->assertFieldTextEquals($this->toCompareSource['targetBeforeEdit'], $segment->target); //not changed the target original
+        $this->assertFieldTextEquals($this->toCompareSource['targetEditAfterEdit'], $segment->targetEdit);
         
         //fetch alikes and assert correct segments found by segmentNrInTask
         $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
@@ -165,26 +164,26 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         
         //check the alike were the ChangeAlikes handler only changed the autoState, the content was already correct
-        $segment = $this->api()->removeUntestableSegmentContent($segments[0]);
+        $segment = $segments[0];
         $this->assertEquals($isSE ? 11 : 13, $segment->autoStateId);
-        $this->assertEquals($this->toCompareSource['sourceAfterEdit'], $segment->source);
+        $this->assertFieldTextEquals($this->toCompareSource['sourceAfterEdit'], $segment->source);
         //this changealike was prefilled with the correct segment data, so targetEditAfterEdit == targetBeforeEdit
-        $this->assertEquals($this->toCompareSource['targetEditAfterEdit'], $segment->target);
-        $this->assertEquals($this->toCompareSource['targetEditAfterEdit'], $segment->targetEdit);
+        $this->assertFieldTextEquals($this->toCompareSource['targetEditAfterEdit'], $segment->target);
+        $this->assertFieldTextEquals($this->toCompareSource['targetEditAfterEdit'], $segment->targetEdit);
         
         //retest the master segment, if the edited content remains and the autostate is correct
-        $segment = $this->api()->removeUntestableSegmentContent($segments[1]);
+        $segment = $segments[1];
         $this->assertEquals(10, $segment->autoStateId);
-        $this->assertEquals($this->toCompareSource['sourceAfterEdit'], $segment->source);
-        $this->assertEquals($this->toCompareSource['targetBeforeEdit'], $segment->target);
-        $this->assertEquals($this->toCompareSource['targetEditAfterEdit'], $segment->targetEdit);
+        $this->assertFieldTextEquals($this->toCompareSource['sourceAfterEdit'], $segment->source);
+        $this->assertFieldTextEquals($this->toCompareSource['targetBeforeEdit'], $segment->target);
+        $this->assertFieldTextEquals($this->toCompareSource['targetEditAfterEdit'], $segment->targetEdit);
         
         //test the alike were changed content and autostate
-        $segment = $this->api()->removeUntestableSegmentContent($segments[2]);
+        $segment = $segments[2];
         $this->assertEquals(11, $segment->autoStateId);
-        $this->assertEquals($this->toCompareSource['sourceAfterEdit'], $segment->source);
-        $this->assertEquals($this->toCompareSource['targetBeforeEdit'], $segment->target);
-        $this->assertEquals($this->toCompareSource['targetEditAfterEdit'], $segment->targetEdit);
+        $this->assertFieldTextEquals($this->toCompareSource['sourceAfterEdit'], $segment->source);
+        $this->assertFieldTextEquals($this->toCompareSource['targetBeforeEdit'], $segment->target);
+        $this->assertFieldTextEquals($this->toCompareSource['targetEditAfterEdit'], $segment->targetEdit);
     }
     
     /**
@@ -199,13 +198,13 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
         $isSE = $this->api()->getTask()->enableSourceEditing;
         
         //test editing a prefilled segment
-        $segToTest = $this->api()->removeUntestableSegmentContent($segments[4], true);
+        $segToTest = $segments[4];
         if($isSE) {
-            $this->assertEquals($this->toCompareTarget['sourceBeforeEdit5'], $segToTest->sourceEdit);
+            $this->assertFieldTextEquals($this->toCompareTarget['sourceBeforeEdit5'], $segToTest->sourceEdit);
         }
-        $this->assertEquals($this->toCompareTarget['sourceBeforeEdit5'], $segToTest->source);
-        $this->assertEquals($this->toCompareTarget['targetBeforeEdit'], $segToTest->targetEdit);
-        $this->assertEquals($this->toCompareTarget['targetBeforeEdit'], $segToTest->target);
+        $this->assertFieldTextEquals($this->toCompareTarget['sourceBeforeEdit5'], $segToTest->source);
+        $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segToTest->targetEdit);
+        $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segToTest->target);
 
         //edit one segment
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'I repeat me in the targettext', $segToTest->id);
@@ -216,12 +215,11 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
             $segmentData = $this->api()->prepareSegmentPut('sourceEdit', 'Ich wiederhole mich im Zieltext - edited', $segToTest->id);
             $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         }
-        $segment = $this->api()->removeUntestableSegmentContent($segment);
-        
+         
         //assert source / target after editing
-        $this->assertEquals($this->toCompareTarget['sourceAfterEdit5'], $segment->source);
-        $this->assertEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target); //not changed the target original
-        $this->assertEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
+        $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit5'], $segment->source);
+        $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target); //not changed the target original
+        $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
         
         //fetch alikes and assert correct segments found by segmentNrInTask
         $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
@@ -246,32 +244,32 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         
         //check the alike were the ChangeAlikes handler only changed the autoState, the content was already correct
-        $segment = $this->api()->removeUntestableSegmentContent($segments[3]);
+        $segment = $segments[3];
         $this->assertEquals(11, $segment->autoStateId);
-        $this->assertEquals($this->toCompareTarget['sourceAfterEdit4'], $segment->source);
-        $this->assertEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target);
-        $this->assertEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
+        $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit4'], $segment->source);
+        $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target);
+        $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
         
         //retest the master segment, if the edited content remains and the autostate is correct
-        $segment = $this->api()->removeUntestableSegmentContent($segments[4]);
+        $segment = $segments[4];
         $this->assertEquals(10, $segment->autoStateId);
-        $this->assertEquals($this->toCompareTarget['sourceAfterEdit5'], $segment->source);
-        $this->assertEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target);
-        $this->assertEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
+        $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit5'], $segment->source);
+        $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target);
+        $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
         
         //test the alike were changed content and autostate
-        $segment = $this->api()->removeUntestableSegmentContent($segments[5]);
+        $segment = $segments[5];
         $this->assertEquals($isSE ? 11 : 13, $segment->autoStateId);
-        $this->assertEquals($this->toCompareTarget['sourceAfterEdit6'], $segment->source);
-        $this->assertEquals($this->toCompareTarget['targetBeforeEdit6'], $segment->target);
-        $this->assertEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
+        $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit6'], $segment->source);
+        $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit6'], $segment->target);
+        $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
         
         //test the alike were changed content and autostate
-        $segment = $this->api()->removeUntestableSegmentContent($segments[6]);
+        $segment = $segments[6];
         $this->assertEquals(11, $segment->autoStateId);
-        $this->assertEquals($this->toCompareTarget['sourceAfterEdit7'], $segment->source);
-        $this->assertEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target);
-        $this->assertEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
+        $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit7'], $segment->source);
+        $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target);
+        $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
     }
     
     /**
@@ -290,17 +288,14 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
         
         $sourceCompareString = $this->toCompareSource['sourceAfterEdit'].' - edited';
         $targetCompareString = $this->toCompareTarget['sourceAfterEdit6'].' - edited';
-        foreach($segments as $segment) {
-            //since objects are used by reference, using return value is not needed  
-            $this->api()->removeUntestableSegmentContent($segment);
-        }
-        $this->assertEquals($sourceCompareString, $segments[0]->sourceEdit);
-        $this->assertEquals($sourceCompareString, $segments[1]->sourceEdit);
-        $this->assertEquals($sourceCompareString, $segments[2]->sourceEdit);
-        $this->assertEquals($targetCompareString, $segments[3]->sourceEdit);
-        $this->assertEquals($targetCompareString, $segments[4]->sourceEdit);
-        $this->assertEquals($targetCompareString, $segments[5]->sourceEdit);
-        $this->assertEquals($targetCompareString, $segments[6]->sourceEdit);
+
+        $this->assertFieldTextEquals($sourceCompareString, $segments[0]->sourceEdit);
+        $this->assertFieldTextEquals($sourceCompareString, $segments[1]->sourceEdit);
+        $this->assertFieldTextEquals($sourceCompareString, $segments[2]->sourceEdit);
+        $this->assertFieldTextEquals($targetCompareString, $segments[3]->sourceEdit);
+        $this->assertFieldTextEquals($targetCompareString, $segments[4]->sourceEdit);
+        $this->assertFieldTextEquals($targetCompareString, $segments[5]->sourceEdit);
+        $this->assertFieldTextEquals($targetCompareString, $segments[6]->sourceEdit);
     }
     
     public static function tearDownAfterClass(): void {

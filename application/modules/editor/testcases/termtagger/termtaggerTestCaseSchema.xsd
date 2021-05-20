@@ -31,7 +31,7 @@
                                                                         <xs:simpleContent>
                                                                             <xs:extension base="xs:string">
                                                                                 <xs:attribute type="xs:string" name="class" use="required"/>
-                                                                                <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                                <xs:attribute type="xs:int" name="data-t5qid" use="required"/>
                                                                                 <xs:attribute type="xs:string" name="data-comment" use="required"/>
                                                                                 <xs:attribute type="xs:string" name="src" use="required"/>
                                                                             </xs:extension>
@@ -47,7 +47,7 @@
                                                             <xs:simpleContent>
                                                                 <xs:extension base="xs:string">
                                                                     <xs:attribute type="xs:string" name="class" use="required"/>
-                                                                    <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                    <xs:attribute type="xs:int" name="data-t5qid" use="required"/>
                                                                     <xs:attribute type="xs:string" name="data-comment" use="required"/>
                                                                     <xs:attribute type="xs:string" name="src" use="required"/>
                                                                 </xs:extension>
@@ -79,7 +79,7 @@
                                                                         <xs:simpleContent>
                                                                             <xs:extension base="xs:string">
                                                                                 <xs:attribute type="xs:string" name="class" use="required"/>
-                                                                                <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                                <xs:attribute type="xs:int" name="data-t5qid" use="required"/>
                                                                                 <xs:attribute type="xs:string" name="data-comment" use="required"/>
                                                                                 <xs:attribute type="xs:string" name="src" use="required"/>
                                                                             </xs:extension>
@@ -95,7 +95,7 @@
                                                             <xs:simpleContent>
                                                                 <xs:extension base="xs:string">
                                                                     <xs:attribute type="xs:string" name="class" use="required"/>
-                                                                    <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                    <xs:attribute type="xs:int" name="data-t5qid" use="required"/>
                                                                     <xs:attribute type="xs:string" name="data-comment" use="required"/>
                                                                     <xs:attribute type="xs:string" name="src" use="required"/>
                                                                 </xs:extension>
@@ -133,7 +133,7 @@
                                                                         <xs:simpleContent>
                                                                             <xs:extension base="xs:string">
                                                                                 <xs:attribute type="xs:string" name="class" use="required"/>
-                                                                                <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                                <xs:attribute type="xs:int" name="data-t5qid" use="required"/>
                                                                                 <xs:attribute type="xs:string" name="data-comment" use="required"/>
                                                                                 <xs:attribute type="xs:string" name="src" use="required"/>
                                                                             </xs:extension>
@@ -171,7 +171,7 @@
                                                             <xs:simpleContent>
                                                                 <xs:extension base="xs:string">
                                                                     <xs:attribute type="xs:string" name="class" use="required"/>
-                                                                    <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                    <xs:attribute type="xs:int" name="data-t5qid" use="required"/>
                                                                     <xs:attribute type="xs:string" name="data-comment" use="required"/>
                                                                     <xs:attribute type="xs:string" name="src" use="required"/>
                                                                 </xs:extension>
@@ -203,7 +203,7 @@
                                                                         <xs:simpleContent>
                                                                             <xs:extension base="xs:string">
                                                                                 <xs:attribute type="xs:string" name="class" use="required"/>
-                                                                                <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                                <xs:attribute type="xs:int" name="data-t5qid" use="required"/>
                                                                                 <xs:attribute type="xs:string" name="data-comment" use="required"/>
                                                                                 <xs:attribute type="xs:string" name="src" use="required"/>
                                                                             </xs:extension>
@@ -244,7 +244,7 @@
                                                             <xs:simpleContent>
                                                                 <xs:extension base="xs:string">
                                                                     <xs:attribute type="xs:string" name="class" use="required"/>
-                                                                    <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                    <xs:attribute type="xs:int" name="data-t5qid" use="required"/>
                                                                     <xs:attribute type="xs:string" name="data-comment" use="required"/>
                                                                     <xs:attribute type="xs:string" name="src" use="required"/>
                                                                 </xs:extension>
