@@ -54,6 +54,27 @@ Ext.define('Editor.util.Util', {
                 }
             }
             return date;
+        },
+        /**
+         * Creates an CSS-Selector from props
+         * @param nodeName {String} the relevant node-name of the serched elements
+         * @param classNames {Array,String} like [class1, ..., classN] OR String the relevant class/classes of the searched elements
+         * @param dataProps {Array} like [{ name:'name1', value:'val1' }, ..., { name:'nameN', value:'valN' }] the relevant data-properties of the searched elements
+         * @return String
+         */
+        createSelectorFromProps(nodeName, classNames, dataProps){
+            var selector = (nodeName) ? nodeName : '';
+                if(classNames){
+                selector += (Array.isArray(classNames)) ? ('.' + classNames.join('.')) : ('.' + classNames.split(' ').join('.'));
+            }
+            if(dataProps && Array.isArray(dataProps)){
+                dataProps.forEach(function(prop){
+                    if(prop.name && prop.value){
+                        selector += ("[data-" + prop.name + "='" + prop.value + "']");
+                    }
+                });
+            }
+            return selector;
         }
     }
     

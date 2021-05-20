@@ -90,13 +90,11 @@ class editor_Models_Segment_Updater {
         $this->segment->validate();
         
         $this->updateTargetHashAndOriginal($this->task);
+
+        // Update the Quality Tags
+        editor_Segment_Quality_Manager::instance()->processSegment($this->segment, $this->task, editor_Segment_Processing::EDIT);
         
-        foreach($allowedAlternatesToChange as $field) {
-            if($this->segment->isModified($field)) {
-                $this->segment->updateQmSubSegments($field);
-            }
-        }
-        
+        // TODO: this event is unused, remove it 
         $this->events->trigger("beforeSegmentUpdate", $this, array(
             'entity' => $this->segment,
             'history' => $history

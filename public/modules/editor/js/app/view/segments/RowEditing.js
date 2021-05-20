@@ -101,7 +101,7 @@ Ext.define('Editor.view.segments.RowEditing', {
      * @param {Editor.model.Segment} record
      * @param {Ext.grid.column.Column/Number} columnHeader The Column object defining the column to be edited, or index of the column.
      * @param {Integer} mode, the editor start mode, see the self.STARTEDIT_ constants
-     * @returns booelean|void
+     * @returns boolean|void
      */
     startEdit: function(record, columnHeader, mode) {
         var me = this;

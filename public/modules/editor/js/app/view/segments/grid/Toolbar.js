@@ -53,8 +53,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_hideTagBtn: '#UT#Tags verbergen',
     item_shortTagBtn: '#UT#Tag-Kurzansicht',
     item_fullTagBtn: '#UT#Tag-Vollansicht',
-    item_qmsummaryBtn: '#UT#MQM',
-    item_qmsummaryTooltip: '#UT#MQM Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
     item_zoomIn: '#UT#Segmentschriftgrad vergrößern',
     item_zoomOut: '#UT#Segmentschriftgrad verkleinern',
@@ -198,16 +196,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     },
                 },{
                     xtype: 'tbseparator',
-                    hidden: !Editor.data.task.hasQmSub()
-                },{
-                    xtype: 'button',
-                    itemId: 'qmsummaryBtn',
-                    text: me.item_qmsummaryBtn,
-                    tooltip: {
-                        text: me.item_qmsummaryTooltip,
-                        showDelay: 0
-                    },
-                    hidden: !Editor.data.task.hasQmSub()
+                    hidden: !Editor.data.task.hasMqm()
                 },{
                 	xtype: 'tbfill'
                 },{

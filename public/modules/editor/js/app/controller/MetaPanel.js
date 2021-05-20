@@ -39,37 +39,53 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.MetaPanel', {
   extend : 'Ext.app.Controller',
-  requires: ['Editor.view.qmsubsegments.AddFlagFieldset'],
+  requires: [
+      'Editor.view.quality.mqm.Fieldset',
+      'Editor.view.quality.FalsePositives',
+      'Editor.view.quality.SegmentQm',
+      'Editor.store.quality.Segment' ],
   models: ['SegmentUserAssoc'],
   messages: {
+      stateIdSaved: '#UT#Der Segment Status wurde gespeichert'
   },
-  refs : [{
-    ref : 'metaPanel',
-    selector : '#metapanel'
+  refs: [{
+    ref: 'metaPanel',
+    selector: '#metapanel'
   },{
-    ref : 'metaTermPanel',
-    selector : '#metapanel #metaTermPanel'
+    ref: 'metaTermPanel',
+    selector: '#metapanel #metaTermPanel'
   },{
-    ref : 'leftBtn',
-    selector : '#metapanel #goAlternateLeftBtn'
+    ref: 'metaQmPanel',
+    selector: '#metapanel #segmentQm'
   },{
-    ref : 'rightBtn',
-    selector : '#metapanel #goAlternateRightBtn'
+    ref: 'metaFalPosPanel',
+    selector: '#metapanel #falsePositives'
   },{
-      ref : 'navi',
-      selector : '#metapanel #naviToolbar'
+      ref: 'metaInfoForm',
+      selector: '#metapanel #metaInfoForm'
   },{
-      ref : 'segmentMeta',
-      selector : '#metapanel segmentsMetapanel'
+    ref: 'segmentMeta',
+    selector: '#metapanel segmentsMetapanel'
   },{
-    ref : 'segmentGrid',
-    selector : '#segmentgrid'
+    ref: 'leftBtn',
+    selector: '#metapanel #goAlternateLeftBtn'
+  },{
+    ref: 'rightBtn',
+    selector: '#metapanel #goAlternateRightBtn'
+  },{
+      ref: 'navi',
+      selector: '#metapanel #naviToolbar'
+  },{
+    ref: 'segmentGrid',
+    selector: '#segmentgrid'
   }],
-  
   listen: {
       component: {
           '#metapanel #metaTermPanel': {
               afterrender: 'initMetaTermHandler'
+          },
+          '#metapanel segmentsMetapanel': {
+              segmentStateChanged: 'onSegmentStateChanged'
           },
           '#segmentgrid': {
               selectionchange: 'handleSegmentSelectionChange',
@@ -81,23 +97,46 @@ Ext.define('Editor.controller.MetaPanel', {
       },
       controller: {
           '#Editor': {
-              changeState: 'changeState'
+              changeSegmentState: 'onChangeSegmentState'
+          }
+      },
+      store: {
+          '#SegmentQualities': {
+              load: 'handleQualitiesLoaded'
           }
       }
   },
-  
+  /**
+   * If the QM qualities are enabled
+   */
+  hasQmQualities: false,
+  /**
+   * The store holding the segments qualiies. Data source for the falsePositives panel and the segmentQm panel
+   */
+  qualitiesStore: null,
+  /**
+   * A flag specifying our editing mode. can be: 'none', 'readonly', 'edit'
+   */
+  editingMode: 'none',
   /**
    * Gibt die RowEditing Instanz des Grids zurück
    * @returns Editor.view.segments.RowEditing
    */
   getEditPlugin: function() {
-    return this.getSegmentGrid().editingPlugin;
+      return this.getSegmentGrid().editingPlugin;
+  },
+  getQualitiesStore: function(){
+      if(this.qualitiesStore == null){
+          this.qualitiesStore = Ext.create('Editor.store.quality.Segment');
+      }
+      return this.qualitiesStore;
   },
   initEditPluginHandler: function() {
       var me = this, 
           multiEdit = me.getSegmentGrid().query('contentEditableColumn').length > 1,
           useChangeAlikes = Editor.app.authenticatedUser.isAllowed('useChangeAlikes', Editor.data.task);
-
+      // creating the store for the segment's qualities on the first edit
+      me.getQualitiesStore();
       me.getLeftBtn().setVisible(multiEdit && ! useChangeAlikes);
       me.getRightBtn().setVisible(multiEdit && ! useChangeAlikes);
   },
@@ -127,32 +166,48 @@ Ext.define('Editor.controller.MetaPanel', {
    * @param {Object} editingPlugin
    */
   startEdit: function(editingPlugin, context) {
-    var me = this,
-        mp = me.getMetaPanel(),
-        record = context.record,
-        segmentId = record.get('id'),
-        isWatched = Boolean(record.get('isWatched')),
-        segmentUserAssocId = record.get('segmentUserAssocId'),
-        navi = me.getNavi(),
-        but = Ext.getCmp('watchSegmentBtn'),
-        tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
-        
-    but.toggle(isWatched, true);
-    but.setTooltip({
-        dismissDelay: 0,
-        text: tooltip
-    });
-    
-    me.record = record;
-    this.loadTermPanel(segmentId);
-    //bindStore(me.record.terms());
-    me.loadRecord(me.record);
-    navi.show();
-    navi.enable();
-    me.getSegmentMeta().show();
-    mp.enable();
+      var me = this,
+          mp = me.getMetaPanel(),
+          record = context.record,
+          segmentId = record.get('id'),
+          isWatched = Boolean(record.get('isWatched')),
+          segmentUserAssocId = record.get('segmentUserAssocId'),
+          navi = me.getNavi(),
+          but = Ext.getCmp('watchSegmentBtn'),
+          tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
+      me.editingMode = 'edit';
+      but.toggle(isWatched, true);
+      but.setTooltip({
+          dismissDelay: 0,
+          text: tooltip
+      });
+      me.record = record;
+      me.loadTermPanel(segmentId);
+      me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
+      // our component controllers are listening for the load event & create their views
+      me.getQualitiesStore().load({
+          params: { segmentId: segmentId }
+      });
+      me.loadRecord(me.record);
+      navi.show();
+      navi.enable();
+      me.getSegmentMeta().show();
+      mp.enable();
+      
   },
-  
+  /**
+   * Starts the creation of the segment's quality related GUIs
+   */
+  handleQualitiesLoaded: function(store, records){
+      // for cases where user is faster than store
+      if(this.editingMode == 'edit'){
+          var segmentId = this.record.get('id');
+          this.getMetaFalPosPanel().startEditing(records, segmentId, true);
+          this.getMetaQmPanel().startEditing(records, segmentId, this.hasQmQualities);
+      } else {
+          store.removeAll(true);
+      }
+  },
   /**
    * @param {Ext.selection.Model} sm current selection model of 
    * @param {Array} selectedRecords 
@@ -163,7 +218,6 @@ Ext.define('Editor.controller.MetaPanel', {
       }
       this.loadTermPanel(selectedRecords[0].get('id'));
   },
-  
   /**
    * @param {Integer} segmentId for which the terms should be loaded 
    */
@@ -174,20 +228,20 @@ Ext.define('Editor.controller.MetaPanel', {
       if(Editor.data.task.get('terminologie') || !panel.html) {
           panel.getLoader().load({
               params: {id: segmentId},
-              callback: function() {
+              callback: function(){
                   me.getSegmentMeta() && me.getSegmentMeta().updateLayout();
               }
           });
       }
   },
-  
   /**
    * opens metapanel for readonly segments
    * @param {Editor.model.Segment} record
    */
   openReadonly: function(record) {
-      var me = this,
+      var me = this,      
       mp = me.getMetaPanel();
+      me.editingMode = 'readonly';
       me.record = record;
       me.getSegmentMeta().hide();
       mp.enable();
@@ -198,58 +252,68 @@ Ext.define('Editor.controller.MetaPanel', {
    * @param {Ext.data.Model} record
    */
   loadRecord: function(record) {
-    var me = this,
-        mp = me.getMetaPanel(),
-        form = mp.down('#metaInfoForm'),
-        values = record.getQmAsArray(),
-        qmBoxes = mp.query('#metaQm checkbox');
-    statBoxes = mp.query('#metaStates radio');
-    Ext.each(statBoxes, function(box){
-      box.setValue(false);
-    });
-    form.loadRecord(record);
-    Ext.each(qmBoxes, function(box){
-      box.setValue(Ext.Array.contains(values, box.inputValue));
-    });
+      // this is only done to be able in the component to detect if a change was done programmatically or user generated
+      // the afterwards loading of the recordstriggers the onChange in the radio controls
+      this.getSegmentMeta().setSegmentStateId(record.get('stateId'));
+      this.getMetaInfoForm().loadRecord(record);
   },
   /**
    * Editor.view.segments.RowEditing edit handler, Speichert die Daten aus dem MetaPanel im record
    */
   saveEdit: function() {
-    var me = this,
-        mp = me.getMetaPanel(),
-        form = mp.down('#metaInfoForm'),
-        qmBoxes = mp.query('#metaQm checkbox'),
-        quality = [];
-    Ext.each(qmBoxes, function(box){box.getValue() && quality.push(box.inputValue);});
-    me.record.set('stateId', form.getValues().stateId);
-    me.record.setQmFromArray(quality);
-    //close the metapanel
-    mp.disable();
+      this.record.set('stateId', this.getMetaInfoForm().getValues().stateId);
+      //close the metapanel
+      this.getMetaPanel().disable();
+      this.getMetaFalPosPanel().endEditing(true, true);
+      this.getMetaQmPanel().endEditing(this.hasQmQualities, true);
+      this.getQualitiesStore().removeAll(true);
+      this.editingMode = 'none';
   },
-  /**
-   * Changes the state box by keyboard shortcut instead of mouseclick
-   * @param {Ext.Number} param
-   */
-  changeState: function(param) {
-    var me = this,
-        mp = me.getMetaPanel(),
-        index = 1,
-        statBoxes = mp.query('#metaStates radio');
-    Ext.each(statBoxes, function(box){
-      if (index++ == param){
-        box.setValue(true);
-      }
-    });
-  },  
   /**
    * Editor.view.segments.RowEditing canceledit handler
    * @hint metapanel
    */
   cancelEdit: function() {
-      var me = this,
-          mp = me.getMetaPanel();
-        
-      mp.disable();
+      this.getMetaPanel().disable();
+      this.getMetaFalPosPanel().endEditing(true, false);
+      this.getMetaQmPanel().endEditing(this.hasQmQualities, false);
+      this.getQualitiesStore().removeAll(true);
+      this.editingMode = 'none';
+  },
+  /**
+   * Changes the state box by keyboard shortcut instead of mouseclick 
+   * we do no set the stateId before to trigger a change event
+   * @param {Ext.Number} param
+   */
+  onChangeSegmentState: function(stateId) {
+      this.getSegmentMeta().showSegmentStateId(stateId);
+  },
+  /**
+   * Listenes for segment state changes thrown from segments metapanel view
+   */
+  onSegmentStateChanged: function(stateId, oldStateId){
+      var me = this;
+      Ext.Ajax.request({
+          url: Editor.data.restpath+'segment/stateid',
+          method: 'GET',
+          params: { id: me.record.get('id'), stateId: stateId },
+          success: function(response){
+              response = Ext.util.JSON.decode(response.responseText);
+              if(response.success){
+                  me.record.set('stateId', stateId);
+                  // commit silently, oherwise the changed state gets lost on next edit of the segment
+                  me.record.commit(true);
+                  Editor.MessageBox.addSuccess(me.messages.stateIdSaved);
+              } else {
+                  console.log("Changing segments stateId via Ajax failed!");
+                  var statePanel = me.getSegmentMeta();
+                  statePanel.setSegmentStateId(oldStateId);
+                  statePanel.showSegmentStateId(oldStateId);
+              }
+          },
+          failure: function(response){
+              Editor.app.getController('ServerException').handleException(response);
+          }
+      });
   }
 });

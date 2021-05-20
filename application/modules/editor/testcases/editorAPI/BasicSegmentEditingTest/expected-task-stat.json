@@ -3,60 +3,60 @@
         "workflowStep": "no workflow",
         "status": "finished",
         "progress": 100,
-	"segmentWorkCount": {
-            "edited":0,
-	    "confirmed":0,
-	    "sum":0
-	}
+		"segmentWorkCount": {
+	        "edited":0,
+		    "confirmed":0,
+		    "sum":0
+		}
     },
     {
         "workflowStep": "translation",
         "status": "finished",
         "progress": 100,
-	"segmentWorkCount": {
-            "edited":5,
-	    "confirmed":0,
-	    "sum":5
-	}
+		"segmentWorkCount": {
+	        "edited":5,
+		    "confirmed":0,
+		    "sum":5
+		}
     },
     {
         "workflowStep": "reviewing",
         "status": "edit",
         "progress": 31,
-	"segmentWorkCount": {
-            "edited":4,
-	    "confirmed":0,
-	    "sum":4
-	}
+		"segmentWorkCount": {
+	        "edited":4,
+		    "confirmed":0,
+		    "sum":4
+		}
     },
     {
         "workflowStep": "translatorCheck",
         "status": "open",
         "progress": 0,
-	"segmentWorkCount": {
-            "edited":0,
-	    "confirmed":0,
-	    "sum":0
-	}
+		"segmentWorkCount": {
+	        "edited":0,
+		    "confirmed":0,
+		    "sum":0
+		}
     },
     {
         "workflowStep": "workflowEnded",
         "status": "open",
         "progress": 0,
-	"segmentWorkCount": {
-            "edited":0,
-	    "confirmed":0,
-	    "sum":0
-	}
+		"segmentWorkCount": {
+	        "edited":0,
+		    "confirmed":0,
+		    "sum":0
+		}
     },
     {
         "workflowStep": "pmCheck",
         "status": "open",
         "progress": 0,
-	"segmentWorkCount": {
-            "edited":0,
-	    "confirmed":0,
-	    "sum":0
-	}
+		"segmentWorkCount": {
+	        "edited":0,
+		    "confirmed":0,
+		    "sum":0
+		}
     }
 ]
