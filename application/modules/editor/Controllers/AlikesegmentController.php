@@ -126,6 +126,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 //Load alike segment, create a history entry, and overwrite with the data of the target segment
                 $entity->load($id);
                 $oldHash = $entity->getTargetMd5();
+                
+                //if neither source nor target hashes are matching,
+                // then the segment is no alike of the edited segment => we ignore and log it
                 if(! $this->isValidSegment($entity, $editedSegmentId, $hasher)) {
                     error_log('Falsche Segmente per WDHE bearbeitet: MasterSegment:'.$editedSegmentId.' per PUT übergebene Ids:'.print_r($ids, 1).' IP:'.$_SERVER['REMOTE_ADDR']);
                     continue;
@@ -283,12 +286,15 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         //the current targetMd5 hash is valid in any case
         $validTargetMd5[] = $this->entity->getTargetMd5();
         
-        //if neither source nor target hashes are matching,
-        // then the segment is no alike of the edited segment => we ignore and log it
-        $sourceMatch = $this->entity->getSourceMd5() === $entity->getSourceMd5();
-        //either the targets are different, or both targets are empty => the empty target case is also no alike match!
-        $targetMatch = (in_array($entity->getTargetMd5(), $validTargetMd5)) && (strlen(trim($entity->getTarget())) > 0);
+        //remove the empty segment hashes from the valid list, since empty targets are no repetition
+        $validTargetMd5 = array_diff(array_unique($validTargetMd5), [$this->entity::EMPTY_STRING_HASH]);
         
+        //the source hash must be just equal
+        $sourceMatch = $this->entity->getSourceMd5() === $entity->getSourceMd5();
+
+        //the target hash must be one of the previous hashes or the current one:
+        $targetMatch = in_array($entity->getTargetMd5(), $validTargetMd5);
+
         return $sourceMatch || $targetMatch;
     }
     

@@ -23,7 +23,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;&amp;lt;/sym&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"ph\" data-length=\"-1\">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;&amp;lt;/sym&amp;gt;&lt;/ph&gt;</span></div><div class=\"term preferredTerm exact\" title=\"\">Ichbin</div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\"><div class=\"term preferredTerm exact\" title=\"\">einTerm</div> </ins><div class=\"term preferredTerm exact\" title=\"\"><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\">Ichbin</ins>einTerm</div>",
         "targetEditToSort": "IchbineinTerm IchbineinTerm",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":27}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "2",
@@ -49,7 +50,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;&amp;lt;/sym&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"ph\" data-length=\"-1\">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;&amp;lt;/sym&amp;gt;&lt;/ph&gt;</span></div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\">Ichbin </ins><div class=\"term preferredTerm exact\" title=\"\"><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\">keinTerm</ins> </div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\"><div class=\"term preferredTerm exact\" title=\"\">Ichbin</div> keinTerm</ins>x",
 		"targetEditToSort": "Ichbin keinTerm Ichbin keinTermx",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":32}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "3",
@@ -75,7 +77,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;&amp;lt;/sym&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"ph\" data-length=\"-1\">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;&amp;lt;/sym&amp;gt;&lt;/ph&gt;</span></div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000001}\" data-username=\"manager test\" data-usercssnr=\"usernr1\" data-workflowstep=\"reviewing1\">Ichbin </ins><div class=\"term preferredTerm exact\" title=\"\"><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000001}\" data-username=\"manager test\" data-usercssnr=\"usernr1\" data-workflowstep=\"reviewing1\">keinTerm</ins> <del class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\">x</del></div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\"><div class=\"term preferredTerm exact\" title=\"\">Ichbin</div> keinTerm</ins>",
       	"targetEditToSort": "Ichbin keinTerm Ichbin keinTerm",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":31}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "4",
@@ -101,7 +104,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;&amp;lt;/sym&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"ph\" data-length=\"-1\">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;&amp;lt;/sym&amp;gt;&lt;/ph&gt;</span></div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000001}\" data-username=\"manager test\" data-usercssnr=\"usernr1\" data-workflowstep=\"reviewing1\">Ichbin </ins><div class=\"term preferredTerm exact\" title=\"\"><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000001}\" data-username=\"manager test\" data-usercssnr=\"usernr1\" data-workflowstep=\"reviewing1\">keinTerm</ins> </div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\"><div class=\"term preferredTerm exact\" title=\"\">Ichbin</div> keinTerm</ins><del class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\">x</del>",
 		"targetEditToSort": "Ichbin keinTerm Ichbin keinTerm",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":31}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "5",
@@ -127,7 +131,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" >Soll hei\u00dfen <\/ins><div title=\"\" class=\"term preferredTerm exact\"><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" >Ich<\/ins>bineinTerm<\/div>",
         "targetEditToSort": "Soll hei\u00dfen IchbineinTerm",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":25}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "6",
@@ -153,6 +158,7 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;&amp;lt;/sym&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"ph\" data-length=\"-1\">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;&amp;lt;/sym&amp;gt;&lt;/ph&gt;</span></div><div class=\"term preferredTerm exact\" title=\"\">Muss heißen <del class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\">x</del></div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\"><div class=\"term preferredTerm exact\" title=\"\">Ichbin</div> keinTerm</ins>",
         "targetEditToSort": "Muss hei\u00dfen Ichbin keinTerm",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":27}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     }
 ]
