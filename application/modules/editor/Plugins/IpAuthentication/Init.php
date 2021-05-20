@@ -60,7 +60,12 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
         
         $user = ZfExtended_Factory::get('editor_Plugins_IpAuthentication_Models_IpBaseUser');
         /* @var $user editor_Plugins_IpAuthentication_Models_IpBaseUser */
-        
+
+        // if there is no ip configuration, do nothing
+        if(empty($user->getConfiguredIps())){
+            return;
+        }
+
         if(!$user->isIpBasedRequest()){
             $logger->debug('E0000', 'Login denied from {ip}', [
                 'ip' => $user->getIp(),

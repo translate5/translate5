@@ -34,7 +34,7 @@ class editor_Plugins_ModelFront_HttpApi {
      * Api-URL from zf configuration
      * @var string
      */
-    protected $apiUrl;
+    protected string $apiUrl;
     
     /**
      * Api token from zf configuration
@@ -45,26 +45,34 @@ class editor_Plugins_ModelFront_HttpApi {
     /**
      * @var Zend_Http_Response
      */
-    protected $response;
+    protected Zend_Http_Response $response;
     
-    protected $http;
+    protected Zend_Http_Client $http;
 
     /***
      * rfc language value
      * @var string
      */
-    protected $sourceLangRfc;
+    protected string $sourceLangRfc;
     
     /***
      * rfc language value
      * @var string
      */
-    protected $targetLangRfc;
+    protected string $targetLangRfc;
     
     protected $result;
-    
+
+    /***
+     * @var Zend_Config
+     */
+    protected Zend_Config $config;
+
+    /**
+     * @throws editor_Plugins_ModelFront_Exception
+     * @throws Zend_Exception
+     */
     public function __construct() {
-        $this->logger = Zend_Registry::get('logger')->cloneMe('plugin.modelfront');
         $this->config = Zend_Registry::get('config');
         $this->apiUrl = $this->config->runtimeOptions->plugins->ModelFront->apiUrl ?? null;
         $this->apiToken = $this->config->runtimeOptions->plugins->ModelFront->apiToken ?? null;
@@ -84,7 +92,7 @@ class editor_Plugins_ModelFront_HttpApi {
      * @throws Exception
      * @return boolean
      */
-    public function predictRisk(array $data){
+    public function predictRisk(array $data): bool{
         if(empty($this->sourceLangRfc) || empty($this->targetLangRfc)){ 
             throw new editor_Plugins_ModelFront_Exception('E1267');
         }
@@ -101,7 +109,7 @@ class editor_Plugins_ModelFront_HttpApi {
      * @param Zend_Http_Client $http
      * @return Zend_Http_Response
      */
-    protected function request(Zend_Http_Client $http) {
+    protected function request(Zend_Http_Client $http): Zend_Http_Response{
         
         try {
             return $http->request();
@@ -115,7 +123,7 @@ class editor_Plugins_ModelFront_HttpApi {
      * @param Zend_Http_Response $response
      * @return boolean
      */
-    protected function processResponse(Zend_Http_Response $response) {
+    protected function processResponse(Zend_Http_Response $response): bool{
         $this->error = [];
         $this->result=[];
         $this->response = $response;
@@ -154,7 +162,7 @@ class editor_Plugins_ModelFront_HttpApi {
      * @param string $method
      * @return Zend_Http_Client
      */
-    protected function getHttp($method) {
+    protected function getHttp($method): Zend_Http_Client{
         $this->http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
         $this->http->setMethod($method);
