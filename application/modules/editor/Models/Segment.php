@@ -1129,8 +1129,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             s.isRepeated = IF(srep.isRepeated, s.isRepeated | 2, s.isRepeated & ~2)
         WHERE v.targetMd5 = srep.targetMd5
         AND v.id = s.id';
-        error_log(sprintf($sql, $this->segmentFieldManager->getView()->getName()));
-        error_log(print_r([$newHash, $oldHash],1));
         $this->db->getAdapter()->query(sprintf($sql, $this->segmentFieldManager->getView()->getName()),[$newHash, $oldHash]);
     }
 
