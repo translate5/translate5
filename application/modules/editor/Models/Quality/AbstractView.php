@@ -107,6 +107,11 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $isTree = false;
     /**
+     * If set (only for Trees) all nodes will have a "checked" property
+     * @var boolean
+     */
+    protected $hasCheckboxes = false;
+    /**
      * Configures the generated data (currently unused)
      * @var boolean
      */
@@ -219,7 +224,9 @@ abstract class editor_Models_Quality_AbstractView {
         $root->qcomplete = true;        
         $root->expanded = true;
         $root->expandable = false; // removes the error in front of the root node
-        $root->checked = $this->getCheckedVal($root->qtype, $root->qcategory);
+        if($this->hasCheckboxes){
+            $root->checked = $this->getCheckedVal($root->qtype, $root->qcategory);
+        }
         $root->text = $this->manager->getTranslate()->_('Alle Kategorien');
         $root->children = $this->rows;
         return [ $root ];
@@ -358,14 +365,16 @@ abstract class editor_Models_Quality_AbstractView {
             }
             $row->leaf = true;
         }
-        if($isRubric){
-            if(!property_exists($row, 'qtotal')){
-                $row->qtotal = $row->qcount;
+        if($isRubric && !property_exists($row, 'qtotal')){
+            $row->qtotal = $row->qcount;
+        }
+        if($this->hasCheckboxes){
+            if($isRubric){
+                // rubrics without segments shall not be checked
+                $row->checked = ($row->qtotal > 0) ? $this->getCheckedVal($row->qtype, $row->qcategory) : false;
+            } else {
+                $row->checked = $this->getCheckedVal($row->qtype, $row->qcategory);
             }
-            // rubrics without segments shall not be checked
-            $row->checked = ($row->qtotal > 0) ? $this->getCheckedVal($row->qtype, $row->qcategory) : false;
-        } else {
-            $row->checked = $this->getCheckedVal($row->qtype, $row->qcategory);
         }
         // mark the faulty item
         if($row->qtype == editor_Segment_Tag::TYPE_INTERNAL && $row->qcategory == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY){
