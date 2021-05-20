@@ -23,7 +23,8 @@
         "targetEdit": "0",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":1}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "2",
@@ -49,7 +50,8 @@
         "targetEdit": "",
         "targetEditToSort": "",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":0}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "3",
@@ -75,7 +77,8 @@
         "targetEdit": "0",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":1}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "4",
@@ -101,7 +104,8 @@
         "targetEdit": "0",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":1}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "5",
@@ -127,7 +131,8 @@
         "targetEdit": "0",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":1}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "6",
@@ -153,7 +158,8 @@
         "targetEdit": "",
         "targetEditToSort": "",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":0}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "7",
@@ -179,7 +185,8 @@
         "targetEdit": "0",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":1}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "8",
@@ -205,6 +212,7 @@
         "targetEdit": "<ins class=\"trackchanges ownttip\" data-usercssnr=\"usernr1\" data-workflowstep=\"no workflow1\" >0<\/ins>",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":1}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     }
 ]

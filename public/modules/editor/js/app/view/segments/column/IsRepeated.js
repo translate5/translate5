@@ -41,7 +41,12 @@ Ext.define('Editor.view.segments.column.IsRepeated', {
     mixins: ['Editor.view.segments.column.BaseMixin'],
     dataIndex: 'isRepeated',
     text: '#UT#Mit Wiederholungen',
+    bind: {
+        disabled: '{!taskHasDefaultLayout}',
+        hidden: '{!taskHasDefaultLayout}'
+    },
     strings: {
+        ttip: '#UT#Änderungen des Wiederholungsstatus durch Segmentänderungen werden nicht sofort angezeigt, die Segmente müssen neugeladen werden!',
         filter: {
             none: '#UT#Segmente ohne Wiederholungen',
             source: '#UT#Segmente mit Wiederholungen nur in der Quellsprache',
@@ -63,6 +68,7 @@ Ext.define('Editor.view.segments.column.IsRepeated', {
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
+                tooltip: me.strings.ttip,
                 editor: {
                     xtype: 'displayfield',
                     cls: 'isRepeated'
@@ -92,7 +98,9 @@ Ext.define('Editor.view.segments.column.IsRepeated', {
         return me.callParent([config]);
     },
     renderer: function(value,context,record){
-        var str = context.column.strings.col;
+        var me = this,
+            str = me.down('isRepeatedColumn').strings.col;
+
         switch(value) {
             case 3:
                 return str.both;
