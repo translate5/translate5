@@ -57,7 +57,7 @@ Ext.define('Editor.store.Segments', {
       this.firstEditableRow = null;
   },
   handleMetachange: function(proxy, meta) {
-            var me = this;
+      var me = this;
       if(meta.hasOwnProperty('firstEditable')) {
           me.firstEditableRow = meta.firstEditable;
       }
@@ -71,5 +71,48 @@ Ext.define('Editor.store.Segments', {
    */
   afterEdit: function(record, modifiedFieldNames) {
       this.fireEvent('update', this, record, 'edit', modifiedFieldNames);
+  },
+  /**
+   * Retrieves our url params as used in our proxy
+   */
+  getParams: function(){
+      var proxy = this.getProxy(), params = {};
+      params[proxy.getFilterParam()] = proxy.encodeFilters(this.getFilters().items);
+      params[proxy.getSortParam()] = proxy.encodeSorters(this.getSorters().items);
+      if(proxy.extraParams['qualities'] && proxy.extraParams['qualities'] !== ''){
+          params['qualities'] = proxy.extraParams['qualities'];
+      }
+      return params;
+  },
+  /**
+   * Retrieves only our filters as url params as used in our proxy
+   */
+  getFilterParams: function(){
+      var proxy = this.getProxy(), params = {};
+      params[proxy.getFilterParam()] = proxy.encodeFilters(this.getFilters().items);
+      return params;
+  },
+  /**
+   * retrieves the currently set quality filter
+   */
+  getQualityFilter: function(){
+      var proxy = this.getProxy();
+      if(proxy.extraParams['qualities'] && proxy.extraParams['qualities'] !== ''){
+          return params['qualities'];
+      }
+      return '';
+  },
+  /**
+   * Sets the qualityFilter, returns, if the filter changed
+   */
+  setQualityFilter: function(filter){
+      var proxy = this.getProxy(), changed = (proxy.extraParams['qualities']) ? (proxy.extraParams['qualities'] !== filter) : (filter !== '');
+      if(filter === ''){
+          delete proxy.extraParams['qualities'];
+      } else {
+          proxy.setExtraParam('qualities', filter);
+      }
+      // console.log("SegmentsStore::setQualityFilter:", filter, changed);
+      return changed;
   }
 });

@@ -143,12 +143,12 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
             get: function(task) {
                 //the old menu will be destroyed by the owner component
                 var me = this,
-                    hasQm = task.hasQmSub(),
+                    hasMqm = task.hasMqm(),
                     menu;
                 
                 menu = Ext.widget('adminExportMenu', {
                     task: task,
-                    fields: hasQm ? task.segmentFields() : false
+                    fields: hasMqm ? task.segmentFields() : false
                 });
                 return menu;
             },

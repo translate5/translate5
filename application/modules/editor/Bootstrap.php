@@ -105,10 +105,10 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     {
         
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
-            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'qmstatistics', 'comment',
+            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                                 'config', 'segmentuserassoc', 'session', 'language','termcollection','languageresourceresource','languageresourcetaskassoc',
-                                'languageresourceinstance','taskusertracking', 'term', 'termattribute', 'category'
+                                'languageresourceinstance','taskusertracking', 'term', 'termattribute', 'category', 'quality'
             ],
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -250,6 +250,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                         'action' => 'replaceall'
                 ));
         $this->front->getRouter()->addRoute('editorReplaceallSegment', $replaceAllRoute);
+        
+        $replaceAllRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/segment/stateid/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'segment',
+                'action' => 'stateid'
+            ));
+        $this->front->getRouter()->addRoute('editorSegmentStateId', $replaceAllRoute);
 
         $authUserRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/user/authenticated/*',
@@ -474,7 +483,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'exportresource'
             ));
         $this->front->getRouter()->addRoute('customer_resourceexport', $customerResourceExport);
-        
+
         $sessionImpersonate = new ZfExtended_Controller_RestLikeRoute(
             'editor/session/impersonate',
             array(
@@ -483,6 +492,62 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'impersonate'
             ));
         $this->front->getRouter()->addRoute('editorSessionImpersonate', $sessionImpersonate);
+        
+        // quality subroutes
+        $this->front->getRouter()->addRoute(
+            'editorQualityDownloadStatistics',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/downloadstatistics/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'downloadstatistics'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorSegmentQuality',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/segment/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'segment'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorTaskQuality',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/task/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'task'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorTaskQualityTooltip',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/tasktooltip/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'tasktooltip'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorQualityFalsepositive',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/falsepositive/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'falsepositive'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorQualitySegmentQm',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/segmentqm/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'segmentqm'
+                )));
     }
     
     

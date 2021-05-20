@@ -64,7 +64,7 @@ class editor_Models_Task_Remover {
         $this->removeDataDirectory();
         $this->removeRelatedDbData();
         $this->task->delete();
-        //it is unclear how $projectId can be null, but we got errors that it was null here:
+        //on import error project may not be created:
         if(!is_null($projectId)) {
             $this->cleanupProject($projectId);
         }
@@ -88,7 +88,7 @@ class editor_Models_Task_Remover {
         }
         $this->removeRelatedDbData();
         $this->task->delete();
-        //it is unclear how $projectId can be null, but we got errors that it was null here:
+        //on import error project may not be created:
         if(!is_null($projectId)) {
             $this->cleanupProject($projectId);
         }

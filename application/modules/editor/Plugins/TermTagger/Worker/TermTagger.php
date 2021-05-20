@@ -27,130 +27,21 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * editor_Plugins_TermTagger_Worker_TermTagger Class
+ * 
+ * Tags the segments on task edit and will only be used sequentially via the run()-method
  */
 class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTagger_Worker_Abstract {
-
-    /**
-     * Defines the timeout in seconds how long a single segment needs to be tagged
-     * @var integer
-     */
-    const TIMEOUT_REQUEST = 180;
     
+    protected $resourcePool = 'gui';    
     /**
-     * Defines the timeout in seconds how long the upload and parse request of a TBX may need
-     * @var integer
-     */
-    const TIMEOUT_TBXIMPORT = 600;
-    
-    /**
-     * @var editor_Plugins_TermTagger_Service_ServerCommunication
-     */
-    protected $serverCommunication = null;
-    
-    public function __construct() {
-        parent::__construct();
-        $this->logger = Zend_Registry::get('logger')->cloneMe('editor.terminology.segmentediting');
-        $this->behaviour->setConfig(['isMaintenanceScheduled' => false]);
-    }
-    
-    /**
-     * Special Paramters:
-     *
-     * $parameters['resourcePool']
-     * sets the resourcePool for slot-calculation depending on the context.
-     * Possible values are all values out of $this->allowedResourcePool
-     *
-     *
-     * On very first init:
-     * seperate data from parameters which are needed while processing queued-worker.
-     * All informations which are only relevant in 'normal processing (not queued)'
-     * are not needed to be saved in DB worker-table (aka not send to parent::init as $parameters)
-     *
-     * ATTENTION:
-     * for queued-operating $parameters saved in parent::init MUST have all necessary paramters
-     * to call this init function again on instanceByModel
-     *
-     * (non-PHPdoc)
-     *
-     * @see ZfExtended_Worker_Abstract::init()
+     * Deactivates maintenance for editor-save mode / non-threaded run
+     * {@inheritDoc}
+     * @see editor_Plugins_TermTagger_Worker_Abstract::init()
      */
     public function init($taskGuid = NULL, $parameters = array()) {
-        //since validateParams is checkin it too late, we have to check it here
-        if (empty($parameters['serverCommunication'])) {
-            $this->log->error('E1124','Parameter validation failed, missing serverCommunication object.',[
-                'taskGuid' => $taskGuid,
-                'parameters' => $parameters,
-            ]);
-            return false;
-        }
-        $this->serverCommunication = $parameters['serverCommunication'];
-        unset($parameters['serverCommunication']); //we don't want and need this in the DB
-
+        $this->behaviour->setConfig(['isMaintenanceScheduled' => false]);
         return parent::init($taskGuid, $parameters);
-    }
-
-    /**
-     * (non-PHPdoc)
-     *
-     * @see ZfExtended_Worker_Abstract::run()
-     */
-    public function run() {
-        return parent::run();
-    }
-
-    /**
-     * (non-PHPdoc)
-     *
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work() {
-        if (empty($this->serverCommunication)) {
-            return false;
-        }
-        
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain(), self::TIMEOUT_REQUEST, self::TIMEOUT_TBXIMPORT]);
-        /* @var $termTagger editor_Plugins_TermTagger_Service */
-        
-        $result = '';
-        $slot = $this->workerModel->getSlot();
-        if(empty($slot)) {
-            return false;
-        }
-        try {
-            $this->checkTermTaggerTbx($termTagger, $slot, $this->serverCommunication->tbxFile);
-            $result = $termTagger->tagterms($slot, $this->serverCommunication);
-        }
-        catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
-            if($exception instanceof editor_Plugins_TermTagger_Exception_Down) {
-                $this->disableSlot($slot);
-            }
-            $this->serverCommunication->task = '- see directly in event -';
-            $exception->addExtraData([
-                'task' => $this->task,
-                'termTagData' => $this->serverCommunication,
-            ]);
-            $this->logger->exception($exception, [
-                'domain' => 'editor.terminology.segmentediting'
-            ]);
-            if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
-                //editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data
-                //so we have to disable termtagging for this task, otherwise on each segment save we will get such a warning
-                $this->task->setTerminologie(0);
-                $this->task->save();
-                return false;
-            }
-        }
-        
-        // on error return false and store original untagged data
-        if (empty($result) && $result !== '0') {
-            return false;
-        }
-        $this->result = $result->segments;
-        $this->result = $this->markTransFound($this->result);
-        return true;
-    }
-    
+    }    
     /***
      * Term tagging takes approximately 15 % of the import time
      * {@inheritDoc}
