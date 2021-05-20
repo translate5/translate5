@@ -2028,7 +2028,8 @@ class editor_TaskController extends ZfExtended_RestController {
             'task' =>$this->entity, //TODO: is this really required ?,
             'sessionGuid'=>$sessionGuid,
             'taskGuid'=>$taskGuid,
-            'tuas' => $tuas
+            'tuas' => $tuas,
+            'internalSessionUniqId' => $session->internalSessionUniqId
         ]);
     }
 }
