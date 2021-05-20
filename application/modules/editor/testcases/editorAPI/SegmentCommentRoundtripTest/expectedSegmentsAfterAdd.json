@@ -24,7 +24,8 @@
         "targetEdit": "Das ist Segment 1 \u2013 hier gibt es keinen Kommentar. Oder doch: Kommentar 1 und Kommentar 2.",
         "targetEditToSort": "Das ist Segment 1 \u2013 hier gibt es keinen Kommentar. Oder doch: Kommentar 1 und Kommentar 2.",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":90}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "2",
@@ -51,7 +52,8 @@
         "targetEdit": "Das ist Segment 2 \u2013 der Kommentar gilt f\u00fcr das ganze Segment.",
         "targetEditToSort": "Das ist Segment 2 \u2013 der Kommentar gilt f\u00fcr das ganze Segment.",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":61}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "3",
@@ -78,7 +80,8 @@
         "targetEdit": "Das ist Segment 3 \u2013 Nur <div class=\"open 672069643d22313722 internal-tag ownttip\"><span title=\"&lt;cf underline=single&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"17\" data-length=\"-1\" class=\"full\">&lt;cf underline=single&gt;<\/span><\/div>HIER<div class=\"close 2f67 internal-tag ownttip\"><span title=\"&lt;\/cf&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"17\" data-length=\"-1\" class=\"full\">&lt;\/cf&gt;<\/span><\/div> ist ein Kommentar.",
         "targetEditToSort": "Das ist Segment 3 \u2013 Nur HIER ist ein Kommentar.",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":47}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "4",
@@ -105,7 +108,8 @@
         "targetEdit": "Das ist Segment 4 \u2013 zwei Benutzer haben einen Kommentar abgegeben \u2013 <div class=\"open 672069643d22343422 internal-tag ownttip\"><span title=\"&lt;cf underline=single&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"44\" data-length=\"-1\" class=\"full\">&lt;cf underline=single&gt;<\/span><\/div>HIER<div class=\"close 2f67 internal-tag ownttip\"><span title=\"&lt;\/cf&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"44\" data-length=\"-1\" class=\"full\">&lt;\/cf&gt;<\/span><\/div> Benutzer 1 und <div class=\"open 672069643d22353022 internal-tag ownttip\"><span title=\"&lt;cf underline=single&gt;\" class=\"short\">&lt;2&gt;<\/span><span data-originalid=\"50\" data-length=\"-1\" class=\"full\">&lt;cf underline=single&gt;<\/span><\/div>HIER<div class=\"close 2f67 internal-tag ownttip\"><span title=\"&lt;\/cf&gt;\" class=\"short\">&lt;\/2&gt;<\/span><span data-originalid=\"50\" data-length=\"-1\" class=\"full\">&lt;\/cf&gt;<\/span><\/div> Benutzer 2. Beim folgenden Wort wurden zwei Kommentare abgegeben: KOMMENTAR_2_KOMMENTARE",
         "targetEditToSort": "Das ist Segment 4 \u2013 zwei Benutzer haben einen Kommentar abgegeben \u2013 HIER Benutzer 1 und HIER Benutzer 2. Beim folgenden Wort wurden zwei Kommentare abgegeben: KOMMENTAR_2_KOMMENTARE",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":181}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "5",
@@ -133,7 +137,8 @@
         "targetEditToSort": "That's the house",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":16}}}}",
         "isWatched": false,
-        "isFirstofFile": true
+        "isFirstofFile": true,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "6",
@@ -160,7 +165,8 @@
         "targetEdit": "of the <div class=\"open 6270742069643d2231222063747970653d22626f6c64223e7b7d3c2f627074 internal-tag ownttip\"><span title=\"&lt;bpt id=&quot;1&quot; ctype=&quot;bold&quot;&gt;{}&lt;\/bpt&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;bpt id=&quot;1&quot; ctype=&quot;bold&quot;&gt;{}&lt;\/bpt&gt;<\/span><\/div><div class=\"open 6270742069643d223222207269643d2232223e266c743b756620756663617469643d2231222667743b3c2f627074 internal-tag ownttip\"><span title=\"&lt;bpt id=&quot;2&quot; rid=&quot;2&quot;&gt;&amp;lt;uf ufcatid=&quot;1&quot;&amp;gt;&lt;\/bpt&gt;\" class=\"short\">&lt;3&gt;<\/span><span data-originalid=\"2\" data-length=\"-1\" class=\"full\">&lt;bpt id=&quot;2&quot; rid=&quot;2&quot;&gt;&amp;lt;uf ufcatid=&quot;1&quot;&amp;gt;&lt;\/bpt&gt;<\/span><\/div>Santa Clause<div class=\"close 6570742069643d2231223e7b7d3c2f657074 internal-tag ownttip\"><span title=\"&lt;ept id=&quot;1&quot;&gt;{}&lt;\/ept&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;ept id=&quot;1&quot;&gt;{}&lt;\/ept&gt;<\/span><\/div><div class=\"close 6570742069643d223322207269643d2232223e266c743b2f75662667743b3c2f657074 internal-tag ownttip\"><span title=\"&lt;ept id=&quot;3&quot; rid=&quot;2&quot;&gt;&amp;lt;\/uf&amp;gt;&lt;\/ept&gt;\" class=\"short\">&lt;\/3&gt;<\/span><span data-originalid=\"2\" data-length=\"-1\" class=\"full\">&lt;ept id=&quot;3&quot; rid=&quot;2&quot;&gt;&amp;lt;\/uf&amp;gt;&lt;\/ept&gt;<\/span><\/div>",
         "targetEditToSort": "of the Santa Clause",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":19}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "7",
@@ -187,6 +193,7 @@
         "targetEdit": "New comment-block",
         "targetEditToSort": "New comment-block",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":17}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     }
 ]
