@@ -65,7 +65,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         'Termportal' => true,
         'JsLogger' => true,
         'editor.CustomPanel' => true,
-        'QmSubSegments' => false,                //disabled by default, controlled by ACL
         'admin.TaskOverview' => false,           //disabled by default, controlled by ACL
         'admin.TaskPreferences' => false,        //disabled by default, controlled by ACL
         'admin.TaskUserAssoc' => false,          //disabled by default, controlled by ACL
@@ -74,7 +73,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         'LanguageResources' => false,            //disabled by default, controlled by ACL
         'TmOverview' => false,                   //disabled by default, controlled by ACL
         'Localizer' => true,
-        'QmSubSegments' => true//the check if this controller is active is task specific(runtimeOptions.editor.enableQmSubSegments flag is task specific)
+        'Quality' => true,
+        'QualityMqm' => true //the check if this controller is active is task specific (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
     ];
     
     public function init() {
@@ -93,7 +93,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         
         // init worker and queue it
-        if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
+        if (!$worker->init($taskGuid, array('resourcePool' => 'import', 'processingMode' => editor_Segment_Processing::IMPORT))) {
             $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }

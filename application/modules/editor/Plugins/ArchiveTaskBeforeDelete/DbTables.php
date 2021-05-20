@@ -78,7 +78,6 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_pixel_mapping' => false,
             'LEK_plugin_segmentstatistic_terms' => 'taskGuid',
             'LEK_plugin_segmentstatistics' => 'taskGuid',
-            'LEK_qmsubsegments' => 'taskGuid',
             'LEK_workflow_log' => false, //its just logging, we dont archive that
             'LEK_segment_data' => 'taskGuid',
             'LEK_segment_field' => 'taskGuid',
@@ -87,6 +86,9 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_segment_user_assoc' => 'taskGuid',
             'LEK_segments' => 'taskGuid',
             'LEK_segments_meta' => 'taskGuid',
+            'LEK_segment_quality' => 'taskGuid',
+            // LEK_segment_tags is just a temorary datamodel during import
+            'LEK_segment_tags' => false,
             //not needed anymore, but keeping as reference how to to implement filters
             //'LEK_skeletonfiles' => array('--single-transaction', "--where=fileId in (select id from LEK_files where taskGuid = '{TASKGUID}')"),
             'LEK_task' => 'taskGuid',
@@ -149,6 +151,14 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
      */
     public static function run($projectRoot, $zendLib): array {
         self::initCliRuntime($projectRoot, $zendLib);
+        $instance = ZfExtended_Factory::get(__CLASS__);
+        return $instance->checkMissingInList();
+    }
+    /**
+     * Runs our check for unit-test
+     * @return array
+     */
+    public static function runTest(): array {
         $instance = ZfExtended_Factory::get(__CLASS__);
         return $instance->checkMissingInList();
     }

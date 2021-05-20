@@ -85,7 +85,7 @@ class DevelopmentCreatetestCommand extends Translate5AbstractCommand
         $path = APPLICATION_PATH.'/modules/editor/testcases/editorAPI';
         
         if($name = $input->getOption('name')) {
-            $issue = $name = $this->getFileName($path, $name);
+            $issue = $name;
         }
         else {
             $gitout = [];
@@ -202,7 +202,6 @@ class '.$name.' extends \ZfExtended_Test_ApiTestcase {
     public function testSegmentValuesAfterImport() {
         $segments = $this->api()->requestJson(\'editor/segment?page=1&start=0&limit=10\');
         
-        $data = array_map([self::$api,\'removeUntestableSegmentContent\'], $segments);
 //TODO FOR TEST USAGE: run the test, the next line creates the expected content json, comment the line out, validate if the produced JSON is as expected
         file_put_contents($this->api()->getFile(\'/expectedSegments.json\', null, false), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent(\'expectedSegments.json\'), $data, \'Imported segments are not as expected!\');
@@ -227,7 +226,7 @@ class '.$name.' extends \ZfExtended_Test_ApiTestcase {
         
         //check direct PUT result
         $segments = $this->api()->requestJson(\'editor/segment?page=1&start=0&limit=10\');
-        $data = array_map([self::$api,\'removeUntestableSegmentContent\'], $segments);
+
 //TODO FOR TEST USAGE: run the test, the next line creates the expected content json, comment the line out, validate if the produced JSON is as expected
         file_put_contents($this->api()->getFile(\'/expectedSegments-edited.json\', null, false), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent(\'expectedSegments-edited.json\'), $data, \'Edited segments are not as expected!\');
@@ -306,7 +305,6 @@ $json = <<<EOF
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;empty",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "4",
         "fileOrder": "0",

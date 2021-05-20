@@ -38,7 +38,15 @@ class editor_Models_SegmentFieldManager {
     const LABEL_RELAIS = 'Relaissprache';
     
     const _MAP_DELIM = '#';
+    /**
+     * @FIXME: this is called PREFIX but used as a SUFFIX ...
+     * @var string
+     */
     const _EDIT_PREFIX = 'Edit';
+    /**
+     * @FIXME: this is called PREFIX but used as a SUFFIX ...
+     * @var string
+     */
     const _TOSORT_PREFIX = 'ToSort';
     
     /**

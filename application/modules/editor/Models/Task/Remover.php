@@ -85,7 +85,10 @@ class editor_Models_Task_Remover {
         }
         $this->removeRelatedDbData();
         $this->task->delete();
-        $this->cleanupProject($projectId);
+        // project may was not created on import errors
+        if(!empty($projectId)){
+            $this->cleanupProject($projectId);
+        }
     }
     
     /**

@@ -41,25 +41,15 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
      * @var editor_Models_Segment
      */
     protected $entity;
-
+    
     /**
-     * mappt einen eingehenden Filtertyp auf einen anderen Filtertyp für ein bestimmtes
-     * Feld.
-     * @var array array($field => array(origType => newType),...)
-     */
-    protected $_filterTypeMap = [
-        'qmId' => ['list' => 'listAsString']
-    ];
-
-    /***
      * Number to divide the segment duration
      *
      * @var integer
      */
     protected $durationsDivisor = 1;
-
-    public function preDispatch()
-    {
+    
+    public function preDispatch(){
         parent::preDispatch();
         $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
         //overwrite sortColMap
@@ -81,10 +71,19 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     {
         return editor_Models_SegmentFieldManager::getForTaskGuid($taskGuid);
     }
-
-    public function indexAction()
-    {
+    
+    public function indexAction() {
+        
         $taskGuid = $this->session->taskGuid;
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        // apply quality filter
+        if($this->getRequest()->getParam('qualities', '') != ''){
+            $qualityState = new editor_Models_Quality_RequestState($this->getRequest()->getParam('qualities'));
+            $filter = $this->entity->getFilter();
+            $filter->setQualityFilter($qualityState, $task);
+        }
         $rows = $this->entity->loadByTaskGuid($taskGuid);
         $this->view->rows = $rows;
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
@@ -143,9 +142,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         $this->view->Php2JsVars()->set($type, $result);
     }
 
-    public function nextsegmentsAction()
-    {
-        $segmentId = (int)$this->_getParam('segmentId');
+    public function nextsegmentsAction() {
+        $segmentId = (int) $this->_getParam('segmentId');
         if ($this->_getParam('nextFiltered', false) || $this->_getParam('prevFiltered', false)) {
             $autoStates = $this->getUsersAutoStateIds();
         }
@@ -247,8 +245,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
             return;
         }
 
-        if (!isset($this->view->metaData)) {
-            //since we dont use metaData otherwise, we can overwrite it completly:
+        if(!isset($this->view->metaData)){
+            //since we dont use metaData otherwise, we can overwrite it completly
             $this->view->metaData = new stdClass();
         }
 
@@ -322,9 +320,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         //set the editing durations for time tracking into the segment object
         settype($this->data->durations, 'object');
         $this->entity->setTimeTrackData($this->data->durations, $this->durationsDivisor);
-        $this->convertQmId();
 
-        $allowedToChange = array('qmId', 'stateId', 'autoStateId', 'matchRate', 'matchRateType');
+        $allowedToChange = array('stateId', 'autoStateId', 'matchRate', 'matchRateType');
 
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
 
@@ -410,10 +407,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         $this->checkRequiredSearchParameters($parameters);
         $parameters['searchField'] = htmlentities($parameters['searchField'], ENT_XML1);
         $parameters['replaceField'] = htmlentities($parameters['replaceField'], ENT_XML1);
-
+        
         //check if the task has mqm tags
         //replace all is not supported for tasks with mqm
-        if ($this->isMqmTask($parameters['taskGuid'])) {
+        if($this->isMqmTask($parameters['taskGuid'])){
             $this->view->message = $t->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');
             $this->view->hasMqm = true;
             return;
@@ -531,6 +528,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
             }
             //search for the img tag, get the data and remove it
             $regex = '#<img[^>]+class="duplicatesavecheck"[^>]+data-segmentid="([0-9]+)" data-fieldname="([^"]+)"[^>]*>#';
+            $match = [];
             if (!preg_match($regex, $value, $match)) {
                 continue;
             }
@@ -646,20 +644,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     {
         return empty($this->entity->getEditable());
     }
-
-    /**
-     * Die QM Id wird serverseitig als String und Clientseitig als Array gehandhabt
-     * Wenn ein QM Id Array reinkommt, wird es in einen String konvertiert.
-     */
-    protected function convertQmId()
-    {
-        if (isset($this->data->qmId) && is_array($this->data->qmId)) {
-            $this->data->qmId = ';' . join(';', $this->data->qmId) . ';';
-        }
-    }
-
-    public function getAction()
-    {
+    
+    public function getAction() {
         $this->entity->load($this->_getParam('id'));
         $session = new Zend_Session_Namespace();
         if ($session->taskGuid !== $this->entity->getTaskGuid()) {
@@ -731,7 +717,25 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
 
         echo Zend_Json::encode($db->fetchAll($sql)->toArray(), Zend_Json::TYPE_ARRAY);
     }
-
+    /**
+     * Sets the stateId asynchronously. This enables the segment meta panel to be independent from saving or canceling the segment text
+     */
+    public function stateidAction(){
+        $this->entity->load($this->_getParam('id'));
+        $session = new Zend_Session_Namespace();
+        if ($session->taskGuid !== $this->entity->getTaskGuid()) {
+            //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        $stateId = intval($this->_getParam('stateId', -1));
+        if($stateId < 0){
+            throw new ZfExtended_Models_Entity_NotFoundException('parameter stateId is required.');
+        }
+        $this->entity->setStateId($stateId);
+        $this->entity->save();
+        $this->view->success = 1;
+    }
+    
     /***
      * Check if the search string length is in between 0 and 1024 characters long
      */
@@ -787,11 +791,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
      * @param string $taskGuid
      * @return boolean
      */
-    private function isMqmTask($taskGuid)
-    {
-        $qms = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
-        /* @var $qms  editor_Models_Qmsubsegments */
-        return $qms->hasTaskMqm($taskGuid);
+    private function isMqmTask($taskGuid){
+        return editor_Models_Db_SegmentQuality::hasTypeCategoryForTask($taskGuid, editor_Segment_Tag::TYPE_MQM);
     }
 
     /***

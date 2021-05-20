@@ -268,15 +268,28 @@ class editor_Models_Import {
         
         $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_SetTaskToOpen');
         /* @var $worker editor_Models_Import_Worker_SetTaskToOpen */
-        
-        //queuing this worker when task has errors make no sense, init checks this.
+        // queuing this worker when task has errors make no sense, init checks this.
         if($worker->init($taskGuid, ['config' => $this->importConfig])) {
             $worker->queue($parentId, null, false); 
         }
         
+        // queueing the quality workers, which have a kind of "sub-plugin" systematic to trigger the dependant workers like termtaggers etc.
+        
+        $worker = ZfExtended_Factory::get('editor_Segment_Quality_ImportWorker');
+        /* @var $worker editor_Segment_Quality_ImportWorker */
+        if($worker->init($taskGuid)) {
+            $worker->queue($parentId, null, false);
+        }
+        $worker = ZfExtended_Factory::get('editor_Segment_Quality_ImportFinishingWorker');
+        /* @var $worker editor_Segment_Quality_ImportFinishingWorker */
+        if($worker->init($taskGuid)) {
+            $worker->queue($parentId, null, false);
+        }
+        
+        // the worker finishing the import
+        
         $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_FinalStep');
         /* @var $worker editor_Models_Import_Worker_FinalStep */
-        
         if($worker->init($taskGuid, ['config' => $this->importConfig])) {
             $worker->queue($parentId); 
         }

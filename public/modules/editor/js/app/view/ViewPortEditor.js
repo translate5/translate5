@@ -46,7 +46,8 @@ Ext.define('Editor.view.ViewPortEditor', {
         'Editor.view.fileorder.ReferenceTree',
         'Editor.view.segments.Grid',
         'Editor.view.segments.MetaPanelNavi',
-        'Editor.view.segments.MetaPanel'
+        'Editor.view.segments.MetaPanel',
+        'Editor.view.quality.FilterPanel'
     ],
 
     viewModel: {
@@ -59,7 +60,7 @@ Ext.define('Editor.view.ViewPortEditor', {
 
     //Item Strings:
     items_north_title: 'Header',
-    items_west_title: '#UT#Dateien',
+    items_west_title: '#UT#QS &amp; Dateien',
     initComponent: function() {
       var me = this,
           task = Editor.data.task,
@@ -77,18 +78,23 @@ Ext.define('Editor.view.ViewPortEditor', {
               width: 250,
               collapsible: true,
               layout: {type:'accordion'},
-              animCollapse: !Ext.isIE, //BugID 3
+              animCollapse: true,
               itemId: 'filepanel',
               items: [{
+                  xtype: 'qualityFilterPanel',
+                  stateId: 'editor.westPanelQualityFilter',
+                  stateEvents: ['collapse', 'expand'],
+                  stateful: true
+              },{
                   xtype: 'fileorder.tree',
                   stateId: 'editor.westPanelFileorderTree',
                   stateEvents: ['collapse', 'expand'],
-                  stateful:true
+                  stateful: true
               },{
                   xtype: 'referenceFileTree',
                   stateId: 'editor.westPanelReferenceFileTree',
                   stateEvents: ['collapse', 'expand'],
-                  stateful:true
+                  stateful: true
               }]
           },{
               region: 'center',
@@ -96,8 +102,8 @@ Ext.define('Editor.view.ViewPortEditor', {
               xtype: 'segments.grid',
               itemId: 'segmentgrid',
               stateful: {
-                  segmentSize:true,
-                  columns:true,
+                  segmentSize: true,
+                  columns: true,
                   sorters: false,
                   filters: false,
                   grouper: false,
@@ -115,42 +121,41 @@ Ext.define('Editor.view.ViewPortEditor', {
               weight: 30,
               collapsible: true,
               layout:'border',
-              animCollapse: !Ext.isIE, //BugID 3
+              animCollapse: true,
               border:0,
               header:{
             	  height:49,
               },
               items:[
-            	  	me.getBrandConfig()
-            	  ,{
-                  xtype: 'panel',
-                  region: 'center',
-                  listeners: {
-                      afterrender: function() {
-                          this.disable();
-                      }
-                  },
-                  preventHeader: true,
-                  border:0,
-                  itemId: 'metapanel',
-                  layout: {type:'accordion'},
-                  dockedItems: [{
-                      xtype: 'metapanelNavi',
-                      dock: 'top'
-                  }],
-                  items: [{
-                      xtype: 'segmentsMetapanel',
-                      stateId: 'editor.eastPanelSegmentsMetapanel',
-                      stateEvents: ['collapse', 'expand'],
-                      stateful:true
-                  },{
-                      xtype: 'commentPanel',
-                      stateId: 'editor.eastPanelCommentPanel',
-                      stateEvents: ['collapse', 'expand'],
-                      stateful:true
+                  me.getBrandConfig(), {
+                      xtype: 'panel',
+                      region: 'center',
+                      listeners: {
+                          afterrender: function() {
+                              this.disable();
+                          }
+                      },
+                      preventHeader: true,
+                      border:0,
+                      itemId: 'metapanel',
+                      layout: { type:'accordion' },
+                      dockedItems: [{
+                          xtype: 'metapanelNavi',
+                          dock: 'top'
+                      }],
+                      items: [{
+                          xtype: 'segmentsMetapanel',
+                          stateId: 'editor.eastPanelSegmentsMetapanel',
+                          stateEvents: ['collapse', 'expand'],
+                          stateful:true
+                      },{
+                          xtype: 'commentPanel',
+                          stateId: 'editor.eastPanelCommentPanel',
+                          stateEvents: ['collapse', 'expand'],
+                          stateful:true
+                      }]
                   }]
-              }]
-          }];
+              }];
       //},{
       //example of adding an additional south panel with width 100%, 
       // as heigher the weight of the region, as "outer" it is rendererd, 
