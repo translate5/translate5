@@ -78,7 +78,7 @@ class XlfSegmentLengthTest extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
         
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfSegmentLengthTest/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        //file_put_contents(self::$api->getFile('expectedSegments.json'), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
     }
     
@@ -111,7 +111,7 @@ class XlfSegmentLengthTest extends \ZfExtended_Test_ApiTestcase {
         
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfSegmentLengthTest/expectedSegmentsEdited-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        //file_put_contents(self::$api->getFile('expectedSegmentsEdited.json'), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegmentsEdited.json'), $data, 'Edited segments are not as expected!');
         
         $task = $this->api()->getTask();
