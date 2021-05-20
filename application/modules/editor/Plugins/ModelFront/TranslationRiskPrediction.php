@@ -37,13 +37,13 @@ class editor_Plugins_ModelFront_TranslationRiskPrediction {
      * 
      * @var editor_Plugins_ModelFront_HttpApi
      */
-    protected $api;
+    protected editor_Plugins_ModelFront_HttpApi $api;
     
     /***
      * 
      * @var editor_Models_Task
      */
-    protected $task;
+    protected editor_Models_Task $task;
     
     /***
      * 
@@ -93,7 +93,7 @@ class editor_Plugins_ModelFront_TranslationRiskPrediction {
         try {
             $matchRate=$this->riskToMatchrate($original, $translation);
         } catch (editor_Plugins_ModelFront_Exception $e) {
-            //if there are erros on the api request for the segment display them
+            //if there are errors on the api request for the segment display them
             $errors[]=[
                 'segmentId'=>$segment->getId(),
                 'error'=>$this->api->getErrors()
