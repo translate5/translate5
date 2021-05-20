@@ -42,7 +42,7 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if(empty($parameters['config']) || !$parameters['config'] instanceof editor_Models_Import_Configuration) {
+        if(empty($parameters['config']) || !$parameters['config'] instanceof editor_Models_Import_Configuration){
             throw new ZfExtended_Exception('missing or wrong parameter config, must be if instance editor_Models_Import_Configuration');
         }
         return true;
@@ -56,6 +56,12 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
+        
+        // we fix all task-specific configs of the task for it's remaining lifetime
+        // this is crucial to ensure, that important configs are changed throughout the lifetime that are usually not designed to be dynamical (AutoQA, Visual, ...)
+        $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
+        /* @var $taskConfig editor_Models_TaskConfig */
+        $taskConfig->fixAfterImport($task->getTaskGuid());
         
         $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $workflowManager editor_Workflow_Manager */

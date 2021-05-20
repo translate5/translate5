@@ -130,7 +130,7 @@ class editor_ConfigController extends ZfExtended_RestController {
                     $projectTasks = array_column($projectTasks, 'taskGuid');
                 }
                 foreach ($projectTasks as $projectTask){
-                    $taskConfig=ZfExtended_Factory::get('editor_Models_TaskConfig');
+                    $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
                     /* @var $taskConfig editor_Models_TaskConfig */
                     if(!isset($oldValue)) {
                         $oldValue = $taskConfig->getCurrentValue($projectTask, $this->data->name);
