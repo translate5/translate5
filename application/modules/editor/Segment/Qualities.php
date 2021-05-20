@@ -88,7 +88,7 @@ final class editor_Segment_Qualities {
         // we only overwrite/adjust existing entries when editing or saving Alike segments
         if($this->processingMode == editor_Segment_Processing::EDIT || $this->processingMode == editor_Segment_Processing::ALIKE){
             // QM-qualities will not be processed with the segment-tags at all as they are not related to the segment's texts but relate on the whole segment
-            foreach($this->table->fetchFiltered(NULL, $segmentId, NULL, editor_Segment_Tag::TYPE_QM, true) as $quality){
+            foreach($this->table->fetchFiltered(NULL, $segmentId, editor_Segment_Tag::TYPE_QM, true) as $quality){
                 /* @var $qualityRow editor_Models_Db_SegmentQualityRow */
                 $quality->processingState = 'delete';
                 $this->existing[] = $quality;
@@ -97,6 +97,7 @@ final class editor_Segment_Qualities {
                 $this->alikeQualities = $alikeQualities;
             }
         }
+        // error_log('PROCESS QUALITIES FOR SEGMENT '.$this->segmentId.', MODE '.$this->processingMode.', EXISTING: '.count($this->existing));
     }
     /**
      * Adds a quality independently of a tag (usually do not use start & end index then)

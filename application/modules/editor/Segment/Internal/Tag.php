@@ -58,6 +58,22 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * @var string
      */
     const CSS_CLASS_CLOSE = 'close';
+    /**
+     * @var string
+     */
+    const CSS_CLASS_NBSP = 'nbsp';
+    /**
+     * @var string
+     */
+    const CSS_CLASS_NEWLINE = 'newline';
+    /**
+     * @var string
+     */
+    const CSS_CLASS_SPACE = 'space';
+    /**
+     * @var string
+     */
+    const CSS_CLASS_TAB = 'tab';
     
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
 
@@ -114,6 +130,13 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      */
     public function isClosing(){
         return $this->hasClass(self::CSS_CLASS_CLOSE);
+    }
+    /**
+     * Evaluates, if the internal tag represents a whitespace tag
+     * @return boolean
+     */
+    public function isWhitespace(){
+        return ($this->isSingle() && ($this->hasClass(self::CSS_CLASS_NEWLINE) || $this->hasClass(self::CSS_CLASS_NBSP) || $this->hasClass(self::CSS_CLASS_SPACE) || $this->hasClass(self::CSS_CLASS_TAB)));
     }
     /**
      * Retrieves the original index of the internal tag within the segment

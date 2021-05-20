@@ -1,14 +1,14 @@
 {
     "success": 1,
     "row": {
-        "id": "21059",
-        "segmentId": "1056804",
+        "id": "26897",
+        "segmentId": "1061250",
         "field": "",
         "type": "qm",
         "category": "qm_1",
         "categoryIndex": "1",
         "falsePositive": "0",
-        "typeText": "QA",
+        "typeText": "Manual QA (complete segment)",
         "text": "Demo QM error 1",
         "filterable": true,
         "falsifiable": true,
