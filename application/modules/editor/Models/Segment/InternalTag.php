@@ -326,7 +326,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         $taghelperTrackChanges = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
         /* @var $taghelperTrackChanges editor_Models_Segment_TrackChangeTag */
         $segment = $taghelperTrackChanges->removeTrackChanges($segment);
-        
+       
         $result = $this->replace($segment, function($match) use (&$replaceMap) {
             //original id coming from import format
             $type = $match[1];
@@ -599,7 +599,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     public function getTagNumber(string $tag): ?int {
         $match = null;
-        if(preg_match('#class="short">&lt;/?([0-9]+)/?&gt;</span#', $tag, $match)) {
+        if(preg_match('#class="short"[^>]*>&lt;/?([0-9]+)/?&gt;</span#', $tag, $match)) {
             return (int) $match[1];
         }
         return null;
