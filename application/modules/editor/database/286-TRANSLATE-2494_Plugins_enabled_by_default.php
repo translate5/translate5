@@ -54,8 +54,30 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
 
 $manager = Zend_Registry::get('PluginManager');
 /* @var $manager ZfExtended_Plugin_Manager */
-$plugins = ['PangeaMt','IpAuthentication','ModelFront'];
+$plugins = [
+    'PangeaMt'=>'editor_Plugins_PangeaMt_Init',
+    'IpAuthentication'=>'editor_Plugins_IpAuthentication_Init',
+    'ModelFront'=>'editor_Plugins_ModelFront_Init'
+];
 
-foreach($plugins as $plugin) {
-    $manager->setActive($plugin, true);
+$activeByDefault = [];
+foreach($plugins as $plugin=>$class) {
+    if($manager->setActive($plugin, true)){
+        $activeByDefault[] = $class;
+    }
+}
+// update the activated plugins also as defaults.
+$config = ZfExtended_Factory::get('editor_Models_Config');
+/* @var $config editor_Models_Config */
+$config->loadByName('runtimeOptions.plugins.active');
+
+try {
+    $defaults = [];
+    if(!empty($config->getDefault())){
+        $defaults = Zend_Json::decode($config->getDefault());
+    }
+    $defaults = Zend_Json::encode(array_unique(array_merge($defaults,$activeByDefault)));
+    $config->setDefault($defaults);
+    $config->save();
+} catch (Zend_Json_Exception $e) {
 }
