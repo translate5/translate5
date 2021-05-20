@@ -81,7 +81,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=47');
         
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        //file_put_contents($this->api()->getFile('expectedSegments.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
     }
     
@@ -92,7 +92,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
     public function testPreserveWhitespace() {
         $segments = $this->api()->requestJson('editor/segment?start=47&limit=200');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegmentsPreserveWhitespace-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        //file_put_contents($this->api()->getFile('expectedSegmentsPreserveWhitespace.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegmentsPreserveWhitespace.json'), $data, 'Imported segments are not as expected!');
     }
     
@@ -154,7 +154,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
          */
         $segments = $this->api()->requestJson('editor/segment?start=47&limit=200');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegmentsPreserveWhitespaceAfterEdit-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        //file_put_contents($this->api()->getFile('expectedSegmentsPreserveWhitespaceAfterEdit.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegmentsPreserveWhitespaceAfterEdit.json'), $data, 'Imported segments are not as expected!');
         
         $task = $this->api()->getTask();
