@@ -35,7 +35,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
 {
 
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_BatchResult';
-    public static $ATTRIBUTES = [
+    const ATTRIBUTES = [
         'words',
         'characters',
         'placeables',
@@ -48,7 +48,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         'baselineWords'
     ];
 
-    public static $NODES = [
+    const NODES = [
         'perfect',
         'inContextExact',
         'exact',
@@ -61,7 +61,8 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         'newLearnings',
         'fuzzy'
     ];
-    public static $FUZZY_RANGES = [
+    
+    protected $FUZZY_RANGES = [
         '50' => '59',
         '60' => '69',
         '70' => '79',
@@ -74,13 +75,13 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
      * @param $data
      * @return SimpleXMLElement
      */
-    public static function addFuzzyChilds(SimpleXMLElement $object, $data, $childName = 'fuzzy'): SimpleXMLElement
+    protected function addFuzzyChilds(SimpleXMLElement $object, $data, $childName = 'fuzzy'): SimpleXMLElement
     {
-        foreach (self::$FUZZY_RANGES as $min => $max) {
+        foreach ($this->FUZZY_RANGES as $min => $max) {
             $child = $object->batchTotal->analyse->addChild($childName);
             $child->addAttribute('min', $min);
             $child->addAttribute('max', $max);
-            foreach (self::$ATTRIBUTES as $attr) {
+            foreach (self::ATTRIBUTES as $attr) {
                 if ($attr == 'words') {
                     $child->addAttribute($attr, $data[$max]);
                 }else{
@@ -96,10 +97,10 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
      * @param $data
      * @return SimpleXMLElement
      */
-    public static function addAttributes(SimpleXMLElement $child, $data): SimpleXMLElement
+    protected function addAttributes(SimpleXMLElement $child, $data): SimpleXMLElement
     {
 
-        foreach (self::$ATTRIBUTES as $attr) {
+        foreach (self::ATTRIBUTES as $attr) {
             $child->addAttribute($attr, '0');
             if ($attr == 'words' && $child->getName() == 'fuzzy') {
                 $attrib = (array)$child->attributes()->max;
@@ -117,15 +118,14 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
      * @param $data
      * @return SimpleXMLElement
      */
-    public static function generateNodesWithAttributes(SimpleXMLElement $object, $data): SimpleXMLElement
+    protected function generateNodesWithAttributes(SimpleXMLElement $object, $data): SimpleXMLElement
     {
-
-        foreach (self::$NODES as $node) {
+        foreach (self::NODES as $node) {
             if ($node == 'fuzzy') {
                 $object = self::addFuzzyChilds($object, $data);
             } else {
                 $child = $object->batchTotal->analyse->addChild($node);
-                foreach (self::$ATTRIBUTES as $attr) {
+                foreach (self::ATTRIBUTES as $attr) {
                     if($node == 'total' && $attr == 'words'){
                         $child->addAttribute('words', $data['total']);
                     }else
@@ -139,6 +139,8 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
                         //exact are 100% and 101% and 104%-Matches from translate5, since Trados does not know our 101 and 104%-Matches
                         $value = $data['100'] + $data['101'] + $data['104'];
                         $child->addAttribute($attr, $value);
+                    }elseif($node == 'new' && $attr == 'words'){
+                        $child->addAttribute('words', $data['wordCountMT']);
                     }else{
                         $child->addAttribute($attr, '0');
                     }
@@ -154,7 +156,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
      * @throws Exception
      */
 
-    public static function generateXML($rows, $taskGuid): SimpleXMLElement
+    public function generateXML($rows, $taskGuid): SimpleXMLElement
     {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
@@ -187,6 +189,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             '69' => 0,
             '59' => 0,
             'noMatch' => 0,
+            'wordCountMT' => 0,
             'wordCount' => 0,
             'type' => '',
             'total' => 0
@@ -196,7 +199,6 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             if(!empty($row['resourceName']) ){
                 $renderData['resourceName'][] = $row['resourceName'];
             }
-
 
             if($row['internalFuzzy'] == 'Yes'){
                 $renderData['internalFuzzy'] = 'Yes';
@@ -211,8 +213,13 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             $renderData['79'] += $row['79'];
             $renderData['69'] += $row['69'];
             $renderData['59'] += $row['59'];
-            $renderData['wordCount'] += $row['wordCount'];
-            $renderData['total'] += (int)$row['104'] +(int)$row['103'] + (int)$row['102'] + (int)$row['101'] + (int)$row['100'] + (int)$row['99'] + (int)$row['89'] + (int)$row['79'] + (int)$row['69'] + (int)$row['59'];
+            $renderData['noMatch'] += $row['noMatch'];
+            $rowTotal = (int)$row['104'] +(int)$row['103'] + (int)$row['102'] + (int)$row['101'] + (int)$row['100'] + (int)$row['99'] + (int)$row['89'] + (int)$row['79'] + (int)$row['69'] + (int)$row['59'] + (int)$row['noMatch'];
+            $renderData['total'] += $rowTotal;
+            
+            if($row['resourceType'] == editor_Models_Segment_MatchRateType::TYPE_MT){
+                $renderData['wordCountMT'] += $rowTotal;
+            }
             $i++;
         }
 
@@ -222,31 +229,45 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
         $to_time = strtotime( $analysisAssoc['created']);
 
         $from_time = strtotime($analysisAssoc['finishedAt']);
-        $difference = round(abs($to_time - $from_time) / 3600,2); //seconds
+        $difference = abs($to_time - $from_time); //seconds
 
 
 
         $xml_header = '<?xml version="1.0" encoding="UTF-8"?><task name="analyse"></task><!--
-The format of the file should look structurally like -
-no file elements, since translate5 does not support a file specific analysis right now
-for the settings element the following values should be set:
-reportInternalFuzzyLeverage="translate5Value" reportLockedSegmentsSeparately="no" reportCrossFileRepetitions="yes" minimumMatchScore="lowestFuzzyValueThatIsConfiguredToBeShownInTranslate5" searchMode="bestWins"
-In the batchTotal analysis section the following applies
-For the following elements all numeric attributes are always set to "0", because they have no analogon currently in translate5:
-locked
-perfect
-repeated (we only have crossFileRepeated)
-newBaseline (this is specific to SDL MT)
-newLearnings (this is specific to SDL MT)
-the number and definitions of fuzzy elements will reflect the fuzzy ranges as defineable with TRANSLATE-2076
-all MT matches will always be counted within "new"
-crossFileRepeated are translate5s repetitions (which are represented by 102% matches)
-exact are 100% and 101% and 104%-Matches from translate5, since Trados does not know our 101 and 104%-Matches
-inContextExact are 103%-Matches from translate5
-The following attributes will always have the value "0", since translate5 does not support them right now:
-characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"
-The following attributes will be ommitted, because translate5 does not support them so far:
-segments-->';
+This file was generated with translate5.
+- there no file elements are added, since translate5 does not support a file specific analysis right now
+- for the settings element the following values are set:
+  reportInternalFuzzyLeverage="AS SET IN Translate5"
+  reportLockedSegmentsSeparately="no"
+  reportCrossFileRepetitions="yes"
+  minimumMatchScore="lowestFuzzyValueThatIsConfiguredToBeShownInTranslate5"
+  searchMode="bestWins"
+- In the batchTotal analysis section the following applies:
+  For the following elements all numeric attributes are always set to "0",
+  because they have no analogon currently in translate5:
+    # locked
+    # perfect
+    # repeated (translate5 will only have crossFileRepeated)
+    # newBaseline (this is specific to SDL MT)
+    # newLearnings (this is specific to SDL MT)
+- the number and definitions of fuzzy elements will reflect the fuzzy ranges as defined in translate5
+- all MT matches will always be counted within "new"
+- crossFileRepeated are translate5s repetitions (which are represented by 102% matches)
+- exact are 100% and 101% and 104%-Matches from translate5
+- inContextExact are 103%-Matches from translate5
+- The following attributes will always have the value "0", since translate5 does not support them right now:
+  # characters="0"
+  # placeables="0"
+  # tags="0"
+  # repairWords="0"
+  # fullRecallWords="0"
+  # partialRecallWords="0"
+  # edits="0"
+  # adaptiveWords="0"
+  # baselineWords="0"
+- The following attributes will be ommitted, because translate5 does not support them so far:
+  # segments
+-->';
         $xml = new SimpleXMLElement($xml_header);
 
         $subnode1 = $xml->addChild('taskInfo');
@@ -274,7 +295,8 @@ segments-->';
         $innerNode4->addAttribute('reportInternalFuzzyLeverage', $internalFuzzy);
         $innerNode4->addAttribute('reportLockedSegmentsSeparately', 'no');
         $innerNode4->addAttribute('reportCrossFileRepetitions', 'yes');
-        $innerNode4->addAttribute('minimumMatchScore', '50'); // Currently the value of minimum score is hardcoded, but will be changed in the future to dynamic
+        // Currently the value of minimum score is hardcoded, but will be changed in the future to dynamic (with TRANSLATE-2076)
+        $innerNode4->addAttribute('minimumMatchScore', '50');
         $innerNode4->addAttribute('searchMode', 'bestWins');
         $innerNode4->addAttribute('missingFormattingPenalty', '1');
         $innerNode4->addAttribute('differentFormattingPenalty', '1');
@@ -293,12 +315,10 @@ segments-->';
 
         header('Content-disposition: attachment; filename='.$fileName);
         header ("Content-Type:text/xml");
-//output the XML data
-        echo  $xml;
         // if you want to directly download then set expires time
         header("Expires: 0");
 
-        return self::generateNodesWithAttributes($xml, $renderData);
+        return $this->generateNodesWithAttributes($xml, $renderData);
     }
 }
 

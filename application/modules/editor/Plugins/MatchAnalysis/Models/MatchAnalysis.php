@@ -102,7 +102,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
 
-        //if edit 100% matches is disabled for the task, filter out the blocked segments from the analysis 
+        //if edit 100% matches is disabled for the task, filter out the blocked segments from the analysis
         $blockedFilter = '';
         //TODO: this should be defined as config
         if (!$task->getEdit100PercentMatch()) {
@@ -245,7 +245,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         $fuzzyString = $isInternalFuzzy ? $translate->_("Ja") : $translate->_("Nein");
 
         //create empty group for given key,name and color
-        $initRow = function ($key, $name, $color) use ($analysisData, $fuzzyString) {
+        $initRow = function ($key, $name, $color, $type) use ($analysisData, $fuzzyString) {
             $row = [];
             $row[$key] = [];
             $row[$key]['resourceName'] = "";
@@ -253,6 +253,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             //set languageResource color and name
             //if the resource is internal fuzzy, change the name
             $row[$key]['resourceName'] = $name;
+            $row[$key]['resourceType'] = $type;
             $row[$key]['resourceColor'] = $color;
 
             $row[$key]['created'] = $analysisData['created'];
@@ -285,17 +286,17 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             $lr = $resourceCache[$res['languageResourceId']];
 
             //init the group
-            $initGroups = $initGroups + $initRow($lr->getId(), $lr->getName(), $lr->getColor());
+            $initGroups = $initGroups + $initRow($lr->getId(), $lr->getName(), $lr->getColor(), $lr->getResourceType());
 
             //if internal fuzzy is activated, and the langage resource is of type tm, add aditional internal fuzzy row
             if ($isInternalFuzzy && $lr->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM) {
                 //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
                 //for each internal fuzzy, additional row is displayed
-                $initGroups = $initGroups + $initRow(($lr->getId() . 'fuzzy'), ($lr->getName() . ' - internal Fuzzies'), $lr->getColor());
+                $initGroups = $initGroups + $initRow(($lr->getId() . 'fuzzy'), ($lr->getName() . ' - internal Fuzzies'), $lr->getColor(), $lr->getResourceType());
             }
         }
         //init the repetition
-        $initGroups = $initGroups + $initRow(0, "", "");
+        $initGroups = $initGroups + $initRow(0, "", "", editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED);
         return $initGroups;
     }
 

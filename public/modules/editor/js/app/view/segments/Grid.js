@@ -54,6 +54,7 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.WorkflowStep',
         'Editor.view.segments.column.Editable',
         'Editor.view.segments.column.IsWatched',
+        'Editor.view.segments.column.IsRepeated',
         'Editor.util.SegmentContent',
         'Editor.view.segments.GridViewModel',
         'Editor.view.segments.grid.Header'
@@ -309,6 +310,10 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'iswatchedColumn',
             itemId: 'iswatchedColumn',
             stateId:'iswatchedColumn',
+        }, {
+            xtype: 'isRepeatedColumn',
+            itemId: 'isRepeatedColumn',
+            stateId:'isRepeatedColumn',
         }]);
     
         //allow the view mode controller to prepare (and store) the columns setup

@@ -4022,7 +4022,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBlbnRmZXJudA=='><source>Whitespace wurde entfernt</source><target>Whitespace has been removed</target></trans-unit>
 <trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Whitespace wurde hinzugefügt</source><target>Whitespace has been added</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdzIGhhYmVuIGVpbmUgdW5nw7xsdGlnZSBTdHJ1a3R1cg=='><source>Interne Tags haben eine ungültige Struktur</source><target>Internal tags have incorrect structure</target></trans-unit>
-<trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGFuYWx5c2llcnQ='><source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source><target>This category was not or only partly analyzed</target></trans-unit>
+<trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGdlcHLDvGZ0'><source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source><target>This category was not or only partly analyzed</target></trans-unit>
 <trans-unit id='Qml0dGUgc3Rvw59lbiBTaWUgdW50ZW4gZWluZSBuZXVlIFByw7xmdW5nIGFuIHVtIGRhcyBQcm9ibGVtIHp1IGJlaGViZW4='><source>Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben</source><target>Please initiate a new re-check below to resolve the problem</target></trans-unit>
 <trans-unit id='UVMgJmFtcDsgRGF0ZWllbg=='><source>QS &amp; Dateien</source><target>QA &amp; Files</target></trans-unit>
 <trans-unit id='TnV0enVuZyB2b24gVE0tVHJlZmZlcm4='><source>Nutzung von TM-Treffern</source><target>Usage of TM-matches</target></trans-unit>
@@ -4069,6 +4069,46 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbiBBc2VyYmFpZHNjaGFuKQ=='><source>Aserbaidschanisch (Latein Aserbaidschan)</source><target>Azerbaijani (Latin Azerbaijan)</target></trans-unit>
 <trans-unit id='VXNiZWtpc2NoIChMYXRlaW4gVXNiZWtpc3Rhbik='><source>Usbekisch (Latein Usbekistan)</source><target>Uzbek (Latin Uzbekistan)</target></trans-unit>
 <trans-unit id='Qm9zbmlzY2ggKExhdGVpbiBCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Bosnisch (Latein Bosnien und Herzegowina)</source><target>Bosnian (Latin Bosnia and Herzegovina)</target></trans-unit>
+<trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbg=='>
+  <source>Nur Segmente mit Wiederholungen anzeigen</source>
+  <target>Show only repeated segments</target>
+</trans-unit>
+<trans-unit id='TWl0IFdpZWRlcmhvbHVuZ2Vu'>
+    <source>Mit Wiederholungen</source>
+    <target>With repetitions</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgb2huZSBXaWVkZXJob2x1bmdlbg=='>
+    <source>Segmente ohne Wiederholungen</source>
+    <target>Segments without repetitions</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgUXVlbGxzcHJhY2hl'>
+    <source>Segmente mit Wiederholungen nur in der Quellsprache</source>
+    <target>Segments with repetitions in the source text</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgWmllbHNwcmFjaGU='>
+    <source>Segmente mit Wiederholungen nur in der Zielsprache</source>
+    <target>Segments with repetitions in the target text</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIGluIGRlciBRdWVsbC0gdW5kIFppZWxzcHJhY2hl'>
+    <source>Segmente mit Wiederholungen in der Quell- und Zielsprache</source>
+    <target>Segments with repetitions in source and target text</target>
+</trans-unit>
+<trans-unit id='LQ=='>
+    <source>-</source>
+    <target>-</target>
+</trans-unit>
+<trans-unit id='TnVyIFF1ZWxsZQ=='>
+    <source>Nur Quelle</source>
+    <target>source only</target>
+</trans-unit>
+<trans-unit id='TnVyIFppZWw='>
+    <source>Nur Ziel</source>
+    <target>target only</target>
+</trans-unit>
+<trans-unit id='QmVpZGVz'>
+    <source>Beides</source>
+    <target>both</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

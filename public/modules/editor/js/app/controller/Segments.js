@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -36,18 +35,18 @@ END LICENSE AND COPYRIGHT
  * Editor.controller.Segments kapselt die Funktionalität des Grids
  * @class Editor.controller.Segments
  * @extends Ext.app.Controller
- * 
- * SaveChain: 
- * Saving a segment triggers several asynchronous actions, which are depending on each other. 
- * To preserve the order of this actions, the complete save process is implemented as a set of functions, 
- * named as "saveChain". The next Step / Function in the save chain is either called directly or used 
+ *
+ * SaveChain:
+ * Saving a segment triggers several asynchronous actions, which are depending on each other.
+ * To preserve the order of this actions, the complete save process is implemented as a set of functions,
+ * named as "saveChain". The next Step / Function in the save chain is either called directly or used
  * as callback method if the previous method has used AJAX.
- * 
- * The way through the chain depends on the actual application state 
+ *
+ * The way through the chain depends on the actual application state
  * (for example change alike settings, segment specific, etc).
- * 
+ *
  * Starting the save chain is done calling "saveChainStart".
- * 
+ *
  * The following Methods belongs to the save chain:
  * saveChainStart (accepts config with one time bindings to events "segmentEditSaved" and "segmentUsageFinished")
  * saveChainCheckAlikes
@@ -60,9 +59,9 @@ END LICENSE AND COPYRIGHT
  * segmentEditSaved: called at the very end of the save process, if bound by config not called in case of an error on completing the editor
  * 
  * The ChangeAlike Controller hooks into the save chain, @see Editor.controller.ChangeAlike
- * 
+ *
  * They are called in this order.
- * Additional Infos see on each method comment. 
+ * Additional Infos see on each method comment.
  */
 Ext.define('Editor.controller.Segments', {
   extend : 'Ext.app.Controller',
@@ -100,6 +99,9 @@ Ext.define('Editor.controller.Segments', {
   },{
       ref : 'watchListFilterBtn',
       selector : '#watchListFilterBtn'
+  },{
+      ref: 'filterBtnRepeated',
+      selector: '#filterBtnRepeated'
   },{
 	  ref:'segmentsToolbar',
 	  selector:'segmentsToolbar'
@@ -145,6 +147,9 @@ Ext.define('Editor.controller.Segments', {
           },
           'segmentsToolbar #watchListFilterBtn': {
               click: 'watchListFilter'
+          },
+          'segmentsToolbar #filterBtnRepeated': {
+              click: 'repeatedFilter'
           }
       },
       store: {
@@ -177,7 +182,6 @@ Ext.define('Editor.controller.Segments', {
           newTotal = store.totalCount,
           cls = 'activated',
           btn = me.getResetFilterBtn(),
-          btnWatchList = me.getWatchListFilterBtn(),
           filters = store.filters;
     
       me.updateFilteredCountDisplay(newTotal);
@@ -187,18 +191,15 @@ Ext.define('Editor.controller.Segments', {
       } else {
           btn.removeCls(cls);
       }
-      if(filters.length == 0){
-          btnWatchList.removeCls(cls);
-      }
   },
   /**
    * Displays / Updates the segment count in the reset button
    * @param {Integer} new segment count to be displayed
    */
   updateFilteredCountDisplay: function(newTotal) {
-    var btn_text = this.getSegmentsToolbar().item_clearSortAndFilterBtn;
-    btn_text = Ext.String.format('{0} ({1})', btn_text, newTotal);
-    this.getResetFilterBtn().setText(btn_text);
+      var btn_text = this.getSegmentsToolbar().item_clearSortAndFilterBtn;
+      btn_text = Ext.String.format('{0} ({1})', btn_text, newTotal);
+      this.getResetFilterBtn().setText(btn_text);
   },
   /**
    * 
@@ -286,39 +287,50 @@ Ext.define('Editor.controller.Segments', {
   /**
    * Toggle filtering by watch list.
    */
-  watchListFilter: function() {
-    var me = this,
-        grid = me.getSegmentGrid(),
-        gridFilters = grid.filters,
-        filters = gridFilters.store.filters,
-        found = false,
-        otherFound = false,
-        column;
-
-    filters.each(function(filter, index, len){
-        var isWatched = filter.getProperty() == 'isWatched';
-        found = found || isWatched;
-        otherFound = otherFound || !isWatched && filter.getDisabled() === false;
-    });
-    //remove watchlist filter
-    if (found) {
-        column = grid.columnManager.getHeaderByDataIndex('isWatched');
-        if (column && column.filter && column.filter.isGridFilter) {
-            column.filter.setActive(false);
-        }
-        return;
-    } 
-    //add watchlist filter
-    gridFilters.addFilter({
-        dataIndex: 'isWatched',
-        type: 'boolean',
-        value: true,
-        disabled: false
-    });
-    // currently enabled at least one more filter:
-    if (otherFound) {
-        Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
-    }
+  watchListFilter: function (btn) {
+      var me = this,
+          grid = me.getSegmentGrid(),
+          gridFilters = grid.filters,
+          filters = gridFilters.store.filters,
+          otherFound = false,
+          column = grid.down('[dataIndex=isWatched]');
+          
+      filters.each(function (filter, index, len) {
+          var isWatched = filter.getProperty() == 'isWatched';
+          otherFound = otherFound || !isWatched && filter.getDisabled() === false;
+      });
+      
+      if(column && column.filter) {
+          if(btn.pressed) {
+              column.filter.filter.setValue(true);
+              column.filter.setActive(true);
+          }
+          else {
+              column.filter.setActive(false);
+          }
+      }
+      
+      // currently enabled at least one more filter:
+      if (btn.pressed && otherFound) {
+          Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
+      }
+  },
+  
+  repeatedFilter: function (btn) {
+      var me = this,
+          grid = me.getSegmentGrid(),
+          column = grid.down('[dataIndex=isRepeated]');
+      
+      if(column && column.filter) {
+          if(btn.pressed) {
+              column.filter.setActive(true);
+              //1,2,3 contain in filter source only (1), target only (2), and segments repeatead in both (3)
+              column.filter.filter.setValue([1,2,3]);
+          }
+          else {
+              column.filter.setActive(false);
+          }
+      }
   },
   /**
    * removes the segment from the grid if removed from the watchlist and watchlist filter is set
@@ -357,22 +369,30 @@ Ext.define('Editor.controller.Segments', {
    * nach einem ändern der Filter muss das mapping zwischen Datei und Startsegmenten neu geladen werden.
    * @return void
    */
-  handleFilterChange: function() {
+  handleFilterChange: function () {
       var me = this,
           grid = me.getSegmentGrid(),
           gridFilters = grid.filters,
           store = gridFilters.store,
           filters = store.filters,
-          btn = me.getWatchListFilterBtn(),
-          found = false,
+          proxy = store.getProxy(),
+          tbar = me.getSegmentsToolbar(),
+          watchListFound = false,
+          isRepeatedFound = false,
           params = {};
 
-      filters.each(function(filter, index, len){
-         found = found || (filter.getProperty() == 'isWatched');
+      filters.each(function (filter, index, len) {
+          watchListFound = watchListFound || filter.getProperty() == 'isWatched';
+          isRepeatedFound = isRepeatedFound || filter.getProperty() == 'isRepeated';
       });
-      btn.toggle(found);
+      
+      tbar.down('#watchListFilterBtn').toggle(watchListFound, false);
+      tbar.down('#filterBtnRepeated').toggle(isRepeatedFound, false);
+
+      params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
+
       filters && me.styleResetFilterButton(filters);
-      me.reloadFilemap(grid.getStore().getFilterParams());
+      me.reloadFilemap(params);
   },
   /**
    * reloads the filemap with the given sort and filter parameters
