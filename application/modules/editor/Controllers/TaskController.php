@@ -760,7 +760,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 'filename' => $tempFilename,
                 'currentUserGuid' => $this->user->data->userGuid,
             ]);
-            //TODO should be an synchronous process (queue instead run)
+            //TODO should be an asynchronous process (queue instead run)
             // currently running import as direct run / synchronous process.
             // Reason is just the feedback for the user, which the user should get directly in the browser
             $worker->run();
