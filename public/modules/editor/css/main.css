@@ -256,7 +256,7 @@ div.single + div {
 #change-alike-window div.transNotFound.t5qfalpos,
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound.t5qfalpos,
 .segment-tag-container.type-source div.transNotFound.t5qfalpos { border-bottom-color:#FF8888; }
-#change-alike-window div.transNotDefined,.t5qfalpos
+#change-alike-window div.transNotDefined,.t5qfalpos,
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotDefined.t5qfalpos,
 .segment-tag-container.type-source div.transNotDefined.t5qfalpos { border-bottom-color:#C2A8A8; }
 .segment-tag-column div.x-grid-cell-inner div.notRecommended.t5qfalpos,
