@@ -24,7 +24,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;sym&gt;\ue023&lt;\/sym&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"cfd9c82da386912e8870b2881e4a83db\" data-length=\"-1\" class=\"full\">&lt;sym&gt;\ue023&lt;\/sym&gt;<\/span><\/div><div title=\"\" class=\"term preferredTerm exact\" data-tbxid=\"term_NOT_TESTABLE\">IchbineinTerm<\/div>",
         "targetEditToSort": "IchbineinTerm",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":13}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "2",
@@ -51,7 +52,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;sym&gt;\ue023&lt;\/sym&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"cfd9c82da386912e8870b2881e4a83db\" data-length=\"-1\" class=\"full\">&lt;sym&gt;\ue023&lt;\/sym&gt;<\/span><\/div> x",
         "targetEditToSort": " x",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":2}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "3",
@@ -78,7 +80,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;sym&gt;\ue023&lt;\/sym&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"cfd9c82da386912e8870b2881e4a83db\" data-length=\"-1\" class=\"full\">&lt;sym&gt;\ue023&lt;\/sym&gt;<\/span><\/div> x",
         "targetEditToSort": " x",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":2}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "4",
@@ -105,7 +108,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;sym&gt;\ue023&lt;\/sym&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"cfd9c82da386912e8870b2881e4a83db\" data-length=\"-1\" class=\"full\">&lt;sym&gt;\ue023&lt;\/sym&gt;<\/span><\/div> x",
         "targetEditToSort": " x",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":2}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "5",
@@ -132,7 +136,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;sym&gt;\ue023&lt;\/sym&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"cfd9c82da386912e8870b2881e4a83db\" data-length=\"-1\" class=\"full\">&lt;sym&gt;\ue023&lt;\/sym&gt;<\/span><\/div>bineinTerm",
         "targetEditToSort": "bineinTerm",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":10}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "6",
@@ -159,6 +164,7 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;sym&gt;\ue023&lt;\/sym&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"cfd9c82da386912e8870b2881e4a83db\" data-length=\"-1\" class=\"full\">&lt;sym&gt;\ue023&lt;\/sym&gt;<\/span><\/div>Muss hei\u00dfen x",
         "targetEditToSort": "Muss hei\u00dfen x",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":13}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     }
 ]

@@ -24,7 +24,8 @@
         "targetEdit": "Das ist ein Titel 1-Testtext<ins class=\"trackchanges ownttip\" data-usertrackingid=\"NOT_TESTABLE\" data-usercssnr=\"usernr1\" data-workflowstep=\"no workflow1\" data-timestamp=\"NOT_TESTABLE\" > - edited<\/ins>",
         "targetEditToSort": "Das ist ein Titel 1-Testtext - edited",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":37}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "2",
@@ -51,7 +52,8 @@
         "targetEdit": "Hallo Welt! 2-Testtext<ins class=\"trackchanges ownttip\" data-usertrackingid=\"NOT_TESTABLE\" data-usercssnr=\"usernr1\" data-workflowstep=\"no workflow1\" data-timestamp=\"NOT_TESTABLE\" > - edited<\/ins>",
         "targetEditToSort": "Hallo Welt! 2-Testtext - edited",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":31}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "3",
@@ -78,7 +80,8 @@
         "targetEdit": "Lasst uns <div class=\"open 672069643d223122 internal-tag ownttip\"><span title=\"&lt;g id=&quot;1&quot;&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;g id=&quot;1&quot;&gt;<\/span><\/div>einfach<div class=\"close 2f67 internal-tag ownttip\"><span title=\"&lt;\/g&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;\/g&gt;<\/span><\/div> testen! 3-Testtext<ins class=\"trackchanges ownttip\" data-usertrackingid=\"NOT_TESTABLE\" data-usercssnr=\"usernr1\" data-workflowstep=\"no workflow1\" data-timestamp=\"NOT_TESTABLE\" > - edited<\/ins>",
         "targetEditToSort": "Lasst uns einfach testen! 3-Testtext - edited",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":45}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "4",
@@ -105,6 +108,7 @@
         "targetEdit": "Teste &amp; Entities \u00b6 und so! 4-Testtext<ins class=\"trackchanges ownttip\" data-usertrackingid=\"NOT_TESTABLE\" data-usercssnr=\"usernr1\" data-workflowstep=\"no workflow1\" data-timestamp=\"NOT_TESTABLE\" > - edited<\/ins>",
         "targetEditToSort": "Teste &amp; Entities \u00b6 und so! 4-Testtext - edited",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":46}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     }
 ]

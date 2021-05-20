@@ -24,7 +24,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div><div title=\"\" class=\"term preferredTerm exact\" data-tbxid=\"term_NOT_TESTABLE\">Ichbin<ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">einTerm<\/ins><\/div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\"> <\/ins><div title=\"\" class=\"term preferredTerm exact\" data-tbxid=\"term_NOT_TESTABLE\"><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">Ichbin<\/ins>einTerm<\/div>",
         "targetEditToSort": "IchbineinTerm IchbineinTerm",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":27}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "2",
@@ -51,7 +52,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">Ichbin <\/ins><div title=\"\" class=\"term preferredTerm exact\" data-tbxid=\"term_NOT_TESTABLE\"><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">keinTerm<\/ins> <ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">Ichbin<\/ins><\/div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\"> keinTerm<\/ins>x",
         "targetEditToSort": "Ichbin keinTerm Ichbin keinTermx",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":32}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "3",
@@ -78,7 +80,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000001}\" data-username=\"manager test\" data-usercssnr=\"usernr1\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">Ichbin <\/ins><div title=\"\" class=\"term preferredTerm exact\" data-tbxid=\"term_NOT_TESTABLE\"><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000001}\" data-username=\"manager test\" data-usercssnr=\"usernr1\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">keinTerm<\/ins> <del class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">x<\/del><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">Ichbin<\/ins><\/div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\"> keinTerm<\/ins>",
         "targetEditToSort": "Ichbin keinTerm Ichbin keinTerm",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":31}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "4",
@@ -105,7 +108,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000001}\" data-username=\"manager test\" data-usercssnr=\"usernr1\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">Ichbi<\/ins><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">n <\/ins><div title=\"\" class=\"term preferredTerm exact\" data-tbxid=\"term_NOT_TESTABLE\"><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">kein<\/ins><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000001}\" data-username=\"manager test\" data-usercssnr=\"usernr1\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">Term<\/ins> <ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">Ichbin<\/ins><\/div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\"> keinTerm<\/ins><del class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">x<\/del>",
         "targetEditToSort": "Ichbin keinTerm Ichbin keinTerm",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":31}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "5",
@@ -132,7 +136,8 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">Soll hei\u00dfen <\/ins><div title=\"\" class=\"term preferredTerm exact\" data-tbxid=\"term_NOT_TESTABLE\"><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">Ich<\/ins>bineinTerm<\/div>",
         "targetEditToSort": "Soll hei\u00dfen IchbineinTerm",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":25}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "6",
@@ -159,6 +164,7 @@
         "targetEdit": "<div class=\"single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div><div title=\"\" class=\"term preferredTerm exact\" data-tbxid=\"term_NOT_TESTABLE\">Muss hei\u00dfen <del class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">x<\/del><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\">Ichbin<\/ins><\/div><ins class=\"trackchanges ownttip\" data-userguid=\"{00000000-0000-0000-C100-CCDDEE000002}\" data-username=\"lector test\" data-usercssnr=\"usernr2\" data-workflowstep=\"reviewing1\" data-timestamp=\"NOT_TESTABLE\"> keinTerm<\/ins>",
         "targetEditToSort": "Muss hei\u00dfen Ichbin keinTerm",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":27}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     }
 ]
