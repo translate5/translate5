@@ -158,8 +158,8 @@ class editor_QualityController extends ZfExtended_RestController {
     public function taskAction(){
         $task = $this->fetchTask();
         $view = new editor_Models_Quality_TaskView($task, NULL, true);
-        $this->view->rows = $view->getRows();
-        $this->view->total = count($this->view->rows);
+        $this->view->text = $task->getTaskGuid();
+        $this->view->children = $view->getRows();
         $this->view->metaData = $view->getMetaData();
     }
     /**

@@ -836,8 +836,7 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 .qualityFilterPanel .x-grid-cell-inner { display:flex; white-space:normal; }
 .qualityFilterPanel .x-grid-cell-inner > div { flex:none; }
 .qualityFilterPanel .x-grid-cell-inner .x-tree-node-text { padding-left:0; white-space:normal; }
-.qualityFilterPanel .x-tree-faulty .x-tree-node-text { color:#ee0000; }
-.taskQualities .x-grid-faulty { color:#ee0000; }
+.qualityFilterPanel .x-tree-faulty .x-tree-node-text, .taskQualities .x-tree-faulty .x-tree-node-text { color:#ee0000; }
 
 /**
  * FIXME must be removed with next ext update, fixes T5DEV-181 / https://www.sencha.com/forum/showthread.php?330718-6-2-ColorField-color-preview-doesn-t-match-color
