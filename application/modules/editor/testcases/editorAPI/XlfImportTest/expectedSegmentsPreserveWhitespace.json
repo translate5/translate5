@@ -1020,7 +1020,7 @@
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
-        "pretrans": "1",
+        "pretrans": "0",
         "matchRate": "100",
         "matchRateType": "import;tm",
         "stateId": "0",

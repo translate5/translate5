@@ -1892,7 +1892,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBlbnRmZXJudA=='><source>Whitespace wurde entfernt</source><target>Whitespace wurde entfernt</target></trans-unit>
 <trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Whitespace wurde hinzugefügt</source><target>Whitespace wurde hinzugefügt</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdzIGhhYmVuIGVpbmUgdW5nw7xsdGlnZSBTdHJ1a3R1cg=='><source>Interne Tags haben eine ungültige Struktur</source><target>Interne Tags haben eine ungültige Struktur</target></trans-unit>
-<trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGFuYWx5c2llcnQ='><source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source><target>Diese Kategorie wurde nicht oder nur unvollständig geprüft</target></trans-unit>
+<trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGdlcHLDvGZ0'><source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source><target>Diese Kategorie wurde nicht oder nur unvollständig geprüft</target></trans-unit>
 <trans-unit id='Qml0dGUgc3Rvw59lbiBTaWUgdW50ZW4gZWluZSBuZXVlIFByw7xmdW5nIGFuIHVtIGRhcyBQcm9ibGVtIHp1IGJlaGViZW4='><source>Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben</source><target>Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben</target></trans-unit>
 <trans-unit id='UVMgJmFtcDsgRGF0ZWllbg=='><source>QS &amp; Dateien</source><target>QS &amp; Dateien</target></trans-unit>
 <trans-unit id='TnV0enVuZyB2b24gVE0tVHJlZmZlcm4='><source>Nutzung von TM-Treffern</source><target>Nutzung von TM-Treffern</target></trans-unit>
@@ -1903,7 +1903,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QWxsZSB6ZWlnZW4='><source>Alle zeigen</source><target>Alle zeigen</target></trans-unit>
 <trans-unit id='TnVyIEZlaGxlcg=='><source>Nur Fehler</source><target>Nur Fehler</target></trans-unit>
 <trans-unit id='TnVyIEZhbHNjaC1Qb3NpdGl2ZQ=='><source>Nur Falsch-Positive</source><target>Nur Falsch-Positive</target></trans-unit>
-<trans-unit id='VW52b2xsc3TDpG5kaWcgYW5hbHlzaWVydA=='><source>Segmente unvollständig geprüft</source><target>Segmente unvollständig geprüft</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgdW52b2xsc3TDpG5kaWcgZ2VwcsO8ZnQ='><source>Segmente unvollständig geprüft</source><target>Segmente unvollständig geprüft</target></trans-unit>
 <trans-unit id='TmV1IMO8YmVycHLDvGZlbg=='><source>Neu überprüfen</source><target>Neu überprüfen</target></trans-unit>
 <trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>Alle Kategorien</target></trans-unit>
 <trans-unit id='UUE6IEZhbHNjaC1Qb3NpdGl2ZQ=='><source>QA: Falsch-Positive</source><target>QA: Falsch-Positive</target></trans-unit>
@@ -1965,9 +1965,17 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbiBBc2VyYmFpZHNjaGFuKQ=='><source>Aserbaidschanisch (Latein Aserbaidschan)</source><target>Aserbaidschanisch (Latein Aserbaidschan)</target></trans-unit>
 <trans-unit id='VXNiZWtpc2NoIChMYXRlaW4gVXNiZWtpc3Rhbik='><source>Usbekisch (Latein Usbekistan)</source><target>Usbekisch (Latein Usbekistan)</target></trans-unit>
 <trans-unit id='Qm9zbmlzY2ggKExhdGVpbiBCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Bosnisch (Latein Bosnien und Herzegowina)</source><target>Bosnisch (Latein Bosnien und Herzegowina)</target></trans-unit>
+<trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbg=='><source>Nur Segmente mit Wiederholungen anzeigen</source><target>Nur Segmente mit Wiederholungen anzeigen</target></trans-unit>
 <trans-unit id='RXhwb3J0IFhNTA=='><source>Export XML</source><target>Export XML</target></trans-unit>
-<trans-unit id='U2VnbWVudGUgdW52b2xsc3TDpG5kaWcgZ2VwcsO8ZnQ='><source>Segmente unvollständig geprüft</source><target>Segmente unvollständig geprüft</target></trans-unit>
-<trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGdlcHLDvGZ0'><source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source><target>Diese Kategorie wurde nicht oder nur unvollständig geprüft</target></trans-unit>
+<trans-unit id='TWl0IFdpZWRlcmhvbHVuZ2Vu'><source>Mit Wiederholungen</source><target>Mit Wiederholungen</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgb2huZSBXaWVkZXJob2x1bmdlbg=='><source>Segmente ohne Wiederholungen</source><target>Segmente ohne Wiederholungen</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgUXVlbGxzcHJhY2hl'><source>Segmente mit Wiederholungen nur in der Quellsprache</source><target>Segmente mit Wiederholungen nur in der Quellsprache</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgWmllbHNwcmFjaGU='><source>Segmente mit Wiederholungen nur in der Zielsprache</source><target>Segmente mit Wiederholungen nur in der Zielsprache</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIGluIGRlciBRdWVsbC0gdW5kIFppZWxzcHJhY2hl'><source>Segmente mit Wiederholungen in der Quell- und Zielsprache</source><target>Segmente mit Wiederholungen in der Quell- und Zielsprache</target></trans-unit>
+<trans-unit id='LQ=='><source>-</source><target>-</target></trans-unit>
+<trans-unit id='TnVyIFF1ZWxsZQ=='><source>Nur Quelle</source><target>Nur Quelle</target></trans-unit>
+<trans-unit id='TnVyIFppZWw='><source>Nur Ziel</source><target>Nur Ziel</target></trans-unit>
+<trans-unit id='QmVpZGVz'><source>Beides</source><target>Beides</target></trans-unit>
   </body>
  </file>
 </xliff>
