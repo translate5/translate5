@@ -4066,6 +4066,10 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Beides</source>
     <target>both</target>
 </trans-unit>
+<trans-unit id='w4RuZGVydW5nZW4gZGVzIFdpZWRlcmhvbHVuZ3NzdGF0dXMgZHVyY2ggU2VnbWVudMOkbmRlcnVuZ2VuIHdlcmRlbiBuaWNodCBzb2ZvcnQgYW5nZXplaWd0LCBkaWUgU2VnbWVudGUgbcO8c3NlbiBuZXVnZWxhZGVuIHdlcmRlbiE='>
+  <source>Änderungen des Wiederholungsstatus durch Segmentänderungen werden nicht sofort angezeigt, die Segmente müssen neugeladen werden!</source>
+  <target>The repetition state is not updated automatically on editing a segment, the segments have to be reloaded!</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
