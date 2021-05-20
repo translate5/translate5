@@ -121,6 +121,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @var integer
      */
     const PRETRANS_TRANSLATED = 2;
+    
+    /**
+     * empty string hash to identify empty segments
+     * generated with md5('');
+     * @var string
+     */
+    const EMPTY_STRING_HASH = 'd41d8cd98f00b204e9800998ecf8427e';
 
 
     protected $dbInstanceClass = 'editor_Models_Db_Segments';
@@ -857,7 +864,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $row->segmentId = $this->get('id');
         $row->mid = $this->get('mid');
         $row->original = '';
-        $row->originalMd5 = 'd41d8cd98f00b204e9800998ecf8427e'; //empty string md5 hash
+        $row->originalMd5 = self::EMPTY_STRING_HASH;
         $row->originalToSort = '';
         $row->edited = '';
         $row->editedToSort = '';
@@ -1093,7 +1100,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     public function updateIsTargetRepeated(string $newHash, string $oldHash)
     {
         //no change, so do nothing
-        $emptyHash = 'd41d8cd98f00b204e9800998ecf8427e'; //md5('');
+        $emptyHash = self::EMPTY_STRING_HASH;
         if($newHash == $emptyHash) {
             $newHash = 'this-may-not-be-a-repetition';
         }
@@ -1118,10 +1125,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             WHERE targetMd5 IN (?, ?)
             GROUP BY targetMd5
             ) srep
-        SET v.isRepeated = IF(srep.isRepeated, v.isRepeated | 2, v.isRepeated & ~2)
+        SET v.isRepeated = IF(srep.isRepeated, v.isRepeated | 2, v.isRepeated & ~2),
+            s.isRepeated = IF(srep.isRepeated, s.isRepeated | 2, s.isRepeated & ~2)
         WHERE v.targetMd5 = srep.targetMd5
         AND v.id = s.id';
-        
+        error_log(sprintf($sql, $this->segmentFieldManager->getView()->getName()));
+        error_log(print_r([$newHash, $oldHash],1));
         $this->db->getAdapter()->query(sprintf($sql, $this->segmentFieldManager->getView()->getName()),[$newHash, $oldHash]);
     }
 
@@ -1142,15 +1151,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             SELECT originalMd5
             FROM LEK_segment_data
             WHERE taskGuid = ? AND
-            original != "" AND original IS NOT NULL AND name = "%2$s" GROUP BY originalMd5 HAVING count(segmentId) > 1
+            originalMd5 != ? AND name = "%2$s" GROUP BY originalMd5 HAVING count(segmentId) > 1
         )
         AND s.id = d.segmentId AND d.taskGuid = ?';
         
         //update isRepeated for source repetitions add bit value of 1
-        $this->db->getAdapter()->query(sprintf($sql, '1', 'source'),[$taskGuid, $taskGuid]);
+        $this->db->getAdapter()->query(sprintf($sql, '1', 'source'),[$taskGuid, self::EMPTY_STRING_HASH, $taskGuid]);
         
         //update isRepeated for target repetitions add bit value of 2
-        $this->db->getAdapter()->query(sprintf($sql, '2', 'target'),[$taskGuid, $taskGuid]);
+        $this->db->getAdapter()->query(sprintf($sql, '2', 'target'),[$taskGuid, self::EMPTY_STRING_HASH, $taskGuid]);
         
         //sync the view too, if it exists
         $this->segmentFieldManager->initFields($taskGuid);
@@ -1496,13 +1505,20 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             return array();
         }
         $segmentsViewName = $this->segmentFieldManager->getView()->getName();
-        $sql = $this->_getAlikesSql($segmentsViewName);
+        $sql = 'select id, segmentNrInTask, source, target, sourceMd5=? sourceMatch, targetMd5=? targetMatch, matchRate, autostateId
+                from ' . $segmentsViewName . '
+                where ((sourceMd5 = ? and sourceMd5 != ?)
+                    or (targetMd5 = ? and targetMd5 != ?))
+                    and taskGuid = ? and editable = 1
+                order by fileOrder, id';
         //since alikes are only usable with segment field default layout we can use the following hardcoded methods
         $stmt = $this->db->getAdapter()->query($sql, array(
             $this->getSourceMd5(),
             $this->getTargetMd5(),
             $this->getSourceMd5(),
+            self::EMPTY_STRING_HASH,
             $this->getTargetMd5(),
+            self::EMPTY_STRING_HASH,
             $taskGuid));
         $alikes = $stmt->fetchAll();
         //gefilterte Segmente bestimmen und flag setzen
@@ -1579,30 +1595,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             $hasIdFiltered[$ids['id']] = true;
         }
         return $hasIdFiltered;
-    }
-
-    /**
-     * Gibt das SQL (mysql) für die Abfrage der Alikes eines Segmentes zurück.
-     * Muss für MSSQL überschrieben werden!
-     *
-     * Für MSSQL (getestet mit konkreten Werten und ohne die letzte Zeile in MSSQL direkt):
-     * select id, source, target,
-     * case when sourceMd5 like '?' then 1 else 0 end as sourceMatch,
-     * case when targetMd5 like '?' then 1 else 0 end as targetMatch
-     * from LEK_segments where (sourceMd5 like '?' or targetMd5 like '?')
-     * and taskGuid = ? and editable = 1 order by fileOrder, id;
-     *
-     * @param string $viewName
-     * @return string
-     */
-    protected function _getAlikesSql(string $viewName)
-    {
-        return 'select id, segmentNrInTask, source, target, sourceMd5=? sourceMatch, targetMd5=? targetMatch, matchRate, autostateId
-    from ' . $viewName . '
-    where ((sourceMd5 = ? and source != \'\' and source IS NOT NULL)
-        or (targetMd5 = ? and target != \'\' and target IS NOT NULL))
-        and taskGuid = ? and editable = 1
-    order by fileOrder, id';
     }
 
     /**
@@ -1715,7 +1707,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $this->reInitDb($taskGuid);
         $s = $this->db->select(true)
             ->columns('count(*) as cnt')
-            ->where('targetMd5 != ?', 'd41d8cd98f00b204e9800998ecf8427e');
+            ->where('targetMd5 != ?', self::EMPTY_STRING_HASH);
         $x = $this->db->fetchRow($s);
         return ((int)$x->cnt) == 0;
     }
