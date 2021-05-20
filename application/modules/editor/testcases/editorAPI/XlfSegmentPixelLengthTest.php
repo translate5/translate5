@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * XlfSegmentLengthTest imports a simple task and checks imported values about the segment lengths
  * edits segments and checks then the edited ones again on correct content
  */
-class XlfSegmentPixelLengthTest extends \ZfExtended_Test_ApiTestcase {
+class XlfSegmentPixelLengthTest extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
@@ -77,9 +77,7 @@ class XlfSegmentPixelLengthTest extends \ZfExtended_Test_ApiTestcase {
         //get segment list (just the ones of the first file for that tests)
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
         
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents(self::$api->getFile('expectedSegments.json'), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
+        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
     }
     
     /**
@@ -110,9 +108,8 @@ class XlfSegmentPixelLengthTest extends \ZfExtended_Test_ApiTestcase {
         }
         
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents(self::$api->getFile('expectedSegmentsEdited.json'), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedSegmentsEdited.json'), $data, 'Edited segments are not as expected!');
+        
+        $this->assertSegmentsEqualsJsonFile('expectedSegmentsEdited.json', $segments, 'Edited segments are not as expected!');
         
         $task = $this->api()->getTask();
         //start task export

@@ -59,8 +59,6 @@ END LICENSE AND COPYRIGHT
  * @method int getMatchRate() getMatchRate()
  * @method void setMatchRate() setMatchRate(int $matchrate)
  * @method string getMatchRateType() getMatchRateType()
- * @method string getQmId() getQmId()
- * @method void setQmId() setQmId(string $qmid)
  * @method int getStateId() getStateId()
  * @method void setStateId() setStateId(int $id)
  * @method integer getAutoStateId() getAutoStateId()
@@ -75,7 +73,7 @@ END LICENSE AND COPYRIGHT
  * @method void setWorkflowStep() setWorkflowStep(string $name)
  *
  * this are just some helper for the always existing segment fields, similar named methods exists for all segment fields:
- * @method string getSource() setSource()
+ * @method string getSource() getSource()
  * @method void setSource() setSource(string $content)
  * @method void setSourceEdit() setSourceEdit(string $content)
  * @method void setSourceMd5() setSourceMd5(string $md5hash)
@@ -130,8 +128,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     const EMPTY_STRING_HASH = 'd41d8cd98f00b204e9800998ecf8427e';
 
 
-    protected $dbInstanceClass = 'editor_Models_Db_Segments';
-    protected $validatorInstanceClass = 'editor_Models_Validator_Segment';
+        public static function createSegmentTagsStatusColumn(string $providerKey) : string{
+        return 'status_'.$providerKey;
+    }
+    
+    protected $dbInstanceClass          = 'editor_Models_Db_Segments';
+    protected $validatorInstanceClass   = 'editor_Models_Validator_Segment';
 
     /**
      * @var Zend_Config
@@ -186,6 +188,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     protected $whitespaceHelper;
 
+    /**
+     * @var Zend_Db_Table_Row_Abstract
+     */
+    protected $tagsModel = null;
+    
     /**
      * static so that only one instance is used, for performance and logging issues
      * @var editor_Models_Segment_PixelLength
@@ -266,7 +273,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
          * SELECT id,rank FROM (
             	SELECT @rownum := @rownum + 1 AS rank,
             	   `id`, `segmentNrInTask`, `fileId`, `mid`, `userGuid`, `userName`, `taskGuid`, `timestamp`,
-            	   `editable`, `pretrans`, `matchRate`, `matchRateType`, `qmId`, `stateId`, `autoStateId`, `fileOrder`,
+            	   `editable`, `pretrans`, `matchRate`, `matchRateType`, `stateId`, `autoStateId`, `fileOrder`,
             	   `comments`, `workflowStepNr`, `workflowStep`, `source`, `sourceMd5`, `sourceToSort`, `target`,
             	   `targetMd5`, `targetToSort`, `targetEdit`, `targetEditToSort`
             	   FROM `LEK_segment_view_10ba195a738894769f296aee08364626`, (SELECT @rownum := 0) r
@@ -464,7 +471,31 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         }
         return $this->isDataModified;
     }
-
+    /**
+     * Convenience API to evaluate if a segment has been pretranslated (either from a TM or a MT)
+     * This may also mean, that the status in an imported sdxliff was the like
+     * @return boolean
+     */
+    public function isPretranslated() {
+        return $this->getPretrans() !== 0;
+    }
+    /**
+     * Convenience API to evaluate if a segment has been pretranslated by a translation memory
+     * @return boolean
+     */
+    public function isTmPretranslated() {
+        return $this->getPretrans() !== 0 && editor_Models_Segment_MatchRateType::isFromTM($this->getMatchRateType());
+    }
+    /**
+     * Convenience API to evaluate if a segment was edited. This is based on the autoStates
+     * Note that there may be textual changes or changed tags / whitespace etc. that do not lead to a "edited" state
+     * @return boolean
+     */
+    public function isEdited() {
+        $autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        /* @var $autoStates editor_Models_Segment_AutoStates */
+        return $autoStates->isEditedState($this->getAutoStateId());
+    }
     /**
      * restores segments with content not changed by the user to the original
      * (which contains termTags - this way no new termTagging is necessary, since
@@ -731,11 +762,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
                 }
             }
         }
-    }
-
-    public function setQmId($qmId)
-    {
-        return parent::setQmId(trim($qmId, ';'));
     }
 
     /**
@@ -1317,7 +1343,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $this->segmentFieldManager->initFields($task->getTaskGuid());
         $this->reInitDb($task->getTaskGuid());
 
-        $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments', 'fileId', 'userGuid', 'userName', 'timestamp');
+        $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'comments', 'fileId', 'userGuid', 'userName', 'timestamp');
         $fields = array_merge($fields, $this->segmentFieldManager->getDataIndexList());
 
         $this->initDefaultSort();
@@ -1348,7 +1374,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
                 $s->where($this->tableName . '.workflowStep = ?', $workflowStep);
                 break;
         }
-        return parent::loadFilterdCustom($s);
+        $list = parent::loadFilterdCustom($s);
+        
+        // add the Segment's Qualities (which are stored in the qualities table) as names
+        if(count($list) > 0){
+            // create the list of segment Ids
+            $segmentIds = [];
+            foreach($list as $item){
+                $segmentIds[] = $item['id'];
+            }
+            $qualityNotifications = new editor_Models_Quality_Notifications($task, $segmentIds);
+            foreach($list as $item){
+                $item['qualities'] = $qualityNotifications->get($item['id'], []);
+            }
+        }
+        return $list;
     }
 
     /**
@@ -1604,25 +1644,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         return ' = ';
         //return ' like ' bei MSSQL
     }
-
-    /**
-     * Updates - if enabled - the QM Sub Segments with correct IDs in the given String and stores it with the given Method in the entity
-     * Also, corrects overlapped image tags between which there is no text node.
-     * @param string $field
-     */
-    public function updateQmSubSegments(string $dataindex)
-    {
-        $field = $this->segmentFieldManager->getDataLocationByKey($dataindex);
-        if (!$this->getConfig()->runtimeOptions->editor->enableQmSubSegments) {
-            return;
-        }
-        $qmsubsegments = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
-        /* @var $qmsubsegments editor_Models_Qmsubsegments */
-        $withQm = $qmsubsegments->updateQmSubSegments($this->get($dataindex), (int)$this->getId(), $field['field']);
-        $correctedOverlappedTags = $qmsubsegments->correctQmSubSegmentsOverlappedTags($withQm);
-        $this->set($dataindex, $correctedOverlappedTags);
-    }
-
+    
     /**
      * @param string $taskGuid
      * @return array
@@ -1747,7 +1769,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
                GROUP BY sourceMd5
               ) v2
               WHERE v2.cnt > 1 and v1.sourceMd5 = v2.sourceMd5
-              ORDER by v1.id';
+              ORDER BY v1.id';
         return $adapter->query($sql)->fetchAll();
     }
 
@@ -1810,16 +1832,16 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $this->reInitDb($taskGuid);
         $mv = $this->segmentFieldManager->getView();
         //find the last edited segment for the user from the segment view table and the segments history
-        $sql = 'select * from (
-    select id as "segmentId",userGuid,timestamp as "date" from ' . $mv->getName() . '
-    where taskGuid = ?
-union
-    select segmentId,userGuid,created as "date" from
-    LEK_segment_history
-    where taskGuid = ?
-) as merged
-where userGuid = ?
-order by date desc, segmentId asc limit 1';
+        $sql = 'SELECT * FROM (
+                    SELECT id AS "segmentId", userGuid, timestamp AS "date" FROM '.$mv->getName().'
+                    WHERE taskGuid = ?
+                UNION
+                    SELECT segmentId, userGuid, created AS "date" FROM
+                    LEK_segment_history
+                    WHERE taskGuid = ?
+                ) AS merged
+                WHERE userGuid = ?
+                ORDER BY date DESC, segmentId ASC LIMIT 1';
         $stmt = $this->db->getAdapter()->query($sql, [$taskGuid, $taskGuid, $userGuid]);
         $result = $stmt->fetchAll();
         return $result[0]['segmentId'] ?? -1;
@@ -1847,5 +1869,69 @@ order by date desc, segmentId asc limit 1';
             $this->setConfig($task->getConfig());
         }
         return $this->config;
+    }
+    /**
+     * Retrieves the Field-tags for a certain field
+     * Keep in mind that the saveTo & termTaggerName fields will be set simply with the field name
+     * @param editor_Models_Task $task
+     * @param string $field
+     * @return editor_Segment_FieldTags|NULL
+     */
+    public function getFieldTags(editor_Models_Task $task, string $field) : ?editor_Segment_FieldTags {
+        $editField = $this->segmentFieldManager->getEditIndex($field);
+        // error_log('getFieldTags: '.$field.' / '.$editField);
+        // TODO: edit field may be null
+        $location = $this->segmentFieldManager->getDataLocationByKey($editField);
+        if($location !== false && array_key_exists($location['field'], $this->segmentdata)) {
+            $fieldText = $this->segmentdata[$location['field']]->__get($location['column']);
+            return new editor_Segment_FieldTags($task, $this->getId(), $location['field'], $fieldText, $editField);
+        }
+        return NULL;
+    }
+    /**
+     *
+     * @return Zend_Db_Table_Row_Abstract
+     */
+    private function getTagsModel() : Zend_Db_Table_Row_Abstract {
+        // Crucial: as this model may loads multiple rows we have to make sure the id matches in case
+        if($this->tagsModel == null || $this->tagsModel->segmentId != $this->getId()){
+            $db = ZfExtended_Factory::get('editor_Models_Db_SegmentTags');
+            /* @var $db editor_Models_Db_SegmentTags */
+            $select = $db->select()->where('segmentId = ?', $this->getId());
+            $this->tagsModel = $db->fetchRow($select);
+            if($this->tagsModel == null){
+                $this->tagsModel = $db->createRow();
+                $this->tagsModel->segmentId = $this->getId();
+                $this->tagsModel->taskGuid = $this->getTaskGuid();
+                $this->tagsModel->tags = '';
+            }
+        }
+        return $this->tagsModel;
+    }
+    /**
+     *
+     * @return bool
+     */
+    public function hasSegmentTagsJSON() : bool {
+        return !empty($this->getTagsModel()->tags);
+    }
+    /**
+     *
+     * @return string
+     */
+    public function getSegmentTagsJSON() : string {
+        return $this->getTagsModel()->tags;
+    }
+    /**
+     * Saves the segment tags during an import and sets the status-flag for the given provider
+     * @param string $json
+     * @param string $providerKey
+     */
+    public function saveSegmentTagsJSON(string $json, string $providerKey){
+        $row = $this->getTagsModel();
+        $statusColumn = self::createSegmentTagsStatusColumn($providerKey);
+        $row->tags = $json;
+        $row->$statusColumn = 1;
+        $row->save();
     }
 }

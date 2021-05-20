@@ -129,7 +129,7 @@ Ext.define('Editor.view.ToolTip', {
     getQmFlagData: function(node) {
         var me = this, 
             qmtype,
-            cache = Editor.qmFlagTypeCache,
+            cache = Editor.mqmFlagTypeCache,
             meta = {sevTitle: me.messages.severity};
         qmtype = node.className.match(/qmflag-([0-9]+)/);
         if(qmtype && qmtype.length > 1) {

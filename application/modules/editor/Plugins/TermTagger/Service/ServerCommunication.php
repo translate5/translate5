@@ -31,15 +31,18 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_TermTagger_Service_ServerCommunication {
     
-    // REQUIRED FIELDS:
-    // *****************************************************
     /**
      * TBX file / hash
      * @var string
      */
     public $tbxFile = NULL;
-    
+    /**
+     * @var string
+     */
     public $sourceLang = NULL;
+    /**
+     * @var string
+     */
     public $targetLang = NULL;
     
     /**
@@ -86,6 +89,8 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
         $langModel->load($task->getTargetLang());
         $this->targetLang = $langModel->getRfc5646();
         $this->targetStringMatch = (int) in_array($this->targetLang, $customerConfig->targetStringMatch->toArray(), true);
+
+		$this->task = $task->getTaskGuid();
     }
     
     /**
@@ -97,12 +102,15 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
      * @param string $target
      */
     public function addSegment ($id, $field, $source, $target) {
+        if($this->segments == NULL){
+            $this->segments = [];
+        }
         $segment = new stdClass();
         $segment->id = (string) $id;
         $segment->field = $field;
         $segment->source = $source;
         $segment->target = $target;
-        
+
         $this->segments[] = $segment;
     }
 }

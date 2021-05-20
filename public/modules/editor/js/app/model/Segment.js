@@ -75,7 +75,6 @@ Ext.define('Editor.model.Segment', {
         //{name: 'terms', type: 'string'},
         {name: 'durations', defaultValue: {}}, //we are using an object here
         {name: 'comments', type: 'string', persist: false},
-        {name: 'qmId', type: 'string'},
         {name: 'stateId', type: 'int'},
         {name: 'metaCache', convert: function(val) {
             if(Ext.isObject(val)){
@@ -102,27 +101,6 @@ Ext.define('Editor.model.Segment', {
             encode: true,
             rootProperty: 'data',
             writeAllFields: false
-        }
-    },
-    /**
-     * konvertiert die serverseitig als string gespeicherte QM Liste in ein Array
-     * @returns Integer[]
-     */
-    getQmAsArray: function (){
-        return Ext.Array.map(this.get('qmId').replace(/^[;]+|[;]+$/g, '').split(';'), function(item){
-            return parseInt(item);
-        });
-    },
-    /**
-     * konvertiert ein Array mit QmIds zurück in das serverseitig benötigte String Format
-     * @param {Integer[]} qmArray
-     */
-    setQmFromArray: function (qmArray){
-        if(qmArray.length > 0){
-            this.set('qmId', ';'+qmArray.sort().join(';')+';');
-        }
-        else {
-            this.set('qmId', '');
         }
     },
     /**
