@@ -85,7 +85,7 @@ class DevelopmentCreatetestCommand extends Translate5AbstractCommand
         $path = APPLICATION_PATH.'/modules/editor/testcases/editorAPI';
         
         if($name = $input->getOption('name')) {
-            $issue = $name = $this->getFileName($path, $name);
+            $issue = $name;
         }
         else {
             $gitout = [];
