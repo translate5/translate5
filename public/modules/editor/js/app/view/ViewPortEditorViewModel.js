@@ -36,6 +36,7 @@ Ext.define('Editor.view.ViewPortEditorViewModel', {
     data: {
         taskIsReadonly: false,   // indicates if the task is readonly (can not be changed by the user in the editor)
         editorIsReadonly: false, // indicates if the task is readonly, triggered by the user and changeable by the user
+        taskHasDefaultLayout: true, //indicates if the tasks segments have the default layout or not (no multiple targets)
         editorViewmode: null
     },
     formulas: {
