@@ -169,6 +169,7 @@ Ext.define('Editor.view.ViewPortEditor', {
 
       //must be set before child components will use it
       me.getViewModel().set('taskIsReadonly', task.isReadOnly() || !isEditor);
+      me.getViewModel().set('taskHasDefaultLayout', task.get('defaultSegmentLayout'));
 
       me.callParent(arguments);
     },
