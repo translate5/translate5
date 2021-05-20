@@ -167,6 +167,16 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public $isFullLength;
     /**
+     * Set by editor_Segment_FieldTags to indicate that the Tag was deleted at some time in the segment's history (is in a del-tag)
+     * @var bool
+     */
+    public $wasDeleted;
+    /**
+     * Set by editor_Segment_FieldTags to indicate that the Tag was inserted at some time in the segment's history (is in a ins-tag)
+     * @var bool
+     */
+    public $wasInserted;
+    /**
      * References the field the Tag belongs to
      * This property is only set, if the tag is part of a FieldTags container and will not be serialized !
      * @var string
@@ -580,5 +590,18 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public function finalize(editor_Segment_FieldTags $tags, editor_Models_task $task){
         
+    }
+    /**
+     * Debug output
+     * @return string
+     */
+    public function debug($asMarkup=false){
+        $debug = '';
+        $processor = ($asMarkup) ? 'htmlspecialchars' : 'trim';
+        $newline = ($asMarkup) ? '<br/>' : "\n";
+        $debug .= 'RENDERED: '.$processor($this->render()).$newline;
+        $debug .= 'START: '.$this->startIndex.' | END: '.$this->endIndex.' | FULLENGTH: '.($this->isFullLength?'true':'false').$newline;
+        $debug .= 'DELETED: '.($this->wasDeleted?'true':'false').' | INSERTED: '.($this->wasInserted?'true':'false').$newline;
+        return $debug;
     }
 }

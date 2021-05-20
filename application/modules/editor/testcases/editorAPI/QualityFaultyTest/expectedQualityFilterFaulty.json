@@ -1,71 +1,80 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 12,
-    "qtotal": 12,
+    "qcount": 13,
+    "qtotal": 13,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
+    "expandable": false,
     "checked": false,
     "text": "All categories",
-    "segmentIds": [],
     "children": [
         {
             "qid": -1,
             "qtype": "internal",
-            "qcount": 2,
+            "qcount": 3,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "25230",
+                    "qid": "26926",
+                    "qtype": "internal",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "internal_tags_missing",
+                    "qcatidx": "0",
+                    "text": "Internal tags missing",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "26925",
+                    "qtype": "internal",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "internal_tags_added",
+                    "qcatidx": "0",
+                    "text": "Internal tags have been added",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "internal",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": null,
+                    "text": "Whitespace has been added",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "internal",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": null,
+                    "text": "Whitespace has been removed",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "26924",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "internal_tag_structure_faulty",
                     "qcatidx": "-1",
-                    "text": "The internal tags have an incorrect structure",
+                    "text": "Internal tags have incorrect structure",
                     "leaf": true,
                     "checked": false,
                     "qfaulty": true
-                },
-                {
-                    "qid": "25231",
-                    "qtype": "internal",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "qcategory": "internal_tags_missing",
-                    "qcatidx": "-1",
-                    "text": "Internal tags are missing",
-                    "leaf": true,
-                    "checked": false
                 }
             ],
             "qcategory": null,
             "text": "Internal tags",
-            "qtotal": 2,
+            "qtotal": 3,
             "expanded": true,
-            "checked": false
-        },
-        {
-            "qid": -1,
-            "qtype": "matchrate",
-            "qcount": 0,
-            "qcomplete": true,
-            "qcategory": null,
-            "text": "Match analysis",
-            "qtotal": 0,
-            "leaf": true,
-            "checked": false
-        },
-        {
-            "qid": -1,
-            "qtype": "mqm",
-            "qcount": 0,
-            "qcomplete": true,
-            "qcategory": null,
-            "text": "MQM",
-            "qtotal": 0,
-            "leaf": true,
             "checked": false
         },
         {
@@ -73,10 +82,337 @@
             "qtype": "qm",
             "qcount": 0,
             "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": null,
+                    "text": "Demo QM error 1",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": null,
+                    "text": "Mistranslation",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": null,
+                    "text": "Terminology problem",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": null,
+                    "text": "Fluency issue",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": null,
+                    "text": "Inconsistency",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
             "qcategory": null,
-            "text": "QA",
+            "text": "Manual QA (complete segment)",
             "qtotal": 0,
-            "leaf": true,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "mqm",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "mqm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "children": [
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_2",
+                            "text": "Terminology",
+                            "qcatidx": 2,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_3",
+                            "text": "Mistranslation",
+                            "qcatidx": 3,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_4",
+                            "text": "Omission",
+                            "qcatidx": 4,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_5",
+                            "text": "Untranslated",
+                            "qcatidx": 5,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_6",
+                            "text": "Addition",
+                            "qcatidx": 6,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        }
+                    ],
+                    "qcategory": "mqm_1",
+                    "text": "Accuracy",
+                    "qcatidx": 1,
+                    "qtotal": 0,
+                    "expanded": false,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "mqm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "children": [
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "children": [
+                                {
+                                    "qid": -1,
+                                    "qtype": "mqm",
+                                    "qcount": 0,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_9",
+                                    "text": "Register",
+                                    "qcatidx": 9,
+                                    "qtotal": 0,
+                                    "leaf": true,
+                                    "checked": false
+                                },
+                                {
+                                    "qid": -1,
+                                    "qtype": "mqm",
+                                    "qcount": 0,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_10",
+                                    "text": "Style",
+                                    "qcatidx": 10,
+                                    "qtotal": 0,
+                                    "leaf": true,
+                                    "checked": false
+                                },
+                                {
+                                    "qid": -1,
+                                    "qtype": "mqm",
+                                    "qcount": 0,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_11",
+                                    "text": "Inconsistency",
+                                    "qcatidx": 11,
+                                    "qtotal": 0,
+                                    "leaf": true,
+                                    "checked": false
+                                }
+                            ],
+                            "qcategory": "mqm_8",
+                            "text": "Content",
+                            "qcatidx": 8,
+                            "qtotal": 0,
+                            "expanded": false,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "children": [
+                                {
+                                    "qid": -1,
+                                    "qtype": "mqm",
+                                    "qcount": 0,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_13",
+                                    "text": "Spelling",
+                                    "qcatidx": 13,
+                                    "qtotal": 0,
+                                    "leaf": true,
+                                    "checked": false
+                                },
+                                {
+                                    "qid": -1,
+                                    "qtype": "mqm",
+                                    "qcount": 0,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_14",
+                                    "text": "Typography",
+                                    "qcatidx": 14,
+                                    "qtotal": 0,
+                                    "leaf": true,
+                                    "checked": false
+                                },
+                                {
+                                    "qid": -1,
+                                    "qtype": "mqm",
+                                    "qcount": 0,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_15",
+                                    "text": "Grammar",
+                                    "qcatidx": 15,
+                                    "qtotal": 0,
+                                    "leaf": true,
+                                    "checked": false
+                                },
+                                {
+                                    "qid": -1,
+                                    "qtype": "mqm",
+                                    "qcount": 0,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_16",
+                                    "text": "Locale violation",
+                                    "qcatidx": 16,
+                                    "qtotal": 0,
+                                    "leaf": true,
+                                    "checked": false
+                                }
+                            ],
+                            "qcategory": "mqm_12",
+                            "text": "Mechanical",
+                            "qcatidx": 12,
+                            "qtotal": 0,
+                            "expanded": false,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_17",
+                            "text": "Unintelligible",
+                            "qcatidx": 17,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        }
+                    ],
+                    "qcategory": "mqm_7",
+                    "text": "Fluency",
+                    "qcatidx": 7,
+                    "qtotal": 0,
+                    "expanded": false,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "mqm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "children": [
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_19",
+                            "text": "Completeness",
+                            "qcatidx": 19,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_20",
+                            "text": "Legal requirements",
+                            "qcatidx": 20,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_21",
+                            "text": "Locale applicability",
+                            "qcatidx": 21,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        }
+                    ],
+                    "qcategory": "mqm_18",
+                    "text": "Verity",
+                    "qcatidx": 18,
+                    "qtotal": 0,
+                    "expanded": false,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "text": "Manual QA (inside segment)",
+            "qtotal": 0,
+            "expanded": false,
             "checked": false
         },
         {
@@ -86,35 +422,45 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "25223",
-                    "qtype": "term",
-                    "qcount": 2,
-                    "qcomplete": true,
-                    "qcategory": "supersededTerm",
-                    "qcatidx": "-1",
-                    "text": "Term superseded, deprecated or forbidden in target language",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "25219",
-                    "qtype": "term",
-                    "qcount": 7,
-                    "qcomplete": true,
-                    "qcategory": "transNotDefined",
-                    "qcatidx": "-1",
-                    "text": "Term not defined in target language",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "25225",
+                    "qid": "26919",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "transNotFound",
                     "qcatidx": "-1",
-                    "text": "Term not found in target language",
+                    "text": "Not found in target",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "26913",
+                    "qtype": "term",
+                    "qcount": 7,
+                    "qcomplete": true,
+                    "qcategory": "transNotDefined",
+                    "qcatidx": "-1",
+                    "text": "Not defined in target terminology",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "26917",
+                    "qtype": "term",
+                    "qcount": 2,
+                    "qcomplete": true,
+                    "qcategory": "supersededTerm",
+                    "qcatidx": "-1",
+                    "text": "Forbidden in target",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": null,
+                    "text": "Forbidden in target",
                     "leaf": true,
                     "checked": false
                 }
@@ -123,6 +469,39 @@
             "text": "Terminology",
             "qtotal": 10,
             "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "matchrate",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "matchrate",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": null,
+                    "text": "Unedited fuzzy match",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "matchrate",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": null,
+                    "text": "Edited 100% match",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "text": "Usage of TM-matches",
+            "qtotal": 0,
+            "expanded": false,
             "checked": false
         }
     ]

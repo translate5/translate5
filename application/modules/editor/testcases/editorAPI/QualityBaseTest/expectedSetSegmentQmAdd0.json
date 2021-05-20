@@ -1,14 +1,14 @@
 {
     "success": 1,
     "row": {
-        "id": "21058",
-        "segmentId": "1056800",
+        "id": "26896",
+        "segmentId": "1061246",
         "field": "",
         "type": "qm",
         "category": "qm_4",
         "categoryIndex": "4",
         "falsePositive": "0",
-        "typeText": "QA",
+        "typeText": "Manual QA (complete segment)",
         "text": "Fluency issue",
         "filterable": true,
         "falsifiable": true,

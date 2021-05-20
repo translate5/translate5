@@ -1,14 +1,14 @@
 {
     "success": 1,
     "row": {
-        "id": "21060",
-        "segmentId": "1056809",
+        "id": "26898",
+        "segmentId": "1061255",
         "field": "",
         "type": "qm",
         "category": "qm_3",
         "categoryIndex": "3",
         "falsePositive": "0",
-        "typeText": "QA",
+        "typeText": "Manual QA (complete segment)",
         "text": "Terminology problem",
         "filterable": true,
         "falsifiable": true,

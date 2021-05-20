@@ -53,12 +53,20 @@ class editor_Segment_Internal_TagComparision {
     const TAGS_MISSING = 'internal_tags_missing';
     /**
      * @var string
+     */
+    const WHITESPACE_MISSING = 'whitespace_tags_missing';
+    /**
+     * @var string
      */    
     const TAGS_ADDED = 'internal_tags_added';
     /**
      * @var string
      */
-    const TAG_STRUCTURE_FAULTY = 'internal_tag_structure_faulty';
+    const WHITESPACE_ADDED = 'whitespace_tags_added';
+    /**
+     * @var string
+     */
+    const TAG_STRUCTURE_FAULTY = 'internal_tag_structure_faulty';        
     /**
      * 
      * @var string;
@@ -96,7 +104,7 @@ class editor_Segment_Internal_TagComparision {
         $this->numCheckTags = count($this->checkTags);
         // the structural check can be done without against tags
         $this->checkStructure();
-        // there is a against
+        // there is a against        
         if($against != NULL){
             $against->sort();
             $this->againstTags = $against->getByType(editor_Segment_Tag::TYPE_INTERNAL);
@@ -109,26 +117,47 @@ class editor_Segment_Internal_TagComparision {
      * Here we check if all tags from checkAgainst are present in the check tags
      */
     private function checkCompleteness(){
-        if($this->numCheckTags == $this->numAgainstTags){
-            $checkHashes = [];
-            $againstHashes = [];
-            foreach($this->checkTags as $tag){
-                $checkHashes[] = $tag->getHash();
+        $states = [];
+        $hashesInternalCheck = [];
+        $hashesWhitespaceCheck = [];
+        $hashesInternalAgainst = [];
+        $hashesWhitespaceAgainst = [];        
+        foreach($this->checkTags as $tag){
+            /* @var $tag editor_Segment_Internal_Tag */
+            if($tag->isWhitespace()){
+                $hashesWhitespaceCheck[] = $tag->getHash();
+            } else {
+                $hashesInternalCheck[] = $tag->getHash();
             }
-            foreach($this->againstTags as $tag){
-                $againstHashes[] = $tag->getHash();
+        }
+        foreach($this->againstTags as $tag){
+            /* @var $tag editor_Segment_Internal_Tag */
+            if($tag->isWhitespace()){
+                $hashesWhitespaceAgainst[] = $tag->getHash();
+            } else {
+                $hashesInternalAgainst[] = $tag->getHash();
             }
-            sort($checkHashes);
-            sort($againstHashes);
-            for($i=0; $i < $this->numCheckTags; $i++){
-                if($checkHashes[$i] != $againstHashes[$i]){
-                    $this->stati[] = self::TAGS_MISSING;
-                    $this->stati[] = self::TAGS_ADDED;
-                    return;
-                }
-            }
-        } else {
-            $this->stati[] = ($this->numCheckTags < $this->numAgainstTags) ? self::TAGS_MISSING : self::TAGS_ADDED;
+        } 
+        // first, we compare 'check' against 'against', this will give uns added tags
+        $diffInternal = array_diff($hashesInternalCheck, $hashesInternalAgainst);
+        $diffWhitespace = array_diff($hashesWhitespaceCheck, $hashesWhitespaceAgainst);
+        if(count($diffInternal) > 0){
+            $states[self::TAGS_ADDED] = true;
+        }
+        if(count($diffWhitespace) > 0){
+            $states[self::WHITESPACE_ADDED] = true;
+        }
+        
+        $diffInternal = array_diff($hashesInternalAgainst, $hashesInternalCheck);
+        $diffWhitespace = array_diff($hashesWhitespaceAgainst, $hashesWhitespaceCheck);
+        if(count($diffInternal) > 0){
+            $states[self::TAGS_MISSING] = true;
+        }
+        if(count($diffWhitespace) > 0){
+            $states[self::WHITESPACE_MISSING] = true;
+        }
+        if(count($states) > 0){
+            $this->stati = array_merge($this->stati, array_keys($states));
         }
     }
     /**

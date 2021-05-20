@@ -76,15 +76,27 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
                 
             case editor_Segment_Internal_TagComparision::TAGS_ADDED:
                 return $translate->_('Interne Tags wurden hinzugefügt');
+            
+            case editor_Segment_Internal_TagComparision::WHITESPACE_MISSING:
+                return $translate->_('Whitespace wurde entfernt');
                 
+            case editor_Segment_Internal_TagComparision::WHITESPACE_ADDED:
+                return $translate->_('Whitespace wurde hinzugefügt');
+
             case editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY:
-                return $translate->_('Die Internen Tags haben eine ungültige Struktur');
+                return $translate->_('Interne Tags haben eine ungültige Struktur');
         }
         return NULL;
     }
     
     public function getAllCategories(editor_Models_Task $task) : array {
-        return [ editor_Segment_Internal_TagComparision::TAGS_MISSING, editor_Segment_Internal_TagComparision::TAGS_ADDED, editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY ];
+        return [
+            editor_Segment_Internal_TagComparision::TAGS_MISSING,
+            editor_Segment_Internal_TagComparision::TAGS_ADDED,
+            editor_Segment_Internal_TagComparision::WHITESPACE_ADDED,
+            editor_Segment_Internal_TagComparision::WHITESPACE_MISSING,
+            editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY
+        ];
     }
     /**
      * The structure of internal tags can not be a false positive

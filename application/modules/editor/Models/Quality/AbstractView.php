@@ -117,7 +117,12 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $hasEmptyCategories = false;
     /**
-     * Configures if the mqm are shown flat or as deeper nested tree
+     * If set, all categories will be collapsed
+     * @var boolean
+     */    
+    protected $allCategoriesCollapsed = false;
+    /**
+     * If set, the mqm are shown flat, otherwise as a deeper nested tree
      * @var boolean
      */
     protected $mqmIsFlat = false;
@@ -337,7 +342,13 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected function finalizeTree(stdClass $row, $isRubric=true){
         if(property_exists($row, 'children') && count($row->children) > 0){
-            $row->expanded = ($this->hasEmptyCategories) ? ((property_exists($row, 'qtotal') && $row->qtotal > 0)) : true;
+            if($this->allCategoriesCollapsed){
+                $row->expanded = false;
+            } else if($this->hasEmptyCategories){
+                $row->expanded = ((property_exists($row, 'qtotal') && $row->qtotal > 0));
+            } else {
+                $row->expanded = true;
+            }
             foreach($row->children as $child){
                 $this->finalizeTree($child, false);
             }
@@ -461,11 +472,15 @@ abstract class editor_Models_Quality_AbstractView {
         $this->rowsByMqmCat = $rowsByMqmCat;
         // turn the mqm-tree to our model
         $mqmNodes = $this->task->getMqmTypesTranslated(false);
-        foreach($mqmNodes as $mqmNode){
-            $child = $this->createMqmRowFromNode($mqmNode);
-            // only add mqm-children that have segments
-            if($child->qtotal > 0 || $this->hasEmptyCategories){
-                $rubric->children[] = $child;
+        if($this->mqmIsFlat){
+            $this->addMqmRowsFromNode($rubric, $mqmNodes);
+        } else {
+            foreach($mqmNodes as $mqmNode){
+                $child = $this->createMqmRowFromNode($mqmNode);
+                // only add mqm-children that have segments
+                if($child->qtotal > 0 || $this->hasEmptyCategories){
+                    $rubric->children[] = $child;
+                }
             }
         }
     }
@@ -496,5 +511,26 @@ abstract class editor_Models_Quality_AbstractView {
             $row->qtotal = $row->qcount;
         }
         return $row;
+    }
+    /**
+     * Recursive function to add a tree of mqm types as flat children to a rubric
+     * @param stdClass $rubric
+     * @param array $mqmNodes
+     */
+    protected function addMqmRowsFromNode(stdClass $rubric, array $mqmNodes){
+        foreach($mqmNodes as $mqmNode){
+            $category = editor_Segment_Mqm_Tag::createCategoryVal($mqmNode->id);            
+            if(array_key_exists($category, $this->rowsByMqmCat)){
+                $row = $this->rowsByMqmCat[$category];
+                $rubric->children[] = $row;
+            } else if($this->hasEmptyCategories) {
+                $row = $this->createNonDbRow($mqmNode->text, editor_Segment_Tag::TYPE_MQM, $category);
+                $row->qcatidx = $mqmNode->id;
+                $rubric->children[] = $row;
+            }
+            if(isset($mqmNode->children) && is_array($mqmNode->children) && count($mqmNode->children) > 0){
+                $this->addMqmRowsFromNode($rubric, $mqmNode->children);
+            }
+        }
     }
 }

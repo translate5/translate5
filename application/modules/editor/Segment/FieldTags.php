@@ -108,6 +108,9 @@ class editor_Segment_FieldTags implements JsonSerializable {
             foreach($data->tags as $tag){
                 $tags->addTag($creator->fromJsonData($tag));
             }
+            // crucial: we do not serialize the deleted/inserted propsas they're serialized indirectly with the trackchanges tags
+            // so we have to re-evaluate these props now
+            $tags->evaluateDeletedInserted();
             return $tags;
         } catch (Exception $e) {
             throw new Exception('Could not deserialize editor_Segment_FieldTags from deserialized JSON-Data '.json_encode($data));
@@ -318,12 +321,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
     /**
      * Retrieves the internal tags of a certain type
      * @param string $type
+     * @param boolean $includeDeleted: if set, internal tags that represent deleted content will be processed as well
      * @return editor_Segment_Tag[]
      */
-    public function getByType(string $type) : array {
+    public function getByType(string $type, bool $includeDeleted=false) : array {
         $result = [];
         foreach($this->tags as $tag){
-            if($tag->getType() == $type){
+            if($tag->getType() == $type && ($includeDeleted || !$tag->wasDeleted)){
                 $result[] = $tag;
             }
         }
@@ -332,12 +336,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
     /**
      * Removes the internal tags of a certain type
      * @param string $type
+     * @param boolean $includeDeleted: if set, internal tags that represent deleted content will be processed as well
      */
-    public function removeByType(string $type){
+    public function removeByType(string $type, bool $includeDeleted=false){
         $result = [];
         $replace = false;
         foreach($this->tags as $tag){
-            if($tag->getType() != $type){
+            if($tag->getType() != $type || (!$includeDeleted && $tag->wasDeleted)){
                 $result[] = $tag;
             } else {
                 $replace = true;
@@ -357,11 +362,12 @@ class editor_Segment_FieldTags implements JsonSerializable {
     /**
      * Checks if a internal tag of a certain type is present
      * @param string $type
+     * @param boolean $includeDeleted: if set, internal tags that represent deleted content will be processed as well
      * @return boolean
      */
-    public function hasType(string $type) : bool {
+    public function hasType(string $type, bool $includeDeleted=false) : bool {
         foreach($this->tags as $tag){
-            if($tag->getType() == $type){
+            if($tag->getType() == $type && ($includeDeleted || !$tag->wasDeleted)){
                 return true;
             }
         }
@@ -373,9 +379,9 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @param string $className
      * @return bool
      */
-    public function hasTypeAndClass(string $type, string $className) : bool {
+    public function hasTypeAndClass(string $type, string $className, bool $includeDeleted=false) : bool {
         foreach($this->tags as $tag){
-            if($tag->getType() == $type && $tag->hasClass($className)){
+            if($tag->getType() == $type && $tag->hasClass($className) && ($includeDeleted || !$tag->wasDeleted)){
                 return true;
             }
         }
@@ -387,9 +393,9 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @param string[] $classNames
      * @return bool
      */
-    public function hasTypeAndClasses(string $type, array $classNames) : bool {
+    public function hasTypeAndClasses(string $type, array $classNames, bool $includeDeleted=false) : bool {
         foreach($this->tags as $tag){
-            if($tag->getType() == $type && $tag->hasClasses($classNames)){
+            if($tag->getType() == $type && $tag->hasClasses($classNames) && ($includeDeleted || !$tag->wasDeleted)){
                 return true;
             }
         }
@@ -681,7 +687,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
                         }
                     }
                 }
-                // we may already removed the current elemnt, so check
+                // we may already removed the current element, so check
                 if($i < $numTags){    
                     $tag = $this->tags[$i];
                     // we join only tasks that are splitable of course ...
@@ -717,6 +723,34 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $tag->field = $this->field;
             $tag->content = $this->getFieldTextPart($tag->startIndex, $tag->endIndex);
             $tag->finalize($this, $this->task);
+        }
+        // finally, we set the wasDeleted / wasInserted properties of our tags
+        $this->evaluateDeletedInserted();
+    }
+    /**
+     * Sets the deleted / inserted properties for all tags. 
+     * This is the last step of unparsing the tags and deserialization from JSON
+     * It is also crucial for evaluating qualities because only non-deleted tags will count
+     */
+    private function evaluateDeletedInserted(){
+        foreach($this->tags as $tag){
+            if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES){
+                $propName = ($tag->getName() == 'del') ? 'wasDeleted' : 'wasInserted';
+                $this->setContainedTagsProp($tag->startIndex, $tag->endIndex, $propName);
+            }
+        }
+    }
+    /**
+     * Helper to set the del/ins properties
+     * @param int $start
+     * @param int $end
+     * @param string $propName
+     */
+    private function setContainedTagsProp(int $start, int $end, string $propName){
+        foreach($this->tags as $tag){
+            if($tag->startIndex >= $start && $tag->endIndex <= $end && $tag->getType() != editor_Segment_Tag::TYPE_TRACKCHANGES){
+                $tag->$propName = true;
+            }
         }
     }
 }

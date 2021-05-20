@@ -9,11 +9,11 @@
     },
     {
         "qid": -1,
-        "qtype": "matchrate",
+        "qtype": "qm",
         "qcount": 0,
         "qcomplete": true,
         "qcountfp": 0,
-        "text": "Match analysis"
+        "text": "Manual QA (complete segment)"
     },
     {
         "qid": -1,
@@ -21,15 +21,7 @@
         "qcount": 487,
         "qcomplete": true,
         "qcountfp": 0,
-        "text": "MQM"
-    },
-    {
-        "qid": -1,
-        "qtype": "qm",
-        "qcount": 0,
-        "qcomplete": true,
-        "qcountfp": 0,
-        "text": "QA"
+        "text": "Manual QA (inside segment)"
     },
     {
         "qid": -1,
@@ -38,5 +30,13 @@
         "qcomplete": true,
         "qcountfp": 0,
         "text": "Terminology"
+    },
+    {
+        "qid": -1,
+        "qtype": "matchrate",
+        "qcount": 0,
+        "qcomplete": true,
+        "qcountfp": 0,
+        "text": "Usage of TM-matches"
     }
 ]
