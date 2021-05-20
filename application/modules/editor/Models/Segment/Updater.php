@@ -80,7 +80,7 @@ class editor_Models_Segment_Updater {
         
         //if no content changed, restore the original content (which contains terms, so segment may not be retagged)
         $this->segment->restoreNotModfied();
-        
+        $oldHash = $this->segment->getTargetMd5();
         //@todo do this with events
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
@@ -90,13 +90,11 @@ class editor_Models_Segment_Updater {
         $this->segment->validate();
         
         $this->updateTargetHashAndOriginal($this->task);
+
+        // Update the Quality Tags
+        editor_Segment_Quality_Manager::instance()->processSegment($this->segment, $this->task, editor_Segment_Processing::EDIT);
         
-        foreach($allowedAlternatesToChange as $field) {
-            if($this->segment->isModified($field)) {
-                $this->segment->updateQmSubSegments($field);
-            }
-        }
-        
+        // TODO: this event is unused, remove it 
         $this->events->trigger("beforeSegmentUpdate", $this, array(
             'entity' => $this->segment,
             'history' => $history
@@ -109,9 +107,10 @@ class editor_Models_Segment_Updater {
         $history->save();
         $this->segment->setTimestamp(NOW_ISO); //see TRANSLATE-922
         $this->segment->save();
+        $this->segment->updateIsTargetRepeated($this->segment->getTargetMd5(), $oldHash);
         //call after segment put handler
         $this->updateLanguageResources();
-        
+
         //update the segment finish count for the current workflow step
         $this->task->changeSegmentFinishCount($this->task, $segment->getAutoStateId(), $history->getAutoStateId());
     }

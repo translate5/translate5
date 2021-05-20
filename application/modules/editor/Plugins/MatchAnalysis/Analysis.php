@@ -167,6 +167,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             //report progress update
             $progressCallback && $progressCallback($progress);
         }
+        
+        if(!empty($segment)) {
+            $segment->syncRepetitions($this->task->getTaskGuid());
+        }
 
         $this->clean();
 
@@ -281,14 +285,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 }
 
                 // If the matchrate is the same, we only check for a new best match if it is from a termcollection
-                if ($matchRateInternal->matchrate == $match->matchrate && $match->languageResourceType != 'termcollection') {
+                if ($matchRateInternal->matchrate == $match->matchrate && $match->languageResourceType != editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
                     continue;
                 }
 
-                if ($match->languageResourceType == 'termcollection') {
+                if ($match->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
                     // - preferred terms > permitted terms
                     // - if multiple permitted terms: take the first
-                    if (!is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == 'termcollection') {
+                    if (!is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
                         $bestMatchMetaData = $bestMatchRateResult->metaData;
                         $bestMatchIsPreferredTerm = editor_Models_Term::isPreferredTerm($bestMatchMetaData['status']);
                         if ($bestMatchIsPreferredTerm) {
@@ -439,14 +443,19 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setLanguageResourceid($languageResourceid);
         $matchAnalysis->setWordCount($segment->meta()->getSourceWordCount());
         $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
-        $matchAnalysis->setUuid(ZfExtended_Utils::uuid());
+        
+        if($languageResourceid === 0) {
+            $type = editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED;
+        }
+        elseif(array_key_exists($languageResourceid, $this->resources)) {
+            $type = $this->resources[$languageResourceid]->getResourceType();
+        }
+        else {
+            $type = editor_Models_Segment_MatchRateType::TYPE_UNKNOWN;
+        }
+        
+        $matchAnalysis->setType($type);
 
-        $type = '';
-        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
-
-        $languageresource->load($languageResourceid);
-        $matchAnalysis->setType($languageresource->getResourceType());
         $isFuzzy = false;
         $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
         if (isset($matchRateResult) && is_object($matchRateResult)) {

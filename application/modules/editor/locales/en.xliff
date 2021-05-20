@@ -1091,7 +1091,7 @@
       </trans-unit>
       <trans-unit id='RXhwb3J0IFFNLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='>
 	<source>Export QM-Statistik (XML) für Feld: {0}</source>
-	<target>Export QM-statistics (XML) for field: {0}</target>
+	<target>Export QA-statistics (XML) for field: {0}</target>
       </trans-unit>
       <trans-unit id='QXVmZ2FiZSB3aXJkIHZlcmxhc3Nlbi4uLg=='>
 	<source>Aufgabe wird verlassen...</source>
@@ -1617,10 +1617,6 @@
 <trans-unit id='TVFN'>
     <source>MQM</source>
     <target>MQM</target>
-</trans-unit>
-<trans-unit id='TVFNIFN0YXRpc3Rpaw=='>
-    <source>MQM Statistik</source>
-    <target>MQM statistics</target>
 </trans-unit>
 <trans-unit id='VGFiZWxsZSB6dXLDvGNrc2V0emVu'>
     <source>Tabelle zurücksetzen</source>
@@ -4013,6 +4009,53 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source>
   <target>If disabled, blocked segments are not included in the analysis and word count</target>
 </trans-unit>
+<trans-unit id='UVMgU3RhdGlzdGlr'><source>QS Statistik</source><target>QA statistics</target></trans-unit>
+<trans-unit id='TWF0Y2gtQW5hbHlzZQ=='><source>Match-Analyse</source><target>Match analysis</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Internal tags</target></trans-unit>
+<trans-unit id='VmVyYm90ZW4gaW4gWmllbA=='><source>Verboten in Ziel</source><target>Forbidden in target</target></trans-unit>
+<trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unedited fuzzy match</target></trans-unit>
+<trans-unit id='QmVhcmJlaXRldGVyIDEwMCUgTWF0Y2g='><source>Bearbeiteter 100% Match</source><target>Edited 100% match</target></trans-unit>
+<trans-unit id='TmljaHQgZ2VmdW5kZW4gaW4gWmllbA=='><source>Nicht gefunden in Ziel</source><target>Not found in target</target></trans-unit>
+<trans-unit id='TmljaHQgZGVmaW5pZXJ0IGluIHppZWxzcHJhY2hsLiBUZXJtaW5vbG9naWU='><source>Nicht definiert in zielsprachl. Terminologie</source><target>Not defined in target terminology</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIGZlaGxlbg=='><source>Interne Tags fehlen</source><target>Internal tags missing</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIHd1cmRlbiBoaW56dWdlZsO8Z3Q='><source>Interne Tags wurden hinzugefügt</source><target>Internal tags have been added</target></trans-unit>
+<trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBlbnRmZXJudA=='><source>Whitespace wurde entfernt</source><target>Whitespace has been removed</target></trans-unit>
+<trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Whitespace wurde hinzugefügt</source><target>Whitespace has been added</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIGhhYmVuIGVpbmUgdW5nw7xsdGlnZSBTdHJ1a3R1cg=='><source>Interne Tags haben eine ungültige Struktur</source><target>Internal tags have incorrect structure</target></trans-unit>
+<trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGdlcHLDvGZ0'><source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source><target>This category was not or only partly analyzed</target></trans-unit>
+<trans-unit id='Qml0dGUgc3Rvw59lbiBTaWUgdW50ZW4gZWluZSBuZXVlIFByw7xmdW5nIGFuIHVtIGRhcyBQcm9ibGVtIHp1IGJlaGViZW4='><source>Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben</source><target>Please initiate a new re-check below to resolve the problem</target></trans-unit>
+<trans-unit id='UVMgJmFtcDsgRGF0ZWllbg=='><source>QS &amp; Dateien</source><target>QA &amp; Files</target></trans-unit>
+<trans-unit id='TnV0enVuZyB2b24gVE0tVHJlZmZlcm4='><source>Nutzung von TM-Treffern</source><target>Usage of TM-matches</target></trans-unit>
+<trans-unit id='TWFudWVsbGUgUVMgKGltIFNlZ21lbnQp'><source>Manuelle QS (im Segment)</source><target>Manual QA (inside segment)</target></trans-unit>
+<trans-unit id='TWFudWVsbGUgUVMgKGdhbnplcyBTZWdtZW50KQ=='><source>Manuelle QS (ganzes Segment)</source><target>Manual QA (complete segment)</target></trans-unit>
+<trans-unit id='QWxsZSBTZWdtZW50ZSB3dXJkZW4gc2VpdCBkZXIgbGV0enRlbiDDhG5kZXJ1bmcgZ2VwcsO8ZnQ='>
+	<source>Alle Segmente wurden seit der letzten Änderung geprüft</source>
+	<target>All segments checked after last segment change</target>
+</trans-unit>
+<trans-unit id='UXVhbGl0w6R0c3NpY2hlcnVuZw=='><source>Qualitätssicherung</source><target>Quality assurance</target></trans-unit>
+<trans-unit id='QWxsZSB6ZWlnZW4='><source>Alle zeigen</source><target>Show all</target></trans-unit>
+<trans-unit id='TnVyIEZlaGxlcg=='><source>Nur Fehler</source><target>Only errors</target></trans-unit>
+<trans-unit id='TnVyIEZhbHNjaC1Qb3NpdGl2ZQ=='><source>Nur Falsch-Positive</source><target>Only false positives</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgdW52b2xsc3TDpG5kaWcgZ2VwcsO8ZnQ='><source>Segmente unvollständig geprüft</source><target>Segment check incomplete</target></trans-unit>
+<trans-unit id='TmV1IMO8YmVycHLDvGZlbg=='><source>Neu überprüfen</source><target>Re-check</target></trans-unit>
+<trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>All categories</target></trans-unit>
+<trans-unit id='UUE6IEZhbHNjaC1Qb3NpdGl2ZQ=='><source>QA: Falsch-Positive</source><target>QA: False positives</target></trans-unit>
+<trans-unit id='S2F0ZWdvcmll'><source>Kategorie</source><target>Category</target></trans-unit>
+<trans-unit id='QW56YWhs'><source>Anzahl</source><target>Amount</target></trans-unit>
+<trans-unit id='RmFsc2NoIGVya2FubnRlIEZlaGxlcg=='><source>Falsch erkannte Fehler</source><target>False positives</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWcgRmVobGVy'><source>Interne Tag Fehler</source><target>Internal tag errors</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIGVpbmVuIGZlaGxlcmZyZWllbiBFeHBvcnQgZGVyIEF1ZmdhYmUgdmVyaGluZGVybg=='>
+	<source>Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern</source>
+	<target>There are problems with internal tags that prevent exporting this task</target>
+</trans-unit>
+<trans-unit id='UVMgRmVobGVy'><source>QS Fehler</source><target>QA Errors</target></trans-unit>
+<trans-unit id='RGVyIFNlZ21lbnQgU3RhdHVzIHd1cmRlIGdlc3BlaWNoZXJ0'><source>Der Segment Status wurde gespeichert</source><target>The segment‘s state has been saved</target></trans-unit>
+<trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Die Qualität wurde hinzugefügt</source><target>The quality has been added</target></trans-unit>
+<trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBlbnRmZXJudA=='><source>Die Qualität wurde entfernt</source><target>The quality has been removed</target></trans-unit>
+<trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='><source>Der False-Positive Status wurde aktualisiert</source><target>The false-positive state has been updated</target></trans-unit>
+<trans-unit id='QWNodHVuZw=='><source>Achtung</source><target>Warning</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBpbiBkaWVzZXIgQXVmZ2FiZSBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIHUuVS4gZWluZW4gZmVobGVyZnJlaWVuIEV4cG9ydCBkZXIgQXVmZ2FiZSB2ZXJoaW5kZXJu'><source>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</source><target>There are problems with internal tags in this task that may prevent exporting this task properly</target></trans-unit>
+<trans-unit id='TGFkZS4uLg=='><source>Lade...</source><target>Loading...</target></trans-unit>
 <trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='>
   <source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source>
   <target>The parameter login containing the desired username is missing.</target>
@@ -4026,6 +4069,50 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbiBBc2VyYmFpZHNjaGFuKQ=='><source>Aserbaidschanisch (Latein Aserbaidschan)</source><target>Azerbaijani (Latin Azerbaijan)</target></trans-unit>
 <trans-unit id='VXNiZWtpc2NoIChMYXRlaW4gVXNiZWtpc3Rhbik='><source>Usbekisch (Latein Usbekistan)</source><target>Uzbek (Latin Uzbekistan)</target></trans-unit>
 <trans-unit id='Qm9zbmlzY2ggKExhdGVpbiBCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Bosnisch (Latein Bosnien und Herzegowina)</source><target>Bosnian (Latin Bosnia and Herzegovina)</target></trans-unit>
+<trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbg=='>
+  <source>Nur Segmente mit Wiederholungen anzeigen</source>
+  <target>Show only repeated segments</target>
+</trans-unit>
+<trans-unit id='TWl0IFdpZWRlcmhvbHVuZ2Vu'>
+    <source>Mit Wiederholungen</source>
+    <target>With repetitions</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgb2huZSBXaWVkZXJob2x1bmdlbg=='>
+    <source>Segmente ohne Wiederholungen</source>
+    <target>Segments without repetitions</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgUXVlbGxzcHJhY2hl'>
+    <source>Segmente mit Wiederholungen nur in der Quellsprache</source>
+    <target>Segments with repetitions in the source text</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgWmllbHNwcmFjaGU='>
+    <source>Segmente mit Wiederholungen nur in der Zielsprache</source>
+    <target>Segments with repetitions in the target text</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIGluIGRlciBRdWVsbC0gdW5kIFppZWxzcHJhY2hl'>
+    <source>Segmente mit Wiederholungen in der Quell- und Zielsprache</source>
+    <target>Segments with repetitions in source and target text</target>
+</trans-unit>
+<trans-unit id='LQ=='>
+    <source>-</source>
+    <target>-</target>
+</trans-unit>
+<trans-unit id='TnVyIFF1ZWxsZQ=='>
+    <source>Nur Quelle</source>
+    <target>source only</target>
+</trans-unit>
+<trans-unit id='TnVyIFppZWw='>
+    <source>Nur Ziel</source>
+    <target>target only</target>
+</trans-unit>
+<trans-unit id='QmVpZGVz'>
+    <source>Beides</source>
+    <target>both</target>
+</trans-unit>
+<trans-unit id='w4RuZGVydW5nZW4gZGVzIFdpZWRlcmhvbHVuZ3NzdGF0dXMgZHVyY2ggU2VnbWVudMOkbmRlcnVuZ2VuIHdlcmRlbiBuaWNodCBzb2ZvcnQgYW5nZXplaWd0LCBkaWUgU2VnbWVudGUgbcO8c3NlbiBuZXVnZWxhZGVuIHdlcmRlbiE='>
+  <source>Änderungen des Wiederholungsstatus durch Segmentänderungen werden nicht sofort angezeigt, die Segmente müssen neugeladen werden!</source>
+  <target>The repetition state is not updated automatically on editing a segment, the segments have to be reloaded!</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

@@ -36,6 +36,6 @@ class editor_Models_Import_FileParser_InvalidXMLException extends ZfExtended_Err
     protected $origin = 'import.fileparser';
     
     static protected $localErrorCodes = [
-        'E1024'=>'Invalid XML: expected closing "{closingTag}" tag, but got tag "{receivedTag}".'
+        'E1024' => 'Invalid XML: expected closing "{closingTag}" tag, but got tag "{receivedTag}".'
     ];
 }

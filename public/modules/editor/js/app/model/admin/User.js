@@ -79,17 +79,56 @@ Ext.define('Editor.model.admin.User', {
       },
       getUserGuid: function(rec) {
           return rec.get('userGuid');
-        },
+      },
       getLongUserName: function(rec) {
           return rec.get('surName')+', '+rec.get('firstName')+' ('+rec.get('login')+')';
+      },
+      getRoles: function(rec) {
+          return rec.get('roles').split(',');
       }
   },
+  /**
+   * @return {String}
+   */
   getUserName: function() {
       return this.self.getUserName(this);
   },
+  /**
+   * @return {String}
+   */
   getUserGuid: function() {
       return this.self.getUserGuid(this);
   },
+  /**
+   * @return {Array}
+   */
+  getRoles: function() {
+      return this.self.getRoles(this);
+  },
+  /**
+   * @param role {String}
+   * @return {Boolean}
+   */
+  hasRole: function(role) {
+      return Ext.Array.contains(this.self.getRoles(this), role);
+  },
+  /**
+   * @param roles {Array}
+   * @return {Boolean}
+   */
+  hasRoles: function(roles) {
+      for(var i=0; i < roles.length; i++){
+          if(!this.hasRole(roles[i])){
+              return false;
+          }
+      }
+      return true;
+  },
+  /**
+   * @param right {String}
+   * @param task {Editor.model.admin.Task}
+   * @return {Boolean}
+   */
   isAllowed: function(right, task) {
       var me = this,
           isAllowed = (Ext.Array.indexOf(Editor.data.app.userRights, right) >= 0);
@@ -136,7 +175,7 @@ Ext.define('Editor.model.admin.User', {
               }
               break;
           case 'editorShowexportmenuTask':
-              if(!task.hasQmSub() && !me.isAllowed('editorExportTask')){
+              if(!task.hasMqm() && !me.isAllowed('editorExportTask')){
                   return false;
               }
               break;

@@ -8,10 +8,11 @@ fi
 # load config:
 . $CONFIG;
 
-INCLUDES="${APPLICATION_ROOT}application:${APPLICATION_ROOT}library:${APPLICATION_ROOT}application/modules/editor/:.:$ZEND:/usr/share/php5:/usr/share/php"
+INCLUDES="${APPLICATION_ROOT}application:${APPLICATION_ROOT}library:${APPLICATION_ROOT}vendor:${APPLICATION_ROOT}application/modules/editor/:.:$ZEND:/usr/share/php5:/usr/share/php"
 export API_URL=$API_URL
 export DATA_DIR=$DATA_DIR
 export LOGOUT_PATH=$LOGOUT_PATH
+export APPLICATION_ROOT=$APPLICATION_ROOT
 
 #single test to test the "things around" (translate5 internal test framework)
 #phpunit --verbose --include-path $INCLUDES --bootstrap bootstrap.php editorAPI/DummyTest.php

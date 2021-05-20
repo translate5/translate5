@@ -36,11 +36,6 @@ class editor_Models_Segment_Utility {
     protected $stateFlags;
     
     /**
-     * @var array
-     */
-    protected $qualityFlags;
-    
-    /**
      * Does the entity encoding when importing segment content, see inline comments
      * @param string $textNode
      * @param bool $xmlBased
@@ -92,7 +87,6 @@ class editor_Models_Segment_Utility {
     public function __construct() {
         $config = Zend_Registry::get('config');
         $this->stateFlags = $config->runtimeOptions->segments->stateFlags->toArray();
-        $this->qualityFlags = $config->runtimeOptions->segments->qualityFlags->toArray();
     }
     
     /**
@@ -108,29 +102,5 @@ class editor_Models_Segment_Utility {
             return $this->stateFlags[$stateId];
         }
         return 'Unknown State '.$stateId;
-    }
-    
-    /**
-     * converts the semicolon separated qmId string into an associative array
-     * key => qmId
-     * value => configured String in the config for this id
-     * @param string $qmIds
-     * @return array
-     */
-    public function convertQmIds($qmIds) {
-        if(empty($qmIds)) {
-            return array();
-        }
-        $qmIds = trim($qmIds, ';');
-        $qmIds = explode(';', $qmIds);
-        $result = array();
-        foreach($qmIds as $qmId) {
-            if(isset($this->qualityFlags[$qmId])){
-                $result[$qmId] = $this->qualityFlags[$qmId];
-                continue;
-            }
-            $result[$qmId] = 'Unknown Qm Id '.$qmId;
-        }
-        return $result;
     }
 }

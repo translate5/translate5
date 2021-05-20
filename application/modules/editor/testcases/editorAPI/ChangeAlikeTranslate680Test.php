@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  *   Tag Content and position does not matter, only the tag count must be
  *   equal in the segments (and the text of course) to be recognized as repetition.
  */
-class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
+class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
     protected static $useSourceEditing = false;
     
     /**
@@ -313,10 +313,7 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
             
         $segmentsAfterChange = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segmentsAfterChange);
-        //file_put_contents($this->api()->getFile('/expectedSegments.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        //In Segment 15 the macReturn is changed correctly to a softReturn, since the whitespace tags belong to the content right now.
-        $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
+        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segmentsAfterChange, 'Imported segments are not as expected!');
         
         //seg 14 has seg 16 as alike, although the target tag count differs.
         // But thats ok since target of 16 is empty, and will be filled with one tag from the source on editing.
@@ -383,10 +380,7 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
                 
         $segmentsAfterChange = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segmentsAfterChange);
-        //file_put_contents($this->api()->getFile('/expectedSegmentsEditedWhitespace.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        //In Segment 15 the macReturn is changed correctly to a softReturn, since the whitespace tags belong to the content right now.
-        $this->assertEquals(self::$api->getFileContent('expectedSegmentsEditedWhitespace.json'), $data, 'Imported segments are not as expected!');
+        $this->assertSegmentsEqualsJsonFile('expectedSegmentsEditedWhitespace.json', $segmentsAfterChange, 'Imported segments are not as expected!');
     }
     
     public static function tearDownAfterClass(): void {
