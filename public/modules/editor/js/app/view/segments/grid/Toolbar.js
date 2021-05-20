@@ -185,6 +185,10 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'button',
                     glyph: 'f0c5@FontAwesome5FreeSolid',
                     itemId: 'filterBtnRepeated',
+                    //FIXME repetition button darf nicht funktionieren wenn multiple targets!
+                    bind: {
+                        hidden: '{!taskHasDefaultLayout}'
+                    },
                     enableToggle: true,
                     tooltip: {
                         text: me.item_showRepeatedSegments,

@@ -23,7 +23,8 @@
         "targetEdit": "",
         "targetEditToSort": "",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":2}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":0}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     },
     {
         "segmentNrInTask": "2",
@@ -49,6 +50,7 @@
         "targetEdit": "",
         "targetEditToSort": "",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":2}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":0}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 0
     }
 ]
