@@ -351,7 +351,7 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         $edited = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing</2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         // missing tag
-        $this->createInternalTagComparisionTest($original, $edited, ['internal_tags_missing']);
+        $this->createInternalTagComparisionTest($original, $edited, ['whitespace_tags_missing']);
     }
     
     public function testTagComparision4(){
@@ -376,8 +376,8 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
     }
     
     public function testTagComparision7(){
-        $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
-        $edited = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam <7/>nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
+        $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
+        $edited = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam <6/>nonumy eirmod tempor <3>invidunt ut labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         // additional tag
         $this->createInternalTagComparisionTest($original, $edited, ['internal_tags_added']);
     }
@@ -386,9 +386,9 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $edited = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<7/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         // additional & missing tag
-        $this->createInternalTagComparisionTest($original, $edited, ['internal_tags_missing','internal_tags_added']);
+        $this->createInternalTagComparisionTest($original, $edited, ['whitespace_tags_added','internal_tags_missing']);
     }
-    
+   
     public function testTagComparision9(){
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $edited = 'Lorem <1>ipsum<6/> dolor sit amet, <2>consetetur sadipscing</2><5/> elitr, sed diam nonumy eirmod tempor </1>invidunt ut<3> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
@@ -408,6 +408,13 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         $edited = 'Lorem <1>ipsum<2> dolor sit amet, <3>consetetur sadipscing<4> elitr, sed diam nonumy eirmod tempor </4>invidunt ut<6/><5/> labore et </3>dolore magna</2> aliquyam erat</1>, sed diam voluptua.<7/>';
         // changed structure
         $this->createInternalTagComparisionTest($original, $edited, []);
+    }
+
+    public function testTagComparision12(){
+        $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
+        $edited = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam <6/>nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
+        // additional tag that is a carbon-copy will lead to a faulty structure
+        $this->createInternalTagComparisionTest($original, $edited, ['internal_tag_structure_faulty']);
     }
    
     /**
