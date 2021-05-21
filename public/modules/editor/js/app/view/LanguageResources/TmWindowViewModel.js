@@ -42,24 +42,25 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
     stores: {
         customers: {
             model: 'Editor.model.admin.Customer',
+            pageSize:0,
             autoLoad:true
         },
         customersDefaultRead: {
             source: '{customers}',
+            pageSize:0,
             filters : {
                 property : 'id',
                 operator : "in",
-                //value : '{resourcesCustomers.value}'
-                value: '{record.customerIds}'
+                value : '{resourcesCustomers.value}'
             }
         },
         customersDefaultWrite: {
             source: '{customersDefaultRead}',
+            pageSize:0,
             filters : {
                 property : 'id',
                 operator : "in",
-                //value : '{useAsDefault.value}'
-                value: '{record.customerUseAsDefaultIds}'
+                value : '{useAsDefault.value}'
             }
         }
     },

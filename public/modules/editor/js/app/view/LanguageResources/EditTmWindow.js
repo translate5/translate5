@@ -147,6 +147,9 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                             value:'{record.customerIds}',
                             store:'{customers}'
                         },
+                        listeners:{
+                            change:'onCustomersTagFieldChange'
+                        },
                         fieldLabel:me.strings.customers,
                         allowBlank: false
                     },{
@@ -159,6 +162,9 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         bind:{
                             value:'{record.customerUseAsDefaultIds}',
                             store:'{customersDefaultRead}'
+                        },
+                        listeners:{
+                            change:'onCustomersReadTagFieldChange'
                         },
                         queryMode: 'local',
                         displayField: 'name',

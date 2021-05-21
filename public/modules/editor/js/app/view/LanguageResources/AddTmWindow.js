@@ -158,6 +158,9 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     bind:{
                         store:'{customers}'
                     },
+                    listeners:{
+                        change:'onCustomersTagFieldChange'
+                    },
                     fieldLabel:me.strings.customers,
                     allowBlank: false
                 },{
@@ -169,6 +172,9 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     publishes: 'value',
                     bind:{
                         store:'{customersDefaultRead}'
+                    },
+                    listeners:{
+                        change:'onCustomersReadTagFieldChange'
                     },
                     queryMode: 'local',
                     displayField: 'name',
@@ -183,9 +189,6 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                         store:'{customersDefaultWrite}',
                         hidden:'{!isTmResourceType}',
                         disabled:'{!isTmResourceType}'
-                    },
-                    listeners:{
-                        change:'onCustomersWriteTagFieldChange'
                     },
                     fieldLabel:me.strings.writeAsDefault,
                     displayField: 'name',
