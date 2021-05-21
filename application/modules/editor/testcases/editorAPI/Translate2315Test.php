@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Testcase for TRANSLATE-2315 repetition filtering
  * For details see the issue.
  */
-class Translate2315Test extends \ZfExtended_Test_ApiTestcase {
+class Translate2315Test extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
@@ -75,9 +75,8 @@ class Translate2315Test extends \ZfExtended_Test_ApiTestcase {
         $this->checkRepetition($segments[4]->id, []);
         $this->checkRepetition($segments[6]->id, [$segments[7]->id]);
         
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
         //file_put_contents($this->api()->getFile('/expectedSegments.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
+        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
     }
     
     protected function checkRepetition(int $idToGetFor, array $idsToBeFound) {
@@ -116,9 +115,8 @@ class Translate2315Test extends \ZfExtended_Test_ApiTestcase {
         
         //check direct PUT result
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
         //file_put_contents($this->api()->getFile('/expectedSegments-edited.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedSegments-edited.json'), $data, 'Edited segments are not as expected!');
+        $this->assertSegmentsEqualsJsonFile('expectedSegments-edited.json', $segments, 'Edited segments are not as expected!');
     }
     
     public static function tearDownAfterClass(): void {

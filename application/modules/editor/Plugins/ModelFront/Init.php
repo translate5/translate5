@@ -150,13 +150,10 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
         if (strpos($segment->getMatchRateType(), $prefix) !== 0 || empty($result) || empty($analysisId) || empty($languageResourceId)) {
             return;
         }
-        
-        $task=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($segment->getTaskGuid());
 
-        $risk = $this->getRiskPredictionInstance($task);
-        if(empty($task)){
+        $risk = $this->getRiskPredictionInstance($segment->getTaskGuid());
+
+        if(is_null($risk)){
             return;
         }
         try {
@@ -171,11 +168,17 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
     /***
      * Return editor_Plugins_ModelFront_TranslationRiskPrediction instance with exception handling.
      * This will not log an exception if for the ModelFront no api config is provided (The ModelFront should be active by default, which means the auth params most of the time will be empty. That is why we ignore the logging)
-     * @param editor_Models_Task $task
+     * @param string $taskGuid
      * @return editor_Plugins_ModelFront_TranslationRiskPrediction|null
      */
-    protected function getRiskPredictionInstance(editor_Models_Task $task): ?editor_Plugins_ModelFront_TranslationRiskPrediction{
+    protected function getRiskPredictionInstance(string $taskGuid): ?editor_Plugins_ModelFront_TranslationRiskPrediction{
         try{
+            // check if the model front api is configured, if not this will throw an exception
+            ZfExtended_Factory::get('editor_Plugins_ModelFront_HttpApi');
+
+            $task=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($taskGuid);
             return ZfExtended_Factory::get('editor_Plugins_ModelFront_TranslationRiskPrediction',[$task]);
         }catch (editor_Plugins_ModelFront_Exception $e){
             // Log the exception only if the error is not for missing api config parameters
