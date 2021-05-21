@@ -158,6 +158,11 @@ class editor_Segment_Internal_TagComparision {
         }
         if(count($states) > 0){
             $this->stati = array_merge($this->stati, array_keys($states));
+        } else if($this->numCheckTags != $this->numAgainstTags) {
+            // if we could not find any differences but the number of tags is different we must assume, that there are some identical tags (presumably through duplication)
+            // for now this is also a 'TAG_STRUCTURE_FAULTY' But we could be more specific here
+            // TODO AutoQA: we may better add a state "duplicated_tags_present" here
+            $this->stati[] = self::TAG_STRUCTURE_FAULTY;
         }
     }
     /**
