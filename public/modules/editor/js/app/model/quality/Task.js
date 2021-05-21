@@ -40,5 +40,25 @@ Ext.define('Editor.model.quality.Task', {
         { name:'qcountfp', type:'int', defaultValue:0 },
         { name:'qcomplete', type:'boolean', defaultValue:true },
         { name:'qfaulty', type:'boolean', defaultValue:false }
-    ]
+    ],
+    isRubric: function(){
+        return (this.get('qcategory') == '');
+    },
+    isIncomplete: function(){
+        return (this.get('qcomplete') == false);
+    },
+    isFaulty: function(){
+        return (this.get('qfaulty') == true);
+    },
+    /**
+     * Helper to decorate the rows: a faulty rubric should be marked when it contains a faulty category
+     */
+    hasFaultyChildren: function(){
+        for(var i=0; i < this.childNodes.length; i++){
+            if(this.childNodes[i].isFaulty()){
+                return true;
+            }
+        }
+        return false;
+    }
 });
