@@ -174,9 +174,27 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         me.filterEngines();
     },
 
-    onCustomersWriteTagFieldChange:function(field,newValue,oldValue,eOpts){
-
+    onCustomersTagFieldChange:function(field,newValue){
+        var me=this;
+        // filter out all selected customers in useAsDefault which are not available in the current selection
+        me.removeNotAvailableCustomers(me.getView().down('#useAsDefault'),newValue);
     },
+
+    onCustomersReadTagFieldChange:function(field,newValue){
+        var me=this;
+        // filter out all selected customers in writeAsDefault which are not available in the current selection
+        me.removeNotAvailableCustomers(me.getView().down('#writeAsDefault'),newValue);
+    },
+
+    /***
+     * Remove the selected options in child which are not available in the source
+     * @param child
+     * @param source
+     */
+    removeNotAvailableCustomers:function(child,source){
+        child.setValue(Ext.Array.intersect(child.getValue(),source));
+    },
+
     /**
      * Filter the engines store, when source or target language is selected
      */
