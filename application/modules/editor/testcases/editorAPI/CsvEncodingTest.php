@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * The test task will be edited and exported. The generated changes.xml and
  * exported file will then be checked for correct encoded content.
  */
-class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
+class CsvEncodingTest extends editor_Test_JsonTest {
     /**
      * Setting up the test task by fresh import, adds the lector and translator users
      */
@@ -134,9 +134,9 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
             $expectedSource = $removeImgTags($row[3]);
             $expectedTarget = $removeImgTags($row[4]);
             $message = 'Imported column %1$s is NOT equal to expected column %1$s (CSV col %2$s) in CSV row/segNr %3$s';
-            $this->assertEquals($expectedSource, $segments[$idx]->source, sprintf($message, 'source', '3', $idx + 1));
-            $this->assertEquals($expectedTarget, $segments[$idx]->target, sprintf($message, 'target', '4', $idx + 1));
-            $this->assertEquals($expectedTarget, $segments[$idx]->targetEdit, sprintf($message, 'targetEdit', '4', $idx + 1));
+            $this->assertFieldTextEquals($expectedSource, $segments[$idx]->source, sprintf($message, 'source', '3', $idx + 1));
+            $this->assertFieldTextEquals($expectedTarget, $segments[$idx]->target, sprintf($message, 'target', '4', $idx + 1));
+            $this->assertFieldTextEquals($expectedTarget, $segments[$idx]->targetEdit, sprintf($message, 'targetEdit', '4', $idx + 1));
             
             $segToEdit = $segments[$idx];
             $editedData = $row[4].' - edited';

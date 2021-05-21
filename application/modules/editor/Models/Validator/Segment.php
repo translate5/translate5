@@ -101,8 +101,6 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         /* @var $workflow editor_Workflow_Abstract */
         $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
         
-        $this->setQualityValidator(array_keys($config->runtimeOptions->segments->qualityFlags->toArray()));
-        
         $allowedValues = array_keys($config->runtimeOptions->segments->stateFlags->toArray());
         $allowedValues[] = 0; //adding "not set" state
         $this->addValidator('stateId', 'inArray', array($allowedValues));
@@ -111,23 +109,6 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         /* @var $states editor_Models_Segment_AutoStates */
         $this->addValidator('autoStateId', 'inArray', array($states->getStates()));
     }
-  
-  protected function setQualityValidator(array $allowedValues) {
-    $inArray = $this->validatorFactory('inArray', array($allowedValues));
-    $me = $this;
-    $qmIdValidator = function($value) use($inArray, $me) {
-      $value = explode(';', trim($value, ';'));
-      foreach($value as $oneValue){
-        if((strlen($oneValue) > 0) && !$inArray->isValid($oneValue)) {
-          $me->addMessage('qmId', 'invalidQmId', 'invalidQmId');
-          return false;
-        }
-      }
-      return true;
-    };
-    
-    $this->addValidatorCustom('qmId', $qmIdValidator);
-  }
   
   /**
    * validates the given value of the given field with the values of the transunit,

@@ -33,12 +33,10 @@ END LICENSE AND COPYRIGHT
  *
 
 /**
- * Stellt Methoden zur Verarbeitung der vom Parser ermittelteten Segment Daten bereit
- * speichert die ermittelten Segment Daten in die Relais Spalte des entsprechenden Segments 
+ * Turns xliff MQM tags to segment tags as used by translate5Note, that this parser only generates the markup, the tags-models will be saved at a later point of the import and here only temporary ids are used /which must be unique within the segment)
+ * See editor_Segment_Quality_Manager::processSegment)
  */
 class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Import_SegmentProcessor {
-    const OPEN_TAG = true;
-    const CLOSE_TAG = false;
     
     const ERR_TAG_INVALID = 1;
     const ERR_TAG_CLOSE = 2;
@@ -48,22 +46,15 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
      * @var editor_Models_SegmentFieldManager
      */
     protected $sfm;
-    
     /**
-     * @var editor_Models_Qmsubsegments
+     * @var boolean
      */
-    protected $mqm;
-    
+    protected $mqmEnabled = true;
     /**
      * issue type to ID map
      * @var array
      */
-    protected $issues;
-    
-    protected $segmentMqmIds = array();
-    
-    protected $mqmEnabled = true;
-    
+    protected $issueIdsByType;
     /**
      * list of occured MQM Import errors
      * @var array
@@ -79,13 +70,12 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         $this->sfm = $sfm;
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
         $this->segment->setTaskGuid($task->getTaskGuid());
-        $config = $task->getConfig();
-        $this->mqmEnabled = $config->runtimeOptions->editor->enableQmSubSegments;
-        if(! $this->mqmEnabled) {
+        $this->mqmEnabled = $task->getConfig()->runtimeOptions->autoQA->enableMqmTags;
+        
+        if(!$this->mqmEnabled) {
             return;
         }
-        $this->issues = array_flip($this->task->getQmSubsegmentIssuesFlat());
-        $this->mqm = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
+        $this->issueIdsByType = array_flip($this->task->getMqmTypesFlat());
     }
     
     /**
@@ -94,13 +84,11 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
      */
     public function process(editor_Models_Import_FileParser $parser){
         $this->closeTags = array();
-        $this->segmentMqmIds = array();
         $allFields = &$parser->getFieldContents();
         foreach($allFields as $field => $data) {
             if($this->mqmEnabled) {
                 $allFields[$field] = $this->restoreMqmTags($data, $field);
-            }
-            else {
+            } else {
                 $allFields[$field] = $this->removeMqmTags($data, $field);
             }
         }
@@ -129,6 +117,7 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         
         $closeTags = array();
         for($i = 1; $i < $splitCnt; $i++) {
+            
             $current = $i++; // save current index and jump over content to next attributes
             //we ignore agent here
             preg_match_all('/(type|severity|note|id)="([^"]*)"/i',$split[$current], $attributes);
@@ -139,15 +128,25 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
                 continue;
             }
             $attributes = array_combine($attributes[1], $attributes[2]);
-            $attributes['segmentfield'] = $field;
-            if($this->createAndSaveInternalMqm($attributes) === false) {
+            
+            settype($attributes['type'], 'string');
+            settype($attributes['severity'], 'string');
+            settype($attributes['note'], 'string');
+            settype($attributes['id'], 'integer');
+
+            if(empty($this->issueIdsByType[$attributes['type']]) || empty($attributes['severity']) || empty($attributes['id'])) {
+                
                 $this->logError(self::ERR_TAG_SAVE, '<mqm:startIssue '.$split[$current].'/>');
-                $split[$current] = ''; //delete given mqm tag
-                continue;
+                $split[$current] = ''; // delete given mqm tag
+
+            } else {
+                
+                $tempQualityId = 'ext-'.strval($i);
+                // we resemble quality-ids as if they were be originating in the frontend (using ext-ids). The qualities itself are saved at a later point in the process (see editor_Segment_Quality_Manager::processSegment)
+                $categoryIndex = $this->issueIdsByType[$attributes['type']];
+                $split[$current] = editor_Segment_Mqm_Tag::renderTag($tempQualityId, true, $categoryIndex, $attributes['severity'], $attributes['note']);
+                $closeTags[$attributes['id']] = editor_Segment_Mqm_Tag::renderTag($tempQualityId, false, $categoryIndex, $attributes['severity'], $attributes['note']);
             }
-            $this->segmentMqmIds[] = $this->mqm->getId();
-            $closeTags[$attributes['id']] = $this->mqm->createTag(self::CLOSE_TAG);
-            $split[$current] = $this->mqm->createTag(self::OPEN_TAG);
         }
         
         $seg = join('', $split);
@@ -186,44 +185,6 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
 
         return $data;
     }
-
-    /**
-     * fills the internal mqm object with the parsed data and saves it to db
-     * @param array $attributes
-     * @return integer the db id of the saved mqm entry
-     */
-    protected function createAndSaveInternalMqm(array $attributes) {
-        settype($attributes['type'], 'string');
-        settype($attributes['severity'], 'string');
-        settype($attributes['note'], 'string');
-        settype($attributes['id'], 'integer');
-        
-        if(empty($this->issues[$attributes['type']]) || empty($attributes['severity']) || empty($attributes['id'])) {
-            return false;
-        }
-        
-        $data = array(
-            'fieldedited' => $attributes['segmentfield'],
-            'taskGuid' => $this->taskGuid,
-            //'segmentId' => '', //can only be set by postprocesshandler
-            'qmtype' => $this->issues[$attributes['type']],
-            'severity' => $attributes['severity'],
-            'comment' => $attributes['note'],
-        );
-        $this->mqm->init($data);
-        return $this->mqm->save();
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see editor_Models_Import_SegmentProcessor::postProcessHandler()
-     */
-    public function postProcessHandler(editor_Models_Import_FileParser $parser, $segmentId) {
-        if(!empty($this->segmentMqmIds)) {
-            $this->mqm->updateSegmentId($segmentId, $this->segmentMqmIds);
-        }
-    }
-    
     /**
      * logs one error
      * @param string $error

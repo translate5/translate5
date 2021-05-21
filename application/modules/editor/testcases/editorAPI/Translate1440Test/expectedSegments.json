@@ -8,7 +8,6 @@
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;none",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "0",
         "fileOrder": "0",
@@ -24,7 +23,8 @@
         "targetEdit": "D\u00e8s , et le symbole<div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Non breaking space\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div><div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"6016fd25abebcf872892097a3ae77df8\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div> s'\u00e9teint.",
         "targetEditToSort": "D\u00e8s , et le symbole s'\u00e9teint.",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":30}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 1
     },
     {
         "segmentNrInTask": "2",
@@ -35,7 +35,6 @@
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;none",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "0",
         "fileOrder": "0",
@@ -51,7 +50,8 @@
         "targetEdit": "D\u00e8s , et le symbole<div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;3\/&gt;: Non breaking space\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div><div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"6016fd25abebcf872892097a3ae77df8\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div> s'\u00e9teint<div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"43255f1a54c5f4f5a0d1b2d9777c42cc\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div>.",
         "targetEditToSort": "D\u00e8s , et le symbole s'\u00e9teint.",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":30}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 1
     },
     {
         "segmentNrInTask": "3",
@@ -62,7 +62,6 @@
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;none",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "0",
         "fileOrder": "0",
@@ -78,7 +77,8 @@
         "targetEdit": "D\u00e8s <div class=\"single 70682069643d2233222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;3&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"f61f10b4b7b8901df37baf82a7c0ebc5\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;3&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div> , et le symbole<div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;4\/&gt;: Non breaking space\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div><div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"6016fd25abebcf872892097a3ae77df8\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div> s'\u00e9teint<div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"43255f1a54c5f4f5a0d1b2d9777c42cc\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div>.",
         "targetEditToSort": "D\u00e8s  , et le symbole s'\u00e9teint.",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":31}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "4",
@@ -89,7 +89,6 @@
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;none",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "0",
         "fileOrder": "0",
@@ -105,7 +104,8 @@
         "targetEdit": "D\u00e8s , et le symbole <div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"6016fd25abebcf872892097a3ae77df8\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div> s'\u00e9teint.",
         "targetEditToSort": "D\u00e8s , et le symbole  s'\u00e9teint.",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":30}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 1
     },
     {
         "segmentNrInTask": "5",
@@ -116,7 +116,6 @@
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;none",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "0",
         "fileOrder": "0",
@@ -132,7 +131,8 @@
         "targetEdit": "D\u00e8s , et le symbole <div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"6016fd25abebcf872892097a3ae77df8\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div> s'\u00e9teint<div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"43255f1a54c5f4f5a0d1b2d9777c42cc\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div>.",
         "targetEditToSort": "D\u00e8s , et le symbole  s'\u00e9teint.",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":30}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 1
     },
     {
         "segmentNrInTask": "6",
@@ -143,7 +143,6 @@
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;none",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "0",
         "fileOrder": "0",
@@ -159,7 +158,8 @@
         "targetEdit": "D\u00e8s <div class=\"single 70682069643d2233222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;3&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"f61f10b4b7b8901df37baf82a7c0ebc5\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;3&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div> , et le symbole <div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"6016fd25abebcf872892097a3ae77df8\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div> s'\u00e9teint<div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"43255f1a54c5f4f5a0d1b2d9777c42cc\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div>.",
         "targetEditToSort": "D\u00e8s  , et le symbole  s'\u00e9teint.",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":31}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "7",
@@ -170,7 +170,6 @@
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;none",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "0",
         "fileOrder": "0",
@@ -186,7 +185,8 @@
         "targetEdit": "D\u00e8s <div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"6016fd25abebcf872892097a3ae77df8\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div> , et le symbole <div class=\"single 70682069643d2233222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;3&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"f61f10b4b7b8901df37baf82a7c0ebc5\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;3&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div> s'\u00e9teint<div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"43255f1a54c5f4f5a0d1b2d9777c42cc\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div>.",
         "targetEditToSort": "D\u00e8s  , et le symbole  s'\u00e9teint.",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":31}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "8",
@@ -197,7 +197,6 @@
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;none",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "0",
         "fileOrder": "0",
@@ -213,6 +212,7 @@
         "targetEdit": "D\u00e8s <div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"6016fd25abebcf872892097a3ae77df8\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div> , et le symbole<div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;4\/&gt;: Non breaking space\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div><div class=\"single 70682069643d2233222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;3&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"f61f10b4b7b8901df37baf82a7c0ebc5\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;3&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div> s'\u00e9teint<div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2230223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"43255f1a54c5f4f5a0d1b2d9777c42cc\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;sym&amp;gt;\ue023&amp;lt;\/sym&amp;gt;&lt;\/ph&gt;<\/span><\/div>.",
         "targetEditToSort": "D\u00e8s  , et le symbole s'\u00e9teint.",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":31}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     }
 ]

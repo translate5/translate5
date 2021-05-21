@@ -35,9 +35,7 @@ $this->translate->setJsonEncode(true);
   //mehrfachverwendete Strings:
   $yes = $this->translate->_('Ja');
   $no  = $this->translate->_('Nein');
-  
-  $config = Zend_Registry::get('config');
-?>
+ ?>
 /*
 Editor Translation Files
 */
@@ -66,7 +64,9 @@ Ext.define('Editor.controller.Localizer', {
       otherFiltersActive: '<?php echo $this->translate->_('ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind');?>',
       noSegmentToFilter: '<?php echo $this->translate->_('Kein Segment dieser Datei entspricht den Filterkriterien');?>'
     };
-
+    Editor.controller.MetaPanel.prototype.messages = {
+    	stateIdSaved: '<?php echo $this->translate->_('Der Segment Status wurde gespeichert');?>'
+    };
     Editor.controller.ServerException.prototype.strings = {
         "401_title": '<?php echo $this->translate->_('Erneute Anmeldung');?>',
         "401_msg": '<?php echo $this->translate->_('Ihre Sitzungsdaten sind abgelaufen. Sie werden nun zur Anmeldeseite weitergeleitet.');?>',
@@ -118,8 +118,12 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.app.Application.prototype.browserAdviceTextTitle = '<?php echo $this->translate->_('Nicht unterstützte Browser-Version');?>';
     Ext.app.Application.prototype.browserAdviceText = '<?php echo $disclaimer;?>';
+    
+    Editor.view.QuickTip.prototype.strings = {
+		loading: '<?php echo $this->translate->_('Lade...');?>'
+	};
 
-    Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
+    Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('QS &amp; Dateien');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
   	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_(' - [LESEMODUS]');?>';
   	Editor.view.segments.Grid.prototype.title_addition_unconfirmed = '<?php echo $this->translate->_(' - [AUFGABE UNBESTÄTIGT]');?>';
@@ -145,9 +149,6 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>';
   	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
   	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
-  	//gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>';
-  	gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('MQM');?>';
-  	gridToolbar.item_qmsummaryTooltip = '<?php echo $this->translate->_('MQM Statistik');?>';
   	gridToolbar.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>';
   	gridToolbar.item_zoomIn = '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>';
   	gridToolbar.item_zoomOut = '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>';
@@ -156,10 +157,9 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Lesezeichen');?>';
   	gridToolbar.item_helpTooltip = '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>';
   	gridToolbar.item_showBookmarkedSegments = '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>';
+  	gridToolbar.item_showRepeatedSegments = '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>';
     gridToolbar.strings.interfaceTranslation = '<?php echo $this->translate->_('Oberfläche');?>';
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
-
-  	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
     
     Ext.define("Editor.locale.view.segments.column.Content", {
@@ -174,6 +174,26 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.segments.column.IsWatched",
         text: '<?php echo $this->translate->_('Lesezeichen');?>',
         text_tip: '<?php echo $this->translate->_('mit Lesezeichen versehen');?>'
+    });
+    
+    Ext.define("Editor.locale.de.view.segments.column.IsRepeated", {
+        override: "Editor.view.segments.column.IsRepeated",
+        text: '<?php echo $this->translate->_('Mit Wiederholungen');?>',
+        strings: {
+            ttip: '<?php echo $this->translate->_('Änderungen des Wiederholungsstatus durch Segmentänderungen werden nicht sofort angezeigt, die Segmente müssen neugeladen werden!');?>',
+            filter: {
+                none: '<?php echo $this->translate->_('Segmente ohne Wiederholungen');?>',
+                source: '<?php echo $this->translate->_('Segmente mit Wiederholungen nur in der Quellsprache');?>',
+                target: '<?php echo $this->translate->_('Segmente mit Wiederholungen nur in der Zielsprache');?>',
+                both: '<?php echo $this->translate->_('Segmente mit Wiederholungen in der Quell- und Zielsprache');?>'
+            },
+            col: {
+                none: '<?php echo $this->translate->_('-');?>',
+                source: '<?php echo $this->translate->_('Nur Quelle');?>',
+                target: '<?php echo $this->translate->_('Nur Ziel');?>',
+                both: '<?php echo $this->translate->_('Beides');?>'
+            }
+        }
     });
     
     Ext.define("Editor.locale.de.view.segments.column.MatchrateType", {
@@ -246,22 +266,50 @@ Ext.define('Editor.controller.Localizer', {
 
   	Editor.view.preferences.Window.prototype.title = '<?php echo $this->translate->_('Einstellungen');?>';
     
-    Editor.view.qmsubsegments.Window.prototype.title = '<?php echo $this->translate->_('MQM Statistik');?>';
-  	Editor.view.qmsubsegments.Window.prototype.tab_title_field = '<?php echo $this->translate->_('In Feld: {0}');?>';
-  	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_text = '<?php echo $this->translate->_('Fehlertyp');?>';
-  	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_totalTotal = '<?php echo $this->translate->_('Gesamt');?>';
-  	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_total = '<?php echo $this->translate->_('Summe');?>';
-
-  	Editor.view.qmsubsegments.AddFlagFieldset.prototype.strings = {
+  	Editor.view.quality.FilterPanel.prototype.title = '<?php echo $this->translate->_('QS Statistik');?>';
+  	Editor.view.quality.FilterPanel.prototype.strings = {
+		modeAll: '<?php echo $this->translate->_('Alle zeigen');?>',
+		modeErrors: '<?php echo $this->translate->_('Nur Fehler');?>',
+		modeFalsePositives: '<?php echo $this->translate->_('Nur Falsch-Positive');?>',
+		incompleteCatCaption: '<?php echo $this->translate->_('Segmente unvollständig geprüft');?>',
+		incompleteCatText: '<?php echo $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig geprüft');?>',
+		startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
+        newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
+	};
+  	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('MQM');?>';
+  	Editor.view.quality.mqm.Fieldset.prototype.strings = {
 		severityLabel: '<?php echo $this->translate->_('Gewichtung');?>',
 		commentLabel: '<?php echo $this->translate->_('Kommentar');?>',
 		qmAddBtn: '<?php echo $this->translate->_('MQM hinzufügen');?>'
 	};
-  	Editor.view.qmsubsegments.AddFlagFieldset.prototype.title = '<?php echo $this->translate->_('MQM');?>';
-	Editor.controller.QmSubSegments.prototype.strings = {
+	Editor.controller.QualityMqm.prototype.strings = {
     	buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
     	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
     };
+    Editor.view.quality.SegmentQm.prototype.title = '<?php echo $this->translate->_('QM');?>';
+    Editor.view.quality.SegmentQmController.prototype.messages = {
+        qmHasBeenAdded: '<?php echo $this->translate->_('Die Qualität wurde hinzugefügt');?>',
+        qmHasBeenRemoved: '<?php echo $this->translate->_('Die Qualität wurde entfernt');?>'
+    };
+    Editor.view.quality.FalsePositives.prototype.title = '<?php echo $this->translate->_('QA: Falsch-Positive');?>';
+    Editor.view.quality.FalsePositivesController.prototype.messages = {
+    	falsePositiveUpdated: '<?php echo $this->translate->_('Der False-Positive Status wurde aktualisiert');?>'
+    };
+    Editor.view.quality.admin.TaskQualities.prototype.title = '<?php echo $this->translate->_('Qualitätssicherung');?>';
+  	Editor.view.quality.admin.TaskQualities.prototype.strings = {
+		category: '<?php echo $this->translate->_('Kategorie');?>',
+        total: '<?php echo $this->translate->_('Anzahl');?>',
+        errors: '<?php echo $this->translate->_('Fehler');?>',
+        falsePositives: '<?php echo $this->translate->_('Falsch erkannte Fehler');?>',
+        status: '<?php echo $this->translate->_('Status');?>',
+        completeTipCaption: '<?php echo $this->translate->_('Alle Segmente wurden seit der letzten Änderung geprüft');?>',
+        incompleteTipCaption: '<?php echo $this->translate->_('Segmente unvollständig geprüft');?>',
+        incompleteTipText: '<?php echo $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig geprüft');?>',
+        startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
+        faultyTipCaption: '<?php echo $this->translate->_('Interne Tag Fehler');?>',
+        faultyTipText: '<?php echo $this->translate->_('Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern');?>',
+        newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
+	};
     
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';
@@ -272,7 +320,6 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.preferences.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
 
     Editor.view.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
-    Editor.view.segments.MetaPanel.prototype.item_metaQm_title = '<?php echo $this->translate->_('QM');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen (ALT + S danach {0})');?>';
@@ -530,7 +577,8 @@ Ext.define('Editor.controller.Localizer', {
             assignmentDateHeader: '<?php echo $this->translate->_('Zuweisungsdatum');?>',
             finishedDateHeader: '<?php echo $this->translate->_('Abschlussdatum');?>',
             deadlineDateHeader: '<?php echo $this->translate->_('Deadline Datum');?>',
-            exelExportedTooltip: '<?php echo $this->translate->_('Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.');?>'
+            exelExportedTooltip: '<?php echo $this->translate->_('Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.');?>',
+            qualityErrorCount: '<?php echo $this->translate->_('QS Fehler');?>'
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
@@ -789,7 +837,9 @@ Ext.define('Editor.controller.Localizer', {
             exportExcel: '<?php echo $this->translate->_('Externe Bearbeitung als Excel');?>',
             downloadImportArchive: '<?php echo $this->translate->_('Importarchiv herunterladen');?>',
             exportTranslation: '<?php echo $this->translate->_('übersetzt');?>',
-            exportReview: '<?php echo $this->translate->_('lektoriert');?>'
+            exportReview: '<?php echo $this->translate->_('lektoriert');?>',
+            faultyQualityAlertTitle: '<?php echo $this->translate->_('Achtung');?>',
+            faultyQualityAlertText: '<?php echo $this->translate->_('Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern');?>',
         }
     });
     

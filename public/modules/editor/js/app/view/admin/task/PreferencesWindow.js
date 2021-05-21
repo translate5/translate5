@@ -35,6 +35,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
        'Editor.view.admin.task.UserAssoc',
        'Editor.view.admin.task.Preferences',
        'Editor.view.admin.task.TaskAttributes',
+       'Editor.view.quality.admin.TaskQualities',
        'Editor.view.admin.task.LogGrid',
        'Editor.view.admin.task.LogWindow',
        'Editor.view.admin.config.Grid'
@@ -69,6 +70,18 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
         
+        if(Editor.app.authenticatedUser.hasRoles(['pm','admin'])) {
+            tabs.push({
+                xtype: 'taskQualities',
+                bind:{
+                    disabled:'{disabledDuringTaskImport}',
+                    extraParams:{
+                        taskGuid: '{projectTaskSelection.taskGuid}'
+                    }
+                }
+            });
+        } 
+        
         if(auth.isAllowed('editorEditTaskPm') || 
             auth.isAllowed('editorEditTaskOrderDate') ||
             auth.isAllowed('editorEditTaskTaskName')||
@@ -78,7 +91,6 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
         
-        
         if(auth.isAllowed('configOverwriteGrid')) {
             tabs.push({
                 xtype: 'adminConfigGrid',
@@ -87,7 +99,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 bind:{
                     disabled:'{disabledDuringTaskImport}',
                     extraParams:{
-                        taskGuid : '{projectTaskSelection.taskGuid}'
+                        taskGuid: '{projectTaskSelection.taskGuid}'
                     }
                 }
             });
@@ -98,7 +110,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'editorAdminTaskLogGrid',
                 title: this.strings.events,
                 bind:{
-                    task:'{currentTask}'
+                    task: '{currentTask}'
                 }
             });
         }

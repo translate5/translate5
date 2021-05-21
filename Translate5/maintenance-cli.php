@@ -51,6 +51,8 @@ use Translate5\MaintenanceCli\Command\{
     MaintenanceDisableCommand,
     MaintenanceAnnounceCommand,
     MaintenanceMessageCommand,
+    UserCreateCommand,
+    UserInfoCommand,
     SystemCheckCommand
 };
 use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
@@ -74,6 +76,8 @@ $commands = [
     new MaintenanceDisableCommand(),
     new MaintenanceAnnounceCommand(),
     new MaintenanceMessageCommand(),
+    new UserCreateCommand(),
+    new UserInfoCommand(),
 ];
 if(file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
