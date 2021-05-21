@@ -35,7 +35,7 @@
  *
  * Testing what users can do with LanguageResources in addition is NOT part of this test.
  */
-class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
+class DeepLLanguageResourceApiTest extends editor_Test_JsonTest {
     
     /**
      * ServiceType according the Service's namespace.
@@ -74,24 +74,6 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
     const SOURCE_LANG_CODE = 4;
     const TARGET_LANG = 'en';
     const TARGET_LANG_CODE = 5;
-    
-    /**
-     * Matches (= see file for task-import): what we expect as result.
-     * @var array
-     */
-    protected static $expectedTranslationsForMatches = [
-        '<div class="open 672069643d22393222 internal-tag ownttip"><span title="&lt;g id=&quot;92&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="92" data-length="-1" class="full">&lt;g id=&quot;92&quot;&gt;</span></div>Datum:<div class="close 2f67 internal-tag ownttip"><span title="&lt;/g&gt;" class="short">&lt;/1&gt;</span><span data-originalid="92" data-length="-1" class="full">&lt;/g&gt;</span></div> PHP Handbuch' => '<div class="open 672069643d22393222 internal-tag ownttip"><span title="&lt;g id=&quot;92&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="92" data-length="-1" class="full">&lt;g id=&quot;92&quot;&gt;</span></div>Date:<div class="close 2f67 internal-tag ownttip"><span title="&lt;/g&gt;" class="short">&lt;/1&gt;</span><span data-originalid="92" data-length="-1" class="full">&lt;/g&gt;</span></div> PHP Manual',
-        'Das Haus ist <div class="open 672069643d22393322 internal-tag ownttip"><span title="&lt;g id=&quot;93&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="93" data-length="-1" class="full">&lt;g id=&quot;93&quot;&gt;</span></div>blau<div class="close 2f67 internal-tag ownttip"><span title="&lt;/g&gt;" class="short">&lt;/1&gt;</span><span data-originalid="93" data-length="-1" class="full">&lt;/g&gt;</span></div>.' => 'The house is <div class="open 672069643d22393322 internal-tag ownttip"><span title="&lt;g id=&quot;93&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="93" data-length="-1" class="full">&lt;g id=&quot;93&quot;&gt;</span></div>blue<div class="close 2f67 internal-tag ownttip"><span title="&lt;/g&gt;" class="short">&lt;/1&gt;</span><span data-originalid="93" data-length="-1" class="full">&lt;/g&gt;</span></div>.'
-    ];
-    /**
-     * InstantTranslate: Translations to check and what we expect as result.
-     * @var array
-     */
-    protected static $expectedTranslationsForInstantTranslate = [
-        '[<i>Datum</i>] PHP Handbuch' => '[<i>date</i>] PHP manual',
-        'Das Haus ist <b>blau</b>' => 'The house is <b>blue</b>'
-    ];
-    
     /**
      *
      */
@@ -125,6 +107,64 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $api->import($task);
     }
     
+    /**
+     * Matches (= see file for task-import): what we expect as result.
+     * @var array
+     */
+    protected $expectedTranslations = [
+        [
+            'source' => '<div class="open 672069643d22393222 internal-tag ownttip"><span title="&lt;g id=&quot;92&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="92" data-length="-1" class="full">&lt;g id=&quot;92&quot;&gt;</span></div>Datum:<div class="close 2f67 internal-tag ownttip"><span title="&lt;/g&gt;" class="short">&lt;/1&gt;</span><span data-originalid="92" data-length="-1" class="full">&lt;/g&gt;</span></div> PHP Handbuch',
+            'translation' => '<div class="open 672069643d22393222 internal-tag ownttip"><span title="&lt;g id=&quot;92&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="92" data-length="-1" class="full">&lt;g id=&quot;92&quot;&gt;</span></div>Date:<div class="close 2f67 internal-tag ownttip"><span title="&lt;/g&gt;" class="short">&lt;/1&gt;</span><span data-originalid="92" data-length="-1" class="full">&lt;/g&gt;</span></div> PHP Manual'
+        ],[
+            'source' => 'Das Haus ist <div class="open 672069643d22393322 internal-tag ownttip"><span title="&lt;g id=&quot;93&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="93" data-length="-1" class="full">&lt;g id=&quot;93&quot;&gt;</span></div>blau<div class="close 2f67 internal-tag ownttip"><span title="&lt;/g&gt;" class="short">&lt;/1&gt;</span><span data-originalid="93" data-length="-1" class="full">&lt;/g&gt;</span></div>.',
+            'translation' => 'The house is <div class="open 672069643d22393322 internal-tag ownttip"><span title="&lt;g id=&quot;93&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="93" data-length="-1" class="full">&lt;g id=&quot;93&quot;&gt;</span></div>blue<div class="close 2f67 internal-tag ownttip"><span title="&lt;/g&gt;" class="short">&lt;/1&gt;</span><span data-originalid="93" data-length="-1" class="full">&lt;/g&gt;</span></div>.'
+        ]
+    ];
+    /**
+     * InstantTranslate: Translations to check and what we expect as result.
+     * @var array
+     */
+    protected $expectedInstantTranslations = [
+        [
+            'source' => '[<i>Datum</i>] PHP Handbuch',
+            'translation' => '[<i>date</i>] PHP manual'
+        ],[
+            'source' => 'Das Haus ist <b>blau</b>',
+            'translation' => 'The house is <b>blue</b>'
+        ]
+    ];
+    
+    /**
+     * 
+     * @param string $source
+     * @param array $data
+     * @param string $msg
+     */
+    public function assertSourceExists($source, $data, $msg){
+        foreach($data as $item){
+            if(editor_Test_Sanitizer::fieldtext($item['source']) == editor_Test_Sanitizer::fieldtext($source)){
+                $this->assertTrue(true, $msg);
+                return;
+            }
+        }
+        $this->assertTrue(false, $msg);
+    }
+    /**
+     * 
+     * @param string $source
+     * @param string $translation
+     * @param array $data
+     * @param string $msg
+     */
+    public function assertTranslationExists($source, $translation, $data, $msg){
+        foreach($data as $item){
+            if(editor_Test_Sanitizer::fieldtext($item['source']) == editor_Test_Sanitizer::fieldtext($source)){
+                $this->assertEquals(editor_Test_Sanitizer::fieldtext($item['translation']), editor_Test_Sanitizer::fieldtext($translation), $msg);
+                return;
+            }
+        }
+        $this->assertEquals('???', $translation, $msg);
+    }    
     /**
      * Create a DeepL-LanguageResource with association to the test-customer
      * and store its ID.
@@ -177,7 +217,7 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         
         foreach ($allSegments->rows as $segment){
             // Do we provide an expected translation at all?
-            $this->assertArrayHasKey($segment->source, self::$expectedTranslationsForMatches, 'Provide an expected translation for: '.$segment->source);
+            $this->assertSourceExists($segment->source, $this->expectedTranslations, 'Provide an expected translation for: '.$segment->source);
             // Does the result match our expectations?
             $params = [];
             $params['segmentId'] = $segment->id;
@@ -185,7 +225,8 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
             $this->api()->requestJson('editor/languageresourceinstance/'.self::$languageResourceID.'/query', 'POST', [], $params);
             $responseBody = json_decode($this->api()->getLastResponse()->getBody());
             $translation = $responseBody->rows[0]->target;
-            $this->assertEquals(self::$expectedTranslationsForMatches[$segment->source], $translation, 'Result of translation is not as expected! Source was:'."\n".$segment->source);
+            
+            $this->assertTranslationExists($segment->source, $translation, $this->expectedTranslations, 'Result of translation is not as expected! Source was:'."\n".$segment->source);
         }
     }
     
@@ -196,7 +237,11 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
      * @depends testCreateLanguageResource
      */
     public function testTranslation() {
-        foreach (self::$expectedTranslationsForInstantTranslate as $text => $expectedTranslation){
+        foreach ($this->expectedInstantTranslations as $item){
+            
+            $text = $item['source'];
+            $expectedTranslation = $item['translation'];
+            
             $params = [];
             $params['source']  = static::SOURCE_LANG;
             $params['target'] = static::TARGET_LANG;

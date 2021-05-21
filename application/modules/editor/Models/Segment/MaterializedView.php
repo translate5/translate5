@@ -166,7 +166,7 @@ class editor_Models_Segment_MaterializedView {
         };
         
         $addColSql = $sfm->walkFields($walker);
-        $addColSql[] = 'ADD COLUMN `metaCache` longText NOT NULL';
+        $addColSql[] = 'ADD COLUMN `metaCache` longtext NOT NULL';
         
         $sql = 'ALTER TABLE `'.$this->viewName.'` '.join(', ', $addColSql).';';
         $db->query($sql);

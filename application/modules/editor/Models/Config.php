@@ -120,8 +120,8 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         $userLevelInt = array_sum(array_unique(array_map([$this, 'convertStringLevelToInt'], $userLevelStrings)));
         
         $s = $this->db->select()
-        ->from('Zf_configuration')
-        ->where('level & ? > 0', $userLevelInt);
+            ->from('Zf_configuration')
+            ->where('level & ? > 0', $userLevelInt);
         if(!empty($nameFilter)) {
             $s->where('name like ?', $nameFilter);
         }
@@ -145,9 +145,9 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             $r['userGuid'] = $userGuid;
         });
         $s = $this->db->select()
-        ->setIntegrityCheck(false)
-        ->from('LEK_user_config')
-        ->where('userGuid = ?',$userGuid);
+            ->setIntegrityCheck(false)
+            ->from('LEK_user_config')
+            ->where('userGuid = ?',$userGuid);
         $userResults = $this->db->fetchAll($s)->toArray();
         return $this->mergeConfig($userResults, $dbResults,self::CONFIG_SOURCE_USER);
     }
@@ -161,32 +161,33 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      * @return array
      */
     public function mergeTaskValues(string $taskGuid, array $dbResults=[]):array {
-        $task=ZfExtended_Factory::get('editor_Models_Task');
+        $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
+        $taskState = $task->getState();
         
-        //when the task is not with state import or project, change for task config and task imort config is alowed
-        $isImportDisabled = !in_array($task->getState(), [$task::STATE_IMPORT,$task::INITIAL_TASKTYPE_PROJECT]);
-        
+        //when the task is not with state import or project, change for task config and task import config is allowed
+        $isImportDisabled = !in_array($taskState, [$task::STATE_IMPORT, $task::INITIAL_TASKTYPE_PROJECT]);
+
         //load the task customer config as config base for this task
         //on customer level, we can override task specific config. With this, those overrides will be loaded
         //and used as base value in task config window
         //configs with customer level will be marked as readonly on the frontend
-        $customerBase = $this->mergeCustomerValues($task->getCustomerId(),$dbResults);
-        array_walk($customerBase, function(&$r) use($taskGuid,$isImportDisabled){
+        $customerBase = $this->mergeCustomerValues($task->getCustomerId(), $dbResults);
+        array_walk($customerBase, function(&$r) use($taskGuid, $isImportDisabled){
             $r['taskGuid'] = $taskGuid;
             //it is readonly when the config is import config and the task is not in import state
             //or when the current config is customer level config
-            $r['isReadOnly'] = ($isImportDisabled && $r['level']==self::CONFIG_LEVEL_TASKIMPORT) || $r['level']==self::CONFIG_LEVEL_CUSTOMER;
+            $r['isReadOnly'] = ($isImportDisabled && $r['level'] == self::CONFIG_LEVEL_TASKIMPORT) || $r['level'] == self::CONFIG_LEVEL_CUSTOMER;
         });
         $s = $this->db->select()
-        ->setIntegrityCheck(false)
-        ->from('LEK_task_config')
-        ->where('taskGuid = ?',$taskGuid);
+            ->setIntegrityCheck(false)
+            ->from('LEK_task_config')
+            ->where('taskGuid = ?',$taskGuid);
         //load all task specific configs
         $taskSpecificConfig = $this->db->fetchAll($s)->toArray();
-        //update the configBase with $taskSpecificConfig values
-        return $this->mergeConfig($taskSpecificConfig, $customerBase,self::CONFIG_SOURCE_TASK);
+        // update the configBase with $taskSpecificConfig values
+        return $this->mergeConfig($taskSpecificConfig, $customerBase, self::CONFIG_SOURCE_TASK);
     }
     
     /***
@@ -216,10 +217,10 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             $r['customerId'] = $customerId;
         });
         $s = $this->db->select()
-        ->setIntegrityCheck(false)
-        ->from('LEK_customer_config')
-        ->where('customerId = ?',$customerId);
-        $userResults =$this->db->fetchAll($s)->toArray();
+            ->setIntegrityCheck(false)
+            ->from('LEK_customer_config')
+            ->where('customerId = ?',$customerId);
+        $userResults = $this->db->fetchAll($s)->toArray();
         return $this->mergeConfig($userResults, $dbResults,self::CONFIG_SOURCE_CUSTOMER);
     }
     
@@ -243,7 +244,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             //is available for now
             $dbResults = $this->loadByLevel($levels,[ZfExtended_Resource_DbConfig::TYPE_MAP]);
         }
-        return $this->mergeConfig([], $dbResults,self::CONFIG_LEVEL_SYSTEM);
+        return $this->mergeConfig([], $dbResults, self::CONFIG_LEVEL_SYSTEM);
     }
     
     /***
@@ -252,9 +253,9 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      * @param array $input
      * @param array $result
      * @param string $configSource
-     * @return string
+     * @return array
      */
-    protected function mergeConfig(array $input,array $result,string $configSource){
+    protected function mergeConfig(array $input, array $result, string $configSource){
         foreach($input as $row) {
             if(!empty($result[$row['name']])) {
                 $row['overwritten'] = $row['value'];

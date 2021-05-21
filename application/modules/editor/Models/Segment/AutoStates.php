@@ -501,4 +501,12 @@ class editor_Models_Segment_AutoStates {
     {
         return in_array($autoState, [self::TRANSLATED, self::TRANSLATED_AUTO]);
     }
+    /**
+     * Retrieves, if the State represents an edited state of the segment
+     * @param int $autoState
+     * @return bool
+     */
+    public function isEditedState(int $autoState): bool {
+        return !in_array($autoState, $this->getNotEditedStates());
+    }
 }

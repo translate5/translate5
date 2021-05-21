@@ -403,9 +403,9 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $this->result[] = '<'.join(' ', $unitTag).'>';
         
         //segment QM states
-        $qms=[];
+        $qualityData = [];
         if($this->options[self::CONFIG_ADD_QM]) {
-            $qms=$this->processQm($segment);
+            $qualityData = $this->processQmQualities($segment);
         }
         
         //add the comments
@@ -439,7 +439,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         
         $fields = $this->sfm->getFieldList();
         foreach($fields as $field) {
-            $this->processSegmentField($field, $segment,$qms);
+            $this->processSegmentField($field, $segment, $qualityData);
         }
         
         $this->result[] = '</segment>';
@@ -482,7 +482,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      * @param Zend_Db_Table_Row $field
      * @param array $segment
      */
-    protected function processSegmentField(Zend_Db_Table_Row $field, array $segment, array $qms = []) {
+    protected function processSegmentField(Zend_Db_Table_Row $field, array $segment, array $qualityData = []) {
         if($field->type == editor_Models_SegmentField::TYPE_SOURCE) {
             return; //handled before
         }
@@ -502,14 +502,14 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             $this->result[] = '<target>';
             
             //if there are qms for the segment add the mrk tag
-            if(!empty($qms)){
-                $this->result[] ='<mrk id="'.$this->escape(self::QM_ID_PREFIX.implode('_',array_keys($qms))).'" its:type="generic" translate="yes" its:locQualityIssuesRef="'.$this->escape(self::QM_ID_PREFIX.implode('_', array_keys($qms))).'">';
+            if(!empty($qualityData)){
+                $this->result[] ='<mrk id="'.$this->escape(self::QM_ID_PREFIX.implode('_',array_keys($qualityData))).'" its:type="generic" translate="yes" its:locQualityIssuesRef="'.$this->escape(self::QM_ID_PREFIX.implode('_', array_keys($qualityData))).'">';
             }
             //add the target edit text
             $this->result[] = $targetEdit;
 
             //if there are qms for this segment close the mark tag
-            if(!empty($qms)){
+            if(!empty($qualityData)){
                 $this->result[] = '</mrk>';
             }
             
@@ -808,24 +808,27 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     
     /**
      * process and convert the segment QM states
+     * TODO FIXME: the processing of the qualities works with QMs only at the moment. If more qualities are included, the processing needs to change as not all qualities have (unique) categoryIndices
      * @param array $segment
      */
-    protected function processQm(array $segment) {
-        $qms = $this->segmentUtility->convertQmIds($segment['qmId']);
-        if(empty($qms)) {
-            return $qms;
+    protected function processQmQualities(array $segment) {
+        $qualityData = $this->fetchQualityData($segment['id']);
+        if(empty($qualityData)) {
+            return [];
         }
-        
-        $this->addComments('qmComment');
-        
-        $this->result[]='<its:locQualityIssues xml:id="'.$this->escape(self::QM_ID_PREFIX.implode('_', array_keys($qms))).'">';
+        $qmData = [];
+        foreach($qualityData as $item){
+            $qmData[$item['categoryIndex']] = $item['text'];
+        }
+        $this->addComments('qmComment');        
+        $this->result[] = '<its:locQualityIssues xml:id="'.$this->escape(self::QM_ID_PREFIX.implode('_', array_keys($qmData))).'">';
         $qmXml = '<its:locQualityIssue locQualityIssueType="%1$s" />';
-        foreach ($qms as $qmid => $qm) {
-            $this->result[] = sprintf($qmXml,$qm);
+        foreach ($qmData as $qmIndex => $qmName) {
+            $this->result[] = sprintf($qmXml, $qmName);
         }
         $this->result[]='</its:locQualityIssues>';
         
-        return $qms;
+        return $qmData;
     }
     
     /****

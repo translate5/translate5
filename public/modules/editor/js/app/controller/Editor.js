@@ -26,15 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * MetaPanel Controller
- * @class Editor.controller.MetaPanel
+ * Editor Controller
+ * @class Editor.controller.Editor
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.controller.Editor', {
@@ -102,7 +96,7 @@ Ext.define('Editor.controller.Editor', {
                 editorViewportClosed: 'onCloseEditorViewport',
                 editorViewportOpened: 'onOpenEditorViewport'
             },
-            '#QmSubSegments': {
+            '#QualityMqm': {
             	afterInsertMqmTag: 'handleAfterContentChange'
             },
             '#Editor.plugins.TrackChanges.controller.Editor':{
@@ -1011,7 +1005,7 @@ Ext.define('Editor.controller.Editor', {
         if(param === 0){
             return false;
         }
-        this.fireEvent('changeState', param);
+        this.fireEvent('changeSegmentState', param);
         e.stopEvent();
         return false;
     },

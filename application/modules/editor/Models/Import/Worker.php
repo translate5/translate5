@@ -65,7 +65,7 @@ class editor_Models_Import_Worker extends editor_Models_Task_AbstractWorker {
         /* @var $importConfig editor_Models_Import_Configuration */
         $importConfig->workerId = $this->workerModel->getId();
         
-        // externalImport just triggers the event aferImport!
+        // externalImport just triggers the event afterImport!
         //@see editor_Models_Import::triggerAfterImport
         $externalImport = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $externalImport editor_Models_Import */

@@ -235,7 +235,25 @@ class editor_Models_Segment_MatchRateType {
         }
         return true;
     }
+    /**
+     * Evaluates if a matchRateType reflects a pretranslation
+     * @param string $type
+     * @return boolean
+     */
+    public static function isTypePretranslated($type) {
+        $type = explode(';', $type);
+        return in_array(self::PREFIX_PRETRANSLATED, $type);
+    }
     
+    /**
+     * Evaluates if a matchRateType reflects a pretranslation
+     * @param string $type
+     * @return boolean
+     */
+    public static function isTypeEdited($type) {
+        $type = explode(';', $type);
+        return in_array(self::PREFIX_EDITED, $type);
+    }
     /**
      * generates the matchrate type by imported segment data
      * @param editor_Models_Import_FileParser_SegmentAttributes $importedValue the plain value from

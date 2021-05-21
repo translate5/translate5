@@ -26,64 +26,68 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWorker {
-    
+class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWorker
+{
+
     /***
      * Task old state before the match analysis were started
      * @var string
      */
-    private $taskOldState=null;
-    
+    private $taskOldState = null;
+
     /***
      *
      * @var ZfExtended_Logger
      */
     protected $log;
-    
+
     /***
-     * 
+     *
      * @var editor_Plugins_MatchAnalysis_Analysis
      */
     protected $analysis;
-    
-    public function __construct() {
+
+    public function __construct()
+    {
         parent::__construct();
-        $this->log=Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
+        $this->log = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
-    protected function validateParameters($parameters = array()) {
+    protected function validateParameters($parameters = array())
+    {
         $neededEntries = ['internalFuzzy', 'pretranslateMatchrate', 'pretranslateTmAndTerm', 'pretranslateMt', 'termtaggerSegment', 'isTaskImport', 'pretranslate'];
         $foundEntries = array_keys($parameters);
         $keyDiff = array_diff($neededEntries, $foundEntries);
         //if there is not keyDiff all needed were found
         return empty($keyDiff);
     }
-    
+
     /**
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::work()
      */
-    public function work() {
+    public function work()
+    {
         try {
             $params = $this->workerModel->getParameters();
             //run the term tagger when the termtagger flag is set, it is pretranslation and no terminologie worker is queued
-            if($params['termtaggerSegment'] && $params['pretranslate'] && !$params['isTaskImport']){
+            if ($params['termtaggerSegment'] && $params['pretranslate'] && !$params['isTaskImport']) {
                 $parentId = $this->workerModel->getParentId();
-                $this->queueTermtagger($this->taskGuid,$parentId ? $parentId : $this->workerModel->getId());
+                $this->queueTermtagger($this->taskGuid, $parentId ? $parentId : $this->workerModel->getId());
             }
             return $this->doWork();
-            
+
         } catch (Throwable $e) {
 
-            if(isset($this->analysis)){
+            if (isset($this->analysis)) {
                 //clean after analysis exception
                 $this->analysis->clean();
             }
-            
+
             //when error happens, revoke the task old state, and unlock the task
             $this->task->setState($this->taskOldState);
             $this->task->save();
@@ -99,25 +103,26 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             return false;
         }
     }
-    
-    
+
+
     /**
      * @return boolean
      */
-    protected function doWork() {
+    protected function doWork()
+    {
         $params = $this->workerModel->getParameters();
 
-        $newState=null;
+        $newState = null;
         $this->taskOldState = $this->task->getState();
-        
+
         //lock the task dedicated for analysis
-        if($this->task->lock(NOW_ISO, editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS)) {
+        if ($this->task->lock(NOW_ISO, editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS)) {
             //lock the task while match analysis are running
-            $newState=editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS;
+            $newState = editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS;
             $this->task->setState(editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS);
             $this->task->save();
-        //else check if we are in import, then no separate lock is needed. Therefore if we are not in import this is an error
-        } elseif($this->task->getState() != editor_Models_Task::STATE_IMPORT) {
+            //else check if we are in import, then no separate lock is needed. Therefore if we are not in import this is an error
+        } elseif ($this->task->getState() != editor_Models_Task::STATE_IMPORT) {
             $this->log->error('E1167', 'MatchAnalysis Plug-In: task can not be locked for analysis and pre-translation.', [
                 'task' => $this->task
             ]);
@@ -125,19 +130,20 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             $this->task->save();
             return false;
         }
-        $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
+        $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc->setTaskGuid($this->task->getTaskGuid());
-        
+
         //set flag for internal fuzzy usage
         $analysisAssoc->setInternalFuzzy($params['internalFuzzy']);
         //set pretranslation matchrate used for the anlysis
         $analysisAssoc->setPretranslateMatchrate($params['pretranslateMatchrate']);
-        
-        $analysisId=$analysisAssoc->save();
-        
+        $analysisAssoc->setUuid(ZfExtended_Utils::uuid());
+
+        $analysisId = $analysisAssoc->save();
+
         $this->analysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis', [$this->task, $analysisId, $this->taskOldState]);
-        
+
         $this->analysis->setPretranslate($params['pretranslate']);
         $this->analysis->setInternalFuzzy($params['internalFuzzy']);
         $this->analysis->setUserGuid($params['userGuid']);
@@ -146,71 +152,67 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         $this->analysis->setPretranslateMt($params['pretranslateMt']);
         $this->analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
         $this->analysis->setBatchQuery($params['batchQuery']);
-        $type = $params['pretranslateMt'] == 1 ? "MT" : "";
-        $this->analysis->setType($type);
+
 
         $updateCounter = 0;
-        $lastProgress=0;
-        $return=$this->analysis->calculateMatchrate(function($progress) use (&$updateCounter,&$lastProgress){
-            $updateCounter ++;
+        $lastProgress = 0;
+        $return = $this->analysis->calculateMatchrate(function ($progress) use (&$updateCounter, &$lastProgress) {
+            $updateCounter++;
             $lastProgress = $progress;
             //update the progress on each 10 segments (to prevent from possible deadlocks in worker table).
-            if($updateCounter % 10 == 0){
+            if ($updateCounter % 10 == 0) {
                 $this->updateProgress($progress);
             }
         });
-            
-        if(!empty($lastProgress)){
+
+        if (!empty($lastProgress)) {
             $this->updateProgress($lastProgress);
         }
-        
+
         //unlock the state
-        if(!empty($newState)){
+        if (!empty($newState)) {
             $this->task->setState($this->taskOldState);
             $this->task->save();
         }
 
-        $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
-        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
-        $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($this->task->getTaskGuid());
-        $analysisAssoc->setFinishedAt(date('Y-m-d H:i:s'));
-        $analysisAssoc->setUuid(ZfExtended_Utils::uuid());
-        $analysisAssoc->save();
+        //setting null takes the current date from DB
+        $analysisAssoc->finishNow();
 
         $this->task->unlock();
         return $return;
     }
-    
+
     /**
      * Queue the termtagger worker
      * @param string $taskGuid
      * @param string $workerId
      * @return boolean
      */
-    protected function queueTermtagger($taskGuid,$workerId){
+    protected function queueTermtagger($taskGuid, $workerId)
+    {
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
-        
+
         // Create segments_meta-field 'termtagState' if not exists
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         /* @var $meta editor_Models_Segment_Meta */
         $meta->addMeta('termtagState', $meta::META_TYPE_STRING, $worker::SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
-        
+
         // init worker and queue it
-        if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
-            $this->log->error('E1168', 'MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized.',['task'=>$this->task]);
+        if (!$worker->init($taskGuid, array('resourcePool' => 'import', 'processingMode' => editor_Segment_Processing::ANALYSIS))) {
+            $this->log->error('E1168', 'MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized.', ['task' => $this->task]);
             return false;
         }
         $worker->queue($workerId);
         return true;
     }
-    
     /***
      * Match analysis and pretranslation takes 92 % of the import time
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::getWeight()
      */
-    public function getWeight() {
+    public function getWeight()
+    {
         return 92;
     }
 }

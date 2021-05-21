@@ -75,6 +75,8 @@ Ext.application({
         'Editor.view.ViewPort',
         'Editor.view.ViewPortEditor',
         'Editor.view.ViewPortSingle',
+        'Editor.view.QuickTip',
+        'Editor.view.QuickTipLoader',
         'Editor.model.ModelOverride', 
         'Editor.util.TaskActions',
         'Editor.util.messageBus.MessageBus',
@@ -122,18 +124,22 @@ Ext.application({
         }
     },
     init: function() {
+
         //enable json in our REST interface
         Ext.Ajax.setDefaultHeaders({
             'Accept': 'application/json'
         });
         //init the plugins namespace
         Ext.ns('Editor.plugins');
-        
+  
         //create and set the application state provider
-        var provider=Ext.create('Editor.util.HttpStateProvider');
+        var provider = Ext.create('Editor.util.HttpStateProvider');
         //load the store data directly. With this no initial store load is required (the app state can be applied directly)
         provider.store.loadRawData(Editor.data.app.configData ? Editor.data.app.configData : []);
         Ext.state.Manager.setProvider(provider);
+        
+        // the init of the QuickTips has to be done here otherwise it's too late to set the internal tip class
+        Ext.tip.QuickTipManager.init(true, { className: 'Editor.view.QuickTip' });
         
         this.callParent(arguments);
         this.logoutOnWindowClose();
@@ -151,8 +157,7 @@ Ext.application({
         var me = this,
             viewSize = Ext.getBody().getViewSize(),
             initMethod = Editor.data.app.initMethod;
-        
-            Ext.QuickTips.init();
+
             me.windowTitle = Ext.getDoc().dom.title;
         
             me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
