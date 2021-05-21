@@ -32,4 +32,10 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Quality_TaskView extends editor_Models_Quality_AbstractView {
     
     protected $hasNumFalsePositives = true;
+    
+    protected $isTree = true;
+    
+    protected $allCategoriesCollapsed = true;
+
+    protected $mqmIsFlat = true;
 }

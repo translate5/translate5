@@ -30,19 +30,35 @@ END LICENSE AND COPYRIGHT
  * The store for the task quality panel
  */
 Ext.define('Editor.store.quality.Task', {
-    extend : 'Ext.data.Store',
+    extend : 'Ext.data.TreeStore',
     model: 'Editor.model.quality.Task',
     storeId: 'TaskQualities',
     autoLoad: false,
     autoSync: false,
     isLoaded: false,
-    pageSize: 0,
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath+'quality/task',
-        reader: {
-            rootProperty: 'rows',
-            type: 'json'
+    folderSort: false,
+    defaultRootId: 'task',
+    taskGuid: null,
+    root: {
+        expanded: false,
+        text: 'ROOT',
+        children: []
+    },
+    proxy : {
+        type : 'rest',  
+        url: Editor.data.restpath+'quality/',
+        reader : {
+            type : 'json',
+            rootProperty: 'children'
+        }
+    },
+    listeners: {
+        beforeload: function(store, operation, eOpts) {
+            if(!store.taskGuid){
+                return false;
+            } else {
+                operation.setParams({ taskGuid: store.taskGuid });
+            }
         }
     }
-});
+}); 

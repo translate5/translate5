@@ -87,8 +87,8 @@ INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `valu
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
 ('runtimeOptions.autoQA.enableUneditedFuzzyMatchCheck', 1, 'editor', 'system', 1, 1, '', 'boolean', 'If activated (default), AutoQA covers checking not edited fuzzy matches', 8, 'Enable not edited fuzzy match check', 'Editor: QA', '');
 
-UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.autoQA.enableMqmTags', `description` = 'If activated (default), the quality management covers MQM', `guiName` = 'Enable MQM in the quality management' 
+UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.autoQA.enableMqmTags', `description` = 'If activated (default), the quality management covers MQM', `guiName` = 'Enable MQM in the quality management', `level` = 8 
 WHERE name = 'runtimeOptions.editor.enableQmSubSegments';
 
-UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.autoQA.enableQm', `description` = 'If activated (default), the quality management for whole segments is active', `guiName` = 'Enable segment QM in the quality management' 
+UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.autoQA.enableQm', `description` = 'If activated (default), the quality management for whole segments is active', `guiName` = 'Enable segment QM in the quality management', `level` = 8 
 WHERE name = 'runtimeOptions.segments.showQM';

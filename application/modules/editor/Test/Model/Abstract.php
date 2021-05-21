@@ -26,6 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * The master class for all Test Models
+ * A test model usually defines how an entity of the REST API will be compared with captured data
+ * All fields to compare must be defined in ::$compared and for those fields that need to be sanitized a sanitation can be provided
+ * The sanitization in ::$sanitized is a assoc array where the key is the field-name and the value is a method name in editor_Test_Sanitizer
+ * The ::$messageField defines a field to use for identifying the entity with auto-generated message texts
+ */
 abstract class editor_Test_Model_Abstract {
     
     /**
@@ -47,7 +54,7 @@ abstract class editor_Test_Model_Abstract {
     protected $compared = [];
     /**
      * Defines the fields that are sanitized and the type of saintation applied (which will point to a method of editor_Test_Sanitizer)
-     * Fields defined here must not appear in _compared
+     * Fields defined here must not appear in compared
      * entries are like 'field' => 'sanitizationtype'
      * If the field does not exist in the passed data, it will be generated with NULL as value
      * @var string[]
@@ -56,7 +63,7 @@ abstract class editor_Test_Model_Abstract {
     /**
      * This Field defines if this is a tree (as ExtJs uses them)
      * If set, the tree will be created recursively and the tree can be compared by comparing the root element or any branch can be compared as well
-     * This field MUST not appear in $compared, otherwise the original data may will be manipulated
+     * This field MUST NOT appear in $compared, otherwise the original data may be manipulated
      * @var boolean
      */
     protected $isTree = false;

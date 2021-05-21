@@ -74,11 +74,8 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
             me.reAnalysisHidden = true;
         }
         if(extraParams && extraParams.taskGuid){
-            me.store.load({
-                params: {
-                    taskGuid: extraParams.taskGuid
-                }
-            });
+            me.store.taskGuid = extraParams.taskGuid;
+            me.store.reload();
         } else {
             me.store.removeAll(false);
         }
@@ -90,16 +87,20 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                 title: this.title,
                 cls: 'taskQualities',
                 items:[{
-                    xtype: 'grid',
-                    itemId: 'taskQualitiesGrid',
+                    xtype: 'treepanel',
+                    itemId: 'taskQualitiesTree',
                     store: me.store,
+                    rootVisible: false,
+                    useArrows: true,
+                    reserveScrollbar: true,
                     viewConfig: {
                         getRowClass: function(record){
-                            return record.get('qfaulty') ? 'x-grid-faulty' : '';
+                            return (record.isFaulty() || record.hasFaultyChildren()) ? 'x-tree-faulty' : '';
                         }
                     },
                     columns: [{
-                        xtype: 'gridcolumn',
+                        xtype: 'treecolumn',
+                        iconCls: 'x-tree-noicon',
                         text: me.strings.category,
                         dataIndex : 'text',
                         sortable: true,
@@ -129,13 +130,17 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                         xtype: 'gridcolumn',
                         text: me.strings.status,
                         renderer: function (isComplete, meta, record){
+                            // only rubrics will have an icon
+                            if(!record.isRubric()){
+                                // mark faulty category, no tooltip needed
+                                if(record.isFaulty()){
+                                    return '<span class="x-grid-symbol t5-quality-faulty">' + Ext.String.fromCodePoint(parseInt('0xf057', 16)) + '</span>';
+                                }
+                                return '';
+                            }
                             var html = '';
-                            // type is complete ore incompletely analysed
-                            if(isComplete){
-                                html = '<span class="x-grid-symbol t5-quality-complete" data-qtip="'
-                                    + '<b>' + me.strings.completeTipCaption +'</b>">'
-                                    + Ext.String.fromCodePoint(parseInt('0xf00c', 16)) + '</span>';
-                            } else {
+                            // type is incompletely analysed
+                            if(record.isIncomplete()){
                                 html = '<span class="x-grid-symbol t5-quality-incomplete" data-qtip="'
                                     + '<b>' + me.strings.incompleteTipCaption +'</b><br/>'
                                     + me.strings.incompleteTipText + '. ' + me.strings.startAnalysisHint
@@ -146,9 +151,13 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                                     me.down('#analysisToolbar').setHidden(false);
                                     me.reAnalysisHidden = false;
                                 }
+                            } else {
+                                html = '<span class="x-grid-symbol t5-quality-complete" data-qtip="'
+                                    + '<b>' + me.strings.completeTipCaption +'</b>">'
+                                    + Ext.String.fromCodePoint(parseInt('0xf00c', 16)) + '</span>';
                             }
                             // type blocks exporting of task
-                            if(record.get('qfaulty') == true){
+                            if(record.hasFaultyChildren()){
                                 html += ' <span class="x-grid-symbol t5-quality-faulty" data-qtip="'
                                     + '<b>' + me.strings.faultyTipCaption +'</b><br/>' + me.strings.faultyTipText + '">'
                                     + Ext.String.fromCodePoint(parseInt('0xf057', 16)) + '</span>';

@@ -87,8 +87,6 @@ class editor_Models_Quality_TaskTooltip extends editor_Models_Quality_AbstractVi
             $html .= '</td></tr>';
         }
         $html .= '</tbody></table>';
-        
-        error_log('ICON:'.$this->getStatusSymbol('faulty'));
         return $html;
     }
     /**
