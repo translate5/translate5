@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.quality.FalsePositives', {
     extend: 'Ext.form.FieldSet',
     alias: 'widget.falsePositives',
-    title: "#UT#QA: Falsch-Positive",
+    title: "#UT#Falsch erkannte Fehler",
     requires: [
         'Editor.view.quality.FalsePositivesController'        
     ],

@@ -193,7 +193,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      * Unloads the qualities after the panel is collapsed
      */
     unloadStore: function(doUpdateGrid){
-        this.getView().getStore().getRootNode().removeAll(false);
+        this.getView().getStore().removeAll(false);
         if(doUpdateGrid){
             this.fireEvent('qualityFilterChanged', '');
         }

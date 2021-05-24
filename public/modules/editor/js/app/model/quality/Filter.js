@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * This involves specialized checked propagation methods
  */
 Ext.define('Editor.model.quality.Filter', {
-    extend: 'Ext.data.Model',
+    extend: 'Ext.data.TreeModel',
     fields: [
         { name:'text', type:'string' },
         { name:'qid', type:'int' },

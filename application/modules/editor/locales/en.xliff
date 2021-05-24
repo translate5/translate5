@@ -4039,7 +4039,6 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='U2VnbWVudGUgdW52b2xsc3TDpG5kaWcgZ2VwcsO8ZnQ='><source>Segmente unvollständig geprüft</source><target>Segment check incomplete</target></trans-unit>
 <trans-unit id='TmV1IMO8YmVycHLDvGZlbg=='><source>Neu überprüfen</source><target>Re-check</target></trans-unit>
 <trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>All categories</target></trans-unit>
-<trans-unit id='UUE6IEZhbHNjaC1Qb3NpdGl2ZQ=='><source>QA: Falsch-Positive</source><target>QA: False positives</target></trans-unit>
 <trans-unit id='S2F0ZWdvcmll'><source>Kategorie</source><target>Category</target></trans-unit>
 <trans-unit id='QW56YWhs'><source>Anzahl</source><target>Amount</target></trans-unit>
 <trans-unit id='RmFsc2NoIGVya2FubnRlIEZlaGxlcg=='><source>Falsch erkannte Fehler</source><target>False positives</target></trans-unit>

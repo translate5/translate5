@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * The model for a task quality entry
  */
 Ext.define('Editor.model.quality.Task', {
-    extend: 'Ext.data.Model',
+    extend: 'Ext.data.TreeModel',
     fields: [
         { name:'text', type:'string' },
         { name:'qid', type:'int' },
