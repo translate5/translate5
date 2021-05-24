@@ -153,3 +153,97 @@ function rif($if, $then, $else = '') {
 function db() {
     return Zend_Db_Table_Abstract::getDefaultAdapter();
 }
+
+/**
+ * Wrap all urls with <a href="..">
+ * Code got from: http://stackoverflow.com/questions/1188129/replace-urls-in-text-with-html-links
+ *
+ * Testing text: <<<EOD
+
+Here are some URLs:
+stackoverflow.com/questions/1188129/pregreplace-to-detect-html-php
+Here's the answer: http://www.google.com/search?rls=en&q=42&ie=utf-8&oe=utf-8&hl=en. What was the question?
+A quick look at http://en.wikipedia.org/wiki/URI_scheme#Generic_syntax is helpful.
+There is no place like 127.0.0.1! Except maybe http://news.bbc.co.uk/1/hi/england/surrey/8168892.stm?
+Ports: 192.168.0.1:8080, https://example.net:1234/.
+Beware of Greeks bringing internationalized top-level domains: xn--hxajbheg2az3al.xn--jxalpdlp.
+And remember.Nobody is perfect.
+
+<script>alert('Remember kids: Say no to XSS-attacks! Always HTML escape untrusted input!');</script>
+EOD;
+
+ *
+ * @param $text
+ * @return string
+ */
+function url2a($text) {
+
+    // Regexps
+    $rexProtocol = '(https?://)?';
+    $rexDomain   = '((?:[-a-zA-Z0-9а-яА-Я]{1,63}\.)+[-a-zA-Z0-9а-яА-Я]{2,63}|(?:[0-9]{1,3}\.){3}[0-9]{1,3})';
+    $rexPort     = '(:[0-9]{1,5})?';
+    $rexPath     = '(/[!$-/0-9:;=@_\':;!a-zA-Z\x7f-\xff]*?)?';
+    $rexQuery    = '(\?[!$-/0-9:;=@_\':;!a-zA-Z\x7f-\xff]+?)?';
+    $rexFragment = '(#[!$-/0-9:;=@_\':;!a-zA-Z\x7f-\xff]+?)?';
+
+    // Valid top-level domains
+    $validTlds = array_fill_keys(explode(' ', '.aero .asia .biz .cat .com .coop .edu .gov .info .int .jobs .mil .mobi '
+        . '.museum .name .net .org .pro .tel .travel .ac .ad .ae .af .ag .ai .al .am .an .ao .aq .ar .as .at .au .aw '
+        . '.ax .az .ba .bb .bd .be .bf .bg .bh .bi .bj .bm .bn .bo .br .bs .bt .bv .bw .by .bz .ca .cc .cd .cf .cg '
+        . '.ch .ci .ck .cl .cm .cn .co .cr .cu .cv .cx .cy .cz .de .dj .dk .dm .do .dz .ec .ee .eg .er .es .et .eu '
+        . '.fi .fj .fk .fm .fo .fr .ga .gb .gd .ge .gf .gg .gh .gi .gl .gm .gn .gp .gq .gr .gs .gt .gu .gw .gy .hk '
+        . '.hm .hn .hr .ht .hu .id .ie .il .im .in .io .iq .ir .is .it .je .jm .jo .jp .ke .kg .kh .ki .km .kn .kp '
+        . '.kr .kw .ky .kz .la .lb .lc .li .lk .lr .ls .lt .lu .lv .ly .ma .mc .md .me .mg .mh .mk .ml .mm .mn .mo '
+        . '.mp .mq .mr .ms .mt .mu .mv .mw .mx .my .mz .na .nc .ne .nf .ng .ni .nl .no .np .nr .nu .nz .om .pa .pe '
+        . '.pf .pg .ph .pk .pl .pm .pn .pr .ps .pt .pw .py .qa .re .ro .rs .ru .rw .sa .sb .sc .sd .se .sg .sh .si '
+        . '.sj .sk .sl .sm .sn .so .sr .st .su .sv .sy .sz .tc .td .tf .tg .th .tj .tk .tl .tm .tn .to .tp .tr .tt '
+        . '.tv .tw .tz .ua .ug .uk .us .uy .uz .va .vc .ve .vg .vi .vn .vu .wf .ws .ye .yt .yu .za .zm .zw '
+        . '.xn--0zwm56d .xn--11b5bs3a9aj6g .xn--80akhbyknj4f .xn--9t4b11yi5a .xn--deba0ad .xn--g6w251d '
+        . '.xn--hgbk6aj7f53bba .xn--hlcj6aya9esc7a .xn--jxalpdlp .xn--kgbechtv .xn--zckzah .arpa .рф .xn--p1ai'), true);
+
+    // Start output buffering
+    ob_start();
+
+    // Position
+    $position = 0;
+
+    // Split given $text by urls
+    while (preg_match("~$rexProtocol$rexDomain$rexPort$rexPath$rexQuery$rexFragment(?=[?.!,;:\"]?(\s|$))~u",
+        $text, $match, PREG_OFFSET_CAPTURE, $position)) {
+
+        // Extract $url and $urlPosition from match
+        list($url, $urlPosition) = $match[0];
+
+        // Print the text leading up to the URL.
+        print(htmlspecialchars(substr($text, $position, $urlPosition - $position)));
+
+        // Pick domain, port and path from matches
+        $domain = $match[2][0];
+        $port   = $match[3][0];
+        $path   = $match[4][0];
+
+        // Get top-level domain
+        $tld = mb_strtolower(strrchr($domain, '.'), 'utf-8');
+
+        // Check if the TLD is valid - or that $domain is an IP address.
+        if (preg_match('{\.[0-9]{1,3}}', $tld) || isset($validTlds[$tld])) {
+
+            // Prepend http:// if no protocol specified
+            $completeUrl = $match[1][0] ? $url : 'http://' . $url;
+
+            // Print the hyperlink.
+            printf('<a href="%s">%s</a>', htmlspecialchars($completeUrl), htmlspecialchars("$domain$port$path"));
+
+            // Else if not a valid URL.
+        } else print(htmlspecialchars($url));
+
+        // Continue text parsing from after the URL.
+        $position = $urlPosition + strlen($url);
+    }
+
+    // Print the remainder of the text.
+    print(htmlspecialchars(substr($text, $position)));
+
+    // Return
+    return ob_get_clean();
+}
