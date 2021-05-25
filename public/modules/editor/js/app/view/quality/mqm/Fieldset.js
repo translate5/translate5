@@ -39,12 +39,12 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.quality.mqm.Fieldset', {
 	extend : 'Ext.form.FieldSet',
 	alias : 'widget.qualityMqmFieldset',
-	title : "#UT#MQM",
+	title : "#UT#Manuelle QS (im Segment)",
 	collapsible: true,
 	strings: {
 		severityLabel: '#UT#Gewichtung',
 		commentLabel: '#UT#Kommentar',
-		qmAddBtn: '#UT#MQM hinzufügen'
+		qmAddBtn: '#UT#Manuelle QS hinzufügen'
 	},
 	initConfig: function(instanceConfig) {
 		var me = this,
@@ -53,7 +53,7 @@ Ext.define('Editor.view.quality.mqm.Fieldset', {
 			items : [{
 				xtype: 'button',
 				text: me.strings.qmAddBtn,
-				//margin: '0 0 0 0',
+				margin: '0 0 10 0',
 				menu: {
 				    xtype: 'menu',
 					bodyCls: 'qmflag-menu',

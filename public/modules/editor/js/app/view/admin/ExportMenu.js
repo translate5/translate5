@@ -40,7 +40,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
       exportReview: '#UT#lektoriert',
       exportDiff: '#UT#SDLXLIFF mit Änderungsmarkierungen',
       export2Def: '#UT#XLIFF 2.1',
-      exportQmField: '#UT#Export QM-Statistik (XML) für Feld: {0}',
+      exportQmField: '#UT#Export QS-Statistik (XML) für Feld: {0}',
       exportExcel: '#UT#Externe Bearbeitung als Excel',
       downloadImportArchive: '#UT#Importarchiv herunterladen',
       faultyQualityAlertTitle: '#UT#Warnung',

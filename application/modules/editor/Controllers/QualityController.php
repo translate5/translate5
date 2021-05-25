@@ -59,7 +59,8 @@ class editor_QualityController extends ZfExtended_RestController {
      */
     public function downloadstatisticsAction(){
         $task = $this->fetchTask();
-        $statisticsProvider = new editor_Models_Quality_StatisticsView($task);
+        $field = $this->getRequest()->getParam('type');
+        $statisticsProvider = new editor_Models_Quality_StatisticsView($task, $field);
 
         header('Content-disposition: attachment; filename="'.$statisticsProvider->getDownloadName().'"');
         header('Content-type: "text/xml"; charset="utf8"', TRUE);
