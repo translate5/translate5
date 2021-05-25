@@ -134,7 +134,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
                 dock: 'bottom',
                 ui: 'footer',
                 itemId: 'analysisToolbar',
-                hidden: !me.reAnalysisVisible,
+                hidden: me.reAnalysisHidden,
                 items: [{
                     xtype: 'button',
                     text: me.strings.newAnalysis,
