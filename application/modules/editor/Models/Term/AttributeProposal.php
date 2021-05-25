@@ -83,7 +83,7 @@ class editor_Models_Term_AttributeProposal extends ZfExtended_Models_Entity_Abst
         $s=$this->db->select()
         ->setIntegrityCheck(false)
         ->from($this->db,[])
-        ->join('LEK_term_attributes', 'LEK_term_attributes.id = LEK_term_attribute_proposal.attributeId',['LEK_term_attributes.id as id'])
+        ->join('LEK_term_attributes', 'LEK_term_attributes.id = terms_attributes_proposal.attributeId',['LEK_term_attributes.id as id'])
         ->where('LEK_term_attributes.termId=?',$termId);
         $rows=$this->db->fetchAll($s)->toArray();
         $count1=0;

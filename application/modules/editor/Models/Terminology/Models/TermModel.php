@@ -302,7 +302,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ->where('`'.$tableTerm.'`.processStatus IN(?)',$processStats);
 
         if ($noTermDefinedFor) {
-            $s->joinLeft(['t2' => $tableTerm], '`'.$tableTerm.'`.`termEntryId` = `t2`.`termEntryId` AND `t2`.`languageId` = "' . $noTermDefinedFor . '"', '');
+            $s->joinLeft(['t2' => $tableTerm], '`'.$tableTerm.'`.`termEntryId` = `t2`.`termEntryId` AND `t2`.`languageId` = "' . explode(',', $noTermDefinedFor)[0] . '"', '');
             $s->where('ISNULL(`t2`.`term`)');
         }
         $s->order($tableTerm.'.term asc');
@@ -331,9 +331,14 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ->where('`'.$tableTerm.'`.collectionId IN(?)', $collectionIds)
             ->order($tableTerm.'.term asc');
 
+        if ($noTermDefinedFor) {
+            $sp->joinLeft(['t2' => $tableTerm], '`'.$tableTerm.'`.`termEntryId` = `t2`.`termEntryId` AND `t2`.`languageId` = "' . explode(',', $noTermDefinedFor)[0] . '"', '');
+            $sp->where('ISNULL(`t2`.`term`)');
+        }
+
         // Build LIMIT clause
         $limit = rif($limit, 'LIMIT ' . rif($offset, '$1,') . '$1', '');
-        //d($s->assemble());
+        //d($sp->assemble());
         // Append LIMIT clause to the UNION-ed query
         $sql = '(' . $s->assemble() . ') UNION (' . $sp->assemble() . ') ' . $limit;
 
@@ -732,11 +737,11 @@ if($termArray['language'] !== null) {
             ->join('LEK_languages', 'terms_term.languageId = LEK_languages.id', ['LEK_languages.rfc5646 AS language']);
 
         if($this->isProposableAllowed()){
-            $s->joinLeft('LEK_term_proposal', 'LEK_term_proposal.termId = terms_term.id',[
-                'LEK_term_proposal.term as proposalTerm',
-                'LEK_term_proposal.id as proposalId',
-                'LEK_term_proposal.created as proposalCreated',
-                'LEK_term_proposal.userName as proposalUserName'
+            $s->joinLeft('terms_proposal', 'terms_proposal.termId = terms_term.id',[
+                'terms_proposal.term as proposalTerm',
+                'terms_proposal.id as proposalId',
+                'terms_proposal.created as proposalCreated',
+                'terms_proposal.userName as proposalUserName'
             ]);
         }
 
@@ -744,9 +749,9 @@ if($termArray['language'] !== null) {
         /* @var $attribute editor_Models_Terminology_Models_AttributeModel */
 
         if($attribute->isProposableAllowed()){
-            $s->joinLeft('LEK_term_attribute_proposal', 'LEK_term_attribute_proposal.attributeId = terms_attributes.id',[
-                'LEK_term_attribute_proposal.value as proposalAttributeValue',
-                'LEK_term_attribute_proposal.id as proposalAttributelId',
+            $s->joinLeft('terms_attributes_proposal', 'terms_attributes_proposal.attributeId = terms_attributes.id',[
+                'terms_attributes_proposal.value as proposalAttributeValue',
+                'terms_attributes_proposal.id as proposalAttributelId',
             ]);
         }else{
             //exclude the proposals
@@ -1256,7 +1261,7 @@ if($termArray['language'] !== null) {
         $s = $this->db->select()
             ->setIntegrityCheck(false)
             ->from(['t'=>'terms_term'],['t.id'])
-            ->joinLeft(['p'=>'LEK_term_proposal'],'p.termId=t.id ',['p.term','p.created','p.userGuid','p.userName'])
+            ->joinLeft(['p'=>'terms_proposal'],'p.termId=t.id ',['p.term','p.created','p.userGuid','p.userName'])
             ->where('t.updated < ?', $olderThan)
             ->where('t.collectionId in (?)',$collectionIds)
             ->where('t.processStatus NOT IN (?)',self::PROCESS_STATUS_UNPROCESSED);
@@ -1362,7 +1367,7 @@ if($termArray['language'] !== null) {
                     null as 'attributeproposal-lastEditedDate',
                     null as 'attributeproposal-lastEditor'
                     FROM terms_term t
-                    LEFT OUTER JOIN LEK_term_proposal tp ON tp.termId = t.id
+                    LEFT OUTER JOIN terms_proposal tp ON tp.termId = t.id
                     INNER JOIN LEK_languages l ON t.language = l.id
                 WHERE ".$adapter->quoteInto('t.collectionId IN(?)',$collectionIds)
             .$termYoungerSql."
@@ -1397,9 +1402,9 @@ if($termArray['language'] !== null) {
                         tp.created as 'termproposal-lastEditedDate',
                         tp.userName as 'termproposal-lastEditor'
                     FROM terms_attributes ta
-                        LEFT OUTER JOIN LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
+                        LEFT OUTER JOIN terms_attributes_proposal tap ON tap.attributeId = ta.id
                         LEFT OUTER JOIN terms_term t on ta.termId = t.id
-                        LEFT OUTER JOIN LEK_term_proposal tp on tp.termId = t.id
+                        LEFT OUTER JOIN terms_proposal tp on tp.termId = t.id
                         LEFT OUTER JOIN LEK_languages l ON t.language = l.id
                     WHERE ".$adapter->quoteInto('ta.collectionId IN(?)', $collectionIds).
             $attrYoungerSql."

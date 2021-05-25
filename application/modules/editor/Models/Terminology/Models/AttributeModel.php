@@ -342,9 +342,9 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         ]);
 
         if ($this->isProposableAllowed()) {
-            $s->joinLeft('LEK_term_attribute_proposal', 'LEK_term_attribute_proposal.attributeId = terms_attributes.id',[
-                'LEK_term_attribute_proposal.value as proposalAttributeValue',
-                'LEK_term_attribute_proposal.id as proposalAttributelId',
+            $s->joinLeft('terms_attributes_proposal', 'terms_attributes_proposal.attributeId = terms_attributes.id',[
+                'terms_attributes_proposal.value as proposalAttributeValue',
+                'terms_attributes_proposal.id as proposalAttributelId',
             ]);
         }
 

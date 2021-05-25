@@ -66,7 +66,7 @@ class editor_Models_Term_Proposal extends ZfExtended_Models_Entity_Abstract {
     public function findProposalInCollection(string $termText, int $languageId, int $termCollection){
         $s = $this->db->select()
         ->setIntegrityCheck(false)
-        ->from(['p'=>'LEK_term_proposal'],['p.term as termProposalValue','p.created as termProposalCreated','p.termId as termProposalTermId'])
+        ->from(['p'=>'terms_proposal'],['p.term as termProposalValue','p.created as termProposalCreated','p.termId as termProposalTermId'])
         ->join(['t'=>'terms_term'],'t.id=p.termId')
         ->where('p.term = ?', $termText)
         ->where('t.language = ?', $languageId)
