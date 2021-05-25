@@ -525,7 +525,7 @@ Ext.define('Editor.controller.Segments', {
       //if completeEdit fails, the plugin remains editing
       if(ed.editing) {
           //TODO the below by config bound handlers can also be bound elsewhere and get no information about success or failed chainend!
-          me.saveChainEnd(); 
+          me.saveChainEnd(record); 
           return;
       }
       
@@ -581,14 +581,14 @@ Ext.define('Editor.controller.Segments', {
       
       //its possible that the editor is already destroyed by editorDomCleanUp, then the save process wouldn't work.
       if(!ed || !ed.editor){
-          Editor.MessageBox.addError(Ext.String.format(me.messages.segmentNotSaved,record.get('segmentNrInTask')));
-          me.saveChainEnd();
+          Editor.MessageBox.addError(Ext.String.format(me.messages.segmentNotSaved, record.get('segmentNrInTask')));
+          me.saveChainEnd(record);
           return;
       }
       
       //this check also prevents saving if RowEditor.completeEdit was returning false!
       if(! record.dirty) {
-          me.saveChainEnd();
+          me.saveChainEnd(record);
           return;
       }
       
@@ -607,7 +607,7 @@ Ext.define('Editor.controller.Segments', {
       //parameters are the callback to the final save chain call,
       //for later usage in ChangeAlike Handling and the saved record
       me.fireEvent('afterSaveCall', function(){
-          me.saveChainEnd();
+          me.saveChainEnd(record);
       }, record);
   },
   /**
@@ -623,7 +623,7 @@ Ext.define('Editor.controller.Segments', {
       if(!operation.success){
           errorHandler = Editor.app.getController('ServerException');
           errorHandler.handleCallback.apply(errorHandler, arguments);
-          me.saveChainEnd();
+          me.saveChainEnd(record);
           return;
       }
       me.updateSiblingsMetaCache(record);
@@ -648,7 +648,7 @@ Ext.define('Editor.controller.Segments', {
       
       //invoking change alike handling:
       if(me.fireEvent('saveComplete')){
-          me.saveChainEnd(); //NEXT step in save chain
+          me.saveChainEnd(record); //NEXT step in save chain
       }
   },
   /**
@@ -696,12 +696,12 @@ Ext.define('Editor.controller.Segments', {
    * End of the save chain.
    * fires event "segmentEditSaved".
    */
-  saveChainEnd: function() {
+  saveChainEnd: function(record) {
       var me = this;
       me.delLoadMask();
       me.saveChainMutex = false;
       me.onSegmentUsageFinished();
-      me.fireEvent('segmentEditSaved', me);
+      me.fireEvent('segmentEditSaved', me, record);
   },
   addLoadMask: function() {
       var me = this;

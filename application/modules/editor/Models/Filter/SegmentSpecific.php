@@ -106,7 +106,7 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
                     $conditions[] = $adapter->quoteInto($colPrefix.'id = ?', $segmentIds[0], Zend_Db::INT_TYPE);
                 } else {
                     // no segment ids, trigger empty result
-                    error_log('editor_Models_Filter_SegmentSpecific: TRIGGER EMPTY SEGMENT-IDs');
+                    // error_log('editor_Models_Filter_SegmentSpecific: TRIGGER EMPTY SEGMENT-IDs');
                     $conditions[] = '1 = 0';
                 }
             }

@@ -110,24 +110,27 @@ Ext.define('Editor.view.quality.FilterPanelController', {
     /**
      * Called on saving of segments (incl. alikes). We refresh our store then without updating the filtered grid if we are visible /show qualities
      */
-    onSegmentSaved: function(){
-        // we only refresh when being shown
-        if(this.panelShown){
-            this.preventNextFilterUpdate = true;
-            this.loadFilteredStrore(this.getFilterValue(true, null));
+    onSegmentSaved: function(grid, record){
+        // the "segmentEditSaved" event it seems does not cover the time e.g. the checking of the segment state needs in conjunction with language resources that must be requested
+        // this is just a very dirty attempt to cover this, obiously we have a race-condition. The good thing is, it' will result in a outdated view only ...
+        var me = this, matchRateType = (record) ? record.get('matchRateType') : null;
+        if(matchRateType && (matchRateType.indexOf(';tm;') > -1 || matchRateType.indexOf(';mt;') > -1)){ // this evaluation is pretty dirty but nothing bad happens when it fails
+            me.delayedChange = new Ext.util.DelayedTask(function(){
+                me.refreshFilteredStore();
+            });
+            me.delayedChange.delay(250);
+        } else {
+            me.refreshFilteredStore();
         }
-        this.qualitiesChanged = false;
     },
     /**
      * Called on a canceled segment edit
      */
     onSegmentCanceled: function(){
         // after a cancled edit we only refresh if we are shown and the store has changed
-        if(this.panelShown && this.qualitiesChanged){
-            this.preventNextFilterUpdate = true;
-            this.loadFilteredStrore(this.getFilterValue(true, null));
+        if(this.qualitiesChanged){
+            this.refreshFilteredStore();
         }
-        this.qualitiesChanged = false;
     },
     /**
      * Prevents an item being checked when it has no qualities
@@ -188,6 +191,17 @@ Ext.define('Editor.view.quality.FilterPanelController', {
                 currentstate: filterVal
             }
         });
+    },
+    /**
+     * Refreshes the view by reloading the store with the current filter (only when we're visible...)
+     */
+    refreshFilteredStore: function(){
+        if(this.panelShown){
+            this.preventNextFilterUpdate = true;
+            this.loadFilteredStrore(this.getFilterValue(true, null));
+        }
+        // we can dismiss this in any case, if we're not visible, fresh data will be loaded in any case
+        this.qualitiesChanged = false;
     },
     /**
      * Unloads the qualities after the panel is collapsed
