@@ -125,11 +125,11 @@ class QualityFaultyTest extends editor_Test_JsonTest {
      * Test the task qualities after being edited
      * @depends testMakeSegmentsFaulty
      */
-    public function testTaskQualities(){
+    public function testTaskQualityTree(){
         
-        $qualities = $this->api()->requestJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
-        if(static::$captureMode){ file_put_contents($this->api()->getFile('expectedTaskQualitiesFaulty.json', null, false), json_encode($qualities, JSON_PRETTY_PRINT)); }
-        $this->assertModelsEqualsJsonFile('TaskQuality', 'expectedTaskQualitiesFaulty.json', $qualities);
+        $tree = $this->api()->requestJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
+        if(static::$captureMode){ file_put_contents($this->api()->getFile('expectedTaskQualitiesFaulty.json', null, false), json_encode($tree, JSON_PRETTY_PRINT)); }
+        $this->assertModelEqualsJsonFile('TaskQuality', 'expectedTaskQualitiesFaulty.json', $tree);
     }
     /**
      * Tests the task-Tooltip of the Task-Grid with the Faulty icons

@@ -68,6 +68,12 @@ abstract class editor_Test_Model_Abstract {
      */
     protected $isTree = false;
     /**
+     * Defines the fields of the root-node of a tree being sanitized.
+     * ONLY the root node fields will be sanitized, this is to come around issues with root-nodes usually containing the task-ID in the text
+     * @var array
+     */
+    protected $treeRootSanitized = [];
+    /**
      * This defines a field that will be added to the default message to identify the model
      * This can be a field not added to the equation
      * @var string
@@ -134,9 +140,10 @@ abstract class editor_Test_Model_Abstract {
     /**
      * Copies & sanitizes our data
      * @param stdClass $data
+     * @param bool $isRoot
      * @return stdClass
      */
-    protected function copy(stdClass $data) : stdClass {
+    protected function copy(stdClass $data, bool $isRoot=true) : stdClass {
         $result = new stdClass();
         // copy sanitized fields
         foreach($this->sanitized as $field => $functionName){
@@ -156,11 +163,21 @@ abstract class editor_Test_Model_Abstract {
                 }
             }
         }
+        // additional sanitization of the Root field of a tree
+        if($this->isTree && $isRoot && count($this->treeRootSanitized) > 0){
+            foreach($this->treeRootSanitized as $field => $functionName){
+                if(property_exists($data, $field)){
+                    $result->$field = editor_Test_Sanitizer::$functionName($data->$field);
+                } else {
+                    $result->$field = NULL;
+                }
+            }
+        }
         // recursive tree processing
         if($this->isTree && property_exists($data, 'children')){
             $result->children = [];
             foreach($data->children as $child){
-                $result->children[] = $this->copy($child);
+                $result->children[] = $this->copy($child, false);
             }
         }
         return $result;

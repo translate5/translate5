@@ -84,6 +84,14 @@ final class editor_Test_Sanitizer {
         return NULL;
     }
     /**
+     * Sanitizes a field by simply turning the field to the string "TEST"
+     * @param string $text
+     * @return string
+     */
+    public static function testtext(?string $text) : string {
+        return 'TEST';
+    }
+    /**
      *
      * @param array $matches
      * @return string
