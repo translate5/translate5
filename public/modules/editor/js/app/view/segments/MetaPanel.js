@@ -61,8 +61,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
               
         Ext.applyIf(me, {
             title:me.title,
-            items: [
-              {
+            items: [{
                 xtype: 'form',
                 border: 0,
                 itemId: 'metaInfoForm',
@@ -86,12 +85,12 @@ Ext.define('Editor.view.segments.MetaPanel', {
                           }
                       }]
                   },{
-                      xtype: 'segmentQm',
-                      itemId: 'segmentQm',
-                      collapsible: true
-                  },{
                       xtype: 'falsePositives',
                       itemId: 'falsePositives',
+                      collapsible: true
+                  },{
+                      xtype: 'segmentQm',
+                      itemId: 'segmentQm',
                       collapsible: true
                   },{
                       xtype: 'fieldset',

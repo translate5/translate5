@@ -276,17 +276,17 @@ Ext.define('Editor.controller.Localizer', {
 		startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
         newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
 	};
-  	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('MQM');?>';
+  	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('Manuelle QS (im Segment)');?>';
   	Editor.view.quality.mqm.Fieldset.prototype.strings = {
 		severityLabel: '<?php echo $this->translate->_('Gewichtung');?>',
 		commentLabel: '<?php echo $this->translate->_('Kommentar');?>',
-		qmAddBtn: '<?php echo $this->translate->_('MQM hinzufügen');?>'
+		qmAddBtn: '<?php echo $this->translate->_('Manuelle QS hinzufügen');?>'
 	};
 	Editor.controller.QualityMqm.prototype.strings = {
     	buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
     	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
     };
-    Editor.view.quality.SegmentQm.prototype.title = '<?php echo $this->translate->_('QM');?>';
+    Editor.view.quality.SegmentQm.prototype.title = '<?php echo $this->translate->_('Manuelle QS (ganzes Segment)');?>';
     Editor.view.quality.SegmentQmController.prototype.messages = {
         qmHasBeenAdded: '<?php echo $this->translate->_('Die Qualität wurde hinzugefügt');?>',
         qmHasBeenRemoved: '<?php echo $this->translate->_('Die Qualität wurde entfernt');?>'
@@ -833,7 +833,7 @@ Ext.define('Editor.controller.Localizer', {
             exportDef: '<?php echo $this->translate->_('Originalformat, {0}');?>',
             exportDiff: '<?php echo $this->translate->_('SDLXLIFF mit Änderungsmarkierungen');?>',
             export2Def: '<?php echo $this->translate->_('XLIFF 2.1');?>',
-            exportQmField: '<?php echo $this->translate->_('Export QM-Statistik (XML) für Feld: {0}');?>',
+            exportQmField: '<?php echo $this->translate->_('Export QS-Statistik (XML) für Feld: {0}');?>',
             exportExcel: '<?php echo $this->translate->_('Externe Bearbeitung als Excel');?>',
             downloadImportArchive: '<?php echo $this->translate->_('Importarchiv herunterladen');?>',
             exportTranslation: '<?php echo $this->translate->_('übersetzt');?>',
@@ -1319,7 +1319,7 @@ Ext.define('Editor.controller.Localizer', {
         colStep: '<?php echo $this->translate->_('Workflow Schritt');?>',
         colUsername: '<?php echo $this->translate->_('Benutzer');?>',
         colTargets: '<?php echo $this->translate->_('Spalten (vorhanden)');?>',
-        colNotEditContent: '<?php echo $this->translate->_('Nur MQM-tags bearbeiten');?>',
+        colNotEditContent: '<?php echo $this->translate->_('Nur manuelle QS im Segment bearbeiten');?>',
         colAnonymous: '<?php echo $this->translate->_('Anonymisiert');?>',
         colVisibility: '<?php echo $this->translate->_('Sichtbarkeit');?>',
         add: '<?php echo $this->translate->_('Eintrag hinzufügen');?>',
@@ -1336,7 +1336,7 @@ Ext.define('Editor.controller.Localizer', {
         fieldStep: '<?php echo $this->translate->_('Workflow Schritt');?>',
         fieldUsername: '<?php echo $this->translate->_('Benutzer');?>',
         fieldTargets: '<?php echo $this->translate->_('vorhandene Spalten');?>',
-        fieldNotEditContent: '<?php echo $this->translate->_('Nur MQM-tags bearbeiten');?>',
+        fieldNotEditContent: '<?php echo $this->translate->_('Nur manuelle QS im Segment bearbeiten');?>',
         fieldAnonymous: '<?php echo $this->translate->_('anonymisierte Zieltextspalten');?>',
         fieldVisibility: '<?php echo $this->translate->_('Sichtbarkeit nicht editierbarer Zieltextspalten');?>',
         btnSave: '<?php echo $this->translate->_('Speichern');?>',

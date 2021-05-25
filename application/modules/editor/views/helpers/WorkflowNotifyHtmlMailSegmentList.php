@@ -199,7 +199,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             $result[] = $th.$field.'</th>';
         }
         $result[] = $th.$t->_('Status').'</th>';
-        $result[] = $th.$t->_('QM').'</th>';
+        $result[] = $th.$t->_('Manuelle QS (ganzes Segment)').'</th>';
         $result[] = $th.$t->_('Bearbeitungsstatus').'</th>';
         $result[] = $th.$t->_('Matchrate').'</th>';
         $result[] = $th.$t->_('Kommentare').'</th>';

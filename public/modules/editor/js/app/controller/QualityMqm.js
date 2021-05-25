@@ -107,7 +107,7 @@ Ext.define('Editor.controller.QualityMqm', {
     		return;
     	}
     	var mpForm = this.getMetaInfoForm(),
-    		pos = mpForm.items.findIndex('itemId', 'segmentQm'); // MQM will be added after QM panel
+    		pos = mpForm.items.findIndex('itemId', 'segmentQm') + 1; // MQM will be added after QM panel
     	mpForm.insert(pos, {xtype: 'qualityMqmFieldset', menuConfig: this.getMenuConfig()});
     },
     /**
@@ -213,6 +213,10 @@ Ext.define('Editor.controller.QualityMqm', {
             return;
         }
         tagDef = this.insertMqmFlag(editor,qmid, comment, sev);
+        // there may was no text selected
+        if(tagDef == null){
+            return;
+        }
         this.fireEvent('afterInsertMqmTag',tagDef); // Inserted tags are marked with INS-trackChange-markers.
         return true;
     },
@@ -231,6 +235,10 @@ Ext.define('Editor.controller.QualityMqm', {
 			tagDef = this.getImgTagDomConfig(qmid, comment, sev),
 			open = Ext.DomHelper.createDom(tagDef.open),
 			close = Ext.DomHelper.createDom(tagDef.close);
+		// check if there is actual text selected
+		if(rangeBegin.startOffset >= rangeBegin.endOffset){
+		    return null;
+		}
 		rangeBegin.collapse(true);
 		rangeEnd.collapse(false);
 		rangeEnd.insertNode(close);

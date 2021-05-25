@@ -102,7 +102,6 @@
 <trans-unit id='RWluc3RlbGx1bmdlbg=='><source>Einstellungen</source><target>Einstellungen</target></trans-unit>
 <trans-unit id='U29ydGllcnVuZyAvIEZpbHRlcnVuZyB6dXLDvGNrc2V0emVu'><source>Sortierung / Filterung zurücksetzen</source><target>Sortierung / Filterung zurücksetzen</target></trans-unit>
 <trans-unit id='VGFiZWxsZSB6dXLDvGNrc2V0emVu'><source>Tabelle zurücksetzen</source><target>Tabelle zurücksetzen</target></trans-unit>
-<trans-unit id='UU0='><source>QM</source><target>QM</target></trans-unit>
 <trans-unit id='TWF0Y2hyYXRl'><source>Matchrate</source><target>Matchrate</target></trans-unit>
 <trans-unit id='WmllbHRleHQgw7xiZXJhcmJlaXRldA=='><source>Zieltext überarbeitet</source><target>Zieltext überarbeitet</target></trans-unit>
 <trans-unit id='QXVzZ2FuZ3N0ZXh0'><source>Ausgangstext</source><target>Ausgangstext</target></trans-unit>
@@ -129,7 +128,7 @@
 <trans-unit id='VHJhY2tDaGFuZ2VzIGZvdW5kLCBidXQgUGx1Z2luIGlzIG5vdCBhY3RpdmF0ZWQu'><source>TrackChanges found, but Plugin is not activated.</source><target>TrackChanges-Auszeichnung gefunden, aber das Plugin ist nicht aktiviert.</target></trans-unit>
 <trans-unit id='R2V3aWNodHVuZw=='><source>Gewichtung</source><target>Gewichtung</target></trans-unit>
 <trans-unit id='S29tbWVudGFy'><source>Kommentar</source><target>Kommentar</target></trans-unit>
-<trans-unit id='TVFNIGhpbnp1ZsO8Z2Vu'><source>MQM hinzufügen</source><target>MQM hinzufügen</target></trans-unit>
+<trans-unit id='TWFudWVsbGUgUVMgaGluenVmw7xnZW4='><source>Manuelle QS hinzufügen</source><target>Manuelle QS hinzufügen</target></trans-unit>
 <trans-unit id='S2VpbiBTdWJzZWdtZW50IGF1c2dld8OkaGx0Lg=='><source>Kein Subsegment ausgewählt.</source><target>Kein Subsegment ausgewählt.</target></trans-unit>
 <trans-unit id='Qml0dGUgd8OkaGxlbiBTaWUgaW0gRWRpdG9yIGVpbiBTdWJzZWdtZW50IGF1cyE='><source>Bitte wählen Sie im Editor ein Subsegment aus!</source><target>Bitte wählen Sie im Editor ein Subsegment aus!</target></trans-unit>
 <trans-unit id='VmVyaGFsdGVuIGRlcyBXaWVkZXJob2x1bmdzZWRpdG9y'><source>Verhalten des Wiederholungseditor</source><target>Verhalten des Wiederholungseditor</target></trans-unit>
@@ -519,7 +518,7 @@
 <trans-unit id='S29tbWVudGFyZSB6dW0gYWt0dWVsbGVuIFNlZ21lbnQ='><source>Kommentare zum aktuellen Segment</source><target>Kommentare zum aktuellen Segment</target></trans-unit>
 <trans-unit id='S29tbWVudGFyIG5ldQ=='><source>Kommentar neu</source><target>Kommentar neu</target></trans-unit>
 <trans-unit id='S29tbWVudGFyIGJlYXJiZWl0ZW4='><source>Kommentar bearbeiten</source><target>Kommentar bearbeiten</target></trans-unit>
-<trans-unit id='RXhwb3J0IFFNLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='><source>Export QM-Statistik (XML) für Feld: {0}</source><target>Export QM-Statistik (XML) für Feld: {0}</target></trans-unit>
+<trans-unit id='RXhwb3J0IFFTLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='><source>Export QS-Statistik (XML) für Feld: {0}</source><target>Export QS-Statistik (XML) für Feld: {0}</target></trans-unit>
 <trans-unit id='UGFzc3dvcnQgZXJmb2xncmVpY2ggZ2VzcGVpY2hlcnQh'><source>Passwort erfolgreich gespeichert!</source><target>Passwort erfolgreich gespeichert!</target></trans-unit>
 <trans-unit id='cXVlbGxl'><source>quelle</source><target>quelle</target></trans-unit>
 <trans-unit id='emllbA=='><source>ziel</source><target>ziel</target></trans-unit>
@@ -747,7 +746,7 @@
 <trans-unit id='QmVhcmJlaXR1bmdzc3RhdHVz'><source>Bearbeitungsstatus</source><target>Bearbeitungsstatus</target></trans-unit>
 <trans-unit id='RXMgaXN0IElobmVuIG5pY2h0IGVybGF1YnQsIGRlbiBTZWdtZW50aW5oYWx0IHp1IGJlYXJiZWl0ZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU1RSRytaIHVtIElocmUgw4RuZGVydW5nZW4genVyw7xja3p1c2V0emVuIG9kZXIgYnJlY2hlbiBTaWUgZGFzIEJlYXJiZWl0ZW4gZGVzIFNlZ21lbnRzIGFiLg=='><source>Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.</source><target>Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.</target></trans-unit>
 <trans-unit id='RmlsdGVydGV4dCBlaW5nZWJlbi4uLg=='><source>Filtertext eingeben...</source><target>Filtertext eingeben...</target></trans-unit>
-<trans-unit id='TnVyIE1RTS10YWdzIGJlYXJiZWl0ZW4='><source>Nur MQM-tags bearbeiten</source><target>Nur MQM-tags bearbeiten</target></trans-unit>
+<trans-unit id='TnVyIG1hbnVlbGxlIFFTIGltIFNlZ21lbnQgYmVhcmJlaXRlbg=='><source>Nur manuelle QS im Segment bearbeiten</source><target>Nur manuelle QS im Segment bearbeiten</target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dA=='><source>Die Aufgabe wird von einem Benutzer benutzt</source><target>Die Aufgabe wird von einem Benutzer benutzt</target></trans-unit>
 <trans-unit id='WnVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldGVzIFNlZ21lbnQgd2llZGVyIGluIGRlbiBTaWNodGJlcmVpY2ggYmV3ZWdlbiAoU1RSRyArIEcp'><source>Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)</source><target>Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)</target></trans-unit>
 <trans-unit id='VmVyc2NoaWViYmFyZXIgRWRpdG9y'><source>Verschiebbarer Editor</source><target>Verschiebbarer Editor</target></trans-unit>
@@ -821,7 +820,6 @@
 <trans-unit id='RmVhdHVyZQ=='><source>Feature</source><target>Feature</target></trans-unit>
 <trans-unit id='Q2hhbmdl'><source>Change</source><target>Change</target></trans-unit>
 <trans-unit id='IFRlc3Q='><source> Test</source><target> Test</target></trans-unit>
-<trans-unit id='TVFN'><source>MQM</source><target>MQM</target></trans-unit>
 <trans-unit id='VGFzdGF0dXJrw7xyemVsIG5hY2hzY2hsYWdlbg=='><source>Tastaturkürzel nachschlagen</source><target>Tastaturkürzel nachschlagen</target></trans-unit>
 <trans-unit id='WmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0KQ=='><source>Zieltext (zur Importzeit)</source><target>Zieltext (zur Importzeit)</target></trans-unit>
 <trans-unit id='U1RSRyArIEVJTkZHIGtvcGllcnQgZGVuIGtvbXBsZXR0ZW4gUXVlbGx0ZXh0IGluIGRlbiBaaWVsdGV4dDxiciAvPlNUUkcgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRlbiBlbnRzcHJlY2hlbmRlbiBUYWcgaW4gZGVuIFppZWx0ZXh0IChOdWxsIGVudHNwcmljaHQgVGFnIE5yLiAxMCk8YnIgLz5TVFJHICsgU0hJRlQgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRpZSBUYWdzIG1pdCBkZW4gTnVtbWVybiAxMSBiaXMgMjAgaW4gZGVuIFppZWx0ZXh0Lg=='><source>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source><target>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</target></trans-unit>
@@ -1245,7 +1243,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='WnUgbm9ybWFsZXIgQW5zaWNodCB6dXLDvGNrc2V0emVu'><source>Zu normaler Ansicht zurücksetzen</source><target>Zu normaler Ansicht zurücksetzen</target></trans-unit>
 <trans-unit id='VGFncyB2ZXJiZXJnZW4gKG51ciBMZXNlbW9kdXMp'><source>Tags verbergen (nur Lesemodus)</source><target>Tags verbergen (nur Lesemodus)</target></trans-unit>
 <trans-unit id='U3VjaGUgaW4gZ2VzcGVycnRlbiBTZWdtZW50ZW4='><source>Suche in gesperrten Segmenten</source><target>Suche in gesperrten Segmenten</target></trans-unit>
-<trans-unit id='QWxsZSBlcnNldHplbiB3aXJkIGbDvHIgQXVmZ2FiZW4gbWl0IFNlZ21lbnRlbiBtaXQgTVFNLVRhZ3MgbmljaHQgdW50ZXJzdMO8dHp0'><source>Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt</source><target>Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt</target></trans-unit>
+<trans-unit id='QWxsZSBlcnNldHplbiB3aXJkIGbDvHIgQXVmZ2FiZW4gbWl0IFNlZ21lbnRlbiBtaXQgTVFNLVRhZ3MgbmljaHQgdW50ZXJzdMO8dHp0'><source>Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt</source><target>Alle ersetzen wird für Aufgaben mit Segmenten mit manueller QS im Segment nicht unterstützt</target></trans-unit>
 <trans-unit id='bWlu'><source>min</source><target>min</target></trans-unit>
 <trans-unit id='bWF4'><source>max</source><target>max</target></trans-unit>
 <trans-unit id='WmVpbGU='><source>Zeile</source><target>Zeile</target></trans-unit>
@@ -1508,7 +1506,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='U3VtbWU6'><source>Summe:</source><target>Summe:</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBGdXp6eSB2ZXJ3ZW5kZXQ='><source>Interne Fuzzy verwendet</source><target>Interne Fuzzy verwendet</target></trans-unit>
 <trans-unit id='TWF0Y2gtUmF0ZQ=='><source>Match-Rate</source><target>Match-Rate</target></trans-unit>
-<trans-unit id='SW4gYmVyZWl0cyBnZWzDtnNjaHRlIEluaGFsdGUga8O2bm5lbiBrZWluZSBNUU0tVGFncyBlaW5nZWbDvGd0IHdlcmRlbi4='><source>In bereits gelöschte Inhalte können keine MQM-Tags eingefügt werden.</source><target>In bereits gelöschte Inhalte können keine MQM-Tags eingefügt werden.</target></trans-unit>
+<trans-unit id='SW4gYmVyZWl0cyBnZWzDtnNjaHRlIEluaGFsdGUga8O2bm5lbiBrZWluZSBNUU0tVGFncyBlaW5nZWbDvGd0IHdlcmRlbi4='><source>In bereits gelöschte Inhalte können keine MQM-Tags eingefügt werden.</source><target>In bereits gelöschte Inhalte können keine manuellen QS-Tags eingefügt werden.</target></trans-unit>
 <trans-unit id='RGVyIEluaGFsdCB3dXJkZSBuaWNodCBpbiBkYXMgQ2xpcGJvYXJkIMO8YmVybm9tbWVuLg=='><source>Der Inhalt wurde nicht in das Clipboard übernommen.</source><target>Der Inhalt wurde nicht in das Clipboard übernommen.</target></trans-unit>
 <trans-unit id='RGllIFBvc2l0aW9uIGRlcyBDdXJzb3JzIGJ6dy4gZGllIEF1c3dhaGwgaW0gVGV4dCB3dXJkZSBuaWNodCBlcmthbm50LiBCaXR0ZSBub2NobWFsIHByb2JpZXJlbiB1bmQgZ2dmLiBkaWUgQWRtaW5zIGJlbmFjaHJpY2h0aWdlbi4='><source>Die Position des Cursors bzw. die Auswahl im Text wurde nicht erkannt. Bitte nochmal probieren und ggf. die Admins benachrichtigen.</source><target>Die Position des Cursors bzw. die Auswahl im Text wurde nicht erkannt. Bitte nochmal probieren und ggf. die Admins benachrichtigen.</target></trans-unit>
 <trans-unit id='V8OkaGxlbiBTaWUgZGllIFJlc3NvdXJjZSBhdXMgdW0gd2VpdGVyZSBJbmZvcyB6dSBiZWtvbW1lbi4='><source>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</source><target>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</target></trans-unit>

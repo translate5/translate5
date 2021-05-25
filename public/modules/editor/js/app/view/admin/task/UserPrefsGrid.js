@@ -38,7 +38,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
         colStep: '#UT#Workflow Schritt',
         colUsername: '#UT#Benutzer',
         colTargets: '#UT#Spalten (vorhanden)',
-        colNotEditContent: '#UT#Nur MQM-tags bearbeiten',
+        colNotEditContent: '#UT#Nur manuelle QS im Segment bearbeiten',
         colAnonymous: '#UT#Anonymisiert',
         colVisibility: '#UT#Sichtbarkeit',
         add: '#UT#Eintrag hinzufügen',

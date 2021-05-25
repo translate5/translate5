@@ -1089,8 +1089,8 @@
 	<source>Exportoptionen</source>
 	<target>export options</target>
       </trans-unit>
-      <trans-unit id='RXhwb3J0IFFNLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='>
-	<source>Export QM-Statistik (XML) für Feld: {0}</source>
+      <trans-unit id='RXhwb3J0IFFTLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='>
+	<source>Export QS-Statistik (XML) für Feld: {0}</source>
 	<target>Export QA-statistics (XML) for field: {0}</target>
       </trans-unit>
       <trans-unit id='QXVmZ2FiZSB3aXJkIHZlcmxhc3Nlbi4uLg=='>
@@ -1181,7 +1181,7 @@
     <source>wird momentan verwendet</source>
     <target>is currently in use</target>
 </trans-unit>
-<trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgTVFNLUF1c3plaWNobnVuZ2VuKQ=='><source>(CSV-Dateiformat mit MQM-Auszeichnungen)</source><target>(CSV file with MQM markup)</target></trans-unit>
+<trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgTVFNLUF1c3plaWNobnVuZ2VuKQ=='><source>(CSV-Dateiformat mit MQM-Auszeichnungen)</source><target>(CSV file with manual QA markup)</target></trans-unit>
 <trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgbWVocmVyZW4gemllbHNwcmFjaGxpY2hlbiBBbHRlcm5hdGl2c3BhbHRlbik='><source>(CSV-Dateiformat mit mehreren zielsprachlichen Alternativspalten)</source><target>(CSV file with multiple target alternatives)</target></trans-unit>
 <trans-unit id='SW5zdGFsbGF0aW9uZW4gJmFtcDsgSG9zdGluZw=='><source>Installationen &amp; Hosting</source><target>Installations &amp; Hosting</target></trans-unit>
 <trans-unit id='U3VwcG9ydCAmYW1wOyBVcGRhdGVz'><source>Support &amp; Updates</source><target>Support &amp; Updates</target></trans-unit>
@@ -1315,9 +1315,9 @@
   <source>Filtertext eingeben...</source>
   <target>Enter filtering text...</target>
 </trans-unit>
-<trans-unit id='TnVyIE1RTS10YWdzIGJlYXJiZWl0ZW4='>
-  <source>Nur MQM-tags bearbeiten</source>
-  <target>Edit only MQM-tags</target>
+<trans-unit id='TnVyIG1hbnVlbGxlIFFTIGltIFNlZ21lbnQgYmVhcmJlaXRlbg=='>
+  <source>Nur manuelle QS im Segment bearbeiten</source>
+  <target>Edit only manual QA inside segments</target>
 </trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dA=='>
   <source>Die Aufgabe wird von einem Benutzer benutzt</source>
@@ -1614,10 +1614,6 @@
     <source>Schließen</source>
     <target>Close</target>
 </trans-unit>
-<trans-unit id='TVFN'>
-    <source>MQM</source>
-    <target>MQM</target>
-</trans-unit>
 <trans-unit id='VGFiZWxsZSB6dXLDvGNrc2V0emVu'>
     <source>Tabelle zurücksetzen</source>
     <target>Reset grid</target>
@@ -1646,9 +1642,9 @@
     <source>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</source>
     <target>Some non representable characters were removed from the segment (multiple white-spaces, tabs, line-breaks etc.)!</target>
 </trans-unit>
-<trans-unit id='TVFNIGhpbnp1ZsO8Z2Vu'>
-    <source>MQM hinzufügen</source>
-    <target>add MQM</target>
+<trans-unit id='TWFudWVsbGUgUVMgaGluenVmw7xnZW4='>
+    <source>Manuelle QS hinzufügen</source>
+    <target>Add manual QA</target>
 </trans-unit>
 
 <trans-unit id='UmVmZXJlbnotRGF0ZWllbg=='>
@@ -2321,7 +2317,7 @@ A task was associated to you in the task-portal {portalLink}.<br />
 
 <trans-unit id="QWxsZSBlcnNldHplbiB3aXJkIGbDvHIgQXVmZ2FiZW4gbWl0IFNlZ21lbnRlbiBtaXQgTVFNLVRhZ3MgbmljaHQgdW50ZXJzdMO8dHp0">
     <source>Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt</source>
-    <target>Replace all is not supported for task with segments with mqm tags</target>
+    <target>Replace all is not supported for task with segments with manual QA tags</target>
 </trans-unit>
 
 <trans-unit id="U2VnbWVudGUgbWl0IFN1Y2h0cmVmZmVyOg==">
@@ -3910,7 +3906,6 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='S3VyemVyIE5hbWU='><source>Konfigurationsoption</source><target>Configuration option</target></trans-unit>
 <trans-unit id='QWt0aXZpZXJ0'><source>Aktiviert</source><target>Activated</target></trans-unit>
 <trans-unit id='RGVha3RpdmllcnQ='><source>Deaktiviert</source><target>Disabled</target></trans-unit>
-<trans-unit id='UU0='><source>QM</source><target>QA</target></trans-unit>
 <trans-unit id='S2FubiBhdWYgRWJlbmUgw7xiZXJzY2hyaWViZW4gd2VyZGVuOg=='><source>Kann auf Ebene überschrieben werden:</source><target>Kann auf Ebene überschrieben werden:</target></trans-unit>
 <trans-unit id='w5xiZXJzY2hyZWliYmFyIGF1ZiBFYmVuZTo='><source>Überschreibbar auf Ebene:</source><target>Overwrite levels:</target></trans-unit>
 <trans-unit id='U2NocmVpYmdlc2Now7x0enRlIEtvbmZpZ3VyYXRpb25lbiBzaWNodGJhcjo='><source>Schreibgeschützte Konfigurationen sichtbar:</source><target>Show write-protected</target></trans-unit>

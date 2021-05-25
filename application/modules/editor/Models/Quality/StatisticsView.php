@@ -54,6 +54,10 @@ class editor_Models_Quality_StatisticsView {
      */
     private $translate;
     /**
+     * @var string
+     */
+    private $field;
+    /**
      * @var array
      */
     private $tree;
@@ -68,20 +72,42 @@ class editor_Models_Quality_StatisticsView {
     /**
      * 
      * @param editor_Models_Task $task
+     * @param string $field
      */
-    public function __construct(editor_Models_Task $task){
+    public function __construct(editor_Models_Task $task, string $field=NULL){
+        
         $this->task = $task;
         $this->table = new editor_Models_Db_SegmentQuality();
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->manager = editor_Segment_Quality_Manager::instance();
+        $this->field = $this->validateField($field);
         $this->create();
+    }
+    /**
+     * returns the desired field to get the statistics for (source or target),
+     * given by user through parameter "type"
+     * if nothing is given or value is invalid returns "target"
+     * @param string $field
+     * @return string
+     */
+    private function validateField(string $field=NULL) : string {
+        $sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        /* @var $sfm editor_Models_SegmentFieldManager */
+        $sfm->initFields($this->task->getTaskGuid());
+        if($field == NULL || $sfm->getByName($field) === false){
+            return $sfm->getFirstTargetName();
+        }
+        return $field;
     }
     /**
      * 
      * @return string
      */
     public function getDownloadName() : string {
-        return $this->task->getTasknameForDownload('.xml');
+        if($this->field == NULL){
+            return $this->task->getTasknameForDownload('.xml');
+        }
+        return $this->task->getTasknameForDownload('-'.$this->field.'.xml');
     }
     /**
      * 
@@ -97,7 +123,7 @@ class editor_Models_Quality_StatisticsView {
         $this->createMqmTree();
         if(!$this->onlyMqm){
             // we use the filter-panel-views intermediate model to add the other types
-            $panelView = new editor_Models_Quality_FilterPanelView($this->task, NULL, false, NULL, true);
+            $panelView = new editor_Models_Quality_FilterPanelView($this->task, NULL, false, NULL, true, $this->field);
             foreach($panelView->getRowsByType() as $type => $typeRows){
                 $row = $typeRows[editor_Models_Quality_FilterPanelView::RUBRIC];
                 if($row->qcount > 0){
@@ -139,7 +165,7 @@ class editor_Models_Quality_StatisticsView {
                 
         $storage =  new stdClass();
         $storage->severitySumKeys = array();
-        $storage->statData = $this->fetchStatisticsData();
+        $storage->statData = $this->fetchStatisticsData($this->field);
         
         $hasChildren = function($checkChilds){
             return isset($checkChilds->children) && is_array($checkChilds->children);
@@ -197,15 +223,18 @@ class editor_Models_Quality_StatisticsView {
     /**
      * @return array array() {[categoryIndex]=>  array(4) { ["categoryIndex"]=> "asdf", ["severity1"]=> (int)count, ["severity2"]=> (int)count, ... ,["sum"]=>  int()sum of severities }
      */
-    private function fetchStatisticsData() : array {
+    private function fetchStatisticsData(string $field=NULL) : array {
         $select = $this->table->getAdapter()->select()
-            ->from(
-                array('q' => $this->table->getName()),
-                array('categoryIndex', 'severity', 'count' => 'COUNT(*)'))
+        ->from(
+            array('q' => $this->table->getName()),
+            array('categoryIndex', 'severity', 'count' => 'COUNT(*)'))
             ->group('categoryIndex')
             ->group('severity')
             ->where('taskGuid = ?', $this->task->getTaskGuid())
             ->where('type = ?', editor_Segment_Tag::TYPE_MQM);
+        if(!empty($field)){
+            $select->where('field = ?', $field);
+        }
         $data = $this->table->getAdapter()->fetchAll($select);
         $groupedData = [];
         foreach ($data as $d) {
