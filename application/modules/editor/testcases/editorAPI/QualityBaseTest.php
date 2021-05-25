@@ -98,11 +98,11 @@ class QualityBaseTest extends editor_Test_JsonTest {
     /**
      * Checks the validity of the task qualities
      */
-    public function testTaskQualities(){
+    public function testTaskQualityTree(){
 
-        $qualities = $this->api()->requestJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
-        if(static::$captureMode){ file_put_contents($this->api()->getFile('expectedTaskQualities.json', null, false), json_encode($qualities, JSON_PRETTY_PRINT)); }
-        $this->assertModelsEqualsJsonFile('TaskQuality', 'expectedTaskQualities.json', $qualities);
+        $tree = $this->api()->requestJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
+        if(static::$captureMode){ file_put_contents($this->api()->getFile('expectedTaskQualities.json', null, false), json_encode($tree, JSON_PRETTY_PRINT)); }
+        $this->assertModelEqualsJsonFile('TaskQuality', 'expectedTaskQualities.json', $tree);
     }
     /**
      * Tests the task-Tooltip of the Task-Grid
@@ -201,9 +201,9 @@ class QualityBaseTest extends editor_Test_JsonTest {
         if(static::$captureMode){ file_put_contents($this->api()->getFile('expectedQualityFilterChanged.json', null, false), json_encode($tree, JSON_PRETTY_PRINT)); }
         $this->assertModelEqualsJsonFile('FilterQuality', 'expectedQualityFilterChanged.json', $tree);
         
-        $qualities = $this->api()->requestJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
-        if(static::$captureMode){ file_put_contents($this->api()->getFile('expectedTaskQualitiesChanged.json', null, false), json_encode($qualities, JSON_PRETTY_PRINT)); }
-        $this->assertModelsEqualsJsonFile('TaskQuality', 'expectedTaskQualitiesChanged.json', $qualities);
+        $tree = $this->api()->requestJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
+        if(static::$captureMode){ file_put_contents($this->api()->getFile('expectedTaskQualitiesChanged.json', null, false), json_encode($tree, JSON_PRETTY_PRINT)); }
+        $this->assertModelEqualsJsonFile('TaskQuality', 'expectedTaskQualitiesChanged.json', $tree);
     }
 
     public static function tearDownAfterClass(): void {

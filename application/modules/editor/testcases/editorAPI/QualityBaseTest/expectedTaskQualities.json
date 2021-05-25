@@ -1,42 +1,231 @@
-[
-    {
-        "qid": -1,
-        "qtype": "internal",
-        "qcount": 0,
-        "qcomplete": true,
-        "qcountfp": 0,
-        "text": "Internal tags"
-    },
-    {
-        "qid": -1,
-        "qtype": "qm",
-        "qcount": 0,
-        "qcomplete": true,
-        "qcountfp": 0,
-        "text": "Manual QA (complete segment)"
-    },
-    {
-        "qid": -1,
-        "qtype": "mqm",
-        "qcount": 487,
-        "qcomplete": true,
-        "qcountfp": 0,
-        "text": "Manual QA (inside segment)"
-    },
-    {
-        "qid": -1,
-        "qtype": "term",
-        "qcount": 0,
-        "qcomplete": true,
-        "qcountfp": 0,
-        "text": "Terminology"
-    },
-    {
-        "qid": -1,
-        "qtype": "matchrate",
-        "qcount": 0,
-        "qcomplete": true,
-        "qcountfp": 0,
-        "text": "Usage of TM-matches"
+{
+    "text": "{7930a930-4995-449d-b119-6a8669b2bd6f}",
+    "children": [
+        {
+            "qid": -1,
+            "qtype": "internal",
+            "qcount": 0,
+            "qcomplete": true,
+            "qcategory": null,
+            "qcountfp": 0,
+            "text": "Internal tags",
+            "qtotal": 0,
+            "leaf": true
+        },
+        {
+            "qid": -1,
+            "qtype": "qm",
+            "qcount": 0,
+            "qcomplete": true,
+            "qcategory": null,
+            "qcountfp": 0,
+            "text": "Manual QA (complete segment)",
+            "qtotal": 0,
+            "leaf": true
+        },
+        {
+            "qid": -1,
+            "qtype": "mqm",
+            "qcount": 487,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "1822",
+                    "qtype": "mqm",
+                    "qcount": 171,
+                    "qcomplete": true,
+                    "qcategory": "mqm_2",
+                    "qcatidx": "2",
+                    "qcountfp": 0,
+                    "text": "Terminology",
+                    "leaf": true
+                },
+                {
+                    "qid": "1817",
+                    "qtype": "mqm",
+                    "qcount": 105,
+                    "qcomplete": true,
+                    "qcategory": "mqm_3",
+                    "qcatidx": "3",
+                    "qcountfp": 0,
+                    "text": "Mistranslation",
+                    "leaf": true
+                },
+                {
+                    "qid": "1948",
+                    "qtype": "mqm",
+                    "qcount": 12,
+                    "qcomplete": true,
+                    "qcategory": "mqm_4",
+                    "qcatidx": "4",
+                    "qcountfp": 0,
+                    "text": "Omission",
+                    "leaf": true
+                },
+                {
+                    "qid": "1821",
+                    "qtype": "mqm",
+                    "qcount": 3,
+                    "qcomplete": true,
+                    "qcategory": "mqm_5",
+                    "qcatidx": "5",
+                    "qcountfp": 0,
+                    "text": "Addition",
+                    "leaf": true
+                },
+                {
+                    "qid": "1811",
+                    "qtype": "mqm",
+                    "qcount": 13,
+                    "qcomplete": true,
+                    "qcategory": "mqm_6",
+                    "qcatidx": "6",
+                    "qcountfp": 0,
+                    "text": "Untranslated",
+                    "leaf": true
+                },
+                {
+                    "qid": "1814",
+                    "qtype": "mqm",
+                    "qcount": 21,
+                    "qcomplete": true,
+                    "qcategory": "mqm_8",
+                    "qcatidx": "8",
+                    "qcountfp": 0,
+                    "text": "Style\/register",
+                    "leaf": true
+                },
+                {
+                    "qid": "1951",
+                    "qtype": "mqm",
+                    "qcount": 6,
+                    "qcomplete": true,
+                    "qcategory": "mqm_9",
+                    "qcatidx": "9",
+                    "qcountfp": 0,
+                    "text": "Typography",
+                    "leaf": true
+                },
+                {
+                    "qid": "1810",
+                    "qtype": "mqm",
+                    "qcount": 12,
+                    "qcomplete": true,
+                    "qcategory": "mqm_10",
+                    "qcatidx": "10",
+                    "qcountfp": 0,
+                    "text": "Punctuation",
+                    "leaf": true
+                },
+                {
+                    "qid": "1845",
+                    "qtype": "mqm",
+                    "qcount": 2,
+                    "qcomplete": true,
+                    "qcategory": "mqm_11",
+                    "qcatidx": "11",
+                    "qcountfp": 0,
+                    "text": "Spelling",
+                    "leaf": true
+                },
+                {
+                    "qid": "1858",
+                    "qtype": "mqm",
+                    "qcount": 4,
+                    "qcomplete": true,
+                    "qcategory": "mqm_12",
+                    "qcatidx": "12",
+                    "qcountfp": 0,
+                    "text": "Capitalization",
+                    "leaf": true
+                },
+                {
+                    "qid": "1839",
+                    "qtype": "mqm",
+                    "qcount": 10,
+                    "qcomplete": true,
+                    "qcategory": "mqm_13",
+                    "qcatidx": "13",
+                    "qcountfp": 0,
+                    "text": "Grammar",
+                    "leaf": true
+                },
+                {
+                    "qid": "1812",
+                    "qtype": "mqm",
+                    "qcount": 32,
+                    "qcomplete": true,
+                    "qcategory": "mqm_16",
+                    "qcatidx": "16",
+                    "qcountfp": 0,
+                    "text": "Agreement",
+                    "leaf": true
+                },
+                {
+                    "qid": "1828",
+                    "qtype": "mqm",
+                    "qcount": 28,
+                    "qcomplete": true,
+                    "qcategory": "mqm_17",
+                    "qcatidx": "17",
+                    "qcountfp": 0,
+                    "text": "Word order",
+                    "leaf": true
+                },
+                {
+                    "qid": "1820",
+                    "qtype": "mqm",
+                    "qcount": 51,
+                    "qcomplete": true,
+                    "qcategory": "mqm_18",
+                    "qcatidx": "18",
+                    "qcountfp": 0,
+                    "text": "Function words",
+                    "leaf": true
+                },
+                {
+                    "qid": "1972",
+                    "qtype": "mqm",
+                    "qcount": 17,
+                    "qcomplete": true,
+                    "qcategory": "mqm_19",
+                    "qcatidx": "19",
+                    "qcountfp": 0,
+                    "text": "Tense\/aspect\/mood",
+                    "leaf": true
+                }
+            ],
+            "qcategory": null,
+            "qcountfp": 0,
+            "text": "Manual QA (inside segment)",
+            "qtotal": 487,
+            "expanded": false
+        },
+        {
+            "qid": -1,
+            "qtype": "term",
+            "qcount": 0,
+            "qcomplete": true,
+            "qcategory": null,
+            "qcountfp": 0,
+            "text": "Terminology",
+            "qtotal": 0,
+            "leaf": true
+        },
+        {
+            "qid": -1,
+            "qtype": "matchrate",
+            "qcount": 0,
+            "qcomplete": true,
+            "qcategory": null,
+            "qcountfp": 0,
+            "text": "Usage of TM-matches",
+            "qtotal": 0,
+            "leaf": true
+        }
+    ],
+    "metaData": {
+        "numSegments": 487,
+        "hasFaultyInternalTags": false
     }
-]
+}

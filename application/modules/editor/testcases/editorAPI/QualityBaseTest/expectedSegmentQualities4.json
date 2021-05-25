@@ -1,7 +1,7 @@
 [
     {
-        "id": "26422",
-        "segmentId": "1061250",
+        "id": "1823",
+        "segmentId": "228216",
         "field": "target",
         "type": "mqm",
         "category": "mqm_3",
@@ -16,8 +16,8 @@
         "cssClass": "qmflag"
     },
     {
-        "id": "26421",
-        "segmentId": "1061250",
+        "id": "1822",
+        "segmentId": "228216",
         "field": "target",
         "type": "mqm",
         "category": "mqm_2",
