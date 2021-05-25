@@ -733,7 +733,7 @@ Ext.define('Editor.controller.Segments', {
   /**
    * Handles the cancel edit of the segment grid
    * Some View Controllers like qualities FilterPanelController can not listen to the #segmentgrid directly but can listen to this controller (Why???) so we forward the event
-   * Generally it would be great to have all events regarding segment editing being dispatched from one source which većentralizes them
+   * Generally it would be great to have all events regarding segment editing being dispatched from one source which centralizes them
    */
   handleCancelEdit(){
       this.fireEvent('segmentEditCanceled', this);
