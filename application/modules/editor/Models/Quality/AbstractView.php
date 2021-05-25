@@ -401,7 +401,9 @@ abstract class editor_Models_Quality_AbstractView {
         $row->qid = -1;
         $row->qtype = $type;
         $row->qcount = 0;
-        $row->qcomplete = $this->manager->isFullyCheckedType($type, $this->taskConfig);
+        // TODO AUTOQA: When the re-check/re-analysis is implemented the buttons need to be activated here
+        // $row->qcomplete = $this->manager->isFullyCheckedType($type, $this->taskConfig);
+        $row->qcomplete = true;
         if($this->isTree){
             $row->children = [];
             $row->qcategory = NULL;

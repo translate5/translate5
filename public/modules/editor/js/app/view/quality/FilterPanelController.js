@@ -101,10 +101,10 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         }
     },
     /**
-     * 
+     * TODO AUTOQA: implement
+     * Opens the re-analysis dialog
      */
     onAnalysisButtonClick: function(btn){
-        // TODO AUTOQA: implement
         console.log('onAnalysisButtonClick: ', btn);
     },
     /**

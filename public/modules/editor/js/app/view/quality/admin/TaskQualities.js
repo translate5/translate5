@@ -33,7 +33,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.quality.admin.TaskQualities', {
     extend:'Ext.panel.Panel',
     alias: 'widget.taskQualities',
-    // controller: 'taskQualities',
     itemId:'taskQualities',
     extraParams: [], // Extra params property used for store proxy binding
     title: '#UT#Qualitätssicherung',
@@ -174,7 +173,7 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                     dock: 'bottom',
                     ui: 'footer',
                     itemId: 'analysisToolbar',
-                    hidden: !me.reAnalysisVisible,
+                    hidden: me.reAnalysisHidden,
                     items: [{
                         xtype: 'button',
                         text: me.strings.newAnalysis,
@@ -194,10 +193,10 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
         return me.callParent([ config ]);
     },
     /**
+     * TODO AUTOQA: implement
      * Opens the re-analysis dialog
      */
     onAnalysisButtonClick: function(btn){
-        // TODO AUTOQA: implement
         console.log('onAnalysisButtonClick: ', btn);
     }    
 });
