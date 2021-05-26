@@ -45,6 +45,7 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
         $appState = self::assertAppState();
         self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
         self::assertContains('editor_Plugins_MatchAnalysis_Init', $appState->pluginsLoaded, 'Plugin MatchAnalysis must be activated for this test case!');
+        self::assertNotContains('editor_Plugins_SegmentStatistics_Bootstrap', $appState->pluginsLoaded, 'Plugin SegmentStatistics must be deactivated for this test case!');
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
