@@ -271,12 +271,12 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      * @param int $noTermDefinedFor
      * @return array
      */
-    public function searchTermByLanguage(string $queryString, string $languages, array $collectionIds, $limit = null, array $processStats, &$total = null, $noTermDefinedFor = null): array
+    public function searchTermByLanguage(string $queryString, string $languages, array $collectionIds, $limit = null, array $processStats, &$total = null, $noTermDefinedFor = null, $query = null): array
     {
         $termObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_Term');
 
         //if wildcards are used, adopt them to the mysql needs
-        $queryString = str_replace("*","%",$queryString);
+        $queryString = str_replace("*","%",$query ?: $queryString);
         $queryString = str_replace("?","_",$queryString);
 
         //when limit is provided -> autocomplete search
@@ -343,7 +343,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $sql = '(' . $s->assemble() . ') UNION (' . $sp->assemble() . ') ' . $limit;
 
         // If $total arg is given
-        if (func_num_args() >= 6) {
+        if (func_num_args() >= 6 && !$query) {
 
             // Replace columns with 'COUNT(*)' for both *_Select instances
             $s->reset(Zend_Db_Select::COLUMNS)->columns(['COUNT(*)']);
