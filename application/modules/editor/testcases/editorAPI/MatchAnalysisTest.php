@@ -178,6 +178,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [$this->api()->getCustomer()->id],
             'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_OpenTM2',
             'serviceName'=> 'OpenTM2',
             'name' => $name
@@ -201,6 +202,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $params['serviceType']='editor_Services_TermCollection';
         $params['customerIds'] = [$customer->id];
         $params['customerUseAsDefaultIds'] = [];
+        $params['customerWriteAsDefaultIds'] = [];
         $params['serviceName']='TermCollection';
         $params['mergeTerms']=false;
         

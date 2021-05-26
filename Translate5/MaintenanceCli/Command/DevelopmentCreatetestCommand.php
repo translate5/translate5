@@ -151,7 +151,7 @@ END LICENSE AND COPYRIGHT
  * Testcase for '.$issue.' Mixing XLF id and rid values led to wrong tag numbering
  * For details see the issue.
  */
-class '.$name.' extends \ZfExtended_Test_ApiTestcase {
+class '.$name.' extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
@@ -203,8 +203,8 @@ class '.$name.' extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson(\'editor/segment?page=1&start=0&limit=10\');
         
 //TODO FOR TEST USAGE: run the test, the next line creates the expected content json, comment the line out, validate if the produced JSON is as expected
-        file_put_contents($this->api()->getFile(\'/expectedSegments.json\', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent(\'expectedSegments.json\'), $data, \'Imported segments are not as expected!\');
+        file_put_contents($this->api()->getFile(\'/expectedSegments.json\', null, false), json_encode($data, JSON_PRETTY_PRINT));
+        $this->assertModelsEqualsJsonFile(\'Segment\', \'expectedSegments.json\', $segments, \'Imported segments are not as expected!\');
     }
     
     /**
@@ -228,8 +228,8 @@ class '.$name.' extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson(\'editor/segment?page=1&start=0&limit=10\');
 
 //TODO FOR TEST USAGE: run the test, the next line creates the expected content json, comment the line out, validate if the produced JSON is as expected
-        file_put_contents($this->api()->getFile(\'/expectedSegments-edited.json\', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent(\'expectedSegments-edited.json\'), $data, \'Edited segments are not as expected!\');
+        file_put_contents($this->api()->getFile(\'/expectedSegments-edited.json\', null, false), json_encode($data, JSON_PRETTY_PRINT));
+        $this->assertModelsEqualsJsonFile(\'Segment\', \'expectedSegments-edited.json\', $segments, \'Imported segments are not as expected!\');
     }
     
     /**

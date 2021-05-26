@@ -3059,9 +3059,9 @@ A task was associated to you in the task-portal {portalLink}.<br />
     <source>Info zum Term-Collection</source>
     <target>Term-Collection info</target>
 </trans-unit>
-<trans-unit id='U3RhbmRhcmRtw6Rzc2lnIGFrdGl2IGbDvHI='>
-    <source>Standardmässig aktiv für</source>
-    <target>Language Ressource used by default for</target>
+<trans-unit id='TGVzZXJlY2h0ZSBzdGFuZGFyZG3DpMOfaWc='>
+    <source>Leserechte standardmäßig</source>
+    <target>Read rights by default</target>
 </trans-unit>
 <trans-unit id='RsO8ciBkaWVzZSBLdW5kZW4gbnV0emVu'>
     <source>Für diese Kunden nutzen</source>
@@ -4053,6 +4053,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='>
   <source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source>
   <target>The parameter login containing the desired username is missing.</target>
+</trans-unit>
+<trans-unit id='U2NocmVpYnJlY2h0ZSBzdGFuZGFyZG3DpMOfaWc='>
+    <source>Schreibrechte standardmäßig</source>
+    <target>Write rights by default</target>
 </trans-unit>
 <trans-unit id='U2VyYmlzY2ggKExhdGVpbiBTZXJiaWVuKQ=='><source>Serbisch (Latein Serbien)</source><target>Serbian (Latin Serbia)</target></trans-unit>
 <trans-unit id='U29tYWxpIChTb21hbGlhKQ=='><source>Somali (Somalia)</source><target>Somali (Somalia)</target></trans-unit>
