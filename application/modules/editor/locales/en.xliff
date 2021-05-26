@@ -4117,6 +4117,14 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Änderungen des Wiederholungsstatus durch Segmentänderungen werden nicht sofort angezeigt, die Segmente müssen neugeladen werden!</source>
   <target>The repetition state is not updated automatically on editing a segment, the segments have to be reloaded!</target>
 </trans-unit>
+<trans-unit id='U3RhbmRhcmRtw6TDn2lnIHdpcmQgYmVpIG5ldWVuIEF1ZmdhYmVuIGbDvHIgZGllIGdld8OkaGx0ZW4gS3VuZGVuIExlc2VyZWNodCBmw7xyIGRpZXNlIFNwcmFjaHJlc291cmNlIGFrdGl2aWVydA=='>
+  <source>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert</source>
+  <target>By default, read permission for this language resource is enabled for new tasks for the selected clients</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRtw6TDn2lnIHdpcmQgYmVpIG5ldWVuIEF1ZmdhYmVuIGbDvHIgZGllIGdld8OkaGx0ZW4gS3VuZGVuIGdlc2V0enQsIGRhc3MgU2VnbWVudGUgYmVpbSBTZWdtZW50IHNwZWljaGVybiBpbiBkaWUgU3ByYWNocmVzb3VyY2UgZ2VzY2hyaWViZW4gd2VyZGVu'>
+  <source>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden</source>
+  <target>By default it is enabled for new tasks for the selected clients, that saved segments are saved to the language resource as well.</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
