@@ -90,6 +90,25 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
             }
         }
     }
+
+    /***
+     * Check if the languageresource tm result in the provided file is the same as the given tmResult.
+     * In $tmResults non required data will be removed.
+     * @param string $fileToCompare
+     * @param array $tmResults
+     * @param string $message
+     */
+    public function assertTmResultEqualsJsonFile(string $fileToCompare, array $tmResults, string $message){
+        $expectations = self::$api->getFileContent($fileToCompare);
+        $tmUnset = function ($in){
+            unset($in->languageResourceid);
+            unset($in->metaData);
+        };
+        foreach ($tmResults as &$res){
+            $tmUnset($res);
+        }
+        $this->assertEquals($tmResults,$expectations ,$message);
+    }
     
     /* Comment model specific API */
     

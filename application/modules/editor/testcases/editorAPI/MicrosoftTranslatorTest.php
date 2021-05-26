@@ -104,6 +104,7 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [$this->api()->getCustomer()->id],
             'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_Microsoft',
             'serviceName'=> 'Microsoft'
         ];

@@ -133,8 +133,9 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         $params['serviceType'] = 'editor_Services_TermCollection';
         $params['customerIds'] = [self::$customerTest->id];
         $params['customerUseAsDefaultIds'] = [self::$customerTest->id];
-        $params['serviceName'] = 'TermCollection';
-        $params['mergeTerms'] = false;
+        $params['customerWriteAsDefaultIds'] = [];
+        $params['serviceName'] ='TermCollection';
+        $params['mergeTerms'] =false;
         
         self::$api->addResource($params, 'collection.tbx', true);
     }
