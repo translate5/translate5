@@ -144,6 +144,7 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
             'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_Moses',
             'serviceName'=> 'Moses',
             'name' => 'API Testing::MosesMt_'.__CLASS__
