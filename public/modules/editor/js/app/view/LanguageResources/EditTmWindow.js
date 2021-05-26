@@ -58,7 +58,9 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         writeAsDefault:'#UT#Schreibrechte standardmäßig',
         collection:'#UT#TBX-Datei',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
-        categories: '#UT#Kategorien'
+        categories: '#UT#Kategorien',
+        useAsDefaultTooltip:'#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert',
+        writeAsDefaultTooltip:'#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden'
     },
     
     listeners:{
@@ -155,7 +157,12 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         queryMode: 'local',
                         displayField: 'name',
                         valueField: 'id',
-                        fieldLabel:me.strings.useAsDefault
+                        fieldLabel:me.strings.useAsDefault,
+                        labelClsExtra:'lableInfoIcon',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': me.strings.useAsDefaultTooltip
+                        }
                     },{
                         xtype:'tagfield',
                         name:'customerWriteAsDefaultIds',
@@ -166,10 +173,15 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                             hidden:'{!isTmResourceType}',
                             disabled:'{!isTmResourceType}'
                         },
-                        fieldLabel:me.strings.writeAsDefault,
                         displayField: 'name',
                         valueField: 'id',
-                        queryMode: 'local'
+                        queryMode: 'local',
+                        fieldLabel:me.strings.writeAsDefault,
+                        labelClsExtra:'lableInfoIcon',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': me.strings.writeAsDefaultTooltip
+                        }
                     },{
                         xtype: 'colorfield',
                         name: 'color',
