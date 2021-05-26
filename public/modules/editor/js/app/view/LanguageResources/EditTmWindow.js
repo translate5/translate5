@@ -102,9 +102,6 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     items: [{
                         xtype: 'displayfield',
                         name:'resourceId',
-                        bind:{
-                            value:'{record.resourceId}'
-                        },
                         id:'resourceId',
                         renderer: function(id) {
                             var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
@@ -115,36 +112,26 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     },{
                         xtype: 'textfield',
                         name: 'name',
-                        bind:{
-                            bind:'{record.name}'
-                        },
                         tooltip: me.strings.name,
                         fieldLabel: me.strings.name,
                         maxLength: 255,
                         allowBlank: false
                     },Ext.applyIf({
                         name: 'sourceLang',
-                        bind: {
-                            value: '{record.sourceLang}'
-                        },
                         tooltip: me.strings.source,
                         fieldLabel: me.strings.source
                     }, langField),Ext.applyIf({
                         name: 'targetLang',
-                        bind:{
-                            value:'{record.targetLang}'
-                        },
                         tooltip: me.strings.target,
                         fieldLabel: me.strings.target
                     }, langField),{
                         xtype:'customers',
-                        name:'customerIds[]',
+                        name:'customerIds',
                         itemId:'resourcesCustomers',
                         dataIndex:'customerIds',
                         reference:'resourcesCustomers',
                         publishes: 'value',
                         bind:{
-                            value:'{record.customerIds}',
                             store:'{customers}'
                         },
                         listeners:{
@@ -154,13 +141,12 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         allowBlank: false
                     },{
                         xtype:'tagfield',
-                        name:'customerUseAsDefaultIds[]',
+                        name:'customerUseAsDefaultIds',
                         itemId:'useAsDefault',
                         dataIndex:'customerUseAsDefaultIds',
                         reference:'useAsDefault',
                         publishes: 'value',
                         bind:{
-                            value:'{record.customerUseAsDefaultIds}',
                             store:'{customersDefaultRead}'
                         },
                         listeners:{
@@ -172,17 +158,13 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         fieldLabel:me.strings.useAsDefault
                     },{
                         xtype:'tagfield',
-                        name:'customerWriteAsDefaultIds[]',
+                        name:'customerWriteAsDefaultIds',
                         itemId:'writeAsDefault',
                         dataIndex:'customerWriteAsDefaultIds',
                         bind:{
-                            value:'{record.customerWriteAsDefaultIds}',
                             store:'{customersDefaultWrite}',
                             hidden:'{!isTmResourceType}',
                             disabled:'{!isTmResourceType}'
-                        },
-                        listeners:{
-                            change:'onCustomersWriteTagFieldChange'
                         },
                         fieldLabel:me.strings.writeAsDefault,
                         displayField: 'name',
@@ -191,9 +173,6 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     },{
                         xtype: 'colorfield',
                         name: 'color',
-                        bind: {
-                            value:'{record.color}'
-                        },
                         fieldLabel: me.strings.color,
                         toolTip: me.strings.colorTooltip,
                         labelWidth: 160,
@@ -204,9 +183,6 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         // after the LanguageResource has been created)
                         xtype: 'displayfield',
                         name:'categories',
-                        bind:{
-                            value:'{record.categories}'
-                        },
                         id:'categories',
                         renderer: function(value) {
                             if(!value){
@@ -259,10 +235,8 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         var me=this,
             vm=me.getViewModel();
 
-        //me.down('form').loadRecord(record);
-        vm.set('record',record.dirty);
+        me.down('form').loadRecord(record);
         vm.set('serviceName',record.get('serviceName'));
         vm.set('resourceType',record.get('resourceType'));
-        console.log(record);
     }
 });
