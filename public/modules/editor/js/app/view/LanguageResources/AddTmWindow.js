@@ -62,7 +62,9 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         writeAsDefault:'#UT#Schreibrechte standardmäßig',
         mergeTerms:'#UT#Termeinträge verschmelzen',
         collection:'#UT#TBX-Datei',
-        importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!'
+        importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
+        useAsDefaultTooltip:'#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert',
+        writeAsDefaultTooltip:'#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden'
     },
     height : 500,
     width : 500,
@@ -179,7 +181,12 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     queryMode: 'local',
                     displayField: 'name',
                     valueField: 'id',
-                    fieldLabel:me.strings.useAsDefault
+                    fieldLabel:me.strings.useAsDefault,
+                    labelClsExtra:'lableInfoIcon',
+                    autoEl: {
+                        tag: 'div',
+                        'data-qtip': me.strings.useAsDefaultTooltip
+                    }
                 },{
                     xtype:'tagfield',
                     name:'customerWriteAsDefaultIds[]',
@@ -190,10 +197,15 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                         hidden:'{!isTmResourceType}',
                         disabled:'{!isTmResourceType}'
                     },
-                    fieldLabel:me.strings.writeAsDefault,
                     displayField: 'name',
                     valueField: 'id',
-                    queryMode: 'local'
+                    queryMode: 'local',
+                    fieldLabel:me.strings.writeAsDefault,
+                    labelClsExtra:'lableInfoIcon',
+                    autoEl: {
+                        tag: 'div',
+                        'data-qtip': me.strings.writeAsDefaultTooltip
+                    }
                 },{
                     xtype: 'hiddenfield',
                     name: 'serviceType',
