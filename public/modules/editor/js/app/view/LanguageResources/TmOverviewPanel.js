@@ -73,7 +73,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             novalidlicense: '#UT#Keine gültige Lizenz.'
         },
         customers:'#UT#Kunden',
-        useAsDefault:'#UT#Standardmässig aktiv für',
+        useAsDefault:'#UT#Leserechte standardmäßig',
+        writeAsDefault:'#UT#Schreibrechte standardmäßig',
         taskassocgridcell:'#UT#Zugewiesene Aufgaben',
         groupHeader: '#UT#Ressource: {name}'
     },
@@ -132,7 +133,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     width: 390,
                     dataIndex: 'name',
                     filter: {
-                        type: 'string',
+                        type: 'string'
                     },
                     text: me.strings.name
                 },{
@@ -143,14 +144,14 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         action: 'edit',
                         iconCls: 'ico-tm-edit',
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            return record.get('status') == 'novalidlicense' ? true : false;
+                            return record.get('status') === 'novalidlicense' ? true : false;
                         }
                     },{
                         tooltip: me.strings.erase,
                         action: 'delete',
                         iconCls: 'ico-tm-delete',
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            return record.get('status') == 'novalidlicense' ? true : false;
+                            return record.get('status') === 'novalidlicense' ? true : false;
                         }
                     },{
                         tooltip: me.strings.tasks,
@@ -165,7 +166,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 	                    getClass:function(v,meta,record) {
                         	return Editor.util.LanguageResources.getService(record.get('serviceName')).getImportIconClass(record);
                         },
-	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
+	                    getTip:function(view,metadata,r){
                             return Editor.util.LanguageResources.getService(r.get('serviceName')).getAddTooltip(r);
 	                    }
                         
@@ -174,7 +175,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         getClass:function(v,meta,record) {
                         	return Editor.util.LanguageResources.getService(record.get('serviceName')).getDownloadIconClass(record);
                         },
-	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
+	                    getTip:function(view,metadata,r){
 	                    	return Editor.util.LanguageResources.getService(r.get('serviceName')).getDownloadTooltip(r);
 	                    }
                     },{
@@ -182,19 +183,19 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         getClass:function(v,meta,record) {
                         	return Editor.util.LanguageResources.getService(record.get('serviceName')).getExportIconClass();
                         },
-	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
+	                    getTip:function(view,metadata,r){
 	                    	return Editor.util.LanguageResources.getService(r.get('serviceName')).getExportTooltip();
 	                    }
                     },{
                         tooltip: me.strings.log,
                         action: 'log',
-                        getTip:function(view,metadata,record,rowIndex,colIndex,store){
+                        getTip:function(view,metadata,record){
                         	return Editor.util.LanguageResources.getService(record.get('serviceName')).getLogTooltip(record);
 	                    },
-	                    getClass:function(view,metadata,record,rowIndex,colIndex,store){
+	                    getClass:function(view,metadata,record){
 	                    	return Editor.util.LanguageResources.getService(record.get('serviceName')).getLogIconClass(record);
 	                    }
-                    }],
+                    }]
                 },{
                     xtype: 'gridcolumn',
                     width: 100,
@@ -233,6 +234,17 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     },
                     text:me.strings.useAsDefault,
                     tooltip:me.strings.useAsDefault,
+                    renderer:me.defaultCustomersRenderer
+                },
+                {
+                    xtype: 'gridcolumn',
+                    width: 270,
+                    dataIndex:'customerWriteAsDefaultIds',
+                    filter: {
+                        type: 'string'
+                    },
+                    text:me.strings.writeAsDefault,
+                    tooltip:me.strings.writeAsDefault,
                     renderer:me.defaultCustomersRenderer
                 },
                 {
@@ -284,10 +296,10 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     tdCls: 'taskList',
                     cls: 'taskList',
                     text: me.strings.taskassocgridcell,
-                    renderer: function(v, meta, rec){
+                    renderer: function(v, meta){
                         var tasks = [], i;
                         
-                        if(!v || v.length == 0){
+                        if(!v || v.length === 0){
                             tasks.push(this.strings.noTaskAssigned);
                         }
                         else {
@@ -330,8 +342,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         var label=[],
             retval=[];
         for(var i=0;i<val.length;i++){
-            var lang = Ext.StoreMgr.get('admin.Languages').getById(val[i]),
-                label;
+            var lang = Ext.StoreMgr.get('admin.Languages').getById(val[i]);
             if (lang) {
                 label.push(lang.get('label'));
                 retval.push(lang.get('rfc5646'));
@@ -344,7 +355,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     /**
      * Renders assigned customers to the resource by name
      */
-    resourceCustomersRenderer:function(value,meta,record){
+    resourceCustomersRenderer:function(value,meta){
         if(!value || value.length<1){
             return '';
         }
@@ -355,7 +366,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     /**
      * Renders the default assigned customer by name
      */
-    defaultCustomersRenderer:function(value,meta,record){
+    defaultCustomersRenderer:function(value){
         if(!value || value.length<1){
             return '';
         }
@@ -381,29 +392,43 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             }
             if(addCustomerNumber){
                 names.push('['+rec.get('number')+'] '+rec.get('name'));
+            }else{
+                names.push(rec.get('name'));
             }
-            names.push(rec.get('name'));
         });
         return names;
     },
 
     /***
-     * Grid row select handler
+     * TmOverview grid row select handler
+     * @param grid TmOverview grid
+     * @param selected Selected grid record. This record will also be reloaded.
+     * @param callback Callback function called after record reload. On load failure, the record will be with status error.
      */
-    onGridRowSelect:function(grid,selected){
+    onGridRowSelect:function(grid,selected,callback){
         if(selected.length<1){
             return;
         }
         var record = selected[0],
-            status = record.get('status');
-        if(status != record.STATUS_NOTCHECKED){
+            status = record.get('status'),
+            callbackCheck = function(r){
+                if (typeof callback !== 'undefined' && typeof callback === 'function') {
+                    callback(r);
+                }
+            };
+        if(status !== record.STATUS_NOTCHECKED){
+            callbackCheck(record);
             return;
         }
         record.set('status',record.STATUS_LOADING);
         record.load({
-            failure: function(record, operation) {
-                record.set('status',record.STATUS_ERROR);
-           }
+            failure: function(newRecord) {
+                record.set('status',newRecord.STATUS_ERROR);
+                callbackCheck(record);
+            },
+            success:function(loadedRecord){
+                callbackCheck(loadedRecord);
+            }
         });
     }
     

@@ -181,6 +181,7 @@ class DeepLLanguageResourceApiTest extends editor_Test_JsonTest {
         $params['serviceName'] = static::SERVICE_NAME;
         $params['customerIds'] = [$customer->id];
         $params['customerUseAsDefaultIds'] = [];
+        $params['customerWriteAsDefaultIds'] = [];
         
         $this->api()->requestJson('editor/languageresourceinstance', 'POST', [], $params);
         $responseBody = json_decode($this->api()->getLastResponse()->getBody());

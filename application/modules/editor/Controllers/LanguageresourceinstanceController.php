@@ -152,7 +152,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             
             //add customer assocs
             $languageresource['customerIds'] = $this->getCustassoc($custAssoc, 'customerId', $id);
-            $languageresource['customerUseAsDefaultIds'] = $this->getCustassocDefault($custAssoc, 'useAsDefault', $id);
+            $languageresource['customerUseAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'useAsDefault', $id);
+            $languageresource['customerWriteAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'writeAsDefault', $id);
             
             $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
@@ -213,17 +214,19 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
     
     /***
-     * Retrives the useAsDefault customers for the given language resource
+     * Returns customer assoc active flag fields (useAsDefault or writeAsDefault) for given customer assoc data
+     * and give language resource id
+     * 
      * @param array $data
      * @param string $index the datafield to get
      * @param int $id the language resource id
-     * @return array
+     * @return array : filtered customer ids
      */
-    protected function getCustassocDefault(array $data, $index, $id){
+    protected function getCustassocByIndex(array $data, $index, $id){
         if(empty($data[$id])){
             return [];
         }
-        //get the useAsDefault array indexes
+        // get the active flag indexes array indexes
         $default=$this->getCustassoc($data, $index, $id);
         $customerIds=[];
         //get the customer ids for those array indexes
@@ -292,11 +295,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         
         $customerAssocs = $customerAssoc->loadByLanguageResourceId($this->entity->getId());
-        $customerAssocs = array_column($customerAssocs,'useAsDefault','customerId');
+        // all assoc customers with customerId as key and useAsDefault flag as value
+        $useAsDefault = array_column($customerAssocs,'useAsDefault','customerId');
         
-        $this->view->rows->customerIds = array_keys($customerAssocs);
-        $this->view->rows->customerUseAsDefaultIds = array_keys(array_filter($customerAssocs));
+        $this->view->rows->customerIds = array_keys($useAsDefault);
+        // filter out all useAsDefault with value 0
+        $this->view->rows->customerUseAsDefaultIds = array_keys(array_filter($useAsDefault));
         
+        // Filter out writable as default from use as default array. If assoc is writeAsDefault it must be useAsDefault to.
+        $writeAsDefault = array_column($customerAssocs,'writeAsDefault','customerId');
+        $this->view->rows->customerWriteAsDefaultIds = array_keys(array_filter($writeAsDefault));
+
         // categories that are assigned to the resource
         $categoryIds = [];
         $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
@@ -314,17 +323,20 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /***
      * Handle custom filtering in source,target,taskList and customerIds.
      * The filters are extended so thay can filter using string values.
+     * TODO: can this be moved/implemented as assoc fiter ?
      */
     protected function handleFilterCustom(){
         $sourceFilter=null;
         $targetFilter=null;
         $useAsDefault=null;
+        $writeAsDefault=null;
         $taskList=null;
         
         $this->entity->getFilter()->hasFilter('sourceLang',$sourceFilter);
         $this->entity->getFilter()->hasFilter('targetLang',$targetFilter);
         
         $this->entity->getFilter()->hasFilter('customerUseAsDefaultIds',$useAsDefault);
+        $this->entity->getFilter()->hasFilter('customerWriteAsDefaultIds',$writeAsDefault);
         $this->entity->getFilter()->hasFilter('taskList',$taskList);
         
         //search the model for the filter value and set the filter value with the found matches(ids)
@@ -404,10 +416,21 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if(isset($useAsDefault)) {
             if(isset($useAsDefault->value) && is_string($useAsDefault->value)) {
                 $resultList=$searchEntity($useAsDefault->value,'editor_Models_Customer');
-                $handleFilter($useAsDefault,$resultList,'editor_Models_LanguageResources_CustomerAssoc','loadByCustomerIdsDefault','languageResourceId');
+                $handleFilter($useAsDefault,$resultList,'editor_Models_LanguageResources_CustomerAssoc','loadByCustomerIdsUseAsDefault','languageResourceId');
             }
             else {
                 $this->entity->getFilter()->deleteFilter('customerUseAsDefaultIds');
+            }
+        }
+
+        //check if filtering for writeAsDefault should be done
+        if(isset($writeAsDefault)) {
+            if(isset($writeAsDefault->value) && is_string($writeAsDefault->value)) {
+                $resultList=$searchEntity($writeAsDefault->value,'editor_Models_Customer');
+                $handleFilter($writeAsDefault,$resultList,'editor_Models_LanguageResources_CustomerAssoc','loadByCustomerIdsWriteAsDefault','languageResourceId');
+            }
+            else {
+                $this->entity->getFilter()->deleteFilter('customerWriteAsDefaultIds');
             }
         }
         
@@ -538,7 +561,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function postAction(){
         $this->entity->init();
         $this->data = $this->getAllParams(); //since its a fileupload, this is a normal POST
-        $this->convertAndWarnOldData();
         $this->setDataInEntity($this->postBlacklist);
         $this->entity->createLangResUuid();
         
@@ -575,12 +597,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->data['id']=$this->entity->save();
         settype($this->data['customerIds'], 'array');
         settype($this->data['customerUseAsDefaultIds'], 'array');
+        settype($this->data['customerWriteAsDefaultIds'], 'array');
 
         //check and save customer assoc db entry
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         try {
-            $customerAssoc->saveAssocRequest($this->entity->getId(), $this->data['customerIds'], $this->data['customerUseAsDefaultIds']);
+            $customerAssoc->saveAssocRequest(
+                $this->entity->getId(), 
+                $this->data['customerIds'], 
+                $this->data['customerUseAsDefaultIds'],
+                $this->data['customerWriteAsDefaultIds']);
         }
         catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             $this->entity->delete();
@@ -627,49 +654,20 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     
     public function putAction() {
         $this->decodePutData();
-        $this->convertAndWarnOldData();
         parent::putAction();
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         settype($this->data->customerIds, 'array');
         settype($this->data->customerUseAsDefaultIds, 'array');
-        $customerAssoc->updateAssocRequest($this->entity->getId(), $this->data->customerIds, $this->data->customerUseAsDefaultIds);
+        settype($this->data->customerWriteAsDefaultIds, 'array');
+        $customerAssoc->updateAssocRequest(
+            $this->entity->getId(), 
+            $this->data->customerIds, 
+            $this->data->customerUseAsDefaultIds,
+            $this->data->customerWriteAsDefaultIds);
         $this->addAssocData();
     }
 
-    /**
-     * API changed in a more usable manner
-     * @deprecated TODO: 30.4.2020 remove this function after all customers adopt there api calls
-     * @see Editor_TaskuserassocController::setLegacyDeadlineDate
-     */
-    protected function convertAndWarnOldData() {
-        $oldCustomers = false;
-        if(is_array($this->data) && isset($this->data['resourcesCustomersHidden'])){
-            $oldCustomers = $this->data['resourcesCustomersHidden'];
-        }
-        if(is_object($this->data) && isset($this->data->resourcesCustomersHidden)){
-            $oldCustomers = $this->data->resourcesCustomersHidden;
-        }
-        $oldCustomers = json_decode($oldCustomers);
-        if(empty($oldCustomers)){
-            return;
-        }
-        
-        $customerIds = array_column($oldCustomers, 'customerId');
-        $useAsDefault = array_keys(array_filter(array_column($oldCustomers, 'useAsDefault', 'customerId')));
-        
-        if(is_array($this->data)) {
-            $this->data['customerIds'] = $customerIds;
-            $this->data['customerUseAsDefaultIds'] = $useAsDefault;
-        }
-        else {
-            $this->data->customerIds = $customerIds;
-            $this->data->customerUseAsDefaultIds = $useAsDefault;
-        }
-        
-        $this->log->warn('E9999','The resourcesCustomersHidden field is deprecated! See https://confluence.translate5.net/display/TAD/LanguageResources%3A+Instance');
-    }
-    
     /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
@@ -680,7 +678,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
     
     /**
-     * Imports an additional file which is transfered to the desired languageResource
+     * Imports an additional file which is transferred to the desired languageResource
      */
     public function importAction(){
         $this->getAction();
