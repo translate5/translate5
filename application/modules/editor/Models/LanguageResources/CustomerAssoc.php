@@ -70,7 +70,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         $useAsDefault = array_intersect($useAsDefault, $customers);
 
         // ensure that only writeAsDefault customers are used, which are added also as useAsDefault(read as default)
-        $writeAsDefault = array_intersect($writeAsDefault, $customers);
+        $writeAsDefault = array_intersect($writeAsDefault, $useAsDefault);
         
         $this->addAssocs($id, $customers, $useAsDefault,$writeAsDefault);
     }
@@ -83,7 +83,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * @param array $writeAsDefault
      */
     public function updateAssocRequest(int $id, array $customers, array $useAsDefault, array $writeAsDefault){
-        // remove old assocs for the curen languageResourceId
+        // remove old assocs for the current languageResourceId
         $this->db->delete(['languageResourceId IN (?)' => $id]);
         
         // save the new data

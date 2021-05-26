@@ -36,8 +36,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
     data: {
         serviceName: false,
         resourceType: false,
-        uploadLabel:null,
-        record:false
+        uploadLabel:null
     },
     stores: {
         customers: {
@@ -66,13 +65,13 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
     },
     formulas: {
         isSdlResource: function(get){
-            return get('serviceName') == Editor.model.LanguageResources.Resource.SDL_SERVICE_NAME;
+            return get('serviceName') === Editor.model.LanguageResources.Resource.SDL_SERVICE_NAME;
         },
         isTermCollectionResource:function(get){
-            return get('serviceName') == Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
+            return get('serviceName') === Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
         },
         isTmResourceType:function(get){
-            return get('resourceType') == Editor.util.LanguageResources.resourceType.TM;
+            return get('resourceType') === Editor.util.LanguageResources.resourceType.TM;
         }
     }
 });
