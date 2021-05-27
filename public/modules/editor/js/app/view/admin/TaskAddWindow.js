@@ -310,6 +310,10 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
 
                         disableCancelButton:function(get){
                             return false;
+                        },
+
+                        disableImportDefaults:function(get){
+                            return false;
                         }
                     }
                 ],
@@ -341,6 +345,15 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         visible:'{!disableSkipButton}'
                     },
                     text : me.strings.btnSkip
+                },{
+                    xtype : 'button',
+                    glyph: 'f560@FontAwesome5FreeSolid',
+                    itemId : 'importdefaults-wizard-btn',
+                    bind:{
+                        disabled:'{disableImportDefaults}',
+                        visible:'{!disableImportDefaults}'
+                    },
+                    text : 'Import defaults'
                 },{
                     xtype : 'button',
                     glyph: 'f00c@FontAwesome5FreeSolid',
