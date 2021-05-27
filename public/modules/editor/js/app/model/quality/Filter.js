@@ -52,13 +52,16 @@ Ext.define('Editor.model.quality.Filter', {
     isRubric: function(){
         return (this.get('qcategory') == '' && this.get('qtype') != 'root');
     },
+    isCategory: function(){
+        return (this.get('qcategory') != '' && this.get('qtype') != 'root');
+    },
     isEmptyQuality: function(){
         return (this.get('qcategory') != '' && this.get('qtype') != 'root' && this.get('qcount') == 0);
     },
     isEmptyRubric: function(){
         return (this.isRubric() && this.get('qtotal') == 0);
     },
-    isEmpty(){
+    isEmpty: function(){
         if(this.get('qtype') == 'root' || this.get('qcategory') == ''){
             return (this.get('qtotal') == 0);
         }
@@ -125,5 +128,36 @@ Ext.define('Editor.model.quality.Filter', {
             }
         }
         return true;
+    },
+    /**
+     * Retrieves all children that are collapsed recursively
+     * Collapsed nodes will not be investigated recursively
+     */
+    getCollapsedChildren: function(){
+        var list = [];
+        this.addCollapsedChildren(list);
+        return list;
+    },
+    /**
+     * Adds all children that are collapsed recursively
+     */
+    addCollapsedChildren: function(list){
+        for(var i=0; i < this.childNodes.length; i++){
+            // only expanded nodes need to be investigated recursively
+            if(this.childNodes[i].isExpanded()){
+                this.childNodes[i].addCollapsedChildren(list);
+            } else {
+                list.push(this.childNodes[i]);
+            }
+        }
+    },
+    /**
+     * Returns the Key that will be used to identify a quality filter with a request
+     */
+    getTypeCatKey(){
+        if(this.get('qcategory') == ''){
+            return this.get('qtype');
+        }
+        return this.get('qtype') + ':' + this.get('qcategory');
     }
 });

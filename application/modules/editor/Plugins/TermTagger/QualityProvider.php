@@ -138,8 +138,8 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
                 return $translate->_('Nicht definiert in zielsprachl. Terminologie');
                 
             case editor_Models_Term::STAT_SUPERSEDED:
-            case editor_Models_Term::STAT_DEPRECATED:                
-                return $translate->_('Verboten in Ziel');
+            case editor_Models_Term::STAT_DEPRECATED:
+                return $translate->_('Verboten in Quelle');
         }
         return NULL;
     }

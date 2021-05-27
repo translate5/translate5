@@ -26,4 +26,4 @@
 -- */
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
-('runtimeOptions.termTagger.enableAutoQA', 1, 'editor', 'system', '1', '1', '', 'boolean', 'If activated (default), AutoQA covers superseeded and deprecated terms, terms with not found or not defined target translation', 8, 'TermTagger: Enable AutoQA', 'Editor: QA', '');
+('runtimeOptions.termTagger.enableAutoQA', 1, 'editor', 'system', '1', '1', '', 'boolean', 'If activated (default), AutoQA covers superseeded and deprecated terms, terms with not found or not defined target translation', 8, 'Terminology check', 'Editor: QA', '');

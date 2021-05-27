@@ -158,6 +158,9 @@ Ext.define('Editor.view.quality.FilterPanel', {
         this.down('#analysisToolbar').setHidden(this.reAnalysisHidden);
         this.reAnalysisHidden = true; // reset for the next load
     },
+    /**
+     * Unchecks all Qualities
+     */
     uncheckAll: function(){
         this.getController().uncheckAll();
     }

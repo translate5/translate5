@@ -29,7 +29,8 @@ END LICENSE AND COPYRIGHT
 /**
  * Decodes the filter qualities sent by request
  * This is used for the qualities itself as well as the segment grid filter
- * The state is sent as a single string with the following "encoding": $quality_type1:$quality_category1,$quality_type2,$quality_type3:$quality_category3,...|$filter_mode
+ * The state is sent as a single string with the following "encoding": $quality_type1:$quality_category1,$quality_type2,$quality_type3:$quality_category3,...|$filter_mode|$quality_type1:$quality_category1,$quality_type2,$quality_type3:$quality_category3,...
+ * These 3 parts represent 0: the checked filters, 1: the current filter mode, 2: the collapsed filters
  * NOTE: the user-restriction is not related to the Request obviously since it is session based but it is needed everywhere the other filters are needed ...
  */
 class editor_Models_Quality_RequestState {
@@ -40,10 +41,15 @@ class editor_Models_Quality_RequestState {
      */
     private $mode;
     /**
-     * Represents the sent qualities list
+     * Represents the sent checked qualities list
      * @var string
      */
     private $checked;
+    /**
+     * Representsa the sent collapsed qualities list
+     * @var string
+     */
+    private $collapsed;
     /**
      * Represents the transformed list of qualities
      * @var string
@@ -57,14 +63,10 @@ class editor_Models_Quality_RequestState {
    
     public function __construct(string $requestValue=NULL){
         if($requestValue != NULL && strpos($requestValue, '|') !== false){
-            list($this->checked, $this->mode) = explode('|', $requestValue);
-            if(empty($this->mode)){
-                $this->mode = editor_Models_Quality_AbstractView::FILTER_MODE_DEFAULT;
-            }
-            // filter various unwanted states of the checked qualities out
-            if(empty($this->checked) || $this->checked == 'NONE'|| $this->checked == 'root'){
-                $this->checked = '';
-            }
+            $parts = explode('|', $requestValue);
+            $this->checked = (count($parts) < 1 || empty($parts[0]) || $parts[0] == 'NONE' || $parts[0] == 'root') ? '' : $parts[0];
+            $this->mode = (count($parts) < 2 || empty($parts[1])) ? editor_Models_Quality_AbstractView::FILTER_MODE_DEFAULT : $parts[1];
+            $this->collapsed = (count($parts) < 3 || empty($parts[2]) || $parts[2] == 'NONE') ? '' : $parts[2];
         }
         //  our user restriction, depends on if the user is a normal editor or pm/admin
         if(!editor_User::instance()->isA([ ACL_ROLE_PM, ACL_ROLE_ADMIN ])){
@@ -106,6 +108,20 @@ class editor_Models_Quality_RequestState {
         $list = [];
         if($this->checked != ''){
             foreach(explode(',', $this->checked) as $typeCat){
+                $list[$typeCat] = true;
+            }
+        }
+        return $list;
+    }
+    /**
+     * Retrieves a flat hashtable of collapsed qualities
+     * Structure like [ 'mqm' => true, 'mqm:mqm_1' => true, 'term' => true, 'term:termSuperseded' => true, ....  ]
+     * @return array
+     */
+    public function getCollapsedList() : array {
+        $list = [];
+        if($this->collapsed != ''){
+            foreach(explode(',', $this->collapsed) as $typeCat){
                 $list[$typeCat] = true;
             }
         }

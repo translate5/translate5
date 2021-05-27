@@ -92,3 +92,6 @@ WHERE name = 'runtimeOptions.editor.enableQmSubSegments';
 
 UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.autoQA.enableQm', `description` = 'If activated (default), the quality management for whole segments is active', `guiName` = 'Enable segment QM in the quality management', `level` = 8 
 WHERE name = 'runtimeOptions.segments.showQM';
+
+UPDATE `Zf_configuration` SET `guiName` = 'Terminology check: Check read-only segments' 
+WHERE `name` = 'runtimeOptions.termTagger.tagReadonlySegments';

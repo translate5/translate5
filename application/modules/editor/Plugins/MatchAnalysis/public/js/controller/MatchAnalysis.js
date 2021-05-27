@@ -85,7 +85,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         pretranslateTmAndTermTooltip:'#UT#Treffer aus der Terminologie werden bevorzugt vorübersetzt.',
         pretranslateMt:'#UT#Vorübersetzen (MT)',
         pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt',
-        termtaggerSegment:'#UT#Terminologie prüfen und markieren',
         analysisLoadingMsg:'#UT#Analyse läuft'
     },
     
@@ -297,19 +296,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                     'data-qtip': me.strings.pretranslateMtTooltip
                 },
                 itemId:'pretranslateMt',
-            },{
-                xtype:'checkbox',
-                bind:{
-                    disabled:'{!hasTermcollection}'
-                },
-                value: 1,
-                cls:'lableInfoIcon',
-                boxLabel:me.strings.termtaggerSegment,
-                autoEl: {
-                    tag: 'div',
-                    'data-qtip': me.strings.termtaggerSegment
-                },
-                itemId:'termtaggerSegment',
             }]
         }]);
     },
@@ -388,7 +374,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 pretranslateMatchrate: me.getComponentByItemId('cbMinMatchrate').getValue(),
                 pretranslateTmAndTerm: me.isCheckboxChecked('pretranslateTmAndTerm'),
                 pretranslateMt: me.isCheckboxChecked('pretranslateMt'),
-                termtaggerSegment: me.isCheckboxChecked('termtaggerSegment'),
                 isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0,
                 batchQuery:me.isCheckboxChecked('batchQuery')
             },

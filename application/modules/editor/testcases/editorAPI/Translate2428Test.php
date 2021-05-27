@@ -144,7 +144,6 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
         $params['pretranslateMatchrate']= 100;
         $params['pretranslateTmAndTerm']= 1;
         $params['pretranslateMt']= 1;
-        $params['termtaggerSegment']= 0;
         $params['isTaskImport']= 0;
         self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', 'PUT', $params,$params);
         error_log("Queue pretranslation and analysis.");
