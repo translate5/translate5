@@ -45,9 +45,9 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @var string
      */
     const REGEX_INTERNAL_TAGS = '#<div\s*class="(open|close|single)\s+([gxA-Fa-f0-9]*)[^"]*"\s*.*?(?!</div>)<span[^>]*data-originalid="([^"]*).*?(?!</div>).</div>#s';
-    const REGEX_STARTTAG = '#^<div class="open.+class="short">&lt;([0-9]+)&gt;</span>.+</div>$#';
-    const REGEX_ENDTAG = '#^<div class="close.+class="short">&lt;/([0-9]+)&gt;</span>.+</div>$#';
-    const REGEX_SINGLETAG = '#^<div class="single.+class="short">&lt;([0-9]+)/&gt;</span>.+</div>$#';
+    const REGEX_STARTTAG = '#^<div class="open.+class="short"[^>]*>&lt;([0-9]+)&gt;</span>.+</div>$#';
+    const REGEX_ENDTAG = '#^<div class="close.+class="short"[^>]*>&lt;/([0-9]+)&gt;</span>.+</div>$#';
+    const REGEX_SINGLETAG = '#^<div class="single.+class="short"[^>]*>&lt;([0-9]+)/&gt;</span>.+</div>$#';
     
     /***
      * Internal tag placeholder template
