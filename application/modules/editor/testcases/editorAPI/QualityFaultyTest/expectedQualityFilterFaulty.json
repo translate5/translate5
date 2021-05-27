@@ -17,7 +17,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "2327",
+                    "qid": "5872",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -28,7 +28,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "2326",
+                    "qid": "5871",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -43,7 +43,7 @@
                     "qtype": "internal",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "whitespace_tags_added",
                     "text": "Whitespace has been added",
                     "leaf": true,
                     "checked": false
@@ -53,13 +53,13 @@
                     "qtype": "internal",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "whitespace_tags_missing",
                     "text": "Whitespace has been removed",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "2325",
+                    "qid": "5870",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -88,7 +88,7 @@
                     "qtype": "qm",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "qm_1",
                     "text": "Demo QM error 1",
                     "leaf": true,
                     "checked": false
@@ -98,7 +98,7 @@
                     "qtype": "qm",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "qm_2",
                     "text": "Mistranslation",
                     "leaf": true,
                     "checked": false
@@ -108,7 +108,7 @@
                     "qtype": "qm",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "qm_3",
                     "text": "Terminology problem",
                     "leaf": true,
                     "checked": false
@@ -118,7 +118,7 @@
                     "qtype": "qm",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "qm_4",
                     "text": "Fluency issue",
                     "leaf": true,
                     "checked": false
@@ -128,7 +128,7 @@
                     "qtype": "qm",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "qm_5",
                     "text": "Inconsistency",
                     "leaf": true,
                     "checked": false
@@ -422,7 +422,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "2320",
+                    "qid": "5865",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
@@ -433,7 +433,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "2314",
+                    "qid": "5859",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -444,13 +444,13 @@
                     "checked": false
                 },
                 {
-                    "qid": "2318",
+                    "qid": "5863",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
                     "qcategory": "supersededTerm",
                     "qcatidx": "-1",
-                    "text": "Forbidden in target",
+                    "text": "Forbidden in source",
                     "leaf": true,
                     "checked": false
                 },
@@ -459,8 +459,8 @@
                     "qtype": "term",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
-                    "text": "Forbidden in target",
+                    "qcategory": "deprecatedTerm",
+                    "text": "Forbidden in source",
                     "leaf": true,
                     "checked": false
                 }
@@ -482,7 +482,7 @@
                     "qtype": "matchrate",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "unedited_fuzzy_match",
                     "text": "Unedited fuzzy match",
                     "leaf": true,
                     "checked": false
@@ -492,7 +492,7 @@
                     "qtype": "matchrate",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "edited_100percent_match",
                     "text": "Edited 100% match",
                     "leaf": true,
                     "checked": false

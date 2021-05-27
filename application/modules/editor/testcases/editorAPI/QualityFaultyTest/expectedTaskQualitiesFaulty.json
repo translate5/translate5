@@ -1,5 +1,5 @@
 {
-    "text": "{028817b8-9d48-4e92-b6b2-e076310d9c09}",
+    "text": "{110ad3ea-9209-4418-9d03-b5e001b92852}",
     "children": [
         {
             "qid": -1,
@@ -8,7 +8,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "2325",
+                    "qid": "5870",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -20,7 +20,7 @@
                     "qfaulty": true
                 },
                 {
-                    "qid": "2326",
+                    "qid": "5871",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -31,7 +31,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "2327",
+                    "qid": "5872",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -77,7 +77,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "2314",
+                    "qid": "5859",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -88,18 +88,18 @@
                     "leaf": true
                 },
                 {
-                    "qid": "2318",
+                    "qid": "5863",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
                     "qcategory": "supersededTerm",
                     "qcatidx": "-1",
                     "qcountfp": 0,
-                    "text": "Forbidden in target",
+                    "text": "Forbidden in source",
                     "leaf": true
                 },
                 {
-                    "qid": "2320",
+                    "qid": "5865",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
