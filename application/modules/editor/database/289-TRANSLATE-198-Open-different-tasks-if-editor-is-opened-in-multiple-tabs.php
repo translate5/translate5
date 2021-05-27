@@ -39,6 +39,9 @@ set_time_limit(0);
 // and must not be a constant since in installation the same named constant would we defined multiple times then
 $SCRIPT_IDENTIFIER = '289-TRANSLATE-198-Open-different-tasks-if-editor-is-opened-in-multiple-tabs.php';
 
+// this is workaround just to be able to use the system user when we check the workflow bellow.
+defined('ZFEXTENDED_IS_WORKER_THREAD') || define('ZFEXTENDED_IS_WORKER_THREAD', true);
+
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
 /**

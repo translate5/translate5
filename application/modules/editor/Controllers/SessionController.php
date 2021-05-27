@@ -63,8 +63,11 @@ class editor_SessionController extends ZfExtended_SessionController {
         $userModel->setUserSessionNamespaceWithoutPwCheck($login);
 
         $userSession = new Zend_Session_Namespace('user');
+        
+        $session = ZfExtended_Factory::get('ZfExtended_Session');
+        /* @var $session ZfExtended_Session */
         // remove the old session (if exist) for the impersonated user
-        ZfExtended_Session::cleanForUser($userSession->data->id);
+        $session->cleanForUser($userSession->data->id);
     }
     
     public function postAction() {
@@ -161,8 +164,10 @@ class editor_SessionController extends ZfExtended_SessionController {
 
         $userSession = new Zend_Session_Namespace('user');
 
+        $session = ZfExtended_Factory::get('ZfExtended_Session');
+        /* @var $session ZfExtended_Session */
         // remove the old session (if exist) for the auth-hash user
-        ZfExtended_Session::cleanForUser($userSession->data->id);
+        $session->cleanForUser($userSession->data->id);
 
         ZfExtended_Models_LoginLog::addSuccess($user, "authhash");
         

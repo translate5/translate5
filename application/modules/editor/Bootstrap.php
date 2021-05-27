@@ -74,6 +74,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', $cleanUp);
         $eventManager->attach('LoginController', 'afterLogoutAction', $cleanUp);
         $eventManager->attach('editor_SessionController', 'afterDeleteAction', $cleanUp);
+        $eventManager->attach('ZfExtended_Session', 'afterSessionCleanForUser', $cleanUp);
         $eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
     }
     
