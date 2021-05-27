@@ -260,6 +260,103 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         return $data;
     }
 
+    public function searchTermByParams(array $params = [], &$total = null) {
+        if (!$params)
+        $params = [
+            'query' => 'bi*',
+            'language' => '5,251,252,367,368,369,370,371,372,373,374,375,376,377',
+            'collectionIds' => '8,10,11,12',
+            'processStatus' => 'provisionallyProcessed,rejected,finalized,unprocessed',
+            'noTermDefinedFor' => '4',
+            'limit' => '25,0'
+        ];
+
+        // If wildcards are used, convert them to the mysql syntax
+        $keyword = str_replace(['*', '?'], ['%', '_'], $params['query']);
+
+        // If we're not going to count $total - it means we're in autocomplete mode
+        if ($total === false) $keyword .= '%';
+
+        // Flag, indicating whether or not current user is allowed to propose terms
+        $isProposer = ZfExtended_Factory::get('ZfExtended_Models_User')->hasRole('termProposer');
+
+        // If current user has no 'termProposer' role - remove 'unprocessed'
+        // from the values list of 'processStatus' filter, so that proposals
+        // will be excluded from search results. Note that $params['processStatus']
+        // is still kept here as comma-separated list, as it's the format
+        // this param initially arrived in as an item within $params argument
+        if (!$isProposer)
+            $params['processStatus']
+                = implode(',', array_diff(ar($params['processStatus']), [self::PROCESS_STATUS_UNPROCESSED]));
+
+        // Basic term-query WHERE clause
+        $termWHERE = [
+            'LOWER(`t`.`term`) LIKE LOWER(?) COLLATE utf8mb4_bin',
+            '`t`.`languageId` IN (' . $params['language'] . ')',
+            '`t`.`collectionId` IN (' . $params['collectionIds'] . ')',
+            '`t`.`processStatus` IN ("' . str_replace(',', '","', $params['processStatus']) . '")',
+        ];
+
+        // If 'noTermDefinedFor' param is given
+        if ($_ = $params['noTermDefinedFor']) {
+
+            // Respect it in FROM clause
+            $noTermDefinedFor = sprintf(' LEFT JOIN `terms_term` AS `t2` ON (
+                `t`.`termEntryId` = `t2`.`termEntryId` AND `t2`.`languageId` = "%s"
+            )', $_);
+
+            // Respect it in WHERE clause
+            $termWHERE  []= 'ISNULL(`t2`.`term`)';
+        }
+
+        // Data columns, that would be fetched by search SQL query
+        $termQueryCol = '
+          `t`.`term` AS `label`, 
+          `t`.`id` AS `value`, 
+          `t`.`id`, 
+          `t`.`term` AS `desc`, 
+          `t`.`processStatus`, 
+          `t`.`status`, 
+          `t`.`definition`, 
+          `t`.`termEntryTbxId`, 
+          `t`.`collectionId`, 
+          `t`.`termEntryId`, 
+          `t`.`languageId` 
+        ';
+
+        // Term query template
+        $termQueryTpl = '
+            SELECT %s 
+            FROM `terms_term` `t` %s
+            WHERE ' . implode(' AND ', $termWHERE) . '
+            ORDER BY `t`.`term` ASC
+        ';
+
+        // Assume limit arg can be comma-separated string containing '<LIMIT>,<OFFSET>'
+        if ($params['limit']) list($limit, $offset) = explode(',', $params['limit']);
+
+        // If we should only search within terms-table (e.g. proposals-table won't be involved)
+        if (true || !$isProposer || !in_array(self::PROCESS_STATUS_UNPROCESSED, $params['processStatus'])) {
+
+            // If we have to calculate total
+            if ($total === true) {
+
+                // Render query for getting total count of results
+                $termQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor);
+
+                // Setup &$total variable by reference
+                $total = (int) db()->query($termQuery, $keyword)->fetchColumn();
+            }
+
+            // Render query for getting regular results
+            $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor)
+                . 'LIMIT ' . (int) $offset . ',' . (int) $limit;
+
+            // Return results
+            return db()->query($termQuery, $keyword)->fetchAll();
+        }
+    }
+
     /**
      * Search terms in the term collection with the given search string and languages.
      * @param string $queryString
