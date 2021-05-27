@@ -148,7 +148,6 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         settype($params['pretranslateMatchrate'], 'integer');
         settype($params['pretranslateTmAndTerm'], 'boolean');
         settype($params['pretranslateMt'], 'boolean');
-        settype($params['termtaggerSegment'], 'boolean');
         settype($params['isTaskImport'], 'boolean');
         
         $params['pretranslate'] = $pretranslate;

@@ -753,4 +753,17 @@ class editor_Segment_FieldTags implements JsonSerializable {
             }
         }
     }
+    /**
+     * Debug output
+     * @return string
+     */
+    public function debug($asMarkup=false){
+        $processor = ($asMarkup) ? 'htmlspecialchars' : 'trim';
+        $newline = ($asMarkup) ? '<br/>' : "\n";
+        $debug = 'FIELD TEXT: '.$newline.$processor($this->fieldText).$newline;
+          for($i=0; $i < count($this->tags); $i++){
+              $debug .= $newline.'TAG '.$i.':'.$newline.$processor($this->tags[$i]->debug($asMarkup)).$newline;
+        }
+        return $debug;
+    }
 }

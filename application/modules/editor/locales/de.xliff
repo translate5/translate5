@@ -1495,7 +1495,6 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='VHJlZmZlciBhdXMgZGVyIFRlcm1pbm9sb2dpZSB3ZXJkZW4gYmV2b3J6dWd0IHZvcsO8YmVyc2V0enQu'><source>Treffer aus der Terminologie werden bevorzugt vorübersetzt.</source><target>Treffer aus der Terminologie werden bevorzugt vorübersetzt.</target></trans-unit>
 <trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKE1UKQ=='><source>Vorübersetzen (MT)</source><target>Vorübersetzen (MT)</target></trans-unit>
 <trans-unit id='VHJlZmZlciBhdXMgZGVtIFRNIHdlcmRlbiBiZXZvcnp1Z3Qgdm9yw7xiZXJzZXR6dA=='><source>Treffer aus dem TM werden bevorzugt vorübersetzt</source><target>Treffer aus dem TM werden bevorzugt vorübersetzt</target></trans-unit>
-<trans-unit id='VGVybWlub2xvZ2llIHByw7xmZW4gdW5kIG1hcmtpZXJlbg=='><source>Terminologie prüfen und markieren</source><target>Terminologie prüfen und markieren</target></trans-unit>
 <trans-unit id='QW5hbHlzZSBsw6R1ZnQ='><source>Analyse läuft</source><target>Analyse läuft</target></trans-unit>
 <trans-unit id='S2VpbmUgVHJlZmZlcg=='><source>Keine Treffer</source><target>Keine Treffer</target></trans-unit>
 <trans-unit id='R2VzYW10emFobCBkZXIgV8O2cnRlcg=='><source>Gesamtzahl der Wörter</source><target>Gesamtzahl der Wörter</target></trans-unit>
@@ -1880,7 +1879,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGJsb2NraWVydGUgU2VnbWVudGUgbmljaHQgaW4gZGllIEFuYWx5c2UgdW5kIFdvcnRhbnphaGwgZWluYmV6b2dlbg=='><source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source><target>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</target></trans-unit>
 <trans-unit id='UVMgU3RhdGlzdGlr'><source>QS Statistik</source><target>QS Statistik</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Interne Tags</target></trans-unit>
-<trans-unit id='VmVyYm90ZW4gaW4gWmllbA=='><source>Verboten in Ziel</source><target>Verboten in Ziel</target></trans-unit>
+<trans-unit id='VmVyYm90ZW4gaW4gUXVlbGxl'><source>Verboten in Quelle</source><target>Verboten in Quelle</target></trans-unit>
 <trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unbearbeiteter Fuzzy</target></trans-unit>
 <trans-unit id='QmVhcmJlaXRldGVyIDEwMCUgTWF0Y2g='><source>Bearbeiteter 100% Match</source><target>Bearbeiteter 100% Match</target></trans-unit>
 <trans-unit id='TmljaHQgZ2VmdW5kZW4gaW4gWmllbA=='><source>Nicht gefunden in Ziel</source><target>Nicht gefunden in Ziel</target></trans-unit>

@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * View Controller for the quality filter panel
+ * TODO FIXME: The state sent to the server when refreshing the store is pretty dirty since it is an encoded string of props. This is due to the eveolutionary extension of it's functionality. The current complexity would require a JSON model ... 
  */
 Ext.define('Editor.view.quality.FilterPanelController', {
     extend: 'Ext.app.ViewController',
@@ -161,7 +162,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      */
     onFilterStoreLoaded: function(store){
         var me = this, view = this.getView();
-        store.getRootNode().expand();
+        store.getRoot().expand();
         view.afterLoad();
         me.delayedChange = new Ext.util.DelayedTask(function(){
             me.delayedChange = null;
@@ -242,17 +243,14 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      * Note, that for filtering the grid we do not add entries for checked rubrics while for a reload of the filter panel we do.
      * Also note, that en empty selection is marked with 'NONE', see backend code
      */
-    getFilterValue: function(forStoreReload, modeVal){
-        var checkedVals = [];
-        if(!modeVal){
-            modeVal = Editor.app.getController('Quality').getFilterMode();
-        }
+    getFilterValue: function(forStoreReload, newModeVal){
+        var checkedVals = [],
+            modeVal = (!newModeVal) ? Editor.app.getController('Quality').getFilterMode() : newModeVal;
+        // retrieve all checked filters. When reloading the store, this has to cover the rubrics as well
         Ext.Array.each(this.getView().getChecked(), function(record){
-            // the rubrics will have an empty category, this will filter them out
-            if(record.get('qcategory') != ''){
-                checkedVals.push(record.get('qtype') + ':' + record.get('qcategory'));
-            } else if(forStoreReload){
-                checkedVals.push(record.get('qtype'));
+            // send the rubrics only for a store reload
+            if(record.isCategory() || forStoreReload){
+                checkedVals.push(record.getTypeCatKey());
             }
         });
         if(checkedVals.length > 0){
@@ -263,6 +261,15 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         // the segments controller will manage only the two states 'not filtered' = empty value or 'filtered= = value with all filters
         if(!forStoreReload && checkedVals.length == 0){
             return '';
+        }
+        // if we reload the store we want the state of the expanded/collapsed nodes to be persistent and thus send them as well
+        // this will not apply when changing the filter mode, it is quite worrying to have stuff invisible when switching back from false negative mode
+        if(forStoreReload && !newModeVal){
+            var collapsedVals = [];
+            Ext.Array.each(this.getView().getStore().getRoot().getCollapsedChildren(), function(record){
+                collapsedVals.push(record.getTypeCatKey());
+            });
+            return (collapsedVals.length == 0) ? (this.currentFilterVal + '|NONE') : (this.currentFilterVal + '|' + collapsedVals.join(','));
         }
         return this.currentFilterVal;
     }

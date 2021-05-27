@@ -143,7 +143,12 @@ abstract class editor_Models_Quality_AbstractView {
      * May be set by request and holds the list of checked tree nodes
      * @var array
      */
-    protected $checkedQualities = null;
+    protected $checkedQualities = NULL;
+    /**
+     * May be set by request and holds the list of collapsed tree nodes
+     * @var array
+     */
+    protected $collapsedQualities = NULL;
     /**
      * The current restriction for the falsePositive column. NULL means no restriction
      * @var int
@@ -174,6 +179,7 @@ abstract class editor_Models_Quality_AbstractView {
         if($currentState !== NULL){
             $requestState = new editor_Models_Quality_RequestState($currentState);
             $this->checkedQualities = $requestState->getCheckedList();
+            $this->collapsedQualities = $requestState->getCollapsedList();
             $this->falsePositiveRestriction = $requestState->getFalsePositiveRestriction();
             // The qualities may have to be limited to the visible segment-nrs for the current editor
             $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs($this->task);
@@ -207,7 +213,7 @@ abstract class editor_Models_Quality_AbstractView {
             $field,
             ['type ASC','category ASC']);
         
-        // error_log('PRESETS: '.print_r($this->checkedQualities, true).' / falsePositives:'.$this->falsePositiveRestriction.' / DBrows: '.count($this->dbRows));
+        // error_log('PRESETS: checked: '.print_r($this->checkedQualities, true).' / falsePositives:'.$this->falsePositiveRestriction.' / collapsed: '.print_r($this->collapsedQualities, true).' / DBrows: '.count($this->dbRows));
      
         $this->create();
     }
@@ -323,7 +329,7 @@ abstract class editor_Models_Quality_AbstractView {
                             if(array_key_exists($category, $this->rowsByType[$rubric->qtype])){
                                 $rubric->children[] = $this->rowsByType[$rubric->qtype][$category];
                             } else {
-                                $row = $this->createNonDbRow($qualityProvider->translateCategory($this->translate, $category, $this->task), $rubric->qtype);
+                                $row = $this->createNonDbRow($qualityProvider->translateCategory($this->translate, $category, $this->task), $rubric->qtype, $category);
                                 $rubric->children[] = $row;
                             }
                         }
@@ -350,13 +356,9 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected function finalizeTree(stdClass $row, $isRubric=true){
         if(property_exists($row, 'children') && count($row->children) > 0){
-            if($this->allCategoriesCollapsed){
-                $row->expanded = false;
-            } else if($this->hasEmptyCategories){
-                $row->expanded = ((property_exists($row, 'qtotal') && $row->qtotal > 0));
-            } else {
-                $row->expanded = true;
-            }
+            // can be set in various ways
+            $row->expanded = $this->getExpandedVal($row);
+            // recursive processing
             foreach($row->children as $child){
                 $this->finalizeTree($child, false);
             }
@@ -474,6 +476,28 @@ abstract class editor_Models_Quality_AbstractView {
             return array_key_exists($type, $this->checkedQualities);
         }
         return array_key_exists($type.':'.$category, $this->checkedQualities);
+    }
+    /**
+     * Evaluates the expanded state of a rubric/category
+     * @param stdClass $row
+     * @return bool
+     */
+    protected function getExpandedVal(stdClass $row) : bool {
+        // all cats collapsed: easy
+        if($this->allCategoriesCollapsed){
+            return false;
+        }
+        // a collapsed state was sent by request
+        if($this->collapsedQualities != null){
+            $typeCat = ($row->qcategory === null || $row->qcategory === '') ? $row->qtype : $row->qtype.':'.$row->qcategory;
+            return (array_key_exists($typeCat, $this->collapsedQualities) == false);
+        }
+        // empty rubrics/categories will not be expanded by default
+        if($this->hasEmptyCategories){
+            return ((property_exists($row, 'qtotal') && $row->qtotal > 0));
+        }
+        // the "absolute default" is to be expanded
+        return true;
     }
     /**
      * Generates the MQM children, which usually are deeper nested

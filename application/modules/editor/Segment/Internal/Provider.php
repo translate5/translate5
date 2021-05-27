@@ -44,7 +44,7 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
 
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
-        if(!$qualityConfig->enableInternalTagCheck || $processingMode == editor_Segment_Processing::IMPORT){
+        if(!$qualityConfig->enableInternalTagCheck){
             return $tags;
         }
         // 1) Tag check: Bei Translation: Internal Tags gegen Source prüfen, bei Review: gegen original Target (insofern gesetzt)          
@@ -97,14 +97,6 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
             editor_Segment_Internal_TagComparision::WHITESPACE_MISSING,
             editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY
         ];
-    }
-    /**
-     * The structure of internal tags can not be a false positive
-     * {@inheritDoc}
-     * @see editor_Segment_Quality_Provider::canBeFalsePositiveCategory()
-     */
-    public function canBeFalsePositiveCategory(string $category) : bool {
-        return false;
     }
     
     public function isFullyChecked(Zend_Config $qualityConfig) : bool {

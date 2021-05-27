@@ -120,11 +120,6 @@
 		    <target>Match analysis and pretranslation are finished.</target>
 		</trans-unit>
 
-		<trans-unit id='VGVybWlub2xvZ2llIHByw7xmZW4gdW5kIG1hcmtpZXJlbg=='>
-		    <source>Terminologie prüfen und markieren</source>
-		    <target>Check and mark terminology</target>
-		</trans-unit>
-
 		<trans-unit id='QW5hbHlzZSBsw6R1ZnQ='>
 		    <source>Analyse läuft</source>
 		    <target>Analysis in progress</target>

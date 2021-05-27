@@ -59,7 +59,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
      */
     protected function validateParameters($parameters = array())
     {
-        $neededEntries = ['internalFuzzy', 'pretranslateMatchrate', 'pretranslateTmAndTerm', 'pretranslateMt', 'termtaggerSegment', 'isTaskImport', 'pretranslate'];
+        $neededEntries = ['internalFuzzy', 'pretranslateMatchrate', 'pretranslateTmAndTerm', 'pretranslateMt', 'isTaskImport', 'pretranslate'];
         $foundEntries = array_keys($parameters);
         $keyDiff = array_diff($neededEntries, $foundEntries);
         //if there is not keyDiff all needed were found
@@ -73,12 +73,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
     public function work()
     {
         try {
-            $params = $this->workerModel->getParameters();
-            //run the term tagger when the termtagger flag is set, it is pretranslation and no terminologie worker is queued
-            if ($params['termtaggerSegment'] && $params['pretranslate'] && !$params['isTaskImport']) {
-                $parentId = $this->workerModel->getParentId();
-                $this->queueTermtagger($this->taskGuid, $parentId ? $parentId : $this->workerModel->getId());
-            }
+            
             return $this->doWork();
 
         } catch (Throwable $e) {
