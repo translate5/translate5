@@ -305,15 +305,16 @@ Ext.define('Editor.view.segments.Grid', {
         },{
             xtype: 'editableColumn',
             itemId: 'editableColumn',
-            stateId:'editableColumn',
+            stateId:'editableColumn'
         },{
             xtype: 'iswatchedColumn',
             itemId: 'iswatchedColumn',
-            stateId:'iswatchedColumn',
+            stateId:'iswatchedColumn'
         }, {
             xtype: 'isRepeatedColumn',
             itemId: 'isRepeatedColumn',
             stateId:'isRepeatedColumn',
+            hideable: Editor.data.task.get('defaultSegmentLayout')
         }]);
     
         //allow the view mode controller to prepare (and store) the columns setup

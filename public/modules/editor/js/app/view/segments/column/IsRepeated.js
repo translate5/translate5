@@ -44,6 +44,7 @@ Ext.define('Editor.view.segments.column.IsRepeated', {
     hidden: true,
     bind: {
         disabled: '{!taskHasDefaultLayout}',
+        stateful: '{taskHasDefaultLayout}'
     },
     strings: {
         ttip: '#UT#Änderungen des Wiederholungsstatus durch Segmentänderungen werden nicht sofort angezeigt, die Segmente müssen neugeladen werden!',
