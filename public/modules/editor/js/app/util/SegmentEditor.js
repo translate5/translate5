@@ -454,7 +454,7 @@ Ext.define('Editor.util.SegmentEditor', {
         if(ele.hasAttribute('data-seq')){
             return ele.getAttribute('data-seq');
         }
-        return NULL;
+        return null;
     },
     /**
      * Comapatibility function to check if the quality id is set on a DOM node
