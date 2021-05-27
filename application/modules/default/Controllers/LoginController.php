@@ -220,8 +220,11 @@ class LoginController extends ZfExtended_Controllers_Login {
                 /* @var $invalidLoginCounter ZfExtended_Models_Invalidlogin */
                 $invalidLoginCounter->resetCounter(); // bei erfolgreichem login den counter zurücksetzen
                 ZfExtended_Models_LoginLog::addSuccess($user, "openid");
+
                 $this->_userModel->setUserSessionNamespaceWithoutPwCheck($user->getLogin());
-                $this->getFrontController()->getPlugin('ZfExtended_Controllers_Plugins_SessionRegenerate')->updateSession(true);
+
+                ZfExtended_Session::updateSession(true,true);
+
                 $this->initDataAndRedirect();
             }
         } catch (ZfExtended_OpenIDConnectClientException $e) {

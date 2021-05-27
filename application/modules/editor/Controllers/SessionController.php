@@ -44,7 +44,7 @@ class editor_SessionController extends ZfExtended_SessionController {
     }
     
     /***
-     * Will relplace the current user session with the provided login.
+     * Will replace the current user session with the provided login.
      * The current user must have api rights to be able to call this action.
      */
     public function impersonateAction(){
@@ -61,6 +61,10 @@ class editor_SessionController extends ZfExtended_SessionController {
         $userModel = ZfExtended_Factory::get($config->authentication->userEntityClass);
         /* @var $userModel \ZfExtended_Models_User */
         $userModel->setUserSessionNamespaceWithoutPwCheck($login);
+
+        $userSession = new Zend_Session_Namespace('user');
+        // remove the old session (if exist) for the impersonated user
+        ZfExtended_Session::cleanForUser($userSession->data->id);
     }
     
     public function postAction() {
@@ -154,7 +158,12 @@ class editor_SessionController extends ZfExtended_SessionController {
         $task->loadByTaskGuid($taskUserAssoc->getTaskGuid());
         
         $user->setUserSessionNamespaceWithoutPwCheck($login);
-        
+
+        $userSession = new Zend_Session_Namespace('user');
+
+        // remove the old session (if exist) for the auth-hash user
+        ZfExtended_Session::cleanForUser($userSession->data->id);
+
         ZfExtended_Models_LoginLog::addSuccess($user, "authhash");
         
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
