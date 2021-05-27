@@ -61,6 +61,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_watchListFilterBtn: '#UT#Lesezeichen',
     item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
     item_showBookmarkedSegments: '#UT#Nur Segmente mit Lesezeichen anzeigen',
+    item_repeatedFilterBtn: '#UT#Nur wiederholt',
     item_showRepeatedSegments: '#UT#Nur Segmente mit Wiederholungen anzeigen',
     strings:{
         interfaceTranslation:'#UT#Oberfläche'
@@ -185,7 +186,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'button',
                     glyph: 'f0c5@FontAwesome5FreeSolid',
                     itemId: 'filterBtnRepeated',
-                    //FIXME repetition button darf nicht funktionieren wenn multiple targets!
+                    text: me.item_repeatedFilterBtn,
                     bind: {
                         hidden: '{!taskHasDefaultLayout}'
                     },
