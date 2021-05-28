@@ -261,7 +261,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     }
 
     public function searchTermByParams(array $params = [], &$total = null) {
-        if (!$params)
+        /*if (!$params)
         $params = [
             'query' => 'bi*',
             'language' => '5,251,252,367,368,369,370,371,372,373,374,375,376,377',
@@ -269,7 +269,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             'processStatus' => 'provisionallyProcessed,rejected,finalized,unprocessed',
             'noTermDefinedFor' => '4',
             'limit' => '25,0'
-        ];
+        ];*/
 
         // If wildcards are used, convert them to the mysql syntax
         $keyword = str_replace(['*', '?'], ['%', '_'], $params['query']);
@@ -289,16 +289,15 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             $params['processStatus']
                 = implode(',', array_diff(ar($params['processStatus']), [self::PROCESS_STATUS_UNPROCESSED]));
 
-        // Basic term-query WHERE clause
-        $termWHERE = [
-            'LOWER(`t`.`term`) LIKE LOWER(?) COLLATE utf8mb4_bin',
+        // Shared WHERE clause, that will be used for querying both terms and proposals tables
+        $where = [
             '`t`.`languageId` IN (' . $params['language'] . ')',
             '`t`.`collectionId` IN (' . $params['collectionIds'] . ')',
             '`t`.`processStatus` IN ("' . str_replace(',', '","', $params['processStatus']) . '")',
         ];
 
         // If 'noTermDefinedFor' param is given
-        if ($_ = $params['noTermDefinedFor']) {
+        if ($_ = (int) $params['noTermDefinedFor']) {
 
             // Respect it in FROM clause
             $noTermDefinedFor = sprintf(' LEFT JOIN `terms_term` AS `t2` ON (
@@ -306,7 +305,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             )', $_);
 
             // Respect it in WHERE clause
-            $termWHERE  []= 'ISNULL(`t2`.`term`)';
+            $where []= 'ISNULL(`t2`.`term`)';
         }
 
         // Data columns, that would be fetched by search SQL query
@@ -328,15 +327,15 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $termQueryTpl = '
             SELECT %s 
             FROM `terms_term` `t` %s
-            WHERE ' . implode(' AND ', $termWHERE) . '
+            WHERE LOWER(`t`.`term`) LIKE LOWER(?) COLLATE utf8mb4_bin AND ' . implode(' AND ', $where) . '
             ORDER BY `t`.`term` ASC
         ';
 
         // Assume limit arg can be comma-separated string containing '<LIMIT>,<OFFSET>'
-        if ($params['limit']) list($limit, $offset) = explode(',', $params['limit']);
+        list($limit, $offset) = explode(',', $params['limit']);
 
         // If we should only search within terms-table (e.g. proposals-table won't be involved)
-        if (true || !$isProposer || !in_array(self::PROCESS_STATUS_UNPROCESSED, $params['processStatus'])) {
+        if (!$isProposer || !in_array(self::PROCESS_STATUS_UNPROCESSED, explode(',', $params['processStatus']))) {
 
             // If we have to calculate total
             if ($total === true) {
@@ -355,6 +354,58 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             // Return results
             return db()->query($termQuery, $keyword)->fetchAll();
         }
+
+        // Data columns, that would be fetched by search SQL query
+        $proposalQueryCol = '
+          `p`.`term` AS `label`, 
+          `p`.`termId` AS `value`, 
+          `p`.`termId` AS `id`, 
+          `p`.`term` AS `desc`, 
+          `t`.`processStatus`, 
+          `t`.`status`, 
+          `t`.`definition`, 
+          `t`.`termEntryTbxId`, 
+          `t`.`collectionId`, 
+          `t`.`termEntryId`, 
+          `t`.`languageId` 
+        ';
+
+        // Term query template
+        $proposalQueryTpl = '
+            SELECT %s 
+            FROM 
+              `terms_proposal` `p`
+              INNER JOIN `terms_term` AS `t` ON `t`.`id` = `p`.`termId` %s
+            WHERE LOWER(`p`.`term`) LIKE LOWER(?) COLLATE utf8mb4_bin AND ' . implode(' AND ', $where) . '
+            ORDER BY `t`.`term` ASC
+        ';
+
+        // If we have to calculate total
+        if ($total === true) {
+
+            // Render query for getting total count of results in terms-table
+            $termQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor);
+
+            // Render query for getting total count of results in proposals-table
+            $proposalQuery = sprintf($proposalQueryTpl, 'COUNT(*)', $noTermDefinedFor);
+
+            // Render query for getting total results
+            $totalQuery = 'SELECT (' . $termQuery . ') + (' . $proposalQuery . ') AS `total`';
+
+            // Setup &$total variable by reference
+            $total = (int) db()->query($totalQuery, [$keyword, $keyword])->fetchColumn();
+        }
+
+        // Render query for getting UNION-ed results from both terms and proposals tables
+        $unionQuery = '('
+            . sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor)
+            . ') UNION ('
+            . sprintf($proposalQueryTpl, $proposalQueryCol, $noTermDefinedFor)
+            . ')'
+            . 'LIMIT ' . (int) $offset . ',' . (int) $limit;
+
+        // Return results
+        return db()->query($unionQuery, [$keyword, $keyword])->fetchAll();
     }
 
     /**
