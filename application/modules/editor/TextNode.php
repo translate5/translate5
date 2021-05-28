@@ -37,9 +37,9 @@
  * A text node has an empty Node-name and will render only it's text content
  * The Text-Content will not be escaped or unescped within this class so it must already be escaped if escaped content shall be rendered
  * 
- * @method editor_TextNode clone(boolean $withDataAttribs)
+ * @method editor_TextNode clone(boolean $withDataAttribs, bool $withId)
  * @method editor_TextNode createBaseClone()
- * @method editor_TextNode cloneProps(editor_Tag $tag, boolean $withDataAttribs)
+ * @method editor_TextNode cloneProps(editor_Tag $tag, bool $withDataAttribs, bool $withId)
  */
 final class editor_TextNode extends editor_Tag {
     

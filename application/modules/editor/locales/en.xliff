@@ -4119,6 +4119,10 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden</source>
   <target>By default it is enabled for new tasks for the selected clients, that saved segments are saved to the language resource as well.</target>
 </trans-unit>
+<trans-unit id='TnVyIHdpZWRlcmhvbHQ='>
+  <source>Nur wiederholt</source>
+  <target>Only repeated</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

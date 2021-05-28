@@ -210,8 +210,8 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
 
     /* Overwritten API to reflect pairing */
     
-    public function clone($withDataAttribs=false){
-        $clone = parent::clone($withDataAttribs);
+    public function clone(bool $withDataAttribs=false, bool $withId=false){
+        $clone = parent::clone($withDataAttribs, $withId);
         /* @var $clone editor_Segment_Mqm_Tag */
         $clone->setMqmProps($this->paired, $this->categoryIndex, $this->severity, $this->comment);
         return $clone;

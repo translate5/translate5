@@ -44,4 +44,18 @@ class  editor_Segment_TrackChanges_DeleteTag extends editor_Segment_Tag {
     protected static $nodeName = 'del';
     
     protected static $identificationClass = self::CSS_CLASS;
+    /**
+     *
+     * @return boolean
+     */
+    public function isDeleteTag() : bool {
+        return true;
+    }
+    /**
+     *
+     * @return boolean
+     */
+    public function isInsertTag() : bool{
+        return false;
+    }
 }
