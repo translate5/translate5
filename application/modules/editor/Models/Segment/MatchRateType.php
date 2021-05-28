@@ -113,7 +113,7 @@ class editor_Models_Segment_MatchRateType {
      *
      * @var string
      */
-    const TYPE_INTERNAL_FUZZY_AVAILABLE='internal-fuzzy-available';
+    const TYPE_INTERNAL_FUZZY_AVAILABLE = 'internal-fuzzy-available';
     
     /**
      * Uses as match rate prefix when the value comes from import
@@ -246,7 +246,7 @@ class editor_Models_Segment_MatchRateType {
     }
     
     /**
-     * Evaluates if a matchRateType reflects a pretranslation
+     * Evaluates if a matchRateType reflects a user edit
      * @param string $type
      * @return boolean
      */
@@ -445,6 +445,15 @@ class editor_Models_Segment_MatchRateType {
      */
     public static function isFromTM(string $type): bool {
         return strpos($type, self::PREFIX_IMPORT.';'.self::TYPE_TM) === 0 || strpos($type, self::PREFIX_PRETRANSLATED.';'.self::TYPE_TM) === 0;
+    }
+    
+    /**
+     * returns true if the given matchtype was imported from a MT
+     * @param string $type
+     * @return bool
+     */
+    public static function isFromMT(string $type): bool {
+        return strpos($type, self::PREFIX_IMPORT.';'.self::TYPE_MT) === 0 || strpos($type, self::PREFIX_PRETRANSLATED.';'.self::TYPE_MT) === 0;
     }
     
     /**

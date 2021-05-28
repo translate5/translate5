@@ -116,13 +116,11 @@ Ext.define('Editor.view.quality.FilterPanelController', {
             // the "segmentEditSaved" event it seems does not cover the time e.g. the checking of the segment state needs in conjunction with language resources that must be requested.
             // generally this event seem to fire BEFORE all processing of all edited segment save related operations have finished
             // this is just a very dirty attempt to cover this, obiously we have a race-condition. The good thing is, it' will result in a outdated view only on errors
-            var me = this,
-                matchRateType = (record) ? record.get('matchRateType') : null,
-                waitFor = (matchRateType && (matchRateType.indexOf(';tm;') > -1 || matchRateType.indexOf(';mt;') > -1)) ? 350 : 150;
+            var me = this;
             me.delayedChange = new Ext.util.DelayedTask(function(){
                 me.refreshFilteredStore();
             });
-            me.delayedChange.delay(waitFor);
+            me.delayedChange.delay(250);
         }
     },
     /**
