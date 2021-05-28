@@ -119,11 +119,10 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $this->createTrackChangesCloneTest($expected, $markup);
     }
     /**
-     * Creates a test for the internal tag comparision. The passed markup will have the following markup replaced with internal tags
+     * Creates a test for the internal tag comparision. The passed markup will have the following short-tags replaced with "real" internal tags
      * Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>
-     * @param string $original
-     * @param string $edited
-     * @param array|string $expectedState
+     * @param string $expected
+     * @param string $markup
      */
     private function createTrackChangesCloneTest($expected, $markup){
         $markupConverted = $this->replaceTags($markup);
