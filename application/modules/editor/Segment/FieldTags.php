@@ -613,7 +613,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @param array $includedTypes
      * @return editor_Segment_FieldTags
      */
-    public function cloneFiltered(array $includedTypes=NULL){
+    public function cloneFiltered(array $includedTypes=NULL) : editor_Segment_FieldTags {
         $clonedTags = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->field, $this->fieldText, $this->saveTo, $this->ttName);
         foreach($this->tags as $tag){
             if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES || ($includedTypes == NULL || in_array($tag->getType(), $includedTypes))){
@@ -628,7 +628,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @param array $includedTypes: if set, filters the existing types of tags to the specified 
      * @return editor_Segment_FieldTags
      */
-    public function cloneWithoutTrackChanges(array $includedTypes=NULL){
+    public function cloneWithoutTrackChanges(array $includedTypes=NULL) : editor_Segment_FieldTags {
         $deleteTags = [];
         $otherTags = [];
         $fieldText = '';
