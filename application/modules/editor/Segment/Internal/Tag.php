@@ -257,8 +257,8 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
         }
     }
     
-    public function clone($withDataAttribs=false){
-        $clone = parent::clone($withDataAttribs);
+    public function clone(bool $withDataAttribs=false, bool $withId=false){
+        $clone = parent::clone($withDataAttribs, $withId);
         /* @var $clone editor_Segment_Internal_Tag */
         foreach($this->contentTags as $contentTag){
             $clone->addContentTag($contentTag->clone(true));

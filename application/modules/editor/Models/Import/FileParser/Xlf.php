@@ -818,16 +818,16 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->setMid($this->_mid.'-'.$mid);
             }
             
-            $emptyTarget = empty($targetChunksTagCut) && $targetChunksTagCut !== "0";
-            $hasOriginalTarget = !(empty($this->segmentData[$targetName]['original']) && $this->segmentData[$targetName]['original']!=="0");
+            $emptyInitialTarget = empty($targetChunksOriginal);
+            $hasCutTargetContent = empty($this->segmentData[$targetName]['original']) || $this->segmentData[$targetName]['original'] === "0";
             //if source contains tags only or is empty (and is no missing source) then we are able to ignore non textual segments
-            if(!$isSourceMrkMissing && !$this->hasText($this->segmentData[$sourceName]['original']) && ($emptyTarget || $hasOriginalTarget)) {
+            if(!$isSourceMrkMissing && !$this->hasText($this->segmentData[$sourceName]['original']) && ($emptyInitialTarget || $hasCutTargetContent)) {
                 //if empty target, we fill the target with the source content, and ignore the segment then in translation
                 //  on reviewing and if target content was given, then it will be ignored too
                 //  on reviewing needs $hasOriginalTarget to be true, which is the case by above if
-                $placeHolders[$mid] = $this->xmlparser->join($emptyTarget ? $sourceChunksOriginal : $targetChunksOriginal);
+                $placeHolders[$mid] = $this->xmlparser->join($emptyInitialTarget ? $sourceChunksOriginal : $targetChunksOriginal);
                 //we add the length of the ignored segment to the additionalUnitLength
-                $this->otherContent->addIgnoredSegmentLength($emptyTarget ? $sourceChunks : $targetChunks, $attributes);
+                $this->otherContent->addIgnoredSegmentLength($emptyInitialTarget ? $sourceChunks : $targetChunks, $attributes);
                 continue;
             }
             $segmentId = $this->setAndSaveSegmentValues();

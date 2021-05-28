@@ -41,9 +41,10 @@ Ext.define('Editor.view.segments.column.IsRepeated', {
     mixins: ['Editor.view.segments.column.BaseMixin'],
     dataIndex: 'isRepeated',
     text: '#UT#Mit Wiederholungen',
+    hidden: true,
     bind: {
         disabled: '{!taskHasDefaultLayout}',
-        hidden: '{!taskHasDefaultLayout}'
+        stateful: '{taskHasDefaultLayout}'
     },
     strings: {
         ttip: '#UT#Änderungen des Wiederholungsstatus durch Segmentänderungen werden nicht sofort angezeigt, die Segmente müssen neugeladen werden!',

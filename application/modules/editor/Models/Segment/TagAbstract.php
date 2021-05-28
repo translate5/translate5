@@ -28,7 +28,7 @@
 
 /***
  * Provides tag protection with customizable tag template and regex tag selector
- * 
+ *
  * @author aleksandar
  *
  */
