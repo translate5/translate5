@@ -36,17 +36,6 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
     protected $entityClass = 'editor_Plugins_MatchAnalysis_Models_MatchAnalysis';
 
     /**
-     * @var editor_Plugins_MatchAnalysis_Export_ExportExcel
-     */
-    protected $helperExcelClass = 'editor_Plugins_MatchAnalysis_Export_ExportExcel';
-
-    /**
-     * @var editor_Plugins_MatchAnalysis_Export_ExportXml
-     */
-    protected $helperXMLClass = 'editor_Plugins_MatchAnalysis_Export_ExportXml';
-
-
-    /**
      * @var editor_Plugins_MatchAnalysis_Models_MatchAnalysis
      */
     protected $entity;
@@ -80,15 +69,30 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
     {
         $params = $this->getAllParams();
 
-        $rows = $this->entity->loadByBestMatchRate($params['taskGuid'], true);
 
 
         switch ($params["type"]) {
             case "exportExcel":
-                ZfExtended_Factory::get($this->helperExcelClass)->generateExcel($rows);
+                $rows = $this->entity->loadByBestMatchRate($params['taskGuid']);
+                ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_ExportExcel')->generateExcel($rows);
                 break;
             case "exportXml":
-                $x = ZfExtended_Factory::get($this->helperXMLClass)->generateXML($rows, $params['taskGuid']);
+                $rows = $this->entity->loadByBestMatchRate($params['taskGuid'], false);
+                $x = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_Xml')->generateXML($rows, $params['taskGuid']);
+                
+                $fileName = 'Match-analysis-'. date('Y-m-d').'.xml';
+                
+                header('Content-disposition: attachment; filename='.$fileName);
+                header ("Content-Type:text/xml");
+                // if you want to directly download then set expires time
+                header("Expires: 0");
+                
+                //with XML formatting:
+//                 $dom = dom_import_simplexml($x)->ownerDocument;
+//                 $dom->formatOutput = true;
+//                 echo $dom->saveXML();
+//                 break;
+                
                 echo $x->asXML();
 
                 break;
