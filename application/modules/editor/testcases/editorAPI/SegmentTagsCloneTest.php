@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Several "classic" PHPUnit tests to check the FieldTags Cloning without TrackChanges tags
+ * TODO: create test with additional quality-tags e.g. MQM
  */
 class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {   
     /**
@@ -98,18 +99,21 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $markup = 'Lorem <1>ipsum dolor</1> sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $expected = 'Lorem <1>ipsum dolor</1> sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $this->createTrackChangesCloneTest($expected, $markup);
+        $this->createTrackChangesFilterCloneTest($expected, $markup);
     }
     
     public function testMarkup2(){
         $markup = 'Lorem <1>ipsum</1> dolor sit amet, <del><2>consetetur sadipscing<5/></2></del> elitr, sed diam <ins>nonumy eirmod tempor</ins> <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $expected = 'Lorem <1>ipsum</1> dolor sit amet, elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $this->createTrackChangesCloneTest($expected, $markup);
+        $this->createTrackChangesFilterCloneTest($expected, $markup);
     }
 
     public function testMarkup3(){
         $markup = 'Lorem <1>ipsum <del>dolor</del></1> <del>sit</del> amet, <2><del>consetetur sadipscing<5/></del></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> <del>labore et <4>dolore magna</4> aliquyam erat</del></3>, sed diam voluptua.';
         $expected = 'Lorem <1>ipsum </1> amet, <2></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> </3>, sed diam voluptua.';
         $this->createTrackChangesCloneTest($expected, $markup);
+        $this->createTrackChangesFilterCloneTest($expected, $markup);
     }
     
     public function testMarkup4(){
@@ -117,9 +121,10 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $markup = 'Lorem <del><1>ipsum dolor</1></del> sit amet, <2>consetetur sadipscing<del><5/></del></2> elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins> <del>ut</del><6/> labore et <ins><4>dolore magna</4></ins> aliquyam erat</3><del>,</del> sed diam voluptua.';
         $expected = 'Lorem sit amet, <2>consetetur sadipscing</2> elitr, sed diam nonumy eirmod tempor <3>invidunt <6/> labore et <4>dolore magna</4> aliquyam erat</3> sed diam voluptua.';
         $this->createTrackChangesCloneTest($expected, $markup);
+        $this->createTrackChangesFilterCloneTest($expected, $markup);
     }
     /**
-     * Creates a test for the internal tag comparision. The passed markup will have the following short-tags replaced with "real" internal tags
+     * Creates a test for the tags cloning. The passed markup will have the following short-tags replaced with "real" internal tags
      * Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>
      * @param string $expected
      * @param string $markup
@@ -147,6 +152,31 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         // make sure the original tags do not become manipulated. We need to remove the IDs here, but at one point they may have to be included for trackchanges purposes
         $markupExpected = preg_replace('~ id="ext-element-[0-9]+"~', '', $markupConverted);
         $this->assertEquals($markupExpected, $markupTags->render());
+    }
+    /**
+     * Creates a test for the tags cloning with filtering for internal tags only
+     * The passed markup will have the following short-tags replaced with "real" internal tags
+     * Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>
+     * @param string $expected
+     * @param string $markup
+     */
+    private function createTrackChangesFilterCloneTest($expected, $markup){
+        // we filter for internal tags only
+        $filter = [ editor_Segment_Tag::TYPE_INTERNAL ];
+        $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $this->replaceTags($markup), 'target', 'target');
+        // a full clone without filter
+        $markupTagsCloned = $markupTags->cloneFiltered();
+        $expectedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $this->replaceTags($expected), 'target', 'target');
+        // create expected clone and only filtered tags
+        $expectedTags = $expectedTags->cloneFiltered($filter);
+        // create clone without trackchanges and only filtered tags
+        $clonedTags = $markupTags->cloneWithoutTrackChanges($filter);
+        // compare
+        $this->assertEquals($expectedTags->render(), $clonedTags->render());
+        $this->assertEquals($expectedTags->toJson(), $clonedTags->toJson());
+        // compare full clone
+        $this->assertEquals($markupTags->render(), $markupTagsCloned->render());
+        $this->assertEquals($markupTags->toJson(), $markupTagsCloned->toJson());
     }
     /**
      * 

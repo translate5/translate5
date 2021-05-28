@@ -608,10 +608,27 @@ class editor_Segment_FieldTags implements JsonSerializable {
         $this->addTagProps();
     }
     /**
-     * Clones without trackchanges tags. Deleted contents (in del-tags) will be removed and all text-lengths/indices will be adjusted
+     * Clones the tags with only the types of tags specified
+     * Note, that you will not be able to filter trackchanges-tags out, use ::cloneWithoutTrackChanges instead for this
+     * @param array $includedTypes
      * @return editor_Segment_FieldTags
      */
-    public function cloneWithoutTrackChanges(){
+    public function cloneFiltered(array $includedTypes=NULL){
+        $clonedTags = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->field, $this->fieldText, $this->saveTo, $this->ttName);
+        foreach($this->tags as $tag){
+            if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES || ($includedTypes == NULL || in_array($tag->getType(), $includedTypes))){
+                $clonedTags->addTag($tag->clone(true, true));
+            }
+        }
+        $clonedTags->evaluateDeletedInserted();
+        return $clonedTags;
+    }
+    /**
+     * Clones without trackchanges tags. Deleted contents (in del-tags) will be removed and all text-lengths/indices will be adjusted
+     * @param array $includedTypes: if set, filters the existing types of tags to the specified 
+     * @return editor_Segment_FieldTags
+     */
+    public function cloneWithoutTrackChanges(array $includedTypes=NULL){
         $deleteTags = [];
         $otherTags = [];
         $fieldText = '';
@@ -625,7 +642,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
                     }
                     $deleteTags[] = $del;
                 }
-            } else if(!$tag->wasDeleted){
+            } else if(!$tag->wasDeleted && ($includedTypes == NULL || in_array($tag->getType(), $includedTypes))){
                 $otherTags[] = $tag->clone(true, true);
             }
         }
