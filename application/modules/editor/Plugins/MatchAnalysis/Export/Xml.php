@@ -368,7 +368,7 @@ This file was generated with translate5.
     # newBaseline (this is specific to SDL MT)
     # newLearnings (this is specific to SDL MT)
 - the number and definitions of fuzzy elements will reflect the fuzzy ranges as defined in translate5
-- all MT matches will always be counted within "new"
+- all MT matches and matches not listed as fuzzy or better match will always be counted within "new"
 - crossFileRepeated are translate5s repetitions (which are represented by 102% matches)
 - exact are 100% and 101% and 104%-Matches from translate5
 - inContextExact are 103%-Matches from translate5
