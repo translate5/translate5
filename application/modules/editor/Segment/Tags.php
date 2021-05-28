@@ -304,9 +304,11 @@ class editor_Segment_Tags implements JsonSerializable {
      */
     public function hasEditedTargets() : bool {
         if($this->hasOriginalTarget()){
-            $compare = $this->targetOriginal->render();
+            // only internal tags will be allowed for the equation
+            $filteredTypes = [ editor_Segment_Tag::TYPE_INTERNAL ];
+            $compare = $this->targetOriginal->cloneFiltered($filteredTypes)->render();
             foreach($this->getTargets() as $target){
-                if(!$target->isEmpty() && $target->cloneWithoutTrackChanges()->render() != $compare){
+                if(!$target->isEmpty() && $target->cloneWithoutTrackChanges($filteredTypes)->render() != $compare){
                     return true;
                 }
             }
