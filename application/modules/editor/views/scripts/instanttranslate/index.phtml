@@ -160,8 +160,10 @@ if(!$this->isIpBasedUser){
                     $optionValues=[];
                     $sourceLangSelected=strtolower($sourceLangSelected);
                     foreach ($allSourceLanguageLocales as $sourceLangLocale) {
+                        // get the language display name from all languages array. The display name is at index 1
+                        $displayLanguage = $this->allDbLanguages[$sourceLangLocale][1] ?? $sourceLangLocale;
                         $selected = ($sourceLangSelected != false && $sourceLangSelected == strtolower($sourceLangLocale)) ? ' selected="selected"' : '';
-                        $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
+                        $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$displayLanguage.'</option>';
                     }
                     echo implode(' ', $optionValues);
                 ?>
@@ -194,8 +196,10 @@ if(!$this->isIpBasedUser){
                     $optionValues=[];
                     $targetLangSelected=strtolower($targetLangSelected);
                     foreach ($allTargetLanguageLocales as $targetLangLocale) {
+                        // get the language display name from all languages array. The display name is at index 1
+                        $displayLanguage = $this->allDbLanguages[$targetLangLocale][1] ?? $targetLangLocale;
                         $selected = ($targetLangSelected != false && $targetLangSelected == strtolower($targetLangLocale)) ? ' selected="selected"' : '';
-                        $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
+                        $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$displayLanguage.'</option>';
                     }
                     echo implode(' ', $optionValues);
                 ?>

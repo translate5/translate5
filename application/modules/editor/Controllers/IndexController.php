@@ -505,19 +505,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
      * Returns all configured languages in an array for displaying in frontend
      */
     protected function getAvailableLanguages() {
-        /* @var $langs editor_Models_Languages */
-        $langs = ZfExtended_Factory::get('editor_Models_Languages');
-        $langs = $langs->loadAll();
-        $result = array();
-        foreach ($langs as $lang) {
-            $name = $this->translate->_($lang['langName']);
-            $result[$name] = array($lang['id'], $name.' ('.$lang['rfc5646'].')', $lang['rtl'],$lang['rfc5646']);
-        }
-        ksort($result); //sort by name of language
-        if(empty($result)){
-            throw new Zend_Exception('No languages defined. Please use /docs/003fill-LEK-languages-after-editor-sql or define them otherwhise.');
-        }
-        return array_values($result);
+        $model = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $model editor_Models_Languages */
+        return $model->loadAllForDisplay();
     }
     
     protected function setJsSegmentFlags($type, array $qualityFlags) {
