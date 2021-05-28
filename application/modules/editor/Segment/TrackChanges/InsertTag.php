@@ -44,4 +44,18 @@ class  editor_Segment_TrackChanges_InsertTag extends editor_Segment_Tag {
     protected static $nodeName = 'ins';
     
     protected static $identificationClass = self::CSS_CLASS;
+    /**
+     *
+     * @return boolean
+     */
+    public function isDeleteTag() : bool {
+        return false;
+    }
+    /**
+     *
+     * @return boolean
+     */
+    public function isInsertTag() : bool{
+        return true;
+    }
 }

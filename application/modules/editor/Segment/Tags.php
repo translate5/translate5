@@ -298,6 +298,24 @@ class editor_Segment_Tags implements JsonSerializable {
         return ($this->targetOriginal != null);
     }
     /**
+     * Retrieves, if the contents of any targets have been changed compared to the original target.
+     * Empty targets will be ignored and trackchanges tags will be stripped. This means, that contents reverted to the original state by the editor will be seen as "unchanged"
+     * @return bool
+     */
+    public function hasEditedTargets() : bool {
+        if($this->hasOriginalTarget()){
+            // only internal tags will be allowed for the equation
+            $filteredTypes = [ editor_Segment_Tag::TYPE_INTERNAL ];
+            $compare = $this->targetOriginal->cloneFiltered($filteredTypes)->render();
+            foreach($this->getTargets() as $target){
+                if(!$target->isEmpty() && $target->cloneWithoutTrackChanges($filteredTypes)->render() != $compare){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    /**
      * 
      * @return editor_Segment_FieldTags
      */

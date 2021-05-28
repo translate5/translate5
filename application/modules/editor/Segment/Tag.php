@@ -39,7 +39,7 @@
  * Keep in mind that start & end-index work just like counting chars or the substr API in php, the tag starts BEFORE the start index and ends BEFORE the index of the end index, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
  * To identify the Types of Internal tags a general API editor_Segment_TagCreator is provided
  * 
- * @method editor_Segment_Tag clone(boolean $withDataAttribs)
+ * @method editor_Segment_Tag clone(bool $withDataAttribs, bool $withId)
  * @method editor_Segment_Tag createBaseClone()
  */
 class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
@@ -218,7 +218,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @see editor_Tag::render()
      */
     public function render(array $skippedTypes=NULL) : string {
-        if($skippedTypes != NULL && is_array($skippedTypes) && in_array($this->getType(), $skippedTypes)){
+        if($skippedTypes != NULL && in_array($this->getType(), $skippedTypes)){
             return $this->renderChildren($skippedTypes);
         }
         return $this->renderStart().$this->renderChildren($skippedTypes).$this->renderEnd();

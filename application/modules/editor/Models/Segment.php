@@ -480,21 +480,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         return $this->getPretrans() !== 0;
     }
     /**
+     * Convenience API to evaluate if a segment has been pretranslated by a machine translation
+     * @return boolean
+     */
+    public function isMtPretranslated() {
+        return $this->getPretrans() !== 0 && editor_Models_Segment_MatchRateType::isFromMT($this->getMatchRateType());
+    }
+    /**
      * Convenience API to evaluate if a segment has been pretranslated by a translation memory
      * @return boolean
      */
     public function isTmPretranslated() {
         return $this->getPretrans() !== 0 && editor_Models_Segment_MatchRateType::isFromTM($this->getMatchRateType());
-    }
-    /**
-     * Convenience API to evaluate if a segment was edited. This is based on the autoStates
-     * Note that there may be textual changes or changed tags / whitespace etc. that do not lead to a "edited" state
-     * @return boolean
-     */
-    public function isEdited() {
-        $autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        /* @var $autoStates editor_Models_Segment_AutoStates */
-        return $autoStates->isEditedState($this->getAutoStateId());
     }
     /**
      * restores segments with content not changed by the user to the original
