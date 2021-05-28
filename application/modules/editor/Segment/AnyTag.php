@@ -37,9 +37,9 @@
  * The main use for this class is for testing purposes
  * In "real life" there should be no unknown segment tags and we could add error logging here to detect such mishaps
  * 
- * @method editor_Segment_AnyTag clone(boolean $withDataAttribs)
+ * @method editor_Segment_AnyTag clone(boolean $withDataAttribs, bool $withId)
  * @method editor_Segment_AnyTag createBaseClone()
- * @method editor_Segment_AnyTag cloneProps(editor_Tag $tag, boolean $withDataAttribs)
+ * @method editor_Segment_AnyTag cloneProps(editor_Tag $tag, bool $withDataAttribs, bool $withId)
  */
 class editor_Segment_AnyTag extends editor_Segment_Tag {
     

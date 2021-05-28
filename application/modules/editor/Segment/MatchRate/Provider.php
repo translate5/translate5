@@ -61,14 +61,17 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
         if($segment->isTmPretranslated()){
             // no need to check for edited 100% matches on import
             if($qualityConfig->enableEdited100MatchCheck && $processingMode != editor_Segment_Processing::IMPORT){
-                
-                if($segment->isEdited() && $segment->getMatchRate() >= 100){
+                if($segment->getMatchRate() >= 100 && $tags->hasEditedTargets()){
                     $tags->addAllTargetsQuality(static::$type, self::EDITED_100PERCENT_MATCH);
                 }
             }
             if($qualityConfig->enableUneditedFuzzyMatchCheck){
-                if(!$segment->isEdited() && $segment->getMatchRate() < 100){
-                    $tags->addAllTargetsQuality(static::$type, self::UNEDITED_FUZZY_MATCH);
+                if($segment->getMatchRate() < 100){
+                    // on import we use the PRETRANSLATED state to indicate a "unedited" segment
+                    $unedited = ($processingMode == editor_Segment_Processing::IMPORT) ? ($segment->getAutoStateId() == editor_Models_Segment_AutoStates::PRETRANSLATED) : !$tags->hasEditedTargets();
+                    if($unedited){
+                        $tags->addAllTargetsQuality(static::$type, self::UNEDITED_FUZZY_MATCH);
+                    }
                 }
             }
         }
