@@ -109,7 +109,7 @@
 <trans-unit id='U3RhdHVz'><source>Status</source><target>Status</target></trans-unit>
 <trans-unit id='UmVsYWlz'><source>Relais</source><target>Relais</target></trans-unit>
 <trans-unit id='WmllbHRleHQ='><source>Zieltext</source><target>Zieltext</target></trans-unit>
-<trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='><source>(zur Importzeit)</source><target>(zur Importzeit)</target></trans-unit>
+<trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='><source>(zur Importzeit)</source><target>(zur Importzeit / Vorübersetzung)</target></trans-unit>
 <trans-unit id='bGV0enRlciBCZWFyYmVpdGVy'><source>letzter Bearbeiter</source><target>letzter Bearbeiter</target></trans-unit>
 <trans-unit id='YmVhcmJlaXRldCBiZWk='><source>bearbeitet bei</source><target>bearbeitet bei</target></trans-unit>
 <trans-unit id='S29tbWVudGFyZQ=='><source>Kommentare</source><target>Kommentare</target></trans-unit>
@@ -821,7 +821,6 @@
 <trans-unit id='Q2hhbmdl'><source>Change</source><target>Change</target></trans-unit>
 <trans-unit id='IFRlc3Q='><source> Test</source><target> Test</target></trans-unit>
 <trans-unit id='VGFzdGF0dXJrw7xyemVsIG5hY2hzY2hsYWdlbg=='><source>Tastaturkürzel nachschlagen</source><target>Tastaturkürzel nachschlagen</target></trans-unit>
-<trans-unit id='WmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0KQ=='><source>Zieltext (zur Importzeit)</source><target>Zieltext (zur Importzeit)</target></trans-unit>
 <trans-unit id='U1RSRyArIEVJTkZHIGtvcGllcnQgZGVuIGtvbXBsZXR0ZW4gUXVlbGx0ZXh0IGluIGRlbiBaaWVsdGV4dDxiciAvPlNUUkcgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRlbiBlbnRzcHJlY2hlbmRlbiBUYWcgaW4gZGVuIFppZWx0ZXh0IChOdWxsIGVudHNwcmljaHQgVGFnIE5yLiAxMCk8YnIgLz5TVFJHICsgU0hJRlQgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRpZSBUYWdzIG1pdCBkZW4gTnVtbWVybiAxMSBiaXMgMjAgaW4gZGVuIFppZWx0ZXh0Lg=='><source>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source><target>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</target></trans-unit>
 <trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgLSBhbGxlIHppZWxzcHJhY2hsaWNoZW4gU2VnbWVudGUgYmVpbSBJbXBvcnQgbGVlciAobmljaHQgYW5nZWhha3QgYmVkZXV0ZXQgUmV2aWV3YXVmZ2FiZSku'><source>Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).</source><target>Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).</target></trans-unit>
 <trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgKGtlaW4gUmV2aWV3KQ=='><source>Übersetzungsaufgabe (kein Review)</source><target>Übersetzungsaufgabe (kein Review)</target></trans-unit>
@@ -1881,6 +1880,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGJsb2NraWVydGUgU2VnbWVudGUgbmljaHQgaW4gZGllIEFuYWx5c2UgdW5kIFdvcnRhbnphaGwgZWluYmV6b2dlbg=='><source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source><target>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</target></trans-unit>
 <trans-unit id='UVMgU3RhdGlzdGlr'><source>QS Statistik</source><target>QS Statistik</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Interne Tags</target></trans-unit>
+<trans-unit id='VmVyYm90ZW4gaW4gWmllbA=='><source>Verboten in Ziel</source><target>Verboten in Ziel</target></trans-unit>
 <trans-unit id='VmVyYm90ZW4gaW4gUXVlbGxl'><source>Verboten in Quelle</source><target>Verboten in Quelle</target></trans-unit>
 <trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unbearbeiteter Fuzzy</target></trans-unit>
 <trans-unit id='QmVhcmJlaXRldGVyIDEwMCUgTWF0Y2g='><source>Bearbeiteter 100% Match</source><target>Bearbeiteter 100% Match</target></trans-unit>
@@ -1979,6 +1979,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U3RhbmRhcmRtw6TDn2lnIHdpcmQgYmVpIG5ldWVuIEF1ZmdhYmVuIGbDvHIgZGllIGdld8OkaGx0ZW4gS3VuZGVuIExlc2VyZWNodCBmw7xyIGRpZXNlIFNwcmFjaHJlc291cmNlIGFrdGl2aWVydA=='><source>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert</source><target>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRtw6TDn2lnIHdpcmQgYmVpIG5ldWVuIEF1ZmdhYmVuIGbDvHIgZGllIGdld8OkaGx0ZW4gS3VuZGVuIGdlc2V0enQsIGRhc3MgU2VnbWVudGUgYmVpbSBTZWdtZW50IHNwZWljaGVybiBpbiBkaWUgU3ByYWNocmVzb3VyY2UgZ2VzY2hyaWViZW4gd2VyZGVu'><source>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden</source><target>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden</target></trans-unit>
 <trans-unit id='TnVyIHdpZWRlcmhvbHQ='><source>Nur wiederholt</source><target>Nur wiederholt</target></trans-unit>
+<trans-unit id='Q291bGQgbm90IGNvbm5lY3QgdG8gbGFuZ3VhZ2UgcmVzb3VyY2UgT3BlblRNMiAtIGh0dHA6Ly9sb2NhbGhvc3Q6MTk4NC9vdG1tZW1vcnlzZXJ2aWNlLzogdGltZW91dCBvbiBjb25uZWN0aW9uIHRvIHNlcnZlcg=='><source>Could not connect to language resource OpenTM2 - http://localhost:1984/otmmemoryservice/: timeout on connection to server</source><target>Could not connect to language resource OpenTM2 - http://localhost:1984/otmmemoryservice/: timeout on connection to server</target></trans-unit>
   </body>
  </file>
 </xliff>

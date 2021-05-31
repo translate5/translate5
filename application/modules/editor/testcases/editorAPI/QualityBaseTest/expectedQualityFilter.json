@@ -150,7 +150,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "4877",
+                            "qid": "7506",
                             "qtype": "mqm",
                             "qcount": 171,
                             "qcomplete": true,
@@ -162,7 +162,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "4872",
+                            "qid": "7501",
                             "qtype": "mqm",
                             "qcount": 105,
                             "qcomplete": true,
@@ -174,7 +174,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "5003",
+                            "qid": "7632",
                             "qtype": "mqm",
                             "qcount": 12,
                             "qcomplete": true,
@@ -186,7 +186,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "4876",
+                            "qid": "7505",
                             "qtype": "mqm",
                             "qcount": 3,
                             "qcomplete": true,
@@ -198,7 +198,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "4866",
+                            "qid": "7495",
                             "qtype": "mqm",
                             "qcount": 13,
                             "qcomplete": true,
@@ -224,7 +224,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "4869",
+                            "qid": "7498",
                             "qtype": "mqm",
                             "qcount": 21,
                             "qcomplete": true,
@@ -236,13 +236,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "5006",
+                            "qid": "7635",
                             "qtype": "mqm",
                             "qcount": 6,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "4865",
+                                    "qid": "7494",
                                     "qtype": "mqm",
                                     "qcount": 12,
                                     "qcomplete": true,
@@ -262,13 +262,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "4900",
+                            "qid": "7529",
                             "qtype": "mqm",
                             "qcount": 2,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "4913",
+                                    "qid": "7542",
                                     "qtype": "mqm",
                                     "qcount": 4,
                                     "qcomplete": true,
@@ -288,7 +288,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "4894",
+                            "qid": "7523",
                             "qtype": "mqm",
                             "qcount": 10,
                             "qcomplete": true,
@@ -318,7 +318,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "4867",
+                                    "qid": "7496",
                                     "qtype": "mqm",
                                     "qcount": 32,
                                     "qcomplete": true,
@@ -330,7 +330,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "4884",
+                                    "qid": "7513",
                                     "qtype": "mqm",
                                     "qcount": 28,
                                     "qcomplete": true,
@@ -342,7 +342,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "4875",
+                                    "qid": "7504",
                                     "qtype": "mqm",
                                     "qcount": 51,
                                     "qcomplete": true,
@@ -354,7 +354,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "5027",
+                                    "qid": "7656",
                                     "qtype": "mqm",
                                     "qcount": 17,
                                     "qcomplete": true,
@@ -411,7 +411,7 @@
                     "qtype": "term",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": "transNotFound",
+                    "qcategory": "not_found_in_target",
                     "text": "Not found in target",
                     "leaf": true,
                     "checked": false
@@ -421,7 +421,7 @@
                     "qtype": "term",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": "transNotDefined",
+                    "qcategory": "not_defined_in_target",
                     "text": "Not defined in target terminology",
                     "leaf": true,
                     "checked": false
@@ -431,8 +431,8 @@
                     "qtype": "term",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": "supersededTerm",
-                    "text": "Forbidden in source",
+                    "qcategory": "forbidden_in_target",
+                    "text": "Forbidden in target",
                     "leaf": true,
                     "checked": false
                 },
@@ -441,7 +441,7 @@
                     "qtype": "term",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": "deprecatedTerm",
+                    "qcategory": "forbidden_in_source",
                     "text": "Forbidden in source",
                     "leaf": true,
                     "checked": false

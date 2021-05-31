@@ -162,9 +162,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           '#Editor.$application': {
               adminViewportClosed: 'clearTasks',
               editorViewportOpened: 'handleInitEditor'
-          },
-          '#admin.Customer':{
-              filteredCustomerForTaskAdd:'updateTaskAddWindowVisible'
           }
       },
       component: {
@@ -230,9 +227,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
           '#taskActionMenu,#projectActionMenu':{
         	  click:'onTaskActionMenuClick'
-          },
-          '#adminTaskAddWindow #customerId':{
-              select:'onTaskAddWindowCustomerSelect'
           }
       }
   },
@@ -302,8 +296,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           if(idx >= 0) {
               customerId = customer.store.getAt(idx).get('id');
               customer.setValue(customerId);
-              // update pivot language dropdown visible
-              me.updateTaskAddWindowVisible(customerId);
           }
       }
   },
@@ -1176,33 +1168,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   onAfterTaskDeleteEventHandler:function(task){
       Ext.StoreManager.get('admin.Tasks').load();
-  },
-  
-  /***
-   * Set pivot language dropdown visible in task add window based on the pivotDropdownVisible customer specific config.
-   * 
-   */
-  updateTaskAddWindowVisible:function(customerId){
-      if(!customerId){
-          return;
-      }
-      
-      var me = this,
-          store = Ext.StoreManager.get('admin.CustomerConfig');
-      
-      store.setExtraParams({customerId:customerId });// load the customer config for the selected customer
-        
-      store.load(function(){
-          // set the rails language combo visible based on the cutomer specific config
-          me.getTaskAddWindowRelaisLangCombo().setVisible(store.getConfig('frontend.importTask.pivotDropdownVisible'));
-      });
-  },
-  
-  /***
-   * Task add window customer dropdown select event listener
-   */
-  onTaskAddWindowCustomerSelect:function(combo, record){
-      this.updateTaskAddWindowVisible(record.get('id'));
   }
   
 });
