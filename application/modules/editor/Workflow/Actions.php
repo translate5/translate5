@@ -206,16 +206,10 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         
         // get the config for the task workflow and the user assoc role workflow step
         $configValue = $task->getConfig()->runtimeOptions->workflow->{$task->getWorkflow()}->{$workflowStep}->defaultDeadlineDate ?? 0;
-        if($configValue<1){
+        if($configValue<=0){
             return;
         }
-        // new deadline date = "task order date" + "configured days"
-        $newDeadline =date ('Y-m-d' , strtotime($task->getOrderdate().' +'.$configValue.' Weekday'));
-        //Add the current time to the new deadline. The order date by default is without timestamp (always 0:0:0 as time), and because of that
-        //the new deadline date will always be with 0:0:0 as timestamp. For the deadline date the time is important.
-        $dateAndTime = explode(" ", NOW_ISO);
-        $newDeadline .=' '.array_pop($dateAndTime);
-        $tua->setDeadlineDate($newDeadline);
+        $tua->setDeadlineDate(editor_Utils::addBusinessDays($task->getOrderdate(),$configValue));
     }
     
     /***
