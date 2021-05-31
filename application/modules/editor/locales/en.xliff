@@ -1584,7 +1584,7 @@
 </trans-unit>
 <trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='>
     <source>(zur Importzeit)</source>
-    <target>(at time of import)</target>
+    <target>(at time of import / pretranslation)</target>
 </trans-unit>
 <trans-unit id='WmllbHRleHQ='>
     <source>Zieltext</source>
