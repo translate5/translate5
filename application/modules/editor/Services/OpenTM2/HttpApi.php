@@ -89,7 +89,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         
         $data = new stdClass();
         $tmData = $this->fixLanguages->tmxOnUpload($tmData);
-        $data->tmxData = base64_encode($tmData);
+        /* @var $tmxRepairer editor_Services_OpenTM2_FixImportParser */
+        $tmxRepairer = ZfExtended_Factory::get('editor_Services_OpenTM2_FixImportParser');
+        $data->tmxData = base64_encode($tmxRepairer->convert($tmData));
 
         $http = $this->getHttpWithMemory('POST', '/import');
         $http->setConfig(['timeout' => 1200]);
@@ -210,6 +212,11 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             $this->result = json_decode('{"ReturnValue":0,"ErrorMsg":"","NumOfFoundProposals":0}');
             return true;
         }
+        
+//         $queryString = 'Start the <bpt i="1" mid="1" /><ph mid="2"/><ex mid="3" i="1"/> and wait until the LED is continuous green.';
+//         $queryString = 'Start the <it type="struct"/> and wait until the LED is continuous green.';
+//         $queryString = 'Start the <x mid="2"/> and wait until the LED is continuous green.';
+//         $queryString = 'Start the <bx mid="1" rid="1"/><x mid="2"/><ex mid="3" rid="1"/> and wait until the LED is continuous green.';
         
         $json->source = $queryString;
         //In general OpenTM2 can deal with whole paths, not only with filenames.
