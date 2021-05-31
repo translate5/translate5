@@ -65,11 +65,11 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
         return $tags;
     }
     
-    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
+    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
         return $translate->_('Interne Tags');
     }
     
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         switch($category){
             case editor_Segment_Internal_TagComparision::TAGS_MISSING:
                 return $translate->_('Interne Tags fehlen');

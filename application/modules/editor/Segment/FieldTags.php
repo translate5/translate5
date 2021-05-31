@@ -247,6 +247,20 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return ($this->isFieldTextEmpty() && !$this->hasTags());
     }
     /**
+     * Evaluates, if the bound field is a source field
+     * @return bool
+     */
+    public function isSourceField() : bool {
+        return (substr($this->field, 0, 6) == 'source');
+    }
+    /**
+     * Evaluates, if the bound field is a target field
+     * @return bool
+     */
+    public function isTargetField() : bool {
+        return !$this->isSourceField();
+    }
+    /**
      *
      * @return string
      */

@@ -82,11 +82,11 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
         return false;
     }
     
-    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
+    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
         return $translate->_('Nutzung von TM-Treffern');
     }
     
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         switch($category){
             case editor_Segment_MatchRate_Provider::UNEDITED_FUZZY_MATCH:
                 return $translate->_('Unbearbeiteter Fuzzy');

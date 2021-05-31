@@ -597,13 +597,13 @@ class editor_Tag {
      * Retrieves the classnames
      * @return string
      */
-    public function getClasses(){
+    public function getClasses() : string {
         return implode(' ', $this->classes);
     }
     /**
      * Retrieves the sorted classnames, can be used to compare tags by classnames
      */
-    public function getSortedClasses(){
+    public function getSortedClasses() : string {
         $classes = $this->classes;
         sort($classes);
         return implode(' ', $classes);
