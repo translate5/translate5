@@ -54,7 +54,7 @@ class QualityBaseTest extends editor_Test_JsonTest {
             'lockLocked' => 1,
         );
         
-        $appState = self::assertAppState();
+        self::assertAppState();
         self::assertNeededUsers();
         self::assertLogin('testmanager');
 

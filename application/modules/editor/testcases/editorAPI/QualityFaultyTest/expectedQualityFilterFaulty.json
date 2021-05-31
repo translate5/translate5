@@ -17,7 +17,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "5872",
+                    "qid": "8487",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -28,7 +28,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "5871",
+                    "qid": "8486",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -59,7 +59,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "5870",
+                    "qid": "8485",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -422,35 +422,35 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "5865",
+                    "qid": "8480",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
-                    "qcategory": "transNotFound",
+                    "qcategory": "not_found_in_target",
                     "qcatidx": "-1",
                     "text": "Not found in target",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "5859",
+                    "qid": "8474",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
-                    "qcategory": "transNotDefined",
+                    "qcategory": "not_defined_in_target",
                     "qcatidx": "-1",
                     "text": "Not defined in target terminology",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "5863",
+                    "qid": "8478",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
-                    "qcategory": "supersededTerm",
+                    "qcategory": "forbidden_in_target",
                     "qcatidx": "-1",
-                    "text": "Forbidden in source",
+                    "text": "Forbidden in target",
                     "leaf": true,
                     "checked": false
                 },
@@ -459,7 +459,7 @@
                     "qtype": "term",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": "deprecatedTerm",
+                    "qcategory": "forbidden_in_source",
                     "text": "Forbidden in source",
                     "leaf": true,
                     "checked": false

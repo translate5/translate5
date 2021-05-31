@@ -1,5 +1,5 @@
 {
-    "text": "{110ad3ea-9209-4418-9d03-b5e001b92852}",
+    "text": "{d5e99721-0326-498a-8c68-fa414aa41286}",
     "children": [
         {
             "qid": -1,
@@ -8,7 +8,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "5870",
+                    "qid": "8485",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -20,7 +20,7 @@
                     "qfaulty": true
                 },
                 {
-                    "qid": "5871",
+                    "qid": "8486",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -31,7 +31,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5872",
+                    "qid": "8487",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -77,33 +77,33 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "5859",
+                    "qid": "8474",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
-                    "qcategory": "transNotDefined",
+                    "qcategory": "not_defined_in_target",
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Not defined in target terminology",
                     "leaf": true
                 },
                 {
-                    "qid": "5863",
+                    "qid": "8478",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
-                    "qcategory": "supersededTerm",
+                    "qcategory": "forbidden_in_target",
                     "qcatidx": "-1",
                     "qcountfp": 0,
-                    "text": "Forbidden in source",
+                    "text": "Forbidden in target",
                     "leaf": true
                 },
                 {
-                    "qid": "5865",
+                    "qid": "8480",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
-                    "qcategory": "transNotFound",
+                    "qcategory": "not_found_in_target",
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Not found in target",
