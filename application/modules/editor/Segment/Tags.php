@@ -303,17 +303,44 @@ class editor_Segment_Tags implements JsonSerializable {
      * @return bool
      */
     public function hasEditedTargets() : bool {
+        return count($this->getEditedTargetFields()) > 0;
+    }
+    /**
+     * Retrieves the target fields that are edited compared to the original target
+     * Empty targets will be ignored and trackchanges tags will be stripped. This means, that contents reverted to the original state by the editor will be seen as "unchanged"
+     * @return array
+     */
+    public function getEditedTargetFields() : array {
+        return $this->getChangedTargetFields(true);
+    }
+    /**
+     * Retrieves the target fields that are NOT edited compared to the original target
+     * Empty targets will be ignored and trackchanges tags will be stripped. This means, that contents reverted to the original state by the editor will be seen as "unchanged"
+     * @return array
+     */
+    public function getUneditedTargetFields() : array {
+        return $this->getChangedTargetFields(false);
+    }
+    /**
+     * Retrieves all targets that have been changed, either edited or not edited
+     * @param boolean $edited
+     * @return array
+     */
+    private function getChangedTargetFields($edited) : array {
+        $changedTargets = [];
         if($this->hasOriginalTarget()){
             // only internal tags will be allowed for the equation
             $filteredTypes = [ editor_Segment_Tag::TYPE_INTERNAL ];
-            $compare = $this->targetOriginal->cloneFiltered($filteredTypes)->render();
+            $renderedOriginal = $this->targetOriginal->cloneFiltered($filteredTypes)->render();
             foreach($this->getTargets() as $target){
-                if(!$target->isEmpty() && $target->cloneWithoutTrackChanges($filteredTypes)->render() != $compare){
-                    return true;
+                // create Clone with stripped trackchanges
+                $renderedTarget = $target->cloneWithoutTrackChanges($filteredTypes)->render();
+                if(!$target->isEmpty() && (($edited === true && $renderedTarget != $renderedOriginal) || ($edited === false && $renderedTarget == $renderedOriginal))){
+                    $changedTargets[] = $target->getField();
                 }
             }
         }
-        return false;
+        return $changedTargets;
     }
     /**
      * 
