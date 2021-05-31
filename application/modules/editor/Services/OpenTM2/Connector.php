@@ -143,7 +143,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_Abstract::addAdditionalTm()
      */
     public function addAdditionalTm(array $fileinfo = null,array $params=null){
-        //FIXME refactor to streaming (for huge files) if possible by underlying HTTP client
         if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
             return true;
         }
@@ -244,7 +243,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 return $this->resultList;
             }
             foreach($result->results as $found) {
-                
                 $target = $this->tagHandler->restoreInResult($found->target);
                 $hasTargetErrors = $this->tagHandler->hasRestoreErrors();
                 
@@ -256,11 +254,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                     $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
                 }
 
-                if($this->tagHandler->hasRemovedContentTags()) {
-                    //the invalid tags are removed, reduce the matchrate by 2 percent
-                    $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
-                }
-                
                 $matchrate = $this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$segment, $fileName);
                 $this->resultList->addResult($target, $matchrate, $this->getMetaData($found));
                 $this->resultList->setSource($source);
