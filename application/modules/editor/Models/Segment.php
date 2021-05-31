@@ -483,15 +483,43 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * Convenience API to evaluate if a segment has been pretranslated by a machine translation
      * @return boolean
      */
-    public function isMtPretranslated() {
+    public function isPretranslatedMT() {
         return $this->getPretrans() !== 0 && editor_Models_Segment_MatchRateType::isFromMT($this->getMatchRateType());
     }
     /**
      * Convenience API to evaluate if a segment has been pretranslated by a translation memory
      * @return boolean
      */
-    public function isTmPretranslated() {
+    public function isPretranslatedTM() {
         return $this->getPretrans() !== 0 && editor_Models_Segment_MatchRateType::isFromTM($this->getMatchRateType());
+    }
+    /**
+     * Convenience API to evaluate if a segment was taken over as a match by a machine translation
+     * @return boolean
+     */
+    public function isEditedMT() {
+        return editor_Models_Segment_MatchRateType::isEditedMT($this->getMatchRateType());
+    }
+    /**
+     * Convenience API to evaluate if a segment was taken over as a match by a translation memory
+     * @return boolean
+     */
+    public function isEditedTM() {
+        return editor_Models_Segment_MatchRateType::isEditedTM($this->getMatchRateType());
+    }
+    /**
+     * Convenience API to evaluate if a segment originates from a machine translation (either pretranslated or taken over later on)
+     * @return boolean
+     */
+    public function isMT() {
+        return editor_Models_Segment_MatchRateType::isTypeMT($this->getMatchRateType());
+    }
+    /**
+     * Convenience API to evaluate if a segment originates from a translation memory (either pretranslated or taken over later on)
+     * @return boolean
+     */
+    public function isTM() {
+        return editor_Models_Segment_MatchRateType::isTypeTM($this->getMatchRateType());
     }
     /**
      * restores segments with content not changed by the user to the original

@@ -255,6 +255,58 @@ class editor_Models_Segment_MatchRateType {
         return in_array(self::PREFIX_EDITED, $type);
     }
     /**
+     * retrieves if the matchtype generally originates from a Machine Translation / MT
+     * @param string $type
+     * @return bool
+     */
+    public static function isTypeMT(string $type): bool {
+        return in_array(self::TYPE_MT, explode(';', $type));
+    }
+    /**
+     * returns true if the given matchtype was imported or is pretranslated from a Machine Translation / MT
+     * TODO / FIXME: the naming should better differntiate from ::isTypeMT
+     * @param string $type
+     * @return bool
+     */
+    public static function isFromMT(string $type): bool {
+        return strpos($type, self::PREFIX_IMPORT.';'.self::TYPE_MT) === 0 || strpos($type, self::PREFIX_PRETRANSLATED.';'.self::TYPE_MT) === 0;
+    }
+    /**
+     * retrieves if the matchtype originates from a taken over Machine Translation / MT match
+     * @param string $type
+     * @return bool
+     */
+    public static function isEditedMT(string $type): bool {
+        $types = explode(';', $type);
+        return $types[0] == self::PREFIX_EDITED && in_array(self::TYPE_MT, $types);
+    }
+    /**
+     * retrieves if the matchtype generally originates from a Translation Memory / TM
+     * @param string $type
+     * @return bool
+     */
+    public static function isTypeTM(string $type): bool {
+        return in_array(self::TYPE_TM, explode(';', $type));
+    }
+    /**
+     * returns true if the given matchtype was imported or is pretranslated from a Translation Memory / TM
+     * TODO / FIXME: the naming should better differntiate from ::isTypeTM
+     * @param string $type
+     * @return bool
+     */
+    public static function isFromTM(string $type): bool {
+        return strpos($type, self::PREFIX_IMPORT.';'.self::TYPE_TM) === 0 || strpos($type, self::PREFIX_PRETRANSLATED.';'.self::TYPE_TM) === 0;
+    }
+    /**
+     * retrieves if the matchtype originates from a taken over Translation Memory / TM match
+     * @param string $type
+     * @return bool
+     */
+    public static function isEditedTM(string $type): bool {
+        $types = explode(';', $type);
+        return $types[0] == self::PREFIX_EDITED && in_array(self::TYPE_TM, $types);
+    }
+    /**
      * generates the matchrate type by imported segment data
      * @param editor_Models_Import_FileParser_SegmentAttributes $importedValue the plain value from
      * @param mixed $mid segment mid for logging purposes only
@@ -437,25 +489,6 @@ class editor_Models_Segment_MatchRateType {
     public function isImported() {
         return isset($this->data[0]) && $this->data[0] == self::PREFIX_IMPORT;
     }
-    
-    /**
-     * returns true if the given matchtype was imported from a TM
-     * @param string $type
-     * @return bool
-     */
-    public static function isFromTM(string $type): bool {
-        return strpos($type, self::PREFIX_IMPORT.';'.self::TYPE_TM) === 0 || strpos($type, self::PREFIX_PRETRANSLATED.';'.self::TYPE_TM) === 0;
-    }
-    
-    /**
-     * returns true if the given matchtype was imported from a MT
-     * @param string $type
-     * @return bool
-     */
-    public static function isFromMT(string $type): bool {
-        return strpos($type, self::PREFIX_IMPORT.';'.self::TYPE_MT) === 0 || strpos($type, self::PREFIX_PRETRANSLATED.';'.self::TYPE_MT) === 0;
-    }
-    
     /**
      * returns true if the given type (as string parameter) is a pretranslation type (currently TM and MT)
      * @param string $type
