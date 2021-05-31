@@ -321,10 +321,7 @@ class editor_Models_Segment_AutoStates {
      */
     public function calculatePretranslationState(bool $isEditable): int
     {
-        if(! $isEditable) {
-            return self::BLOCKED;
-        }
-        return self::PRETRANSLATED;
+        return $isEditable ? self::PRETRANSLATED : self::BLOCKED;
     }
     
     /**

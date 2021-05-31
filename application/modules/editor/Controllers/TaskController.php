@@ -693,7 +693,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         
-        //TODO: here write as reference also 
+        //TODO: here write as reference also
         $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsUseAsDefault([$this->data['customerId']]);
         
         if(empty($allUseAsDefaultCustomers)) {
@@ -1105,7 +1105,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //if the edit100PercentMatch is changed, update the value for all segments in the task
         if(isset($this->data->edit100PercentMatch)){
             $bulkUpdater = ZfExtended_Factory::get('editor_Models_Segment_AutoStates_BulkUpdater');
-            /* @var editor_Models_Segment_Utility $bulkUpdater */
+            /* @var editor_Models_Segment_AutoStates_BulkUpdater $bulkUpdater */
             $bulkUpdater->updateSegmentsEdit100PercentMatch($this->entity, (boolean)$this->data->edit100PercentMatch);
         }
 
