@@ -994,11 +994,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * returns a list with editable dataindex
+     * @param boolean $addOriginalTargetWhenDefaultLayout: special flag to enable manipulating the target when the fields are in default layout
      * @return array
      */
-    public function getEditableDataIndexList()
+    public function getEditableDataIndexList($addOriginalTargetWhenDefaultLayout=false)
     {
-        return $this->segmentFieldManager->getEditableDataIndexList();
+        return $this->segmentFieldManager->getEditableDataIndexList($addOriginalTargetWhenDefaultLayout);
     }
 
     /**
