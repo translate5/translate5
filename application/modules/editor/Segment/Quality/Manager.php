@@ -265,13 +265,13 @@ final class editor_Segment_Quality_Manager {
     public function translateQualityType(string $type) : string {
         if($this->hasProvider($type)){
             $translation = $this->getProvider($type)->translateType($this->getTranslate());
-            if(empty($translation)){
-                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+            if($translation === NULL){
+                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation for the type".');
             }
             return $translation;
         }
-        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation for the type".');
-        return NULL;
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+        return '';
     }
     /**
      * Translates a Segment Quality Code that is referenced in LEK_segment_quality category in conjunction with type
@@ -284,13 +284,13 @@ final class editor_Segment_Quality_Manager {
     public function translateQualityCategory(string $type, string $category, editor_Models_Task $task) : string {
         if($this->hasProvider($type)){
             $translation = $this->getProvider($type)->translateCategory($this->getTranslate(), $category, $task);
-            if(empty($translation)){
-                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+            if($translation === NULL){
+                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation of category "'.$category.'".');
             }
             return $translation;
-        }        
-        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation of category "'.$category.'".');
-        return NULL;
+        }
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+        return '';
     }
     /**
      * Evaluates, if a quality of the given type renders tags in the tags texts

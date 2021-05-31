@@ -62,11 +62,11 @@ class editor_Segment_Qm_Provider extends editor_Segment_Quality_Provider {
         return $tags;
     }
     
-    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
+    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
         return $translate->_('Manuelle QS (ganzes Segment)');
     }
     
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         $typesByIndex = $this->getTypesByIndex();
         $categoryIndex = intval(str_replace(editor_Segment_Tag::TYPE_QM.'_', '', $category)); // see editor_Models_Db_SegmentQuality::addMqm how we evaluate the index from the category
         if(isset($typesByIndex[$categoryIndex])){

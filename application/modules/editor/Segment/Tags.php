@@ -431,7 +431,22 @@ class editor_Segment_Tags implements JsonSerializable {
         }
         return $result;
     }
-    
+    /**
+     * Retrieves all tags from all our field tags and ranges them by field
+     * @param string $type
+     * @return array
+     */
+    public function getTagsByTypeForField(string $type) : array {
+        $result = [];
+        foreach($this->getFieldTags() as $fieldTags){
+            $field = $fieldTags->getField();
+            if(!array_key_exists($field, $result)){
+                $result[$field] = [];
+            }
+            $result[$field] = array_merge($result[$field], $fieldTags->getByType($type));
+        }
+        return $result;
+    }
     /**
      * Removes the tags of the passed type in all our editable field tags
      * @param string $type
