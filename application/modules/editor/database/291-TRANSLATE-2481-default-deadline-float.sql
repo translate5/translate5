@@ -25,4 +25,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
+ALTER TABLE `Zf_configuration`
+CHANGE COLUMN `type` `type` ENUM('string', 'integer', 'boolean', 'list', 'map', 'absolutepath', 'float') NOT NULL DEFAULT 'string' COMMENT 'the type of the config value is needed also for GUI' ;
+
 UPDATE Zf_configuration set type = "float" where name like '%.defaultDeadlineDate' and type = "integer";
