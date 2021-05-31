@@ -280,16 +280,16 @@ class editor_Utils {
      * Add weekdays/business-days to the inputDate. The daysToAdd can be integer or float (the number will be converted to seconds and add to toe inputDate).
      * If the inputDate is without time (00:00:00), the current time will be used
      * @param string $inputDate : string as date in Y-m-d H:i:s or Y-m-d format
-     * @param number $daysToAdd
+     * @param mixed $daysToAdd
      * @return string
      */
-    public static function addBusinessDays(string $inputDate ,  $daysToAdd){
+    public static function addBusinessDays(string $inputDate, $daysToAdd): string{
 
         $daysDecimal = $daysToAdd - (int)$daysToAdd;
         $secondsToAdd = $daysDecimal > 0 ? (' +'.(24*$daysDecimal*3600).' seconds') : '';
 
         $inputDateChunks = explode(' ',$inputDate);
-        // if no timestamp is provided for the inputDate, use the current timestamp
+        // if no timestamp is provided for the inputDate, or the time is 00:00:00 -> use the current timestamp
         if(count($inputDateChunks) === 1 || $inputDateChunks[1] === '00:00:00'){
             $dateAndTime = explode(" ", NOW_ISO);
             $inputDate = date('Y-m-d',strtotime($inputDate)).' '.array_pop($dateAndTime);

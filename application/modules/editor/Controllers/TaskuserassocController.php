@@ -399,7 +399,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      * To use the defaultDeadline date, the deadlineDate field should be set to "default" 
      */
     protected function setDefaultDeadlineDate() {
-         $this->data->deadlineDate = "default";
         //check if default deadline date should be set
         //To set the defaultDeadline date via the api, the deadlineDate field should be set to "default"
         if(!isset($this->data->deadlineDate) || $this->data->deadlineDate!=="default" || !isset($this->data->taskGuid)){
@@ -425,31 +424,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             return;
         }
 
-        $deadline = editor_Utils::addBusinessDays($model->getOrderdate(),$configValue);
-
-        $this->data->deadlineDate = $deadline;
-        $this->entity->setDeadlineDate($deadline);
-        return;
-
-        $daysDecimal = $configValue - (int)$configValue;
-        $secondsToAdd = $daysDecimal > 0 ? (' +'.(24*$daysDecimal*3600).' seconds') : '';
-
-        //Add the current time to the new deadline. The order date by default is without timestamp (always 0:0:0 as time), and because of that
-        //the new deadline date will always be with 0:0:0 as timestamp. For the deadline date the time is important.
-        $dateAndTime = explode(" ", NOW_ISO);
-        $deadlineTimestamp = date('Y-m-d',strtotime($model->getOrderdate())).' '.array_pop($dateAndTime);
-
-        if(!empty($secondsToAdd)){
-            $deadlineTimestamp = date ('Y-m-d H:i:s' , strtotime($deadlineTimestamp.$secondsToAdd));
-        }
-        // this must be done because the time is set to 00:00:00 when the date contains time in it
-        // probably it is php bug
-        $deadlineTimestamp = explode(' ',$deadlineTimestamp);
-
-
-        $weekdaysTemplate = $deadlineTimestamp[0].' +'.((int)$configValue).' Weekday';
-        $newDeadline = date ('Y-m-d' , strtotime($weekdaysTemplate)).' '.$deadlineTimestamp[1];
-        $this->data->deadlineDate = $newDeadline;
-        $this->entity->setDeadlineDate($newDeadline);
+        // the deadline will be order date + defaultDeadlineDate days config
+        $this->data->deadlineDate = editor_Utils::addBusinessDays($model->getOrderdate(),$configValue);
+        $this->entity->setDeadlineDate($this->data->deadlineDate);
     }
 }
