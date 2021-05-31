@@ -94,25 +94,16 @@ class editor_Plugins_MatchAnalysis_Export_Xml
     protected $rootNode = null;
     
     /**
-     * @param SimpleXMLElement $object
-     * @param $data
-     * @return SimpleXMLElement
+     * adds empty fuzzy nodes
      */
-    protected function addFuzzyChilds(SimpleXMLElement $object, $data, $childName = 'fuzzy'): SimpleXMLElement
-    {
-        foreach ($this->FUZZY_RANGES as $min => $max) {
-            $child = $object->batchTotal->analyse->addChild($childName);
-            $child->addAttribute('min', $min);
-            $child->addAttribute('max', $max);
-            foreach (self::ATTRIBUTES as $attr) {
-                if ($attr == 'words') {
-                    $child->addAttribute($attr, $data[$max]);
-                }else{
-                    $child->addAttribute($attr, '0');
-                }
-            }
+    protected function addEmptyFuzzyNodes() {
+        foreach(self::FUZZY_RANGES as $min => $max) {
+            $this->add('fuzzy', ['min' => $min, 'max' => $max]);
         }
-        return $object;
+        //we use separate loops to sort all internal fuzzies below the fuzzies
+        foreach(self::FUZZY_RANGES as $min => $max) {
+            $this->add('internalFuzzy', ['min' => $min, 'max' => $max]);
+        }
     }
 
     /**
@@ -147,6 +138,8 @@ class editor_Plugins_MatchAnalysis_Export_Xml
         $usedLanguageResources = [];
         
         $hasInternalFuzzy = false;
+        
+        $this->addEmptyFuzzyNodes();
         
         //llop over data and categorize it
         foreach ($rows as $row) {
