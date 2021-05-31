@@ -268,8 +268,56 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             'collectionIds' => '8,10,11,12',
             'processStatus' => 'provisionallyProcessed,rejected,finalized,unprocessed',
             'noTermDefinedFor' => '4',
-            'limit' => '25,0'
+            'limit' => '25,0',
+            'attrs' => [
+                6 => 'asd',   // 6 is the attribute's dataTypeId
+                7 => 'qwe'
+            ]
         ];*/
+
+        // Get the comma-separated list of termEntryIds matching attr-filters
+        foreach ($params['attrs'] as $aDataTypeId => $aValue) {
+
+            // If wildcards are used, convert them to the mysql syntax
+            $expr = str_replace(['*', '?'], ['%', '_'], $aValue);
+
+            // Prepare query param bindings
+            $bind = [':dataTypeId' => $aDataTypeId];
+
+            // Build WHERE clause
+            $attrWHERE = ['`dataTypeId` = :dataTypeId'];
+
+            // If filter value is given
+            if ($aValue) {
+
+                // Append to WHERE clause
+                $attrWHERE []= '`value`' . ($expr == $aValue ? ' = ' : ' LIKE ') . ':value';
+
+                // Add bindings
+                $bind += [':value' => $expr];
+            }
+
+            // Mind previous query results to apply intersection
+            if ($termEntryIds) $attrWHERE []= '`termEntryId` IN (' . $termEntryIds . ')';
+
+            // Get termEntryIds of matched attributes
+            $termEntryIds = implode(',', db()->query('
+                SELECT DISTINCT `termEntryId` 
+                FROM `terms_attributes` 
+                WHERE ' . implode(' AND ', $attrWHERE),
+                $bind
+            )->fetchAll(PDO::FETCH_COLUMN));
+
+            // If nothing found
+            if (!$termEntryIds) {
+
+                // Setup &$total variable by reference, as 0
+                $total = 0;
+
+                // Return empty data
+                return [];
+            }
+        }
 
         // If wildcards are used, convert them to the mysql syntax
         $keyword = str_replace(['*', '?'], ['%', '_'], $params['query']);
@@ -295,6 +343,9 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             '`t`.`collectionId` IN (' . $params['collectionIds'] . ')',
             '`t`.`processStatus` IN ("' . str_replace(',', '","', $params['processStatus']) . '")',
         ];
+
+        // Mind attr-filters in WHERE clause
+        if ($termEntryIds) array_unshift($where, '`t`.`termEntryId` IN (' . $termEntryIds . ')');
 
         // If 'noTermDefinedFor' param is given
         if ($_ = (int) $params['noTermDefinedFor']) {
