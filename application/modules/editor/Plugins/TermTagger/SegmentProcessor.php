@@ -33,20 +33,35 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_TermTagger_SegmentProcessor {
     
     /**
-     * these are the term states we want to see as qualities and which are also css-classes of the term-tags
-     * @var string[]
-     */
-    static $qualityStates = [ editor_Models_Term::STAT_SUPERSEDED, editor_Models_Term::STAT_DEPRECATED, editor_Models_Term::TRANSSTAT_NOT_FOUND, editor_Models_Term::TRANSSTAT_NOT_DEFINED ];
-    /**
-     * Filters a quality state out of an array of term-entries
+     * Filters a quality state out of an array of term tag css-classes (=states)
      * Returns an empty string if any found
      * @param array $cssClasses
+     * @param bool $isTargetField
      * @return string
      */
-    public static function getQualityState(array $cssClasses) : string {
+    public static function getQualityState(array $cssClasses, bool $isSourceField) : string {
         foreach($cssClasses as $cssClass){
-            if(in_array($cssClass, self::$qualityStates)){
-                return $cssClass;
+            switch($cssClass){                
+                case editor_Models_Term::TRANSSTAT_NOT_FOUND:
+                    if($isSourceField){
+                        return editor_Plugins_TermTagger_QualityProvider::NOT_FOUND_IN_TARGET;
+                    }
+                    break;
+                    
+                case editor_Models_Term::TRANSSTAT_NOT_DEFINED:
+                    if($isSourceField){
+                        return editor_Plugins_TermTagger_QualityProvider::NOT_DEFINED_IN_TARGET;
+                    }
+                    break;
+                    
+                case editor_Models_Term::STAT_SUPERSEDED:
+                case editor_Models_Term::STAT_DEPRECATED:
+                    if($isSourceField){
+                        return editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_SOURCE;
+                    } else {
+                        return editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_TARGET;
+                    }                    
+                    break;
             }
         }
         return '';
@@ -57,10 +72,12 @@ class editor_Plugins_TermTagger_SegmentProcessor {
      */
     public static function findAndAddQualitiesInTags(editor_Segment_Tags $tags){
         $type = editor_Plugins_TermTagger_Tag::TYPE;
-        foreach($tags->getTagsByType($type) as $termTag){
-            /* @var $termTag editor_Plugins_TermTagger_Tag */
-            if($termTag->hasCategory()){
-                $tags->addQualityByTag($termTag);
+        foreach($tags->getTagsByTypeForField($type) as $field => $termTags){
+            /* @var $termTags editor_Plugins_TermTagger_Tag[] */
+            foreach($termTags as $termTag){
+                if($termTag->hasCategory()){
+                    $tags->addQualityByTag($termTag, $field);
+                }
             }
         }
     }
