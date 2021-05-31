@@ -43,10 +43,16 @@ Ext.define('Editor.util.Util', {
         /***
         *
         * @param {Date} date The date to modify
-        * @param {Number} days The amount to add to the current date.
+        * @param {Number} days The amount to add to the current date. If decimal provided, it will be converted to hours
         * @return {Date} The new Date instance.
         */
         addBusinessDays:function(date,days){
+            // if it is float number, calculate the hours from the floating point number.
+            var hours = days - parseInt(days);
+            if(hours > 0){
+                hours = 24 * hours;
+                date = Ext.Date.add(date, Ext.Date.HOUR, hours);
+            }
             for(var i=1;i<=days;){
                 date = Ext.Date.add(date, Ext.Date.DAY, 1);
                 if(!Ext.Date.isWeekend(date)){
