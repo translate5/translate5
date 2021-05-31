@@ -210,9 +210,12 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             $targetResult = $this->internalTag->removeIgnoredTags($targetResult);
             $segment->setMatchRate($result->matchrate);
             $matchrateType->initPretranslated($languageResource->getResourceType(), $type);
+            //negated explanation is easier: lock the pretranslations if 100 matches in the task are not editable
+            $segment->setEditable($result->matchrate < 100 || $this->task->getEdit100PercentMatch());
         }
-        //if the source contains no text but tags only, we set the target to the source directly
         else {
+            //if the source contains no text but tags only, we set the target to the source directly
+            // and the segment is not editable
             $targetResult = $segment->getSource();
             $segment->setMatchRate(editor_Services_Connector_FilebasedAbstract::CONTEXT_MATCH_VALUE);
             $matchrateType->initPretranslated($matchrateType::TYPE_SOURCE);
@@ -221,10 +224,9 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         $segment->setMatchRateType((string) $matchrateType);
         
-        //if there is no text, it should be blocked, also if it is not editable
-        $pretrans = $hasText && $segment->isEditable();
-        $segment->setAutoStateId($this->autoStates->calculatePretranslationState($pretrans));
-        $segment->setPretrans($pretrans ? $segment::PRETRANS_INITIAL : $segment::PRETRANS_NOTDONE);
+        $segment->setAutoStateId($this->autoStates->calculatePretranslationState($segment->isEditable()));
+        //a segment is only pretranslated if it contains content
+        $segment->setPretrans($hasText ? $segment::PRETRANS_INITIAL : $segment::PRETRANS_NOTDONE);
         
         //check if the result is valid for log
         if($this->isResourceLogValid($languageResource, $segment->getMatchRate())){
@@ -251,9 +253,6 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             $segment->setTargetMd5($segmentHash);
         }
         
-        //negated explanation is easier: lock the pretranslations if 100 matches in the task are not editable
-        $segment->setEditable($result->matchrate < 100 || $this->task->getEdit100PercentMatch());
-
         //set the used language resource uuid in the segments meta table
         $segment->meta()->setPreTransLangResUuid($languageResource->getLangResUuid());
         $segment->meta()->save();
