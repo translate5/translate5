@@ -30,11 +30,11 @@ END LICENSE AND COPYRIGHT
  * Test the default deadline date. For each workflow role (this tests only the default workflow),
  * an default deadline date task overwrite config is set.
  * 
- * 1. create task with and set static order date -> 2020-11-21 00:00:00
+ * 1. create task with and set static order date -> 2020-11-21 18:01:00
  * 
  * 2. define in task-config.ini the deadline date days
  *    translation ->  2 Days after orderdate
- *    reviewing -> 4 Days after orderdate
+ *    reviewing -> 4,2 Days after orderdate -> this case will test also the hour deadline date.
  *    translatorCheck -> 6 
  *    
  * 3. assign user via api, set deadline date to default-date
@@ -43,7 +43,7 @@ END LICENSE AND COPYRIGHT
  * 
  */
 class Translate2375Test extends \ZfExtended_Test_ApiTestcase {
-    protected static $fixedDate = '2020-11-21 00:00:00';
+    protected static $fixedDate = '2020-11-21 18:01:00';
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
@@ -87,9 +87,6 @@ class Translate2375Test extends \ZfExtended_Test_ApiTestcase {
             unset($assoc->staticAuthHash);
             unset($assoc->editable);
             unset($assoc->deletable);
-            //deadline date without time
-            $assoc->deadlineDate = explode(' ', $assoc->deadlineDate)[0];
-            
             return $assoc;
         }, $data);
         

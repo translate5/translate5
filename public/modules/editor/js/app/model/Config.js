@@ -52,9 +52,14 @@ Ext.define('Editor.model.Config', {
             return !/^(?:f(?:alse)?|no?|0+)$/i.test(value) && !!value;
           case 'integer':
             if(Ext.isNumber(value)) {
+                return value;
+            }
+          return parseInt(value);
+          case 'float':
+            if(Ext.isNumber(value)) {
               return value;
             }
-            return parseInt(value);
+            return Ext.Number.from(value,0);
           case 'map':
           case 'list':
             if(Ext.isArray(value) || Ext.isObject(value)) {
