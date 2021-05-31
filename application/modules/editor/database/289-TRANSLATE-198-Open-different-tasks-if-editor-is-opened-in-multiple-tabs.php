@@ -54,10 +54,10 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
 
 $db = Zend_Db_Table::getDefaultAdapter();
 
-$res = $db->query('DELETE FROM session;', $SCRIPT_IDENTIFIER);
+$res = $db->query('DELETE FROM session;');
 $res->execute();
 
-$res = $db->query('DELETE FROM sessionMapInternalUniqId;', $SCRIPT_IDENTIFIER);
+$res = $db->query('DELETE FROM sessionMapInternalUniqId;');
 $res->execute();
 
 // clean up the all task locks
