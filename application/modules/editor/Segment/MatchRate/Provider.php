@@ -68,7 +68,7 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
             $segment = $tags->getSegment();
     
             // no need to check for edited 100% matches on import
-            if($processingMode != editor_Segment_Processing::IMPORT && $qualityConfig->enableEdited100MatchCheck && $segment->getMatchRate() >= 100 && $segment->isTM()){
+            if($processingMode != editor_Segment_Processing::IMPORT && $qualityConfig->enableEdited100MatchCheck && $segment->getMatchRate() >= 100 && $segment->isFromTM()){
                 
                 $editedTargetFields = $tags->getEditedTargetFields();
                 if(count($editedTargetFields) > 0){
