@@ -84,7 +84,7 @@ class editor_Models_Segment_Updater {
         //@todo do this with events
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
-        $workflow=$wfm->getActive($this->segment->getTaskGuid());
+        $workflow = $wfm->getActive($this->segment->getTaskGuid());
         $workflow->beforeSegmentSave($this->segment, $this->task);
         
         $this->segment->validate();

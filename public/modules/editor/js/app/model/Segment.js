@@ -115,5 +115,7 @@ Ext.define('Editor.model.Segment', {
             meta.siblingData[id].length[field] = length;
             this.set('metaCache', meta);
         }        
-    }
+    },
+    // this is a flag needed when processing taken over matches, which causes the target to be updated in alike segments as well
+    wasOriginalTargetUpdated: false
 });
