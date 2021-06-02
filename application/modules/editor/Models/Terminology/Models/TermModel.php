@@ -275,6 +275,20 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ]
         ];*/
 
+        // If attr-filters are involved in search
+        if ($params['attrs']) {
+
+            // Get `id` => `rfc5646` pairs for all languages
+            $codeByLangIdA = ZfExtended_Factory::get('editor_Models_Languages')
+                ->loadAllKeyValueCustom('id', 'rfc5646', true);
+
+            // Prepare array of language code to be used in WHERE clause
+            $codeA = [];
+            foreach (explode(',', $params['language']) as $langId)
+                $codeA []= $codeByLangIdA[$langId];
+        }
+
+
         // Get the comma-separated list of termEntryIds matching attr-filters
         foreach ($params['attrs'] as $aDataTypeId => $aValue) {
 
@@ -286,6 +300,12 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
             // Build WHERE clause
             $attrWHERE = ['`dataTypeId` = :dataTypeId'];
+
+            // Setup WHERE clauses for entry-, language- and term- level attributes
+            $attrWHERE []= '((' . implode(') OR (', [
+                'ISNULL(`language`) AND ISNULL(`termId`)', // entry-level
+                '`language` IN ("' . implode('","', $codeA) . '")', // both language- and term- levels
+            ]) . '))';
 
             // If filter value is given
             if ($aValue) {
