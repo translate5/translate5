@@ -72,6 +72,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         btnNextWizard:'#UT#Weiter',
         cancelBtn: '#UT#Abbrechen',
         btnSkip:'#UT#Importieren (weitere überspringen)',
+        importDefaultsButtonText:'#UT#Importieren (mit Standardwerten für die nächsten Schritte)'
     },
     height : 550,
     width : 1000,
@@ -353,7 +354,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         disabled:'{disableImportDefaults}',
                         visible:'{!disableImportDefaults}'
                     },
-                    text : 'Import defaults'
+                    text : me.strings.importDefaultsButtonText
                 },{
                     xtype : 'button',
                     glyph: 'f00c@FontAwesome5FreeSolid',

@@ -191,7 +191,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             '#adminTaskGrid,#projectTaskGrid': {
                 hide: 'handleAfterHide',
                 celldblclick: 'handleGridClick',
-                cellclick: 'handleGridClick',
+                cellclick: 'handleGridClick'
             },
             '#adminTaskGrid': {
                 filterchange: 'onAdminTaskGridFilterChange'
@@ -216,9 +216,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             },
             '#adminTaskAddWindow': {
                 close: 'onAdminTaskAddWindowClose'
-            },
-            '#adminTaskAddWindow #importdefaults-wizard-btn': {
-                click: 'handleImportDefaults'
             },
             '#adminTaskAddWindow #add-task-btn': {
                 click: 'handleTaskAdd'
@@ -256,6 +253,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             },
             '#adminTaskAddWindow #customerId': {
                 select: 'onTaskAddWindowCustomerSelect'
+            },
+            '#adminTaskAddWindow #importdefaults-wizard-btn': {
+                click: 'handleImportDefaults'
             }
         }
     },
@@ -293,8 +293,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             targetLang = me.getTaskAddForm().down('tagfield[name^=targetLang]'),
             customer = me.getTaskAddForm().down('combo[name=customerId]'),
             idx,
-            customerId;
-        langs = val.match(/-([a-zA-Z]{2,5})-([a-zA-Z]{2,5})\.[^.]+$/);
+            customerId,
+            langs = val.match(/-([a-zA-Z]{2,5})-([a-zA-Z]{2,5})\.[^.]+$/);
         if (name && name.getValue() == '') {
             name.setValue(val.replace(/\.[^.]+$/, '').replace(/^C:\\fakepath\\/, ''));
         }
@@ -330,6 +330,21 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             }
         }
     },
+
+    /***
+     * Import with defaults button handler. After the task is created, and before the import is triggered,
+     * wizardCardImportDefaults event is thrown. Everything after task creation and before task import should be done/registered within this event
+     */
+    handleImportDefaults: function () {
+        var me = this;
+        if (me.getTaskAddForm().isValid()) {
+            me.saveTask(function (task) {
+                me.fireEvent('wizardCardImportDefaults',task);
+                me.startImport(task);
+            });
+        }
+    },
+
     /**
      * Method Shortcut for convenience
      * @param {String} right
@@ -354,9 +369,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     handleGridClick: function (view, colEl, colIdx, rec, rowEl, rowIdxindex, e, eOpts) {
         //logic for handling single clicks on column taskNr and dblclick on other cols
         var dataIdx = view.up('grid').getColumns()[colIdx].dataIndex,
-            isState = (dataIdx == 'state'),
-            isTaskNr = (dataIdx == 'taskNr'),
-            dbl = e.type == 'dblclick';
+            isState = (dataIdx === 'state'),
+            isTaskNr = (dataIdx === 'taskNr'),
+            dbl = e.type === 'dblclick';
         if (rec.isErroneous() || rec.isImporting()) {
             if (isState || dbl) {
                 this.editorLogTask(rec);
@@ -368,7 +383,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         }
     },
 
-    onAdminTaskGridFilterChange: function (store, filters, eOpts) {
+    onAdminTaskGridFilterChange: function (store) {
         var me = this;
         //get the store active filters object as parameter
         me.getAdvancedFilterToolbar().loadFilters(store.getFilters(false));
@@ -411,12 +426,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         }
         me.getTaskAddForm().getForm().reset();
         me.getTaskAddWindow().close();
-    },
-
-    handleImportDefaults: function (button) {
-        // On import defaults click
-        // 1. queue analysis/translaton
-        // 2. call handleTaskAdd, this should set taskUploadCard as active and with this run the import
     },
 
     handleTaskAdd: function (button) {
@@ -464,60 +473,81 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         activeItem.triggerSkipCard(activeItem);
     },
 
+    /***
+     * Skip "skipCount" of cards and return the next card after the skipped
+     * @param skipCount
+     * @returns {null}
+     */
+    skipCards: function(skipCount){
+        var me = this,
+            win = me.getTaskAddWindow(),
+            winLayout = win.getLayout(),
+            nextStep = winLayout.getNext();
+
+        for (var i = 0; i < skipCount; i++) {
+            if (win.isTaskUploadNext()) {
+                break;
+            }
+            winLayout.setActiveItem(nextStep);
+            nextStep = winLayout.getNext();
+        }
+        return nextStep;
+    },
+
+    /***
+     * Change the given card in the import wizard. When switching from import to postImport, the task will be saved.
+     * @param card
+     * @param task
+     */
+    changeCard: function(card,task){
+        var me = this,
+            win = me.getTaskAddWindow(),
+            winLayout = win.getLayout(),
+            activeItem = winLayout.getActiveItem(),
+            vm = win.getViewModel(),
+            setActiveCard = function(){
+                if (card.strings && card.strings.wizardTitle) {
+                    win.setTitle(card.strings.wizardTitle);
+                }
+                //if the task is provided, set the next card task variable
+                if (task) {
+                    card.task = task;
+                }
+                vm.set('activeItem', card);
+                winLayout.setActiveItem(card);
+            };
+
+        // when switch from import card to postimport card, save the task before switching
+        if (activeItem.importType === "import" && card.importType === "postimport") {
+            me.saveTask(function (){
+                setActiveCard();
+            });
+            return;
+        }
+        setActiveCard();
+    },
+
     onWizardCardFinished: function (skipCards) {
         var me = this,
             win = me.getTaskAddWindow(),
             winLayout = win.getLayout(),
             nextStep = winLayout.getNext(),
-            activeItem = winLayout.getActiveItem(),
-            vm = win.getViewModel();
+            activeItem = winLayout.getActiveItem();
 
         if (skipCards) {
-            for (var i = 0; i < skipCards; i++) {
-                if (win.isTaskUploadNext()) {
-                    break;
-                }
-                winLayout.setActiveItem(nextStep);
-                nextStep = winLayout.getNext();
-            }
+            nextStep = me.skipCards(skipCards);
         }
 
-        //check for next step
-        if (!nextStep) {
-
-            //if no next step, and no task, save it and start the import
-            if (!activeItem.task) {
-                me.saveTask(function (task) {
-                    me.startImport(task);
-                });
-            } else {
-                //the task is already saved, start the import
-                me.startImport(activeItem.task);
-            }
+        // check for next step
+        if (nextStep) {
+            // change the card
+            me.changeCard(nextStep);
             return;
         }
 
-        //switch to next card help function
-        var goToNextCard = function (task) {
-            if (nextStep.strings && nextStep.strings.wizardTitle) {
-                win.setTitle(nextStep.strings.wizardTitle);
-            }
-            //if the task is provided, set the next card task variable
-            if (task) {
-                nextStep.task = task;
-            }
-
-            vm.set('activeItem', nextStep);
-            winLayout.setActiveItem(nextStep);
-        };
-
-        //when switch from import to postimport, save the task
-        if (activeItem.importType == "import" && nextStep.importType == "postimport") {
-            me.saveTask(goToNextCard);
-            return;
-        }
-        //change the card
-        goToNextCard();
+        // save or start the task import process. If the active item has no task, first the task will be saved
+        // and after this the import process will be run
+        me.saveAndImportTask(activeItem.task);
     },
 
     onWizardCardSkiped: function () {
@@ -710,9 +740,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             return;
         }
 
-        confirm = me.confirmStrings[action];
+        var confirm = me.confirmStrings[action];
         Ext.Msg.confirm(confirm.title, confirm.msg, function (btn) {
-            if (btn == 'yes') {
+            if (btn === 'yes') {
                 me[action](task, ev);
             }
         });
@@ -885,7 +915,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         //the task delete will be omitted.
         if (!me.fireEvent('beforeTaskDelete', task)) {
             app.unmask();
-            return
+            return;
         }
 
         store.sync({
@@ -898,7 +928,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             failure: function (records, op) {
                 task.reject();
                 app.unmask();
-                if (op.getError().status == '405') {
+                if (op.getError().status === '405') {
                     Editor.MessageBox.addError(me.strings.taskNotDestroyed);
                 } else {
                     Editor.app.getController('ServerException').handleException(op.error.response);
@@ -933,21 +963,21 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      * Task action menu click handler
      */
     handleTaskMenu: function (selectedTask, event) {
-        this.showActionMenu(selectedTask, event, 'taskActionMenu')
+        this.showActionMenu(selectedTask, event, 'taskActionMenu');
     },
 
     /***
      * Project action menu click handler
      */
     handleProjectMenu: function (selectedTask, event) {
-        this.showActionMenu(selectedTask, event, 'projectActionMenu')
+        this.showActionMenu(selectedTask, event, 'projectActionMenu');
     },
 
     /***
      * Edit task action icon handler
      */
     handleTaskEdit: function (selectedTask, event) {
-        this.editorEditTask(selectedTask, event)
+        this.editorEditTask(selectedTask, event);
     },
 
     /***
@@ -990,7 +1020,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         var me = this,
             menu = me.getAdminMainSection(),
             activeTab = menu.getActiveTab(),
-            isTaskOverview = activeTab == me.getTaskGrid(),
+            isTaskOverview = activeTab === me.getTaskGrid(),
             redirectCmp = isTaskOverview ? me.getProjectPanel() : activeTab,
             route = 'task/' + task.get('id') + '/filter';
 
@@ -1032,6 +1062,22 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 }
             });
         }
+    },
+
+    /***
+     * Save the task in task import wizard and run the import workers. If the task is provided, it will directly run the import process.
+     *
+     * @param task
+     */
+    saveAndImportTask: function (task){
+        var me = this;
+        if(task){
+            me.startImport(task);
+            return;
+        }
+        me.saveTask(function (newTask){
+            me.startImport(newTask);
+        });
     },
 
     /***
@@ -1079,8 +1125,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             failure: function (form, submit) {
                 var card, errorHandler = Editor.app.getController('ServerException');
                 win.setLoading(false);
-                if (submit.failureType == 'server' && submit.result && !submit.result.success) {
-                    if (submit.result.httpStatus == "422") {
+                if (submit.failureType === 'server' && submit.result && !submit.result.success) {
+                    if (submit.result.httpStatus === "422") {
                         win.getLayout().setActiveItem('taskMainCard');
                         win.getViewModel().set('activeItem', win.down('#taskMainCard'));
                         form.markInvalid(submit.result.errorsTranslated);
@@ -1184,7 +1230,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             menu = me.getAdminMainSection(),
             activeTab = menu.getActiveTab();
 
-        if (activeTab.xtype != 'projectPanel') {
+        if (activeTab.xtype !== 'projectPanel') {
             return null;
         }
         return activeTab;
