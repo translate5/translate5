@@ -421,7 +421,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
 
         $label = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
         /* @var $label editor_Models_Terminology_Models_AttributeDataType */
-        $label->loadOrCreate('termNote', 'processStatus');
+        $label->loadOrCreate('termNote', 'processStatus',editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_LEVEL_TERM);
         $this->setDataTypeId($label->getId());
 
 //        $this->setAttrLang($language->getRfc5646());

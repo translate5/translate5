@@ -67,7 +67,10 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     protected editor_Models_Terminology_Models_ImagesModel $tbxImagesModel;
 
     /** @var editor_Models_Terminology_Models_AttributeDataType */
-    protected editor_Models_Terminology_Models_AttributeDataType $attributeLabelModel;
+    protected editor_Models_Terminology_Models_AttributeDataType $attributeDataTypeModel;
+
+    /** @var editor_Models_Terminology_TbxObjects_DataType  */
+    protected editor_Models_Terminology_TbxObjects_DataType  $dataType;
 
     /**
      * $tbxMap = segment names for different TBX standards
@@ -175,11 +178,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     protected array $attributes;
     /**
-     * Collection of attributeLabels for attribute mapping
-     * @var array
-     */
-    protected array $attributeLabel;
-    /**
      * Collection of term as object prepared for insert or update.
      * @var array
      */
@@ -259,7 +257,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->termEntryModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
         $this->termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         $this->attributeModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        $this->attributeLabelModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
+        $this->attributeDataTypeModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
         $this->transacGrpModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
         $this->tbxImagesModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
@@ -269,6 +267,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->attributesObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_Attribute');
         $this->transacGrpObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_TransacGrp');
         $this->tbxImageObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_Image');
+        $this->dataType = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_DataType');
 
         $this->termEntryMerge = ZfExtended_Factory::get('editor_Models_Terminology_Import_TermEntryMerge');
     }
@@ -312,7 +311,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->user = $user;
         $this->collectionId = $collection->getId();
         $this->mergeTerms = $mergeTerms;
-        $this->attributeLabel = [];
+        $this->dataType->resetData();
 
         $this->tbxMap[$this::TBX_TERM_ENTRY] = 'termEntry';
         $this->tbxMap[$this::TBX_LANGSET] = 'langSet';
@@ -328,10 +327,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->allowedTypes = array_merge($this::ATTRIBUTE_ALLOWED_TYPES, array_keys($this->importMap));
 
         // get custom attribute label text and prepare array to check if custom label text exist.
-        $attributeLabels = $this->attributeLabelModel->loadAllTranslated();
-        foreach ($attributeLabels as $attributeLabel) {
-            $this->attributeLabel[$attributeLabel['label'].'-'.$attributeLabel['type']] = $attributeLabel['id'];
-        }
+        $this->dataType->loadData();
 
         if ($mergeTerms) {
             $this->termEntriesCollection = $this->termEntryModel->getAllTermEntryAndCollection($this->collectionId);
@@ -396,7 +392,10 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->logUnknownLanguages();
         }
 
-        $termSelect = $this->termModel->updateAttributeAndTransacTermIdAfterImport($this->collectionId);
+        $this->termModel->updateAttributeAndTransacTermIdAfterImport($this->collectionId);
+
+        // insert all attribute data types for current collection in the terms_collection_attribute_datatype table
+        $this->updateCollectionAttributeAssoc();
 
         return $this->attributes;
     }
@@ -432,6 +431,15 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->createOrUpdateElement($this->transacGrpModel, $this->transacGrps, $this->transacGrpCollection, $this->mergeTerms);
             $this->transacGrps = [];
         }
+    }
+
+    /***
+     * Update the collection to attribute data-type association for the current term collection.
+     * If the attribute data type exist for the collection, no row will be inserted.
+     */
+    public function updateCollectionAttributeAssoc(){
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $db->query("INSERT INTO `terms_collection_attribute_datatype` (collectionId,dataTypeId) (SELECT collectionId,dataTypeId FROM `terms_attributes` WHERE collectionId = ? GROUP BY collectionId,dataTypeId) ON DUPLICATE KEY UPDATE id = id",[$this->collectionId]);
     }
 
     /**
@@ -628,16 +636,20 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $attribute->setUserName($this->user->getUserName());
             $attribute->setCreated(NOW_ISO);
 
-            if (isset($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()])) {
-                $attribute->setDataTypeId($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()]);
-            } else {
-                $this->attributeLabelModel->loadOrCreate($attribute->getElementName(), $attribute->getType());
-                $attributeLabels = $this->attributeLabelModel->loadAllTranslated();
-                foreach ($attributeLabels as $attributeLabel) {
-                    $this->attributeLabel[$attributeLabel['label'].'-'.$attributeLabel['type']] = $attributeLabel['id'];
-                }
-                $attribute->setDataTypeId($this->attributeLabel[$attribute->getElementName().'-'.$attribute->getType()]);
+            // check if the dataType exist for the element
+            $labelId = $this->dataType->getForAttribute($attribute);
+            if (empty($labelId)) {
+                // the dataType does not exist -> create it
+                $this->attributeDataTypeModel->loadOrCreate($attribute->getElementName(), $attribute->getType(),[$attribute->getLevel()]);
+
+                // reload all dataTypes
+                $this->dataType->loadData(true);
+
+                $labelId = $this->dataType->getForAttribute($attribute);
             }
+
+            $attribute->setDataTypeId((int)$labelId);
+
             $attributes[] = $attribute;
 
             if ($addToAttributesCollection) {

@@ -30,12 +30,16 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_AttributeDatatype';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Term_AttributeDatatype';
 
+
     /**
-     * Loads the label with given name and type, if it does not exist, the label will be created
+     * Load the label with given name,type and level, if it does not exist, the label will be created
      * @param string $labelName
      * @param string $labelType
      */
-    public function loadOrCreate(string $labelName, string $labelType = '')
+    public function loadOrCreate(string $labelName, string $labelType = '',array $level = [
+        editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_LEVEL_ENTRY,
+        editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_LEVEL_LANGUAGE,
+        editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_LEVEL_TERM])
     {
         $s = $this->db->select()
         ->from($this->db)
@@ -44,20 +48,28 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
             $this->setType($labelType);
             $s->where('type = ?', $labelType);
         }
+        $levelSql = [];
+        // for each level, add like search
+        foreach ($level as $l) {
+            $levelSql[] = 'level LIKE "%'.$l.'%"';
+        }
+        $s->where(implode(' OR ',$levelSql));
         $row = $this->db->fetchRow($s);
         if ($row) {
             $this->row = $row;
             return;
         }
         $this->setLabel($labelName);
+        $this->setDataType(editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_DEFAULT_DATATYPE);
+        $this->setLevel(implode(',',$level));
         $this->save();
     }
 
-    /**
+    /***
      * Return all labels with translated labelText
      * @return array
      */
-    public function loadAllTranslated(): array
+    public function loadAllTranslated(bool $addUniqueKey = false): array
     {
         $labels = $this->loadAll();
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
