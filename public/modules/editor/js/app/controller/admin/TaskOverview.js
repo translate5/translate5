@@ -265,19 +265,19 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           customer = me.getTaskAddForm().down('combo[name=customerId]'),
           idx,
           customerId;
-          langs = val.match(/-([a-zA-Z]{2,5})-([a-zA-Z]{2,5})\.[^.]+$/);
+          langs = val.match(/-([a-zA-Z_]{2,5})-([a-zA-Z_]{2,5})\.[^.]+$/);
       if(name && name.getValue() == '') {
           name.setValue(val.replace(/\.[^.]+$/, '').replace(/^C:\\fakepath\\/,''));
       }
       //simple algorithmus to get the language from the filename
       if(langs && langs.length == 3) {
           //try to convert deDE language to de-DE for searching in the store
-          var regex = /^([a-z]+)([A-Z]+)$/;
+          var regex = /^([a-z]+)_?([A-Z]+)$/;
           if(regex.test(langs[1])) {
-              langs[1] = langs[1].match(/^([a-z]+)([A-Z]+)$/).splice(1).join('-');
+              langs[1] = langs[1].match(/^([a-z]+)_?([A-Z]+)$/).splice(1).join('-');
           }
           if(regex.test(langs[2])) {
-              langs[2] = langs[2].match(/^([a-z]+)([A-Z]+)$/).splice(1).join('-');
+              langs[2] = langs[2].match(/^([a-z]+)_?([A-Z]+)$/).splice(1).join('-');
           }
           
           var srcStore = srcLang.store,

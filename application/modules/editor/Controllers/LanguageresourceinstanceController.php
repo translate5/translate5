@@ -216,7 +216,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /***
      * Returns customer assoc active flag fields (useAsDefault or writeAsDefault) for given customer assoc data
      * and give language resource id
-     * 
+     *
      * @param array $data
      * @param string $index the datafield to get
      * @param int $id the language resource id
@@ -604,8 +604,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         try {
             $customerAssoc->saveAssocRequest(
-                $this->entity->getId(), 
-                $this->data['customerIds'], 
+                $this->entity->getId(),
+                $this->data['customerIds'],
                 $this->data['customerUseAsDefaultIds'],
                 $this->data['customerWriteAsDefaultIds']);
         }
@@ -661,8 +661,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         settype($this->data->customerUseAsDefaultIds, 'array');
         settype($this->data->customerWriteAsDefaultIds, 'array');
         $customerAssoc->updateAssocRequest(
-            $this->entity->getId(), 
-            $this->data->customerIds, 
+            $this->entity->getId(),
+            $this->data->customerIds,
             $this->data->customerUseAsDefaultIds,
             $this->data->customerWriteAsDefaultIds);
         $this->addAssocData();
