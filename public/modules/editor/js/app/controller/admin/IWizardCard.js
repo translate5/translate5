@@ -59,6 +59,13 @@ Ext.define('Editor.controller.admin.IWizardCard', {
     },
 
     /***
+     * called when import defaults button is clicked
+     */
+    triggerImportDefaults:function(activeItem){
+
+    },
+
+    /***
      * if return true, disable the skip button
      */
     disableSkipButton:function(){
@@ -84,5 +91,13 @@ Ext.define('Editor.controller.admin.IWizardCard', {
      */
     disableCancelButton:function(){
         
+    },
+
+    /***
+     * if true, disable the import defaults button
+     */
+    disableImportDefaults:function(){
+        return true;
     }
+
 });
