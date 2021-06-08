@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_MatchAnalysis_Export_ExportExcel {
 
-    public static function generateExcel($rows){
+    public static function generateExcelAndProvideDownload($rows, $filename){
 
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $createdDate=null;
@@ -90,7 +90,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
         $spreadsheet->setPreCalculateFormulas(true);
 
         // set property for export-filename
-        $spreadsheet->setProperty('filename', $translate->_('Trefferanalyse'));
+        $spreadsheet->setProperty('filename', $filename);
 
         //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
         //[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59'];
