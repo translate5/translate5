@@ -72,7 +72,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         btnNextWizard:'#UT#Weiter',
         cancelBtn: '#UT#Abbrechen',
         btnSkip:'#UT#Importieren (weitere überspringen)',
-        importDefaultsButtonText:'#UT#Importieren (mit Standardwerten für die nächsten Schritte)'
+        importDefaultsButtonText:'#UT#Importieren (Standards nutzen)'
     },
     height : 550,
     width : 1000,
