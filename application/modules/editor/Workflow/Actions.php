@@ -96,6 +96,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     }
     
     /**
+     * removes all competitive users in competitive mode
      * @throws ZfExtended_Models_Entity_Conflict
      */
     public function removeCompetitiveUsers() {
@@ -261,8 +262,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     }
     
     /***
-     * Remove old connector usage logs. How old the logs should be is defined in
-     * zf configuration
+     * Remove old connector usage logs. How old the logs should be is defined in system configuration
      */
     public function removeOldConnectorUsageLog() {
         $log = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');

@@ -123,6 +123,14 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     /* *************** REST view API *************** */
     
     /**
+     * Retrieves, if the quality is configuered to be active
+     * @param Zend_Config $qualityConfig
+     * @return bool
+     */
+    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
+        return true;
+    }
+    /**
      * Retrieves, if the Quality has tags in the segment texts present
      * @return bool
      */
@@ -149,7 +157,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @param Zend_Config $qualityConfig
      * @return bool
      */
-    public function isFullyChecked(Zend_Config $qualityConfig) : bool {
+    public function isFullyChecked(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
         return true;
     }
     /**

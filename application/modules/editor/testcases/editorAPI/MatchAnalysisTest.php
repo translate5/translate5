@@ -158,6 +158,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'customerId'=>self::$api->getCustomer()->id,
+            'edit100PercentMatch' => true,
             'autoStartImport'=>0
         ];
         self::assertLogin('testmanager');

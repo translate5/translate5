@@ -54,6 +54,10 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindowViewController', {
     close: function() {
         this.getView().close();
     },
+    gotoTask: function(grid, rowIndex, colIndex, icon, ev, task) {
+        Editor.app.openAdministrationSection('#projectPanel', 'project/'+task.get('projectId')+'/'+task.get('taskId')+'/focus');
+        this.close();
+    },
     /**
      */
     importTaskIntoTm: function() {

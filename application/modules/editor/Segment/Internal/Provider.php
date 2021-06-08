@@ -41,6 +41,10 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
     
     protected static $segmentTagClass = 'editor_Segment_Internal_Tag';
+    
+    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
+        return ($qualityConfig->enableInternalTagCheck == 1);
+    }
 
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
@@ -99,7 +103,7 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
         ];
     }
     
-    public function isFullyChecked(Zend_Config $qualityConfig) : bool {
-        return $qualityConfig->enableInternalTagCheck;
+    public function isFullyChecked(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
+        return ($qualityConfig->enableInternalTagCheck == 1);
     }
 }

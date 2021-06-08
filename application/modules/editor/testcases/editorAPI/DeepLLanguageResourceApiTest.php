@@ -127,15 +127,15 @@ class DeepLLanguageResourceApiTest extends editor_Test_JsonTest {
     protected $expectedInstantTranslations = [
         [
             'source' => '[<i>Datum</i>] PHP Handbuch',
-            'translation' => '[<i>date</i>] PHP manual'
+            'translation' => '[date] PHP manual'
         ],[
             'source' => 'Das Haus ist <b>blau</b>',
-            'translation' => 'The house is <b>blue</b>'
+            'translation' => 'The house is blue'
         ]
     ];
     
     /**
-     * 
+     *
      * @param string $source
      * @param array $data
      * @param string $msg
@@ -150,7 +150,7 @@ class DeepLLanguageResourceApiTest extends editor_Test_JsonTest {
         $this->assertTrue(false, $msg);
     }
     /**
-     * 
+     *
      * @param string $source
      * @param string $translation
      * @param array $data
@@ -164,7 +164,7 @@ class DeepLLanguageResourceApiTest extends editor_Test_JsonTest {
             }
         }
         $this->assertEquals('???', $translation, $msg);
-    }    
+    }
     /**
      * Create a DeepL-LanguageResource with association to the test-customer
      * and store its ID.

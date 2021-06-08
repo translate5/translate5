@@ -51,6 +51,10 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
      */
     protected static $type = 'matchrate';
     
+    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
+        return ($qualityConfig->enableUneditedFuzzyMatchCheck == 1 || $qualityConfig->enableEdited100MatchCheck == 1);
+    }
+    
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
         if(!$qualityConfig->enableUneditedFuzzyMatchCheck && (!$qualityConfig->enableEdited100MatchCheck || $processingMode == editor_Segment_Processing::IMPORT)){
@@ -68,7 +72,7 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
             $segment = $tags->getSegment();
     
             // no need to check for edited 100% matches on import
-            if($processingMode != editor_Segment_Processing::IMPORT && $qualityConfig->enableEdited100MatchCheck && $segment->getMatchRate() >= 100 && $segment->isTM()){
+            if($processingMode != editor_Segment_Processing::IMPORT && $qualityConfig->enableEdited100MatchCheck && $segment->getMatchRate() >= 100 && $segment->isFromTM()){
                 
                 $editedTargetFields = $tags->getEditedTargetFields();
                 if(count($editedTargetFields) > 0){
@@ -121,7 +125,7 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
         return [ editor_Segment_MatchRate_Provider::UNEDITED_FUZZY_MATCH, editor_Segment_MatchRate_Provider::EDITED_100PERCENT_MATCH ];
     }
     
-    public function isFullyChecked(Zend_Config $qualityConfig) : bool {
-        return ($qualityConfig->enableUneditedFuzzyMatchCheck && $qualityConfig->enableEdited100MatchCheck);
+    public function isFullyChecked(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
+        return ($qualityConfig->enableUneditedFuzzyMatchCheck == 1 && $qualityConfig->enableEdited100MatchCheck == 1);
     }
 }

@@ -511,15 +511,22 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * Convenience API to evaluate if a segment originates from a machine translation (either pretranslated or taken over later on)
      * @return boolean
      */
-    public function isMT() {
+    public function isFromMT() {
         return editor_Models_Segment_MatchRateType::isTypeMT($this->getMatchRateType());
     }
     /**
      * Convenience API to evaluate if a segment originates from a translation memory (either pretranslated or taken over later on)
      * @return boolean
      */
-    public function isTM() {
+    public function isFromTM() {
         return editor_Models_Segment_MatchRateType::isTypeTM($this->getMatchRateType());
+    }
+    /**
+     * Convenience API to evaluate if a segment originates from a Language Resource (either pretranslated or taken over later on, either MT, TM or TermCollection)
+     * @return boolean
+     */
+    public function isFromLanguageResource(){
+        return editor_Models_Segment_MatchRateType::isTypeLanguageResource($this->getMatchRateType());
     }
     /**
      * restores segments with content not changed by the user to the original
