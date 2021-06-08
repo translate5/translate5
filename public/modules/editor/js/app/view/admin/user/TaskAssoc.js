@@ -39,105 +39,144 @@ Ext.define('Editor.view.admin.user.TaskAssoc', {
         type:'adminUserTaskAssoc'
     },
     glyph: 'xf0c0@FontAwesome5FreeSolid',
-    layout: {
-      type: 'fit'
-    },
     title: '#UT#Standard-Benutzerzuweisungen',
-    strings:{
-
+    strings: {
+        fieldRole: '#UT#Rolle',
+        fieldState: '#UT#Status',
+        fieldUser: '#UT#Benutzer',
+        btnSave: '#UT#Speichern',
+        btnCancel: '#UT#Abbrechen',
+        formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
+        formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
+        fieldDeadline:'#UT#Deadline',
+        fieldSegmentrange: '#UT#Editierbare Segmente',
+        fieldSegmentrangeInfo: '#UT#Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)',
+        deadlineDateInfoTooltip:'#UT#translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.'
     },
+    layout:'border',
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
-                columns: [{
-                    xtype: 'gridcolumn',
-                    width: 230,
-                    dataIndex: 'login',
-                    renderer: function(v, meta, rec) {
-                        if(Editor.data.debug) {
-                            v = Ext.String.format('<a href="{0}session/?authhash={1}">{2}</a>', Editor.data.restpath, rec.get('staticAuthHash'), v);
-                        }
-                        return rec.get('surName')+', '+rec.get('firstName')+' ('+v+')';
-                    },
-                    filter: {
-                        type: 'string'
-                    },
-                    text: me.strings.userGuidCol
+                title: me.title, //see EXT6UPD-9
+                items: [{
+                    xtype: 'adminTaskUserAssocGrid',
+                    region: 'center'
                 },{
-                    xtype: 'gridcolumn',
-                    width: 100,
-                    dataIndex: 'role',
-                    text: me.strings.roleCol
-                },{
-                    xtype: 'gridcolumn',
-                    width: 70,
-                    dataIndex: 'segmentrange',
-                    text: me.strings.segmentrangeCol
-                },{
-                    xtype: 'gridcolumn',
-                    width: 90,
-                    dataIndex: 'state',
-                    text: me.strings.stateCol
-                },{
-                    xtype: 'datecolumn',
-                    width: 90,
-                    dataIndex: 'assignmentDate',
-                    format:Editor.DATE_TIME_LOCALIZED_FORMAT,
-                    text: me.strings.assignmentDateLable
-                },{
-                    xtype: 'datecolumn',
-                    width: 90,
-                    dataIndex: 'finishedDate',
-                    format:Editor.DATE_TIME_LOCALIZED_FORMAT,
-                    text: me.strings.finishedDateLabel
-                },{
-                    xtype: 'datecolumn',
-                    width: 90,
-                    dataIndex: 'deadlineDate',
-                    format:Editor.DATE_TIME_LOCALIZED_FORMAT,
-                    text: me.strings.deadlineDateLable
-                }],
-                dockedItems: [{
-                    xtype: 'toolbar',
-                    dock: 'top',
+                    xtype: 'container',
+                    region: 'east',
+                    autoScroll: true,
+                    height: 'auto',
+                    width: 300,
                     items: [{
-                        xtype: 'button',
-                        glyph: 'f234@FontAwesome5FreeSolid',
-                        itemId: 'add-user-btn',
-                        text: me.strings.addUser,
-                        tooltip: me.strings.addUserTip
+                        xtype: 'container',
+                        itemId: 'editInfoOverlay',
+                        cls: 'edit-info-overlay',
+                        padding: 10,
+                        bind: {
+                            html: '{editInfoHtml}'
+                        }
                     },{
-                        xtype: 'button',
-                        glyph: 'f503@FontAwesome5FreeSolid',
-                        disabled: true,
-                        itemId: 'remove-user-btn',
-                        handler: function() {
-                            Ext.Msg.confirm(me.strings.confirmDeleteTitle, me.strings.confirmDelete, function(btn){
-                                var toDelete = me.getSelectionModel().getSelection();
-                                if(btn == 'yes') {
-                                    me.fireEvent('confirmDelete', me, toDelete, this);
-                                }
-                            });
+                        xtype: 'form',
+                        title : me.strings.formTitleAdd,
+                        hidden: true,
+                        bodyPadding: 10,
+                        region: 'east',
+                        defaults: {
+                            labelAlign: 'top'
                         },
-                        text: me.strings.removeUser,
-                        tooltip: me.strings.removeUserTip
-                    },{
-                        xtype: 'button',
-                        itemId: 'reload-btn',
-                        glyph: 'f2f1@FontAwesome5FreeSolid',
-                        text: me.strings.reload
-                    },'-',{
-                        xtype: 'button',
-                        itemId: 'notifyAssociatedUsersBtn',
-                        glyph: 'f674@FontAwesome5FreeSolid',
-                        text: me.strings.notifyButtonText,
-                        tooltip: me.strings.notifyButtonTooltip,
-                    },'->',{
-                        xtype: 'button',
-                        hidden:!Editor.app.authenticatedUser.isAllowed('editorWorkflowPrefsTask'),
-                        itemId: 'userSpecialPropertiesBtn',
-                        glyph: 'f509@FontAwesome5FreeSolid',
-                        text: me.strings.userSpecialProperties
+                        items:[{
+                            xtype: 'languagecombo',
+                            name: 'sourceLang'
+                        },{
+                            xtype: 'languagecombo',
+                            name: 'targetLang'
+                        },{
+                            anchor: '100%',
+                            xtype: 'combo',
+                            allowBlank: false,
+                            editable: false,
+                            forceSelection: true,
+                            queryMode: 'local',
+                            name: 'role',
+                            fieldLabel: me.strings.fieldRole,
+                            valueField: 'id',
+                            bind: {
+                                store: '{roles}'
+                            }
+                        },{
+                            anchor: '100%',
+                            xtype: 'combo',
+                            allowBlank: false,
+                            listConfig: {
+                                loadMask: false
+                            },
+                            bind: {
+                                store: '{users}'
+                            },
+                            forceSelection: true,
+                            anyMatch: true,
+                            queryMode: 'local',
+                            name: 'userGuid',
+                            displayField: 'longUserName',
+                            valueField: 'userGuid',
+                            fieldLabel: me.strings.fieldUser
+                        },{
+                            anchor: '100%',
+                            xtype: 'combo',
+                            allowBlank: false,
+                            editable: false,
+                            forceSelection: true,
+                            name: 'state',
+                            queryMode: 'local',
+                            fieldLabel: me.strings.fieldState,
+                            valueField: 'id',
+                            bind: {
+                                store: '{states}'
+                            }
+                        },{
+                            xtype:'datetimefield',
+                            name: 'deadlineDate',
+                            format : Editor.DATE_HOUR_MINUTE_ISO_FORMAT,
+                            fieldLabel: me.strings.fieldDeadline,
+                            labelCls: 'labelInfoIcon',
+                            cls:'userAssocLabelIconField',
+                            autoEl: {
+                                tag: 'span',
+                                'data-qtip': me.strings.deadlineDateInfoTooltip
+                            },
+                            anchor: '100%'
+                        },{
+                            xtype: 'textfield',
+                            itemId: 'segmentrange',
+                            name: 'segmentrange',
+                            fieldLabel: me.strings.fieldSegmentrange,
+                            labelCls: 'labelInfoIcon',
+                            cls:'userAssocLabelIconField',
+                            autoEl: {
+                                tag: 'span',
+                                'data-qtip': me.strings.fieldSegmentrangeInfo
+                            },
+                            anchor: '100%'
+                        }],
+                        dockedItems: [{
+                            xtype: 'toolbar',
+                            dock: 'bottom',
+                            ui: 'footer',
+                            items: [{
+                                xtype: 'tbfill'
+                            },{
+                                xtype: 'button',
+                                itemId: 'save-assoc-btn',
+                                glyph: 'f00c@FontAwesome5FreeSolid',
+                                text: me.strings.btnSave
+                            },
+                                {
+                                    xtype: 'button',
+                                    glyph: 'f00d@FontAwesome5FreeSolid',
+                                    itemId: 'cancel-assoc-btn',
+                                    text: me.strings.btnCancel
+                                }]
+                        }]
                     }]
                 }]
             };
@@ -146,5 +185,37 @@ Ext.define('Editor.view.admin.user.TaskAssoc', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+
+    /**
+     * loads all or all available users into the dropdown, the store is reused to get the username to userguids
+     * @param {Boolean} edit true if edit an assoc, false if add a new one
+     */
+    loadUsers: function() {
+        var me = this,
+            user = me.down('combo[name="userGuid"]'),
+            store = user.store;
+        store.clearFilter(true);
+        store.load();
+    },
+    /**
+     * loads the given record into the userAssoc form
+     * @param {Editor.data.model.admin.TaskUserAssoc} rec
+     */
+    loadRecord: function(rec) {
+        var me = this,
+            edit = !rec.phantom,
+            form = me.down('form'),
+            user = me.down('combo[name="userGuid"]');
+        form.loadRecord(rec);
+        if(edit) {
+            form.setTitle(Ext.String.format(me.strings.formTitleEdit, rec.get('longUserName')));
+        }
+        else {
+            me.loadUsers(edit);
+            form.setTitle(me.strings.formTitleAdd);
+        }
+        user.setVisible(!edit);
+        user.setDisabled(edit);
     }
 });

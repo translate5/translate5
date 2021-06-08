@@ -51,7 +51,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
             pageSize: 0
         },
         states: {
-            data: '{statesData}',
+            data: '{statesData}'
         },
         roles: {
             data: '{rolesData}'
