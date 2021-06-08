@@ -69,23 +69,32 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
     {
         $params = $this->getAllParams();
 
+        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        $task->loadByTaskGuid($params['taskGuid']);
 
-
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $fileName = $translate->_('Trefferanalyse').' - '.$task->getTaskName();
+        $taskNr = $task->getTaskNr();
+        if(!empty($taskNr)) {
+            $fileName = $fileName . ' - ('.$taskNr.')';
+        }
+        
         switch ($params["type"]) {
             case "exportExcel":
                 $rows = $this->entity->loadByBestMatchRate($params['taskGuid']);
-                ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_ExportExcel')->generateExcel($rows);
+                ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_ExportExcel')->generateExcelAndProvideDownload($rows, $fileName);
                 break;
             case "exportXml":
                 $rows = $this->entity->loadByBestMatchRate($params['taskGuid'], false);
                 $x = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_Xml')->generateXML($rows, $params['taskGuid']);
                 
-                $fileName = 'Match-analysis-'. date('Y-m-d').'.xml';
+                $fileName = $fileName.' '.date('- Y-m-d').'.xml';
                 
-                header('Content-disposition: attachment; filename='.$fileName);
-                header ("Content-Type:text/xml");
+                header("Content-Disposition: attachment; filename*=UTF-8''".rawurlencode($fileName));
+                header('Content-Type:text/xml');
                 // if you want to directly download then set expires time
-                header("Expires: 0");
+                header('Expires: 0');
                 
                 //with XML formatting:
 //                 $dom = dom_import_simplexml($x)->ownerDocument;
