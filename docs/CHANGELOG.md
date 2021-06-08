@@ -15,6 +15,32 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.2.1] - 2021-06-08
+
+### Important Notes:
+In addition to the below listed fixes, several minor fixes for the new features of major release 5.2.0 were implemented.
+
+
+### Changed
+**[TRANSLATE-2501](https://jira.translate5.net/browse/TRANSLATE-2501): Create table that contains all attribute types of a termCollection** <br>
+All available data type attributes for term collection are saved in database.
+
+
+### Bugfixes
+**[TRANSLATE-2532](https://jira.translate5.net/browse/TRANSLATE-2532): ERROR in core: E9999 - Call to a member function getMessage() on null** <br>
+Fix a seldom PHP error, only happening when translate5 instance is tried to be crawled.
+
+**[TRANSLATE-2531](https://jira.translate5.net/browse/TRANSLATE-2531): Microsoft Translator language resource connector is not properly implemented** <br>
+The Microsoft Translator language resource connector is not properly implemented regarding error handling and if a location restriction is used in the azure API configuration.
+
+**[TRANSLATE-2529](https://jira.translate5.net/browse/TRANSLATE-2529): Brute-Force attacks may produce: ERROR in core: E9999 - $request->getParam('locale') war keine gültige locale** <br>
+Providing invalid locales as parameter on application loading has produced an error. Now the invalid locale is ignored and the default one is loaded.
+
+**[TRANSLATE-2526](https://jira.translate5.net/browse/TRANSLATE-2526): Run analysis on task import wizard** <br>
+Fixes problem with analysis and pre-translation not triggered for default associated resources on task import (without opening the language resources wizard)
+
+
 ## [5.2.0] - 2021-05-31
 
 ### Important Notes:
