@@ -53,22 +53,45 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
     
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
-        if((!$qualityConfig->enableUneditedFuzzyMatchCheck && !$qualityConfig->enableEdited100MatchCheck) || ($processingMode == editor_Segment_Processing::IMPORT && !$qualityConfig->enableUneditedFuzzyMatchCheck)){
+        if(!$qualityConfig->enableUneditedFuzzyMatchCheck && (!$qualityConfig->enableEdited100MatchCheck || $processingMode == editor_Segment_Processing::IMPORT)){
             return $tags;
         }
-        $segment = $tags->getSegment();
-        // applies only to segments 
-        if($segment->isTmPretranslated()){
+        
+        if($processingMode == editor_Segment_Processing::ALIKE){
+            
+            // the only task in an alike process is cloning the qualities ...
+            $tags->cloneAlikeQualitiesByType(static::$type);
+            
+        } else {        
+        
+            // we need the segment to evaluate
+            $segment = $tags->getSegment();
+    
             // no need to check for edited 100% matches on import
-            if($qualityConfig->enableEdited100MatchCheck && $processingMode != editor_Segment_Processing::IMPORT){
+            if($processingMode != editor_Segment_Processing::IMPORT && $qualityConfig->enableEdited100MatchCheck && $segment->getMatchRate() >= 100 && $segment->isFromTM()){
                 
-                if($segment->isEdited() && $segment->getMatchRate() >= 100){
-                    $tags->addAllTargetsQuality(static::$type, self::EDITED_100PERCENT_MATCH);
+                $editedTargetFields = $tags->getEditedTargetFields();
+                if(count($editedTargetFields) > 0){
+                    foreach($editedTargetFields as $targetField){
+                        $tags->addQuality($targetField, static::$type, self::EDITED_100PERCENT_MATCH);
+                    }
                 }
             }
-            if($qualityConfig->enableUneditedFuzzyMatchCheck){
-                if(!$segment->isEdited() && $segment->getMatchRate() < 100){
+            // Fuzzy Match check must be done on import (where it can be assumed that all targets are set with the match) and for taken over TMs otherwise
+            if($qualityConfig->enableUneditedFuzzyMatchCheck && $segment->getMatchRate() < 100){
+
+                if($segment->isPretranslatedTM()){
+                    
                     $tags->addAllTargetsQuality(static::$type, self::UNEDITED_FUZZY_MATCH);
+                    
+                } else if($segment->isEditedTM()){
+                    
+                    $uneditedTargetFields = $tags->getUneditedTargetFields();
+                    if(count($uneditedTargetFields) > 0){
+                        foreach($uneditedTargetFields as $targetField){
+                            $tags->addQuality($targetField, static::$type, self::UNEDITED_FUZZY_MATCH);
+                        }
+                    }
                 }
             }
         }
@@ -79,11 +102,11 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
         return false;
     }
     
-    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
+    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
         return $translate->_('Nutzung von TM-Treffern');
     }
     
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         switch($category){
             case editor_Segment_MatchRate_Provider::UNEDITED_FUZZY_MATCH:
                 return $translate->_('Unbearbeiteter Fuzzy');

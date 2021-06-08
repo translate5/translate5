@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Several "classic" PHPUnit tests to check the TagComparision which detects faulty structures and added/removed internal tags
  */
-class SegmentTagComparisionTest extends \ZfExtended_Test_Testcase {
+class SegmentTagsComparisionTest extends \ZfExtended_Test_Testcase {
     
     /**
      * 

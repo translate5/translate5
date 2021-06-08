@@ -323,7 +323,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
 
         $allowedToChange = array('stateId', 'autoStateId', 'matchRate', 'matchRateType');
 
-        $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
+        $allowedAlternatesToChange = $this->entity->getEditableDataIndexList(true);
 
         $this->checkPlausibilityOfPut($allowedAlternatesToChange);
         $this->sanitizeEditedContent($updater, $allowedAlternatesToChange);

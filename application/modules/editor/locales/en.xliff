@@ -1584,7 +1584,7 @@
 </trans-unit>
 <trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='>
     <source>(zur Importzeit)</source>
-    <target>(at time of import)</target>
+    <target>(at time of import / pretranslation)</target>
 </trans-unit>
 <trans-unit id='WmllbHRleHQ='>
     <source>Zieltext</source>
@@ -3061,7 +3061,7 @@ A task was associated to you in the task-portal {portalLink}.<br />
 </trans-unit>
 <trans-unit id='TGVzZXJlY2h0ZSBzdGFuZGFyZG3DpMOfaWc='>
     <source>Leserechte standardmäßig</source>
-    <target>Read rights by default</target>
+    <target>Read access by default</target>
 </trans-unit>
 <trans-unit id='RsO8ciBkaWVzZSBLdW5kZW4gbnV0emVu'>
     <source>Für diese Kunden nutzen</source>
@@ -3611,9 +3611,9 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>In Bearbeitung</source>
     <target>In process</target>
 </trans-unit>
-<trans-unit id='dW52ZXLDpG5kZXJ0ZSAxMDAlIFRNIE1hdGNoZXMgc2luZCBlZGl0aWVyYmFy'>
-  <source>unveränderte 100% TM Matches sind editierbar</source>
-  <target>edit unchanged 100% TM matches</target>
+<trans-unit id='VW52ZXLDpG5kZXJ0ZSAxMDAlIFRNIE1hdGNoZXMgc2luZCBlZGl0aWVyYmFy'>
+  <source>Unveränderte 100% TM Matches sind editierbar</source>
+  <target>Edit unchanged 100% TM matches</target>
 </trans-unit>
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Delete proposals older than current import</target></trans-unit>
@@ -3996,17 +3996,18 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Anwendung verlassen</source>
     <target>Leave application</target>
 </trans-unit>
-<trans-unit id='V2VubiBha3RpdmllcnQsIHdlcmRlbiBibG9ja2llcnRlIFNlZ21lbnRlIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4='>
-  <source>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</source>
-  <target>If enabled, blocked segments are included in the analysis and word count</target>
+<trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGFiIGpldHp0IGdlc3BlcnJ0ZSBTZWdtZW50ZSBuaWNodCBtZWhyIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4u'>
+  <source>Wenn deaktiviert, werden ab jetzt gesperrte Segmente nicht mehr in die Analyse und Wortanzahl einbezogen.</source>
+  <target>If disabled, segments that are blocked from now on are not included in the analysis and word count any more.</target>
 </trans-unit>
-<trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGJsb2NraWVydGUgU2VnbWVudGUgbmljaHQgaW4gZGllIEFuYWx5c2UgdW5kIFdvcnRhbnphaGwgZWluYmV6b2dlbg=='>
-  <source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source>
-  <target>If disabled, blocked segments are not included in the analysis and word count</target>
+<trans-unit id='V2VubiBha3RpdmllcnQgd2VyZGVuIGFiIGpldHp0IHp1dm9yIGdlc3BlcnJ0ZSBTZWdtZW50ZSBpbiBkaWUgQW5hbHlzZSB1bmQgV29ydGFuemFobCBlaW5iZXpvZ2VuLg=='>
+  <source>Wenn aktiviert werden ab jetzt zuvor gesperrte Segmente in die Analyse und Wortanzahl einbezogen.</source>
+  <target>If enabled, previously locked segments will be included in the analysis and word count from now on.</target>
 </trans-unit>
 <trans-unit id='UVMgU3RhdGlzdGlr'><source>QS Statistik</source><target>QA statistics</target></trans-unit>
 <trans-unit id='TWF0Y2gtQW5hbHlzZQ=='><source>Match-Analyse</source><target>Match analysis</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Internal tags</target></trans-unit>
+<trans-unit id='VmVyYm90ZW4gaW4gWmllbA=='><source>Verboten in Ziel</source><target>Forbidden in target</target></trans-unit>
 <trans-unit id='VmVyYm90ZW4gaW4gUXVlbGxl'><source>Verboten in Quelle</source><target>Forbidden in source</target></trans-unit>
 <trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unedited fuzzy match</target></trans-unit>
 <trans-unit id='QmVhcmJlaXRldGVyIDEwMCUgTWF0Y2g='><source>Bearbeiteter 100% Match</source><target>Edited 100% match</target></trans-unit>
@@ -4056,7 +4057,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 </trans-unit>
 <trans-unit id='U2NocmVpYnJlY2h0ZSBzdGFuZGFyZG3DpMOfaWc='>
     <source>Schreibrechte standardmäßig</source>
-    <target>Write rights by default</target>
+    <target>Write access by default</target>
 </trans-unit>
 <trans-unit id='U2VyYmlzY2ggKExhdGVpbiBTZXJiaWVuKQ=='><source>Serbisch (Latein Serbien)</source><target>Serbian (Latin Serbia)</target></trans-unit>
 <trans-unit id='U29tYWxpIChTb21hbGlhKQ=='><source>Somali (Somalia)</source><target>Somali (Somalia)</target></trans-unit>
@@ -4122,6 +4123,9 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='SW1wb3J0aWVyZW4gKG1pdCBTdGFuZGFyZHdlcnRlbiBmw7xyIGRpZSBuw6RjaHN0ZW4gU2Nocml0dGUp'>
     <source>Importieren (mit Standardwerten für die nächsten Schritte)</source>
     <target>Import (use defaults for next steps)</target>
+<trans-unit id='TnVyIHdpZWRlcmhvbHQ='>
+  <source>Nur wiederholt</source>
+  <target>Only repeated</target>
 </trans-unit>
 </body>
   </file>

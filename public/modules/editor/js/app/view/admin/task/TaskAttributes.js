@@ -43,7 +43,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         btnCancel:'#UT#Abbrechen',
         btnReload: '#UT#Aktualisieren',
         loadingMask:'#UT#Aktualisieren',
-        fullMatchLabel: '#UT#unveränderte 100% TM Matches sind editierbar',
+        fullMatchLabel: '#UT#Unveränderte 100% TM Matches sind editierbar',
         editTrue:'#UT#Ja',
         editFalse:'#UT#Nein',
         usageModeTitle: "#UT#Mehrere Benutzer",

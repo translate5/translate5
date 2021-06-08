@@ -374,11 +374,17 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           days = Editor.app.getTaskConfig(configName),
           newValue = null;
       
-      //calculate the new date if config exist
+      // calculate the new date if config exist
       if(days){
-          //the order date has timestamp 00:00:00
-          //For the deadlineDate the time is also important. This will change the time to now.
-          orderDate.setTime(new Date().getTime());
+          // check if the order date has timestamp 00:00:00
+          if(orderDate.getHours() === 0 && orderDate.getMinutes() === 0){
+              // For the deadlineDate the time is also important. This will change the time to now.
+              var tmpNow = new Date();
+              orderDate.setHours(tmpNow.getHours());
+              orderDate.setMinutes(tmpNow.getMinutes());
+              orderDate.setSeconds(tmpNow.getSeconds());
+          }
+
           newValue = Editor.util.Util.addBusinessDays(orderDate, days);
       }
       

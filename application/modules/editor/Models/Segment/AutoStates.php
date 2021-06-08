@@ -321,10 +321,7 @@ class editor_Models_Segment_AutoStates {
      */
     public function calculatePretranslationState(bool $isEditable): int
     {
-        if(! $isEditable) {
-            return self::BLOCKED;
-        }
-        return self::PRETRANSLATED;
+        return $isEditable ? self::PRETRANSLATED : self::BLOCKED;
     }
     
     /**
@@ -500,13 +497,5 @@ class editor_Models_Segment_AutoStates {
     public function isTranslationState(int $autoState): bool
     {
         return in_array($autoState, [self::TRANSLATED, self::TRANSLATED_AUTO]);
-    }
-    /**
-     * Retrieves, if the State represents an edited state of the segment
-     * @param int $autoState
-     * @return bool
-     */
-    public function isEditedState(int $autoState): bool {
-        return !in_array($autoState, $this->getNotEditedStates());
     }
 }

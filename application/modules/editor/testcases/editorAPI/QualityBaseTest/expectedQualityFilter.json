@@ -21,7 +21,7 @@
                     "qtype": "internal",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "internal_tags_missing",
                     "text": "Internal tags missing",
                     "leaf": true,
                     "checked": false
@@ -31,7 +31,7 @@
                     "qtype": "internal",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "internal_tags_added",
                     "text": "Internal tags have been added",
                     "leaf": true,
                     "checked": false
@@ -41,7 +41,7 @@
                     "qtype": "internal",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "whitespace_tags_added",
                     "text": "Whitespace has been added",
                     "leaf": true,
                     "checked": false
@@ -51,7 +51,7 @@
                     "qtype": "internal",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "whitespace_tags_missing",
                     "text": "Whitespace has been removed",
                     "leaf": true,
                     "checked": false
@@ -61,10 +61,11 @@
                     "qtype": "internal",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "internal_tag_structure_faulty",
                     "text": "Internal tags have incorrect structure",
                     "leaf": true,
-                    "checked": false
+                    "checked": false,
+                    "qfaulty": true
                 }
             ],
             "qcategory": null,
@@ -84,7 +85,7 @@
                     "qtype": "qm",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "qm_1",
                     "text": "Demo QM error 1",
                     "leaf": true,
                     "checked": false
@@ -94,7 +95,7 @@
                     "qtype": "qm",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "qm_2",
                     "text": "Mistranslation",
                     "leaf": true,
                     "checked": false
@@ -104,7 +105,7 @@
                     "qtype": "qm",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "qm_3",
                     "text": "Terminology problem",
                     "leaf": true,
                     "checked": false
@@ -114,7 +115,7 @@
                     "qtype": "qm",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "qm_4",
                     "text": "Fluency issue",
                     "leaf": true,
                     "checked": false
@@ -124,7 +125,7 @@
                     "qtype": "qm",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "qm_5",
                     "text": "Inconsistency",
                     "leaf": true,
                     "checked": false
@@ -149,7 +150,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "1822",
+                            "qid": "7506",
                             "qtype": "mqm",
                             "qcount": 171,
                             "qcomplete": true,
@@ -161,7 +162,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "1817",
+                            "qid": "7501",
                             "qtype": "mqm",
                             "qcount": 105,
                             "qcomplete": true,
@@ -173,7 +174,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "1948",
+                            "qid": "7632",
                             "qtype": "mqm",
                             "qcount": 12,
                             "qcomplete": true,
@@ -185,7 +186,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "1821",
+                            "qid": "7505",
                             "qtype": "mqm",
                             "qcount": 3,
                             "qcomplete": true,
@@ -197,7 +198,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "1811",
+                            "qid": "7495",
                             "qtype": "mqm",
                             "qcount": 13,
                             "qcomplete": true,
@@ -223,7 +224,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "1814",
+                            "qid": "7498",
                             "qtype": "mqm",
                             "qcount": 21,
                             "qcomplete": true,
@@ -235,13 +236,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "1951",
+                            "qid": "7635",
                             "qtype": "mqm",
                             "qcount": 6,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "1810",
+                                    "qid": "7494",
                                     "qtype": "mqm",
                                     "qcount": 12,
                                     "qcomplete": true,
@@ -261,13 +262,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "1845",
+                            "qid": "7529",
                             "qtype": "mqm",
                             "qcount": 2,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "1858",
+                                    "qid": "7542",
                                     "qtype": "mqm",
                                     "qcount": 4,
                                     "qcomplete": true,
@@ -287,7 +288,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "1839",
+                            "qid": "7523",
                             "qtype": "mqm",
                             "qcount": 10,
                             "qcomplete": true,
@@ -317,7 +318,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "1812",
+                                    "qid": "7496",
                                     "qtype": "mqm",
                                     "qcount": 32,
                                     "qcomplete": true,
@@ -329,7 +330,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "1828",
+                                    "qid": "7513",
                                     "qtype": "mqm",
                                     "qcount": 28,
                                     "qcomplete": true,
@@ -341,7 +342,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "1820",
+                                    "qid": "7504",
                                     "qtype": "mqm",
                                     "qcount": 51,
                                     "qcomplete": true,
@@ -353,7 +354,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "1972",
+                                    "qid": "7656",
                                     "qtype": "mqm",
                                     "qcount": 17,
                                     "qcomplete": true,
@@ -410,7 +411,7 @@
                     "qtype": "term",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "not_found_in_target",
                     "text": "Not found in target",
                     "leaf": true,
                     "checked": false
@@ -420,7 +421,7 @@
                     "qtype": "term",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "not_defined_in_target",
                     "text": "Not defined in target terminology",
                     "leaf": true,
                     "checked": false
@@ -430,7 +431,7 @@
                     "qtype": "term",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "forbidden_in_target",
                     "text": "Forbidden in target",
                     "leaf": true,
                     "checked": false
@@ -440,8 +441,8 @@
                     "qtype": "term",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
-                    "text": "Forbidden in target",
+                    "qcategory": "forbidden_in_source",
+                    "text": "Forbidden in source",
                     "leaf": true,
                     "checked": false
                 }
@@ -463,7 +464,7 @@
                     "qtype": "matchrate",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "unedited_fuzzy_match",
                     "text": "Unedited fuzzy match",
                     "leaf": true,
                     "checked": false
@@ -473,7 +474,7 @@
                     "qtype": "matchrate",
                     "qcount": 0,
                     "qcomplete": true,
-                    "qcategory": null,
+                    "qcategory": "edited_100percent_match",
                     "text": "Edited 100% match",
                     "leaf": true,
                     "checked": false

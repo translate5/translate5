@@ -480,21 +480,53 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         return $this->getPretrans() !== 0;
     }
     /**
+     * Convenience API to evaluate if a segment has been pretranslated by a machine translation
+     * @return boolean
+     */
+    public function isPretranslatedMT() {
+        return $this->getPretrans() !== 0 && editor_Models_Segment_MatchRateType::isFromMT($this->getMatchRateType());
+    }
+    /**
      * Convenience API to evaluate if a segment has been pretranslated by a translation memory
      * @return boolean
      */
-    public function isTmPretranslated() {
+    public function isPretranslatedTM() {
         return $this->getPretrans() !== 0 && editor_Models_Segment_MatchRateType::isFromTM($this->getMatchRateType());
     }
     /**
-     * Convenience API to evaluate if a segment was edited. This is based on the autoStates
-     * Note that there may be textual changes or changed tags / whitespace etc. that do not lead to a "edited" state
+     * Convenience API to evaluate if a segment was taken over as a match by a machine translation
      * @return boolean
      */
-    public function isEdited() {
-        $autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        /* @var $autoStates editor_Models_Segment_AutoStates */
-        return $autoStates->isEditedState($this->getAutoStateId());
+    public function isEditedMT() {
+        return editor_Models_Segment_MatchRateType::isEditedMT($this->getMatchRateType());
+    }
+    /**
+     * Convenience API to evaluate if a segment was taken over as a match by a translation memory
+     * @return boolean
+     */
+    public function isEditedTM() {
+        return editor_Models_Segment_MatchRateType::isEditedTM($this->getMatchRateType());
+    }
+    /**
+     * Convenience API to evaluate if a segment originates from a machine translation (either pretranslated or taken over later on)
+     * @return boolean
+     */
+    public function isFromMT() {
+        return editor_Models_Segment_MatchRateType::isTypeMT($this->getMatchRateType());
+    }
+    /**
+     * Convenience API to evaluate if a segment originates from a translation memory (either pretranslated or taken over later on)
+     * @return boolean
+     */
+    public function isFromTM() {
+        return editor_Models_Segment_MatchRateType::isTypeTM($this->getMatchRateType());
+    }
+    /**
+     * Convenience API to evaluate if a segment originates from a Language Resource (either pretranslated or taken over later on, either MT, TM or TermCollection)
+     * @return boolean
+     */
+    public function isFromLanguageResource(){
+        return editor_Models_Segment_MatchRateType::isTypeLanguageResource($this->getMatchRateType());
     }
     /**
      * restores segments with content not changed by the user to the original
@@ -997,11 +1029,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * returns a list with editable dataindex
+     * @param boolean $addOriginalTargetWhenDefaultLayout: special flag to enable manipulating the target when the fields are in default layout
      * @return array
      */
-    public function getEditableDataIndexList()
+    public function getEditableDataIndexList($addOriginalTargetWhenDefaultLayout=false)
     {
-        return $this->segmentFieldManager->getEditableDataIndexList();
+        return $this->segmentFieldManager->getEditableDataIndexList($addOriginalTargetWhenDefaultLayout);
     }
 
     /**

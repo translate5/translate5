@@ -262,7 +262,7 @@ Ext.define('Editor.controller.ChangeAlike', {
 
 	  //If it is set to true, the repetition editor only pops up (processes automatically) 
 	  //when the target of the current segment is empty
-	  if(Editor.app.getUserConfig('alike.showOnEmptyTarget') && record.get('target')!=""){
+	  if(Editor.app.getUserConfig('alike.showOnEmptyTarget') && record.get('target') != ''){
 		  me.fireEvent('segmentUsageFinished', me);
 		  me.callbackToSaveChain();
 		  return;
@@ -326,6 +326,11 @@ Ext.define('Editor.controller.ChangeAlike', {
         data.source = rec.data.source;
     }
     data.targetEdit = rec.data.targetEdit;
+    // when a LanguageResource match was taken over, we will have to update the original target as well
+    // this affects only the view, the actual copying in the backend is based on evaluations there
+    if(rec.wasOriginalTargetUpdated) {
+        data.target = rec.get('target');
+    }
     me.alikesToProcess = me.getAlikesToProcess();
     me.calculateUsedTime();
     

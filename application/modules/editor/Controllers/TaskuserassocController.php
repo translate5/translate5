@@ -407,7 +407,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $model = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $model editor_Models_Task */
         $model->loadByTaskGuid($this->data->taskGuid);
-        //check if the order date is set. With empty order data, no deadline date from config is posible
+        //check if the order date is set. With empty order data, no deadline date from config is possible
         if(empty($model->getOrderdate()) || is_null($model->getOrderdate())){
             return;
         }
@@ -416,21 +416,16 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         /* @var $wm editor_Workflow_Manager */
         
         $workflow = $wm->get($model->getWorkflow());
-        /* @var $workflow editor_Workflow_Abstract */
+
         $step = $workflow->getStepOfRole($this->data->role);
         //get the config for the task workflow and the user assoc role workflow step
         $configValue = $model->getConfig()->runtimeOptions->workflow->{$model->getWorkflow()}->{$step}->defaultDeadlineDate ?? 0;
-        if($configValue<1){
+        if($configValue <= 0){
             return;
         }
-        //new deadline date = "task order date" + "configured days"
-        $newDeadline =date ('Y-m-d' , strtotime($model->getOrderdate().' +'.$configValue.' Weekday'));
-        //Add the current time to the new deadline. The order date by default is without timestamp (always 0:0:0 as time), and because of that
-        //the new deadline date will always be with 0:0:0 as timestamp. For the deadline date the time is important.
-        $dateAndTime = explode(" ", NOW_ISO);
-        $newDeadline .=' '.array_pop($dateAndTime); 
-        
-        $this->data->deadlineDate = $newDeadline;
-        $this->entity->setDeadlineDate($newDeadline);
+
+        // the deadline will be order date + defaultDeadlineDate days config
+        $this->data->deadlineDate = editor_Utils::addBusinessDays($model->getOrderdate(),$configValue);
+        $this->entity->setDeadlineDate($this->data->deadlineDate);
     }
 }

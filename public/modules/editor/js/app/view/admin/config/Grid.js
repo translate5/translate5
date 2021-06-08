@@ -269,12 +269,13 @@ Ext.define('Editor.view.admin.config.Grid', {
             return false; 
         }
         switch(record.get('type')){
+            case 'float':
             case 'int':
             case 'integer':
                 config={
                     xtype: 'numberfield',
                     name: 'value',
-                    value:record.get('value'),
+                    value:record.get('value')
                 };
                 break;
             case 'string':
@@ -338,7 +339,7 @@ Ext.define('Editor.view.admin.config.Grid', {
      */
     getValueRenderer:function (value, metaData, record) {
         var me=this,
-            isValueChanged = record.get('default') != value,
+            isValueChanged = record.get('default') !== value,
             returnValue = value;
         switch (record.get('type')) {
             case 'boolean': // bool
@@ -412,5 +413,5 @@ Ext.define('Editor.view.admin.config.Grid', {
         }
         
         return html.join("");
-    },
+    }
 });

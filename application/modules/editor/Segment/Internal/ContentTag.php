@@ -152,8 +152,8 @@ final class  editor_Segment_Internal_ContentTag extends editor_Tag implements Js
      * {@inheritDoc}
      * @return editor_Segment_Internal_ContentTag
      */
-    public function clone($withDataAttribs=false){
-        $tag = parent::clone($withDataAttribs);
+    public function clone(bool $withDataAttribs=false, bool $withId=false){
+        $tag = parent::clone($withDataAttribs, $withId);
         /* @var $tag editor_Segment_Internal_ContentTag */
         $tag->setInnerHTML($this->innerHTML);
         return $tag;

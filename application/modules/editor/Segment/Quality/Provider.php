@@ -105,7 +105,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @param ZfExtended_Zendoverwrites_Translate $translate
      * @return string
      */
-    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
+    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
         return NULL;
     }
     /**
@@ -116,7 +116,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @param editor_Models_Task $task
      * @return string
      */
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         return NULL;
     }
     

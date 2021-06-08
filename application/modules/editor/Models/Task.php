@@ -1228,7 +1228,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'emptyTargets' => 'Übersetzungsaufgabe (kein Review)',
             'enableSourceEditing' => 'Quellsprache bearbeitbar',
             'fileCount' => 'Dateien',
-            'fullMatchEdit' => 'unveränderte 100% TM Matches sind editierbar',
+            'fullMatchEdit' => 'Unveränderte 100% TM Matches sind editierbar',
             'lockLocked' => 'Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
             'orderdate' => 'Bestelldatum',
             'pmGuid' => 'Projektmanager',

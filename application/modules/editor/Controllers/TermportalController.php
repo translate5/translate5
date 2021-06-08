@@ -274,7 +274,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         /* @var $customer editor_Models_Customer */
         $clients = [];
         foreach ($customers as $id) {
-            if (count($customerAssoc->loadByCustomerIds($id))>0) {
+            if (count($customerAssoc->loadByCustomerIds([$id]))>0) {
                 $customer->load($id);
                 $clients[$id] = $customer->getName();
             }

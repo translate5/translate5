@@ -298,6 +298,51 @@ class editor_Segment_Tags implements JsonSerializable {
         return ($this->targetOriginal != null);
     }
     /**
+     * Retrieves, if the contents of any targets have been changed compared to the original target.
+     * Empty targets will be ignored and trackchanges tags will be stripped. This means, that contents reverted to the original state by the editor will be seen as "unchanged"
+     * @return bool
+     */
+    public function hasEditedTargets() : bool {
+        return count($this->getEditedTargetFields()) > 0;
+    }
+    /**
+     * Retrieves the target fields that are edited compared to the original target
+     * Empty targets will be ignored and trackchanges tags will be stripped. This means, that contents reverted to the original state by the editor will be seen as "unchanged"
+     * @return array
+     */
+    public function getEditedTargetFields() : array {
+        return $this->getChangedTargetFields(true);
+    }
+    /**
+     * Retrieves the target fields that are NOT edited compared to the original target
+     * Empty targets will be ignored and trackchanges tags will be stripped. This means, that contents reverted to the original state by the editor will be seen as "unchanged"
+     * @return array
+     */
+    public function getUneditedTargetFields() : array {
+        return $this->getChangedTargetFields(false);
+    }
+    /**
+     * Retrieves all targets that have been changed, either edited or not edited
+     * @param boolean $edited
+     * @return array
+     */
+    private function getChangedTargetFields($edited) : array {
+        $changedTargets = [];
+        if($this->hasOriginalTarget()){
+            // only internal tags will be allowed for the equation
+            $filteredTypes = [ editor_Segment_Tag::TYPE_INTERNAL ];
+            $renderedOriginal = $this->targetOriginal->cloneFiltered($filteredTypes)->render();
+            foreach($this->getTargets() as $target){
+                // create Clone with stripped trackchanges
+                $renderedTarget = $target->cloneWithoutTrackChanges($filteredTypes)->render();
+                if(!$target->isEmpty() && (($edited === true && $renderedTarget != $renderedOriginal) || ($edited === false && $renderedTarget == $renderedOriginal))){
+                    $changedTargets[] = $target->getField();
+                }
+            }
+        }
+        return $changedTargets;
+    }
+    /**
      * 
      * @return editor_Segment_FieldTags
      */
@@ -413,7 +458,22 @@ class editor_Segment_Tags implements JsonSerializable {
         }
         return $result;
     }
-    
+    /**
+     * Retrieves all tags from all our field tags and ranges them by field
+     * @param string $type
+     * @return array
+     */
+    public function getTagsByTypeForField(string $type) : array {
+        $result = [];
+        foreach($this->getFieldTags() as $fieldTags){
+            $field = $fieldTags->getField();
+            if(!array_key_exists($field, $result)){
+                $result[$field] = [];
+            }
+            $result[$field] = array_merge($result[$field], $fieldTags->getByType($type));
+        }
+        return $result;
+    }
     /**
      * Removes the tags of the passed type in all our editable field tags
      * @param string $type

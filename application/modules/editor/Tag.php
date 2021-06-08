@@ -597,13 +597,13 @@ class editor_Tag {
      * Retrieves the classnames
      * @return string
      */
-    public function getClasses(){
+    public function getClasses() : string {
         return implode(' ', $this->classes);
     }
     /**
      * Retrieves the sorted classnames, can be used to compare tags by classnames
      */
-    public function getSortedClasses(){
+    public function getSortedClasses() : string {
         $classes = $this->classes;
         sort($classes);
         return implode(' ', $classes);
@@ -938,17 +938,18 @@ class editor_Tag {
      * @param boolean $withDataAttribs
      * @return editor_Tag
      */
-    public function clone($withDataAttribs=false){
-        return $this->cloneProps($this->createBaseClone(), $withDataAttribs);
+    public function clone(bool $withDataAttribs=false, bool $withId=false){
+        return $this->cloneProps($this->createBaseClone(), $withDataAttribs, $withId);
     }
     /**
      * Clones our attributes & classes to a different tag-object
      * @param editor_Tag $tag
      * @param boolean $withDataAttribs
+     * @param boolean $withId
      * @return editor_Tag
      */
-    public function transferProps(editor_Tag $tag, $withDataAttribs=false){
-        return $this->cloneProps($tag, $withDataAttribs);
+    public function transferProps(editor_Tag $tag, bool $withDataAttribs=false, bool $withId=false){
+        return $this->cloneProps($tag, $withDataAttribs, $withId);
     }
     /**
      * Helper to create a basic cloned object (with empty props)
@@ -962,12 +963,13 @@ class editor_Tag {
      * Helper clone our properties. Does not clone the ID
      * @param editor_Tag $tag
      * @param boolean $withDataAttribs
+     * @param boolean $withId
      * @return editor_Tag
      */
-    protected function cloneProps(editor_Tag $tag, $withDataAttribs=false){
+    protected function cloneProps(editor_Tag $tag, bool $withDataAttribs=false, bool $withId=false){
         $tag->setClasses($this->getClasses());
         foreach($this->attribs as $name => $val){
-            if(($withDataAttribs || substr($name, 0, 5) != 'data-') && $name != 'id'){
+            if(($withDataAttribs || substr($name, 0, 5) != 'data-') && ($withId || $name != 'id')){
                 $tag->setUnescapedAttribute($name, $val);
             }
         }
