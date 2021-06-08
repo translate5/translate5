@@ -324,18 +324,20 @@ final class editor_Segment_Quality_Manager {
      * @return bool
      */
     public function isFullyCheckedType(string $type, Zend_Config $taskConfig) : bool {
-        return $this->getProvider($type)->isFullyChecked($taskConfig->runtimeOptions->autoQA);
+        return $this->getProvider($type)->isFullyChecked($taskConfig->runtimeOptions->autoQA, $taskConfig);
     }
     /**
      * Retrieves all types of qualities we have. By default only those, that should show up in the filter-panel
      * @param bool $includeNonFilterableTypes
      * @return string[]
      */
-    public function getAllTypes(bool $includeNonFilterableTypes=false){
+    public function getAllFilterableTypes(editor_Models_Task $task){
         $types = [];
+        $taskConfig = $task->getConfig();
+        $qualityConfig = $taskConfig->runtimeOptions->autoQA; 
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
-            if($includeNonFilterableTypes || $provider->isFilterableType()){
+            if($provider->isActive($qualityConfig, $taskConfig) && $provider->isFilterableType()){
                 $types[] = $provider->getType();
             }
         }

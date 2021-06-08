@@ -405,6 +405,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return mixed depending on $asJson
      */
     public function getMqmTypesTranslated($asJson = true){
+        // ugly defaults when no data set to avoid exceptions. Generally, no code should request this when MQMs are not configured
+        if($this->row->qmSubsegmentFlags == NULL){
+            if($asJson){
+                return NULL;
+            }
+            return [];
+        }
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
         $walk = function(array $qmFlagTree) use ($translate, &$walk){
