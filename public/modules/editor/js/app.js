@@ -387,6 +387,9 @@ Ext.application({
         var me = this,
             mainTabs = me.viewport.down('> #adminMainSection');
 
+        if(Ext.isString(panel)) {
+            panel = me.viewport.down(panel);
+        }
         //what  happens if panel does not belong to the tabpanel?
         mainTabs.setActiveTab(panel);
         me.redirectTo(redirectRoute);
