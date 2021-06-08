@@ -53,17 +53,19 @@ class editor_Models_Segment_RepetitionUpdater {
     protected $originalSegment = null;
     
     /**
+     * editor_Models_Segment_RepetitionUpdater
      * @var Zend_Config
      */
     protected $config = null;
     
     /**
-     * @param editor_Models_Segment $segment
-     * @param array $qmSubsegmentAlikes
+     * 
+     * @param editor_Models_Segment $originalSegment
+     * @param Zend_Config $config
      */
-    public function __construct(editor_Models_Segment $segment, Zend_Config $config){
+    public function __construct(editor_Models_Segment $originalSegment, Zend_Config $config){
         $this->config = $config;
-        $this->originalSegment = $segment;
+        $this->originalSegment = $originalSegment;
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
     }
@@ -77,7 +79,7 @@ class editor_Models_Segment_RepetitionUpdater {
     public function updateRepetition(editor_Models_Segment $master, editor_Models_Segment $repetition): bool {
         $this->originalSegment = $master;
         $this->setRepetition($repetition);
-        return $this->updateSegmentContent('target', 'targetEdit', 'getTargetEdit', 'setTargetEdit');
+        return $this->updateSegmentContent('target');
     }
     
     /**
@@ -91,29 +93,28 @@ class editor_Models_Segment_RepetitionUpdater {
     /**
      * call back for the fieldloop over all editable segments, 
      *   replaces the tags in the given content with the tags which were before in the segemnt
-     * @param string $field
-     * @param string $editField
-     * @param string $getter
-     * @param string $setter
+     * @param string $field: can be 'target' or 'source', no other operations suported for repetitions! Source is expected to be an editable source
      * @return bool
      */
-    public function updateSegmentContent(string $field, string $editField, string $getter, string $setter) : bool {
+    public function updateSegmentContent(string $field) : bool {
         
-        // TODO: we could make much more use of the segment-tags code if only it would be clear what this code does ...       
+        if($field != 'target' && $field != 'source'){
+            throw new ZfExtended_BadMethodCallException('editor_Models_Segment_RepetitionUpdater: Param "field" can only be "target" or "source"');
+        }
+
+        // TODO: we could make much more use of the segment-tags code if only it would be more clear what this code does ...
         
-        $id = $this->repeatedSegment->getId();
-        $getOriginal = 'get'.ucfirst($field);
-        $segmentContent = $this->originalSegment->{$getter}();
+        $originalContent = ($field == 'target') ? $this->repeatedSegment->getTarget() : $this->repeatedSegment->getSource();
+        $segmentContent = ($field == 'target') ? $this->originalSegment->getTargetEdit() : $this->originalSegment->getSourceEdit();
         
         //replace the repeatedSegment tags with the original repetition ones
-        $originalContent = $this->repeatedSegment->{$getOriginal}();
         $useSourceTags = empty($originalContent);
         if($useSourceTags) {
             //if the original had no content (mostly translation context), we have to load the source tags.
             $originalContent = $this->repeatedSegment->getSource();
         }
-        //get only the real tags, we do not consider white tags in repetitions, 
-        // this is because whitespace belongs to the content and not to the segment (tags instead belong to the segment instead)
+        //get only the real tags, we do not consider whitespace tags in repetitions, 
+        // this is because whitespace belongs to the content and not to the segment (tags instead belong to the segment)
         $tagsForRepetition = $this->tagHelper->getRealTags($originalContent);
         $shortTagNumbers = $this->tagHelper->getTagNumbers($tagsForRepetition);
         if(empty($shortTagNumbers)) {
@@ -150,9 +151,16 @@ class editor_Models_Segment_RepetitionUpdater {
         if(count($tagsForRepetition) !== $i) {
             return false;
         }
-        
-        $this->repeatedSegment->{$setter}($segmentContent);
-        $this->repeatedSegment->updateToSort($editField);
+        if($field == 'target'){
+            $this->repeatedSegment->setTargetEdit($segmentContent);
+            // when copying targets originating from a language-resource, we copy the original target as well ...
+            if($this->originalSegment->isFromLanguageResource()){
+                $this->repeatedSegment->setTarget($originalContent);
+            }
+        } else {
+            $this->repeatedSegment->setSourceEdit($segmentContent);
+        }
+        $this->repeatedSegment->updateToSort($field.editor_Models_SegmentFieldManager::_EDIT_PREFIX);
         return true;
     }
 }

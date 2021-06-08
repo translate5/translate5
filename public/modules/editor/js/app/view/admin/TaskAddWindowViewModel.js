@@ -53,7 +53,10 @@ Ext.define('Editor.view.admin.TaskAddWindowViewModel', {
 
         disableCancelButton:function(get){
             return get('activeItem').disableCancelButton();
+        },
+
+        disableImportDefaults:function(get){
+            return get('activeItem').disableImportDefaults();
         }
     }
-
 });

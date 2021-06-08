@@ -130,7 +130,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * @param array $customerIds
      * @return array
      */
-    public function loadByCustomerIds($customerIds=array()){
+    public function loadByCustomerIds(array $customerIds = []){
         $s=$this->getCustomerIdsSelect($customerIds);
         return $this->db->fetchAll($s)->toArray();
     }
@@ -167,7 +167,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * @param array $customerIds
      * @return array
      */
-    public function loadByCustomerIdsWriteAsDefault(array $customerIds = []){
+    public function loadByCustomerIdsWriteAsDefault(array $customerIds = []): array{
         $s=$this->getCustomerIdsSelect($customerIds);
         $s->where('writeAsDefault=1');
         return $this->db->fetchAll($s)->toArray();

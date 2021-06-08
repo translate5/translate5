@@ -706,6 +706,8 @@ Ext.define('Editor.controller.Segments', {
       me.delLoadMask();
       me.saveChainMutex = false;
       me.onSegmentUsageFinished();
+      // crucial: reset the trigger flag indicating a original target update when save chain ended
+      record.wasOriginalTargetUpdated = false;
       me.fireEvent('segmentEditSaved', me, record);
   },
   addLoadMask: function() {

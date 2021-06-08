@@ -42,6 +42,10 @@ class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider {
     protected static $type = editor_Segment_Tag::TYPE_MQM;
     
     protected static $segmentTagClass = 'editor_Segment_Mqm_Tag';
+    
+    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
+        return ($qualityConfig->enableMqmTags == 1);
+    }
 
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         

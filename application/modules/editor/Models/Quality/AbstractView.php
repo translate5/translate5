@@ -268,10 +268,9 @@ abstract class editor_Models_Quality_AbstractView {
     protected function create(){
         // create ordered rubrics
         $rubrics = [];
-        foreach($this->manager->getAllTypes() as $type){
+        foreach($this->manager->getAllFilterableTypes($this->task) as $type){
             if(!$this->excludeMQM || $type != editor_Segment_Tag::TYPE_MQM){
                 $rubrics[] = $this->createRubricRow($type);
-                
             }
         }
         usort($rubrics, 'editor_Models_Quality_AbstractView::compareByTitle');

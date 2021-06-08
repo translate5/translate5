@@ -37,7 +37,8 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * This is only the case when using the translate call
      * @var integer
      */
-    const DICTONARY_SEARCH_CHARACTERS_BORDER=30;
+    const DICTONARY_SEARCH_CHARACTERS_BORDER = 30;
+    
     /**
      * @var editor_Services_Microsoft_HttpApi
      */
@@ -61,9 +62,25 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      */
     public function __construct() {
         parent::__construct();
-        $this->api = ZfExtended_Factory::get('editor_Services_Microsoft_HttpApi');
         $this->defaultMatchRate = $this->config->runtimeOptions->LanguageResources->microsoft->matchrate;
         $this->batchQueryBuffer = 30;
+        
+        editor_Services_Connector_Exception::addCodes([
+            'E1344' => 'Microsoft Translator returns an error: {errorNr} - {message}',
+            'E1345' => 'Could not authorize to Microsoft Translator, check your configured credentials.',
+            'E1346' => 'Microsoft Translator quota exceeded. A limit has been reached.',
+        ]);
+        
+        ZfExtended_Logger::addDuplicatesByMessage('E1345', 'E1346');
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_FilebasedAbstract::connectTo()
+     */
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
+        parent::connectTo($languageResource, $sourceLang, $targetLang);
+        $this->api = ZfExtended_Factory::get('editor_Services_Microsoft_HttpApi', [$languageResource->getResource()]);
     }
     
     /**
@@ -71,67 +88,116 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $qs = $this->getQueryStringAndSetAsDefault($segment);
-        if(!$this->api->search($this->tagHandler->prepareQuery($qs),$this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode())){
+        $queryString = $this->getQueryStringAndSetAsDefault($segment);
+        
+        if(empty($queryString) && $queryString !== "0") {
             return $this->resultList;
         }
-        $result=$this->api->getResult();
-        $metaData=[];
-        $translation="";
-        foreach ($result as $res) {
-            if(empty($translation)&& $translation !== "0"){
-                $translation=$res['text'];
+        
+        if ($this->queryApi($this->tagHandler->prepareQuery($queryString))) {
+            $results = $this->api->getResult();
+            foreach ($results as $segmentResults) {
+                //a single response is the same as for batch processing:
+                $this->processBatchResult($segmentResults);
             }
-            if(isset($res['metaData'])){
-                $metaData[]=$res['metaData'];
-            }
+            return $this->resultList;
         }
-        $this->resultList->addResult($this->tagHandler->restoreInResult($translation), $this->defaultMatchRate,['alternativeTranslations'=>$metaData]);
-        return $this->resultList;
+        throw $this->createConnectorException();
     }
     
-    /***
-     * Search the resource for available translation. Where the source text is in resource source language and the received results
-     * are in the resource target language
+    /**
+     * Query the API for the search string
+     * @param string $searchString
+     * @param boolean $useDictionary
+     * @return boolean
+     */
+    protected function queryApi($searchString, $useDictionary = false): bool{
+        return $this->api->search($searchString, $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode(), $useDictionary);
+    }
+    
+    /**
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::translate()
      */
     public function translate(string $searchString){
-        //the dictonary lookup translation is active only for less than or equal to DICTONARY_SEARCH_CHARACTERS_BORDER
-        $this->api->setIsDictionaryLookup(mb_strlen($searchString)<=self::DICTONARY_SEARCH_CHARACTERS_BORDER);
-        
         if(empty($searchString)&&$searchString!=="0") {
             return $this->resultList;
         }
         
-        $result=null;
-        if($this->api->search($searchString,$this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode())){
-            $result=$this->api->getResult();
+        $results = [];
+        //the dictonary lookup translation is active only for less than or equal to DICTONARY_SEARCH_CHARACTERS_BORDER
+        $useDictionary = mb_strlen($searchString) <= self::DICTONARY_SEARCH_CHARACTERS_BORDER;
+        
+        //query either with dictionary or without as fallback
+        if ($this->queryApi($searchString, $useDictionary)) {
+            $results = $this->api->getResult();
+            $hasNoDictResults = $useDictionary && (empty($results) || empty($results[0]) || empty($results[0]->translations));
+            //if there was no dictionary translation we call it again without dictionary
+            if($hasNoDictResults && $this->queryApi($searchString)) {
+                $useDictionary = false; //set to false for further processing of the data
+            }
         }
         
-        if(empty($result)){
-            return $this->resultList;
+        if(!is_null($this->api->getError())) {
+            throw $this->createConnectorException();
         }
-        $metaData=[];
-        $translation="";
-        foreach ($result as $res) {
-            if(empty($translation)&& $translation !== "0"){
-                $translation=$res['text'];
-            }
-            if(isset($res['metaData'])){
-                $metaData[]=$res['metaData'];
-            }
-        }
-        $this->resultList->addResult($translation, $this->defaultMatchRate,['alternativeTranslations'=>$metaData]);
+        
+        $this->processTranslateResults($useDictionary);
+        
         return $this->resultList;
+    }
+    
+    /**
+     * process the instant translate results
+     * @param bool $useDictionary
+     */
+    protected function processTranslateResults(bool $useDictionary) {
+        $foundText = null;
+        $metaData = [];
+        
+        //loop over all results, if using dictionary we collect also additional meta data
+        foreach ($this->api->getResult() as $result) {
+            if(empty($result->translations)){
+                continue;
+            }
+            foreach($result->translations as $translation) {
+                //use first translation as result:
+                if(is_null($foundText)) {
+                    //the translation is in a different field, depending if dictionary used or not:
+                    $foundText = $useDictionary ? $translation->displayTarget : $translation->text;
+                }
+                if($useDictionary) {
+                    //dictionary usage
+                    $metaData[] = $translation;
+                }
+            }
+        }
+        
+        //return just the emty result list if nothing found
+        if(is_null($foundText)) {
+            return;
+        }
+        
+        //with dictionary used, use also the found metadata (wrap it in another array first)
+        $metaData = $useDictionary ? ['alternativeTranslations' => $metaData] : null;
+        
+        $this->resultList->addResult($foundText, $this->defaultMatchRate, $metaData);
     }
     
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::languages()
      */
-    public function languages(): array{
-        return array_keys($this->api->getLanguages());
+    public function languages(): array {
+        //if empty api wrapper
+        if(empty($this->api)) {
+            $this->api = ZfExtended_Factory::get('editor_Services_Microsoft_HttpApi', [$this->resource]);
+        }
+        $languages = $this->api->getLanguages();
+        if(is_null($languages)){
+            throw $this->createConnectorException();
+        }
+        return $languages;
     }
     
     /**
@@ -139,7 +205,11 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @see editor_Services_Connector_BatchTrait::batchSearch()
      */
     protected function batchSearch(array $queryStrings, string $sourceLang, string $targetLang): bool {
-        return $this->api->search($queryStrings, $sourceLang, $targetLang);
+        $result = $this->api->search($queryStrings, $sourceLang, $targetLang);
+        if($result) {
+            return $result;
+        }
+        throw $this->createConnectorException();
     }
     
     /**
@@ -147,7 +217,13 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @see editor_Services_Connector_BatchTrait::processBatchResult()
      */
     protected function processBatchResult($segmentResults) {
-        $this->resultList->addResult($this->tagHandler->restoreInResult($segmentResults['text']), $this->defaultMatchRate);
+        if(!isset($segmentResults->translations) || empty($segmentResults->translations[0])) {
+            //if there is no translation we do not process any result
+            return;
+        }
+        //since we translate only to one target language, we will receive only one result in the translations array:
+        $result = $segmentResults->translations[0];
+        $this->resultList->addResult($this->tagHandler->restoreInResult($result->text), $this->defaultMatchRate);
     }
     
     /**
@@ -155,9 +231,72 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(editor_Models_LanguageResources_Resource $resource){
+        $this->lastStatusInfo = '';
+        $this->api = ZfExtended_Factory::get('editor_Services_Microsoft_HttpApi',[$resource]);
+        
         if($this->api->getStatus()){
             return self::STATUS_AVAILABLE;
         }
+        
+        //we also log below errors
+        $exception = $this->createConnectorException();
+        $this->logger->exception($exception);
+        
+        $status = $this->api->getResponse()->getStatus();
+        if($status == 403 || $status == 401) {
+            $this->lastStatusInfo = 'Anmeldung bei Microsoft Translator fehlgeschlagen. Bitte überprüfen Sie die API Einstellungen.';
+            return self::STATUS_NOVALIDLICENSE;
+        }
+        
+        if($this->api->getResponse()->getStatus() == 429) {
+            $this->lastStatusInfo = 'Ein Nutzungslimit wurde erreicht, prüfen Sie das Systemlog für weitere Informationen.';
+            return self::STATUS_QUOTA_EXCEEDED;
+        }
+        
+        $this->lastStatusInfo = $exception->getExtra('message', '');
         return self::STATUS_NOCONNECTION;
+    }
+    
+    /**
+     * Creates a service connector exception
+     * @return editor_Services_Connector_Exception
+     */
+    protected function createConnectorException(): editor_Services_Connector_Exception {
+        $httpStatus = $this->api->getResponse()->getStatus();
+        $error = $this->api->getError();
+        $json = null;
+        $data = [
+            'service' => $this->getResource()->getName(),
+            'languageResource' => $this->languageResource ?? '',
+        ];
+        
+        switch ($httpStatus) {
+            case 401:
+            case 403:
+                $ecode = 'E1345'; //Could not authorize to Microsoft Translator, check your configured credentials.
+                break;
+            case 429:
+                $ecode = 'E1346'; //Microsoft Translator quota exceeded. A limit has been reached.
+                break;
+            default:
+                //common language resource error
+                $ecode = 'E1344'; //Microsoft Translator returns an error: {errorNr} - {message}
+                break;
+        }
+        
+        //if the body contains json with a valid message, we use that as error message, but we still keep the whole body
+        if(!empty($error->body)) {
+            $json = json_decode($error->body);
+            //the strlen check can not be added with && to the above if
+            if(isset($json->error) && isset($json->error->code)) {
+                $data['errorNr'] = $json->error->code;
+            }
+            if(isset($json->error) && isset($json->error->message)) {
+                $data['message'] = $json->error->message;
+            }
+        }
+        $data['error'] = $error;
+        
+        return new editor_Services_Connector_Exception($ecode, $data);
     }
 }

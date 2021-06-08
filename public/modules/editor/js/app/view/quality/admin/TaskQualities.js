@@ -72,6 +72,7 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
             me.down('#analysisToolbar').setHidden(true);
             me.reAnalysisHidden = true;
         }
+        me.store.getProxy().abort(); // abort running requests to avoid contextless requests
         if(extraParams && extraParams.taskGuid){
             me.store.taskGuid = extraParams.taskGuid;
             me.store.reload();
