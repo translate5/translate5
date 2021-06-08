@@ -72,6 +72,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         btnNextWizard:'#UT#Weiter',
         cancelBtn: '#UT#Abbrechen',
         btnSkip:'#UT#Importieren (weitere überspringen)',
+        importDefaultsButtonText:'#UT#Importieren (Standards nutzen)'
     },
     height : 550,
     width : 1000,
@@ -310,6 +311,10 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
 
                         disableCancelButton:function(get){
                             return false;
+                        },
+
+                        disableImportDefaults:function(get){
+                            return false;
                         }
                     }
                 ],
@@ -341,6 +346,15 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         visible:'{!disableSkipButton}'
                     },
                     text : me.strings.btnSkip
+                },{
+                    xtype : 'button',
+                    glyph: 'f560@FontAwesome5FreeSolid',
+                    itemId : 'importdefaults-wizard-btn',
+                    bind:{
+                        disabled:'{disableImportDefaults}',
+                        visible:'{!disableImportDefaults}'
+                    },
+                    text : me.strings.importDefaultsButtonText
                 },{
                     xtype : 'button',
                     glyph: 'f00c@FontAwesome5FreeSolid',
