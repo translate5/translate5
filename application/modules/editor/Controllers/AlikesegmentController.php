@@ -95,7 +95,8 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
 
         $duration = new stdClass();
         
-        $this->fieldLoop(function($field, $editField, $getter, $setter) use ($duration){
+        $this->fieldLoop(function($field) use ($duration){
+            $editField = $field.editor_Models_SegmentFieldManager::_EDIT_PREFIX;
             $duration->$editField = (int)$this->_getParam('duration');
         });
         
@@ -144,8 +145,8 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
 
                 $repetitionUpdater->setRepetition($entity);
                 //if source editing = true, then fieldLoop loops also over the source field
-                    //replace the masters tags with the original repetition ones
-                    //if there was an error in taking over the segment content into the repetition, we return false, so the segment is inored later on
+                //replace the masters tags with the original repetition ones
+                //if there was an error in taking over the segment content into the repetition, we return false, so the segment is inored later on
                 $fieldLoopResult = $this->fieldLoop([$repetitionUpdater, 'updateSegmentContent']);
                 if($fieldLoopResult['target'] === false || $this->isSourceEditable && $fieldLoopResult['source'] === false ) {
                     //the segment has to be ignored!
@@ -301,7 +302,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     /**
      * Applies the given Closure for each editable segment field
      * (currently only source and target! Since ChangeAlikes are deactivated for alternatives)
-     * Closure Parameters: $field, $editField, $getter, $setter → 'target', 'targetEdit', 'getTargetEdit', 'setTargetEdit'
+     * Closure Parameters: $field → 'target' or 'source'
      *
      * @param Callable $callback
      * @return array
@@ -309,9 +310,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     protected function fieldLoop(Callable $callback) {
         $result = array();
         if($this->isSourceEditable) {
-            $result['source'] = $callback('source', 'sourceEdit', 'getSourceEdit', 'setSourceEdit');
+            $result['source'] = $callback('source');
         }
-        $result['target'] = $callback('target', 'targetEdit', 'getTargetEdit', 'setTargetEdit');
+        $result['target'] = $callback('target');
         return $result;
     }
 

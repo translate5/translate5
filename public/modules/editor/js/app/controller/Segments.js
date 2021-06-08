@@ -209,6 +209,7 @@ Ext.define('Editor.controller.Segments', {
           task = Editor.data.task,
           title = Ext.String.ellipsis(task.get('taskName'), 60),
           store = grid.store,
+          repeated = grid.down('isRepeatedColumn'),
           initialGridFilters = Editor.data.initialGridFilters;
       
       grid.getHeader().getTitle().getEl().set({
@@ -221,6 +222,10 @@ Ext.define('Editor.controller.Segments', {
 
       if(task.isUnconfirmed()) {
           title = title + grid.title_addition_unconfirmed;
+      }
+      
+      if(!task.get('defaultSegmentLayout')) {
+          repeated && repeated.hide();
       }
       
       initialGridFilters = initialGridFilters && initialGridFilters.segmentgrid;
@@ -701,6 +706,8 @@ Ext.define('Editor.controller.Segments', {
       me.delLoadMask();
       me.saveChainMutex = false;
       me.onSegmentUsageFinished();
+      // crucial: reset the trigger flag indicating a original target update when save chain ended
+      record.wasOriginalTargetUpdated = false;
       me.fireEvent('segmentEditSaved', me, record);
   },
   addLoadMask: function() {

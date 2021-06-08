@@ -84,16 +84,13 @@ class editor_Models_Segment_Updater {
         //@todo do this with events
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
-        $workflow=$wfm->getActive($this->segment->getTaskGuid());
+        $workflow = $wfm->getActive($this->segment->getTaskGuid());
         $workflow->beforeSegmentSave($this->segment, $this->task);
         
         $this->segment->validate();
         
         $this->updateTargetHashAndOriginal($this->task);
 
-        // Update the Quality Tags
-        editor_Segment_Quality_Manager::instance()->processSegment($this->segment, $this->task, editor_Segment_Processing::EDIT);
-        
         // TODO: this event is unused, remove it 
         $this->events->trigger("beforeSegmentUpdate", $this, array(
             'entity' => $this->segment,
@@ -101,6 +98,9 @@ class editor_Models_Segment_Updater {
         ));
         
         $this->updateMatchRateType();
+        
+        // Update the Quality Tags
+        editor_Segment_Quality_Manager::instance()->processSegment($this->segment, $this->task, editor_Segment_Processing::EDIT);
         
         //saving history directly before normal saving,
         // so no exception between can lead to history entries without changing the master segment

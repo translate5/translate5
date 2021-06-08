@@ -46,7 +46,7 @@ Ext.define('Editor.store.admin.Config', {
             return null;
         }
         //Convert the map types to object (this is not done by the model instance). 
-        if(record.get('type') == 'map'){
+        if(record.get('type') === 'map'){
             return Ext.JSON.decode(record.get('value'));
         }
         return record.get('value');
@@ -63,13 +63,12 @@ Ext.define('Editor.store.admin.Config', {
              return me.searchFiltered(name);
          }   
             
-        var pos = me.findExact('name',me.RUNTIMEOPTIONS_CONFIG_PREFIX+name),//TODO: get me from const
-            row;
-        
+        var pos = me.findExact('name',me.RUNTIMEOPTIONS_CONFIG_PREFIX+name);
+
         if (pos < 0) {
             return null;
         }
-        return me.getRecordValue(me.getAt(pos))
+        return me.getRecordValue(me.getAt(pos));
     },
 
     /***

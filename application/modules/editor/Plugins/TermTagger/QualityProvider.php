@@ -28,8 +28,7 @@
  @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
  http://www.gnu.org/licenses/gpl.html
  http://www.translate5.net/plugin-exception.txt
- 
- END LICENSE AND COPYRIGHT
+  END LICENSE AND COPYRIGHT
  */
 
 /**
@@ -37,6 +36,23 @@
  * Provides the tagging when Importing Tasks and tagging edited segments which is integrated in the general quality management
  */
 class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_Provider {
+    
+    /**
+     * @var string
+     */
+    const NOT_FOUND_IN_TARGET = 'not_found_in_target';
+    /**
+     * @var string
+     */
+    const NOT_DEFINED_IN_TARGET = 'not_defined_in_target';
+    /**
+     * @var string
+     */
+    const FORBIDDEN_IN_TARGET = 'forbidden_in_target';
+    /**
+     * @var string
+     */
+    const FORBIDDEN_IN_SOURCE = 'forbidden_in_source';
     
     /**
      * The central UNIQUE amongst quality providersKey to identify termtagger-related stuff.
@@ -125,37 +141,34 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         return $tags;
     }
     
-    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
+    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
         return $translate->_('Terminologie');
     }
     
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         switch($category){
-            case editor_Models_Term::TRANSSTAT_NOT_FOUND:
+            case editor_Plugins_TermTagger_QualityProvider::NOT_FOUND_IN_TARGET:
                 return $translate->_('Nicht gefunden in Ziel');
                 
-            case editor_Models_Term::TRANSSTAT_NOT_DEFINED:
+            case editor_Plugins_TermTagger_QualityProvider::NOT_DEFINED_IN_TARGET:
                 return $translate->_('Nicht definiert in zielsprachl. Terminologie');
                 
-            case editor_Models_Term::STAT_SUPERSEDED:
-            case editor_Models_Term::STAT_DEPRECATED:
+            case editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_TARGET:
+                return $translate->_('Verboten in Ziel');
+                
+            case editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_SOURCE:
                 return $translate->_('Verboten in Quelle');
         }
         return NULL;
     }
     
     public function getAllCategories(editor_Models_Task $task) : array {
-        return [ editor_Models_Term::TRANSSTAT_NOT_FOUND, editor_Models_Term::TRANSSTAT_NOT_DEFINED, editor_Models_Term::STAT_SUPERSEDED, editor_Models_Term::STAT_DEPRECATED ];
+        return [ editor_Plugins_TermTagger_QualityProvider::NOT_FOUND_IN_TARGET, editor_Plugins_TermTagger_QualityProvider::NOT_DEFINED_IN_TARGET, editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_TARGET, editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_SOURCE ];
     }
 
     public function isSegmentTag(string $type, string $nodeName, array $classNames, array $attributes) : bool {
         // if the data says it's a term-tag or the class is 'term'
         return (($type == static::$type || in_array(static::$type, $classNames)) && editor_Plugins_TermTagger_Tag::hasNodeName($nodeName));
-    }
-
-    public function createSegmentTag(int $startIndex, int $endIndex, string $nodeName, array $classNames) : editor_Segment_Tag {
-        // the category is represented by a css-class
-        return new editor_Plugins_TermTagger_Tag($startIndex, $endIndex, editor_Plugins_TermTagger_SegmentProcessor::getQualityState($classNames));
     }
     /**
      * Find oversized segments and mark them as oversized

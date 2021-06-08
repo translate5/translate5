@@ -58,18 +58,6 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
     protected static $identificationClass = self::TYPE;
     
     /**
-     * Our css-classes are connected with the category, we must reflect that
-     * {@inheritDoc}
-     * @see editor_Segment_Tag::setCategory()
-     */
-    public function setCategory(string $category) : editor_Segment_Tag {
-        $this
-            ->removeClass($this->category)
-            ->addClass($category);
-        $this->category = $category;
-        return $this;
-    }
-    /**
      * Adds the TBX Id to our additional data
      * {@inheritDoc}
      * @see editor_Segment_Tag::getAdditionalData()
@@ -80,6 +68,14 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
             $data->tbxid = $this->getData(self::DATA_NAME_TBXID);
         }
         return $data;
+    }
+    /**
+     * We evaluate our category by the classes we have. Note, that additionally the originating field type is relevant for evaluation !
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::finalize()
+     */
+    public function finalize(editor_Segment_FieldTags $tags, editor_Models_task $task){
+        $this->category = editor_Plugins_TermTagger_SegmentProcessor::getQualityState($this->classes, $tags->isSourceField());
     }
     /**
      * Compares the TBX Id instead of the content

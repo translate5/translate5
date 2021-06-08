@@ -67,6 +67,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      * @var string
      */
     const TASK_STATE_ANALYSIS = 'matchanalysis';
+    
+    protected static $languageResourceCache = [];
 
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_MatchAnalysis';
     protected $validatorInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Validator_MatchAnalysis';
@@ -86,10 +88,10 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      * Ex: group index 99 is every matchrate between 90 and 99
      *
      * @param string $taskGuid
-     * @param bool $isExport : is the data requested for export
+     * @param bool $rawData return raw data
      * @return array
      */
-    public function loadByBestMatchRate(string $taskGuid, bool $isExport = false): array
+    public function loadByBestMatchRate(string $taskGuid, bool $groupData = true): array
     {
         //load the latest analysis for the given taskGuid
         $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
@@ -102,57 +104,28 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
 
-        //if edit 100% matches is disabled for the task, filter out the blocked segments from the analysis
-        $blockedFilter = '';
-        //TODO: this should be defined as config
-        if (!$task->getEdit100PercentMatch()) {
-            $blockedFilter = 'INNER JOIN LEK_segments s ON t1.segmentId = s.id AND s.autoStateId!=' . editor_Models_Segment_AutoStates::BLOCKED;
-        }
-
-        /*
-        $sqlV1='SELECT wordCount,languageResourceid,matchRate,analysisId,internalFuzzy,segmentId FROM (
-                SELECT SUM(o.wordCount) wordCount,o.languageResourceid,o.matchRate,o.analysisId,o.internalFuzzy,o.segmentId
-                FROM LEK_match_analysis o
-                  LEFT JOIN LEK_match_analysis b
-                      ON o.segmentId = b.segmentId AND IF(o.matchRate IS NULL,0,o.matchRate) < IF(b.matchRate IS NULL,0,b.matchRate)
-                WHERE b.matchRate is NULL
-                AND o.analysisId=?
-                GROUP BY o.internalFuzzy,o.languageResourceid,o.matchRate # group by internal fuzzie so we get it as separate row if exist
-                ORDER BY o.languageResourceid DESC,o.matchRate DESC
-                ) s GROUP BY s.segmentId;';
-        $sqlV2='SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.wordCount) wordCount  FROM (
-                SELECT t1.*
-                FROM LEK_match_analysis AS t1
-                LEFT OUTER JOIN LEK_match_analysis AS t2
-                ON t1.segmentId = t2.segmentId
-                        AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.internalFuzzy = 0 AND t2.analysisId = ?
-                WHERE t2.segmentId IS NULL AND t1.analysisId = ? AND t1.internalFuzzy = 0
-                UNION
-                SELECT t1.*
-                FROM LEK_match_analysis AS t1
-                LEFT OUTER JOIN LEK_match_analysis AS t2
-                ON t1.segmentId = t2.segmentId
-                        AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.internalFuzzy = 1 AND t2.analysisId = ?
-                WHERE t2.segmentId IS NULL AND t1.analysisId = ? AND t1.internalFuzzy = 1
-            ) bestRates GROUP BY bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate;';
-        */
-        $sqlV3 = 'SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.wordCount) wordCount  FROM (
-                SELECT t1.*
-                    FROM LEK_match_analysis AS t1 '
-            . $blockedFilter .
-            '
+        $sqlV3 = 'SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.wordCount) wordCount, SUM(bestRates.segCount) segCount
+                  FROM (
+                    SELECT t1.*, 1 as segCount
+                    FROM LEK_match_analysis AS t1
+                    INNER JOIN LEK_segments s ON t1.segmentId = s.id AND s.autoStateId != ?
                     LEFT OUTER JOIN LEK_match_analysis AS t2
                     ON t1.segmentId = t2.segmentId
-                            AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.analysisId =?
-                	WHERE t2.segmentId IS NULL AND t1.analysisId = ?) bestRates GROUP BY bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate;';
-        //$resultArray=$this->db->getAdapter()->query($sqlV2,[$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id']])->fetchAll();
-        //$resultArray=$this->db->getAdapter()->query($sqlV1,[$analysisAssoc['id']])->fetchAll();
-        $resultArray = $this->db->getAdapter()->query($sqlV3, [$analysisAssoc['id'], $analysisAssoc['id']])->fetchAll();
+                      AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.analysisId = ?
+                    WHERE t2.segmentId IS NULL AND t1.analysisId = ?
+                  ) bestRates
+                  GROUP BY bestRates.internalFuzzy, bestRates.languageResourceid, bestRates.matchRate;';
+
+        $bind = [editor_Models_Segment_AutoStates::BLOCKED, $analysisAssoc['id'], $analysisAssoc['id']];
+        
+        $resultArray = $this->db->getAdapter()->query($sqlV3, $bind)->fetchAll();
         if (empty($resultArray)) {
             return [];
         }
-
-        return $this->groupByMatchrate($resultArray, $analysisAssoc);
+        if($groupData) {
+            return $this->groupByMatchrate($resultArray, $analysisAssoc);
+        }
+        return $this->addLanguageResourceInfos($resultArray);
     }
 
     /***
@@ -275,15 +248,14 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($analysisData['taskGuid']);
 
-        $resourceCache = [];
         foreach ($result as $res) {
-            $lr = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-            /* @var $lr editor_Models_LanguageResources_LanguageResource */
-            if (!isset($resourceCache[$res['languageResourceId']])) {
-                $lr->load($res['languageResourceId']);
-                $resourceCache[$res['languageResourceId']] = $lr;
+            $lr = $this->getLanguageResourceCached($res['languageResourceId']);
+            
+            //if the languageresource was deleted, we can not add additional data here
+            if(empty($lr)) {
+                $initGroups = $initGroups + $initRow($res['languageResourceId'], 'deleted!', 'cdcdcd', 'n/a');
+                continue;
             }
-            $lr = $resourceCache[$res['languageResourceId']];
 
             //init the group
             $initGroups = $initGroups + $initRow($lr->getId(), $lr->getName(), $lr->getColor(), $lr->getResourceType());
@@ -300,18 +272,47 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         return $initGroups;
     }
 
-    /***
-     * Sort by best  languageResource
-     * TODO: implement me
-     * @param array $groupedResults
+    /**
+     * adds the language resource meta data to the result set
+     * @param array $data
      * @return array
      */
-    private function sortByTm($groupedResults)
-    {
-        $retArray = [];
-        foreach ($groupedResults as $languageResourcegroup) {
-            array_push($retArray, $languageResourcegroup);
+    protected function addLanguageResourceInfos(array $data): array {
+        foreach($data as $idx => $row) {
+            $id = (int) $row['languageResourceid'];
+            $lr = $this->getLanguageResourceCached($id);
+            if($id === 0 && $row['matchRate'] == editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE) {
+                $data[$idx]['type'] = editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED;
+                $data[$idx]['name'] = 'repetition';
+            }
+            elseif(empty($lr)) {
+                $data[$idx]['type'] = 'n/a';
+                $data[$idx]['name'] = 'language resource deleted';
+            }
+            else {
+                $data[$idx]['type'] = $lr->getResourceType();
+                $data[$idx]['name'] = $lr->getName();
+            }
         }
-        return $retArray;
+        return $data;
+    }
+    
+    /**
+     * Loads and returns a languageresource by id, returns null if the given language resource does not exist
+     * @param int $id
+     * @return editor_Models_LanguageResources_LanguageResource|NULL
+     */
+    protected function getLanguageResourceCached(int $id): ?editor_Models_LanguageResources_LanguageResource {
+        if(!array_key_exists($id, self::$languageResourceCache)) {
+            $lr = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var $lr editor_Models_LanguageResources_LanguageResource */
+            try {
+                $lr->load($id);
+            }catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                $lr = null;
+            }
+            self::$languageResourceCache[$id] = $lr;
+        }
+        return self::$languageResourceCache[$id];
     }
 }
