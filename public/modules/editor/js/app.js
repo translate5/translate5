@@ -177,7 +177,7 @@ Ext.application({
                     Editor.data.app.initState = 'edit';
                     initMethod = 'openEditor';
                 }
-            }else if(window.location.hash!=''){
+            }else if(window.location.hash !== ''){
                 initMethod = 'openAdministration';
             }
 
@@ -484,7 +484,7 @@ Ext.application({
      * when the segments-editor is opened
      */
     isEditTaskRoute:function(){
-        return window.location.hash.startsWith('#task') && window.location.hash.endsWith('/edit')
+        return window.location.hash.startsWith('#task') && window.location.hash.endsWith('/edit');
     },
 
     /***

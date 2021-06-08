@@ -1226,7 +1226,14 @@ Ext.define('Editor.controller.Localizer', {
             confirmResetPwMsg: '<?php echo $this->translate->_('Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.');?>'
         }
     });
-    
+
+    Ext.define("Editor.locale.de.view.admin.user.TaskAssoc", {
+        override: "Editor.view.admin.user.TaskAssoc",
+        title: '<?php echo $this->translate->_('Standard-Benutzerzuweisungen');?>',
+        strings: {
+        }
+    });
+
     Ext.define("Editor.locale.de.view.admin.user.Grid", {
         override: "Editor.view.admin.user.Grid",
         title: '<?php echo $this->translate->_('Benutzer');?>',
@@ -1238,7 +1245,7 @@ Ext.define('Editor.controller.Localizer', {
             email: '<?php echo $this->translate->_('E-Mail');?>',
             locale: '<?php echo $this->translate->_('Sprache');?>',
             roles: '<?php echo $this->translate->_('Systemrollen');?>',
-            openIdIssuer: '<?php echo $this->translate->_('OpenId Emitten');?>'
+            openIdIssuer: '<?php echo $this->translate->_('OpenID Emitten');?>'
         },
         strings: {
             addUser: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
@@ -1310,7 +1317,7 @@ Ext.define('Editor.controller.Localizer', {
             languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>',
             localeLabel: '<?php echo $this->translate->_('Benutzersprache');?>',
             parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>',
-            bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.');?>'
+            bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.');?>'
         }
     });
     Editor.view.admin.task.UserPrefsGrid.prototype.strings = {
@@ -1379,7 +1386,6 @@ Ext.define('Editor.controller.Localizer', {
             save:'<?php echo $this->translate->_("Speichern");?>',
             cancel:'<?php echo $this->translate->_("Abbrechen");?>',
             remove:'<?php echo $this->translate->_("Löschen");?>',
-            editCustomerTitle:'<?php echo $this->translate->_("Kunde bearbeiten");?>',
             addCustomerTitle:'<?php echo $this->translate->_("Kunde hinzufügen");?>',
             saveCustomerMsg:'<?php echo $this->translate->_("Kunde wird gespeichert...");?>',
             customerSavedMsg:'<?php echo $this->translate->_("Kunde gespeichert!");?>',
@@ -1388,19 +1394,19 @@ Ext.define('Editor.controller.Localizer', {
             customerDeletedMsg:'<?php echo $this->translate->_("Kunde gelöscht");?>',
             export:'<?php echo $this->translate->_("Ressourcen-Nutzung Exportieren");?>',
             domain:'<?php echo $this->translate->_("translate5 Domain");?>',
-            openIdServer:'<?php echo $this->translate->_("OpenId server");?>',
-            openIdIssuer:'<?php echo $this->translate->_("OpenId Issuer");?>',
-            openIdAuth2Url:'<?php echo $this->translate->_("OpenId OAuth URL");?>',
+            openIdServer:'<?php echo $this->translate->_("OpenID server");?>',
+            openIdIssuer:'<?php echo $this->translate->_("OpenID Issuer");?>',
+            openIdAuth2Url:'<?php echo $this->translate->_("OpenID OAuth URL");?>',
             defaultRolesGroupLabel:'<?php echo $this->translate->_("Standardrollen");?>',
             serverRolesGroupLabel:'<?php echo $this->translate->_("Erlaubte Rollen");?>',
-            openIdClientId:'<?php echo $this->translate->_("OpenId Benutzername");?>',
-            openIdClientSecret:'<?php echo $this->translate->_("OpenId Passwort");?>',
+            openIdClientId:'<?php echo $this->translate->_("OpenID Benutzername");?>',
+            openIdClientSecret:'<?php echo $this->translate->_("OpenID Passwort");?>',
             openIdRedirectLabel:'<?php echo $this->translate->_("Verlinkter Text Loginseite");?>',
             openIdRedirectCheckbox:'<?php echo $this->translate->_("Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.");?>',
-            defaultRolesGroupLabelTooltip:'<?php echo $this->translate->_("Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.");?>',
+            defaultRolesGroupLabelTooltip:'<?php echo $this->translate->_("Standardsystemrollen werden verwendet, wenn der OpenID-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.");?>',
             serverRolesGroupLabelTooltip:'<?php echo $this->translate->_("Systemrollen, die der OpenID-Server in translate5 festlegen darf.");?>',
-            propertiesTabPanelTitle:'<?php echo $this->translate->_("Eigenschaften");?>',
-            configTabTitle:'<?php echo $this->translate->_("Standardkonfiguration des Systems");?>',
+            propertiesTabPanelTitle:'<?php echo $this->translate->_("Allgemein");?>',
+            configTabTitle:'<?php echo $this->translate->_("Überschreibung der Systemkonfiguration");?>',
             actionColumn:'<?php echo $this->translate->_("Aktionen");?>',
             customerEditActionIcon:'<?php echo $this->translate->_("Kunden bearbeiten");?>'
         }

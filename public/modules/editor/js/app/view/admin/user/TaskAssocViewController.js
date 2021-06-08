@@ -27,14 +27,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.customer.ViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.customerPanel',
-
-    data: {
-        title: '',
-        record: false,
-        isOpenIdRequired:false,
-        isActiveTabIncludedInForm:false
-    }
+Ext.define('Editor.view.admin.user.TaskAssocViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.adminUserTaskAssoc'
 });
