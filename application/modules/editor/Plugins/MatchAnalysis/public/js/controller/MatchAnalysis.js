@@ -68,6 +68,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },{
         ref:'projectTaskGrid',
         selector:'#projectTaskGrid'
+    },{
+        ref: 'taskAddWindow',
+        selector: '#adminTaskAddWindow'
     }],
     TASK_STATE_ANALYSIS: 'matchanalysis',
     strings:{
@@ -111,7 +114,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         },
         controller:{
             '#admin.TaskOverview':{
-                taskCreated:'onTaskCreated'
+                taskCreated:'onTaskCreated',
+                wizardCardImportDefaults:'onWizardCardImportDefaults'
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -122,6 +126,14 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 load:'onLanguageResourcesTaskAssocStoreLoad'
             }
         }
+    },
+
+    /***
+     * Queue the analysis when the import with defaults button is clicked
+     * @param task
+     */
+    onWizardCardImportDefaults: function (task) {
+        this.startAnalysis(task.get('id'),'pretranslation');
     },
 
     /***
@@ -280,7 +292,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                         value:100,
                         displayField: 'value',
                         valueField: 'id',
-                        queryMode: 'local',
+                        queryMode: 'local'
                     }
                 ]
             },{
@@ -295,7 +307,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                     tag: 'div',
                     'data-qtip': me.strings.pretranslateMtTooltip
                 },
-                itemId:'pretranslateMt',
+                itemId:'pretranslateMt'
             }]
         }]);
     },
@@ -356,14 +368,17 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     /***
      * Start the match analysis or pretranslation for the taskId.
-     * Operation can contains: 
+     * Operation can contains:
      *    'analysis' -> runs only match analysis
      *    'pretranslation' -> runs match analysis with pretranslation
+     *
+     * @param taskId
+     * @param operation
      */
     startAnalysis:function(taskId,operation){
         //'editor/:entity/:id/operation/:operation',
         var me = this;
-        
+
         me.fireEvent('beforeStartAnalysis',taskId,operation);
 
         Ext.Ajax.request({
@@ -381,7 +396,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             failure: function(response){
                 Editor.app.getController('ServerException').handleException(response);
             }
-        })
+        });
     },
     
     /***
