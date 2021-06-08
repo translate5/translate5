@@ -33,42 +33,29 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.view.LanguageResources.MatchGridViewModel
- * @extends Ext.app.ViewModel
+ * @class Editor.model.LanguageResources.Task
+ * @extends Ext.data.Model
+ * this is shortened form of a readonly task entity to be used in the language resource area
  */
-
-Ext.define('Editor.view.LanguageResources.TaskGridWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.languageResourceTaskGridWindow',
-    requires: [
-        'Ext.util.Sorter',
-        'Ext.data.Store',
-        'Ext.data.field.Integer',
-        'Ext.data.field.String',
-        'Editor.model.LanguageResources.Task'
-    ],
-    data: {
-        record: null
-    },
-    initConfig: function(instanceConfig) {
-        var me = this,
-            config = {
-                stores: {
-                    tasklist: {
-                        buffered: true,
-                        pageSize: 200,
-                        autoLoad: false,
-                        model: 'Editor.model.LanguageResources.Task',
-                        sorters: [{
-                            property: 'taskName',
-                            direction: 'DESC'
-                        }]
-                    }
-                }
-            };
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
-        }
-        return me.callParent([config]);
+Ext.define('Editor.model.LanguageResources.Task', {
+  extend: 'Ext.data.Model',
+  fields: [
+    {name: 'id', type: 'int'}, //the taskassoc ID!
+    {name: 'taskId', type: 'int'},
+    {name: 'projectId', type: 'int'},
+    {name: 'taskName', type: 'string'},
+    {name: 'taskGuid', type: 'string'},
+    {name: 'taskNr', type: 'string'},
+    {name: 'state', type: 'string'},
+    {name: 'lockingUser', type: 'string'},
+    {name: 'languageResourceId', type: 'int'}
+  ],
+  idProperty: 'id',
+  proxy : {
+    type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
+    reader : {
+      rootProperty: 'rows',
+      type : 'json'
     }
+  }
 });
