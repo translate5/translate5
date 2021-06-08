@@ -94,7 +94,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             '<taskInfo taskId="UNTESTABLECONTENT" runAt="UNTESTABLECONTENT" runTime="UNTESTABLECONTENT">',
             $actual);
         
-        file_put_contents($this->api()->getFile('exportResults.xml', null, false), $actual);
+        //file_put_contents($this->api()->getFile('exportResults.xml', null, false), $actual);
         $expected = self::$api->getFileContent('exportResults.xml');
         
         //check for differences between the expected and the actual content
@@ -264,8 +264,8 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         //open task for whole testcase
         self::$api->login('testmanager');
         
-        //self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
         //remove the created resources
-        //self::$api->removeResources();
+        self::$api->removeResources();
     }
 }
