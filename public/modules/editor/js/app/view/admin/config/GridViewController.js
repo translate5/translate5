@@ -38,6 +38,11 @@ Ext.define('Editor.view.admin.config.GridViewController', {
             '#showReadOnly':{
                 change:'onShowReadOnlyChange'
             }
+        },
+        controller: {
+            'taskOverviewController': {
+                taskImportWorkStarted: 'onTaskImportWorkStarted'
+            }
         }
     },
     
@@ -67,18 +72,18 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         this.groupingFeature.expandAll();
     },
     
-    onSaveClick:function(view, recIndex, cellIndex, item, e, record){
+    onSaveClick: function(view, recIndex, cellIndex, item, e, record){
         this.saveRecord(record);
     },
     
-    onGridActivate:function(){
-        var me=this,
+    onGridActivate: function(){
+        var me = this,
             store = me.getView().getStore();
         if(!store.isLoaded()){
             store.load();
         }
     },
-    
+
     /***
      * If there is one readonly config in the curretn config store, set view model propertie
      */
@@ -168,12 +173,20 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         this.handleReadonlyConfig(newValue);
     },
     
+    /**
+     * Handles the end onf the task import work wizard / when the workers start
+     * At this point the task-confik is fixed and our view needs to be updated
+     */
+    onTaskImportWorkStarted: function(task){
+        this.getView().refreshForTask(task);
+    },
+    
     /***
      * Show or hide readonly configs in the grid, based on the showReadonlyConfig flag
      */
     handleReadonlyConfig:function(showReadonlyConfig){
-        var me=this,
-            store =me.getView().getStore();
+        var me = this,
+            store = me.getView().getStore();
     
         if(showReadonlyConfig){
             store.removeFilter('isReadOnly');

@@ -835,28 +835,34 @@ class editor_TaskController extends ZfExtended_RestController {
             $task = $this->entity;
         }
 
-        $tasks=[];
+        $tasks = [];
         //if it is a project, start the import workers for each task project
         if($task->isProject()) {
             $tasks=$task->loadProjectTasks($task->getProjectId(),true);
-        }else{
-            $tasks[]=$task;
+        } else {
+            $tasks[] = $task;
         }
 
-        $model=ZfExtended_Factory::get('editor_Models_Task');
+        $model = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $model editor_Models_Task */
         foreach ($tasks as $task){
             
             if(is_array($task)){
                 $model->load($task['id']);
-            }else{
-                $model=$task;
+            } else {
+                $model = $task;
             }
             
             //import workers can only be started for tasks
             if($model->isProject()) {
                 continue;
             }
+
+            // we fix all task-specific configs of the task for it's remaining lifetime
+            // this is crucial to ensure, that important configs are changed throughout the lifetime that are usually not designed to be dynamical (AutoQA, Visual, ...)
+            $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
+            /* @var $taskConfig editor_Models_TaskConfig */
+            $taskConfig->fixAfterImport($model->getTaskGuid());
     
             $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
             /* @var $workerModel ZfExtended_Models_Worker */
