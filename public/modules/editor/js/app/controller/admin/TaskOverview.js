@@ -218,7 +218,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 click: 'handleTaskAdd'
             },
             '#adminTaskAddWindow #cancel-task-btn': {
-                click: 'handleTaskCancel'
+                click: 'handleImportStartOrCancel'
             },
             '#adminTaskAddWindow #continue-wizard-btn': {
                 click: 'handleContinueWizardClick'
@@ -412,7 +412,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         me.fireEvent('handleTaskPreferences', task);
     },
 
-    handleTaskCancel: function () {
+    handleImportStartOrCancel: function () {
         var me = this;
         if (!me.getTaskAddForm()) {
             return;
@@ -1155,7 +1155,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             success: function (response) {
                 win && win.setLoading(false);
                 Editor.MessageBox.addSuccess(me.strings.importTaskMessage, 2);
-                me.handleTaskCancel();
+                // some panels may need to update the view after the import wizard closed and the import workers start
+                me.fireEvent('taskImportWorkStarted', task);
+                me.handleImportStartOrCancel();
                 me.isImportStarted = false;
             },
             failure: function (response) {
