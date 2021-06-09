@@ -10,10 +10,16 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+## [5.2.2] - 2021-06-09
+
+### Important Notes:
+ 
+**This release contains important Hotfixes for [TRANSLATE-2196](https://jira.translate5.net/browse/TRANSLATE-2196): Complete Auto QA for translate5 released in version 5.2.0.**
 
 
-
-
+### Bugfixes
+**[TRANSLATE-2500](https://jira.translate5.net/browse/TRANSLATE-2500): Worker Architecture: Solving Problems with Deadlocks and related Locking/Mutex Quirks** <br>
+Improved the internal worker handling regarding DB dead locks and a small opportunity that workers run twice.
 
 
 ## [5.2.1] - 2021-06-08
