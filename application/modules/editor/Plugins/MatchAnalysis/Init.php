@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
+    protected static $description = 'Provides the match-analysis and pre-translation against language-resources.';
     
     /**
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
