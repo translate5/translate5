@@ -30,20 +30,20 @@ END LICENSE AND COPYRIGHT
  * View Controller for the task quality panel
  * Handles only the finished task's import refresh of qualities
  */
-Ext.define('Editor.view.quality.TaskQualitiesController', {
+Ext.define('Editor.view.quality.admin.TaskQualitiesController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.taskQualities',
     listen: {
-        messagebus: {
-            '#translate5 task': {
-                triggerReload: 'onTriggerTaskReload'
+        controller: {
+            'taskGrid': {
+                taskImportFinished: 'onTaskImportFinished'
             }
         }
     },
     /**
      * After an import is finished (and the AutoQA workers worked) we need to show the new state
      */
-    onTriggerTaskReload: function(params){
-        this.getView().refreshStore(params.taskGuid);
+    onTaskImportFinished: function(task){
+        this.getView().refreshStore(task.get('taskGuid'));
     }
 });

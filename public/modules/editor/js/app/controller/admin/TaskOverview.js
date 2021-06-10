@@ -1155,8 +1155,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             success: function (response) {
                 win && win.setLoading(false);
                 Editor.MessageBox.addSuccess(me.strings.importTaskMessage, 2);
-                // some panels may need to update the view after the import wizard closed and the import workers start
-                me.fireEvent('taskImportWorkStarted', task);
+                // some panels may need to update the view after the import wizard closed and the import workers start (currently not neccessary ...)
+                // me.fireEvent('taskImportWorkStarted', task);
                 me.handleImportStartOrCancel();
                 me.isImportStarted = false;
             },

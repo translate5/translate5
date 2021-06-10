@@ -42,8 +42,10 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
     reAnalysisHidden: true,
     // autoScroll: true,
     requires: [
-        'Editor.store.quality.Task'
+        'Editor.store.quality.Task',
+        'Editor.view.quality.admin.TaskQualitiesController'
     ],
+    controller: 'taskQualities',
     strings: {
         category: '#UT#Kategorie',
         total: '#UT#Anzahl',
@@ -83,7 +85,6 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
      * refreshes a loaded store (checks for matching taskGuid)
      */
     refreshStore: function(taskGuid){
-        console.log('TaskQualities.refreshStore: ', taskGuid);
         if(taskGuid && this.store.taskGuid && this.store.taskGuid == taskGuid){
             this.store.getProxy().abort();
             this.store.reload();

@@ -159,10 +159,10 @@ Ext.define('Editor.view.admin.config.Grid', {
     /**
      * Called when import is finished to show a potentially changed view
      */
-    refreshForTask: function(task){
-        if(this.taskGuid && this.taskGuid == task.get('taskGuid')){
-            // TODO: what to do here ? Reloading or loading the store does not work...
-            console.log('refreshForTask: RELOAD');
+    refreshForTask: function(taskGuid){
+        var store = this.getStore();
+        if(store && this.taskGuid && this.taskGuid == taskGuid && store.isLoaded() && !store.isLoading()){
+            store.load();
         }
     },
     
