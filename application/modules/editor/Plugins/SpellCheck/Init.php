@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  * Hint: class must be named NOT Bootstrap, otherwise we will get a strange Zend Error
  */
 class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
+    protected static $description = 'Provides the languagetool spell-checker.';
     
     /**
      * @var array

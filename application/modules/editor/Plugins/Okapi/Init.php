@@ -29,6 +29,8 @@
 /**
  */
 class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
+    protected static $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
+    
     /**
      * Name of the default okapi config file
      *
@@ -42,7 +44,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     const OKAPI_BCONF_TARGET_IMPORT = 'import';
     
     /***
-     * 
+     *
      * @var string
      */
     const OKAPI_BCONF_TARGET_EXPORT = 'export';
@@ -52,7 +54,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     
     /***
      * Return the default bconf import/export file-name from the task configuration
-     * 
+     *
      * @param editor_Models_Task $task
      * @param string $target : it can be import or export
      * @throws editor_Plugins_Okapi_Exception
@@ -480,7 +482,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     
     /***
      * After config index action event handler. This will check if runtimeOptions.plugins.Okapi.import.okapiBconfDefaultName
-     *  are up to date with the files on the disk 
+     *  are up to date with the files on the disk
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterConfigIndexAction(Zend_EventManager_Event $event) {
