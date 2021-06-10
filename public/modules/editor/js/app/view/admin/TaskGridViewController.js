@@ -65,7 +65,10 @@ Ext.define('Editor.view.admin.TaskGridViewController', {
         if(!task){
             return;
         }
-        task.set('importProgress',params.progress);
+        task.set('importProgress', params.progress);
+        if(params.progress >= 100){
+            me.fireEvent('taskImportFinished', task);
+        }
     },
     
     onTaskRoute:function(){

@@ -40,8 +40,8 @@ Ext.define('Editor.view.admin.config.GridViewController', {
             }
         },
         controller: {
-            'taskOverviewController': {
-                taskImportWorkStarted: 'onTaskImportWorkStarted'
+            'taskGrid': {
+                taskImportFinished: 'onTaskImportFinished'
             }
         }
     },
@@ -172,16 +172,14 @@ Ext.define('Editor.view.admin.config.GridViewController', {
     onShowReadOnlyChange:function(field, newValue, oldValue, eOpts ){
         this.handleReadonlyConfig(newValue);
     },
-    
+
     /**
-     * Handles the end onf the task import work wizard / when the workers start
-     * At this point the task-confik is fixed and our view needs to be updated
+     * Handles the task import finish (triggered implicitly by the messagabus ...)
      */
-    onTaskImportWorkStarted: function(task){
-        this.getView().refreshForTask(task);
+    onTaskImportFinished: function(task){
+        this.getView().refreshForTask(task.get('taskGuid'));
     },
-    
-    /***
+    /**
      * Show or hide readonly configs in the grid, based on the showReadonlyConfig flag
      */
     handleReadonlyConfig:function(showReadonlyConfig){
