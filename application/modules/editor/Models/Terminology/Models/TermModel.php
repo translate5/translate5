@@ -321,7 +321,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             if ($termEntryIds) $attrWHERE []= '`termEntryId` IN (' . $termEntryIds . ')';
 
             // Get termEntryIds of matched attributes
-            $termEntryIds = implode(',', db()->query('
+            $termEntryIds = implode(',', editor_Utils::db()->query('
                 SELECT DISTINCT `termEntryId` 
                 FROM `terms_attributes` 
                 WHERE ' . implode(' AND ', $attrWHERE),
@@ -355,7 +355,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         // this param initially arrived in as an item within $params argument
         if (!$isProposer)
             $params['processStatus']
-                = implode(',', array_diff(ar($params['processStatus']), [self::PROCESS_STATUS_UNPROCESSED]));
+                = implode(',', array_diff(editor_Utils::ar($params['processStatus']), [self::PROCESS_STATUS_UNPROCESSED]));
 
         // Shared WHERE clause, that will be used for querying both terms and proposals tables
         $where = [
@@ -406,7 +406,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         list($limit, $offset) = explode(',', $params['limit']);
 
         // If we should only search within terms-table (e.g. proposals-table won't be involved)
-        if (!$isProposer || !in_array(self::PROCESS_STATUS_UNPROCESSED, explode(',', $params['processStatus']))) {
+        if (!$isProposer || !in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus']))) {
 
             // If we have to calculate total
             if ($total === true) {
@@ -415,7 +415,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                 $termQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor);
 
                 // Setup &$total variable by reference
-                $total = (int) db()->query($termQuery, $keyword)->fetchColumn();
+                $total = (int) editor_Utils::db()->query($termQuery, $keyword)->fetchColumn();
             }
 
             // Render query for getting regular results
@@ -423,7 +423,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                 . 'LIMIT ' . (int) $offset . ',' . (int) $limit;
 
             // Return results
-            return db()->query($termQuery, $keyword)->fetchAll();
+            return editor_Utils::db()->query($termQuery, $keyword)->fetchAll();
         }
 
         // Data columns, that would be fetched by search SQL query
@@ -464,7 +464,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             $totalQuery = 'SELECT (' . $termQuery . ') + (' . $proposalQuery . ') AS `total`';
 
             // Setup &$total variable by reference
-            $total = (int) db()->query($totalQuery, [$keyword, $keyword])->fetchColumn();
+            $total = (int) editor_Utils::db()->query($totalQuery, [$keyword, $keyword])->fetchColumn();
         }
 
         // Render query for getting UNION-ed results from both terms and proposals tables
@@ -476,7 +476,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             . 'LIMIT ' . (int) $offset . ',' . (int) $limit;
 
         // Return results
-        return db()->query($unionQuery, [$keyword, $keyword])->fetchAll();
+        return editor_Utils::db()->query($unionQuery, [$keyword, $keyword])->fetchAll();
     }
 
     /**
@@ -556,7 +556,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         }
 
         // Build LIMIT clause
-        $limit = rif($limit, 'LIMIT ' . rif($offset, '$1,') . '$1', '');
+        $limit = editor_Utils::rif($limit, 'LIMIT ' . editor_Utils::rif($offset, '$1,') . '$1', '');
         //d($sp->assemble());
         // Append LIMIT clause to the UNION-ed query
         $sql = '(' . $s->assemble() . ') UNION (' . $sp->assemble() . ') ' . $limit;
