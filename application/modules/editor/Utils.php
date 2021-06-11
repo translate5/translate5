@@ -690,6 +690,35 @@ class editor_Utils {
     }
 }
 
+class ZfExtended_Mismatch extends ZfExtended_ErrorCodeException {
+    use ZfExtended_ResponseExceptionTrait;
+
+    /**
+     * @var integer
+     */
+    protected $httpReturnCode = 400;
+
+    /**
+     * By default we log that as INFO, if created as response then the level is set to DEBUG
+     *
+     * @var integer
+     */
+    protected $level = ZfExtended_Logger::LEVEL_INFO;
+
+    /**
+     * @var array
+     */
+    protected static $localErrorCodes = [
+        'E2000' => 'Param "{0}" - is not given',                                           // REQ
+        'E2001' => 'Value "{0}" of param "{1}" - is in invalid format',                    // REX
+        'E2002' => 'No object of type "{0}" was found by key "{1}"',                       // KEY
+        'E2003' => 'Wrong value',                                                          // EQL
+        'E2004' => 'Value "{0}" of param "{1}" - is not in the list of allowed values',    // FIS
+        'E2005' => 'Value "{0}" of param "{1}" - is in the list of disabled values',       // DIS
+        'E2006' => 'Value "{0}" of param "{1}" - is not unique. It should be unique.',     // UNQ
+    ];
+}
+
 /**
  * Include functions file
  */
