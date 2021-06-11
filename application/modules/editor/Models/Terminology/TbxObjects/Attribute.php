@@ -26,6 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 class editor_Models_Terminology_TbxObjects_Attribute {
+    CONST ATTRIBUTE_LEVEL_ENTRY = 'entry';
+    CONST ATTRIBUTE_LEVEL_LANGUAGE = 'language';
+    CONST ATTRIBUTE_LEVEL_TERM = 'term';
+    CONST ATTRIBUTE_DEFAULT_DATATYPE = 'plainText';
+
     const TABLE_FIELDS = [
         'elementName' => true,
         'language' => true,
@@ -377,5 +382,19 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     {
         $this->created = $created;
         return $this;
+    }
+
+    public function getLevel(){
+        if(empty($this->language)){
+            return self::ATTRIBUTE_LEVEL_ENTRY;
+        }
+        if(empty($this->termGuid) && !empty($this->termEntryGuid)){
+            return self::ATTRIBUTE_LEVEL_LANGUAGE;
+        }
+        if(!empty($this->termGuid) && !empty($this->termEntryGuid)){
+            return self::ATTRIBUTE_LEVEL_TERM;
+        }
+        // TODO: error code for non existing level. this should never happen, if it does, this is not a valid attribute
+        throw new ZfExtended_ErrorCodeException();
     }
 }

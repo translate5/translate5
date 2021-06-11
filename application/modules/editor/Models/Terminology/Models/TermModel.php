@@ -173,12 +173,12 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         return $res->toArray();
     }
 
-    /**
-     * $fullResult[$term['termId'].'-'.$term['termEntryTbxId'].'-'.$term['collectionId']]
-     * $fullResult['termId-termEntryTbxId-collectionId'] = TERM
-     *
-     * $simpleResult[$term['term']]
-     * $simpleResult['term'] = termId
+    /***
+     * Load all terms for given collection and custom array key for each term.
+     * The result array will be:
+     * [
+     *   'termEntryId-language-termTbxId' => [ term results ]
+     * ]
      * @param int $collectionId
      * @return array[]
      */
@@ -190,7 +190,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
 
         foreach ($queryResults as $key => $term) {
-            $fullResult[$term['termEntryId'].'-'.$term['language'].'-'.$term['termId']] = $term;
+            $fullResult[$term['termEntryId'].'-'.$term['language'].'-'.$term['termTbxId']] = $term;
         }
 
         return $fullResult;

@@ -405,7 +405,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     }
 
     /***
-     * Update term collection lanugages assoc.
+     * Update term collection languages assoc.
      */
     protected  function updateCollectionLanguage()
     {
