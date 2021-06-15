@@ -39,9 +39,11 @@ Ext.define('Editor.controller.admin.Customer', {
     views: [
         'Editor.view.admin.customer.Panel',
         'Editor.view.admin.customer.TagField',
+        'Editor.store.admin.WorkflowSteps',
+        'Editor.store.admin.Workflow'
     ],
-    models:['Editor.model.admin.Customer'],
-    stores:['Editor.store.admin.Customers','Editor.store.admin.UserCustomers'],
+    models:['Editor.model.admin.Customer','Editor.model.admin.UserAssocDefault'],
+    stores:['Editor.store.admin.Customers','Editor.store.admin.UserCustomers','Editor.store.admin.UserAssocDefault'],
 
     refs:[{
         ref: 'customerSwitch',

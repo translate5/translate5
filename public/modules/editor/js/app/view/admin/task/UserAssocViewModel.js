@@ -106,7 +106,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                         //check if there are assigned users of the curent rolename
                         for(var u=0;u<task.get('users').length;u++){
                             var assoc=task.get('users')[u];
-                            if(assoc.role===rolename && assoc.segmentrange && assoc.segmentrange!=""){
+                            if(assoc.role===rolename && assoc.segmentrange && assoc.segmentrange!==""){
                                 allUnassigned=false;
                             }
                         }

@@ -1981,6 +1981,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='SW1wb3J0aWVyZW4gKFN0YW5kYXJkcyBudXR6ZW4p'><source>Importieren (Standards nutzen)</source><target>Importieren (Standards nutzen)</target></trans-unit>
 <trans-unit id='TnVyIHdpZWRlcmhvbHQ='><source>Nur wiederholt</source><target>Nur wiederholt</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQtQmVudXR6ZXJ6dXdlaXN1bmdlbg=='><source>Standard-Benutzerzuweisungen</source><target>Standard-Benutzerzuweisungen</target></trans-unit>
+<trans-unit id='V29ya2Zsb3ctU2Nocml0dA=='><source>Workflow-Schritt</source><target>Workflow-Schritt</target></trans-unit>
   </body>
  </file>
 </xliff>

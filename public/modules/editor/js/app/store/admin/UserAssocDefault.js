@@ -26,7 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.user.TaskAssocViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.adminUserTaskAssoc'
+/**
+ * Store for Editor.model.admin.UserAssocDefault
+ * @class Editor.store.admin.UserAssocDefault
+ * @extends Ext.data.Store
+ */
+Ext.define('Editor.store.admin.UserAssocDefault', {
+  extend : 'Ext.data.Store',
+  model: 'Editor.model.admin.UserAssocDefault',
+  autoLoad: false,
+  pageSize:false,
+  remoteFilter:true
 });

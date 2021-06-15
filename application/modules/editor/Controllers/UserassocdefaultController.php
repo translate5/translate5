@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -15,19 +15,32 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.user.TaskAssocViewController', {
-    extend: 'Ext.app.ViewController',
-    alias: 'controller.adminUserTaskAssoc'
-});
+/***
+ *
+ */
+class Editor_UserassocdefaultController extends ZfExtended_RestController {
+
+    protected $entityClass = 'editor_Models_UserAssocDefault';
+
+    /**
+     * @var editor_Models_UserAssocDefault
+     */
+    protected $entity;
+    
+    /**
+     * ignoring ID field for POST Requests
+     * @var array
+     */
+    protected $postBlacklist = array('id');
+}
