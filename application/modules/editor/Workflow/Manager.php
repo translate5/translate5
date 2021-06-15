@@ -46,14 +46,16 @@ class editor_Workflow_Manager {
     /**
      */
     public function __construct() {
-        $config = Zend_Registry::get('config');
-        if(empty($config->runtimeOptions->workflows)) {
-            //setting the default workflow if nothing is configured
-            $this->addWorkflow('editor_Workflow_Default');
-            return;
-        }
-        foreach($config->runtimeOptions->workflows as $wf) {
-            $this->addWorkflow($wf);
+        /* @var $workflow editor_Models_Workflow */
+        $workflow = ZfExtended_Factory::get('editor_Models_Workflow');
+        $workflows = $workflow->loadAll();
+        
+        foreach($workflows as $workflowData) {
+            //if the workflow exists already, it was added by a plug-in with a different class
+            // if not, we add it as default workflow configured from database
+            if(empty(self::$workflowList[$workflowData['name']])) {
+                $this->addWorkflow($workflowData['name']);
+            }
         }
     }
     
@@ -62,11 +64,12 @@ class editor_Workflow_Manager {
      * @param string $wfId
      * @param string $workflowClass
      */
-    public function addWorkflow($workflowClass) {
-        self::$workflowList[constant($workflowClass.'::WORKFLOW_ID')] = $workflowClass;
+    public function addWorkflow($name, $workflowClass = 'editor_Workflow_Default') {
+        self::$workflowList[$name] = $workflowClass;
     }
     
     /**
+     * @deprecated is currently used since classes are configured and stored, in future the name is used for configuration!
      * @param string $className
      * @return string
      */
@@ -81,15 +84,15 @@ class editor_Workflow_Manager {
     
     /**
      * returns a new workflow instance by given string ID (e.g. default for "Default" Workflow)
-     * @param string $wfId
+     * @param string $wfName
      * @return editor_Workflow_Abstract
      */
-    public function get($wfId) {
-        if(empty(self::$workflowList[$wfId])) {
+    public function get($wfName) {
+        if(empty(self::$workflowList[$wfName])) {
             //Workflow with ID "{workflowId}" not found!
-            throw new editor_Workflow_Exception('E1252', ['workflowId' => $wfId]);
+            throw new editor_Workflow_Exception('E1252', ['workflowId' => $wfName]);
         }
-        return ZfExtended_Factory::get(self::$workflowList[$wfId]);
+        return ZfExtended_Factory::get(self::$workflowList[$wfName],[$wfName]);
     }
     
     /**
@@ -98,11 +101,11 @@ class editor_Workflow_Manager {
      * @param string $wfId
      * @return editor_Workflow_Abstract
      */
-    public function getCached($wfId) {
-        if(empty($this->instances[$wfId])) {
-            $this->instances[$wfId] = $this->get($wfId);
+    public function getCached($wfName) {
+        if(empty($this->instances[$wfName])) {
+            $this->instances[$wfName] = $this->get($wfName);
         }
-        return $this->instances[$wfId];
+        return $this->instances[$wfName];
     }
     
     /**
@@ -115,13 +118,25 @@ class editor_Workflow_Manager {
     }
     
     /**
-     * returns an hard-coded assoc array with the class names (e.g. 'default' => editor_Workflow_Default)
-     * @return array
+     * returns a list of available workflows (workflow names)
+     * @return [string]
      */
-    public function getWorkflows() {
-        return self::$workflowList;
+    public function getWorkflows(): array {
+        return array_keys(self::$workflowList);
     }
 
+    public function getWorkflowConstants() {
+        //collection of programmatically needed constants in the GUI
+        //only constants of the abstract and therefore always available workflow are allowed to be listed here
+        //since only a subset of all constants of the abstract is needed, this manual sub selection is OK.
+        return [
+            'STEP_NO_WORKFLOW' => editor_Workflow_Abstract::STEP_NO_WORKFLOW,
+            'ROLE_TRANSLATOR' => editor_Workflow_Abstract::ROLE_TRANSLATOR,
+            'ROLE_REVIEWER' => editor_Workflow_Abstract::ROLE_REVIEWER,
+            'ROLE_TRANSLATORCHECK' => editor_Workflow_Abstract::ROLE_TRANSLATORCHECK,
+        ];
+    }
+    
     /**
      * returns all workflow metadata (roles, steps, etc) as array of objects
      * Warning: in backend states are ment to be all states including the pending states
@@ -131,8 +146,8 @@ class editor_Workflow_Manager {
      * @return array
      */
     public function getWorkflowData() {
-        $result = array();
-        $labelize = function(array $data, $cls) use (&$labels) {
+        $result = [];
+        $labelize = function(array $data, $cls, $labels) {
             $usedLabels = array_intersect_key($labels, $data);
             ksort($usedLabels);
             ksort($data);
@@ -142,32 +157,33 @@ class editor_Workflow_Manager {
             }
             return array_combine($data, $usedLabels);
         };
-        foreach(self::$workflowList as $id => $cls) {
-            $wf = ZfExtended_Factory::get($cls);
+        foreach(self::$workflowList as $name => $cls) {
+            $wf = $this->get($name);
             /* @var $wf editor_Workflow_Abstract */
             $labels = $wf->getLabels();
             $data = new stdClass();
-            $data->id = $id;
-            $data->label = $labels['WORKFLOW_ID'];
+            $data->id = $name;
+            $data->label = $wf->getLabel();
             $data->anonymousFieldLabel = false; //FIXME true | false, comes from app.ini not from wf class
             
-            $data->roles = $labelize($wf->getRoles(), $cls);
+            $data->roles = $labelize($wf->getRoles(), $cls, $labels);
             
-            $data->editableRoles = $labelize($wf->getAddableRoles(), $cls);
+            $data->editableRoles = $labelize($wf->getAddableRoles(), $cls, $labels);
             
             $allStates = $wf->getStates();
             $pendingStates = $wf->getPendingStates();
             //the returned states are the states without the pending ones
-            $data->states = $labelize(array_diff($allStates, $pendingStates), $cls);
-            $data->pendingStates = $labelize($pendingStates, $cls);
-            $data->steps = $labelize($wf->getSteps(), $cls);
-            $data->assignableSteps = $labelize($wf->getAssignableSteps(), $cls);
+            $data->states = $labelize(array_diff($allStates, $pendingStates), $cls, $labels);
+            $data->pendingStates = $labelize($pendingStates, $cls, $labels);
+            $data->steps = $labelize($wf->getSteps(), $cls, $labels);
+            $data->assignableSteps = $labelize($wf->getAssignableSteps(), $cls, $labels);
             $data->steps2roles = $wf->getSteps2Roles();
+    //FIXME this will not work anymore, check usage!
             $data->roles2steps = array_flip($data->steps2roles);
             $data->stepChain = $wf->getStepChain();
             $data->stepsWithFilter = $wf->getStepsWithFilter();
             $data->initialStates = $wf->getInitialStates();
-            $result[$id] = $data;
+            $result[$name] = $data;
         }
         return $result;
     }

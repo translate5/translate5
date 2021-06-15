@@ -364,9 +364,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
                 
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
-        /* @var $workflow editor_Workflow_Default */
-        
         $ed = $this->config->runtimeOptions->editor;
         
         $php2js = $this->view->Php2JsVars();
@@ -393,7 +390,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $php2js->set('task', $taskData);
             $openState = $this->_session->taskOpenState ?
                     $this->_session->taskOpenState :
-                    $workflow::STATE_WAITING; //in doubt read only
+                    editor_Workflow_Default::STATE_WAITING; //in doubt read only
             $php2js->set('app.initState', $openState);
             $php2js->set('app.initMethod', 'openEditor');
         }
