@@ -33,7 +33,9 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.admin.TaskAddWindowViewModel',
         'Editor.view.admin.customer.UserCustomersCombo',
         'Editor.view.LanguageCombo',
-        'Editor.view.admin.config.ConfigWizard'
+        'Editor.view.admin.config.ConfigWizard',
+        'Editor.view.admin.task.UserAssoc',
+        'Editor.view.admin.user.AssocImportWizardViewModel'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -74,8 +76,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         btnSkip:'#UT#Importieren (weitere überspringen)',
         importDefaultsButtonText:'#UT#Importieren (Standards nutzen)'
     },
-    height : 550,
-    width : 1000,
     modal : true,
     layout: 'anchor',
     autoScroll: true,
@@ -84,21 +84,36 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
      * The groups are:preimport, import and postimport
      */
     groupCards:[],
-    
+
+    height : 550,
+    width : 1000,
+    maximizable:true,
+
     listeners:{
         beforerender:function(win){
             //insert the taskUpload card in before render
             win.insertCard({
                 xtype:'taskUpload', 
                 itemId:'taskUploadCard',
-                groupIndex:4,
+                groupIndex:5
             },'postimport');
             
             win.insertCard({
+                xtype:'adminUserAssoc',
+                header:false,
+                itemId:'adminUserImportAssoc',
+                viewModel:{
+                    type:'adminUserImportWizardAssoc'
+                },
+                groupIndex:1//index 2 is language resources assoc
+            },'postimport');
+
+            win.insertCard({
                 xtype:'adminConfigWizard', 
                 itemId:'adminConfigWizard',
-                groupIndex:2,//index 1 is language resources assoc
+                groupIndex:3//index 2 is language resources assoc
             },'postimport');
+
         },
         render:function(win){
             

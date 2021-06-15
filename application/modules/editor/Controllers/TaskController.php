@@ -549,6 +549,8 @@ class editor_TaskController extends ZfExtended_RestController {
             $upload->initAndValidate();
             $dp = $dpFactory->createFromUpload($upload);
 
+            $projectGuids = [];
+
             //PROJECT with multiple target languages
             if($this->entity->isProject()) {
                 $entityId=$this->entity->save();
@@ -573,10 +575,14 @@ class editor_TaskController extends ZfExtended_RestController {
                     $task->setTargetLang($target);
                     $task->setTaskName($this->entity->getTaskName().' - '.$languages[$task->getSourceLang()].' / '.$languages[$task->getTargetLang()]);
                     $this->processUploadedFile($task, $dpFactory->createFromTask($this->entity));
-                    $this->addDefaultLanguageResources($task);
+
+                    // add task defaults (user associations and language resources)
+                    $this->setTaskDefaults($task);
                     
                     //update the task usage log for the this project-task
                     $this->insertTaskUsageLog($task);
+
+                    $projectGuids[] = $task->getTaskGuid();
                 }
                 
                 $this->entity->setState($this->entity::INITIAL_TASKTYPE_PROJECT);
@@ -589,15 +595,17 @@ class editor_TaskController extends ZfExtended_RestController {
                 //$this->entity->save(); => is done by the import call!
                 //handling project tasks is also done in processUploadedFile
                 $this->processUploadedFile($this->entity, $dp);
-                // Language resources that are assigned as default language resource for a client,
-                // are associated automatically with tasks for this client.
-                $this->addDefaultLanguageResources($this->entity);
+
+                // add task defaults (user associations and language resources)
+                $this->setTaskDefaults($this->entity);
 
                 //if the current task type is for instant translate pretransaltion, the usage log requires different handling
                 if($this->entity->isHiddenTask() == false){
                     //update the task usage log for the current task
                     $this->insertTaskUsageLog($this->entity);
                 }
+
+                $projectGuids[] = $this->entity->getTaskGuid();
             }
 
             //warn the api user for the targetDeliveryDate ussage
@@ -616,6 +624,11 @@ class editor_TaskController extends ZfExtended_RestController {
 
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
+
+            if(!empty($projectGuids)){
+                settype($this->view->rows->projectGuids,'array');
+                $this->view->rows->projectGuids = $projectGuids;
+            }
         }
         else {
             //we have to prevent attached events, since when we get here the task is not created, which would lead to task not found errors,
@@ -684,46 +697,15 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->data['customerId'] = (int) $customer->getId();
     }
 
-    /**
-     * Assign language resources by default that are set as useAsDefault for the task's client
-     * (but only if the language combination matches).
+    /***
+     * Sets task defaults for given task (default languageResources, default userAssocs)
      * @param editor_Models_Task $task
      */
-    protected function addDefaultLanguageResources(editor_Models_Task $task) {
-        $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
-        
-        //TODO: here write as reference also
-        $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsUseAsDefault([$this->data['customerId']]);
-        
-        if(empty($allUseAsDefaultCustomers)) {
-            return;
-        }
-        
-        $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
-        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
-        /* @var $languages editor_Models_LanguageResources_Languages */
-        $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language ZfExtended_Languages */
-        
-        $sourceLanguages = $language->getFuzzyLanguages($task->getSourceLang(),'id',true);
-        $targetLanguages = $language->getFuzzyLanguages($task->getTargetLang(),'id',true);
-        
-        foreach ($allUseAsDefaultCustomers as $defaultCustomer) {
-            $languageResourceId = $defaultCustomer['languageResourceId'];
-            $sourceLangMatch = $languages->isInCollection($sourceLanguages, 'sourceLang', $languageResourceId);
-            $targetLangMatch = $languages->isInCollection($targetLanguages, 'targetLang', $languageResourceId);
-            if ($sourceLangMatch && $targetLangMatch) {
-                $taskAssoc->init();
-                $taskAssoc->setLanguageResourceId($languageResourceId);
-                $taskAssoc->setTaskGuid($task->getTaskGuid());
-                if(!empty($defaultCustomer['writeAsDefault'])){
-                    $taskAssoc->setSegmentsUpdateable(1);
-                }
-                $taskAssoc->save();
-            }
-        }
+    protected function setTaskDefaults(editor_Models_Task $task){
+        $defaults = $this->_helper->taskDefaults;
+        /* @var $defaults Editor_Controller_Helper_TaskDefaults */
+        $defaults->addDefaultLanguageResources($task,$this->data['customerId']);
+        $defaults->addDefaultUserAssoc($task);
     }
 
     /**

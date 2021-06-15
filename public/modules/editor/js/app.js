@@ -69,8 +69,8 @@ Ext.ClassManager.onCreated(function(className) {
 
 Ext.application({
     name : 'Editor',
-    models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field','Config','TaskConfig','CustomerConfig'],
-    stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages','UserConfig','admin.Config','admin.CustomerConfig','admin.task.Config'],
+    models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field','Config','TaskConfig','CustomerConfig','admin.UserAssocDefault'],
+    stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages','UserConfig','admin.Config','admin.CustomerConfig','admin.task.Config','admin.UserAssocDefault'],
     requires: [
         'Editor.view.ViewPort',
         'Editor.view.ViewPortEditor',
@@ -177,7 +177,7 @@ Ext.application({
                     Editor.data.app.initState = 'edit';
                     initMethod = 'openEditor';
                 }
-            }else if(window.location.hash!=''){
+            }else if(window.location.hash !== ''){
                 initMethod = 'openAdministration';
             }
 
@@ -487,7 +487,7 @@ Ext.application({
      * when the segments-editor is opened
      */
     isEditTaskRoute:function(){
-        return window.location.hash.startsWith('#task') && window.location.hash.endsWith('/edit')
+        return window.location.hash.startsWith('#task') && window.location.hash.endsWith('/edit');
     },
 
     /***
