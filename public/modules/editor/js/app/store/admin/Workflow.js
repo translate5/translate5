@@ -26,22 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.admin.WorkflowState', {
+Ext.define('Editor.store.admin.Workflow', {
     extend : 'Ext.data.Store',
     initConfig: function(instanceConfig) {
         var me = this,
             config={},
-            workflowStates=[];
-        //Info:duplicated id values will be ignored by te store
+            data = [];
         Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
-            Ext.Object.each(workflow.states, function(key, value){
-                workflowStates.push({
-                    id:key,
-                    label:value
-                });
-            });
+            data.push(workflow);
         });
-        config.data=workflowStates;
+        config.data=data;
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }

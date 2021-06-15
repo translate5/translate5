@@ -33,7 +33,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
     requires: [
         'Editor.view.admin.customer.ViewModel',
         'Editor.view.admin.customer.ViewController',
-        'Editor.view.admin.config.Grid'
+        'Editor.view.admin.config.Grid',
+        'Editor.view.admin.user.Assoc'
     ],
 
     stores:['Editor.stores.admin.Customers'],
@@ -248,6 +249,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             bind:{
                                 disabled : '{!record}'
                             },
+                            //TODO: move me as button in the openid panel after cancel/save button -> lower toolbar
                             tools:[{
                                 itemId: 'home',
                                 type: 'home',
@@ -285,14 +287,27 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     }
                                 ]
                             },{
+                                xtype: 'adminUserAssoc',
+                                bind:{
+                                    customer:'{record.id}'
+                                }
+                            },{
+                                xtype: 'adminConfigGrid',
+                                store:'admin.CustomerConfig',
+                                title:me.strings.configTabTitle,
+                                bind: {
+                                    extraParams:{
+                                        customerId : '{record.id}'
+                                    }
+                                }
+                            },{
                                 itemId:'openIdFieldset',
                                 disabled:true,
                                 scrollable:true,
                                 isIncludedInForm:true,// is the component part of the customers form. There are some other components in the display tab which are not part of the form (ex: config and user assoc tabs)
                                 bodyPadding: 10,
                                 title:'OpenID Connect',
-                                items:[
-                                    {
+                                items:[{
                                         xtype:'textfield',
                                         fieldLabel:me.strings.openIdServer,
                                         vtype: 'url',
@@ -307,8 +322,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         bind:{
                                             allowBlank:'{!isOpenIdRequired}'
                                         }
-                                    },
-                                    {
+                                    },{
                                         xtype:'textfield',
                                         fieldLabel:me.strings.openIdIssuer,
                                         vtype: 'url',
@@ -323,8 +337,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         bind:{
                                             allowBlank:'{!isOpenIdRequired}'
                                         }
-                                    },
-                                    {
+                                    },{
                                         xtype:'textfield',
                                         fieldLabel:me.strings.openIdClientId,
                                         name:'openIdClientId',
@@ -420,15 +433,6 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         }
                                     }
                                 ]
-                            },{
-                                xtype: 'adminConfigGrid',
-                                store:'admin.CustomerConfig',
-                                title:me.strings.configTabTitle,
-                                bind: {
-                                    extraParams:{
-                                        customerId : '{record.id}'
-                                    }
-                                }
                             }]
                         }]
                     }

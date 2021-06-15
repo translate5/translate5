@@ -69,8 +69,8 @@ Ext.ClassManager.onCreated(function(className) {
 
 Ext.application({
     name : 'Editor',
-    models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field','Config','TaskConfig','CustomerConfig'],
-    stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages','UserConfig','admin.Config','admin.CustomerConfig','admin.task.Config'],
+    models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field','Config','TaskConfig','CustomerConfig','admin.UserAssocDefault'],
+    stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages','UserConfig','admin.Config','admin.CustomerConfig','admin.task.Config','admin.UserAssocDefault'],
     requires: [
         'Editor.view.ViewPort',
         'Editor.view.ViewPortEditor',
