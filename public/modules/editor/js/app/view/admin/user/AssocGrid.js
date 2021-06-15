@@ -1,0 +1,171 @@
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+Ext.define('Editor.view.admin.user.AssocGrid', {
+    extend: 'Ext.grid.Panel',
+    alias: 'widget.adminUserAssocGrid',
+    requires: [
+    ],
+    strings: {
+        sourceLang: '#UT#Quellsprache',
+        relaisLang: '#UT#Relaissprache',
+        userGuidCol: '#UT#Benutzer',
+        roleCol: '#UT#Rolle',
+        segmentrangeCol: '#UT#Segmente',
+        addUser: '#UT#Hinzufügen',
+        addUserTip: '#UT#Einen Benutzer dieser Aufgabe zuordnen.',
+        removeUser: '#UT#Entfernen',
+        removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
+        save: '#UT#Änderungen speichern',
+        reload: '#UT#Aktualisieren',
+        cancel: '#UT#Abbrechen',
+        deadlineDateLable: '#UT#Deadline',
+        notifyButtonText: '#UT#Benutzer benachrichtigen',
+        notifyButtonTooltip: '#UT#Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen',
+        workflowStepNameCol:'#UT#Workflow-Schritt'
+    },
+
+    viewModel: {
+        type: 'adminUserAssoc'
+    },
+
+    bind:{
+        store:'{userAssoc}'
+    },
+
+    initConfig: function (instanceConfig) {
+        var me = this,
+            config = {
+                columns: [{
+                    xtype: 'gridcolumn',
+                    width: 230,
+                    dataIndex: 'sourceLang',
+                    renderer:me.langRenderer,
+                    filter: {
+                        type: 'list',
+                        options: Editor.data.languages,
+                        phpMode: false
+                    },
+                    text: me.strings.sourceLang
+                },{
+                    xtype: 'gridcolumn',
+                    width: 230,
+                    dataIndex: 'targetLang',
+                    renderer:me.langRenderer,
+                    filter: {
+                        type: 'list',
+                        options: Editor.data.languages,
+                        phpMode: false
+                    },
+                    text: me.strings.targetLang
+                },{
+                    xtype: 'gridcolumn',
+                    width: 230,
+                    dataIndex: 'userGuid',
+                    filter: {
+                        type: 'string'
+                    },
+                    text: me.strings.userGuidCol
+                },{
+                    xtype: 'gridcolumn',
+                    width: 100,
+                    dataIndex: 'workflowStepName',
+                    text: me.strings.workflowStepNameCol,
+                    filter: {
+                        type: 'list',
+                        store:'admin.WorkflowSteps'
+                    }
+                } ,{
+                    xtype: 'gridcolumn',
+                    width: 100,
+                    dataIndex: 'role',
+                    hidden:true,
+                    text: me.strings.roleCol
+                }, {
+                    xtype: 'gridcolumn',
+                    width: 70,
+                    dataIndex: 'segmentrange',
+                    text: me.strings.segmentrangeCol
+                },{
+                    xtype: 'gridcolumn',
+                    width: 90,
+                    dataIndex: 'deadlineDate',
+                    text: me.strings.deadlineDateLable
+                }],
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    items: [{
+                        xtype: 'button',
+                        glyph: 'f234@FontAwesome5FreeSolid',
+                        itemId: 'addAssocBtn',
+                        text: me.strings.addUser,
+                        tooltip: me.strings.addUserTip
+                    }, {
+                        xtype: 'button',
+                        glyph: 'f503@FontAwesome5FreeSolid',
+                        disabled: true,
+                        itemId: 'deleteAssocBtn',
+                        text: me.strings.removeUser,
+                        tooltip: me.strings.removeUserTip
+                    }, {
+                        xtype: 'button',
+                        itemId: 'reloadAssocBtn',
+                        glyph: 'f2f1@FontAwesome5FreeSolid',
+                        text: me.strings.reload
+                    }, '-', {
+                        xtype: 'checkbox',
+                        itemId: 'notifyAssociatedUsersCheckBox',
+                        glyph: 'f674@FontAwesome5FreeSolid',
+                        fieldLabel: me.strings.notifyButtonText,
+                        tooltip: me.strings.notifyButtonTooltip
+                    }]
+                }]
+            };
+
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    },
+
+    /**
+     * renders the value of the language columns
+     * @param {String} val
+     * @returns {String}
+     */
+    langRenderer: function(val, md) {
+        var lang = Ext.StoreMgr.get('admin.Languages').getById(val),
+            label;
+        if(lang){
+            label = lang.get('label');
+            md.tdAttr = 'data-qtip="' + label + '"';
+            return label;
+        }
+        return '';
+    }
+});

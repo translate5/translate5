@@ -43,7 +43,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         'admin.task.Logs',
         'admin.WorkflowUserRoles',
         'admin.WorkflowState',
-        'admin.WorkflowSteps'
+        'admin.WorkflowSteps',
+        'admin.Workflow',
     ],
     views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow', 'StatefulWindow'],
     refs: [{

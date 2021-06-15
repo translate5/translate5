@@ -21,40 +21,39 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.store.admin.WorkflowUserRoles', {
-	extend : 'Ext.data.Store',
-	alias:'store.workflowuserroles',
-	initConfig: function(instanceConfig) {
-		var me = this,
-			config={},
-			workflowUserRoles=[];
-		if (instanceConfig) {
-			me.self.getConfigurator().merge(me, config, instanceConfig);
-		}
-	    var returnConfig= me.callParent([config]);
+    extend : 'Ext.data.Store',
+    alias:'store.workflowuserroles',
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config={};
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        var returnConfig= me.callParent([config]);
 
-	    //required order
-	    me.add({id:'translator',label:''});
-	    me.add({id:'reviewer',label:''});
-	    me.add({id:'translatorCheck',label:''});
-	    me.add({id:'visitor',label:''});
-	    
-		//Info:duplicated id values will be ignored by te store
-		Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
-			Ext.Object.each(workflow.roles, function(key, value){
-				var rec=me.getById(key);
-				if(!rec){
-					me.add({id:key,label:value})
-				}else{
-					rec.set('label',value);
-				}
-			});
-		});
-		return returnConfig;
-	},
+        //required order
+        me.add({id:'translator',label:''});
+        me.add({id:'reviewer',label:''});
+        me.add({id:'translatorCheck',label:''});
+        me.add({id:'visitor',label:''});
+        
+        //Info:duplicated id values will be ignored by te store
+        Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
+            Ext.Object.each(workflow.roles, function(key, value){
+                var rec=me.getById(key);
+                if(!rec){
+                    me.add({id:key,label:value})
+                }else{
+                    rec.set('label',value);
+                }
+            });
+        });
+        return returnConfig;
+    }
 });

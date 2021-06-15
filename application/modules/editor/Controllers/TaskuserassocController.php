@@ -71,7 +71,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows = $rows;
         $this->view->total = $this->entity->getTotalCount();
         $this->applyEditableAndDeletable();
-        $this->addSegmentrangesToResult();
+        //$this->addSegmentrangesToResult();
     }
     
     public function postDispatch() {

@@ -26,41 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * @class Editor.plugins.GlobalesePreTranslation.controller.Globalese
- * @extends Ext.app.Controller
+ * Store for Editor.model.admin.UserAssocDefault
+ * @class Editor.store.admin.UserAssocDefault
+ * @extends Ext.data.Store
  */
-Ext.define('Editor.plugins.GlobalesePreTranslation.controller.Globalese', {
-  extend: 'Ext.app.Controller',
-  views: [
-      'Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth',
-      'Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings',
-      'Editor.view.admin.TaskAddWindow'
-      ],
-  
-  listen: {
-      component: {
-          '#adminTaskAddWindow': {
-              beforerender:'onAdminTaskWindowBeforeRender'
-          }
-      }
-  },
-  onAdminTaskWindowBeforeRender:function(window,eOpts){
-      window.insertCard({
-          xtype:'globaleseAuthPanel',
-          //index where the card should appear in the group
-          groupIndex:3,
-      },'postimport');      
-      window.insertCard({
-          xtype:'globaleseSettingsPanel',
-          //index where the card should appear in the group
-          groupIndex:4,
-      },'postimport');
-  }
+Ext.define('Editor.store.admin.UserAssocDefault', {
+  extend : 'Ext.data.Store',
+  model: 'Editor.model.admin.UserAssocDefault',
+  autoLoad: false,
+  pageSize:false,
+  remoteFilter:true
 });
