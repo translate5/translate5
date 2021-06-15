@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -21,29 +20,36 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+                            http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.store.admin.WorkflowSteps', {
-	extend : 'Ext.data.Store',
-	alias:'store.workflowsteps',
-	initConfig: function(instanceConfig) {
-		var me = this,
-			config={};
-		
-		if (instanceConfig) {
-			me.self.getConfigurator().merge(me, config, instanceConfig);
-		}
-	    var returnConfig= me.callParent([config]);
-	    
-        Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
-            Ext.Object.each(workflow.steps, function(key, value){
-				me.add({id:key,text:value});
+    extend: 'Ext.data.Store',
+    alias: 'store.workflowsteps',
+
+    useAssignableSteps:false, // if set to true only the assignable steps will be listed
+
+    initConfig: function (instanceConfig) {
+        var me = this,
+            config = {};
+
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        var returnConfig = me.callParent([config]);
+
+        Ext.Object.each(Editor.data.app.workflows, function (key, workflow) {
+            var loopOver = workflow.steps;
+            if(me.useAssignableSteps){
+                loopOver = workflow.assignableSteps;
+            }
+            Ext.Object.each(loopOver, function (key, value) {
+                me.add({id: key, text: value});
             });
         });
-        
+
         return returnConfig;
-	},
+    }
 });

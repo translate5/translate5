@@ -187,7 +187,22 @@ class editor_Workflow_Manager {
         }
         return $result;
     }
-    
+
+    /***
+     * Return default configured task workflow in zf configuration. The config to define the default
+     * task (import ) workflow is : runtimeOptions.import.taskWorkflow
+     * @return editor_Workflow_Abstract|null
+     * @throws Zend_Exception
+     * @throws editor_Workflow_Exception
+     */
+    public function getDefaultTaskConfigured(){
+        $config = Zend_Registry::get('config');
+        if(empty($config->runtimeOptions->import->taskWorkflow)) {
+            return null;
+        }
+        return $this->get($this->getIdToClass($config->runtimeOptions->import->taskWorkflow));
+    }
+
     /**
      * returns the workflow for the given taskGuid, if no taskGuid given take config.import.taskWorkflow as default
      * @param string|editor_Models_Task $taskOrGuid
@@ -195,11 +210,8 @@ class editor_Workflow_Manager {
      */
     public function getActive($taskOrGuid = null) {
         if(empty($taskOrGuid)) {
-            $config = Zend_Registry::get('config');
-            if(empty($config->runtimeOptions->import->taskWorkflow)) {
-                return null;
-            }
-            return $this->get($this->getIdToClass($config->runtimeOptions->import->taskWorkflow));
+            return $this->getDefaultTaskConfigured();
+
         }
         //process given task instead guid
         if($taskOrGuid instanceof editor_Models_Task) {

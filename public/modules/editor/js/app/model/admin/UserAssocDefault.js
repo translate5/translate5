@@ -26,41 +26,36 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * @class Editor.plugins.GlobalesePreTranslation.controller.Globalese
- * @extends Ext.app.Controller
+ * @class Editor.model.admin.UserAssocDefault
+ * @extends Ext.data.Model
  */
-Ext.define('Editor.plugins.GlobalesePreTranslation.controller.Globalese', {
-  extend: 'Ext.app.Controller',
-  views: [
-      'Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth',
-      'Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings',
-      'Editor.view.admin.TaskAddWindow'
-      ],
-  
-  listen: {
-      component: {
-          '#adminTaskAddWindow': {
-              beforerender:'onAdminTaskWindowBeforeRender'
-          }
+Ext.define('Editor.model.admin.UserAssocDefault', {
+    extend: 'Ext.data.Model',
+
+    fields: [
+      {name: 'id', type: 'int',persist: false},
+      {name: 'customerId', type: 'int'},
+      {name: 'sourceLang', type: 'int'},
+      {name: 'targetLang', type: 'int'},
+      {name: 'userGuid', type: 'string'},
+      {name: 'login', type: 'string', persist: false},
+      {name: 'workflowStepName', type: 'string'},
+      {name: 'workflow', type: 'string'},
+      {name: 'segmentrange', type: 'string'}
+    ],
+    idProperty: 'id',
+    proxy : {
+      type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity
+      url: Editor.data.restpath+'userassocdefault', //same as PHP controller name
+      reader : {
+        rootProperty: 'rows',
+        type : 'json'
+      },
+      writer: {
+        encode: true,
+        rootProperty: 'data',
+        writeAllFields: false
       }
-  },
-  onAdminTaskWindowBeforeRender:function(window,eOpts){
-      window.insertCard({
-          xtype:'globaleseAuthPanel',
-          //index where the card should appear in the group
-          groupIndex:3,
-      },'postimport');      
-      window.insertCard({
-          xtype:'globaleseSettingsPanel',
-          //index where the card should appear in the group
-          groupIndex:4,
-      },'postimport');
-  }
+    }
 });

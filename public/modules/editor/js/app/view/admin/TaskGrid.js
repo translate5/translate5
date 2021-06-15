@@ -362,8 +362,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
           items:[{
               text: me.text_cols.taskActions,
               menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
-              xtype: 'taskActionColumn',
               stateId:'taskGridActionColumn',
+              xtype: 'taskActionColumn',
               sortable: false
           },{
               xtype: 'gridcolumn',

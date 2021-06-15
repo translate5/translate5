@@ -55,7 +55,7 @@ Ext.define('Editor.view.admin.user.Grid', {
       email: '#UT#E-Mail',
       locale: '#UT#Sprache',
       roles: '#UT#Systemrollen',
-      openIdIssuer:'#UT#OpenId Emittent'
+      openIdIssuer:'#UT#OpenID Emittent'
   },
   strings: {
       addUser: '#UT#Benutzer hinzufügen',
