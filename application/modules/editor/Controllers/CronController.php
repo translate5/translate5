@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -27,10 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Cron Controller 
+ * Cron Controller
  * This controller provides methods to be called regularly.
- * Each action should be called through wget by a crontjob  
- */ 
+ * Each action should be called through wget by a crontjob
+ */
 class Editor_CronController extends ZfExtended_Controllers_Action {
     /**
      * @var Zend_Session_Namespace
@@ -62,7 +62,7 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
     public function indexAction() {}
     
     /**
-     * This action should be called periodically between every 5 to 15 minutes, depending on the traffic on the installation. 
+     * This action should be called periodically between every 5 to 15 minutes, depending on the traffic on the installation.
      */
     public function periodicalAction() {
         $this->_helper->layout->disableLayout();
@@ -99,7 +99,7 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
         $workflows = $wfm->getWorkflows();
-        foreach($workflows as $wfId => $cls) {
+        foreach($workflows as $wfId) {
             $workflow = $wfm->get($wfId);
             /* @var $workflow editor_Workflow_Abstract */
             $workflow->$fn();

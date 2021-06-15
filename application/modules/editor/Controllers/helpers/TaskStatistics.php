@@ -48,7 +48,7 @@ class Editor_Controller_Helper_TaskStatistics extends Zend_Controller_Action_Hel
         /* @var $autoStates editor_Models_Segment_AutoStates */
         $segmentProcessingSummary = $autoStates->getStatistics($task->getTaskGuid());
         
-        $workflow=$task->getTaskActiveWorkflow($task->getTaskGuid());
+        $workflow=$task->getTaskActiveWorkflow();
         $stateMap = $autoStates->getRoleToStateMap();
         
         $steps = $workflow->getStepChain();

@@ -137,7 +137,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
                 $userPref->setFields(join(',', $allFields));
         } else {
             $user = new Zend_Session_Namespace('user');
-            $userPref->loadByTaskUserAndStep($taskguid, $this->workflow::WORKFLOW_ID, $user->data->userGuid, $row['userStep']);
+            $userPref->loadByTaskUserAndStep($taskguid, $this->workflow->getName(), $user->data->userGuid, $row['userStep']);
             $row['segmentFields'] = $fields->loadByUserPref($userPref);
         }
         
