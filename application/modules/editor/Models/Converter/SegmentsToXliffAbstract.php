@@ -89,6 +89,11 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     protected $task;
     
     /**
+     * @var editor_Workflow_Abstract
+     */
+    protected $workflow;
+    
+    /**
      * @var editor_Models_Export_FileParser_Sdlxliff
      */
     protected $exportParser;
@@ -293,6 +298,10 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
      */
     protected function initConvertionData() {
         $task = $this->task;
+        
+        $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wm editor_Workflow_Manager */
+        $this->workflow = $wm->getByTask($task);
         
         /**
          * define autostates
