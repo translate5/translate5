@@ -88,35 +88,18 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
         $workflow = $manager->getCached($task->getWorkflow());
         $initialStates = $workflow->getInitialStates();
 
-        $api = ZfExtended_Factory::get('ZfExtended_ApiAcess');
-        /* @var $api ZfExtended_ApiAcess */
-
         foreach ($defaults as $assoc){
-            $params = [
-                'taskGuid'=>$task->getTaskGuid(),
-                'userGuid'=>$assoc['userGuid'],
-                'state'=>$initialStates[$assoc['workflowStepName']][$role],
-                'role'=>$role,
-                'segmentrange'=>$assoc['segmentrange']
-            ];
-
-            $queryParams = [
-                "data" => json_encode($params)
-            ];
-
-            if(!empty($assoc['deadlineDate'])){
-                $params['deadlineDate'] = editor_Utils::addBusinessDays($task->getOrderdate(),$assoc['deadlineDate']);
-            }
-            // use model to insert and at the ednt trigger the workflow
-
             $role = $workflow->getRoleOfStep($assoc['workflowStepName']);
 
-            /* @var $model editor_Models_TaskUserAssoc */
             $model = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-
-
-            // save via api to trigger all other steps after this
-            $api->translate5Request('POST', 'editor/taskuserassoc',[],$queryParams);
+            /* @var $model editor_Models_TaskUserAssoc */
+            $model->setTaskGuid($task->getTaskGuid());
+            $model->setUserGuid($assoc['userGuid']);
+            $model->setState($initialStates[$assoc['workflowStepName']][$role]);
+            $model->setRole($role);
+            $model->setSegmentrange($assoc['segmentrange']);
+            $model->setDeadlineDate(editor_Utils::addBusinessDays($task->getOrderdate(),$assoc['deadlineDate']));
+            $model->save();
         }
 
         // TODO: function from Thomas which will recalculate the workflow based on the default assocs. The current function is doing this when single assoc is assigned, but this needs to be done onace after all assocs are assigned
