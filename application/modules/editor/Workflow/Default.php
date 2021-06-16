@@ -190,21 +190,22 @@ class editor_Workflow_Default {
      * @var array
      */
     protected $validStates = [
-//         self::STEP_TRANSLATION => [
-//             self::ROLE_TRANSLATOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-//             self::ROLE_REVIEWER => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
-//             self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
-//         ],
-//         self::STEP_REVIEWING => [
-//             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-//             self::ROLE_REVIEWER => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-//             self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
-//         ],
-//         self::STEP_TRANSLATORCHECK => [
-//             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-//             self::ROLE_REVIEWER => [self::STATE_FINISH],
-//             self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-//         ],
+        //FIXME dummy data, must be calculated depending on the DB content
+'translation' => [
+            self::ROLE_TRANSLATOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+            self::ROLE_REVIEWER => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
+        ],
+        'reviewing' => [
+            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
+            self::ROLE_REVIEWER => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
+        ],
+        'translatorCheck' => [
+            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
+            self::ROLE_REVIEWER => [self::STATE_FINISH],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+        ],
         self::STEP_WORKFLOW_ENDED => [
             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
             self::ROLE_REVIEWER => [self::STATE_FINISH],
