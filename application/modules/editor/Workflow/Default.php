@@ -230,21 +230,21 @@ abstract class editor_Workflow_Abstract {
      * @var array
      */
     protected $validStates = [
-        self::STEP_TRANSLATION => [
-            self::ROLE_TRANSLATOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-            self::ROLE_REVIEWER => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
-            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
-        ],
-        self::STEP_REVIEWING => [
-            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-            self::ROLE_REVIEWER => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
-        ],
-        self::STEP_TRANSLATORCHECK => [
-            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-            self::ROLE_REVIEWER => [self::STATE_FINISH],
-            self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-        ],
+//         self::STEP_TRANSLATION => [
+//             self::ROLE_TRANSLATOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+//             self::ROLE_REVIEWER => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
+//             self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
+//         ],
+//         self::STEP_REVIEWING => [
+//             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
+//             self::ROLE_REVIEWER => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+//             self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
+//         ],
+//         self::STEP_TRANSLATORCHECK => [
+//             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
+//             self::ROLE_REVIEWER => [self::STATE_FINISH],
+//             self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+//         ],
         self::STEP_WORKFLOW_ENDED => [
             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
             self::ROLE_REVIEWER => [self::STATE_FINISH],
@@ -825,6 +825,7 @@ abstract class editor_Workflow_Abstract {
      * @param editor_Models_Task $task
      */
     public function beforeCommentedSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
+//FIXME wie soll das überarbeitet werden, wie passt das mit translator überhaupt?
         $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, editor_Models_Segment $segment, $tua) {
             $autostates->updateAfterCommented($segment, $tua);
         };
