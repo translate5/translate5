@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,172 +26,170 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.admin.task.UserAssocGrid', {
-  extend: 'Ext.grid.Panel',
-  alias: 'widget.adminTaskUserAssocGrid',
-  cls: 'task-user-assoc-grid',
-  itemId: 'adminTaskUserAssocGrid',
-  controller: 'adminTaskUserAssocGrid',
-  requires:[
-      'Editor.view.admin.task.UserAssocGridWindowController'
-  ],
-  strings: {
-      confirmDeleteTitle: '#UT#Eintrag löschen?',
-      confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
-      userGuidCol: '#UT#Benutzer',
-      roleCol: '#UT#Rolle',
-      stepCol: '#UT#Workflowschritt',
-      segmentrangeCol: '#UT#Segmente',
-      stateCol: '#UT#Status',
-      addUser: '#UT#Hinzufügen',
-      addUserTip: '#UT#Einen Benutzer dieser Aufgabe zuordnen.',
-      removeUser: '#UT#Entfernen',
-      removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
-      save: '#UT#Änderungen speichern',
-      reload: '#UT#Aktualisieren',
-      cancel: '#UT#Abbrechen',
-      assignmentDateLable:'#UT#Zuweisung',
-      finishedDateLabel:'#UT#Abgeschlossen',
-      deadlineDateLable:'#UT#Deadline',
-      userSpecialProperties:'#UT#Spezial',
-      notifyUsersTitle: '#UT#Zugewiesene Benutzer benachrichtigen?',
-      notifyUsersMsg: '#UT#Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtigt werden?',
-      userNotifySuccess:'#UT#Benutzer wurden erfolgreich per E-Mail benachrichtigt',
-      notifyButtonText:'#UT#Benutzer benachrichtigen',
-      notifyButtonTooltip:'#UT#Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen',
-  },
-  states: {
-      edit: '#UT#in Arbeit'
-  },
+    extend: 'Ext.grid.Panel',
+    alias: 'widget.adminTaskUserAssocGrid',
+    cls: 'task-user-assoc-grid',
+    itemId: 'adminTaskUserAssocGrid',
+    controller: 'adminTaskUserAssocGrid',
+    requires: [
+        'Editor.view.admin.task.UserAssocGridWindowController'
+    ],
+    strings: {
+        confirmDeleteTitle: '#UT#Eintrag löschen?',
+        confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
+        userGuidCol: '#UT#Benutzer',
+        roleCol: '#UT#Rolle',
+        stepCol: '#UT#Workflowschritt',
+        segmentrangeCol: '#UT#Segmente',
+        stateCol: '#UT#Status',
+        addUser: '#UT#Hinzufügen',
+        addUserTip: '#UT#Einen Benutzer dieser Aufgabe zuordnen.',
+        removeUser: '#UT#Entfernen',
+        removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
+        save: '#UT#Änderungen speichern',
+        reload: '#UT#Aktualisieren',
+        cancel: '#UT#Abbrechen',
+        assignmentDateLable: '#UT#Zuweisung',
+        finishedDateLabel: '#UT#Abgeschlossen',
+        deadlineDateLable: '#UT#Deadline',
+        userSpecialProperties: '#UT#Spezial',
+        notifyUsersTitle: '#UT#Zugewiesene Benutzer benachrichtigen?',
+        notifyUsersMsg: '#UT#Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtigt werden?',
+        userNotifySuccess: '#UT#Benutzer wurden erfolgreich per E-Mail benachrichtigt',
+        notifyButtonText: '#UT#Benutzer benachrichtigen',
+        notifyButtonTooltip: '#UT#Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen',
+    },
+    states: {
+        edit: '#UT#in Arbeit'
+    },
 
-  plugins: ['gridfilters'],
-  initConfig: function(instanceConfig) {
-    var me = this,
-        config;
-    
-    config = {
-      columns: [{
-          xtype: 'gridcolumn',
-          width: 230,
-          dataIndex: 'login',
-          renderer: function(v, meta, rec) {
-              if(Editor.data.debug) {
-                  v = Ext.String.format('<a href="{0}session/?authhash={1}">{2}</a>', Editor.data.restpath, rec.get('staticAuthHash'), v);
-              }
-              return rec.get('surName')+', '+rec.get('firstName')+' ('+v+')';
-          },
-          filter: {
-              type: 'string'
-          },
-          text: me.strings.userGuidCol
-      },{
-          xtype: 'gridcolumn',
-          width: 100,
-          dataIndex: 'role',
-          renderer: function(v,meta,rec) {
-              var task=me.lookupViewModel().get('currentTask'),
-                vfm=task && task.getWorkflowMetaData(),
-              	role=(vfm && vfm.roles && vfm.roles[v]) || v;
-              return role;
-          },
-          text: me.strings.roleCol
-      },{
-          xtype: 'gridcolumn',
-          width: 100,
-          dataIndex: 'workflowStepName',
-          renderer: function(v,meta,rec) {
-              var task=me.lookupViewModel().get('currentTask'),
-                vfm=task && task.getWorkflowMetaData(),
-              	step=(vfm && vfm.steps && vfm.steps[v]) || v;
-              return step;
-          },
-          text: me.strings.stepCol
-      },{
-          xtype: 'gridcolumn',
-          width: 70,
-          dataIndex: 'segmentrange',
-          text: me.strings.segmentrangeCol
-      },{
-          xtype: 'gridcolumn',
-          width: 90,
-          dataIndex: 'state',
-          renderer: function(v,meta,rec) {
-        	  //is custom state translation needed
-        	  if(me.states[v]){
-        		  return me.states[v];
-        	  }
-        	  var task=me.lookupViewModel().get('currentTask'),
-                  vfm=task && task.getWorkflowMetaData(),
-                  state=(vfm && vfm.mergedStates && vfm.mergedStates[v]) || v;
-              return state;
-          },
-          text: me.strings.stateCol
-      },{
-          xtype: 'datecolumn',
-          width: 90,
-          dataIndex: 'assignmentDate',
-          format:Editor.DATE_TIME_LOCALIZED_FORMAT,
-          text: me.strings.assignmentDateLable
-      },{
-          xtype: 'datecolumn',
-          width: 90,
-          dataIndex: 'finishedDate',
-          format:Editor.DATE_TIME_LOCALIZED_FORMAT,
-          text: me.strings.finishedDateLabel
-      },{
-          xtype: 'datecolumn',
-          width: 90,
-          dataIndex: 'deadlineDate',
-          format:Editor.DATE_TIME_LOCALIZED_FORMAT,
-          text: me.strings.deadlineDateLable
-      }],
-      dockedItems: [{
-          xtype: 'toolbar',
-          dock: 'top',
-          items: [{
-              xtype: 'button',
-              glyph: 'f234@FontAwesome5FreeSolid',
-              itemId: 'add-user-btn',
-              text: me.strings.addUser,
-              tooltip: me.strings.addUserTip
-          },{
-              xtype: 'button',
-              glyph: 'f503@FontAwesome5FreeSolid',
-              disabled: true,
-              itemId: 'remove-user-btn',
-              handler: function() {
-                  Ext.Msg.confirm(me.strings.confirmDeleteTitle, me.strings.confirmDelete, function(btn){
-                      var toDelete = me.getSelectionModel().getSelection();
-                      if(btn == 'yes') {
-                          me.fireEvent('confirmDelete', me, toDelete, this);
-                      }
-                  });
-              },
-              text: me.strings.removeUser,
-              tooltip: me.strings.removeUserTip
-          },{
-              xtype: 'button',
-              itemId: 'reload-btn',
-              glyph: 'f2f1@FontAwesome5FreeSolid',
-              text: me.strings.reload
-          },'-',{
-              xtype: 'button',
-              itemId: 'notifyAssociatedUsersBtn',
-              glyph: 'f674@FontAwesome5FreeSolid',
-              text: me.strings.notifyButtonText,
-              tooltip: me.strings.notifyButtonTooltip,
-          },'->',{
-              xtype: 'button',
-              hidden:!Editor.app.authenticatedUser.isAllowed('editorWorkflowPrefsTask'),
-              itemId: 'userSpecialPropertiesBtn',
-              glyph: 'f509@FontAwesome5FreeSolid',
-              text: me.strings.userSpecialProperties
-          }]
-        }]
-    };
+    plugins: ['gridfilters'],
+    initConfig: function (instanceConfig) {
+        var me = this,
+            config = {
+                columns: [{
+                    xtype: 'gridcolumn',
+                    width: 230,
+                    dataIndex: 'login',
+                    renderer: function (v, meta, rec) {
+                        if (Editor.data.debug) {
+                            v = Ext.String.format('<a href="{0}session/?authhash={1}">{2}</a>', Editor.data.restpath, rec.get('staticAuthHash'), v);
+                        }
+                        return rec.get('surName') + ', ' + rec.get('firstName') + ' (' + v + ')';
+                    },
+                    filter: {
+                        type: 'string'
+                    },
+                    text: me.strings.userGuidCol
+                }, {
+                    xtype: 'gridcolumn',
+                    width: 100,
+                    dataIndex: 'role',
+                    renderer: function (v, meta, rec) {
+                        var task = me.lookupViewModel().get('currentTask'),
+                            vfm = task && task.getWorkflowMetaData(),
+                            role = (vfm && vfm.roles && vfm.roles[v]) || v;
+                        return role;
+                    },
+                    text: me.strings.roleCol
+                }, {
+                    xtype: 'gridcolumn',
+                    width: 100,
+                    dataIndex: 'workflowStepName',
+                    renderer: function (v, meta, rec) {
+                        var task = me.lookupViewModel().get('currentTask'),
+                            vfm = task && task.getWorkflowMetaData(),
+                            step = (vfm && vfm.steps && vfm.steps[v]) || v;
+                        return step;
+                    },
+                    text: me.strings.stepCol
+                }, {
+                    xtype: 'gridcolumn',
+                    width: 70,
+                    dataIndex: 'segmentrange',
+                    text: me.strings.segmentrangeCol
+                }, {
+                    xtype: 'gridcolumn',
+                    width: 90,
+                    dataIndex: 'state',
+                    renderer: function (v, meta, rec) {
+                        //is custom state translation needed
+                        if (me.states[v]) {
+                            return me.states[v];
+                        }
+                        var task = me.lookupViewModel().get('currentTask'),
+                            vfm = task && task.getWorkflowMetaData(),
+                            state = (vfm && vfm.mergedStates && vfm.mergedStates[v]) || v;
+                        return state;
+                    },
+                    text: me.strings.stateCol
+                }, {
+                    xtype: 'datecolumn',
+                    width: 90,
+                    dataIndex: 'assignmentDate',
+                    format: Editor.DATE_TIME_LOCALIZED_FORMAT,
+                    text: me.strings.assignmentDateLable
+                }, {
+                    xtype: 'datecolumn',
+                    width: 90,
+                    dataIndex: 'finishedDate',
+                    format: Editor.DATE_TIME_LOCALIZED_FORMAT,
+                    text: me.strings.finishedDateLabel
+                }, {
+                    xtype: 'datecolumn',
+                    width: 90,
+                    dataIndex: 'deadlineDate',
+                    format: Editor.DATE_TIME_LOCALIZED_FORMAT,
+                    text: me.strings.deadlineDateLable
+                }],
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    items: [{
+                        xtype: 'button',
+                        glyph: 'f234@FontAwesome5FreeSolid',
+                        itemId: 'add-user-btn',
+                        text: me.strings.addUser,
+                        tooltip: me.strings.addUserTip
+                    }, {
+                        xtype: 'button',
+                        glyph: 'f503@FontAwesome5FreeSolid',
+                        disabled: true,
+                        itemId: 'remove-user-btn',
+                        handler: function () {
+                            Ext.Msg.confirm(me.strings.confirmDeleteTitle, me.strings.confirmDelete, function (btn) {
+                                var toDelete = me.getSelectionModel().getSelection();
+                                if (btn == 'yes') {
+                                    me.fireEvent('confirmDelete', me, toDelete, this);
+                                }
+                            });
+                        },
+                        text: me.strings.removeUser,
+                        tooltip: me.strings.removeUserTip
+                    }, {
+                        xtype: 'button',
+                        itemId: 'reload-btn',
+                        glyph: 'f2f1@FontAwesome5FreeSolid',
+                        text: me.strings.reload
+                    }, '-', {
+                        xtype: 'button',
+                        itemId: 'notifyAssociatedUsersBtn',
+                        glyph: 'f674@FontAwesome5FreeSolid',
+                        text: me.strings.notifyButtonText,
+                        tooltip: me.strings.notifyButtonTooltip,
+                    }, '->', {
+                        xtype: 'button',
+                        hidden: !Editor.app.authenticatedUser.isAllowed('editorWorkflowPrefsTask'),
+                        itemId: 'userSpecialPropertiesBtn',
+                        glyph: 'f509@FontAwesome5FreeSolid',
+                        text: me.strings.userSpecialProperties
+                    }]
+                }]
+            };
 
-    if (instanceConfig) {
-        me.self.getConfigurator().merge(me, config, instanceConfig);
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     }
-    return me.callParent([config]);
-  }
 });
