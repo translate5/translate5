@@ -43,14 +43,24 @@ CREATE TABLE `LEK_workflow_step` (
   `label` varchar(128) NOT NULL COMMENT 'human readable workflow step name (goes through the translator)',
   `role` varchar(64) NOT NULL COMMENT 'one of the available roles, by default review|translator|translatorCheck|visitor can be extended by customized PHP workflows',
   `position` int(11) NULL COMMENT 'the position of the step in the workflow, may be null if not in chain (for visitor for example), steps with same position are ordered by name then',
+  `flagInitiallyFiltered` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'define if the segments of the previous step should be filtered in the GUI when reaching this step',
   PRIMARY KEY (`id`),
   INDEX (`workflowName`, `name`),
   CONSTRAINT FOREIGN KEY (`workflowName`) REFERENCES `LEK_workflow` (`name`) ON DELETE CASCADE
 );
 
-INSERT INTO `LEK_workflow_step` (`workflowName`, `name`, `label`, `role`, `position`)
+INSERT INTO `LEK_workflow_step` (`workflowName`, `name`, `label`, `role`, `position`, `flagInitiallyFiltered`)
 VALUES
-('default', 'translation', 'Übersetzung', 'translator', 1),
-('default', 'reviewing', 'Lektorat', 'reviewer', 2),
-('default', 'translatorCheck', 'Zweites Lektorat', 'translatorCheck', 3),
-('default', 'visiting', 'Nur anschauen', 'visitor', null);
+('default', 'translation', 'Übersetzung', 'translator', 1, 0),
+('default', 'reviewing', 'Lektorat', 'reviewer', 2, 0),
+('default', 'translatorCheck', 'Zweites Lektorat', 'translatorCheck', 3, 1),
+('default', 'visiting', 'Nur anschauen', 'visitor', null, 0);
+
+
+
+
+ALTER TABLE `LEK_taskUserAssoc` ADD COLUMN `workflowStepName` varchar(64) NOT NULL DEFAULT 'reviewing' COMMENT 'workflow step which is used for this job entry' AFTER `role`;
+UPDATE `LEK_taskUserAssoc` SET `workflowStepName` = 'translation' WHERE `role` = 'translator';
+UPDATE `LEK_taskUserAssoc` SET `workflowStepName` = 'reviewing' WHERE `role` = 'reviewer';
+UPDATE `LEK_taskUserAssoc` SET `workflowStepName` = 'translatorCheck' WHERE `role` = 'translatorCheck';
+UPDATE `LEK_taskUserAssoc` SET `workflowStepName` = 'visiting' WHERE `role` = 'visitor';

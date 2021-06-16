@@ -152,15 +152,15 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           isTranslationTask=task.get('emptyTargets'),
           newRec;
       
-      
       //in competitive mode instead OPEN / UNCONFIRMED is used
       if(usageMode == task.USAGE_MODE_COMPETITIVE && state == task.USER_STATE_OPEN){
           state = task.USER_STATE_UNCONFIRMED;
       }
       //set the default role to translator when the task is translation task and
       //the workflow name is no workflow
-      if(isTranslationTask && task.WORKFLOW_STEP_NO_WORKFLOW == task.get('workflowStepName')){
-          role=task.WORKFLOW_USER_ROLE_TRANSLATOR;
+      if(isTranslationTask && task.isNoWorkflowStep()){
+          //FIXME improve from current workflow? Also set step here and not only role! Should be fixed by Aleks
+          role = Editor.data.app.workflow.CONST.ROLE_TRANSLATOR;
       }
       newRec = assoc.model.create({
           taskGuid: task.get('taskGuid'),

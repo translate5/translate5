@@ -55,11 +55,6 @@ Ext.define('Editor.model.admin.Task', {
       OPEN: 'open',
       END: 'end',
   },
-  WORKFLOW_STEP_NO_WORKFLOW:'no workflow',//default workflow step constant
-  WORKFLOW_STEP_TRANSLATION:'translation',//default workflow step constant
-  WORKFLOW_STEP_REVIEWING:'reviewing',//default workflow step constant
-  WORKFLOW_STEP_TRANSLATORCHECK:'translatorCheck',//default workflow step constant
-  WORKFLOW_USER_ROLE_TRANSLATOR:'translator',//TODO: when needed add the other constants
   fields: [
     {name: 'id', type: 'int'},
     {name: 'taskGuid', type: 'string'},
@@ -284,7 +279,7 @@ Ext.define('Editor.model.admin.Task', {
   },
   /**
    * returns if task is readonly
-   * @param ignoreUnconfirmed : ignore the unconfirmed state as readonly case
+   * @param {Boolean} ignoreUnconfirmed ignore the unconfirmed state as readonly case
    * @returns {Boolean}
    */
   isReadOnly: function(ignoreUnconfirmed) {    
@@ -354,6 +349,34 @@ Ext.define('Editor.model.admin.Task', {
           return this.get('taskName')+' ('+nr+')';
       }
       return this.get('taskName');
+  },
+  
+  /**
+   * returns true if task is in no workflow step
+   * @return {Boolean}
+   */
+  isNoWorkflowStep: function() {
+      return Editor.data.app.workflow.CONST.STEP_NO_WORKFLOW == this.get('workflowStepName');
+  },
+  
+  /**
+   * returns true if task is a translation task or is currently in workflow step
+   * @return {Boolean}
+   */
+  isTranslation: function() {
+      var me = this;
+      return me.get('emptyTargets') || me.stepHasRole([Editor.data.app.workflow.CONST.ROLE_TRANSLATOR]);
+  },
+  /**
+   * returns true if task is in a step doing a review or a translatorcheck
+   * @param {Array} roles ignore the unconfirmed state as readonly case
+   * @return {Boolean}
+   */
+  stepHasRole: function(roles) {
+      var me = this,
+          meta = me.getWorkflowMetaData(),
+          currentRole = meta && meta.steps2roles[me.get('workflowStepName')];
+      return currentRole && Ext.Array.contains(roles, currentRole);
   },
   
   /**

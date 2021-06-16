@@ -39,6 +39,7 @@ END LICENSE AND COPYRIGHT
  * @method string getUserGuid() getUserGuid()
  * @method string getState() getState()
  * @method string getRole() getRole()
+ * @method string getWorkflowStepName() getWorkflowStepName()
  * @method string getSegmentrange() getSegmentrange()
  * @method string getUsedState() getUsedState()
  * @method string getUsedInternalSessionUniqId() getUsedInternalSessionUniqId()
@@ -48,6 +49,7 @@ END LICENSE AND COPYRIGHT
  * @method void setUserGuid() setUserGuid(string $userGuid)
  * @method void setState() setState(string $state)
  * @method void setRole() setRole(string $role)
+ * @method void setWorkflowStepName() setWorkflowStepName(string $step)
  * @method void setSegmentrange() setSegmentrange(string $segmentrange)
  * @method void setUsedState() setUsedState(string $state)
  * @method void setUsedInternalSessionUniqId() setUsedInternalSessionUniqId(string $sessionId)
@@ -532,12 +534,12 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     
     // ---------------------- segmentrange: ------------------------
     /**
-     * If 
-     * (1) a task is in sequential-mode,  
+     * If
+     * (1) a task is in sequential-mode,
      * (2) not in PM-override, and
-     * (3) and ANY segments are assigned to ANY user of the given user's role 
-     *     in the current workflow-step, 
-     * then the editable-status of the segments will have to be checked for 
+     * (3) and ANY segments are assigned to ANY user of the given user's role
+     *     in the current workflow-step,
+     * then the editable-status of the segments will have to be checked for
      * ALL segments for ALL users of this role.
      * @param editor_Models_Task $task
      * @param string $role

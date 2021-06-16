@@ -39,8 +39,10 @@ END LICENSE AND COPYRIGHT
  * @method void setLabel() setLabel(string $label)
  * @method string getRole() getRole()
  * @method void setRole() setRole(string $role)
- * @method string getPosition() getPosition()
- * @method void setPosition() setPosition(string $position)
+ * @method ?integer getPosition() getPosition()
+ * @method void setPosition() setPosition(?integer $position)
+ * @method bool getFlagInitiallyFiltered() getFlagInitiallyFiltered()
+ * @method void setFlagInitiallyFiltered() setFlagInitiallyFiltered(bool $filter)
  */
 class editor_Models_Workflow_Step extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass          = 'editor_Models_Db_Workflow_Step';

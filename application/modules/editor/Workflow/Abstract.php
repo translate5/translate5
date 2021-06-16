@@ -40,39 +40,48 @@ abstract class editor_Workflow_Abstract {
      * for translation, JS Task Model and workflow for programmatic usage
      */
     //the user cant access the task yet
-    const STATE_WAITING = 'waiting';
+    const STATE_WAITING         = 'waiting';
     //the user has finished his work on this task, and cant access it anymore
-    const STATE_FINISH = 'finished';
+    const STATE_FINISH          = 'finished';
     //the user can access the task editable and writeable,
     //setting this state releases the lock if the user had locked the task
-    const STATE_OPEN = 'open';
+    const STATE_OPEN            = 'open';
     //this state must be set on editing a task, it locks the task for the user
-    const STATE_EDIT = 'edit';
+    const STATE_EDIT            = 'edit';
     //setting this state opens the task readonly
-    const STATE_VIEW = 'view';
+    const STATE_VIEW            = 'view';
     //the user can access the task readable, must confirm it before usage
-    const STATE_UNCONFIRMED = 'unconfirmed';
+    const STATE_UNCONFIRMED     = 'unconfirmed';
     
-    const ROLE_TRANSLATOR = 'translator';
-    const ROLE_REVIEWER = 'reviewer';
-    const ROLE_TRANSLATORCHECK = 'translatorCheck';
-    const ROLE_VISITOR = 'visitor';
+    const ROLE_TRANSLATOR       = 'translator';
+    const ROLE_REVIEWER         = 'reviewer';
+    const ROLE_TRANSLATORCHECK  = 'translatorCheck';
+    const ROLE_VISITOR          = 'visitor';
     
-    const STEP_NO_WORKFLOW='no workflow';
-    const STEP_TRANSLATION = 'translation';
-    const STEP_REVIEWING = 'reviewing';
-    const STEP_TRANSLATORCHECK = 'translatorCheck';
-    const STEP_PM_CHECK = 'pmCheck';
-    const STEP_WORKFLOW_ENDED = 'workflowEnded';
+    /*
+     ** The following hard coded steps are always needed / or are out of workflow:
+     */
+    const STEP_NO_WORKFLOW      = 'no workflow';
+    const STEP_PM_CHECK         = 'pmCheck';
+    const STEP_WORKFLOW_ENDED   = 'workflowEnded';
     
-    //const WORKFLOW_ID = ''; this is the internal used name for this workflow, it has to be defined in each subclass!
+    /**
+     * The workflow name
+     * @var string
+     */
+    protected $name;
+    
+    /**
+     * The workflow label (untranslated)
+     * @var string
+     */
+    protected $label;
     
     /**
      * labels of the states, roles and steps. Can be changed / added in constructor
      * @var array
      */
     protected $labels = array(
-        'WORKFLOW_ID' => 'Standard Ablaufplan',
         'STATE_IMPORT' => 'import',
         'STATE_WAITING' => 'wartend',
         'STATE_UNCONFIRMED' => 'unbestätigt',
@@ -85,9 +94,6 @@ abstract class editor_Workflow_Abstract {
         'ROLE_TRANSLATORCHECK' => 'Zweiter Lektor',
         'ROLE_VISITOR' => 'Besucher',
         'STEP_NO_WORKFLOW' => 'Kein Workflow',
-        'STEP_TRANSLATION' => 'Übersetzung',
-        'STEP_REVIEWING' => 'Lektorat',
-        'STEP_TRANSLATORCHECK' => 'Zweites Lektorat',
         'STEP_PM_CHECK' => 'PM Prüfung',
         'STEP_WORKFLOW_ENDED' => 'Workflow abgeschlossen',
     );
@@ -193,31 +199,30 @@ abstract class editor_Workflow_Abstract {
         self::STATE_OPEN,
         self::STATE_EDIT,
     );
-    /**
-     * roles which are part of the workflow chain (in this order)
-     * @todo currently only used in notification. For extending of workflow system
-     *      or use of a workflow engine extend the use of roleChain to whereever applicable
-     * @var array
-     */
-    protected $stepChain = array(
-        self::STEP_NO_WORKFLOW,
-        self::STEP_TRANSLATION,
-        self::STEP_REVIEWING,
-        self::STEP_TRANSLATORCHECK,
-        self::STEP_WORKFLOW_ENDED,
-    );
-    
     
     /**
-     * Mapping between roles and workflowSteps.
+     * workflow steps which are part of the workflow chain (in this order)
      * @var array
      */
-    protected $steps2Roles = array(
-        self::STEP_TRANSLATION => self::ROLE_TRANSLATOR,
-        self::STEP_REVIEWING => self::ROLE_REVIEWER,
-        self::STEP_TRANSLATORCHECK => self::ROLE_TRANSLATORCHECK,
-    );
+    protected $stepChain = [];
     
+    /**
+     * Mapping between workflowSteps and roles
+     * @var array
+     */
+    protected $steps2Roles = [];
+    
+    /**
+     * Loaded steps from DB, key is STEP_STEPNAME value is the step value (similar to the STEP_ constants)
+     * @var array
+     */
+    protected $steps = [];
+    
+    /**
+     * list of steps with flag flagInitiallyFiltered on
+     * @var array
+     */
+    protected $stepsWithFilter = [];
     
     /**
      * Valid state / role combination for each step
@@ -278,7 +283,11 @@ abstract class editor_Workflow_Abstract {
      */
     protected $notAssignableSteps=[self::STEP_PM_CHECK,self::STEP_NO_WORKFLOW,self::STEP_WORKFLOW_ENDED];
     
-    public function __construct() {
+    public function __construct($name) {
+    //FIXME use $name to load workflow and steps, store them internally cached somehow. As zend cache?
+        $workflow = $this->initWorkflow($name);
+        $this->initWorkflowSteps($workflow);
+        
         $this->loadAuthenticatedUser();
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         
@@ -310,31 +319,63 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
-     * returns the workflow ID used in translate5
-     * if parameter $className is given return the ID of the given classname,
-     * if no $className is given, the current class is used
-     * @param string $className optional
+     * loads the workflow entity by name and stores name and label internally
+     * @param string $name
+     * @return editor_Models_Workflow
      */
-    public static function getId($className = null) {
-        if(empty($className)) {
-            return static::WORKFLOW_ID;
-        }
-        return call_user_func(array($className, __METHOD__));
+    protected function initWorkflow(string $name): editor_Models_Workflow {
+        /* @var $workflow editor_Models_Workflow */
+        $workflow = ZfExtended_Factory::get('editor_Models_Workflow');
+        $workflow->loadByName($name);
+        
+        $this->name = $workflow->getName();
+        $this->label = $workflow->getLabel();
+        return $workflow;
     }
     
     /**
-     * returns a recursive list of workflow IDs used by this workflows instances class hierarchy
-     * @return array
+     * loads all workflow steps and stores them in the chain and in the steps to roles mapping
+     * @param editor_Models_Workflow $workflow
      */
-    public function getIdList() {
-        $parents = class_parents($this);
-        $result = [static::WORKFLOW_ID];
-        foreach($parents as $parent) {
-            if (defined($parent.'::WORKFLOW_ID')) {
-                $result[] = constant($parent.'::WORKFLOW_ID');
+    protected function initWorkflowSteps(editor_Models_Workflow $workflow) {
+        /* @var $step editor_Models_Workflow_Step */
+        $step = ZfExtended_Factory::get('editor_Models_Workflow_Step');
+        $steps = $step->loadByWorkflow($workflow);
+        
+        //if position is null, the step is not in the chain!
+        //the workflow starts always with no_workflow and ends with workflow ended
+        //the step2roles array contains all configured steps, assignable to users
+        $this->stepChain[] = self::STEP_NO_WORKFLOW;
+        foreach($steps as $step) {
+            if(!is_null($step['position'])) {
+                $this->stepChain[] = $step['name'];
             }
+            $this->steps2Roles[$step['name']] = $step['role'];
+            
+            if($step['flagInitiallyFiltered']) {
+                $this->stepsWithFilter[] = $step['name'];
+            }
+            $constName = 'STEP_'.strtoupper($step['name']);
+            $this->labels[$constName] = $step['label'];
+            $this->steps[$constName] = $step['name'];
         }
-        return $result;
+        $this->stepChain[] = self::STEP_WORKFLOW_ENDED;
+    }
+    
+    /**
+     * returns the workflow name used in translate5
+     * @return string
+     */
+    public function getName(): string {
+        return $this->name;
+    }
+    
+    /**
+     * returns the workflow label for the workflow (untranslated)
+     * @return string
+     */
+    public function getLabel(): string {
+        return $this->label;
     }
     
     /**
@@ -343,6 +384,15 @@ abstract class editor_Workflow_Abstract {
      */
     public function isCalledByCron() {
         return $this->isCron;
+    }
+    
+    /**
+     * returns true if the given task is ended regarding its workflow
+     * @param editor_Models_Task $task
+     * @return bool
+     */
+    public function isEnded(editor_Models_Task $task): bool {
+        return $task->getWorkflowStepName() == self::STEP_WORKFLOW_ENDED;
     }
     
     /**
@@ -358,7 +408,7 @@ abstract class editor_Workflow_Abstract {
      * @return string[]
      */
     public function getStepsWithFilter() {
-        return [self::STEP_TRANSLATORCHECK];
+        return $this->stepsWithFilter;
     }
     
     /**
@@ -398,11 +448,10 @@ abstract class editor_Workflow_Abstract {
         /* @var $tua editor_Models_TaskUserAssoc */
         $tuas = $tua->loadByTaskGuidList([$this->newTask->getTaskGuid()]);
         if(!empty($tuas)) {
-            $roles = array_column($tuas, 'role');
-            $roles = array_unique($roles);
+            $steps = array_column($tuas, 'workflowStepName');
+            $steps = array_unique($steps);
             // 2. check if roles of given nextStep are associated to the task
-            $nextRole = $this->getRoleOfStep($nextStep);
-            if(! in_array($nextRole, $roles)) {
+            if(! in_array($nextStep, $steps)) {
                 //3. if not, set nextStep to workflow ended
                 return self::STEP_WORKFLOW_ENDED;
             }
@@ -424,15 +473,6 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
-     * returns the step of a role (the first configured one, if there are multiple steps for a role)
-     * @param string $role
-     * @return string|false
-     */
-    public function getStepOfRole(string $role) {
-        return array_search($role, $this->steps2Roles, true);
-    }
-    
-    /**
      * returns the available step values
      * @return array
      */
@@ -448,6 +488,16 @@ abstract class editor_Workflow_Abstract {
         return array_intersect($this->getStates(), $this->pendingStates);
     }
 
+    /**
+     * returns true if the given step is of one of the given roles
+     * @param string $step
+     * @param array $roles
+     * @return boolean
+     */
+    public function isStepOfRole(string $step, array $roles): bool {
+        return in_array($this->getRoleOfStep($step), $roles);
+    }
+    
     /**
      * loads the system user as authenticatedUser, if no user is logged in
      */
@@ -485,7 +535,7 @@ abstract class editor_Workflow_Abstract {
      * @return array of available step constants (keys are constants, valus are constant-values)
      */
     public function getSteps(){
-        return $this->getFilteredConstants('STEP_');
+        return array_merge($this->getFilteredConstants('STEP_'), $this->steps);
     }
     
     /**
@@ -493,7 +543,7 @@ abstract class editor_Workflow_Abstract {
      * @return array
      */
     public function getAssignableSteps(){
-        return array_diff($this->getFilteredConstants('STEP_'), $this->notAssignableSteps);
+        return array_diff($this->getSteps(), $this->notAssignableSteps);
     }
     
     /**
@@ -565,7 +615,7 @@ abstract class editor_Workflow_Abstract {
      * @param string $filter
      * @return array values are all constant values which names match filter
      */
-    public function getFilteredConstants(string $filter){
+    protected function getFilteredConstants(string $filter){
         $refl = new ReflectionClass($this);
         $consts = $refl->getConstants();
         $filtered = array();
@@ -775,7 +825,7 @@ abstract class editor_Workflow_Abstract {
      * @param editor_Models_Task $task
      */
     public function beforeCommentedSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
-        $updateAutoStates = function($autostates, $segment, $tua) {
+        $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, editor_Models_Segment $segment, $tua) {
             $autostates->updateAfterCommented($segment, $tua);
         };
         $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates, $task);
@@ -801,8 +851,7 @@ abstract class editor_Workflow_Abstract {
             $segmentToSave->setWorkflowStepNr($task->getWorkflowStep());
             
             //sets the actual workflow step name, does currently depend only on the userTaskRole!
-            $step = $this->getStepOfRole($tua->getRole());
-            $step && $segmentToSave->setWorkflowStep($step);
+            $segmentToSave->setWorkflowStep($tua->getWorkflowStepName());
         }
 
         $autostates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
@@ -905,16 +954,8 @@ abstract class editor_Workflow_Abstract {
             'role' => $role,
             'state' => $state,
         ];
-        if($this->isCron) {
-            //in cron calls we loop over each workflow, so we may not iterate here over the whole inheritance tree.
-            // This would duplicate action calls.
-            $workflows = [static::WORKFLOW_ID];
-        }
-        else {
-            $workflows = $this->getIdList();
-        }
-        $actions = $actions->loadByTrigger($workflows, $trigger, $step, $role, $state);
-        $this->actionDebugMessage($workflows, $debugData);
+        $actions = $actions->loadByTrigger([$this->name], $trigger, $step, $role, $state);
+        $this->actionDebugMessage([$this->name], $debugData);
         $instances = [];
         foreach($actions as $action) {
             $class = $action['actionClass'];
@@ -988,6 +1029,8 @@ abstract class editor_Workflow_Abstract {
      * If the combination of roles and states are pointing to an specific workflow step, this step is used
      * If the states and roles does not match any valid combination, no step is changed.
      * @param editor_Models_TaskUserAssoc $tua
+     *
+     *
      */
     protected function recalculateWorkflowStep(editor_Models_TaskUserAssoc $tua) {
         $sendNotice = function($step) {
