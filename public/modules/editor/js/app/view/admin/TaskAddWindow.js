@@ -99,9 +99,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
             },'postimport');
             
             win.insertCard({
-                xtype:'adminUserAssoc',
-                header:false,
-                itemId:'adminUserImportAssoc',
+                xtype:'adminTaskUserAssoc',
+                itemId:'adminTaskUserAssoc',
                 viewModel:{
                     type:'adminUserImportWizardAssoc'
                 },

@@ -44,6 +44,18 @@ Ext.define('Editor.model.admin.UserAssocDefault', {
       {name: 'workflow', type: 'string'},
       {name: 'segmentrange', type: 'string'}
     ],
+
+    toString: function (){
+        return [
+            this.get('customerId'),
+            this.get('workflow'),
+            this.get('workflowStepName'),
+            this.get('sourceLang'),
+            this.get('targetLang'),
+            this.get('userGuid')
+        ].join('-');
+    },
+
     idProperty: 'id',
     proxy : {
       type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity
