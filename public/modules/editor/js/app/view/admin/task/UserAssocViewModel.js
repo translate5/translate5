@@ -53,8 +53,8 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
         states: {
             data: '{statesData}'
         },
-        roles: {
-            data: '{rolesData}'
+        steps: {
+            data: '{stepsData}'
         },
         userAssoc:{
             model:'Editor.model.admin.TaskUserAssoc',
@@ -136,13 +136,13 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                 return states;
             }
         },
-        rolesData: {
+        stepsData: {
             get: function (get) {
-            	var task=get('currentTask'),
-            		roles = [],
-                	metaData = task ? task.getWorkflowMetaData() : [];
-            	Ext.Object.each(metaData.editableRoles, function(key, role) {
-                    roles.push({id: key, text: role});
+                var task=get('currentTask'),
+                    roles = [],
+                    metaData = task ? task.getWorkflowMetaData() : [];
+                Ext.Object.each(metaData.usableSteps, function(key, step) {
+                    roles.push({id: key, text: step});
                 });
                 return roles;
             }

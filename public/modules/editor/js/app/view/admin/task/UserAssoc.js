@@ -40,7 +40,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
     importType:'postimport',
     task:null,
   strings: {
-      fieldRole: '#UT#Rolle',
+      fieldStep: '#UT#Workflowschritt',
       fieldState: '#UT#Status',
       fieldUser: '#UT#Benutzer',
       btnSave: '#UT#Speichern',
@@ -105,11 +105,11 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   editable: false,
                   forceSelection: true,
                   queryMode: 'local',
-                  name: 'role',
-                  fieldLabel: me.strings.fieldRole,
+                  name: 'workflowStepName',
+                  fieldLabel: me.strings.fieldStep,
                   valueField: 'id',
                   bind: {
-                      store: '{roles}'
+                      store: '{steps}'
                   }
               },{
                   anchor: '100%',
