@@ -289,7 +289,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             },{
                                 xtype: 'adminUserAssoc',
                                 bind:{
-                                    customer:'{record.id}'
+                                    customer:'{record}'
                                 }
                             },{
                                 xtype: 'adminConfigGrid',

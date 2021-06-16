@@ -53,9 +53,7 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
         type: 'adminUserAssoc'
     },
 
-    bind:{
-        store:'{userAssoc}'
-    },
+    store:'Editor.store.admin.UserAssocDefault',
 
     initConfig: function (instanceConfig) {
         var me = this,
@@ -86,6 +84,7 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     xtype: 'gridcolumn',
                     width: 230,
                     dataIndex: 'userGuid',
+                    renderer:me.userRenderer,
                     filter: {
                         type: 'string'
                     },
@@ -129,6 +128,9 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                         xtype: 'button',
                         glyph: 'f503@FontAwesome5FreeSolid',
                         disabled: true,
+                        bind:{
+                            disabled: '{!selectedAssocRecord}'
+                        },
                         itemId: 'deleteAssocBtn',
                         text: me.strings.removeUser,
                         tooltip: me.strings.removeUserTip
@@ -139,6 +141,7 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                         text: me.strings.reload
                     }, '-', {
                         xtype: 'checkbox',
+                        hidden:true,
                         itemId: 'notifyAssociatedUsersCheckBox',
                         glyph: 'f674@FontAwesome5FreeSolid',
                         fieldLabel: me.strings.notifyButtonText,
@@ -165,6 +168,24 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
             label = lang.get('label');
             md.tdAttr = 'data-qtip="' + label + '"';
             return label;
+        }
+        return '';
+    },
+
+    /**
+     * renders the value of the users columns
+     * @param {String} val
+     * @returns {String}
+     */
+    userRenderer:function (val){
+        var store = Ext.StoreManager.get('admin.Users'),
+            idx = store.find('userGuid', val);
+        if(idx < 0) {
+            return '';
+        }
+        var user = store.getAt(idx);
+        if(user){
+            return user.get('surName')+', '+user.get('firstName')+' ('+user.get('login')+')';
         }
         return '';
     }

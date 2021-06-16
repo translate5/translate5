@@ -45,6 +45,7 @@ Ext.define('Editor.view.admin.user.AssocImportWizardViewModel', {
             model:'Editor.model.admin.TaskUserAssoc',
             remoteFilter: true,
             pageSize: false,
+            groupField: 'targetLang',
             setFilters:function(filters){
                 // ignore the firing on empty value
                 if(filters && !filters.value){
