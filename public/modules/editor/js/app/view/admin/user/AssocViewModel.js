@@ -31,8 +31,7 @@ Ext.define('Editor.view.admin.user.AssocViewModel', {
     alias: 'viewmodel.adminUserAssoc',
 
     data:{
-        selectedCustomer : false,
-        selectedAssocRecord : false
+        selectedCustomer : false
     },
 
     strings: {
@@ -56,7 +55,7 @@ Ext.define('Editor.view.admin.user.AssocViewModel', {
             model:'Editor.model.admin.UserAssocDefault',
             remoteFilter: true,
             pageSize: false,
-            /*setFilters:function(filters){
+            setFilters:function(filters){
                 // ignore the firing on empty value
                 if(filters && !filters.value){
                     this.loadData([],false);
@@ -64,11 +63,10 @@ Ext.define('Editor.view.admin.user.AssocViewModel', {
                 }
                 this.superclass.superclass.setFilters.apply(this, [filters]);
             },
-             */
             filters:{
                 property: 'customerId',
                 operator:"eq",
-                value:'{selectedCustomer}'
+                value:'{selectedCustomer.id}'
             }
         }
     }

@@ -43,6 +43,9 @@ END LICENSE AND COPYRIGHT
 * @method string getWorkflow() getWorkflow()
 * @method void setSegmentrange() setSegmentrange(string $segmentrange)
 * @method string getSegmentrange() getSegmentrange()
+* @method void setDeadlineDate() setDeadlineDate(double $deadlineDate)
+* @method double getDeadlineDate() getDeadlineDate()
+*
 */
 
 class editor_Models_UserAssocDefault extends ZfExtended_Models_Entity_Abstract {

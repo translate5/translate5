@@ -52,72 +52,63 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
                 select: 'onAssocGridSelect'
             },
             '#workflowStepName': {
-                select: 'onWorkflowStepNameSelect'
+                select: 'onWorkflowStepNameSelect',
+                change:'checkDuplicates'
+            },
+            '#workflow':{
+                change:'checkDuplicates'
+            },
+            '#sourceLang':{
+                change:'checkDuplicates'
+            },
+            '#targetLang':{
+                change:'checkDuplicates'
+            },
+            '#userGuid':{
+                change:'checkDuplicates'
             }
         }
     },
 
     onSaveAssocBtnClick : function(){
+
         var me = this,
-            form = me.getView().down('form').getForm(),
-            record = form.getRecord(),
-            store = me.getView().down('grid').getStore();
+            view = me.getView(),
+            form = view.down('form').getForm(),
+            store = view.down('grid').getStore();
 
         if (form.isValid()) {
-            // Update associated record with values
-            form.updateRecord();
-            store.add(record);
-
-            record.save({
-                callback:function() {
-                    store.load();
-                    // call add new record for re-setting the form with empty record
-                    me.onAddAssocBtnClick();
-                }
-            });
+            store.sync();
         }
     },
 
     onCancelAssocBtnClick : function(){
-        var me = this;
-        // no event fire required -> set silent to true
-        me.getView().down('form').getForm().getRecord().reject(true);
+        this.cancelEditRecord();
     },
 
     onAddAssocBtnClick : function(){
         var me = this,
-            formPanel = me.getView().down('form'),
-            form = formPanel.getForm(),
+            grid = me.getView().down('grid'),
             newRecord = Ext.create('Editor.model.admin.UserAssocDefault',{
-                customerId : me.getViewModel().get('selectedCustomer'),
+                customerId : me.getViewModel().get('selectedCustomer').get('id'),
                 workflow: Editor.data.frontend.hasOwnProperty('import.defaultTaskWorkflow') ? Editor.data.frontend.import.defaultTaskWorkflow : 'default'
             });
-
-        formPanel.setDisabled(false);
-        // Clear form
-        form.reset();
-        // Set record
-        form.loadRecord(newRecord);
+        grid.getStore().rejectChanges();
+        grid.getStore().add(newRecord);
+        grid.setSelection(newRecord);
     },
 
     onDeleteAssocBtnClick : function (){
         var me = this;
-
         // Ask user to confirm this action
         Ext.Msg.confirm('Confirm Delete', 'Are you sure you want to delete this user?', function (result) {
-
             // User confirmed yes
             if (result === 'yes') {
-
                 var record = me.getViewModel().get('selectedAssocRecord'),
                     store = me.getView().down('grid').getStore();
-
                 // Delete record from store
                 store.remove(record);
-
-                // Hide display
-                me.showView('selectMessage');
-
+                store.sync();
             }
 
         });
@@ -128,16 +119,8 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
         me.getView().down('grid').getStore().load();
     },
 
-    onAssocGridSelect: function (rowmodel, record) {
-        var me = this,
-            formPanel = me.getView().down('form'),
-            form = formPanel.getForm();
+    onAssocGridSelect: function () {
 
-        // Set selected record
-        me.getViewModel().set('selectedAssocRecord', record);
-
-        // Load record model into form
-        form.loadRecord(record);
     },
 
     /***
@@ -161,5 +144,46 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
         var me = this,
             configStore = me.getView().up('#displayTabPanel').down('adminConfigGrid').getStore();
         return configStore.getConfig('workflow.default.'+step+'.defaultDeadlineDate');
+    },
+
+    /***
+     * Cancels form editing and resets the current form values
+     */
+    cancelEditRecord:function (){
+        var me=this,
+            grid = me.getView().down('grid');
+
+        grid.getStore().rejectChanges();
+        grid.getSelectionModel().deselectAll();
+    },
+
+    /***
+     * Check if the current new form record exist already.
+     * @param field
+     */
+    checkDuplicates:function (field){
+        var me = this,
+            grid = me.getView().down('grid'),
+            selection = grid.getSelection(),
+            record = selection.length === 1 ? selection[0] : false,
+            store = grid.getStore();
+
+        // if the record exist on the server, ignore the check ( the check is being triggered via selecting record in the grid)
+        if(!record || !record.phantom){
+            return;
+        }
+
+        store.each(function (r){
+            if(r.phantom){
+                return true;
+            }
+            field.duplicateRecord = r.toString() === record.toString();
+            field.clearInvalid();
+            if(field.duplicateRecord){
+                field.markInvalid('Duplicate field');
+                record.set(field.getName(),null);
+                return false;
+            }
+        });
     }
 });
