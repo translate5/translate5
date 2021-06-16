@@ -49,7 +49,18 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     },
 
     onDisplayTabPanelTabChange: function (tabPanel,newActiveTab){
-        this.updateActiveTabViewModel(newActiveTab);
+        var me=this,
+            grid = newActiveTab.down('grid');
+        me.updateActiveTabViewModel(newActiveTab);
+
+        // reload the store when the card is changed. This must be done because the grid store is not loaded
+        // after the component is rendered
+        if(grid && grid.getStore() && !grid.getStore().isLoaded()){
+            if(grid.getViewModel()){
+                grid.getViewModel().notify();
+            }
+            grid.getStore().load();
+        }
     },
 
     onDisplayTabPanelActivate:function (tabPanel){

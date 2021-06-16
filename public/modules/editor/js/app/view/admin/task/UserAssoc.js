@@ -35,6 +35,10 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   ],
   alias: 'widget.adminTaskUserAssoc',
   itemId:'adminTaskUserAssoc',
+    mixins:['Editor.controller.admin.IWizardCard'],
+    //card type, used for card display order
+    importType:'postimport',
+    task:null,
   strings: {
       fieldRole: '#UT#Rolle',
       fieldState: '#UT#Status',
@@ -64,6 +68,12 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       title: me.title, //see EXT6UPD-9
       items: [{
           xtype: 'adminTaskUserAssocGrid',
+          bind:{
+              //INFO: this will load only the users of the task when projectTaskGrid selection is changed
+              //override the store binding in the place where the component is used/defined
+              //the default usage is in the task properties panel
+              store:'{userAssoc}'
+          },
           region: 'center'
       },{
           xtype: 'container',
