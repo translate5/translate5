@@ -34,7 +34,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.admin.customer.UserCustomersCombo',
         'Editor.view.LanguageCombo',
         'Editor.view.admin.config.ConfigWizard',
-        'Editor.view.admin.task.UserAssoc',
+        'Editor.view.admin.task.UserAssocWizard',
         'Editor.view.admin.user.AssocImportWizardViewModel'
     ],
     mixins:[
@@ -99,8 +99,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
             },'postimport');
             
             win.insertCard({
-                xtype:'adminTaskUserAssoc',
-                itemId:'adminTaskUserAssoc',
+                xtype:'adminTaskUserAssocWizard',
+                itemId:'adminTaskUserAssocWizard',
                 viewModel:{
                     type:'adminUserImportWizardAssoc'
                 },
