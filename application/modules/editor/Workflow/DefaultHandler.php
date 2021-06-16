@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Default Workflow regarding action invocations, roles, states and basic steps.
+ * Handler functions for the Default Workflow.
  * Default roles are:
  * - translator
  * - reviewer
@@ -41,9 +41,8 @@ END LICENSE AND COPYRIGHT
  * - workflowEnded as final step
  * All other steps are loaded from the database step configuration list
  */
-class editor_Workflow_Default extends editor_Workflow_Abstract {
-    public function __construct($name) {
-        parent::__construct($name);
+class editor_Workflow_DefaultHandler {
+    public function __construct() {
         $this->events->addIdentifiers(__CLASS__);
     }
     
