@@ -549,8 +549,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $upload->initAndValidate();
             $dp = $dpFactory->createFromUpload($upload);
 
-            $projectGuids = [];
-
             //PROJECT with multiple target languages
             if($this->entity->isProject()) {
                 $entityId=$this->entity->save();
@@ -581,8 +579,6 @@ class editor_TaskController extends ZfExtended_RestController {
                     
                     //update the task usage log for the this project-task
                     $this->insertTaskUsageLog($task);
-
-                    $projectGuids[] = $task->getTaskGuid();
                 }
                 
                 $this->entity->setState($this->entity::INITIAL_TASKTYPE_PROJECT);
@@ -604,8 +600,6 @@ class editor_TaskController extends ZfExtended_RestController {
                     //update the task usage log for the current task
                     $this->insertTaskUsageLog($this->entity);
                 }
-
-                $projectGuids[] = $this->entity->getTaskGuid();
             }
 
             //warn the api user for the targetDeliveryDate ussage
@@ -624,11 +618,6 @@ class editor_TaskController extends ZfExtended_RestController {
 
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
-
-            if(!empty($projectGuids)){
-                settype($this->view->rows->projectGuids,'array');
-                $this->view->rows->projectGuids = $projectGuids;
-            }
         }
         else {
             //we have to prevent attached events, since when we get here the task is not created, which would lead to task not found errors,
