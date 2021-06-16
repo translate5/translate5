@@ -144,8 +144,8 @@ class editor_Workflow_DefaultHandler {
         $sendNotice = function($step) {
             $msg = ZfExtended_Factory::get('ZfExtended_Models_Messages');
             /* @var $msg ZfExtended_Models_Messages */
-            $labels = $this->getLabels();
-            $steps = $this->getSteps();
+            $labels = $this->workflow->getLabels();
+            $steps = $this->workflow->getSteps();
             $step = $labels[array_search($step, $steps)];
             $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
         };

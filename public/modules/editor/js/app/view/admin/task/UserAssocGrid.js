@@ -40,6 +40,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
       userGuidCol: '#UT#Benutzer',
       roleCol: '#UT#Rolle',
+      stepCol: '#UT#Workflowschritt',
       segmentrangeCol: '#UT#Segmente',
       stateCol: '#UT#Status',
       addUser: '#UT#Hinzufügen',
@@ -94,6 +95,17 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               return role;
           },
           text: me.strings.roleCol
+      },{
+          xtype: 'gridcolumn',
+          width: 100,
+          dataIndex: 'workflowStepName',
+          renderer: function(v,meta,rec) {
+              var task=me.lookupViewModel().get('currentTask'),
+                vfm=task && task.getWorkflowMetaData(),
+              	step=(vfm && vfm.steps && vfm.steps[v]) || v;
+              return step;
+          },
+          text: me.strings.stepCol
       },{
           xtype: 'gridcolumn',
           width: 70,
