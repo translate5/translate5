@@ -85,7 +85,7 @@ class editor_Workflow_Manager {
     /**
      * returns a new workflow instance by given string ID (e.g. default for "Default" Workflow)
      * @param string $wfName
-     * @return editor_Workflow_Abstract
+     * @return editor_Workflow_Default
      */
     public function get($wfName) {
         if(empty(self::$workflowList[$wfName])) {
@@ -99,7 +99,7 @@ class editor_Workflow_Manager {
      * returns a workflow instance by given string ID, caches the workflow instances internally
      * @see self::get
      * @param string $wfId
-     * @return editor_Workflow_Abstract
+     * @return editor_Workflow_Default
      */
     public function getCached($wfName) {
         if(empty($this->instances[$wfName])) {
@@ -111,7 +111,7 @@ class editor_Workflow_Manager {
     /**
      * returns the workflow for the given task
      * @param editor_Models_Task $task
-     * @return editor_Workflow_Abstract
+     * @return editor_Workflow_Default
      */
     public function getByTask(editor_Models_Task $task) {
         return $this->get($task->getWorkflow());
@@ -130,10 +130,10 @@ class editor_Workflow_Manager {
         //only constants of the abstract and therefore always available workflow are allowed to be listed here
         //since only a subset of all constants of the abstract is needed, this manual sub selection is OK.
         return [
-            'STEP_NO_WORKFLOW' => editor_Workflow_Abstract::STEP_NO_WORKFLOW,
-            'ROLE_TRANSLATOR' => editor_Workflow_Abstract::ROLE_TRANSLATOR,
-            'ROLE_REVIEWER' => editor_Workflow_Abstract::ROLE_REVIEWER,
-            'ROLE_TRANSLATORCHECK' => editor_Workflow_Abstract::ROLE_TRANSLATORCHECK,
+            'STEP_NO_WORKFLOW' => editor_Workflow_Default::STEP_NO_WORKFLOW,
+            'ROLE_TRANSLATOR' => editor_Workflow_Default::ROLE_TRANSLATOR,
+            'ROLE_REVIEWER' => editor_Workflow_Default::ROLE_REVIEWER,
+            'ROLE_TRANSLATORCHECK' => editor_Workflow_Default::ROLE_TRANSLATORCHECK,
         ];
     }
     
@@ -159,7 +159,7 @@ class editor_Workflow_Manager {
         };
         foreach(self::$workflowList as $name => $cls) {
             $wf = $this->get($name);
-            /* @var $wf editor_Workflow_Abstract */
+            /* @var $wf editor_Workflow_Default */
             $labels = $wf->getLabels();
             $data = new stdClass();
             $data->id = $name;
@@ -191,7 +191,7 @@ class editor_Workflow_Manager {
     /***
      * Return default configured task workflow in zf configuration. The config to define the default
      * task (import ) workflow is : runtimeOptions.import.taskWorkflow
-     * @return editor_Workflow_Abstract|null
+     * @return editor_Workflow_Default|null
      * @throws Zend_Exception
      * @throws editor_Workflow_Exception
      */
@@ -206,7 +206,7 @@ class editor_Workflow_Manager {
     /**
      * returns the workflow for the given taskGuid, if no taskGuid given take config.import.taskWorkflow as default
      * @param string|editor_Models_Task $taskOrGuid
-     * @return editor_Workflow_Abstract
+     * @return editor_Workflow_Default
      */
     public function getActive($taskOrGuid = null) {
         if(empty($taskOrGuid)) {

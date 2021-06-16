@@ -138,11 +138,11 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         //lector deprecated message
         $lectorUsed = false;
         if(is_object($this->data) && property_exists($this->data, 'role') && $this->data->role == 'lector') {
-            $this->data->role = editor_Workflow_Abstract::ROLE_REVIEWER;
+            $this->data->role = editor_Workflow_Default::ROLE_REVIEWER;
             $lectorUsed = true;
         }
         elseif(is_array($this->data) && array_key_exists('role', $this->data) && $this->data['role'] == 'lector') {
-            $this->data['role'] = editor_Workflow_Abstract::ROLE_REVIEWER;
+            $this->data['role'] = editor_Workflow_Default::ROLE_REVIEWER;
             $lectorUsed = true;
         }
         if($lectorUsed) {
@@ -168,7 +168,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->task->loadByTaskGuid($this->entity->getTaskGuid());
         $this->log->request();
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
-        /* @var $workflow editor_Workflow_Abstract */
+        /* @var $workflow editor_Workflow_Default */
         
         //here checks the isWritable if the tua is already in editing mode... Not as intended.
         if(!empty($this->entity->getUsedState()) && $workflow->isWriteable($this->entity, true)) {
@@ -259,7 +259,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->task->loadByTaskGuid($this->entity->getTaskGuid());
         $this->log->request();
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
-        /* @var $workflow editor_Workflow_Abstract */
+        /* @var $workflow editor_Workflow_Default */
         $this->checkAuthenticatedIsParentOfEntity();
         $this->processClientReferenceVersion();
         $entity = clone $this->entity;

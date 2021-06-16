@@ -34,11 +34,11 @@ class editor_Plugins_ManualStatusCheck_Bootstrap extends ZfExtended_Plugin_Abstr
     protected static $description = 'This Plugin checks if all segments has a manual status set. If not, the task can not be finished.';
     
     public function init() {
-        $this->eventManager->attach('editor_Workflow_Abstract', 'beforeFinish', array($this, 'handleBeforeFinish'));
+        $this->eventManager->attach('editor_Workflow_Default', 'beforeFinish', array($this, 'handleBeforeFinish'));
     }
     
     /**
-     * handler for event: editor_Workflow_Abstract#handleBeforeFinish
+     * handler for event: editor_Workflow_Default#handleBeforeFinish
      * @param $event Zend_EventManager_Event
      */
     public function handleBeforeFinish(Zend_EventManager_Event $event) {

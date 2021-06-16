@@ -185,7 +185,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
         if (!empty($segment->comment)) {
             $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
             /* @var $wfm editor_Workflow_Manager */
-            $wfm->getActive($this->task->getTaskGuid())->beforeCommentedSegmentSave($t5Segment, $this->task);
+            $wfm->getActive($this->task->getTaskGuid())->getHandler()->beforeCommentedSegmentSave($t5Segment, $this->task);
             $comment = $this->addComment($segment->comment, $t5Segment);
             $comment->updateSegment($t5Segment, $this->task->getTaskGuid());
         }

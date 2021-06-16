@@ -396,7 +396,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
 
     protected function _cleanupLocked($taskGuid = null, $forced = false) {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($taskGuid);
-        /* @var $workflow editor_Workflow_Abstract */
+        /* @var $workflow editor_Workflow_Default */
 
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
         $where = array('not usedState is null and (usedInternalSessionUniqId not in ('.$validSessionIds.') or usedInternalSessionUniqId is null)');
@@ -487,7 +487,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
         //if the states are not set uset the default states for kpi
         if(empty($states)){
-            $states=[editor_Workflow_Abstract::ROLE_REVIEWER,editor_Workflow_Abstract::ROLE_TRANSLATOR,editor_Workflow_Abstract::ROLE_TRANSLATORCHECK];
+            $states=[editor_Workflow_Default::ROLE_REVIEWER,editor_Workflow_Default::ROLE_TRANSLATOR,editor_Workflow_Default::ROLE_TRANSLATORCHECK];
         }
         $s = $this->db->select()
         ->where('taskGuid IN(?)', $taskGuids)
@@ -515,7 +515,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
 
     public function updateReviewersFinishDate(string $taskGuid,string $date){
         $this->db->update(['finishedDate'=>$date],
-            ['taskGuid=?' => $taskGuid,'role=?' => editor_Workflow_Abstract::ROLE_REVIEWER]);
+            ['taskGuid=?' => $taskGuid,'role=?' => editor_Workflow_Default::ROLE_REVIEWER]);
     }
     
     /**

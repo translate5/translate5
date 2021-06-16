@@ -288,7 +288,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             $this->userTaskAssoc->setIsPmOverride(true);
             $this->userTaskAssoc->setUsedInternalSessionUniqId(null);
             $this->userTaskAssoc->setUsedState(null);
-            $this->userTaskAssoc->setState(editor_Workflow_Abstract::STATE_EDIT);
+            $this->userTaskAssoc->setState(editor_Workflow_Default::STATE_EDIT);
         }
     }
     
