@@ -95,7 +95,7 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
             /* @var $model editor_Models_TaskUserAssoc */
             $model->setTaskGuid($task->getTaskGuid());
             $model->setUserGuid($assoc['userGuid']);
-            $model->setState($initialStates[$assoc['workflowStepName']][$role]);
+            $model->setState($initialStates[$task->getWorkflowStepName()][$assoc['workflowStepName']]);
             $model->setRole($role);
             $model->setSegmentrange($assoc['segmentrange']);
             $model->setDeadlineDate(editor_Utils::addBusinessDays($task->getOrderdate(),$assoc['deadlineDate']));

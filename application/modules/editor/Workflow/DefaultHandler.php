@@ -144,8 +144,8 @@ class editor_Workflow_DefaultHandler {
         $sendNotice = function($step) {
             $msg = ZfExtended_Factory::get('ZfExtended_Models_Messages');
             /* @var $msg ZfExtended_Models_Messages */
-            $labels = $this->getLabels();
-            $steps = $this->getSteps();
+            $labels = $this->workflow->getLabels();
+            $steps = $this->workflow->getSteps();
             $step = $labels[array_search($step, $steps)];
             $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
         };
@@ -161,21 +161,20 @@ class editor_Workflow_DefaultHandler {
         
         $tuas = $tua->loadByTaskGuidList([$taskGuid]);
         
-        $steps2Roles = $this->workflow->getSteps2Roles();
-        $areTuasSubset = function($toCompare, $currentStep) use ($tuas, $steps2Roles){
-            $hasRoleToCurrentStep = false;
+        $areTuasSubset = function($toCompare, $currentStep) use ($tuas){
+            $hasStepToCurrentTaskStep = false;
             foreach($tuas as $tua) {
-                if(empty($toCompare[$tua['role']])) {
+                if(empty($toCompare[$tua['workflowStepName']])) {
                     return false;
                 }
-                if(!in_array($tua['state'], $toCompare[$tua['role']])) {
+                if(!in_array($tua['state'], $toCompare[$tua['workflowStepName']])) {
                     return false;
                 }
-                $hasRoleToCurrentStep = $hasRoleToCurrentStep || (($steps2Roles[$currentStep] ?? '') == $tua['role']);
+                $hasStepToCurrentTaskStep = $hasStepToCurrentTaskStep || ($currentStep == $tua['workflowStepName']);
             }
             //we can only return true, if the Tuas contain at least one role belonging to the currentStep,
             // in other words we can not reset the task to reviewing, if we do not have a reviewer
-            return $hasRoleToCurrentStep;
+            return $hasStepToCurrentTaskStep;
         };
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
@@ -192,7 +191,6 @@ class editor_Workflow_DefaultHandler {
         if(empty($tuas) && count($tuas)==$pmOvverideCount){
             $matchingSteps[]=$this->workflow::STEP_NO_WORKFLOW;
         }else{
-            //FIXME validState access
             foreach($this->workflow->getValidStates() as $step => $roleStates) {
                 if(!$areTuasSubset($roleStates, $step)) {
                     continue;

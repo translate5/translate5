@@ -180,7 +180,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $tuaNew = clone $tua;
             $tuaNew->setState($workflow::STATE_FINISH);
             $tuaNew->validate();
-            $workflow->triggerBeforeEvents($tua, $tuaNew);
+            $workflow->getHandler()->triggerBeforeEvents($tua, $tuaNew);
             $tuaNew->save();
             $workflow->getHandler()->doWithUserAssoc($tua, $tuaNew);
         }

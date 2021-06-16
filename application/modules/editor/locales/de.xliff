@@ -1982,6 +1982,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='TnVyIHdpZWRlcmhvbHQ='><source>Nur wiederholt</source><target>Nur wiederholt</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQtQmVudXR6ZXJ6dXdlaXN1bmdlbg=='><source>Standard-Benutzerzuweisungen</source><target>Standard-Benutzerzuweisungen</target></trans-unit>
 <trans-unit id='V29ya2Zsb3ctU2Nocml0dA=='><source>Workflow-Schritt</source><target>Workflow-Schritt</target></trans-unit>
+<trans-unit id='V29ya2Zsb3dzY2hyaXR0'><source>Workflowschritt</source><target>Workflowschritt</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -168,7 +168,7 @@ class editor_Workflow_Manager {
             
             $data->roles = $labelize($wf->getRoles(), $cls, $labels);
             
-            $data->editableRoles = $labelize($wf->getAddableRoles(), $cls, $labels);
+            $data->usableSteps = $labelize($wf->getUsableSteps(), $cls, $labels);
             
             $allStates = $wf->getStates();
             $pendingStates = $wf->getPendingStates();
@@ -178,8 +178,6 @@ class editor_Workflow_Manager {
             $data->steps = $labelize($wf->getSteps(), $cls, $labels);
             $data->assignableSteps = $labelize($wf->getAssignableSteps(), $cls, $labels);
             $data->steps2roles = $wf->getSteps2Roles();
-    //FIXME this will not work anymore, check usage!
-            $data->roles2steps = array_flip($data->steps2roles);
             $data->stepChain = $wf->getStepChain();
             $data->stepsWithFilter = $wf->getStepsWithFilter();
             $data->initialStates = $wf->getInitialStates();
