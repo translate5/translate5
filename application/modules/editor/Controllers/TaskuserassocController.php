@@ -73,7 +73,15 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->applyEditableAndDeletable();
         //$this->addSegmentrangesToResult();
     }
-    
+
+    public function projectAction(){
+        $projectId = $this->getParam('projectId');
+        if(empty($projectId)){
+            return;
+        }
+        $this->view->rows = $this->entity->loadProjectWithUserInfo($projectId);
+    }
+
     public function postDispatch() {
         $user = new Zend_Session_Namespace('user');
         $acl = ZfExtended_Acl::getInstance();

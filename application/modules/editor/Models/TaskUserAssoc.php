@@ -257,6 +257,34 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         return $this->loadFilterdCustom($s);
     }
 
+    /***
+     * Load all user assoc for all tasks in a project. This will load also the single task projects.
+     *
+     * @param int $projectId
+     * @return array
+     * @throws Zend_Db_Table_Exception
+     */
+    public function loadProjectWithUserInfo(int $projectId){
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        $db = $this->db;
+        $s = $db->select()
+            ->setIntegrityCheck(false)
+            ->from(array('tua' => $db->info($db::NAME)))
+            ->join(array('u' => $user->db->info($db::NAME)), 'tua.userGuid = u.userGuid', array('login', 'surName', 'firstName', 'parentIds'))
+            ->join(['t'=>'LEK_task'],'t.taskGuid = tua.taskGuid',['t.sourceLang','t.targetLang'])
+            ->where('tua.isPmOverride = 0')
+            ->where('t.projectId = ?',$projectId)
+            ->where('t.taskType != ?',editor_Models_Task::INITIAL_TASKTYPE_PROJECT);
+
+        //default sort:
+        if(!$this->filter->hasSort()) {
+            $this->filter->addSort('surName');
+            $this->filter->addSort('firstName');
+            $this->filter->addSort('login');
+        }
+        return $db->fetchAll($s)->toArray();
+    }
+
 
     /**
      * (non-PHPdoc)

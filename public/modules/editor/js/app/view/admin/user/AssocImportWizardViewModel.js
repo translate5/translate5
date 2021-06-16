@@ -31,8 +31,7 @@ Ext.define('Editor.view.admin.user.AssocImportWizardViewModel', {
     alias: 'viewmodel.adminUserImportWizardAssoc',
 
     data:{
-        selectedCustomer : false,
-        selectedAssocRecord : false
+        selectedCustomer : false
     },
 
     stores: {
@@ -45,20 +44,30 @@ Ext.define('Editor.view.admin.user.AssocImportWizardViewModel', {
             model:'Editor.model.admin.TaskUserAssoc',
             remoteFilter: true,
             pageSize: false,
+            autoLoad:false,
             groupField: 'targetLang',
-            setFilters:function(filters){
-                // ignore the firing on empty value
-                if(filters && !filters.value){
-                    this.loadData([],false);
-                    return;
-                }
-                this.superclass.superclass.setFilters.apply(this, [filters]);
-                this.reload();
+            /***
+             * Add additional params to the store proxy. The newExtra params will be merged into
+             * the existing proxy extra params
+             */
+            setExtraParams:function(newExtra){
+                var me=this,
+                    existing = me.getProxy().getExtraParams(),
+                    merged = Ext.Object.merge(existing, newExtra);
+                me.getProxy().setExtraParams(merged);
             },
-            filters:{
-                property: 'taskGuid',
-                operator:"in",
-                value:'{currentTask.projectGuids}'
+            proxy : {
+                type : 'rest',
+                url: Editor.data.restpath+'taskuserassoc/project',
+                reader : {
+                    rootProperty: 'rows',
+                    type : 'json'
+                },
+                writer: {
+                    encode: true,
+                    rootProperty: 'data',
+                    writeAllFields: false
+                }
             }
         }
     }
