@@ -111,7 +111,7 @@ class editor_Models_Import_Worker_Import {
         //init default user prefs
         $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $workflowManager editor_Workflow_Manager */
-        $workflowManager->getByTask($this->task)->doImport($this->task, $importConfig);
+        $workflowManager->getByTask($this->task)->getHandler()->doImport($this->task, $importConfig);
         $workflowManager->initDefaultUserPrefs($this->task);
         
         $this->events->trigger('importCleanup', $this, ['task' => $task, 'importConfig' => $importConfig]);

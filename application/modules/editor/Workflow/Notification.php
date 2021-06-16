@@ -224,7 +224,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $workflow = $this->config->workflow;
-        $isCron = $workflow->isCalledByCron();
+        $isCron = $workflow->getHandler()->isCalledByCron();
         $triggeringRole = $this->config->newTua->getRole();
         $currentStep = $this->config->newTua->getWorkflowStepName();
         $this->tua = clone $this->config->newTua; //we just reuse the already used entity
@@ -238,7 +238,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $segmentHash = md5(print_r($segments,1)); //hash to identify the given segments (for internal caching)
         
-        $nextRole = $workflow->getRoleOfStep((string)$workflow->getNextStep($currentStep));
+        $nextRole = $workflow->getRoleOfStep((string)$workflow->getNextStep($task, $currentStep));
         
         
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
@@ -288,7 +288,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $workflow = $this->config->workflow;
-        $isCron = $workflow->isCalledByCron();
+        $isCron = $workflow->getHandler()->isCalledByCron();
         if($isCron) {
             //currently we do not trigger the notifyOne on cron actions (since currently there are all users set to finish)
             return;
