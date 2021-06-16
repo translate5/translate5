@@ -4128,7 +4128,11 @@ The following task was imported with errors / warnings / notices. Please take ca
 </trans-unit>
 <trans-unit id='V29ya2Zsb3ctU2Nocml0dA=='>
   <source>Workflow-Schritt</source>
-  <target>Workflow step</target>
+  <target>Workflow-step</target>
+</trans-unit>
+<trans-unit id='V29ya2Zsb3dzY2hyaXR0'>
+    <source>Workflowschritt</source>
+    <target>Workflow-step</target>
 </trans-unit>
 </body>
   </file>

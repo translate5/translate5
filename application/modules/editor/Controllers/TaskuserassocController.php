@@ -143,27 +143,41 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     protected function decodePutData() {
         parent::decodePutData();
         
+        $this->data = (object) $this->data;
+        
+        //if both is set, we remove role in favour of step
+        if(property_exists($this->data, 'workflowStepName') && property_exists($this->data, 'role')) {
+            unset($this->data->role);
+        }
+        
         //lector deprecated message
-        $lectorUsed = false;
-        if(is_object($this->data) && property_exists($this->data, 'role') && $this->data->role == 'lector') {
+        if(property_exists($this->data, 'role') && $this->data->role == 'lector') {
             $this->data->role = editor_Workflow_Default::ROLE_REVIEWER;
-            $lectorUsed = true;
-        }
-        elseif(is_array($this->data) && array_key_exists('role', $this->data) && $this->data['role'] == 'lector') {
-            $this->data['role'] = editor_Workflow_Default::ROLE_REVIEWER;
-            $lectorUsed = true;
-        }
-        if($lectorUsed) {
             Zend_Registry::get('logger')->warn('E1232', 'Job creation: role "lector" is deprecated, use "reviewer" instead!');
+        }
+
+        //on post the task is not intialized yet
+        if($this->task->getId() == 0) {
+            $this->task->loadByTaskGuid($this->data->taskGuid);
+        }
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
+        /* @var $workflow editor_Workflow_Default */
+        
+        //we have to get the role from the workflowStepName
+        if(property_exists($this->data, 'workflowStepName')) {
+            $this->data->role = $workflow->getRoleOfStep($this->data->workflowStepName);
+        }
+        //we have to get the step from the role (the first found step to the role)
+        elseif(property_exists($this->data, 'role')) {
+            $steps = $workflow->getSteps2Roles();
+            $roles = array_flip(array_reverse($steps));
+            $this->data->workflowStepName = $roles[$this->data->role] ?? null;
+            Zend_Registry::get('logger')->warn('E1232', 'Job creation: using role as parameter on job creation is deprecated, use workflowStepName instead');
         }
         
         //may not be set from outside!
-        if(is_object($this->data) && property_exists($this->data, 'staticAuthHash')) {
+        if(property_exists($this->data, 'staticAuthHash')) {
             unset($this->data->staticAuthHash);
-            return;
-        }
-        if(is_array($this->data) && array_key_exists('staticAuthHash', $this->data)) {
-            unset($this->data['staticAuthHash']);
         }
     }
     
@@ -230,7 +244,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         }
         
         $this->entity->validate();
-        $workflow->triggerBeforeEvents($oldEntity, $this->entity);
+        $workflow->getHandler()->triggerBeforeEvents($oldEntity, $this->entity);
         $this->entity->save();
 
         $workflow->getHandler()->doWithUserAssoc($oldEntity, $this->entity);
@@ -426,6 +440,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $workflow = $wm->get($model->getWorkflow());
 
         $step = $this->data->workflowStepName;
+//FIXME fallback from default workflow if step/workflow is not defined!
         //get the config for the task workflow and the user assoc role workflow step
         $configValue = $model->getConfig()->runtimeOptions->workflow->{$model->getWorkflow()}->{$step}->defaultDeadlineDate ?? 0;
         if($configValue <= 0){

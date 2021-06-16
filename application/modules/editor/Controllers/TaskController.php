@@ -1420,7 +1420,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
 
         if(!$disableWorkflowEvents) {
-            $this->workflow->triggerBeforeEvents($oldUserTaskAssoc, $userTaskAssoc);
+            $this->workflow->getHandler()->triggerBeforeEvents($oldUserTaskAssoc, $userTaskAssoc);
         }
 
         $userTaskAssoc->save();

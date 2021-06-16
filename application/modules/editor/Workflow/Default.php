@@ -191,25 +191,25 @@ class editor_Workflow_Default {
      */
     protected $validStates = [
         //FIXME dummy data, must be calculated depending on the DB content
-'translation' => [
-            self::ROLE_TRANSLATOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-            self::ROLE_REVIEWER => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
-            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
+        'translation' => [
+            'translation' => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+            'reviewing' => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
+            'translatorCheck' => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
         ],
         'reviewing' => [
-            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-            self::ROLE_REVIEWER => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
+            'translation' => [self::STATE_FINISH],
+            'reviewing' => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+            'translatorCheck' => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
         ],
         'translatorCheck' => [
-            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-            self::ROLE_REVIEWER => [self::STATE_FINISH],
-            self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+            'translation' => [self::STATE_FINISH],
+            'reviewing' => [self::STATE_FINISH],
+            'translatorCheck' => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
         ],
         self::STEP_WORKFLOW_ENDED => [
-            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-            self::ROLE_REVIEWER => [self::STATE_FINISH],
-            self::ROLE_TRANSLATORCHECK => [self::STATE_FINISH],
+            'translation' => [self::STATE_FINISH],
+            'reviewing' => [self::STATE_FINISH],
+            'translatorCheck' => [self::STATE_FINISH],
         ],
     ];
     
@@ -338,11 +338,11 @@ class editor_Workflow_Default {
      */
     public function getInitialStates() {
         $result = [];
-        foreach($this->validStates as $step => $statesToRoles) {
+        foreach($this->validStates as $step => $statesToSteps) {
             $result[$step] = [];
-            foreach($statesToRoles as $role => $states) {
+            foreach($statesToSteps as $stepInner => $states) {
                 //the initial state per role is just the first defined state per role
-                $result[$step][$role] = reset($states);
+                $result[$step][$stepInner] = reset($states);
             }
         }
         return $result;
@@ -444,17 +444,16 @@ class editor_Workflow_Default {
     }
     
     /**
-     * returns an array of wf roles which are allowed by the current user to be used in task user associations
-     * @return array of for the authenticated user usable role constants (keys are constants, valus are constant-values)
+     * returns a subset of getAssignableSteps, respecting the rights of the current user filtering the steps which are not allowed to be used by the current user in task user associations
+     * @return array
      */
-    public function getAddableRoles(){
-        $roles = $this->getRoles();
+    public function getUsableSteps(): array {
+        $steps = $this->getAssignableSteps();
         //FIXME instead of checking the roles a user have,
         //this must come from ACL table analogous to setaclrole, use a setwfrole then
-        // check sub classes on refactoring too!
         $user = new Zend_Session_Namespace('user');
         if(in_array(ACL_ROLE_PM, $user->data->roles)) {
-            return $roles;
+            return $steps;
         }
         return [];
     }

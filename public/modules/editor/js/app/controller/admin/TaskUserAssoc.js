@@ -147,24 +147,28 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           task = me.getPrefWindow().getCurrentTask(),
           meta = task.getWorkflowMetaData(),
           usageMode = task.get('usageMode'),
-          role = meta.steps2roles[task.get('workflowStepName')] || Ext.Object.getKeys(meta.roles)[0],
+          step = task.get('workflowStepName'),
           state = Ext.Object.getKeys(meta.states)[0],
           isTranslationTask=task.get('emptyTargets'),
           newRec;
       
+      if(! meta.usableSteps[step]) {
+          step = Ext.Object.getKeys(meta.usableSteps)[0];
+      }
+
       //in competitive mode instead OPEN / UNCONFIRMED is used
       if(usageMode == task.USAGE_MODE_COMPETITIVE && state == task.USER_STATE_OPEN){
           state = task.USER_STATE_UNCONFIRMED;
       }
-      //set the default role to translator when the task is translation task and
+      //set the default step to the first translation step when the task is translation task and
       //the workflow name is no workflow
       if(isTranslationTask && task.isNoWorkflowStep()){
-          //FIXME improve from current workflow? Also set step here and not only role! Should be fixed by Aleks
-          role = Editor.data.app.workflow.CONST.ROLE_TRANSLATOR;
+          //load first translation step
+          step = Ext.Object.getKey(meta.steps2roles, Editor.data.app.workflow.CONST.ROLE_TRANSLATOR);
       }
       newRec = assoc.model.create({
           taskGuid: task.get('taskGuid'),
-          role: role,
+          workflowStepName: step,
           state: state
       });
       me.getAssocDelBtn().disable();
@@ -173,7 +177,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       me.getUserAssocForm().setDisabled(false);
       me.getUserAssocSegmentrange().setDisabled(usageMode !== task.USAGE_MODE_SIMULTANEOUS);
       me.getUserAssoc().loadRecord(newRec);
-      me.initState(null, role, '');
+      me.initState(null, step, '');
   },
   
   /**
@@ -286,12 +290,12 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   },
 
   /**
-   * sets the initial state value dependent on the role
+   * sets the initial state value dependent on the step
    * @param {Ext.form.field.ComboBox} roleCombo
-   * @param {String} newValue
+   * @param {String} step
    * @param {String} oldValue
    */
-  initState: function(roleCombo, newValue, oldValue) {
+  initState: function(roleCombo, step, oldValue) {
       var me = this,
           form = me.getUserAssocForm(),
           task = me.getPrefWindow().getCurrentTask(),
@@ -306,7 +310,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       stateCombo.store.clearFilter();
       
       //set the default deadline date when the form state is initialized
-      me.setWorkflowStepDefaultDeadline(task,meta["roles2steps"][newValue],rec);
+      me.setWorkflowStepDefaultDeadline(task,step,rec);
       
       if(!rec.phantom || isChanged) {
           return;
@@ -316,21 +320,21 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       stateCombo.store.addFilter(function(item){
           return item.get('id') != Editor.model.admin.Task.prototype.USER_STATE_FINISH;
       });
-      if(initialStates && initialStates[newValue]) {
-          newState = initialStates[newValue];
+      if(initialStates && initialStates[step]) {
+          newState = initialStates[step];
       }
       if(isCompetitive && newState == task.USER_STATE_OPEN) {
           newState = task.USER_STATE_UNCONFIRMED;
       }
       rec.set('state', newState);
       stateCombo.setValue(newState);
-      me.filterUserCombo(newValue)
+      me.filterUserCombo(step)
   },
 
   /***
    * Filter the user combo store based on the selected user role. The user can be assigned only onece per role.
    */
-  filterUserCombo:function(userRole){
+  filterUserCombo:function(userStep){
       var me = this,
         form = me.getUserAssocForm(),
         userAssocGrid=me.getUserAssocGrid(),
@@ -339,7 +343,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       
       //collect all userGuids for the current role
       userAssocGrid.getStore().each(function(rec){
-          if(rec.get('role')==userRole){
+          if(rec.get('workflowStepName')==userStep){
             tuaUsers.push(rec.get('userGuid'));
           }
       });
