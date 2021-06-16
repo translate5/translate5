@@ -61,13 +61,14 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
     },
 
     initComponent:function(){
-        var me=this;
-        var newColumns = [];
-        if(newColumns.length>0){
-            me.columns.items = newColumns;
-        }
+        var me=this,
+            gridConfig = me.items[0];
+        gridConfig.features= [{
+            ftype: 'grouping',
+            startCollapsed: true,
+            groupHeaderTpl: '{targetLang} ({rows.length})'
+        }];
         me.callParent();
-debugger;
         me.loadCustomConfig();
     },
 
@@ -77,7 +78,47 @@ debugger;
         assocGrid.down('#userSpecialPropertiesBtn').setHidden(true);
         assocGrid.down('#reload-btn').setHidden(true);
 
-        assocGrid.columns = [];
+        assocGrid.reconfigure(assocGrid.getStore(),[{
+            xtype: 'gridcolumn',
+            width: 230,
+            dataIndex: 'sourceLang',
+            text: 'Source'
+        },{
+            xtype: 'gridcolumn',
+            width: 230,
+            dataIndex: 'targetLang',
+            text: 'Target'
+        },{
+            xtype: 'gridcolumn',
+            width: 230,
+            dataIndex: 'login',
+            renderer: function(v, meta, rec) {
+                if(Editor.data.debug) {
+                    v = Ext.String.format('<a href="{0}session/?authhash={1}">{2}</a>', Editor.data.restpath, rec.get('staticAuthHash'), v);
+                }
+                return rec.get('surName')+', '+rec.get('firstName')+' ('+v+')';
+            },
+            filter: {
+                type: 'string'
+            },
+            text: assocGrid.strings.userGuidCol
+        },{
+            xtype: 'gridcolumn',
+            width: 100,
+            dataIndex: 'role',
+            renderer: function(v,meta,rec) {
+                var task=me.lookupViewModel().get('currentTask'),
+                    vfm=task && task.getWorkflowMetaData(),
+                    role=(vfm && vfm.roles && vfm.roles[v]) || v;
+                return role;
+            },
+            text: assocGrid.strings.roleCol
+        },{
+            xtype: 'gridcolumn',
+            width: 70,
+            dataIndex: 'segmentrange',
+            text: assocGrid.strings.segmentrangeCol
+        }]);
     },
 
     /***
