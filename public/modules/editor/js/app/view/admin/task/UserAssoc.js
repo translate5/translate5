@@ -35,10 +35,6 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   ],
   alias: 'widget.adminTaskUserAssoc',
   itemId:'adminTaskUserAssoc',
-    mixins:['Editor.controller.admin.IWizardCard'],
-    //card type, used for card display order
-    importType:'postimport',
-    task:null,
   strings: {
       fieldStep: '#UT#Workflowschritt',
       fieldState: '#UT#Status',
