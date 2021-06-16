@@ -189,29 +189,7 @@ class editor_Workflow_Default {
      * the first state of the states array is also the default state for that step and role
      * @var array
      */
-    protected $validStates = [
-        //FIXME dummy data, must be calculated depending on the DB content
-        'translation' => [
-            'translation' => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-            'reviewing' => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
-            'translatorCheck' => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
-        ],
-        'reviewing' => [
-            'translation' => [self::STATE_FINISH],
-            'reviewing' => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-            'translatorCheck' => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
-        ],
-        'translatorCheck' => [
-            'translation' => [self::STATE_FINISH],
-            'reviewing' => [self::STATE_FINISH],
-            'translatorCheck' => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-        ],
-        self::STEP_WORKFLOW_ENDED => [
-            'translation' => [self::STATE_FINISH],
-            'reviewing' => [self::STATE_FINISH],
-            'translatorCheck' => [self::STATE_FINISH],
-        ],
-    ];
+    protected $validStates = [];
     
     /***
      * the defined steps can not be assigned as workflow step
@@ -274,6 +252,27 @@ class editor_Workflow_Default {
             $this->steps[$constName] = $step['name'];
         }
         $this->stepChain[] = self::STEP_WORKFLOW_ENDED;
+        
+        //calculate the valid states
+        foreach($this->stepChain as $step) {
+            $this->validStates[$step] = [];
+            foreach($this->getAssignableSteps() as $assignableStep) {
+                if(!in_array($assignableStep, $this->stepChain)) {
+                    //for steps not in the chain we can not calculate valid states, they always have to be configured manually in the GUI
+                    continue;
+                }
+                $compared = $this->compareSteps($step, $assignableStep);
+                if($compared === 0) {
+                    $this->validStates[$step][$assignableStep] = [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED];
+                }
+                elseif($compared > 0) {
+                    $this->validStates[$step][$assignableStep] = [self::STATE_WAITING, self::STATE_UNCONFIRMED];
+                }
+                else {
+                    $this->validStates[$step][$assignableStep] = [self::STATE_FINISH];
+                }
+            }
+        }
     }
     
     /**
@@ -642,5 +641,18 @@ class editor_Workflow_Default {
             return array(self::STATE_EDIT, self::STATE_VIEW);
         }
         return array();
+    }
+    
+    /**
+     * return <0 if stepOne is before stepTwo in the stepChain, >0 if stepOne is after stepTwo and 0 if the steps are equal.
+     * @param string $stepOne
+     * @param string $stepTwo
+     * @return integer
+     */
+    public function compareSteps(string $stepOne, string $stepTwo): int {
+        if($stepOne === $stepTwo) {
+            return 0;
+        }
+        return array_search($stepTwo, $this->stepChain, true) - array_search($stepOne, $this->stepChain, true);
     }
 }
