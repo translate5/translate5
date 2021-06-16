@@ -226,8 +226,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $workflow = $this->config->workflow;
         $isCron = $workflow->isCalledByCron();
         $triggeringRole = $this->config->newTua->getRole();
+        $currentStep = $this->config->newTua->getWorkflowStepName();
         $this->tua = clone $this->config->newTua; //we just reuse the already used entity
-        $currentStep = $workflow->getStepOfRole($triggeringRole);
         if($currentStep === false){
             $this->log->warn('E1013', 'No workflow step to Role {role} found! This is actually a workflow config error!', [
                 'task' => $task,
@@ -294,8 +294,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             return;
         }
         $triggeringRole = $this->config->newTua->getRole();
+        $currentStep = $this->config->newTua->getWorkflowStepName();
         $this->tua = clone $this->config->newTua; //we just reuse the already used entity
-        $currentStep = $workflow->getStepOfRole($triggeringRole);
         if($currentStep === false){
             $this->log->warn('E1013', 'No workflow step to Role {role} found! This is actually a workflow config error!', [
                 'task' => $task,

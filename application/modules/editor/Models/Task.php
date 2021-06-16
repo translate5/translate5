@@ -1132,19 +1132,27 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param editor_Models_Task $task
      */
     public function updateSegmentFinishCount(){
-        $stateRoles = $this->getTaskStateRoles($this->getTaskGuid(), $this->getWorkflowStepName());
-        $isWorkflowEnded = $this->getWorkflowStepName() == editor_Workflow_Abstract::STEP_WORKFLOW_ENDED;
-        if(!$stateRoles && !$isWorkflowEnded){
+        $workflow = $this->getTaskActiveWorkflow();
+        if(empty($workflow)) {
             return;
         }
+        $states = $this->getTaskRoleAutoStates();
+        $isWorkflowEnded = $workflow->isEnded($this);
 
-        $adapted=$this->db->getAdapter();
-        //if it is workflow ended, set the count to 100% (segmentFinishCount=segmentCount)
+        $adapted = $this->db->getAdapter();
+        
+        if(!$isWorkflowEnded && !$states) {
+            //if workflow is not ended and we do not have any states to the current steps role, we do not update anything
+            return;
+        }
+        
         if($isWorkflowEnded){
+            //if workflow is ended, set the count to 100% (segmentFinishCount=segmentCount)
             $expression='segmentCount';
-        }else{
+        }
+        else {
             //get the autostates for the valid task workflow states
-            $expression='(SELECT COUNT(*) FROM LEK_segments WHERE autoStateId IN('.implode(',', $stateRoles).') AND taskGuid='.$adapted->quote($this->getTaskGuid()).')';
+            $expression='(SELECT COUNT(*) FROM LEK_segments WHERE autoStateId IN('.implode(',', $states).') AND taskGuid='.$adapted->quote($this->getTaskGuid()).')';
         }
         $this->db->update(['segmentFinishCount'=>new Zend_Db_Expr($expression)],['taskGuid=?' => $this->getTaskGuid()]);
     }
@@ -1156,7 +1164,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param int $oldAutoState
      */
     public function changeSegmentFinishCount(editor_Models_Task $task,int $newAutostate,int $oldAutoState){
-        $stateRoles=$this->getTaskStateRoles($task->getTaskGuid(),$task->getWorkflowStepName());
+        $stateRoles=$this->getTaskRoleAutoStates();
         if(!$stateRoles){
             return;
         }
@@ -1174,18 +1182,16 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /***
      * Get all autostate ids for the active tasks workflow
      *
-     * @param string $taskGuid
-     * @param string $workflowStepName
      * @return boolean|boolean|multitype:string
      */
-    public function getTaskStateRoles(string $taskGuid,string $workflowStepName){
+    protected function getTaskRoleAutoStates(){
         try {
-            $workflow=$this->getTaskActiveWorkflow($taskGuid);
+            $workflow=$this->getTaskActiveWorkflow();
         } catch (ZfExtended_Exception $e) {
             //the workflow with $workflowStepName does not exist
             return false;
         }
-        $roleOfStep=$workflow->getRoleOfStep($workflowStepName);
+        $roleOfStep=$workflow->getRoleOfStep($this->getWorkflowStepName());
         if(empty($roleOfStep)){
             return false;
         }
@@ -1195,15 +1201,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /***
-     * Get the active workflow for the given taskGuid
-     * @param string $taskGuid
-     * @return editor_Workflow_Abstract
+     * Get the active workflow for the current task
+     * @return editor_Workflow_Abstract|null if task is configured with a non existent workflow
      */
-    public function getTaskActiveWorkflow(string $taskGuid){
+    public function getTaskActiveWorkflow(): ?editor_Workflow_Abstract {
         //get the current task active workflow
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
-        return $wfm->getActive($taskGuid);
+        return $wfm->getActive($this->getTaskGuid());
     }
     
     /***

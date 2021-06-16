@@ -95,7 +95,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
         if(isset($this->userAssocInfos[$taskguid])) {
             $row['userRole'] = $this->userAssocInfos[$taskguid]['role'];
             $row['userState'] = $this->userAssocInfos[$taskguid]['state'];
-            $row['userStep'] = $this->workflow->getStepOfRole($row['userRole']);
+            $row['userStep'] = $this->userAssocInfos[$taskguid]['workflowStepName'];
         }
         elseif($isEditAll && !empty($givenUserState)) {
             $row['userState'] = $givenUserState; //returning the given userState for usage in frontend

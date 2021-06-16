@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -27,17 +27,23 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Default Workflow Class
+ * Default Workflow regarding action invocations, roles, states and basic steps.
+ * Default roles are:
+ * - translator
+ * - reviewer
+ * - translatorCheck
+ * - visitor
+ * Default states are waiting, finished, open, edit, view and unconfirmed
+ * Default states are waiting, finished, open, edit, view and unconfirmed
+ * Basic steps (always available) are
+ * - 'no workflow' as initial step
+ * - pmCheck for PM usage
+ * - workflowEnded as final step
+ * All other steps are loaded from the database step configuration list
  */
 class editor_Workflow_Default extends editor_Workflow_Abstract {
-    /**
-     * internal used name of the workflow
-     * @var string
-     */
-    const WORKFLOW_ID = 'default';
-    
-    public function __construct() {
-        parent::__construct();
+    public function __construct($name) {
+        parent::__construct($name);
         $this->events->addIdentifiers(__CLASS__);
     }
     
@@ -47,9 +53,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      */
     protected function handleImport(){
         $this->doDebug(__FUNCTION__);
-        $this->initWorkflowStep($this->newTask, self::STEP_NO_WORKFLOW);
-        $this->newTask->load($this->newTask->getId()); //reload task with new workflowStepName and new calculated workflowStepNr
-        $this->callActions(__FUNCTION__, self::STEP_NO_WORKFLOW);
+        $this->callActions(__FUNCTION__);
     }
     
     /**
@@ -58,7 +62,9 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      */
     protected function handleBeforeImport(){
         $this->doDebug(__FUNCTION__);
-        $this->callActions(__FUNCTION__);
+        $this->initWorkflowStep($this->newTask, self::STEP_NO_WORKFLOW);
+        $this->newTask->load($this->newTask->getId()); //reload task with new workflowStepName and new calculated workflowStepNr
+        $this->callActions(__FUNCTION__, self::STEP_NO_WORKFLOW);
     }
 
     /**
@@ -83,8 +89,8 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         $oldStep = $task->getWorkflowStepName();
         
         //this remains as default behaviour
-        $nextStep = $this->getNextStep($this->getStepOfRole($newTua->getRole()));
-        $this->doDebug(__FUNCTION__." Next Step: ".$nextStep.' to role '.$newTua->getRole().' with step '.$this->getStepOfRole($newTua->getRole())."; Old Step in Task: ".$oldStep);
+        $nextStep = $newTua->getWorkflowStepName();
+        $this->doDebug(__FUNCTION__." Next Step: ".$nextStep.' to role '.$newTua->getRole().' with step '.$nextStep."; Old Step in Task: ".$oldStep);
         if($nextStep) {
             //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!
             $this->setNextStep($task, $nextStep);
@@ -146,8 +152,8 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
     protected function handleFirstFinishOfARole(array $finishStat){
         $taskState = $this->newTask->getState();
         if($taskState == editor_Models_Task::STATE_UNCONFIRMED) {
-            //we have to confirm the task and retrigger task workflow triggers 
-            // if task was unconfirmed but a lektor is set to finish, this implies confirming 
+            //we have to confirm the task and retrigger task workflow triggers
+            // if task was unconfirmed but a lektor is set to finish, this implies confirming
             $oldTask = clone $this->newTask;
             $this->newTask->setState(editor_Models_Task::STATE_OPEN);
             $this->doWithTask($oldTask, $this->newTask);
@@ -167,7 +173,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
     
     /**
      * reopen an ended task (task-specific reopening in contrast to taskassoc-specific unfinish)
-     * 
+     *
      * @see editor_Workflow_Abstract::handleReopen()
      */
     protected function handleReopen(){
@@ -201,7 +207,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
     }
     
     /***
-     * 
+     *
      * {@inheritDoc}
      * @see editor_Workflow_Abstract::doCronPeriodical()
      */
@@ -226,7 +232,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
     }
     
     /***
-     * 
+     *
      * {@inheritDoc}
      * @see editor_Workflow_Abstract::handleUserAssociationEdited()
      */

@@ -332,7 +332,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $workflow = $wfm->getDefaultTaskConfigured();
 
       if(!is_null($workflow)){
-          $this->view->Php2JsVars()->set('frontend.import.defaultTaskWorkflow',$workflow::getId());
+          $this->view->Php2JsVars()->set('frontend.import.defaultTaskWorkflow',$workflow->getName());
       }
 
 
@@ -430,6 +430,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wm editor_Workflow_Manager */
         $php2js->set('app.workflows', $wm->getWorkflowData());
+        $php2js->set('app.workflow.CONST', $wm->getWorkflowConstants());
         
         $php2js->set('app.userRights', $acl->getFrontendRights($userRoles));
         

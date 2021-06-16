@@ -126,6 +126,10 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
      * Loops over each Excel segment and saves it back into translate5 if necessary
      */
     protected function loopOverExcelSegments() {
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $workflow = $wfm->getActive($this->task);
+        
         foreach ($this->excel->getSegments() as $segment) {
             //segment must be initialized completly new
             $t5Segment = ZfExtended_Factory::get('editor_Models_Segment');
@@ -151,7 +155,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
             // add TrackChanges informations comparing the new segment (from excel) with the t5 segment (converted to excel tagging)
             // but only if task is not in workflowStep 'translation'
             // @FIXME: ADD check Plugin.TrackChanges active, or something similar.
-            if ($this->task->getWorkflowStepName() !== editor_Workflow_Abstract::STEP_TRANSLATION) {
+            if (! $workflow->isStepOfRole($this->task->getWorkflowStepName(), [$workflow::ROLE_TRANSLATOR])) {
                 $newSegment = $this->diffTagger->diffSegment($orgSegmentAsExcel, $newSegment, date(NOW_ISO), $this->user->getUserName());
             }
             

@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -51,7 +51,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     protected $log = false;
     
     /**
-     * contains if available the task to the current tua 
+     * contains if available the task to the current tua
      * @var editor_Models_Task
      */
     protected $task;
@@ -170,14 +170,14 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
         /* @var $workflow editor_Workflow_Abstract */
         
-        //here checks the isWritable if the tua is already in editing mode... Not as intended. 
+        //here checks the isWritable if the tua is already in editing mode... Not as intended.
         if(!empty($this->entity->getUsedState()) && $workflow->isWriteable($this->entity, true)) {
             // the following check on preventing changing Jobs which are used, prevents the following problems:
-            // competitive tasks: 
-            //   a task can not confirmed by user A if user A could not get a lock on the task, 
-            //   because user B has opened the task for editing (and locked it), before User B was set to unconfirmed. 
+            // competitive tasks:
+            //   a task can not confirmed by user A if user A could not get a lock on the task,
+            //   because user B has opened the task for editing (and locked it), before User B was set to unconfirmed.
             //   This is prevented now, since the PM gets an error when he wants to set User B to unconfirmed while B is editing already.
-            //  another prevented problem: 
+            //  another prevented problem:
             //    User B have opened the task for editing, after that his job is set to unconfirmed
             //    User B does not notice this and edits more segments, although he should be unconfirmed or waiting.
             //  Throwing the following exception do not kick out the user, but the PM knows now that he fucked up the task.
@@ -245,7 +245,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     public function postAction() {
         parent::postAction();
-        //if the validation was successful, log the request and apply additional data 
+        //if the validation was successful, log the request and apply additional data
         if($this->wasValid){
             $this->log->request();
             $this->addUserInfoToResult();
@@ -264,7 +264,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->processClientReferenceVersion();
         $entity = clone $this->entity;
         $this->entity->setId(0);
-        //we have to perform the delete call on cloned object, since the delete call resets the data in the entity, but we need it for post processing 
+        //we have to perform the delete call on cloned object, since the delete call resets the data in the entity, but we need it for post processing
         $entity->delete();
         $this->log->info('E1012', 'job deleted', ['tua' => $this->entity->getSanitizedEntityForLog()]);
     }
@@ -396,7 +396,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     /***
      * Set the default deadline date from the config. How many work days the deadlinde date will be from the task
      * order date can be define in the system configuration.
-     * To use the defaultDeadline date, the deadlineDate field should be set to "default" 
+     * To use the defaultDeadline date, the deadlineDate field should be set to "default"
      */
     protected function setDefaultDeadlineDate() {
         //check if default deadline date should be set
@@ -417,7 +417,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         
         $workflow = $wm->get($model->getWorkflow());
 
-        $step = $workflow->getStepOfRole($this->data->role);
+        $step = $this->data->workflowStepName;
         //get the config for the task workflow and the user assoc role workflow step
         $configValue = $model->getConfig()->runtimeOptions->workflow->{$model->getWorkflow()}->{$step}->defaultDeadlineDate ?? 0;
         if($configValue <= 0){
