@@ -160,7 +160,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             $this->data->role = $workflow->getRoleOfStep($this->data->workflowStepName);
         }
         //we have to get the step from the role (the first found step to the role)
-        else {
+        elseif(property_exists($this->data, 'role')) {
             $steps = $workflow->getSteps2Roles();
             $roles = array_flip(array_reverse($steps));
             $this->data->workflowStepName = $roles[$this->data->role] ?? null;
