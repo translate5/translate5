@@ -60,14 +60,9 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       notifyButtonTooltip:'#UT#Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen',
   },
   states: {
-      edit: '#UT#in Arbeit',
+      edit: '#UT#in Arbeit'
   },
-  bind:{
-	  //INFO: this will load only the users of the task when projectTaskGrid selection is changed
-	  //override the store binding in the place where the component is used/defined
-	  //the default usage is in the task properties panel
-  	  store:'{userAssoc}'
-  },
+
   plugins: ['gridfilters'],
   initConfig: function(instanceConfig) {
     var me = this,
