@@ -89,7 +89,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     protected $task;
     
     /**
-     * @var editor_Workflow_Abstract
+     * @var editor_Workflow_Default
      */
     protected $workflow;
     

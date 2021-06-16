@@ -202,7 +202,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                     break;
                 case 'state':
                     $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($task['taskGuid']);
-                    /* @var $workflow editor_Workflow_Abstract */
+                    /* @var $workflow editor_Workflow_Default */
                     $states = $workflow->getStates();
                     $labels = $workflow->getLabels(true);
                     $value = (array_search($task['state'], $states) !== false) ? $labels[array_search($task['state'], $states)] : $task['state'];

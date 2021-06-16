@@ -56,13 +56,13 @@ class editor_Plugins_DeleteUserAssociations_Init extends ZfExtended_Plugin_Abstr
         //enable the deletable flag
         if(is_array($view->rows)) {
             foreach ($view->rows as &$row){
-                if($row['role'] == editor_Workflow_Abstract::ROLE_TRANSLATORCHECK) {
+                if($row['role'] == editor_Workflow_Default::ROLE_TRANSLATORCHECK) {
                     $row['deletable'] = true;
                 }
             }
         }
         elseif(is_object($view->rows)) {
-            if($view->rows->role == editor_Workflow_Abstract::ROLE_TRANSLATORCHECK) {
+            if($view->rows->role == editor_Workflow_Default::ROLE_TRANSLATORCHECK) {
                 $view->rows->deletable = true;
             }
         }
@@ -80,7 +80,7 @@ class editor_Plugins_DeleteUserAssociations_Init extends ZfExtended_Plugin_Abstr
         $tua = $event->getParam('entity');
         /* @var $tua editor_Models_TaskUserAssoc */
         $tua->load($params['id']);
-        if($tua->getRole() != editor_Workflow_Abstract::ROLE_TRANSLATORCHECK) {
+        if($tua->getRole() != editor_Workflow_Default::ROLE_TRANSLATORCHECK) {
             return;
         }
         //add the backend right seeAllUsers to the current logged user, so the user is able to delete any assoc users

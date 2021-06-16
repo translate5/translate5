@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Workflow_Actions_Config {
     /**
-     * @var editor_Workflow_Abstract 
+     * @var editor_Workflow_Default 
      */
     public $workflow;
     

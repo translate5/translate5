@@ -44,7 +44,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
     protected $segmentFieldManager;
     
     /**
-     * @var editor_Workflow_Abstract
+     * @var editor_Workflow_Default
      */
     protected $workflow;
     
@@ -79,7 +79,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
         $this->userTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
     }
     
-    public function initForTask(editor_Workflow_Abstract $workflow, editor_Models_Task $task) {
+    public function initForTask(editor_Workflow_Default $workflow, editor_Models_Task $task) {
         $this->task = $task;
         $this->workflow = $workflow;
     }

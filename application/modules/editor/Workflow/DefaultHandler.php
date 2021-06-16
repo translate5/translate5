@@ -28,27 +28,20 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Handler functions for the Default Workflow.
- * Default roles are:
- * - translator
- * - reviewer
- * - translatorCheck
- * - visitor
- * Default states are waiting, finished, open, edit, view and unconfirmed
- * Default states are waiting, finished, open, edit, view and unconfirmed
- * Basic steps (always available) are
- * - 'no workflow' as initial step
- * - pmCheck for PM usage
- * - workflowEnded as final step
- * All other steps are loaded from the database step configuration list
  */
 class editor_Workflow_DefaultHandler {
-    public function __construct() {
-        $this->events->addIdentifiers(__CLASS__);
+    /**
+     * @var editor_Workflow_Default
+     */
+    protected $workflow;
+    
+    public function __construct(editor_Workflow_Default $workflow) {
+        $this->workflow = $workflow;
+        $this->events->addIdentifiers(get_class($workflow));
     }
     
     /**
-     * (non-PHPdoc)
-     * @see editor_Workflow_Abstract::handleImport()
+     * will be called after task import, the imported task is available in $this->newTask
      */
     protected function handleImport(){
         $this->doDebug(__FUNCTION__);
@@ -56,8 +49,7 @@ class editor_Workflow_DefaultHandler {
     }
     
     /**
-     * {@inheritDoc}
-     * @see editor_Workflow_Abstract::handleBeforeImport()
+     * will be called directly before import is started, task is already created and available
      */
     protected function handleBeforeImport(){
         $this->doDebug(__FUNCTION__);
@@ -67,17 +59,17 @@ class editor_Workflow_DefaultHandler {
     }
 
     /**
-     * {@inheritDoc}
-     * @see editor_Workflow_Abstract::handleImportCompleted()
+     * will be called after import (in set task to open worker) after the task is opened and the import is complete.
      */
     protected function handleImportCompleted(){
         $this->doDebug(__FUNCTION__);
         $this->callActions(__FUNCTION__);
     }
 
+    
     /**
-     * (non-PHPdoc)
-     * @see editor_Workflow_Abstract::handleAllFinishOfARole()
+     * will be called after all users of a role has finished a task
+     * @param array $finishStat contains the info which of all different finishes are applicable
      */
     protected function handleAllFinishOfARole(array $finishStat) {
         $newTua = $this->newTaskUserAssoc;
@@ -106,8 +98,8 @@ class editor_Workflow_DefaultHandler {
     }
     
     /**
-     * (non-PHPdoc)
-     * @see editor_Workflow_Abstract::handleFinish()
+     * will be called after a user has finished a task
+     * @param array $finishStat contains the info which of all different finishes are applicable
      */
     protected function handleFinish(array $finishStat) {
         $this->doDebug(__FUNCTION__);
@@ -119,7 +111,7 @@ class editor_Workflow_DefaultHandler {
         $oldStep = $task->getWorkflowStepName();
         
         //set the finished date when the user finishes a role
-        if($newTua->getState()==editor_Workflow_Abstract::STATE_FINISH){
+        if($newTua->getState()==editor_Workflow_Default::STATE_FINISH){
             $newTua->setFinishedDate(NOW_ISO);
             $newTua->save();
         }
@@ -128,16 +120,15 @@ class editor_Workflow_DefaultHandler {
     }
     
     /**
-     * (non-PHPdoc)
-     * @see editor_Workflow_Abstract::handleAllFinish()
+     * will be called after all associated users of a task has finished a task
+     * @param array $finishStat contains the info which of all different finishes are applicable
      */
     protected function handleAllFinish(array $finishStat) {
         $this->doDebug(__FUNCTION__);
     }
 
     /**
-     * (non-PHPdoc)
-     * @see editor_Workflow_Abstract::handleEnd()
+     * will be called after a task has been ended
      */
     protected function handleEnd() {
         $this->newTask->dropMaterializedView();
@@ -145,8 +136,8 @@ class editor_Workflow_DefaultHandler {
     }
     
     /**
-     * (non-PHPdoc)
-     * @see editor_Workflow_Abstract::handleFirstFinishOfARole()
+     * will be called after first user of a role has finished a task
+     * @param array $finishStat contains the info which of all different finishes are applicable
      */
     protected function handleFirstFinishOfARole(array $finishStat){
         $taskState = $this->newTask->getState();
@@ -163,8 +154,8 @@ class editor_Workflow_DefaultHandler {
     }
     
     /**
-     * (non-PHPdoc)
-     * @see editor_Workflow_Abstract::handleFirstFinish()
+     * will be called after a user has finished a task
+     * @param array $finishStat contains the info which of all different finishes are applicable
      */
     protected function handleFirstFinish(array $finishStat){
         $this->doDebug(__FUNCTION__);
@@ -172,8 +163,7 @@ class editor_Workflow_DefaultHandler {
     
     /**
      * reopen an ended task (task-specific reopening in contrast to taskassoc-specific unfinish)
-     *
-     * @see editor_Workflow_Abstract::handleReopen()
+     * will be called after a task has been reopened (after was ended - task-specific)
      */
     protected function handleReopen(){
         $this->newTask->createMaterializedView();
@@ -183,8 +173,7 @@ class editor_Workflow_DefaultHandler {
     /**
      * unfinish a finished task (taskassoc-specific unfinish in contrast to task-specific reopening)
      * Set all REVIEWED_UNTOUCHED segments to TRANSLATED
-     * (non-PHPdoc)
-     * @see editor_Workflow_Abstract::handleUnfinish()
+     * will be called after a task has been unfinished (after was finished - taskassoc-specific)
      */
     protected function handleUnfinish(){
         $this->doDebug(__FUNCTION__);
@@ -196,8 +185,7 @@ class editor_Workflow_DefaultHandler {
         
     /**
      * checks the delivery dates, if a task is overdue, it'll be finished for all lectors, triggers normal workflow handlers if needed.
-     * (non-PHPdoc)
-     * @see editor_Workflow_Abstract::handleCronDaily()
+     * will be called daily
      */
     public function doCronDaily() {
         $this->isCron = true;
@@ -205,10 +193,8 @@ class editor_Workflow_DefaultHandler {
         $this->callActions(__FUNCTION__);
     }
     
-    /***
-     *
-     * {@inheritDoc}
-     * @see editor_Workflow_Abstract::doCronPeriodical()
+    /**
+     * will be called periodically between every 5 to 15 minutes, depending on the traffic on the installation.
      */
     public function doCronPeriodical(){
         $this->isCron = true;
@@ -217,8 +203,7 @@ class editor_Workflow_DefaultHandler {
     }
     
     /**
-     * {@inheritDoc}
-     * @see editor_Workflow_Abstract::handleUserAssociationAdded()
+     * will be called when a new task user association is created
      */
     protected function handleUserAssociationAdded() {
         $this->doDebug(__FUNCTION__);
@@ -230,10 +215,8 @@ class editor_Workflow_DefaultHandler {
         $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
     }
     
-    /***
-     *
-     * {@inheritDoc}
-     * @see editor_Workflow_Abstract::handleUserAssociationEdited()
+    /**
+     * will be called when a new task user association is edited
      */
     protected function handleUserAssociationEdited(){
         $this->doDebug(__FUNCTION__);
@@ -247,8 +230,7 @@ class editor_Workflow_DefaultHandler {
     
     
     /**
-     * {@inheritDoc}
-     * @see editor_Workflow_Abstract::handleUserAssociationDeleted()
+     * will be called when a task user association is deleted
      */
     protected function handleUserAssociationDeleted() {
         $this->doDebug(__FUNCTION__);
@@ -258,5 +240,70 @@ class editor_Workflow_DefaultHandler {
             $this->newTask->loadByTaskGuid($tua->getTaskGuid());
         }
         $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
+    }
+    
+    /**
+     * manipulates the segment as needed by workflow after updated by user
+     * @param editor_Models_Segment $segmentToSave
+     * @param editor_Models_Task $task
+     */
+    public function beforeSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
+        $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, editor_Models_Segment $segment, $tua) {
+            //sets the calculated autoStateId
+            $oldAutoState = $segment->getAutoStateId();
+            $newAutoState = $autostates->calculateSegmentState($segment, $tua);
+            $isChanged = $oldAutoState != $newAutoState;
+            
+            //if a segment with PRETRANS_INITIAL is saved by a translator, it is confirmed by setting it to PRETRANS_TRANSLATED
+            // this is needed to restore the auto_state later in things like segmentsSetInitialState
+            if($segment->getPretrans() == $segment::PRETRANS_INITIAL && $autostates->isTranslationState($newAutoState) && $isChanged) {
+                $segment->setPretrans($segment::PRETRANS_TRANSLATED);
+            }
+            $segment->setAutoStateId($newAutoState);
+        };
+        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates, $task);
+    }
+    
+    /**
+     * manipulates the segment as needed by workflow after user has add or edit a comment of the segment
+     * @param editor_Models_Segment $segmentToSave
+     * @param editor_Models_Task $task
+     */
+    public function beforeCommentedSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
+        //FIXME wie soll das überarbeitet werden, wie passt das mit translator überhaupt?
+        $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, editor_Models_Segment $segment, $tua) {
+            $autostates->updateAfterCommented($segment, $tua);
+        };
+        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates, $task);
+    }
+    
+    /**
+     * internal used method containing all common logic happend on a segment before saving it
+     * @param editor_Models_Segment $segmentToSave
+     * @param Closure $updateStates
+     * @param editor_Models_Task $task
+     */
+    protected function commonBeforeSegmentSave(editor_Models_Segment $segmentToSave, Closure $updateStates, editor_Models_Task $task) {
+        $sessionUser = new Zend_Session_Namespace('user');
+        
+        //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
+        $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUser->data->userGuid, $task);
+        if($tua->getIsPmOverride() == 1){
+            $segmentToSave->setWorkflowStepNr($task->getWorkflowStep()); //set also the number to identify in which phase the changes were done
+            $segmentToSave->setWorkflowStep(self::STEP_PM_CHECK);
+        }
+        else {
+            //sets the actual workflow step
+            $segmentToSave->setWorkflowStepNr($task->getWorkflowStep());
+            
+            //sets the actual workflow step name, does currently depend only on the userTaskRole!
+            $segmentToSave->setWorkflowStep($tua->getWorkflowStepName());
+        }
+        
+        $autostates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        
+        //set the autostate as defined in the given Closure
+        /* @var $autostates editor_Models_Segment_AutoStates */
+        $updateStates($autostates, $segmentToSave, $tua);
     }
 }

@@ -98,7 +98,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         /* simplest way to get the correct workflow here: */
         $session = new Zend_Session_Namespace();
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($session->taskGuid);
-        /* @var $workflow editor_Workflow_Abstract */
+        /* @var $workflow editor_Workflow_Default */
         $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
         
         $allowedValues = array_keys($config->runtimeOptions->segments->stateFlags->toArray());

@@ -148,7 +148,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
      */
     protected function render() {
         //the segments list should not be send to reviewers when the previous workflow step was translations
-        if(isset($this->view->triggeringRole) && $this->view->triggeringRole == editor_Workflow_Abstract::ROLE_TRANSLATOR){
+        if(isset($this->view->triggeringRole) && $this->view->triggeringRole == editor_Workflow_Default::ROLE_TRANSLATOR){
             return '';
         }
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');

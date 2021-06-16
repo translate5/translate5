@@ -202,19 +202,19 @@ class editor_Models_Segment_AutoStates {
             self::REVIEWED_PM_UNCHANGED,
             self::REVIEWED_PM_UNCHANGED_AUTO,
           ),
-          editor_Workflow_Abstract::ROLE_TRANSLATOR => [
+          editor_Workflow_Default::ROLE_TRANSLATOR => [
               // may not contain the state PRETRANSLATED, since PRETRANSLATED does not belong (in statistics, workflow etc) to the translators!
               self::TRANSLATED,
               self::TRANSLATED_AUTO,
           ],
-          editor_Workflow_Abstract::ROLE_REVIEWER => array(
+          editor_Workflow_Default::ROLE_REVIEWER => array(
             self::REVIEWED,
             self::REVIEWED_AUTO,
             self::REVIEWED_UNTOUCHED,
             self::REVIEWED_UNCHANGED,
             self::REVIEWED_UNCHANGED_AUTO,
           ),
-          editor_Workflow_Abstract::ROLE_TRANSLATORCHECK => array(
+          editor_Workflow_Default::ROLE_TRANSLATORCHECK => array(
             self::REVIEWED_TRANSLATOR,
             self::REVIEWED_TRANSLATOR_AUTO,
           )
@@ -333,7 +333,7 @@ class editor_Models_Segment_AutoStates {
         $isModified = $segment->isDataModifiedAgainstOriginal();
         
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($segment->getTaskGuid());
-        /* @var $workflow editor_Workflow_Abstract */
+        /* @var $workflow editor_Workflow_Default */
         
         if($segment->getAutoStateId() == self::BLOCKED){
             return self::BLOCKED;

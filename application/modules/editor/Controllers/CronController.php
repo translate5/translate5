@@ -101,8 +101,8 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
         $workflows = $wfm->getWorkflows();
         foreach($workflows as $wfId) {
             $workflow = $wfm->get($wfId);
-            /* @var $workflow editor_Workflow_Abstract */
-            $workflow->$fn();
+            /* @var $workflow editor_Workflow_Default */
+            $workflow->getHandler()->$fn();
            
         }
     }

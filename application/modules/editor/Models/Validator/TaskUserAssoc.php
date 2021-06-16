@@ -35,7 +35,7 @@ class editor_Models_Validator_TaskUserAssoc extends ZfExtended_Models_Validator_
         /* simplest way to get the correct workflow here: */
         $session = new Zend_Session_Namespace();
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($session->taskGuid);
-        /* @var $workflow editor_Workflow_Abstract */
+        /* @var $workflow editor_Workflow_Default */
         $this->addValidator('id', 'int');
         $this->addValidator('taskGuid', 'guid');
         $this->addValidator('userGuid', 'guid');

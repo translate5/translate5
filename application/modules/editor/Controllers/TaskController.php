@@ -63,7 +63,7 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $filterClass = 'editor_Models_Filter_TaskSpecific';
 
     /**
-     * @var editor_Workflow_Abstract
+     * @var editor_Workflow_Default
      */
     protected $workflow;
 

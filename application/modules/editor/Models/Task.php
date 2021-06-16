@@ -594,7 +594,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * This method may not be called directly!
      * Either call editor_Models_Task::updateWorkflowStep
-     * or if you are in Workflow Context call editor_Workflow_Abstract::setNextStep
+     * or if you are in Workflow Context call editor_Workflow_Default::setNextStep
      * @param string $stepName
      * @throws BadMethodCallException
      */
@@ -1202,9 +1202,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
 
     /***
      * Get the active workflow for the current task
-     * @return editor_Workflow_Abstract|null if task is configured with a non existent workflow
+     * @return editor_Workflow_Default|null if task is configured with a non existent workflow
      */
-    public function getTaskActiveWorkflow(): ?editor_Workflow_Abstract {
+    public function getTaskActiveWorkflow(): ?editor_Workflow_Default {
         //get the current task active workflow
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
