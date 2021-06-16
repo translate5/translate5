@@ -225,7 +225,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $workflow->triggerBeforeEvents($oldEntity, $this->entity);
         $this->entity->save();
 
-        $workflow->doWithUserAssoc($oldEntity, $this->entity);
+        $workflow->getHandler()->doWithUserAssoc($oldEntity, $this->entity);
         
         $this->view->rows = $this->entity->getDataObject();
         $this->addUserInfoToResult();

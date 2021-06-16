@@ -1065,7 +1065,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //opening a task must be done before all workflow "do" calls which triggers some events
         $this->openAndLock();
 
-        $this->workflow->doWithTask($oldTask, $this->entity);
+        $this->workflow->getHandler()->doWithTask($oldTask, $this->entity);
 
         if($oldTask->getState() != $this->entity->getState()) {
             $this->logInfo('Status change to {status}', ['status' => $this->entity->getState()]);
@@ -1437,7 +1437,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $userTaskAssoc->save();
 
         if(!$disableWorkflowEvents) {
-            $this->workflow->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc);
+            $this->workflow->getHandler()->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc);
         }
 
         if($oldUserTaskAssoc->getState() != $this->data->userState){
@@ -1793,14 +1793,14 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->log->request();
         $this->initWorkflow($this->entity->getWorkflow());
         $this->view->trigger = $this->getParam('trigger');
-        $this->view->success = $this->workflow->doDirectTrigger($this->entity, $this->getParam('trigger'));
+        $this->view->success = $this->workflow->getHandler()->doDirectTrigger($this->entity, $this->getParam('trigger'));
         if($this->view->success) {
             return;
         }
         $errors = array('trigger' => 'Trigger is invalid. Valid triggers are listed below.');
         $e = new ZfExtended_ValidateException();
         $e->setErrors($errors);
-        $this->view->validTrigger = $this->workflow->getDirectTrigger();
+        $this->view->validTrigger = $this->workflow->getHandler()->getDirectTrigger();
         $this->handleValidateException($e);
     }
     
