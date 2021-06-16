@@ -65,12 +65,6 @@ Ext.define('Editor.view.admin.user.Assoc', {
      */
     customer:null,
 
-
-    mixins:['Editor.controller.admin.IWizardCard'],
-    //card type, used for card display order
-    importType:'postimport',
-    task:null,
-
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
@@ -78,7 +72,21 @@ Ext.define('Editor.view.admin.user.Assoc', {
                 items: [{
                         xtype: 'adminUserAssocGrid',
                         itemId: 'adminUserAssocGrid',
+                        bind:{
+                            store:'{userAssoc}',
+                            selection:'{selectedAssocRecord}'
+                        },
                         region: 'center'
+                    },{
+                        xtype: 'container',
+                        region: 'south',
+                        height: 'auto',
+                        itemId: 'editInfoOverlay',
+                        cls: 'edit-info-overlay',
+                        padding: 10,
+                        bind: {
+                            html: '{editInfoHtml}'
+                        }
                     },{
                         xtype: 'container',
                         region: 'east',
@@ -86,29 +94,27 @@ Ext.define('Editor.view.admin.user.Assoc', {
                         height: 'auto',
                         width: 300,
                         items: [{
-                            xtype: 'container',
-                            itemId: 'editInfoOverlay',
-                            cls: 'edit-info-overlay',
-                            padding: 10,
-                            bind: {
-                                html: '{editInfoHtml}'
-                            }
-                        },{
                             xtype:'form',
                             title : me.strings.formTitleAdd,
                             bodyPadding: 10,
                             region: 'east',
                             defaults: {
-                                labelAlign: 'top'
+                                labelAlign: 'top',
+                                duplicateRecord: false,
+                                validator: function(){
+                                    if(this.duplicateRecord){
+                                        return 'This record entry already exist.';
+                                    }
+                                    return true;
+                                }
                             },
                             disabled:true,
                             bind: {
-                                disabled: '{!selectedAssocRecord.userGuid}'
+                                disabled: '{!selectedAssocRecord}'
                             },
                             items:[{
                                 anchor: '100%',
                                 xtype: 'combo',
-                                allowBlank: false,
                                 editable: false,
                                 forceSelection: true,
                                 queryMode: 'local',
@@ -118,6 +124,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 fieldLabel: me.strings.fieldWorkflow,
                                 valueField: 'id',
                                 displayField: 'label',
+                                allowBlank: false,
                                 bind: {
                                     store:'{workflow}',
                                     value:'{selectedAssocRecord.workflow}'
@@ -127,6 +134,8 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 viewModel:'adminUserAssoc',
                                 dataIndex: 'sourceLang',
                                 name: 'sourceLang',
+                                itemId: 'sourceLang',
+                                allowBlank: false,
                                 bind:{
                                     value:'{selectedAssocRecord.sourceLang}'
                                 }
@@ -134,14 +143,15 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 xtype: 'languagecombo',
                                 dataIndex: 'targetLang',
                                 name: 'targetLang',
+                                itemId: 'targetLang',
                                 viewModel:'adminUserAssoc',
+                                allowBlank: false,
                                 bind:{
                                     value:'{selectedAssocRecord.targetLang}'
                                 }
                             },{
                                 anchor: '100%',
                                 xtype: 'combo',
-                                allowBlank: false,
                                 editable: false,
                                 forceSelection: true,
                                 queryMode: 'local',
@@ -151,6 +161,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 fieldLabel: me.strings.fieldWorkflowStepName,
                                 valueField: 'id',
                                 displayField: 'text',
+                                allowBlank: false,
                                 bind: {
                                     store:'{workflowSteps}',
                                     value:'{selectedAssocRecord.workflowStepName}'
@@ -171,13 +182,11 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 queryMode: 'local',
                                 dataIndex: 'userGuid',
                                 name: 'userGuid',
+                                itemId: 'userGuid',
                                 displayField: 'longUserName',
                                 valueField: 'userGuid',
                                 fieldLabel: me.strings.fieldUser
                             },{
-                                //TODO: this writes to deadline config. It is not date field, it should be decimal same as config
-                                //TODO: if value on lower lever -> pre-set
-                                //TODO: remove the field from the database
                                 xtype:'numberfield',
                                 dataIndex: 'deadlineDate',
                                 itemId: 'deadlineDate',
@@ -220,6 +229,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                     xtype: 'button',
                                     itemId: 'saveAssocBtn',
                                     glyph: 'f00c@FontAwesome5FreeSolid',
+                                    formBind:true,
                                     text: me.strings.btnSave
                                 },{
                                     xtype: 'button',
