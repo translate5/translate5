@@ -41,7 +41,7 @@ END LICENSE AND COPYRIGHT
  * All other steps are loaded from the database step configuration list
  */
 class editor_Workflow_Default {
-    /*
+    /**
      * STATES: states describe on the one side the actual state between a user and a task
      *         on the other side changing a state can trigger specific actions on the server
      * currently we have 3 places to define userStates: IndexController
@@ -73,38 +73,7 @@ class editor_Workflow_Default {
     const STEP_PM_CHECK         = 'pmCheck';
     const STEP_WORKFLOW_ENDED   = 'workflowEnded';
     
-    /**
-     * The workflow name
-     * @var string
-     */
-    protected $name;
-    
-    /**
-     * The workflow label (untranslated)
-     * @var string
-     */
-    protected $label;
-    
-    /**
-     * labels of the states, roles and steps. Can be changed / added in constructor
-     * @var array
-     */
-    protected $labels = array(
-        'STATE_IMPORT' => 'import',
-        'STATE_WAITING' => 'wartend',
-        'STATE_UNCONFIRMED' => 'unbestätigt',
-        'STATE_FINISH' => 'abgeschlossen',
-        'STATE_OPEN' => 'offen',
-        'STATE_EDIT' => 'selbst in Arbeit',
-        'STATE_VIEW' => 'selbst geöffnet',
-        'ROLE_TRANSLATOR' => 'Übersetzer',
-        'ROLE_REVIEWER' => 'Lektor',
-        'ROLE_TRANSLATORCHECK' => 'Zweiter Lektor',
-        'ROLE_VISITOR' => 'Besucher',
-        'STEP_NO_WORKFLOW' => 'Kein Workflow',
-        'STEP_PM_CHECK' => 'PM Prüfung',
-        'STEP_WORKFLOW_ENDED' => 'Workflow abgeschlossen',
-    );
+    const CACHE_KEY             = 'workflow_definitions_';
     
     /**
      * This part is very ugly: in the frontend we are working only with all states expect the ones listed here.
@@ -160,37 +129,6 @@ class editor_Workflow_Default {
         self::STATE_EDIT,
     );
     
-    /**
-     * workflow steps which are part of the workflow chain (in this order)
-     * @var array
-     */
-    protected $stepChain = [];
-    
-    /**
-     * Mapping between workflowSteps and roles
-     * @var array
-     */
-    protected $steps2Roles = [];
-    
-    /**
-     * Loaded steps from DB, key is STEP_STEPNAME value is the step value (similar to the STEP_ constants)
-     * @var array
-     */
-    protected $steps = [];
-    
-    /**
-     * list of steps with flag flagInitiallyFiltered on
-     * @var array
-     */
-    protected $stepsWithFilter = [];
-    
-    /**
-     * Valid state / role combination for each step
-     * the first state of the states array is also the default state for that step and role
-     * @var array
-     */
-    protected $validStates = [];
-    
     /***
      * the defined steps can not be assigned as workflow step
      * @var array
@@ -203,10 +141,24 @@ class editor_Workflow_Default {
      */
     protected $handler;
     
+    /**
+     * The workflow definition in a cachable manner
+     * @var editor_Workflow_CachableDefinition
+     */
+    protected $definition;
+    
     public function __construct($name) {
-    //FIXME use $name to load workflow and steps, store them internally cached somehow. As zend cache?
-        $workflow = $this->initWorkflow($name);
-        $this->initWorkflowSteps($workflow);
+        
+        $cache = Zend_Registry::get('cache');
+        $this->definition = $cache->load(self::CACHE_KEY.$name);
+        if($this->definition === false) {
+            /* @var $def editor_Workflow_CachableDefinition */
+            $this->definition = ZfExtended_Factory::get('editor_Workflow_CachableDefinition');
+            $workflow = $this->initWorkflow($name);
+            $this->initWorkflowSteps($workflow);
+            $cache->save($this->definition, self::CACHE_KEY.$name);
+        }
+        
         $this->handler = ZfExtended_Factory::get('editor_Workflow_DefaultHandler',[$this]);
     }
     
@@ -220,8 +172,8 @@ class editor_Workflow_Default {
         $workflow = ZfExtended_Factory::get('editor_Models_Workflow');
         $workflow->loadByName($name);
         
-        $this->name = $workflow->getName();
-        $this->label = $workflow->getLabel();
+        $this->definition->name = $workflow->getName();
+        $this->definition->label = $workflow->getLabel();
         return $workflow;
     }
     
@@ -237,39 +189,39 @@ class editor_Workflow_Default {
         //if position is null, the step is not in the chain!
         //the workflow starts always with no_workflow and ends with workflow ended
         //the step2roles array contains all configured steps, assignable to users
-        $this->stepChain[] = self::STEP_NO_WORKFLOW;
+        $this->definition->stepChain[] = self::STEP_NO_WORKFLOW;
         foreach($steps as $step) {
             if(!is_null($step['position'])) {
-                $this->stepChain[] = $step['name'];
+                $this->definition->stepChain[] = $step['name'];
             }
-            $this->steps2Roles[$step['name']] = $step['role'];
+            $this->definition->steps2Roles[$step['name']] = $step['role'];
             
             if($step['flagInitiallyFiltered']) {
-                $this->stepsWithFilter[] = $step['name'];
+                $this->definition->stepsWithFilter[] = $step['name'];
             }
             $constName = 'STEP_'.strtoupper($step['name']);
-            $this->labels[$constName] = $step['label'];
-            $this->steps[$constName] = $step['name'];
+            $this->definition->labels[$constName] = $step['label'];
+            $this->definition->steps[$constName] = $step['name'];
         }
-        $this->stepChain[] = self::STEP_WORKFLOW_ENDED;
+        $this->definition->stepChain[] = self::STEP_WORKFLOW_ENDED;
         
         //calculate the valid states
-        foreach($this->stepChain as $step) {
-            $this->validStates[$step] = [];
+        foreach($this->definition->stepChain as $step) {
+            $this->definition->validStates[$step] = [];
             foreach($this->getAssignableSteps() as $assignableStep) {
-                if(!in_array($assignableStep, $this->stepChain)) {
+                if(!in_array($assignableStep, $this->definition->stepChain)) {
                     //for steps not in the chain we can not calculate valid states, they always have to be configured manually in the GUI
                     continue;
                 }
                 $compared = $this->compareSteps($step, $assignableStep);
                 if($compared === 0) {
-                    $this->validStates[$step][$assignableStep] = [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED];
+                    $this->definition->validStates[$step][$assignableStep] = [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED];
                 }
                 elseif($compared > 0) {
-                    $this->validStates[$step][$assignableStep] = [self::STATE_WAITING, self::STATE_UNCONFIRMED];
+                    $this->definition->validStates[$step][$assignableStep] = [self::STATE_FINISH];
                 }
                 else {
-                    $this->validStates[$step][$assignableStep] = [self::STATE_FINISH];
+                    $this->definition->validStates[$step][$assignableStep] = [self::STATE_WAITING, self::STATE_UNCONFIRMED];
                 }
             }
         }
@@ -287,7 +239,7 @@ class editor_Workflow_Default {
      * @return array
      */
     public function getValidStates(): array {
-        return $this->validStates;
+        return $this->definition->validStates;
     }
     
     /**
@@ -295,7 +247,7 @@ class editor_Workflow_Default {
      * @return string
      */
     public function getName(): string {
-        return $this->name;
+        return $this->definition->name;
     }
     
     /**
@@ -303,7 +255,7 @@ class editor_Workflow_Default {
      * @return string
      */
     public function getLabel(): string {
-        return $this->label;
+        return $this->definition->label;
     }
     
     /**
@@ -320,7 +272,7 @@ class editor_Workflow_Default {
      * @return array
      */
     public function getSteps2Roles() {
-        return $this->steps2Roles;
+        return $this->definition->steps2Roles;
     }
     
     /**
@@ -328,7 +280,7 @@ class editor_Workflow_Default {
      * @return string[]
      */
     public function getStepsWithFilter() {
-        return $this->stepsWithFilter;
+        return $this->definition->stepsWithFilter;
     }
     
     /**
@@ -337,7 +289,7 @@ class editor_Workflow_Default {
      */
     public function getInitialStates() {
         $result = [];
-        foreach($this->validStates as $step => $statesToSteps) {
+        foreach($this->definition->validStates as $step => $statesToSteps) {
             $result[$step] = [];
             foreach($statesToSteps as $stepInner => $states) {
                 //the initial state per role is just the first defined state per role
@@ -397,7 +349,7 @@ class editor_Workflow_Default {
      * @return array
      */
     public function getStepChain() {
-        return $this->stepChain;
+        return $this->definition->stepChain;
     }
     
     /**
@@ -423,15 +375,17 @@ class editor_Workflow_Default {
      * @return array of available step constants (keys are constants, valus are constant-values)
      */
     public function getSteps(){
-        return array_merge($this->getFilteredConstants('STEP_'), $this->steps);
+        return array_merge($this->getFilteredConstants('STEP_'), $this->definition->steps);
     }
     
     /**
      * Return only the assignable workflow steps.
      * @return array
      */
-    public function getAssignableSteps(){
-        return array_diff($this->getSteps(), $this->notAssignableSteps);
+    public function getAssignableSteps(): array {
+        $result = array_diff($this->getSteps(), $this->notAssignableSteps);
+        uasort($result, [$this, 'compareSteps']);
+        return $result;
     }
     
     /**
@@ -464,12 +418,12 @@ class editor_Workflow_Default {
      */
     public function getLabels($translated = true) {
         if(!$translated) {
-            return $this->labels;
+            return $this->definition->labels;
         }
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         return array_map(function($label) use ($t) {
             return $t->_($label);
-        }, $this->labels);
+        }, $this->definition->labels);
     }
     
     /**
@@ -644,7 +598,7 @@ class editor_Workflow_Default {
     }
     
     /**
-     * return <0 if stepOne is before stepTwo in the stepChain, >0 if stepOne is after stepTwo and 0 if the steps are equal.
+     * return <0 if stepTwo is before stepOne in the stepChain, >0 if stepTwo is after stepOne and 0 if the steps are equal.
      * @param string $stepOne
      * @param string $stepTwo
      * @return integer
@@ -653,6 +607,21 @@ class editor_Workflow_Default {
         if($stepOne === $stepTwo) {
             return 0;
         }
-        return array_search($stepTwo, $this->stepChain, true) - array_search($stepOne, $this->stepChain, true);
+        return array_search($stepOne, $this->definition->stepChain, true) - array_search($stepTwo, $this->definition->stepChain, true);
+    }
+    
+    /**
+     * uses given array as keys and adds the corresponding internal labels as values
+     */
+    public function labelize(array $data) {
+        $labels = $this->getLabels();
+        $usedLabels = array_intersect_key($labels, $data);
+        ksort($usedLabels);
+        ksort($data);
+        if(count($data) !== count($usedLabels)) {
+            // {className}::$labels has to much / or missing labels!',
+            throw new editor_Workflow_Exception('E1253', ['workflowId' => $this->definition->name]);
+        }
+        return array_combine($data, $usedLabels);
     }
 }

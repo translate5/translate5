@@ -163,6 +163,11 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActiveByTask($this->task);
         /* @var $workflow editor_Workflow_Default */
         
+        //is forced to be used from task, so must not go into the documentation either
+        if(property_exists($this->data, 'workflow')) {
+            $this->data->workflow = $workflow->getName();
+        }
+        
         //we have to get the role from the workflowStepName
         if(property_exists($this->data, 'workflowStepName')) {
             $this->data->role = $workflow->getRoleOfStep($this->data->workflowStepName);

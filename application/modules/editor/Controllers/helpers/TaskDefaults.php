@@ -69,9 +69,8 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
         }
     }
 
-    /***
+    /**
      * Add user which should be associated by default on task creation
-     * TODO: recalculate the workflow
      * @param editor_Models_Task $task
      */
     public function addDefaultUserAssoc(editor_Models_Task $task){
@@ -86,22 +85,20 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
         /* @var $manager editor_Workflow_Manager */
 
         $workflow = $manager->getCached($task->getWorkflow());
-        $initialStates = $workflow->getInitialStates();
 
         foreach ($defaults as $assoc){
             $role = $workflow->getRoleOfStep($assoc['workflowStepName']);
 
             $model = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             /* @var $model editor_Models_TaskUserAssoc */
+            $model->setWorkflow($assoc['workflow']);
             $model->setTaskGuid($task->getTaskGuid());
             $model->setUserGuid($assoc['userGuid']);
-            $model->setState($initialStates[$assoc['workflowStepName']][$assoc['workflowStepName']]);
+            $model->setWorkflowStepName($assoc['workflowStepName']);
             $model->setRole($role);
             $model->setSegmentrange($assoc['segmentrange']);
             $model->setDeadlineDate(editor_Utils::addBusinessDays($task->getOrderdate(),$assoc['deadlineDate']));
             $model->save();
         }
-
-        // TODO: function from Thomas which will recalculate the workflow based on the default assocs. The current function is doing this when single assoc is assigned, but this needs to be done onace after all assocs are assigned
     }
 }

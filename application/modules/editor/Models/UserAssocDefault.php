@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -62,8 +62,7 @@ class editor_Models_UserAssocDefault extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
             ->where('customerId = ?', $task->getCustomerId())
             ->where('sourceLang = ?',$task->getSourceLang())
-            ->where('targetLang = ?',$task->getTargetLang())
-            ->where('workflow = ?',$task->getWorkflow());
+            ->where('targetLang = ?',$task->getTargetLang());
         return $this->db->getAdapter()->fetchAll($s);
     }
 }
