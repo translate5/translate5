@@ -105,8 +105,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
 
         //init workflow id for the task
-        $defaultWorkflow = $config->runtimeOptions->import->taskWorkflow;
-        self::$testTask->setWorkflow($workflowManager->getIdToClass($defaultWorkflow));
+        self::$testTask->setWorkflow($config->runtimeOptions->workflow->initialWorkflow);
         self::$testTask->validate();
 
         $wfId = self::$testTask->getWorkflow();

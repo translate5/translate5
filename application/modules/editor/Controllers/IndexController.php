@@ -327,15 +327,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       /* @var $config editor_Models_Config */
       $this->view->Php2JsVars()->set('frontend.config.configLabelMap',$config->getLabelMap());
 
-      $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-      /* @var $wfm editor_Workflow_Manager */
-      $workflow = $wfm->getDefaultTaskConfigured();
-
-      if(!is_null($workflow)){
-          $this->view->Php2JsVars()->set('frontend.import.defaultTaskWorkflow',$workflow->getName());
-      }
-
-
       $this->setJsAppData();
     }
 

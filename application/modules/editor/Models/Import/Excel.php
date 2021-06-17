@@ -128,7 +128,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
     protected function loopOverExcelSegments() {
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
-        $workflow = $wfm->getActive($this->task);
+        $workflow = $wfm->getActiveByTask($this->task);
         
         foreach ($this->excel->getSegments() as $segment) {
             //segment must be initialized completly new

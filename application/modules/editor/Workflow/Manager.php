@@ -69,20 +69,6 @@ class editor_Workflow_Manager {
     }
     
     /**
-     * @deprecated is currently used since classes are configured and stored, in future the name is used for configuration!
-     * @param string $className
-     * @return string
-     */
-    public function getIdToClass($className) {
-        $flipped = array_flip(self::$workflowList);
-        if(empty($flipped[$className])) {
-            // 'Workflow to class "{className}" not found!',
-            throw new editor_Workflow_Exception('E1251', ['className' => $className]);
-        }
-        return $flipped[$className];
-    }
-    
-    /**
      * returns a new workflow instance by given string ID (e.g. default for "Default" Workflow)
      * @param string $wfName
      * @return editor_Workflow_Default
@@ -130,6 +116,7 @@ class editor_Workflow_Manager {
         //only constants of the abstract and therefore always available workflow are allowed to be listed here
         //since only a subset of all constants of the abstract is needed, this manual sub selection is OK.
         return [
+            'DEFAULT_WORKFLOW' => 'default',
             'STEP_NO_WORKFLOW' => editor_Workflow_Default::STEP_NO_WORKFLOW,
             'ROLE_TRANSLATOR' => editor_Workflow_Default::ROLE_TRANSLATOR,
             'ROLE_REVIEWER' => editor_Workflow_Default::ROLE_REVIEWER,
@@ -186,48 +173,27 @@ class editor_Workflow_Manager {
         return $result;
     }
 
-    /***
-     * Return default configured task workflow in zf configuration. The config to define the default
-     * task (import ) workflow is : runtimeOptions.import.taskWorkflow
-     * @return editor_Workflow_Default|null
-     * @throws Zend_Exception
-     * @throws editor_Workflow_Exception
-     */
-    public function getDefaultTaskConfigured(){
-        $config = Zend_Registry::get('config');
-        if(empty($config->runtimeOptions->import->taskWorkflow)) {
-            return null;
-        }
-        return $this->get($this->getIdToClass($config->runtimeOptions->import->taskWorkflow));
-    }
-
     /**
-     * returns the workflow for the given taskGuid, if no taskGuid given take config.import.taskWorkflow as default
+     * returns the workflow for the given taskGuid, if no taskGuid given take config.workflow.initialWorkflow as default
      * @param string|editor_Models_Task $taskOrGuid
      * @return editor_Workflow_Default
      */
-    public function getActive($taskOrGuid = null) {
-        if(empty($taskOrGuid)) {
-            return $this->getDefaultTaskConfigured();
-
+    public function getActiveByTask(editor_Models_Task $task) {
+        $taskGuid = $task->getTaskGuid();
+        if(empty(self::$workflowTaskCache[$taskGuid])) {
+            return self::$workflowTaskCache[$taskGuid] = $this->get($task->getWorkflow());
         }
-        //process given task instead guid
-        if($taskOrGuid instanceof editor_Models_Task) {
-            $task = $taskOrGuid;
-            $taskGuid = $task->getTaskGuid();
-        }
-        else {
-            $taskGuid = $taskOrGuid;
-        }
-        if(!empty(self::$workflowTaskCache[$taskGuid])) {
-            return self::$workflowTaskCache[$taskGuid];
-        }
-        if(empty($task)) {
+        return self::$workflowTaskCache[$taskGuid];
+    }
+    
+    public function getActive(string $taskGuid) {
+        if(empty(self::$workflowTaskCache[$taskGuid])) {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($taskGuid);
+            return $this->getActiveByTask($task);
         }
-        return self::$workflowTaskCache[$taskGuid] = $this->get($task->getWorkflow());
+        return self::$workflowTaskCache[$taskGuid];
     }
     
     /**
