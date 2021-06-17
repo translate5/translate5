@@ -246,14 +246,6 @@ class editor_Workflow_DefaultHandler {
     }
     
     /**
-     * will be called after task import, the imported task is available in $this->newTask
-     */
-    protected function handleImport(){
-        $this->doDebug(__FUNCTION__);
-        $this->callActions(__FUNCTION__);
-    }
-    
-    /**
      * will be called directly before import is started, task is already created and available
      */
     protected function handleBeforeImport(){
@@ -613,7 +605,53 @@ class editor_Workflow_DefaultHandler {
     public function doImport(editor_Models_Task $importedTask, editor_Models_Import_Configuration $importConfig) {
         $this->newTask = $importedTask;
         $this->importConfig = $importConfig;
-        $this->handleImport();
+        $this->doDebug('handleImport');
+        $this->setupInitialWorkflow();
+        $this->callActions('handleImport'); //FIXME convert all handler to their doer functions
+    }
+    
+    /**
+     * - cleans the not needed automatically added task user associations from the job list
+     * - sets the tasks workflow step depending the associated jobs
+     * - sets the initial states depending on the workflow step of the task and task usage mode
+     */
+    protected function setupInitialWorkflow() {
+        /* @var $job editor_Models_TaskUserAssoc */
+        $job = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        $jobs = $job->loadByTaskGuidList([$this->newTask->getTaskGuid()]);
+        
+        $usedSteps = [];
+        //delete jobs created by default which are not belonging to the tasks workflow and collect used steps
+        foreach($jobs as $rawJob) {
+            if($rawJob['workflow'] !== $this->newTask->getWorkflow()) {
+                $job->db->delete(['id = ?' => $rawJob['id']]);
+            }
+            $usedSteps[] = $rawJob['workflowStepName'];
+        }
+        if(empty($usedSteps)) {
+            return;
+        }
+        
+        //sort the found steps regarding the step chain
+        $usedSteps = array_unique($usedSteps);
+        usort($usedSteps, [$this->workflow, 'compareSteps']);
+        
+        //we set the tasks workflow step to the first found step of the assigned users, respecting the order of the step chain
+        $currentStep = array_shift($usedSteps);
+        $this->newTask->updateWorkflowStep($currentStep, false);
+        
+        $isComp = $this->newTask->getUsageMode() == $this->newTask::USAGE_MODE_COMPETITIVE;
+        foreach($jobs as $rawJob) {
+            //currentstep jobs are open
+            if($currentStep === $rawJob['workflowStepName']) {
+                $state = $isComp ? $this->workflow::STATE_UNCONFIRMED : $this->workflow::STATE_OPEN;
+            }
+            else {
+            //all other steps are coming later in the chain, so they are waiting
+                $state = $this->workflow::STATE_WAITING;
+            }
+            $job->db->update(['state' => $state], ['id = ?' => $rawJob['id']]);
+        }
     }
     
     /**
@@ -761,7 +799,7 @@ class editor_Workflow_DefaultHandler {
     protected function getActionConfig() {
         $config = ZfExtended_Factory::get('editor_Workflow_Actions_Config');
         /* @var $config editor_Workflow_Actions_Config */
-        $config->workflow = $this;
+        $config->workflow = $this->workflow;
         $config->newTua = $this->newTaskUserAssoc;
         $config->oldTua = $this->oldTaskUserAssoc;
         $config->oldTask = $this->oldTask;

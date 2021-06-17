@@ -32,3 +32,5 @@ DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.import.taskWorkflo
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`)
 VALUES ('runtimeOptions.workflow.initialWorkflow', '1', 'editor', 'workflow', 'default', 'default', '', 'string', 'The name of the workflow which should be used by default on task creation.', 4, 'Initial workflow on task creation', 'Workflow');
+
+ALTER TABLE `LEK_taskUserAssoc` ADD COLUMN `workflow` varchar(64) NOT NULL DEFAULT 'default' COMMENT 'the workflow to which this job belongs' AFTER `workflowStepName`;

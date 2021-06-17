@@ -56,9 +56,6 @@ VALUES
 ('default', 'translatorCheck', 'Zweites Lektorat', 'translatorCheck', 3, 1),
 ('default', 'visiting', 'Nur anschauen', 'visitor', null, 0);
 
-
-
-
 ALTER TABLE `LEK_taskUserAssoc` ADD COLUMN `workflowStepName` varchar(64) NOT NULL DEFAULT 'reviewing' COMMENT 'workflow step which is used for this job entry' AFTER `role`;
 UPDATE `LEK_taskUserAssoc` SET `workflowStepName` = 'translation' WHERE `role` = 'translator';
 UPDATE `LEK_taskUserAssoc` SET `workflowStepName` = 'reviewing' WHERE `role` = 'reviewer';

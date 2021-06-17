@@ -40,6 +40,7 @@ END LICENSE AND COPYRIGHT
  * @method string getState() getState()
  * @method string getRole() getRole()
  * @method string getWorkflowStepName() getWorkflowStepName()
+ * @method string getWorkflow() getWorkflow()
  * @method string getSegmentrange() getSegmentrange()
  * @method string getUsedState() getUsedState()
  * @method string getUsedInternalSessionUniqId() getUsedInternalSessionUniqId()
@@ -50,6 +51,7 @@ END LICENSE AND COPYRIGHT
  * @method void setState() setState(string $state)
  * @method void setRole() setRole(string $role)
  * @method void setWorkflowStepName() setWorkflowStepName(string $step)
+ * @method void setWorkflow() setWorkflow(string $workflow)
  * @method void setSegmentrange() setSegmentrange(string $segmentrange)
  * @method void setUsedState() setUsedState(string $state)
  * @method void setUsedInternalSessionUniqId() setUsedInternalSessionUniqId(string $sessionId)
@@ -423,8 +425,14 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
 
     protected function _cleanupLocked($taskGuid = null, $forced = false) {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($taskGuid);
-        /* @var $workflow editor_Workflow_Default */
+        if(empty($taskGuid)){
+            $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->get('default');
+            /* @var $workflow editor_Workflow_Default */
+        }
+        else {
+            $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($taskGuid);
+            /* @var $workflow editor_Workflow_Default */
+        }
 
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
         $where = array('not usedState is null and (usedInternalSessionUniqId not in ('.$validSessionIds.') or usedInternalSessionUniqId is null)');
