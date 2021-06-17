@@ -160,7 +160,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         if($this->task->getId() == 0) {
             $this->task->loadByTaskGuid($this->data->taskGuid);
         }
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActiveByTask($this->task);
         /* @var $workflow editor_Workflow_Default */
         
         //we have to get the role from the workflowStepName
@@ -189,7 +189,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->entityLoad();
         $this->task->loadByTaskGuid($this->entity->getTaskGuid());
         $this->log->request();
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActiveByTask($this->task);
         /* @var $workflow editor_Workflow_Default */
         
         //here checks the isWritable if the tua is already in editing mode... Not as intended.
@@ -280,7 +280,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->entityLoad();
         $this->task->loadByTaskGuid($this->entity->getTaskGuid());
         $this->log->request();
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActiveByTask($this->task);
         /* @var $workflow editor_Workflow_Default */
         $this->checkAuthenticatedIsParentOfEntity();
         $this->processClientReferenceVersion();

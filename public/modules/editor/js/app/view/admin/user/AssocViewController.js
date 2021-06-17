@@ -88,11 +88,22 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
 
     onAddAssocBtnClick : function(){
         var me = this,
+            newRecord, config,
             grid = me.getView().down('grid'),
-            newRecord = Ext.create('Editor.model.admin.UserAssocDefault',{
-                customerId : me.getViewModel().get('selectedCustomer').get('id'),
-                workflow: Editor.data.frontend.hasOwnProperty('import.defaultTaskWorkflow') ? Editor.data.frontend.import.defaultTaskWorkflow : 'default'
-            });
+            customerConfig = Ext.getStore('admin.CustomerConfig'),
+            idx = customerConfig.findExact('name', 'runtimeOptions.workflow.initialWorkflow'),
+            workflow = Editor.data.app.workflow.CONST.DEFAULT_WORKFLOW;
+            
+        if(idx >= 0) {
+            config = customerConfig.getAt(idx);
+            if(config) {
+                workflow = config.get('value');
+            }
+        }
+        newRecord = Ext.create('Editor.model.admin.UserAssocDefault',{
+            customerId : me.getViewModel().get('selectedCustomer').get('id'),
+            workflow: workflow
+        });
         grid.getStore().rejectChanges();
         grid.getStore().add(newRecord);
         grid.setSelection(newRecord);

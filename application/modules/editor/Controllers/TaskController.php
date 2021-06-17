@@ -533,11 +533,16 @@ class editor_TaskController extends ZfExtended_RestController {
             $meta->setMappingType($this->data['mappingType']);
         }
 
-        $this->prepareCustomer();
+        $customer = $this->prepareCustomer();
 
-        //init workflow id for the task
-        $defaultWorkflow = $this->config->runtimeOptions->import->taskWorkflow;
-        $this->entity->setWorkflow($this->workflowManager->getIdToClass($defaultWorkflow));
+        if($customer) {
+            $c = $customer->getConfig();
+        }
+        else {
+            $c = $this->config;
+        }
+        //init workflow id for the task, based on customer or general config as fallback
+        $this->entity->setWorkflow($c->runtimeOptions->workflow->initialWorkflow);
 
         if($this->validate()) {
             $this->initWorkflow();
@@ -660,9 +665,10 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * Loads the customer by id, or number, or the default customer
      * stores the customerid internally and in this->data
+     * @return editor_Models_Customer the loaded customer if any
      */
-    protected function prepareCustomer() {
-        $customer = ZfExtended_Factory::get('editor_Models_Customer');
+    protected function prepareCustomer(): ?editor_Models_Customer {
+        $result = $customer = ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $customer editor_Models_Customer */
 
         if(empty($this->data['customerId'])) {
@@ -678,12 +684,14 @@ class editor_TaskController extends ZfExtended_RestController {
                 }
                 catch (ZfExtended_Models_Entity_NotFoundException $e) {
                     // do nothing here, then the validation is triggered to feedback the user
+                    $result = null;
                 }
             }
         }
 
         $this->entity->setCustomerId((int) $customer->getId());
         $this->data['customerId'] = (int) $customer->getId();
+        return $result;
     }
 
     /***

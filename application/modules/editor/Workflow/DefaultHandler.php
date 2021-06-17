@@ -300,7 +300,7 @@ class editor_Workflow_DefaultHandler {
         if($nextStep) {
             //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!
             $this->setNextStep($task, $nextStep);
-            $nextRole = $this->getRoleOfStep($nextStep);
+            $nextRole = $this->workflow->getRoleOfStep($nextStep);
             $this->doDebug(__FUNCTION__." Next Role: ".$nextRole);
             if($nextRole) {
                 $isComp = $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE;
