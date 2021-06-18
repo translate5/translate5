@@ -30,13 +30,55 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.customer.ViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.customerPanel',
-    
+
     routes: {
         'client': 'onClientRoute'
     },
-    
+
+    listen: {
+        component: {
+            '#displayTabPanel': {
+                tabchange: 'onDisplayTabPanelTabChange',
+                activate: 'onDisplayTabPanelActivate'
+            }
+        }
+    },
+
     onClientRoute: function() {
         Editor.app.openAdministrationSection(this.getView(), 'client');
+    },
+
+    onDisplayTabPanelTabChange: function (tabPanel,newActiveTab){
+        var me=this,
+            grid = newActiveTab.down('grid');
+        me.updateActiveTabViewModel(newActiveTab);
+
+        // reload the store when the card is changed. This must be done because the grid store is not loaded
+        // after the component is rendered
+        if(grid && grid.getStore() && !grid.getStore().isLoaded()){
+            if(grid.getViewModel()){
+                grid.getViewModel().notify();
+            }
+            grid.getStore().load();
+        }
+    },
+
+    onDisplayTabPanelActivate:function (tabPanel){
+        this.updateActiveTabViewModel(tabPanel.activeTab);
+    },
+
+    /***
+     * Update view model values which are depending on the current active tab.
+     * If no active tab is provided as argument the current active-set in displayTabPanel will be used.
+     * @param activeTab
+     */
+    updateActiveTabViewModel:function (activeTab){
+        var me=this,
+            vm = me.getView().getViewModel();
+        if(!activeTab){
+            activeTab = me.getView().down('#displayTabPanel').getActiveTab();
+        }
+        vm.set('isActiveTabIncludedInForm',activeTab.isIncludedInForm);
     },
     
     /**
@@ -44,6 +86,20 @@ Ext.define('Editor.view.admin.customer.ViewController', {
      */
     dblclick: function(dataview, record, item, index, e, eOpts) {
         this.editCustomer(record);
+    },
+
+    /***
+     * Action icon "edit customer" event handler
+     */
+    onCustomerEditClick:function(view, cell, row, col, ev, record) {
+        this.editCustomer(record);
+    },
+
+    /***
+     * On export action column click handler
+     */
+    onTmExportClick:function(view, cell, row, col, ev, record) {
+        this.exportCustomerResourceUsage(record && record.get('id'));
     },
 
     /**
@@ -73,7 +129,6 @@ Ext.define('Editor.view.admin.customer.ViewController', {
                 Editor.MessageBox.addSuccess(me.getView().strings.customerSavedMsg);
                 store.load();
                 me.getView().unmask();
-                //me.getView().fireEvent('customerSaved');
                 me.cancelEdit();
             },
             failure: function(rec, op) {
@@ -89,13 +144,11 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     editCustomer:function(record){
         var me=this,
             formPanel = me.getReferences().form,
-            removeButton = me.getReferences().removeButton,
             vm = me.getViewModel(),
-            isOpenIdHidden=record.get('number')==Editor.model.admin.Customer.DEFAULTCUSTOMER_NUMBER && !Editor.data.customers.openid.showOpenIdDefaultCustomerData;
+            isOpenIdHidden = record.get('number') === Editor.model.admin.Customer.DEFAULTCUSTOMER_NUMBER && !Editor.data.customers.openid.showOpenIdDefaultCustomerData;
     
         vm.set('record', record);
-        vm.set('title', me.getView().strings.editCustomerTitle);
-    
+
         formPanel.loadRecord(record);
         
         var roles = record.get('openIdServerRoles').split(','),
@@ -111,11 +164,12 @@ Ext.define('Editor.view.admin.customer.ViewController', {
             item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
         });
         
-        removeButton.setDisabled(false);
-        
         //hide the openid data for the default customer if it is configured so
-        formPanel.down('#openIdDomain').setVisible(!isOpenIdHidden);
-        formPanel.down('#openIdFieldset').setVisible(!isOpenIdHidden);
+        me.getView().down('#openIdDomain').setVisible(!isOpenIdHidden);
+        me.getView().down('#openIdFieldset').setDisabled(isOpenIdHidden);
+
+        // update active tab view models
+        me.updateActiveTabViewModel();
     },
     
     /***
@@ -136,24 +190,32 @@ Ext.define('Editor.view.admin.customer.ViewController', {
      * Reset the customer form
      */
     cancelEdit: function(button, e, eOpts) {
-        var formPanel = this.getReferences().form,
+        var me=this,
+            formPanel = me.getReferences().form,
             form = formPanel.getForm(),
-            vm = this.getViewModel();
+            vm = me.getViewModel();
 
         // Clear form
         form.reset();
         vm.set('record', false);
+
+        // update the active tab view model values
+        me.updateActiveTabViewModel();
     },
 
     /***
      * Load empty record in customer form
      */
     add: function(button, e, eOpts) {
-        var formPanel = this.getReferences().form,
-            removeButton = this.getReferences().removeButton,
+        var me = this,
+            formPanel = me.getReferences().form,
             form = formPanel.getForm(),
             newRecord = Ext.create('Editor.model.admin.Customer'),
             vm = this.getViewModel();
+
+
+        // set the first tab always active after new record add
+        me.getView().down('#displayTabPanel').setActiveTab(0);
 
         // Clear form
         form.reset();
@@ -164,8 +226,6 @@ Ext.define('Editor.view.admin.customer.ViewController', {
 
         // Set title
         vm.set('title',this.getView().strings.addCustomerTitle);
-
-        removeButton.setDisabled(true);
     },
 
     /**
@@ -178,15 +238,28 @@ Ext.define('Editor.view.admin.customer.ViewController', {
 
     /**
      * Show confirmation message for remove customer
+     *
+     * @param {Ext.grid.View} view
+     * @param {DOMElement} cell
+     * @param {Integer} row
+     * @param {Integer} col
+     * @param {Ext.Event} ev
+     * @param {Object} record
      */
-    remove:function(){
+    remove:function(view, cell, row, col, ev, record) {
         var me=this;
 
         Ext.create('Ext.window.MessageBox').show({
             title: me.getView().strings.customerDeleteTitle,
             msg: me.getView().strings.customerDeleteMsg,
             buttons: Ext.Msg.YESNO,
-            fn:me.handleDeleteCustomerWindowButton,
+            fn:function(button){
+                if(button === "yes"){
+                    me.removeCustomer(record);
+                    return true;
+                }
+                return false;
+            },
             scope:me,
             defaultFocus:'no',
             icon: Ext.MessageBox.QUESTION
@@ -197,16 +270,10 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     /***
      * Remove the loaded customer
      */
-    removeCustomer:function(){
+    removeCustomer:function(record){
         var me = this,
-            formPanel = me.getReferences().form,
-            form = formPanel.getForm(),
-            record = form.getRecord(),
             store = Ext.StoreManager.get('customersStore'),
             deleting = me.getView().strings.customerDeleteTitle;
-
-        // Update associated record with values
-        form.updateRecord();
 
         me.getView().mask(deleting);
 
@@ -216,7 +283,6 @@ Ext.define('Editor.view.admin.customer.ViewController', {
                 Editor.MessageBox.addSuccess(me.getView().strings.customerDeletedMsg);
                 me.getView().unmask();
                 me.cancelEdit();
-                //me.getView().fireEvent('customerRemoved');
             },
             failure: function(rec, op) {
                 store.load();
@@ -227,19 +293,9 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     },
 
     /***
-     * Handler for the delete customer dialog window.
-     * 
+     * On customer panel activate event handler
      */
-    handleDeleteCustomerWindowButton:function(button){
-        if(button=="yes"){
-            this.removeCustomer();
-            return true;
-        }
-        return false
-    },
-
-    //when customers panel is displayed,this function is executed
-    reloadCustomerStore:function(){
+    onCustomerPanelActivate:function(){
         Ext.StoreManager.get('customersStore').load();
     },
     
@@ -247,34 +303,56 @@ Ext.define('Editor.view.admin.customer.ViewController', {
      * Return boolean if one of the given fields in the form is changed/has value
      */
     handleRequiredFields:function(form,fields){
-    	var me=this,
-			isRequired=false;
-		
-		//for each of the openid, check if one of them contains value
-		//if yes all other fields are required
-	    Ext.Array.forEach(fields, function(field) {
-	    	if(!isRequired){
-	    		isRequired=form.findField(field).getValue()!='';
-	    	}
-	    });
-	    return isRequired;
+        var me=this,
+            isRequired=false;
+        
+        //for each of the openid, check if one of them contains value
+        //if yes all other fields are required
+        Ext.Array.forEach(fields, function(field) {
+            if(!isRequired){
+                isRequired=form.findField(field).getValue()!='';
+            }
+        });
+        return isRequired;
     },
     
     onOpenIdFieldChange:function(field,newValue,oldValue,eOpts){
-    	var me=this,
-    		form=me.getView().down('form').getForm(),
-    		vm=me.getViewModel(),
-    		fields=['openIdServer','openIdIssuer','openIdAuth2Url','openIdClientId','openIdClientSecret'];
-    	
-    	vm.set('isOpenIdRequired',me.handleRequiredFields(form,fields));
+        var me=this,
+            form=me.getView().down('form').getForm(),
+            vm=me.getViewModel(),
+            fields=['openIdServer','openIdIssuer','openIdAuth2Url','openIdClientId','openIdClientSecret'];
+        
+        vm.set('isOpenIdRequired',me.handleRequiredFields(form,fields));
     },
     
     onOpenIdRedirectCheckboxChange:function(field){
-    	var me=this,
-			form=me.getView().down('form').getForm(),
-			openIdRedirectLabel=form.findField('openIdRedirectLabel');
+        var me=this,
+            form=me.getView().down('form').getForm(),
+            openIdRedirectLabel=form.findField('openIdRedirectLabel');
 
-		openIdRedirectLabel.setAllowBlank(field.checked);
+        openIdRedirectLabel.setAllowBlank(field.checked);
+    },
+
+    /***
+     * Generate excel for resource usage for the given customer. If the customer is not defined,
+     * summ excel for all customers will be generated.
+     */
+    exportCustomerResourceUsage:function(id){
+        var url = Editor.data.restpath+'customer/exportresource?format=resourceLogExport',
+            extraParams = [];
+
+        if(id){
+            extraParams.push(Ext.urlEncode({customerId: id}));
+        }
+
+        // Fire before resources export event.
+        this.getView().fireEvent('beforeExportCustomerResourceUsage',extraParams);
+
+        Ext.each(extraParams, function(ob){
+            url += '&'+ob;
+        });
+
+        window.open(url);
     }
 
 });
