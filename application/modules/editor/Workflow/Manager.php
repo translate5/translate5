@@ -135,6 +135,7 @@ class editor_Workflow_Manager {
     public function getWorkflowData() {
         $result = [];
         $labelize = function(array $data, $cls, $labels) {
+            return $labels;
             $usedLabels = array_intersect_key($labels, $data);
             ksort($usedLabels);
             ksort($data);

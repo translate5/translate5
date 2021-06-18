@@ -42,7 +42,8 @@ Ext.define('Editor.model.admin.UserAssocDefault', {
       {name: 'login', type: 'string', persist: false},
       {name: 'workflowStepName', type: 'string'},
       {name: 'workflow', type: 'string'},
-      {name: 'segmentrange', type: 'string'}
+      {name: 'segmentrange', type: 'string'},
+      {name: 'deadlineDate'}
     ],
 
     toString: function (){

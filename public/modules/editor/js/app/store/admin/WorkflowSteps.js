@@ -51,5 +51,25 @@ Ext.define('Editor.store.admin.WorkflowSteps', {
         });
 
         return returnConfig;
+    },
+
+    /***
+     * Load all steps of given workflow
+     * @param workflow
+     */
+    loadForWorkflow: function (workflow){
+        var me=this;
+        me.removeAll();
+        if(!Editor.data.app.workflows.hasOwnProperty(workflow)){
+            return;
+        }
+        var w = Editor.data.app.workflows[workflow];
+        var loopOver = w.steps;
+        if(me.useAssignableSteps){
+            loopOver = w.assignableSteps;
+        }
+        Ext.Object.each(loopOver, function (key, value) {
+            me.add({id: key, text: value});
+        });
     }
 });

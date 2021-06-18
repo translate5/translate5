@@ -30,10 +30,6 @@ Ext.define('Editor.view.admin.user.AssocViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.adminUserAssoc',
 
-    data:{
-        selectedCustomer : false
-    },
-
     strings: {
         editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
         segmentrangeError: '#UT#Nicht zugewiesene Segmente',
@@ -49,25 +45,9 @@ Ext.define('Editor.view.admin.user.AssocViewModel', {
         users: {
             source: 'admin.Users'
         },
-        workflowSteps: Ext.create('Editor.store.admin.WorkflowSteps',{ useAssignableSteps:true }),
-        workflow: Ext.create('Editor.store.admin.Workflow'),
-        userAssoc:{
-            model:'Editor.model.admin.UserAssocDefault',
-            remoteFilter: true,
-            pageSize: false,
-            setFilters:function(filters){
-                // ignore the firing on empty value
-                if(filters && !filters.value){
-                    this.loadData([],false);
-                    return;
-                }
-                this.superclass.superclass.setFilters.apply(this, [filters]);
-            },
-            filters:{
-                property: 'customerId',
-                operator:"eq",
-                value:'{selectedCustomer.id}'
-            }
-        }
+        workflowSteps: Ext.create('Editor.store.admin.WorkflowSteps',{
+            useAssignableSteps:true
+        }),
+        workflow: Ext.create('Editor.store.admin.Workflow')
     }
 });
