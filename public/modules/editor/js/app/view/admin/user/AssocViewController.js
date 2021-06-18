@@ -34,7 +34,7 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
     listen:{
         component:{
             '#saveAssocBtn':{
-                click:'onSaveAssocBtnClick',
+                click:'onSaveAssocBtnClick'
             },
             '#cancelAssocBtn': {
                 click:'onCancelAssocBtnClick'
@@ -55,8 +55,8 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
                 select: 'onWorkflowStepNameSelect',
                 change:'checkDuplicates'
             },
-            '#workflow':{
-                change:'checkDuplicates'
+            '#workflowCombo':{
+                change:'onWorkflowComboChange'
             },
             '#sourceLang':{
                 change:'checkDuplicates'
@@ -71,42 +71,53 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
     },
 
     onSaveAssocBtnClick : function(){
-
         var me = this,
-            view = me.getView(),
-            form = view.down('form').getForm(),
-            store = view.down('grid').getStore();
+            formPanel = me.lookup('assocForm'),
+            form = formPanel.getForm(),
+            rec = formPanel.getRecord();
+        form.updateRecord(rec);
 
-        if (form.isValid()) {
-            store.sync();
+        if(! form.isValid()) {
+            return;
         }
+        rec.save({
+            failure: function(rec, op) {
+                var errorHandler = Editor.app.getController('ServerException');
+                errorHandler.handleFormFailure(form, rec, op);
+            },
+            success: function() {
+                me.getView().down('grid').getStore().load();
+                Editor.MessageBox.addSuccess('Assoc saved');
+                me.onCancelAssocBtnClick();
+            }
+        });
     },
 
     onCancelAssocBtnClick : function(){
-        this.cancelEditRecord();
+        var me=this,
+            formPanel = me.lookup('assocForm'),
+            form = formPanel.getForm();
+        form.reset(true);
+        formPanel.setDisabled(true);
     },
 
     onAddAssocBtnClick : function(){
-        var me = this,
-            newRecord, config,
-            grid = me.getView().down('grid'),
-            customerConfig = Ext.getStore('admin.CustomerConfig'),
-            idx = customerConfig.findExact('name', 'runtimeOptions.workflow.initialWorkflow'),
-            workflow = Editor.data.app.workflow.CONST.DEFAULT_WORKFLOW;
-            
-        if(idx >= 0) {
-            config = customerConfig.getAt(idx);
-            if(config) {
-                workflow = config.get('value');
-            }
-        }
+        var me=this,
+            newRecord,
+            formPanel = me.getView().down('form'),//me.lookup('assocForm'),
+            form = formPanel.getForm(),
+            workflowCombo = me.getView().down('#workflowCombo');
+
+        form.reset(true);
+
         newRecord = Ext.create('Editor.model.admin.UserAssocDefault',{
-            customerId : me.getViewModel().get('selectedCustomer').get('id'),
-            workflow: workflow
+            customerId : me.getView().getCustomer().get('id'),
+            workflow: workflowCombo.getValue()
         });
-        grid.getStore().rejectChanges();
-        grid.getStore().add(newRecord);
-        grid.setSelection(newRecord);
+
+        form.loadRecord(newRecord);
+
+        formPanel.setDisabled(false);
     },
 
     onDeleteAssocBtnClick : function (){
@@ -120,8 +131,8 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
                 // Delete record from store
                 store.remove(record);
                 store.sync();
+                me.onCancelAssocBtnClick();
             }
-
         });
     },
 
@@ -130,8 +141,10 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
         me.getView().down('grid').getStore().load();
     },
 
-    onAssocGridSelect: function () {
-
+    onAssocGridSelect: function (grid,record) {
+        var me=this,
+            form = me.lookup('assocForm');
+        form.getForm().loadRecord(record);
     },
 
     /***
@@ -141,9 +154,15 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
      */
     onWorkflowStepNameSelect: function (combo,record) {
         var me = this,
-            form = me.getView().down('form').getForm(),
+            form = me.lookup('assocForm').getForm(),
             deadlineDate = form.findField('deadlineDate');
         deadlineDate.setValue(me.getConfigDeadlineDate(record.get('id')));
+    },
+
+    onWorkflowComboChange : function (combo, newValue){
+        var me = this;
+        me.getView().loadAssocData();
+        me.getViewModel().getStore('workflowSteps').loadForWorkflow(newValue);
     },
 
     /***
@@ -175,26 +194,24 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
     checkDuplicates:function (field){
         var me = this,
             grid = me.getView().down('grid'),
-            selection = grid.getSelection(),
-            record = selection.length === 1 ? selection[0] : false,
+            form = me.lookup('assocForm').getForm(),
+            record = form.getRecord(),
             store = grid.getStore();
 
+        form.updateRecord();
+
         // if the record exist on the server, ignore the check ( the check is being triggered via selecting record in the grid)
-        if(!record || !record.phantom){
+        if(!record){
             return;
         }
 
         store.each(function (r){
-            if(r.phantom){
-                return true;
-            }
             field.duplicateRecord = r.toString() === record.toString();
-            field.clearInvalid();
             if(field.duplicateRecord){
-                field.markInvalid('Duplicate field');
-                record.set(field.getName(),null);
                 return false;
             }
         });
+
+        form.isValid();
     }
 });

@@ -37,23 +37,41 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.form.Panel
  */
 Ext.define('Editor.view.admin.task.UserAssocWizard', {
-    extend:'Editor.view.admin.task.UserAssoc',
+    extend:'Editor.view.admin.user.Assoc',
     alias: 'widget.adminTaskUserAssocWizard',
     itemId:'adminTaskUserAssocWizard',
     requires: [
-        'Editor.view.admin.task.UserAssoc'
+        'Editor.view.admin.task.UserAssoc',
+        'Editor.view.admin.task.UserAssocWizardViewController'
     ],
+    viewModel:{
+        type:'adminTaskUserAssocWizard'
+    },
+    controller:'adminTaskUserAssocWizard',
     mixins:['Editor.controller.admin.IWizardCard'],
 
     //card type, used for card display order
     importType:'postimport',
-
     task:null,
     header:false,
     title:null,
 
     strings:{
-        wizardTitle:'#UT#Standard-Benutzerzuweisungen'
+        wizardTitle:'#UT#Standard-Benutzerzuweisungen',
+        sourceLang: '#UT#Quellsprache',
+        targetLang: '#UT#Zielsprache',
+        fieldWorkflowStepName: '#UT#Workflow-Schritt',
+        fieldWorkflow: '#UT#Workflow',
+        fieldState: '#UT#Status',
+        fieldUser: '#UT#Benutzer',
+        btnSave: '#UT#Speichern',
+        btnCancel: '#UT#Abbrechen',
+        formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
+        formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
+        fieldDeadline:'#UT#Deadline',
+        fieldSegmentrange: '#UT#Editierbare Segmente',
+        fieldSegmentrangeInfo: '#UT#Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)',
+        deadlineDateInfoTooltip:'#UT#translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.'
     },
 
     listeners:{
@@ -61,75 +79,34 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
     },
 
     initComponent:function(){
-        var me=this,
-            gridConfig = me.items[0];
-        gridConfig.features= [{
-            ftype: 'grouping',
-            startCollapsed: true,
-            groupHeaderTpl: '{targetLang} ({rows.length})'
-        }];
+        var me=this;
         me.callParent();
-        me.loadCustomConfig();
+        me.setCustomConfig();
     },
 
-    loadCustomConfig:function(){
-        var me=this,
-            assocGrid = me.down('#adminTaskUserAssocGrid');
-        assocGrid.down('#userSpecialPropertiesBtn').setHidden(true);
-        assocGrid.down('#reload-btn').setHidden(true);
-
-        assocGrid.reconfigure(assocGrid.getStore(),[{
-            xtype: 'gridcolumn',
-            width: 230,
-            dataIndex: 'sourceLang',
-            text: 'Source'
-        },{
-            xtype: 'gridcolumn',
-            width: 230,
-            dataIndex: 'targetLang',
-            text: 'Target'
-        },{
-            xtype: 'gridcolumn',
-            width: 230,
-            dataIndex: 'login',
-            renderer: function(v, meta, rec) {
-                if(Editor.data.debug) {
-                    v = Ext.String.format('<a href="{0}session/?authhash={1}">{2}</a>', Editor.data.restpath, rec.get('staticAuthHash'), v);
-                }
-                return rec.get('surName')+', '+rec.get('firstName')+' ('+v+')';
-            },
-            filter: {
-                type: 'string'
-            },
-            text: assocGrid.strings.userGuidCol
-        },{
-            xtype: 'gridcolumn',
-            width: 100,
-            dataIndex: 'role',
-            renderer: function(v,meta,rec) {
-                var task=me.lookupViewModel().get('currentTask'),
-                    vfm=task && task.getWorkflowMetaData(),
-                    role=(vfm && vfm.roles && vfm.roles[v]) || v;
-                return role;
-            },
-            text: assocGrid.strings.roleCol
-        },{
-            xtype: 'gridcolumn',
-            width: 70,
-            dataIndex: 'segmentrange',
-            text: assocGrid.strings.segmentrangeCol
-        }]);
-    },
-
-    /***
-     */
-    onUserAssocWizardActivate:function(){
-        var me=this,
-            store=me.down('#adminTaskUserAssocGrid').getStore();
-        store.setExtraParams({
-            projectId:me.task.get('projectId')
+    setCustomConfig:function (){
+        var me = this,
+            form = me.lookup('assocForm');
+        // bind the assoc grid to taskUserAssoc store
+        me.down('adminUserAssocGrid').setBind({
+            store:'{userAssocImport}'
         });
-        store.load();
+
+        // remove the numberfield deadline date and create it as datetime field
+        form.remove(form.down('#deadlineDate'));
+        form.add({
+            xtype: 'datetimefield',
+            name: 'deadlineDate',
+            format: Editor.DATE_HOUR_MINUTE_ISO_FORMAT,
+            fieldLabel: me.strings.fieldDeadline,
+            labelCls: 'labelInfoIcon',
+            cls: 'userAssocLabelIconField',
+            autoEl: {
+                tag: 'span',
+                'data-qtip': me.strings.deadlineDateInfoTooltip
+            },
+            anchor: '100%'
+        });
     },
 
     //called when next button is clicked

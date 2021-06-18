@@ -81,6 +81,22 @@ Ext.define('Editor.util.Util', {
                 });
             }
             return selector;
+        },
+
+        /**
+         * renders the value of the language columns
+         * @param {String} val
+         * @returns {String}
+         */
+        gridColumnLanguageRenderer: function(val, md) {
+            var lang = Ext.StoreMgr.get('admin.Languages').getById(val),
+                label;
+            if(lang){
+                label = lang.get('label');
+                md.tdAttr = 'data-qtip="' + label + '"';
+                return label;
+            }
+            return '';
         }
     }
     
