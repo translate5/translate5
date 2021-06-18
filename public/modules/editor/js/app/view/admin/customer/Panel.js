@@ -33,7 +33,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
     requires: [
         'Editor.view.admin.customer.ViewModel',
         'Editor.view.admin.customer.ViewController',
-        'Editor.view.admin.config.Grid'
+        'Editor.view.admin.config.Grid',
+        'Editor.view.admin.user.Assoc'
     ],
 
     stores:['Editor.stores.admin.Customers'],
@@ -43,7 +44,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
     },
     listeners: {
         activate: {
-            fn: 'reloadCustomerStore',//when customers panel is displayed,this function is executed in the ViewController
+            fn: 'onCustomerPanelActivate',
             scope: 'controller'
         },
         render:{
@@ -58,7 +59,6 @@ Ext.define('Editor.view.admin.customer.Panel', {
         save:'#UT#Speichern',
         cancel:'#UT#Abbrechen',
         remove:'#UT#Löschen',
-        editCustomerTitle:'#UT#Kunde bearbeiten',
         addCustomerTitle:'#UT#Kunde hinzufügen',
         saveCustomerMsg:'#UT#Kunde wird gespeichert...',
         customerSavedMsg:'#UT#Kunde gespeichert!',
@@ -67,19 +67,19 @@ Ext.define('Editor.view.admin.customer.Panel', {
         customerDeletedMsg:'#UT#Kunde gelöscht',
         export:'#UT#Ressourcen-Nutzung Exportieren',
         domain:'#UT#translate5 Domain',
-        openIdServer:'#UT#OpenId server',
-        openIdIssuer:'#UT#OpenId Issuer',
-        openIdClientId:'#UT#OpenId Benutzername',
-        openIdClientSecret:'#UT#OpenId Passwort',
-        openIdAuth2Url:'#UT#OpenId OAuth URL',
+        openIdServer:'#UT#OpenID server',
+        openIdIssuer:'#UT#OpenID Issuer',
+        openIdClientId:'#UT#OpenID Benutzername',
+        openIdClientSecret:'#UT#OpenID Passwort',
+        openIdAuth2Url:'#UT#OpenID OAuth URL',
         defaultRolesGroupLabel: '#UT#Standardrollen',
         serverRolesGroupLabel: '#UT#Erlaubte Rollen',
         openIdRedirectLabel:'#UT#Verlinkter Text Loginseite',
         openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.',
-        defaultRolesGroupLabelTooltip: '#UT#Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.',
+        defaultRolesGroupLabelTooltip: '#UT#Standardsystemrollen werden verwendet, wenn der OpenID-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.',
         serverRolesGroupLabelTooltip: '#UT#Systemrollen, die der OpenID-Server in translate5 festlegen darf.',
-        propertiesTabPanelTitle: '#UT#Eigenschaften',
-        configTabTitle:'#UT#Standardkonfiguration des Systems',
+        propertiesTabPanelTitle: '#UT#Allgemein',
+        configTabTitle:'#UT#Überschreibung der Systemkonfiguration',
         actionColumn:'#UT#Aktionen',
         customerEditActionIcon:'#UT#Kunden bearbeiten'
     },
@@ -98,7 +98,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
             roles=[];
         
         Ext.Object.each(Editor.data.app.roles, function(key, value) {
-            //if the role is not setable for the user, do not create an check box for it
+            //if the role is not settable for the user, do not create check box for it
             if(!value.setable){
                 return;
             }
@@ -133,36 +133,43 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             filter: {
                                 type: 'number'
                             }
-                        },
-                            {
+                            },{
+                            xtype: 'actioncolumn',
+                            text:  me.strings.actionColumn,
+                            //menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter.
+                            // NOTE: when this is uncommented, the last action icon is always hidden. You need to resize the action column to make all action items visible.
+                            sortable: false,
+                            width: 60,
+                            items:[{
+                                glyph: 'f044@FontAwesome5FreeSolid',
+                                tooltip: me.strings.customerEditActionIcon,
+                                scope:'controller',
+                                handler:'onCustomerEditClick'
+                            },{
+                                glyph: 'f1c3@FontAwesome5FreeSolid',
+                                tooltip: me.strings.export,
+                                scope:'controller',
+                                handler:'onTmExportClick'
+                            },{
+                                glyph: 'f2ed@FontAwesome5FreeSolid',
+                                tooltip:me.strings.remove,
+                                scope:'controller',
+                                handler:'remove'
+                            }]
+                        },{
                                 xtype: 'gridcolumn',
                                 dataIndex: 'name',
                                 text: me.strings.customerName,
                                 filter: {
                                     type: 'string'
                                 }
-                            },
-                            {
+                            },{
                                 xtype: 'gridcolumn',
                                 dataIndex: 'number',
                                 text:  me.strings.customerNumber,
                                 filter: {
                                     type: 'string'
                                 }
-                            },{
-                                xtype: 'actioncolumn',
-                                text:  me.strings.actionColumn,
-                                menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
-                                sortable: false,
-                                items:[{
-                                    glyph: 'f044@FontAwesome5FreeSolid',
-                                    tooltip: me.strings.customerEditActionIcon,
-                                    handler:me.onCustomerEditClick
-                                },{
-                                    glyph: 'f1c3@FontAwesome5FreeSolid',
-                                    tooltip: me.strings.export,
-                                    handler:me.onTmExportClick
-                                }]
                             }
                         ],
                         listeners: {
@@ -184,37 +191,79 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 beforerefresh: 'onViewBeforeRefresh'
                             }
                         }
-                    },
-                    {
-                        xtype: 'tabpanel',
+                    },{
+                        xtype: 'form',
                         flex: 0.7,
                         region: 'east',
+                        reference: 'form',
                         split: true,
-                        reference: 'display',
-                        width: 150,
-                        bodyBorder: true,
-                        scrollable:true,
-                        items: [
-                            {
-                                xtype: 'form',
-                                reference: 'form',
-                                bodyPadding: 10,
-                                tools:[{
-                                    itemId: 'home',
-                                    type: 'home',
-                                    cls:'tools-help-icon',
-                                    qtip: 'OpenID connect',
-                                    handler: function(panel, tool, event) {
-                                        window.open('https://confluence.translate5.net/display/BUS/OpenID+connect+in+translate5', '_blank');
+                        layout:'fit',
+                        fieldDefaults: {
+                            width: '100%'
+                        },
+                        dockedItems:[{
+                            xtype: 'toolbar',
+                            flex: 1,
+                            dock: 'bottom',
+                            ui: 'footer',
+                            layout: {
+                                pack: 'start',
+                                type: 'hbox'
+                            },
+                            bind:{
+                                disabled:'{!record}'
+                            },
+                            items:[{
+                                xtype: 'button',
+                                formBind: true,
+                                itemId: 'saveButton',
+                                reference: 'saveButton',
+                                text: me.strings.save,
+                                glyph: 'f00c@FontAwesome5FreeSolid',
+                                bind:{
+                                    visible:'{isActiveTabIncludedInForm}'
+                                },
+                                listeners: {
+                                    click: {
+                                        fn: 'save',
+                                        scope: 'controller'
                                     }
-                                }],
-                                fieldDefaults: {
-                                    anchor: '1'
-                                },
+                                }
+                            },{
+                                xtype: 'button',
+                                itemId: 'cancelButton',
+                                text: me.strings.cancel,
+                                glyph: 'f00d@FontAwesome5FreeSolid',
+                                listeners: {
+                                    click: {
+                                        fn: 'cancelEdit',
+                                        scope: 'controller'
+                                    }
+                                }
+                            }]
+                        }],
+                        items: [{
+                            xtype: 'tabpanel',
+                            itemId:'displayTabPanel',
+                            reference: 'display',
+                            bind:{
+                                disabled : '{!record}'
+                            },
+                            //TODO: move me as button in the openid panel after cancel/save button -> lower toolbar
+                            tools:[{
+                                itemId: 'home',
+                                type: 'home',
+                                cls:'tools-help-icon',
+                                qtip: 'OpenID connect',
+                                handler: function() {
+                                    window.open('https://confluence.translate5.net/display/BUS/OpenID+connect+in+translate5', '_blank');
+                                }
+                            }],
+                            items:[{
                                 title:me.strings.propertiesTabPanelTitle,
-                                bind: {
-                                    disabled: '{!record}'
-                                },
+                                bodyPadding: 10,
+                                scrollable:true,
+                                isIncludedInForm:true,// is the component part of the customers form. There are some other components in the display tab which are not part of the form (ex: config and user assoc tabs)
                                 items: [
                                     {
                                         xtype: 'textfield',
@@ -235,209 +284,157 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         fieldLabel:me.strings.domain,
                                         name:'domain',
                                         itemId:'openIdDomain'
-                                    },{
-                                        xtype:'fieldset',
-                                        itemId:'openIdFieldset',
-                                        collapsible: true,
-                                        collapsed: true,
-                                        title:'OpenId Connect',
-                                        items:[
-                                            {
-                                                xtype:'textfield',
-                                                fieldLabel:me.strings.openIdServer,
-                                                vtype: 'url',
-                                                name:'openIdServer',
-                                                setAllowBlank:me.setFieldAllowBlank,
-                                                listeners: {
-                                                    change: {
-                                                        fn: 'onOpenIdFieldChange',
-                                                        scope: 'controller'
-                                                    }
-                                                },
-                                                bind:{
-                                                    allowBlank:'{!isOpenIdRequired}'
-                                                }
-                                            },
-                                            {
-                                                xtype:'textfield',
-                                                fieldLabel:me.strings.openIdIssuer,
-                                                vtype: 'url',
-                                                name:'openIdIssuer',
-                                                setAllowBlank:me.setFieldAllowBlank,
-                                                listeners: {
-                                                    change: {
-                                                        fn: 'onOpenIdFieldChange',
-                                                        scope: 'controller'
-                                                    }
-                                                },
-                                                bind:{
-                                                    allowBlank:'{!isOpenIdRequired}'
-                                                }
-                                            },
-                                            {
-                                                xtype:'textfield',
-                                                fieldLabel:me.strings.openIdClientId,
-                                                name:'openIdClientId',
-                                                setAllowBlank:me.setFieldAllowBlank,
-                                                listeners: {
-                                                    change: {
-                                                        fn: 'onOpenIdFieldChange',
-                                                        scope: 'controller'
-                                                    }
-                                                },
-                                                bind:{
-                                                    allowBlank:'{!isOpenIdRequired}'
-                                                }
-                                            },
-                                            {
-                                                xtype:'textfield',
-                                                fieldLabel:me.strings.openIdClientSecret,
-                                                name:'openIdClientSecret',
-                                                setAllowBlank:me.setFieldAllowBlank,
-                                                listeners: {
-                                                    change: {
-                                                        fn: 'onOpenIdFieldChange',
-                                                        scope: 'controller'
-                                                    }
-                                                },
-                                                bind:{
-                                                    allowBlank:'{!isOpenIdRequired}'
-                                                }
-                                            },
-                                            {
-                                                xtype:'textfield',
-                                                fieldLabel:me.strings.openIdAuth2Url,
-                                                vtype: 'url',
-                                                name:'openIdAuth2Url',
-                                                setAllowBlank:me.setFieldAllowBlank,
-                                                listeners: {
-                                                    change: {
-                                                        fn: 'onOpenIdFieldChange',
-                                                        scope: 'controller'
-                                                    }
-                                                },
-                                                bind:{
-                                                    allowBlank:'{!isOpenIdRequired}'
-                                                }
-                                            },{
-                                                xtype: 'hidden',
-                                                name: 'openIdDefaultServerRoles'
-                                            },{
-                                                xtype: 'checkboxgroup',
-                                                itemId: 'defaultRolesGroup',
-                                                cls: 'x-check-group-alt',
-                                                labelClsExtra: 'checkBoxLableInfoIconDefault',
-                                                fieldLabel: me.strings.defaultRolesGroupLabel,
-                                                autoEl: {
-                                                    tag: 'span',
-                                                    'data-qtip': me.strings.defaultRolesGroupLabelTooltip
-                                                },
-                                                items: roles,
-                                                columns: 3
-                                            },{
-                                                xtype: 'hidden',
-                                                name: 'openIdServerRoles'
-                                            },{
-                                                xtype: 'checkboxgroup',
-                                                name: 'serverRolesGroup',
-                                                itemId: 'serverRolesGroup',
-                                                cls: 'x-check-group-alt',
-                                                labelClsExtra: 'checkBoxLableInfoIconDefault',
-                                                fieldLabel: me.strings.serverRolesGroupLabel,
-                                                autoEl: {
-                                                    tag: 'span',
-                                                    'data-qtip': me.strings.serverRolesGroupLabelTooltip
-                                                },
-                                                items: roles,
-                                                columns: 3
-                                            },{
-                                                xtype:'textfield',
-                                                fieldLabel:me.strings.openIdRedirectLabel,
-                                                name:'openIdRedirectLabel',
-                                                setAllowBlank:me.setFieldAllowBlank
-                                            },{
-                                                xtype:'checkbox',
-                                                boxLabel:me.strings.openIdRedirectCheckbox,
-                                                name:'openIdRedirectCheckbox',
-                                                inputValue:1,
-                                                uncheckedValue:0,
-                                                checked:1,
-                                                listeners: {
-                                                    change: {
-                                                        fn: 'onOpenIdRedirectCheckboxChange',
-                                                        scope: 'controller'
-                                                    }
-                                                }
-                                            }
-                                        ]
-                                    },{
-                                        xtype: 'container',
-                                        padding: 10,
-                                        layout: {
-                                            type: 'hbox',
-                                            align: 'middle',
-                                            pack: 'center'
-                                        },
-                                        items: [
-                                            {
-                                                xtype: 'button',
-                                                flex: 1,
-                                                formBind: true,
-                                                itemId: 'saveButton',
-                                                reference: 'saveButton',
-                                                margin: 5,
-                                                text: me.strings.save,
-                                                listeners: {
-                                                    click: {
-                                                        fn: 'save',
-                                                        scope: 'controller'
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                xtype: 'button',
-                                                flex: 1,
-                                                itemId: 'cancelButton',
-                                                margin: 5,
-                                                text: me.strings.cancel,
-                                                listeners: {
-                                                    click: {
-                                                        fn: 'cancelEdit',
-                                                        scope: 'controller'
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                xtype: 'button',
-                                                flex: 1,
-                                                itemId: 'removeButton',
-                                                margin: 5,
-                                                text: me.strings.remove,
-                                                disabled:true,
-                                                reference: 'removeButton',
-                                                listeners: {
-                                                    click: {
-                                                        fn: 'remove',
-                                                        scope: 'controller'
-                                                    }
-                                                }
-                                                
-                                            }
-                                        ]
                                     }
                                 ]
+                            },{
+                                xtype: 'adminUserAssoc',
+                                bind:{
+                                    customer:'{record}'
+                                }
                             },{
                                 xtype: 'adminConfigGrid',
                                 store:'admin.CustomerConfig',
                                 title:me.strings.configTabTitle,
                                 bind: {
-                                    disabled: '{!record}',
                                     extraParams:{
                                         customerId : '{record.id}'
                                     }
                                 }
-                            }
-                        ]
+                            },{
+                                itemId:'openIdFieldset',
+                                disabled:true,
+                                scrollable:true,
+                                isIncludedInForm:true,// is the component part of the customers form. There are some other components in the display tab which are not part of the form (ex: config and user assoc tabs)
+                                bodyPadding: 10,
+                                title:'OpenID Connect',
+                                items:[{
+                                        xtype:'textfield',
+                                        fieldLabel:me.strings.openIdServer,
+                                        vtype: 'url',
+                                        name:'openIdServer',
+                                        setAllowBlank:me.setFieldAllowBlank,
+                                        listeners: {
+                                            change: {
+                                                fn: 'onOpenIdFieldChange',
+                                                scope: 'controller'
+                                            }
+                                        },
+                                        bind:{
+                                            allowBlank:'{!isOpenIdRequired}'
+                                        }
+                                    },{
+                                        xtype:'textfield',
+                                        fieldLabel:me.strings.openIdIssuer,
+                                        vtype: 'url',
+                                        name:'openIdIssuer',
+                                        setAllowBlank:me.setFieldAllowBlank,
+                                        listeners: {
+                                            change: {
+                                                fn: 'onOpenIdFieldChange',
+                                                scope: 'controller'
+                                            }
+                                        },
+                                        bind:{
+                                            allowBlank:'{!isOpenIdRequired}'
+                                        }
+                                    },{
+                                        xtype:'textfield',
+                                        fieldLabel:me.strings.openIdClientId,
+                                        name:'openIdClientId',
+                                        setAllowBlank:me.setFieldAllowBlank,
+                                        listeners: {
+                                            change: {
+                                                fn: 'onOpenIdFieldChange',
+                                                scope: 'controller'
+                                            }
+                                        },
+                                        bind:{
+                                            allowBlank:'{!isOpenIdRequired}'
+                                        }
+                                    },
+                                    {
+                                        xtype:'textfield',
+                                        fieldLabel:me.strings.openIdClientSecret,
+                                        name:'openIdClientSecret',
+                                        setAllowBlank:me.setFieldAllowBlank,
+                                        listeners: {
+                                            change: {
+                                                fn: 'onOpenIdFieldChange',
+                                                scope: 'controller'
+                                            }
+                                        },
+                                        bind:{
+                                            allowBlank:'{!isOpenIdRequired}'
+                                        }
+                                    },
+                                    {
+                                        xtype:'textfield',
+                                        fieldLabel:me.strings.openIdAuth2Url,
+                                        vtype: 'url',
+                                        name:'openIdAuth2Url',
+                                        setAllowBlank:me.setFieldAllowBlank,
+                                        listeners: {
+                                            change: {
+                                                fn: 'onOpenIdFieldChange',
+                                                scope: 'controller'
+                                            }
+                                        },
+                                        bind:{
+                                            allowBlank:'{!isOpenIdRequired}'
+                                        }
+                                    },{
+                                        xtype: 'hidden',
+                                        name: 'openIdDefaultServerRoles'
+                                    },{
+                                        xtype: 'checkboxgroup',
+                                        itemId: 'defaultRolesGroup',
+                                        cls: 'x-check-group-alt',
+                                        labelClsExtra: 'checkBoxLableInfoIconDefault',
+                                        fieldLabel: me.strings.defaultRolesGroupLabel,
+                                        autoEl: {
+                                            tag: 'span',
+                                            'data-qtip': me.strings.defaultRolesGroupLabelTooltip
+                                        },
+                                        items: roles,
+                                        columns: 3
+                                    },{
+                                        xtype: 'hidden',
+                                        name: 'openIdServerRoles'
+                                    },{
+                                        xtype: 'checkboxgroup',
+                                        name: 'serverRolesGroup',
+                                        itemId: 'serverRolesGroup',
+                                        cls: 'x-check-group-alt',
+                                        labelClsExtra: 'checkBoxLableInfoIconDefault',
+                                        fieldLabel: me.strings.serverRolesGroupLabel,
+                                        autoEl: {
+                                            tag: 'span',
+                                            'data-qtip': me.strings.serverRolesGroupLabelTooltip
+                                        },
+                                        items: roles,
+                                        columns: 3
+                                    },{
+                                        xtype:'textfield',
+                                        fieldLabel:me.strings.openIdRedirectLabel,
+                                        name:'openIdRedirectLabel',
+                                        setAllowBlank:me.setFieldAllowBlank
+                                    },{
+                                        xtype:'checkbox',
+                                        boxLabel:me.strings.openIdRedirectCheckbox,
+                                        name:'openIdRedirectCheckbox',
+                                        inputValue:1,
+                                        uncheckedValue:0,
+                                        checked:1,
+                                        listeners: {
+                                            change: {
+                                                fn: 'onOpenIdRedirectCheckboxChange',
+                                                scope: 'controller'
+                                            }
+                                        }
+                                    }
+                                ]
+                            }]
+                        }]
                     }
                 ],
                 dockedItems: [
@@ -471,7 +468,10 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 glyph: 'f1c3@FontAwesome5FreeSolid',
                                 text: me.strings.export,
                                 listeners: {
-                                    click: me.onTmExportClick
+                                    click: {
+                                        fn: 'onTmExportClick',
+                                        scope: 'controller'
+                                    }
                                 }
                             }
                         ]
@@ -484,17 +484,13 @@ Ext.define('Editor.view.admin.customer.Panel', {
         return me.callParent([config]);
     },
     
-    initComponent: function() {
-        var me = this;
-        me.callParent(arguments);
-    },
-    
     setFieldAllowBlank:function(value){
-        this.allowBlank=value || this.isDisabled();
-        this.up('form').isValid();
+        var me = this;
+        me.allowBlank=value || me.isDisabled();
+        me.up('customerPanel').down('form').isValid();
     },
     
-    onViewBeforeRefresh: function(dataview, eOpts) {
+    onViewBeforeRefresh: function(dataview) {
         //workaround / fix for TMUE-11
         dataview.getSelectionModel().deselectAll();
     },
@@ -516,44 +512,5 @@ Ext.define('Editor.view.admin.customer.Panel', {
             roles.push(box.initialConfig.value);
         });
         box.up('form').down('hidden[name="'+holderMap[holder.getItemId()]+'"]').setValue(roles.join(','));
-    },
-
-    /***
-     * On export action column click handler
-     */
-    onTmExportClick:function(view, cell, row, col, ev, record) {
-        var me=this.up('customerPanel');
-        me.exportCustomerResourceUsage(record && record.get('id'));
-    },
-    
-    /***
-     * Actio icon "edit customer" event handler
-     */
-    onCustomerEditClick:function(view, cell, row, col, ev, record) {
-        var me=this.up('customerPanel'),
-            controller = me.getController();
-        controller.editCustomer(record);
-    },
-    
-    /***
-     * Generate excel for resource usage for the given customer. If the customer is not defined,
-     * summ excel for all customers will be generated.
-     */
-    exportCustomerResourceUsage:function(id){
-        var url = Editor.data.restpath+'customer/exportresource?format=resourceLogExport',
-            extraParams = [];
-        
-        if(id){
-            extraParams.push(Ext.urlEncode({customerId: id}));
-        }
-
-        // Fire before resources export event. 
-        this.fireEvent('beforeExportCustomerResourceUsage',extraParams);
-
-        Ext.each(extraParams, function(ob){
-            url += '&'+ob;
-        });
-
-        window.open(url); 
     }
 });
