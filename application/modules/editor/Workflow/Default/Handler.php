@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Handler functions for the Default Workflow.
  */
-class editor_Workflow_DefaultHandler {
+class editor_Workflow_Default_Handler {
     /**
      * @var editor_Workflow_Default
      */
@@ -141,41 +141,16 @@ class editor_Workflow_DefaultHandler {
      * @param editor_Models_TaskUserAssoc $tua
      */
     protected function recalculateWorkflowStep(editor_Models_TaskUserAssoc $tua) {
-        $sendNotice = function($step) {
-            $msg = ZfExtended_Factory::get('ZfExtended_Models_Messages');
-            /* @var $msg ZfExtended_Models_Messages */
-            $labels = $this->workflow->getLabels();
-            $steps = $this->workflow->getSteps();
-            $step = $labels[array_search($step, $steps)];
-            $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
-        };
-        
         $taskGuid = $tua->getTaskGuid();
         
         //if the step was recalculated due setNextStep in internal workflow calculations,
         // we may not recalculate it here again!
         if(!empty($this->nextStepWasSet[$taskGuid])) {
-            $sendNotice($this->nextStepWasSet[$taskGuid]['newStep']);
+            $this->sendFrontEndNotice($this->nextStepWasSet[$taskGuid]['newStep']);
             return;
         }
         
         $tuas = $tua->loadByTaskGuidList([$taskGuid]);
-        
-        $areTuasSubset = function($toCompare, $currentStep) use ($tuas){
-            $hasStepToCurrentTaskStep = false;
-            foreach($tuas as $tua) {
-                if(empty($toCompare[$tua['workflowStepName']])) {
-                    return false;
-                }
-                if(!in_array($tua['state'], $toCompare[$tua['workflowStepName']])) {
-                    return false;
-                }
-                $hasStepToCurrentTaskStep = $hasStepToCurrentTaskStep || ($currentStep == $tua['workflowStepName']);
-            }
-            //we can only return true, if the Tuas contain at least one role belonging to the currentStep,
-            // in other words we can not reset the task to reviewing, if we do not have a reviewer
-            return $hasStepToCurrentTaskStep;
-        };
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
@@ -192,7 +167,7 @@ class editor_Workflow_DefaultHandler {
             $matchingSteps[]=$this->workflow::STEP_NO_WORKFLOW;
         }else{
             foreach($this->workflow->getValidStates() as $step => $roleStates) {
-                if(!$areTuasSubset($roleStates, $step)) {
+                if(!$this->areTuasSubset($roleStates, $step, $tuas)) {
                     continue;
                 }
                 $matchingSteps[] = $step;
@@ -210,7 +185,39 @@ class editor_Workflow_DefaultHandler {
         $this->doDebug('recalculate workflow to step {step} ', ['step' => $step], true);
         $task->updateWorkflowStep($step, false);
         //set $step as new workflow step if different to before!
-        $sendNotice($step);
+        $this->sendFrontEndNotice($step);
+    }
+    
+    /**
+     * Checks if the given Jobs (tuas) are a subset of the list be compared
+     * @param array $toCompare
+     * @param string $currentStep
+     * @param array $tuas
+     * @return bool
+     */
+    protected function areTuasSubset(array $toCompare, string $currentStep, array $tuas): bool {
+        $hasStepToCurrentTaskStep = false;
+        foreach($tuas as $tua) {
+            if(empty($toCompare[$tua['workflowStepName']])) {
+                return false;
+            }
+            if(!in_array($tua['state'], $toCompare[$tua['workflowStepName']])) {
+                return false;
+            }
+            $hasStepToCurrentTaskStep = $hasStepToCurrentTaskStep || ($currentStep == $tua['workflowStepName']);
+        }
+        //we can only return true, if the Tuas contain at least one role belonging to the currentStep,
+        // in other words we can not reset the task to reviewing, if we do not have a reviewer
+        return $hasStepToCurrentTaskStep;
+    }
+    
+    protected function sendFrontEndNotice(string $step) {
+        $msg = ZfExtended_Factory::get('ZfExtended_Models_Messages');
+        /* @var $msg ZfExtended_Models_Messages */
+        $labels = $this->workflow->getLabels();
+        $steps = $this->workflow->getSteps();
+        $step = $labels[array_search($step, $steps)];
+        $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
     }
     
     /**
@@ -278,7 +285,7 @@ class editor_Workflow_DefaultHandler {
      * will be called after all users of a role has finished a task
      * @param array $finishStat contains the info which of all different finishes are applicable
      */
-    protected function handleAllFinishOfARole(array $finishStat) {
+    protected function handleAllFinishOfARole() {
         $newTua = $this->newTaskUserAssoc;
         $taskGuid = $newTua->getTaskGuid();
         $task = ZfExtended_Factory::get('editor_Models_Task');
@@ -308,7 +315,7 @@ class editor_Workflow_DefaultHandler {
      * will be called after a user has finished a task
      * @param array $finishStat contains the info which of all different finishes are applicable
      */
-    protected function handleFinish(array $finishStat) {
+    protected function handleFinish() {
         $this->doDebug(__FUNCTION__);
         $newTua = $this->newTaskUserAssoc;
         $taskGuid = $newTua->getTaskGuid();
@@ -330,7 +337,7 @@ class editor_Workflow_DefaultHandler {
      * will be called after all associated users of a task has finished a task
      * @param array $finishStat contains the info which of all different finishes are applicable
      */
-    protected function handleAllFinish(array $finishStat) {
+    protected function handleAllFinish() {
         $this->doDebug(__FUNCTION__);
     }
 
@@ -346,7 +353,7 @@ class editor_Workflow_DefaultHandler {
      * will be called after first user of a role has finished a task
      * @param array $finishStat contains the info which of all different finishes are applicable
      */
-    protected function handleFirstFinishOfARole(array $finishStat){
+    protected function handleFirstFinishOfARole(){
         $taskState = $this->newTask->getState();
         if($taskState == editor_Models_Task::STATE_UNCONFIRMED) {
             //we have to confirm the task and retrigger task workflow triggers
@@ -364,7 +371,7 @@ class editor_Workflow_DefaultHandler {
      * will be called after a user has finished a task
      * @param array $finishStat contains the info which of all different finishes are applicable
      */
-    protected function handleFirstFinish(array $finishStat){
+    protected function handleFirstFinish(){
         $this->doDebug(__FUNCTION__);
     }
     
@@ -419,106 +426,14 @@ class editor_Workflow_DefaultHandler {
     /**
      * will be called when a new task user association is created
      */
-    protected function handleUserAssociationAdded() {
-        $this->doDebug(__FUNCTION__);
+    protected function handleUserAssociationChanged(string $handler) {
+        $this->doDebug($handler);
         $tua = $this->newTaskUserAssoc;
         if(empty($this->newTask)) {
             $this->newTask = ZfExtended_Factory::get('editor_Models_Task');
             $this->newTask->loadByTaskGuid($tua->getTaskGuid());
         }
-        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
-    }
-    
-    /**
-     * will be called when a new task user association is edited
-     */
-    protected function handleUserAssociationEdited(){
-        $this->doDebug(__FUNCTION__);
-        $tua = $this->newTaskUserAssoc;
-        if(empty($this->newTask)) {
-            $this->newTask = ZfExtended_Factory::get('editor_Models_Task');
-            $this->newTask->loadByTaskGuid($tua->getTaskGuid());
-        }
-        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
-    }
-    
-    
-    /**
-     * will be called when a task user association is deleted
-     */
-    protected function handleUserAssociationDeleted() {
-        $this->doDebug(__FUNCTION__);
-        $tua = $this->newTaskUserAssoc;
-        if(empty($this->newTask)) {
-            $this->newTask = ZfExtended_Factory::get('editor_Models_Task');
-            $this->newTask->loadByTaskGuid($tua->getTaskGuid());
-        }
-        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
-    }
-    
-    /**
-     * manipulates the segment as needed by workflow after updated by user
-     * @param editor_Models_Segment $segmentToSave
-     * @param editor_Models_Task $task
-     */
-    public function beforeSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
-        $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, editor_Models_Segment $segment, $tua) {
-            //sets the calculated autoStateId
-            $oldAutoState = $segment->getAutoStateId();
-            $newAutoState = $autostates->calculateSegmentState($segment, $tua);
-            $isChanged = $oldAutoState != $newAutoState;
-            
-            //if a segment with PRETRANS_INITIAL is saved by a translator, it is confirmed by setting it to PRETRANS_TRANSLATED
-            // this is needed to restore the auto_state later in things like segmentsSetInitialState
-            if($segment->getPretrans() == $segment::PRETRANS_INITIAL && $autostates->isTranslationState($newAutoState) && $isChanged) {
-                $segment->setPretrans($segment::PRETRANS_TRANSLATED);
-            }
-            $segment->setAutoStateId($newAutoState);
-        };
-        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates, $task);
-    }
-    
-    /**
-     * manipulates the segment as needed by workflow after user has add or edit a comment of the segment
-     * @param editor_Models_Segment $segmentToSave
-     * @param editor_Models_Task $task
-     */
-    public function beforeCommentedSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
-        //FIXME wie soll das überarbeitet werden, wie passt das mit translator überhaupt?
-        $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, editor_Models_Segment $segment, $tua) {
-            $autostates->updateAfterCommented($segment, $tua);
-        };
-        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates, $task);
-    }
-    
-    /**
-     * internal used method containing all common logic happend on a segment before saving it
-     * @param editor_Models_Segment $segmentToSave
-     * @param Closure $updateStates
-     * @param editor_Models_Task $task
-     */
-    protected function commonBeforeSegmentSave(editor_Models_Segment $segmentToSave, Closure $updateStates, editor_Models_Task $task) {
-        $sessionUser = new Zend_Session_Namespace('user');
-        
-        //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
-        $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUser->data->userGuid, $task);
-        if($tua->getIsPmOverride() == 1){
-            $segmentToSave->setWorkflowStepNr($task->getWorkflowStep()); //set also the number to identify in which phase the changes were done
-            $segmentToSave->setWorkflowStep($this->workflow::STEP_PM_CHECK);
-        }
-        else {
-            //sets the actual workflow step
-            $segmentToSave->setWorkflowStepNr($task->getWorkflowStep());
-            
-            //sets the actual workflow step name, does currently depend only on the userTaskRole!
-            $segmentToSave->setWorkflowStep($tua->getWorkflowStepName());
-        }
-        
-        $autostates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        
-        //set the autostate as defined in the given Closure
-        /* @var $autostates editor_Models_Segment_AutoStates */
-        $updateStates($autostates, $segmentToSave, $tua);
+        $this->callActions($handler, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
     }
     
     /**
@@ -594,7 +509,7 @@ class editor_Workflow_DefaultHandler {
             }
             $this->events->trigger($state, $this->workflow, array('oldTua' => $oldTua, 'newTua' => $newTua, 'task' => $task));
         }
-        $this->handleUserAssociationEdited();
+        $this->handleUserAssociationChanged('handleUserAssociationEdited');
         $this->recalculateWorkflowStep($newTua);
     }
     
@@ -660,7 +575,7 @@ class editor_Workflow_DefaultHandler {
      */
     public function doUserAssociationAdd(editor_Models_TaskUserAssoc $tua) {
         $this->newTaskUserAssoc = $tua;
-        $this->handleUserAssociationAdded();
+        $this->handleUserAssociationChanged('handleUserAssociationAdded');
     }
     
     /**
@@ -682,15 +597,15 @@ class editor_Workflow_DefaultHandler {
         if($wasNotFinished && $stat['roleAllFinished']) {
             //in order to trigger the actions correctly we have to assume that the deleted one was "finished"
             $tua->setState($this->workflow::STATE_FINISH);
-            $this->handleAllFinishOfARole($stat);
+            $this->handleAllFinishOfARole();
         }
         if($wasNotFinished && $stat['allFinished']) {
             //in order to trigger the actions correctly we have to assume that the deleted one was "finished"
             $tua->setState($this->workflow::STATE_FINISH);
-            $this->handleAllFinish($stat);
+            $this->handleAllFinish();
         }
         $tua->setState($originalState);
-        $this->handleUserAssociationDeleted();
+        $this->handleUserAssociationChanged('handleUserAssociationDeleted');
     }
     
     /**
@@ -909,18 +824,18 @@ class editor_Workflow_DefaultHandler {
         $this->doDebug(__FUNCTION__.print_r($stat,1));
         
         if($stat['roleFirstFinished']) {
-            $this->handleFirstFinishOfARole($stat);
+            $this->handleFirstFinishOfARole();
         }
         if($stat['firstFinished']) {
-            $this->handleFirstFinish($stat);
+            $this->handleFirstFinish();
         }
         if($stat['roleAllFinished']) {
-            $this->handleAllFinishOfARole($stat);
+            $this->handleAllFinishOfARole();
         }
         if($stat['allFinished']) {
-            $this->handleAllFinish($stat);
+            $this->handleAllFinish();
         }
-        $this->handleFinish($stat);
+        $this->handleFinish();
     }
     
     /**
