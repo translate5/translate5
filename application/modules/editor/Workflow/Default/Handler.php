@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Handler functions for the Default Workflow.
  */
-class editor_Workflow_DefaultHandler {
+class editor_Workflow_Default_Handler {
     /**
      * @var editor_Workflow_Default
      */
@@ -434,71 +434,6 @@ class editor_Workflow_DefaultHandler {
             $this->newTask->loadByTaskGuid($tua->getTaskGuid());
         }
         $this->callActions($handler, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
-    }
-    
-    /**
-     * manipulates the segment as needed by workflow after updated by user
-     * @param editor_Models_Segment $segmentToSave
-     * @param editor_Models_Task $task
-     */
-    public function beforeSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
-        $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, editor_Models_Segment $segment, $tua) {
-            //sets the calculated autoStateId
-            $oldAutoState = $segment->getAutoStateId();
-            $newAutoState = $autostates->calculateSegmentState($segment, $tua);
-            $isChanged = $oldAutoState != $newAutoState;
-            
-            //if a segment with PRETRANS_INITIAL is saved by a translator, it is confirmed by setting it to PRETRANS_TRANSLATED
-            // this is needed to restore the auto_state later in things like segmentsSetInitialState
-            if($segment->getPretrans() == $segment::PRETRANS_INITIAL && $autostates->isTranslationState($newAutoState) && $isChanged) {
-                $segment->setPretrans($segment::PRETRANS_TRANSLATED);
-            }
-            $segment->setAutoStateId($newAutoState);
-        };
-        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates, $task);
-    }
-    
-    /**
-     * manipulates the segment as needed by workflow after user has add or edit a comment of the segment
-     * @param editor_Models_Segment $segmentToSave
-     * @param editor_Models_Task $task
-     */
-    public function beforeCommentedSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
-        //FIXME wie soll das überarbeitet werden, wie passt das mit translator überhaupt?
-        $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, editor_Models_Segment $segment, $tua) {
-            $autostates->updateAfterCommented($segment, $tua);
-        };
-        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates, $task);
-    }
-    
-    /**
-     * internal used method containing all common logic happend on a segment before saving it
-     * @param editor_Models_Segment $segmentToSave
-     * @param Closure $updateStates
-     * @param editor_Models_Task $task
-     */
-    protected function commonBeforeSegmentSave(editor_Models_Segment $segmentToSave, Closure $updateStates, editor_Models_Task $task) {
-        $sessionUser = new Zend_Session_Namespace('user');
-        
-        //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
-        $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUser->data->userGuid, $task);
-        if($tua->getIsPmOverride() == 1){
-            $segmentToSave->setWorkflowStepNr($task->getWorkflowStep()); //set also the number to identify in which phase the changes were done
-            $segmentToSave->setWorkflowStep($this->workflow::STEP_PM_CHECK);
-        }
-        else {
-            //sets the actual workflow step
-            $segmentToSave->setWorkflowStepNr($task->getWorkflowStep());
-            
-            //sets the actual workflow step name, does currently depend only on the userTaskRole!
-            $segmentToSave->setWorkflowStep($tua->getWorkflowStepName());
-        }
-        
-        $autostates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        
-        //set the autostate as defined in the given Closure
-        /* @var $autostates editor_Models_Segment_AutoStates */
-        $updateStates($autostates, $segmentToSave, $tua);
     }
     
     /**
