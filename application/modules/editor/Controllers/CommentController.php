@@ -50,7 +50,7 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($segment->getTaskGuid());
             //@todo do this with events
-            $workflow->getHandler()->beforeCommentedSegmentSave($segment, $task);
+            $workflow->getSegmentHandler()->beforeCommentedSegmentSave($segment, $task);
         });
     }
     
