@@ -134,36 +134,38 @@ class editor_Workflow_Manager {
      */
     public function getWorkflowData() {
         $result = [];
-        $labelize = function(array $data, $cls, $labels) {
-            $usedLabels = array_intersect_key($labels, $data);
-            ksort($usedLabels);
-            ksort($data);
-            if(count($data) !== count($usedLabels)) {
-                 // {className}::$labels has to much / or missing labels!',
-                 throw new editor_Workflow_Exception('E1253', ['className' => $cls]);
-            }
-            return array_combine($data, $usedLabels);
-        };
-        foreach(self::$workflowList as $name => $cls) {
+        
+        //updating the config defaults list if needed FIXME move to workflow configurator on workflow creation if implemented in the future
+        $config = ZfExtended_Factory::get('editor_Models_Config');
+        /* @var $model editor_Models_Config */
+        $config->loadByName('runtimeOptions.workflow.initialWorkflow');
+        $workflows = array_keys(self::$workflowList);
+        $workflowList = join(',', $workflows);
+        
+        if($config->getDefaults() != $workflowList) {
+            $config->setDefaults($workflowList);
+            $config->save();
+        }
+        
+        foreach($workflows as $name) {
             $wf = $this->get($name);
             /* @var $wf editor_Workflow_Default */
-            $labels = $wf->getLabels();
             $data = new stdClass();
             $data->id = $name;
             $data->label = $wf->getLabel();
             $data->anonymousFieldLabel = false; //FIXME true | false, comes from app.ini not from wf class
             
-            $data->roles = $labelize($wf->getRoles(), $cls, $labels);
+            $data->roles = $wf->labelize($wf->getRoles());
             
-            $data->usableSteps = $labelize($wf->getUsableSteps(), $cls, $labels);
+            $data->usableSteps = $wf->labelize($wf->getUsableSteps());
             
             $allStates = $wf->getStates();
             $pendingStates = $wf->getPendingStates();
             //the returned states are the states without the pending ones
-            $data->states = $labelize(array_diff($allStates, $pendingStates), $cls, $labels);
-            $data->pendingStates = $labelize($pendingStates, $cls, $labels);
-            $data->steps = $labelize($wf->getSteps(), $cls, $labels);
-            $data->assignableSteps = $labelize($wf->getAssignableSteps(), $cls, $labels);
+            $data->states = $wf->labelize(array_diff($allStates, $pendingStates));
+            $data->pendingStates = $wf->labelize($pendingStates);
+            $data->steps = $wf->labelize($wf->getSteps());
+            $data->assignableSteps = $wf->labelize($wf->getAssignableSteps());
             $data->steps2roles = $wf->getSteps2Roles();
             $data->stepChain = $wf->getStepChain();
             $data->stepsWithFilter = $wf->getStepsWithFilter();

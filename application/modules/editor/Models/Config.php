@@ -27,8 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * TODO: config validator. It needs to check if the field is requeired or not 
- *
+ * TODO: config validator. It needs to check if the field is requeired or not
  */
 class editor_Models_Config extends ZfExtended_Models_Config {
 
@@ -155,7 +154,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     /***
      * Load all task specific config with customer specific base. The base customer is the task customer.
      * The result array keys are set from the config name.
-     * 
+     *
      * @param string $taskGuid
      * @param array $dbResults
      * @return array
@@ -195,16 +194,16 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      * You can also override task specific configs on customer level. Then the customer override value will be used
      * as base value when no taks override exist.
      * The result array keys are set from the config name.
-     * 
+     *
      * @param int $customerId
      * @param array $dbResults
      * @param array $level
      * @return array
      */
     public function mergeCustomerValues(
-            int $customerId, 
+            int $customerId,
             array $dbResults=[],
-            array $level = [self::CONFIG_LEVEL_CUSTOMER,self::CONFIG_LEVEL_TASK,self::CONFIG_LEVEL_TASKIMPORT] 
+            array $level = [self::CONFIG_LEVEL_CUSTOMER,self::CONFIG_LEVEL_TASK,self::CONFIG_LEVEL_TASKIMPORT]
         ):array {
         
         if(empty($dbResults)){
@@ -227,7 +226,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     /***
      * Load all configs for which the current user is allowed to see.
      * The result array keys are set from the config name.
-     * 
+     *
      * @param array $dbResults
      * @return array
      */
@@ -248,7 +247,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     }
     
     /***
-     * Merge the input array into the result array. Values will be merged only if the config from 
+     * Merge the input array into the result array. Values will be merged only if the config from
      * the input array exisit in the result array
      * @param array $input
      * @param array $result
