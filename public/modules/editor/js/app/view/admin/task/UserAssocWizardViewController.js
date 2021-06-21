@@ -34,6 +34,9 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         component:{
             '#targetLang':{
                 select:'onTargetlangSelect'
+            },
+            '#workflowStepName': {
+                select: 'onWorkflowStepNameSelect'
             }
         }
     },
@@ -97,13 +100,85 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             task = me.getView().task,
             projectTasks = task.get('projectTasks'),
             formPanel = me.lookup('assocForm'),
-            rec = formPanel.getRecord();
+            formRecord = formPanel.getRecord();
 
         for (var i=0;i<projectTasks.length;i++){
             if(projectTasks[i].targetLang === record.get('id')){
-                rec.set('taskGuid',projectTasks[i].taskGuid);
+                formRecord.set('taskGuid',projectTasks[i].taskGuid);
                 break;
             }
         }
+    },
+
+    /***
+     * On workflow step name change event handler
+     * @param combo
+     * @param step
+     */
+    onWorkflowStepNameSelect: function (combo,step) {
+        this.setWorkflowStepDefaultDeadline(step);
+    },
+
+    /***
+     * Calculate and set the default deadline date from config and order date.
+     */
+    setWorkflowStepDefaultDeadline:function(step){
+        var me=this,
+            task = me.getFormTask(),
+            formPanel = me.lookup('assocForm'),
+            formRecord = formPanel.getRecord(),
+            form = formPanel.getForm(),
+            deadlineDate = form.findField('deadlineDate'),
+            recordDeadlineDate = formRecord.get('deadlineDate'),//the record has deadlineDate
+            orderDate = task.get('orderdate');
+
+        //if order date is not set, no calculation is required
+        //if there is no workflow step defined, no calculation is required
+        //if the deadlineDate is already set, no calculation is required
+        if(!orderDate || !step || recordDeadlineDate){
+            return;
+        }
+        var workflow = task.get('workflow'),
+            configName = Ext.String.format('workflow.{0}.{1}.defaultDeadlineDate',workflow,step),
+            days = Editor.app.getTaskConfig(configName),
+            newValue = null;
+
+        // calculate the new date if config exist
+        if(days){
+            // check if the order date has timestamp 00:00:00
+            if(orderDate.getHours() === 0 && orderDate.getMinutes() === 0){
+                // For the deadlineDate the time is also important. This will change the time to now.
+                var tmpNow = new Date();
+                orderDate.setHours(tmpNow.getHours());
+                orderDate.setMinutes(tmpNow.getMinutes());
+                orderDate.setSeconds(tmpNow.getSeconds());
+            }
+
+            newValue = Editor.util.Util.addBusinessDays(orderDate, days);
+        }
+
+        deadlineDate.setValue(newValue);
+    },
+
+    /***
+     * Get the task/projectTask based on the selected target language.
+     * If no targetLang is provided, this will try to get it from the targetLang dropdown
+     * @param targetLang
+     * @returns {*}
+     */
+    getFormTask: function (targetLang){
+        var me = this,
+            task = me.getView().task,
+            projectTasks = task.get('projectTasks'),
+            form = me.lookup('assocForm').getForm(),
+            formTargetLang = targetLang && form.findField('targetLang').getValue();
+
+        for (var i=0;i<projectTasks.length;i++){
+            if(projectTasks[i].targetLang === formTargetLang){
+                return projectTasks[i];
+            }
+        }
+
+        return null;
     }
 });

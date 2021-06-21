@@ -115,7 +115,6 @@ Ext.define('Editor.view.admin.user.Assoc', {
                             },
                             items:[{
                                 xtype: 'languagecombo',
-                                viewModel:'adminUserAssoc',
                                 name: 'sourceLang',
                                 itemId: 'sourceLang',
                                 allowBlank: false
@@ -123,7 +122,8 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 xtype: 'languagecombo',
                                 name: 'targetLang',
                                 itemId: 'targetLang',
-                                viewModel:'adminUserAssoc',
+                                reference: 'targetLangUserAssoc',
+                                publishes: 'value',
                                 allowBlank: false
                             },{
                                 anchor: '100%',

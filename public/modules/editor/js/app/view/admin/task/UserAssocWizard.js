@@ -86,15 +86,16 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
 
     setCustomConfig:function (){
         var me = this,
-            form = me.lookup('assocForm');
+            formPanel = me.lookup('assocForm'),
+            form = formPanel.getForm();
         // bind the assoc grid to taskUserAssoc store
         me.down('adminUserAssocGrid').setBind({
             store:'{userAssocImport}'
         });
 
         // remove the numberfield deadline date and create it as datetime field
-        form.remove(form.down('#deadlineDate'));
-        form.add({
+        formPanel.remove(form.findField('deadlineDate'));
+        formPanel.insert(formPanel.items.length-1,{
             xtype: 'datetimefield',
             name: 'deadlineDate',
             format: Editor.DATE_HOUR_MINUTE_ISO_FORMAT,
@@ -107,6 +108,26 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
             },
             anchor: '100%'
         });
+
+        // define the form fields bindings
+        form.findField('userGuid').setBind({
+            store: '{users}', // the store binding must be redefined because this will overwrite the main bind definition
+            disabled:'{!targetLangUserAssoc.value}'
+        });
+
+        form.findField('workflowStepName').setBind({
+            store:'{workflowSteps}',// the store binding must be redefined because this will overwrite the main bind definition
+            disabled:'{!targetLangUserAssoc.value}'
+        });
+
+        form.findField('deadlineDate').setBind({
+            disabled:'{!targetLangUserAssoc.value}'
+        });
+
+        form.findField('segmentrange').setBind({
+            disabled:'{!targetLangUserAssoc.value}'
+        });
+
     },
 
     //called when next button is clicked
