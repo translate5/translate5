@@ -206,6 +206,13 @@ class editor_Workflow_Default {
         $this->definition->stepChain[] = self::STEP_WORKFLOW_ENDED;
         
         //calculate the valid states
+        $this->initValidStates();
+    }
+    
+    /**
+     * initializes the workflows valid states
+     */
+    protected function initValidStates() {
         foreach($this->definition->stepChain as $step) {
             $this->definition->validStates[$step] = [];
             foreach($this->getAssignableSteps() as $assignableStep) {
