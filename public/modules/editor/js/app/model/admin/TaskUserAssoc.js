@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -31,46 +30,62 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Model
  */
 Ext.define('Editor.model.admin.TaskUserAssoc', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'int'},
-    {name: 'entityVersion', type: 'int'}, //does not exist in DB, for versioning only
-    {name: 'taskGuid', type: 'string'},
-    {name: 'userGuid', type: 'string'},
-    {name: 'login', type: 'string', persist: false},
-    {name: 'surName', type: 'string', persist: false},
-    {name: 'firstName', type: 'string', persist: false},
-    {name: 'longUserName', type: 'string', persist: false, convert: function(v, rec) {
-        return Editor.model.admin.User.getLongUserName(rec);
-    }},
-    {name: 'state', type: 'string'},
-    {name: 'role', type: 'string'},
-    {name: 'workflowStepName', type: 'string'},
-    {name: 'segmentrange', type: 'string'},
-    {name: 'deletable', type: 'boolean'},
-    {name: 'editable', type: 'boolean'},
-    {name: 'assignmentDate', type: 'date',dateFormat: Editor.DATE_ISO_FORMAT},
-    {name: 'finishedDate', type: 'date',dateFormat: Editor.DATE_ISO_FORMAT},
-    {name: 'deadlineDate', type: 'date',dateFormat: Editor.DATE_ISO_FORMAT}
-  ],
-  validators: {
-      taskGuid: 'presence',
-      userGuid: 'presence'//,
-      //FIXME make me dynamic? state: {type: 'inclusion', list: Ext.Object.getKeys(Editor.data.app.utStates)},
-      //FIXME make me dynamic? role: {type: 'inclusion', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
-  },
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
-    url: Editor.data.restpath+'taskuserassoc', //same as PHP controller name
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
+    extend: 'Ext.data.Model',
+    fields: [
+        {name: 'id', type: 'int'},
+        {name: 'entityVersion', type: 'int'}, //does not exist in DB, for versioning only
+        {name: 'taskGuid', type: 'string'},
+        {name: 'userGuid', type: 'string'},
+        {name: 'login', type: 'string', persist: false},
+        {name: 'surName', type: 'string', persist: false},
+        {name: 'firstName', type: 'string', persist: false},
+        {
+            name: 'longUserName', type: 'string', persist: false, convert: function (v, rec) {
+                return Editor.model.admin.User.getLongUserName(rec);
+            }
+        },
+        {name: 'state', type: 'string'},
+        {name: 'role', type: 'string'},
+        {name: 'workflow', type: 'string'},
+        {name: 'workflowStepName', type: 'string'},
+        {name: 'segmentrange', type: 'string'},
+        {name: 'deletable', type: 'boolean'},
+        {name: 'editable', type: 'boolean'},
+        {name: 'assignmentDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+        {name: 'finishedDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+        {name: 'deadlineDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT}
+    ],
+    validators: {
+        taskGuid: 'presence',
+        userGuid: 'presence'//,
+        //FIXME make me dynamic? state: {type: 'inclusion', list: Ext.Object.getKeys(Editor.data.app.utStates)},
+        //FIXME make me dynamic? role: {type: 'inclusion', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
     },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+
+    /***
+     * Return unique string value from the record
+     */
+    getUnique: function () {
+        return [
+            this.get('workflow'),
+            this.get('workflowStepName'),
+            this.get('taskGuid'),
+            this.get('userGuid')
+        ].join('-');
+    },
+
+    idProperty: 'id',
+    proxy: {
+        type: 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity
+        url: Editor.data.restpath + 'taskuserassoc', //same as PHP controller name
+        reader: {
+            rootProperty: 'rows',
+            type: 'json'
+        },
+        writer: {
+            encode: true,
+            rootProperty: 'data',
+            writeAllFields: false
+        }
     }
-  }
 });

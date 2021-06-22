@@ -919,13 +919,14 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 app.unmask();
                 me.fireEvent('afterTaskDelete', task);
             },
-            failure: function (records, op) {
+            failure: function (batch, op) {
+                var operation = batch.operations[0];
                 task.reject();
                 app.unmask();
-                if (op.getError().status === '405') {
+                if (operation.error.status === '405') {
                     Editor.MessageBox.addError(me.strings.taskNotDestroyed);
                 } else {
-                    Editor.app.getController('ServerException').handleException(op.error.response);
+                    Editor.app.getController('ServerException').handleException(operation.error.response);
                 }
             }
 

@@ -145,9 +145,9 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                         itemId: 'reloadAssocBtn',
                         glyph: 'f2f1@FontAwesome5FreeSolid',
                         text: me.strings.reload
-                    },{
+                    }, '-' ,{
                         xtype: 'combo',
-                        width:250,
+                        width:300,
                         forceSelection: true,
                         queryMode: 'local',
                         itemId: 'workflowCombo',
@@ -158,7 +158,7 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                         bind: {
                             store:'{workflow}'
                         }
-                    }, '-', {
+                    }, {
                         xtype: 'checkbox',
                         hidden:true,
                         itemId: 'notifyAssociatedUsersCheckBox',

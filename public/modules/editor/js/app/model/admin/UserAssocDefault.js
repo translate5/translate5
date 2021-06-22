@@ -46,7 +46,10 @@ Ext.define('Editor.model.admin.UserAssocDefault', {
       {name: 'deadlineDate'}
     ],
 
-    toString: function (){
+    /***
+     * Return unique string value from the record
+     */
+    getUnique: function (){
         return [
             this.get('customerId'),
             this.get('workflow'),

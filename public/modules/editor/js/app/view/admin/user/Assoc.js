@@ -110,9 +110,6 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 }
                             },
                             disabled:true,
-                            bind: {
-                                disabled: '{!selectedAssocRecord}'
-                            },
                             items:[{
                                 xtype: 'languagecombo',
                                 name: 'sourceLang',
@@ -158,19 +155,6 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 displayField: 'longUserName',
                                 valueField: 'userGuid',
                                 fieldLabel: me.strings.fieldUser
-                            },{
-                                xtype:'numberfield',
-                                itemId: 'deadlineDate',
-                                name:'deadlineDate',
-                                decimalPrecision:4,
-                                fieldLabel: me.strings.fieldDeadline,
-                                labelCls: 'labelInfoIcon',
-                                cls:'userAssocLabelIconField',
-                                autoEl: {
-                                    tag: 'span',
-                                    'data-qtip': me.strings.deadlineDateInfoTooltip
-                                },
-                                anchor: '100%'
                             },{
                                 xtype: 'textfield',
                                 itemId: 'segmentrange',

@@ -71,7 +71,10 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
         fieldDeadline:'#UT#Deadline',
         fieldSegmentrange: '#UT#Editierbare Segmente',
         fieldSegmentrangeInfo: '#UT#Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)',
-        deadlineDateInfoTooltip:'#UT#translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.'
+        deadlineDateInfoTooltip:'#UT#translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.',
+        usageModeCoop: "#UT#Sequentielles Arbeiten",
+        usageModeCompetitive: "#UT#Konkurrierende Zuweisung",
+        usageModeSimultaneous: "#UT#Gleichzeitiges Arbeiten",
     },
 
     listeners:{
@@ -86,15 +89,20 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
 
     setCustomConfig:function (){
         var me = this,
+            grid = me.down('grid'),
             formPanel = me.lookup('assocForm'),
             form = formPanel.getForm();
         // bind the assoc grid to taskUserAssoc store
         me.down('adminUserAssocGrid').setBind({
-            store:'{userAssocImport}'
+            store:'{userAssocImport}',
+            selection:'{selectedAssocRecord}'
         });
 
-        // remove the numberfield deadline date and create it as datetime field
-        formPanel.remove(form.findField('deadlineDate'));
+        grid.down('#notifyAssociatedUsersCheckBox').setVisible(true);
+
+        form.findField('sourceLang').setVisible(false);
+        form.findField('targetLang').setVisible(false);
+
         formPanel.insert(formPanel.items.length-1,{
             xtype: 'datetimefield',
             name: 'deadlineDate',
@@ -128,15 +136,43 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
             disabled:'{!targetLangUserAssoc.value}'
         });
 
+        grid.addDocked({
+            xtype:'combo',
+            width:250,
+            fieldLabel: me.strings.usageModeTitle,
+            name:'usageMode',
+            itemId:'usageMode',
+            forceSelection: true,
+            value:'cooperative', // the default value according to the database default. Should we use config ?
+            store:  Ext.create('Ext.data.Store', {
+                fields: ['id', 'label'],
+                data : [
+                    {"id":"simultaneous", "name":me.strings.usageModeSimultaneous},
+                    {"id":"competitive", "name":me.strings.usageModeCompetitive},
+                    {"id":"cooperative", "name":me.strings.usageModeCoop}
+                ]
+            }),
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'id'
+        },'top');
+    },
+
+    /***
+     * Load the assoc data based on the current projectId and workflow
+     */
+    loadAssocData : function (){
+        this.getController().loadAssocData();
     },
 
     //called when next button is clicked
     triggerNextCard:function(activeItem){
-        this.fireEvent('wizardCardFinished', null);
+        this.getController().nextCardClick();
     },
+
     //called when skip button is clicked
     triggerSkipCard:function(activeItem){
-        this.fireEvent('wizardCardFinished', 2);
+        this.getController().skipCardClick();
     },
 
     disableSkipButton:function(){
