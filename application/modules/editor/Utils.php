@@ -60,6 +60,7 @@ class editor_Utils {
         'ipv4' => '~^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$~',
         'base64' => '^~(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$~',
         'wskey' => '~^[A-Za-z0-9+/]{22}==$~',
+        'rfc5646' => '~^[a-z]{2,3}(-[a-zA-Z0-9]{2,4}|)(-[a-zA-Z]{2}|)$~',
         'json' => '/
           (?(DEFINE)
              (?<number>   -? (?= [1-9]|0(?!\d) ) \d+ (\.\d+)? ([eE] [+-]? \d+)? )
@@ -400,25 +401,32 @@ class editor_Utils {
                 throw new ZfExtended_Mismatch('E2005', [$value, $label]);
 
             // If prop's value should be an identifier of an existing object, but such object not found - flush error
-            /*if ($rule['key'] && strlen($value) && $value != '0') {
+            if ($rule['key'] && strlen($value) && $value != '0') {
 
-                // Get model/table name
-                $m = preg_replace('/\*$/', '', $rule['key']);
+                // Get table name
+                $table = preg_replace('/\*$/', '', $rule['key']);
 
                 // Setup $s as a flag indicating whether *_Row (single row) or *_Rowset should be fetched
-                $s = $m == $rule['key'];
+                $isSingleRow = $table == $rule['key'];
 
                 // Setup WHERE clause and method name to be used for fetching
-                $w = $s ? '`id` = "' . $value . '"' : '`id` IN (' . $value . ')';
-                $f = $s ? 'fetchRow' : 'fetchAll';
+                $where = $isSingleRow ? '`id` = "' . $value . '"' : '`id` IN (' . $value . ')';
+
+                // Prepare statement
+                $stmt = self::db()->query('
+                    SELECT * 
+                    FROM `' . $table . '` 
+                    WHERE ' . $where . self::rif($isSingleRow, '
+                    LIMIT 1'
+                ));
 
                 // Fetch
-                $rowA[$prop] = ZfExtended_Factory::get($m)->$f($w);
+                $rowA[$prop] = $isSingleRow ? $stmt->fetch() : $stmt->fetchAll();
 
                 // If no *_Row was fetched, or empty *_Rowset was fetched - flush error
-                if (!($s ? $rowA[$prop] : $rowA[$prop]->count()))
-                    $flushFn($arg1, sprintf(constant($c . 'KEY'), $rule['key'], $value));
-            }*/
+                if (!$rowA[$prop])
+                    throw new ZfExtended_Mismatch('E2002', [$rule['key'], $value]);
+            }
 
             // If prop's value should be unique within the whole database table, but it's not - flush error
             /*if ($rule['unq']
