@@ -198,25 +198,6 @@ class editor_Workflow_Default {
         //the step2roles array contains all configured steps, assignable to users
         $this->definition->stepChain[] = self::STEP_NO_WORKFLOW;
 
-        $constants = [
-         'STATE_IMPORT' => 'import',
-        'STATE_WAITING' => 'wartend',
-        'STATE_UNCONFIRMED' => 'unbestätigt',
-        'STATE_FINISH' => 'abgeschlossen',
-        'STATE_OPEN' => 'offen',
-        'STATE_EDIT' => 'selbst in Arbeit',
-        'STATE_VIEW' => 'selbst geöffnet',
-        'ROLE_TRANSLATOR' => 'Übersetzer',
-        'ROLE_REVIEWER' => 'Lektor',
-        'ROLE_TRANSLATORCHECK' => 'Zweiter Lektor',
-        'ROLE_VISITOR' => 'Besucher',
-        'STEP_NO_WORKFLOW' => 'Kein Workflow',
-        'STEP_PM_CHECK' => 'PM Prüfung',
-        'STEP_WORKFLOW_ENDED' => 'Workflow abgeschlossen'
-        ];
-
-        $this->definition->labels = array_merge([],$constants);
-
         foreach($steps as $step) {
             if(!is_null($step['position'])) {
                 $this->definition->stepChain[] = $step['name'];
@@ -227,6 +208,7 @@ class editor_Workflow_Default {
                 $this->definition->stepsWithFilter[] = $step['name'];
             }
             $constName = 'STEP_'.strtoupper($step['name']);
+            $this->definition->labels[$constName] = $step['label'];
             $this->definition->steps[$constName] = $step['name'];
         }
         $this->definition->stepChain[] = self::STEP_WORKFLOW_ENDED;
@@ -659,7 +641,7 @@ class editor_Workflow_Default {
         ksort($data);
         if(count($data) !== count($usedLabels)) {
             // {className}::$labels has to much / or missing labels!',
-            throw new editor_Workflow_Exception('E1253', ['workflowId' => $this->definition->name]);
+            throw new editor_Workflow_Exception('E1253', ['data'=>$data,'usedLabels'=>$usedLabels,'workflowId' => $this->definition->name]);
         }
         return array_combine($data, $usedLabels);
     }

@@ -92,12 +92,18 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
             $model = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             /* @var $model editor_Models_TaskUserAssoc */
             $model->setWorkflow($assoc['workflow']);
-            $model->setTaskGuid($task->getTaskGuid());
-            $model->setUserGuid($assoc['userGuid']);
+
             $model->setWorkflowStepName($assoc['workflowStepName']);
             $model->setRole($role);
+
+            $model->setTaskGuid($task->getTaskGuid());
+            $model->setUserGuid($assoc['userGuid']);
             $model->setSegmentrange($assoc['segmentrange']);
-            $model->setDeadlineDate(editor_Utils::addBusinessDays($task->getOrderdate(),$assoc['deadlineDate']));
+
+            $configValue = $task->getConfig()->runtimeOptions->workflow->{$model->getWorkflow()}->{$model->getWorkflowStepName()}->defaultDeadlineDate ?? 0;
+            if($configValue > 0){
+                $model->setDeadlineDate(editor_Utils::addBusinessDays($task->getOrderdate(),$configValue));
+            }
             $model->save();
         }
     }

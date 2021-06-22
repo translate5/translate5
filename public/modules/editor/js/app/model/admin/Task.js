@@ -109,7 +109,21 @@ Ext.define('Editor.model.admin.Task', {
         {name: 'usageMode', type: 'string'},
         {name: 'segmentCount', type: 'int', persist: false},
         {name: 'segmentFinishCount', type: 'int', persist: false},
-        {name: 'diffExportUsable', type: 'boolean'}
+        {name: 'diffExportUsable', type: 'boolean'},
+        {
+            name: 'projectTasks', persist: false,
+            convert: function (tasks) {
+                if(!tasks){
+                    return tasks;
+                }
+                for(var i=0;i<tasks.length;i++){
+                    if(!tasks[i].isModel){
+                        tasks[i] = Ext.create('Editor.model.admin.TaskUserAssoc',tasks[i]);
+                    }
+                }
+                return tasks;
+            }
+        }
     ],
     hasMany: [{
         model: 'Editor.model.segment.Field',

@@ -76,10 +76,11 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
 
     public function projectAction(){
         $projectId = $this->getParam('projectId');
-        if(empty($projectId)){
+        $workflow = $this->getParam('workflow');
+        if(empty($projectId) || empty($workflow)){
             return;
         }
-        $this->view->rows = $this->entity->loadProjectWithUserInfo($projectId);
+        $this->view->rows = $this->entity->loadProjectWithUserInfo($projectId,$workflow);
     }
 
     public function postDispatch() {
@@ -178,6 +179,11 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             $roles = array_flip(array_reverse($steps));
             $this->data->workflowStepName = $roles[$this->data->role] ?? null;
             Zend_Registry::get('logger')->warn('E1232', 'Job creation: using role as parameter on job creation is deprecated, use workflowStepName instead');
+        }
+
+        if(!property_exists($this->data, 'state') || empty($this->data->state)){
+            // set default state. The correct state is calculated later
+            $this->data->state =$workflow::STATE_WAITING;
         }
         
         //may not be set from outside!

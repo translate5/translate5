@@ -58,7 +58,6 @@ class editor_Models_UserAssocDefault extends ZfExtended_Models_Entity_Abstract {
      * @return array|null
      */
     public function loadDefaultsForTask(editor_Models_Task $task){
-        // TODO: fuzzy matchin for the langauges ?
         $s = $this->db->select()
             ->where('customerId = ?', $task->getCustomerId())
             ->where('sourceLang = ?',$task->getSourceLang())
