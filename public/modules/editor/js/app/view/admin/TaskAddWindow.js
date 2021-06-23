@@ -35,7 +35,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.LanguageCombo',
         'Editor.view.admin.config.ConfigWizard',
         'Editor.view.admin.task.UserAssocWizard',
-        'Editor.view.admin.user.AssocImportWizardViewModel'
+        'Editor.view.admin.task.UserAssocWizardViewModel'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -97,18 +97,15 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 itemId:'taskUploadCard',
                 groupIndex:5
             },'postimport');
-            
+
             win.insertCard({
                 xtype:'adminTaskUserAssocWizard',
                 itemId:'adminTaskUserAssocWizard',
-                viewModel:{
-                    type:'adminUserImportWizardAssoc'
-                },
                 groupIndex:1//index 2 is language resources assoc
             },'postimport');
 
             win.insertCard({
-                xtype:'adminConfigWizard', 
+                xtype:'adminConfigWizard',
                 itemId:'adminConfigWizard',
                 groupIndex:3//index 2 is language resources assoc
             },'postimport');

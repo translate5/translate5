@@ -204,6 +204,7 @@ class editor_Workflow_Default {
         //the workflow starts always with no_workflow and ends with workflow ended
         //the step2roles array contains all configured steps, assignable to users
         $this->definition->stepChain[] = self::STEP_NO_WORKFLOW;
+
         foreach($steps as $step) {
             if(!is_null($step['position'])) {
                 $this->definition->stepChain[] = $step['name'];
@@ -647,7 +648,7 @@ class editor_Workflow_Default {
         ksort($data);
         if(count($data) !== count($usedLabels)) {
             // {className}::$labels has to much / or missing labels!',
-            throw new editor_Workflow_Exception('E1253', ['workflowId' => $this->definition->name]);
+            throw new editor_Workflow_Exception('E1253', ['data'=>$data,'usedLabels'=>$usedLabels,'workflowId' => $this->definition->name]);
         }
         return array_combine($data, $usedLabels);
     }

@@ -26,12 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.user.AssocImportWizardViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.adminUserImportWizardAssoc',
+Ext.define('Editor.view.admin.task.UserAssocWizardViewModel', {
+    extend: 'Editor.view.admin.user.AssocViewModel',
+    alias: 'viewmodel.adminTaskUserAssocWizard',
 
     data:{
-        selectedCustomer : false
+        sendPreImportOperation:false
     },
 
     stores: {
@@ -40,7 +40,7 @@ Ext.define('Editor.view.admin.user.AssocImportWizardViewModel', {
         },
         workflowSteps: Ext.create('Editor.store.admin.WorkflowSteps',{ useAssignableSteps:true }),
         workflow: Ext.create('Editor.store.admin.Workflow'),
-        userAssoc:{
+        userAssocImport:{
             model:'Editor.model.admin.TaskUserAssoc',
             remoteFilter: true,
             pageSize: false,

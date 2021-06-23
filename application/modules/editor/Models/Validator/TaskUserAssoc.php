@@ -36,7 +36,9 @@ class editor_Models_Validator_TaskUserAssoc extends ZfExtended_Models_Validator_
     }
     
     public function isValid(array $data) {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($data['taskGuid']);
+        $manager = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $manager editor_Workflow_Manager */
+        $workflow = $manager->getActive($this->entity->getTaskGuid());
         /* @var $workflow editor_Workflow_Default */
         $this->addValidator('id', 'int');
         $this->addValidator('taskGuid', 'guid');
@@ -49,6 +51,7 @@ class editor_Models_Validator_TaskUserAssoc extends ZfExtended_Models_Validator_
             $states = array_diff($states, [$workflow::STATE_FINISH]);
         }
         $this->addValidator('state', 'inArray', array($states));
+        $this->addValidator('workflow', 'inArray', [$manager->getWorkflows()]);
         
         $this->addValidator('role', 'inArray', array($workflow->getRoles()));
         $this->addValidator('workflowStepName', 'inArray', array($workflow->getSteps()));
