@@ -867,7 +867,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         //date select when this is triggered from the daily action
         $dateSelect = 'DATE(tua.deadlineDate)=DATE(CURRENT_DATE) '.$symbol.' INTERVAL ? DAY';
         
-        if($this->isPeriodical()){
+        if($this->config->trigger == 'doCronPeriodical'){
             //the deadline check date will be between: "days offset date" +/- "cron periodical call frequency"
             $dateSelect='tua.deadlineDate BETWEEN '.
                 ' DATE_SUB(NOW() '.$symbol.' INTERVAL ? DAY,INTERVAL '.Zend_Db_Table::getDefaultAdapter()->quote(self::CRON_PERIODICAL_CALL_FREQUENCY_MIN).' MINUTE)'.
@@ -957,13 +957,5 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      */
     protected function generateDeadlineNotifiedMessage(bool $isApproaching){
         return self::DEADLINE_NOTIFICATION_LOG_MESSAGE.($isApproaching ? 'DeadlineApproaching' : 'OverdueDeadline');
-    }
-    
-    /***
-     * Is the current request from the periodical trigger
-     * @return boolean
-     */
-    protected function isPeriodical() {
-        return $this->getTrigger()=="doCronPeriodical";
     }
 }

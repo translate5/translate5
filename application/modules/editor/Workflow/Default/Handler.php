@@ -510,8 +510,7 @@ class editor_Workflow_Default_Handler {
             if(empty($instances[$class])) {
                 $instance = ZfExtended_Factory::get($class);
                 /* @var $instance editor_Workflow_Actions_Abstract */
-                $instance->init($this->getActionConfig());
-                $instance->setTrigger($trigger);
+                $instance->init($this->getActionConfig($trigger));
                 $instances[$class] = $instance;
             }
             else {
@@ -556,11 +555,13 @@ class editor_Workflow_Default_Handler {
     
     /**
      * prepares a config object for workflow actions
+     * @param string $trigger
      * @return editor_Workflow_Actions_Config
      */
-    protected function getActionConfig() {
+    protected function getActionConfig(string $trigger) {
         $config = ZfExtended_Factory::get('editor_Workflow_Actions_Config');
         /* @var $config editor_Workflow_Actions_Config */
+        $config->trigger = $trigger;
         $config->workflow = $this->workflow;
         $config->newTua = $this->newTaskUserAssoc;
         $config->oldTua = $this->oldTaskUserAssoc;
