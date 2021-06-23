@@ -116,6 +116,91 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     }
 
     /**
+     *
+     */
+    public function insert($misc = []) {
+
+        // Save
+        $termId = $this->save();
+
+        // Check whether there were no terms for this language previously within same termEntryId
+        $isTermForNewLanguage = !editor_Utils::db()->query('
+            SELECT `id` 
+            FROM `terms_term` 
+            WHERE TRUE 
+              AND `termEntryId` = :termEntryId
+              AND `languageId` = :languageId
+              AND `id` != :id
+            LIMIT 1
+        ', [
+            ':termEntryId' => $this->getTermEntryId(),
+            ':languageId' => $this->getLanguageId(),
+            ':id' => $this->getId()
+        ])->fetchColumn();
+
+        // Prepare transacgrp-props relevant for term-level
+        $levelA['term'] = [
+            'termId' => $this->getId(),
+            'termGuid' => $this->getGuid(),
+        ];
+
+        // Prepare transacgrp-props relevant for language-level
+        // No props actually, but this allows us to cycle through $levelA
+        if ($isTermForNewLanguage) $levelA['language'] = [];
+
+        // Create 'creation' and 'modification' `terms_transacgroup`-entries for term-level (and language-level, if need)
+        foreach ($levelA as $byLevel) foreach (['creation', 'modification'] as $type) {
+
+            // Create `terms_transacgrp` model instance
+            $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+
+            // Setup data
+            $t->init($byLevel + [
+                'elementName' => 'date',
+                'transac' => $type,
+                'date' => time(),
+                'transacNote' => $misc['transacNote'],
+                'transacType' => $type,
+                'language' => $this->getLanguage(),
+                'attrLang' => $this->getLanguage(),
+                'collectionId' => $this->getCollectionId(),
+                'termEntryId' => $this->getTermEntryId(),
+                'termEntryGuid' => $this->getTermEntryGuid(),
+                'guid' => ZfExtended_Utils::uuid(),
+            ]);
+
+            // Save `terms_transacgrp` entry
+            $t->save();
+        }
+
+        // Basic clause for `language`-column to be used in UPDATE query to affect termEntry-level's 'modification'-record
+        $language = 'ISNULL(`language`)';
+
+        // If there was at least one term defined for same language, then alter clause for `language`-combo
+        // so that not only termEntry-level's 'modification'-record would be affected, but language-level's as well
+        if (!$isTermForNewLanguage) $language = '(' . $language . ' OR `language` = "' . $this->getLanguage() . '")';
+
+        // Update 'modification'-record of termEntry-level
+        editor_Utils::db()->query('
+            UPDATE `terms_transacgrp` 
+            SET 
+              `date` = :date, 
+              `transacNote` = :userName 
+            WHERE TRUE
+              AND `termEntryId` = :termEntryId 
+              AND ' . $language . '
+              AND `transac` = "modification" 
+        ', [
+            ':date' => time(),
+            ':userName' => $misc['transacNote'],
+            ':termEntryId' => $this->getTermEntryId(),
+        ]);
+
+        // Return
+        return $termId;
+    }
+
+    /**
      * creates a new, unsaved term history entity
      * @return editor_Models_Term_History
      */

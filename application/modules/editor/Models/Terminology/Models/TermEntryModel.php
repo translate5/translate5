@@ -46,6 +46,38 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Terminology_Models_TermEntryModel extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_TermEntry';
 
+    public function insert($misc = []) {
+
+        // Save and get insert id
+        $termEntryId = $this->save();
+
+        // Create 'creation' and 'modification' `terms_transacgroup`-entries
+        foreach (['creation', 'modification'] as $type) {
+
+            // Create `terms_transacgrp` model instance
+            $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+
+            // Setup data
+            $t->init([
+                'elementName' => 'date',
+                'transac' => $type,
+                'date' => time(),
+                'transacNote' => $misc['transacNote'],
+                'transacType' => $type,
+                'collectionId' => $this->getCollectionId(),
+                'termEntryId' => $termEntryId,
+                'termEntryGuid' => $this->getEntryGuid(),
+                'guid' => ZfExtended_Utils::uuid(),
+            ]);
+
+            // Save `terms_transacgrp` entry
+            $t->save();
+        }
+
+        // Return
+        return $termEntryId;
+    }
+
     /**
      * groupId = termEntryId
      * collectionId = LEK_languageresources->id
