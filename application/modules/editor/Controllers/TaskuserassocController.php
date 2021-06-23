@@ -255,10 +255,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         }
         
         $this->entity->validate();
-        $workflow->getHandler()->triggerBeforeEvents($oldEntity, $this->entity);
-        $this->entity->save();
 
-        $workflow->getHandler()->doWithUserAssoc($oldEntity, $this->entity);
+        $workflow->getHandler()->doWithUserAssoc($oldEntity, $this->entity, function() {
+            $this->entity->save();
+        });
         
         $this->view->rows = $this->entity->getDataObject();
         $this->addUserInfoToResult();
