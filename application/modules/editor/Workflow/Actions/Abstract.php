@@ -41,12 +41,6 @@ class editor_Workflow_Actions_Abstract {
     protected ZfExtended_Logger $log;
     
     
-    /***
-     * Workflow action trigger
-     * @var string
-     */
-    protected $trigger="";
-
     public function init(editor_Workflow_Actions_Config $config) {
         $this->config = $config;
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.workflow.notification');
@@ -67,13 +61,5 @@ class editor_Workflow_Actions_Abstract {
             $user->loadByGuid($this->config->newTua->getUserGuid());
         }
         return $user;
-    }
-    
-    public function setTrigger(string $trigger) {
-        $this->trigger=$trigger;
-    }
-    
-    public function getTrigger(){
-        return $this->trigger;
     }
 }

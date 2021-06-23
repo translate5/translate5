@@ -72,4 +72,9 @@ class editor_Workflow_Actions_Config {
      * @var boolean
      */
     public bool $isCalledByCron = false;
+    
+    /**
+     * @var string
+     */
+    public string $trigger;
 }
