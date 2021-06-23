@@ -27,9 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Handler functions for the Default Workflow.
+ * Hook In functions for the Default Workflow.
  */
-class editor_Workflow_Default_Handler {
+class editor_Workflow_Default_Hooks {
     /**
      * @var editor_Workflow_Default
      */

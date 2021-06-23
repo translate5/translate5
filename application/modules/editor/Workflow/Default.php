@@ -137,7 +137,7 @@ class editor_Workflow_Default {
     
     /**
      * the default workflow handler instance
-     * @var editor_Workflow_Default_Handler
+     * @var editor_Workflow_Default_Hooks
      */
     protected $handler;
     
@@ -172,7 +172,7 @@ class editor_Workflow_Default {
             $cache->save($this->definition, self::CACHE_KEY.$name);
         }
         
-        $this->handler = ZfExtended_Factory::get('editor_Workflow_Default_Handler',[$this]);
+        $this->handler = ZfExtended_Factory::get('editor_Workflow_Default_Hooks',[$this]);
         $this->segmentHandler = ZfExtended_Factory::get('editor_Workflow_Default_SegmentHandler',[$this]);
     }
     
@@ -250,16 +250,16 @@ class editor_Workflow_Default {
     }
     
     /**
-     * returns a reference to the instance containing all the workflow handler functions
-     * @return editor_Workflow_Default_Handler
+     * returns a reference to the instance containing all the workflow hook in functions
+     * @return editor_Workflow_Default_Hooks
      */
-    public function getHandler(): editor_Workflow_Default_Handler {
+    public function hookin(): editor_Workflow_Default_Hooks {
         return $this->handler;
     }
     
     /**
      * returns a reference to the instance containing all the workflow handler functions
-     * @return editor_Workflow_Default_Handler
+     * @return editor_Workflow_Default_SegmentHandler
      */
     public function getSegmentHandler(): editor_Workflow_Default_SegmentHandler {
         return $this->segmentHandler;

@@ -256,7 +256,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         
         $this->entity->validate();
 
-        $workflow->getHandler()->doWithUserAssoc($oldEntity, $this->entity, function() {
+        $workflow->hookin()->doWithUserAssoc($oldEntity, $this->entity, function() {
             $this->entity->save();
         });
         
