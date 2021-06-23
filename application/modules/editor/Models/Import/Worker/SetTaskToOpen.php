@@ -61,7 +61,7 @@ class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Task_Abstr
         //get the current task active workflow
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
-        $wfm->getActiveByTask($task)->getHandler()->doAfterImport($task);
+        $wfm->getActiveByTask($task)->hookin()->doAfterImport($task);
         
         return true;
     }

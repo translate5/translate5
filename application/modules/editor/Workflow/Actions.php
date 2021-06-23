@@ -63,7 +63,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $task->setState('end');
 
         try {
-            $this->config->workflow->getHandler()->doWithTask($oldTask, $task);
+            $this->config->workflow->hookin()->doWithTask($oldTask, $task);
         }
         catch (ZfExtended_Models_Entity_NoAccessException $e) {
             //ignore no access here. Access may by declined by the called workflow. But this may not block the end via workflow action.
@@ -176,11 +176,11 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $task->loadByTaskGuid($row['taskGuid']);
             //its much easier to load the entity as setting it (INSERT instead UPDATE issue on save, because of internal zend things on initing rows)
             $tua->load($row['id']);
-            $workflow->getHandler()->doWithTask($task, $task); //nothing changed on task directly, but call is needed
+            $workflow->hookin()->doWithTask($task, $task); //nothing changed on task directly, but call is needed
             $tuaNew = clone $tua;
             $tuaNew->setState($workflow::STATE_FINISH);
             $tuaNew->validate();
-            $workflow->getHandler()->doWithUserAssoc($tua, $tuaNew, function() use ($tuaNew){
+            $workflow->hookin()->doWithUserAssoc($tua, $tuaNew, function() use ($tuaNew){
                 $tuaNew->save();
             });
         }
