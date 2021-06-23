@@ -34,3 +34,17 @@ INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `valu
 VALUES ('runtimeOptions.workflow.initialWorkflow', '1', 'editor', 'workflow', 'default', 'default', '', 'string', 'The name of the workflow which should be used by default on task creation.', 4, 'Initial workflow on task creation', 'Workflow');
 
 ALTER TABLE `LEK_taskUserAssoc` ADD COLUMN `workflow` varchar(64) NOT NULL DEFAULT 'default' COMMENT 'the workflow to which this job belongs' AFTER `workflowStepName`;
+
+ALTER TABLE `LEK_taskUserAssoc` DROP FOREIGN KEY `fk_LEK_taskUserAssoc_2`;
+ALTER TABLE `LEK_taskUserAssoc` DROP INDEX `taskGuid`;
+
+ALTER TABLE `LEK_taskUserAssoc` ADD UNIQUE INDEX `taskGuid` (`taskGuid`,`userGuid`,`workflow`,`workflowStepName`);
+ALTER TABLE `LEK_taskUserAssoc` ADD CONSTRAINT `fk_LEK_taskUserAssoc_2` FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE;
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`)
+VALUES ('runtimeOptions.workflow.notifyAllUsersAboutTask', '1', 'editor', 'workflow', '1', '1', '', 'boolean', 'Defines if the associated users of a task should be notified about the association (after a successfull import of a task).', 8, 'Workflow notifications: Notify associated users', 'Workflow');
+
+UPDATE LEK_workflow_action 
+SET `trigger` = 'handleAfterImport' 
+WHERE `trigger` = 'handleDirect::notifyAllUsersAboutTaskAssociation';
+

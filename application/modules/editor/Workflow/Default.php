@@ -153,6 +153,13 @@ class editor_Workflow_Default {
      */
     protected $definition;
     
+    /**
+     * Holds workflow log instance per affected task
+     * Accesable via doDebug method
+     * @var array
+     */
+    protected $log = [];
+    
     public function __construct($name) {
         
         $cache = Zend_Registry::get('cache');
@@ -643,5 +650,25 @@ class editor_Workflow_Default {
             throw new editor_Workflow_Exception('E1253', ['workflowId' => $this->definition->name]);
         }
         return array_combine($data, $usedLabels);
+    }
+    
+    /**
+     * returns either a task specific workflow logger or the native one
+     * @return ZfExtended_Logger
+     */
+    public function getLogger(editor_Models_Task $task = null): ZfExtended_Logger {
+        if(empty($task)) {
+            return Zend_Registry::get('logger')->cloneMe('editor.workflow');
+        }
+        $taskGuid = $task->getTaskGuid();
+        //without that data no loggin is possible
+        if(empty($taskGuid)) {
+            return Zend_Registry::get('logger')->cloneMe('editor.workflow');
+        }
+        //get the logger for the task
+        if(empty($this->log[$taskGuid])) {
+            $this->log[$taskGuid] = ZfExtended_Factory::get('editor_Logger_Workflow', [$task]);
+        }
+        return $this->log[$taskGuid];
     }
 }

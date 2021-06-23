@@ -180,7 +180,7 @@ class editor_Workflow_Manager {
      * @param string|editor_Models_Task $taskOrGuid
      * @return editor_Workflow_Default
      */
-    public function getActiveByTask(editor_Models_Task $task) {
+    public function getActiveByTask(editor_Models_Task $task): editor_Workflow_Default {
         $taskGuid = $task->getTaskGuid();
         if(empty(self::$workflowTaskCache[$taskGuid])) {
             return self::$workflowTaskCache[$taskGuid] = $this->get($task->getWorkflow());

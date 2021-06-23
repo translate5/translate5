@@ -36,13 +36,6 @@ class editor_Workflow_Default_Handler {
     protected $workflow;
     
     /**
-     * Holds workflow log instance per affected task
-     * Accesable via doDebug method
-     * @var array
-     */
-    protected $log = [];
-    
-    /**
      * @var ZfExtended_EventManager
      */
     protected $events = false;
@@ -99,8 +92,6 @@ class editor_Workflow_Default_Handler {
         'notifyAllUsersAboutTaskAssociation',
     ];
     
-    protected $nextStepWasSet = [];
-    
     public function __construct(editor_Workflow_Default $workflow) {
         $this->workflow = $workflow;
         $this->loadAuthenticatedUser();
@@ -113,13 +104,13 @@ class editor_Workflow_Default_Handler {
             //if entity could not be saved no ID was given, so check for it
             if($tua->getId() > 0) {
                 $this->doUserAssociationAdd($tua);
-                $this->recalculateWorkflowStep($tua);
+                $this->getStepRecalculation()->recalculateWorkflowStep($tua);
             }
         });
 
         $events->attach('Editor_TaskuserassocController', 'afterDeleteAction', function(Zend_EventManager_Event $event){
             $this->doUserAssociationDelete($event->getParam('entity'));
-            $this->recalculateWorkflowStep($event->getParam('entity'));
+            $this->getStepRecalculation()->recalculateWorkflowStep($event->getParam('entity'));
         });
 
         $events->attach('editor_Models_Import', 'beforeImport', function(Zend_EventManager_Event $event){
@@ -132,92 +123,6 @@ class editor_Workflow_Default_Handler {
             $this->importConfig = $event->getParam('importConfig');
             $this->handleImportCompleted();
         });
-    }
-    
-    /**
-     * recalculates the workflow step by the given task user assoc combinations
-     * If the combination of roles and states are pointing to an specific workflow step, this step is used
-     * If the states and roles does not match any valid combination, no step is changed.
-     * @param editor_Models_TaskUserAssoc $tua
-     */
-    protected function recalculateWorkflowStep(editor_Models_TaskUserAssoc $tua) {
-        $taskGuid = $tua->getTaskGuid();
-        
-        //if the step was recalculated due setNextStep in internal workflow calculations,
-        // we may not recalculate it here again!
-        if(!empty($this->nextStepWasSet[$taskGuid])) {
-            $this->sendFrontEndNotice($this->nextStepWasSet[$taskGuid]['newStep']);
-            return;
-        }
-        
-        $tuas = $tua->loadByTaskGuidList([$taskGuid]);
-        
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        
-        $matchingSteps = [];
-        $pmOvverideCount=0;
-        foreach($tuas as $tua) {
-            if($tua['isPmOverride']==1){
-                $pmOvverideCount++;
-            }
-        }
-        if(empty($tuas) && count($tuas)==$pmOvverideCount){
-            $matchingSteps[]=$this->workflow::STEP_NO_WORKFLOW;
-        }else{
-            foreach($this->workflow->getValidStates() as $step => $roleStates) {
-                if(!$this->areTuasSubset($roleStates, $step, $tuas)) {
-                    continue;
-                }
-                $matchingSteps[] = $step;
-            }
-        }
-        
-        //if the current step is one of the possible steps for the tua configuration
-        // then everything is OK,
-        // or if no valid configuration is found, then we also could not change the step
-        if(empty($matchingSteps) || in_array($task->getWorkflowStepName(), $matchingSteps)) {
-            return;
-        }
-        //set the first found valid step to the current workflow step
-        $step = reset($matchingSteps);
-        $this->doDebug('recalculate workflow to step {step} ', ['step' => $step], true);
-        $task->updateWorkflowStep($step, false);
-        //set $step as new workflow step if different to before!
-        $this->sendFrontEndNotice($step);
-    }
-    
-    /**
-     * Checks if the given Jobs (tuas) are a subset of the list be compared
-     * @param array $toCompare
-     * @param string $currentStep
-     * @param array $tuas
-     * @return bool
-     */
-    protected function areTuasSubset(array $toCompare, string $currentStep, array $tuas): bool {
-        $hasStepToCurrentTaskStep = false;
-        foreach($tuas as $tua) {
-            if(empty($toCompare[$tua['workflowStepName']])) {
-                return false;
-            }
-            if(!in_array($tua['state'], $toCompare[$tua['workflowStepName']])) {
-                return false;
-            }
-            $hasStepToCurrentTaskStep = $hasStepToCurrentTaskStep || ($currentStep == $tua['workflowStepName']);
-        }
-        //we can only return true, if the Tuas contain at least one role belonging to the currentStep,
-        // in other words we can not reset the task to reviewing, if we do not have a reviewer
-        return $hasStepToCurrentTaskStep;
-    }
-    
-    protected function sendFrontEndNotice(string $step) {
-        $msg = ZfExtended_Factory::get('ZfExtended_Models_Messages');
-        /* @var $msg ZfExtended_Models_Messages */
-        $labels = $this->workflow->getLabels();
-        $steps = $this->workflow->getSteps();
-        $step = $labels[array_search($step, $steps)];
-        $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
     }
     
     /**
@@ -257,19 +162,9 @@ class editor_Workflow_Default_Handler {
      */
     protected function handleBeforeImport(){
         $this->doDebug(__FUNCTION__);
-        $this->initWorkflowStep($this->newTask, $this->workflow::STEP_NO_WORKFLOW);
+        $this->getStepRecalculation()->initWorkflowStep($this->newTask, $this->workflow::STEP_NO_WORKFLOW);
         $this->newTask->load($this->newTask->getId()); //reload task with new workflowStepName and new calculated workflowStepNr
         $this->callActions(__FUNCTION__, $this->workflow::STEP_NO_WORKFLOW);
-    }
-    
-    /**
-     * Inits the workflow step in the given task
-     * @param editor_Models_Task $task
-     * @param string $stepName
-     */
-    protected function initWorkflowStep(editor_Models_Task $task, $stepName) {
-        $this->doDebug('workflow init step to "{step}"', ['step' => $stepName], true);
-        $task->updateWorkflowStep($stepName, false);
     }
 
     /**
@@ -510,7 +405,11 @@ class editor_Workflow_Default_Handler {
             $this->events->trigger($state, $this->workflow, array('oldTua' => $oldTua, 'newTua' => $newTua, 'task' => $task));
         }
         $this->handleUserAssociationChanged('handleUserAssociationEdited');
-        $this->recalculateWorkflowStep($newTua);
+        $this->getStepRecalculation()->recalculateWorkflowStep($newTua);
+    }
+    
+    protected function getStepRecalculation(): editor_Workflow_Default_StepRecalculation {
+        return ZfExtended_Factory::get('editor_Workflow_Default_StepRecalculation', [$this->workflow]);
     }
     
     /**
@@ -521,52 +420,18 @@ class editor_Workflow_Default_Handler {
         $this->newTask = $importedTask;
         $this->importConfig = $importConfig;
         $this->doDebug('handleImport');
-        $this->setupInitialWorkflow();
+        $this->getStepRecalculation()->setupInitialWorkflow($this->newTask);
         $this->callActions('handleImport'); //FIXME convert all handler to their doer functions
     }
     
     /**
-     * - cleans the not needed automatically added task user associations from the job list
-     * - sets the tasks workflow step depending the associated jobs
-     * - sets the initial states depending on the workflow step of the task and task usage mode
+     * is called after whole import, after task was successfully opened for usage
+     * @param editor_Models_Task $importedTask
      */
-    protected function setupInitialWorkflow() {
-        /* @var $job editor_Models_TaskUserAssoc */
-        $job = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        $jobs = $job->loadByTaskGuidList([$this->newTask->getTaskGuid()]);
-        
-        $usedSteps = [];
-        //delete jobs created by default which are not belonging to the tasks workflow and collect used steps
-        foreach($jobs as $rawJob) {
-            if($rawJob['workflow'] !== $this->newTask->getWorkflow()) {
-                $job->db->delete(['id = ?' => $rawJob['id']]);
-            }
-            $usedSteps[] = $rawJob['workflowStepName'];
-        }
-        if(empty($usedSteps)) {
-            return;
-        }
-        
-        //sort the found steps regarding the step chain
-        $usedSteps = array_unique($usedSteps);
-        usort($usedSteps, [$this->workflow, 'compareSteps']);
-        
-        //we set the tasks workflow step to the first found step of the assigned users, respecting the order of the step chain
-        $currentStep = array_shift($usedSteps);
-        $this->newTask->updateWorkflowStep($currentStep, false);
-        
-        $isComp = $this->newTask->getUsageMode() == $this->newTask::USAGE_MODE_COMPETITIVE;
-        foreach($jobs as $rawJob) {
-            //currentstep jobs are open
-            if($currentStep === $rawJob['workflowStepName']) {
-                $state = $isComp ? $this->workflow::STATE_UNCONFIRMED : $this->workflow::STATE_OPEN;
-            }
-            else {
-            //all other steps are coming later in the chain, so they are waiting
-                $state = $this->workflow::STATE_WAITING;
-            }
-            $job->db->update(['state' => $state], ['id = ?' => $rawJob['id']]);
-        }
+    public function doAfterImport(editor_Models_Task $importedTask) {
+        $this->newTask = $importedTask;
+        $this->doDebug('handleAfterImport');
+        $this->callActions('handleAfterImport');
     }
     
     /**
@@ -678,7 +543,7 @@ class editor_Workflow_Default_Handler {
             }
             call_user_func([$instance, $method], json_decode($action['parameters']));
             if(json_last_error() != JSON_ERROR_NONE) {
-                $this->getLogger()->error('E1171', 'Workflow Action: JSON Parameters for workflow action call could not be parsed with message: {msg}', [
+                $this->workflow->getLogger($this->newTask)->error('E1171', 'Workflow Action: JSON Parameters for workflow action call could not be parsed with message: {msg}', [
                     'msg' => json_last_error_msg(),
                     'action' => $action
                 ]);
@@ -804,11 +669,12 @@ class editor_Workflow_Default_Handler {
     protected function setNextStep(editor_Models_Task $task, $stepName) {
         //store the nextStepWasSet per taskGuid,
         // so this mechanism works also when looping over different tasks with the same workflow instance
-        $this->nextStepWasSet[$task->getTaskGuid()] = [
+        $steps = [
             'oldStep' => $task->getWorkflowStepName(),
             'newStep' => $stepName,
         ];
-        $this->doDebug(__FUNCTION__.': workflow next step "{newStep}"; oldstep: "{oldStep}"', $this->nextStepWasSet[$task->getTaskGuid()], true);
+        $this->getStepRecalculation()->addNextStepSet($task->getTaskGuid(), $steps['newStep']);
+        $this->doDebug(__FUNCTION__.': workflow next step "{newStep}"; oldstep: "{oldStep}"', $steps, true);
         $task->updateWorkflowStep($stepName, true);
         //call action directly without separate handler method
         $newTua = $this->newTaskUserAssoc;
@@ -934,7 +800,7 @@ class editor_Workflow_Default_Handler {
      * @param bool $levelInfo optional, if true log in level info instead debug
      */
     protected function doDebug($msg, array $data = [], $levelInfo = false) {
-        $log = $this->getLogger();
+        $log = $this->workflow->getLogger($this->newTask);
         
         //add the job / tua
         if(!empty($this->newTaskUserAssoc)) {
@@ -946,26 +812,6 @@ class editor_Workflow_Default_Handler {
         else {
             $log->debug('E1013', $msg, $data);
         }
-    }
-    
-    /**
-     * returns either a task specific workflow logger or the native one
-     * @return ZfExtended_Logger
-     */
-    protected function getLogger(): ZfExtended_Logger {
-        if(empty($this->newTask)) {
-            return Zend_Registry::get('logger')->cloneMe('editor.workflow');
-        }
-        $taskGuid = $this->newTask->getTaskGuid();
-        //without that data no loggin is possible
-        if(empty($taskGuid)) {
-            return Zend_Registry::get('logger')->cloneMe('editor.workflow');
-        }
-        //get the logger for the task
-        if(empty($this->log[$taskGuid])) {
-            $this->log[$taskGuid] = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->newTask]);
-        }
-        return $this->log[$taskGuid];
     }
     
     /**

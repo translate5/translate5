@@ -376,6 +376,14 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $this->tua = $tua = $this->config->newTua;
         
+        //the usage of this config is more a workaround,
+        // since this was the easiest but also straight forward way to transport the information "yes notify"
+        // from one task import wizard page to the final startImport action.
+        // Not using the system config would mean to implement an own way to transport such config information.
+        if(!($this->config->task->getConfig()->runtimeOptions->workflow->notifyAllUsersAboutTask ?? false)) {
+            return;
+        }
+        
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $pm = clone $user;
