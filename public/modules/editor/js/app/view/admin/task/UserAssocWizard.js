@@ -37,23 +37,44 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.form.Panel
  */
 Ext.define('Editor.view.admin.task.UserAssocWizard', {
-    extend:'Editor.view.admin.task.UserAssoc',
+    extend:'Editor.view.admin.user.Assoc',
     alias: 'widget.adminTaskUserAssocWizard',
     itemId:'adminTaskUserAssocWizard',
     requires: [
-        'Editor.view.admin.task.UserAssoc'
+        'Editor.view.admin.task.UserAssoc',
+        'Editor.view.admin.task.UserAssocWizardViewController'
     ],
+    viewModel:{
+        type:'adminTaskUserAssocWizard'
+    },
+    controller:'adminTaskUserAssocWizard',
     mixins:['Editor.controller.admin.IWizardCard'],
 
     //card type, used for card display order
     importType:'postimport',
-
     task:null,
     header:false,
     title:null,
 
     strings:{
-        wizardTitle:'#UT#Standard-Benutzerzuweisungen'
+        wizardTitle:'#UT#Standard-Benutzerzuweisungen',
+        sourceLang: '#UT#Quellsprache',
+        targetLang: '#UT#Zielsprache',
+        fieldWorkflowStepName: '#UT#Workflow-Schritt',
+        fieldWorkflow: '#UT#Workflow',
+        fieldState: '#UT#Status',
+        fieldUser: '#UT#Benutzer',
+        btnSave: '#UT#Speichern',
+        btnCancel: '#UT#Abbrechen',
+        formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
+        formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
+        fieldDeadline:'#UT#Deadline',
+        fieldSegmentrange: '#UT#Editierbare Segmente',
+        fieldSegmentrangeInfo: '#UT#Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)',
+        deadlineDateInfoTooltip:'#UT#translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.',
+        usageModeCoop: "#UT#Sequentielles Arbeiten",
+        usageModeCompetitive: "#UT#Konkurrierende Zuweisung",
+        usageModeSimultaneous: "#UT#Gleichzeitiges Arbeiten",
     },
 
     listeners:{
@@ -61,84 +82,97 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
     },
 
     initComponent:function(){
-        var me=this,
-            gridConfig = me.items[0];
-        gridConfig.features= [{
-            ftype: 'grouping',
-            startCollapsed: true,
-            groupHeaderTpl: '{targetLang} ({rows.length})'
-        }];
+        var me=this;
         me.callParent();
-        me.loadCustomConfig();
+        me.setCustomConfig();
     },
 
-    loadCustomConfig:function(){
-        var me=this,
-            assocGrid = me.down('#adminTaskUserAssocGrid');
-        assocGrid.down('#userSpecialPropertiesBtn').setHidden(true);
-        assocGrid.down('#reload-btn').setHidden(true);
+    setCustomConfig:function (){
+        var me = this,
+            grid = me.down('grid'),
+            formPanel = me.lookup('assocForm'),
+            form = formPanel.getForm();
+        // bind the assoc grid to taskUserAssoc store
+        me.down('adminUserAssocGrid').setBind({
+            store:'{userAssocImport}',
+            selection:'{selectedAssocRecord}'
+        });
 
-        assocGrid.reconfigure(assocGrid.getStore(),[{
-            xtype: 'gridcolumn',
-            width: 230,
-            dataIndex: 'sourceLang',
-            text: 'Source'
-        },{
-            xtype: 'gridcolumn',
-            width: 230,
-            dataIndex: 'targetLang',
-            text: 'Target'
-        },{
-            xtype: 'gridcolumn',
-            width: 230,
-            dataIndex: 'login',
-            renderer: function(v, meta, rec) {
-                if(Editor.data.debug) {
-                    v = Ext.String.format('<a href="{0}session/?authhash={1}">{2}</a>', Editor.data.restpath, rec.get('staticAuthHash'), v);
-                }
-                return rec.get('surName')+', '+rec.get('firstName')+' ('+v+')';
+        grid.down('#notifyAssociatedUsersCheckBox').setVisible(true);
+
+        form.findField('sourceLang').setVisible(false);
+        form.findField('targetLang').setVisible(false);
+
+        formPanel.insert(formPanel.items.length-1,{
+            xtype: 'datetimefield',
+            name: 'deadlineDate',
+            format: Editor.DATE_HOUR_MINUTE_ISO_FORMAT,
+            fieldLabel: me.strings.fieldDeadline,
+            labelCls: 'labelInfoIcon',
+            cls: 'userAssocLabelIconField',
+            autoEl: {
+                tag: 'span',
+                'data-qtip': me.strings.deadlineDateInfoTooltip
             },
-            filter: {
-                type: 'string'
-            },
-            text: assocGrid.strings.userGuidCol
-        },{
-            xtype: 'gridcolumn',
-            width: 100,
-            dataIndex: 'role',
-            renderer: function(v,meta,rec) {
-                var task=me.lookupViewModel().get('currentTask'),
-                    vfm=task && task.getWorkflowMetaData(),
-                    role=(vfm && vfm.roles && vfm.roles[v]) || v;
-                return role;
-            },
-            text: assocGrid.strings.roleCol
-        },{
-            xtype: 'gridcolumn',
-            width: 70,
-            dataIndex: 'segmentrange',
-            text: assocGrid.strings.segmentrangeCol
-        }]);
+            anchor: '100%'
+        });
+
+        // define the form fields bindings
+        form.findField('userGuid').setBind({
+            store: '{users}', // the store binding must be redefined because this will overwrite the main bind definition
+            disabled:'{!targetLangUserAssoc.value}'
+        });
+
+        form.findField('workflowStepName').setBind({
+            store:'{workflowSteps}',// the store binding must be redefined because this will overwrite the main bind definition
+            disabled:'{!targetLangUserAssoc.value}'
+        });
+
+        form.findField('deadlineDate').setBind({
+            disabled:'{!targetLangUserAssoc.value}'
+        });
+
+        form.findField('segmentrange').setBind({
+            disabled:'{!targetLangUserAssoc.value}'
+        });
+
+        grid.addDocked({
+            xtype:'combo',
+            width:250,
+            fieldLabel: me.strings.usageModeTitle,
+            name:'usageMode',
+            itemId:'usageMode',
+            forceSelection: true,
+            value:'cooperative', // the default value according to the database default. Should we use config ?
+            store:  Ext.create('Ext.data.Store', {
+                fields: ['id', 'label'],
+                data : [
+                    {"id":"simultaneous", "name":me.strings.usageModeSimultaneous},
+                    {"id":"competitive", "name":me.strings.usageModeCompetitive},
+                    {"id":"cooperative", "name":me.strings.usageModeCoop}
+                ]
+            }),
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'id'
+        },'top');
     },
 
     /***
+     * Load the assoc data based on the current projectId and workflow
      */
-    onUserAssocWizardActivate:function(){
-        var me=this,
-            store=me.down('#adminTaskUserAssocGrid').getStore();
-        store.setExtraParams({
-            projectId:me.task.get('projectId')
-        });
-        store.load();
+    loadAssocData : function (){
+        this.getController().loadAssocData();
     },
 
     //called when next button is clicked
     triggerNextCard:function(activeItem){
-        this.fireEvent('wizardCardFinished', null);
+        this.getController().nextCardClick();
     },
+
     //called when skip button is clicked
     triggerSkipCard:function(activeItem){
-        this.fireEvent('wizardCardFinished', 2);
+        this.getController().skipCardClick();
     },
 
     disableSkipButton:function(){

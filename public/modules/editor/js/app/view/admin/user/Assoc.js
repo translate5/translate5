@@ -72,8 +72,8 @@ Ext.define('Editor.view.admin.user.Assoc', {
                 items: [{
                         xtype: 'adminUserAssocGrid',
                         itemId: 'adminUserAssocGrid',
+                        store:Ext.StoreManager.get('admin.UserAssocDefault'),
                         bind:{
-                            store:'{userAssoc}',
                             selection:'{selectedAssocRecord}'
                         },
                         region: 'center'
@@ -98,6 +98,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
                             title : me.strings.formTitleAdd,
                             bodyPadding: 10,
                             region: 'east',
+                            reference: 'assocForm',
                             defaults: {
                                 labelAlign: 'top',
                                 duplicateRecord: false,
@@ -109,53 +110,24 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 }
                             },
                             disabled:true,
-                            bind: {
-                                disabled: '{!selectedAssocRecord}'
-                            },
                             items:[{
-                                anchor: '100%',
-                                xtype: 'combo',
-                                editable: false,
-                                forceSelection: true,
-                                queryMode: 'local',
-                                dataIndex: 'workflow',
-                                itemId: 'workflow',
-                                name: 'workflow',
-                                fieldLabel: me.strings.fieldWorkflow,
-                                valueField: 'id',
-                                displayField: 'label',
-                                allowBlank: false,
-                                bind: {
-                                    store:'{workflow}',
-                                    value:'{selectedAssocRecord.workflow}'
-                                }
-                            },{
                                 xtype: 'languagecombo',
-                                viewModel:'adminUserAssoc',
-                                dataIndex: 'sourceLang',
                                 name: 'sourceLang',
                                 itemId: 'sourceLang',
-                                allowBlank: false,
-                                bind:{
-                                    value:'{selectedAssocRecord.sourceLang}'
-                                }
+                                allowBlank: false
                             },{
                                 xtype: 'languagecombo',
-                                dataIndex: 'targetLang',
                                 name: 'targetLang',
                                 itemId: 'targetLang',
-                                viewModel:'adminUserAssoc',
-                                allowBlank: false,
-                                bind:{
-                                    value:'{selectedAssocRecord.targetLang}'
-                                }
+                                reference: 'targetLangUserAssoc',
+                                publishes: 'value',
+                                allowBlank: false
                             },{
                                 anchor: '100%',
                                 xtype: 'combo',
                                 editable: false,
                                 forceSelection: true,
                                 queryMode: 'local',
-                                dataIndex: 'workflowStepName',
                                 itemId: 'workflowStepName',
                                 name: 'workflowStepName',
                                 fieldLabel: me.strings.fieldWorkflowStepName,
@@ -163,8 +135,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 displayField: 'text',
                                 allowBlank: false,
                                 bind: {
-                                    store:'{workflowSteps}',
-                                    value:'{selectedAssocRecord.workflowStepName}'
+                                    store:'{workflowSteps}'
                                 }
                             },{
                                 anchor: '100%',
@@ -174,42 +145,20 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                     loadMask: false
                                 },
                                 bind: {
-                                    store: '{users}',
-                                    value:'{selectedAssocRecord.userGuid}'
+                                    store: '{users}'
                                 },
                                 forceSelection: true,
                                 anyMatch: true,
                                 queryMode: 'local',
-                                dataIndex: 'userGuid',
                                 name: 'userGuid',
                                 itemId: 'userGuid',
                                 displayField: 'longUserName',
                                 valueField: 'userGuid',
                                 fieldLabel: me.strings.fieldUser
                             },{
-                                xtype:'numberfield',
-                                dataIndex: 'deadlineDate',
-                                itemId: 'deadlineDate',
-                                decimalPrecision:4,
-                                fieldLabel: me.strings.fieldDeadline,
-                                labelCls: 'labelInfoIcon',
-                                cls:'userAssocLabelIconField',
-                                bind: {
-                                    value:'{selectedAssocRecord.deadlineDate}'
-                                },
-                                autoEl: {
-                                    tag: 'span',
-                                    'data-qtip': me.strings.deadlineDateInfoTooltip
-                                },
-                                anchor: '100%'
-                            },{
                                 xtype: 'textfield',
                                 itemId: 'segmentrange',
-                                dataIndex: 'segmentrange',
                                 name: 'segmentrange',
-                                bind: {
-                                    value:'{selectedAssocRecord.segmentrange}'
-                                },
                                 fieldLabel: me.strings.fieldSegmentrange,
                                 labelCls: 'labelInfoIcon',
                                 cls:'userAssocLabelIconField',
@@ -248,39 +197,55 @@ Ext.define('Editor.view.admin.user.Assoc', {
         return me.callParent([config]);
     },
 
+    /***
+     * set the current customer. This is used for binding
+     * @param newCustomer
+     */
     setCustomer:function (newCustomer){
-        this.getViewModel().set('selectedCustomer',newCustomer);
+        var me = this;
+        me.customer = newCustomer;
+        me.setDefaultWorkflow();
+        me.loadAssocData();
     },
 
-    /**
-     * loads all or all available users into the dropdown, the store is reused to get the username to userguids
-     * @param {Boolean} edit true if edit an assoc, false if add a new one
-     */
-    loadUsers: function() {
-        var me = this,
-            user = me.down('combo[name="userGuid"]'),
-            store = user.store;
-        store.clearFilter(true);
-        store.load();
+    getCustomer:function (){
+        return this.customer;
     },
-    /**
-     * loads the given record into the userAssoc form
-     * @param {Editor.data.model.admin.TaskUserAssoc} rec
+
+    /***
+     * Update the assoc grid filters with current selected customer and workflow
      */
-    loadRecord: function(rec) {
-        var me = this,
-            edit = !rec.phantom,
-            form = me.down('form'),
-            user = me.down('combo[name="userGuid"]');
-        form.loadRecord(rec);
-        if(edit) {
-            form.setTitle(Ext.String.format(me.strings.formTitleEdit, rec.get('longUserName')));
+    loadAssocData : function (){
+        var me=this,
+            workflowCombo = me.down('#workflowCombo'),
+            customerId = me.getCustomer() ? me.getCustomer().get('id') : false,
+            currentWorkflow = !Ext.isEmpty(workflowCombo.getValue()) ? workflowCombo.getValue() : false;
+
+        if(customerId && currentWorkflow){
+            Ext.StoreManager.get('admin.UserAssocDefault').addFilter([{
+                property: 'customerId',
+                operator:"eq",
+                value:customerId
+            },{
+                property: 'workflow',
+                operator:"eq",
+                value:currentWorkflow
+            }]);
         }
-        else {
-            me.loadUsers(edit);
-            form.setTitle(me.strings.formTitleAdd);
+    },
+
+    /***
+     * Set the default workflow in the workflow combo. If there is not no value defined
+     * in the config, the "default" workflow will be set as default
+     */
+    setDefaultWorkflow:function (){
+        var me=this,
+            workflowCombo = me.down('#workflowCombo'),
+            newValue = Ext.getStore('admin.CustomerConfig').getConfig('workflow.initialWorkflow');
+
+        if(!newValue){
+            newValue = Editor.data.app.workflow.CONST.DEFAULT_WORKFLOW;
         }
-        user.setVisible(!edit);
-        user.setDisabled(edit);
+        workflowCombo.setValue(newValue);
     }
 });

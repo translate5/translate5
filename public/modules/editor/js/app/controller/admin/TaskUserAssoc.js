@@ -118,7 +118,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           },
           '#adminTaskUserAssocGrid #reload-btn': {
               click: me.reloadTaskUserAssocGrid
-          },
+          }
       });
   },
   /**

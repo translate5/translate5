@@ -32,7 +32,7 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
     ],
     strings: {
         sourceLang: '#UT#Quellsprache',
-        relaisLang: '#UT#Relaissprache',
+        targetLang: '#UT#Zielsprache',
         userGuidCol: '#UT#Benutzer',
         roleCol: '#UT#Rolle',
         segmentrangeCol: '#UT#Segmente',
@@ -46,7 +46,8 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
         deadlineDateLable: '#UT#Deadline',
         notifyButtonText: '#UT#Benutzer benachrichtigen',
         notifyButtonTooltip: '#UT#Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen',
-        workflowStepNameCol:'#UT#Workflow-Schritt'
+        workflowStepNameCol:'#UT#Workflow-Schritt',
+        fieldWorkflow: '#UT#Workflow'
     },
 
     viewModel: {
@@ -58,11 +59,16 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
     initConfig: function (instanceConfig) {
         var me = this,
             config = {
+                features:[{
+                    ftype: 'grouping',
+                    startCollapsed: true,
+                    groupHeaderTpl: '{columnName}: {name}'
+                }],
                 columns: [{
                     xtype: 'gridcolumn',
                     width: 230,
                     dataIndex: 'sourceLang',
-                    renderer:me.langRenderer,
+                    renderer:Editor.util.Util.gridColumnLanguageRenderer,
                     filter: {
                         type: 'list',
                         options: Editor.data.languages,
@@ -73,7 +79,7 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     xtype: 'gridcolumn',
                     width: 230,
                     dataIndex: 'targetLang',
-                    renderer:me.langRenderer,
+                    renderer:Editor.util.Util.gridColumnLanguageRenderer,
                     filter: {
                         type: 'list',
                         options: Editor.data.languages,
@@ -139,7 +145,20 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                         itemId: 'reloadAssocBtn',
                         glyph: 'f2f1@FontAwesome5FreeSolid',
                         text: me.strings.reload
-                    }, '-', {
+                    }, '-' ,{
+                        xtype: 'combo',
+                        width:300,
+                        forceSelection: true,
+                        queryMode: 'local',
+                        itemId: 'workflowCombo',
+                        fieldLabel: me.strings.fieldWorkflow,
+                        valueField: 'id',
+                        displayField: 'label',
+                        allowBlank: false,
+                        bind: {
+                            store:'{workflow}'
+                        }
+                    }, {
                         xtype: 'checkbox',
                         hidden:true,
                         itemId: 'notifyAssociatedUsersCheckBox',
@@ -154,22 +173,6 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
-    },
-
-    /**
-     * renders the value of the language columns
-     * @param {String} val
-     * @returns {String}
-     */
-    langRenderer: function(val, md) {
-        var lang = Ext.StoreMgr.get('admin.Languages').getById(val),
-            label;
-        if(lang){
-            label = lang.get('label');
-            md.tdAttr = 'data-qtip="' + label + '"';
-            return label;
-        }
-        return '';
     },
 
     /**

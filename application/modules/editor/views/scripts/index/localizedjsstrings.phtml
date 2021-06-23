@@ -1005,7 +1005,26 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.admin.task.UserAssocWizard", {
         override: "Editor.view.admin.task.UserAssocWizard",
         strings: {
-            wizardTitle: '<?php echo $this->translate->_('Standard-Benutzerzuweisungen');?>'
+            wizardTitle: '<?php echo $this->translate->_('Standard-Benutzerzuweisungen');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+            fieldRole: '<?php echo $this->translate->_('Rolle');?>',
+            fieldState: '<?php echo $this->translate->_('Status');?>',
+            fieldUser: '<?php echo $this->translate->_('Benutzer');?>',
+            btnSave: '<?php echo $this->translate->_('Speichern');?>',
+            btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            formTitleAdd: '<?php echo $this->translate->_('Benutzerzuweisung hinzufügen:');?>',
+            formTitleEdit: '<?php echo $this->translate->_('Bearbeite Benutzer "{0}"');?>',
+            fieldDeadline: '<?php echo $this->translate->_('Deadline');?>',
+            fieldSegmentrange: '<?php echo $this->translate->_('Editierbare Segmente');?>',
+            fieldSegmentrangeInfo: '<?php echo $this->translate->_('Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)');?>',
+            deadlineDateInfoTooltip: '<?php echo $this->translate->_('translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.');?>',
+            fieldWorkflowStepName: '<?php echo $this->translate->_('Workflow-Schritt');?>',
+            fieldWorkflow: '<?php echo $this->translate->_('Workflow');?>',
+            usageModeCoop: '<?php echo $this->translate->_('Sequentielles Arbeiten');?>',
+            usageModeCompetitive: '<?php echo $this->translate->_('Konkurrierende Zuweisung');?>',
+            usageModeSimultaneous: '<?php echo $this->translate->_('Gleichzeitiges Arbeiten');?>',
+            usageModeTitle: '<?php echo $this->translate->_('Mehrere Benutzer');?>'
         }
     });
 
@@ -1030,7 +1049,8 @@ Ext.define('Editor.controller.Localizer', {
             deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
             notifyButtonText: '<?php echo $this->translate->_('Benutzer benachrichtigen');?>',
             notifyButtonTooltip: '<?php echo $this->translate->_('Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen');?>',
-            workflowStepNameCol: '<?php echo $this->translate->_('Workflow-Schritt');?>'
+            workflowStepNameCol: '<?php echo $this->translate->_('Workflow-Schritt');?>',
+            fieldWorkflow: '<?php echo $this->translate->_('Workflow');?>'
         }
     });
     
@@ -1053,8 +1073,8 @@ Ext.define('Editor.controller.Localizer', {
     });
 
 
-    Ext.define("Editor.view.admin.user.AssocImportWizardViewModel", {
-        override: "Editor.view.admin.user.AssocImportWizardViewModel",
+    Ext.define("Editor.view.admin.task.UserAssocWizardViewModel", {
+        override: "Editor.view.admin.task.UserAssocWizardViewModel",
         strings: {
             editInfo: '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>',
             segmentrangeError: '<?php echo $this->translate->_('Nicht zugewiesene Segmente');?>',

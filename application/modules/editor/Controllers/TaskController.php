@@ -554,6 +554,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $upload->initAndValidate();
             $dp = $dpFactory->createFromUpload($upload);
 
+            $projectTasks = [];
             //PROJECT with multiple target languages
             if($this->entity->isProject()) {
                 $entityId=$this->entity->save();
@@ -584,6 +585,8 @@ class editor_TaskController extends ZfExtended_RestController {
                     
                     //update the task usage log for the this project-task
                     $this->insertTaskUsageLog($task);
+
+                    $projectTasks[] = $task->getDataObject();
                 }
                 
                 $this->entity->setState($this->entity::INITIAL_TASKTYPE_PROJECT);
@@ -623,6 +626,9 @@ class editor_TaskController extends ZfExtended_RestController {
 
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
+
+            settype($this->view->rows->projectTasks,'array');
+            $this->view->rows->projectTasks = $projectTasks;
         }
         else {
             //we have to prevent attached events, since when we get here the task is not created, which would lead to task not found errors,
@@ -713,6 +719,49 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->startImportWorkers();
     }
 
+    /***
+     * Operation for pre task-import operations (change task config, task property or queue custom workers)
+     */
+    public function preimportOperation(){
+
+        $projectId = $this->entity->getProjectId();
+        $usageMode = $this->getParam('usageMode',false);
+        $workflow = $this->getParam('workflow',false);
+        $notifyAssociatedUsers = $this->getParam('notifyAssociatedUsers',false);
+        if(!$projectId){
+            return;
+        }
+        $projectLoader = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $projectLoader editor_Models_Task */
+        $projectTaks = $projectLoader->loadProjectTasks($projectId,true);
+
+
+        foreach ($projectTaks as $task) {
+            $saveModel = false;
+            $model = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $model editor_Models_Task */
+            $model->load($task['id']);
+
+            if(!empty($usageMode)){
+                $saveModel = true;
+                $model->setUsageMode($usageMode);
+            }
+
+            if(!empty($workflow)){
+                $saveModel = true;
+                $model->setWorkflow($workflow);
+            }
+
+            if(!empty($notifyAssociatedUsers)){
+                $saveModel = true;
+                $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
+                /* @var $taskConfig editor_Models_TaskConfig */
+                $taskConfig->updateInsertConfig($model->getTaskGuid(),'runtimeOptions.workflow.notifyAllUsersAboutTask',1);
+            }
+
+            $saveModel && $model->save();
+        }
+    }
 
     /**
      * Starts the export of a task into an excel file
