@@ -180,9 +180,9 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $tuaNew = clone $tua;
             $tuaNew->setState($workflow::STATE_FINISH);
             $tuaNew->validate();
-            $workflow->getHandler()->triggerBeforeEvents($tua, $tuaNew);
-            $tuaNew->save();
-            $workflow->getHandler()->doWithUserAssoc($tua, $tuaNew);
+            $workflow->getHandler()->doWithUserAssoc($tua, $tuaNew, function() use ($tuaNew){
+                $tuaNew->save();
+            });
         }
         $log = ZfExtended_Factory::get('editor_Logger_Workflow', [$task]);
         $log->debug('E1013', 'finish overdued task via workflow action');

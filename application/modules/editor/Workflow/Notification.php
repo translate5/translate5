@@ -224,7 +224,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $workflow = $this->config->workflow;
-        $isCron = $workflow->getHandler()->isCalledByCron();
+        $isCron = $this->config->isCalledByCron;
         $triggeringRole = $this->config->newTua->getRole();
         $currentStep = $this->config->newTua->getWorkflowStepName();
         $this->tua = clone $this->config->newTua; //we just reuse the already used entity
@@ -288,7 +288,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $workflow = $this->config->workflow;
-        $isCron = $workflow->getHandler()->isCalledByCron();
+        $isCron = $this->config->isCalledByCron;
         if($isCron) {
             //currently we do not trigger the notifyOne on cron actions (since currently there are all users set to finish)
             return;

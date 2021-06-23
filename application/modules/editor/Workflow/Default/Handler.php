@@ -67,14 +67,9 @@ class editor_Workflow_Default_Handler {
     protected $newTaskUserAssoc;
     
     /**
-     * @var stdClass
-     */
-    protected $authenticatedUser;
-    
-    /**
      * @var ZfExtended_Models_User
      */
-    protected $authenticatedUserModel;
+    protected $authenticatedUser;
     
     /**
      * Import config, only available on workflow stuff triggerd in the context of an import
@@ -144,17 +139,16 @@ class editor_Workflow_Default_Handler {
         $config = Zend_Registry::get('config');
         $isCron = $config->runtimeOptions->cronIP === ($_SERVER['REMOTE_ADDR'] ?? null);
         $isWorker = defined('ZFEXTENDED_IS_WORKER_THREAD');
-        $this->authenticatedUserModel = ZfExtended_Factory::get('ZfExtended_Models_User');
+        $this->authenticatedUser = ZfExtended_Factory::get('ZfExtended_Models_User');
         
         if($userGuid === false){
             if(!$isCron && !$isWorker) {
                 throw new ZfExtended_NotAuthenticatedException("Cannot authenticate the system user!");
             }
             //set session user data with system user
-            $this->authenticatedUserModel->setUserSessionNamespaceWithoutPwCheck(ZfExtended_Models_User::SYSTEM_LOGIN);
+            $this->authenticatedUser->setUserSessionNamespaceWithoutPwCheck(ZfExtended_Models_User::SYSTEM_LOGIN);
         }
-        $this->authenticatedUserModel->loadByGuid($userSession->data->userGuid);
-        $this->authenticatedUser = $userSession->data;
+        $this->authenticatedUser->loadByGuid($userSession->data->userGuid);
     }
     
     /**
@@ -237,14 +231,6 @@ class editor_Workflow_Default_Handler {
     }
 
     /**
-     * will be called after a task has been ended
-     */
-    protected function handleEnd() {
-        $this->newTask->dropMaterializedView();
-        $this->doDebug(__FUNCTION__);
-    }
-    
-    /**
      * will be called after first user of a role has finished a task
      * @param array $finishStat contains the info which of all different finishes are applicable
      */
@@ -268,35 +254,6 @@ class editor_Workflow_Default_Handler {
      */
     protected function handleFirstFinish(){
         $this->doDebug(__FUNCTION__);
-    }
-    
-    /**
-     * reopen an ended task (task-specific reopening in contrast to taskassoc-specific unfinish)
-     * will be called after a task has been reopened (after was ended - task-specific)
-     */
-    protected function handleReopen(){
-        $this->newTask->createMaterializedView();
-        $this->doDebug(__FUNCTION__);
-    }
-    
-    /**
-     * unfinish a finished task (taskassoc-specific unfinish in contrast to task-specific reopening)
-     * Set all REVIEWED_UNTOUCHED segments to TRANSLATED
-     * will be called after a task has been unfinished (after was finished - taskassoc-specific)
-     */
-    protected function handleUnfinish(){
-        $this->doDebug(__FUNCTION__);
-        $newTua = $this->newTaskUserAssoc;
-        /* @var $actions editor_Workflow_Actions */
-        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $newTua->getRole(), $newTua->getState());
-    }
-    
-    /**
-     * returns true if the workflow methods were triggered by a cron job and no direct user/API interaction
-     * @return boolean
-     */
-    public function isCalledByCron() {
-        return $this->isCron;
     }
     
     /**
@@ -351,26 +308,44 @@ class editor_Workflow_Default_Handler {
         //a segment mv creation is currently not needed, since doEnd deletes it, and doReopen creates it implicitly!
         
         if($newState == $oldState) {
-            $this->doTaskChange();
-            $this->events->trigger("doTaskChange", $this->workflow, array('oldTask' => $oldTask, 'newTask' => $newTask));
+            $this->doDebug("handleTaskChange");
+            try {
+                $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($this->authenticatedUser->getUserGuid(), $this->newTask);
+                $this->callActions("handleTaskChange", $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
+            }
+            catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                $this->callActions("handleTaskChange", $this->newTask->getWorkflowStepName());
+            }
+            $this->events->trigger("handleTaskChange", $this->workflow, ['oldTask' => $this->oldTask, 'newTask' => $this->newTask]);
             return; //saved some other attributes, do nothing
         }
+        $tasks = ['oldTask' => $oldTask, 'newTask' => $newTask];
         switch($newState) {
             case $newTask::STATE_OPEN:
                 if($oldState == $newTask::STATE_END) {
-                    $this->doReopen();
-                    $this->events->trigger("doReopen", $this->workflow, array('oldTask' => $oldTask, 'newTask' => $newTask));
+                    /**
+                     * is called on re opening a task
+                     * reopen an ended task (task-specific reopening in contrast to taskassoc-specific unfinish)
+                     * will be called after a task has been reopened (after was ended - task-specific)
+                     */
+                    $this->newTask->createMaterializedView();
+                    $this->doDebug("doReopen");
+                    
+                    $this->events->trigger("doReopen", $this->workflow, $tasks);
                 }
                 if($oldState == $newTask::STATE_UNCONFIRMED) {
-                    $this->doTaskConfirm();
-                    $this->events->trigger("doTaskConfirm", $this->workflow, array('oldTask' => $oldTask, 'newTask' => $newTask));
+                    $this->events->trigger("doTaskConfirm", $this->workflow, $tasks);
                 }
                 break;
             case $newTask::STATE_END:
-                $this->doEnd();
-                $this->events->trigger("doEnd", $this->workflow, array('oldTask' => $oldTask, 'newTask' => $newTask));
+                $this->doDebug("doEnd");
+                // is called on ending
+                // will be called after a task has been ended
+                $this->events->trigger("doEnd", $this->workflow, $tasks);
+                $this->newTask->dropMaterializedView();
                 break;
             case $newTask::STATE_UNCONFIRMED:
+            default:
                 //doing currently nothing
                 break;
         }
@@ -380,8 +355,15 @@ class editor_Workflow_Default_Handler {
      * Method should be called every time a TaskUserAssoc is updated. Must be called after doWithTask if both methods are called.
      * @param editor_Models_TaskUserAssoc $oldTua
      * @param editor_Models_TaskUserAssoc $newTua
+     * @param Callable $saveCallback Optional callback which is triggered after the beforeEvents and before doWithUserAssoc code - normally for persisting the new tua
      */
-    public function doWithUserAssoc(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua) {
+    public function doWithUserAssoc(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua, Callable $saveCallback = null) {
+        $state = $this->getTriggeredState($oldTua, $newTua, 'before');
+        $this->events->trigger($state, $this->workflow, array('oldTua' => $oldTua, 'newTua' => $newTua));
+        
+        //call here stuff which must be done between the before trigger and the other code (normally saving the TUA)
+        $saveCallback();
+        
         $this->oldTaskUserAssoc = $oldTua;
         $this->newTaskUserAssoc = $newTua;
         
@@ -486,7 +468,7 @@ class editor_Workflow_Default_Handler {
         
         try {
             //try to load an user assoc between current user and task
-            $this->newTaskUserAssoc =editor_Models_Loaders_Taskuserassoc::loadByTask($this->authenticatedUser->userGuid, $task);
+            $this->newTaskUserAssoc =editor_Models_Loaders_Taskuserassoc::loadByTask($this->authenticatedUser->getUserGuid(), $task);
         }
         catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->newTaskUserAssoc = null;
@@ -585,22 +567,9 @@ class editor_Workflow_Default_Handler {
         $config->oldTask = $this->oldTask;
         $config->task = $this->newTask;
         $config->importConfig = $this->importConfig;
-        $config->authenticatedUser = $this->authenticatedUserModel;
+        $config->authenticatedUser = $this->authenticatedUser;
+        $config->isCalledByCron = $this->isCron;
         return $config;
-    }
-    
-    /**
-     * is called on ending
-     */
-    protected function doEnd() {
-        $this->handleEnd();
-    }
-    
-    /**
-     * is called on re opening a task
-     */
-    protected function doReopen() {
-        $this->handleReopen();
     }
     
     /**
@@ -643,21 +612,6 @@ class editor_Workflow_Default_Handler {
         foreach($toTrigger as $trigger) {
             $this->doDebug($trigger);
             $this->callActions($trigger, $oldStep, $newTua->getRole(), $newTua->getState());
-        }
-    }
-    
-    /**
-     * is called when a task changes via API
-     */
-    protected function doTaskChange() {
-        $function = 'handleTaskChange';
-        $this->doDebug($function);
-        try {
-            $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($this->authenticatedUser->userGuid, $this->newTask);
-            $this->callActions($function, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
-        }
-        catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            $this->callActions($function, $this->newTask->getWorkflowStepName());
         }
     }
     
@@ -788,9 +742,16 @@ class editor_Workflow_Default_Handler {
     
     /**
      * is called on reopening / unfinishing a task
+     * unfinish a finished task (taskassoc-specific unfinish in contrast to task-specific reopening)
+     * Set all REVIEWED_UNTOUCHED segments to TRANSLATED
+     * will be called after a task has been unfinished (after was finished - taskassoc-specific)
      */
     protected function doUnfinish() {
-        $this->handleUnfinish();
+        //FIXME use key handleUnfinish
+        $this->doDebug(__FUNCTION__);
+        $newTua = $this->newTaskUserAssoc;
+        /* @var $actions editor_Workflow_Actions */
+        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $newTua->getRole(), $newTua->getState());
     }
     
     /**
@@ -815,19 +776,9 @@ class editor_Workflow_Default_Handler {
     }
     
     /**
-     * triggers a beforeSTATE event
-     * @param editor_Models_TaskUserAssoc $oldTua
-     * @param editor_Models_TaskUserAssoc $newTua
-     */
-    public function triggerBeforeEvents(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua) {
-        $state = $this->getTriggeredState($oldTua, $newTua, 'before');
-        $this->events->trigger($state, $this->workflow, array('oldTua' => $oldTua, 'newTua' => $newTua));
-    }
-    
-    /**
      * method returns the triggered state as string ready to use in events, these are mainly:
      * doUnfinish, doView, doEdit, doFinish, doWait, doConfirm
-     * beforeUnfinish, beforeView, beforeEdit, beforeFinish, beforeWait
+     * beforeUnfinish, beforeView, beforeEdit, beforeFinish, beforeWait, beforeConfirm
      *
      * @param editor_Models_TaskUserAssoc $oldTua
      * @param editor_Models_TaskUserAssoc $newTua
