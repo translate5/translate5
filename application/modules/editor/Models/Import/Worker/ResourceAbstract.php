@@ -50,7 +50,7 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
                 $this->raiseNoAvailableResourceException();
             }
             
-            // we trigger the parent init WITHOUT starting further workers of course
+            // we trigger the parent init without starting them of course
             $idToReturn = parent::queue($parentId, $state, false);
             
             // the still free slots after the worker is queued
