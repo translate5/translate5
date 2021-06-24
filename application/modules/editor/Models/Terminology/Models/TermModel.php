@@ -123,6 +123,66 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         // Save
         $termId = $this->save();
 
+        // Get processStatus-attr dataTypeId
+        $dataTypeId_processStatus = editor_Utils::db()->query('
+            SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = "processStatus" LIMIT 1
+        ')->fetchColumn();
+
+        // Append to $attrA
+        $attrA['processStatus'] = [
+            'dataTypeId' => $dataTypeId_processStatus,
+            'value' => $this->getProcessStatus()
+        ];
+
+        // If value for note-attr is given
+        if ($misc['note']) {
+
+            // Get note-attr dataTypeId
+            $dataTypeId_note = editor_Utils::db()->query('
+                SELECT `id` FROM `terms_attributes_datatype` WHERE `label` = "note" LIMIT 1
+            ')->fetchColumn();
+
+            // Append to attrA
+            $attrA['note'] = [
+                'dataTypeId' => $dataTypeId_note,
+                'value' => $misc['note']
+            ];
+        }
+
+        // Foreach attribute to be INSERTed
+        foreach ($attrA as $type => $attrI) {
+
+            // Create `terms_attributes` model instance
+            $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+
+            // Apply data
+            $a->init([
+                'elementName' => 'termNote',
+                'language' => $this->getLanguage(),
+                'attrLang' => $this->getLanguage(),
+                'value' => $attrI['value'],
+                'type' => $type,
+                'collectionId' => $this->getCollectionId(),
+                'termEntryId' => $this->getTermEntryId(),
+                'termEntryGuid' => $this->getTermEntryGuid(),
+                'termId' => $termId,
+                'termGuid' => $this->getGuid(),
+                'dataTypeId' => $attrI['dataTypeId'],
+                'guid' => ZfExtended_Utils::uuid(),
+                'userGuid' => $misc['userGuid'],
+                'userName' => $misc['userName'],
+                'created' => date('Y-m-d H:i:s'),
+                //'updated' => date('Y-m-d H:i:s'),
+                //'processStatus' => 'finalized', // it's 'finalized' by DEFAULT
+                //'tmpOldId' => 0,
+                //'tmpOldTermId' => 0,
+                //'tmpOldTermEntryId' => 0,
+            ]);
+
+            // Save attr
+            $a->save();
+        }
+
         // Check whether there were no terms for this language previously within same termEntryId
         $isTermForNewLanguage = !editor_Utils::db()->query('
             SELECT `id` 
@@ -159,7 +219,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                 'elementName' => 'date',
                 'transac' => $type,
                 'date' => time(),
-                'transacNote' => $misc['transacNote'],
+                'transacNote' => $misc['userName'],
                 'transacType' => $type,
                 'language' => $this->getLanguage(),
                 'attrLang' => $this->getLanguage(),
@@ -192,7 +252,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
               AND `transac` = "modification" 
         ', [
             ':date' => time(),
-            ':userName' => $misc['transacNote'],
+            ':userName' => $misc['userName'],
             ':termEntryId' => $this->getTermEntryId(),
         ]);
 
