@@ -53,11 +53,11 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
             // we trigger the parent init WITHOUT starting further workers of course
             $idToReturn = parent::queue($parentId, $state, false);
             
+            // the still free slots after the worker is queued
             $usedSlots = count($this->workerModel->getListSlotsCount(static::$resourceName));
             
             // we can use the free slots to start additional workers
             if($availableSlots > $usedSlots){
-                // we can use the further free slots to start additional workers
                 for($i=0; $i < ($availableSlots - $usedSlots); $i++){
                     $worker = ZfExtended_Factory::get(get_class($this));
                     $worker->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
