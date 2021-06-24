@@ -44,24 +44,21 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
         // we start as many workers as there a free resources on startNext
         if($startNext){
             
-            $idToReturn = $parentId;
-            
             $availableSlots = count($this->getAvailableSlots($this->resourcePool));
             // if there are no available slots (e.g. all Resources down) we need to raise an exception to inform the user
             if($availableSlots == 0){
                 $this->raiseNoAvailableResourceException();
             }
             
+            // we trigger the parent init WITHOUT starting further workers of course
+            $idToReturn = parent::queue($parentId, $state, false);
+            
             $usedSlots = count($this->workerModel->getListSlotsCount(static::$resourceName));
             
             // we can use the free slots to start additional workers
             if($availableSlots > $usedSlots){
-                
-                // we trigger the parent init WITHOUT starting further workers of course
-                $idToReturn = parent::queue($parentId, $state, false);
-                
                 // we can use the further free slots to start additional workers
-                for($i=0; $i < ($availableSlots - $usedSlots - 1); $i++){
+                for($i=0; $i < ($availableSlots - $usedSlots); $i++){
                     $worker = ZfExtended_Factory::get(get_class($this));
                     $worker->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
                     $worker->queue($parentId, $state, false);
