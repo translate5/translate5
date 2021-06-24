@@ -41,7 +41,7 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
      */
     public function queue($parentId=0, $state=NULL, $startNext=true) : int {
 
-        // if wanted, we create the next workers
+        // we start as many workers as there a free resources on startNext
         if($startNext){
             
             $idToReturn = $parentId;
