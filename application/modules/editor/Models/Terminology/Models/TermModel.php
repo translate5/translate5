@@ -131,7 +131,8 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         // Append to $attrA
         $attrA['processStatus'] = [
             'dataTypeId' => $dataTypeId_processStatus,
-            'value' => $this->getProcessStatus()
+            'value' => $this->getProcessStatus(),
+            'processStatus' => 'finalized',
         ];
 
         // If value for note-attr is given
@@ -145,7 +146,8 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             // Append to attrA
             $attrA['note'] = [
                 'dataTypeId' => $dataTypeId_note,
-                'value' => $misc['note']
+                'value' => $misc['note'],
+                'processStatus' => 'unprocessed',
             ];
         }
 
@@ -156,24 +158,21 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
 
             // Apply data
-            $a->init([
+            $a->init($attrI + [
                 'elementName' => 'termNote',
                 'language' => $this->getLanguage(),
                 'attrLang' => $this->getLanguage(),
-                'value' => $attrI['value'],
                 'type' => $type,
                 'collectionId' => $this->getCollectionId(),
                 'termEntryId' => $this->getTermEntryId(),
                 'termEntryGuid' => $this->getTermEntryGuid(),
                 'termId' => $termId,
                 'termGuid' => $this->getGuid(),
-                'dataTypeId' => $attrI['dataTypeId'],
                 'guid' => ZfExtended_Utils::uuid(),
                 'userGuid' => $misc['userGuid'],
                 'userName' => $misc['userName'],
                 'created' => date('Y-m-d H:i:s'),
                 //'updated' => date('Y-m-d H:i:s'),
-                //'processStatus' => 'finalized', // it's 'finalized' by DEFAULT
                 //'tmpOldId' => 0,
                 //'tmpOldTermId' => 0,
                 //'tmpOldTermEntryId' => 0,

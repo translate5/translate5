@@ -47,6 +47,42 @@ class editor_Models_Term_Proposal extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_Term_Proposal';
 
     /**
+     * If $transacgrpData is given, method expects it's an array containing values under 'termEntryId' and 'language' keys,
+     * and if so, this method will run UPDATE query to update `date` and `transacNote` for all involved records of
+     * `terms_transacgrp` table for entry-, language- and term-level
+     *
+     * @param bool|array $transacgrpData
+     * @return mixed
+     */
+    public function save($transacgrpData = false) {
+
+        // Call parent
+        $return = parent::save();
+
+        // If $transacgrpData arg is given - update 'modification'-records of all levels
+        if ($transacgrpData)
+            editor_Utils::db()->query('
+                UPDATE `terms_transacgrp` 
+                SET 
+                  `date` = :date, 
+                  `transacNote` = :userName 
+                WHERE TRUE
+                  AND `termEntryId` = :termEntryId 
+                  AND `transac` = "modification" 
+                  AND (ISNULL(`language`) OR (`language` = :language AND (ISNULL(`termId`) OR `termId` = :termId)))
+            ', [
+                ':date' => time(),
+                ':userName' => $this->getUserName(),
+                ':termEntryId' => $transacgrpData['termEntryId'],
+                ':language' => $transacgrpData['language'],
+                ':termId' => $this->getTermId(),
+            ]);
+
+        // Return
+        return $return;
+    }
+
+    /**
      * Loads a proposal by termId
      * @param integer $termId
      * @return Zend_Db_Table_Row_Abstract
