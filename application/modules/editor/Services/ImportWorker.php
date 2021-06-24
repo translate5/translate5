@@ -78,7 +78,7 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
             $return = $connector->addAdditionalTm($params['fileinfo'],$params);
         }
         
-        $this->updateLanguageResourceStatus($connector);
+        $this->updateLanguageResourceStatus($return);
         
         if(isset($params['fileinfo']['tmp_name']) && !empty($params['fileinfo']['tmp_name']) && file_exists($params['fileinfo']['tmp_name'])){
             //remove the file from the temp dir
@@ -88,11 +88,17 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
         return $return;
     }
     
-    /***
+    /**
      * Update language reources status so the resource is available again
+     * @param bool $success
      */
-    protected function updateLanguageResourceStatus() {
-        $this->languageResource->addSpecificData('status', editor_Services_Connector_FilebasedAbstract::STATUS_AVAILABLE);
+    protected function updateLanguageResourceStatus($success) {
+        if($success) {
+            $this->languageResource->addSpecificData('status', editor_Services_Connector_FilebasedAbstract::STATUS_AVAILABLE);
+        }
+        else {
+            $this->languageResource->addSpecificData('status', editor_Services_Connector_FilebasedAbstract::STATUS_ERROR);
+        }
         $this->languageResource->save();
     }
     
