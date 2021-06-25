@@ -86,7 +86,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     groupCards:[],
 
     height : 550,
-    width : 1000,
+    width : 1024,
     maximizable:true,
 
     listeners:{
@@ -175,7 +175,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                             ui: 'default-frame',
                             layout: 'hbox',
                             layoutConfig : {
-                                align : 'stretch',
+                                align : 'stretch'
                             },
                             anchor: '100%',
                             items: [{

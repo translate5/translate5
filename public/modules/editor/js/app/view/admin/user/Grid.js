@@ -68,10 +68,6 @@ Ext.define('Editor.view.admin.user.Grid', {
       gender_neutral: '#UT#keine Angabe',
       reloadBtn: '#UT#Aktualisieren',
       reloadBtnTip: '#UT#Benutzerliste vom Server aktualisieren.',
-      sourceLangageLabel:'#UT#Quellsprache(n)',
-      sourceLangageTip:'#UT#Quellsprache(n)',
-      targetLangageLabel:'#UT#Zielsprache(n)',
-      targetLangageTip:'#UT#Zielsprache(n)',
       localeTooltip:'#UT#Benutzersprache'
   },
   store: 'admin.Users',
@@ -187,11 +183,7 @@ Ext.define('Editor.view.admin.user.Grid', {
               type: 'string'
           },
           text: me.text_cols.roles
-      },
-        me.getLanguagesConfig('sourceLanguage',me.strings.sourceLangageLabel,me.strings.sourceLangageTip)
-      ,
-        me.getLanguagesConfig('targetLanguage',me.strings.targetLangageLabel,me.strings.targetLangageTip)
-      ,{
+      },{
           xtype: 'gridcolumn',
           width: 160,
           dataIndex: 'locale',
@@ -246,28 +238,7 @@ Ext.define('Editor.view.admin.user.Grid', {
     return me.callParent([config]);
   },
 
-    /**
-     * Return the language field configuration for type of language (sourceLanguage,targetLanguage)
-     */
-    getLanguagesConfig:function(langageType,text,tooltip){
-        var field={
-                xtype: 'gridcolumn',
-                minWidth: 160,
-                dataIndex: langageType,
-                stateId:langageType,
-                renderer: this.userRenderer,
-                text:text,
-                tooltip: tooltip,
-                filter: {
-                    type: 'list',
-                    idField:'id',
-                    labelField:'label',
-                    options: Editor.data.languages,
-                    phpMode: false
-                }
-        };
-        return field;
-    },
+   
     userRenderer: function(value,metaData){
         if(value === null || value.length<1){
             return [];

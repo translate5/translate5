@@ -86,6 +86,10 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
 
         $workflow = $manager->getCached($task->getWorkflow());
 
+        /* @var $taskConfig editor_Models_TaskConfig */
+        $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
+
+
         foreach ($defaults as $assoc){
             $role = $workflow->getRoleOfStep($assoc['workflowStepName']);
 
@@ -98,12 +102,19 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
 
             $model->setTaskGuid($task->getTaskGuid());
             $model->setUserGuid($assoc['userGuid']);
-            $model->setSegmentrange($assoc['segmentrange']);
 
+            // if there is default dedline date default config, insert it as task specific config.
+            if($assoc['deadlineDate']!== null && $assoc['deadlineDate']>0){
+                $name = ['runtimeOptions','workflow',$model->getWorkflow(),$model->getWorkflowStepName(),'defaultDeadlineDate'];
+                $taskConfig->updateInsertConfig($task->getTaskGuid(),implode('.',$name),$assoc['deadlineDate']);
+            }
+
+            // get deadline date config and set it if exist
             $configValue = $task->getConfig()->runtimeOptions->workflow->{$model->getWorkflow()}->{$model->getWorkflowStepName()}->defaultDeadlineDate ?? 0;
             if($configValue > 0){
                 $model->setDeadlineDate(editor_Utils::addBusinessDays($task->getOrderdate(),$configValue));
             }
+
             $model->save();
         }
     }

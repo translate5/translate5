@@ -48,7 +48,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     onSegmentGridRender: function(){
         return; //FIXME prepare that socket server is only triggered for simultaneous usage, for beta testing we enable socket server just for each task 
         var bus = Editor.app.getController('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage');
-        if(Editor.data.task.get('usageMode') === Editor.data.task.USAGE_MODE_SIMULTANEOUS){
+        if(Editor.data.task.get('usageMode') === Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS){
             bus.activate();
         }
         else {

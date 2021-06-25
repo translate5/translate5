@@ -42,7 +42,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
                 change:'onNotifyAssociatedUsersCheckBoxChange'
             },
             '#usageMode':{
-                select: 'onUsageModeSelect'
+                beforeselect:'onUsageModeBeforeSelect'
             }
         }
     },
@@ -62,34 +62,25 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             view = me.getView(),
             sendPreImportOperation = view.getViewModel().get('sendPreImportOperation'),
             notify = view.down('#notifyAssociatedUsersCheckBox').checked,
-            workflowCombo = view.down('#workflowCombo'),
-            usageMode = view.down('#usageMode');
+            usageMode = view.down('#usageMode'),
+            workflowCombo = view.down('#workflowCombo');
 
         if(!sendPreImportOperation){
             view.fireEvent('wizardCardFinished', skipCards);
             return;
         }
-
-        Ext.Ajax.request({
-            url:Editor.data.restpath+'task/{id}/preimport/operation'.replace("{id}",view.task.get('id')),
-            method: 'POST',
-            params: {
-                usageMode: usageMode.getValue(),
-                workflow:workflowCombo.getValue(),
-                notifyAssociatedUsers:notify.checked
-            },
-            success: function(response){
-                view.fireEvent('wizardCardFinished', skipCards);
-            },
-            failure: function(response){
-                Editor.app.getController('ServerException').handleException(response);
-            }
+        me.preimportOperation({
+            usageMode: usageMode.getValue(),
+            workflow:workflowCombo.getValue(),
+            notifyAssociatedUsers:notify.checked
+        },function (){
+            view.fireEvent('wizardCardFinished', skipCards);
         });
-
     },
 
     /***
-     * Load the taskuserassoc store for current workflow and projectId.
+     * Load the taskuserassoc store for current workflow and projectId and set the formTask view model
+     * for single task project.
      * The workflow is get from the workflowCombo
      */
     loadAssocData: function (){
@@ -103,6 +94,10 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             workflow: workflowCombo.getValue()
         });
         store.load();
+
+        if(!view.task.hasProjectTasks()){
+            me.getViewModel().set('formTask',me.getFormTask());
+        }
     },
 
     /***
@@ -154,6 +149,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             project = me.getView().task,
             formPanel = me.lookup('assocForm'),
             form = formPanel.getForm(),
+            targetLangField =  form.findField('targetLang'),
             workflowCombo = me.getView().down('#workflowCombo'),
             hasProjectTasks = project.hasProjectTasks();
 
@@ -162,23 +158,30 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             workflow: workflowCombo.getValue()
         });
 
-        form.findField('targetLang').setVisible(hasProjectTasks);
+        targetLangField.setVisible(hasProjectTasks);
 
         if(!hasProjectTasks){
+            // it is single task project, set the taskGuid and the target langauge as record values
             newRecord.set('targetLang',project.get('targetLang'));
             newRecord.set('taskGuid',project.get('taskGuid'));
         }else{
+            // it is multi task project, the target language dropdown should contain only the project-tasks target languages
             var targetLangs = [];
             project.get('projectTasks').forEach(function(t){
                 targetLangs.push(t.get('targetLang'));
             });
-            form.findField('targetLang').getStore().filter([{
+            targetLangField.getStore().filter([{
                 property: 'id',
                 operator:"in",
                 value:targetLangs
             }]);
+            targetLangField.suspendEvents();
+            targetLangField.setValue(null);
+            targetLangField.resumeEvents(true);
+            me.getViewModel().set('formTask',null);
         }
 
+        // reset the current form and load the new record
         me.resetRecord(newRecord);
 
         formPanel.setDisabled(false);
@@ -186,18 +189,14 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
 
     onTargetlangSelect: function (combo, record){
         var me = this,
-            task = me.getView().task,
-            projectTasks = task.get('projectTasks'),
             formPanel = me.lookup('assocForm'),
-            formRecord = formPanel.getRecord();
+            formRecord = formPanel.getRecord(),
+            task = me.getFormTask();
 
+        // on target language changem, set the current form taskGuid to matching project task/single task
+        formRecord.set('taskGuid',task.get('taskGuid'));
 
-        projectTasks.forEach(function(t){
-            if(t.get('targetLang') === record.get('id')){
-                formRecord.set('taskGuid',t.get('taskGuid'));
-                return false;
-            }
-        });
+        me.getViewModel().set('formTask',task);
     },
 
     /***
@@ -223,9 +222,20 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         me.updatePreImportOnChange(newValue, oldValue);
     },
 
-    onUsageModeSelect: function (combo, newValue, oldValue){
-        var me = this;
-        me.updatePreImportOnChange(newValue, oldValue);
+
+    /***
+     *
+     * @param combo
+     * @param record
+     * @param index
+     * @param eOpts
+     */
+    onUsageModeBeforeSelect:function (combo, record){
+        // for simultaneous usage state the message bus must be active
+        if(record && record.get('id') === Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS && !Editor.plugins.FrontEndMessageBus) {
+            Editor.MessageBox.addError('In order to use that mode the FrontEndMessageBus plug-in must be active!');
+            return false;
+        }
     },
 
     /***
@@ -235,17 +245,14 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         var me=this,
             task = me.getFormTask(),
             formPanel = me.lookup('assocForm'),
-            formRecord = formPanel.getRecord(),
             form = formPanel.getForm(),
             workflowCombo = me.getView().down('#workflowCombo'),
             deadlineDate = form.findField('deadlineDate'),
-            recordDeadlineDate = formRecord.get('deadlineDate'),//the record has deadlineDate
             orderDate = task.get('orderdate');
 
         //if order date is not set, no calculation is required
         //if there is no workflow step defined, no calculation is required
-        //if the deadlineDate is already set, no calculation is required
-        if(!orderDate || !step || recordDeadlineDate){
+        if(!orderDate || !step){
             return;
         }
         var workflow = workflowCombo.getValue(),
@@ -289,12 +296,31 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         projectTasks.forEach(function(t){
             if(t.get('targetLang') === formTargetLang){
                 // return the task from the taskStore (the latest task version is stored there)
-                task = taskStore.getById(t.get('id'));;
+                task = taskStore.getById(t.get('id'));
                 return false;
             }
         });
 
         return task;
+    },
+
+    /***
+     * Preimport operation request for given params. This is used to update some task properties before the task import is started
+     * @param params
+     * @param successCallback
+     */
+    preimportOperation:function (params,successCallback){
+        var me=this,
+            view = me.getView();
+        Ext.Ajax.request({
+            url:Editor.data.restpath+'task/{id}/preimport/operation'.replace("{id}",view.task.get('id')),
+            method: 'POST',
+            params: params,
+            success: successCallback,
+            failure: function(response){
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        });
     },
 
     /***

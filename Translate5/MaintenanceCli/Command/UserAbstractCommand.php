@@ -110,12 +110,6 @@ abstract class UserAbstractCommand extends Translate5AbstractCommand
             '   <info>Locale:</info> '.OutputFormatter::escape((string) $data->locale),
         ];
         
-        if(!empty($data->sourceLanguage)) {
-            $out[] = '<info>SourceLang:</info> '.OutputFormatter::escape((string) $data->sourceLanguage);
-        }
-        if(!empty($data->targetLanguage)) {
-            $out[] = '<info>TargetLang:</info> '.OutputFormatter::escape((string) $data->targetLanguage);
-        }
         if(!empty($data->parentIds)) {
             $out[] = '<info>Parent IDs:</info> '.OutputFormatter::escape((string) $data->parentIds);
         }

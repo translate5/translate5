@@ -55,9 +55,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
         formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
         formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
         fieldDeadline:'#UT#Deadline',
-        fieldSegmentrange: '#UT#Editierbare Segmente',
-        fieldSegmentrangeInfo: '#UT#Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)',
-        deadlineDateInfoTooltip:'#UT#translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.',
+        deadlineDateInfoTooltip:'#UT#Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.',
         wizardTitle:'#UT#Standard-Benutzerzuweisungen'
     },
 
@@ -77,16 +75,6 @@ Ext.define('Editor.view.admin.user.Assoc', {
                             selection:'{selectedAssocRecord}'
                         },
                         region: 'center'
-                    },{
-                        xtype: 'container',
-                        region: 'south',
-                        height: 'auto',
-                        itemId: 'editInfoOverlay',
-                        cls: 'edit-info-overlay',
-                        padding: 10,
-                        bind: {
-                            html: '{editInfoHtml}'
-                        }
                     },{
                         xtype: 'container',
                         region: 'east',
@@ -156,15 +144,17 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 valueField: 'userGuid',
                                 fieldLabel: me.strings.fieldUser
                             },{
-                                xtype: 'textfield',
-                                itemId: 'segmentrange',
-                                name: 'segmentrange',
-                                fieldLabel: me.strings.fieldSegmentrange,
+                                xtype:'numberfield',
+                                itemId: 'deadlineDate',
+                                name:'deadlineDate',
+                                decimalPrecision:4,
+                                minValue:0.1,
+                                fieldLabel: me.strings.fieldDeadline,
                                 labelCls: 'labelInfoIcon',
                                 cls:'userAssocLabelIconField',
                                 autoEl: {
                                     tag: 'span',
-                                    'data-qtip': me.strings.fieldSegmentrangeInfo
+                                    'data-qtip': me.strings.deadlineDateInfoTooltip
                                 },
                                 anchor: '100%'
                             }],

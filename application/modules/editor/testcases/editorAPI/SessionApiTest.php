@@ -154,7 +154,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         }
         $sessionData->user->customers = null;
         
-        $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"support@translate5.net","roles":["pm","editor","admin","instantTranslate","api","basic","noRights"],"passwd":"********","editable":0,"locale":"en","sourceLanguage":null,"targetLanguage":null,"parentIds":null,"customers":null,"userName":"manager test"}}';
+        $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"support@translate5.net","roles":["pm","editor","admin","instantTranslate","api","basic","noRights"],"passwd":"********","editable":0,"locale":"en","parentIds":null,"customers":null,"userName":"manager test"}}';
         $this->assertEquals(json_decode($expected), $sessionData, 'User was not properly authenticated via ');
         
         $this->api()->logout();

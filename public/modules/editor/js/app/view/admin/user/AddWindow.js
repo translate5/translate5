@@ -189,45 +189,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                             toolTip: me.strings.emailTip,
                             fieldLabel: me.strings.emailLabel
                         }]
-                    },{
-                        //secound column
-                        xtype: 'fieldset',
-                        margin:5,
-                        flex:1,
-                        title: me.strings.languagesLabel,
-                        items: [{
-                            xtype:'tagfield',
-                            name: 'sourceLanguage',
-                            fieldLabel: me.strings.sourceLangageLabel,
-                            toolTip: me.strings.sourceLangageTip,
-                            //flex: 2,
-                            typeAhead:true,
-                            queryMode: 'local',
-                            displayField: 'label',
-                            valueField: 'id',
-                            store: new Ext.data.ArrayStore({
-                                fields:['id','label'],
-                                data: Editor.data.languages,
-                            })
-                        }, {
-                            xtype:'tagfield',
-                            name: 'targetLanguage',
-                            fieldLabel: me.strings.targetLangageLabel,
-                            toolTip: me.strings.targetLangageTip,
-                            //flex: 3,
-                            typeAhead:true,
-                            queryMode: 'local',
-                            displayField: 'label',
-                            valueField: 'id',
-                            store: new Ext.data.ArrayStore({
-                                fields:['id','label'],
-                                data: Editor.data.languages,
-                            })
-                        },{
-                            xtype: 'panel',
-                            html: me.strings.languageInfo,
-                            ui: 'fieldset'
-                        }]
                     }]
                 },{
                     layout: {

@@ -56,6 +56,8 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
     header:false,
     title:null,
 
+    referenceHolder: true,
+
     strings:{
         wizardTitle:'#UT#Standard-Benutzerzuweisungen',
         sourceLang: '#UT#Quellsprache',
@@ -69,12 +71,10 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
         formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
         formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
         fieldDeadline:'#UT#Deadline',
-        fieldSegmentrange: '#UT#Editierbare Segmente',
-        fieldSegmentrangeInfo: '#UT#Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)',
         deadlineDateInfoTooltip:'#UT#translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.',
         usageModeCoop: "#UT#Sequentielles Arbeiten",
         usageModeCompetitive: "#UT#Konkurrierende Zuweisung",
-        usageModeSimultaneous: "#UT#Gleichzeitiges Arbeiten",
+        usageModeSimultaneous: "#UT#Gleichzeitiges Arbeiten"
     },
 
     listeners:{
@@ -92,6 +92,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
             grid = me.down('grid'),
             formPanel = me.lookup('assocForm'),
             form = formPanel.getForm();
+
         // bind the assoc grid to taskUserAssoc store
         me.down('adminUserAssocGrid').setBind({
             store:'{userAssocImport}',
@@ -103,9 +104,13 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
         form.findField('sourceLang').setVisible(false);
         form.findField('targetLang').setVisible(false);
 
-        formPanel.insert(formPanel.items.length-1,{
+        // remove the number field deadlineDate (in the default assoc numberfield is used to define deadline date offset)
+        formPanel.remove(form.findField('deadlineDate'));
+        // insert deadlineDate as datepicker
+        formPanel.insert(formPanel.items.length,{
             xtype: 'datetimefield',
             name: 'deadlineDate',
+            dataIndex: 'deadlineDate',
             format: Editor.DATE_HOUR_MINUTE_ISO_FORMAT,
             fieldLabel: me.strings.fieldDeadline,
             labelCls: 'labelInfoIcon',
@@ -132,10 +137,6 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
             disabled:'{!targetLangUserAssoc.value}'
         });
 
-        form.findField('segmentrange').setBind({
-            disabled:'{!targetLangUserAssoc.value}'
-        });
-
         grid.addDocked({
             xtype:'combo',
             width:250,
@@ -143,7 +144,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
             name:'usageMode',
             itemId:'usageMode',
             forceSelection: true,
-            value:'cooperative', // the default value according to the database default. Should we use config ?
+            value:Editor.model.admin.Task.USAGE_MODE_COOPERATIVE, // the default value according to the database default. Should we use config ?
             store:  Ext.create('Ext.data.Store', {
                 fields: ['id', 'label'],
                 data : [

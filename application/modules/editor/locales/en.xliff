@@ -4134,6 +4134,22 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Workflowschritt</source>
     <target>Workflow-step</target>
 </trans-unit>
+<trans-unit id='RGVyIEJlbnV0emVyIGhhdCBkYXMgUmVjaHQsIGRpZSBTcHJhY2hyZXNzb3VyY2VuIGluIEluc3RhbnRUcmFuc2xhdGUgJmFtcDsgVGVybVBvcnRhbCB6dSBudXR6ZW4sIGRpZSBkZW5zZWxiZW4gS3VuZGVuIHp1Z2VvcmRuZXQgc2luZCwgZGVuZW4gZGVyIEJlbnV0emVyIGhpZXIgenVnZW9yZG5ldCBpc3Qu'>
+  <source>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</source>
+  <target>User has the right to use those language resources in InstantTranslate &amp; TermPortal, that are assigned to the same clients, as the user is assigned to here.</target>
+</trans-unit>
+<trans-unit id='S3VuZGVuIEluc3RhbnRUcmFuc2xhdGUgJmFtcDsgVGVybVBvcnRhbA=='>
+  <source>Kunden InstantTranslate &amp; TermPortal</source>
+  <target>Clients InstantTranslate &amp; TermPortal</target>
+</trans-unit>
+<trans-unit id='QmVudXR6ZXIgbmFjaCBJbXBvcnQgYmVuYWNocmljaHRpZ2Vu'>
+    <source>Benutzer nach Import benachrichtigen</source>
+    <target>Notify users after import</target>
+</trans-unit>
+<trans-unit id='V2VydCBzZXR6dCBzZWxiZSBLb25maWd1cmF0aW9uLCBkaWUgYXVjaCBkaWUgIsOcYmVyc2NocmVpYnVuZyBkZXIgU3lzdGVta29uZmlndXJhdGlvbiIgbWl0IE5hbWVuICJEZWZhdWx0IGRlYWRsaW5lIGRhdGUiIHNldHp0Lg=='>
+    <source>Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.</source>
+    <target>Value sets the same config, as the "System configuration overwrite" of the same name</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
