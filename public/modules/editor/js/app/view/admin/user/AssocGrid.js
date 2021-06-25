@@ -35,7 +35,6 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
         targetLang: '#UT#Zielsprache',
         userGuidCol: '#UT#Benutzer',
         roleCol: '#UT#Rolle',
-        segmentrangeCol: '#UT#Segmente',
         addUser: '#UT#Hinzufügen',
         addUserTip: '#UT#Einen Benutzer dieser Aufgabe zuordnen.',
         removeUser: '#UT#Entfernen',
@@ -44,7 +43,7 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
         reload: '#UT#Aktualisieren',
         cancel: '#UT#Abbrechen',
         deadlineDateLable: '#UT#Deadline',
-        notifyButtonText: '#UT#Benutzer benachrichtigen',
+        notifyButtonText: '#UT#Benutzer nach Import benachrichtigen',
         notifyButtonTooltip: '#UT#Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen',
         workflowStepNameCol:'#UT#Workflow-Schritt',
         fieldWorkflow: '#UT#Workflow'
@@ -100,8 +99,10 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     width: 100,
                     dataIndex: 'workflowStepName',
                     text: me.strings.workflowStepNameCol,
+                    renderer:Editor.util.Util.getWorkflowStepNameTranslated,
                     filter: {
                         type: 'list',
+
                         store:'admin.WorkflowSteps'
                     }
                 } ,{
@@ -110,11 +111,6 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     dataIndex: 'role',
                     hidden:true,
                     text: me.strings.roleCol
-                }, {
-                    xtype: 'gridcolumn',
-                    width: 70,
-                    dataIndex: 'segmentrange',
-                    text: me.strings.segmentrangeCol
                 },{
                     xtype: 'gridcolumn',
                     width: 90,
@@ -140,11 +136,6 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                         itemId: 'deleteAssocBtn',
                         text: me.strings.removeUser,
                         tooltip: me.strings.removeUserTip
-                    }, {
-                        xtype: 'button',
-                        itemId: 'reloadAssocBtn',
-                        glyph: 'f2f1@FontAwesome5FreeSolid',
-                        text: me.strings.reload
                     }, '-' ,{
                         xtype: 'combo',
                         width:300,

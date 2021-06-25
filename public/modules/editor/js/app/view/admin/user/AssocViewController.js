@@ -106,6 +106,7 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
 
         me.resetRecord(Ext.create('Editor.model.admin.UserAssocDefault',{
             customerId : me.getView().getCustomer().get('id'),
+            deadlineDate:null,
             workflow: workflowCombo.getValue()
         }));
 
@@ -146,8 +147,6 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
      * @param record
      */
     onWorkflowStepNameSelect: function (combo,record) {
-        //TODO: tmp disabled until i talk about it with Marc
-        return;
         var me = this,
             form = me.lookup('assocForm').getForm(),
             deadlineDate = form.findField('deadlineDate');
@@ -158,6 +157,7 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
         var me = this;
         me.getView().loadAssocData();
         me.getViewModel().getStore('workflowSteps').loadForWorkflow(newValue);
+        me.resetRecord();
     },
 
     /***
@@ -202,13 +202,17 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
 
         form.getFields().each(function (field){
             if(field.isVisible() && !field.allowBlank){
+                
+                field.duplicateRecord = false;
+                field.clearInvalid();
+                
                 store.each(function (r){
                     field.duplicateRecord = r.getUnique() === record.getUnique();
-                    field.clearInvalid();
                     if(field.duplicateRecord){
                         return false;
                     }
                 });
+                
             }
         });
         form.isValid();

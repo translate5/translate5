@@ -157,8 +157,8 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       }
 
       //in competitive mode instead OPEN / UNCONFIRMED is used
-      if(usageMode == task.USAGE_MODE_COMPETITIVE && state == task.USER_STATE_OPEN){
-          state = task.USER_STATE_UNCONFIRMED;
+      if(usageMode == Editor.model.admin.Task.USAGE_MODE_COMPETITIVE && state == task.USER_STATE_OPEN){
+          state = Editor.model.admin.Task.USER_STATE_UNCONFIRMED;
       }
       //set the default step to the first translation step when the task is translation task and
       //the workflow name is no workflow
@@ -175,7 +175,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       me.getEditInfo().hide();
       me.getUserAssocForm().show();
       me.getUserAssocForm().setDisabled(false);
-      me.getUserAssocSegmentrange().setDisabled(usageMode !== task.USAGE_MODE_SIMULTANEOUS);
+      me.getUserAssocSegmentrange().setDisabled(usageMode !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS);
       me.getUserAssoc().loadRecord(newRec);
       me.initState(null, step, '');
   },
@@ -196,7 +196,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       me.getEditInfo().setVisible(emptySel);
       me.getUserAssocForm().setVisible(!emptySel);
       me.getUserAssocForm().setDisabled(emptySel || !userEditable);
-      me.getUserAssocSegmentrange().setDisabled(task.get('usageMode') !== task.USAGE_MODE_SIMULTANEOUS);
+      me.getUserAssocSegmentrange().setDisabled(task.get('usageMode') !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS);
       if(emptySel) {
           me.getUserAssocForm().getForm().reset();
       }
@@ -300,7 +300,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           form = me.getUserAssocForm(),
           task = me.getPrefWindow().getCurrentTask(),
           stateCombo = form.down('combo[name="state"]'),
-          isCompetitive = task.get('usageMode') == task.USAGE_MODE_COMPETITIVE,
+          isCompetitive = task.get('usageMode') == Editor.model.admin.Task.USAGE_MODE_COMPETITIVE,
           newState = task.USER_STATE_OPEN,
           rec = form.getRecord(),
           isChanged = stateCombo.getValue() != rec.get('state'),
@@ -324,7 +324,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           newState = initialStates[step];
       }
       if(isCompetitive && newState == task.USER_STATE_OPEN) {
-          newState = task.USER_STATE_UNCONFIRMED;
+          newState = Editor.model.admin.Task.USER_STATE_UNCONFIRMED;
       }
       rec.set('state', newState);
       stateCombo.setValue(newState);

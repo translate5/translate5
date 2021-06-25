@@ -41,8 +41,6 @@ END LICENSE AND COPYRIGHT
 * @method string getWorkflowStepName() getWorkflowStepName()
 * @method void setWorkflow() setWorkflow(string $workflow)
 * @method string getWorkflow() getWorkflow()
-* @method void setSegmentrange() setSegmentrange(string $segmentrange)
-* @method string getSegmentrange() getSegmentrange()
 * @method void setDeadlineDate() setDeadlineDate(double $deadlineDate)
 * @method double getDeadlineDate() getDeadlineDate()
 *
@@ -53,7 +51,7 @@ class editor_Models_UserAssocDefault extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = "editor_Models_Validator_UserAssocDefault";
 
     /***
-     * Load all default assocs for given task. The rows are filtered for customerId, sourceLang and targetLang
+     * Load all default assocs for given task. The rows are filtered for workflow,customerId, sourceLang and targetLang
      * @param editor_Models_Task $task
      * @return array|null
      */
@@ -61,7 +59,8 @@ class editor_Models_UserAssocDefault extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
             ->where('customerId = ?', $task->getCustomerId())
             ->where('sourceLang = ?',$task->getSourceLang())
-            ->where('targetLang = ?',$task->getTargetLang());
+            ->where('targetLang = ?',$task->getTargetLang())
+            ->where('workflow = ?',$task->getWorkflow());
         return $this->db->getAdapter()->fetchAll($s);
     }
 }

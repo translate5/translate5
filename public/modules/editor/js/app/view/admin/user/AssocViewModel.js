@@ -30,17 +30,6 @@ Ext.define('Editor.view.admin.user.AssocViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.adminUserAssoc',
 
-    strings: {
-        editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
-        segmentrangeError: '#UT#Nicht zugewiesene Segmente',
-        translator: '#UT#Übersetzer',
-        translatorCheck: '#UT#Zweiter Lektor',
-        reviewer: '#UT#Lektor',
-        visitor: '#UT#Besucher',
-        allEditedByUsers:'#UT#(alle Segmente können von allen Nutzern editiert werden)',
-        canNotBeEditedByUsers:'#UT#(können derzeit von niemandem bearbeitet werden)'
-    },
-
     stores: {
         users: {
             source: 'admin.Users'

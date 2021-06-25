@@ -35,6 +35,8 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
         {name: 'id', type: 'int'},
         {name: 'entityVersion', type: 'int'}, //does not exist in DB, for versioning only
         {name: 'taskGuid', type: 'string'},
+        {name: 'sourceLang',persist: false}, // associated task source language
+        {name: 'targetLang',persist: false}, // associated task target language
         {name: 'userGuid', type: 'string'},
         {name: 'login', type: 'string', persist: false},
         {name: 'surName', type: 'string', persist: false},

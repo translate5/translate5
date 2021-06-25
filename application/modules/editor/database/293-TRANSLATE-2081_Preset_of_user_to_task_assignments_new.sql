@@ -33,7 +33,6 @@ CREATE TABLE `LEK_user_assoc_default` (
   `userGuid` varchar(38) NOT NULL,
   `workflowStepName` varchar(60) NOT NULL DEFAULT 'reviewing',
   `workflow` varchar(60) NOT NULL DEFAULT 'default',
-  `segmentrange` varchar(255) DEFAULT NULL,
   `deadlineDate` double(19,2) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_default_user_assoc` (`customerId`,`sourceLang`,`targetLang`,`userGuid`,`workflow`,`workflowStepName`),
@@ -51,7 +50,8 @@ CREATE TABLE `LEK_user_assoc_default` (
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_userassocdefault', 'all');
 
-UPDATE `Zf_configuration`
-SET `level`='4' WHERE `name` LIKE '%.defaultDeadlineDate';
-
 DELETE FROM `LEK_workflow_action` WHERE `action`='autoAssociateEditorUsers';
+
+ALTER TABLE `Zf_users`
+DROP COLUMN `targetLanguage`,
+DROP COLUMN `sourceLanguage`;

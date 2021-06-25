@@ -71,7 +71,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows = $rows;
         $this->view->total = $this->entity->getTotalCount();
         $this->applyEditableAndDeletable();
-        //$this->addSegmentrangesToResult();
+        $this->addSegmentrangesToResult();
     }
 
     public function projectAction(){
@@ -361,18 +361,12 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     protected function addSegmentrangesToResult() {
         $taskGuid = null;
-        $filters = $this->entity->getFilter()->getFilters();
-        array_walk(
-            $filters,
-            function ($item) use (&$taskGuid) {
-                if ($item->field == 'taskGuid') {
-                    $taskGuid = $item->value;
-                }
-            }
-        );
+
+        $this->entity->getFilter()->hasFilter('taskGuid',$taskGuid);
         if (is_null($taskGuid)) {
             return;
         }
+        $taskGuid = $taskGuid->value;
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         $this->view->segmentstoassign = $tua->getAllNotAssignedSegments($taskGuid);

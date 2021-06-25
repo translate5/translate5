@@ -97,6 +97,21 @@ Ext.define('Editor.util.Util', {
                 return label;
             }
             return '';
+        },
+
+        /***
+         * Return the translated workflowStep name
+         */
+        getWorkflowStepNameTranslated:function(stepName){
+            if(!stepName){
+                return "";
+            }
+            var store=Ext.StoreManager.get('admin.WorkflowSteps'),
+                rec=store.getById(stepName);
+            if(rec){
+                stepName=rec.get('text');
+            }
+            return stepName;
         }
     }
     
