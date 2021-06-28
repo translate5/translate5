@@ -72,7 +72,7 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
         $this->config = $actionConfig;
         
         $state = $this->getTriggeredState($actionConfig->oldTua, $actionConfig->newTua, 'before');
-        $actionConfig->events->trigger($state, $this->workflow, ['oldTua' => $actionConfig->oldTua, 'newTua' => $actionConfig->newTua]);
+        $actionConfig->events->trigger($state, $actionConfig->workflow, ['oldTua' => $actionConfig->oldTua, 'newTua' => $actionConfig->newTua]);
         
         //call here stuff which must be done between the before trigger and the other code (normally saving the TUA)
         $saveCallback();
@@ -120,33 +120,34 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
     protected function getTriggeredState(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua, $prefix = 'do') {
         $oldState = $oldTua->getState();
         $newState = $newTua->getState();
+        $workflow = $this->config->workflow;
         if($oldState == $newState) {
             return null;
         }
         
-        if($oldState == $this->workflow::STATE_FINISH && $newState != $this->workflow::STATE_FINISH) {
+        if($oldState == $workflow::STATE_FINISH && $newState != $workflow::STATE_FINISH) {
             return $prefix.'Unfinish';
         }
         
-        if($oldState == $this->workflow::STATE_UNCONFIRMED && $newState == $this->workflow::STATE_EDIT) {
+        if($oldState == $workflow::STATE_UNCONFIRMED && $newState == $workflow::STATE_EDIT) {
             return $prefix.'Confirm';
         }
         
         $result = null;
         switch($newState) {
-            case $this->workflow::STATE_OPEN:
+            case $workflow::STATE_OPEN:
                 $result = $prefix.'Open';
                 break;
-            case $this->workflow::STATE_VIEW:
+            case $workflow::STATE_VIEW:
                 $result = $prefix.'View';
                 break;
-            case $this->workflow::STATE_EDIT:
+            case $workflow::STATE_EDIT:
                 $result = $prefix.'Edit';
                 break;
-            case $this->workflow::STATE_FINISH:
+            case $workflow::STATE_FINISH:
                 $result = $prefix.'Finish';
                 break;
-            case $this->workflow::STATE_WAITING:
+            case $workflow::STATE_WAITING:
                 $result = $prefix.'Wait';
                 break;
             default:
@@ -162,7 +163,7 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
     protected function doFinish() {
         /* @var $finishHandler editor_Workflow_Default_JobHandler_Finish */
         $finishHandler = ZfExtended_Factory::get('editor_Workflow_Default_JobHandler_Finish');
-        $finishHandler->execute($this->getActionConfig());
+        $finishHandler->execute($this->config);
     }
     
     /**
@@ -172,9 +173,10 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
      * will be called after a task has been unfinished (after was finished - taskassoc-specific)
      */
     protected function doUnfinish() {
-        $this->doDebug(self::HANDLE_JOB_UNFINISH);
+        $this->config->trigger = self::HANDLE_JOB_UNFINISH;
+        $this->doDebug($this->config->trigger);
         /* @var $actions editor_Workflow_Actions */
-        $this->callActions(self::HANDLE_JOB_UNFINISH, $this->config->task->getWorkflowStepName(), $this->config->newTua->getRole(), $this->config->newTua->getState());
+        $this->callActions($this->config, $this->config->task->getWorkflowStepName(), $this->config->newTua->getRole(), $this->config->newTua->getState());
     }
     
     /**

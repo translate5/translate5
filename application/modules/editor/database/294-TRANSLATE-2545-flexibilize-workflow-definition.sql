@@ -44,7 +44,26 @@ ALTER TABLE `LEK_taskUserAssoc` ADD CONSTRAINT `fk_LEK_taskUserAssoc_2` FOREIGN 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`)
 VALUES ('runtimeOptions.workflow.notifyAllUsersAboutTask', '1', 'editor', 'workflow', '1', '1', '', 'boolean', 'Defines if the associated users of a task should be notified about the association (after a successfull import of a task).', 8, 'Workflow notifications: Notify associated users', 'Workflow');
 
+
 UPDATE LEK_workflow_action 
 SET `trigger` = 'handleAfterImport' 
 WHERE `trigger` = 'handleDirect::notifyAllUsersAboutTaskAssociation';
 
+UPDATE `LEK_workflow_action` 
+SET `parameters` = '{"role": "reviewer"}'
+WHERE `action` = 'notifyAllAssociatedUsers' AND JSON_CONTAINS(`parameters`, '"lector"', '$.role');
+
+UPDATE `LEK_workflow_action` `action`,
+(
+    SELECT `action`.id, `step`.`name`
+    FROM (
+        SELECT `id`, `workflow`, JSON_UNQUOTE(JSON_EXTRACT(`parameters`, '$.role')) `role` 
+        FROM `LEK_workflow_action`
+        WHERE `action` = 'notifyAllAssociatedUsers' and JSON_VALID(`parameters`)
+    ) `action`
+    JOIN `LEK_workflow_step` `step` ON `step`.`workflowName` = `action`.`workflow` AND `action`.`role` = `step`.`role` 
+    ORDER BY `step`.`position`
+    limit 1
+) `data`
+SET `parameters` = CONCAT('{"step": "', `data`.`name`, '"}')
+WHERE `action`.id = `data`.id;

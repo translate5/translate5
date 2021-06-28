@@ -381,28 +381,6 @@ class editor_Workflow_Default_Hooks {
         return $config;
     }
     
-    
-    
-    /**
-     * Sets the new workflow step in the given task and increases by default the workflow step nr
-     * @param editor_Models_Task $task
-     * @param string $stepName
-     */
-    protected function setNextStep(editor_Models_Task $task, $stepName) {
-        //store the nextStepWasSet per taskGuid,
-        // so this mechanism works also when looping over different tasks with the same workflow instance
-        $steps = [
-            'oldStep' => $task->getWorkflowStepName(),
-            'newStep' => $stepName,
-        ];
-        $this->workflow->getStepRecalculation()->addNextStepSet($task->getTaskGuid(), $steps['newStep']);
-        $this->doDebug(__FUNCTION__.': workflow next step "{newStep}"; oldstep: "{oldStep}"', $steps, true);
-        $task->updateWorkflowStep($stepName, true);
-        //call action directly without separate handler method
-        $newTua = $this->newTaskUserAssoc;
-        $this->callActions('handleSetNextStep', $stepName, $newTua->getRole(), $newTua->getState());
-    }
-    
     /**
      * debugging workflow
      * @param string $msg
