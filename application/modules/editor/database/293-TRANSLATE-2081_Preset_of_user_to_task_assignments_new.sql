@@ -31,23 +31,21 @@ CREATE TABLE `LEK_user_assoc_default` (
   `sourceLang` int(11) DEFAULT NULL,
   `targetLang` int(11) DEFAULT NULL,
   `userGuid` varchar(38) NOT NULL,
-  `workflowStepName` varchar(60) NOT NULL DEFAULT 'reviewing',
-  `workflow` varchar(60) NOT NULL DEFAULT 'default',
+  `workflowStepName` varchar(64) NOT NULL DEFAULT 'reviewing',
+  `workflow` varchar(64) NOT NULL DEFAULT 'default',
   `deadlineDate` double(19,2) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_default_user_assoc` (`customerId`,`sourceLang`,`targetLang`,`userGuid`,`workflow`,`workflowStepName`),
-  KEY `fk_LEK_user_assoc_default_1_idx` (`customerId`),
-  KEY `fk_LEK_user_assoc_default_2_idx` (`sourceLang`),
-  KEY `fk_LEK_user_assoc_default_3_idx` (`targetLang`),
-  KEY `fk_LEK_user_assoc_default_4_idx` (`userGuid`),
-  KEY `fk_LEK_user_assoc_default_5_idx` (`workflow`),
-  KEY `fk_LEK_user_assoc_default_6_idx` (`workflowStepName`),
-  CONSTRAINT `fk_LEK_user_assoc_default_1` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_LEK_user_assoc_default_2` FOREIGN KEY (`sourceLang`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_LEK_user_assoc_default_3` FOREIGN KEY (`targetLang`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_LEK_user_assoc_default_4` FOREIGN KEY (`userGuid`) REFERENCES `Zf_users` (`userGuid`) ON DELETE CASCADE ON UPDATE CASCADE
+  UNIQUE KEY `customerId` (`customerId`,`sourceLang`,`targetLang`,`userGuid`,`workflow`,`workflowStepName`),
+  KEY `sourceLang` (`sourceLang`),
+  KEY `targetLang` (`targetLang`),
+  KEY `userGuid` (`userGuid`),
+  KEY `workflow` (`workflow`),
+  CONSTRAINT `LEK_user_assoc_default_ibfk_1` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `LEK_user_assoc_default_ibfk_2` FOREIGN KEY (`sourceLang`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `LEK_user_assoc_default_ibfk_3` FOREIGN KEY (`targetLang`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `LEK_user_assoc_default_ibfk_4` FOREIGN KEY (`userGuid`) REFERENCES `Zf_users` (`userGuid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `LEK_user_assoc_default_ibfk_5` FOREIGN KEY (`workflow`) REFERENCES `LEK_workflow` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_userassocdefault', 'all');
 
 DELETE FROM `LEK_workflow_action` WHERE `action`='autoAssociateEditorUsers';
