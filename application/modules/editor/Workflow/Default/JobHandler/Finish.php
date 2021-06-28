@@ -31,11 +31,13 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_AbstractHandler {
     
-    const HANDLE_JOB_FINISH = 'handleFinish';
-    const HANDLE_JOB_FIRSTFINISH = 'handleFirstFinish';
+    const HANDLE_JOB_FINISH             = 'handleFinish';
+    const HANDLE_JOB_FIRSTFINISH        = 'handleFirstFinish';
     const HANDLE_JOB_FIRSTFINISHOFAROLE = 'handleFirstFinishOfARole';
-    const HANDLE_JOB_ALLFINISH = 'handleAllFinish';
-    const HANDLE_JOB_ALLFINISHOFAROLE = 'handleAllFinishOfARole';
+    const HANDLE_JOB_ALLFINISH          = 'handleAllFinish';
+    const HANDLE_JOB_ALLFINISHOFAROLE   = 'handleAllFinishOfARole';
+    
+    const HANDLE_TASK_SETNEXTSTEP       = 'handleSetNextStep';
     
     /**
      * @param editor_Workflow_Actions_Config $actionConfig
@@ -104,7 +106,7 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
         $sum = 0;
         foreach($stat as $entry) {
             $isRole = $entry['role'] === $userTaskAssoc->getRole();
-            $isFinish = $entry['state'] === $this->workflow::STATE_FINISH;
+            $isFinish = $entry['state'] === $this->config->workflow::STATE_FINISH;
             if($isRole && $roleAllFinished && ! $isFinish) {
                 $roleAllFinished = false;
             }
@@ -140,17 +142,13 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
         $oldStep = $task->getWorkflowStepName();
         
         //this remains as default behaviour
-        $nextStep = $newTua->getWorkflowStepName();
+        $nextStep = $this->config->workflow->getNextStep($newTua->getWorkflowStepName());
         $this->doDebug($this->config->trigger." Next Step: ".$nextStep.' to role '.$newTua->getRole().' with step '.$nextStep."; Old Step in Task: ".$oldStep);
         if($nextStep) {
             //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!
             $this->setNextStep($task, $nextStep);
-            $nextRole = $this->config->workflow->getRoleOfStep($nextStep);
-            $this->doDebug($this->config->trigger." Next Role: ".$nextRole);
-            if($nextRole) {
-                $isComp = $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE;
-                $newTua->setStateForRoleAndTask($isComp ? $this->config->workflow::STATE_UNCONFIRMED : $this->config->workflow::STATE_OPEN, $nextRole);
-            }
+            $isComp = $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE;
+            $newTua->setStateForStepAndTask($isComp ? $this->config->workflow::STATE_UNCONFIRMED : $this->config->workflow::STATE_OPEN, $nextStep);
         }
         
         //provide here oldStep, since this was the triggering one. The new step is given to handleNextStep trigger
@@ -217,6 +215,28 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
      */
     protected function handleFirstFinish(){
         $this->doDebug(self::HANDLE_JOB_FIRSTFINISH);
+    }
+    
+    /**
+     * Sets the new workflow step in the given task and increases by default the workflow step nr
+     * @param editor_Models_Task $task
+     * @param string $stepName
+     */
+    protected function setNextStep(editor_Models_Task $task, string $stepName) {
+        //store the nextStepWasSet per taskGuid,
+        // so this mechanism works also when looping over different tasks with the same workflow instance
+        $steps = [
+            'oldStep' => $task->getWorkflowStepName(),
+            'newStep' => $stepName,
+        ];
+        $this->config->workflow->getStepRecalculation()->addNextStepSet($task->getTaskGuid(), $stepName);
+        $this->doDebug(__FUNCTION__.': workflow next step "{newStep}"; oldstep: "{oldStep}"', $steps, true);
+        $task->updateWorkflowStep($stepName, true);
+        //call action directly without separate handler method
+        $newTua = $this->config->newTua;
+        $config = clone $this->config;
+        $config->trigger = self::HANDLE_TASK_SETNEXTSTEP;
+        $this->callActions($config, $stepName, $newTua->getRole(), $newTua->getState());
     }
     
     /**

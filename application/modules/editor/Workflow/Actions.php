@@ -92,7 +92,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         else {
             $tua = $this->config->newTua;
         }
-        $tua->setStateForRoleAndTask($this->config->workflow::STATE_OPEN, $tua->getRole());
+        $tua->setStateForStepAndTask($this->config->workflow::STATE_OPEN, $tua->getWorkflowStepName());
     }
     
     /**

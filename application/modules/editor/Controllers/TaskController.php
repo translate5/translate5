@@ -1451,6 +1451,8 @@ class editor_TaskController extends ZfExtended_RestController {
             }
             $userTaskAssoc->setUserGuid($userGuid);
             $userTaskAssoc->setTaskGuid($this->entity->getTaskGuid());
+            $userTaskAssoc->setWorkflow($this->workflow->getName());
+            $userTaskAssoc->setWorkflowStepName('');
             $userTaskAssoc->setRole('');
             $userTaskAssoc->setState('');
             $isPmOverride = true;
