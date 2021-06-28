@@ -74,12 +74,12 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     /**
      * returns all users to the taskGuid and role of the given TaskUserAssoc
      * @param string $taskGuid
-     * @param string $role string or null, if empty returns no users, since needed as filter
+     * @param string $workflowStepName string or null, if empty returns no users, since needed as filter
      * @param array $assocFields optional, column names of the assoc table to be added in the result set
      * @param string $state string or null, additional filter for state of the job
      * @return [array] list with user arrays
      */
-    public function loadUsersOfTaskWithRole(string $taskGuid, $role, array $assocFields = [], $state = null){
+    public function loadUsersOfTaskWithStep(string $taskGuid, $workflowStepName, array $assocFields = [], $state = null){
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $db = $this->db;
         $s = $user->db->select()
@@ -88,8 +88,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         ->join(array('tua' => $db->info($db::NAME)), 'tua.userGuid = u.userGuid', $assocFields)
         ->where('tua.isPmOverride = 0')
         ->where('tua.taskGuid = ?', $taskGuid);
-        if(!empty($role)) {
-            $s->where('tua.role = ?', $role);
+        if(!empty($workflowStepName)) {
+            $s->where('tua.workflowStepName = ?', $workflowStepName);
         }
         if(!empty($state)){
             $s->where('tua.state = ?', $state);
@@ -150,22 +150,47 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * Load single task user assoc for the given task#user#role params.
+     * Load single task user assoc for the given task#user#step params.
      * @param string $userGuid
      * @param string $taskGuid
-     * @param string $role | null
-     * @param string $state | null
+     * @param string $workflowStepName
+     * @param string $state | null optional state filter
      * @return array
      */
-    public function loadByParams(string $userGuid,string $taskGuid,string $role, $state = null) {
+    public function loadByStep(string $userGuid, string $taskGuid, string $workflowStepName, $state = null) {
         try {
             $s = $this->db->select()
                 ->where('userGuid = ?', $userGuid)
                 ->where('taskGuid = ?', $taskGuid)
-                ->where('(role= ? OR isPmOverride=1)', $role);//load the given state or load pmoveride (pmoveride is when for the given task#user#role no record is found)
+                ->where('(workflowStepName = ? OR isPmOverride = 1)', $workflowStepName);//load the given state or load pmoveride (pmoveride is when for the given task#user#role no record is found)
             if(!is_null($state)) {
-                $s->where('state= ?', $state);
+                $s->where('state = ?', $state);
             }
+            $row = $this->db->fetchRow($s);
+        } catch (Exception $e) {
+            $this->notFound('NotFound after other Error', $e);
+        }
+        if (!$row) {
+            $this->notFound(__CLASS__ . '#taskGuid + userGuid + workflowStepName', $taskGuid.' + '.$userGuid.' + '.$workflowStepName);
+        }
+        //load implies loading one Row, so use only the first row
+        $this->row = $row;
+        return $this->row->toArray();
+    }
+    
+    /**
+     * Load single task user assoc for the given task#user#role params.
+     * @param string $userGuid
+     * @param string $taskGuid
+     * @param string $role | null
+     * @return array
+     */
+    public function loadByRole(string $userGuid, string $taskGuid, string $role) {
+        try {
+            $s = $this->db->select()
+                ->where('userGuid = ?', $userGuid)
+                ->where('taskGuid = ?', $taskGuid)
+                ->where('role = ?', $role);
             $row = $this->db->fetchRow($s);
         } catch (Exception $e) {
             $this->notFound('NotFound after other Error', $e);
@@ -179,17 +204,17 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Returns the task user assoc matching a role, or if nothing found the one with the most useful state.
+     * Returns the task user assoc matching a step, or if nothing found the one with the most useful state.
      * The state loading order is: edit, view, unconfirmed, open, waiting, finished
      * @param string $userGuid
      * @param string $taskGuid
-     * @param string $role
+     * @param string $workflowStepName
      * @return array
      */
-    public function loadByRoleOrSortedState(string $userGuid, string $taskGuid, string $role): array {
+    public function loadByStepOrSortedState(string $userGuid, string $taskGuid, string $workflowStepName): array {
         
         //order first by matching role, then by the states as defined
-        $order = $this->db->getAdapter()->quoteInto('role=? DESC, state="edit" DESC,state="view" DESC,state="unconfirmed" DESC,state="open" DESC,state="waiting" DESC,state="finished" DESC', $role);
+        $order = $this->db->getAdapter()->quoteInto('workflowStepName = ? DESC, state="edit" DESC,state="view" DESC,state="unconfirmed" DESC,state="open" DESC,state="waiting" DESC,state="finished" DESC', $workflowStepName);
         
         $s =$this->db->select()
         ->where('userGuid = ?', $userGuid)
@@ -210,15 +235,15 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     /**
      * Updates the stored user states of an given taskGuid (may exclude the current user if enabled by third parameter)
      * @param string $state
-     * @param string $role
-     * @param boolean $expectMySelf if true, the internally loaded userGuid is excluded from the the update
+     * @param string $step
+     * @param boolean $exceptMySelf if true, the internally loaded userGuid is excluded from the the update
      */
-    public function setStateForRoleAndTask(string $state, string $role, $expectMySelf = false) {
+    public function setStateForStepAndTask(string $state, string $step, $exceptMySelf = false) {
         $where = [
-            'role = ?' => $role,
+            'workflowStepName = ?' => $step,
             'taskGuid = ?' => $this->getTaskGuid(),
         ];
-        if($expectMySelf) {
+        if($exceptMySelf) {
             $where['userGuid != ?'] = $this->getUserGuid();
         }
         $this->db->update(['state' => $state], $where);

@@ -42,7 +42,7 @@ class editor_Models_Loaders_Taskuserassoc {
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         //load the user assoc of the curent available workflow role
-        $tua->loadByParams($userGuid, $task->getTaskGuid(), self::getRole($task));
+        $tua->loadByStep($userGuid, $task->getTaskGuid(), $task->getWorkflowStepName());
         return $tua;
     }
     
@@ -79,7 +79,7 @@ class editor_Models_Loaders_Taskuserassoc {
     public static function loadByTask(string $userGuid, editor_Models_Task $task){
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
-        $tua->loadByRoleOrSortedState($userGuid, $task->getTaskGuid(), self::getRole($task));
+        $tua->loadByStepOrSortedState($userGuid, $task->getTaskGuid(), $task->getWorkflowStepName());
         
         return $tua;
     }
@@ -105,17 +105,5 @@ class editor_Models_Loaders_Taskuserassoc {
         $task->loadByTaskGuid($taskGuid);
         
         return self::loadByTask($userGuid, $task);
-    }
-    
-    /**
-     * returns the role to the current workflow step
-     * @param editor_Models_Task $task
-     * @return string
-     */
-    protected static function getRole(editor_Models_Task $task): string {
-        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wfm editor_Workflow_Manager */
-        $workflow = $wfm->getByTask($task);
-        return $workflow->getRoleOfStep($task->getWorkflowStepName());
     }
 }

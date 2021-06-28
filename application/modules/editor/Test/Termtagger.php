@@ -193,7 +193,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         $upload->initDataProvider("testcase",$importUpload);
         $dp = $upload->getDataProvider();
         $import->import($dp);
-        self::$workflow->getHandler()->doImport(self::$testTask,$import->getImportConfig());
+        self::$workflow->hookin()->doImport(self::$testTask,$import->getImportConfig());
 
         //run the queued import worker
         $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
