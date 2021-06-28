@@ -257,6 +257,8 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
             $userTaskAssoc->setTaskGuid($this->task->getTaskGuid());
             $userTaskAssoc->setRole('');
             $userTaskAssoc->setState('');
+            $userTaskAssoc->setWorkflow($this->task->getWorkflow());
+            $userTaskAssoc->setWorkflowStepName('');
             $isPmOverride = true;
             $userTaskAssoc->setIsPmOverride($isPmOverride);
         }
