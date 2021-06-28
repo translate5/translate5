@@ -142,7 +142,7 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
         $oldStep = $task->getWorkflowStepName();
         
         //this remains as default behaviour
-        $nextStep = $this->config->workflow->getNextStep($newTua->getWorkflowStepName());
+        $nextStep = $this->config->workflow->getNextStep($task, $newTua->getWorkflowStepName());
         $this->doDebug($this->config->trigger." Next Step: ".$nextStep.' to role '.$newTua->getRole().' with step '.$nextStep."; Old Step in Task: ".$oldStep);
         if($nextStep) {
             //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!
