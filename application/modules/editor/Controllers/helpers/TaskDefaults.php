@@ -81,16 +81,16 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
             return;
         }
 
-        $manager = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $manager editor_Workflow_Manager */
-
-        $workflow = $manager->getCached($task->getWorkflow());
-
         /* @var $taskConfig editor_Models_TaskConfig */
         $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
 
-
         foreach ($defaults as $assoc){
+
+            $manager = ZfExtended_Factory::get('editor_Workflow_Manager');
+            /* @var $manager editor_Workflow_Manager */
+
+            $workflow = $manager->getCached($assoc['workflow']);
+
             $role = $workflow->getRoleOfStep($assoc['workflowStepName']);
 
             $model = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
