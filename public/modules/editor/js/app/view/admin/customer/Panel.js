@@ -283,6 +283,11 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         xtype:'textfield',
                                         fieldLabel:me.strings.domain,
                                         name:'domain',
+                                        reference:'customerDomain',
+                                        publishes:'value',
+                                        bind:{
+                                            visible:'{!isOpenIdHidden}'
+                                        },
                                         itemId:'openIdDomain'
                                     }
                                 ]
@@ -307,6 +312,9 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 isIncludedInForm:true,// is the component part of the customers form. There are some other components in the display tab which are not part of the form (ex: config and user assoc tabs)
                                 bodyPadding: 10,
                                 title:'OpenID Connect',
+                                bind:{
+                                    disabled:'{!customerDomain.value}'
+                                },
                                 items:[{
                                         xtype:'textfield',
                                         fieldLabel:me.strings.openIdServer,

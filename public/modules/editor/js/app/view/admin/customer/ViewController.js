@@ -134,9 +134,8 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     editCustomer:function(record){
         var me=this,
             formPanel = me.getReferences().form,
-            vm = me.getViewModel(),
-            isOpenIdHidden = record.get('number') === Editor.model.admin.Customer.DEFAULTCUSTOMER_NUMBER && !Editor.data.customers.openid.showOpenIdDefaultCustomerData;
-    
+            vm = me.getViewModel();
+
         vm.set('record', record);
 
         formPanel.loadRecord(record);
@@ -153,10 +152,6 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         Ext.Array.forEach(rolesBoxes, function(item) {
             item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
         });
-        
-        //hide the openid data for the default customer if it is configured so
-        me.getView().down('#openIdDomain').setVisible(!isOpenIdHidden);
-        me.getView().down('#openIdFieldset').setDisabled(isOpenIdHidden);
 
         // update active tab view models
         me.updateActiveTabViewModel();
