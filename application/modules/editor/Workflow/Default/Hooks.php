@@ -30,6 +30,15 @@ END LICENSE AND COPYRIGHT
  * Hook In functions for the Default Workflow.
  */
 class editor_Workflow_Default_Hooks {
+    const HANDLE_IMPORT_BEFORE    = 'handleBeforeImport';
+    const HANDLE_IMPORT           = 'handleImport';
+    const HANDLE_IMPORT_AFTER     = 'handleAfterImport';
+    const HANDLE_IMPORT_COMPLETED = 'handleImportCompleted';
+    
+    const HANDLE_CRON_DAILY       = 'doCronDaily';
+    const HANDLE_CRON_PERIODICAL  = 'doCronPeriodical';
+    
+    
     /**
      * @var editor_Workflow_Default
      */
@@ -98,14 +107,20 @@ class editor_Workflow_Default_Hooks {
             $tua = $event->getParam('entity');
             //if entity could not be saved no ID was given, so check for it
             if($tua->getId() > 0) {
-                $this->doUserAssociationAdd($tua);
-                $this->getStepRecalculation()->recalculateWorkflowStep($tua);
+                $this->newTaskUserAssoc = $tua;
+                $jobHandler = ZfExtended_Factory::get('editor_Workflow_Default_JobHandler');
+                /* @var $jobHandler editor_Workflow_Default_JobHandler */
+                $jobHandler->execute($this->getActionConfig($jobHandler::HANDLE_JOB_ADD));
+                $this->workflow->getStepRecalculation()->recalculateWorkflowStep($tua);
             }
         });
 
         $events->attach('Editor_TaskuserassocController', 'afterDeleteAction', function(Zend_EventManager_Event $event){
-            $this->doUserAssociationDelete($event->getParam('entity'));
-            $this->getStepRecalculation()->recalculateWorkflowStep($event->getParam('entity'));
+            $this->newTaskUserAssoc = $event->getParam('entity');
+            $jobHandler = ZfExtended_Factory::get('editor_Workflow_Default_JobHandler');
+            /* @var $jobHandler editor_Workflow_Default_JobHandler */
+            $jobHandler->execute($this->getActionConfig($jobHandler::HANDLE_JOB_DELETE));
+            $this->workflow->getStepRecalculation()->recalculateWorkflowStep($this->newTaskUserAssoc);
         });
 
         $events->attach('editor_Models_Import', 'beforeImport', function(Zend_EventManager_Event $event){
@@ -155,106 +170,20 @@ class editor_Workflow_Default_Hooks {
      * will be called directly before import is started, task is already created and available
      */
     protected function handleBeforeImport(){
-        $this->doDebug(__FUNCTION__);
-        $this->getStepRecalculation()->initWorkflowStep($this->newTask, $this->workflow::STEP_NO_WORKFLOW);
+        $this->doDebug(self::HANDLE_IMPORT_BEFORE);
+        $this->workflow->getStepRecalculation()->initWorkflowStep($this->newTask, $this->workflow::STEP_NO_WORKFLOW);
         $this->newTask->load($this->newTask->getId()); //reload task with new workflowStepName and new calculated workflowStepNr
-        $this->callActions(__FUNCTION__, $this->workflow::STEP_NO_WORKFLOW);
+        $this->callActions(self::HANDLE_IMPORT_BEFORE, $this->workflow::STEP_NO_WORKFLOW);
     }
 
     /**
      * will be called after import (in set task to open worker) after the task is opened and the import is complete.
      */
     protected function handleImportCompleted(){
-        $this->doDebug(__FUNCTION__);
-        $this->callActions(__FUNCTION__);
+        $this->doDebug(self::HANDLE_IMPORT_COMPLETED);
+        $this->callActions(self::HANDLE_IMPORT_COMPLETED);
     }
 
-    
-    /**
-     * will be called after all users of a role has finished a task
-     * @param array $finishStat contains the info which of all different finishes are applicable
-     */
-    protected function handleAllFinishOfARole() {
-        $newTua = $this->newTaskUserAssoc;
-        $taskGuid = $newTua->getTaskGuid();
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        $oldStep = $task->getWorkflowStepName();
-        
-        //this remains as default behaviour
-        $nextStep = $newTua->getWorkflowStepName();
-        $this->doDebug(__FUNCTION__." Next Step: ".$nextStep.' to role '.$newTua->getRole().' with step '.$nextStep."; Old Step in Task: ".$oldStep);
-        if($nextStep) {
-            //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!
-            $this->setNextStep($task, $nextStep);
-            $nextRole = $this->workflow->getRoleOfStep($nextStep);
-            $this->doDebug(__FUNCTION__." Next Role: ".$nextRole);
-            if($nextRole) {
-                $isComp = $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE;
-                $newTua->setStateForRoleAndTask($isComp ? $this->workflow::STATE_UNCONFIRMED : $this->workflow::STATE_OPEN, $nextRole);
-            }
-        }
-        
-        //provide here oldStep, since this was the triggering one. The new step is given to handleNextStep trigger
-        $this->callActions(__FUNCTION__, $oldStep, $newTua->getRole(), $newTua->getState());
-    }
-    
-    /**
-     * will be called after a user has finished a task
-     * @param array $finishStat contains the info which of all different finishes are applicable
-     */
-    protected function handleFinish() {
-        $this->doDebug(__FUNCTION__);
-        $newTua = $this->newTaskUserAssoc;
-        $taskGuid = $newTua->getTaskGuid();
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        $oldStep = $task->getWorkflowStepName();
-        
-        //set the finished date when the user finishes a role
-        if($newTua->getState()==editor_Workflow_Default::STATE_FINISH){
-            $newTua->setFinishedDate(NOW_ISO);
-            $newTua->save();
-        }
-        
-        $this->callActions(__FUNCTION__, $oldStep, $newTua->getRole(), $newTua->getState());
-    }
-    
-    /**
-     * will be called after all associated users of a task has finished a task
-     * @param array $finishStat contains the info which of all different finishes are applicable
-     */
-    protected function handleAllFinish() {
-        $this->doDebug(__FUNCTION__);
-    }
-
-    /**
-     * will be called after first user of a role has finished a task
-     * @param array $finishStat contains the info which of all different finishes are applicable
-     */
-    protected function handleFirstFinishOfARole(){
-        $taskState = $this->newTask->getState();
-        if($taskState == editor_Models_Task::STATE_UNCONFIRMED) {
-            //we have to confirm the task and retrigger task workflow triggers
-            // if task was unconfirmed but a lektor is set to finish, this implies confirming
-            $oldTask = clone $this->newTask;
-            $this->newTask->setState(editor_Models_Task::STATE_OPEN);
-            $this->doWithTask($oldTask, $this->newTask);
-            $this->newTask->save();
-            $this->newTask->setState(editor_Models_Task::STATE_OPEN);
-        }
-        $this->doDebug(__FUNCTION__);
-    }
-    
-    /**
-     * will be called after a user has finished a task
-     * @param array $finishStat contains the info which of all different finishes are applicable
-     */
-    protected function handleFirstFinish(){
-        $this->doDebug(__FUNCTION__);
-    }
     
     /**
      * checks the delivery dates, if a task is overdue, it'll be finished for all lectors, triggers normal workflow handlers if needed.
@@ -263,7 +192,7 @@ class editor_Workflow_Default_Hooks {
     public function doCronDaily() {
         $this->isCron = true;
         //no info about tasks, tuas are possible in cron call, so set nothing here
-        $this->callActions(__FUNCTION__);
+        $this->callActions(self::HANDLE_CRON_DAILY);
     }
     
     /**
@@ -272,83 +201,21 @@ class editor_Workflow_Default_Hooks {
     public function doCronPeriodical(){
         $this->isCron = true;
         //no info about tasks, tuas are possible in cron call, so set nothing here
-        $this->callActions(__FUNCTION__);
+        $this->callActions(self::HANDLE_CRON_PERIODICAL);
     }
     
     /**
-     * will be called when a new task user association is created
-     */
-    protected function handleUserAssociationChanged(string $handler) {
-        $this->doDebug($handler);
-        $tua = $this->newTaskUserAssoc;
-        if(empty($this->newTask)) {
-            $this->newTask = ZfExtended_Factory::get('editor_Models_Task');
-            $this->newTask->loadByTaskGuid($tua->getTaskGuid());
-        }
-        $this->callActions($handler, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
-    }
-    
-    /**
-     - Methode wird beim PUT vom Task aufgerufen
-     - bekommt den alten und den neuen Task, sowie den Benutzer übergeben
-     - setzt die übergebenen Task und User Objekte zur weiteren Verwendung als Objekt Attribute
-     - Anhand von der Statusänderung ergibt sich welche ""do"" Methode aufgerufen wird
-     - Anhand der Statusänderung kann auch der TaskLog Eintrag erzeugt werden
-     - Hier lässt sich zukünftig auch eine Zend_Acl basierte Rechteüberprüfung integrieren, ob der Benutzer die ermittelte Aktion überhaupt durchführen darf.
-     - Hier lassen sich zukünftig auch andere Änderungen am Task abfangen"	1.6		x
-     *
+     * task change hook in for the workflow
      * @param editor_Models_Task $oldTask task as loaded from DB
      * @param editor_Models_Task $newTask task as going into DB (means not saved yet!)
      */
     public function doWithTask(editor_Models_Task $oldTask, editor_Models_Task $newTask) {
         $this->oldTask = $oldTask;
         $this->newTask = $newTask;
-        $newState = $newTask->getState();
-        $oldState = $oldTask->getState();
-        //a segment mv creation is currently not needed, since doEnd deletes it, and doReopen creates it implicitly!
         
-        if($newState == $oldState) {
-            $this->doDebug("handleTaskChange");
-            try {
-                $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($this->authenticatedUser->getUserGuid(), $this->newTask);
-                $this->callActions("handleTaskChange", $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
-            }
-            catch (ZfExtended_Models_Entity_NotFoundException $e) {
-                $this->callActions("handleTaskChange", $this->newTask->getWorkflowStepName());
-            }
-            $this->events->trigger("handleTaskChange", $this->workflow, ['oldTask' => $this->oldTask, 'newTask' => $this->newTask]);
-            return; //saved some other attributes, do nothing
-        }
-        $tasks = ['oldTask' => $oldTask, 'newTask' => $newTask];
-        switch($newState) {
-            case $newTask::STATE_OPEN:
-                if($oldState == $newTask::STATE_END) {
-                    /**
-                     * is called on re opening a task
-                     * reopen an ended task (task-specific reopening in contrast to taskassoc-specific unfinish)
-                     * will be called after a task has been reopened (after was ended - task-specific)
-                     */
-                    $this->newTask->createMaterializedView();
-                    $this->doDebug("doReopen");
-                    
-                    $this->events->trigger("doReopen", $this->workflow, $tasks);
-                }
-                if($oldState == $newTask::STATE_UNCONFIRMED) {
-                    $this->events->trigger("doTaskConfirm", $this->workflow, $tasks);
-                }
-                break;
-            case $newTask::STATE_END:
-                $this->doDebug("doEnd");
-                // is called on ending
-                // will be called after a task has been ended
-                $this->events->trigger("doEnd", $this->workflow, $tasks);
-                $this->newTask->dropMaterializedView();
-                break;
-            case $newTask::STATE_UNCONFIRMED:
-            default:
-                //doing currently nothing
-                break;
-        }
+        /* @var $taskHandler editor_Workflow_Default_TaskHandler */
+        $taskHandler = ZfExtended_Factory::get('editor_Workflow_Default_TaskHandler');
+        $taskHandler->execute($this->getActionConfig());
     }
     
     /**
@@ -358,12 +225,6 @@ class editor_Workflow_Default_Hooks {
      * @param Callable $saveCallback Optional callback which is triggered after the beforeEvents and before doWithUserAssoc code - normally for persisting the new tua
      */
     public function doWithUserAssoc(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua, Callable $saveCallback = null) {
-        $state = $this->getTriggeredState($oldTua, $newTua, 'before');
-        $this->events->trigger($state, $this->workflow, array('oldTua' => $oldTua, 'newTua' => $newTua));
-        
-        //call here stuff which must be done between the before trigger and the other code (normally saving the TUA)
-        $saveCallback();
-        
         $this->oldTaskUserAssoc = $oldTua;
         $this->newTaskUserAssoc = $newTua;
         
@@ -373,25 +234,10 @@ class editor_Workflow_Default_Hooks {
             $task->loadByTaskGuid($newTua->getTaskGuid());
             $this->newTask = $task;
         }
-        else {
-            $task = $this->newTask;
-        }
-        $this->doDebug(__FUNCTION__);
-        //ensure that segment MV is createad
-        $task->createMaterializedView();
-        $state = $this->getTriggeredState($oldTua, $newTua);
-        if(!empty($state)) {
-            if(method_exists($this, $state)) {
-                $this->{$state}();
-            }
-            $this->events->trigger($state, $this->workflow, array('oldTua' => $oldTua, 'newTua' => $newTua, 'task' => $task));
-        }
-        $this->handleUserAssociationChanged('handleUserAssociationEdited');
-        $this->getStepRecalculation()->recalculateWorkflowStep($newTua);
-    }
-    
-    protected function getStepRecalculation(): editor_Workflow_Default_StepRecalculation {
-        return ZfExtended_Factory::get('editor_Workflow_Default_StepRecalculation', [$this->workflow]);
+        
+        /* @var $jobHandler editor_Workflow_Default_JobHandler */
+        $jobHandler = ZfExtended_Factory::get('editor_Workflow_Default_JobHandler');
+        $jobHandler->executeSave($this->getActionConfig(), $saveCallback);
     }
     
     /**
@@ -401,9 +247,9 @@ class editor_Workflow_Default_Hooks {
     public function doImport(editor_Models_Task $importedTask, editor_Models_Import_Configuration $importConfig) {
         $this->newTask = $importedTask;
         $this->importConfig = $importConfig;
-        $this->doDebug('handleImport');
-        $this->getStepRecalculation()->setupInitialWorkflow($this->newTask);
-        $this->callActions('handleImport'); //FIXME convert all handler to their doer functions
+        $this->doDebug(self::HANDLE_IMPORT);
+        $this->workflow->getStepRecalculation()->setupInitialWorkflow($this->newTask);
+        $this->callActions(self::HANDLE_IMPORT);
     }
     
     /**
@@ -412,47 +258,8 @@ class editor_Workflow_Default_Hooks {
      */
     public function doAfterImport(editor_Models_Task $importedTask) {
         $this->newTask = $importedTask;
-        $this->doDebug('handleAfterImport');
-        $this->callActions('handleAfterImport');
-    }
-    
-    /**
-     * is called after a user association is added
-     * @param editor_Models_TaskUserAssoc $tua
-     */
-    public function doUserAssociationAdd(editor_Models_TaskUserAssoc $tua) {
-        $this->newTaskUserAssoc = $tua;
-        $this->handleUserAssociationChanged('handleUserAssociationAdded');
-    }
-    
-    /**
-     * is called after a user association is added
-     * @param editor_Models_TaskUserAssoc $tua
-     */
-    public function doUserAssociationDelete(editor_Models_TaskUserAssoc $tua) {
-        $this->newTaskUserAssoc = $tua; //"new" is basicly wrong, but with that entity all calculation is done
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($tua->getTaskGuid());
-        $this->newTask = $task;
-        
-        $originalState = $tua->getState();
-        //if the deleted tua was not finished, we have to recheck the allFinished events after deleting it!
-        $wasNotFinished = ($originalState !== $this->workflow::STATE_FINISH);
-        $stat = $this->calculateFinish();
-        $this->doDebug(__FUNCTION__. ' OriginalState: '.$originalState.'; Finish Stat: '.print_r($stat,1));
-        if($wasNotFinished && $stat['roleAllFinished']) {
-            //in order to trigger the actions correctly we have to assume that the deleted one was "finished"
-            $tua->setState($this->workflow::STATE_FINISH);
-            $this->handleAllFinishOfARole();
-        }
-        if($wasNotFinished && $stat['allFinished']) {
-            //in order to trigger the actions correctly we have to assume that the deleted one was "finished"
-            $tua->setState($this->workflow::STATE_FINISH);
-            $this->handleAllFinish();
-        }
-        $tua->setState($originalState);
-        $this->handleUserAssociationChanged('handleUserAssociationDeleted');
+        $this->doDebug(self::HANDLE_IMPORT_AFTER);
+        $this->callActions(self::HANDLE_IMPORT_AFTER);
     }
     
     /**
@@ -558,10 +365,11 @@ class editor_Workflow_Default_Hooks {
      * @param string $trigger
      * @return editor_Workflow_Actions_Config
      */
-    protected function getActionConfig(string $trigger) {
+    protected function getActionConfig(string $trigger = null): editor_Workflow_Actions_Config {
         $config = ZfExtended_Factory::get('editor_Workflow_Actions_Config');
         /* @var $config editor_Workflow_Actions_Config */
         $config->trigger = $trigger;
+        $config->events = $this->events;
         $config->workflow = $this->workflow;
         $config->newTua = $this->newTaskUserAssoc;
         $config->oldTua = $this->oldTaskUserAssoc;
@@ -573,48 +381,7 @@ class editor_Workflow_Default_Hooks {
         return $config;
     }
     
-    /**
-     * is called when a task assoc state gets OPEN
-     */
-    protected function doOpen() {
-    }
     
-    /**
-     * is called when a task is opened coming from state unconfirmed
-     */
-    protected function doTaskConfirm() {
-    }
-    
-    /**
-     * is called when a user confirms his job (job was unconfirmed and is set to edit)
-     * No handler functions for confirm available, everything is handled via actions
-     */
-    protected function doConfirm() {
-        $stat = $this->calculateConfirm();
-        $this->doDebug(__FUNCTION__.print_r($stat,1));
-        
-        $toTrigger = [];
-        if($stat['roleFirstConfirmed']) {
-            $toTrigger[] = 'handleFirstConfirmOfARole';
-        }
-        if($stat['firstConfirmed']) {
-            $toTrigger[] = 'handleFirstConfirm';
-        }
-        if($stat['roleAllConfirmed']) {
-            $toTrigger[] = 'handleAllConfirmOfARole';
-        }
-        if($stat['allConfirmed']) {
-            $toTrigger[] = 'handleAllConfirm';
-        }
-        $toTrigger[] = 'handleConfirm';
-        
-        $newTua = $this->newTaskUserAssoc;
-        $oldStep = $this->newTask->getWorkflowStepName();
-        foreach($toTrigger as $trigger) {
-            $this->doDebug($trigger);
-            $this->callActions($trigger, $oldStep, $newTua->getRole(), $newTua->getState());
-        }
-    }
     
     /**
      * Sets the new workflow step in the given task and increases by default the workflow step nr
@@ -628,131 +395,12 @@ class editor_Workflow_Default_Hooks {
             'oldStep' => $task->getWorkflowStepName(),
             'newStep' => $stepName,
         ];
-        $this->getStepRecalculation()->addNextStepSet($task->getTaskGuid(), $steps['newStep']);
+        $this->workflow->getStepRecalculation()->addNextStepSet($task->getTaskGuid(), $steps['newStep']);
         $this->doDebug(__FUNCTION__.': workflow next step "{newStep}"; oldstep: "{oldStep}"', $steps, true);
         $task->updateWorkflowStep($stepName, true);
         //call action directly without separate handler method
         $newTua = $this->newTaskUserAssoc;
         $this->callActions('handleSetNextStep', $stepName, $newTua->getRole(), $newTua->getState());
-    }
-    
-    /**
-     * is called on finishin a task
-     * evaluates the role and states of the User Task Association and calls the matching handlers:
-     */
-    protected function doFinish() {
-        $stat = $this->calculateFinish();
-        $this->doDebug(__FUNCTION__.print_r($stat,1));
-        
-        if($stat['roleFirstFinished']) {
-            $this->handleFirstFinishOfARole();
-        }
-        if($stat['firstFinished']) {
-            $this->handleFirstFinish();
-        }
-        if($stat['roleAllFinished']) {
-            $this->handleAllFinishOfARole();
-        }
-        if($stat['allFinished']) {
-            $this->handleAllFinish();
-        }
-        $this->handleFinish();
-    }
-    
-    /**
-     * calculates which of the "finish" handlers can be called accordingly to the currently existing tuas of a task
-     * @return boolean[]
-     */
-    protected function calculateFinish() {
-        $userTaskAssoc = $this->newTaskUserAssoc;
-        $stat = $userTaskAssoc->getUsageStat();
-        //we have to initialize $allFinished with true for proper working but with false if there is no tua at all
-        $allFinished = !empty($stat);
-        
-        //we have to initialize $roleAllFinished with true for proper working but with false if there is no tua with the current tuas role
-        $usedRoles = array_column($stat, 'role');
-        $roleAllFinished = in_array($userTaskAssoc->getRole(), $usedRoles);
-        $roleFirstFinished = false;
-        $sum = 0;
-        foreach($stat as $entry) {
-            $isRole = $entry['role'] === $userTaskAssoc->getRole();
-            $isFinish = $entry['state'] === $this->workflow::STATE_FINISH;
-            if($isRole && $roleAllFinished && ! $isFinish) {
-                $roleAllFinished = false;
-            }
-            if($allFinished && ! $isFinish) {
-                $allFinished = false;
-            }
-            if($isRole && $isFinish && (int)$entry['cnt'] === 1) {
-                $roleFirstFinished = true;
-            }
-            if($isFinish) {
-                $sum += (int)$entry['cnt'];
-            }
-        }
-        return [
-            'allFinished' => $allFinished,
-            'roleAllFinished' => $roleAllFinished,
-            'roleFirstFinished' => $roleFirstFinished,
-            'firstFinished' => $sum === 1,
-        ];
-    }
-    
-    /**
-     * Calculates the workflow step confirmation status
-     * Warning: this function may only be called in doConfirm (which is called if there was a state unconfirmed which is now set to edit)
-     *  For all other usages the calculation will not be correct, since we don't know if a state was unconfirmed before,
-     *  we see only that all states are now not unconfirmed.
-     */
-    protected function calculateConfirm() {
-        $userTaskAssoc = $this->newTaskUserAssoc;
-        $stat = $userTaskAssoc->getUsageStat();
-        $sum = 0;
-        $roleSum = 0;
-        $otherSum = 0;
-        $roleUnconfirmedSum = 0;
-        foreach($stat as $entry) {
-            $sum += (int)$entry['cnt'];
-            $isRole = $entry['role'] === $userTaskAssoc->getRole();
-            $isUnconfirmed = $entry['state'] === $this->workflow::STATE_UNCONFIRMED;
-            if($isRole) {
-                $roleSum += (int)$entry['cnt'];
-                if($isUnconfirmed) {
-                    $roleUnconfirmedSum += (int)$entry['cnt'];
-                }
-            }
-            if(!$isUnconfirmed) {
-                $otherSum += (int)$entry['cnt'];
-            }
-        }
-        return [
-            'allConfirmed' => $sum > 0 && $otherSum === $sum,
-            'roleAllConfirmed' => $roleUnconfirmedSum === 0,
-            'roleFirstConfirmed' => $roleSum - 1 === $roleUnconfirmedSum,
-            //firstConfirmed is working only if really all other jobs are unconfirmed, what is seldom, since the other states will be waiting / finished etc.
-            'firstConfirmed' => $otherSum === 1,
-        ];
-    }
-    
-    /**
-     * is called on wait for a task
-     */
-    protected function doWait() {
-        
-    }
-    
-    /**
-     * is called on reopening / unfinishing a task
-     * unfinish a finished task (taskassoc-specific unfinish in contrast to task-specific reopening)
-     * Set all REVIEWED_UNTOUCHED segments to TRANSLATED
-     * will be called after a task has been unfinished (after was finished - taskassoc-specific)
-     */
-    protected function doUnfinish() {
-        //FIXME use key handleUnfinish
-        $this->doDebug(__FUNCTION__);
-        $newTua = $this->newTaskUserAssoc;
-        /* @var $actions editor_Workflow_Actions */
-        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $newTua->getRole(), $newTua->getState());
     }
     
     /**
@@ -774,45 +422,5 @@ class editor_Workflow_Default_Hooks {
         else {
             $log->debug('E1013', $msg, $data);
         }
-    }
-    
-    /**
-     * method returns the triggered state as string ready to use in events, these are mainly:
-     * doUnfinish, doView, doEdit, doFinish, doWait, doConfirm
-     * beforeUnfinish, beforeView, beforeEdit, beforeFinish, beforeWait, beforeConfirm
-     *
-     * @param editor_Models_TaskUserAssoc $oldTua
-     * @param editor_Models_TaskUserAssoc $newTua
-     * @param string $prefix optional, defaults to "do"
-     * @return string
-     */
-    protected function getTriggeredState(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua, $prefix = 'do') {
-        $oldState = $oldTua->getState();
-        $newState = $newTua->getState();
-        if($oldState == $newState) {
-            return null;
-        }
-        
-        if($oldState == $this->workflow::STATE_FINISH && $newState != $this->workflow::STATE_FINISH) {
-            return $prefix.'Unfinish';
-        }
-        
-        if($oldState == $this->workflow::STATE_UNCONFIRMED && $newState == $this->workflow::STATE_EDIT) {
-            return $prefix.'Confirm';
-        }
-        
-        switch($newState) {
-            case $this->workflow::STATE_OPEN:
-                return $prefix.'Open';
-            case $this->workflow::STATE_VIEW:
-                return $prefix.'View';
-            case $this->workflow::STATE_EDIT:
-                return $prefix.'Edit';
-            case $this->workflow::STATE_FINISH:
-                return $prefix.'Finish';
-            case $this->workflow::STATE_WAITING:
-                return $prefix.'Wait';
-        }
-        return null;
     }
 }

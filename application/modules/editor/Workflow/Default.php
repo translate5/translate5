@@ -139,10 +139,10 @@ class editor_Workflow_Default {
      * the default workflow handler instance
      * @var editor_Workflow_Default_Hooks
      */
-    protected $handler;
+    protected $hookin;
     
     /**
-     * the default workflow handler instance
+     * the segment handler instance
      * @var editor_Workflow_Default_SegmentHandler
      */
     protected $segmentHandler;
@@ -172,7 +172,7 @@ class editor_Workflow_Default {
             $cache->save($this->definition, self::CACHE_KEY.$name);
         }
         
-        $this->handler = ZfExtended_Factory::get('editor_Workflow_Default_Hooks',[$this]);
+        $this->hookin = ZfExtended_Factory::get('editor_Workflow_Default_Hooks',[$this]);
         $this->segmentHandler = ZfExtended_Factory::get('editor_Workflow_Default_SegmentHandler',[$this]);
     }
     
@@ -254,7 +254,7 @@ class editor_Workflow_Default {
      * @return editor_Workflow_Default_Hooks
      */
     public function hookin(): editor_Workflow_Default_Hooks {
-        return $this->handler;
+        return $this->hookin;
     }
     
     /**
@@ -535,6 +535,10 @@ class editor_Workflow_Default {
             return self::STATE_VIEW;
         }
         return self::STATE_EDIT;
+    }
+    
+    public function getStepRecalculation(): editor_Workflow_Default_StepRecalculation {
+        return ZfExtended_Factory::get('editor_Workflow_Default_StepRecalculation', [$this]);
     }
 
     /**

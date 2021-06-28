@@ -39,29 +39,29 @@ class editor_Workflow_Actions_Config {
      * Task instance before task was changed
      * @var editor_Models_Task
      */
-    public editor_Models_Task $oldTask;
+    public ?editor_Models_Task $oldTask;
     
     /**
      * current task instance, with changes done by the current request
      * @var editor_Models_Task
      */
-    public editor_Models_Task $task;
+    public ?editor_Models_Task $task;
 
     /**
      * @var editor_Models_TaskUserAssoc
      */
-    public editor_Models_TaskUserAssoc $newTua;
+    public ?editor_Models_TaskUserAssoc $newTua;
     
     /**
      * @var editor_Models_TaskUserAssoc
      */
-    public editor_Models_TaskUserAssoc $oldTua;
+    public ?editor_Models_TaskUserAssoc $oldTua;
 
     /**
      * only available for import actions
      * @var editor_Models_Import_Configuration
      */
-    public editor_Models_Import_Configuration $importConfig;
+    public ?editor_Models_Import_Configuration $importConfig;
     
     /**
      * @var ZfExtended_Models_User
@@ -76,5 +76,10 @@ class editor_Workflow_Actions_Config {
     /**
      * @var string
      */
-    public string $trigger;
+    public ?string $trigger;
+    
+    /**
+     * @var ZfExtended_EventManager
+     */
+    public ZfExtended_EventManager $events;
 }
