@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Utility functions usable in workflow notification E-Mails. 
+ * Utility functions usable in workflow notification E-Mails.
  */
 class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
     public function workflowNotifyMail() {
@@ -56,7 +56,9 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
         
         /* @var $task editor_Models_Task */
         $taskGuid = $task->getTaskGuid();
-        if ($task->anonymizeUsers(false)) { 
+        
+        $rolesOfReceiver = is_string($this->view->receiver->roles) ? explode(',', $this->view->receiver->roles) : $this->view->receiver->roles;
+        if ($task->anonymizeUsers(true, $rolesOfReceiver)) {
             // = anonymize $users for task without taking the addressed user into account
             // (the receiver of the mail might not be the currently authenticated user)
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
@@ -114,7 +116,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
     /**
      * returns an array with translated language names used in the given task
      * The result is ready to be used in mail templates
-     * 
+     *
      * @param editor_Models_Task $task
      * @return array
      */
