@@ -255,7 +255,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function getUsageStat() {
-        $sql = 'select state, role, count(userGuid) cnt from LEK_taskUserAssoc where taskGuid = ? and isPmOverride = 0 group by state, role;';
+        $sql = 'select state, workflowStepName, count(userGuid) cnt from LEK_taskUserAssoc where taskGuid = ? and isPmOverride = 0 group by state, workflowStepName;';
         $res = $this->db->getAdapter()->query($sql, array($this->getTaskGuid()));
         return $res->fetchAll();
     }

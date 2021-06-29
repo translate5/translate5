@@ -100,12 +100,12 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
         $allFinished = !empty($stat);
         
         //we have to initialize $roleAllFinished with true for proper working but with false if there is no tua with the current tuas role
-        $usedRoles = array_column($stat, 'role');
-        $roleAllFinished = in_array($userTaskAssoc->getRole(), $usedRoles);
+        $usedSteps = array_column($stat, 'workflowStepName');
+        $roleAllFinished = in_array($userTaskAssoc->getWorkflowStepName(), $usedSteps);
         $roleFirstFinished = false;
         $sum = 0;
         foreach($stat as $entry) {
-            $isRole = $entry['role'] === $userTaskAssoc->getRole();
+            $isRole = $entry['workflowStepName'] === $userTaskAssoc->getWorkflowStepName();
             $isFinish = $entry['state'] === $this->config->workflow::STATE_FINISH;
             if($isRole && $roleAllFinished && ! $isFinish) {
                 $roleAllFinished = false;
