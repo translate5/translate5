@@ -66,6 +66,44 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Transacgrp';
 
+    /**
+     * @param $user
+     * @param $termEntryId
+     * @param null $language
+     * @param null $termId
+     */
+    public function affectLevels($user, $termEntryId, $language = null, $termId = null) {
+
+        // Detect level that levels should be affected from and up to top
+        if ($termEntryId && $language && $termId) $level = 'term';
+        else if ($termEntryId && $language) $level = 'language';
+        else $level = 'entry';
+
+        // Build WHERE clause for each level and all it's parent levels to be affected
+        $where = [
+            'term'     => '(ISNULL(`language`) OR (`language` = :language AND (ISNULL(`termId`) OR `termId` = :termId)))',
+            'language' => '(ISNULL(`language`) OR (`language` = :language AND  ISNULL(`termId`)                       ))',
+            'entry'    => ' ISNULL(`language`)',
+        ];
+
+        // Build param bindings
+        $bind = [':date' => time(), ':userName' => $user, ':termEntryId' => $termEntryId];
+        if ($level == 'language' || $level == 'term') $bind[':language'] = strtolower($language);
+        if ($level == 'term') $bind[':termId'] = $termId;
+
+        // Run query
+        editor_Utils::db()->query('
+            UPDATE `terms_transacgrp` 
+            SET 
+              `date` = :date, 
+              `transacNote` = :userName 
+            WHERE TRUE
+              AND `termEntryId` = :termEntryId 
+              AND `transac` = "modification" 
+              AND ' . $where[$level],
+        $bind);
+    }
+
     public function getTransacGrpCollectionByEntryId($collectionId, $termEntryId): array
     {
         $transacGrpByKey = [];

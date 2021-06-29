@@ -61,22 +61,13 @@ class editor_Models_Term_Proposal extends ZfExtended_Models_Entity_Abstract {
 
         // If $transacgrpData arg is given - update 'modification'-records of all levels
         if ($transacgrpData)
-            editor_Utils::db()->query('
-                UPDATE `terms_transacgrp` 
-                SET 
-                  `date` = :date, 
-                  `transacNote` = :userName 
-                WHERE TRUE
-                  AND `termEntryId` = :termEntryId 
-                  AND `transac` = "modification" 
-                  AND (ISNULL(`language`) OR (`language` = :language AND (ISNULL(`termId`) OR `termId` = :termId)))
-            ', [
-                ':date' => time(),
-                ':userName' => $this->getUserName(),
-                ':termEntryId' => $transacgrpData['termEntryId'],
-                ':language' => $transacgrpData['language'],
-                ':termId' => $this->getTermId(),
-            ]);
+            ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
+                ->affectLevels(
+                    $this->getUserName(),
+                    $transacgrpData['termEntryId'],
+                    $transacgrpData['language'],
+                    $this->getTermId()
+                );
 
         // Return
         return $return;
