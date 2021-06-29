@@ -306,7 +306,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
 
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
         $loadAll = $userModel->isAllowed('backend', 'loadAllTasks');
-        $ignoreAnonStuff = $userModel->readAnonymizedUsers();
+        $ignoreAnonStuff = $this->rolesAllowReadAnonymizedUsers();
 
         $anonSql = '';
         if(!$ignoreAnonStuff) {
@@ -1111,10 +1111,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * (2) if the currently logged in user does not have the role admin, PM or api.
      * If the $checkUser-param is set to "false", the user-check is omitted (= only the
      * task's anonymizeUsers-config is taken into account).
-     * @param string|false $checkUser (optional)
+     * @param bool $checkUser optional, set to false to check only the config (and do not consider the ACLs behind the currently logged in user or the roles given in $customRoles)
+     * @param bool $customRoles (optional) if checkUser = true the here provided roles are used for ACL check instead the currently logged in user
      * @return boolean
      */
-    public function anonymizeUsers($checkUser = true) {
+    public function anonymizeUsers(bool $checkUser = true, array $customRoles = null) {
         $config = $this->getConfig();
         if(!$config->runtimeOptions->customers->anonymizeUsers) {
             return false;
@@ -1122,9 +1123,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if($checkUser === false) {
             return $config->runtimeOptions->customers->anonymizeUsers; // = true if we get here
         }
-        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        return !($userModel->readAnonymizedUsers());
+        return !($this->rolesAllowReadAnonymizedUsers($customRoles));
+    }
+    
+    /**
+     * returns true if the given roles (or the roles of the current user) disallow seeing all user data
+     * @param array $rolesToCheck
+     */
+    protected function rolesAllowReadAnonymizedUsers(array $rolesToCheck = null) {
+        if(empty($rolesToCheck)) {
+            $userSession = new Zend_Session_Namespace('user');
+            $rolesToCheck = $userSession->data->roles;
+        }
+        $aclInstance = ZfExtended_Acl::getInstance();
+        return $aclInstance->isInAllowedRoles($rolesToCheck, "frontend", "readAnonymyzedUsers");
     }
 
     /***
