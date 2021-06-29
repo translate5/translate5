@@ -165,9 +165,14 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $manager = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $manager editor_Workflow_Manager */
 
+
         // if the workflow is defined by the api use it from there, otherwize load it from the task
-        $workflow = property_exists($this->data, 'workflow') ? $manager->getCached($this->data->workflow) : $manager->getActiveByTask($this->task);
-        /* @var $workflow editor_Workflow_Default */
+        if(property_exists($this->data, 'workflow') && !empty($this->data->workflow)){
+            $workflow = $manager->getCached($this->data->workflow);
+        }else{
+            $workflow = $manager->getActiveByTask($this->task);
+            /* @var $workflow editor_Workflow_Default */
+        }
 
         $this->data->workflow = $workflow->getName();
 

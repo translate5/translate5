@@ -81,7 +81,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
         propertiesTabPanelTitle: '#UT#Allgemein',
         configTabTitle:'#UT#Überschreibung der Systemkonfiguration',
         actionColumn:'#UT#Aktionen',
-        customerEditActionIcon:'#UT#Kunden bearbeiten'
+        customerEditActionIcon:'#UT#Kunden bearbeiten',
+        helpButtonText:'#UT#Hilfe'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -240,6 +241,17 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         scope: 'controller'
                                     }
                                 }
+                            },{
+                                xtype: 'button',
+                                itemId: 'home',
+                                glyph: 'f059@FontAwesome5FreeSolid',
+                                text: me.strings.helpButtonText,
+                                bind:{
+                                    visible:'{isActiveTabIncludedInForm}'
+                                },
+                                handler: function() {
+                                    window.open('https://confluence.translate5.net/display/BUS/OpenID+connect+in+translate5', '_blank');
+                                }
                             }]
                         }],
                         items: [{
@@ -249,16 +261,6 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             bind:{
                                 disabled : '{!record}'
                             },
-                            //TODO: move me as button in the openid panel after cancel/save button -> lower toolbar
-                            tools:[{
-                                itemId: 'home',
-                                type: 'home',
-                                cls:'tools-help-icon',
-                                qtip: 'OpenID connect',
-                                handler: function() {
-                                    window.open('https://confluence.translate5.net/display/BUS/OpenID+connect+in+translate5', '_blank');
-                                }
-                            }],
                             items:[{
                                 title:me.strings.propertiesTabPanelTitle,
                                 bodyPadding: 10,
