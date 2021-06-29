@@ -213,12 +213,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
     
     /**
-     * Feel free to define additional Notifications
-     */
-    /**
      * Workflow specific Notification after all users of a role have finished a task
-     * @param string $triggeringRole
-     * @param bool $isCron
      */
     public function notifyAllFinishOfARole() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
@@ -245,8 +240,10 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $users = $tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $nextStep,['deadlineDate']);
         $previousUsers = $tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $currentStep,['deadlineDate']);
         $params = array(
-            'triggeringRole' => $currentStep,
-            'nextRole' => $nextStep,
+            'triggeringRole' => $this->config->newTua->getRole(),
+            'triggeringStep' => $currentStep,
+            'nextStep' => $nextStep,
+            'nextRole' => $nextRole,
             'segmentsHash' => $segmentHash,
             'segments' => $segments,
             'isCron' => $isCron,
@@ -280,8 +277,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     
     /**
      * Workflow specific PM Notification after one users of a role have finished a task
-     * @param string $triggeringRole
-     * @param bool $isCron
      */
     public function notifyOneFinishOfARole() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
@@ -303,7 +298,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $currentUsers = $this->tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $currentStep, ['state','deadlineDate']);
         $params = array(
-            'triggeringRole' => $currentStep,
+            'triggeringRole' => $this->config->newTua->getRole(),
+            'triggeringStep' => $currentStep,
             'currentUsers' => $currentUsers,
             'task' => $task,
             'workflow' => $workflow
@@ -605,7 +601,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param array $segments
      * @param string $currentStep
      */
-    protected function attachXliffSegmentList($segmentHash, array $segments,$currentStep) {
+    protected function attachXliffSegmentList($segmentHash, array $segments, $currentStep) {
         $config = $this->config->task->getConfig();
         $notifyConfig = $config->runtimeOptions->editor->notification;
         

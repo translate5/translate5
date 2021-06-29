@@ -100,12 +100,12 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
         $allFinished = !empty($stat);
         
         //we have to initialize $roleAllFinished with true for proper working but with false if there is no tua with the current tuas role
-        $usedRoles = array_column($stat, 'role');
-        $roleAllFinished = in_array($userTaskAssoc->getRole(), $usedRoles);
+        $usedSteps = array_column($stat, 'workflowStepName');
+        $roleAllFinished = in_array($userTaskAssoc->getWorkflowStepName(), $usedSteps);
         $roleFirstFinished = false;
         $sum = 0;
         foreach($stat as $entry) {
-            $isRole = $entry['role'] === $userTaskAssoc->getRole();
+            $isRole = $entry['workflowStepName'] === $userTaskAssoc->getWorkflowStepName();
             $isFinish = $entry['state'] === $this->config->workflow::STATE_FINISH;
             if($isRole && $roleAllFinished && ! $isFinish) {
                 $roleAllFinished = false;
@@ -142,7 +142,7 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
         $oldStep = $task->getWorkflowStepName();
         
         //this remains as default behaviour
-        $nextStep = $this->config->workflow->getNextStep($newTua->getWorkflowStepName());
+        $nextStep = $this->config->workflow->getNextStep($task, $newTua->getWorkflowStepName());
         $this->doDebug($this->config->trigger." Next Step: ".$nextStep.' to role '.$newTua->getRole().' with step '.$nextStep."; Old Step in Task: ".$oldStep);
         if($nextStep) {
             //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!
