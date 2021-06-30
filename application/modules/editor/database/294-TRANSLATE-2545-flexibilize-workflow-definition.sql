@@ -75,3 +75,11 @@ WHERE `trigger` = 'handleFirstConfirmOfARole';
 UPDATE LEK_workflow_action 
 SET `trigger` = 'handleAllConfirmOfAStep' 
 WHERE `trigger` = 'handleAllConfirmOfARole';
+
+UPDATE LEK_task SET workflow = 'default' WHERE workflow = 'dummy';
+
+ALTER TABLE LEK_workflow MODIFY COLUMN name varchar(64) NOT NULL COMMENT 'technical workflow name, use alphanumeric chars only (refresh app cache!)';
+ALTER TABLE LEK_workflow MODIFY COLUMN label varchar(128) NOT NULL COMMENT 'human readable workflow name (goes through the translator, refresh app cache!)';
+ALTER TABLE LEK_workflow_step MODIFY COLUMN name varchar(64) NOT NULL COMMENT 'technical workflow step name, use alphanumeric chars only (refresh app cache!)';
+ALTER TABLE LEK_workflow_step MODIFY COLUMN label varchar(128) NOT NULL COMMENT 'human readable workflow step name (goes through the translator,  refresh app cache!)';
+
