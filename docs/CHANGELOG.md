@@ -11,9 +11,35 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+## [5.2.3] - 2021-06-24
+
+### Important Notes:
+This release contains important Hotfixes for the releases 5.2.0 / 5.2.1 / 5.2.2!
+
+### Bugfixes
+**[TRANSLATE-2556](https://jira.translate5.net/browse/TRANSLATE-2556): PHP Error Specified column previousOrigin is not in the row** <br>
+This error was triggered in certain circumstances by the import of SDLXLIFF files containing empty origin information.
+
+**[TRANSLATE-2555](https://jira.translate5.net/browse/TRANSLATE-2555): XML errors in uploaded TMX files are not shown properly in the TM event log** <br>
+The XML error was logged in the system log, but was not added to the specific log of the TM. This is changed now so that the PM can see what is wrong.
+
+**[TRANSLATE-2554](https://jira.translate5.net/browse/TRANSLATE-2554): BUG TermTagger Worker: Workers are scheduled exponentially** <br>
+FIXED: Bug in TermTagger Worker leads to scheduling workers exponentially what causes database deadlocks
+
+**[TRANSLATE-2552](https://jira.translate5.net/browse/TRANSLATE-2552): Typos in translate5** <br>
+Fixes couple of typos in translate5 locales
 
 
+## [5.2.2] - 2021-06-09
 
+### Important Notes:
+ 
+**This release contains important Hotfixes for [TRANSLATE-2196](https://jira.translate5.net/browse/TRANSLATE-2196): Complete Auto QA for translate5 released in version 5.2.0.**
+
+
+### Bugfixes
+**[TRANSLATE-2500](https://jira.translate5.net/browse/TRANSLATE-2500): Worker Architecture: Solving Problems with Deadlocks and related Locking/Mutex Quirks** <br>
+Improved the internal worker handling regarding DB dead locks and a small opportunity that workers run twice.
 
 
 ## [5.2.1] - 2021-06-08
