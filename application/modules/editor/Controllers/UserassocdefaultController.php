@@ -49,8 +49,12 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController {
     {
         parent::decodePutData();
         // check and convert the languages to lek_languages id
-        $this->_helper->Api->convertLanguageParameters($this->data->sourceLang);
-        $this->_helper->Api->convertLanguageParameters($this->data->targetLang);
+        if(property_exists($this->data, 'sourceLang')) {
+            $this->_helper->Api->convertLanguageParameters($this->data->sourceLang);
+        }
+        if(property_exists($this->data, 'targetLang')) {
+            $this->_helper->Api->convertLanguageParameters($this->data->targetLang);
+        }
     }
 
 }
