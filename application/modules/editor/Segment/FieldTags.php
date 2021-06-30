@@ -392,9 +392,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
         // CRUCIAL: adjusting all text-indices of all following tags
         $cut = $internalTag->endIndex - $internalTag->startIndex;
         foreach($this->tags as $tag){
-            if($tag->startIndex >= $internalTag->endIndex){
-                $tag->startIndex -= $cut;
-                $tag->endIndex -= $cut;
+            if($tag->startIndex > $internalTag->startIndex){
+                $discount = min(($tag->startIndex - $internalTag->startIndex), $cut);
+                $tag->startIndex -= $discount;
+            }
+            if($tag->endIndex > $internalTag->startIndex){
+                $discount = min(($tag->endIndex - $internalTag->startIndex), $cut);
+                $tag->endIndex -= $discount;
             }
         }
         $internalTag->startIndex = 0;

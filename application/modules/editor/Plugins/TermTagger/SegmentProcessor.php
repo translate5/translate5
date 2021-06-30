@@ -117,7 +117,8 @@ class editor_Plugins_TermTagger_SegmentProcessor {
      */
     public function process(array $segmentsTags, string $slot, bool $doSaveTags) {
         foreach($segmentsTags as $tags){            
-            $tags->removeTagsByType(editor_Plugins_TermTagger_Tag::TYPE);
+            // $tags->removeTagsByType(editor_Plugins_TermTagger_Tag::TYPE);
+            $tags->removeAllTags();
         }
         // creating the communication service which passes the tags to a temporary model sent to the tagger
         $this->communicationService = $this->config->createServerCommunicationServiceFromTags($segmentsTags);
