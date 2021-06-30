@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -179,7 +179,7 @@ class editor_Models_Quality_RequestState {
         return ($this->userGuid != NULL);
     }
     /**
-     * 
+     *
      * @param editor_Models_Task $task
      * @return array|NULL
      */
@@ -187,11 +187,11 @@ class editor_Models_Quality_RequestState {
         if($this->userGuid != NULL){
             $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($this->userGuid, $task);
             /* @var $tua editor_Models_TaskUserAssoc */
-            $role = $tua->getRole();
-            if(!$tua->isSegmentrangedTaskForRole($task, $role)){
+            $step = $tua->getWorkflowStepName();
+            if(!$tua->isSegmentrangedTaskForStep($task, $step)){
                 return NULL;
             }
-            return $tua->getAllAssignedSegmentsByUserAndRole($task->getTaskGuid(), $this->userGuid, $role);
+            return $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $this->userGuid, $step);
         }
         return NULL;
     }
