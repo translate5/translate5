@@ -104,7 +104,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           '#adminTaskUserAssocGrid #add-user-btn': {
               click: me.handleAddUser
           },
-          'adminTaskUserAssoc combo[name="role"]': {
+          'adminTaskUserAssoc combo[name="workflowStepName"]': {
               change: me.initState
           },
           'adminTaskUserAssoc #save-assoc-btn': {
@@ -158,7 +158,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
 
       //in competitive mode instead OPEN / UNCONFIRMED is used
       if(usageMode == Editor.model.admin.Task.USAGE_MODE_COMPETITIVE && state == task.USER_STATE_OPEN){
-          state = Editor.model.admin.Task.USER_STATE_UNCONFIRMED;
+          state = task.USER_STATE_UNCONFIRMED;
       }
       //set the default step to the first translation step when the task is translation task and
       //the workflow name is no workflow
@@ -303,7 +303,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           isCompetitive = task.get('usageMode') == Editor.model.admin.Task.USAGE_MODE_COMPETITIVE,
           newState = task.USER_STATE_OPEN,
           rec = form.getRecord(),
-          isChanged = stateCombo.getValue() != rec.get('state'),
+          isChanged = stateCombo.getValue() && stateCombo.getValue() != rec.get('state'),
           meta = task.getWorkflowMetaData(),
           initialStates = meta.initialStates[task.get('workflowStepName')];
       
@@ -324,7 +324,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           newState = initialStates[step];
       }
       if(isCompetitive && newState == task.USER_STATE_OPEN) {
-          newState = Editor.model.admin.Task.USER_STATE_UNCONFIRMED;
+          newState = task.USER_STATE_UNCONFIRMED;
       }
       rec.set('state', newState);
       stateCombo.setValue(newState);
