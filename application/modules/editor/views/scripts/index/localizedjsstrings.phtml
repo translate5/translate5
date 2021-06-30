@@ -1000,6 +1000,14 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
+    Ext.define("Editor.locale.de.view.admin.user.AssocViewController", {
+        override: "Editor.view.admin.user.AssocViewController",
+        strings: {
+            deleteUserMessage: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
+            deleteUserTitle: '<?php echo $this->translate->_('Eintrag löschen?');?>'
+        }
+    });
+
     Ext.define("Editor.locale.de.view.admin.task.UserAssocWizard", {
         override: "Editor.view.admin.task.UserAssocWizard",
         strings: {
