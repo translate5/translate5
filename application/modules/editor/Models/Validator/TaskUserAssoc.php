@@ -38,8 +38,10 @@ class editor_Models_Validator_TaskUserAssoc extends ZfExtended_Models_Validator_
     public function isValid(array $data) {
         $manager = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $manager editor_Workflow_Manager */
-        $workflow = $manager->getActive($this->entity->getTaskGuid());
+
+        $workflow = $manager->getCached($this->entity->getWorkflow());
         /* @var $workflow editor_Workflow_Default */
+
         $this->addValidator('id', 'int');
         $this->addValidator('taskGuid', 'guid');
         $this->addValidator('userGuid', 'guid');
