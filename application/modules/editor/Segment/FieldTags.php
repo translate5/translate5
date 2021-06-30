@@ -351,7 +351,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
     /**
      * Removes the internal tags of a certain type
      * @param string $type
-     * @param boolean $includeDeleted: if set, internal tags that represent deleted content will be processed as well
+     * @param boolean $includeDeleted: if set, field tags that represent deleted content will be processed as well
      */
     public function removeByType(string $type, bool $includeDeleted=false){
         $result = [];
@@ -361,11 +361,44 @@ class editor_Segment_FieldTags implements JsonSerializable {
                 $result[] = $tag;
             } else {
                 $replace = true;
+                if($tag->getType() == editor_Segment_Tag::TYPE_INTERNAL){
+                    $this->removeInternalTagText($tag);
+                }
             }
         }
         if($replace){
             $this->tags = $result;
         }
+    }
+    /**
+     * Removes all tags, so only the raw text will be left
+     */
+    public function removeAll(){
+        // CRUCIAL: remove the internal tags first to remove the text-contents of the internal tags as well
+        $this->removeByType(editor_Segment_Tag::TYPE_INTERNAL, true);
+        $this->tags = [];
+    }
+    /**
+     * Removes the text belonging to the internal tag
+     * All indexes of all following tags will be adjusted, the internal tag will be reset to contain no text
+     * @param editor_Segment_Internal_Tag $tag
+     */
+    protected function removeInternalTagText(editor_Segment_Internal_Tag $internalTag){
+        $text = ($internalTag->startIndex == 0) ? '' : mb_substr($this->fieldText, 0, $internalTag->startIndex);
+        if($internalTag->endIndex < $this->getFieldTextLength() - 1){
+            $text .= mb_substr($this->fieldText, $internalTag->endIndex);
+        }
+        $this->fieldText = $text;
+        // CRUCIAL: adjusting all text-indices of all following tags
+        $cut = $internalTag->endIndex - $internalTag->startIndex;
+        foreach($this->tags as $tag){
+            if($tag->startIndex >= $internalTag->endIndex){
+                $tag->startIndex -= $cut;
+                $tag->endIndex -= $cut;
+            }
+        }
+        $internalTag->startIndex = 0;
+        $internalTag->endIndex = 0;
     }
     /**
      * 
