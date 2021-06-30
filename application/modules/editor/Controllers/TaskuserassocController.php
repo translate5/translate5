@@ -71,7 +71,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows = $rows;
         $this->view->total = $this->entity->getTotalCount();
         $this->applyEditableAndDeletable();
-        $this->addSegmentrangesToResult();
     }
 
     public function projectAction(){
@@ -360,23 +359,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows->surName = $user->getSurName();
         $this->view->rows->parentIds = $user->getParentIds();
         $this->view->rows->longUserName=$user->getUsernameLong();
-    }
-    
-    /**
-     * Add the number of segments that are not assigned to a user
-     * although some other segments ARE assigned to users of this role.
-     */
-    protected function addSegmentrangesToResult() {
-        $taskGuid = null;
-
-        $this->entity->getFilter()->hasFilter('taskGuid',$taskGuid);
-        if (is_null($taskGuid)) {
-            return;
-        }
-        $taskGuid = $taskGuid->value;
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        $this->view->segmentstoassign = $tua->getAllNotAssignedSegments($taskGuid);
     }
     
     /***

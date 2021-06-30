@@ -25,6 +25,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * the task user assoc grid used when imporing a task or configuring the client defaults!
+ */
 Ext.define('Editor.view.admin.user.AssocGrid', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.adminUserAssocGrid',

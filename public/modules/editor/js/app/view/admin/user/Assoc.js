@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * the task user assoc panel used when imporing a task or configuring the client defaults!
+ */
 Ext.define('Editor.view.admin.user.Assoc', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.adminUserAssoc',
