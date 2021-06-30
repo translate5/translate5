@@ -171,6 +171,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
         try {
             $processor = new editor_Plugins_TermTagger_SegmentProcessor($this->task, $this->config, $this->processingMode, $this->isWorkerThread);
             $processor->process($segmentsTags, $slot, true);
+            $this->setTermtagState($this->loadedSegmentIds, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_TAGGED);
         }
         //Malfunction means the termtagger is up, but the send data produces an error in the tagger.
         // 1. we set the segment satus to retag, so each segment is tagged again, segment by segment, not in a bulk manner
@@ -345,4 +346,5 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             }
         }
         return true;
-    }}
+    }
+}

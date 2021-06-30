@@ -67,3 +67,11 @@ UPDATE `LEK_workflow_action` `action`,
 ) `data`
 SET `parameters` = CONCAT('{"step": "', `data`.`name`, '"}')
 WHERE `action`.id = `data`.id;
+
+UPDATE LEK_workflow_action 
+SET `trigger` = 'handleFirstConfirmOfAStep' 
+WHERE `trigger` = 'handleFirstConfirmOfARole';
+
+UPDATE LEK_workflow_action 
+SET `trigger` = 'handleAllConfirmOfAStep' 
+WHERE `trigger` = 'handleAllConfirmOfARole';

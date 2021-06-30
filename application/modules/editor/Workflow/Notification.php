@@ -237,7 +237,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
-        $users = $tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $nextStep,['deadlineDate']);
+        $users = empty($nextStep) ? [] : $tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $nextStep,['deadlineDate']);
         $previousUsers = $tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $currentStep,['deadlineDate']);
         $params = array(
             'triggeringRole' => $this->config->newTua->getRole(),

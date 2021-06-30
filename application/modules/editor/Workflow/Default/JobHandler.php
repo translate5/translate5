@@ -32,9 +32,9 @@ END LICENSE AND COPYRIGHT
 class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_AbstractHandler {
     const HANDLE_JOB_UNFINISH            = 'doUnfinish';
     
-    const HANDLE_JOB_FIRSTCONFIRMOFAROLE = 'handleFirstConfirmOfARole';
+    const HANDLE_JOB_FIRSTCONFIRMOFASTEP = 'handleFirstConfirmOfAStep';
     const HANDLE_JOB_FIRSTCONFIRM        = 'handleFirstConfirm';
-    const HANDLE_JOB_ALLCONFIRMOFAROLE   = 'handleAllConfirmOfARole';
+    const HANDLE_JOB_ALLCONFIRMOFASTEP   = 'handleAllConfirmOfAStep';
     const HANDLE_JOB_ALLCONFIRM          = 'handleAllConfirm';
     const HANDLE_JOB_CONFIRM             = 'handleConfirm';
     
@@ -188,14 +188,14 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
         $this->doDebug(__FUNCTION__.print_r($stat,1));
         
         $toTrigger = [];
-        if($stat['roleFirstConfirmed']) {
-            $toTrigger[] = self::HANDLE_JOB_FIRSTCONFIRMOFAROLE;
+        if($stat['stepFirstConfirmed']) {
+            $toTrigger[] = self::HANDLE_JOB_FIRSTCONFIRMOFASTEP;
         }
         if($stat['firstConfirmed']) {
             $toTrigger[] = self::HANDLE_JOB_FIRSTCONFIRM;
         }
-        if($stat['roleAllConfirmed']) {
-            $toTrigger[] = self::HANDLE_JOB_ALLCONFIRMOFAROLE;
+        if($stat['stepAllConfirmed']) {
+            $toTrigger[] = self::HANDLE_JOB_ALLCONFIRMOFASTEP;
         }
         if($stat['allConfirmed']) {
             $toTrigger[] = self::HANDLE_JOB_ALLCONFIRM;
@@ -206,7 +206,8 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
         $oldStep = $this->config->task->getWorkflowStepName();
         foreach($toTrigger as $trigger) {
             $this->doDebug($trigger);
-            $this->callActions($trigger, $oldStep, $newTua->getRole(), $newTua->getState());
+            $this->config->trigger = $trigger;
+            $this->callActions($this->config, $oldStep, $newTua->getRole(), $newTua->getState());
         }
     }
     
@@ -220,17 +221,17 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
         $userTaskAssoc = $this->config->newTua;
         $stat = $userTaskAssoc->getUsageStat();
         $sum = 0;
-        $roleSum = 0;
+        $stepSum = 0;
         $otherSum = 0;
-        $roleUnconfirmedSum = 0;
+        $stepUnconfirmedSum = 0;
         foreach($stat as $entry) {
             $sum += (int)$entry['cnt'];
-            $isRole = $entry['role'] === $userTaskAssoc->getRole();
+            $isStep = $entry['workflowStepName'] === $userTaskAssoc->getWorkflowStepName();
             $isUnconfirmed = $entry['state'] === $this->config->workflow::STATE_UNCONFIRMED;
-            if($isRole) {
-                $roleSum += (int)$entry['cnt'];
+            if($isStep) {
+                $stepSum += (int)$entry['cnt'];
                 if($isUnconfirmed) {
-                    $roleUnconfirmedSum += (int)$entry['cnt'];
+                    $stepUnconfirmedSum += (int)$entry['cnt'];
                 }
             }
             if(!$isUnconfirmed) {
@@ -239,8 +240,8 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
         }
         return [
             'allConfirmed' => $sum > 0 && $otherSum === $sum,
-            'roleAllConfirmed' => $roleUnconfirmedSum === 0,
-            'roleFirstConfirmed' => $roleSum - 1 === $roleUnconfirmedSum,
+            'stepAllConfirmed' => $stepUnconfirmedSum === 0,
+            'stepFirstConfirmed' => $stepSum - 1 === $stepUnconfirmedSum,
             //firstConfirmed is working only if really all other jobs are unconfirmed, what is seldom, since the other states will be waiting / finished etc.
             'firstConfirmed' => $otherSum === 1,
         ];

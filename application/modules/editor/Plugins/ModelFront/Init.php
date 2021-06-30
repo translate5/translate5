@@ -209,7 +209,7 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
         }
         $parent=ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $parent ZfExtended_Models_Worker */
-        $result = $parent->loadByState("editor_Plugins_MatchAnalysis_Worker", ZfExtended_Models_Worker::STATE_PREPARE,$taskGuid);
+        $result = $parent->loadByState(ZfExtended_Models_Worker::STATE_PREPARE, 'editor_Plugins_MatchAnalysis_Worker', $taskGuid);
         $parentWorkerId = null;
         if(!empty($result)){
             $parentWorkerId = $result[0]['id'];

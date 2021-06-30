@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Handler methods for task hookins
+ * WARNING TODO the handlers are named OfARole but basically they are triggered OfAWorkflowStep
  */
 class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_AbstractHandler {
     
@@ -144,7 +145,7 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
         //this remains as default behaviour
         $nextStep = $this->config->workflow->getNextStep($task, $newTua->getWorkflowStepName());
         $this->doDebug($this->config->trigger." Next Step: ".$nextStep.' to role '.$newTua->getRole().' with step '.$nextStep."; Old Step in Task: ".$oldStep);
-        if($nextStep) {
+        if(!empty($nextStep)) {
             //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!
             $this->setNextStep($task, $nextStep);
             $isComp = $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE;
