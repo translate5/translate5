@@ -143,8 +143,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_Abstract::addAdditionalTm()
      */
     public function addAdditionalTm(array $fileinfo = null,array $params=null){
-        if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
-            return true;
+        try {
+            if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
+                return true;
+            }
+        }
+        catch(editor_Models_Import_FileParser_InvalidXMLException $e) {
+            $e->addExtraData([
+                'languageResource' => $this->languageResource,
+            ]);
+            $this->logger->exception($e);
         }
         $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
             'languageResource' => $this->languageResource,
@@ -451,6 +459,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // - the requested TM is currently not loaded, so there is no info about the existence
         // - So we display the STATUS_NOT_LOADED instead
         if($this->api->getResponse()->getStatus() == 404) {
+            if($status == self::STATUS_ERROR) {
+                $this->lastStatusInfo = 'Es gab einen Fehler beim Import, bitte prüfen Sie das Fehlerlog.';
+                return self::STATUS_ERROR;
+            }
             $this->lastStatusInfo = 'Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.';
             return self::STATUS_NOT_LOADED;
         }
