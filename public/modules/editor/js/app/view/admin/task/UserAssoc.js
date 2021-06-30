@@ -25,6 +25,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * the task user assoc panel used when editing an imported task
+ */
 Ext.define('Editor.view.admin.task.UserAssoc', {
     extend: 'Ext.panel.Panel',
     requires: [
