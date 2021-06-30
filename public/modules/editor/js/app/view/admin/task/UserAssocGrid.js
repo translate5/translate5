@@ -25,6 +25,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * the task user assoc grid used when editing an imported task
+ */
 Ext.define('Editor.view.admin.task.UserAssocGrid', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.adminTaskUserAssocGrid',
@@ -84,6 +87,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                 }, {
                     xtype: 'gridcolumn',
                     width: 100,
+                    hidden: true,
                     dataIndex: 'role',
                     renderer: function (v, meta, rec) {
                         var task = me.lookupViewModel().get('currentTask'),
@@ -94,7 +98,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                     text: me.strings.roleCol
                 }, {
                     xtype: 'gridcolumn',
-                    width: 100,
+                    width: 120,
                     dataIndex: 'workflowStepName',
                     renderer: function (v, meta, rec) {
                         var task = me.lookupViewModel().get('currentTask'),
@@ -105,12 +109,12 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                     text: me.strings.stepCol
                 }, {
                     xtype: 'gridcolumn',
-                    width: 70,
+                    width: 80,
                     dataIndex: 'segmentrange',
                     text: me.strings.segmentrangeCol
                 }, {
                     xtype: 'gridcolumn',
-                    width: 90,
+                    width: 100,
                     dataIndex: 'state',
                     renderer: function (v, meta, rec) {
                         //is custom state translation needed
