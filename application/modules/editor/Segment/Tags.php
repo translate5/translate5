@@ -447,6 +447,14 @@ class editor_Segment_Tags implements JsonSerializable {
         }
     }
     /**
+     * Removes all field tags leaving just the pure text content
+     */
+    public function removeAllTags(){
+        foreach($this->getFieldTags() as $fieldTags){
+            $fieldTags->removeAll();
+        }
+    }
+    /**
      * Retrieves all tags from all our field tags
      * @param string $type
      * @return editor_Segment_Tag[]
