@@ -586,9 +586,9 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @param string $taskGuid
      * @return array
      */
-    public function getAllAssignedRolesByTask($taskGuid) {
+    private function getAllAssignedStepsByTask($taskGuid) {
         $s = $this->db->select()
-            ->from($this->db, array('role'))
+            ->from($this->db, array('workflowStepName'))
             ->distinct()
             ->where('isPmOverride = 0')
             ->where('taskGuid = ?', $taskGuid);
@@ -600,51 +600,51 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * If
      * (1) a task is in sequential-mode,
      * (2) not in PM-override, and
-     * (3) and ANY segments are assigned to ANY user of the given user's role
+     * (3) and ANY segments are assigned to ANY user of the given user's step
      *     in the current workflow-step,
      * then the editable-status of the segments will have to be checked for
      * ALL segments for ALL users of this role.
      * @param editor_Models_Task $task
-     * @param string $role
+     * @param string $step
      * @return bool
      */
-    public function isSegmentrangedTaskForRole(editor_Models_Task $task, string $role) : bool {
+    public function isSegmentrangedTaskForStep(editor_Models_Task $task, string $step) : bool {
         if ($task->getUsageMode() !== $task::USAGE_MODE_SIMULTANEOUS) {
             return false;
         }
         if($this->getIsPmOverride()) {
             return false;
         }
-        $assignedSegments = $this->getAllAssignedSegmentsByRole($task->getTaskGuid(), $role);
+        $assignedSegments = $this->getAllAssignedSegmentsByStep($task->getTaskGuid(), $step);
         return count($assignedSegments) > 0;
     }
     /**
      * Return an array with all segments in given task for the given user in the given role.
      * @param string $taskGuid
      * @param string $userGuid
-     * @param string $role
+     * @param string $step
      * @return array
      */
-    public function getAllAssignedSegmentsByUserAndRole(string $taskGuid, string $userGuid, string $role) : array {
+    public function getAllAssignedSegmentsByUserAndStep(string $taskGuid, string $userGuid, string $step) : array {
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
             ->where('userGuid = ?', $userGuid)
-            ->where('role = ?', $role)
+            ->where('workflowStepName = ?', $step)
             ->where('segmentrange IS NOT NULL');
         $tuaRows = $this->db->fetchAll($s)->toArray();
         return editor_Models_TaskUserAssoc_Segmentrange::getSegmentNumbersFromRows($tuaRows);
     }
     /**
      * Return an array with the numbers of all segments in the task
-     * that are assigned to any user of the given role.
+     * that are assigned to any user of the given step.
      * @param string $taskGuid
-     * @param string $role
+     * @param string $step
      * @return array
      */
-    public function getAllAssignedSegmentsByRole(string $taskGuid, string $role) : array {
+    protected function getAllAssignedSegmentsByStep(string $taskGuid, string $step) : array {
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
-            ->where('role = ?', $role)
+            ->where('workflowStepName = ?', $step)
             ->where('segmentrange IS NOT NULL');
         $tuaRows = $this->db->fetchAll($s)->toArray();
         return editor_Models_TaskUserAssoc_Segmentrange::getSegmentNumbersFromRows($tuaRows);
@@ -684,10 +684,10 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         //   translatorCheck => [1-7]
         // ]
         $notAssignedSegments = [];
-        $allRoles = $this->getAllAssignedRolesByTask($taskGuid);
-        foreach ($allRoles as $role) {
-            $rolename = $role['role'];
-            $notAssignedSegments[] = array('role' => $rolename, 'missingSegments' => $this->getAllNotAssignedSegmentsByRole($taskGuid, $rolename));
+        $allSteps = $this->getAllAssignedStepsByTask($taskGuid);
+        foreach ($allSteps as $step) {
+            $stepname = $step['workflowStepName'];
+            $notAssignedSegments[] = array('workflowStepName' => $stepname, 'missingSegments' => $this->getAllNotAssignedSegmentsByStep($taskGuid, $stepname));
         }
         return $notAssignedSegments;
     }
@@ -696,10 +696,10 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * Return an string with the ranges of the segments in the task
      * that are NOT assigned to any user of the given role.
      * @param string $taskGuid
-     * @param string $role
+     * @param string $step
      * @return string
      */
-    private function getAllNotAssignedSegmentsByRole(string $taskGuid, string $role) : string {
+    private function getAllNotAssignedSegmentsByStep(string $taskGuid, string $step) : string {
         // Example for a task with 10 segments:
         // - translator {94ff4a53-dae0-4793-beae-1f09968c3c93}: "1-3,5"
         // - translator {c77edcf5-3c55-4c29-a73d-da80d4dcfb36}: "7-8"
@@ -708,7 +708,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $segmentModel = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segmentModel editor_Models_Segment */
         $segmentsNr = $segmentModel->getTotalSegmentsCount($taskGuid);
-        $assignedSegments = $this->getAllAssignedSegmentsByRole($taskGuid, $role);
+        $assignedSegments = $this->getAllAssignedSegmentsByStep($taskGuid, $step);
         for ($i = 1; $i <= $segmentsNr; $i++) {
             if (!in_array($i, $assignedSegments)) {
                 $notAssignedSegments[] = $i;
