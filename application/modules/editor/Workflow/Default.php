@@ -332,34 +332,44 @@ class editor_Workflow_Default {
     /**
      * Returns next step in stepChain, or STEP_WORKFLOW_ENDED if for nextStep no users are associated
      * @param mixed $step string or null
-     * @return string $role OR false if step does not exist
+     * @return string $step or null if the step does not exist
      */
-    public function getNextStep(editor_Models_Task $task, string $step) {
-        $stepChain = $this->getStepChain();
+    public function getNextStep(editor_Models_Task $task, string $step): ?string {
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         
-        //if no next step is found, we return false
-        $nextStep = false;
+        //get used roles in task:
+        $tuas = $tua->loadByTaskGuidList([$task->getTaskGuid()]);
+        
+        $stepChain = array_values($this->getStepChain());
+        $stepCount = count($stepChain);
         
         $position = array_search($step, $stepChain);
-        if (isset($stepChain[$position + 1])) {
-            $nextStep = $stepChain[$position + 1];
+        
+        // if the current step is not found in the chain or
+        // if there are no jobs the workflow should be ended then
+        // (normally we never reach here since to change the workflow at least one job is needed)
+        if($position === false || empty($tuas)) {
+            return self::STEP_WORKFLOW_ENDED;
         }
         
-        //1. get used roles in task:
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        $tuas = $tua->loadByTaskGuidList([$task->getTaskGuid()]);
-        if(!empty($tuas)) {
-            $steps = array_column($tuas, 'workflowStepName');
-            $steps = array_unique($steps);
-            // 2. check if roles of given nextStep are associated to the task
-            if(! in_array($nextStep, $steps)) {
-                //3. if not, set nextStep to workflow ended
-                return self::STEP_WORKFLOW_ENDED;
+        //get just the associated steps from the jobs
+        $stepsAssociated = array_column($tuas, 'workflowStepName');
+        $stepsAssociated = array_unique($stepsAssociated);
+        
+        //we want the position of the next step, not the current one:
+        $position++;
+        
+        //loop over all steps after the current one
+        for ($position; $position < $stepCount; $position++) {
+            if(in_array($stepChain[$position], $stepsAssociated)) {
+                //the first one with associated users is returned
+                return $stepChain[$position];
             }
         }
         
-        return $nextStep;
+        //if no next step is found, it is ended by definition
+        return self::STEP_WORKFLOW_ENDED;
     }
     
     /**
