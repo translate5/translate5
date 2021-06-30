@@ -70,6 +70,10 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
         }
     },
 
+    strings:{
+        deleteUserMessage:'#UT#Soll dieser Eintrag wirklich gelöscht werden?',
+        deleteUserTitle:'#UT#Eintrag löschen?'
+    },
     onSaveAssocBtnClick : function(){
         var me = this,
             formPanel = me.lookup('assocForm'),
@@ -116,7 +120,7 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
     onDeleteAssocBtnClick : function (){
         var me = this;
         // Ask user to confirm this action
-        Ext.Msg.confirm('Confirm Delete', 'Are you sure you want to delete this user?', function (result) {
+        Ext.Msg.confirm(me.strings.deleteUserTitle, me.strings.deleteUserMessage, function (result) {
             // User confirmed yes
             if (result === 'yes') {
                 var record = me.getViewModel().get('selectedAssocRecord'),
