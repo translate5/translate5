@@ -43,9 +43,9 @@ Ext.define('Editor.model.admin.Task', {
     USER_STATE_VIEW: 'view',
     USER_STATE_WAITING: 'waiting',
     USER_STATE_FINISH: 'finished',
+    USER_STATE_UNCONFIRMED: 'unconfirmed',
     
     statics: {
-        USER_STATE_UNCONFIRMED: 'unconfirmed',
         USAGE_MODE_COMPETITIVE: 'competitive',
         USAGE_MODE_COOPERATIVE: 'cooperative',
         USAGE_MODE_SIMULTANEOUS: 'simultaneous',
