@@ -119,7 +119,9 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                 }],
                 dockedItems: [{
                     xtype: 'toolbar',
+                    itemId:'assocGridTopToolbar',
                     dock: 'top',
+                    enableOverflow: true,
                     items: [{
                         xtype: 'button',
                         glyph: 'f234@FontAwesome5FreeSolid',
@@ -138,7 +140,6 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                         tooltip: me.strings.removeUserTip
                     }, '-' ,{
                         xtype: 'combo',
-                        width:300,
                         forceSelection: true,
                         queryMode: 'local',
                         itemId: 'workflowCombo',
@@ -152,6 +153,7 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     }, {
                         xtype: 'checkbox',
                         hidden:true,
+                        value:1,
                         itemId: 'notifyAssociatedUsersCheckBox',
                         glyph: 'f674@FontAwesome5FreeSolid',
                         fieldLabel: me.strings.notifyButtonText,

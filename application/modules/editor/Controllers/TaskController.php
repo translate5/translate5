@@ -752,11 +752,11 @@ class editor_TaskController extends ZfExtended_RestController {
                 $model->setWorkflow($workflow);
             }
 
-            if(!empty($notifyAssociatedUsers)){
+            if($notifyAssociatedUsers !== false){
                 $saveModel = true;
                 $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
                 /* @var $taskConfig editor_Models_TaskConfig */
-                $taskConfig->updateInsertConfig($model->getTaskGuid(),'runtimeOptions.workflow.notifyAllUsersAboutTask',1);
+                $taskConfig->updateInsertConfig($model->getTaskGuid(),'runtimeOptions.workflow.notifyAllUsersAboutTask',$notifyAssociatedUsers);
             }
 
             $saveModel && $model->save();
