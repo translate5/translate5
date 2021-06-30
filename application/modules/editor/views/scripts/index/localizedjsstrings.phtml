@@ -1481,6 +1481,29 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
+
+    Ext.define("Editor.locale.view.admin.customer.OpenIdPanel", {
+    	override: "Editor.view.admin.customer.OpenIdPanel",
+        strings: {
+            save:'<?php echo $this->translate->_("Speichern");?>',
+            cancel:'<?php echo $this->translate->_("Abbrechen");?>',
+            saveCustomerMsg:'<?php echo $this->translate->_("Kunde wird gespeichert...");?>',
+            customerSavedMsg:'<?php echo $this->translate->_("Kunde gespeichert!");?>',
+            openIdServer:'<?php echo $this->translate->_("OpenID server");?>',
+            openIdIssuer:'<?php echo $this->translate->_("OpenID Issuer");?>',
+            openIdAuth2Url:'<?php echo $this->translate->_("OpenID OAuth URL");?>',
+            defaultRolesGroupLabel:'<?php echo $this->translate->_("Standardrollen");?>',
+            serverRolesGroupLabel:'<?php echo $this->translate->_("Erlaubte Rollen");?>',
+            openIdClientId:'<?php echo $this->translate->_("OpenID Benutzername");?>',
+            openIdClientSecret:'<?php echo $this->translate->_("OpenID Passwort");?>',
+            openIdRedirectLabel:'<?php echo $this->translate->_("Verlinkter Text Loginseite");?>',
+            openIdRedirectCheckbox:'<?php echo $this->translate->_("Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.");?>',
+            defaultRolesGroupLabelTooltip:'<?php echo $this->translate->_("Standardsystemrollen werden verwendet, wenn der OpenID-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.");?>',
+            serverRolesGroupLabelTooltip:'<?php echo $this->translate->_("Systemrollen, die der OpenID-Server in translate5 festlegen darf.");?>',
+            helpButtonText:'<?php echo $this->translate->_("Hilfe");?>'
+        }
+    });
+
     Ext.define("Editor.locale.view.admin.customer.Combo", {
         override: "Editor.view.admin.customer.Combo",
         fieldLabel:'<?php echo $this->translate->_("Endkunde");?>'

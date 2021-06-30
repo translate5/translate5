@@ -45,7 +45,7 @@ CREATE TABLE `LEK_workflow_step` (
   `position` int(11) NULL COMMENT 'the position of the step in the workflow, may be null if not in chain (for visitor for example), steps with same position are ordered by name then',
   `flagInitiallyFiltered` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'define if the segments of the previous step should be filtered in the GUI when reaching this step',
   PRIMARY KEY (`id`),
-  INDEX (`workflowName`, `name`),
+  UNIQUE (`name`, `workflowName`),
   CONSTRAINT FOREIGN KEY (`workflowName`) REFERENCES `LEK_workflow` (`name`) ON DELETE CASCADE
 );
 

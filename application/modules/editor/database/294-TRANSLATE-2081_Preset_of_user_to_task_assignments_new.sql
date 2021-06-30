@@ -40,11 +40,15 @@ CREATE TABLE `LEK_user_assoc_default` (
   KEY `targetLang` (`targetLang`),
   KEY `userGuid` (`userGuid`),
   KEY `workflow` (`workflow`),
+  KEY `fk_LEK_user_assoc_default_1_idx` (`workflowStepName`),
   CONSTRAINT `LEK_user_assoc_default_ibfk_1` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `LEK_user_assoc_default_ibfk_2` FOREIGN KEY (`sourceLang`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `LEK_user_assoc_default_ibfk_3` FOREIGN KEY (`targetLang`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `LEK_user_assoc_default_ibfk_4` FOREIGN KEY (`userGuid`) REFERENCES `Zf_users` (`userGuid`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `LEK_user_assoc_default_ibfk_4` FOREIGN KEY (`userGuid`) REFERENCES `Zf_users` (`userGuid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_LEK_user_assoc_default_1` FOREIGN KEY (`workflowStepName`) REFERENCES `LEK_workflow_step` (`name`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_LEK_user_assoc_default_2` FOREIGN KEY (`workflow`) REFERENCES `LEK_workflow` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_userassocdefault', 'all');
 
 DELETE FROM `LEK_workflow_action` WHERE `action`='autoAssociateEditorUsers';

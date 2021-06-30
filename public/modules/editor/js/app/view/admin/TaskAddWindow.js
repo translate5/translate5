@@ -85,8 +85,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
      */
     groupCards:[],
 
-    height : 550,
-    width : 1024,
     maximizable:true,
 
     listeners:{
@@ -163,6 +161,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         config = {
                 title: me.title, //see EXT6UPD-9
                 layout: 'card',
+                height: parseInt(Editor.app.viewport.getHeight() * 0.70),
+                width: parseInt(Editor.app.viewport.getWidth() * 0.70),
                 items:[
                     {
                         xtype:'panel',

@@ -41,16 +41,33 @@ Ext.define('Editor.store.admin.WorkflowSteps', {
         var returnConfig = me.callParent([config]);
 
         Ext.Object.each(Editor.data.app.workflows, function (key, workflow) {
-            var loopOver = workflow.steps;
-            if(me.useAssignableSteps){
-                loopOver = workflow.assignableSteps;
-            }
-            Ext.Object.each(loopOver, function (key, value) {
-                me.add({id: key, text: value});
-            });
+            me.addWorkflow(workflow);
         });
 
         return returnConfig;
+    },
+
+    /***
+     * Add workflow steps
+     * @param w
+     */
+    addWorkflow:function (w){
+        var me=this,
+            steps = me.useAssignableSteps ? w.assignableSteps : w.steps,
+            added = [];
+
+        Ext.Array.each(w.stepChain, function (key) {
+            if(steps[key]){
+                me.add({id: key, text: steps[key]});
+                added.push(key);
+            }
+        });
+
+        Ext.Object.each(steps,function(key,value){
+            if(!Ext.Array.contains(added,key)){
+                me.add({id: key, text: value});                
+            }
+        });
     },
 
     /***
@@ -63,13 +80,6 @@ Ext.define('Editor.store.admin.WorkflowSteps', {
         if(!Editor.data.app.workflows.hasOwnProperty(workflow)){
             return;
         }
-        var w = Editor.data.app.workflows[workflow];
-        var loopOver = w.steps;
-        if(me.useAssignableSteps){
-            loopOver = w.assignableSteps;
-        }
-        Ext.Object.each(loopOver, function (key, value) {
-            me.add({id: key, text: value});
-        });
+        me.addWorkflow(Editor.data.app.workflows[workflow]);
     }
 });

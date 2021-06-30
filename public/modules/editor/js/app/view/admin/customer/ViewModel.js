@@ -33,9 +33,7 @@ Ext.define('Editor.view.admin.customer.ViewModel', {
 
     data: {
         title: '',
-        record: false,
-        isOpenIdRequired:false,
-        isActiveTabIncludedInForm:false
+        record: false
     },
 
     formulas: {
