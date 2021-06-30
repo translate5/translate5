@@ -137,9 +137,8 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
             disabled:'{!targetLangUserAssoc.value}'
         });
 
-        grid.addDocked({
+        grid.down('#assocGridTopToolbar').insert(4,{
             xtype:'combo',
-            width:250,
             fieldLabel: me.strings.usageModeTitle,
             name:'usageMode',
             itemId:'usageMode',
@@ -156,7 +155,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
             queryMode: 'local',
             displayField: 'name',
             valueField: 'id'
-        },'top');
+        });
     },
 
     /***

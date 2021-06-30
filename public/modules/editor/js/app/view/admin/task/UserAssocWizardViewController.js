@@ -72,7 +72,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         me.preimportOperation({
             usageMode: usageMode.getValue(),
             workflow:workflowCombo.getValue(),
-            notifyAssociatedUsers:notify.checked
+            notifyAssociatedUsers:notify.checked ? 1 : 0
         },function (){
             view.fireEvent('wizardCardFinished', skipCards);
         });
@@ -193,7 +193,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             formRecord = formPanel.getRecord(),
             task = me.getFormTask();
 
-        // on target language changem, set the current form taskGuid to matching project task/single task
+        // on target language change, set the current form taskGuid to matching project task/single task
         formRecord.set('taskGuid',task.get('taskGuid'));
 
         me.getViewModel().set('formTask',task);
