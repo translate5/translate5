@@ -1237,7 +1237,7 @@
   </trans-unit>
   <trans-unit id='U2VnbWVudCB2b24gTGVzZXplaWNoZW5saXN0ZSBlbnRmZXJuZW4gKFNUUkcgKyBEKQ=='>
     <source>Segment von Lesezeichenliste entfernen (STRG + D)</source>
-    <target>remove segment bookmarks (CTRL + D)</target>
+    <target>Remove segment bookmarks (CTRL + D)</target>
   </trans-unit>  
 <trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW4gKFNUUkcgKyBBTFQgKyBFTlRFUik='>
   <source>Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)</source>
@@ -1281,7 +1281,7 @@
 </trans-unit>
 <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
   <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
-  <target>The segment content was resetted to the original import state.</target>
+  <target>The segment content was reset to the original import state.</target>
 </trans-unit>
 <trans-unit id='U2VnbWVudCBhdWYgaW5pdGlhbGVuIEluaGFsdCB6dXLDvGNrc2V0emVuIChBTFQgKyBFTlRGKQ=='>
   <source>Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)</source>
@@ -1374,7 +1374,7 @@
 <trans-unit id='SGlud2VpcyE='><source>Hinweis!</source><target>Note!</target></trans-unit>
 <trans-unit id='RGllIGdld8O8bnNjaHRlIEFrdGlvbiBrYW5uIG5pY2h0IGR1cmNoZ2Vmw7xocnQgd2VyZGVuISBEYXMgYWt0dWVsbCBnZcO2ZmZuZXRlIFNlZ21lbnQgbXVzcyB6dW7DpGNoc3QgZ2VzcGVpY2hlcnQgYnp3LiBnZXNjaGxvc3NlbiB3ZXJkZW4u'>
   <source>Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.</source>
-  <target>The desired action cannot be processed! The currenlty opened segment has to be saved / closed first.</target>
+  <target>The desired action cannot be processed! The currently opened segment has to be saved / closed first.</target>
 </trans-unit>
 <trans-unit id='RGllc2VyIEFubWVsZGVuYW1lIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'>
   <source>Dieser Anmeldename wird bereits verwendet.</source>
@@ -1472,7 +1472,7 @@
 </trans-unit>
 <trans-unit id='RGFzIHZlcndlbmRldGUgw5xiZXJzZXR6dW5nc3dlcmt6ZXVnIGhhdCBrZWluZSBJbmZvcm1hdGlvbiB6dXIgSGVya3VuZnQgZGVzIE1hdGNoZXMgenVyIFZlcmbDvGd1bmcgZ2VzdGVsbHQu'>
     <source>Das verwendete Übersetzungswerkzeug hat keine Information zur Herkunft des Matches zur Verfügung gestellt.</source>
-    <target>The previously used translation tool did not provide information to the origin of the match.</target>
+    <target>The translation tool used did not provided information on the origin of the match.</target>
 </trans-unit>
 <trans-unit id='RGllc2VyIFRhc2sgd3VyZGUgaW1wb3J0aWVydCwgYmV2b3IgZGFzIE1hdGNoIFJhdGUgVHlwLUZlYXR1cmUgaW1wbGVtZW50aWVydCB3dXJkZS4='>
     <source>Dieser Task wurde importiert, bevor das Match Rate Typ-Feature implementiert wurde.</source>

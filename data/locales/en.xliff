@@ -422,7 +422,7 @@
             </trans-unit>
             <trans-unit id="ezB9IFdpZWRlcmhvbHVuZ2VuIHd1cmRlbiBiZWFyYmVpdGV0IHVuZCBnZXNwZWljaGVydA==">
                 <source>{0} Wiederholungen wurden bearbeitet und gespeichert</source>
-                <target>{0} Repetitions processed and saved</target>
+                <target>{0} repetitions processed and saved</target>
             </trans-unit>
             <trans-unit id="TnVtbWVyIGVpbmdlYmVuLi4u">
                 <source>Nummer eingeben...</source>
