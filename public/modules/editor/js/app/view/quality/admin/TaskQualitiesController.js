@@ -21,29 +21,29 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.PreferencesWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.taskpreferences',
-    data: {
-        userAssocDirty: false,
-        currentTask:null
-    },
-    formulas: {
-        workflowMetadata: {
-            get: function(get) {
-                return this.get('currentTask') && this.get('currentTask').getWorkflowMetaData();
+/**
+ * View Controller for the task quality panel
+ * Handles only the finished task's import refresh of qualities
+ */
+Ext.define('Editor.view.quality.admin.TaskQualitiesController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.taskQualities',
+    listen: {
+        controller: {
+            'taskGrid': {
+                taskImportFinished: 'onTaskImportFinished'
             }
-        },
-        disabledDuringTaskImport:{
-            get: function(task) {
-                return !task || task.isImporting();
-            },
-            bind: { bindTo:'{currentTask}', deep:true }
         }
+    },
+    /**
+     * After an import is finished (and the AutoQA workers worked) we need to show the new state
+     */
+    onTaskImportFinished: function(task){
+        this.getView().refreshStore(task.get('taskGuid'));
     }
 });

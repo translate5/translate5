@@ -39,7 +39,7 @@ use PHPHtmlParser\Dom\Node\HtmlNode;
  * The structure of the tags in this class is a simple sequence, any nesting / interleaving is covered with rendering / unparsing
  * The rendering will take care about interleaving and nested tags and may part a tag into chunks
  * When Markup is unserialized multiple chunks in a row of an internal tag will be joined to a single tag and the structure will be re-sequenced
- * Keep in mind that start & end-index work just like counting chars or the substr API in php, the tag starts BEFORE the start index and ends BEFORE the index of the end index, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
+ * Keep in mind that start & end-index work just like counting chars or the substr API in php, the tag starts BEFORE the start index and ends BEFORE the end index, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
  * tags that are immediate siblings can be identified by having the same end/start index
  * To identify the Types of Internal tags a general API editor_Segment_TagCreator is provided
  * Tag types can be registered via the Quality Provider registry in editor_Segment_Quality_Manager or (if not quality related) directly in the editor_Segment_TagCreator registry
@@ -351,7 +351,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
     /**
      * Removes the internal tags of a certain type
      * @param string $type
-     * @param boolean $includeDeleted: if set, internal tags that represent deleted content will be processed as well
+     * @param boolean $includeDeleted: if set, field tags that represent deleted content will be processed as well
      */
     public function removeByType(string $type, bool $includeDeleted=false){
         $result = [];
@@ -361,11 +361,48 @@ class editor_Segment_FieldTags implements JsonSerializable {
                 $result[] = $tag;
             } else {
                 $replace = true;
+                if($tag->getType() == editor_Segment_Tag::TYPE_INTERNAL){
+                    $this->removeInternalTagText($tag);
+                }
             }
         }
         if($replace){
             $this->tags = $result;
         }
+    }
+    /**
+     * Removes all tags, so only the raw text will be left
+     */
+    public function removeAll(){
+        // CRUCIAL: remove the internal tags first to remove the text-contents of the internal tags as well
+        $this->removeByType(editor_Segment_Tag::TYPE_INTERNAL, true);
+        $this->tags = [];
+    }
+    /**
+     * Removes the text belonging to the internal tag
+     * All indexes of all following tags will be adjusted, the internal tag will be reset to contain no text
+     * @param editor_Segment_Internal_Tag $tag
+     */
+    protected function removeInternalTagText(editor_Segment_Internal_Tag $internalTag){
+        $text = ($internalTag->startIndex == 0) ? '' : mb_substr($this->fieldText, 0, $internalTag->startIndex);
+        if($internalTag->endIndex < $this->getFieldTextLength() - 1){
+            $text .= mb_substr($this->fieldText, $internalTag->endIndex);
+        }
+        $this->fieldText = $text;
+        // CRUCIAL: adjusting all text-indices of all following tags
+        $cut = $internalTag->endIndex - $internalTag->startIndex;
+        foreach($this->tags as $tag){
+            if($tag->startIndex > $internalTag->startIndex){
+                $discount = min(($tag->startIndex - $internalTag->startIndex), $cut);
+                $tag->startIndex -= $discount;
+            }
+            if($tag->endIndex > $internalTag->startIndex){
+                $discount = min(($tag->endIndex - $internalTag->startIndex), $cut);
+                $tag->endIndex -= $discount;
+            }
+        }
+        $internalTag->startIndex = 0;
+        $internalTag->endIndex = 0;
     }
     /**
      * 
