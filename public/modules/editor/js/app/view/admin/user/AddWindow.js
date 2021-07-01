@@ -120,7 +120,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         });
         config = {
             title: me.title, //see EXT6UPD-9
-            height: Math.min(720, parseInt(Ext.getBody().getViewSize().height * 0.9)),
+            height: Math.min(750, parseInt(Ext.getBody().getViewSize().height * 0.9)),
             width : 900,
             flex:1,
             items : [{
