@@ -21,30 +21,30 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.store.admin.WorkflowState', {
-	extend : 'Ext.data.Store',
-	initConfig: function(instanceConfig) {
-		var me = this,
-			config={},
-			workflowStates=[];
-		//Info:duplicated id values will be ignored by te store
-		Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
-			Ext.Object.each(workflow.states, function(key, value){
-				workflowStates.push({
-					id:key,
-					label:value
-				});
-			});
-		});
-		config.data=workflowStates;
-		if (instanceConfig) {
-			me.self.getConfigurator().merge(me, config, instanceConfig);
-		}
-	    return me.callParent([config]);
-	},
+    extend : 'Ext.data.Store',
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config={},
+            workflowStates=[];
+        //Info:duplicated id values will be ignored by te store
+        Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
+            Ext.Object.each(workflow.states, function(key, value){
+                workflowStates.push({
+                    id:key,
+                    label:value
+                });
+            });
+        });
+        config.data=workflowStates;
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    }
 });

@@ -334,7 +334,7 @@ function() {
             if(!Ext.isEmpty(version) && version != Editor.data.app.version) {
                 Ext.MessageBox.show({
                      title: serverException.strings.update_title,
-                     msg: Ext.String.format(serverException.strings.update_msg, Editor.data.app.version),
+                     msg: Ext.String.format(serverException.strings.update_msg, version),
                      buttons: Ext.MessageBox.OK,
                      fn: function(){
                          return serverException.handleMaintenance();

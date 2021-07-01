@@ -283,12 +283,14 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             $this->userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             $this->userTaskAssoc->setUserGuid($this->userGuid);
             $this->userTaskAssoc->setTaskGuid($this->task->getTaskGuid());
+            $this->userTaskAssoc->setWorkflow($this->task->getWorkflow());
+            $this->userTaskAssoc->setWorkflowStepName('');
             $this->userTaskAssoc->setRole('');
             $this->userTaskAssoc->setState('');
             $this->userTaskAssoc->setIsPmOverride(true);
             $this->userTaskAssoc->setUsedInternalSessionUniqId(null);
             $this->userTaskAssoc->setUsedState(null);
-            $this->userTaskAssoc->setState(editor_Workflow_Abstract::STATE_EDIT);
+            $this->userTaskAssoc->setState(editor_Workflow_Default::STATE_EDIT);
         }
     }
     

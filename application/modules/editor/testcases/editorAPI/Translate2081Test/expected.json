@@ -1,0 +1,18 @@
+[
+    {
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
+        "state": "open",
+        "role": "translator",
+        "workflowStepName": "translation",
+        "workflow": "default",
+        "segmentrange": null,
+        "usedState": null,
+        "isPmOverride": "0",
+        "deadlineDate": null,
+        "finishedDate": null,
+        "login": "testtranslator",
+        "surName": "test",
+        "firstName": "translator",
+        "parentIds": null
+    }
+]

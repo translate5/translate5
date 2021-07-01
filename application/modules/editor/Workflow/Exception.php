@@ -38,6 +38,6 @@ class editor_Workflow_Exception extends ZfExtended_ErrorCodeException {
     static protected $localErrorCodes = [
         'E1251' => 'Workflow to class "{className}" not found!',
         'E1252' => 'Workflow with ID "{workflowId}" not found!',
-        'E1253' => '{className}::$labels has to much / or missing labels!',
+        'E1253' => 'Workflow {workflowId} $labels has to much / or missing labels!',
     ];
 }

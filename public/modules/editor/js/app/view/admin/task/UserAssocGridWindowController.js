@@ -78,6 +78,6 @@ Ext.define('Editor.view.admin.task.UserAssocGridWindowController', {
                     Editor.app.getController('ServerException').handleException(response);
                 }
             });
-        }
+        };
     }
 });

@@ -95,12 +95,12 @@ class editor_Models_KPI {
         //only reviewer,translator and translatorCheck roles are loaded
         $tua=ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc  */
-        $assocs=$tua->loadKpiData($taskGuids,[editor_Workflow_Abstract::ROLE_REVIEWER,editor_Workflow_Abstract::ROLE_TRANSLATOR,editor_Workflow_Abstract::ROLE_TRANSLATORCHECK]);
+        $assocs=$tua->loadKpiData($taskGuids,[editor_Workflow_Default::ROLE_REVIEWER,editor_Workflow_Default::ROLE_TRANSLATOR,editor_Workflow_Default::ROLE_TRANSLATORCHECK]);
         
         $collections=[];
-        $collections[editor_Workflow_Abstract::ROLE_REVIEWER]=[];
-        $collections[editor_Workflow_Abstract::ROLE_TRANSLATOR]=[];
-        $collections[editor_Workflow_Abstract::ROLE_TRANSLATORCHECK]=[];
+        $collections[editor_Workflow_Default::ROLE_REVIEWER]=[];
+        $collections[editor_Workflow_Default::ROLE_TRANSLATOR]=[];
+        $collections[editor_Workflow_Default::ROLE_TRANSLATORCHECK]=[];
         
         foreach ($assocs as $assoc){
             $startDate = new DateTime($assoc['assignmentDate']);
@@ -117,9 +117,9 @@ class editor_Models_KPI {
             return round($average, 0) . ' ' . $this->translate->_('Tage');
         };
         
-        $results[self::KPI_REVIEWER]=$getAverage(editor_Workflow_Abstract::ROLE_REVIEWER);
-        $results[self::KPI_TRANSLATOR]=$getAverage(editor_Workflow_Abstract::ROLE_TRANSLATOR);
-        $results[self::KPI_TRANSLATOR_CHECK]=$getAverage(editor_Workflow_Abstract::ROLE_TRANSLATORCHECK);
+        $results[self::KPI_REVIEWER]=$getAverage(editor_Workflow_Default::ROLE_REVIEWER);
+        $results[self::KPI_TRANSLATOR]=$getAverage(editor_Workflow_Default::ROLE_TRANSLATOR);
+        $results[self::KPI_TRANSLATOR_CHECK]=$getAverage(editor_Workflow_Default::ROLE_TRANSLATORCHECK);
         return $results;
     }
     

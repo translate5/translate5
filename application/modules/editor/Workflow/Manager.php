@@ -46,14 +46,16 @@ class editor_Workflow_Manager {
     /**
      */
     public function __construct() {
-        $config = Zend_Registry::get('config');
-        if(empty($config->runtimeOptions->workflows)) {
-            //setting the default workflow if nothing is configured
-            $this->addWorkflow('editor_Workflow_Default');
-            return;
-        }
-        foreach($config->runtimeOptions->workflows as $wf) {
-            $this->addWorkflow($wf);
+        /* @var $workflow editor_Models_Workflow */
+        $workflow = ZfExtended_Factory::get('editor_Models_Workflow');
+        $workflows = $workflow->loadAll();
+        
+        foreach($workflows as $workflowData) {
+            //if the workflow exists already, it was added by a plug-in with a different class
+            // if not, we add it as default workflow configured from database
+            if(empty(self::$workflowList[$workflowData['name']])) {
+                $this->addWorkflow($workflowData['name']);
+            }
         }
     }
     
@@ -62,66 +64,66 @@ class editor_Workflow_Manager {
      * @param string $wfId
      * @param string $workflowClass
      */
-    public function addWorkflow($workflowClass) {
-        self::$workflowList[constant($workflowClass.'::WORKFLOW_ID')] = $workflowClass;
-    }
-    
-    /**
-     * @param string $className
-     * @return string
-     */
-    public function getIdToClass($className) {
-        $flipped = array_flip(self::$workflowList);
-        if(empty($flipped[$className])) {
-            // 'Workflow to class "{className}" not found!',
-            throw new editor_Workflow_Exception('E1251', ['className' => $className]);
-        }
-        return $flipped[$className];
+    public function addWorkflow($name, $workflowClass = 'editor_Workflow_Default') {
+        self::$workflowList[$name] = $workflowClass;
     }
     
     /**
      * returns a new workflow instance by given string ID (e.g. default for "Default" Workflow)
-     * @param string $wfId
-     * @return editor_Workflow_Abstract
+     * @param string $wfName
+     * @return editor_Workflow_Default
      */
-    public function get($wfId) {
-        if(empty(self::$workflowList[$wfId])) {
+    public function get($wfName) {
+        if(empty(self::$workflowList[$wfName])) {
             //Workflow with ID "{workflowId}" not found!
-            throw new editor_Workflow_Exception('E1252', ['workflowId' => $wfId]);
+            throw new editor_Workflow_Exception('E1252', ['workflowId' => $wfName]);
         }
-        return ZfExtended_Factory::get(self::$workflowList[$wfId]);
+        return ZfExtended_Factory::get(self::$workflowList[$wfName],[$wfName]);
     }
     
     /**
      * returns a workflow instance by given string ID, caches the workflow instances internally
      * @see self::get
      * @param string $wfId
-     * @return editor_Workflow_Abstract
+     * @return editor_Workflow_Default
      */
-    public function getCached($wfId) {
-        if(empty($this->instances[$wfId])) {
-            $this->instances[$wfId] = $this->get($wfId);
+    public function getCached($wfName) {
+        if(empty($this->instances[$wfName])) {
+            $this->instances[$wfName] = $this->get($wfName);
         }
-        return $this->instances[$wfId];
+        return $this->instances[$wfName];
     }
     
     /**
      * returns the workflow for the given task
      * @param editor_Models_Task $task
-     * @return editor_Workflow_Abstract
+     * @return editor_Workflow_Default
      */
     public function getByTask(editor_Models_Task $task) {
         return $this->get($task->getWorkflow());
     }
     
     /**
-     * returns an hard-coded assoc array with the class names (e.g. 'default' => editor_Workflow_Default)
-     * @return array
+     * returns a list of available workflows (workflow names)
+     * @return [string]
      */
-    public function getWorkflows() {
-        return self::$workflowList;
+    public function getWorkflows(): array {
+        return array_keys(self::$workflowList);
     }
 
+    public function getWorkflowConstants() {
+        //collection of programmatically needed constants in the GUI
+        //only constants of the abstract and therefore always available workflow are allowed to be listed here
+        //since only a subset of all constants of the abstract is needed, this manual sub selection is OK.
+        return [
+            'DEFAULT_WORKFLOW' => 'default',
+            'STEP_NO_WORKFLOW' => editor_Workflow_Default::STEP_NO_WORKFLOW,
+            'ROLE_TRANSLATOR' => editor_Workflow_Default::ROLE_TRANSLATOR,
+            'ROLE_REVIEWER' => editor_Workflow_Default::ROLE_REVIEWER,
+            'ROLE_TRANSLATORCHECK' => editor_Workflow_Default::ROLE_TRANSLATORCHECK,
+        ];
+    }
+    
     /**
      * returns all workflow metadata (roles, steps, etc) as array of objects
      * Warning: in backend states are ment to be all states including the pending states
@@ -131,77 +133,69 @@ class editor_Workflow_Manager {
      * @return array
      */
     public function getWorkflowData() {
-        $result = array();
-        $labelize = function(array $data, $cls) use (&$labels) {
-            $usedLabels = array_intersect_key($labels, $data);
-            ksort($usedLabels);
-            ksort($data);
-            if(count($data) !== count($usedLabels)) {
-                 // {className}::$labels has to much / or missing labels!',
-                 throw new editor_Workflow_Exception('E1253', ['className' => $cls]);
-            }
-            return array_combine($data, $usedLabels);
-        };
-        foreach(self::$workflowList as $id => $cls) {
-            $wf = ZfExtended_Factory::get($cls);
-            /* @var $wf editor_Workflow_Abstract */
-            $labels = $wf->getLabels();
+        $result = [];
+        
+        //updating the config defaults list if needed FIXME move to workflow configurator on workflow creation if implemented in the future
+        $config = ZfExtended_Factory::get('editor_Models_Config');
+        /* @var $model editor_Models_Config */
+        $config->loadByName('runtimeOptions.workflow.initialWorkflow');
+        $workflows = array_keys(self::$workflowList);
+        $workflowList = join(',', $workflows);
+        
+        if($config->getDefaults() != $workflowList) {
+            $config->setDefaults($workflowList);
+            $config->save();
+        }
+        
+        foreach($workflows as $name) {
+            $wf = $this->get($name);
+            /* @var $wf editor_Workflow_Default */
             $data = new stdClass();
-            $data->id = $id;
-            $data->label = $labels['WORKFLOW_ID'];
+            $data->id = $name;
+            $data->label = $wf->getLabel();
             $data->anonymousFieldLabel = false; //FIXME true | false, comes from app.ini not from wf class
             
-            $data->roles = $labelize($wf->getRoles(), $cls);
+            $data->roles = $wf->labelize($wf->getRoles());
             
-            $data->editableRoles = $labelize($wf->getAddableRoles(), $cls);
+            $data->usableSteps = $wf->labelize($wf->getUsableSteps());
             
             $allStates = $wf->getStates();
             $pendingStates = $wf->getPendingStates();
             //the returned states are the states without the pending ones
-            $data->states = $labelize(array_diff($allStates, $pendingStates), $cls);
-            $data->pendingStates = $labelize($pendingStates, $cls);
-            $data->steps = $labelize($wf->getSteps(), $cls);
-            $data->assignableSteps = $labelize($wf->getAssignableSteps(), $cls);
+            $data->states = $wf->labelize(array_diff($allStates, $pendingStates));
+            $data->pendingStates = $wf->labelize($pendingStates);
+            $data->steps = $wf->labelize($wf->getSteps());
+            $data->assignableSteps = $wf->labelize($wf->getAssignableSteps());
             $data->steps2roles = $wf->getSteps2Roles();
-            $data->roles2steps = array_flip($data->steps2roles);
             $data->stepChain = $wf->getStepChain();
             $data->stepsWithFilter = $wf->getStepsWithFilter();
             $data->initialStates = $wf->getInitialStates();
-            $result[$id] = $data;
+            $result[$name] = $data;
         }
         return $result;
     }
-    
+
     /**
-     * returns the workflow for the given taskGuid, if no taskGuid given take config.import.taskWorkflow as default
+     * returns the workflow for the given taskGuid, if no taskGuid given take config.workflow.initialWorkflow as default
      * @param string|editor_Models_Task $taskOrGuid
-     * @return editor_Workflow_Abstract
+     * @return editor_Workflow_Default
      */
-    public function getActive($taskOrGuid = null) {
-        if(empty($taskOrGuid)) {
-            $config = Zend_Registry::get('config');
-            if(empty($config->runtimeOptions->import->taskWorkflow)) {
-                return null;
-            }
-            return $this->get($this->getIdToClass($config->runtimeOptions->import->taskWorkflow));
+    public function getActiveByTask(editor_Models_Task $task): editor_Workflow_Default {
+        $taskGuid = $task->getTaskGuid();
+        if(empty(self::$workflowTaskCache[$taskGuid])) {
+            return self::$workflowTaskCache[$taskGuid] = $this->get($task->getWorkflow());
         }
-        //process given task instead guid
-        if($taskOrGuid instanceof editor_Models_Task) {
-            $task = $taskOrGuid;
-            $taskGuid = $task->getTaskGuid();
-        }
-        else {
-            $taskGuid = $taskOrGuid;
-        }
-        if(!empty(self::$workflowTaskCache[$taskGuid])) {
-            return self::$workflowTaskCache[$taskGuid];
-        }
-        if(empty($task)) {
+        return self::$workflowTaskCache[$taskGuid];
+    }
+    
+    public function getActive(string $taskGuid) {
+        if(empty(self::$workflowTaskCache[$taskGuid])) {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($taskGuid);
+            return $this->getActiveByTask($task);
         }
-        return self::$workflowTaskCache[$taskGuid] = $this->get($task->getWorkflow());
+        return self::$workflowTaskCache[$taskGuid];
     }
     
     /**

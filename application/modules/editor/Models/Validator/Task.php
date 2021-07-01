@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -32,7 +32,7 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
    * Validators for Task Entity
    */
   protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible 
+    //comment = string, without length contrain. No validator needed / possible
     $this->addValidator('id', 'int');
     $this->addValidator('taskGuid', 'guid');
     $this->addValidator('taskNr', 'stringLength', array('min' => 0, 'max' => 120));
@@ -48,7 +48,7 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('state', 'inArray', array(array(editor_Models_Task::STATE_OPEN, editor_Models_Task::STATE_END, editor_Models_Task::STATE_UNCONFIRMED)));
     $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
     /* @var $wfm editor_Workflow_Manager */
-    $this->addValidator('workflow', 'inArray', array(array_keys($wfm->getWorkflows())));
+    $this->addValidator('workflow', 'inArray', [$wfm->getWorkflows()]);
     $this->addValidator('workflowStep', 'int');
     $this->addValidator('pmGuid', 'guid');
     $this->addValidator('pmName', 'stringLength', array('min' => 0, 'max' => 512));

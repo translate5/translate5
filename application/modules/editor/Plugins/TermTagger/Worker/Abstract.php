@@ -115,7 +115,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             $this->logger = Zend_Registry::get('logger')->cloneMe($this->config->getLoggerDomain($this->processingMode));
         }
         return $this->logger;
-    }    
+    }
     /**
      * Needed Implementation for editor_Models_Import_Worker_ResourceAbstract
      * {@inheritDoc}
@@ -274,7 +274,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
         ]);
     }
     /**
-     * 
+     *
      */
     private function reportDefectSegments() {
         // get list of defect segments

@@ -51,10 +51,10 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
             pageSize: 0
         },
         states: {
-            data: '{statesData}',
+            data: '{statesData}'
         },
-        roles: {
-            data: '{rolesData}'
+        steps: {
+            data: '{stepsData}'
         },
         userAssoc:{
             model:'Editor.model.admin.TaskUserAssoc',
@@ -89,8 +89,8 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                     missingsegmentranges,
                     i,
                     workflowdata,
-                    workflowroles,
-                    rolename,
+                    workflowsteps,
+                    stepname,
                     allUnassigned=true;
                 if (task === null) {
                     return html;
@@ -98,15 +98,15 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                 missingsegmentranges = task.get('missingsegmentranges');
                 if(missingsegmentranges && missingsegmentranges.length > 0) {
                     workflowdata =  task.getWorkflowMetaData();
-                    workflowroles = workflowdata.roles;
+                    workflowsteps = workflowdata.steps;
                     html += '<hr><span class="errors">' + me.strings.segmentrangeError + ':</span><br>';
                     for (i = 0; i < missingsegmentranges.length; i++) {
                         allUnassigned=true;
-                        rolename = missingsegmentranges[i]['role'];
-                        //check if there are assigned users of the curent rolename
+                        stepname = missingsegmentranges[i]['workflowStepName'];
+                        //check if there are assigned users of the curent step
                         for(var u=0;u<task.get('users').length;u++){
                             var assoc=task.get('users')[u];
-                            if(assoc.role===rolename && assoc.segmentrange && assoc.segmentrange!=""){
+                            if(assoc.workflowStepName===stepname && assoc.segmentrange && assoc.segmentrange!==""){
                                 allUnassigned=false;
                             }
                         }
@@ -117,7 +117,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                             html += ' '+me.strings.canNotBeEditedByUsers + '<br>';
                         }
                         
-                        html += '- ' + workflowroles[rolename] + ': ' + missingsegmentranges[i]['missingSegments'] + '<br>';
+                        html += '- ' + workflowsteps[stepname] + ': ' + missingsegmentranges[i]['missingSegments'] + '<br>';
                         html += '<hr>';
                     } 
                 }
@@ -136,15 +136,32 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                 return states;
             }
         },
-        rolesData: {
+        stepsData: {
             get: function (get) {
-            	var task=get('currentTask'),
-            		roles = [],
-                	metaData = task ? task.getWorkflowMetaData() : [];
-            	Ext.Object.each(metaData.editableRoles, function(key, role) {
-                    roles.push({id: key, text: role});
+                var me = this,
+                    task = get('currentTask'),
+                    metaData = task && task.getWorkflowMetaData(),
+                    steps = [],
+                    added = [];
+
+                if(!metaData) {
+                    return [];
+                }
+
+                Ext.Array.each(metaData.stepChain, function (key) {
+                    if(metaData.usableSteps[key]){
+                        steps.push({id: key, text: metaData.usableSteps[key]});
+                        added.push(key);
+                    }
                 });
-                return roles;
+
+                Ext.Object.each(metaData.usableSteps, function(key,value){
+                    if(!Ext.Array.contains(added, key)){
+                        steps.push({id: key, text: value});                
+                    }
+                });
+
+                return steps;
             }
         }
     }
