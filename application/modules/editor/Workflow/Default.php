@@ -170,6 +170,7 @@ class editor_Workflow_Default {
             $workflow = $this->initWorkflow($name);
             $this->initWorkflowSteps($workflow);
             $cache->save($this->definition, self::CACHE_KEY.$name);
+            $this->checkForMissingConfiguration();
         }
         
         $this->hookin = ZfExtended_Factory::get('editor_Workflow_Default_Hooks',[$this]);
@@ -245,6 +246,44 @@ class editor_Workflow_Default {
                 else {
                     $this->definition->validStates[$step][$assignableStep] = [self::STATE_WAITING, self::STATE_UNCONFIRMED];
                 }
+            }
+        }
+    }
+
+    /**
+     * checks if the configuration for the current workflow definition does exist, if not it is created
+     */
+    protected function checkForMissingConfiguration() {
+        /* @var $config Zend_Config */
+        $config = Zend_Registry::get('config');
+        if(isset($config->runtimeOptions->workflow->{$this->definition->name})){
+           return;
+        }
+        /* @var $configModel editor_Models_Config */
+        $configModel = ZfExtended_Factory::get('editor_Models_Config');
+
+        foreach($this->definition->steps as $key => $step) {
+            $configModel->init([
+                'name' => join('.', [
+                    'runtimeOptions.workflow',
+                    $this->definition->name,
+                    $step,
+                    'defaultDeadlineDate',
+                ]),
+                'confirmed' => 1,
+                'module' => 'editor',
+                'category' => 'workflow',
+                'type' => 'float',
+                'description' => 'The config defines, how many days the deadline should be in the future based on the order date',
+                'level' => 4,
+                'guiName' => sprintf('Default deadline date: workflow:%1$s,step:%2$s', $this->definition->label, $this->definition->labels[$key]),
+                'guiGroup' => 'Workflow',
+            ]);
+            try {
+                $configModel->save();
+            }
+            catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+                //do nothing if the config does exist already (probably created by a concurrent process)
             }
         }
     }
