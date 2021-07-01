@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -27,20 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Default Workflow Class
+ * encapsulates table LEK_workflow_step
  */
-class editor_Workflow_Dummy extends editor_Workflow_Default {
-    /**
-     * internal used name of the workflow
-     * @var string
-     */
-    const WORKFLOW_ID = 'dummy';
-    
-    const STEP_TESTING = 'testing';
-
-    public function __construct() {
-        $this->labels['STEP_TESTING'] = 'Testeintrag';
-        $this->labels['WORKFLOW_ID'] = 'Test Workflow';
-        parent::__construct();
-    }
+class editor_Models_Db_Workflow_Step extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_workflow_step';
+    public $_primary = 'id';
 }

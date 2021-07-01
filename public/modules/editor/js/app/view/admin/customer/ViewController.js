@@ -35,11 +35,14 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         'client': 'onClientRoute'
     },
 
-    listen: {
-        component: {
-            '#displayTabPanel': {
-                tabchange: 'onDisplayTabPanelTabChange',
-                activate: 'onDisplayTabPanelActivate'
+
+    listen:{
+        component:{
+            '#saveOpenIdButton':{
+                click:'save'
+            },
+            '#cancelOpenIdButton': {
+                click:'cancelEdit'
             }
         }
     },
@@ -48,39 +51,6 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         Editor.app.openAdministrationSection(this.getView(), 'client');
     },
 
-    onDisplayTabPanelTabChange: function (tabPanel,newActiveTab){
-        var me=this,
-            grid = newActiveTab.down('grid');
-        me.updateActiveTabViewModel(newActiveTab);
-
-        // reload the store when the card is changed. This must be done because the grid store is not loaded
-        // after the component is rendered
-        if(grid && grid.getStore() && !grid.getStore().isLoaded()){
-            if(grid.getViewModel()){
-                grid.getViewModel().notify();
-            }
-            grid.getStore().load();
-        }
-    },
-
-    onDisplayTabPanelActivate:function (tabPanel){
-        this.updateActiveTabViewModel(tabPanel.activeTab);
-    },
-
-    /***
-     * Update view model values which are depending on the current active tab.
-     * If no active tab is provided as argument the current active-set in displayTabPanel will be used.
-     * @param activeTab
-     */
-    updateActiveTabViewModel:function (activeTab){
-        var me=this,
-            vm = me.getView().getViewModel();
-        if(!activeTab){
-            activeTab = me.getView().down('#displayTabPanel').getActiveTab();
-        }
-        vm.set('isActiveTabIncludedInForm',activeTab.isIncludedInForm);
-    },
-    
     /**
      * Set record for editing
      */
@@ -107,7 +77,7 @@ Ext.define('Editor.view.admin.customer.ViewController', {
      */
     save: function(button, e, eOpts) {
         var me = this,
-            formPanel = me.getReferences().form,
+            formPanel = me.getView().down('#customersForm'),
             form = formPanel.getForm(),
             record = form.getRecord(),
             store = Ext.StoreManager.get('customersStore'),
@@ -143,10 +113,9 @@ Ext.define('Editor.view.admin.customer.ViewController', {
      */
     editCustomer:function(record){
         var me=this,
-            formPanel = me.getReferences().form,
-            vm = me.getViewModel(),
-            isOpenIdHidden = record.get('number') === Editor.model.admin.Customer.DEFAULTCUSTOMER_NUMBER && !Editor.data.customers.openid.showOpenIdDefaultCustomerData;
-    
+            formPanel = me.getView().down('#customersForm'),
+            vm = me.getViewModel();
+
         vm.set('record', record);
 
         formPanel.loadRecord(record);
@@ -163,13 +132,6 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         Ext.Array.forEach(rolesBoxes, function(item) {
             item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
         });
-        
-        //hide the openid data for the default customer if it is configured so
-        me.getView().down('#openIdDomain').setVisible(!isOpenIdHidden);
-        me.getView().down('#openIdFieldset').setDisabled(isOpenIdHidden);
-
-        // update active tab view models
-        me.updateActiveTabViewModel();
     },
     
     /***
@@ -191,16 +153,13 @@ Ext.define('Editor.view.admin.customer.ViewController', {
      */
     cancelEdit: function(button, e, eOpts) {
         var me=this,
-            formPanel = me.getReferences().form,
+            formPanel = me.getView().down('#customersForm'),
             form = formPanel.getForm(),
             vm = me.getViewModel();
 
         // Clear form
         form.reset();
         vm.set('record', false);
-
-        // update the active tab view model values
-        me.updateActiveTabViewModel();
     },
 
     /***
@@ -208,10 +167,10 @@ Ext.define('Editor.view.admin.customer.ViewController', {
      */
     add: function(button, e, eOpts) {
         var me = this,
-            formPanel = me.getReferences().form,
+            formPanel = me.getView().down('#customersForm'),
             form = formPanel.getForm(),
             newRecord = Ext.create('Editor.model.admin.Customer'),
-            vm = this.getViewModel();
+            vm = me.getViewModel();
 
 
         // set the first tab always active after new record add
@@ -299,40 +258,6 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         Ext.StoreManager.get('customersStore').load();
     },
     
-    /***
-     * Return boolean if one of the given fields in the form is changed/has value
-     */
-    handleRequiredFields:function(form,fields){
-        var me=this,
-            isRequired=false;
-        
-        //for each of the openid, check if one of them contains value
-        //if yes all other fields are required
-        Ext.Array.forEach(fields, function(field) {
-            if(!isRequired){
-                isRequired=form.findField(field).getValue()!='';
-            }
-        });
-        return isRequired;
-    },
-    
-    onOpenIdFieldChange:function(field,newValue,oldValue,eOpts){
-        var me=this,
-            form=me.getView().down('form').getForm(),
-            vm=me.getViewModel(),
-            fields=['openIdServer','openIdIssuer','openIdAuth2Url','openIdClientId','openIdClientSecret'];
-        
-        vm.set('isOpenIdRequired',me.handleRequiredFields(form,fields));
-    },
-    
-    onOpenIdRedirectCheckboxChange:function(field){
-        var me=this,
-            form=me.getView().down('form').getForm(),
-            openIdRedirectLabel=form.findField('openIdRedirectLabel');
-
-        openIdRedirectLabel.setAllowBlank(field.checked);
-    },
-
     /***
      * Generate excel for resource usage for the given customer. If the customer is not defined,
      * summ excel for all customers will be generated.

@@ -331,6 +331,17 @@ class editor_Models_Segment_MatchRateType {
         
         $this->data = [self::PREFIX_IMPORT];
         
+        $previousOrigin = null;
+        if(array_key_exists(self::DATA_PREVIOUS_ORIGIN, $attributes->customMetaAttributes)){
+            $previousOrigin = strtoupper($attributes->customMetaAttributes[self::DATA_PREVIOUS_ORIGIN]);
+            unset($attributes->customMetaAttributes[self::DATA_PREVIOUS_ORIGIN]);
+        }
+        $previousName = null;
+        if(array_key_exists(self::DATA_PREVIOUS_NAME, $attributes->customMetaAttributes)){
+            $previousName = $attributes->customMetaAttributes[self::DATA_PREVIOUS_NAME];
+            unset($attributes->customMetaAttributes[self::DATA_PREVIOUS_NAME]);
+        }
+        
         if($importedValue == self::TYPE_MISSING_SOURCE_MRK || $importedValue == self::TYPE_MISSING_TARGET_MRK) {
             $this->data[] = $importedValue;
             return $this;
@@ -354,14 +365,13 @@ class editor_Models_Segment_MatchRateType {
             $this->errors->add('E1193', ['mid' => $mid, 'matchRateType' => $value]);
             $this->data[] = self::TYPE_UNKNOWN;
         }
+        
         $this->data[] = $value;
-        if(array_key_exists(self::DATA_PREVIOUS_ORIGIN, $attributes->customMetaAttributes)){
-            $this->data[] = strtoupper($attributes->customMetaAttributes[self::DATA_PREVIOUS_ORIGIN]);
-            unset($attributes->customMetaAttributes[self::DATA_PREVIOUS_ORIGIN]);
+        if(!is_null($previousOrigin)) {
+            $this->data[] = $previousOrigin;
         }
-        if(array_key_exists(self::DATA_PREVIOUS_NAME, $attributes->customMetaAttributes)){
-            $this->data[] = $attributes->customMetaAttributes[self::DATA_PREVIOUS_NAME];
-            unset($attributes->customMetaAttributes[self::DATA_PREVIOUS_NAME]);
+        if(!is_null($previousName)) {
+            $this->data[] = $previousName;
         }
         return $this;
     }

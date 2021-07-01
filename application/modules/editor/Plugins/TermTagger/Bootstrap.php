@@ -30,6 +30,8 @@ END LICENSE AND COPYRIGHT
  * Initial Class of Plugin "TermTagger"
  */
 class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
+    protected static $description = 'Provides term-tagging';
+    
     /**
      * @var ZfExtended_Logger
      */
@@ -95,7 +97,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      */
     public function handleAfterTermCollectionAssocChange(Zend_EventManager_Event $event){
         
-        $entity = $event->getParam('entity');        
+        $entity = $event->getParam('entity');
         $entityGuid = $entity->getTaskGuid();
 
         $task = ZfExtended_Factory::get('editor_Models_Task');
@@ -105,7 +107,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $taskGuids = [$task->getTaskGuid()];
         //check if the current task is project.
         if($task->isProject()){
-            //collect all project tasks to check the terminologie 
+            //collect all project tasks to check the terminologie
             $taskGuids = $task->loadProjectTasks($task->getProjectId(),true);
             $taskGuids = array_column($taskGuids, 'taskGuid');
         }

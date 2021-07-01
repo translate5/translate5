@@ -39,6 +39,8 @@ END LICENSE AND COPYRIGHT
  * @method string getUserGuid() getUserGuid()
  * @method string getState() getState()
  * @method string getRole() getRole()
+ * @method string getWorkflowStepName() getWorkflowStepName()
+ * @method string getWorkflow() getWorkflow()
  * @method string getSegmentrange() getSegmentrange()
  * @method string getUsedState() getUsedState()
  * @method string getUsedInternalSessionUniqId() getUsedInternalSessionUniqId()
@@ -48,6 +50,8 @@ END LICENSE AND COPYRIGHT
  * @method void setUserGuid() setUserGuid(string $userGuid)
  * @method void setState() setState(string $state)
  * @method void setRole() setRole(string $role)
+ * @method void setWorkflowStepName() setWorkflowStepName(string $step)
+ * @method void setWorkflow() setWorkflow(string $workflow)
  * @method void setSegmentrange() setSegmentrange(string $segmentrange)
  * @method void setUsedState() setUsedState(string $state)
  * @method void setUsedInternalSessionUniqId() setUsedInternalSessionUniqId(string $sessionId)
@@ -70,12 +74,12 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     /**
      * returns all users to the taskGuid and role of the given TaskUserAssoc
      * @param string $taskGuid
-     * @param string $role string or null, if empty returns no users, since needed as filter
+     * @param string $workflowStepName string or null, if empty returns no users, since needed as filter
      * @param array $assocFields optional, column names of the assoc table to be added in the result set
      * @param string $state string or null, additional filter for state of the job
      * @return [array] list with user arrays
      */
-    public function loadUsersOfTaskWithRole(string $taskGuid, $role, array $assocFields = [], $state = null){
+    public function loadUsersOfTaskWithStep(string $taskGuid, $workflowStepName, array $assocFields = [], $state = null){
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $db = $this->db;
         $s = $user->db->select()
@@ -84,8 +88,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         ->join(array('tua' => $db->info($db::NAME)), 'tua.userGuid = u.userGuid', $assocFields)
         ->where('tua.isPmOverride = 0')
         ->where('tua.taskGuid = ?', $taskGuid);
-        if(!empty($role)) {
-            $s->where('tua.role = ?', $role);
+        if(!empty($workflowStepName)) {
+            $s->where('tua.workflowStepName = ?', $workflowStepName);
         }
         if(!empty($state)){
             $s->where('tua.state = ?', $state);
@@ -146,22 +150,47 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * Load single task user assoc for the given task#user#role params.
+     * Load single task user assoc for the given task#user#step params.
      * @param string $userGuid
      * @param string $taskGuid
-     * @param string $role | null
-     * @param string $state | null
+     * @param string $workflowStepName
+     * @param string $state | null optional state filter
      * @return array
      */
-    public function loadByParams(string $userGuid,string $taskGuid,string $role, $state = null) {
+    public function loadByStep(string $userGuid, string $taskGuid, string $workflowStepName, $state = null) {
         try {
             $s = $this->db->select()
                 ->where('userGuid = ?', $userGuid)
                 ->where('taskGuid = ?', $taskGuid)
-                ->where('(role= ? OR isPmOverride=1)', $role);//load the given state or load pmoveride (pmoveride is when for the given task#user#role no record is found)
+                ->where('(workflowStepName = ? OR isPmOverride = 1)', $workflowStepName);//load the given state or load pmoveride (pmoveride is when for the given task#user#role no record is found)
             if(!is_null($state)) {
-                $s->where('state= ?', $state);
+                $s->where('state = ?', $state);
             }
+            $row = $this->db->fetchRow($s);
+        } catch (Exception $e) {
+            $this->notFound('NotFound after other Error', $e);
+        }
+        if (!$row) {
+            $this->notFound(__CLASS__ . '#taskGuid + userGuid + workflowStepName', $taskGuid.' + '.$userGuid.' + '.$workflowStepName);
+        }
+        //load implies loading one Row, so use only the first row
+        $this->row = $row;
+        return $this->row->toArray();
+    }
+    
+    /**
+     * Load single task user assoc for the given task#user#role params.
+     * @param string $userGuid
+     * @param string $taskGuid
+     * @param string $role | null
+     * @return array
+     */
+    public function loadByRole(string $userGuid, string $taskGuid, string $role) {
+        try {
+            $s = $this->db->select()
+                ->where('userGuid = ?', $userGuid)
+                ->where('taskGuid = ?', $taskGuid)
+                ->where('role = ?', $role);
             $row = $this->db->fetchRow($s);
         } catch (Exception $e) {
             $this->notFound('NotFound after other Error', $e);
@@ -175,17 +204,17 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Returns the task user assoc matching a role, or if nothing found the one with the most useful state.
+     * Returns the task user assoc matching a step, or if nothing found the one with the most useful state.
      * The state loading order is: edit, view, unconfirmed, open, waiting, finished
      * @param string $userGuid
      * @param string $taskGuid
-     * @param string $role
+     * @param string $workflowStepName
      * @return array
      */
-    public function loadByRoleOrSortedState(string $userGuid, string $taskGuid, string $role): array {
+    public function loadByStepOrSortedState(string $userGuid, string $taskGuid, string $workflowStepName): array {
         
         //order first by matching role, then by the states as defined
-        $order = $this->db->getAdapter()->quoteInto('role=? DESC, state="edit" DESC,state="view" DESC,state="unconfirmed" DESC,state="open" DESC,state="waiting" DESC,state="finished" DESC', $role);
+        $order = $this->db->getAdapter()->quoteInto('workflowStepName = ? DESC, state="edit" DESC,state="view" DESC,state="unconfirmed" DESC,state="open" DESC,state="waiting" DESC,state="finished" DESC', $workflowStepName);
         
         $s =$this->db->select()
         ->where('userGuid = ?', $userGuid)
@@ -206,15 +235,15 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     /**
      * Updates the stored user states of an given taskGuid (may exclude the current user if enabled by third parameter)
      * @param string $state
-     * @param string $role
-     * @param boolean $expectMySelf if true, the internally loaded userGuid is excluded from the the update
+     * @param string $step
+     * @param boolean $exceptMySelf if true, the internally loaded userGuid is excluded from the the update
      */
-    public function setStateForRoleAndTask(string $state, string $role, $expectMySelf = false) {
+    public function setStateForStepAndTask(string $state, string $step, $exceptMySelf = false) {
         $where = [
-            'role = ?' => $role,
+            'workflowStepName = ?' => $step,
             'taskGuid = ?' => $this->getTaskGuid(),
         ];
-        if($expectMySelf) {
+        if($exceptMySelf) {
             $where['userGuid != ?'] = $this->getUserGuid();
         }
         $this->db->update(['state' => $state], $where);
@@ -226,7 +255,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function getUsageStat() {
-        $sql = 'select state, role, count(userGuid) cnt from LEK_taskUserAssoc where taskGuid = ? and isPmOverride = 0 group by state, role;';
+        $sql = 'select state, workflowStepName, count(userGuid) cnt from LEK_taskUserAssoc where taskGuid = ? and isPmOverride = 0 group by state, workflowStepName;';
         $res = $this->db->getAdapter()->query($sql, array($this->getTaskGuid()));
         return $res->fetchAll();
     }
@@ -253,6 +282,36 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $this->filter->addSort('login');
         }
         return $this->loadFilterdCustom($s);
+    }
+
+    /***
+     * Load all user assoc for all tasks in a project. This will load also the single task projects.
+     *
+     * @param int $projectId
+     * @param string $workflow
+     * @return array
+     * @throws Zend_Db_Table_Exception
+     */
+    public function loadProjectWithUserInfo(int $projectId, string $workflow){
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        $db = $this->db;
+        $s = $db->select()
+            ->setIntegrityCheck(false)
+            ->from(array('tua' => $db->info($db::NAME)))
+            ->join(array('u' => $user->db->info($db::NAME)), 'tua.userGuid = u.userGuid', array('login', 'surName', 'firstName', 'parentIds'))
+            ->join(['t'=>'LEK_task'],'t.taskGuid = tua.taskGuid',['t.sourceLang','t.targetLang'])
+            ->where('tua.isPmOverride = 0')
+            ->where('tua.workflow = ?',$workflow)
+            ->where('t.projectId = ?',$projectId)
+            ->where('t.taskType != ?',editor_Models_Task::INITIAL_TASKTYPE_PROJECT);
+
+        //default sort:
+        if(!$this->filter->hasSort()) {
+            $this->filter->addSort('surName');
+            $this->filter->addSort('firstName');
+            $this->filter->addSort('login');
+        }
+        return $db->fetchAll($s)->toArray();
     }
 
 
@@ -393,8 +452,14 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
 
     protected function _cleanupLocked($taskGuid = null, $forced = false) {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($taskGuid);
-        /* @var $workflow editor_Workflow_Abstract */
+        if(empty($taskGuid)){
+            $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->get('default');
+            /* @var $workflow editor_Workflow_Default */
+        }
+        else {
+            $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($taskGuid);
+            /* @var $workflow editor_Workflow_Default */
+        }
 
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
         $where = array('not usedState is null and (usedInternalSessionUniqId not in ('.$validSessionIds.') or usedInternalSessionUniqId is null)');
@@ -485,7 +550,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
         //if the states are not set uset the default states for kpi
         if(empty($states)){
-            $states=[editor_Workflow_Abstract::ROLE_REVIEWER,editor_Workflow_Abstract::ROLE_TRANSLATOR,editor_Workflow_Abstract::ROLE_TRANSLATORCHECK];
+            $states=[editor_Workflow_Default::ROLE_REVIEWER,editor_Workflow_Default::ROLE_TRANSLATOR,editor_Workflow_Default::ROLE_TRANSLATORCHECK];
         }
         $s = $this->db->select()
         ->where('taskGuid IN(?)', $taskGuids)
@@ -513,7 +578,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
 
     public function updateReviewersFinishDate(string $taskGuid,string $date){
         $this->db->update(['finishedDate'=>$date],
-            ['taskGuid=?' => $taskGuid,'role=?' => editor_Workflow_Abstract::ROLE_REVIEWER]);
+            ['taskGuid=?' => $taskGuid,'role=?' => editor_Workflow_Default::ROLE_REVIEWER]);
     }
     
     /**
@@ -521,9 +586,9 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @param string $taskGuid
      * @return array
      */
-    public function getAllAssignedRolesByTask($taskGuid) {
+    private function getAllAssignedStepsByTask($taskGuid) {
         $s = $this->db->select()
-            ->from($this->db, array('role'))
+            ->from($this->db, array('workflowStepName'))
             ->distinct()
             ->where('isPmOverride = 0')
             ->where('taskGuid = ?', $taskGuid);
@@ -532,54 +597,54 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     
     // ---------------------- segmentrange: ------------------------
     /**
-     * If 
-     * (1) a task is in sequential-mode,  
+     * If
+     * (1) a task is in sequential-mode,
      * (2) not in PM-override, and
-     * (3) and ANY segments are assigned to ANY user of the given user's role 
-     *     in the current workflow-step, 
-     * then the editable-status of the segments will have to be checked for 
+     * (3) and ANY segments are assigned to ANY user of the given user's step
+     *     in the current workflow-step,
+     * then the editable-status of the segments will have to be checked for
      * ALL segments for ALL users of this role.
      * @param editor_Models_Task $task
-     * @param string $role
+     * @param string $step
      * @return bool
      */
-    public function isSegmentrangedTaskForRole(editor_Models_Task $task, string $role) : bool {
+    public function isSegmentrangedTaskForStep(editor_Models_Task $task, string $step) : bool {
         if ($task->getUsageMode() !== $task::USAGE_MODE_SIMULTANEOUS) {
             return false;
         }
         if($this->getIsPmOverride()) {
             return false;
         }
-        $assignedSegments = $this->getAllAssignedSegmentsByRole($task->getTaskGuid(), $role);
+        $assignedSegments = $this->getAllAssignedSegmentsByStep($task->getTaskGuid(), $step);
         return count($assignedSegments) > 0;
     }
     /**
      * Return an array with all segments in given task for the given user in the given role.
      * @param string $taskGuid
      * @param string $userGuid
-     * @param string $role
+     * @param string $step
      * @return array
      */
-    public function getAllAssignedSegmentsByUserAndRole(string $taskGuid, string $userGuid, string $role) : array {
+    public function getAllAssignedSegmentsByUserAndStep(string $taskGuid, string $userGuid, string $step) : array {
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
             ->where('userGuid = ?', $userGuid)
-            ->where('role = ?', $role)
+            ->where('workflowStepName = ?', $step)
             ->where('segmentrange IS NOT NULL');
         $tuaRows = $this->db->fetchAll($s)->toArray();
         return editor_Models_TaskUserAssoc_Segmentrange::getSegmentNumbersFromRows($tuaRows);
     }
     /**
      * Return an array with the numbers of all segments in the task
-     * that are assigned to any user of the given role.
+     * that are assigned to any user of the given step.
      * @param string $taskGuid
-     * @param string $role
+     * @param string $step
      * @return array
      */
-    public function getAllAssignedSegmentsByRole(string $taskGuid, string $role) : array {
+    protected function getAllAssignedSegmentsByStep(string $taskGuid, string $step) : array {
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
-            ->where('role = ?', $role)
+            ->where('workflowStepName = ?', $step)
             ->where('segmentrange IS NOT NULL');
         $tuaRows = $this->db->fetchAll($s)->toArray();
         return editor_Models_TaskUserAssoc_Segmentrange::getSegmentNumbersFromRows($tuaRows);
@@ -619,10 +684,10 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         //   translatorCheck => [1-7]
         // ]
         $notAssignedSegments = [];
-        $allRoles = $this->getAllAssignedRolesByTask($taskGuid);
-        foreach ($allRoles as $role) {
-            $rolename = $role['role'];
-            $notAssignedSegments[] = array('role' => $rolename, 'missingSegments' => $this->getAllNotAssignedSegmentsByRole($taskGuid, $rolename));
+        $allSteps = $this->getAllAssignedStepsByTask($taskGuid);
+        foreach ($allSteps as $step) {
+            $stepname = $step['workflowStepName'];
+            $notAssignedSegments[] = array('workflowStepName' => $stepname, 'missingSegments' => $this->getAllNotAssignedSegmentsByStep($taskGuid, $stepname));
         }
         return $notAssignedSegments;
     }
@@ -631,10 +696,10 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * Return an string with the ranges of the segments in the task
      * that are NOT assigned to any user of the given role.
      * @param string $taskGuid
-     * @param string $role
+     * @param string $step
      * @return string
      */
-    private function getAllNotAssignedSegmentsByRole(string $taskGuid, string $role) : string {
+    private function getAllNotAssignedSegmentsByStep(string $taskGuid, string $step) : string {
         // Example for a task with 10 segments:
         // - translator {94ff4a53-dae0-4793-beae-1f09968c3c93}: "1-3,5"
         // - translator {c77edcf5-3c55-4c29-a73d-da80d4dcfb36}: "7-8"
@@ -643,7 +708,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $segmentModel = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segmentModel editor_Models_Segment */
         $segmentsNr = $segmentModel->getTotalSegmentsCount($taskGuid);
-        $assignedSegments = $this->getAllAssignedSegmentsByRole($taskGuid, $role);
+        $assignedSegments = $this->getAllAssignedSegmentsByStep($taskGuid, $step);
         for ($i = 1; $i <= $segmentsNr; $i++) {
             if (!in_array($i, $assignedSegments)) {
                 $notAssignedSegments[] = $i;

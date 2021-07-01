@@ -81,6 +81,37 @@ Ext.define('Editor.util.Util', {
                 });
             }
             return selector;
+        },
+
+        /**
+         * renders the value of the language columns
+         * @param {String} val
+         * @returns {String}
+         */
+        gridColumnLanguageRenderer: function(val, md) {
+            var lang = Ext.StoreMgr.get('admin.Languages').getById(val),
+                label;
+            if(lang){
+                label = lang.get('label');
+                md.tdAttr = 'data-qtip="' + label + '"';
+                return label;
+            }
+            return '';
+        },
+
+        /***
+         * Return the translated workflowStep name
+         */
+        getWorkflowStepNameTranslated:function(stepName){
+            if(!stepName){
+                return "";
+            }
+            var store=Ext.StoreManager.get('admin.WorkflowSteps'),
+                rec=store.getById(stepName);
+            if(rec){
+                stepName=rec.get('text');
+            }
+            return stepName;
         }
     }
     

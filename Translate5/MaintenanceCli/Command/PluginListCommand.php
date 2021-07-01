@@ -70,14 +70,15 @@ class PluginListCommand extends Translate5AbstractCommand
         $activePlugins = $pluginmanager->getActive();
         $rows = [];
         foreach($plugins as $plugin => $cls) {
+            $desc = $cls::getDescription();
             if(in_array($cls, $activePlugins)) {
-                $rows[] = ['<info>'.$plugin.'</info>', '<info>active</info>'];
+                $rows[] = ['<info>'.$plugin.'</info>', '<info>active</info>', $desc];
             }
             else {
-                $rows[] = [$plugin, 'disabled'];
+                $rows[] = [$plugin, 'disabled', $desc];
             }
         }
-        $this->io->table(['Plugin', 'Status'], $rows);
+        $this->io->table(['Plugin', 'Status', 'Description'], $rows);
         return 0;
     }
 }

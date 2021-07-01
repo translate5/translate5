@@ -213,7 +213,17 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'task',
                 'action' => 'position'
         )));
-        
+
+        $this->front->getRouter()->addRoute('editorTaskUserAssocProject', new ZfExtended_Controller_RestLikeRoute(
+            'editor/taskuserassoc/project',
+            array(
+                'module' => 'editor',
+                'controller' => 'taskuserassoc',
+                'action' => 'project'
+        )));
+
+
+
         //FIXME convert me to RestLikeRoute (see filemap)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/nextsegments/*',

@@ -31,10 +31,10 @@ class Editor_Controller_Helper_Workflow extends Zend_Controller_Action_Helper_Ab
      * throws a ZfExtended_NoAccessException if user is not allowed to write to the loaded task
      * @param string $taskGuid optional, if omitted we take the curently opened task from session
      * @param string $userGuid optional, if omitted we take the logged in user
-     * @param editor_Workflow_Abstract $workflow optional, if omitted the configured workflow for task stored in the session is created
+     * @param editor_Workflow_Default $workflow optional, if omitted the configured workflow for task stored in the session is created
      * @throws ZfExtended_NoAccessException
      */
-    public function checkWorkflowWriteable($taskGuid = null, $userGuid = null, editor_Workflow_Abstract $workflow = null) {
+    public function checkWorkflowWriteable($taskGuid = null, $userGuid = null, editor_Workflow_Default $workflow = null) {
         if(empty($taskGuid)) {
             $s = new Zend_Session_Namespace();
             $taskGuid = $s->taskGuid;
@@ -52,7 +52,7 @@ class Editor_Controller_Helper_Workflow extends Zend_Controller_Action_Helper_Ab
             /* @var $wfm editor_Workflow_Manager */
             
             $workflow = $wfm->getByTask($task);
-            /* @var $workflow editor_Workflow_Abstract */
+            /* @var $workflow editor_Workflow_Default */
         }
         $tua = null;
         try {

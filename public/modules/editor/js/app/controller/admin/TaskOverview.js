@@ -219,7 +219,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 click: 'handleTaskAdd'
             },
             '#adminTaskAddWindow #cancel-task-btn': {
-                click: 'handleTaskCancel'
+                click: 'handleImportStartOrCancel'
             },
             '#adminTaskAddWindow #continue-wizard-btn': {
                 click: 'handleContinueWizardClick'
@@ -413,7 +413,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         me.fireEvent('handleTaskPreferences', task);
     },
 
-    handleTaskCancel: function () {
+    handleImportStartOrCancel: function () {
         var me = this;
         if (!me.getTaskAddForm()) {
             return;
@@ -919,13 +919,14 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 app.unmask();
                 me.fireEvent('afterTaskDelete', task);
             },
-            failure: function (records, op) {
+            failure: function (batch, op) {
+                var operation = batch.operations[0];
                 task.reject();
                 app.unmask();
-                if (op.getError().status === '405') {
+                if (operation.error.status === '405') {
                     Editor.MessageBox.addError(me.strings.taskNotDestroyed);
                 } else {
-                    Editor.app.getController('ServerException').handleException(op.error.response);
+                    Editor.app.getController('ServerException').handleException(operation.error.response);
                 }
             }
 
@@ -1156,7 +1157,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             success: function (response) {
                 win && win.setLoading(false);
                 Editor.MessageBox.addSuccess(me.strings.importTaskMessage, 2);
-                me.handleTaskCancel();
+                // some panels may need to update the view after the import wizard closed and the import workers start (currently not neccessary ...)
+                // me.fireEvent('taskImportWorkStarted', task);
+                me.handleImportStartOrCancel();
                 me.isImportStarted = false;
             },
             failure: function (response) {

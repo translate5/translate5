@@ -63,7 +63,7 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $filterClass = 'editor_Models_Filter_TaskSpecific';
 
     /**
-     * @var editor_Workflow_Abstract
+     * @var editor_Workflow_Default
      */
     protected $workflow;
 
@@ -533,11 +533,16 @@ class editor_TaskController extends ZfExtended_RestController {
             $meta->setMappingType($this->data['mappingType']);
         }
 
-        $this->prepareCustomer();
+        $customer = $this->prepareCustomer();
 
-        //init workflow id for the task
-        $defaultWorkflow = $this->config->runtimeOptions->import->taskWorkflow;
-        $this->entity->setWorkflow($this->workflowManager->getIdToClass($defaultWorkflow));
+        if($customer) {
+            $c = $customer->getConfig();
+        }
+        else {
+            $c = $this->config;
+        }
+        //init workflow id for the task, based on customer or general config as fallback
+        $this->entity->setWorkflow($c->runtimeOptions->workflow->initialWorkflow);
 
         if($this->validate()) {
             $this->initWorkflow();
@@ -549,8 +554,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $upload->initAndValidate();
             $dp = $dpFactory->createFromUpload($upload);
 
-            $projectGuids = [];
-
+            $projectTasks = [];
             //PROJECT with multiple target languages
             if($this->entity->isProject()) {
                 $entityId=$this->entity->save();
@@ -582,7 +586,7 @@ class editor_TaskController extends ZfExtended_RestController {
                     //update the task usage log for the this project-task
                     $this->insertTaskUsageLog($task);
 
-                    $projectGuids[] = $task->getTaskGuid();
+                    $projectTasks[] = $task->getDataObject();
                 }
                 
                 $this->entity->setState($this->entity::INITIAL_TASKTYPE_PROJECT);
@@ -604,8 +608,6 @@ class editor_TaskController extends ZfExtended_RestController {
                     //update the task usage log for the current task
                     $this->insertTaskUsageLog($this->entity);
                 }
-
-                $projectGuids[] = $this->entity->getTaskGuid();
             }
 
             //warn the api user for the targetDeliveryDate ussage
@@ -625,10 +627,8 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
 
-            if(!empty($projectGuids)){
-                settype($this->view->rows->projectGuids,'array');
-                $this->view->rows->projectGuids = $projectGuids;
-            }
+            settype($this->view->rows->projectTasks,'array');
+            $this->view->rows->projectTasks = $projectTasks;
         }
         else {
             //we have to prevent attached events, since when we get here the task is not created, which would lead to task not found errors,
@@ -671,9 +671,10 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * Loads the customer by id, or number, or the default customer
      * stores the customerid internally and in this->data
+     * @return editor_Models_Customer the loaded customer if any
      */
-    protected function prepareCustomer() {
-        $customer = ZfExtended_Factory::get('editor_Models_Customer');
+    protected function prepareCustomer(): ?editor_Models_Customer {
+        $result = $customer = ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $customer editor_Models_Customer */
 
         if(empty($this->data['customerId'])) {
@@ -689,12 +690,14 @@ class editor_TaskController extends ZfExtended_RestController {
                 }
                 catch (ZfExtended_Models_Entity_NotFoundException $e) {
                     // do nothing here, then the validation is triggered to feedback the user
+                    $result = null;
                 }
             }
         }
 
         $this->entity->setCustomerId((int) $customer->getId());
         $this->data['customerId'] = (int) $customer->getId();
+        return $result;
     }
 
     /***
@@ -716,6 +719,49 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->startImportWorkers();
     }
 
+    /***
+     * Operation for pre task-import operations (change task config, task property or queue custom workers)
+     */
+    public function preimportOperation(){
+
+        $projectId = $this->entity->getProjectId();
+        $usageMode = $this->getParam('usageMode',false);
+        $workflow = $this->getParam('workflow',false);
+        $notifyAssociatedUsers = $this->getParam('notifyAssociatedUsers',false);
+        if(!$projectId){
+            return;
+        }
+        $projectLoader = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $projectLoader editor_Models_Task */
+        $projectTaks = $projectLoader->loadProjectTasks($projectId,true);
+
+
+        foreach ($projectTaks as $task) {
+            $saveModel = false;
+            $model = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $model editor_Models_Task */
+            $model->load($task['id']);
+
+            if(!empty($usageMode)){
+                $saveModel = true;
+                $model->setUsageMode($usageMode);
+            }
+
+            if(!empty($workflow)){
+                $saveModel = true;
+                $model->setWorkflow($workflow);
+            }
+
+            if($notifyAssociatedUsers !== false){
+                $saveModel = true;
+                $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
+                /* @var $taskConfig editor_Models_TaskConfig */
+                $taskConfig->updateInsertConfig($model->getTaskGuid(),'runtimeOptions.workflow.notifyAllUsersAboutTask',$notifyAssociatedUsers);
+            }
+
+            $saveModel && $model->save();
+        }
+    }
 
     /**
      * Starts the export of a task into an excel file
@@ -817,28 +863,34 @@ class editor_TaskController extends ZfExtended_RestController {
             $task = $this->entity;
         }
 
-        $tasks=[];
+        $tasks = [];
         //if it is a project, start the import workers for each task project
         if($task->isProject()) {
             $tasks=$task->loadProjectTasks($task->getProjectId(),true);
-        }else{
-            $tasks[]=$task;
+        } else {
+            $tasks[] = $task;
         }
 
-        $model=ZfExtended_Factory::get('editor_Models_Task');
+        $model = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $model editor_Models_Task */
         foreach ($tasks as $task){
             
             if(is_array($task)){
                 $model->load($task['id']);
-            }else{
-                $model=$task;
+            } else {
+                $model = $task;
             }
             
             //import workers can only be started for tasks
             if($model->isProject()) {
                 continue;
             }
+
+            // we fix all task-specific configs of the task for it's remaining lifetime
+            // this is crucial to ensure, that important configs are changed throughout the lifetime that are usually not designed to be dynamical (AutoQA, Visual, ...)
+            $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
+            /* @var $taskConfig editor_Models_TaskConfig */
+            $taskConfig->fixAfterImport($model->getTaskGuid());
     
             $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
             /* @var $workerModel ZfExtended_Models_Worker */
@@ -1065,7 +1117,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //opening a task must be done before all workflow "do" calls which triggers some events
         $this->openAndLock();
 
-        $this->workflow->doWithTask($oldTask, $this->entity);
+        $this->workflow->hookin()->doWithTask($oldTask, $this->entity);
 
         if($oldTask->getState() != $this->entity->getState()) {
             $this->logInfo('Status change to {status}', ['status' => $this->entity->getState()]);
@@ -1405,6 +1457,8 @@ class editor_TaskController extends ZfExtended_RestController {
             }
             $userTaskAssoc->setUserGuid($userGuid);
             $userTaskAssoc->setTaskGuid($this->entity->getTaskGuid());
+            $userTaskAssoc->setWorkflow($this->workflow->getName());
+            $userTaskAssoc->setWorkflowStepName('');
             $userTaskAssoc->setRole('');
             $userTaskAssoc->setState('');
             $isPmOverride = true;
@@ -1430,14 +1484,14 @@ class editor_TaskController extends ZfExtended_RestController {
             $userTaskAssoc->setState($this->data->userState);
         }
 
-        if(!$disableWorkflowEvents) {
-            $this->workflow->triggerBeforeEvents($oldUserTaskAssoc, $userTaskAssoc);
+
+        if($disableWorkflowEvents) {
+            $userTaskAssoc->save();
         }
-
-        $userTaskAssoc->save();
-
-        if(!$disableWorkflowEvents) {
-            $this->workflow->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc);
+        else {
+            $this->workflow->hookin()->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc, function() use ($userTaskAssoc) {
+                $userTaskAssoc->save();
+            });
         }
 
         if($oldUserTaskAssoc->getState() != $this->data->userState){
@@ -1793,14 +1847,14 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->log->request();
         $this->initWorkflow($this->entity->getWorkflow());
         $this->view->trigger = $this->getParam('trigger');
-        $this->view->success = $this->workflow->doDirectTrigger($this->entity, $this->getParam('trigger'));
+        $this->view->success = $this->workflow->hookin()->doDirectTrigger($this->entity, $this->getParam('trigger'));
         if($this->view->success) {
             return;
         }
         $errors = array('trigger' => 'Trigger is invalid. Valid triggers are listed below.');
         $e = new ZfExtended_ValidateException();
         $e->setErrors($errors);
-        $this->view->validTrigger = $this->workflow->getDirectTrigger();
+        $this->view->validTrigger = $this->workflow->hookin()->getDirectTrigger();
         $this->handleValidateException($e);
     }
     

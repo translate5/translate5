@@ -69,9 +69,8 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
         }
     }
 
-    /***
+    /**
      * Add user which should be associated by default on task creation
-     * TODO: recalculate the workflow
      * @param editor_Models_Task $task
      */
     public function addDefaultUserAssoc(editor_Models_Task $task){
@@ -82,26 +81,41 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
             return;
         }
 
-        $manager = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $manager editor_Workflow_Manager */
-
-        $workflow = $manager->getCached($task->getWorkflow());
-        $initialStates = $workflow->getInitialStates();
+        /* @var $taskConfig editor_Models_TaskConfig */
+        $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
 
         foreach ($defaults as $assoc){
+
+            $manager = ZfExtended_Factory::get('editor_Workflow_Manager');
+            /* @var $manager editor_Workflow_Manager */
+
+            $workflow = $manager->getCached($assoc['workflow']);
+
             $role = $workflow->getRoleOfStep($assoc['workflowStepName']);
 
             $model = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             /* @var $model editor_Models_TaskUserAssoc */
+            $model->setWorkflow($assoc['workflow']);
+
+            $model->setWorkflowStepName($assoc['workflowStepName']);
+            $model->setRole($role);
+
             $model->setTaskGuid($task->getTaskGuid());
             $model->setUserGuid($assoc['userGuid']);
-            $model->setState($initialStates[$assoc['workflowStepName']][$role]);
-            $model->setRole($role);
-            $model->setSegmentrange($assoc['segmentrange']);
-            $model->setDeadlineDate(editor_Utils::addBusinessDays($task->getOrderdate(),$assoc['deadlineDate']));
+
+            // if there is default dedline date default config, insert it as task specific config.
+            if($assoc['deadlineDate']!== null && $assoc['deadlineDate']>0){
+                $name = ['runtimeOptions','workflow',$model->getWorkflow(),$model->getWorkflowStepName(),'defaultDeadlineDate'];
+                $taskConfig->updateInsertConfig($task->getTaskGuid(),implode('.',$name),$assoc['deadlineDate']);
+            }
+
+            // get deadline date config and set it if exist
+            $configValue = $task->getConfig()->runtimeOptions->workflow->{$model->getWorkflow()}->{$model->getWorkflowStepName()}->defaultDeadlineDate ?? 0;
+            if($configValue > 0){
+                $model->setDeadlineDate(editor_Utils::addBusinessDays($task->getOrderdate(),$configValue));
+            }
+
             $model->save();
         }
-
-        // TODO: function from Thomas which will recalculate the workflow based on the default assocs. The current function is doing this when single assoc is assigned, but this needs to be done onace after all assocs are assigned
     }
 }

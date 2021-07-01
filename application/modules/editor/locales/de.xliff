@@ -1982,6 +1982,11 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='TnVyIHdpZWRlcmhvbHQ='><source>Nur wiederholt</source><target>Nur wiederholt</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQtQmVudXR6ZXJ6dXdlaXN1bmdlbg=='><source>Standard-Benutzerzuweisungen</source><target>Standard-Benutzerzuweisungen</target></trans-unit>
 <trans-unit id='V29ya2Zsb3ctU2Nocml0dA=='><source>Workflow-Schritt</source><target>Workflow-Schritt</target></trans-unit>
+<trans-unit id='V29ya2Zsb3dzY2hyaXR0'><source>Workflowschritt</source><target>Workflowschritt</target></trans-unit>
+<trans-unit id='RGVyIEJlbnV0emVyIGhhdCBkYXMgUmVjaHQsIGRpZSBTcHJhY2hyZXNzb3VyY2VuIGluIEluc3RhbnRUcmFuc2xhdGUgJmFtcDsgVGVybVBvcnRhbCB6dSBudXR6ZW4sIGRpZSBkZW5zZWxiZW4gS3VuZGVuIHp1Z2VvcmRuZXQgc2luZCwgZGVuZW4gZGVyIEJlbnV0emVyIGhpZXIgenVnZW9yZG5ldCBpc3Qu'><source>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</source><target>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</target></trans-unit>
+<trans-unit id='S3VuZGVuIEluc3RhbnRUcmFuc2xhdGUgJmFtcDsgVGVybVBvcnRhbA=='><source>Kunden InstantTranslate &amp; TermPortal</source><target>Kunden InstantTranslate &amp; TermPortal</target></trans-unit>
+<trans-unit id='QmVudXR6ZXIgbmFjaCBJbXBvcnQgYmVuYWNocmljaHRpZ2Vu'><source>Benutzer nach Import benachrichtigen</source><target>Benutzer nach Import benachrichtigen</target></trans-unit>
+<trans-unit id='V2VydCBzZXR6dCBzZWxiZSBLb25maWd1cmF0aW9uLCBkaWUgYXVjaCBkaWUgIsOcYmVyc2NocmVpYnVuZyBkZXIgU3lzdGVta29uZmlndXJhdGlvbiIgbWl0IE5hbWVuICJEZWZhdWx0IGRlYWRsaW5lIGRhdGUiIHNldHp0Lg=='><source>Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.</source><target>Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.</target></trans-unit>
   </body>
  </file>
 </xliff>

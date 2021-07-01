@@ -48,13 +48,13 @@ class Editor_Controller_Helper_TaskStatistics extends Zend_Controller_Action_Hel
         /* @var $autoStates editor_Models_Segment_AutoStates */
         $segmentProcessingSummary = $autoStates->getStatistics($task->getTaskGuid());
         
-        $workflow=$task->getTaskActiveWorkflow($task->getTaskGuid());
+        $workflow=$task->getTaskActiveWorkflow();
         $stateMap = $autoStates->getRoleToStateMap();
         
         $steps = $workflow->getStepChain();
-        
-        //we just add the PM Step as the last one
-        $steps[] = $workflow::STEP_PM_CHECK;
+        $missingSteps = array_diff(array_values($workflow->getSteps()), $steps);
+        //now we have all steps in the order of the stepchain + all remaining steps not in the chain added to the end
+        $steps = array_merge($steps, $missingSteps);
         
         $taskStepIndex = array_search($task->getWorkflowStepName(),$steps);
         $totalSegmentCount=$task->getSegmentCount() ?? 0;

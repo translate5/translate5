@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -46,22 +46,23 @@ else {
 }
 $action = $this->templateApply($action, [
     'task' => $this->task->getDataObject(),
-    'previousRole' => $this->translate->_($this->triggeringRole),
+    'previousRole' => $this->translate->_($this->triggeringStep),
 ]);
 
-//Define User List of next role users 
+//Define User List of next role users
 $params = [];
-if(empty($this->nextRole)&&  in_array($this->triggeringRole, $this->workflow->getSteps2Roles())){
+if(empty($this->nextStep)&&  in_array($this->triggeringStep, $this->workflow->getSteps())){
     $userNotification = "Die Aufgabe ist vollständig bearbeitet, es sind keine weiteren Benutzer der Aufgabe zugeordnet.<br />\n<br />\n";
 }
-elseif(!empty($this->nextRole)&&  in_array($this->triggeringRole, $this->workflow->getSteps2Roles())) {
+elseif(!empty($this->nextStep)&&  in_array($this->triggeringStep, $this->workflow->getSteps())) {
     $userNotification=<<<'END'
 Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>{nextRole}</i> freigegeben:<br />
 {userList}<br />
 Die Benutzer wurden per E-Mail darüber informiert.<br />
 <br />
 END;
-    $params['nextRole'] = $this->translate->_($this->nextRole); 
+    //Fucking here up with role and step. Since in the heavily overwritten texts we still have nextRole we set the nextStep just the into the nextRole param
+    $params['nextRole'] = $this->translate->_($this->nextStep);
     $params['userList'] = $this->workflowNotifyMail()->renderUserList($this->users);
 }
 else{

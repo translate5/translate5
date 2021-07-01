@@ -45,7 +45,7 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewModel', {
             if(get('hasMqm')){
             	return this.getView().strings.mqmNotSupporterTooltip;
             }
-            if(Editor.data.task.get('usageMode')===Editor.data.task.USAGE_MODE_SIMULTANEOUS){
+            if(Editor.data.task.get('usageMode')===Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS){
             	return this.getView().strings.multiUsersTooltip;
             }
             return null;
@@ -57,7 +57,7 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewModel', {
             return get('searchResultsFound');
         },
         isDisableReplaceAllButton:function(get){
-            return !get('searchResultsFound') || get('hasMqm') || Editor.data.task.get('usageMode')===Editor.data.task.USAGE_MODE_SIMULTANEOUS;
+            return !get('searchResultsFound') || get('hasMqm') || Editor.data.task.get('usageMode')===Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS;
         },
         isDisableSearchButton:function(get){
             return get('disableSearchButton');

@@ -34,7 +34,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
         'Editor.view.admin.customer.ViewModel',
         'Editor.view.admin.customer.ViewController',
         'Editor.view.admin.config.Grid',
-        'Editor.view.admin.user.Assoc'
+        'Editor.view.admin.user.Assoc',
+        'Editor.view.admin.customer.OpenIdPanel'
     ],
 
     stores:['Editor.stores.admin.Customers'],
@@ -67,17 +68,6 @@ Ext.define('Editor.view.admin.customer.Panel', {
         customerDeletedMsg:'#UT#Kunde gelöscht',
         export:'#UT#Ressourcen-Nutzung Exportieren',
         domain:'#UT#translate5 Domain',
-        openIdServer:'#UT#OpenID server',
-        openIdIssuer:'#UT#OpenID Issuer',
-        openIdClientId:'#UT#OpenID Benutzername',
-        openIdClientSecret:'#UT#OpenID Passwort',
-        openIdAuth2Url:'#UT#OpenID OAuth URL',
-        defaultRolesGroupLabel: '#UT#Standardrollen',
-        serverRolesGroupLabel: '#UT#Erlaubte Rollen',
-        openIdRedirectLabel:'#UT#Verlinkter Text Loginseite',
-        openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.',
-        defaultRolesGroupLabelTooltip: '#UT#Standardsystemrollen werden verwendet, wenn der OpenID-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.',
-        serverRolesGroupLabelTooltip: '#UT#Systemrollen, die der OpenID-Server in translate5 festlegen darf.',
         propertiesTabPanelTitle: '#UT#Allgemein',
         configTabTitle:'#UT#Überschreibung der Systemkonfiguration',
         actionColumn:'#UT#Aktionen',
@@ -95,21 +85,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
 
     initConfig: function(instanceConfig) {
         var me = this,
-            roles=[];
-        
-        Ext.Object.each(Editor.data.app.roles, function(key, value) {
-            //if the role is not settable for the user, do not create check box for it
-            if(!value.setable){
-                return;
-            }
-            roles.push({
-                boxLabel: value.label, 
-                name: 'roles_helper', 
-                value: key,
-                handler: me.roleCheckChange
-            });
-        });
-        var config = {
+            config = {
                 title: me.title, //see EXT6UPD-9
                 items: [
                     {
@@ -192,248 +168,113 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             }
                         }
                     },{
-                        xtype: 'form',
+                        xtype: 'tabpanel',
                         flex: 0.7,
                         region: 'east',
-                        reference: 'form',
                         split: true,
                         layout:'fit',
-                        fieldDefaults: {
-                            width: '100%'
+                        itemId:'displayTabPanel',
+                        reference: 'display',
+                        bind:{
+                            disabled : '{!record}'
                         },
-                        dockedItems:[{
-                            xtype: 'toolbar',
-                            flex: 1,
-                            dock: 'bottom',
-                            ui: 'footer',
-                            layout: {
-                                pack: 'start',
-                                type: 'hbox'
+                        items:[{
+                            xtype: 'form',
+                            itemId:'customersForm',
+                            reference: 'form',
+                            fieldDefaults: {
+                                width: '100%'
                             },
-                            bind:{
-                                disabled:'{!record}'
-                            },
-                            items:[{
-                                xtype: 'button',
-                                formBind: true,
-                                itemId: 'saveButton',
-                                reference: 'saveButton',
-                                text: me.strings.save,
-                                glyph: 'f00c@FontAwesome5FreeSolid',
-                                bind:{
-                                    visible:'{isActiveTabIncludedInForm}'
+                            title:me.strings.propertiesTabPanelTitle,
+                            bodyPadding: 10,
+                            scrollable:true,
+                            dockedItems:[{
+                                xtype: 'toolbar',
+                                flex: 1,
+                                dock: 'bottom',
+                                ui: 'footer',
+                                layout: {
+                                    pack: 'start',
+                                    type: 'hbox'
                                 },
-                                listeners: {
-                                    click: {
-                                        fn: 'save',
-                                        scope: 'controller'
-                                    }
-                                }
-                            },{
-                                xtype: 'button',
-                                itemId: 'cancelButton',
-                                text: me.strings.cancel,
-                                glyph: 'f00d@FontAwesome5FreeSolid',
-                                listeners: {
-                                    click: {
-                                        fn: 'cancelEdit',
-                                        scope: 'controller'
-                                    }
-                                }
-                            }]
-                        }],
-                        items: [{
-                            xtype: 'tabpanel',
-                            itemId:'displayTabPanel',
-                            reference: 'display',
-                            bind:{
-                                disabled : '{!record}'
-                            },
-                            //TODO: move me as button in the openid panel after cancel/save button -> lower toolbar
-                            tools:[{
-                                itemId: 'home',
-                                type: 'home',
-                                cls:'tools-help-icon',
-                                qtip: 'OpenID connect',
-                                handler: function() {
-                                    window.open('https://confluence.translate5.net/display/BUS/OpenID+connect+in+translate5', '_blank');
-                                }
-                            }],
-                            items:[{
-                                title:me.strings.propertiesTabPanelTitle,
-                                bodyPadding: 10,
-                                scrollable:true,
-                                isIncludedInForm:true,// is the component part of the customers form. There are some other components in the display tab which are not part of the form (ex: config and user assoc tabs)
-                                items: [
-                                    {
-                                        xtype: 'textfield',
-                                        fieldLabel: me.strings.customerName,
-                                        name: 'name',
-                                        allowBlank: false,
-                                        maxLength: 255,
-                                        minLength: 1
-                                    },
-                                    {
-                                        xtype: 'textfield',
-                                        fieldLabel: me.strings.customerNumber,
-                                        name: 'number',
-                                        allowBlank: false,
-                                        maxLength: 255
-                                    },{
-                                        xtype:'textfield',
-                                        fieldLabel:me.strings.domain,
-                                        name:'domain',
-                                        itemId:'openIdDomain'
-                                    }
-                                ]
-                            },{
-                                xtype: 'adminUserAssoc',
                                 bind:{
-                                    customer:'{record}'
-                                }
-                            },{
-                                xtype: 'adminConfigGrid',
-                                store:'admin.CustomerConfig',
-                                title:me.strings.configTabTitle,
-                                bind: {
-                                    extraParams:{
-                                        customerId : '{record.id}'
-                                    }
-                                }
-                            },{
-                                itemId:'openIdFieldset',
-                                disabled:true,
-                                scrollable:true,
-                                isIncludedInForm:true,// is the component part of the customers form. There are some other components in the display tab which are not part of the form (ex: config and user assoc tabs)
-                                bodyPadding: 10,
-                                title:'OpenID Connect',
+                                    disabled:'{!record}'
+                                },
                                 items:[{
-                                        xtype:'textfield',
-                                        fieldLabel:me.strings.openIdServer,
-                                        vtype: 'url',
-                                        name:'openIdServer',
-                                        setAllowBlank:me.setFieldAllowBlank,
-                                        listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                        bind:{
-                                            allowBlank:'{!isOpenIdRequired}'
-                                        }
-                                    },{
-                                        xtype:'textfield',
-                                        fieldLabel:me.strings.openIdIssuer,
-                                        vtype: 'url',
-                                        name:'openIdIssuer',
-                                        setAllowBlank:me.setFieldAllowBlank,
-                                        listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                        bind:{
-                                            allowBlank:'{!isOpenIdRequired}'
-                                        }
-                                    },{
-                                        xtype:'textfield',
-                                        fieldLabel:me.strings.openIdClientId,
-                                        name:'openIdClientId',
-                                        setAllowBlank:me.setFieldAllowBlank,
-                                        listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                        bind:{
-                                            allowBlank:'{!isOpenIdRequired}'
-                                        }
+                                    xtype: 'button',
+                                    formBind:true,
+                                    itemId: 'saveButton',
+                                    reference: 'saveButton',
+                                    text: me.strings.save,
+                                    glyph: 'f00c@FontAwesome5FreeSolid',
+                                    bind:{
+                                        visible:'{isActiveTabIncludedInForm}'
                                     },
-                                    {
-                                        xtype:'textfield',
-                                        fieldLabel:me.strings.openIdClientSecret,
-                                        name:'openIdClientSecret',
-                                        setAllowBlank:me.setFieldAllowBlank,
-                                        listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                        bind:{
-                                            allowBlank:'{!isOpenIdRequired}'
-                                        }
-                                    },
-                                    {
-                                        xtype:'textfield',
-                                        fieldLabel:me.strings.openIdAuth2Url,
-                                        vtype: 'url',
-                                        name:'openIdAuth2Url',
-                                        setAllowBlank:me.setFieldAllowBlank,
-                                        listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                        bind:{
-                                            allowBlank:'{!isOpenIdRequired}'
-                                        }
-                                    },{
-                                        xtype: 'hidden',
-                                        name: 'openIdDefaultServerRoles'
-                                    },{
-                                        xtype: 'checkboxgroup',
-                                        itemId: 'defaultRolesGroup',
-                                        cls: 'x-check-group-alt',
-                                        labelClsExtra: 'checkBoxLableInfoIconDefault',
-                                        fieldLabel: me.strings.defaultRolesGroupLabel,
-                                        autoEl: {
-                                            tag: 'span',
-                                            'data-qtip': me.strings.defaultRolesGroupLabelTooltip
-                                        },
-                                        items: roles,
-                                        columns: 3
-                                    },{
-                                        xtype: 'hidden',
-                                        name: 'openIdServerRoles'
-                                    },{
-                                        xtype: 'checkboxgroup',
-                                        name: 'serverRolesGroup',
-                                        itemId: 'serverRolesGroup',
-                                        cls: 'x-check-group-alt',
-                                        labelClsExtra: 'checkBoxLableInfoIconDefault',
-                                        fieldLabel: me.strings.serverRolesGroupLabel,
-                                        autoEl: {
-                                            tag: 'span',
-                                            'data-qtip': me.strings.serverRolesGroupLabelTooltip
-                                        },
-                                        items: roles,
-                                        columns: 3
-                                    },{
-                                        xtype:'textfield',
-                                        fieldLabel:me.strings.openIdRedirectLabel,
-                                        name:'openIdRedirectLabel',
-                                        setAllowBlank:me.setFieldAllowBlank
-                                    },{
-                                        xtype:'checkbox',
-                                        boxLabel:me.strings.openIdRedirectCheckbox,
-                                        name:'openIdRedirectCheckbox',
-                                        inputValue:1,
-                                        uncheckedValue:0,
-                                        checked:1,
-                                        listeners: {
-                                            change: {
-                                                fn: 'onOpenIdRedirectCheckboxChange',
-                                                scope: 'controller'
-                                            }
+                                    listeners: {
+                                        click: {
+                                            fn: 'save',
+                                            scope: 'controller'
                                         }
                                     }
-                                ]
-                            }]
+                                },{
+                                    xtype: 'button',
+                                    itemId: 'cancelButton',
+                                    text: me.strings.cancel,
+                                    glyph: 'f00d@FontAwesome5FreeSolid',
+                                    listeners: {
+                                        click: {
+                                            fn: 'cancelEdit',
+                                            scope: 'controller'
+                                        }
+                                    }
+                                }]
+                            }],
+                            items: [
+                                {
+                                    xtype: 'textfield',
+                                    fieldLabel: me.strings.customerName,
+                                    name: 'name',
+                                    allowBlank: false,
+                                    maxLength: 255,
+                                    minLength: 1
+                                },
+                                {
+                                    xtype: 'textfield',
+                                    fieldLabel: me.strings.customerNumber,
+                                    name: 'number',
+                                    allowBlank: false,
+                                    maxLength: 255
+                                },{
+                                    xtype:'textfield',
+                                    fieldLabel:me.strings.domain,
+                                    name:'domain',
+                                    reference:'customerDomain',
+                                    publishes:'value',
+                                    bind:{
+                                        visible:'{!isOpenIdHidden}'
+                                    },
+                                    itemId:'openIdDomain'
+                                }
+                            ]
+                        },{
+                            xtype: 'adminUserAssoc',
+                            bind:{
+                                customer:'{record}'
+                            }
+                        },{
+                            xtype: 'adminConfigGrid',
+                            store:'admin.CustomerConfig',
+                            title:me.strings.configTabTitle,
+                            bind: {
+                                extraParams:{
+                                    customerId : '{record.id}'
+                                }
+                            }
+                        },{
+                            xtype:'openIdPanel',
+                            bind:{
+                                disabled:'{!customerDomain.value}'
+                            }
                         }]
                     }
                 ],
@@ -483,34 +324,9 @@ Ext.define('Editor.view.admin.customer.Panel', {
         }
         return me.callParent([config]);
     },
-    
-    setFieldAllowBlank:function(value){
-        var me = this;
-        me.allowBlank=value || me.isDisabled();
-        me.up('customerPanel').down('form').isValid();
-    },
-    
+
     onViewBeforeRefresh: function(dataview) {
         //workaround / fix for TMUE-11
         dataview.getSelectionModel().deselectAll();
-    },
-    
-    /**
-     * merge and save the checked roles into the hidden roles field
-     * @param {Ext.form.field.Checkbox} box
-     * @param {Boolean} checked
-     */
-    roleCheckChange: function(box, checked) {
-        var roles = [],
-            holder=box.up('checkboxgroup'),
-            boxes = holder.query('checkbox[checked=true]'),
-            holderMap={
-                serverRolesGroup:'openIdServerRoles',
-                defaultRolesGroup:'openIdDefaultServerRoles'
-            };
-        Ext.Array.forEach(boxes, function(box){
-            roles.push(box.initialConfig.value);
-        });
-        box.up('form').down('hidden[name="'+holderMap[holder.getItemId()]+'"]').setValue(roles.join(','));
     }
 });

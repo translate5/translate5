@@ -76,8 +76,8 @@ Ext.define('Editor.view.admin.config.ConfigWizard', {
      * On card visually activate load the configs
      */
     onConfigWizardActivate:function(){
-        var me=this,
-            grid=me.down('#adminConfigGrid');
+        var me = this,
+            grid = me.down('#adminConfigGrid');
         grid.setExtraParams({
             taskGuid:me.task.get('taskGuid')
         });

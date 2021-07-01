@@ -102,6 +102,7 @@ Ext.define('Editor.view.admin.config.Grid', {
             }
         }
      */
+    taskGuid: null,
     extraParams : [],
     publishes: {
         //publish this field so it is bindable
@@ -124,31 +125,45 @@ Ext.define('Editor.view.admin.config.Grid', {
             }
         });
         
+        this.taskGuid = null;
+        
         //if it is an empty object, removes(local only) all unfiltered items from the store. Filtered records will not be removed
         if(Ext.Object.getSize(newExtra) < 1){
             this.getStore().removeAll(true);
             return;
         }
         
-        var me=this,
+        var me = this,
             store = me.getStore(),
             controller = me.getController(),
             cbShowReadOnly = me.down('#showReadOnly'),
             showReadonlyConfig = cbShowReadOnly == null ? true : cbShowReadOnly.checked;
         
         store.setExtraParams(newExtra);
-
+        
+        if(newExtra.taskGuid){
+            me.taskGuid = newExtra.taskGuid;
+        }
+        
         store.load({
             callback:function(){
                 if(!store || !controller){
                     return;
                 }
-                
                 controller.handleReadonlyConfig(showReadonlyConfig);
                 controller.onCollapseAll();
                 controller.handleHasReadOnly();
             }
         });
+    },
+    /**
+     * Called when import is finished to show a potentially changed view
+     */
+    refreshForTask: function(taskGuid){
+        var store = this.getStore();
+        if(store && this.taskGuid && this.taskGuid == taskGuid && store.isLoaded() && !store.isLoading()){
+            store.load();
+        }
     },
     
     initConfig: function(instanceConfig) {
