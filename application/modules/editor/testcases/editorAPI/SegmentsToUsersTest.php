@@ -80,7 +80,7 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
     public function testNonEditableSegments() {
         $missingsegmentranges = $this->api()->reloadTask()->missingsegmentranges[0];
         //fwrite(STDERR, print_r($missingsegmentranges,1));
-        $this->assertEquals('translating', $missingsegmentranges->workflowStepName);
+        $this->assertEquals('translation', $missingsegmentranges->workflowStepName);
         $this->assertEquals(self::NON_EDITABLE_SEGMENTS_EXPECTED, $missingsegmentranges->missingSegments);
     }
     
