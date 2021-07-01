@@ -58,5 +58,15 @@
 		    "confirmed":0,
 		    "sum":0
 		}
+    },
+    {
+        "workflowStep": "visiting",
+        "status": "open",
+        "progress": 0,
+        "segmentWorkCount": {
+            "edited": 0,
+            "confirmed": 0,
+            "sum": 0
+        }
     }
 ]
