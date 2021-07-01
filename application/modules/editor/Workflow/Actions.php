@@ -63,7 +63,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $task->setState('end');
 
         try {
-            $this->config->workflow->doWithTask($oldTask, $task);
+            $this->config->workflow->hookin()->doWithTask($oldTask, $task);
         }
         catch (ZfExtended_Models_Entity_NoAccessException $e) {
             //ignore no access here. Access may by declined by the called workflow. But this may not block the end via workflow action.
@@ -92,7 +92,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         else {
             $tua = $this->config->newTua;
         }
-        $tua->setStateForRoleAndTask($this->config->workflow::STATE_OPEN, $tua->getRole());
+        $tua->setStateForStepAndTask($this->config->workflow::STATE_OPEN, $tua->getWorkflowStepName());
     }
     
     /**
@@ -126,69 +126,6 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         throw ZfExtended_Models_Entity_Conflict::createResponse('E1160', [
             'noField' => 'Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.'
         ]);
-    }
-    
-    /**
-     * Associates automatically editor users to the task by users languages
-     */
-    public function autoAssociateEditorUsers() {
-        $task = $this->config->task;
-        $workflow = $this->config->workflow;
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        
-        $user->loadByGuid($task->getPmGuid());
-        $pmId = $user->getId();
-        $aclInstance = ZfExtended_Acl::getInstance();
-        $roles = $user->getRoles();
-        $pmSeeAll = !empty($roles) && $aclInstance->isInAllowedRoles($roles, 'backend', 'seeAllUsers');
-        
-        $sourceLang = $task->getSourceLang();
-        $targetLang = $task->getTargetLang();
-        
-        //since the initial workflow step is no_workflow,
-        // we have to decide here hardcoded between the wanted roles:
-        if($task->getEmptyTargets()) {
-            $role = $workflow::ROLE_TRANSLATOR;
-            $stepName = $workflow::STEP_TRANSLATION;
-        }
-        else {
-            $role = $workflow::ROLE_REVIEWER;
-            $stepName = $workflow::STEP_REVIEWING;
-        }
-        $states = $workflow->getInitialStates();
-        $state = $states[$stepName][$role];
-        
-        $users = $user->loadAllByLanguages($sourceLang, $targetLang);
-        
-        foreach($users as $data) {
-            $roles = explode(',', $data['roles']);
-            $isPm = in_array(ACL_ROLE_PM, $roles);
-            $isAdmin = in_array(ACL_ROLE_ADMIN, $roles);
-            $isEditor = in_array(ACL_ROLE_EDITOR, $roles);
-            //the user to be added must be a editor and it must be visible for the pm of the task
-            $isVisible = $pmSeeAll || $user->hasParent($pmId, $data['parentIds']);
-            if(!$isEditor || $isPm || $isAdmin || !$isVisible) {
-                continue;
-            }
-            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-            /* @var $tua editor_Models_TaskUserAssoc */
-            $tua->setRole($role);
-            $tua->setState($state);
-            $tua->setUserGuid($data['userGuid']);
-            $tua->setTaskGuid($task->getTaskGuid());
-            
-            $this->setDefaultDeadlineDate($tua, $stepName);
-            
-            //entity version?
-            $tua->save();
-            $workflow->doUserAssociationAdd($tua);
-        }
-        
-        //if at least one task user association was added, then we have to update the workflowstep too
-        if(!empty($tua)) {
-            $task->updateWorkflowStep($stepName, false);
-        }
     }
     
     /***
@@ -239,13 +176,13 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $task->loadByTaskGuid($row['taskGuid']);
             //its much easier to load the entity as setting it (INSERT instead UPDATE issue on save, because of internal zend things on initing rows)
             $tua->load($row['id']);
-            $workflow->doWithTask($task, $task); //nothing changed on task directly, but call is needed
+            $workflow->hookin()->doWithTask($task, $task); //nothing changed on task directly, but call is needed
             $tuaNew = clone $tua;
             $tuaNew->setState($workflow::STATE_FINISH);
             $tuaNew->validate();
-            $workflow->triggerBeforeEvents($tua, $tuaNew);
-            $tuaNew->save();
-            $workflow->doWithUserAssoc($tua, $tuaNew);
+            $workflow->hookin()->doWithUserAssoc($tua, $tuaNew, function() use ($tuaNew){
+                $tuaNew->save();
+            });
         }
         $log = ZfExtended_Factory::get('editor_Logger_Workflow', [$task]);
         $log->debug('E1013', 'finish overdued task via workflow action');

@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  * that the user comes from a certain IP address. Currently this makes sense for the roles termSearch and InstantTranslate (the user must have no other roles).
  */
 class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
-    
+    protected static $description = 'Provides the possibility to authenticate InstantTranslate and TermSearch roles only by IP address (must be configured).';
     
     public function init() {
         $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', array($this, 'onGarbageCollectorCleanUp'));

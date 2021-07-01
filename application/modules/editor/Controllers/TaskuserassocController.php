@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -51,7 +51,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     protected $log = false;
     
     /**
-     * contains if available the task to the current tua 
+     * contains if available the task to the current tua
      * @var editor_Models_Task
      */
     protected $task;
@@ -71,9 +71,17 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows = $rows;
         $this->view->total = $this->entity->getTotalCount();
         $this->applyEditableAndDeletable();
-        $this->addSegmentrangesToResult();
     }
-    
+
+    public function projectAction(){
+        $projectId = $this->getParam('projectId');
+        $workflow = $this->getParam('workflow');
+        if(empty($projectId) || empty($workflow)){
+            return;
+        }
+        $this->view->rows = $this->entity->loadProjectWithUserInfo($projectId,$workflow);
+    }
+
     public function postDispatch() {
         $user = new Zend_Session_Namespace('user');
         $acl = ZfExtended_Acl::getInstance();
@@ -135,27 +143,58 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     protected function decodePutData() {
         parent::decodePutData();
         
+        $this->data = (object) $this->data;
+        
+        //if both is set, we remove role in favour of step
+        if(property_exists($this->data, 'workflowStepName') && property_exists($this->data, 'role')) {
+            unset($this->data->role);
+        }
+        
         //lector deprecated message
-        $lectorUsed = false;
-        if(is_object($this->data) && property_exists($this->data, 'role') && $this->data->role == 'lector') {
-            $this->data->role = editor_Workflow_Abstract::ROLE_REVIEWER;
-            $lectorUsed = true;
-        }
-        elseif(is_array($this->data) && array_key_exists('role', $this->data) && $this->data['role'] == 'lector') {
-            $this->data['role'] = editor_Workflow_Abstract::ROLE_REVIEWER;
-            $lectorUsed = true;
-        }
-        if($lectorUsed) {
+        if(property_exists($this->data, 'role') && $this->data->role == 'lector') {
+            $this->data->role = editor_Workflow_Default::ROLE_REVIEWER;
             Zend_Registry::get('logger')->warn('E1232', 'Job creation: role "lector" is deprecated, use "reviewer" instead!');
+        }
+
+        //on post the task is not intialized yet
+        if($this->task->getId() == 0) {
+            $this->task->loadByTaskGuid($this->data->taskGuid);
+        }
+
+        $manager = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $manager editor_Workflow_Manager */
+
+
+        // if the workflow is defined by the api use it from there, otherwize load it from the task
+        if(property_exists($this->data, 'workflow') && !empty($this->data->workflow)){
+            $workflow = $manager->getCached($this->data->workflow);
+        }else{
+            $workflow = $manager->getActiveByTask($this->task);
+            /* @var $workflow editor_Workflow_Default */
+        }
+
+        $this->data->workflow = $workflow->getName();
+
+        //we have to get the role from the workflowStepName
+        if(property_exists($this->data, 'workflowStepName')) {
+            $this->data->role = $workflow->getRoleOfStep($this->data->workflowStepName);
+        }
+        //we have to get the step from the role (the first found step to the role)
+        elseif(property_exists($this->data, 'role')) {
+            $steps = $workflow->getSteps2Roles();
+            $roles = array_flip(array_reverse($steps));
+            $this->data->workflowStepName = $roles[$this->data->role] ?? null;
+            Zend_Registry::get('logger')->warn('E1232', 'Job creation: using role as parameter on job creation is deprecated, use workflowStepName instead');
+        }
+
+        if(!property_exists($this->data, 'state') || empty($this->data->state)){
+            // set default state. The correct state is calculated later
+            $this->data->state =$workflow::STATE_WAITING;
         }
         
         //may not be set from outside!
-        if(is_object($this->data) && property_exists($this->data, 'staticAuthHash')) {
+        if(property_exists($this->data, 'staticAuthHash')) {
             unset($this->data->staticAuthHash);
-            return;
-        }
-        if(is_array($this->data) && array_key_exists('staticAuthHash', $this->data)) {
-            unset($this->data['staticAuthHash']);
         }
     }
     
@@ -167,17 +206,17 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->entityLoad();
         $this->task->loadByTaskGuid($this->entity->getTaskGuid());
         $this->log->request();
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
-        /* @var $workflow editor_Workflow_Abstract */
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActiveByTask($this->task);
+        /* @var $workflow editor_Workflow_Default */
         
-        //here checks the isWritable if the tua is already in editing mode... Not as intended. 
+        //here checks the isWritable if the tua is already in editing mode... Not as intended.
         if(!empty($this->entity->getUsedState()) && $workflow->isWriteable($this->entity, true)) {
             // the following check on preventing changing Jobs which are used, prevents the following problems:
-            // competitive tasks: 
-            //   a task can not confirmed by user A if user A could not get a lock on the task, 
-            //   because user B has opened the task for editing (and locked it), before User B was set to unconfirmed. 
+            // competitive tasks:
+            //   a task can not confirmed by user A if user A could not get a lock on the task,
+            //   because user B has opened the task for editing (and locked it), before User B was set to unconfirmed.
             //   This is prevented now, since the PM gets an error when he wants to set User B to unconfirmed while B is editing already.
-            //  another prevented problem: 
+            //  another prevented problem:
             //    User B have opened the task for editing, after that his job is set to unconfirmed
             //    User B does not notice this and edits more segments, although he should be unconfirmed or waiting.
             //  Throwing the following exception do not kick out the user, but the PM knows now that he fucked up the task.
@@ -222,10 +261,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         }
         
         $this->entity->validate();
-        $workflow->triggerBeforeEvents($oldEntity, $this->entity);
-        $this->entity->save();
 
-        $workflow->doWithUserAssoc($oldEntity, $this->entity);
+        $workflow->hookin()->doWithUserAssoc($oldEntity, $this->entity, function() {
+            $this->entity->save();
+        });
         
         $this->view->rows = $this->entity->getDataObject();
         $this->addUserInfoToResult();
@@ -245,7 +284,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     public function postAction() {
         parent::postAction();
-        //if the validation was successful, log the request and apply additional data 
+        //if the validation was successful, log the request and apply additional data
         if($this->wasValid){
             $this->log->request();
             $this->addUserInfoToResult();
@@ -258,13 +297,13 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->entityLoad();
         $this->task->loadByTaskGuid($this->entity->getTaskGuid());
         $this->log->request();
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
-        /* @var $workflow editor_Workflow_Abstract */
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActiveByTask($this->task);
+        /* @var $workflow editor_Workflow_Default */
         $this->checkAuthenticatedIsParentOfEntity();
         $this->processClientReferenceVersion();
         $entity = clone $this->entity;
         $this->entity->setId(0);
-        //we have to perform the delete call on cloned object, since the delete call resets the data in the entity, but we need it for post processing 
+        //we have to perform the delete call on cloned object, since the delete call resets the data in the entity, but we need it for post processing
         $entity->delete();
         $this->log->info('E1012', 'job deleted', ['tua' => $this->entity->getSanitizedEntityForLog()]);
     }
@@ -322,29 +361,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows->longUserName=$user->getUsernameLong();
     }
     
-    /**
-     * Add the number of segments that are not assigned to a user
-     * although some other segments ARE assigned to users of this role.
-     */
-    protected function addSegmentrangesToResult() {
-        $taskGuid = null;
-        $filters = $this->entity->getFilter()->getFilters();
-        array_walk(
-            $filters,
-            function ($item) use (&$taskGuid) {
-                if ($item->field == 'taskGuid') {
-                    $taskGuid = $item->value;
-                }
-            }
-        );
-        if (is_null($taskGuid)) {
-            return;
-        }
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        $this->view->segmentstoassign = $tua->getAllNotAssignedSegments($taskGuid);
-    }
-    
     /***
      * Add editable/deletable variable calculated for each user in the response rows.
      */
@@ -396,7 +412,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     /***
      * Set the default deadline date from the config. How many work days the deadlinde date will be from the task
      * order date can be define in the system configuration.
-     * To use the defaultDeadline date, the deadlineDate field should be set to "default" 
+     * To use the defaultDeadline date, the deadlineDate field should be set to "default"
      */
     protected function setDefaultDeadlineDate() {
         //check if default deadline date should be set
@@ -417,7 +433,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         
         $workflow = $wm->get($model->getWorkflow());
 
-        $step = $workflow->getStepOfRole($this->data->role);
+        $step = $this->data->workflowStepName;
+//FIXME fallback from default workflow if step/workflow is not defined!
         //get the config for the task workflow and the user assoc role workflow step
         $configValue = $model->getConfig()->runtimeOptions->workflow->{$model->getWorkflow()}->{$step}->defaultDeadlineDate ?? 0;
         if($configValue <= 0){

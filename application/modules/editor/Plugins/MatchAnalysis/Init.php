@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
+    protected static $description = 'Provides the match-analysis and pre-translation against language-resources.';
     
     /**
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
@@ -273,7 +274,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     {
         $parent = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $parent ZfExtended_Models_Worker */
-        $result = $parent->loadByState('editor_Models_Import_Worker', ZfExtended_Models_Worker::STATE_PREPARE, $taskGuid);
+        $result = $parent->loadByState(ZfExtended_Models_Worker::STATE_PREPARE, 'editor_Models_Import_Worker', $taskGuid);
         if(count($result) > 0){
             return $result[0]['id'];
         }

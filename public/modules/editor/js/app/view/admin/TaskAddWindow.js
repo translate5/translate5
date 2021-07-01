@@ -33,7 +33,9 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.admin.TaskAddWindowViewModel',
         'Editor.view.admin.customer.UserCustomersCombo',
         'Editor.view.LanguageCombo',
-        'Editor.view.admin.config.ConfigWizard'
+        'Editor.view.admin.config.ConfigWizard',
+        'Editor.view.admin.task.UserAssocWizard',
+        'Editor.view.admin.task.UserAssocWizardViewModel'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -74,8 +76,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         btnSkip:'#UT#Importieren (weitere überspringen)',
         importDefaultsButtonText:'#UT#Importieren (Standards nutzen)'
     },
-    height : 550,
-    width : 1000,
     modal : true,
     layout: 'anchor',
     autoScroll: true,
@@ -84,21 +84,30 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
      * The groups are:preimport, import and postimport
      */
     groupCards:[],
-    
+
+    maximizable:true,
+
     listeners:{
         beforerender:function(win){
             //insert the taskUpload card in before render
             win.insertCard({
                 xtype:'taskUpload', 
                 itemId:'taskUploadCard',
-                groupIndex:4,
+                groupIndex:5
             },'postimport');
-            
+
             win.insertCard({
-                xtype:'adminConfigWizard', 
-                itemId:'adminConfigWizard',
-                groupIndex:2,//index 1 is language resources assoc
+                xtype:'adminTaskUserAssocWizard',
+                itemId:'adminTaskUserAssocWizard',
+                groupIndex:1//index 2 is language resources assoc
             },'postimport');
+
+            win.insertCard({
+                xtype:'adminConfigWizard',
+                itemId:'adminConfigWizard',
+                groupIndex:3//index 2 is language resources assoc
+            },'postimport');
+
         },
         render:function(win){
             
@@ -152,6 +161,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         config = {
                 title: me.title, //see EXT6UPD-9
                 layout: 'card',
+                height: parseInt(Editor.app.viewport.getHeight() * 0.70),
+                width: parseInt(Editor.app.viewport.getWidth() * 0.70),
                 items:[
                     {
                         xtype:'panel',
@@ -164,7 +175,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                             ui: 'default-frame',
                             layout: 'hbox',
                             layoutConfig : {
-                                align : 'stretch',
+                                align : 'stretch'
                             },
                             anchor: '100%',
                             items: [{

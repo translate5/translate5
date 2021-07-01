@@ -120,7 +120,7 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
         // some slots in use
         if (!empty($usedSlots)) {
             // sort out the used slots
-            $unusedSlots = $availableSlots;            
+            $unusedSlots = $availableSlots;
             foreach ($usedSlots as $usedSlot) {
                 $key = array_search($usedSlot['slot'], $unusedSlots);
                 if($key !== false) {
@@ -168,6 +168,6 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
     abstract protected function getAvailableSlots($resourcePool = 'default') : array;
     /**
      * @throws Exception
-     */    
+     */
     abstract protected function raiseNoAvailableResourceException();
 }

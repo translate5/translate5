@@ -481,7 +481,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         // but then the open was triggerd when the grid was not ready yet, therefore resulting segment locks from the server were producing errors in the GUI
         me.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
 
-        if(Editor.data.task.get('usageMode') !== Editor.data.task.USAGE_MODE_SIMULTANEOUS) {
+        if(Editor.data.task.get('usageMode') !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS) {
             return;
         }
 

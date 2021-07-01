@@ -105,8 +105,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
 
         //init workflow id for the task
-        $defaultWorkflow = $config->runtimeOptions->import->taskWorkflow;
-        self::$testTask->setWorkflow($workflowManager->getIdToClass($defaultWorkflow));
+        self::$testTask->setWorkflow($config->runtimeOptions->workflow->initialWorkflow);
         self::$testTask->validate();
 
         $wfId = self::$testTask->getWorkflow();
@@ -194,7 +193,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         $upload->initDataProvider("testcase",$importUpload);
         $dp = $upload->getDataProvider();
         $import->import($dp);
-        self::$workflow->doImport(self::$testTask,$import->getImportConfig());
+        self::$workflow->hookin()->doImport(self::$testTask,$import->getImportConfig());
 
         //run the queued import worker
         $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
