@@ -1,0 +1,8 @@
+{
+    "sourceLang": "4",
+    "targetLang": "5",
+    "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
+    "workflowStepName": "translation",
+    "workflow": "default",
+    "deadlineDate": null
+}

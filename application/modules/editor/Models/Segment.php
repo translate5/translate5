@@ -1395,11 +1395,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         switch ($pmChanges) {
             case self::PM_ALL_INCLUDED:
                 $s->where('(' . $this->tableName . '.workflowStep = ?', $workflowStep);
-                $s->orWhere($this->tableName . '.workflowStep = ?)', editor_Workflow_Abstract::STEP_PM_CHECK);
+                $s->orWhere($this->tableName . '.workflowStep = ?)', editor_Workflow_Default::STEP_PM_CHECK);
                 break;
             case self::PM_SAME_STEP_INCLUDED:
                 $s->where('(' . $this->tableName . '.workflowStep = ?', $workflowStep);
-                $s->orWhere('(' . $this->tableName . '.workflowStep = ?', editor_Workflow_Abstract::STEP_PM_CHECK);
+                $s->orWhere('(' . $this->tableName . '.workflowStep = ?', editor_Workflow_Default::STEP_PM_CHECK);
                 $s->where($this->tableName . '.workflowStepNr = ?))', $workflowStepNr);
                 break;
             case self::PM_NOT_INCLUDED:

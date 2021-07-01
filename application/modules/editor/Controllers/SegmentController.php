@@ -608,9 +608,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
             $task->loadByTaskGuid($this->entity->getTaskGuid());
             $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUserGuid, $task);
             /* @var $tua editor_Models_TaskUserAssoc */
-            $role = $tua->getRole();
-            if ($tua->isSegmentrangedTaskForRole($task, $role)) {
-                $assignedSegments = $tua->getAllAssignedSegmentsByUserAndRole($task->getTaskGuid(), $sessionUserGuid, $role);
+            $step = $tua->getWorkflowStepName();
+            if ($tua->isSegmentrangedTaskForStep($task, $step)) {
+                $assignedSegments = $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $sessionUserGuid, $step);
                 if (!in_array($this->entity->getSegmentNrInTask(), $assignedSegments)) {
                     $isTaskGuidAndEditable = false;
                 }
@@ -815,12 +815,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         $sessionUserGuid = $sessionUser->data->userGuid;
         $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($sessionUserGuid, $task);
         /* @var $tua editor_Models_TaskUserAssoc */
-        $role = $tua->getRole();
-        $handleSegmentranges = $tua->isSegmentrangedTaskForRole($task, $role);
+        $step = $tua->getWorkflowStepName();
+        $handleSegmentranges = $tua->isSegmentrangedTaskForStep($task, $step);
         if (!$handleSegmentranges) {
             return false;
         }
-        return $tua->getAllAssignedSegmentsByUserAndRole($task->getTaskGuid(), $sessionUserGuid, $role);
+        return $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $sessionUserGuid, $step);
     }
 
     /***
@@ -876,7 +876,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         $task->loadByTaskGuid($taskGuid);
 
         //if for the task there are no ranges defined, use first editable(if defined) or 0
-        if (!$tua->isSegmentrangedTaskForRole($task, $tua->getRole())) {
+        if (!$tua->isSegmentrangedTaskForStep($task, $tua->getWorkflowStepName())) {
             $this->view->metaData->jumpToSegmentIndex = $this->view->metaData->firstEditable ?? 0;
             return;
         }

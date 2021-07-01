@@ -35,40 +35,44 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
 
     /**
      * it should be based on maxParallelProcesses instead of just having one running worker per slot. maxParallelProcesses is ignored so far.
+     * UGLY: The param $startNext has a different meaning here:more like "startAsManyAsThereAreFreeResources" ...
      *
      * @see ZfExtended_Worker_Abstract::queue()
      */
     public function queue($parentId=0, $state=NULL, $startNext=true) : int {
-        
-        // we trigger the parent init WITHOUT starting further workers
-        $idToReturn = parent::queue($parentId, $state, false);
-        
-        // if wanted, we create the next workers
+
+        // we start as many workers as there a free resources on startNext
         if($startNext){
             
-            $workerCountToStart = 0;
-            $usedSlots = count($this->workerModel->getListSlotsCount(static::$resourceName));
-            $availableWorkerSlots = count($this->getAvailableSlots($this->resourcePool));
-            
-            while(($usedSlots + $workerCountToStart) < ($availableWorkerSlots + 1)){
-                $workerCountToStart++;
-            }
-            if(empty($usedSlots)){
-                $workerCountToStart = count($this->getAvailableSlots($this->resourcePool));
-            }
-            if($workerCountToStart == 0) {
+            $availableSlots = count($this->getAvailableSlots($this->resourcePool));
+            // if there are no available slots (e.g. all Resources down) we need to raise an exception to inform the user
+            if($availableSlots == 0){
                 $this->raiseNoAvailableResourceException();
             }
-            for($i=0; $i < $workerCountToStart; $i++){
-                $worker = ZfExtended_Factory::get(get_class($this));
-                $worker->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
-                $worker->queue($parentId, $state, false);
+            
+            // we trigger the parent init without starting them of course
+            $idToReturn = parent::queue($parentId, $state, false);
+            
+            // the still free slots after the worker is queued
+            $usedSlots = count($this->workerModel->getListSlotsCount(static::$resourceName));
+            
+            // we can use the free slots to start additional workers
+            if($availableSlots > $usedSlots){
+                for($i=0; $i < ($availableSlots - $usedSlots); $i++){
+                    $worker = ZfExtended_Factory::get(get_class($this));
+                    $worker->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
+                    $worker->queue($parentId, $state, false);
+                }
             }
             // we now can start the queue
             $this->wakeUpAndStartNextWorkers();
             $this->emulateBlocking();
+            
+            return $idToReturn;
+            
+        } else {
+            return parent::queue($parentId, $state, false);
         }
-        return (int) $idToReturn;
     }
     /**
      * A Resource worker has the "process" function to replace the "work" API enriched with the slot as param
@@ -80,15 +84,7 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
         if(empty($slot)){
             return false;
         }
-        if($this->isWorkerThread){
-            if($this->process($slot)){
-                $this->queueNextWorkers();
-                return true;
-            }
-            return false;
-        } else {
-            return $this->process($slot);
-        }
+        return $this->process($slot);
     }
 
     // overwrites ZfExtended_Worker_Abstract functionality
@@ -124,7 +120,7 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
         // some slots in use
         if (!empty($usedSlots)) {
             // sort out the used slots
-            $unusedSlots = $availableSlots;            
+            $unusedSlots = $availableSlots;
             foreach ($usedSlots as $usedSlot) {
                 $key = array_search($usedSlot['slot'], $unusedSlots);
                 if($key !== false) {
@@ -139,23 +135,25 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
         return ['resource' => self::$resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]];
     }
     /**
-     * Creates the Next Workers to start (the multiplication of workers is done in the queue-method
-     * @param string $taskGuid
+     * Chaining of Resource workers: Creates the Next Workers to start (the multiplication of workers is done in the queue-method) if we successfully worked
      * @return boolean
      */
-    protected function queueNextWorkers() {
-        $taskGuid = $this->workerModel->getTaskGuid();
-        $parameters = $this->workerModel->getParameters();
-        $worker = ZfExtended_Factory::get(get_class($this));
-        /* @var $worker editor_Models_Import_Worker_ResourceAbstract */
-        if (!$worker->init($taskGuid, $parameters)) {
-            $this->getLogger()->error('E1122', get_class($this).' next Worker can not be initialized!', [
-                'taskGuid' => $taskGuid,
-                'parameters' => $parameters
-            ]);
-            return false;
+    protected function onRunQueuedFinished($success) {
+        // only queue workers if the work was successful
+        // the last worker must return false if no segments to process could be found, otherwise we will work endlessly...
+        if($success){        
+            $taskGuid = $this->workerModel->getTaskGuid();
+            $parameters = $this->workerModel->getParameters();
+            $worker = ZfExtended_Factory::get(get_class($this));
+            /* @var $worker editor_Models_Import_Worker_ResourceAbstract */
+            if (!$worker->init($taskGuid, $parameters)) {
+                $this->getLogger()->error('E1122', get_class($this).' next Worker can not be initialized!', [
+                    'taskGuid' => $taskGuid,
+                    'parameters' => $parameters
+                ]);
+            }
+            $worker->queue($this->workerModel->getParentId(), ZfExtended_Models_Worker::STATE_WAITING);
         }
-        $worker->queue($this->workerModel->getParentId());
     }
     /**
      * Needs to be defined in the real worker. Performs the threaded work
@@ -170,6 +168,6 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
     abstract protected function getAvailableSlots($resourcePool = 'default') : array;
     /**
      * @throws Exception
-     */    
+     */
     abstract protected function raiseNoAvailableResourceException();
 }

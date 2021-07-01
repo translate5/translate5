@@ -86,7 +86,8 @@ Ext.define('Editor.controller.admin.Customer', {
     },
 
     strings:{
-        customer:'#UT#Kunden',
+        customerLabelText:'#UT#Kunden InstantTranslate &amp; TermPortal',
+        customerInfoIconTooltip:'#UT#Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.',
         allCustomers:'#UT#Alle Kunden'
     },
     
@@ -124,7 +125,8 @@ Ext.define('Editor.controller.admin.Customer', {
             loginFieldset=adminWindow.down('#loginDetailsFieldset');
         
         loginFieldset.add({
-            xtype:'customers'
+            xtype:'customers',
+            fieldLabel:me.strings.customerLabelText
         });
     },
 
@@ -144,27 +146,28 @@ Ext.define('Editor.controller.admin.Customer', {
         if(grid.down('gridcolumn[dataIndex=customers]')){
             return;
         }
-        
+
         column = Ext.create('Ext.grid.column.Column', {
             xtype: 'gridcolumn',
             width: 250,
             dataIndex:'customers',
             tdCls: 'customers',
             sortable: false,
-            cls: 'customers',
-            text:this.strings.customer,
+            cls: 'gridColumnInfoIconTooltipLeft',
+            text:me.strings.customerLabelText,
+            tooltip:me.strings.customerInfoIconTooltip,
             filter: {
-                type: 'customer', // [Multitenancy]
+                type: 'customer' // [Multitenancy]
             },
-            renderer: function(v, meta, rec){
+            renderer: function(v){
                 var names = [];
-                if(!v || v.length == 0){
+                if(!v || v.length === 0){
                     return '';
                 }
                 var v = v.replace(/(^,)|(,$)/g, ''),
                     customersStore=Ext.StoreManager.get('customersStore');
                 v=v.split(',');
-                for(i=0;i<v.length;i++){
+                for(var i=0;i<v.length;i++){
                     var tmpRec=customersStore.findRecord('id',v[i],0,false,false,true);
                     tmpRec && names.push(tmpRec.get('name'));
                 }

@@ -44,7 +44,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
     protected $segmentFieldManager;
     
     /**
-     * @var editor_Workflow_Abstract
+     * @var editor_Workflow_Default
      */
     protected $workflow;
     
@@ -79,7 +79,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
         $this->userTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
     }
     
-    public function initForTask(editor_Workflow_Abstract $workflow, editor_Models_Task $task) {
+    public function initForTask(editor_Workflow_Default $workflow, editor_Models_Task $task) {
         $this->task = $task;
         $this->workflow = $workflow;
     }
@@ -95,7 +95,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
         if(isset($this->userAssocInfos[$taskguid])) {
             $row['userRole'] = $this->userAssocInfos[$taskguid]['role'];
             $row['userState'] = $this->userAssocInfos[$taskguid]['state'];
-            $row['userStep'] = $this->workflow->getStepOfRole($row['userRole']);
+            $row['userStep'] = $this->userAssocInfos[$taskguid]['workflowStepName'];
         }
         elseif($isEditAll && !empty($givenUserState)) {
             $row['userState'] = $givenUserState; //returning the given userState for usage in frontend
@@ -137,7 +137,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
                 $userPref->setFields(join(',', $allFields));
         } else {
             $user = new Zend_Session_Namespace('user');
-            $userPref->loadByTaskUserAndStep($taskguid, $this->workflow::WORKFLOW_ID, $user->data->userGuid, $row['userStep']);
+            $userPref->loadByTaskUserAndStep($taskguid, $this->workflow->getName(), $user->data->userGuid, $row['userStep']);
             $row['segmentFields'] = $fields->loadByUserPref($userPref);
         }
         
@@ -212,7 +212,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
      */
     public function initUserAssocInfos(array $taskRawObjects) {
         $taskGuids = array_column($taskRawObjects, 'taskGuid');
-        $currentWorkflowRoles = $this->getTasksCurrentWorkflowRoles($taskRawObjects);
+        $currentWorkflowSteps = array_column($taskRawObjects, 'workflowStepName', 'taskGuid');
         $this->userAssocInfos = []; //collects the assoc infos to the current user
         $userAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userAssoc editor_Models_TaskUserAssoc */
@@ -229,12 +229,12 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
             }
             //since a user can be assigned multiple times to a task,
             // the role has also to be checked to determine the current user
-            $role = $currentWorkflowRoles[$assoc['taskGuid']] ?? '';
+            $stepName = $currentWorkflowSteps[$assoc['taskGuid']] ?? '';
             
             //we need an info about the current user in any case, so we init the userAssocInfos with the first assoc of the current user
             // but we override the already stored userAssocInfo if a later assoc has the matching role
             $firstCurrentUserAssoc = empty($this->userAssocInfos[$assoc['taskGuid']]);
-            if($userGuid == $assoc['userGuid'] && ($firstCurrentUserAssoc || $role == $assoc['role'])) {
+            if($userGuid == $assoc['userGuid'] && ($firstCurrentUserAssoc || $stepName == $assoc['workflowStepName'])) {
                 $this->userAssocInfos[$assoc['taskGuid']] = $assoc;
             }
             $userInfo = $this->getUserinfo($assoc['userGuid'], $assoc['taskGuid']);
@@ -259,32 +259,6 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
             $this->allAssocInfos[$taskGuid] = $taskUsers;
         }
         return $this->userAssocInfos;
-    }
-    
-    /**
-     * returns a mapping between task and the workflow role to the tasks workflow step
-     * @return array
-     */
-    protected function getTasksCurrentWorkflowRoles($taskRawObjects): array {
-        $result = [];
-        $wfRoleCache = [];
-        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wfm editor_Workflow_Manager */
-        foreach($taskRawObjects as $taskObj) {
-            $taskObj = (object) $taskObj;
-            $key = $taskObj->workflow.'#'.$taskObj->workflowStepName;
-            if(empty($wfRoleCache[$key])) {
-                try {
-                    $workflow = $wfm->getCached($taskObj->workflow);
-                }
-                catch(editor_Workflow_Exception $e) {
-                    continue;
-                }
-                $wfRoleCache[$key] = $workflow->getRoleOfStep($taskObj->workflowStepName);
-            }
-            $result[$taskObj->taskGuid] = $wfRoleCache[$key];
-        }
-        return $result;
     }
     
     /**

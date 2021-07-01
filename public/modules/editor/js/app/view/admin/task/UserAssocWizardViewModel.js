@@ -26,13 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.user.AssocImportWizardViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.adminUserImportWizardAssoc',
+Ext.define('Editor.view.admin.task.UserAssocWizardViewModel', {
+    extend: 'Editor.view.admin.user.AssocViewModel',
+    alias: 'viewmodel.adminTaskUserAssocWizard',
 
     data:{
-        selectedCustomer : false,
-        selectedAssocRecord : false
+        sendPreImportOperation:false,
+        formTask:null
+
     },
 
     stores: {
@@ -41,24 +42,34 @@ Ext.define('Editor.view.admin.user.AssocImportWizardViewModel', {
         },
         workflowSteps: Ext.create('Editor.store.admin.WorkflowSteps',{ useAssignableSteps:true }),
         workflow: Ext.create('Editor.store.admin.Workflow'),
-        userAssoc:{
+        userAssocImport:{
             model:'Editor.model.admin.TaskUserAssoc',
             remoteFilter: true,
             pageSize: false,
+            autoLoad:false,
             groupField: 'targetLang',
-            setFilters:function(filters){
-                // ignore the firing on empty value
-                if(filters && !filters.value){
-                    this.loadData([],false);
-                    return;
-                }
-                this.superclass.superclass.setFilters.apply(this, [filters]);
-                this.reload();
+            /***
+             * Add additional params to the store proxy. The newExtra params will be merged into
+             * the existing proxy extra params
+             */
+            setExtraParams:function(newExtra){
+                var me=this,
+                    existing = me.getProxy().getExtraParams(),
+                    merged = Ext.Object.merge(existing, newExtra);
+                me.getProxy().setExtraParams(merged);
             },
-            filters:{
-                property: 'taskGuid',
-                operator:"in",
-                value:'{currentTask.projectGuids}'
+            proxy : {
+                type : 'rest',
+                url: Editor.data.restpath+'taskuserassoc/project',
+                reader : {
+                    rootProperty: 'rows',
+                    type : 'json'
+                },
+                writer: {
+                    encode: true,
+                    rootProperty: 'data',
+                    writeAllFields: false
+                }
             }
         }
     }

@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -27,44 +27,59 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Workflow Action Configuration Struct 
+ * Workflow Action Configuration Struct
  */
 class editor_Workflow_Actions_Config {
     /**
-     * @var editor_Workflow_Abstract 
+     * @var editor_Workflow_Default
      */
-    public $workflow;
+    public editor_Workflow_Default $workflow;
     
     /**
      * Task instance before task was changed
-     * @var editor_Models_Task 
+     * @var editor_Models_Task
      */
-    public $oldTask;
+    public ?editor_Models_Task $oldTask;
     
     /**
      * current task instance, with changes done by the current request
-     * @var editor_Models_Task 
+     * @var editor_Models_Task
      */
-    public $task;
+    public ?editor_Models_Task $task;
 
     /**
      * @var editor_Models_TaskUserAssoc
      */
-    public $newTua;
+    public ?editor_Models_TaskUserAssoc $newTua;
     
     /**
      * @var editor_Models_TaskUserAssoc
      */
-    public $oldTua;
+    public ?editor_Models_TaskUserAssoc $oldTua;
 
     /**
      * only available for import actions
      * @var editor_Models_Import_Configuration
      */
-    public $importConfig;
+    public ?editor_Models_Import_Configuration $importConfig;
     
     /**
      * @var ZfExtended_Models_User
      */
-    public $authenticatedUser;
+    public ZfExtended_Models_User $authenticatedUser;
+    
+    /**
+     * @var boolean
+     */
+    public bool $isCalledByCron = false;
+    
+    /**
+     * @var string
+     */
+    public ?string $trigger;
+    
+    /**
+     * @var ZfExtended_EventManager
+     */
+    public ZfExtended_EventManager $events;
 }

@@ -34,9 +34,9 @@ class editor_Models_Validator_UserAssocDefault extends ZfExtended_Models_Validat
         $this->addValidator("sourceLang", "int");
         $this->addValidator("targetLang", "int");
         $this->addValidator("userGuid","stringLength", array("min" => 1, "max" => 38));
-        $this->addValidator("workflowStepName","stringLength", array("min" => 1, "max" => 60));
-        $this->addValidator("workflow","stringLength", array("min" => 1, "max" => 60));
+        $this->addValidator("workflowStepName","stringLength", array("min" => 1, "max" => 64));
+        $this->addValidator("workflow","stringLength", array("min" => 1, "max" => 64));
         $this->addValidator("segmentrange","stringLength", array("min" => 0, "max" => 255));
-        $this->addValidator("deadlineDate", "float");
+        $this->addValidator("deadlineDate", "float",[],true);
     }
 }

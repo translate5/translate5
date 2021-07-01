@@ -968,7 +968,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.task.UserAssoc",
         title: '<?php echo $this->translate->_('Benutzer-Plural');?>',
         strings: {
-            fieldRole: '<?php echo $this->translate->_('Rolle');?>',
+            fieldStep: '<?php echo $this->translate->_('Workflowschritt');?>',
             fieldState: '<?php echo $this->translate->_('Status');?>',
             fieldUser: '<?php echo $this->translate->_('Benutzer');?>',
             btnSave: '<?php echo $this->translate->_('Speichern');?>',
@@ -994,12 +994,41 @@ Ext.define('Editor.controller.Localizer', {
             formTitleAdd: '<?php echo $this->translate->_('Benutzerzuweisung hinzufügen:');?>',
             formTitleEdit: '<?php echo $this->translate->_('Bearbeite Benutzer "{0}"');?>',
             fieldDeadline: '<?php echo $this->translate->_('Deadline');?>',
-            fieldSegmentrange: '<?php echo $this->translate->_('Editierbare Segmente');?>',
-            fieldSegmentrangeInfo: '<?php echo $this->translate->_('Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)');?>',
+            deadlineDateInfoTooltip: '<?php echo $this->translate->_('Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.');?>',
+            fieldWorkflowStepName: '<?php echo $this->translate->_('Workflow-Schritt');?>',
+            fieldWorkflow: '<?php echo $this->translate->_('Workflow');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.admin.user.AssocViewController", {
+        override: "Editor.view.admin.user.AssocViewController",
+        strings: {
+            deleteUserMessage: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
+            deleteUserTitle: '<?php echo $this->translate->_('Eintrag löschen?');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.admin.task.UserAssocWizard", {
+        override: "Editor.view.admin.task.UserAssocWizard",
+        strings: {
+            wizardTitle: '<?php echo $this->translate->_('Standard-Benutzerzuweisungen');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+            fieldRole: '<?php echo $this->translate->_('Rolle');?>',
+            fieldState: '<?php echo $this->translate->_('Status');?>',
+            fieldUser: '<?php echo $this->translate->_('Benutzer');?>',
+            btnSave: '<?php echo $this->translate->_('Speichern');?>',
+            btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            formTitleAdd: '<?php echo $this->translate->_('Benutzerzuweisung hinzufügen:');?>',
+            formTitleEdit: '<?php echo $this->translate->_('Bearbeite Benutzer "{0}"');?>',
+            fieldDeadline: '<?php echo $this->translate->_('Deadline');?>',
             deadlineDateInfoTooltip: '<?php echo $this->translate->_('translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.');?>',
             fieldWorkflowStepName: '<?php echo $this->translate->_('Workflow-Schritt');?>',
             fieldWorkflow: '<?php echo $this->translate->_('Workflow');?>',
-            wizardTitle: '<?php echo $this->translate->_('Standard-Benutzerzuweisungen');?>'
+            usageModeCoop: '<?php echo $this->translate->_('Sequentielles Arbeiten');?>',
+            usageModeCompetitive: '<?php echo $this->translate->_('Konkurrierende Zuweisung');?>',
+            usageModeSimultaneous: '<?php echo $this->translate->_('Gleichzeitiges Arbeiten');?>',
+            usageModeTitle: '<?php echo $this->translate->_('Mehrere Benutzer');?>'
         }
     });
 
@@ -1010,6 +1039,7 @@ Ext.define('Editor.controller.Localizer', {
             sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
             targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
             roleCol: '<?php echo $this->translate->_('Rolle');?>',
+            stepCol: '<?php echo $this->translate->_('Workflowschritt');?>',
             segmentrangeCol: '<?php echo $this->translate->_('Segmente');?>',
             stateCol: '<?php echo $this->translate->_('Status');?>',
             addUser: '<?php echo $this->translate->_('Hinzufügen');?>',
@@ -1021,9 +1051,10 @@ Ext.define('Editor.controller.Localizer', {
             cancel: '<?php echo $this->translate->_('Abbrechen');?>',
             deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
             deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
-            notifyButtonText: '<?php echo $this->translate->_('Benutzer benachrichtigen');?>',
+            notifyButtonText: '<?php echo $this->translate->_('Benutzer nach Import benachrichtigen');?>',
             notifyButtonTooltip: '<?php echo $this->translate->_('Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen');?>',
-            workflowStepNameCol: '<?php echo $this->translate->_('Workflow-Schritt');?>'
+            workflowStepNameCol: '<?php echo $this->translate->_('Workflow-Schritt');?>',
+            fieldWorkflow: '<?php echo $this->translate->_('Workflow');?>'
         }
     });
     
@@ -1046,8 +1077,8 @@ Ext.define('Editor.controller.Localizer', {
     });
 
 
-    Ext.define("Editor.view.admin.user.AssocImportWizardViewModel", {
-        override: "Editor.view.admin.user.AssocImportWizardViewModel",
+    Ext.define("Editor.view.admin.task.UserAssocWizardViewModel", {
+        override: "Editor.view.admin.task.UserAssocWizardViewModel",
         strings: {
             editInfo: '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>',
             segmentrangeError: '<?php echo $this->translate->_('Nicht zugewiesene Segmente');?>',
@@ -1067,6 +1098,7 @@ Ext.define('Editor.controller.Localizer', {
             confirmDelete: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
             userGuidCol: '<?php echo $this->translate->_('Benutzer');?>',
             roleCol: '<?php echo $this->translate->_('Rolle');?>',
+            stepCol: '<?php echo $this->translate->_('Workflowschritt');?>',
             segmentrangeCol: '<?php echo $this->translate->_('Segmente');?>',
             stateCol: '<?php echo $this->translate->_('Status');?>',
             addUser: '<?php echo $this->translate->_('Hinzufügen');?>',
@@ -1312,10 +1344,6 @@ Ext.define('Editor.controller.Localizer', {
             gender_neutral: '<?php echo $this->translate->_('keine Angabe');?>',
             reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
             reloadBtnTip: '<?php echo $this->translate->_('Benutzerliste vom Server aktualisieren.');?>',
-            sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
-            sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
-            targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
-            targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
             localeTooltip: '<?php echo $this->translate->_('Benutzersprache');?>'
         }
     });
@@ -1364,10 +1392,6 @@ Ext.define('Editor.controller.Localizer', {
             saveBtn: '<?php echo $this->translate->_('Benutzer speichern');?>',
             cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
             languagesLabel: '<?php echo $this->translate->_('Automatische Zuweisung');?>',
-            sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
-            sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
-            targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
-            targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
             languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>',
             localeLabel: '<?php echo $this->translate->_('Benutzersprache');?>',
             parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>',
@@ -1422,13 +1446,12 @@ Ext.define('Editor.controller.Localizer', {
       customerTip: '<?php echo $this->translate->_('Kunde der Aufgabe (Angabe notwendig)');?>',
       customerLabel: '<?php echo $this->translate->_('Kunde');?>'
     };
-	Ext.define("Editor.locale.controller.admin.Customer", {
-		override: "Editor.controller.admin.Customer",
-        strings: {
-            customer:'<?php echo $this->translate->_("Kunden");?>',
-            allCustomers:'<?php echo $this->translate->_("Alle Kunden");?>',
-        }
-    });
+
+    Editor.controller.admin.Customer.prototype.strings = {
+        customerLabelText:'<?php echo $this->translate->_("Kunden InstantTranslate &amp; TermPortal");?>',
+        customerInfoIconTooltip:'<?php echo $this->translate->_("Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.");?>',
+        allCustomers:'<?php echo $this->translate->_("Alle Kunden");?>'
+    };
 
     Ext.define("Editor.locale.view.admin.customer.Panel", {
     	override: "Editor.view.admin.customer.Panel",
@@ -1462,7 +1485,31 @@ Ext.define('Editor.controller.Localizer', {
             propertiesTabPanelTitle:'<?php echo $this->translate->_("Allgemein");?>',
             configTabTitle:'<?php echo $this->translate->_("Überschreibung der Systemkonfiguration");?>',
             actionColumn:'<?php echo $this->translate->_("Aktionen");?>',
-            customerEditActionIcon:'<?php echo $this->translate->_("Kunden bearbeiten");?>'
+            customerEditActionIcon:'<?php echo $this->translate->_("Kunden bearbeiten");?>',
+            helpButtonText:'<?php echo $this->translate->_("Hilfe");?>'
+        }
+    });
+
+
+    Ext.define("Editor.locale.view.admin.customer.OpenIdPanel", {
+    	override: "Editor.view.admin.customer.OpenIdPanel",
+        strings: {
+            save:'<?php echo $this->translate->_("Speichern");?>',
+            cancel:'<?php echo $this->translate->_("Abbrechen");?>',
+            saveCustomerMsg:'<?php echo $this->translate->_("Kunde wird gespeichert...");?>',
+            customerSavedMsg:'<?php echo $this->translate->_("Kunde gespeichert!");?>',
+            openIdServer:'<?php echo $this->translate->_("OpenID server");?>',
+            openIdIssuer:'<?php echo $this->translate->_("OpenID Issuer");?>',
+            openIdAuth2Url:'<?php echo $this->translate->_("OpenID OAuth URL");?>',
+            defaultRolesGroupLabel:'<?php echo $this->translate->_("Standardrollen");?>',
+            serverRolesGroupLabel:'<?php echo $this->translate->_("Erlaubte Rollen");?>',
+            openIdClientId:'<?php echo $this->translate->_("OpenID Benutzername");?>',
+            openIdClientSecret:'<?php echo $this->translate->_("OpenID Passwort");?>',
+            openIdRedirectLabel:'<?php echo $this->translate->_("Verlinkter Text Loginseite");?>',
+            openIdRedirectCheckbox:'<?php echo $this->translate->_("Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.");?>',
+            defaultRolesGroupLabelTooltip:'<?php echo $this->translate->_("Standardsystemrollen werden verwendet, wenn der OpenID-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.");?>',
+            serverRolesGroupLabelTooltip:'<?php echo $this->translate->_("Systemrollen, die der OpenID-Server in translate5 festlegen darf.");?>',
+            helpButtonText:'<?php echo $this->translate->_("Hilfe");?>'
         }
     });
 
