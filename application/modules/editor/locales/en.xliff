@@ -4150,6 +4150,14 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.</source>
     <target>Value sets the same config, as the "System configuration overwrite" of the same name</target>
 </trans-unit>
+<trans-unit id='Qml0dGUga29uZmlndXJpZXJlbiBTaWUgenVuw6RjaHN0IGRhcyBGZWxkICJ0cmFuc2xhdGU1IERvbWFpbiIgaW0gVGFiICJBbGxnZW1laW4iLiBEYW5hY2gga8O2bm5lbiBTaWUgT3BlbklEIENvbm5lY3QgZsO8ciBkaWVzZW4gS3VuZGVuIGVpbnJpY2h0ZW4u'>
+    <source>Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.</source>
+    <target>Please configure the "translate5 domain" field in the "General" tab first. After that you can set up OpenID Connect for this customer.</target>
+</trans-unit>
+<trans-unit id='QWxsZ2VtZWlu'>
+    <source>Allgemein</source>
+    <target>General</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
