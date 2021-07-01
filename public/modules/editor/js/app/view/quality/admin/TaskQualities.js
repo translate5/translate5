@@ -42,8 +42,10 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
     reAnalysisHidden: true,
     // autoScroll: true,
     requires: [
-        'Editor.store.quality.Task'
+        'Editor.store.quality.Task',
+        'Editor.view.quality.admin.TaskQualitiesController'
     ],
+    controller: 'taskQualities',
     strings: {
         category: '#UT#Kategorie',
         total: '#UT#Anzahl',
@@ -67,17 +69,25 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
      * This function only expects and handles extraParams with valid taskGuid
      */
     setExtraParams: function(extraParams){
-        var me = this;
-        if(!me.reAnalysisHidden){
-            me.down('#analysisToolbar').setHidden(true);
-            me.reAnalysisHidden = true;
+        if(!this.reAnalysisHidden){
+            this.down('#analysisToolbar').setHidden(true);
+            this.reAnalysisHidden = true;
         }
-        me.store.getProxy().abort(); // abort running requests to avoid contextless requests
+        this.store.getProxy().abort(); // abort running requests to avoid contextless requests
         if(extraParams && extraParams.taskGuid){
-            me.store.taskGuid = extraParams.taskGuid;
-            me.store.reload();
+            this.store.taskGuid = extraParams.taskGuid;
+            this.store.reload();
         } else {
-            me.store.removeAll(false);
+            this.store.removeAll(false);
+        }
+    },
+    /**
+     * refreshes a loaded store (checks for matching taskGuid)
+     */
+    refreshStore: function(taskGuid){
+        if(taskGuid && this.store.taskGuid && this.store.taskGuid == taskGuid){
+            this.store.getProxy().abort();
+            this.store.reload();
         }
     },
     initConfig: function(instanceConfig) {
