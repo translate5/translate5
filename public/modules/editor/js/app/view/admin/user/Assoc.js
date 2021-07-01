@@ -37,7 +37,8 @@ Ext.define('Editor.view.admin.user.Assoc', {
         'Editor.view.admin.user.AssocViewController',
         'Editor.view.admin.user.AssocViewModel',
         'Editor.view.admin.user.AssocGrid',
-        'Editor.view.LanguageCombo'
+        'Editor.view.LanguageCombo',
+        'Editor.view.NumberfieldCustom'
     ],
 
     itemId: 'adminUserAssoc',
@@ -147,11 +148,13 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 valueField: 'userGuid',
                                 fieldLabel: me.strings.fieldUser
                             },{
-                                xtype:'numberfield',
+                                xtype:'numberfieldcustom',
                                 itemId: 'deadlineDate',
                                 name:'deadlineDate',
-                                decimalPrecision:4,
-                                minValue:0.1,
+                                decimalPrecision:2,
+                                useCustomPrecision:true,
+                                minValue:0.10,
+                                mouseWheelEnabled:true,
                                 fieldLabel: me.strings.fieldDeadline,
                                 labelCls: 'labelInfoIcon',
                                 cls:'userAssocLabelIconField',
