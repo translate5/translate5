@@ -71,7 +71,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
         propertiesTabPanelTitle: '#UT#Allgemein',
         configTabTitle:'#UT#Überschreibung der Systemkonfiguration',
         actionColumn:'#UT#Aktionen',
-        customerEditActionIcon:'#UT#Kunden bearbeiten'
+        customerEditActionIcon:'#UT#Kunden bearbeiten',
+        openIdTabPanelDisabledTooltip:'#UT#Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -102,37 +103,37 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             store: 'customersStore'
                         },
                         columns: [{
-                            xtype: 'gridcolumn',
-                            dataIndex: 'id',
-                            text: 'Id',
-                            width: 20,
-                            filter: {
-                                type: 'number'
-                            }
+                                xtype: 'gridcolumn',
+                                dataIndex: 'id',
+                                text: 'Id',
+                                width: 20,
+                                filter: {
+                                    type: 'number'
+                                }
                             },{
-                            xtype: 'actioncolumn',
-                            text:  me.strings.actionColumn,
-                            //menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter.
-                            // NOTE: when this is uncommented, the last action icon is always hidden. You need to resize the action column to make all action items visible.
-                            sortable: false,
-                            width: 60,
-                            items:[{
-                                glyph: 'f044@FontAwesome5FreeSolid',
-                                tooltip: me.strings.customerEditActionIcon,
-                                scope:'controller',
-                                handler:'onCustomerEditClick'
+                                xtype: 'actioncolumn',
+                                text:  me.strings.actionColumn,
+                                menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter.
+                                // NOTE: when this is uncommented, the last action icon is always hidden. You need to resize the action column to make all action items visible.
+                                sortable: false,
+                                width: 60,
+                                items:[{
+                                    glyph: 'f044@FontAwesome5FreeSolid',
+                                    tooltip: me.strings.customerEditActionIcon,
+                                    scope:'controller',
+                                    handler:'onCustomerEditClick'
+                                },{
+                                    glyph: 'f1c3@FontAwesome5FreeSolid',
+                                    tooltip: me.strings.export,
+                                    scope:'controller',
+                                    handler:'onTmExportClick'
+                                },{
+                                    glyph: 'f2ed@FontAwesome5FreeSolid',
+                                    tooltip:me.strings.remove,
+                                    scope:'controller',
+                                    handler:'remove'
+                                }]
                             },{
-                                glyph: 'f1c3@FontAwesome5FreeSolid',
-                                tooltip: me.strings.export,
-                                scope:'controller',
-                                handler:'onTmExportClick'
-                            },{
-                                glyph: 'f2ed@FontAwesome5FreeSolid',
-                                tooltip:me.strings.remove,
-                                scope:'controller',
-                                handler:'remove'
-                            }]
-                        },{
                                 xtype: 'gridcolumn',
                                 dataIndex: 'name',
                                 text: me.strings.customerName,
@@ -259,7 +260,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         },{
                             xtype: 'adminUserAssoc',
                             bind:{
-                                customer:'{record}'
+                                customer:'{record}',
+                                disabled:'{isNewRecord}'
                             }
                         },{
                             xtype: 'adminConfigGrid',
@@ -272,6 +274,13 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             }
                         },{
                             xtype:'openIdPanel',
+                            tabConfig: {
+                                style: {
+                                    // to enable tooltip when the tabpanel is disabled
+                                    pointerEvents: 'all'
+                                },
+                                tooltip: me.strings.openIdTabPanelDisabledTooltip
+                            },
                             bind:{
                                 disabled:'{!customerDomain.value}'
                             }

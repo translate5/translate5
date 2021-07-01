@@ -589,11 +589,6 @@ tr.customState td div {font-style: italic;}
 .projectGrid .ico-task-edit {display:none; background-repeat: no-repeat; background-position: center;}
 .projectGrid .ico-task-project {display:none; background-repeat: no-repeat; background-position: center;}
 
-/* space between action icons */
-.x-action-col-icon{
-	margin-right:5px;
-}
-
 /* User Admin */
 .gender-male {background: url("../images/user.png") no-repeat 6px center;}
 .gender-neutral {background: url("../images/user_gray.png") no-repeat 6px center;}

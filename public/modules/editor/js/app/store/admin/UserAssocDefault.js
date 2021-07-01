@@ -36,5 +36,6 @@ Ext.define('Editor.store.admin.UserAssocDefault', {
   model: 'Editor.model.admin.UserAssocDefault',
   autoLoad: false,
   pageSize:false,
-  remoteFilter:true
+  remoteFilter:true,
+  groupField: 'sourceLang'
 });
