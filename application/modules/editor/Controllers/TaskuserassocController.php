@@ -420,9 +420,11 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         if(!isset($this->data->deadlineDate) || $this->data->deadlineDate!=="default" || !isset($this->data->taskGuid)){
             return;
         }
+
         $model = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $model editor_Models_Task */
         $model->loadByTaskGuid($this->data->taskGuid);
+
         //check if the order date is set. With empty order data, no deadline date from config is possible
         if(empty($model->getOrderdate()) || is_null($model->getOrderdate())){
             return;
@@ -434,7 +436,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $workflow = $wm->get($model->getWorkflow());
 
         $step = $this->data->workflowStepName;
-//FIXME fallback from default workflow if step/workflow is not defined!
         //get the config for the task workflow and the user assoc role workflow step
         $configValue = $model->getConfig()->runtimeOptions->workflow->{$model->getWorkflow()}->{$step}->defaultDeadlineDate ?? 0;
         if($configValue <= 0){
