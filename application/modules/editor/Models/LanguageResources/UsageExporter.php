@@ -148,6 +148,9 @@ class editor_Models_LanguageResources_UsageExporter{
 
         $users = $this->users;
         $this->excel->setCallback('userGuid',function ($userGuid) use($users){
+            if($userGuid === ZfExtended_Models_User::SYSTEM_GUID){
+                return ZfExtended_Models_User::SYSTEM_LOGIN;
+            }
             $u = $users[$userGuid] ?? false;
             if(!$u){
                 return $userGuid;
@@ -291,7 +294,7 @@ class editor_Models_LanguageResources_UsageExporter{
         
         $result = $this->getExportRawData($customerId);
         
-        $unset = ["customerId","yearAndMonth","timestamp","customers"];
+        $unset = ["customerId","yearAndMonth","timestamp","customers","userGuid"];
         $languages = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languages editor_Models_Languages */
         $languages = $languages->loadAllKeyValueCustom('id','rfc5646');
