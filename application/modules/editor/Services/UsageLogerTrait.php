@@ -100,16 +100,24 @@ trait editor_Services_UsageLogerTrait {
             }
 
         }elseif(is_string($querySource)){//if the the querySource is string, the context is instant-translate (translate request)
-            //calculate the customers for the instant-translate request
+            // calculate the customers for the instant-translate request
             $logger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
             //set the request source to instant-translate
             $logger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_INSTANT_TRANSLATE);
+            // for instant translate search use the session user
+            $logger->setUserGuid(editor_User::instance()->getGuid());
         }
 
-        // for instant translate search and for normal task query action, set the user from the session
-        if(is_string($querySource) || (isset($this->task) && !$this->task->isHiddenTask())){
-            // set the user from the session
-            $logger->setUserGuid(editor_User::instance()->getGuid());
+        // if no user is set from above, try to set one
+        if($logger->getUserGuid() === null){
+
+            $session = new Zend_Session_Namespace('user');
+            // if no session user is, this must be worker context or tests
+            if(!isset($session->data->id)){
+                $logger->setUserGuid(ZfExtended_Models_User::SYSTEM_GUID);
+            }else{
+                $logger->setUserGuid($session->data->userGuid);
+            }
         }
 
         $logger->save();
