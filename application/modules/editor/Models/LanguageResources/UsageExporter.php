@@ -49,7 +49,12 @@ class editor_Models_LanguageResources_UsageExporter{
      * @var array
      */
     protected $customers;
-    
+
+    /***
+     * @var array
+     */
+    protected $users;
+
     /***
      * @var ZfExtended_Models_Entity_ExcelExport
      */
@@ -68,7 +73,8 @@ class editor_Models_LanguageResources_UsageExporter{
         "charactersPerCustomer"=>"Übersetzte Zeichen",
         "taskCount"=>"Anzahl der mit InstantTranslate übersetzten Dokumente",
         "customers" =>"Kunden",
-        "repetition" => "Wiederholung"
+        "repetition" => "Wiederholung",
+        "userGuid" => "Benutzer",
     ];
     
     /***
@@ -113,7 +119,11 @@ class editor_Models_LanguageResources_UsageExporter{
         $customers = ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $customers editor_Models_Customer */
         $this->customers = $customers->loadAllKeyCustom('id');
-        
+
+        $users = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $users ZfExtended_Models_User */
+        $this->users = $users->loadAllKeyCustom('userGuid');
+
         $this->initExcelExport();
     }
     
@@ -135,6 +145,15 @@ class editor_Models_LanguageResources_UsageExporter{
         
         $this->excel->setCallback('sourceLang',$langCallback);
         $this->excel->setCallback('targetLang',$langCallback);
+
+        $users = $this->users;
+        $this->excel->setCallback('userGuid',function ($userGuid) use($users){
+            $u = $users[$userGuid] ?? false;
+            if(!$u){
+                return $userGuid;
+            }
+            return $u['surName'].', '.$u['firstName'].' ('.$u['login'].')';
+        });
         
         $this->excel->setCallback('repetition',function($repetition){
             return $repetition == 1 ? '✓' : '';
