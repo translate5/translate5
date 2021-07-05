@@ -47,6 +47,10 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
     }
     
     public function isValid($data) {
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($data['taskGuid'] ?? $this->entity->getTaskGuid());
+        /* @var $workflow editor_Workflow_Default */
+        $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
+
         if(parent::isValid($data)) {
             return true;
         }
@@ -94,12 +98,6 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $this->addValidator('matchRateType', 'stringLength', array('min' => 0, 'max' => 1084));
         $this->addValidator('workflowStepNr', 'int');
         $this->addValidator('pretrans', 'inArray', [ZfExtended_Utils::getConstants('editor_Models_Segment', 'PRETRANS_')]);
-        
-        /* simplest way to get the correct workflow here: */
-        $session = new Zend_Session_Namespace();
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($session->taskGuid);
-        /* @var $workflow editor_Workflow_Default */
-        $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
         
         $allowedValues = array_keys($config->runtimeOptions->segments->stateFlags->toArray());
         $allowedValues[] = 0; //adding "not set" state
@@ -178,11 +176,11 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
                   $errorsMinWidth[] = ($key+1) . ': ' . $length;
               }
           }
-          if (count($errorsMinWidth) > 0) {
+          if (!empty($errorsMinWidth)) {
               $this->addMessage($field, 'segmentLinesTooShort', 'Not all lines in the segment match the given minimal length: ' . implode('; ', $errorsMinWidth));
               $isValid = false;
           }
-          if (count($errorsMaxWidth) > 0) {
+          if (!empty($errorsMaxWidth)) {
               $this->addMessage($field, 'segmentLinesTooLong', 'Not all lines in the segment match the given maximal length: ' . implode('; ', $errorsMaxWidth));
               $isValid = false;
           }
