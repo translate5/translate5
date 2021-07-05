@@ -361,8 +361,15 @@ class editor_Workflow_Default {
         foreach($this->definition->validStates as $step => $statesToSteps) {
             $result[$step] = [];
             foreach($statesToSteps as $stepInner => $states) {
-                //the initial state per role is just the first defined state per role
-                $result[$step][$stepInner] = reset($states);
+                //the initial states for NO WORKFLOW is always OPEN so that the first assigned job is added as open,
+                //  then the workflow changes and all following jobs are getting their calculated state then
+                if($step === self::STEP_NO_WORKFLOW) {
+                    $result[$step][$stepInner] = self::STATE_OPEN;
+                }
+                else {
+                    //the initial state per role is just the first defined state per role
+                    $result[$step][$stepInner] = reset($states);
+                }
             }
         }
         return $result;
