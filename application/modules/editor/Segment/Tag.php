@@ -162,6 +162,16 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public $endIndex = 0;
     /**
+     * This saves the order of the tag as found on creation. This is e.g. crucial for multiple singular tags beneath each other or singular tags on the start or end of the covered markup that are directly beside tags with content
+     * @var int
+     */
+    public $order = -1;
+    /**
+     * This saves the order of the parent tag as found on creation (if there is a perent tag). This is e.g. crucial for singular tags contained in other tags or to specify the nesting if tags have identical start & end indices
+     * @var int
+     */
+    public $parentOrder = -1;
+    /**
      * Set by editor_Segment_FieldTags to indicate that the Tag spans the complete segment text
      * @var bool
      */
@@ -172,7 +182,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public $wasDeleted;
     /**
-     * Set by editor_Segment_FieldTags to indicate that the Tag was inserted at some time in the segment's history (is in a ins-tag)
+     * Set by editor_Segment_FieldTags to indicate that the Tag was inserted at some time in the segment's history (is in an ins-tag)
      * @var bool
      */
     public $wasInserted;
@@ -408,6 +418,8 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         $data->category = $this->getCategory();
         $data->startIndex = $this->startIndex;
         $data->endIndex = $this->endIndex;
+        $data->order = $this->order;
+        $data->parentOrder = $this->parentOrder;
         $data->classes = $this->classes;
         $data->attribs = editor_Tag::encodeAttributes($this->attribs);
         $this->furtherSerialize($data);
@@ -421,6 +433,8 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         $this->category = $data->category;
         $this->startIndex = $data->startIndex;
         $this->endIndex = $data->endIndex;
+        $this->order = $data->order;
+        $this->parentOrder = $data->parentOrder;
         $this->classes = $data->classes;
         $this->attribs = editor_Tag::decodeAttributes($data->attribs);
         $this->furtherUnserialize($data);
@@ -438,6 +452,14 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     protected function furtherUnserialize(stdClass $data){
         
+    }
+    /**
+     * Additionally to the base function we check also for the same segment tag type
+     * {@inheritDoc}
+     * @see editor_Tag::isEqual()
+     */
+    public function isEqual(editor_Tag $tag, bool $withDataAttribs=true) : bool {
+        return ($this->isEqualType($tag) && parent::isEqual($tag, $withDataAttribs));
     }
     /**
      * Determines, if Internal tags are of an equal type
@@ -501,7 +523,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return false;
     }
     /**
-     * Checks, if this internal tag can contain the passed internal tag
+     * Checks, if this segment tag can contain the passed segment tag
      * API is used in the rendering process only
      * @param editor_Segment_Tag $tag
      * @return boolean
@@ -509,6 +531,10 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     public function canContain(editor_Segment_Tag $tag) : bool {
         if(!$this->isSingular()){
             if($this->startIndex <= $tag->startIndex && $this->endIndex >= $tag->endIndex){
+                // when tag are aligned with our boundries it is unclear if they are inside or outside, so let's decide by the parentship on creation
+                if($tag->endIndex == $this->startIndex || $tag->startIndex == $this->endIndex){
+                    return $tag->parentOrder == $this->order;
+                }
                 return true;
             }
         }
@@ -528,6 +554,14 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
             return $this->parent->getNearestContainer($tag);
         }
         return null;
+    }
+    /**
+     * For rendering all tags are cloned and the orders need to be cloned as well
+     * @param editor_Segment_Tag $from
+     */
+    public function cloneOrder(editor_Segment_Tag $from){
+        $this->order = $from->order;
+        $this->parentOrder = $from->parentOrder;
     }
     /**
      * After the nested structure of tags is set this fills in the text-chunks of the segments text
@@ -563,22 +597,23 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     }
     /**
      * Adds us and all our children to the segment tags
-     * @param editor_Segment_FieldTags $tags
+     * @param int $parentOrder
      */
-    public function sequence(editor_Segment_FieldTags $tags){
-        $tags->addTag($this);
-        $this->sequenceChildren($tags);
+    public function sequence(editor_Segment_FieldTags $tags, int $parentOrder){
+        $tags->addTag($this, -1, $parentOrder);
+        $this->sequenceChildren($tags, $this->order);
     }
     /**
      * Adds all our children to the segment tags
      * @param editor_Segment_FieldTags $tags
+     * @param int $parentOrder
      */
-    public function sequenceChildren(editor_Segment_FieldTags $tags){
+    public function sequenceChildren(editor_Segment_FieldTags $tags, int $parentOrder=-1){
         if($this->hasChildren()){
             foreach($this->children as $child){
                 if(is_a($child, 'editor_Segment_Tag')){
                     /* @var $child editor_Segment_Tag */
-                    $child->sequence($tags);
+                    $child->sequence($tags, $parentOrder);
                 }
             }
         }

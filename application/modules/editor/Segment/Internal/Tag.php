@@ -192,7 +192,7 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * @see editor_Tag::isEqual()
      */
     public function isEqual(editor_Tag $tag, bool $withDataAttribs=true) : bool {
-        if(parent::isEqual($tag, $withDataAttribs) && get_class($tag) == get_class($this)){
+        if(parent::isEqual($tag, $withDataAttribs)){
             return $tag->renderChildren() == $this->renderChildren();
         }
         return false;

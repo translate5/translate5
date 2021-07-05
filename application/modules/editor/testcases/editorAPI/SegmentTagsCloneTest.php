@@ -100,6 +100,7 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $expected = 'Lorem <1>ipsum dolor</1> sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $this->createTrackChangesCloneTest($expected, $markup);
         $this->createTrackChangesFilterCloneTest($expected, $markup);
+        $this->createTrackChangesMqmFilterCloneTest(strip_tags($expected), $markup);
     }
     
     public function testMarkup2(){
@@ -107,6 +108,7 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $expected = 'Lorem <1>ipsum</1> dolor sit amet, elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $this->createTrackChangesCloneTest($expected, $markup);
         $this->createTrackChangesFilterCloneTest($expected, $markup);
+        $this->createTrackChangesMqmFilterCloneTest(strip_tags($expected), $markup);
     }
 
     public function testMarkup3(){
@@ -114,6 +116,7 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $expected = 'Lorem <1>ipsum </1> amet, <2></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> </3>, sed diam voluptua.';
         $this->createTrackChangesCloneTest($expected, $markup);
         $this->createTrackChangesFilterCloneTest($expected, $markup);
+        $this->createTrackChangesMqmFilterCloneTest(strip_tags($expected), $markup);
     }
     
     public function testMarkup4(){
@@ -122,6 +125,7 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $expected = 'Lorem sit amet, <2>consetetur sadipscing</2> elitr, sed diam nonumy eirmod tempor <3>invidunt <6/> labore et <4>dolore magna</4> aliquyam erat</3> sed diam voluptua.';
         $this->createTrackChangesCloneTest($expected, $markup);
         $this->createTrackChangesFilterCloneTest($expected, $markup);
+        $this->createTrackChangesMqmFilterCloneTest(strip_tags($expected), $markup);
     }
     /**
      * Creates a test for the tags cloning. The passed markup will have the following short-tags replaced with "real" internal tags
@@ -148,7 +152,8 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $this->assertEquals($expected, $reconvertedCloned);
         $this->assertEquals($expectedConverted, $renderedCloned);
         $this->assertEquals($expectedTags->render(), $renderedCloned);
-        $this->assertEquals($expectedTags->toJson(), $clonedTags->toJson());
+        // ther order in the cloned json still has the old values, so we ignore the ordering
+        $this->assertEquals($this->cleanOrderInJSON($expectedTags->toJson()), $this->cleanOrderInJSON($clonedTags->toJson()));
         // make sure the original tags do not become manipulated. We need to remove the IDs here, but at one point they may have to be included for trackchanges purposes
         $markupExpected = preg_replace('~ id="ext-element-[0-9]+"~', '', $markupConverted);
         $this->assertEquals($markupExpected, $markupTags->render());
@@ -173,10 +178,44 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $clonedTags = $markupTags->cloneWithoutTrackChanges($filter);
         // compare
         $this->assertEquals($expectedTags->render(), $clonedTags->render());
-        $this->assertEquals($expectedTags->toJson(), $clonedTags->toJson());
+        $this->assertEquals($this->cleanOrderInJSON($expectedTags->toJson()), $this->cleanOrderInJSON($clonedTags->toJson()));
         // compare full clone
         $this->assertEquals($markupTags->render(), $markupTagsCloned->render());
-        $this->assertEquals($markupTags->toJson(), $markupTagsCloned->toJson());
+        $this->assertEquals($this->cleanOrderInJSON($markupTags->toJson()), $this->cleanOrderInJSON($markupTagsCloned->toJson()));
+    }
+    /**
+     * Creates a test for the tags cloning with filtering for MQM tags only, what will effectively remove all tags as we only have internal tags
+     * The passed markup will have the following short-tags replaced with "real" internal tags
+     * Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>
+     * @param string $expected
+     * @param string $markup
+     */
+    private function createTrackChangesMqmFilterCloneTest($expected, $markup){
+        // we filter for internal tags only
+        $filter = [ editor_Segment_Tag::TYPE_MQM ];
+        $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $this->replaceTags($markup), 'target', 'target');
+        // a full clone without filter
+        $markupTagsCloned = $markupTags->cloneFiltered();
+        $expectedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $this->replaceTags($expected), 'target', 'target');
+        // create expected clone and only filtered tags
+        $expectedTags = $expectedTags->cloneFiltered($filter);
+        // create clone without trackchanges and only filtered tags
+        $clonedTags = $markupTags->cloneWithoutTrackChanges($filter);
+        // compare
+        $this->assertEquals($expectedTags->render(), $clonedTags->render());
+        $this->assertEquals($this->cleanOrderInJSON($expectedTags->toJson()), $this->cleanOrderInJSON($clonedTags->toJson()));
+        // compare full clone
+        $this->assertEquals($markupTags->render(), $markupTagsCloned->render());
+        $this->assertEquals($this->cleanOrderInJSON($markupTags->toJson()), $this->cleanOrderInJSON($markupTagsCloned->toJson()));
+    }
+    /**
+     * Removes the order / parentOrder props in the json-data as they are not sequenced (but valid!) in the cloned tags
+     * @param string $json
+     * @return string
+     */
+    private function cleanOrderInJSON($json){
+        $json = preg_replace('/"parentOrder":[0-9]+,/', '"parentOrder":-1,', $json);
+        return preg_replace('/"order":[0-9]+,/', '"order":-1,', $json);
     }
     /**
      * 
