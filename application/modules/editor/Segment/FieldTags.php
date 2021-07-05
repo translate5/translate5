@@ -151,6 +151,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
     private $field;
     /**
      * The text of the relevant segment field
+     * This text unfortunately covers the text-contents of Internal Tags
      * @var string
      */
     private $fieldText;
@@ -219,7 +220,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return $this->field;
     }
     /**
-     * 
+     * Returns the field text (which covers the textual contents of internal tags as well !)
      * @return string
      */
     public function getFieldText() : string {
@@ -929,4 +930,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
         return $debug;
     }
+    /**
+     * Debug state of our segment props
+     * @return string
+     */
+    public function debugProps(){
+        return '[ segment:'.$this->segmentId.' | field:'.$this->field.' | saveTo:'.$this->saveTo.' | ttName:'.$this->ttName.' ]';
+    }
+    
+    
 }
