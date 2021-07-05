@@ -162,12 +162,12 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public $endIndex = 0;
     /**
-     * This saves the order of the tag as found on creation. This is e.g. crucial for multiple singular tags beneath each other or singular tags on the start or end of the covered markup that are directly beside tags with content
+     * This saves the order of the tag as found on creation. This is e.g. crucial for multiple singular tags beside each other or singular tags on the start or end of the covered markup that are directly beside tags with content
      * @var int
      */
     public $order = -1;
     /**
-     * This saves the order of the parent tag as found on creation (if there is a perent tag). This is e.g. crucial for singular tags contained in other tags or to specify the nesting if tags have identical start & end indices
+     * This saves the order of the parent tag as found on creation (if there is a parent tag). This is e.g. crucial for singular tags contained in other tags or to specify the nesting if tags have identical start & end indices
      * @var int
      */
     public $parentOrder = -1;

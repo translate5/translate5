@@ -676,7 +676,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return editor_Segment_FieldTags
      */
     public function cloneFiltered(array $includedTypes=NULL) : editor_Segment_FieldTags {
-        // UGLY: The Internal tags can not be filtered out but must be removed from the cloned tags if they should be filtered out diue to the text-contents of the internal tags
+        // UGLY: The Internal tags can not be filtered out but must be removed from the cloned tags if they should be filtered out due to the text-contents of the internal tags
         $cloneHasInternal = ($includedTypes == NULL || in_array(editor_Segment_Tag::TYPE_INTERNAL, $includedTypes));
         $clonedTags = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->field, $this->fieldText, $this->saveTo, $this->ttName);
         foreach($this->tags as $tag){
@@ -696,7 +696,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return editor_Segment_FieldTags
      */
     public function cloneWithoutTrackChanges(array $includedTypes=NULL) : editor_Segment_FieldTags {
-        // UGLY: The Internal tags can not be filtered out but must be removed from the cloned tags if they should be filtered out diue to the text-contents of the internal tags
+        // UGLY: The Internal tags can not be filtered out but must be removed from the cloned tags if they should be filtered out due to the text-contents of the internal tags
         $cloneHasInternal = ($includedTypes == NULL || in_array(editor_Segment_Tag::TYPE_INTERNAL, $includedTypes));
         $deleteTags = [];
         $otherTags = [];
