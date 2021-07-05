@@ -39,11 +39,11 @@ trait editor_Services_UsageLogerTrait {
     protected $userFilePretranslate;
     
     /***
-     * The current task which is being pretranslated. This is needed so we do not load the task each time when the segment
+     * The current task which is being pretranslated. This is needed, so we do not load the task each time when the segment
      * usage is loged
      * @var editor_Models_Task
      */
-    protected $taskFilePretranslate;
+    protected $task;
     
     
     /***
@@ -53,59 +53,97 @@ trait editor_Services_UsageLogerTrait {
      * @param boolean $isSegmentRepetition : is the queryString segment repetition. If yes, the repetition flag will be set to 1.
      */
     public function logAdapterUsage($querySource, bool $isSegmentRepetition = false){
-        $mtlogger=ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
-        /* @var $mtlogger editor_Models_LanguageResources_UsageLogger */
-        $mtlogger->setLanguageResourceId($this->getLanguageResource()->getId());
-        $mtlogger->setSourceLang($this->sourceLang);
-        $mtlogger->setTargetLang($this->targetLang);
-        
+
+        $logger=ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
+        /* @var $logger editor_Models_LanguageResources_UsageLogger */
+
+        $logger->setLanguageResourceId($this->getLanguageResource()->getId());
+        $logger->setSourceLang($this->sourceLang);
+        $logger->setTargetLang($this->targetLang);
+
         $logQueryString =$this->toLogQueryString($querySource);
         
-        $mtlogger->setQueryString($logQueryString);
+        $logger->setQueryString($logQueryString);
         
-        $mtlogger->setTranslatedCharacterCount($this->getCharacterCount($logQueryString));
-        
+        $logger->setTranslatedCharacterCount($this->getCharacterCount($logQueryString));
+
+        if($isSegmentRepetition){
+            $logger->setRepetition(1);
+        }
+
         //if the query source is segment, the context is for task
         if($querySource instanceof editor_Models_Segment){
             
-            
             // init the default request source
-            $mtlogger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_EDITOR);
+            $logger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_EDITOR);
             
-            if($isSegmentRepetition){
-                $mtlogger->setRepetition(1);
-            }
-            
-            //load the task for the current request
-            if(!isset($this->taskFilePretranslate) || $this->taskFilePretranslate->getTaskGuid()!=$querySource->getTaskGuid()){
-                $this->taskFilePretranslate = ZfExtended_Factory::get('editor_Models_Task');
-                $this->taskFilePretranslate->loadByTaskGuid($querySource->getTaskGuid());
-            }
-            
+            // load the task for the current request
+            $this->loadTask($querySource->getTaskGuid());
+
             //by default, set the customers to the task customer
-            $mtlogger->setCustomers($this->taskFilePretranslate->getCustomerId());
+            $logger->setCustomers($this->task->getCustomerId());
 
             //if the task type is hidden task( file-pretranslation), we need to load the pre-translation task user, and calculate the customers
-            if($this->taskFilePretranslate->isHiddenTask()){
-                
-                if(!isset($this->userFilePretranslate) || $this->userFilePretranslate->getUserGuid() != $this->taskFilePretranslate->getPmGuid()){
-                    //when file is being pretranslated in instant translate, the task pm is always the user who runs the pretranslation
-                    $this->userFilePretranslate = ZfExtended_Factory::get('ZfExtended_Models_User');
-                    $this->userFilePretranslate->loadByGuid($this->taskFilePretranslate->getPmGuid());
-                }
+            if($this->task->isHiddenTask()){
+
+                // load the user which pre-translates the task and store the user in class variable
+                $this->loadUserFilePretranslate();
+
                 //for instant translate, calculate the customers
-                $mtlogger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
+                $logger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
                 
                 // set the request source to instant-translate
-                $mtlogger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_INSTANT_TRANSLATE);
+                $logger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_INSTANT_TRANSLATE);
+
+                // for file pre-translation, the logger user is the task pm user -> userFilePretranslate
+                $logger->setUserGuid($this->userFilePretranslate->getUserGuid());
             }
+
         }elseif(is_string($querySource)){//if the the querySource is string, the context is instant-translate (translate request)
-            //calculate the customers for the instant-translate request
-            $mtlogger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
+            // calculate the customers for the instant-translate request
+            $logger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
             //set the request source to instant-translate
-            $mtlogger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_INSTANT_TRANSLATE);
+            $logger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_INSTANT_TRANSLATE);
+            // for instant translate search use the session user
+            $logger->setUserGuid(editor_User::instance()->getGuid());
         }
-        $mtlogger->save();
+
+        // if no user is set from above, try to set one
+        if($logger->getUserGuid() === null){
+
+            $session = new Zend_Session_Namespace('user');
+            // if no session user is, this must be worker context or tests
+            if(!isset($session->data->id)){
+                $logger->setUserGuid(ZfExtended_Models_User::SYSTEM_GUID);
+            }else{
+                $logger->setUserGuid($session->data->userGuid);
+            }
+        }
+
+        $logger->save();
+    }
+
+    /***
+     * Load the task from the current request and store it in local variable task
+     * @param string $taskGuid
+     */
+    protected function loadTask(string $taskGuid){
+        // load the task for the current request
+        if(!isset($this->task) || $this->task->getTaskGuid()!=$taskGuid){
+            $this->task = ZfExtended_Factory::get('editor_Models_Task');
+            $this->task->loadByTaskGuid($taskGuid);
+        }
+    }
+
+    /***
+     * @param string $userGuid
+     */
+    protected function loadUserFilePretranslate(){
+        if(!isset($this->userFilePretranslate) || $this->userFilePretranslate->getUserGuid() != $this->task->getPmGuid()){
+            //when file is being pretranslated in instant translate, the task pm is always the user who runs the pretranslation
+            $this->userFilePretranslate = ZfExtended_Factory::get('ZfExtended_Models_User');
+            $this->userFilePretranslate->loadByGuid($this->task->getPmGuid());
+        }
     }
     
     /***
