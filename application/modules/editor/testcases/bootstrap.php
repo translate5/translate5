@@ -31,6 +31,8 @@ END LICENSE AND COPYRIGHT
  */
 
 $APPLICATION_ROOT = rtrim(getenv('APPLICATION_ROOT'), '/');
+$DO_CAPTURE = (getenv('DO_CAPTURE') === "1");
+
 $zendLib = $APPLICATION_ROOT.'/vendor/shardj/zf1-future/library/';
 
 //include optional composer vendor autoloader. TODO FIXME: why needs this to be done here, shouldn't the bootstarpper make that happen ?
@@ -67,7 +69,7 @@ $DATA_DIR = $config->runtimeOptions->dir->taskData;
 $LOGOUT_PATH = $config->runtimeOptions->loginUrl;
 
 // crucial: setup the test-API with the neccessary pathes & url's
-ZfExtended_Test_ApiHelper::setup($API_URL, $DATA_DIR, $LOGOUT_PATH);
+ZfExtended_Test_ApiHelper::setup($API_URL, $DATA_DIR, $LOGOUT_PATH, $DO_CAPTURE);
 
 //forcing cwd to testcases dir
 chdir(dirname(__FILE__));

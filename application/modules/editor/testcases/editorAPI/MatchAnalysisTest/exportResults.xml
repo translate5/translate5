@@ -4,6 +4,7 @@
     <project name="API Testing::MatchAnalysisTest" number="UNTESTABLECONTENT"/>
     <language lcid="" name="Deutsch"/>
     <customer name="Alex, Test Customer"/>
+    <tm name="MATESTresource1"/>
     <tm name="MATESTresource2"/>
     <tm name="MATESTresource3"/>
     <settings reportInternalFuzzyLeverage="yes" reportLockedSegmentsSeparately="no" reportCrossFileRepetitions="yes" minimumMatchScore="50" searchMode="bestWins" missingFormattingPenalty="n/a" differentFormattingPenalty="n/a" multipleTranslationsPenalty="n/a" autoLocalizationPenalty="n/a" textReplacementPenalty="n/a" fullRecallMatchedWords="n/a" partialRecallMatchedWords="n/a" fullRecallSignificantWords="n/a" partialRecallSignificantWords="n/a"/>
@@ -20,10 +21,10 @@
       <internalFuzzy min="70" max="79" words="3" segments="1" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <internalFuzzy min="80" max="89" words="28" segments="4" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <internalFuzzy min="90" max="99" words="0" segments="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <crossFileRepeated words="40" segments="8" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <total words="872" segments="109" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <crossFileRepeated words="56" segments="13" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <total words="1270" segments="163" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <exact words="385" segments="50" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <new words="478" segments="73" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <exact words="3" segments="1" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <perfect words="0" segments="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <inContextExact words="0" segments="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <locked words="0" segments="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>

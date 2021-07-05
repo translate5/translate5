@@ -419,14 +419,11 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * updates the task table count field
-     * @todo this method is a perfect example for the usage in events!
      */
     protected function updateTask($taskGuid) {
-        $sql = 'update `LEK_task` t, (select count(*) cnt, ? taskGuid from `LEK_taskUserAssoc` where taskGuid = ? and isPmOverride = 0) tua
-            set t.userCount = tua.cnt where t.taskGuid = tua.taskGuid';
-        $db = $this->db->getAdapter();
-        $sql = $db->quoteInto($sql, $taskGuid, 'string', 2);
-        $db->query($sql);
+        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        $task->updateTask($taskGuid);
     }
 
     /**
