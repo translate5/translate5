@@ -152,15 +152,20 @@ class editor_Workflow_Default_StepRecalculation {
         $job = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         $jobs = $job->loadByTaskGuidList([$task->getTaskGuid()]);
         
+        $usedJobs = [];
         $usedSteps = [];
         //delete jobs created by default which are not belonging to the tasks workflow and collect used steps
         foreach($jobs as $rawJob) {
-            if($rawJob['workflow'] !== $task->getWorkflow()) {
+            if($rawJob['workflow'] === $task->getWorkflow()) {
+                $usedJobs[] = $rawJob;
+                $usedSteps[] = $rawJob['workflowStepName'];
+            }
+            else {
                 $job->db->delete(['id = ?' => $rawJob['id']]);
             }
-            $usedSteps[] = $rawJob['workflowStepName'];
         }
-        if(empty($usedSteps)) {
+        $task->updateTask();
+        if(empty($usedJobs)) {
             return;
         }
         
@@ -173,7 +178,7 @@ class editor_Workflow_Default_StepRecalculation {
         $task->updateWorkflowStep($currentStep, false);
         
         $isComp = $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE;
-        foreach($jobs as $rawJob) {
+        foreach($usedJobs as $rawJob) {
             //currentstep jobs are open
             if($currentStep === $rawJob['workflowStepName']) {
                 $state = $isComp ? $this->workflow::STATE_UNCONFIRMED : $this->workflow::STATE_OPEN;
