@@ -12,7 +12,9 @@
         "login": "testtranslator",
         "surName": "test",
         "firstName": "translator",
-        "parentIds": null
+        "parentIds": null,
+        "workflowStepName": "reviewing",
+        "workflow": "default"
     },
     {
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
@@ -27,7 +29,9 @@
         "login": "testtranslator",
         "surName": "test",
         "firstName": "translator",
-        "parentIds": null
+        "parentIds": null,
+        "workflowStepName": "translation",
+        "workflow": "default"
     },
     {
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
@@ -42,6 +46,8 @@
         "login": "testtranslator",
         "surName": "test",
         "firstName": "translator",
-        "parentIds": null
+        "parentIds": null,
+        "workflowStepName": "translatorCheck",
+        "workflow": "default"
     }
 ]
