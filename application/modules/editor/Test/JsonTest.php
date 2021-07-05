@@ -188,6 +188,18 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
     public function assertModelEqualsJsonFile(string $modelName, string $fileToCompare, stdClass $actualModel, string $message=''){
         $this->assertModelEqualsObject($modelName, self::$api->getFileContent($fileToCompare), $actualModel, $message);
     }
+    
+    /**
+     * Compares a row of the given model/name with an expected model encoded as JSON object in a file. Both Objects must have a property "row"
+     * @param string $modelName
+     * @param string $fileToCompare
+     * @param stdClass $actual
+     * @param string $message
+     */
+    public function assertModelEqualsJsonFileRow(string $modelName, string $fileToCompare, stdClass $actual, string $message=''){
+        $expected = $this->api()->getFileContent($fileToCompare);
+        $this->assertModelEqualsObject('SegmentQuality', $expected->row, $actual->row);
+    }
     /**
      * Compares an expected with an actual model of the given type/name
      * @param string $modelName
