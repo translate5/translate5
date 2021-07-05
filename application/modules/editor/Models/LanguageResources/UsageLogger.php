@@ -46,7 +46,9 @@ END LICENSE AND COPYRIGHT
  * @method void setCustomers() setCustomers(string $customerId)
  * @method bool getRepetition() getRepetition()
  * @method void setRepetition() setRepetition(bool $repetition)
- * 
+ * @method string getUserGuid() getUserGuid()
+ * @method void setUserGuid() setUserGuid(string $userGuid)
+ *
  */
 class editor_Models_LanguageResources_UsageLogger extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_UsageLogger';
@@ -71,7 +73,8 @@ class editor_Models_LanguageResources_UsageLogger extends ZfExtended_Models_Enti
             'log.timestamp',
             'log.customers',
             'log.repetition',
-            //devide the row characters count with the number of assigned characters for the row. This field represents characters per customer
+            'log.userGuid',
+            //divide the row characters count with the number of assigned characters for the row. This field represents characters per customer
             'ROUND((log.translatedCharacterCount  / (CHAR_LENGTH(TRIM( BOTH  "," FROM  log.customers )) - CHAR_LENGTH(REPLACE(log.customers, ",", "")) + 1))) as charactersPerCustomer'
         ])
         ->join(["lr"=>"LEK_languageresources"], 'lr.id=log.languageResourceId',[]);
