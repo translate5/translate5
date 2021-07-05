@@ -86,7 +86,7 @@ class editor_Models_Terminology_Models_TermEntryModel extends ZfExtended_Models_
      */
     public function getAllTermEntryAndCollection($collectionId): array
     {
-        $query = "SELECT id, collectionId, termEntryTbxId, descrip, isProposal, entryGuid FROM terms_term_entry WHERE collectionId = :collectionId";
+        $query = "SELECT id, collectionId, termEntryTbxId, descrip, isCreatedLocally, entryGuid FROM terms_term_entry WHERE collectionId = :collectionId";
         $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
 
         $simpleResult = [];
@@ -180,11 +180,11 @@ class editor_Models_Terminology_Models_TermEntryModel extends ZfExtended_Models_
             $entryType[] = 1;
         }
         //FIXME testen ob die methode das macht was sie soll
-        return $this->db->delete([' isProposal IN('.implode(',', $entryType).') AND id IN (SELECT t.termEntryId
+        return $this->db->delete([' isCreatedLocally IN('.implode(',', $entryType).') AND id IN (SELECT t.termEntryId
             	FROM terms_attributes t
-            	INNER JOIN (SELECT termEntryId, MAX(updated) as MaxDate FROM terms_attributes WHERE termId is null AND collectionId = '.$collectionId.' GROUP BY termEntryId)
-            	tm ON t.termEntryId = tm.termEntryId AND t.updated = tm.MaxDate
-            	WHERE t.termId is null AND t.collectionId = '.$collectionId.' AND t.updated < ?
+            	INNER JOIN (SELECT termEntryId, MAX(updatedAt) as MaxDate FROM terms_attributes WHERE termId is null AND collectionId = '.$collectionId.' GROUP BY termEntryId)
+            	tm ON t.termEntryId = tm.termEntryId AND t.updatedAt = tm.MaxDate
+            	WHERE t.termId is null AND t.collectionId = '.$collectionId.' AND t.updatedAt < ?
             	GROUP BY t.termEntryId)'=>$olderThan])>0;
     }
 }

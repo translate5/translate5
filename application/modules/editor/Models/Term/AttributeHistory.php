@@ -55,11 +55,11 @@ class editor_Models_Term_AttributeHistory extends ZfExtended_Models_Entity_Abstr
         return [
             'collectionId',
             'value',
-            'processStatus',
+            'isCreatedLocally',
             'userGuid',
             'userName',
             'created',
-            'updated',
+            'updatedAt',
         ];
     }
 }

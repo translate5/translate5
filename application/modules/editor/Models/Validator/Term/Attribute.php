@@ -48,9 +48,9 @@ class editor_Models_Validator_Term_Attribute extends ZfExtended_Models_Validator
     $this->addValidator('termId', 'stringLength', array('min' => 0, 'max' => 255));
     $this->addValidator('dataTypeId', 'int');
     $this->addValidator('guid', 'stringLength', array('min' => 0, 'max' => 38));
-    $this->addValidator('internalCount', 'int');
+    //$this->addValidator('internalCount', 'int');
     $this->addValidator('userGuid', 'stringLength', array('min' => 0, 'max' => 38));
     $this->addValidator('userName', 'stringLength', array('min' => 0, 'max' => 38));
-    $this->addValidator('processStatus', 'stringLength', array('min' => 0, 'max' => 128));
+    $this->addValidator('isCreatedLocally', 'bool');
   }
 }

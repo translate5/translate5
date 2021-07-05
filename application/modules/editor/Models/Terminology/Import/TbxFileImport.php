@@ -153,7 +153,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     protected array $attributesCollection;
     /**
      * All collection from LEK_LanguageResources to check if termEntry isset in actual collection.
-     * $termEntriesCollection['collectionId-groupId' => 'id-isProposal-descrip'];
+     * $termEntriesCollection['collectionId-groupId' => 'id-isCreatedLocally-descrip'];
      * @var array
      */
     protected array $termEntriesCollection;

@@ -141,7 +141,7 @@ class editor_Models_Term_Proposal extends ZfExtended_Models_Entity_Abstract {
         /* @var $term editor_Models_Terminology_Models_TermModel */
         //remove proposals from the term table
         $rowsCount=$term->db->delete([
-            'updated < ?' => $olderThan,
+            'updatedAt < ?' => $olderThan,
             'collectionId in (?)' => $collectionIds,
             'processStatus=?'=>$term::PROCESS_STATUS_UNPROCESSED
         ]);

@@ -73,7 +73,7 @@ class editor_Models_Term_AttributeProposal extends ZfExtended_Models_Entity_Abst
 
     /***
      * Remove term attribute proposals for given termId. The term attribute proposals from the original
-     * attribute table (attributes with processStatus=unprocessed) will be removed to
+     * attribute table (attributes with isCreatedLocally=unprocessed) will be removed to
      *
      * @param int $termId
      * @return boolean
@@ -94,7 +94,7 @@ class editor_Models_Term_AttributeProposal extends ZfExtended_Models_Entity_Abst
         $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
         /* @var $attribute editor_Models_Terminology_Models_AttributeModel */
         //remove the term attribute proposals from the term attribute table
-        $count2 = $attribute->db->delete(['termId=?' => $termId,'processStatus=?' => editor_Models_Terminology_Models_TermModel::PROCESS_STATUS_UNPROCESSED]);
+        $count2 = $attribute->db->delete(['termId=?' => $termId,'isCreatedLocally=?' =>1]);
         return $count1 + $count2 > 0;
     }
 

@@ -316,7 +316,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             'terms_attributes.id AS attributeId',
             'terms_attributes.dataTypeId as dataTypeId',
             'terms_attributes.termEntryId AS termEntryId',
-            'terms_attributes.internalCount AS internalCount',
+            //'terms_attributes.internalCount AS internalCount',
             'terms_attributes.language AS language',
             'terms_attributes.elementName AS name',
             'terms_attributes.type AS attrType',
@@ -325,7 +325,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             'terms_attributes.guid AS attrId',
             'terms_attributes.value AS attrValue',
             'terms_attributes.created AS attrCreated',
-            'terms_attributes.updated AS attrUpdated',
+            'terms_attributes.updatedAt AS attrUpdated',
             'terms_term_entry.collectionId AS collectionId',
             new Zend_Db_Expr('"termEntryAttribute" as attributeOriginType')//this is needed as fixed value
         ];
@@ -489,7 +489,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $this->init([
             'elementName' => 'note',
             'created' => NOW_ISO,
-            'internalCount' => 1,
+          //'internalCount' => 1,
             'collectionId' => $term->getCollectionId(),
             'termId' => $term->getTermId(),
             'termEntryId' => $term->getTermEntryId(),
@@ -498,13 +498,13 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             'guid' => ZfExtended_Utils::guid(),
             'language' => strtolower($lang->getRfc5646()),
             'dataTypeId' => $label->getId(),
-            'processStatus' => editor_Models_Terminology_Models_TermModel::PROCESS_STATUS_UNPROCESSED
+            'isCreatedLocally' => 1
         ]);
         $this->setValue(trim($termText));
         $sessionUser = new Zend_Session_Namespace('user');
         $this->setUserGuid($sessionUser->data->userGuid);
         $this->setUserName($sessionUser->data->userName);
-        $this->hasField('updated') && $this->setUpdated(NOW_ISO);
+        $this->hasField('updatedAt') && $this->setUpdatedAt(NOW_ISO);
         $this->save();
 
         return $this;

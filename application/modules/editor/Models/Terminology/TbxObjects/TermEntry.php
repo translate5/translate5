@@ -35,7 +35,7 @@ class editor_Models_Terminology_TbxObjects_TermEntry {
     const TABLE_FIELDS = [
         'collectionId',
         'termEntryId',
-        'isProposal',
+        'isCreatedLocally',
         'entryGuid',
         'descrip'
     ];

@@ -132,7 +132,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $attrA['processStatus'] = [
             'dataTypeId' => $dataTypeId_processStatus,
             'value' => $this->getProcessStatus(),
-            'processStatus' => 'finalized',
+            'isCreatedLocally' => 1, // 1 or 0 ?
         ];
 
         // If value for note-attr is given
@@ -147,7 +147,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             $attrA['note'] = [
                 'dataTypeId' => $dataTypeId_note,
                 'value' => $misc['note'],
-                'processStatus' => 'unprocessed',
+                'isCreatedLocally' => 1,
             ];
         }
 
@@ -172,10 +172,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                 'userGuid' => $misc['userGuid'],
                 'userName' => $misc['userName'],
                 'created' => date('Y-m-d H:i:s'),
-                //'updated' => date('Y-m-d H:i:s'),
-                //'tmpOldId' => 0,
-                //'tmpOldTermId' => 0,
-                //'tmpOldTermEntryId' => 0,
+                //'updatedAt' => date('Y-m-d H:i:s'),
             ]);
 
             // Save attr
@@ -967,56 +964,6 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         return $map;
     }
 
-    private function createNewAttributeTermArray(array $termArray): array
-    {
-        $attributeColumns = [
-            'attrCreated',
-            'attrDataType',
-            'attrId',
-            'attrLang',
-            'attrProcessStatus',
-            'attrTarget',
-            'attrType',
-            'attrUpdated',
-            'attrValue',
-            'attributeId',
-            'attributeOriginType',
-            'children',
-            'headerText',
-            'internalCount',
-            'dataTypeId',
-            'language',
-            'name',
-            'parentId',
-            'proposable'
-        ];
-        $attNew = [];
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-
-if($termArray['language'] !== null) {
-    $attNew['attrCreated'] = $termArray['created'];
-    $attNew['attrDataType'] = $termArray['dataType'];
-    $attNew['attrId'] = $termArray['id'];
-    $attNew['attrLang'] = $termArray['language'];
-    $attNew['attrProcessStatus'] = $termArray['processStatus'];
-    $attNew['attrTarget'] = $termArray['target'];
-    $attNew['attrType'] = $termArray['type'];
-    $attNew['attrUpdated'] = $termArray['updated'];
-    $attNew['attrValue'] = $termArray['value'];
-    $attNew['attributeId'] = $termArray['id'];
-    $attNew['attributeOriginType'] = 'termAttribute';
-    $attNew['children'] = [];
-    $attNew['headerText'] = $translate->_($termArray['type']);
-    $attNew['internalCount'] = '';
-    $attNew['dataTypeId'] = '';
-    $attNew['language'] = $termArray['language'];
-    $attNew['name'] = $termArray['elementName'];
-    $attNew['parentId'] = '';
-    $attNew['proposable'] = true;
-}
-
-        return $attNew;
-    }
     /**
      * Find term in collection by given language and term value
      * @param string $termText
@@ -1060,7 +1007,7 @@ if($termArray['language'] !== null) {
             'terms_attributes.dataTypeId as dataTypeId',
             'terms_attributes.id AS attributeId',
 //            'terms_attributes.parentId AS parentId',
-            'terms_attributes.internalCount AS internalCount',
+            //'terms_attributes.internalCount AS internalCount',
             'terms_attributes.elementName AS name',
             'terms_attributes.type AS attrType',
             'terms_attributes.target AS attrTarget',
@@ -1068,9 +1015,9 @@ if($termArray['language'] !== null) {
             'terms_attributes.language AS attrLang',
             'terms_attributes.value AS attrValue',
             'terms_attributes.created AS attrCreated',
-            'terms_attributes.updated AS attrUpdated',
+            'terms_attributes.updatedAt AS attrUpdated',
             'terms_attributes.dataType AS attrDataType',
-            'terms_attributes.processStatus AS attrProcessStatus',
+            'terms_attributes.isCreatedLocally AS attrIsCreatedLocally',
             'terms_attributes.termId AS termGuid',
             'terms_attributes.langSetGuid AS langSetGuid',
             new Zend_Db_Expr('"termAttribute" as attributeOriginType') //this is needed as fixed value
@@ -1119,7 +1066,7 @@ if($termArray['language'] !== null) {
         }else{
             //exclude the proposals
             $s->where('terms_term.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED)
-                ->where('terms_attributes.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED);
+                ->where('terms_attributes.isCreatedLocally!=?',1);
         }
 
         return $s;
@@ -1625,7 +1572,7 @@ if($termArray['language'] !== null) {
             ->setIntegrityCheck(false)
             ->from(['t'=>'terms_term'],['t.id'])
             ->joinLeft(['p'=>'terms_proposal'],'p.termId=t.id ',['p.term','p.created','p.userGuid','p.userName'])
-            ->where('t.updated < ?', $olderThan)
+            ->where('t.updatedAt < ?', $olderThan)
             ->where('t.collectionId in (?)',$collectionIds)
             ->where('t.processStatus NOT IN (?)',self::PROCESS_STATUS_UNPROCESSED);
         $result = $this->db->fetchAll($s)->toArray();
@@ -1715,7 +1662,7 @@ if($termArray['language'] !== null) {
                     t.term as 'term-term',
                     t.processStatus as 'term-processStatus',
                     t.userName as 'term-lastEditor',
-                    t.updated as 'term-lastEditedDate',
+                    t.updatedAt as 'term-lastEditedDate',
                     tp.id as 'termproposal-id',
                     tp.term as 'termproposal-term',
                     tp.created as 'termproposal-lastEditedDate',
@@ -1745,9 +1692,9 @@ if($termArray['language'] !== null) {
                         ta.termEntryId as 'attribute-termEntryId',
                         ta.elementName as 'attribute-name',
                         ta.value as 'attribute-value',
-                        ta.updated as 'attribute-lastEditedDate',
+                        ta.updatedAt as 'attribute-lastEditedDate',
                         ta.userName as 'attribute-lastEditor',
-                        ta.processStatus as 'attribute-processStatus',
+                        ta.isCreatedLocally as 'attribute-isCreatedLocally',
                         l.langName as 'term-language',
                         tap.id as 'attributeproposal-id',
                         tap.value as 'attributeproposal-value',
@@ -1759,7 +1706,7 @@ if($termArray['language'] !== null) {
                         t.term as 'term-term',
                         t.processStatus as 'term-processStatus',
                         t.userName as 'term-lastEditor',
-                        t.updated as 'term-lastEditedDate',
+                        t.updatedAt as 'term-lastEditedDate',
                         tp.id as 'termproposal-id',
                         tp.term as 'termproposal-term',
                         tp.created as 'termproposal-lastEditedDate',
@@ -1771,7 +1718,7 @@ if($termArray['language'] !== null) {
                         LEFT OUTER JOIN LEK_languages l ON t.language = l.id
                     WHERE ".$adapter->quoteInto('ta.collectionId IN(?)', $collectionIds).
             $attrYoungerSql."
-                    AND (tap.value is not null or ta.processStatus = 'unprocessed')
+                    AND (tap.value is not null or ta.isCreatedLocally = 1)
                     ORDER BY ta.termEntryId, ta.termId";
 
         $attributeResult = $adapter->query($attributeSql,$bindParams)->fetchAll();
@@ -1832,7 +1779,7 @@ if($termArray['language'] !== null) {
                 $tmpTerm['lastEditedDate'] = $changeMyCollorTag.$row['termproposal-lastEditedDate'];
             }
 
-            if(isset($row['attribute-processStatus']) && $row['attribute-processStatus']==self::PROCESS_STATUS_UNPROCESSED){
+            if(isset($row['attribute-isCreatedLocally']) && $row['attribute-isCreatedLocally']==1){
                 $tmpTerm['attribute'] = $changeMyCollorTag.$row['attribute-value'];
                 $tmpTerm['lastEditor'] = $changeMyCollorTag.$row['attribute-lastEditor'];
                 $tmpTerm['lastEditedDate'] = $changeMyCollorTag.$row['attribute-lastEditedDate'];

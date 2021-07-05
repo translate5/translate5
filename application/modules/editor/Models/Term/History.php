@@ -65,7 +65,7 @@ class editor_Models_Term_History extends ZfExtended_Models_Entity_Abstract {
             'userGuid',
             'userName',
             'created',
-            'updated',
+            'updatedAt',
         ];
     }
 }
