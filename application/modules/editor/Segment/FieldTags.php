@@ -106,9 +106,10 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $tags = new editor_Segment_FieldTags($task, $data->segmentId, $data->field, $data->fieldText, $data->saveTo, $data->ttName);
             $creator = editor_Segment_TagCreator::instance();
             foreach($data->tags as $tag){
-                $tags->addTag($creator->fromJsonData($tag));
+                $segmentTag = $creator->fromJsonData($tag);
+                $tags->addTag($segmentTag, $segmentTag->order, $segmentTag->parentOrder);
             }
-            // crucial: we do not serialize the deleted/inserted propsas they're serialized indirectly with the trackchanges tags
+            // crucial: we do not serialize the deleted/inserted props as they're serialized indirectly with the trackchanges tags
             // so we have to re-evaluate these props now
             $tags->evaluateDeletedInserted();
             return $tags;
@@ -124,7 +125,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     public static function compare(editor_Segment_Tag $a, editor_Segment_Tag $b){
         if($a->startIndex === $b->startIndex){
-            // crucial: we must make sure, that a "normal" tag may contain a single tag all at the same index (no text-content). Thus, the normal tags always must weight less
+            // only tags at the exact same position that do not contain each other will need the order-property evaluated when sorting !
+            if($a->endIndex == $b->endIndex && $a->order > -1 && $b->order > -1 && $a->parentOrder != $b->order && $a->order != $b->parentOrder){
+                return $a->order - $b->order;
+            }
+            // crucial: we must make sure, that a "normal" tag may contain a single tag at the same index (no text-content). Thus, the normal tags always must weight less / come first
             if($a->isSingular() && !$b->isSingular()){
                 return 1;
             } else if(!$a->isSingular() && $b->isSingular()){
@@ -171,6 +176,10 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @var editor_Segment_Tag[]
      */
     private $tags = [];
+    /**
+     * @var integer
+     */
+    private $orderIndex = -1;
     
     /**
      * @param editor_Models_Task $task
@@ -302,6 +311,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
         $textBefore = $this->fieldText;
         $this->fieldText = '';
         $this->tags = [];
+        $this->orderIndex = -1;
         $this->unparse($text);
         // this checks if the new Tags may changed the text-content which must not happen during quality checks
         if($this->fieldText != $textBefore){
@@ -314,13 +324,23 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
     }
     /**
-     *
+     * Adds a Segment tag. Note, that the nesting has to be reflected with the internal order of tags and the parent (referencing the order of the parent element)
      * @param editor_Segment_Tag $tag
+     * @param int $order: Do only use if the internal order is know. If not provided, a tag is always added as the last thing at the tags startPosition (e.g. a single tag can not be added inside a present tag's send position without knowing the order)
+     * @param int $parent: Order-index of the oparent element with nested tags. If not provided, the added tag will be rendered outside of other tags if possible
      */
-    public function addTag(editor_Segment_Tag $tag){
+    public function addTag(editor_Segment_Tag $tag, int $order=-1, int $parentOrder=-1){
         $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= $this->getFieldTextLength());
         $tag->field = $this->field; // we transfer our field to the tag for easier handling of our segment-tags
         $tag->content = $this->getFieldTextPart($tag->startIndex, $tag->endIndex);
+        if($order < 0){
+            $this->orderIndex++;
+            $tag->order = $this->orderIndex;
+        } else {
+            $tag->order = $order;
+            $this->orderIndex = max($this->orderIndex, $order);
+        }
+        $tag->parentOrder = $parentOrder;
         $this->tags[] = $tag;
     }
     /**
@@ -378,13 +398,14 @@ class editor_Segment_FieldTags implements JsonSerializable {
         // CRUCIAL: remove the internal tags first to remove the text-contents of the internal tags as well
         $this->removeByType(editor_Segment_Tag::TYPE_INTERNAL, true);
         $this->tags = [];
+        $this->orderIndex = -1;
     }
     /**
      * Removes the text belonging to the internal tag
      * All indexes of all following tags will be adjusted, the internal tag will be reset to contain no text
      * @param editor_Segment_Internal_Tag $tag
      */
-    protected function removeInternalTagText(editor_Segment_Internal_Tag $internalTag){
+    private function removeInternalTagText(editor_Segment_Internal_Tag $internalTag){
         $text = ($internalTag->startIndex == 0) ? '' : mb_substr($this->fieldText, 0, $internalTag->startIndex);
         if($internalTag->endIndex < $this->getFieldTextLength() - 1){
             $text .= mb_substr($this->fieldText, $internalTag->endIndex);
@@ -455,20 +476,6 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return false;
     }
     /**
-     * Transfers (clones) all tags of a certain type to the passed field tags. By default removes existing tags
-     * @param editor_Segment_FieldTags $fieldTags
-     * @param string $type
-     * @param bool $removeExisting
-     */
-    public function transferTagsByType(editor_Segment_FieldTags $fieldTags, string $type, bool $removeExisting=true){
-        if($removeExisting){
-            $fieldTags->removeByType($type);
-        }
-        foreach($this->getByType($type) as $tag){
-            $fieldTags->addTag($tag->clone(true));
-        }
-    }
-    /**
      * Sorts the items ascending, takes the second index into account when items have the same startIndex
      */
     public function sort(){
@@ -518,11 +525,12 @@ class editor_Segment_FieldTags implements JsonSerializable {
         $numRtags = 0;
         // creating a datamodel where the overlapping tags are segmented to pieces that do not overlap
         // therefore, all tags are compared with the tags after them and are cut into pieces if needed
-        // this will lead to tags being cut into pieces not necceccarily in the order as they have been added but in the order of their start-indexes / weight
+        // this will lead to tags being cut into pieces not nesseccarily in the order as they have been added but in the order of their start-indexes / weight
         if($numTags > 1){
             for($i = 0; $i < $numTags; $i++){
                 $tag = $this->tags[$i];
                 $last = $tag->clone(true);
+                $last->cloneOrder($tag);
                 $rtags[$numRtags] = $last;
                 $numRtags++;
                 if(($i + 1) < $numTags){
@@ -536,10 +544,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
                                 $last->endIndex = $cut;
                                 $last = $tag->clone(true);
                                 $last->startIndex = $cut;
+                                $last->cloneOrder($tag);
                                 $rtags[$numRtags] = $last;
                                 $numRtags++;
                             } else {
-                                // this must not happen.// TODO FIXME: Add Code
+                                // this must not happen.// TODO FIXME: Add Proper Exception
                                 $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.tags');
                                 /* @var $logger ZfExtended_Logger */
                                 $logger->error('E9999', 'Two non-splittable tags interleave each other. Segment-ID: '.$this->segmentId);
@@ -575,6 +584,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $nearest->addChild($tag);
             $container = $tag;
         }
+        // distributes the text-portions to the now re-nested structure
         $holder->addSegmentText($this);
         // finally, render the holder's children
         return $holder->renderChildren($skippedTypes);
@@ -666,11 +676,16 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return editor_Segment_FieldTags
      */
     public function cloneFiltered(array $includedTypes=NULL) : editor_Segment_FieldTags {
+        // UGLY: The Internal tags can not be filtered out but must be removed from the cloned tags if they should be filtered out diue to the text-contents of the internal tags
+        $cloneHasInternal = ($includedTypes == NULL || in_array(editor_Segment_Tag::TYPE_INTERNAL, $includedTypes));
         $clonedTags = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->field, $this->fieldText, $this->saveTo, $this->ttName);
         foreach($this->tags as $tag){
-            if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES || ($includedTypes == NULL || in_array($tag->getType(), $includedTypes))){
-                $clonedTags->addTag($tag->clone(true, true));
+            if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES || $tag->getType() == editor_Segment_Tag::TYPE_INTERNAL || ($includedTypes == NULL || in_array($tag->getType(), $includedTypes))){
+                $clonedTags->addTag($tag->clone(true, true), $tag->order, $tag->parentOrder);
             }
+        }
+        if(!$cloneHasInternal){
+            $clonedTags->removeByType(editor_Segment_Tag::TYPE_INTERNAL, true);
         }
         $clonedTags->evaluateDeletedInserted();
         return $clonedTags;
@@ -681,6 +696,8 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return editor_Segment_FieldTags
      */
     public function cloneWithoutTrackChanges(array $includedTypes=NULL) : editor_Segment_FieldTags {
+        // UGLY: The Internal tags can not be filtered out but must be removed from the cloned tags if they should be filtered out diue to the text-contents of the internal tags
+        $cloneHasInternal = ($includedTypes == NULL || in_array(editor_Segment_Tag::TYPE_INTERNAL, $includedTypes));
         $deleteTags = [];
         $otherTags = [];
         $fieldText = '';
@@ -694,8 +711,10 @@ class editor_Segment_FieldTags implements JsonSerializable {
                     }
                     $deleteTags[] = $del;
                 }
-            } else if(!$tag->wasDeleted && ($includedTypes == NULL || in_array($tag->getType(), $includedTypes))){
-                $otherTags[] = $tag->clone(true, true);
+            } else if(!$tag->wasDeleted && ($tag->getType() == editor_Segment_Tag::TYPE_INTERNAL || $includedTypes == NULL || in_array($tag->getType(), $includedTypes))){
+                $clone = $tag->clone(true, true);
+                $clone->cloneOrder($tag);
+                $otherTags[] = $clone;
             }
         }
         usort($deleteTags, array($this, 'compare'));
@@ -733,10 +752,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
         // create the clone & add all non-trackchanges tags
         $clonedTags = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->field, $fieldText, $this->saveTo, $this->ttName);
         foreach($otherTags as $tag){
-            // the "hole punching" may creates more deleted tags - should not happen though
+            // the "hole punching" may created more deleted tags - should not happen though
             if(!$tag->wasDeleted){
-                $clonedTags->addTag($tag);
+                $clonedTags->addTag($tag, $tag->order, $tag->parentOrder);
             }
+        }
+        if(!$cloneHasInternal){
+            $clonedTags->removeByType(editor_Segment_Tag::TYPE_INTERNAL, true);
         }
         return $clonedTags;
     }
@@ -851,11 +873,12 @@ class editor_Segment_FieldTags implements JsonSerializable {
                         }
                     }
                 }
+                
                 // we may already removed the current element, so check
-                if($i < $numTags){    
+                if($i < $numTags){
                     $tag = $this->tags[$i];
                     // we join only tasks that are splitable of course ...
-                    if($last->isSplitable() && $tag->isSplitable() && $tag->isEqualType($last) && $tag->isEqual($last) && $last->endIndex == $tag->startIndex){
+                    if($last->isSplitable() && $tag->isSplitable() && $tag->isEqual($last) && $last->endIndex == $tag->startIndex){
                         $last->endIndex = $tag->endIndex;
                     } else {
                         $last = $tag;
