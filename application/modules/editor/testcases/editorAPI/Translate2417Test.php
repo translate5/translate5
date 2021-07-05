@@ -85,7 +85,7 @@ class Translate2417Test extends editor_Test_JsonTest {
         $segToTest = $segments[0];
 
         // query the results from this segment and compare them against the expected initial json
-        $tmResults = $this->api()->requestJson('editor/languageresourceinstance/'.$tm->id.'/query','GET',['segmentId'=>$segToTest->id]);
+        $tmResults = $this->api()->requestJson('editor/languageresourceinstance/'.$tm->id.'/query','GET',['segmentId' => $segToTest->id]);
 
         //file_put_contents($this->api()->getFile('/tmResultsBeforeEdit.json', null, false), json_encode($tmResults,JSON_PRETTY_PRINT));
         $this->assertTmResultEqualsJsonFile('tmResultsBeforeEdit.json', $tmResults, 'The received tm results before segment modification are not as expected!');
@@ -97,8 +97,8 @@ class Translate2417Test extends editor_Test_JsonTest {
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
 
         // after the segment save, check for the tm results for the same segment
-        $tmResults = $this->api()->requestJson('editor/languageresourceinstance/'.$tm->id.'/query','GET',['segmentId'=>$segToTest->id]);
-        //file_put_contents($this->api()->getFile('/tmResultsAfterEdit.json', null, false), json_encode($tmResults,JSON_PRETTY_PRINT));
+        $tmResults = $this->api()->requestJson('editor/languageresourceinstance/'.$tm->id.'/query','GET',['segmentId' => $segToTest->id]);
+        //file_put_contents($this->api()->getFile('/tmResultsAfterEdit.json', null, false), json_encode($tmResults, JSON_PRETTY_PRINT));
         $this->assertTmResultEqualsJsonFile('tmResultsAfterEdit.json', $tmResults, 'The received tm results after segment modification are not as expected!');
     }
 
