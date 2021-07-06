@@ -171,15 +171,22 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $this->createTaskGuidIfNeeded();
     }
     
-    /**
-     *  Return all task specific configs for the current task.
-     *  For all configs for which there is not task specific overwrite, the overwrite for the task client will be used as a value.
-     *  For all configs for which there is no task customer specific overwrite, the instance-level config value will be used
+
+    /***
+     * Returns all task specific configs for the current task.
+     * For all configs for which there is no task specific overwrite, overwrite for the task client will be used as a value.
+     * For all configs for which there is no task customer specific overwrite, instance-level config value will be used
+     *
+     * @param bool $disableCache : disable the config cache. Load always fresh config from the db
      * @return Zend_Config
+     * @throws editor_Models_ConfigException
      */
-    public function getConfig() {
+    public function getConfig(bool $disableCache = false) {
         $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
         /* @var $taskConfig editor_Models_TaskConfig */
+        if($disableCache){
+            $taskConfig->cleanConfigCache();
+        }
         return $taskConfig->getTaskConfig($this->getTaskGuid());
     }
     
