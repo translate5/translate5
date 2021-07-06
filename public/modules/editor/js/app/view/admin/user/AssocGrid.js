@@ -63,7 +63,7 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
             config = {
                 features:[{
                     ftype: 'grouping',
-                    startCollapsed: true,
+                    startCollapsed: false,
                     groupHeaderTpl: '{columnName}: {name}'
                 }],
                 columns: [{
