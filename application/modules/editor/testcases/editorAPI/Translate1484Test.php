@@ -36,7 +36,8 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
     protected static $customerTest;
     protected static $sourceLangRfc = 'de';
     protected static $targetLangRfc = 'en';
-    
+
+
     
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);

@@ -218,8 +218,8 @@ class editor_Plugins_MatchAnalysis_Export_Xml
     protected function add(string $name, array $row) {
         $isFuzzy = ($name == 'fuzzy' || $name == 'internalFuzzy');
         $idx = $name;
-        $min = (int) $row['min'];
-        $max = (int) $row['max'];
+        $min = array_key_exists('min', $row) ? (int) $row['min'] : 0;
+        $max = array_key_exists('max', $row) ? (int) $row['max'] : 0;
         if($isFuzzy) {
             $idx = $name.'_'.$min.'_'.$max;
         }
@@ -241,8 +241,12 @@ class editor_Plugins_MatchAnalysis_Export_Xml
             $node['max'] = $max;
         }
         //summing up the currently available values
-        $node['words'] += $row['wordCount'];
-        $node['segments'] += $row['segCount'];
+        if(array_key_exists('wordCount', $row)) {
+            $node['words'] += $row['wordCount'];
+        }
+        if(array_key_exists('segCount', $row)) {
+            $node['segments'] += $row['segCount'];
+        }
         $this->analyseNodes[$idx] = $node;
     }
     
