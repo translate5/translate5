@@ -83,3 +83,20 @@ ALTER TABLE LEK_workflow MODIFY COLUMN label varchar(128) NOT NULL COMMENT 'huma
 ALTER TABLE LEK_workflow_step MODIFY COLUMN name varchar(64) NOT NULL COMMENT 'technical workflow step name, use alphanumeric chars only (refresh app cache!)';
 ALTER TABLE LEK_workflow_step MODIFY COLUMN label varchar(128) NOT NULL COMMENT 'human readable workflow step name (goes through the translator,  refresh app cache!)';
 
+INSERT INTO `LEK_workflow` (`name`, `label`)
+VALUES('complex', 'Complex workflow');
+
+INSERT INTO `LEK_workflow_step` (`workflowName`, `name`, `label`, `role`, `position`, `flagInitiallyFiltered`)
+VALUES
+('complex', 'firsttranslation', 'Erste Übersetzung', 'translator', 1, 0),
+('complex', 'review1stlanguage', '1st revision - language', 'reviewer', 2, 0),
+('complex', 'review1sttechnical', '1st revision - technical', 'reviewer', 3, 0),
+('complex', 'review2ndlanguage', '2nd revision - language', 'reviewer', 4, 0),
+('complex', 'review2ndtechnical', '2nd revision - technical', 'reviewer', 5, 0),
+('complex', 'textapproval', 'text approval', 'reviewer', 6, 0),
+('complex', 'graphicimplementation', 'graphic implementation', 'reviewer', 7, 0),
+('complex', 'finaltextapproval', 'final text approval', 'reviewer', 8, 0);
+
+INSERT INTO `LEK_workflow_action` (workflow, `trigger`, inStep, byRole, userState, actionClass, action, parameters, position, description)
+SELECT "complex" as workflow, `trigger`, inStep, byRole, userState, actionClass, action, parameters, position, description
+FROM LEK_workflow_action WHERE workflow = 'default';

@@ -33,11 +33,6 @@ END LICENSE AND COPYRIGHT
 class QualityFaultyTest extends editor_Test_JsonTest {
     
     /**
-     * If set to true, all tests will be re-recorded !
-     * @var boolean
-     */
-    static $captureMode = false; 
-    /**
      *
      * @var stdClass[]
      */
@@ -101,35 +96,33 @@ class QualityFaultyTest extends editor_Test_JsonTest {
         // edit segment 1 and make their internal tags overlap
         $segment1 = static::$segments[1];
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segment1Edit, $segment1->id);
-        $segment1 = $this->api()->requestJson('editor/segment/'.$segment1->id, 'PUT', $segmentData);
-        if(static::$captureMode){ file_put_contents($this->api()->getFile('testSegment1EditTarget.json', null, false), json_encode($segment1, JSON_PRETTY_PRINT)); }
-        $this->assertSegmentEqualsJsonFile('testSegment1EditTarget.json', $segment1);
+        $jsonFile = 'testSegment1EditTarget.json';
+        $segment1 = $this->api()->putJson('editor/segment/'.$segment1->id, $segmentData, $jsonFile);
+        $this->assertSegmentEqualsJsonFile($jsonFile, $segment1);
 
         // edit segment 3, swap open/close tag
         $segment3 = static::$segments[1];
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segment3Edit, $segment3->id);
-        $segment3 = $this->api()->requestJson('editor/segment/'.$segment3->id, 'PUT', $segmentData);
-        if(static::$captureMode){ file_put_contents($this->api()->getFile('testSegment3EditTarget.json', null, false), json_encode($segment3, JSON_PRETTY_PRINT)); }
-        $this->assertSegmentEqualsJsonFile('testSegment3EditTarget.json', $segment3);
+        $jsonFile = 'testSegment3EditTarget.json';
+        $segment3 = $this->api()->putJson('editor/segment/'.$segment3->id, $segmentData, $jsonFile);
+        $this->assertSegmentEqualsJsonFile($jsonFile, $segment3);
     }
     /**
      * Tests the generally availability and validity of the filter tree
      */
     public function testFilterQualityTree(){
-        
-        $tree = $this->api()->requestJson('/editor/quality', 'GET', [], [], true);
-        if(static::$captureMode){ file_put_contents($this->api()->getFile('expectedQualityFilterFaulty.json', null, false), json_encode($tree, JSON_PRETTY_PRINT)); }
-        $this->assertModelEqualsJsonFile('FilterQuality', 'expectedQualityFilterFaulty.json', $tree);
+        $jsonFile = 'expectedQualityFilterFaulty.json';
+        $tree = $this->api()->getJsonTree('/editor/quality', [], $jsonFile);
+        $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree);
     }
     /**
      * Test the task qualities after being edited
      * @depends testMakeSegmentsFaulty
      */
     public function testTaskQualityTree(){
-        
-        $tree = $this->api()->requestJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
-        if(static::$captureMode){ file_put_contents($this->api()->getFile('expectedTaskQualitiesFaulty.json', null, false), json_encode($tree, JSON_PRETTY_PRINT)); }
-        $this->assertModelEqualsJsonFile('TaskQuality', 'expectedTaskQualitiesFaulty.json', $tree);
+        $jsonFile = 'expectedTaskQualitiesFaulty.json';
+        $tree = $this->api()->getJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid), [], $jsonFile);
+        $this->assertModelEqualsJsonFile('TaskQuality', $jsonFile, $tree);
     }
     /**
      * Tests the task-Tooltip of the Task-Grid with the Faulty icons
@@ -140,7 +133,7 @@ class QualityFaultyTest extends editor_Test_JsonTest {
         $file = $this->api()->getFile('expectedTaskToolTipFaulty.html', null, false);
         $response = $this->api()->request('editor/quality/tasktooltip?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
         $markup = $response->getBody();
-        if(static::$captureMode){ file_put_contents($file, $markup); }
+        if($this->api()->isCapturing()){ file_put_contents($file, $markup); }
         $this->assertStringContainsString('</table>', $markup, 'Task Qualities ToolTip Markup does not match');
         $this->assertStringContainsString('<span class="x-grid-symbol t5-quality-faulty">', $markup, 'Task Qualities ToolTip Markup does not match'); // number of all MQMs
         $this->assertEquals(file_get_contents($file), $markup, 'Task Qualities ToolTip Markup does not match'); // this test mignt has to be adjusted due to the translation problematic

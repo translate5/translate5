@@ -105,8 +105,8 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
         $this->api()->request('editor/task/'.$this->api()->getTask()->id.'/excelreimport', 'POST');
         $this->api()->reloadTask();
         $task = $this->api()->getTask();
-        $this->assertEmpty($task->lockedInternalSessionUniqId);
-        $this->assertEmpty($task->lockingUser);
+        $this->assertEmpty($task->lockingUser, 'Task is locked by user '.$task->lockingUser);
+        $this->assertEmpty($task->lockedInternalSessionUniqId, 'Task is locked by sessionUniqId '.$task->lockedInternalSessionUniqId);
         $this->assertEquals('open', $task->state);
         $this->assertEmpty($task->locked);
         
