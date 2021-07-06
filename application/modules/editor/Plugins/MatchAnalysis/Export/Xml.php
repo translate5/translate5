@@ -38,8 +38,8 @@ class editor_Plugins_MatchAnalysis_Export_Xml
      * @var array
      */
     const ATTRIBUTES = [
-        'words',
         'segments',
+        'words',
         'characters',
         'placeables',
         'tags',
@@ -241,11 +241,11 @@ class editor_Plugins_MatchAnalysis_Export_Xml
             $node['max'] = $max;
         }
         //summing up the currently available values
-        if(array_key_exists('wordCount', $row)) {
-            $node['words'] += $row['wordCount'];
-        }
         if(array_key_exists('segCount', $row)) {
             $node['segments'] += $row['segCount'];
+        }
+        if(array_key_exists('wordCount', $row)) {
+            $node['words'] += $row['wordCount'];
         }
         $this->analyseNodes[$idx] = $node;
     }
