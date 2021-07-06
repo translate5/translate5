@@ -1600,12 +1600,11 @@ class editor_TaskController extends ZfExtended_RestController {
     public function deleteAction() {
         $forced = $this->getParam('force', false) && $this->isAllowed('backend', 'taskForceDelete');
         $this->entityLoad();
-        //if task is erroneous then it is also deleteable, regardless of its locking state
-        if(!$this->entity->isImporting() && !$this->entity->isErroneous() && !$forced){
-            $this->entity->checkStateAllowsActions();
-        }
+
+        $this->checkStateDelete($this->entity,$forced);
+
         //we enable task deletion for importing task
-        $forced=$forced || $this->entity->isImporting();
+        $forced=$forced || $this->entity->isImporting() || $this->entity->isProject();
 
         $this->processClientReferenceVersion();
         $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
@@ -2071,5 +2070,30 @@ class editor_TaskController extends ZfExtended_RestController {
             'tuas' => $tuas,
             'internalSessionUniqId' => $session->internalSessionUniqId
         ]);
+    }
+
+    /***
+     * Check if the given task/project can be deleted based on the task state. When project task is provided,
+     * all project tasks will be checked
+     */
+    protected function checkStateDelete(editor_Models_Task $taskEntity, bool $forced){
+
+        // if it is not project, do regular check
+        if(!$taskEntity->isProject()){
+
+            //if task is erroneous then it is also deleteable, regardless of its locking state
+            if(!$taskEntity->isImporting() && !$taskEntity->isErroneous() && !$forced){
+                $taskEntity->checkStateAllowsActions();
+            }
+        }else{
+            $model=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $model editor_Models_Task */
+            $tasks=$model->loadProjectTasks($this->entity->getProjectId(),true);
+            // if it is project, load all project tasks, and check the state for each one of them
+            foreach ($tasks as $projectTask){
+                $model->init($projectTask);
+                $this->checkStateDelete($model,$forced);
+            }
+        }
     }
 }
