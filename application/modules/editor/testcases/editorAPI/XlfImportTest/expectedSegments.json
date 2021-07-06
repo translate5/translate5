@@ -26,7 +26,8 @@
         "targetEditToSort": "Apache 2.0 auf Unixsystemen - Manual",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "PHP Manual",
@@ -55,7 +56,8 @@
         "targetEditToSort": "PHP Manual",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test a soft (unix) return<div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span class=\"short\" title=\"&lt;1\/&gt;: Newline\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"softReturn\" data-length=\"1\">\u21b5<\/span><\/div>",
@@ -84,7 +86,8 @@
         "targetEditToSort": "Teste einen weichen (Unix) Umbruch",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test multiple <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;2\/&gt;: 3 whitespace characters\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"3\">\u00b7\u00b7\u00b7<\/span><\/div>whitespaces and<div class=\"single 7461622074733d223039303922206c656e6774683d2232222f tab internal-tag ownttip\"><span class=\"short\" title=\"&lt;1\/&gt;: 2 tab characters\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"tab\" data-length=\"2\">\u2192\u2192<\/span><\/div>tabs",
@@ -113,7 +116,8 @@
         "targetEditToSort": "Teste mehrere Leerzeichen undTabs",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test that matchratio &lt; 100 is editable",
@@ -142,7 +146,8 @@
         "targetEditToSort": "Teste dass eine matchratio &lt; 100 editierbar ist",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test different matchinfos",
@@ -171,7 +176,8 @@
         "targetEditToSort": "Teste unterschiedliche matchinfos",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test &amp;para; entities \u00b6 and umlauts \u00f6\u00e4\u00fc\u00b6 and <div class=\"single 636861722074733d2232363233333133323338336222206c656e6774683d2231222f char internal-tag ownttip\"><span class=\"short\" title=\"&lt;1\/&gt;: protected Special-Character\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"char\" data-length=\"1\">protected Special-Character<\/span><\/div> TRANSLATE-1824",
@@ -200,7 +206,8 @@
         "targetEditToSort": "Teste &amp;para; Entities \u00b6 und Umlaute \u00f6\u00e4\u00fc\u00b6 und  TRANSLATE-1824",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "This segment should be readonly!",
@@ -229,7 +236,8 @@
         "targetEditToSort": "Dieses Segment sollte nicht editierbar sein!",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "11 - Test a new translation - no target exists",
@@ -258,7 +266,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "12 - Test a new translation - empty target exists",
@@ -287,7 +296,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "13 - Test an existing translation. ",
@@ -316,7 +326,8 @@
         "targetEditToSort": "13 - Teste eine vorhandene \u00dcbersetzung. ",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "13 - With MRK tags.",
@@ -345,7 +356,8 @@
         "targetEditToSort": "13 - Mit MRK Tags.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "16 - Test an empty translation. ",
@@ -374,7 +386,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "16 - With MRK tags. ",
@@ -403,7 +416,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "16 - And missing target.",
@@ -432,7 +446,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "17 - Test an empty translation. ",
@@ -461,7 +476,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "17 - With MRK tags. ",
@@ -490,7 +506,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "17 - And empty target.",
@@ -519,7 +536,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "<div class=\"single 70683e3139202d2054686973207365676d656e74206d75737420626520696d706f727465642073696e6365206974206861732074657874206f757473696465206f6620746865207461672e3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"19 - This segment must be imported since it has text outside of the tag.\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"dce21bf527e3dd866dfdd0ff74df9690\" data-length=\"-1\">19 - This segment must be imported since it has text outside of the tag.<\/span><\/div>Text",
@@ -548,7 +566,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "f2-1 - Test usage of already used id - which is valid!",
@@ -577,7 +596,8 @@
         "targetEditToSort": "f2-1 - Teste die Verwendung einer bereits verwendeten ID - was zul\u00e4ssig ist!",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "f2-2 - <div class=\"single 70683e266c743b67206373732d7374796c653d2671756f743b666f6e742d66616d696c793a27417269616c273b666f6e742d666163653a27526567756c6172273b636f6c6f723a233030303030303b666f6e742d73697a653a32302e3070742671756f743b2063747970653d2671756f743b782d63702d666f6e742671756f743b2069643d2671756f743b353238392d31392d312d312671756f743b2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;g css-style=&quot;font-family:'Arial';font-face:'Regular';color:#000000;font-size:20.0pt&quot; ctype=&quot;x-cp-font&quot; id=&quot;5289-19-1-1&quot;&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"a1123669e42cdf94d52c09828ca00a51\" data-length=\"-1\">&lt;g css-style=&quot;font-family:'Arial';font-face:'Regular';color:#000000;font-size:20.0pt&quot; ctype=&quot;x-cp-font&quot; id=&quot;5289-19-1-1&quot;&gt;<\/span><\/div>Testen wir lustige Tags.<div class=\"single 70683e266c743b2f672667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/g&gt;\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"5861c99c7a367726da2cce3e9eb98251\" data-length=\"-1\">&lt;\/g&gt;<\/span><\/div>",
@@ -606,7 +626,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "f2-3 - <div class=\"single 70683e266c743b62722f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;br\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"a7c4d814ef0d08debb9cf5451df213c1\" data-length=\"-1\">&lt;br\/&gt;<\/span><\/div><div class=\"open 67206373732d7374796c653d22666f6e742d66616d696c793a27417269616c273b222063747970653d22782d63702d666f6e74222069643d22313334342d31392d312d3122 internal-tag ownttip\"><span class=\"short\" title=\"&lt;g css-style=&quot;font-family:'Arial';&quot; ctype=&quot;x-cp-font&quot; id=&quot;1344-19-1-1&quot;&gt;\">&lt;2&gt;<\/span><span class=\"full\" data-originalid=\"1344-19-1-1\" data-length=\"-1\">&lt;g css-style=&quot;font-family:'Arial';&quot; ctype=&quot;x-cp-font&quot; id=&quot;1344-19-1-1&quot;&gt;<\/span><\/div>With nice text<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/g&gt;\">&lt;\/2&gt;<\/span><span class=\"full\" data-originalid=\"1344-19-1-1\" data-length=\"-1\">&lt;\/g&gt;<\/span><\/div> <div class=\"open 67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;g&gt;\">&lt;3&gt;<\/span><span class=\"full\" data-originalid=\"g-9\" data-length=\"-1\">&lt;g&gt;<\/span><\/div>for g<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/g&gt;\">&lt;\/3&gt;<\/span><span class=\"full\" data-originalid=\"g-9\" data-length=\"-1\">&lt;\/g&gt;<\/span><\/div> <div class=\"open 67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;g&gt;\">&lt;4&gt;<\/span><span class=\"full\" data-originalid=\"g-13\" data-length=\"-1\">&lt;g&gt;<\/span><\/div>tag testing.<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/g&gt;\">&lt;\/4&gt;<\/span><span class=\"full\" data-originalid=\"g-13\" data-length=\"-1\">&lt;\/g&gt;<\/span><\/div>",
@@ -635,7 +656,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "f2-4 - <div class=\"single 70682069643d2231223e266c743b62722f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;br\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"06316d5ae056150605982c694d87dc0c\" data-length=\"-1\">&lt;br\/&gt;<\/span><\/div><div class=\"open 6270742069643d223222207269643d2231223e266c743b622667743b3c2f627074 internal-tag ownttip\"><span class=\"short\" title=\"&lt;b&gt;\">&lt;2&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;b&gt;<\/span><\/div>With nice text<div class=\"single 65782069643d223422207269643d2232222f internal-tag ownttip\"><span class=\"short\" title=\"&lt;ex id=&quot;4&quot; rid=&quot;2&quot;\/&gt;\">&lt;3\/&gt;<\/span><span class=\"full\" data-originalid=\"dbfe3a1eb4a7c4349c7049d5a1b02096\" data-length=\"-1\">&lt;ex id=&quot;4&quot; rid=&quot;2&quot;\/&gt;<\/span><\/div> <div class=\"single 62782069643d223522207269643d2232222f internal-tag ownttip\"><span class=\"short\" title=\"&lt;bx id=&quot;5&quot; rid=&quot;2&quot;\/&gt;\">&lt;4\/&gt;<\/span><span class=\"full\" data-originalid=\"43049e47ec9fa202d8cc5e91b38965bd\" data-length=\"-1\">&lt;bx id=&quot;5&quot; rid=&quot;2&quot;\/&gt;<\/span><\/div>for g<div class=\"close 6570742069643d223322207269643d2231223e266c743b2f622667743b3c2f657074 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/b&gt;\">&lt;\/2&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;\/b&gt;<\/span><\/div> <div class=\"open 672069643d223622 internal-tag ownttip\"><span class=\"short\" title=\"&lt;g id=&quot;6&quot;&gt;\">&lt;5&gt;<\/span><span class=\"full\" data-originalid=\"6\" data-length=\"-1\">&lt;g id=&quot;6&quot;&gt;<\/span><\/div><div class=\"single 69743e266c743b64697620636c6173733d2671756f743b6d697373696e6720696e20616374696f6e2671756f743b2667743b3c2f6974 internal-tag ownttip\"><span class=\"short\" title=\"&lt;div class=&quot;missing in action&quot;&gt;\">&lt;6\/&gt;<\/span><span class=\"full\" data-originalid=\"7f41a64bb42b0b175bff68cb90759b22\" data-length=\"-1\">&lt;div class=&quot;missing in action&quot;&gt;<\/span><\/div>tag testing.<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/g&gt;\">&lt;\/5&gt;<\/span><span class=\"full\" data-originalid=\"6\" data-length=\"-1\">&lt;\/g&gt;<\/span><\/div>",
@@ -664,7 +686,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "f2-5 - A img tag is recommended to replaced like this: <div class=\"single 70682069643d22615f33222063747970653d22782d68746d6c2d696d6722207868746d6c3a7372633d226d74686f6f642e6a7067223e3c7375622063747970653d22782d68746d6c2d696d672d616c74223e546869732069732074686520616c742061747472696275746520636f6e74656e74206f662074686520696d6720726570726573656e74656420617320706c61696e207068207461673c2f7375623e3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;a_3&quot; ctype=&quot;x-html-img&quot; xhtml:src=&quot;mthood.jpg&quot;&gt;&lt;sub ctype=&quot;x-html-img-alt&quot;&gt;This is the alt attribute content of the img represented as plain ph tag&lt;\/sub&gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"00a8cbc0596803fbdaf5c1582667c5cc\" data-length=\"-1\">&lt;ph id=&quot;a_3&quot; ctype=&quot;x-html-img&quot; xhtml:src=&quot;mthood.jpg&quot;&gt;&lt;sub ctype=&quot;x-html-img-alt&quot;&gt;This is the alt attribute content of the img represented as plain ph tag&lt;\/sub&gt;&lt;\/ph&gt;<\/span><\/div> this is described in XLIFF 1.2 Representation Guide for HTML",
@@ -693,7 +716,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "This is the alt attribute content of the img represented as plain ph tag",
@@ -722,7 +746,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "f2-6 - Test given <div class=\"single 70682069643d2231223e266c743b696d67207372633d2671756f743b666f6f2671756f743b207469746c653d2671756f743b3c7375623e66322d36202d20746573742073756220667261676d656e743c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img src=&quot;foo&quot; title=&quot;f2-6 - test sub fragment&quot;\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"2cb5b5a09d41891060df658e1bea422c\" data-length=\"-1\">&lt;img src=&quot;foo&quot; title=&quot;f2-6 - test sub fragment&quot;\/&gt;<\/span><\/div>translations with MRK and sub tags.",
@@ -751,7 +776,8 @@
         "targetEditToSort": "f2-6 - Test mit gegebenen \u00dcbersetzungen mit MRK und SUB Tags.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "f2-6 - test sub fragment",
@@ -780,7 +806,8 @@
         "targetEditToSort": "f2-6 - teste sub Fragment",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "f2-6 - Test alignment of source and target fragments.",
@@ -809,7 +836,8 @@
         "targetEditToSort": "f2-6 - Teste das Alignment von Quell- und Zielfragmenten.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "f2-7 - Test given <div class=\"single 70682069643d2231223e266c743b696d67207469746c653d2671756f743b313c7375623e66322d37202d2073756220313c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img title=&quot;1f2-7 - sub 1&quot;\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"38036d7cd7c4f3a399a943a030adddf2\" data-length=\"-1\">&lt;img title=&quot;1f2-7 - sub 1&quot;\/&gt;<\/span><\/div>translations <div class=\"single 70682069643d2233223e266c743b696d67207469746c653d2671756f743b333c7375623e66322d37202d2073756220333c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img title=&quot;3f2-7 - sub 3&quot;\/&gt;\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"2c547bf10ddb0780798a65c7da3d79ef\" data-length=\"-1\">&lt;img title=&quot;3f2-7 - sub 3&quot;\/&gt;<\/span><\/div>with MRK and sub tags.",
@@ -838,7 +866,8 @@
         "targetEditToSort": "f2-7 - Test mit gegebenen \u00dcbersetzungen mit MRK und SUB Tags.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "f2-7 - sub 1",
@@ -867,7 +896,8 @@
         "targetEditToSort": "f2-7 - sub 1",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "f2-7 - sub 3",
@@ -896,7 +926,8 @@
         "targetEditToSort": "f2-7 - sub 3",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "f2-7 - Test alignment of source <div class=\"single 70682069643d2232223e266c743b696d67207469746c653d2671756f743b323c7375623e66322d37202d2073756220323c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img title=&quot;2f2-7 - sub 2&quot;\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"b3a78b41bd032ee740c803b60f72dd32\" data-length=\"-1\">&lt;img title=&quot;2f2-7 - sub 2&quot;\/&gt;<\/span><\/div> and target fragments.",
@@ -925,7 +956,8 @@
         "targetEditToSort": "f2-7 - Teste das Alignment von Quell-  und Zielfragmenten.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "f2-7 - sub 2",
@@ -954,7 +986,8 @@
         "targetEditToSort": "f2-7 - sub 2",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "f2-9 - test nested tags and subs <div class=\"single 70682069643d22615f31223e783c7375623e615f31203c70682069643d22615f33223e3c7375623e615f332073756220746578743c2f7375623e3c2f70683e73756220746578743c2f7375623e783c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"xa_1 a_3 sub textsub textx\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"0723c991ab7165baf4e93d1678ca9939\" data-length=\"-1\">xa_1 a_3 sub textsub textx<\/span><\/div> and <div class=\"single 70682069643d22615f32223e783c7375623e615f322073756220746578743c2f7375623e783c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"xa_2 sub textx\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"b1719d8dd4041117612208307c7c9586\" data-length=\"-1\">xa_2 sub textx<\/span><\/div>",
@@ -983,7 +1016,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "a_1 <div class=\"single 70682069643d22615f33223e3c7375623e615f332073756220746578743c2f7375623e3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;a_3&quot;&gt;&lt;sub&gt;a_3 sub text&lt;\/sub&gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"83b91ad8e23f3f6e81e9a1ac841b90f6\" data-length=\"-1\">&lt;ph id=&quot;a_3&quot;&gt;&lt;sub&gt;a_3 sub text&lt;\/sub&gt;&lt;\/ph&gt;<\/span><\/div>sub text",
@@ -1012,7 +1046,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "a_3 sub text",
@@ -1041,7 +1076,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "a_2 sub text",
@@ -1070,7 +1106,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "f2-10 - test nested tags and flipped subs on editing <div class=\"single 70682069643d22615f31223e783c7375623e615f31203c70682069643d22615f33223e3c7375623e615f332073756220746578743c2f7375623e3c2f70683e7375622074657874203c70682069643d22615f32223e783c7375623e615f322073756220746578743c2f7375623e783c2f70683e207465787432203c2f7375623e783c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"xa_1 a_3 sub textsub text xa_2 sub textx text2 x\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"0723c991ab7165baf4e93d1678ca9939\" data-length=\"-1\">xa_1 a_3 sub textsub text xa_2 sub textx text2 x<\/span><\/div>",
@@ -1099,7 +1136,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "a_1 <div class=\"single 70682069643d22615f33223e3c7375623e615f332073756220746578743c2f7375623e3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;a_3&quot;&gt;&lt;sub&gt;a_3 sub text&lt;\/sub&gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"83b91ad8e23f3f6e81e9a1ac841b90f6\" data-length=\"-1\">&lt;ph id=&quot;a_3&quot;&gt;&lt;sub&gt;a_3 sub text&lt;\/sub&gt;&lt;\/ph&gt;<\/span><\/div>sub text <div class=\"single 70682069643d22615f32223e783c7375623e615f322073756220746578743c2f7375623e783c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"xa_2 sub textx\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"b1719d8dd4041117612208307c7c9586\" data-length=\"-1\">xa_2 sub textx<\/span><\/div> text2",
@@ -1128,7 +1166,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "a_3 sub text",
@@ -1157,7 +1196,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "a_2 sub text",
@@ -1186,7 +1226,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "f2-11 - protected unicode characters <div class=\"open 6270742069643d223122207269643d223122202f internal-tag ownttip\"><span class=\"short\" title=\"&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;\">&lt;1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div><div class=\"single 636861722074733d2265663831386122206c656e6774683d2231222f char internal-tag ownttip\"><span class=\"short\" title=\"&lt;2\/&gt;: protected Special-Character\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"char\" data-length=\"1\">protected Special-Character<\/span><\/div><div class=\"close 6570742069643d223222207269643d223122202f internal-tag ownttip\"><span class=\"short\" title=\"&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;\">&lt;\/1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div> is a wingdings smiley",
@@ -1215,7 +1256,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "f2-12 - tag encapsulated content should be imported with tags - since target is empty!",
@@ -1244,7 +1286,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "f2-13 - tag encapsulated content should be imported without tags - if target has same tag structure",
@@ -1273,7 +1316,8 @@
         "targetEditToSort": "f2-13 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - wenn das Target die gleiche Tag Struktur hat",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "<div class=\"open 6270742069643d223122207269643d223122202f internal-tag ownttip\"><span class=\"short\" title=\"&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;\">&lt;1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div>f2-14 - tag encapsulated content should be imported with tags - target has different tag structure<div class=\"close 6570742069643d223222207269643d223122202f internal-tag ownttip\"><span class=\"short\" title=\"&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;\">&lt;\/1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div>",
@@ -1302,7 +1346,8 @@
         "targetEditToSort": "f2-14 -  Von Tags umgebener Inhalt soll mit Tags importiert werden - wenn das Target eine andere Tag Struktur hat",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "f2-15 - tag encapsulated content should be imported without tags - but import single tags<div class=\"single 782069643d2234222f internal-tag ownttip\"><span class=\"short\" title=\"&lt;x id=&quot;4&quot;\/&gt;\">&lt;3\/&gt;<\/span><span class=\"full\" data-originalid=\"f90c8ae8b8da5995e2b68961a896ebb6\" data-length=\"-1\">&lt;x id=&quot;4&quot;\/&gt;<\/span><\/div>",
@@ -1331,7 +1376,8 @@
         "targetEditToSort": "f2-15 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - aber importiere single tags",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "f2-16 - tag encapsulated content should be imported without tags - but import single tags<div class=\"single 782069643d2234222f internal-tag ownttip\"><span class=\"short\" title=\"&lt;x id=&quot;4&quot;\/&gt;\">&lt;3\/&gt;<\/span><span class=\"full\" data-originalid=\"f90c8ae8b8da5995e2b68961a896ebb6\" data-length=\"-1\">&lt;x id=&quot;4&quot;\/&gt;<\/span><\/div>",
@@ -1360,6 +1406,7 @@
         "targetEditToSort": "f2-16 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - hier fehlt der singletag",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     }
 ]
