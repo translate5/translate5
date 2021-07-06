@@ -206,6 +206,7 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
+        self::$api->isCapturing() && file_put_contents($this->api()->getFile($fileToCompare, null, false), $exportedFile);
         //compare it
         $expectedResult = $this->api()->getFileContent($fileToCompare);
         $foundIds = [];
