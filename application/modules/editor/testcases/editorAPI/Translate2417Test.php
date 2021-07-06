@@ -87,6 +87,8 @@ class Translate2417Test extends editor_Test_JsonTest {
         // query the results from this segment and compare them against the expected initial json
         $tmResults = $this->api()->requestJson('editor/languageresourceinstance/'.$tm->id.'/query','GET',['segmentId' => $segToTest->id]);
 
+        $this->assertIsArray($tmResults, 'GET editor/languageresourceinstance/'.$tm->id.'/query does not return an array but: '.print_r($tmResults,1).' and raw result is '.print_r($this->api()->getLastResponse(),1));
+
         //file_put_contents($this->api()->getFile('/tmResultsBeforeEdit.json', null, false), json_encode($tmResults,JSON_PRETTY_PRINT));
         $this->assertTmResultEqualsJsonFile('tmResultsBeforeEdit.json', $tmResults, 'The received tm results before segment modification are not as expected!');
 
