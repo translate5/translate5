@@ -575,8 +575,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $connector = ZfExtended_Factory::get(get_class($this));
         /* @var $connector editor_Services_Connector */
         $connector->connectTo($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());
-        //copy the current config (for task specific config)
+        // copy the current config (for task specific config)
         $connector->setConfig($this->getConfig());
+        // copy the worker user guid
+        $connector->setWorkerUserGuid($this->getWorkerUserGuid());
         $connector->isInternalFuzzy = true;
         return $connector;
     }
