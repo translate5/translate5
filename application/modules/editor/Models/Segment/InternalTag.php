@@ -117,7 +117,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     public function getLength($tag) {
         $matches = [];
-        if(preg_match('/<span[^>]+data-length="([^"]*)"[^>]+>/', $tag, $matches)) {
+        if(preg_match('/<span[^>]+data-length="([^"]*)"[^>]*>/', $tag, $matches)) {
             return $matches[1];
         }
         return -1;
