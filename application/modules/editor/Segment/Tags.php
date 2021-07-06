@@ -663,13 +663,13 @@ class editor_Segment_Tags implements JsonSerializable {
         $processor = ($asMarkup) ? 'htmlspecialchars' : 'trim';
         $newline = ($asMarkup) ? '<br/>' : "\n";
         if($this->source != NULL){
-            $debug .= 'SOURCE: '.$processor($this->source->render()).$newline;
+            $debug .= 'SOURCE '.$this->source->debugProps().': '.$processor($this->source->render()).$newline;
         }
         if($this->sourceOriginal != NULL){
-            $debug .= 'SOURCE ORIGINAL: '.$processor($this->sourceOriginal->render()).$newline;
+            $debug .= 'SOURCE ORIGINAL '.$this->sourceOriginal->debugProps().': '.$processor($this->sourceOriginal->render()).$newline;
         }
         for($i=0; $i < count($this->targets); $i++){
-            $debug .= 'TARGET '.$i.': '.$processor($this->targets[$i]->render()).$newline;
+            $debug .= 'TARGET '.$i.' '.$this->targets[$i]->debugProps().': '.$processor($this->targets[$i]->render()).$newline;
         }
         return $debug;
     }

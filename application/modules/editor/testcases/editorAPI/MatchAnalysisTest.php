@@ -94,7 +94,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             '<taskInfo taskId="UNTESTABLECONTENT" runAt="UNTESTABLECONTENT" runTime="UNTESTABLECONTENT">',
             $actual);
         
-        //file_put_contents($this->api()->getFile('exportResults.xml', null, false), $actual);
+        self::$api->isCapturing() && file_put_contents($this->api()->getFile('exportResults.xml', null, false), $actual);
         $expected = self::$api->getFileContent('exportResults.xml');
         
         //check for differences between the expected and the actual content

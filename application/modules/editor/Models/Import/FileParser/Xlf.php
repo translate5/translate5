@@ -817,11 +817,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             if(strpos($mid, self::PREFIX_SUB) === 0) {
                 $this->setMid($this->_mid.'-'.$mid);
             }
-            
+
             $emptyInitialTarget = empty($targetChunksOriginal);
             $hasCutTargetContent = empty($this->segmentData[$targetName]['original']) || $this->segmentData[$targetName]['original'] === "0";
-            //if source contains tags only or is empty (and is no missing source) then we are able to ignore non textual segments
-            if(!$isSourceMrkMissing && !$this->hasText($this->segmentData[$sourceName]['original']) && ($emptyInitialTarget || $hasCutTargetContent)) {
+            $targetHasTagsOnly = !$this->hasText($this->segmentData[$targetName]['original']);
+            //if source contains tags only or is empty (and is no missing source) then we are able to ignore non textual segments if target fulfills the given 3 criterias
+            if(!$isSourceMrkMissing && !$this->hasText($this->segmentData[$sourceName]['original']) && ($emptyInitialTarget || $hasCutTargetContent || $targetHasTagsOnly)) {
                 //if empty target, we fill the target with the source content, and ignore the segment then in translation
                 //  on reviewing and if target content was given, then it will be ignored too
                 //  on reviewing needs $hasOriginalTarget to be true, which is the case by above if

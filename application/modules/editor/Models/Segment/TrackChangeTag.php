@@ -89,14 +89,14 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * Attributes for the trackchange-Node 
      * @var string
      */
-    const ATTRIBUTE_USERTRACKINGID='data-usertrackingid';
-    const ATTRIBUTE_USERCSSNR='data-usercssnr';
-    const ATTRIBUTE_WORKFLOWSTEP='data-workflowstep';
-    const ATTRIBUTE_TIMESTAMP='data-timestamp';
-    const ATTRIBUTE_HISTORYLIST='data-historylist';
-    const ATTRIBUTE_HISTORY_SUFFIX='_history_';
-    const ATTRIBUTE_ACTION='data-action';
-    const ATTRIBUTE_USERCSSNR_VALUE_PREFIX='usernr';
+    const ATTRIBUTE_USERTRACKINGID          = 'data-usertrackingid';
+    const ATTRIBUTE_USERCSSNR               = 'data-usercssnr';
+    const ATTRIBUTE_WORKFLOWSTEP            = 'data-workflowstep';
+    const ATTRIBUTE_TIMESTAMP               = 'data-timestamp';
+    const ATTRIBUTE_HISTORYLIST             = 'data-historylist';
+    const ATTRIBUTE_HISTORY_SUFFIX          = '_history_';
+    const ATTRIBUTE_ACTION                  = 'data-action';
+    const ATTRIBUTE_USERCSSNR_VALUE_PREFIX  = 'usernr';
     
     /**
      * the id of the user in the taskUserTracking-table
@@ -116,8 +116,8 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
     
     
     public function __construct(){
-        $this->replacerRegex=self::REGEX_DEL;
-        $this->placeholderTemplate='<'.self::PLACEHOLDER_TAG_DEL.' id="%s" />';
+        $this->replacerRegex = self::REGEX_DEL;
+        $this->placeholderTemplate = '<'.self::PLACEHOLDER_TAG_DEL.' id="%s" />';
     }
     
     /***
@@ -129,23 +129,23 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      */
     public function createTrackChangesNode($nodeName,$nodeText){
         
-        $node=[];
-        $node[]='<'.$nodeName;
-        $node[]='class="'.$this->getTrackChangesCss($nodeName).'"';
+        $node = [];
+        $node[] = '<'.$nodeName;
+        $node[] = 'class="'.$this->getTrackChangesCss($nodeName).'"';
         
         // id to identify the user who did the editing (also used for verifying checks)
-        $node[]=self::ATTRIBUTE_USERTRACKINGID.'="'.$this->userTrackingId.'"';
+        $node[] = self::ATTRIBUTE_USERTRACKINGID.'="'.$this->userTrackingId.'"';
         
         // css-selector with specific number for this user
-        $node[]=self::ATTRIBUTE_USERCSSNR.'="'.self::ATTRIBUTE_USERCSSNR_VALUE_PREFIX.$this->userColorNr.'"';
+        $node[] = self::ATTRIBUTE_USERCSSNR.'="'.self::ATTRIBUTE_USERCSSNR_VALUE_PREFIX.$this->userColorNr.'"';
         
         //workflow-step:
-        $node[]=self::ATTRIBUTE_WORKFLOWSTEP.'="'.$this->attributeWorkflowstep.'"';
+        $node[] = self::ATTRIBUTE_WORKFLOWSTEP.'="'.$this->attributeWorkflowstep.'"';
         
         // timestamp af the change:
-        $node[]=self::ATTRIBUTE_TIMESTAMP.'="'.date("c").'"';
+        $node[] = self::ATTRIBUTE_TIMESTAMP.'="'.date("c").'"';
         
-        $node[]='>'.$nodeText.'</'.$nodeName.'>';
+        $node[] = '>'.$nodeText.'</'.$nodeName.'>';
         
         return implode(' ', $node);
         
