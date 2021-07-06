@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Service Class of Plugin "TermTagger"
+ * TODO: the whole tag-merging/stripping/restoring (also in editor_Models_Segment_TrackChangeTag) could be done much more reliably with the Object Oriented FieldTags
  */
 class editor_Plugins_TermTagger_Service {
     /**
@@ -339,7 +340,6 @@ class editor_Plugins_TermTagger_Service {
                 'requestedData' => $data,
             ]);
         }
-        
         return $this->decodeSegments($response, $data);
     }
     
@@ -353,7 +353,6 @@ class editor_Plugins_TermTagger_Service {
             $segment->source = $this->encodeSegment($segment, 'source');
             $segment->target = $this->encodeSegment($segment, 'target');
         }
-        
         return $data;
     }
 
@@ -373,12 +372,13 @@ class editor_Plugins_TermTagger_Service {
     }
     
     private function encodeSegment($segment, $field) {
+
         $trackChangeTag = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
         /* @var $trackChangeTag editor_Models_Segment_TrackChangeTag */
         
         $text = $segment->$field;
         $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
-        
+        $tempMatches = [];
         preg_match_all($matchContentRegExp, $text, $tempMatches);
         
         foreach ($tempMatches[0] as $match) {
@@ -395,8 +395,8 @@ class editor_Plugins_TermTagger_Service {
         $text = $trackChangeTag->protect($text);
         //store the text with track changes
         $trackChangeTag->textWithTrackChanges = $text;
-        $this->segments[$field.'-'.$segment->id] = $trackChangeTag; //we have to store one instance per segment since it contains specific data for recreation
-        
+        $this->segments[$this->createUniqueKey($segment, $field)] = $trackChangeTag; //we have to store one instance per segment since it contains specific data for recreation
+
         // Now remove the stored TrackChange-Nodes from the text for termtagging (with the general helper to keep the original tags inside the specific instance)
         return $this->generalTrackChangesHelper->removeTrackChanges($text);
     }
@@ -408,37 +408,36 @@ class editor_Plugins_TermTagger_Service {
         }
         //fix TRANSLATE-713
         $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
+
+        $trackChangeTag = $this->segments[$this->createUniqueKey($segment, $field)];
+        /* @var $trackChangeTag editor_Models_Segment_TrackChangeTag */
         
-        //remerge trackchanges and terms - FIXME dont do it if there are no INS/DEL!
-        $trackChangeTag = $this->segments[$field.'-'.$segment->id];
-        
-        //error_log(print_r($trackChangeTag,1));
-        //error_log($text);
-        $text = $this->termTagTrackChangeHelper->mergeTermsAndTrackChanges($text, $trackChangeTag->textWithTrackChanges);
-        //check if content is valid XML, or if textual content has changed
-        $oldFlagValue = libxml_use_internal_errors(true);
-        // delete tags and internal tags are masked, thats ok for the check here
-        $invalidXml = ! @simplexml_load_string('<container>'.$text.'</container>');
-        libxml_use_internal_errors($oldFlagValue);
-        $textNotEqual = strip_tags($text) !== strip_tags($segment->$field);
-        if($invalidXml || $textNotEqual) {
-            $this->log->warn('E1132', 'Conflict in merging terminology and track changes: "{type}".', [
-                'type' => ($invalidXml?'Invalid XML,':'').($textNotEqual?' text changed by merge':''),
-                'task' => $request->task,
-                'segmentId' => $segment->id,
-                'inputFromBrowser' => $trackChangeTag->unprotect($trackChangeTag->textWithTrackChanges),
-                'termTaggerResult' => $segment->$field,
-                'mergedResult' => $text,
-            ]);
+        // remerge trackchanges and terms - don't do it if there were no INS/DEL!
+        // TODO FIXME: if you do the above there are problems with trackchanges tags getting lost ...
+        // if($trackChangeTag->hasOriginalTags()){
+        if(true){
+            $text = $this->termTagTrackChangeHelper->mergeTermsAndTrackChanges($text, $trackChangeTag->textWithTrackChanges);
+            //check if content is valid XML, or if textual content has changed
+            $oldFlagValue = libxml_use_internal_errors(true);
+            // delete tags and internal tags are masked, thats ok for the check here
+            $invalidXml = ! @simplexml_load_string('<container>'.$text.'</container>');
+            libxml_use_internal_errors($oldFlagValue);
+            $textNotEqual = strip_tags($text) !== strip_tags($segment->$field);
+            if($invalidXml || $textNotEqual) {
+                $this->log->warn('E1132', 'Conflict in merging terminology and track changes: "{type}".', [
+                    'type' => ($invalidXml?'Invalid XML,':'').($textNotEqual?' text changed by merge':''),
+                    'task' => $request->task,
+                    'segmentId' => $segment->id,
+                    'inputFromBrowser' => $trackChangeTag->unprotect($trackChangeTag->textWithTrackChanges),
+                    'termTaggerResult' => $segment->$field,
+                    'mergedResult' => $text,
+                ]);
+            }
+            $text = $trackChangeTag->unprotect($text);
         }
-        //error_log($text);
-        $text = $trackChangeTag->unprotect($text);
-        //error_log($text);
-        
         if (empty($this->replacedTagsNeedles)) {
             return $text;
         }
-        
         $text = preg_replace('"&lt;img class=&quot;content-tag&quot; src=&quot;(\d+)&quot; alt=&quot;TaggingError&quot; /&gt;"', '<img class="content-tag" src="\\1" alt="TaggingError" />', $text);
         $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
         
@@ -469,6 +468,15 @@ class editor_Plugins_TermTagger_Service {
             'jsonBody' => $result->getBody(),
         ]);
         return null;
+    }
+    /**
+     * Creates a unique key to use as an array key to identify an encoded segment
+     * @param stdClass $segment
+     * @param string $field
+     * @return string
+     */
+    private function createUniqueKey(stdClass $segment, string $field) : string {
+        return $segment->field.'-'.$segment->id.'-'.$field;
     }
     
 }
