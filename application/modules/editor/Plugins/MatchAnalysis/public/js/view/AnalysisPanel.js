@@ -65,8 +65,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
         totalSum: '#UT#Summe',
         internalFuzzy: "#UT#Interne Fuzzy verwendet",
         matchRate: "#UT#Match-Rate",
-        edit100PercentMatchEnabledMessage: '#UT#Gesperrte Segmente sind in der Analyse enthalten',
-        edit100PercentMatchDisabledMessage: '#UT#Gesperrte Segmente sind in der Analyse nicht enthalten'
+        edit100PercentMatchDisabledMessage: '#UT#Gesperrte 100%-Matches sind nicht Teil der Analyse.'
     },
 
     listeners: {
