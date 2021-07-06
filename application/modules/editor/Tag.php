@@ -892,7 +892,7 @@ class editor_Tag {
         return $this->singular;
     }
     /**
-     * Tags are seen as equal if they have the same node-name, the same classes & the same attributes apart from data-aatributes
+     * Tags are seen as equal if they have the same node-name, the same classes & the same attributes (apart from data-attributes if set)
      * The data-attributes and the children of the tag will not count for comparision
      * @param editor_Tag $tag
      * @param bool $withDataAttribs
@@ -903,7 +903,7 @@ class editor_Tag {
             return false;
         }
         foreach($this->attribs as $key => $val){
-            if(substr($key, 0, 5) != 'data-' && (!$tag->hasAttribute($key) || $tag->getUnescapedAttribute($key) != $val)){
+            if(($withDataAttribs || substr($key, 0, 5) != 'data-') && (!$tag->hasAttribute($key) || $tag->getUnescapedAttribute($key) != $val)){
                 return false;
             }
         }
