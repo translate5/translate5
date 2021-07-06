@@ -3990,13 +3990,13 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Anwendung verlassen</source>
     <target>Leave application</target>
 </trans-unit>
-<trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGFiIGpldHp0IGdlc3BlcnJ0ZSBTZWdtZW50ZSBuaWNodCBtZWhyIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4u'>
-  <source>Wenn deaktiviert, werden ab jetzt gesperrte Segmente nicht mehr in die Analyse und Wortanzahl einbezogen.</source>
-  <target>If disabled, segments that are blocked from now on are not included in the analysis and word count any more.</target>
+<trans-unit id='V2VubiBha3RpdmllcnQgd2VyZGVuIHp1dm9yIGdlc3BlcnJ0ZSBTZWdtZW50ZSBpbiBkaWUgQW5hbHlzZSB1bmQgV29ydGFuemFobCBlaW5iZXpvZ2VuLg=='>
+  <source>Wenn aktiviert werden zuvor gesperrte Segmente in die Analyse und Wortanzahl einbezogen.</source>
+  <target>If enabled, locked segments are included in the analysis and word count.</target>
 </trans-unit>
-<trans-unit id='V2VubiBha3RpdmllcnQgd2VyZGVuIGFiIGpldHp0IHp1dm9yIGdlc3BlcnJ0ZSBTZWdtZW50ZSBpbiBkaWUgQW5hbHlzZSB1bmQgV29ydGFuemFobCBlaW5iZXpvZ2VuLg=='>
-  <source>Wenn aktiviert werden ab jetzt zuvor gesperrte Segmente in die Analyse und Wortanzahl einbezogen.</source>
-  <target>If enabled, previously locked segments will be included in the analysis and word count from now on.</target>
+<trans-unit id='V2VubiBkZWFrdGl2aWVydCB3ZXJkZW4gZ2VzcGVycnRlIDEwMCUtTWF0Y2hlcyBuaWNodCBtZWhyIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4u'>
+  <source>Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.</source>
+  <target>If disabled, locked 100% matches will no longer be included in the analysis and word count.</target>
 </trans-unit>
 <trans-unit id='UVMgU3RhdGlzdGlr'><source>QS Statistik</source><target>QA statistics</target></trans-unit>
 <trans-unit id='TWF0Y2gtQW5hbHlzZQ=='><source>Match-Analyse</source><target>Match analysis</target></trans-unit>
