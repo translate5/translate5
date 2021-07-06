@@ -35,6 +35,7 @@ class editor_Plugins_MatchAnalysis_Export_Xml
 {
     /**
      * List of attributes of a analyse node
+     * WARNING: the here listed order of the attributes is important (segments before words) otherwise plunet can not import the XML file
      * @var array
      */
     const ATTRIBUTES = [
