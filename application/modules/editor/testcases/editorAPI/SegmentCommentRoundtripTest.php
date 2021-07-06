@@ -105,11 +105,12 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=100');
         $segmentIds = array_column($segments, 'id');
         foreach($segmentIds as $idx => $segmentId) {
-            $comment = new stdClass();
-            $comment->isEditable = true;
-            $comment->segmentId = $segmentId;
-            $comment->userName = 'A Test users name';
-            $comment->comment = 'A test comment for segment '.$idx;
+            $comment = [
+                'isEditable'    => true,
+                'segmentId'     => $segmentId,
+                'userName'      => 'A Test users name',
+                'comment'       => 'A test comment for segment '.$idx,
+            ];
             $this->api()->requestJson('editor/comment', 'POST', $comment);
         }
 

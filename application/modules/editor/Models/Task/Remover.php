@@ -50,21 +50,22 @@ class editor_Models_Task_Remover {
     }
     
     /**
-     * Removes a task completly from translate5 if task is not locked and therefore removable
+     * Removes a task completely from translate5 if task is not locked and therefore removable
      */
     public function remove($forced = false) {
         $taskGuid = $this->task->getTaskGuid();
         $projectId = $this->task->getProjectId();
+        $isProject = $this->task->isProject();
         if(empty($taskGuid)) {
             return false;
         }
-        if(!$forced) {
-            $this->checkRemovable();
+        if(!$isProject){
+            $this->removeTask($forced);
+        }else{
+            $this->removeProject($projectId,$forced,true);
         }
-        $this->removeDataDirectory();
-        $this->removeRelatedDbData();
-        $this->task->delete();
-        //on import error project may not be created:
+
+        // on import error project may not be created:
         if(!is_null($projectId)) {
             $this->cleanupProject($projectId);
         }
@@ -77,23 +78,62 @@ class editor_Models_Task_Remover {
     public function removeForced($removeFiles = true) {
         $taskGuid = $this->task->getTaskGuid();
         $projectId = $this->task->getProjectId();
+        $isProject = $this->task->isProject();
         if(empty($taskGuid)) {
             return false;
         }
         //tries to lock the task, but delete it regardless if could be locked or not.
         $this->task->lock(NOW_ISO);
-        
-        if($removeFiles) {
-            $this->removeDataDirectory();
+
+        if(!$isProject){
+            $this->removeTask(true,$removeFiles);
+        }else{
+            $this->removeProject($projectId,true,$removeFiles);
         }
-        $this->removeRelatedDbData();
-        $this->task->delete();
-        //on import error project may not be created:
+
+        // on import error project may not be created:
         if(!is_null($projectId)) {
             $this->cleanupProject($projectId);
         }
     }
-    
+
+    /***
+     * Remove the current loaded task. The task data on the disk will be removed by default ($removeFiles). To disable this set $removeFiles to false.
+     * @param false $forced
+     * @param true $removeFiles: should the task files be removed
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_Conflict
+     */
+    protected function removeTask(bool $forced = false, bool $removeFiles = true){
+        if(!$forced) {
+            $this->checkRemovable();
+        }
+        if($removeFiles){
+            $this->removeDataDirectory();
+        }
+        $this->removeRelatedDbData();
+        $this->task->delete();
+    }
+
+    /***
+     * Remove project and all of his tasks and related data
+     *
+     * @param int $projectId
+     * @param bool $forced
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_Conflict
+     */
+    protected function removeProject(int $projectId, bool $forced,bool $removeFiles){
+        $model=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $model editor_Models_Task */
+        $tasks=$model->loadProjectTasks($projectId);
+        $tasks = array_reverse($tasks);
+        foreach ($tasks as $projectTask){
+            $this->task->init($projectTask);
+            $this->removeTask($forced,$removeFiles);
+        }
+    }
+
     /**
      * Remove the project if there are no tasks in the project
      * @param int $projectId
