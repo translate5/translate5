@@ -31,7 +31,30 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Test_Model_Segment extends editor_Test_Model_Abstract {
     
-    protected $compared = ['segmentNrInTask', 'mid', 'userGuid', 'userName', 'editable', 'pretrans', 'matchRate', 'stateId', 'autoStateId', 'fileOrder', 'workflowStepNr', 'workflowStep', 'sourceMd5', 'sourceToSort', 'targetMd5', 'targetToSort', 'targetEditToSort', 'isWatched', 'segmentUserAssocId', 'matchRateType'];
+    protected $compared = [
+        'segmentNrInTask',
+        'mid',
+        'userGuid',
+        'userName',
+        'editable',
+        'pretrans',
+        'matchRate',
+        'stateId',
+        'autoStateId',
+        'fileOrder',
+        'workflowStepNr',
+        'workflowStep',
+        'isRepeated',
+        'sourceMd5',
+        'sourceToSort',
+        'targetMd5',
+        'targetToSort',
+        'targetEditToSort',
+        'isWatched',
+        'segmentUserAssocId',
+        'matchRateType',
+        'isFirstofFile',
+    ];
 
     protected $sanitized = [
         'source' => 'fieldtext',

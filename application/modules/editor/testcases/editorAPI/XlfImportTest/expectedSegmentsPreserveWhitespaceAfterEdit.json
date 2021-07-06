@@ -26,7 +26,8 @@
         "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": true
     },
     {
         "source": "Multi <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;1\/&gt;: 3 whitespace characters\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"3\">\u00b7\u00b7\u00b7<\/span><\/div>Space",
@@ -55,7 +56,8 @@
         "targetEditToSort": "Multiz Spacez",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img alt=&quot;Multi    Space&quot;\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\">&lt;img alt=&quot;Multi    Space&quot;\/&gt;<\/span><\/div>Whitespace - <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;4\/&gt;: 3 whitespace characters\">&lt;4\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"3\">\u00b7\u00b7\u00b7<\/span><\/div><div class=\"single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip\"><span class=\"short\" title=\"&lt;3\/&gt;: 1 tab character\">&lt;3\/&gt;<\/span><span class=\"full\" data-originalid=\"tab\" data-length=\"1\">\u2192<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323022206c656e6774683d2235222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;5\/&gt;: 5 whitespace characters\">&lt;5\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"5\">\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>should be <div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span class=\"short\" title=\"&lt;2\/&gt;: Newline\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"softReturn\" data-length=\"1\">\u21b5<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323032303230323032303230323022206c656e6774683d223131222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;6\/&gt;: 11 whitespace characters\">&lt;6\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"11\">\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>preserved.",
@@ -84,7 +86,8 @@
         "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Multi <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;1\/&gt;: 3 whitespace characters\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"3\">\u00b7\u00b7\u00b7<\/span><\/div>Space",
@@ -113,7 +116,8 @@
         "targetEditToSort": "Multiz Spacez",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img alt=&quot;Multi    Space&quot;\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\">&lt;img alt=&quot;Multi    Space&quot;\/&gt;<\/span><\/div>Whitespace - should be like config.",
@@ -142,7 +146,8 @@
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Multi Space",
@@ -171,7 +176,8 @@
         "targetEditToSort": "Multiz Spacez",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img alt=&quot;Multi    Space&quot;\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\">&lt;img alt=&quot;Multi    Space&quot;\/&gt;<\/span><\/div>Whitespace - should be like config.",
@@ -200,7 +206,8 @@
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Multi Space",
@@ -229,7 +236,8 @@
         "targetEditToSort": "Multiz Spacez",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img alt=&quot;Multi    Space&quot;\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\">&lt;img alt=&quot;Multi    Space&quot;\/&gt;<\/span><\/div>Whitespace - <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;4\/&gt;: 3 whitespace characters\">&lt;4\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"3\">\u00b7\u00b7\u00b7<\/span><\/div><div class=\"single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip\"><span class=\"short\" title=\"&lt;3\/&gt;: 1 tab character\">&lt;3\/&gt;<\/span><span class=\"full\" data-originalid=\"tab\" data-length=\"1\">\u2192<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323022206c656e6774683d2235222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;5\/&gt;: 5 whitespace characters\">&lt;5\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"5\">\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>should be <div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span class=\"short\" title=\"&lt;2\/&gt;: Newline\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"softReturn\" data-length=\"1\">\u21b5<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323032303230323032303230323022206c656e6774683d223131222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;6\/&gt;: 11 whitespace characters\">&lt;6\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"11\">\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>preserved.",
@@ -258,7 +266,8 @@
         "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Multi <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;1\/&gt;: 3 whitespace characters\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"3\">\u00b7\u00b7\u00b7<\/span><\/div>Space",
@@ -287,7 +296,8 @@
         "targetEditToSort": "Multiz Spacez",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img alt=&quot;Multi    Space&quot;\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\">&lt;img alt=&quot;Multi    Space&quot;\/&gt;<\/span><\/div>Whitespace - should be like config.",
@@ -316,7 +326,8 @@
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Multi Space",
@@ -345,7 +356,8 @@
         "targetEditToSort": "Multiz Spacez",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img alt=&quot;Multi    Space&quot;\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\">&lt;img alt=&quot;Multi    Space&quot;\/&gt;<\/span><\/div>Whitespace - should be like config.",
@@ -374,7 +386,8 @@
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Multi Space",
@@ -403,7 +416,8 @@
         "targetEditToSort": "Multiz Spacez",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img alt=&quot;Multi    Space&quot;\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\">&lt;img alt=&quot;Multi    Space&quot;\/&gt;<\/span><\/div>Whitespace - <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;4\/&gt;: 3 whitespace characters\">&lt;4\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"3\">\u00b7\u00b7\u00b7<\/span><\/div><div class=\"single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip\"><span class=\"short\" title=\"&lt;3\/&gt;: 1 tab character\">&lt;3\/&gt;<\/span><span class=\"full\" data-originalid=\"tab\" data-length=\"1\">\u2192<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323022206c656e6774683d2235222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;5\/&gt;: 5 whitespace characters\">&lt;5\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"5\">\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>should be <div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span class=\"short\" title=\"&lt;2\/&gt;: Newline\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"softReturn\" data-length=\"1\">\u21b5<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323032303230323032303230323022206c656e6774683d223131222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;6\/&gt;: 11 whitespace characters\">&lt;6\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"11\">\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>preserved.",
@@ -432,7 +446,8 @@
         "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Multi <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span class=\"short\" title=\"&lt;1\/&gt;: 3 whitespace characters\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"space\" data-length=\"3\">\u00b7\u00b7\u00b7<\/span><\/div>Space",
@@ -461,7 +476,8 @@
         "targetEditToSort": "Multiz Spacez",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img alt=&quot;Multi    Space&quot;\/&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\">&lt;img alt=&quot;Multi    Space&quot;\/&gt;<\/span><\/div>Whitespace - should be like config.",
@@ -490,7 +506,8 @@
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Multi Space",
@@ -519,7 +536,8 @@
         "targetEditToSort": "Multiz Spacez",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test preserve whitespace.",
@@ -548,7 +566,8 @@
         "targetEditToSort": "Testz preservez whitespacez.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Between mrk tags.",
@@ -577,7 +596,8 @@
         "targetEditToSort": "Betweenz mrkz tagsz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "And surrounding tags.",
@@ -606,7 +626,8 @@
         "targetEditToSort": "Andz surroundingz tagsz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test not to preserve whitespace.",
@@ -635,7 +656,8 @@
         "targetEditToSort": "Testz notz toz preservez whitespacez.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Between mrk tags.",
@@ -664,7 +686,8 @@
         "targetEditToSort": "Betweenz mrkz tagsz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "And surrounding tags.",
@@ -693,7 +716,8 @@
         "targetEditToSort": "Andz surroundingz tagsz.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "Test preserve whitespace.",
@@ -722,7 +746,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "Between mrk tags.",
@@ -751,7 +776,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "And surrounding tags.",
@@ -780,7 +806,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "With missing or empty target.",
@@ -809,7 +836,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "Test preserve whitespace.",
@@ -838,7 +866,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "Between mrk tags.",
@@ -867,7 +896,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "And surrounding tags.",
@@ -896,7 +926,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "With missing or empty target.",
@@ -925,7 +956,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;empty"
+        "matchRateType": "import;empty",
+        "isFirstofFile": null
     },
     {
         "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;p_in&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\">&lt;p_in&gt;<\/span><\/div>across tags outside from mrk test",
@@ -954,7 +986,8 @@
         "targetEditToSort": "zacross ztags zoutside zfrom zmrk ztest",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;tm"
+        "matchRateType": "import;tm",
+        "isFirstofFile": null
     },
     {
         "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e616674657220656469742034342063686172616374657273202834322074657874202b20316e627370202b2031206265747765656e206d726b293c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"after edit 44 characters (42 text + 1nbsp + 1 between mrk)\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"751e6ac38fea726eafd45fd9e9ae3016\" data-length=\"-1\">after edit 44 characters (42 text + 1nbsp + 1 between mrk)<\/span><\/div>across tags outside from mrk test",
@@ -983,7 +1016,8 @@
         "targetEditToSort": "across tags outside from mrk test - edited",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;tm"
+        "matchRateType": "import;tm",
+        "isFirstofFile": null
     },
     {
         "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e616674657220656469742034342063686172616374657273202834322074657874202b20316e627370202b2031206265747765656e206d726b293c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"after edit 44 characters (42 text + 1nbsp + 1 between mrk)\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"751e6ac38fea726eafd45fd9e9ae3016\" data-length=\"-1\">after edit 44 characters (42 text + 1nbsp + 1 between mrk)<\/span><\/div>across tags outside from mrk test",
@@ -1012,7 +1046,8 @@
         "targetEditToSort": "across tags outside from mrk test - edited",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;tm"
+        "matchRateType": "import;tm",
+        "isFirstofFile": null
     },
     {
         "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e616674657220656469742034352063686172616374657273202834322074657874202b20316e627370202b203220737572726f756e642069736f6c6174656420706820746167293c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"after edit 45 characters (42 text + 1nbsp + 2 surround isolated ph tag)\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"e86d7bcb48303b7128031b2fbb764b4e\" data-length=\"-1\">after edit 45 characters (42 text + 1nbsp + 2 surround isolated ph tag)<\/span><\/div>across tags outside from mrk test",
@@ -1041,7 +1076,8 @@
         "targetEditToSort": "across tags outside from mrk test - edited",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;tm"
+        "matchRateType": "import;tm",
+        "isFirstofFile": null
     },
     {
         "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e616674657220656469742038352063686172616374657273202834322074657874202b20316e627370202b203432206f74686572293c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"after edit 85 characters (42 text + 1nbsp + 42 other)\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"e60970dd724a06f4cec9b7fdbcd26aad\" data-length=\"-1\">after edit 85 characters (42 text + 1nbsp + 42 other)<\/span><\/div>across tags outside from mrk test",
@@ -1070,7 +1106,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;tm"
+        "matchRateType": "import;tm",
+        "isFirstofFile": null
     },
     {
         "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e616674657220656469742038352063686172616374657273202834322074657874202b20316e627370202b203432206f74686572293c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"after edit 85 characters (42 text + 1nbsp + 42 other)\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"e60970dd724a06f4cec9b7fdbcd26aad\" data-length=\"-1\">after edit 85 characters (42 text + 1nbsp + 42 other)<\/span><\/div>across tags outside from mrk test",
@@ -1099,7 +1136,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;tm"
+        "matchRateType": "import;tm",
+        "isFirstofFile": null
     },
     {
         "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e616674657220656469742038352063686172616374657273202834322074657874202b20316e627370202b203432206f74686572293c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"after edit 85 characters (42 text + 1nbsp + 42 other)\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"e60970dd724a06f4cec9b7fdbcd26aad\" data-length=\"-1\">after edit 85 characters (42 text + 1nbsp + 42 other)<\/span><\/div>across tags outside from mrk test",
@@ -1128,7 +1166,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;tm"
+        "matchRateType": "import;tm",
+        "isFirstofFile": null
     },
     {
         "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>Testwort<div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2231223e266c743b2f705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"3d66ffe6daeb9dbf775c6166877e9d4b\" data-length=\"-1\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>",
@@ -1157,7 +1196,8 @@
         "targetEditToSort": "Testword",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;tm"
+        "matchRateType": "import;tm",
+        "isFirstofFile": true
     },
     {
         "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>Testtext eins",
@@ -1186,7 +1226,8 @@
         "targetEditToSort": "testtext one",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;tm"
+        "matchRateType": "import;tm",
+        "isFirstofFile": null
     },
     {
         "source": "Testtext zwei",
@@ -1215,7 +1256,8 @@
         "targetEditToSort": "text text two",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;tm"
+        "matchRateType": "import;tm",
+        "isFirstofFile": null
     },
     {
         "source": "Testtext 3",
@@ -1244,7 +1286,8 @@
         "targetEditToSort": "texttext three",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;tm"
+        "matchRateType": "import;tm",
+        "isFirstofFile": null
     },
     {
         "source": "ohne match",
@@ -1273,7 +1316,8 @@
         "targetEditToSort": "without match",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "1 - Test an existing translation. ",
@@ -1302,7 +1346,8 @@
         "targetEditToSort": "1 - Teste eine vorhandene \u00dcbersetzung. Mit MRK Tags und zus\u00e4tzlichen Segmenten im Source",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": true
     },
     {
         "source": "1 - With MRK tags and source additional segments.",
@@ -1331,7 +1376,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;missing-target-mrk"
+        "matchRateType": "import;missing-target-mrk",
+        "isFirstofFile": null
     },
     {
         "source": "2 - Test an existing translation. ",
@@ -1360,7 +1406,8 @@
         "targetEditToSort": "2 - Teste eine vorhandene \u00dcbersetzung. ",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "2 - With MRK tags and target additional segments.",
@@ -1389,7 +1436,8 @@
         "targetEditToSort": "2 - Mit MRK Tags und ",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "",
@@ -1418,7 +1466,8 @@
         "targetEditToSort": "2 - zus\u00e4tzlichen Target Segmenten.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;missing-source-mrk"
+        "matchRateType": "import;missing-source-mrk",
+        "isFirstofFile": null
     },
     {
         "source": "1 - Test an existing translation. ",
@@ -1447,7 +1496,8 @@
         "targetEditToSort": "1 - Teste eine vorhandene \u00dcbersetzung. Mit MRK Tags und zus\u00e4tzlichen Segmenten im Source.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "1 - With MRK tags and source additional segments.",
@@ -1476,7 +1526,8 @@
         "targetEditToSort": "",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;missing-target-mrk"
+        "matchRateType": "import;missing-target-mrk",
+        "isFirstofFile": null
     },
     {
         "source": "inbetween.",
@@ -1505,7 +1556,8 @@
         "targetEditToSort": "Mittendrin",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "2 - Test an existing translation. ",
@@ -1534,7 +1586,8 @@
         "targetEditToSort": "2 - Teste eine vorhandene \u00dcbersetzung. ",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "",
@@ -1563,7 +1616,8 @@
         "targetEditToSort": "2 - Mit MRK Tags und ",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;missing-source-mrk"
+        "matchRateType": "import;missing-source-mrk",
+        "isFirstofFile": null
     },
     {
         "source": "2 - With MRK tags and target additional segments. inbetween.",
@@ -1592,7 +1646,8 @@
         "targetEditToSort": "2 - zus\u00e4tzlichen Target Segmenten. Mittendrin.",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": null
     },
     {
         "source": "",
@@ -1621,7 +1676,8 @@
         "targetEditToSort": "Empty Source mit target 3",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;missing-source-mrk"
+        "matchRateType": "import;missing-source-mrk",
+        "isFirstofFile": null
     },
     {
         "source": "",
@@ -1650,7 +1706,8 @@
         "targetEditToSort": "foo 1",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;missing-source-mrk"
+        "matchRateType": "import;missing-source-mrk",
+        "isFirstofFile": null
     },
     {
         "source": "",
@@ -1679,7 +1736,8 @@
         "targetEditToSort": "foo 2",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;missing-source-mrk"
+        "matchRateType": "import;missing-source-mrk",
+        "isFirstofFile": null
     },
     {
         "source": "",
@@ -1708,7 +1766,8 @@
         "targetEditToSort": "foo 3",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;missing-source-mrk"
+        "matchRateType": "import;missing-source-mrk",
+        "isFirstofFile": null
     },
     {
         "source": "-",
@@ -1737,6 +1796,7 @@
         "targetEditToSort": "- - edited",
         "isWatched": false,
         "segmentUserAssocId": null,
-        "matchRateType": "import;none"
+        "matchRateType": "import;none",
+        "isFirstofFile": true
     }
 ]
