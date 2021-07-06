@@ -190,4 +190,11 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
             $db->query($sql);
         }
     }
+
+    /***
+     * Clean the internal config cache variable
+     */
+    public function cleanConfigCache(){
+        self::$taskCustomerConfig = [];
+    }
 }
