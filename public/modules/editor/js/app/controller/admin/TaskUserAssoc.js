@@ -269,13 +269,17 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
 
     reloadTaskUserAssocGrid: function () {
         var me = this,
-            task = me.getPrefWindow().getCurrentTask(),
+            prefWindow = me.getPrefWindow(),
+            task = prefWindow.getCurrentTask(),
             store = me.getUserAssocGrid().getStore();
 
 
         me.getUserAssocGrid().getSelectionModel().deselectAll();
-        store.load();
-        task && task.load();
+        store.load({
+            callback:function (){
+                task && task.load();
+            }
+        });
     },
 
     onUserSpecialPropertiesBtnClick: function () {
