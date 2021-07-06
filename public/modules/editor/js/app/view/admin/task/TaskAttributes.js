@@ -55,8 +55,8 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         usageModeCoopInfo: "#UT#Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.",
         usageModeCompetitiveInfo: "#UT#Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.",
         usageModeSimultaneousInfo: "#UT#Alle zugewiesenen Nutzer eines Workflowschritts können gleichzeitig arbeiten",
-        edit100PercentMatchEnabledMessage:'#UT#Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen',
-        edit100PercentMatchDisabledMessage:'#UT#Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen'
+        edit100PercentMatchEnabledMessage:'#UT#Wenn aktiviert werden zuvor gesperrte Segmente in die Analyse und Wortanzahl einbezogen.',
+        edit100PercentMatchDisabledMessage:'#UT#Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.'
     },
     itemId:'taskAttributesPanel',
     controller:'taskattributesviewcontroller',
