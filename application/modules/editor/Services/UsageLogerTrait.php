@@ -44,6 +44,12 @@ trait editor_Services_UsageLogerTrait {
      * @var editor_Models_Task
      */
     protected $task;
+
+    /***
+     * The user which did trigger the worker
+     * @var string
+     */
+    protected $workerUserGuid = null;
     
     
     /***
@@ -112,11 +118,16 @@ trait editor_Services_UsageLogerTrait {
         if($logger->getUserGuid() === null){
 
             $session = new Zend_Session_Namespace('user');
-            // if no session user is, this must be worker context or tests
-            if(!isset($session->data->id)){
-                $logger->setUserGuid(ZfExtended_Models_User::SYSTEM_GUID);
-            }else{
+
+            if(!is_null($this->workerUserGuid)){
+                // it is worker context, use the user from there (this call is from analysis)
+                $logger->setUserGuid($this->workerUserGuid);
+            }elseif(isset($session->data->id)){
+                // the session user exist, use the session user (this call is from regular query action)
                 $logger->setUserGuid($session->data->userGuid);
+            }else{
+                // no user was found, set the system user (this call is from the tests)
+                $logger->setUserGuid(ZfExtended_Models_User::SYSTEM_GUID);
             }
         }
 
@@ -199,5 +210,21 @@ trait editor_Services_UsageLogerTrait {
         }
         //return with leading and trailing comma so the customers are searchable
         return ','.implode(',', $return).',';
+    }
+
+    /***
+     * Setter for the internal worker user guid property
+     * @param string|null $workerUserGuid
+     */
+    public function setWorkerUserGuid(string $workerUserGuid = null){
+        $this->workerUserGuid = $workerUserGuid;
+    }
+
+    /***
+     * Return the current worker user guid
+     * @return string|null
+     */
+    public function getWorkerUserGuid(){
+        return $this->workerUserGuid;
     }
 }
