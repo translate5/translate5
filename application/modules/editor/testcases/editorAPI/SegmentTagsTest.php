@@ -103,7 +103,7 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         ->setData('some-name', 'some "data"')
         ->setData('other-name', 12345);
         $result = $segmentTag->toJson();
-        $expected = '{"type":"any","name":"div","category":"test","startIndex":6,"endIndex":11,"classes":["zclass","aclass","bclass"],"attribs":[{"name":"onclick","value":"window.open(\'page\');"},{"name":"rel","value":"something"},{"name":"data-some-name","value":"some \"data\""},{"name":"data-other-name","value":"12345"}]}';
+        $expected = '{"type":"any","name":"div","category":"test","startIndex":6,"endIndex":11,"order":-1,"parentOrder":-1,"classes":["zclass","aclass","bclass"],"attribs":[{"name":"onclick","value":"window.open(\'page\');"},{"name":"rel","value":"something"},{"name":"data-some-name","value":"some \"data\""},{"name":"data-other-name","value":"12345"}]}';
         $this->assertEquals($expected, $result);
     }
     
@@ -125,8 +125,8 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
     public function testOverlappingTags(){
         $tags = $this->createTags();
         $tags->addTag(new editor_Segment_AnyTag(6, 26, 'test', 'a'));
-        $tags->addTag(new editor_Segment_AnyTag(50, 72, 'test', 'b'));
         $tags->addTag(new editor_Segment_AnyTag(18, 60, 'test', 'c'));
+        $tags->addTag(new editor_Segment_AnyTag(50, 72, 'test', 'b'));
         $markup = 'Lorem <a>ipsum dolor </a><c><a>sit amet</a>, consetetur sadipscing </c><b><c>elitr, sed</c> diam nonumy</b> eirmod.';
         $this->createTagsTest($tags, $markup);
     }
@@ -154,24 +154,59 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
     
     public function testSingularNestedTags(){
         $tags = $this->createTags();
-        $tags->addTag(new editor_Segment_AnyTag(5, 5, 'test', 'div'));
-        $tags->addTag(new editor_Segment_AnyTag(5, 5, 'test', 'img'));
-        $tags->addTag(new editor_Segment_AnyTag(50, 50, 'test', 'img'));
-        $tags->addTag(new editor_Segment_AnyTag(50, 50, 'test', 'div'));
+        $tags->addTag(new editor_Segment_AnyTag(5, 5, 'test', 'div'), 0);
+        $tags->addTag(new editor_Segment_AnyTag(5, 5, 'test', 'img'), 1, 0);
+        $tags->addTag(new editor_Segment_AnyTag(50, 50, 'test', 'div'), 2);
+        $tags->addTag(new editor_Segment_AnyTag(50, 50, 'test', 'img'), 3, 2);
         $markup = 'Lorem<div><img /></div> ipsum dolor sit amet, consetetur sadipscing <div><img /></div>elitr, sed diam nonumy eirmod.';
         $this->createTagsTest($tags, $markup);
     }
     
-    public function testSingularNestedFulllengthTags(){
+    public function testSingularUnNestedTags1(){
         $tags = $this->createTags();
         $tags->addTag(new editor_Segment_AnyTag(5, 5, 'test', 'div'));
         $tags->addTag(new editor_Segment_AnyTag(5, 5, 'test', 'img'));
-        $tags->addTag(new editor_Segment_AnyTag(50, 50, 'test', 'img'));
         $tags->addTag(new editor_Segment_AnyTag(50, 50, 'test', 'div'));
-        $tags->addTag(new editor_Segment_AnyTag(0, 80, 'test', 'a'));
-        $tags->addTag(new editor_Segment_AnyTag(0, 80, 'test', 'b'));
+        $tags->addTag(new editor_Segment_AnyTag(50, 50, 'test', 'img'));
+        $markup = 'Lorem<div></div><img /> ipsum dolor sit amet, consetetur sadipscing <div></div><img />elitr, sed diam nonumy eirmod.';
+        $this->createTagsTest($tags, $markup);
+    }
+    
+    public function testSingularUnNestedTags2(){
+        $markup = 'Lorem<div><img /></div> ipsum dolor sit amet, consetetur sadipscing <div><img /></div>elitr, sed diam nonumy eirmod.';
+        $this->createDataTest(1234, $markup);
+    }
+    
+    public function testSingularUnNestedTags3(){
+        $markup = 'Lorem<img /><div></div> ipsum dolor sit amet, consetetur sadipscing <div></div><img />elitr, sed diam nonumy eirmod.';
+        $this->createDataTest(1234, $markup);
+    }
+    
+    public function testSingularUnNestedTags4(){
+        $markup = '<img /><div></div> ipsum dolor sit amet, consetetur sadipscing <div></div><img />';
+        $this->createDataTest(1234, $markup);
+    }
+    
+    public function testSingularUnNestedTags5(){
+        $markup = '<div></div><img /><img /> ipsum dolor sit amet, consetetur sadipscing <img /><div></div><img />';
+        $this->createDataTest(1234, $markup);
+    }
+    
+    public function testSingularNestedFulllengthTags1(){
+        $tags = $this->createTags();        
+        $tags->addTag(new editor_Segment_AnyTag(0, 80, 'test', 'a'), 0);
+        $tags->addTag(new editor_Segment_AnyTag(0, 80, 'test', 'b'), 1, 0);
+        $tags->addTag(new editor_Segment_AnyTag(5, 5, 'test', 'div'), 2, 1);
+        $tags->addTag(new editor_Segment_AnyTag(5, 5, 'test', 'img'), 3, 2);
+        $tags->addTag(new editor_Segment_AnyTag(50, 50, 'test', 'div'), 4, 1);
+        $tags->addTag(new editor_Segment_AnyTag(50, 50, 'test', 'img'), 5, 4);
         $markup = '<a><b>Lorem<div><img /></div> ipsum dolor sit amet, consetetur sadipscing <div><img /></div>elitr, sed diam nonumy eirmod.</b></a>';
         $this->createTagsTest($tags, $markup);
+    }
+    
+    public function testSingularNestedFulllengthTags2(){
+        $markup = '<a><b>Lorem<div><img /></div> ipsum dolor sit amet, consetetur sadipscing <div><img /></div>elitr, sed diam nonumy eirmod.</b></a>';
+        $this->createDataTest(1234, $markup);
     }
     
     public function testUnescapedChars(){
@@ -247,6 +282,14 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         $segmentId = 688498;
         $original = '<div class="open 672069643d2233313422 internal-tag ownttip"><span title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="314" data-length="-1" class="full">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div>Aktualizacja 07-2<div class="close 2f67 internal-tag ownttip"><span title="&lt;/cf&gt;" class="short">&lt;/1&gt;</span><span data-originalid="314" data-length="-1" class="full">&lt;/cf&gt;</span></div><div class="open 672069643d2233313622 internal-tag ownttip"><span title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;" class="short">&lt;2&gt;</span><span data-originalid="316" data-length="-1" class="full">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div>0<div class="close 2f67 internal-tag ownttip"><span title="&lt;/cf&gt;" class="short">&lt;/2&gt;</span><span data-originalid="316" data-length="-1" class="full">&lt;/cf&gt;</span></div><div class="open 672069643d2233313722 internal-tag ownttip"><span title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;" class="short">&lt;3&gt;</span><span data-originalid="317" data-length="-1" class="full">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div>1<div class="close 2f67 internal-tag ownttip"><span title="&lt;/cf&gt;" class="short">&lt;/3&gt;</span><span data-originalid="317" data-length="-1" class="full">&lt;/cf&gt;</span></div><div class="open 672069643d2233313822 internal-tag ownttip"><span title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;" class="short">&lt;4&gt;</span><span data-originalid="318" data-length="-1" class="full">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div>6 (akt.<div class="close 2f67 internal-tag ownttip"><span title="&lt;/cf&gt;" class="short">&lt;/4&gt;</span><span data-originalid="318" data-length="-1" class="full">&lt;/cf&gt;</span></div><div class="open 672069643d2233313922 internal-tag ownttip"><span title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;" class="short">&lt;5&gt;</span><span data-originalid="319" data-length="-1" class="full">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div> 0<div class="close 2f67 internal-tag ownttip"><span title="&lt;/cf&gt;" class="short">&lt;/5&gt;</span><span data-originalid="319" data-length="-1" class="full">&lt;/cf&gt;</span></div><div class="open 672069643d2233323022 internal-tag ownttip"><span title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;" class="short">&lt;6&gt;</span><span data-originalid="320" data-length="-1" class="full">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div>1<div class="close 2f67 internal-tag ownttip"><span title="&lt;/cf&gt;" class="short">&lt;/6&gt;</span><span data-originalid="320" data-length="-1" class="full">&lt;/cf&gt;</span></div><div class="open 672069643d2233323122 internal-tag ownttip"><span title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;" class="short">&lt;7&gt;</span><span data-originalid="321" data-length="-1" class="full">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div>)<div class="close 2f67 internal-tag ownttip"><span title="&lt;/cf&gt;" class="short">&lt;/7&gt;</span><span data-originalid="321" data-length="-1" class="full">&lt;/cf&gt;</span></div>';
         $markup = '<div class="open 672069643d2233313422 internal-tag ownttip"><span class="short" title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;">&lt;1&gt;</span><span class="full" data-originalid="314" data-length="-1">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div>Aktualizacja 07-2<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/cf&gt;">&lt;/1&gt;</span><span class="full" data-originalid="314" data-length="-1">&lt;/cf&gt;</span></div><div class="open 672069643d2233313622 internal-tag ownttip"><span class="short" title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;">&lt;2&gt;</span><span class="full" data-originalid="316" data-length="-1">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div>0<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/cf&gt;">&lt;/2&gt;</span><span class="full" data-originalid="316" data-length="-1">&lt;/cf&gt;</span></div><div class="open 672069643d2233313722 internal-tag ownttip"><span class="short" title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;">&lt;3&gt;</span><span class="full" data-originalid="317" data-length="-1">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div>1<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/cf&gt;">&lt;/3&gt;</span><span class="full" data-originalid="317" data-length="-1">&lt;/cf&gt;</span></div><div class="open 672069643d2233313822 internal-tag ownttip"><span class="short" title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;">&lt;4&gt;</span><span class="full" data-originalid="318" data-length="-1">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div>6 (akt.<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/cf&gt;">&lt;/4&gt;</span><span class="full" data-originalid="318" data-length="-1">&lt;/cf&gt;</span></div><div class="open 672069643d2233313922 internal-tag ownttip"><span class="short" title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;">&lt;5&gt;</span><span class="full" data-originalid="319" data-length="-1">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div> 0<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/cf&gt;">&lt;/5&gt;</span><span class="full" data-originalid="319" data-length="-1">&lt;/cf&gt;</span></div><div class="open 672069643d2233323022 internal-tag ownttip"><span class="short" title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;">&lt;6&gt;</span><span class="full" data-originalid="320" data-length="-1">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div>1<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/cf&gt;">&lt;/6&gt;</span><span class="full" data-originalid="320" data-length="-1">&lt;/cf&gt;</span></div><div class="open 672069643d2233323122 internal-tag ownttip"><span class="short" title="&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;">&lt;7&gt;</span><span class="full" data-originalid="321" data-length="-1">&lt;cf size=&quot;5.5&quot; font=&quot;Frutiger Next LT W1G&quot; nfa=&quot;true&quot;&gt;</span></div>)<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/cf&gt;">&lt;/7&gt;</span><span class="full" data-originalid="321" data-length="-1">&lt;/cf&gt;</span></div>';
+        $this->createOriginalDataTest($segmentId, $original, $markup);
+    }
+    
+    public function testRealDataTags9(){
+        // testing "real" segment content
+        $segmentId = 688445;
+        $original = '<del class="trackchanges ownttip deleted" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00" data-historylist="1625486496000" data-action_history_1625486496000="INS" data-usertrackingid_history_1625486496000="4269">F</del><ins class="trackchanges ownttip" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00">f</ins><ins class="trackchanges ownttip" data-usertrackingid="4269" data-usercssnr="usernr2" data-workflowstep="review1stlanguage3" data-timestamp="2021-07-05T14:01:36+02:00">ür Industriekunden</ins><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="duplicatesavecheck" data-segmentid="4395852" data-fieldname="targetEdit">';
+        $markup = '<del class="trackchanges ownttip deleted" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00" data-historylist="1625486496000" data-action_history_1625486496000="INS" data-usertrackingid_history_1625486496000="4269">F</del><ins class="trackchanges ownttip" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00">f</ins><ins class="trackchanges ownttip" data-usertrackingid="4269" data-usercssnr="usernr2" data-workflowstep="review1stlanguage3" data-timestamp="2021-07-05T14:01:36+02:00">ür Industriekunden</ins><img class="duplicatesavecheck" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-segmentid="4395852" data-fieldname="targetEdit" />';
         $this->createOriginalDataTest($segmentId, $original, $markup);
     }
     
