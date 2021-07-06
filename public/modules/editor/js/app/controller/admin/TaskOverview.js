@@ -900,7 +900,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     editorDeleteTask: function (task) {
         var me = this,
-            store = task.store,
             app = Editor.app;
 
         app.mask(me.strings.taskDestroy, task.get('taskName'));
@@ -912,15 +911,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             return;
         }
 
-        store.sync({
+        task.dropped = true; //doing the drop / erase manually
+        task.save({
             //prevent default ServerException handling
             preventDefaultHandler: true,
             success: function () {
                 app.unmask();
                 me.fireEvent('afterTaskDelete', task);
             },
-            failure: function (batch, op) {
-                var operation = batch.operations[0];
+            failure: function (batch, operation) {
                 task.reject();
                 app.unmask();
                 if (operation.error.status === '405') {
