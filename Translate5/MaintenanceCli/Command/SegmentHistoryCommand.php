@@ -166,9 +166,6 @@ The single versions are showing only the values different to the current one! Th
         if(mb_stripos($segment->getMatchRateType(), $segmentVersion->matchRateType) !== 0) {
             $result[] = ' <info>matchRate type:</info> '.$segmentVersion->matchRateType;
         }
-        if(!empty($segmentVersion->qmId) && $segmentVersion->qmId != $segment->getQmId()) {
-            $result[] = '       <info>QM id(s):</info> '.$segmentVersion->qmId;
-        }
         if(!empty($segmentVersion->stateId) && $segmentVersion->stateId != $segment->getStateId()) {
             $result[] = '       <info>state id:</info> '.$segmentVersion->stateId;
         }
@@ -199,9 +196,6 @@ The single versions are showing only the values different to the current one! Th
         }
         $result[] = '      <info>matchRate:</info> <options=bold>'.$segment->getMatchRate().'</>';
         $result[] = '  <info>matchRateType:</info> <options=bold>'.$segment->getMatchRateType().'</>';
-        if(!empty($segment->getQmId())) {
-            $result[] = '           <info>qmId:</info> <options=bold>'.$segment->getQmId().'</>';
-        }
         if(!empty($segment->getStateId())) {
             $result[] = '        <info>stateId:</info> <options=bold>'.$segment->getStateId().'</>';
         }
