@@ -79,15 +79,24 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param boolean $keepComments
      */
     public function assertSegmentsEqualsJsonFile(string $fileToCompare, array $segments, string $message='', bool $keepComments=true){
+        if(self::$api->isCapturing()) {
+            foreach($segments as $idx => $segment) {
+                $model = editor_Test_Model_Abstract::create($segment, 'segment');
+                $segments[$idx] = $model->getComparableData();
+            }
+            file_put_contents($this->api()->getFile($fileToCompare), json_encode($segments,JSON_PRETTY_PRINT));
+        }
         $expectations = self::$api->getFileContent($fileToCompare);
         $numSegments = count($segments);
-        if($numSegments != count($expectations)){
-            $this->assertEquals($numSegments, count($expectations), $message.' [Number of segments does not match the expectations]');
-        } else {
+        $numExpectations = count($expectations);
+        if($numSegments === $numExpectations) {
+
             for($i=0; $i < $numSegments; $i++){
                 $msg = (empty($message)) ? '' : $message.' [Segment '.($i + 1).']';
                 $this->assertSegmentEqualsObject($expectations[$i], $segments[$i], $msg, $keepComments);
             }
+        } else {
+            $this->assertEquals($numSegments, $numExpectations, $message.' [Number of segments does not match the expectations]');
         }
     }
 

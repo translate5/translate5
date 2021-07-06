@@ -61,7 +61,7 @@ abstract class editor_Models_Segment_TagAbstract {
      */
     public function protect(string $segment) {
         $id = 1;
-        $this->originalTags=array();
+        $this->originalTags = array();
         return $this->replace($segment, function($match) use (&$id) {
             $placeholder = $this->getPlaceholderTemplate($id++);
             $this->originalTags[$placeholder] = $match[0];
@@ -141,7 +141,13 @@ abstract class editor_Models_Segment_TagAbstract {
     public function getOriginalTags(){
         return $this->originalTags;
     }
-    
+    /**
+     * Retrieves, if there were original tags, that had to be protected
+     * @return boolean
+     */
+    public function hasOriginalTags() : bool {
+        return (count($this->originalTags) > 0);
+    }
     /***
      * Update the protected tag value by given key
      * @param mixed $key
@@ -150,7 +156,7 @@ abstract class editor_Models_Segment_TagAbstract {
      */
     public function updateOriginalTagValue($key,$value){
         if(isset($this->originalTags[$key])){
-            $this->originalTags[$key]=$value;
+            $this->originalTags[$key] = $value;
             return true;
         }
         return false;

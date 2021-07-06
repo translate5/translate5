@@ -192,7 +192,7 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * @see editor_Tag::isEqual()
      */
     public function isEqual(editor_Tag $tag, bool $withDataAttribs=true) : bool {
-        if(parent::isEqual($tag, $withDataAttribs) && get_class($tag) == get_class($this)){
+        if(parent::isEqual($tag, $withDataAttribs)){
             return $tag->renderChildren() == $this->renderChildren();
         }
         return false;
@@ -239,7 +239,7 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * {@inheritDoc}
      * @see editor_Segment_Tag::sequenceChildren()
      */
-    public function sequenceChildren(editor_Segment_FieldTags $tags){
+    public function sequenceChildren(editor_Segment_FieldTags $tags, int $parentOrder=-1){
         if($this->hasChildren()){
             foreach($this->children as $child){
                 $this->addContentTag(editor_Segment_Internal_ContentTag::fromTag($child));

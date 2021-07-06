@@ -60,7 +60,7 @@ final class editor_Test_Sanitizer {
         return preg_replace('/<span class="modified">[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}</', '<span class="modified">NOT_TESTABLE<', $text);
     }
     /**
-     * Sanitizes the segments metaCache object
+     * Sanitizes the segments metaCache object (just reorder the metacache data in a unified way)
      * @param string $jsonString
      * @return string|NULL
      */
@@ -71,9 +71,6 @@ final class editor_Test_Sanitizer {
             if(!empty($meta['siblingData'])) {
                 $data = [];
                 foreach($meta['siblingData'] as $sibling) {
-                    if(array_key_exists('length', $sibling) && array_key_exists('targetEdit', $sibling['length'])){
-                        $sibling['length']['targetEdit'] = 1;
-                    }
                     $data['fakeSegId_'.$sibling['nr']] = $sibling;
                 }
                 ksort($data);
