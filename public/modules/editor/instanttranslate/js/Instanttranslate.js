@@ -485,7 +485,7 @@ function renderSingleMatchAndResources (translateTextResponse) {
                   'infoText': '',
                   'term': '',
                   'termStatus': '',
-                  'translationText': translationText.replace(/(\r\n|\n|\r)/gm, '<br>'),
+                  'translationText': translationText,
                   'processStatusAttribute':'',
                   'processStatusAttributeValue':'',
                   'languageRfc':'',
@@ -595,7 +595,7 @@ function renderTranslationContainer(resultData) {
     }
     
     translationsContainer += '<div class="copyable">';
-    translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'" data-languageresource-type="'+resultData.languageResourceType+'">'+resultData.translationText+'</div>';
+    translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'" data-languageresource-type="'+resultData.languageResourceType+'">'+sanitizeTranslatedText(resultData.translationText)+'</div>';
     translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
     
     if(resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
@@ -972,6 +972,16 @@ function checkTermPortalIntegration() {
 function drawTermPortalIntegration(termToPropose) {
     var html = '<span class="term-proposal" title="'+Editor.data.languageresource.translatedStrings['termProposalIconTooltip']+'" data-id="'+termToPropose.id+'" data-term="'+termToPropose.text+'"><span class="ui-icon ui-icon-circle-plus"></span></span>';
     $('#'+termToPropose.id+'.translation-result').next('.copyable-copy').append(html);
+}
+
+/***
+ * Prepare the transalted text before it is rendered to the page
+ * @param translatedText
+ * @returns {*}
+ */
+function sanitizeTranslatedText(translatedText){
+    translatedText = translatedText.replace(/(\r\n|\n|\r)/gm, '<br>');
+    return translatedText;
 }
 
 /**
