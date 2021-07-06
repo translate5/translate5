@@ -70,6 +70,10 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
         
         $connector = $manager->getConnector($languageResource, $task->getSourceLang(), $task->getTargetLang(), $task->getConfig());
         /* @var $connector editor_Services_Connector */
+
+        // set the worker user for the connector. This is required for the resource usage log
+        $connector->setWorkerUserGuid($params['userGuid']);
+
         $connector->batchQuery($this->taskGuid,function($progress){
             //update the worker model progress with progress value reported from the batch query
             $this->updateProgress($progress);
