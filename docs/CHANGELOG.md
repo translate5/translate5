@@ -11,6 +11,59 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.2.4] - 2021-07-06
+
+### Important Notes:
+#### [TRANSLATE-2560](https://jira.translate5.net/browse/TRANSLATE-2560)
+These changes must not be applied with running imports!
+
+#### [TRANSLATE-2545](https://jira.translate5.net/browse/TRANSLATE-2545)
+The usage of at least PHP >= 7.4 is mandatory now! (PHP 8 is not yet supported).
+The field role on associating a user to a task is deprecated. Use the field workflowStepName instead. The change is downwards compatible and creates a warning on further usage of the role field. See https://confluence.translate5.net/display/TAD/Task+User+Associations
+
+#### [TRANSLATE-2081](https://jira.translate5.net/browse/TRANSLATE-2081)
+The form field group "Auto-Assignment" based on languages in the user management is removed completely.
+If you now want to pre-define, if a user should be assigned to a task automatically, please use the new very extended mechanisms in the client management panel.
+Existing pre-definitions are NOT migrated.
+The OpenID-Connect configuration is moved into a separate tab.
+ 
+
+
+### Added
+**[TRANSLATE-2081](https://jira.translate5.net/browse/TRANSLATE-2081): Preset of user to task assignments** <br>
+Provides the functionality to configure auto-assignment of users to tasks on client configuration level, filtered by language, setting the to be used user and workflow step.
+
+
+### Changed
+**[TRANSLATE-2545](https://jira.translate5.net/browse/TRANSLATE-2545): Flexibilize workflow by putting role and step definitions in database** <br>
+The definition of all available workflow steps and roles is now stored in the database instead in a fixed workflow class. A new complex workflow is added for demonstration purposes and usage if wanted.
+
+**[TRANSLATE-2516](https://jira.translate5.net/browse/TRANSLATE-2516): Add user column to Excel language resource usage log** <br>
+The spreadsheet with the usage log of language resources is extended with a user column, that shows, who actually did the request.
+
+
+### Bugfixes
+**[TRANSLATE-2563](https://jira.translate5.net/browse/TRANSLATE-2563): Adjust texts that connect analysis and locking of 100%-Matches** <br>
+Adjust texts that connect analysis and locking of 100%-Matches.
+
+**[TRANSLATE-2560](https://jira.translate5.net/browse/TRANSLATE-2560): Combination of term-tagging and enabled source editing duplicates tags on saving a segment, AutoQA removes/merges TrackChanges from different Users** <br>
+FIXED BUG in the TermTagger leading to duplication of internal tags when source editing was activated
+FIXED BUG in the AutoQA leading to TrackChanges tags from different users being merged
+
+**[TRANSLATE-2557](https://jira.translate5.net/browse/TRANSLATE-2557): Select correct okapi file filter for txt-files by default** <br>
+By default the file format conversion used for txt-files the okapi-filter "moses-text". In this filter xml-special characters like & < > where kept in encoded version when the file was reconverted back to txt after export from translate5. This was wrong. Now the default was changed to the okapi plain-text filter, what handles the xml-special chars correctly.
+
+**[TRANSLATE-2547](https://jira.translate5.net/browse/TRANSLATE-2547): Clean-up project tasks** <br>
+Deleting a project deletes all files from database but not from disk. This is fixed.
+
+**[TRANSLATE-2536](https://jira.translate5.net/browse/TRANSLATE-2536): Task Configuration Panel does show old Values after Import** <br>
+FIX: Task Qualities & Task Configuration panels now update their view automatically after import to avoid outdated date is being shown
+
+**[TRANSLATE-2533](https://jira.translate5.net/browse/TRANSLATE-2533): Line breaks in InstantTranslate are deleted** <br>
+InstantTranslate dealing of line breaks is fixed.
+
+
 ## [5.2.3] - 2021-06-24
 
 ### Important Notes:
