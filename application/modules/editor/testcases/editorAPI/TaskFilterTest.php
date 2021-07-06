@@ -67,7 +67,7 @@ class TaskFilterTest extends \ZfExtended_Test_ApiTestcase {
     public function testTaskUserAssocFilters() {
         //test the assigment date of the task
         $return = $this->api()->requestJson('editor/task', 'GET',[
-            'filter' => '[{"operator":"eq","value":"'.date("Y-m-d 00:00:00", strtotime("now")).'","property":"assignmentDate"},{"operator":"eq","value":'.self::$api->getTask()->id.',"property":"id"}]',
+            'filter' => '[{"operator":"eq","value":"'.date("Y-m-d 00:00:00", strtotime("now")).'","property":"assignmentDate"},{"operator":"eq","value":'.self::$api->getTask()->id.',"property":"id"}]'
         ]);
         $this->assertCount(2, $return);
         

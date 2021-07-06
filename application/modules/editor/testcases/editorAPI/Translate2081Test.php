@@ -67,7 +67,7 @@ class Translate2081Test extends editor_Test_JsonTest {
         $params['workflowStepName'] = 'translation';
 
         $result = self::$api->requestJson('editor/userassocdefault', 'POST',[], [
-            'data'=>Zend_Json::encode($params)
+            'data' => Zend_Json::encode($params)
         ]);
         unset($result->id);
         unset($result->customerId);
