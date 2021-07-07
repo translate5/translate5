@@ -108,7 +108,8 @@ Ext.define('Editor.controller.ChangeAlike', {
           },
           '#changealikeWindow' : {
               show: 'focusButton',
-              onEscape: 'handleCancelChangeAlike'
+              onEscape: 'handleCancelChangeAlike',
+              onCtrlS: 'handleSaveChangeAlike'
           },
           '#changealikeWindow #cancelBtn' : {
               click: 'handleCancelChangeAlike'

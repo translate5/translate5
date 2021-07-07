@@ -356,14 +356,6 @@
                 <source>Aktuelles Segment f&#xFC;r die folgenden Segmente &#xFC;bernehmen?</source>
                 <target>Adopt current segment for the following segments?</target>
             </trans-unit>
-            <trans-unit id="S2VpbmUgw4RuZGVydW5nZW4gZHVyY2hmw7xocmVu">
-                <source>Keine &#xC4;nderungen durchf&#xFC;hren</source>
-                <target>Do not conduct changes</target>
-            </trans-unit>
-            <trans-unit id="w4RuZGVydW5nZW4gw7xiZXJuZWhtZW4=">
-                <source>&#xC4;nderungen &#xFC;bernehmen</source>
-                <target>Accept changes</target>
-            </trans-unit>
             <trans-unit id="SGlsZmU6">
                 <source>Hilfe:</source>
                 <target>Help:</target>
