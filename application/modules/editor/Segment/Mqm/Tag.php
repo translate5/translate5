@@ -39,9 +39,12 @@
  * OPENER: <img class="open minor qmflag ownttip qmflag-13" data-t5qid="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />
  * CLOSER: <img class="close minor qmflag ownttip qmflag-13" data-t5qid="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />
  * TEMPLATE: <img class="%1$s qmflag ownttip %2$s qmflag-%3$d" data-t5qid="%4$d" data-comment="%5$s" src="%6$s" />
+ * this tag is represented by two image-tags in the markup which will be paired to a single tag in the unparsing process
+ * In the rendering phase an instance will be cloned and act's as two seperate single image tags again !
  * 
  * @method editor_Segment_Mqm_Tag clone(boolean $withDataAttribs)
  * @method editor_Segment_Mqm_Tag createBaseClone()
+ * @method editor_Segment_Mqm_Tag cloneForRendering()
  */
 final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
 
@@ -149,6 +152,12 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      */
     private $paired = false;
     /**
+     * This flag will be set in the rendering-phase, then we act as a single image tag !
+     * Can be NULL | left | right
+     * @var string
+     */
+    private $rendering = NULL;
+    /**
      * 
      * @var int
      */
@@ -191,6 +200,14 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     public function isPaired() : bool {
         return $this->paired;
     }
+    /**
+     * MQM tags can not be Splitted as they are explicitly allowed to overlap
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::isSplitable()
+     */    
+    public function isSplitable() : bool {
+        return false;
+    }
     
     /* Overwritten API */
     
@@ -216,14 +233,63 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         $clone->setMqmProps($this->paired, $this->categoryIndex, $this->severity, $this->comment);
         return $clone;
     }
-    
+    /**
+     * Special API to set the rendering props in the rendering phase
+     * @param array $config
+     * @return editor_Segment_Mqm_Tag
+     */
+    private function setRendering(array $config=NULL){
+        if(is_array($config) && array_key_exists('rendering', $config)){
+            $this->rendering = $config['rendering'];
+            $this->singular = true; // crucial to deactivate "canContain" API
+            $this->parentOrder = -1; // crucial to invalidate any vertical nesting as long as we have be seen as tag with expansion. This we elevate us to the top-level
+            if($this->rendering == 'left'){
+                $this->endIndex = $this->startIndex; 
+            } else {
+                $this->startIndex = $this->endIndex;
+            }
+        }
+        return $this;
+    }
+    /**
+     * Overwritten to add two clones acting as image tags instead of a single clone
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::addRenderingClone()
+     */
+    public function addRenderingClone(array &$renderingQueue){
+        $renderingQueue[] = $this->cloneForRendering()->setRendering(['rendering' => 'left']);
+        $renderingQueue[] = $this->cloneForRendering()->setRendering(['rendering' => 'right']);
+    }
+    /**
+     * Overwritten since we act as a single image tag in the rendering phase
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::render()
+     */
+    public function render(array $skippedTypes=NULL) : string {
+        if($this->rendering == NULL){
+            return parent::render($skippedTypes);
+        }
+        if($this->rendering == 'left'){
+            return $this->renderImageTag(true);
+        }
+        return $this->renderImageTag(false);
+    }
+    /**
+     * Normally not used, but who knows if we are ever rendered outside the rendering phase
+     * {@inheritDoc}
+     * @see editor_Tag::renderStart()
+     */
     protected function renderStart($withDataAttribs=true) : string {
         if($this->paired){
             return $this->renderImageTag(true);
         }
         return parent::renderStart($withDataAttribs);
     }
-
+    /**
+     * Normally not used, but who knows if we are ever rendered outside the rendering phase
+     * {@inheritDoc}
+     * @see editor_Tag::renderStart()
+     */
     protected function renderEnd() : string {
         if($this->paired){
             return $this->renderImageTag(false);

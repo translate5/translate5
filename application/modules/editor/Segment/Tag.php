@@ -116,9 +116,18 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @return editor_Segment_Tag
      */
     public static function createNew(int $startIndex=0, int $endIndex=0, string $category='') : editor_Segment_Tag {
-        $tag = new self($startIndex, $endIndex, $category);
+        $tag = new static($startIndex, $endIndex, $category);
         $tag->addClass($tag->getIdentificationClass());
         return $tag;
+    }
+    /**
+     * Strips all segment tags from a string
+     * Note, that (currently) the internal tags text-contents are part of the returned text
+     * @param string $markup
+     * @return string
+     */
+    public static function strip(string $markup) : string {
+        return strip_tags($markup);
     }
     /**
      * @deprecated: do not use with segment tags
@@ -473,7 +482,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return false;
     }
     /**
-     * Evaluates, if the tag can be splitted (interleaved with other tags). Apart from internal tags this is the case for all other tags
+     * Retrieves, if the tag can be splitted (to solve overlappings with other tags). This means, that identical tags will be joined when consolidating
      * API is used in the consolidation phase only
      * @return bool
      */
@@ -542,7 +551,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     }
     /**
      * Finds the next container that can contain the passed tag
-     * API is used in the rendering process only
+     * API is used in the rendering phase only
      * @param editor_Segment_Tag $tag
      * @return editor_Segment_Tag|NULL
      */
@@ -562,6 +571,24 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     public function cloneOrder(editor_Segment_Tag $from){
         $this->order = $from->order;
         $this->parentOrder = $from->parentOrder;
+    }
+    /**
+     * Clones the tag to create the rendering model
+     * API is used in the rendering phase only
+     * @return editor_Segment_Tag
+     */
+    public function cloneForRendering(){
+        $clone = $this->clone(true);
+        $clone->cloneOrder($this);
+        return $clone;
+    }
+    /**
+     * Adds our rendering clone to the rendering queue
+     * API is used in the rendering phase only
+     * @param array $renderingQueue
+     */
+    public function addRenderingClone(array &$renderingQueue){
+        $renderingQueue[] = $this->cloneForRendering();
     }
     /**
      * After the nested structure of tags is set this fills in the text-chunks of the segments text
@@ -630,11 +657,10 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * Debug output
      * @return string
      */
-    public function debug($asMarkup=false){
+    public function debug(){
         $debug = '';
-        $processor = ($asMarkup) ? 'htmlspecialchars' : 'trim';
-        $newline = ($asMarkup) ? '<br/>' : "\n";
-        $debug .= 'RENDERED: '.$processor($this->render()).$newline;
+        $newline = "\n";
+        $debug .= 'RENDERED: '.trim($this->render()).$newline;
         $debug .= 'START: '.$this->startIndex.' | END: '.$this->endIndex.' | FULLENGTH: '.($this->isFullLength?'true':'false').$newline;
         $debug .= 'DELETED: '.($this->wasDeleted?'true':'false').' | INSERTED: '.($this->wasInserted?'true':'false').$newline;
         return $debug;
