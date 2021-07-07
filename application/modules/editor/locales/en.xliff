@@ -4146,9 +4146,9 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Benutzer nach Import benachrichtigen</source>
     <target>Notify users after import</target>
 </trans-unit>
-<trans-unit id='V2VydCBzZXR6dCBzZWxiZSBLb25maWd1cmF0aW9uLCBkaWUgYXVjaCBkaWUgIsOcYmVyc2NocmVpYnVuZyBkZXIgU3lzdGVta29uZmlndXJhdGlvbiIgbWl0IE5hbWVuICJEZWZhdWx0IGRlYWRsaW5lIGRhdGUiIHNldHp0Lg=='>
-    <source>Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.</source>
-    <target>Value sets the same config, as the "System configuration overwrite" of the same name</target>
+<trans-unit id='RGVmaW5pZXJ0IGRpZSBBbnphaGwgVGFnZSwgZGllIGRpZSBEZWFkbGluZSBpbiBkZXIgWnVrdW5mdCBsaWVnZW4gc29sbCAtIGdlc2VoZW4gdm9tIFplaXRwdW5rdCBkZXIgUHJvamVrdGFubGFnZSBhbi4gV2VydCBzZXR6dCBzZWxiZSBLb25maWd1cmF0aW9uLCBkaWUgYXVjaCBkaWUgIsOcYmVyc2NocmVpYnVuZyBkZXIgU3lzdGVta29uZmlndXJhdGlvbiIgbWl0IE5hbWVuICJEZWZhdWx0IGRlYWRsaW5lIGRhdGUiIHNldHp0Lg=='>
+    <source>Definiert die Anzahl Tage, die die Deadline in der Zukunft liegen soll - gesehen vom Zeitpunkt der Projektanlage an. Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.</source>
+    <target>Defines the number of days that the deadline should be in the future - seen from the time of of the project creation. Value sets the same config, as the "System configuration overwrite" of the same name.</target>
 </trans-unit>
 <trans-unit id='Qml0dGUga29uZmlndXJpZXJlbiBTaWUgenVuw6RjaHN0IGRhcyBGZWxkICJ0cmFuc2xhdGU1IERvbWFpbiIgaW0gVGFiICJBbGxnZW1laW4iLiBEYW5hY2gga8O2bm5lbiBTaWUgT3BlbklEIENvbm5lY3QgZsO8ciBkaWVzZW4gS3VuZGVuIGVpbnJpY2h0ZW4u'>
     <source>Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.</source>

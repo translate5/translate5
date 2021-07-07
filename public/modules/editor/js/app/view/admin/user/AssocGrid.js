@@ -68,8 +68,8 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                 }],
                 columns: [{
                     xtype: 'gridcolumn',
-                    width: 230,
                     dataIndex: 'sourceLang',
+                    flex:1,
                     renderer:Editor.util.Util.gridColumnLanguageRenderer,
                     filter: {
                         type: 'list',
@@ -79,8 +79,8 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     text: me.strings.sourceLang
                 },{
                     xtype: 'gridcolumn',
-                    width: 230,
                     dataIndex: 'targetLang',
+                    flex:1,
                     renderer:Editor.util.Util.gridColumnLanguageRenderer,
                     filter: {
                         type: 'list',
@@ -90,8 +90,8 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     text: me.strings.targetLang
                 },{
                     xtype: 'gridcolumn',
-                    width: 230,
                     dataIndex: 'userGuid',
+                    flex:1,
                     renderer:me.userRenderer,
                     filter: {
                         type: 'string'
@@ -99,8 +99,8 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     text: me.strings.userGuidCol
                 },{
                     xtype: 'gridcolumn',
-                    width: 100,
                     dataIndex: 'workflowStepName',
+                    flex:1,
                     text: me.strings.workflowStepNameCol,
                     renderer:Editor.util.Util.getWorkflowStepNameTranslated,
                     filter: {
@@ -110,14 +110,14 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     }
                 } ,{
                     xtype: 'gridcolumn',
-                    width: 100,
                     dataIndex: 'role',
+                    flex:1,
                     hidden:true,
                     text: me.strings.roleCol
                 },{
                     xtype: 'gridcolumn',
-                    width: 90,
                     dataIndex: 'deadlineDate',
+                    flex:1,
                     text: me.strings.deadlineDateLable
                 }],
                 dockedItems: [{

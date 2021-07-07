@@ -59,7 +59,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
         formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
         formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
         fieldDeadline:'#UT#Deadline',
-        deadlineDateInfoTooltip:'#UT#Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.',
+        deadlineDateInfoTooltip:'#UT#Definiert die Anzahl Tage, die die Deadline in der Zukunft liegen soll - gesehen vom Zeitpunkt der Projektanlage an. Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.',
         wizardTitle:'#UT#Standard-Benutzerzuweisungen'
     },
 
@@ -117,18 +117,18 @@ Ext.define('Editor.view.admin.user.Assoc', {
                             },{
                                 anchor: '100%',
                                 xtype: 'combo',
-                                editable: false,
-                                forceSelection: true,
-                                queryMode: 'local',
-                                itemId: 'workflowStepName',
-                                name: 'workflowStepName',
-                                fieldLabel: me.strings.fieldWorkflowStepName,
-                                valueField: 'id',
-                                displayField: 'text',
                                 allowBlank: false,
                                 bind: {
                                     store:'{workflowSteps}'
-                                }
+                                },
+                                forceSelection: true,
+                                anyMatch: true,
+                                queryMode: 'local',
+                                name: 'workflowStepName',
+                                itemId: 'workflowStepName',
+                                displayField: 'text',
+                                valueField: 'id',
+                                fieldLabel: me.strings.fieldWorkflowStepName
                             },{
                                 anchor: '100%',
                                 xtype: 'combo',
