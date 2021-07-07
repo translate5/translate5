@@ -4174,6 +4174,10 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Allgemein</source>
     <target>General</target>
 </trans-unit>
+<trans-unit id='TGF5b3V0IHdlY2hzZWxu'>
+  <source>Layout wechseln</source>
+  <target>Switch layout</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

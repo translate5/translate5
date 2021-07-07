@@ -108,7 +108,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
               'ExtJs'
           );
         /* @var $extJs ZfExtended_Controller_Helper_ExtJs */
-        $this->view->extJsCss = $extJs->getCssPath();
+
+        $userConfig = ZfExtended_Factory::get('editor_Models_Config');
+        /* @var $userConfig editor_Models_Config */
+        $userConfig = $userConfig->mergeUserValues(editor_User::instance()->getGuid());
+
+        // load extjs theme from user specific config
+        $this->view->extJsCss = $extJs->getHttpPath().$userConfig['runtimeOptions.extJs.cssFile']['value'];
         $this->view->extJsBasepath = $extJs->getHttpPath();
         $this->view->extJsVersion = $extJs->getVersion();
         

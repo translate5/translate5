@@ -46,16 +46,24 @@ Ext.define('Editor.view.HeadPanel', {
     },
     strings: {
         logout: '#UT# Abmelden',
-        readonly: '#UT# - [LESEMODUS]'
+        readonly: '#UT# - [LESEMODUS]',
+        uiThemeComboLabelText:'#UT#Layout wechseln'
     },
     
     initConfig: function(instanceConfig) {
         var me = this,
-            translations = [];
-        
+            translations = [],
+            uiThemesRecord = Editor.app.getUserConfig('extJs.cssFile',true),
+            uiDefaults = [];
+
         Ext.Object.each(Editor.data.translations, function(i, n) {
             translations.push([i, n]);
         });
+
+        Ext.Array.each(uiThemesRecord.get('defaults'), function(i) {
+            uiDefaults.push([i, i.split('/')[3]]);
+        });
+
 
         var config = {
             items: [{
@@ -74,6 +82,16 @@ Ext.define('Editor.view.HeadPanel', {
                     xtype: 'tbfill'
                 },{
                     xtype: 'helpButton'
+                },{
+                    xtype: 'combo',
+                    itemId: 'uiTheme',
+                    value: uiThemesRecord.get('value'),
+                    store: uiDefaults,
+                    fieldLabel: me.strings.uiThemeComboLabelText,
+                    width:300,
+                    forceSelection: true,
+                    editable: false,
+                    queryMode: 'local'
                 },{
                     xtype: 'combo',
                     itemId: 'languageSwitch',
