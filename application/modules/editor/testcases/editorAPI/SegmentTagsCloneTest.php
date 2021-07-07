@@ -30,12 +30,8 @@ END LICENSE AND COPYRIGHT
  * Several "classic" PHPUnit tests to check the FieldTags Cloning without TrackChanges tags
  * TODO: create test with additional quality-tags e.g. MQM
  */
-class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {   
-    /**
-     * 
-     * @var editor_Models_Task
-     */
-    private static $testTask = NULL;
+class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {   
+
     /**
      * Some Internal Tags to create Tests with
      */
@@ -100,7 +96,7 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $expected = 'Lorem <1>ipsum dolor</1> sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $this->createTrackChangesCloneTest($expected, $markup);
         $this->createTrackChangesFilterCloneTest($expected, $markup);
-        $this->createTrackChangesMqmFilterCloneTest(strip_tags($expected), $markup);
+        $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
     
     public function testMarkup2(){
@@ -108,7 +104,7 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $expected = 'Lorem <1>ipsum</1> dolor sit amet, elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.';
         $this->createTrackChangesCloneTest($expected, $markup);
         $this->createTrackChangesFilterCloneTest($expected, $markup);
-        $this->createTrackChangesMqmFilterCloneTest(strip_tags($expected), $markup);
+        $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
 
     public function testMarkup3(){
@@ -116,7 +112,7 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $expected = 'Lorem <1>ipsum </1> amet, <2></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> </3>, sed diam voluptua.';
         $this->createTrackChangesCloneTest($expected, $markup);
         $this->createTrackChangesFilterCloneTest($expected, $markup);
-        $this->createTrackChangesMqmFilterCloneTest(strip_tags($expected), $markup);
+        $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
     
     public function testMarkup4(){
@@ -125,7 +121,7 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $expected = 'Lorem sit amet, <2>consetetur sadipscing</2> elitr, sed diam nonumy eirmod tempor <3>invidunt <6/> labore et <4>dolore magna</4> aliquyam erat</3> sed diam voluptua.';
         $this->createTrackChangesCloneTest($expected, $markup);
         $this->createTrackChangesFilterCloneTest($expected, $markup);
-        $this->createTrackChangesMqmFilterCloneTest(strip_tags($expected), $markup);
+        $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
     /**
      * Creates a test for the tags cloning. The passed markup will have the following short-tags replaced with "real" internal tags
@@ -309,29 +305,5 @@ class SegmentTagsCloneTest extends \ZfExtended_Test_Testcase {
         $markup = str_replace($this->single6, '<6/>', $markup);
         $markup = str_replace($this->single7, '<7/>', $markup);
         return $markup;
-    }
-    /**
-     * Retrieves a test-tak to init field-tags with
-     * @return editor_Models_Task
-     */
-    private function getTestTask() : editor_Models_Task {
-        if(static::$testTask == NULL){
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->setId(1234);
-            $task->setEntityVersion(280);
-            $task->setTaskGuid('{c56eadf5-ca66-43ae-931f-a09ff22643ab}');
-            $task->setTaskName('UNIT_TEST_TASK');
-            $task->setForeignName('');
-            $task->setSourceLang(5);
-            $task->setTargetLang(4);
-            $task->setRelaisLang(0);
-            $task->setState('open');
-            $task->setQmSubsegmentFlags('{"qmSubsegmentFlags":[{"text":"Accuracy","id":1,"children":[{"text":"Terminology","id":2},{"text":"Mistranslation","id":3},{"text":"Omission","id":4},{"text":"Untranslated","id":5},{"text":"Addition","id":6}]},{"text":"Fluency","id":7,"children":[{"text":"Content","id":8,"children":[{"text":"Register","id":9},{"text":"Style","id":10},{"text":"Inconsistency","id":11}]},{"text":"Mechanical","id":12,"children":[{"text":"Spelling","id":13},{"text":"Typography","id":14},{"text":"Grammar","id":15},{"text":"Locale violation","id":16}]},{"text":"Unintelligible","id":17}]},{"text":"Verity","id":18,"children":[{"text":"Completeness","id":19},{"text":"Legal requirements","id":20},{"text":"Locale applicability","id":21}]}],"severities":{"critical":"Critical","major":"Major","minor":"Minor"}}');
-            $task->setTaskType('default');
-            $task->setProjectId(1233);
-            static::$testTask = $task;
-        }
-        return static::$testTask;
     }
 }

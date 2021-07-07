@@ -197,16 +197,16 @@ class editor_Segment_FieldTags implements JsonSerializable {
         $this->saveTo = is_array($saveTo) ? implode(',', $saveTo) : $saveTo;
         $this->ttName = (empty($ttName)) ? $this->getFirstSaveToField() : $ttName;
         // if HTML was passed as field text we have to unparse it
-        if(!empty($fieldText) && $fieldText != strip_tags($fieldText)){
+        if(!empty($fieldText) && $fieldText != editor_Segment_Tag::strip($fieldText)){
             $this->unparse($fieldText);
         } else if($fieldText !== NULL) {
             $this->fieldText = $fieldText;
         }
         // This debug can be used to evaluate the quality of the DOM parsing
-        if(self::VALIDATION_MODE && $this->fieldText != strip_tags($fieldText)){
+        if(self::VALIDATION_MODE && $this->fieldText != editor_Segment_Tag::strip($fieldText)){
             error_log('=================== PARSED FIELD TEXT DID NOT MATCH PASSED HTML ===================='."\n");
             error_log('FAULTY FIELDTAGS FOR SEGMENT '.$this->segmentId."\n");
-            error_log('RAW TEXT: '.strip_tags($fieldText)."\n");
+            error_log('RAW TEXT: '.editor_Segment_Tag::strip($fieldText)."\n");
             error_log('FIELD TEXT: '.$this->fieldText."\n");
             error_log('IN:  '.$fieldText."\n");
             error_log('OUT: '.$this->render()."\n");
@@ -515,55 +515,67 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return string
      */
     public function render(array $skippedTypes=NULL) : string {
-        $numTags = count($this->tags);
-        if($numTags == 0){
+        if(count($this->tags) == 0){
             return $this->fieldText;
         }
         $this->sort();
+        // first, clone our tags to have a disposable rendering model
+        $clones = [];
+        /* @var $clones editor_Segment_Tag[] */
+        foreach($this->tags as $tag){
+            $tag->addRenderingClone($clones);
+        }
+        // the final rendered model
         $rtags = [];
         /* @var $rtags editor_Segment_Tag[] */
-        $numRtags = 0;
         // creating a datamodel where the overlapping tags are segmented to pieces that do not overlap
         // therefore, all tags are compared with the tags after them and are cut into pieces if needed
         // this will lead to tags being cut into pieces not nesseccarily in the order as they have been added but in the order of their start-indexes / weight
-        if($numTags > 1){
-            for($i = 0; $i < $numTags; $i++){
-                $tag = $this->tags[$i];
-                $last = $tag->clone(true);
-                $last->cloneOrder($tag);
-                $rtags[$numRtags] = $last;
-                $numRtags++;
-                if(($i + 1) < $numTags){
-                    for($j = $i + 1; $j < $numTags; $j++){
-                        $compare = $this->tags[$j];
-                        // if the tag to compare overlaps we cut at the start-index
-                        if($compare->startIndex < $tag->endIndex && $compare->endIndex > $tag->endIndex){
-                            if($tag->isSplitable() || $compare->isSplitable()){
-                                // depending on who is splittable we set the cut
-                                $cut = ($tag->isSplitable()) ? $compare->startIndex : $tag->endIndex;
-                                $last->endIndex = $cut;
-                                $last = $tag->clone(true);
-                                $last->startIndex = $cut;
-                                $last->cloneOrder($tag);
-                                $rtags[$numRtags] = $last;
-                                $numRtags++;
+        $numClones = count($clones);
+        if($numClones > 1){
+            while($numClones > 0){
+                $tag = array_shift($clones);
+                $numClones--;
+                $rtags[] = $tag;
+                $added = false;
+                for($i = 0; $i < $numClones; $i++){
+                    $compare = $clones[$i];
+                      // if the tag to compare overlaps we have to cut one of the two in pieces
+                    if($compare->startIndex < $tag->endIndex && $compare->endIndex > $tag->endIndex){
+                        if($tag->isSplitable() || $compare->isSplitable()){
+                            if($tag->isSplitable()){
+                                // cut the current tag at the next tags start index
+                                $part = $tag->cloneForRendering();
+                                $tag->endIndex = $compare->startIndex;
+                                $part->startIndex = $compare->startIndex;
                             } else {
-                                // this must not happen.// TODO FIXME: Add Proper Exception
-                                $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.tags');
-                                /* @var $logger ZfExtended_Logger */
-                                $logger->error('E9999', 'Two non-splittable tags interleave each other. Segment-ID: '.$this->segmentId);
-                                // we simply do not add the next tag which will not be rendered this way
+                                // cut the following tag at the tag's end index
+                                $part = $compare->cloneForRendering();
+                                $compare->endIndex = $tag->endIndex;
+                                $part->startIndex = $tag->endIndex;
                             }
+                            // tricky: since we add the part at the end, it will not be evaluated again in the current camparision run
+                            $clones[] = $part;
+                            $added = true;
+                        } else {
+                            // we have an overlap with tags, that both are not allowed to overlap. this must not happen.
+                            // TODO FIXME: Add Proper Exception
+                            $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.tags');
+                            /* @var $logger ZfExtended_Logger */
+                            $logger->error('E9999', 'Two non-splittable tags interleave each other. Segment-ID: '.$this->segmentId);
+                            // we simply do not add the next tag which will not be rendered this way
                         }
                     }
                 }
+                // the number may changed when adding to the clones when following tags are cut. Also, reordering is needed then
+                if($added){
+                    usort($clones, array($this, 'compare'));
+                    $numClones = count($clones);
+                }
             }
             usort($rtags, array($this, 'compare'));
-         
         } else {
-            
-            $rtags[$numRtags] = $this->tags[0]->clone(true);
-            $numRtags++;
+            $rtags = $clones;
         }
         // now we create the nested data-model from the up to now sequential but sorted $rtags model. We also add the text-portions of the segment as text nodes
         // this container just acts as the master container 
@@ -580,7 +592,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
                 error_log("\n============== TAG =============\n");
                 error_log($tag->toJson());
                 error_log("\n========================================\n");
-             }
+            }
             $nearest->addChild($tag);
             $container = $tag;
         }
@@ -944,12 +956,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * Debug output
      * @return string
      */
-    public function debug($asMarkup=false){
-        $processor = ($asMarkup) ? 'htmlspecialchars' : 'trim';
-        $newline = ($asMarkup) ? '<br/>' : "\n";
-        $debug = 'FIELD TEXT: '.$newline.$processor($this->fieldText).$newline;
+    public function debug(){
+        $newline = "\n";
+        $debug = 'FIELD TEXT: '.$newline.trim($this->fieldText).$newline;
           for($i=0; $i < count($this->tags); $i++){
-              $debug .= $newline.'TAG '.$i.':'.$newline.$processor($this->tags[$i]->debug($asMarkup)).$newline;
+              $debug .= $newline.'TAG '.$i.':'.$newline.trim($this->tags[$i]->debug()).$newline;
         }
         return $debug;
     }
@@ -960,6 +971,4 @@ class editor_Segment_FieldTags implements JsonSerializable {
     public function debugProps(){
         return '[ segment:'.$this->segmentId.' | field:'.$this->field.' | saveTo:'.$this->saveTo.' | ttName:'.$this->ttName.' ]';
     }
-    
-    
 }
