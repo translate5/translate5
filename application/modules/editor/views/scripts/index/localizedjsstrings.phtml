@@ -428,16 +428,18 @@ Ext.define('Editor.controller.Localizer', {
         edit100pWarning: '<?php echo $this->translate->_('Achtung, Sie editieren einen 100% Match!');?>'
     };
 
-    Ext.define("Editor.locale.view.ui.changealike.Window", {
-        override: "Editor.view.ui.changealike.Window",
+    Ext.define("Editor.locale.view.changealike.Window", {
+        override: "Editor.view.changealike.Window",
         title: '<?php echo $this->translate->_('Aktuelles Segment für die folgenden Segmente übernehmen?');?>',
-        item_cancelBtn: '<?php echo $this->translate->_('Keine Änderungen durchführen');?>',
-        item_saveBtn: '<?php echo $this->translate->_('Änderungen übernehmen');?>'
+        strings: {
+            cancelBtn: '<?php echo $this->translate->_('Keine Änderungen durchführen [ESC]');?>',
+            saveBtn: '<?php echo $this->translate->_('Änderungen übernehmen [STRG+S]');?>',
+            help: <?php echo json_encode($this->translate->_('Hilfe:'));?>,
+            segmentData: <?php echo json_encode('{edited}{addition}'); ?>,
+            overwriteSource: '<?php echo $this->translate->_('<b><i>Überschreibe Quelltext mit:</i></b> ');?>',
+            overwriteTarget: '<?php echo $this->translate->_('<b><i>Überschreibe Zieltext mit:</i></b> ');?>'
+        }
     });
-  	Editor.view.changealike.Window.prototype.items_help = <?php echo json_encode($this->translate->_('Hilfe:'));?>;
-  	Editor.view.changealike.Window.prototype.items_segmentData = <?php echo json_encode('{edited}{addition}'); ?>;
-  	Editor.view.changealike.Window.prototype.overwriteSource = '<?php echo $this->translate->_('<b><i>Überschreibe Quelltext mit:</i></b> ');?>';
-  	Editor.view.changealike.Window.prototype.overwriteTarget = '<?php echo $this->translate->_('<b><i>Überschreibe Zieltext mit:</i></b> ');?>';
 
   	Editor.view.ui.changealike.Grid.prototype.item_segmentNrInTaskColumn = '<?php echo $this->translate->_('Nr.');?>';
   	Editor.view.ui.changealike.Grid.prototype.item_sourceColumn = '<?php echo $this->translate->_('Quelle');?>';
