@@ -5,4 +5,5 @@
 class editor_Models_Db_Terminology_Attribute extends Zend_Db_Table_Abstract {
     protected $_name    = 'terms_attributes';
     public $_primary = 'id';
+    protected $_rowClass = 'editor_Models_Db_Terminology_AttributeRow';
 }

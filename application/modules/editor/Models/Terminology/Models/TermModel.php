@@ -39,6 +39,8 @@ END LICENSE AND COPYRIGHT
  * @method string setTermTbxId() setTermTbxId(string $termTbxId)
  * @method string getTerm() getTerm()
  * @method string setTerm() setTerm(string $term)
+ * @method string getProposal() getProposal()
+ * @method void setProposal() setProposal(string $proposal)
  * @method integer getCollectionId() getCollectionId()
  * @method integer setCollectionId() setCollectionId(integer $collectionId)
  * @method integer getTermEntryId() getTermEntryId()
@@ -57,14 +59,10 @@ END LICENSE AND COPYRIGHT
  * @method string setLangSetGuid() setLangSetGuid(string $langSetGuid)
  * @method string getGuid() getGuid()
  * @method string setGuid() setGuid(string $guid)
- * @method string getUserGuid() getUserGuid()
- * @method string setUserGuid() setUserGuid(string $userGuid)
- * @method string getUserName() getUserName()
- * @method string setUserName() setUserName(string $userName)
- * @method string getCreated() getCreated()
- * @method void setCreated() setCreated(string $created)
- * @method string getUpdated() getUpdated()
- * @method void setUpdated() setUpdated(string $updated)
+ * @method string getUpdatedBy() getUpdatedBy()
+ * @method string setUpdatedBy() setUpdatedBy(int $userId)
+ * @method string getUpdatedAt() getUpdatedAt()
+ * @method void setUpdatedAt() setUpdatedAt(string $updated)
  */
 class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Term';
@@ -169,10 +167,10 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                 'termId' => $termId,
                 'termGuid' => $this->getGuid(),
                 'guid' => ZfExtended_Utils::uuid(),
-                'userGuid' => $misc['userGuid'],
-                'userName' => $misc['userName'],
-                'created' => date('Y-m-d H:i:s'),
-                //'updatedAt' => date('Y-m-d H:i:s'),
+                'createdBy' => $misc['userId'],
+                'createdAt' => date('Y-m-d H:i:s'),
+                'updatedBy' => $misc['userId'],
+                'updatedAt' => date('Y-m-d H:i:s'),
             ]);
 
             // Save attr
@@ -254,6 +252,52 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
         // Return
         return $termId;
+    }
+
+    /**
+     * If $transacgrpData arg is given, method expects it's an array containing values under 'userName', 'termEntryId'
+     * and 'language' keys, and if so, this method will run UPDATE query to update `date` and `transacNote` for all
+     * involved records of `terms_transacgrp` table for entry-, language- and term-level
+     *
+     * @param bool|array $transacgrpData
+     * @return mixed
+     */
+    public function update($transacgrpData = false) {
+
+        // Get original data
+        $orig = $this->row->getCleanData();
+
+        // Call parent
+        $return = parent::save();
+
+        // If current data is not equal to original data
+        if ($this->toArray() != $orig) {
+
+            // Prepare data for history record
+            $init = $orig; $init['termId'] = $orig['id']; unset($init['id']);
+
+            // Create history instance
+            $history = ZfExtended_Factory::get('editor_Models_Term_History');
+
+            // Init with data
+            $history->init($init);
+
+            // Save
+            $history->save();
+        }
+
+        // If $transacgrpData arg is given - update 'modification'-records of all levels
+        if ($transacgrpData)
+            ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
+                ->affectLevels(
+                    $transacgrpData['userName'],
+                    $transacgrpData['termEntryId'],
+                    $transacgrpData['language'],
+                    $this->getId()
+                );
+
+        // Return
+        return $return;
     }
 
     /**
@@ -522,102 +566,63 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
         // Data columns, that would be fetched by search SQL query
         $termQueryCol = '
-          `t`.`term` AS `label`, 
-          `t`.`id` AS `value`, 
           `t`.`id`, 
-          `t`.`term` AS `desc`, 
+          `t`.`collectionId`, 
+          `t`.`termEntryId`, 
+          `t`.`languageId`, 
+          `t`.`term`, 
+          `t`.`proposal`, 
           `t`.`processStatus`, 
           `t`.`status`, 
           `t`.`definition`, 
-          `t`.`termEntryTbxId`, 
-          `t`.`collectionId`, 
-          `t`.`termEntryId`, 
-          `t`.`languageId` 
+          `t`.`termEntryTbxId` 
         ';
 
         // Term query template
         $termQueryTpl = '
             SELECT %s 
             FROM `terms_term` `t` %s
-            WHERE LOWER(`t`.`term`) LIKE LOWER(?) COLLATE utf8mb4_bin AND ' . implode(' AND ', $where) . '
+            WHERE %s AND ' . implode(' AND ', $where) . '
             ORDER BY `t`.`term` ASC
         ';
 
         // Assume limit arg can be comma-separated string containing '<LIMIT>,<OFFSET>'
         list($limit, $offset) = explode(',', $params['limit']);
 
-        // If we should only search within terms-table (e.g. proposals-table won't be involved)
-        if (!$isProposer || !in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus']))) {
+        // Keyword WHERE clauses
+        $keywordWHERE = [
+            'LOWER(`t`.`term`)     LIKE LOWER(:keyword) COLLATE utf8mb4_bin',
+            'LOWER(`t`.`proposal`) LIKE LOWER(:keyword) COLLATE utf8mb4_bin',
+        ];
 
-            // If we have to calculate total
-            if ($total === true) {
+        // If we should only search for `term`-column (e.g. `proposal`-column won't be involved)
+        if (!$isProposer || !in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus'])))
 
-                // Render query for getting total count of results
-                $termQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor);
+            // Drop proposal-clause from $keywordWHERE
+            array_pop($keywordWHERE);
 
-                // Setup &$total variable by reference
-                $total = (int) editor_Utils::db()->query($termQuery, $keyword)->fetchColumn();
-            }
+        // Render keyword WHERE string
+        $keywordWHERE = '(' . implode(' OR ', $keywordWHERE) . ')';
 
-            // Render query for getting regular results
-            $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor)
-                . 'LIMIT ' . (int) $offset . ',' . (int) $limit;
-
-            // Return results
-            return editor_Utils::db()->query($termQuery, $keyword)->fetchAll();
-        }
-
-        // Data columns, that would be fetched by search SQL query
-        $proposalQueryCol = '
-          `p`.`term` AS `label`, 
-          `p`.`termId` AS `value`, 
-          `p`.`termId` AS `id`, 
-          `p`.`term` AS `desc`, 
-          `t`.`processStatus`, 
-          `t`.`status`, 
-          `t`.`definition`, 
-          `t`.`termEntryTbxId`, 
-          `t`.`collectionId`, 
-          `t`.`termEntryId`, 
-          `t`.`languageId` 
-        ';
-
-        // Term query template
-        $proposalQueryTpl = '
-            SELECT %s 
-            FROM 
-              `terms_proposal` `p`
-              INNER JOIN `terms_term` AS `t` ON `t`.`id` = `p`.`termId` %s
-            WHERE LOWER(`p`.`term`) LIKE LOWER(?) COLLATE utf8mb4_bin AND ' . implode(' AND ', $where) . '
-            ORDER BY `t`.`term` ASC
-        ';
+        // Prepare params array
+        $bindParam = [':keyword' => $keyword];
 
         // If we have to calculate total
         if ($total === true) {
 
             // Render query for getting total count of results in terms-table
-            $termQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor);
-
-            // Render query for getting total count of results in proposals-table
-            $proposalQuery = sprintf($proposalQueryTpl, 'COUNT(*)', $noTermDefinedFor);
-
-            // Render query for getting total results
-            $totalQuery = 'SELECT (' . $termQuery . ') + (' . $proposalQuery . ') AS `total`';
+            $totalQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor, $keywordWHERE);
 
             // Setup &$total variable by reference
-            $total = (int) editor_Utils::db()->query($totalQuery, [$keyword, $keyword])->fetchColumn();
+            $total = (int) editor_Utils::db()->query($totalQuery, $bindParam)->fetchColumn();
         }
 
-        // Render query for getting UNION-ed results from both terms and proposals tables
-        $unionQuery = '('
-            . sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor)
-            . ') UNION ('
-            . sprintf($proposalQueryTpl, $proposalQueryCol, $noTermDefinedFor)
-            . ')'
+        // Render query for getting actual results from terms table
+        $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor, $keywordWHERE)
             . 'LIMIT ' . (int) $offset . ',' . (int) $limit;
 
         // Return results
-        return editor_Utils::db()->query($unionQuery, [$keyword, $keyword])->fetchAll();
+        return editor_Utils::db()->query($termQuery, $bindParam)->fetchAll();
     }
 
     /**

@@ -528,4 +528,48 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
 
         return $history;
     }
+
+    /**
+     * @return mixed
+     */
+    public function update(/*$orig = []*/) {
+
+        /*//$this->row->setFromArray(['value' => 'full form']);
+        if (json_encode($this->toArray()) != json_encode($orig)) {
+            d('modified');
+        } else {
+            d('not modified');
+        }
+        d($this->getModifiedValues());
+        d($this->getModifiedData());
+        d($this->toArray());
+        d($orig);
+        die();*/
+
+        //d($this);
+        $orig = $this->row->getCleanData();
+        //die();
+
+        // Call parent
+        $return = parent::save();
+
+        // If current data is not equal to original data
+        if ($this->toArray() != $orig) {
+
+            // Prepare data for history record
+            $init = $orig; $init['attrId'] = $orig['id']; unset($init['id'], $init['createdBy'], $init['createdAt']);
+
+            // Create history instance
+            $history = ZfExtended_Factory::get('editor_Models_Term_AttributeHistory');
+
+            // Init with data
+            $history->init($init);
+
+            // Save
+            $history->save();
+        }
+
+        // Return
+        return $return;
+    }
 }
