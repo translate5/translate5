@@ -4086,6 +4086,22 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Segmente mit Wiederholungen in der Quell- und Zielsprache</source>
     <target>Segments with repetitions in source and target text</target>
 </trans-unit>
+<trans-unit id="S2VpbmUgw4RuZGVydW5nZW4gZHVyY2hmw7xocmVu">
+    <source>Keine Änderungen durchführen</source>
+    <target>Do not conduct changes</target>
+</trans-unit>
+<trans-unit id='S2VpbmUgw4RuZGVydW5nZW4gZHVyY2hmw7xocmVuIFtFU0Nd'>
+  <source>Keine Änderungen durchführen [ESC]</source>
+  <target>Do not conduct changes [ESC]</target>
+</trans-unit>
+<trans-unit id="w4RuZGVydW5nZW4gw7xiZXJuZWhtZW4=">
+    <source>Änderungen übernehmen</source>
+    <target>Accept changes</target>
+</trans-unit>
+<trans-unit id='w4RuZGVydW5nZW4gw7xiZXJuZWhtZW4gW1NUUkcrU10='>
+  <source>Änderungen übernehmen [STRG+S]</source>
+  <target>Accept changes [CTRL+S]</target>
+</trans-unit>
 <trans-unit id='LQ=='>
     <source>-</source>
     <target>-</target>
