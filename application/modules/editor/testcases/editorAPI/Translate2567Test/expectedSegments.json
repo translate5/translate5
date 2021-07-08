@@ -1,6 +1,6 @@
 [
     {
-        "source": "Text mit <singletag_1><b>0<\/b><\/singletag_1> in tags gab Probleme.",
+        "source": "Text mit <div class=\"open 62 internal-tag ownttip\"><span class=\"short\" title=\"&lt;b&gt;\">&lt;1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;b&gt;<\/span><\/div>0<div class=\"close 2f62 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/b&gt;\">&lt;\/1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;\/b&gt;<\/span><\/div> in tags gab Probleme.",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -19,7 +19,7 @@
         "workflowStepNr": "0",
         "workflowStep": null,
         "isRepeated": "0",
-        "sourceMd5": "aa23d3d8a5cbaee8538b6e333c1b43d9",
+        "sourceMd5": "4d060509210d6ffc967f85a3d2a5cf46",
         "sourceToSort": "Text mit 0 in tags gab Probleme.",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
@@ -30,7 +30,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "Text mit <div class=\"open 7370616e20646174612d746578743d226226237846363b7365205a65696c656e20556d627226237846433b63686522 internal-tag ownttip\"><span class=\"short\" title=\"&lt;span data-text=&quot;b&amp;#xF6;se Zeilen Umbr&amp;#xFC;che&quot;&gt;\">&lt;1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;span data-text=&quot;b&amp;#xF6;se Zeilen Umbr&amp;#xFC;che&quot;&gt;<\/span><\/div>Umbr\u00fcchen <div class=\"close 2f7370616e internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/span&gt;\">&lt;\/1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;\/span&gt;<\/span><\/div> im Attribut gab Probleme.",
+        "source": "Text mit <div class=\"open 7370616e20646174612d746578743d226226237846363b7365205a65696c656e20556d627226237846433b63686522 internal-tag ownttip\"><span class=\"short\" title=\"&lt;span data-text=&quot;b&amp;#xF6;se Zeilen Umbr&amp;#xFC;che&quot;&gt;\">&lt;1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;span data-text=&quot;b&amp;#xF6;se Zeilen Umbr&amp;#xFC;che&quot;&gt;<\/span><\/div><div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span class=\"short\" title=\"&lt;2\/&gt;: Newline\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"softReturn\" data-length=\"1\">\u21b5<\/span><\/div>Umbr\u00fcchen <div class=\"close 2f7370616e internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/span&gt;\">&lt;\/1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;\/span&gt;<\/span><\/div> im Attribut gab Probleme.",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -49,7 +49,7 @@
         "workflowStepNr": "0",
         "workflowStep": null,
         "isRepeated": "0",
-        "sourceMd5": "b2d50838c78d193154a04a8b8552780b",
+        "sourceMd5": "d0d483372b53e8363ce27e1871262edd",
         "sourceToSort": "Text mit Umbr\u00fcchen  im Attribut gab Probleme.",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
@@ -60,7 +60,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "Invalides XML <div class=\"single 696d67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;img&gt;<\/span><\/div> mit invaliden <donotexist>HTML Tags<\/donotexist> m\u00fcssen encodiert sein!",
+        "source": "Invalides XML <div class=\"single 696d67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;img&gt;<\/span><\/div> mit invaliden &lt;donotexist&gt;HTML Tags&lt;\/donotexist&gt; m\u00fcssen encodiert sein!",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -79,8 +79,8 @@
         "workflowStepNr": "0",
         "workflowStep": null,
         "isRepeated": "0",
-        "sourceMd5": "0190718bb672c872da330d3855a593cf",
-        "sourceToSort": "Invalides XML  mit invaliden HTML Tags m\u00fcssen encodiert sein!",
+        "sourceMd5": "ade377f700a9230867553c5ba78d0b0b",
+        "sourceToSort": "Invalides XML  mit invaliden &lt;donotexist&gt;HTML Tags&lt;\/donotexist&gt; m\u00fcssen encodiert sein!",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
         "targetEditToSort": "",
