@@ -1,0 +1,18 @@
+[
+    {
+        "id": "7516",
+        "segmentId": "233699",
+        "field": "target",
+        "type": "mqm",
+        "category": "mqm_2",
+        "categoryIndex": "2",
+        "falsePositive": "0",
+        "typeText": "Manual QA (inside segment)",
+        "text": "Terminology",
+        "filterable": true,
+        "falsifiable": true,
+        "hasTag": true,
+        "tagName": "img",
+        "cssClass": "qmflag"
+    }
+]

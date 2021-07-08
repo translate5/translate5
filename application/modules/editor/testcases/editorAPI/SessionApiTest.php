@@ -124,9 +124,12 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $response = $this->api()->requestJson('editor/session', 'POST', $loginData);
         $sessionId = $response->sessionId;
         $sessionToken = $response->sessionToken;
+        
+        $this->api()->setAuthCookie($sessionId);
+
         $plainResponse = $this->api()->getLastResponse();
         $this->assertEquals(200, $plainResponse->getStatus(), 'Server did not respond HTTP 200');
-        $this->assertNotFalse($response, 'JSON Login request was not successfull!');
+        $this->assertNotFalse($response, 'JSON Login request was not successful!');
         $this->assertRegExp('/[a-zA-Z0-9]{26}/', $sessionId, 'Login call does not return a valid sessionId!');
         $this->assertRegExp('/[0-9a-fA-F]{32}/', $sessionToken, 'Login call does not return a valid sessionToken!');
         
@@ -151,7 +154,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         }
         $sessionData->user->customers = null;
         
-        $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"support@translate5.net","roles":["pm","editor","admin","instantTranslate","api","basic","noRights"],"passwd":"********","editable":0,"locale":"en","sourceLanguage":null,"targetLanguage":null,"parentIds":null,"customers":null,"userName":"manager test"}}';
+        $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"support@translate5.net","roles":["pm","editor","admin","instantTranslate","api","basic","noRights"],"passwd":"********","editable":0,"locale":"en","parentIds":null,"customers":null,"userName":"manager test"}}';
         $this->assertEquals(json_decode($expected), $sessionData, 'User was not properly authenticated via ');
         
         $this->api()->logout();

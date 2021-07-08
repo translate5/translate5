@@ -57,9 +57,9 @@ END LICENSE AND COPYRIGHT
      * @param string $importPath
      * @throws Zend_Exception
      */
-    public function importFromXml(editor_Models_Task $task,string $importPath) {
+    public function importFromXml(editor_Models_Task $task, string $importPath) {
         $config = $task->getConfig();
-        if(! $config->runtimeOptions->editor->enableQmSubSegments) {
+        if(! $config->runtimeOptions->autoQA->enableMqmTags) {
             return;
         }
         //take a task-specific qmFlagXmlFile

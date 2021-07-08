@@ -65,7 +65,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         'Termportal' => true,
         'JsLogger' => true,
         'editor.CustomPanel' => true,
-        'QmSubSegments' => false,                //disabled by default, controlled by ACL
         'admin.TaskOverview' => false,           //disabled by default, controlled by ACL
         'admin.TaskPreferences' => false,        //disabled by default, controlled by ACL
         'admin.TaskUserAssoc' => false,          //disabled by default, controlled by ACL
@@ -74,7 +73,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         'LanguageResources' => false,            //disabled by default, controlled by ACL
         'TmOverview' => false,                   //disabled by default, controlled by ACL
         'Localizer' => true,
-        'QmSubSegments' => true//the check if this controller is active is task specific(runtimeOptions.editor.enableQmSubSegments flag is task specific)
+        'Quality' => true,
+        'QualityMqm' => true //the check if this controller is active is task specific (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
     ];
     
     public function init() {
@@ -93,7 +93,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         
         // init worker and queue it
-        if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
+        if (!$worker->init($taskGuid, array('resourcePool' => 'import', 'processingMode' => editor_Segment_Processing::IMPORT))) {
             $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
@@ -326,7 +326,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $config = ZfExtended_Factory::get('editor_Models_Config');
       /* @var $config editor_Models_Config */
       $this->view->Php2JsVars()->set('frontend.config.configLabelMap',$config->getLabelMap());
-      
+
       $this->setJsAppData();
     }
 
@@ -364,9 +364,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
                 
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
-        /* @var $workflow editor_Workflow_Default */
-        
         $ed = $this->config->runtimeOptions->editor;
         
         $php2js = $this->view->Php2JsVars();
@@ -393,7 +390,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $php2js->set('task', $taskData);
             $openState = $this->_session->taskOpenState ?
                     $this->_session->taskOpenState :
-                    $workflow::STATE_WAITING; //in doubt read only
+                    editor_Workflow_Default::STATE_WAITING; //in doubt read only
             $php2js->set('app.initState', $openState);
             $php2js->set('app.initMethod', 'openEditor');
         }
@@ -424,6 +421,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wm editor_Workflow_Manager */
         $php2js->set('app.workflows', $wm->getWorkflowData());
+        $php2js->set('app.workflow.CONST', $wm->getWorkflowConstants());
         
         $php2js->set('app.userRights', $acl->getFrontendRights($userRoles));
         
@@ -505,19 +503,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
      * Returns all configured languages in an array for displaying in frontend
      */
     protected function getAvailableLanguages() {
-        /* @var $langs editor_Models_Languages */
-        $langs = ZfExtended_Factory::get('editor_Models_Languages');
-        $langs = $langs->loadAll();
-        $result = array();
-        foreach ($langs as $lang) {
-            $name = $this->translate->_($lang['langName']);
-            $result[$name] = array($lang['id'], $name.' ('.$lang['rfc5646'].')', $lang['rtl'],$lang['rfc5646']);
-        }
-        ksort($result); //sort by name of language
-        if(empty($result)){
-            throw new Zend_Exception('No languages defined. Please use /docs/003fill-LEK-languages-after-editor-sql or define them otherwhise.');
-        }
-        return array_values($result);
+        $model = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $model editor_Models_Languages */
+        return $model->loadAllForDisplay();
     }
     
     protected function setJsSegmentFlags($type, array $qualityFlags) {

@@ -45,6 +45,7 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
         $appState = self::assertAppState();
         self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
         self::assertContains('editor_Plugins_MatchAnalysis_Init', $appState->pluginsLoaded, 'Plugin MatchAnalysis must be activated for this test case!');
+        self::assertNotContains('editor_Plugins_SegmentStatistics_Bootstrap', $appState->pluginsLoaded, 'Plugin SegmentStatistics must be deactivated for this test case!');
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
@@ -144,6 +145,7 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
             'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_Moses',
             'serviceName'=> 'Moses',
             'name' => 'API Testing::MosesMt_'.__CLASS__
@@ -169,7 +171,6 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
         $params['pretranslateMatchrate']= 100;
         $params['pretranslateTmAndTerm']= 1;
         $params['pretranslateMt']= 1;
-        $params['termtaggerSegment']= 0;
         $params['isTaskImport']= 0;
         self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', 'PUT', $params,$params);
         error_log("Queue pretranslation and analysis.");

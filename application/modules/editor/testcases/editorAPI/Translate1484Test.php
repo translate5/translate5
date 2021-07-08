@@ -36,7 +36,8 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
     protected static $customerTest;
     protected static $sourceLangRfc = 'de';
     protected static $targetLangRfc = 'en';
-    
+
+
     
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
@@ -123,6 +124,7 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
             'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_Moses',
             'serviceName'=> 'Moses',
             'name' => 'API Testing::MosesMt_'.__CLASS__
@@ -141,6 +143,7 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
             'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_OpenTM2',
             'serviceName'=> 'OpenTM2',
             'name' => 'API Testing::OpenTm2Tm_'.__CLASS__
@@ -165,7 +168,6 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
         $params['pretranslateMatchrate']= 100;
         $params['pretranslateTmAndTerm']= 1;
         $params['pretranslateMt']= 1;
-        $params['termtaggerSegment']= 0;
         $params['isTaskImport']= 0;
         self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', 'PUT', $params,$params);
         error_log("Queue pretranslation and analysis.");

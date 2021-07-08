@@ -35,14 +35,43 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
     alias: 'viewmodel.tmwindow',
     data: {
         serviceName: false,
+        resourceType: false,
         uploadLabel:null
+    },
+    stores: {
+        customers: {
+            model: 'Editor.model.admin.Customer',
+            pageSize:0,
+            autoLoad:true
+        },
+        customersDefaultRead: {
+            source: '{customers}',
+            pageSize:0,
+            filters : {
+                property : 'id',
+                operator : "in",
+                value : '{resourcesCustomers.value}'
+            }
+        },
+        customersDefaultWrite: {
+            source: '{customersDefaultRead}',
+            pageSize:0,
+            filters : {
+                property : 'id',
+                operator : "in",
+                value : '{useAsDefault.value}'
+            }
+        }
     },
     formulas: {
         isSdlResource: function(get){
-            return get('serviceName') == Editor.model.LanguageResources.Resource.SDL_SERVICE_NAME;
+            return get('serviceName') === Editor.model.LanguageResources.Resource.SDL_SERVICE_NAME;
         },
         isTermCollectionResource:function(get){
-            return get('serviceName') == Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
+            return get('serviceName') === Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
+        },
+        isTmResourceType:function(get){
+            return get('resourceType') === Editor.util.LanguageResources.resourceType.TM;
         }
     }
 });

@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Tests if Relais Files are imported correctly, inclusive our alignment checks 
  */
-class RelaisImportTest extends \ZfExtended_Test_ApiTestcase {
+class RelaisImportTest extends editor_Test_JsonTest {
     
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
@@ -102,18 +102,18 @@ class RelaisImportTest extends \ZfExtended_Test_ApiTestcase {
             '23' => 'Installation und Konfiguration',
             '24' => 'Installation auf Unix-Systemen',
             '25' => 'RELAIS - Apache 1.3.x auf Unix-Systemen',
-            '26' => '',
+            '26' => ''
         ];
         
         $this->assertEquals($expected, $relais, 'Relais columns not filled as expected!');
         
         //the following checks are only to ensure that the imported content contains terminology
         $targetSource = 'Das ist eine rotes <div title="" class="term standardizedTerm lowercase transNotFound" data-tbxid="term_06_1_de_1_00013">Haus</div>';
-        $this->assertEquals($targetSource, $segments[0]['source'], 'Imported Source is not as expected!');
+        $this->assertFieldTextEquals($targetSource, $segments[0]['source'], 'Imported Source is not as expected!');
         $targetEdit = 'This is <div title="" class="term preferredTerm exact" data-tbxid="term_03_1_en_1_00006">a</div> red <div title="" class="term preferredTerm exact" data-tbxid="term_05_1_en_1_00011a">house</div>';
-        $this->assertEquals($targetEdit, $segments[0]['targetEdit'], 'Imported Target is not as expected!');
+        $this->assertFieldTextEquals($targetEdit, $segments[0]['targetEdit'], 'Imported Target is not as expected!');
         $targetEdit = '<div title="" class="term preferredTerm exact" data-tbxid="term_11_1_en_1_00019">Apache</div> 1.3.x auf Unix-Systemen';
-        $this->assertEquals($targetEdit, $segments[24]['targetEdit'], 'Imported Target is not as expected!');
+        $this->assertFieldTextEquals($targetEdit, $segments[24]['targetEdit'], 'Imported Target is not as expected!');
     }
     
     public static function tearDownAfterClass(): void {

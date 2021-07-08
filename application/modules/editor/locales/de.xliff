@@ -102,7 +102,6 @@
 <trans-unit id='RWluc3RlbGx1bmdlbg=='><source>Einstellungen</source><target>Einstellungen</target></trans-unit>
 <trans-unit id='U29ydGllcnVuZyAvIEZpbHRlcnVuZyB6dXLDvGNrc2V0emVu'><source>Sortierung / Filterung zurücksetzen</source><target>Sortierung / Filterung zurücksetzen</target></trans-unit>
 <trans-unit id='VGFiZWxsZSB6dXLDvGNrc2V0emVu'><source>Tabelle zurücksetzen</source><target>Tabelle zurücksetzen</target></trans-unit>
-<trans-unit id='UU0='><source>QM</source><target>QM</target></trans-unit>
 <trans-unit id='TWF0Y2hyYXRl'><source>Matchrate</source><target>Matchrate</target></trans-unit>
 <trans-unit id='WmllbHRleHQgw7xiZXJhcmJlaXRldA=='><source>Zieltext überarbeitet</source><target>Zieltext überarbeitet</target></trans-unit>
 <trans-unit id='QXVzZ2FuZ3N0ZXh0'><source>Ausgangstext</source><target>Ausgangstext</target></trans-unit>
@@ -110,7 +109,7 @@
 <trans-unit id='U3RhdHVz'><source>Status</source><target>Status</target></trans-unit>
 <trans-unit id='UmVsYWlz'><source>Relais</source><target>Relais</target></trans-unit>
 <trans-unit id='WmllbHRleHQ='><source>Zieltext</source><target>Zieltext</target></trans-unit>
-<trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='><source>(zur Importzeit)</source><target>(zur Importzeit)</target></trans-unit>
+<trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='><source>(zur Importzeit)</source><target>(zur Importzeit / Vorübersetzung)</target></trans-unit>
 <trans-unit id='bGV0enRlciBCZWFyYmVpdGVy'><source>letzter Bearbeiter</source><target>letzter Bearbeiter</target></trans-unit>
 <trans-unit id='YmVhcmJlaXRldCBiZWk='><source>bearbeitet bei</source><target>bearbeitet bei</target></trans-unit>
 <trans-unit id='S29tbWVudGFyZQ=='><source>Kommentare</source><target>Kommentare</target></trans-unit>
@@ -129,7 +128,7 @@
 <trans-unit id='VHJhY2tDaGFuZ2VzIGZvdW5kLCBidXQgUGx1Z2luIGlzIG5vdCBhY3RpdmF0ZWQu'><source>TrackChanges found, but Plugin is not activated.</source><target>TrackChanges-Auszeichnung gefunden, aber das Plugin ist nicht aktiviert.</target></trans-unit>
 <trans-unit id='R2V3aWNodHVuZw=='><source>Gewichtung</source><target>Gewichtung</target></trans-unit>
 <trans-unit id='S29tbWVudGFy'><source>Kommentar</source><target>Kommentar</target></trans-unit>
-<trans-unit id='TVFNIGhpbnp1ZsO8Z2Vu'><source>MQM hinzufügen</source><target>MQM hinzufügen</target></trans-unit>
+<trans-unit id='TWFudWVsbGUgUVMgaGluenVmw7xnZW4='><source>Manuelle QS hinzufügen</source><target>Manuelle QS hinzufügen</target></trans-unit>
 <trans-unit id='S2VpbiBTdWJzZWdtZW50IGF1c2dld8OkaGx0Lg=='><source>Kein Subsegment ausgewählt.</source><target>Kein Subsegment ausgewählt.</target></trans-unit>
 <trans-unit id='Qml0dGUgd8OkaGxlbiBTaWUgaW0gRWRpdG9yIGVpbiBTdWJzZWdtZW50IGF1cyE='><source>Bitte wählen Sie im Editor ein Subsegment aus!</source><target>Bitte wählen Sie im Editor ein Subsegment aus!</target></trans-unit>
 <trans-unit id='VmVyaGFsdGVuIGRlcyBXaWVkZXJob2x1bmdzZWRpdG9y'><source>Verhalten des Wiederholungseditor</source><target>Verhalten des Wiederholungseditor</target></trans-unit>
@@ -149,6 +148,8 @@
 <trans-unit id='QWt0dWVsbGVzIFNlZ21lbnQgZsO8ciBkaWUgZm9sZ2VuZGVuIFNlZ21lbnRlIMO8YmVybmVobWVuPw=='><source>Aktuelles Segment für die folgenden Segmente übernehmen?</source><target>Aktuelles Segment für die folgenden Segmente übernehmen?</target></trans-unit>
 <trans-unit id='S2VpbmUgw4RuZGVydW5nZW4gZHVyY2hmw7xocmVu'><source>Keine Änderungen durchführen</source><target>Keine Änderungen durchführen</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nZW4gw7xiZXJuZWhtZW4='><source>Änderungen übernehmen</source><target>Änderungen übernehmen</target></trans-unit>
+<trans-unit id='S2VpbmUgw4RuZGVydW5nZW4gZHVyY2hmw7xocmVuIFtFU0Nd'><source>Keine Änderungen durchführen [ESC]</source><target>Keine Änderungen durchführen [ESC]</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nZW4gw7xiZXJuZWhtZW4gW1NUUkcrU10='><source>Änderungen übernehmen [STRG+S]</source><target>Änderungen übernehmen [STRG+S]</target></trans-unit>
 <trans-unit id='SGlsZmU6'><source>Hilfe:</source><target>Hilfe:</target></trans-unit>
 <trans-unit id='QWNodHVuZzogRGVyIEF1c2dhbmdzdGV4dCB3aXJkIMO8YmVyc2NocmllYmVuIQ=='><source>Achtung: Der Ausgangstext wird überschrieben!</source><target>Achtung: Der Ausgangstext wird überschrieben!</target></trans-unit>
 <trans-unit id='TnIu'><source>Nr.</source><target>Nr.</target></trans-unit>
@@ -237,7 +238,7 @@
 <trans-unit id='TGllZmVyZGF0dW0gKHNvbGwp'><source>Lieferdatum (soll)</source><target>Lieferdatum (soll)</target></trans-unit>
 <trans-unit id='TGllZmVyZGF0dW0gKGlzdCk='><source>Lieferdatum (ist)</source><target>Lieferdatum (ist)</target></trans-unit>
 <trans-unit id='UmVmZXJlbnpkYXRlaWVu'><source>Referenzdateien</source><target>Referenzdateien</target></trans-unit>
-<trans-unit id='dW52ZXLDpG5kZXJ0ZSAxMDAlIFRNIE1hdGNoZXMgc2luZCBlZGl0aWVyYmFy'><source>unveränderte 100% TM Matches sind editierbar</source><target>unveränderte 100% TM Matches sind editierbar</target></trans-unit>
+<trans-unit id='VW52ZXLDpG5kZXJ0ZSAxMDAlIFRNIE1hdGNoZXMgc2luZCBlZGl0aWVyYmFy'><source>Unveränderte 100% TM Matches sind editierbar</source><target>Unveränderte 100% TM Matches sind editierbar</target></trans-unit>
 <trans-unit id='QmVzdGVsbGRhdHVt'><source>Bestelldatum</source><target>Bestelldatum</target></trans-unit>
 <trans-unit id='UXVlbGxzcHJhY2hlIGJlYXJiZWl0YmFy'><source>Quellsprache bearbeitbar</source><target>Quellsprache bearbeitbar</target></trans-unit>
 <trans-unit id='UHJvamVrdCBlcnN0ZWxsZW4='><source>Projekt erstellen</source><target>Projekt erstellen</target></trans-unit>
@@ -519,7 +520,7 @@
 <trans-unit id='S29tbWVudGFyZSB6dW0gYWt0dWVsbGVuIFNlZ21lbnQ='><source>Kommentare zum aktuellen Segment</source><target>Kommentare zum aktuellen Segment</target></trans-unit>
 <trans-unit id='S29tbWVudGFyIG5ldQ=='><source>Kommentar neu</source><target>Kommentar neu</target></trans-unit>
 <trans-unit id='S29tbWVudGFyIGJlYXJiZWl0ZW4='><source>Kommentar bearbeiten</source><target>Kommentar bearbeiten</target></trans-unit>
-<trans-unit id='RXhwb3J0IFFNLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='><source>Export QM-Statistik (XML) für Feld: {0}</source><target>Export QM-Statistik (XML) für Feld: {0}</target></trans-unit>
+<trans-unit id='RXhwb3J0IFFTLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='><source>Export QS-Statistik (XML) für Feld: {0}</source><target>Export QS-Statistik (XML) für Feld: {0}</target></trans-unit>
 <trans-unit id='UGFzc3dvcnQgZXJmb2xncmVpY2ggZ2VzcGVpY2hlcnQh'><source>Passwort erfolgreich gespeichert!</source><target>Passwort erfolgreich gespeichert!</target></trans-unit>
 <trans-unit id='cXVlbGxl'><source>quelle</source><target>quelle</target></trans-unit>
 <trans-unit id='emllbA=='><source>ziel</source><target>ziel</target></trans-unit>
@@ -544,26 +545,6 @@
 <trans-unit id='S2VpbmUgVGVybWlub2xvZ2llIHZvcmhhbmRlbiE='><source>Keine Terminologie vorhanden!</source><target>Keine Terminologie vorhanden!</target></trans-unit>
 <trans-unit id='Vm9yenVnc2JlbmVubnVuZw=='><source>Vorzugsbenennung</source><target>Vorzugsbenennung</target></trans-unit>
 <trans-unit id='JyV2YWx1ZSUnIGlzIG1vcmUgdGhhbiAlbWF4JSBjaGFyYWN0ZXJzIGxvbmc='><source>'%value%' is more than %max% characters long</source><target>'%value%' is more than %max% characters long</target></trans-unit>
-<trans-unit id='QWNjdXJhY3k='><source>Accuracy</source><target>Accuracy</target></trans-unit>
-<trans-unit id='T21pc3Npb24='><source>Omission</source><target>Omission</target></trans-unit>
-<trans-unit id='QWRkaXRpb24='><source>Addition</source><target>Addition</target></trans-unit>
-<trans-unit id='TWlzdHJhbnNsYXRpb24='><source>Mistranslation</source><target>Mistranslation</target></trans-unit>
-<trans-unit id='VW50cmFuc2xhdGVk'><source>Untranslated</source><target>Untranslated</target></trans-unit>
-<trans-unit id='Rmx1ZW5jeQ=='><source>Fluency</source><target>Fluency</target></trans-unit>
-<trans-unit id='U3R5bGUvcmVnaXN0ZXI='><source>Style/register</source><target>Style/register</target></trans-unit>
-<trans-unit id='VHlwb2dyYXBoeQ=='><source>Typography</source><target>Typography</target></trans-unit>
-<trans-unit id='U3BlbGxpbmc='><source>Spelling</source><target>Spelling</target></trans-unit>
-<trans-unit id='R3JhbW1hcg=='><source>Grammar</source><target>Grammar</target></trans-unit>
-<trans-unit id='V29yZCBvcmRlcg=='><source>Word order</source><target>Word order</target></trans-unit>
-<trans-unit id='V29yZCBmb3Jt'><source>Word form</source><target>Word form</target></trans-unit>
-<trans-unit id='UGFydCBvZiBzcGVlY2g='><source>Part of speech</source><target>Part of speech</target></trans-unit>
-<trans-unit id='QWdyZWVtZW50'><source>Agreement</source><target>Agreement</target></trans-unit>
-<trans-unit id='VGVuc2UvYXNwZWN0L21vb2Q='><source>Tense/aspect/mood</source><target>Tense/aspect/mood</target></trans-unit>
-<trans-unit id='RnVuY3Rpb24gd29yZHM='><source>Function words</source><target>Function words</target></trans-unit>
-<trans-unit id='RXh0cmFuZW91cw=='><source>Extraneous</source><target>Extraneous</target></trans-unit>
-<trans-unit id='TWlzc2luZw=='><source>Missing</source><target>Missing</target></trans-unit>
-<trans-unit id='SW5jb3JyZWN0'><source>Incorrect</source><target>Incorrect</target></trans-unit>
-<trans-unit id='VW5pbnRlbGxpZ2libGU='><source>Unintelligible</source><target>Unintelligible</target></trans-unit>
 <trans-unit id='S2VpbmUgWnVncmlmZnNiZXJlY2h0aWd1bmch'><source>Keine Zugriffsberechtigung!</source><target>Keine Zugriffsberechtigung!</target></trans-unit>
 <trans-unit id='ZXJsYXVidGUgQmVuZW5udW5n'><source>erlaubte Benennung</source><target>erlaubte Benennung</target></trans-unit>
 <trans-unit id='dmVyYm90ZW5lIEJlbmVubnVuZw=='><source>verbotene Benennung</source><target>verbotene Benennung</target></trans-unit>
@@ -617,16 +598,6 @@
 <trans-unit id='RWludHJhZyBnZWzDtnNjaHQ='><source>Eintrag gelöscht</source><target>Eintrag gelöscht</target></trans-unit>
 <trans-unit id='RGllIEF1c2dhbmdzZGF0ZW4gd3VyZGVuIGluIGRlciBad2lzY2hlbnplaXQgdmVyw6RuZGVydC4gQml0dGUgYWt0dWFsaXNpZXJlbiBTaWUgSWhyZSBBbnNpY2h0IQ=='><source>Die Ausgangsdaten wurden in der Zwischenzeit verändert. Bitte aktualisieren Sie Ihre Ansicht!</source><target>Die Ausgangsdaten wurden in der Zwischenzeit verändert. Bitte aktualisieren Sie Ihre Ansicht!</target></trans-unit>
 <trans-unit id='U2ljaHRiYXJrZWl0IG5pY2h0IGVkaXRpZXJiYXJlciBaaWVsdGV4dHNwYWx0ZW4='><source>Sichtbarkeit nicht editierbarer Zieltextspalten</source><target>Sichtbarkeit nicht editierbarer Zieltextspalten</target></trans-unit>
-<trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>
-<trans-unit id='Q29udGVudA=='><source>Content</source><target>Content</target></trans-unit>
-<trans-unit id='U3R5bGU='><source>Style</source><target>Style</target></trans-unit>
-<trans-unit id='SW5jb25zaXN0ZW5jeQ=='><source>Inconsistency</source><target>Inconsistency</target></trans-unit>
-<trans-unit id='TWVjaGFuaWNhbA=='><source>Mechanical</source><target>Mechanical</target></trans-unit>
-<trans-unit id='TG9jYWxlIHZpb2xhdGlvbg=='><source>Locale violation</source><target>Locale violation</target></trans-unit>
-<trans-unit id='VmVyaXR5'><source>Verity</source><target>Verity</target></trans-unit>
-<trans-unit id='Q29tcGxldGVuZXNz'><source>Completeness</source><target>Completeness</target></trans-unit>
-<trans-unit id='TGVnYWwgcmVxdWlyZW1lbnRz'><source>Legal requirements</source><target>Legal requirements</target></trans-unit>
-<trans-unit id='TG9jYWxlIGFwcGxpY2FiaWxpdHk='><source>Locale applicability</source><target>Locale applicability</target></trans-unit>
 <trans-unit id='IC0gbWl0IEFlbmRlcnVuZ2VuIG5hY2h2ZXJmb2xnZW4uemlw'><source> - mit Aenderungen nachverfolgen.zip</source><target> - mit Aenderungen nachverfolgen.zip</target></trans-unit>
 <trans-unit id='UGFzc3dvcnQgc2V0emVu'><source>Passwort setzen</source><target>Passwort setzen</target></trans-unit>
 <trans-unit id='U2VociBnZWVocnRlIEZyYXU='><source>Sehr geehrte Frau</source><target>Sehr geehrte Frau</target></trans-unit>
@@ -667,7 +638,6 @@
 <trans-unit id='QWNjdXJlZWVlZWVlYWN5'><source>Accureeeeeeeacy</source><target>Accureeeeeeeacy</target></trans-unit>
 <trans-unit id='RmlsZSAnJXZhbHVlJScgd2FzIG5vdCB1cGxvYWRlZA=='><source>File '%value%' was not uploaded</source><target>File '%value%' was not uploaded</target></trans-unit>
 <trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IG1hdGNoIHRoZSBleHBlY3RlZCBzdHJ1Y3R1cmUgZm9yIGEgRE5TIGhvc3RuYW1l'><source>'%value%' does not match the expected structure for a DNS hostname</source><target>'%value%' does not match the expected structure for a DNS hostname</target></trans-unit>
-<trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>Alle Kategorien</target></trans-unit>
 <trans-unit id='dGVzdA=='><source>test</source><target>test</target></trans-unit>
 <trans-unit id='a3Vyeg=='><source>kurz</source><target>kurz</target></trans-unit>
 <trans-unit id='bGFuZ2xhbmdsYW5nbGFuZ2xhbmdsYW5nbGFuZw=='><source>langlanglanglanglanglanglang</source><target>langlanglanglanglanglanglang</target></trans-unit>
@@ -704,7 +674,6 @@
 <trans-unit id='ZWRpdGFibGU='><source>editable</source><target>editable</target></trans-unit>
 <trans-unit id='cHJldHJhbnM='><source>pretrans</source><target>pretrans</target></trans-unit>
 <trans-unit id='bWF0Y2hSYXRl'><source>matchRate</source><target>matchRate</target></trans-unit>
-<trans-unit id='cW1JZA=='><source>qmId</source><target>qmId</target></trans-unit>
 <trans-unit id='c3RhdGVJZA=='><source>stateId</source><target>stateId</target></trans-unit>
 <trans-unit id='YXV0b1N0YXRlSWQ='><source>autoStateId</source><target>autoStateId</target></trans-unit>
 <trans-unit id='ZmlsZU9yZGVy'><source>fileOrder</source><target>fileOrder</target></trans-unit>
@@ -779,7 +748,7 @@
 <trans-unit id='QmVhcmJlaXR1bmdzc3RhdHVz'><source>Bearbeitungsstatus</source><target>Bearbeitungsstatus</target></trans-unit>
 <trans-unit id='RXMgaXN0IElobmVuIG5pY2h0IGVybGF1YnQsIGRlbiBTZWdtZW50aW5oYWx0IHp1IGJlYXJiZWl0ZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU1RSRytaIHVtIElocmUgw4RuZGVydW5nZW4genVyw7xja3p1c2V0emVuIG9kZXIgYnJlY2hlbiBTaWUgZGFzIEJlYXJiZWl0ZW4gZGVzIFNlZ21lbnRzIGFiLg=='><source>Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.</source><target>Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.</target></trans-unit>
 <trans-unit id='RmlsdGVydGV4dCBlaW5nZWJlbi4uLg=='><source>Filtertext eingeben...</source><target>Filtertext eingeben...</target></trans-unit>
-<trans-unit id='TnVyIE1RTS10YWdzIGJlYXJiZWl0ZW4='><source>Nur MQM-tags bearbeiten</source><target>Nur MQM-tags bearbeiten</target></trans-unit>
+<trans-unit id='TnVyIG1hbnVlbGxlIFFTIGltIFNlZ21lbnQgYmVhcmJlaXRlbg=='><source>Nur manuelle QS im Segment bearbeiten</source><target>Nur manuelle QS im Segment bearbeiten</target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dA=='><source>Die Aufgabe wird von einem Benutzer benutzt</source><target>Die Aufgabe wird von einem Benutzer benutzt</target></trans-unit>
 <trans-unit id='WnVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldGVzIFNlZ21lbnQgd2llZGVyIGluIGRlbiBTaWNodGJlcmVpY2ggYmV3ZWdlbiAoU1RSRyArIEcp'><source>Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)</source><target>Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)</target></trans-unit>
 <trans-unit id='VmVyc2NoaWViYmFyZXIgRWRpdG9y'><source>Verschiebbarer Editor</source><target>Verschiebbarer Editor</target></trans-unit>
@@ -853,10 +822,7 @@
 <trans-unit id='RmVhdHVyZQ=='><source>Feature</source><target>Feature</target></trans-unit>
 <trans-unit id='Q2hhbmdl'><source>Change</source><target>Change</target></trans-unit>
 <trans-unit id='IFRlc3Q='><source> Test</source><target> Test</target></trans-unit>
-<trans-unit id='TVFN'><source>MQM</source><target>MQM</target></trans-unit>
-<trans-unit id='TVFNIFN0YXRpc3Rpaw=='><source>MQM Statistik</source><target>MQM Statistik</target></trans-unit>
 <trans-unit id='VGFzdGF0dXJrw7xyemVsIG5hY2hzY2hsYWdlbg=='><source>Tastaturkürzel nachschlagen</source><target>Tastaturkürzel nachschlagen</target></trans-unit>
-<trans-unit id='WmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0KQ=='><source>Zieltext (zur Importzeit)</source><target>Zieltext (zur Importzeit)</target></trans-unit>
 <trans-unit id='U1RSRyArIEVJTkZHIGtvcGllcnQgZGVuIGtvbXBsZXR0ZW4gUXVlbGx0ZXh0IGluIGRlbiBaaWVsdGV4dDxiciAvPlNUUkcgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRlbiBlbnRzcHJlY2hlbmRlbiBUYWcgaW4gZGVuIFppZWx0ZXh0IChOdWxsIGVudHNwcmljaHQgVGFnIE5yLiAxMCk8YnIgLz5TVFJHICsgU0hJRlQgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRpZSBUYWdzIG1pdCBkZW4gTnVtbWVybiAxMSBiaXMgMjAgaW4gZGVuIFppZWx0ZXh0Lg=='><source>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source><target>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</target></trans-unit>
 <trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgLSBhbGxlIHppZWxzcHJhY2hsaWNoZW4gU2VnbWVudGUgYmVpbSBJbXBvcnQgbGVlciAobmljaHQgYW5nZWhha3QgYmVkZXV0ZXQgUmV2aWV3YXVmZ2FiZSku'><source>Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).</source><target>Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).</target></trans-unit>
 <trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgKGtlaW4gUmV2aWV3KQ=='><source>Übersetzungsaufgabe (kein Review)</source><target>Übersetzungsaufgabe (kein Review)</target></trans-unit>
@@ -1278,7 +1244,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='WnUgbm9ybWFsZXIgQW5zaWNodCB6dXLDvGNrc2V0emVu'><source>Zu normaler Ansicht zurücksetzen</source><target>Zu normaler Ansicht zurücksetzen</target></trans-unit>
 <trans-unit id='VGFncyB2ZXJiZXJnZW4gKG51ciBMZXNlbW9kdXMp'><source>Tags verbergen (nur Lesemodus)</source><target>Tags verbergen (nur Lesemodus)</target></trans-unit>
 <trans-unit id='U3VjaGUgaW4gZ2VzcGVycnRlbiBTZWdtZW50ZW4='><source>Suche in gesperrten Segmenten</source><target>Suche in gesperrten Segmenten</target></trans-unit>
-<trans-unit id='QWxsZSBlcnNldHplbiB3aXJkIGbDvHIgQXVmZ2FiZW4gbWl0IFNlZ21lbnRlbiBtaXQgTVFNLVRhZ3MgbmljaHQgdW50ZXJzdMO8dHp0'><source>Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt</source><target>Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt</target></trans-unit>
+<trans-unit id='QWxsZSBlcnNldHplbiB3aXJkIGbDvHIgQXVmZ2FiZW4gbWl0IFNlZ21lbnRlbiBtaXQgTVFNLVRhZ3MgbmljaHQgdW50ZXJzdMO8dHp0'><source>Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt</source><target>Alle ersetzen wird für Aufgaben mit Segmenten mit manueller QS im Segment nicht unterstützt</target></trans-unit>
 <trans-unit id='bWlu'><source>min</source><target>min</target></trans-unit>
 <trans-unit id='bWF4'><source>max</source><target>max</target></trans-unit>
 <trans-unit id='WmVpbGU='><source>Zeile</source><target>Zeile</target></trans-unit>
@@ -1421,7 +1387,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='VGVybWUgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Terme löschen, deren letzte Berührung länger her ist als</source><target>Terme löschen, deren letzte Berührung länger her ist als</target></trans-unit>
 <trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxzIGFrdHVlbGxlciBJbXBvcnQ='><source>Termeinträge löschen älter als aktueller Import</source><target>Termeinträge löschen älter als aktueller Import</target></trans-unit>
 <trans-unit id='SW5mbyB6dW0gVGVybS1Db2xsZWN0aW9u'><source>Info zum Term-Collection</source><target>Info zum Term-Collection</target></trans-unit>
-<trans-unit id='U3RhbmRhcmRtw6Rzc2lnIGFrdGl2IGbDvHI='><source>Standardmässig aktiv für</source><target>Standardmässig aktiv für</target></trans-unit>
+<trans-unit id='TGVzZXJlY2h0ZSBzdGFuZGFyZG3DpMOfaWc='><source>Leserechte standardmäßig</source><target>Leserechte standardmäßig</target></trans-unit>
 <trans-unit id='RsO8ciBkaWVzZSBLdW5kZW4gbnV0emVu'><source>Für diese Kunden nutzen</source><target>Für diese Kunden nutzen</target></trans-unit>
 <trans-unit id='VmVyYW50d29ydGxpY2g='><source>Verantwortlich</source><target>Verantwortlich</target></trans-unit>
 <trans-unit id='RGF0dW0='><source>Datum</source><target>Datum</target></trans-unit>
@@ -1444,7 +1410,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='QWRtaW5pc3RyYXRpdmVyIFN0YXR1cw=='><source>Administrativer Status</source><target>Administrativer Status</target></trans-unit>
 <trans-unit id='w5xiZXJ0cmFndW5nc2tvbW1lbnRhcg=='><source>Übertragungskommentar</source><target>Übertragungskommentar</target></trans-unit>
 <trans-unit id='UXVlbGxlIGRlcyBFaW50cmFncw=='><source>Quelle des Eintrags</source><target>Quelle des Eintrags</target></trans-unit>
-<trans-unit id='U29sbHRlIGRlciBUYXNrIGdlbMO2c2NodCBvZGVyIG1pdCBkZW4gYWt0dWVsbGVuIEVpbnN0ZWxsdW5nZW4gaW1wb3J0aWVydCB3ZXJkZW4/'><source>Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?</source><target>Should the task be deleted or imported with the current settings?</target></trans-unit>
+<trans-unit id='U29sbHRlIGRlciBUYXNrIGdlbMO2c2NodCBvZGVyIG1pdCBkZW4gYWt0dWVsbGVuIEVpbnN0ZWxsdW5nZW4gaW1wb3J0aWVydCB3ZXJkZW4/'><source>Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?</source><target>Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSBsw7ZzY2hlbg=='><source>Aufgabe löschen</source><target>Delete task</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSBpbXBvcnRpZXJlbg=='><source>Aufgabe importieren</source><target>Aufgabe importieren</target></trans-unit>
 <trans-unit id='VW50ZXJzY2hpZWQgenUgUXVlbGxzZWdtZW50'><source>Unterschied zu Quellsegment</source><target>Unterschied zu Quellsegment</target></trans-unit>
@@ -1461,14 +1427,14 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='dHJhbnNsYXRlNS1hcHBz'><source>translate5-apps</source><target>translate5-apps</target></trans-unit>
 <trans-unit id='dHJhbnNsYXRlNS1pbnN0YW50dHJhbnNsYXRl'><source>translate5-instanttranslate</source><target>InstantTranslate</target></trans-unit>
 <trans-unit id='dHJhbnNsYXRlNS10ZXJtcG9ydGFs'><source>translate5-termportal</source><target>TermPortal</target></trans-unit>
-<trans-unit id='T3BlbklkIEVtaXR0ZW4='><source>OpenId Emitten</source><target>OpenId Emitten</target></trans-unit>
-<trans-unit id='4oG0IERlciBCZW51dHplciBrYW5uIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuLiBEaWVzZXIgQmVudXR6ZXIgd2lyZCB2b24gdHJhbnNsYXRlNSBuYWNoIGRlciBPcGVuSWQtQXV0aGVudGlmaXppZXJ1bmcgYXV0b21hdGlzY2ggZXJzdGVsbHQu'><source>⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.</source><target>⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.</target></trans-unit>
+<trans-unit id='T3BlbklEIEVtaXR0ZW4='><source>OpenID Emitten</source><target>OpenID Emitten</target></trans-unit>
+<trans-unit id='4oG0IERlciBCZW51dHplciBrYW5uIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuLiBEaWVzZXIgQmVudXR6ZXIgd2lyZCB2b24gdHJhbnNsYXRlNSBuYWNoIGRlciBPcGVuSUQtQXV0aGVudGlmaXppZXJ1bmcgYXV0b21hdGlzY2ggZXJzdGVsbHQu'><source>⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.</source><target>⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.</target></trans-unit>
 <trans-unit id='dHJhbnNsYXRlNSB3aXJkIGdlbGFkZW46'><source>translate5 wird geladen:</source><target>translate5 wird geladen:</target></trans-unit>
 <trans-unit id='dHJhbnNsYXRlNSBEb21haW4='><source>translate5 Domain</source><target>translate5 Domain</target></trans-unit>
-<trans-unit id='T3BlbklkIHNlcnZlcg=='><source>OpenId server</source><target>OpenId server</target></trans-unit>
-<trans-unit id='T3BlbklkIEJlbnV0emVybmFtZQ=='><source>OpenId Benutzername</source><target>OpenId Benutzername</target></trans-unit>
-<trans-unit id='T3BlbklkIFBhc3N3b3J0'><source>OpenId Passwort</source><target>OpenId Passwort</target></trans-unit>
-<trans-unit id='T3BlbklkIE9BdXRoIFVSTA=='><source>OpenId OAuth URL</source><target>OpenId OAuth URL</target></trans-unit>
+<trans-unit id='T3BlbklEIHNlcnZlcg=='><source>OpenID server</source><target>OpenID server</target></trans-unit>
+<trans-unit id='T3BlbklEIEJlbnV0emVybmFtZQ=='><source>OpenID Benutzername</source><target>OpenID Benutzername</target></trans-unit>
+<trans-unit id='T3BlbklEIFBhc3N3b3J0'><source>OpenID Passwort</source><target>OpenID Passwort</target></trans-unit>
+<trans-unit id='T3BlbklEIE9BdXRoIFVSTA=='><source>OpenID OAuth URL</source><target>OpenID OAuth URL</target></trans-unit>
 <trans-unit id='VmVybGlua3RlciBUZXh0IExvZ2luc2VpdGU='><source>Verlinkter Text Loginseite</source><target>Verlinkter Text Loginseite</target></trans-unit>
 <trans-unit id='QW5tZWxkZXNlaXRlIG5pY2h0IGFuemVpZ2VuOiBBdXRvbWF0aXNjaCB6dW0gT3BlbklEIENvbm5lY3QtU2VydmVyIHVtbGVpdGVuLCB3ZW5uIGtlaW5lIEJlbnV0emVyc2l0enVuZyBpbiB0cmFuc2xhdGU1IHZvcmhhbmRlbiBpc3QuIFdlbm4gZGllc2UgQ2hlY2tib3ggbmljaHQgYWt0aXZpZXJ0IGlzdCwgd2lyZCBkZXIgaW0gdW50ZW5zdGVoZW5kZW4gVGV4dGZlbGQgZGVmaW5pZXJ0ZSBUZXh0IGF1ZiBkZXIgTG9naW5zZWl0ZSB2b24gdHJhbnNsYXRlNSBtaXQgZGVtIE9wZW5JRCBDb25uZWN0IFNlcnZlciB2ZXJsaW5rdC4='><source>Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.</source><target>Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.</target></trans-unit>
 <trans-unit id='RGllIFp1d2Vpc3VuZyB6d2lzY2hlbiBBdWZnYWJlIHVuZCBCZW51dHplciBrYW5uIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIGRhIGRlciBCZW51dHplciBkaWVzZSBha3R1ZWxsIGJlbnV0enQu'><source>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.</source><target>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.</target></trans-unit>
@@ -1511,7 +1477,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='SW50ZXJuZXIgRnV6enk='><source>Interner Fuzzy</source><target>Interner Fuzzy</target></trans-unit>
 <trans-unit id='SW50ZXJuZXIgRnV6enkgdmVyZsO8Z2Jhcg=='><source>Interner Fuzzy verfügbar</source><target>Interner Fuzzy verfügbar</target></trans-unit>
 <trans-unit id='S3VuZGU='><source>Kunde</source><target>Kunde</target></trans-unit>
-<trans-unit id='IOKBtCBEZXIgQmVudXR6ZXIga2FubiBuaWNodCBiZWFyYmVpdGV0IHdlcmRlbi4gRGllc2VyIEJlbnV0emVyIHdpcmQgdm9uIHRyYW5zbGF0ZTUgbmFjaCBkZXIgT3BlbklkLUF1dGhlbnRpZml6aWVydW5nIGF1dG9tYXRpc2NoIGVyc3RlbGx0Lg=='><source> ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.</source><target> ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.</target></trans-unit>
+<trans-unit id='IOKBtCBEZXIgQmVudXR6ZXIga2FubiBuaWNodCBiZWFyYmVpdGV0IHdlcmRlbi4gRGllc2VyIEJlbnV0emVyIHdpcmQgdm9uIHRyYW5zbGF0ZTUgbmFjaCBkZXIgT3BlbklELUF1dGhlbnRpZml6aWVydW5nIGF1dG9tYXRpc2NoIGVyc3RlbGx0Lg=='><source> ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.</source><target> ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.</target></trans-unit>
 <trans-unit id='S3VuZGUgd2lyZCBnZXNwZWljaGVydC4uLg=='><source>Kunde wird gespeichert...</source><target>Kunde wird gespeichert...</target></trans-unit>
 <trans-unit id='RXhwb3J0aWVyZW4='><source>Exportieren</source><target>Exportieren</target></trans-unit>
 <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiB1bmQgZsO8ciBkZW4gS3VuZGVuIGRlcyBnZcO2ZmZuZXRlbiBUYXNrcyB2ZXJmw7xnYmFyLg=='><source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source><target>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</target></trans-unit>
@@ -1530,7 +1496,6 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='VHJlZmZlciBhdXMgZGVyIFRlcm1pbm9sb2dpZSB3ZXJkZW4gYmV2b3J6dWd0IHZvcsO8YmVyc2V0enQu'><source>Treffer aus der Terminologie werden bevorzugt vorübersetzt.</source><target>Treffer aus der Terminologie werden bevorzugt vorübersetzt.</target></trans-unit>
 <trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKE1UKQ=='><source>Vorübersetzen (MT)</source><target>Vorübersetzen (MT)</target></trans-unit>
 <trans-unit id='VHJlZmZlciBhdXMgZGVtIFRNIHdlcmRlbiBiZXZvcnp1Z3Qgdm9yw7xiZXJzZXR6dA=='><source>Treffer aus dem TM werden bevorzugt vorübersetzt</source><target>Treffer aus dem TM werden bevorzugt vorübersetzt</target></trans-unit>
-<trans-unit id='VGVybWlub2xvZ2llIHByw7xmZW4gdW5kIG1hcmtpZXJlbg=='><source>Terminologie prüfen und markieren</source><target>Terminologie prüfen und markieren</target></trans-unit>
 <trans-unit id='QW5hbHlzZSBsw6R1ZnQ='><source>Analyse läuft</source><target>Analyse läuft</target></trans-unit>
 <trans-unit id='S2VpbmUgVHJlZmZlcg=='><source>Keine Treffer</source><target>Keine Treffer</target></trans-unit>
 <trans-unit id='R2VzYW10emFobCBkZXIgV8O2cnRlcg=='><source>Gesamtzahl der Wörter</source><target>Gesamtzahl der Wörter</target></trans-unit>
@@ -1541,7 +1506,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='U3VtbWU6'><source>Summe:</source><target>Summe:</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBGdXp6eSB2ZXJ3ZW5kZXQ='><source>Interne Fuzzy verwendet</source><target>Interne Fuzzy verwendet</target></trans-unit>
 <trans-unit id='TWF0Y2gtUmF0ZQ=='><source>Match-Rate</source><target>Match-Rate</target></trans-unit>
-<trans-unit id='SW4gYmVyZWl0cyBnZWzDtnNjaHRlIEluaGFsdGUga8O2bm5lbiBrZWluZSBNUU0tVGFncyBlaW5nZWbDvGd0IHdlcmRlbi4='><source>In bereits gelöschte Inhalte können keine MQM-Tags eingefügt werden.</source><target>In bereits gelöschte Inhalte können keine MQM-Tags eingefügt werden.</target></trans-unit>
+<trans-unit id='SW4gYmVyZWl0cyBnZWzDtnNjaHRlIEluaGFsdGUga8O2bm5lbiBrZWluZSBNUU0tVGFncyBlaW5nZWbDvGd0IHdlcmRlbi4='><source>In bereits gelöschte Inhalte können keine MQM-Tags eingefügt werden.</source><target>In bereits gelöschte Inhalte können keine manuellen QS-Tags eingefügt werden.</target></trans-unit>
 <trans-unit id='RGVyIEluaGFsdCB3dXJkZSBuaWNodCBpbiBkYXMgQ2xpcGJvYXJkIMO8YmVybm9tbWVuLg=='><source>Der Inhalt wurde nicht in das Clipboard übernommen.</source><target>Der Inhalt wurde nicht in das Clipboard übernommen.</target></trans-unit>
 <trans-unit id='RGllIFBvc2l0aW9uIGRlcyBDdXJzb3JzIGJ6dy4gZGllIEF1c3dhaGwgaW0gVGV4dCB3dXJkZSBuaWNodCBlcmthbm50LiBCaXR0ZSBub2NobWFsIHByb2JpZXJlbiB1bmQgZ2dmLiBkaWUgQWRtaW5zIGJlbmFjaHJpY2h0aWdlbi4='><source>Die Position des Cursors bzw. die Auswahl im Text wurde nicht erkannt. Bitte nochmal probieren und ggf. die Admins benachrichtigen.</source><target>Die Position des Cursors bzw. die Auswahl im Text wurde nicht erkannt. Bitte nochmal probieren und ggf. die Admins benachrichtigen.</target></trans-unit>
 <trans-unit id='V8OkaGxlbiBTaWUgZGllIFJlc3NvdXJjZSBhdXMgdW0gd2VpdGVyZSBJbmZvcyB6dSBiZWtvbW1lbi4='><source>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</source><target>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</target></trans-unit>
@@ -1567,7 +1532,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>Alle verfügbaren Sprachen</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</target></trans-unit>
 <trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>TermProposer</target></trans-unit>
-<trans-unit id='T3BlbklkIElzc3Vlcg=='><source>OpenId Issuer</source><target>OpenId Issuer</target></trans-unit>
+<trans-unit id='T3BlbklEIElzc3Vlcg=='><source>OpenID Issuer</source><target>OpenID Issuer</target></trans-unit>
 <trans-unit id='SsO8bmdlciBhbHMgb2RlciBnbGVpY2g='><source>Jünger als oder gleich</source><target>Jünger als oder gleich</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Vorschläge löschen, deren letzte Berührung länger her ist als</source><target>Vorschläge löschen, deren letzte Berührung länger her ist als</target></trans-unit>
 <trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IGFwcGVhciB0byBiZSBhbiBpbnRlZ2Vy'><source>'%value%' does not appear to be an integer</source><target>'%value%' does not appear to be an integer</target></trans-unit>
@@ -1659,7 +1624,7 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='UHJvemVudCBkZXIgQXVmZ2FiZW4sIGJlaSBkZW5lbiBkZXIgRXhjZWwtRXhwb3J0IGRlciBTZWdtZW50dGFiZWxsZSBnZW51dHp0IHd1cmRlLg=='><source>Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.</source><target>Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRyb2xsZW4='><source>Standardrollen</source><target>Standardrollen</target></trans-unit>
 <trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</target></trans-unit>
-<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklELVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenID-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Standardsystemrollen werden verwendet, wenn der OpenID-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</target></trans-unit>
 <trans-unit id='RXJsYXVidGUgUm9sbGVu'><source>Erlaubte Rollen</source><target>Erlaubte Rollen</target></trans-unit>
 <trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGdsZWljaHplaXRpZyBkaWVzZWxiZSBBdWZnYWJl'><source>Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe</source><target>Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe</target></trans-unit>
 <trans-unit id='SW4gQmVhcmJlaXR1bmc='><source>In Bearbeitung</source><target>In Bearbeitung</target></trans-unit>
@@ -1875,7 +1840,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QWxsZXMgenVrbGFwcGVu'><source>Alles zuklappen</source><target>Alles zuklappen</target></trans-unit>
 <trans-unit id='QWxsZXMgYXVma2xhcHBlbg=='><source>Alles aufklappen</source><target>Alles aufklappen</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRrb25maWd1cmF0aW9uIEt1bmRlIMO8YmVyc2NocmVpYmVu'><source>Standardkonfiguration Kunde überschreiben</source><target>Konfiguration</target></trans-unit>
-<trans-unit id='U3RhbmRhcmRrb25maWd1cmF0aW9uIGRlcyBTeXN0ZW1z'><source>Standardkonfiguration des Systems</source><target>Konfiguration Kunde (überschreibt Systemkonfiguration)</target></trans-unit>
+<trans-unit id='w5xiZXJzY2hyZWlidW5nIGRlciBTeXN0ZW1rb25maWd1cmF0aW9u'><source>Überschreibung der Systemkonfiguration</source><target>Überschreibung der Systemkonfiguration</target></trans-unit>
 <trans-unit id='w5xiZXJzY2hyaWViZW4='><source>Überschrieben</source><target>Überschrieben</target></trans-unit>
 <trans-unit id='QXVmIGViZW5lIGdlc2V0enQ='><source>Auf ebene gesetzt</source><target>Auf Ebene gesetzt</target></trans-unit>
 <trans-unit id='S3VyemVyIE5hbWU='><source>Konfigurationsoption</source><target>Konfigurationsoptionen</target></trans-unit>
@@ -1911,14 +1876,85 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QW56YWhsIGRlciBtaXQgSW5zdGFudFRyYW5zbGF0ZSDDvGJlcnNldHp0ZW4gRG9rdW1lbnRl'><source>Anzahl der mit InstantTranslate übersetzten Dokumente</source><target>Anzahl der mit InstantTranslate übersetzten Dokumente</target></trans-unit>
 <trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIEV4cG9ydGllcmVu'><source>Ressourcen-Nutzung Exportieren</source><target>Ressourcen-Nutzung Exportieren</target></trans-unit>
 <trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='><source>Kunden bearbeiten</source><target>Kunden bearbeiten</target></trans-unit>
-<trans-unit id='V2VubiBha3RpdmllcnQsIHdlcmRlbiBibG9ja2llcnRlIFNlZ21lbnRlIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4='><source>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</source><target>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</target></trans-unit>
-<trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGJsb2NraWVydGUgU2VnbWVudGUgbmljaHQgaW4gZGllIEFuYWx5c2UgdW5kIFdvcnRhbnphaGwgZWluYmV6b2dlbg=='><source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source><target>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</target></trans-unit>
+<trans-unit id='V2VubiBha3RpdmllcnQgd2VyZGVuIHp1dm9yIGdlc3BlcnJ0ZSBTZWdtZW50ZSBpbiBkaWUgQW5hbHlzZSB1bmQgV29ydGFuemFobCBlaW5iZXpvZ2VuLg=='><source>Wenn aktiviert werden zuvor gesperrte Segmente in die Analyse und Wortanzahl einbezogen.</source><target>Wenn aktiviert werden zuvor gesperrte Segmente in die Analyse und Wortanzahl einbezogen.</target></trans-unit>
+<trans-unit id='V2VubiBkZWFrdGl2aWVydCB3ZXJkZW4gZ2VzcGVycnRlIDEwMCUtTWF0Y2hlcyBuaWNodCBtZWhyIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4u'><source>Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.</source><target>Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.</target></trans-unit>
+<trans-unit id='UVMgU3RhdGlzdGlr'><source>QS Statistik</source><target>QS Statistik</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Interne Tags</target></trans-unit>
+<trans-unit id='VmVyYm90ZW4gaW4gWmllbA=='><source>Verboten in Ziel</source><target>Verboten in Ziel</target></trans-unit>
+<trans-unit id='VmVyYm90ZW4gaW4gUXVlbGxl'><source>Verboten in Quelle</source><target>Verboten in Quelle</target></trans-unit>
+<trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unbearbeiteter Fuzzy</target></trans-unit>
+<trans-unit id='QmVhcmJlaXRldGVyIDEwMCUgTWF0Y2g='><source>Bearbeiteter 100% Match</source><target>Bearbeiteter 100% Match</target></trans-unit>
+<trans-unit id='TmljaHQgZ2VmdW5kZW4gaW4gWmllbA=='><source>Nicht gefunden in Ziel</source><target>Nicht gefunden in Ziel</target></trans-unit>
+<trans-unit id='TmljaHQgZGVmaW5pZXJ0IGluIHppZWxzcHJhY2hsLiBUZXJtaW5vbG9naWU='><source>Nicht definiert in zielsprachl. Terminologie</source><target>Nicht definiert in zielsprachl. Terminologie</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIGZlaGxlbg=='><source>Interne Tags fehlen</source><target>Interne Tags fehlen</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIHd1cmRlbiBoaW56dWdlZsO8Z3Q='><source>Interne Tags wurden hinzugefügt</source><target>Interne Tags wurden hinzugefügt</target></trans-unit>
+<trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBlbnRmZXJudA=='><source>Whitespace wurde entfernt</source><target>Whitespace wurde entfernt</target></trans-unit>
+<trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Whitespace wurde hinzugefügt</source><target>Whitespace wurde hinzugefügt</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIGhhYmVuIGVpbmUgdW5nw7xsdGlnZSBTdHJ1a3R1cg=='><source>Interne Tags haben eine ungültige Struktur</source><target>Interne Tags haben eine ungültige Struktur</target></trans-unit>
+<trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGdlcHLDvGZ0'><source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source><target>Diese Kategorie wurde nicht oder nur unvollständig geprüft</target></trans-unit>
+<trans-unit id='Qml0dGUgc3Rvw59lbiBTaWUgdW50ZW4gZWluZSBuZXVlIFByw7xmdW5nIGFuIHVtIGRhcyBQcm9ibGVtIHp1IGJlaGViZW4='><source>Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben</source><target>Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben</target></trans-unit>
+<trans-unit id='UVMgJmFtcDsgRGF0ZWllbg=='><source>QS &amp; Dateien</source><target>QS &amp; Dateien</target></trans-unit>
+<trans-unit id='TnV0enVuZyB2b24gVE0tVHJlZmZlcm4='><source>Nutzung von TM-Treffern</source><target>Nutzung von TM-Treffern</target></trans-unit>
+<trans-unit id='TWFudWVsbGUgUVMgKGltIFNlZ21lbnQp'><source>Manuelle QS (im Segment)</source><target>Manuelle QS (im Segment)</target></trans-unit>
+<trans-unit id='TWFudWVsbGUgUVMgKGdhbnplcyBTZWdtZW50KQ=='><source>Manuelle QS (ganzes Segment)</source><target>Manuelle QS (ganzes Segment)</target></trans-unit>
+<trans-unit id='QWxsZSBTZWdtZW50ZSB3dXJkZW4gc2VpdCBkZXIgbGV0enRlbiDDhG5kZXJ1bmcgZ2VwcsO8ZnQ='><source>Alle Segmente wurden seit der letzten Änderung geprüft</source><target>Alle Segmente wurden seit der letzten Änderung geprüft</target></trans-unit>
+<trans-unit id='UXVhbGl0w6R0c3NpY2hlcnVuZw=='><source>Qualitätssicherung</source><target>Qualitätssicherung</target></trans-unit>
+<trans-unit id='QWxsZSB6ZWlnZW4='><source>Alle zeigen</source><target>Alle zeigen</target></trans-unit>
+<trans-unit id='TnVyIEZlaGxlcg=='><source>Nur Fehler</source><target>Nur Fehler</target></trans-unit>
+<trans-unit id='TnVyIEZhbHNjaC1Qb3NpdGl2ZQ=='><source>Nur Falsch-Positive</source><target>Nur Falsch-Positive</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgdW52b2xsc3TDpG5kaWcgZ2VwcsO8ZnQ='><source>Segmente unvollständig geprüft</source><target>Segmente unvollständig geprüft</target></trans-unit>
+<trans-unit id='TmV1IMO8YmVycHLDvGZlbg=='><source>Neu überprüfen</source><target>Neu überprüfen</target></trans-unit>
+<trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>Alle Kategorien</target></trans-unit>
+<trans-unit id='S2F0ZWdvcmll'><source>Kategorie</source><target>Kategorie</target></trans-unit>
+<trans-unit id='QW56YWhs'><source>Anzahl</source><target>Anzahl</target></trans-unit>
+<trans-unit id='RmFsc2NoIGVya2FubnRlIEZlaGxlcg=='><source>Falsch erkannte Fehler</source><target>Falsch erkannte Fehler</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWcgRmVobGVy'><source>Interne Tag Fehler</source><target>Interne Tag Fehler</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIGVpbmVuIGZlaGxlcmZyZWllbiBFeHBvcnQgZGVyIEF1ZmdhYmUgdmVyaGluZGVybg=='><source>Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern</source><target>Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern</target></trans-unit>
+<trans-unit id='UVMgRmVobGVy'><source>QS Fehler</source><target>QS Fehler</target></trans-unit>
+<trans-unit id='RGVyIFNlZ21lbnQgU3RhdHVzIHd1cmRlIGdlc3BlaWNoZXJ0'><source>Der Segment Status wurde gespeichert</source><target>Der Segment Status wurde gespeichert</target></trans-unit>
+<trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Die Qualität wurde hinzugefügt</source><target>Die Qualität wurde hinzugefügt</target></trans-unit>
+<trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBlbnRmZXJudA=='><source>Die Qualität wurde entfernt</source><target>Die Qualität wurde entfernt</target></trans-unit>
+<trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='><source>Der False-Positive Status wurde aktualisiert</source><target>Der False-Positive Status wurde aktualisiert</target></trans-unit>
+<trans-unit id='QWNodHVuZw=='><source>Achtung</source><target>Achtung</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBpbiBkaWVzZXIgQXVmZ2FiZSBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIHUuVS4gZWluZW4gZmVobGVyZnJlaWVuIEV4cG9ydCBkZXIgQXVmZ2FiZSB2ZXJoaW5kZXJu'><source>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</source><target>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</target></trans-unit>
+<trans-unit id='TGFkZS4uLg=='><source>Lade...</source><target>Lade...</target></trans-unit>
+<trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>
+<trans-unit id='Q29udGVudA=='><source>Content</source><target>Content</target></trans-unit>
+<trans-unit id='U3R5bGU='><source>Style</source><target>Style</target></trans-unit>
+<trans-unit id='SW5jb25zaXN0ZW5jeQ=='><source>Inconsistency</source><target>Inconsistency</target></trans-unit>
+<trans-unit id='TWVjaGFuaWNhbA=='><source>Mechanical</source><target>Mechanical</target></trans-unit>
+<trans-unit id='TG9jYWxlIHZpb2xhdGlvbg=='><source>Locale violation</source><target>Locale violation</target></trans-unit>
+<trans-unit id='VmVyaXR5'><source>Verity</source><target>Verity</target></trans-unit>
+<trans-unit id='Q29tcGxldGVuZXNz'><source>Completeness</source><target>Completeness</target></trans-unit>
+<trans-unit id='TGVnYWwgcmVxdWlyZW1lbnRz'><source>Legal requirements</source><target>Legal requirements</target></trans-unit>
+<trans-unit id='TG9jYWxlIGFwcGxpY2FiaWxpdHk='><source>Locale applicability</source><target>Locale applicability</target></trans-unit>
+<trans-unit id='QWNjdXJhY3k='><source>Accuracy</source><target>Accuracy</target></trans-unit>
+<trans-unit id='T21pc3Npb24='><source>Omission</source><target>Omission</target></trans-unit>
+<trans-unit id='QWRkaXRpb24='><source>Addition</source><target>Addition</target></trans-unit>
+<trans-unit id='TWlzdHJhbnNsYXRpb24='><source>Mistranslation</source><target>Mistranslation</target></trans-unit>
+<trans-unit id='VW50cmFuc2xhdGVk'><source>Untranslated</source><target>Untranslated</target></trans-unit>
+<trans-unit id='Rmx1ZW5jeQ=='><source>Fluency</source><target>Fluency</target></trans-unit>
+<trans-unit id='U3R5bGUvcmVnaXN0ZXI='><source>Style/register</source><target>Style/register</target></trans-unit>
+<trans-unit id='VHlwb2dyYXBoeQ=='><source>Typography</source><target>Typography</target></trans-unit>
+<trans-unit id='U3BlbGxpbmc='><source>Spelling</source><target>Spelling</target></trans-unit>
+<trans-unit id='R3JhbW1hcg=='><source>Grammar</source><target>Grammar</target></trans-unit>
+<trans-unit id='V29yZCBvcmRlcg=='><source>Word order</source><target>Word order</target></trans-unit>
+<trans-unit id='V29yZCBmb3Jt'><source>Word form</source><target>Word form</target></trans-unit>
+<trans-unit id='UGFydCBvZiBzcGVlY2g='><source>Part of speech</source><target>Part of speech</target></trans-unit>
+<trans-unit id='QWdyZWVtZW50'><source>Agreement</source><target>Agreement</target></trans-unit>
+<trans-unit id='VGVuc2UvYXNwZWN0L21vb2Q='><source>Tense/aspect/mood</source><target>Tense/aspect/mood</target></trans-unit>
+<trans-unit id='RnVuY3Rpb24gd29yZHM='><source>Function words</source><target>Function words</target></trans-unit>
+<trans-unit id='RXh0cmFuZW91cw=='><source>Extraneous</source><target>Extraneous</target></trans-unit>
+<trans-unit id='TWlzc2luZw=='><source>Missing</source><target>Missing</target></trans-unit>
+<trans-unit id='SW5jb3JyZWN0'><source>Incorrect</source><target>Incorrect</target></trans-unit>
+<trans-unit id='VW5pbnRlbGxpZ2libGU='><source>Unintelligible</source><target>Unintelligible</target></trans-unit>
 <trans-unit id='Y29uZmlnX292ZXJ3cml0ZV9zeXN0ZW0='><source>config_overwrite_system</source><target>config_overwrite_system</target></trans-unit>
 <trans-unit id='S29uZmlndXJhdGlvbiBnZXNwZWljaGVydA=='><source>Konfiguration gespeichert</source><target>Konfiguration gespeichert</target></trans-unit>
 <trans-unit id='VmFsdWU='><source>Value</source><target>Value</target></trans-unit>
 <trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse enthalten</source><target>Gesperrte Segmente sind in der Analyse enthalten</target></trans-unit>
 <trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgbmljaHQgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse nicht enthalten</source><target>Gesperrte Segmente sind in der Analyse nicht enthalten</target></trans-unit>
 <trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='><source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source><target>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</target></trans-unit>
+<trans-unit id='U2NocmVpYnJlY2h0ZSBzdGFuZGFyZG3DpMOfaWc='><source>Schreibrechte standardmäßig</source><target>Schreibrechte standardmäßig</target></trans-unit>
 <trans-unit id='U2VyYmlzY2ggKExhdGVpbiBTZXJiaWVuKQ=='><source>Serbisch (Latein Serbien)</source><target>Serbisch (Latein Serbien)</target></trans-unit>
 <trans-unit id='U29tYWxpIChTb21hbGlhKQ=='><source>Somali (Somalia)</source><target>Somali (Somalia)</target></trans-unit>
 <trans-unit id='QW1oYXJpc2NoICjDhHRoaW9waWVuKQ=='><source>Amharisch (Äthiopien)</source><target>Amharisch (Äthiopien)</target></trans-unit>
@@ -1928,6 +1964,31 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbiBBc2VyYmFpZHNjaGFuKQ=='><source>Aserbaidschanisch (Latein Aserbaidschan)</source><target>Aserbaidschanisch (Latein Aserbaidschan)</target></trans-unit>
 <trans-unit id='VXNiZWtpc2NoIChMYXRlaW4gVXNiZWtpc3Rhbik='><source>Usbekisch (Latein Usbekistan)</source><target>Usbekisch (Latein Usbekistan)</target></trans-unit>
 <trans-unit id='Qm9zbmlzY2ggKExhdGVpbiBCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Bosnisch (Latein Bosnien und Herzegowina)</source><target>Bosnisch (Latein Bosnien und Herzegowina)</target></trans-unit>
+<trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbg=='><source>Nur Segmente mit Wiederholungen anzeigen</source><target>Nur Segmente mit Wiederholungen anzeigen</target></trans-unit>
+<trans-unit id='RXhwb3J0IFhNTA=='><source>Export XML</source><target>Export XML</target></trans-unit>
+<trans-unit id='TWl0IFdpZWRlcmhvbHVuZ2Vu'><source>Mit Wiederholungen</source><target>Mit Wiederholungen</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgb2huZSBXaWVkZXJob2x1bmdlbg=='><source>Segmente ohne Wiederholungen</source><target>Segmente ohne Wiederholungen</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgUXVlbGxzcHJhY2hl'><source>Segmente mit Wiederholungen nur in der Quellsprache</source><target>Segmente mit Wiederholungen nur in der Quellsprache</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgWmllbHNwcmFjaGU='><source>Segmente mit Wiederholungen nur in der Zielsprache</source><target>Segmente mit Wiederholungen nur in der Zielsprache</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIGluIGRlciBRdWVsbC0gdW5kIFppZWxzcHJhY2hl'><source>Segmente mit Wiederholungen in der Quell- und Zielsprache</source><target>Segmente mit Wiederholungen in der Quell- und Zielsprache</target></trans-unit>
+<trans-unit id='LQ=='><source>-</source><target>-</target></trans-unit>
+<trans-unit id='TnVyIFF1ZWxsZQ=='><source>Nur Quelle</source><target>Nur Quelle</target></trans-unit>
+<trans-unit id='TnVyIFppZWw='><source>Nur Ziel</source><target>Nur Ziel</target></trans-unit>
+<trans-unit id='QmVpZGVz'><source>Beides</source><target>Beides</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nZW4gZGVzIFdpZWRlcmhvbHVuZ3NzdGF0dXMgZHVyY2ggU2VnbWVudMOkbmRlcnVuZ2VuIHdlcmRlbiBuaWNodCBzb2ZvcnQgYW5nZXplaWd0LCBkaWUgU2VnbWVudGUgbcO8c3NlbiBuZXVnZWxhZGVuIHdlcmRlbiE='><source>Änderungen des Wiederholungsstatus durch Segmentänderungen werden nicht sofort angezeigt, die Segmente müssen neugeladen werden!</source><target>Änderungen des Wiederholungsstatus durch Segmentänderungen werden nicht sofort angezeigt, die Segmente müssen neugeladen werden!</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRtw6TDn2lnIHdpcmQgYmVpIG5ldWVuIEF1ZmdhYmVuIGbDvHIgZGllIGdld8OkaGx0ZW4gS3VuZGVuIExlc2VyZWNodCBmw7xyIGRpZXNlIFNwcmFjaHJlc291cmNlIGFrdGl2aWVydA=='><source>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert</source><target>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRtw6TDn2lnIHdpcmQgYmVpIG5ldWVuIEF1ZmdhYmVuIGbDvHIgZGllIGdld8OkaGx0ZW4gS3VuZGVuIGdlc2V0enQsIGRhc3MgU2VnbWVudGUgYmVpbSBTZWdtZW50IHNwZWljaGVybiBpbiBkaWUgU3ByYWNocmVzb3VyY2UgZ2VzY2hyaWViZW4gd2VyZGVu'><source>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden</source><target>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden</target></trans-unit>
+<trans-unit id='SW1wb3J0aWVyZW4gKFN0YW5kYXJkcyBudXR6ZW4p'><source>Importieren (Standards nutzen)</source><target>Importieren (Standards nutzen)</target></trans-unit>
+<trans-unit id='TnVyIHdpZWRlcmhvbHQ='><source>Nur wiederholt</source><target>Nur wiederholt</target></trans-unit>
+<trans-unit id='U3RhbmRhcmQtQmVudXR6ZXJ6dXdlaXN1bmdlbg=='><source>Standard-Benutzerzuweisungen</source><target>Standard-Benutzerzuweisungen</target></trans-unit>
+<trans-unit id='V29ya2Zsb3ctU2Nocml0dA=='><source>Workflow-Schritt</source><target>Workflow-Schritt</target></trans-unit>
+<trans-unit id='V29ya2Zsb3dzY2hyaXR0'><source>Workflowschritt</source><target>Workflowschritt</target></trans-unit>
+<trans-unit id='RGVyIEJlbnV0emVyIGhhdCBkYXMgUmVjaHQsIGRpZSBTcHJhY2hyZXNzb3VyY2VuIGluIEluc3RhbnRUcmFuc2xhdGUgJmFtcDsgVGVybVBvcnRhbCB6dSBudXR6ZW4sIGRpZSBkZW5zZWxiZW4gS3VuZGVuIHp1Z2VvcmRuZXQgc2luZCwgZGVuZW4gZGVyIEJlbnV0emVyIGhpZXIgenVnZW9yZG5ldCBpc3Qu'><source>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</source><target>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</target></trans-unit>
+<trans-unit id='S3VuZGVuIEluc3RhbnRUcmFuc2xhdGUgJmFtcDsgVGVybVBvcnRhbA=='><source>Kunden InstantTranslate &amp; TermPortal</source><target>Kunden InstantTranslate &amp; TermPortal</target></trans-unit>
+<trans-unit id='QmVudXR6ZXIgbmFjaCBJbXBvcnQgYmVuYWNocmljaHRpZ2Vu'><source>Benutzer nach Import benachrichtigen</source><target>Benutzer nach Import benachrichtigen</target></trans-unit>
+<trans-unit id='RGVmaW5pZXJ0IGRpZSBBbnphaGwgVGFnZSwgZGllIGRpZSBEZWFkbGluZSBpbiBkZXIgWnVrdW5mdCBsaWVnZW4gc29sbCAtIGdlc2VoZW4gdm9tIFplaXRwdW5rdCBkZXIgUHJvamVrdGFubGFnZSBhbi4gV2VydCBzZXR6dCBzZWxiZSBLb25maWd1cmF0aW9uLCBkaWUgYXVjaCBkaWUgIsOcYmVyc2NocmVpYnVuZyBkZXIgU3lzdGVta29uZmlndXJhdGlvbiIgbWl0IE5hbWVuICJEZWZhdWx0IGRlYWRsaW5lIGRhdGUiIHNldHp0Lg=='><source>Definiert die Anzahl Tage, die die Deadline in der Zukunft liegen soll - gesehen vom Zeitpunkt der Projektanlage an. Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.</source><target>Definiert die Anzahl Tage, die die Deadline in der Zukunft liegen soll - gesehen vom Zeitpunkt der Projektanlage an. Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.</target></trans-unit>
+<trans-unit id='Qml0dGUga29uZmlndXJpZXJlbiBTaWUgenVuw6RjaHN0IGRhcyBGZWxkICJ0cmFuc2xhdGU1IERvbWFpbiIgaW0gVGFiICJBbGxnZW1laW4iLiBEYW5hY2gga8O2bm5lbiBTaWUgT3BlbklEIENvbm5lY3QgZsO8ciBkaWVzZW4gS3VuZGVuIGVpbnJpY2h0ZW4u'><source>Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.</source><target>Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.</target></trans-unit>
+<trans-unit id='QWxsZ2VtZWlu'><source>Allgemein</source><target>Allgemein</target></trans-unit>
   </body>
  </file>
 </xliff>

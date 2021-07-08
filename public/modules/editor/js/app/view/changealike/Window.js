@@ -34,41 +34,126 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * @class Editor.view.changealike.Window
- * @extends Editor.view.ui.changealike.Window
+ * @extends Ext.window.Window
  */
 Ext.define('Editor.view.changealike.Window', {
-  extend: 'Editor.view.ui.changealike.Window',
-  alias: 'widget.changealikeWindow',
+    extend: 'Ext.window.Window',
+    alias: 'widget.changealikeWindow',
+    requires: [
+        'Editor.view.changealike.Grid'
+    ],
+    itemId: 'changealikeWindow',
 
-  //Item Strings:
-  items_segmentData: ['<h1>aktuell bearbeitetes Segment</h1>',
-               '{edited}'],
-  overwriteSource: '<b><i>#UT#Überschreibe Quelltext mit:</i></b> ',
-  overwriteTarget: '<b><i>#UT#Überschreibe Zieltext mit:</i></b> ',
-  items_help: 'Hilfe:',
-  loadedAlikes: null,
-  tools: [{
-    type:'help'
-  }],
-  id: 'change-alike-window',
-  openedFor: null,
-  initComponent: function() {
-    var me = this;
-    me.items_segmentData = Ext.create('Ext.XTemplate', me.items_segmentData);
-    me.items_segmentData.compile();
-    me.callParent(arguments);
-    Ext.apply(me.tools[0], {
-      tooltip: me.items_help,
-      renderData: {
-        label:  me.items_help
-      },
-      handler: me.showHelp,
-      scope: me
-    });
-  },
-  onEsc: function() {
-      this.fireEvent('onEscape', this);
-  },
+    title: 'Aktuelles Segment für die folgenden Segmente übernehmen?',
+    height: 570,
+    width: 955,
+    layout: {
+        align: 'stretch',
+        type: 'vbox'
+    },
+    closeAction: 'hide',
+    modal: true,
+
+    strings: {
+        cancelBtn: 'Keine Änderungen durchführen [ESC]',
+        saveBtn: 'Änderungen übernehmen [STRG+S]',
+        help: 'Hilfe:',
+        segmentData: [
+            '<h1>aktuell bearbeitetes Segment</h1>',
+            '{edited}'
+        ],
+        overwriteSource: '<b><i>#UT#Überschreibe Quelltext mit:</i></b> ',
+        overwriteTarget: '<b><i>#UT#Überschreibe Zieltext mit:</i></b> '
+    },
+
+    loadedAlikes: null,
+    tools: [{
+        type:'help'
+    }],
+    id: 'change-alike-window',
+    openedFor: null,
+
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config,
+            segTpl = Ext.create('Ext.XTemplate', me.strings.segmentData);
+        segTpl.compile();
+
+        config = {
+            title: me.title, //see EXT6UPD-9
+            items: [
+                {
+                    xtype: 'container',
+                    padding:10,
+                    height:100,
+                    autoScroll: true,
+                    cls: 'segment-tag-container',
+                    tpl: segTpl,
+                    itemId: 'infoText'
+                },
+                {
+                    xtype: 'changealikeGrid',
+                    flex: 1
+                }
+            ],
+            dockedItems: [
+                {
+                    xtype: 'toolbar',
+                    ui: 'footer',
+                    flex: 1,
+                    dock: 'bottom',
+                    layout: {
+                        pack: 'end',
+                        type: 'hbox'
+                    },
+                    items: [
+                        {
+                            xtype: 'button',
+                            itemId: 'cancelBtn',
+                            text: me.strings.cancelBtn
+                        },
+                        {
+                            xtype: 'button',
+                            itemId: 'saveBtn',
+                            text: me.strings.saveBtn
+                        }
+                    ]
+                }
+            ]
+        };
+
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    },
+
+    initComponent: function() {
+        var me = this;
+
+        me.setKeyMap({
+            scope: 'this',
+            "CmdOrCtrl+s": 'onCtrlS'
+        });
+
+        me.callParent(arguments);
+        Ext.apply(me.tools[0], {
+            tooltip: me.strings.help,
+            renderData: {
+                label:  me.strings.help
+            },
+            handler: me.showHelp,
+            scope: me
+        });
+    },
+    onEsc: function(e) {
+        e.stopEvent();
+        this.fireEvent('onEscape', this);
+    },
+    onCtrlS: function(e) {
+        e.stopEvent();
+        this.fireEvent('onCtrlS', this);
+    },
   /**
    * @param {Editor.model.Segment} rec
    */
@@ -123,7 +208,7 @@ Ext.define('Editor.view.changealike.Window', {
           };
 
       if(sourceEdit) {
-          targetEdit = this.overwriteSource+format('source',sourceEdit)+this.overwriteTarget+format('target',targetEdit);
+          targetEdit = this.strings.overwriteSource+format('source',sourceEdit)+this.strings.overwriteTarget+format('target',targetEdit);
       }
       else {
           targetEdit = format('target',targetEdit);

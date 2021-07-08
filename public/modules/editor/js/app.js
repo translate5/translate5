@@ -69,12 +69,14 @@ Ext.ClassManager.onCreated(function(className) {
 
 Ext.application({
     name : 'Editor',
-    models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field','Config','TaskConfig','CustomerConfig'],
-    stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages','UserConfig','admin.Config','admin.CustomerConfig','admin.task.Config'],
+    models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field','Config','TaskConfig','CustomerConfig','admin.UserAssocDefault'],
+    stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages','UserConfig','admin.Config','admin.CustomerConfig','admin.task.Config','admin.UserAssocDefault'],
     requires: [
         'Editor.view.ViewPort',
         'Editor.view.ViewPortEditor',
         'Editor.view.ViewPortSingle',
+        'Editor.view.QuickTip',
+        'Editor.view.QuickTipLoader',
         'Editor.model.ModelOverride', 
         'Editor.util.TaskActions',
         'Editor.util.messageBus.MessageBus',
@@ -122,18 +124,22 @@ Ext.application({
         }
     },
     init: function() {
+
         //enable json in our REST interface
         Ext.Ajax.setDefaultHeaders({
             'Accept': 'application/json'
         });
         //init the plugins namespace
         Ext.ns('Editor.plugins');
-        
+  
         //create and set the application state provider
-        var provider=Ext.create('Editor.util.HttpStateProvider');
+        var provider = Ext.create('Editor.util.HttpStateProvider');
         //load the store data directly. With this no initial store load is required (the app state can be applied directly)
         provider.store.loadRawData(Editor.data.app.configData ? Editor.data.app.configData : []);
         Ext.state.Manager.setProvider(provider);
+        
+        // the init of the QuickTips has to be done here otherwise it's too late to set the internal tip class
+        Ext.tip.QuickTipManager.init(true, { className: 'Editor.view.QuickTip' });
         
         this.callParent(arguments);
         this.logoutOnWindowClose();
@@ -151,8 +157,7 @@ Ext.application({
         var me = this,
             viewSize = Ext.getBody().getViewSize(),
             initMethod = Editor.data.app.initMethod;
-        
-            Ext.QuickTips.init();
+
             me.windowTitle = Ext.getDoc().dom.title;
         
             me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
@@ -172,7 +177,7 @@ Ext.application({
                     Editor.data.app.initState = 'edit';
                     initMethod = 'openEditor';
                 }
-            }else if(window.location.hash!=''){
+            }else if(window.location.hash !== ''){
                 initMethod = 'openAdministration';
             }
 
@@ -382,6 +387,9 @@ Ext.application({
         var me = this,
             mainTabs = me.viewport.down('> #adminMainSection');
 
+        if(Ext.isString(panel)) {
+            panel = me.viewport.down(panel);
+        }
         //what  happens if panel does not belong to the tabpanel?
         mainTabs.setActiveTab(panel);
         me.redirectTo(redirectRoute);
@@ -479,7 +487,7 @@ Ext.application({
      * when the segments-editor is opened
      */
     isEditTaskRoute:function(){
-        return window.location.hash.startsWith('#task') && window.location.hash.endsWith('/edit')
+        return window.location.hash.startsWith('#task') && window.location.hash.endsWith('/edit');
     },
 
     /***

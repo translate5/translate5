@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Formats a Segment List as a HTML table to be send as an E-Mail. 
+ * Formats a Segment List as a HTML table to be send as an E-Mail.
  */
 class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abstract
 {
@@ -53,9 +53,9 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
     
     /**
      * This vars are initialized lazy
-     * @var editor_Models_Segment_QmSubsegments
+     * @var editor_Models_Segment_Mqm
      */
-    protected $subSegmentConverter;
+    protected $mqmConverter;
     
     /**
      * replace the comment HTML Tags with <br>
@@ -78,7 +78,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
     protected function prepareSegment($content) {
         //remove full tags
         $content = preg_replace('#<span[^>]+class="full"[^>]*>[^<]*</span>#i', '', $content);
-        //replace short tag div span construct to a simple span 
+        //replace short tag div span construct to a simple span
         $content = preg_replace('#<div[^>]+>[\s]*<span([^>]+)class="short"([^>]*)>([^<]*)</span>[\s]*</div>#mi', '<span $1 $2 style="background-color:#39ffa3;">$3</span>', $content);
         //replace term divs by breaking apart to replace the class
         $parts = preg_split('#(<div[^>]+>)#i', $content, null, PREG_SPLIT_DELIM_CAPTURE);
@@ -89,14 +89,13 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             $parts[$idx] = $this->modifyTermTag($part);
         }
         $content = str_ireplace('</div>', '</span>', join('', $parts));
-        $qmSubFlags = $this->view->task->getQmSubsegmentFlags();
-        return $this->modifyQmSubsegments($content);
+        return $this->modifyMqmTags($content);
     }
     
     /**
      * replaces the current term tag with a span tag, containing styles instead css classes
      * In this method the current used term styles are adapted (see main.css)
-     * 
+     *
      * @param string $termTag
      * @return string
      */
@@ -126,7 +125,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
      * @param string $content
      * @return string
      */
-    protected function modifyQmSubsegments($content) {
+    protected function modifyMqmTags($content) {
         $translate = $this->view->translate;
         $resultRenderer = function($tag, $cls, $issueId, $issueName, $sev, $sevName, $comment) use ($translate){
             $title = empty($sevName) ? '' : htmlspecialchars($translate->_($sevName)).': ';
@@ -140,8 +139,8 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             return sprintf($span, $title, $issueId.']');
         };
         
-        return $this->subSegmentConverter->replace($this->view->task, $content, $resultRenderer);
-    } 
+        return $this->mqmConverter->replace($this->view->task, $content, $resultRenderer);
+    }
     
     /**
      * render the HTML Segment Table
@@ -149,14 +148,14 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
      */
     protected function render() {
         //the segments list should not be send to reviewers when the previous workflow step was translations
-        if(isset($this->view->triggeringRole) && $this->view->triggeringRole == editor_Workflow_Abstract::ROLE_TRANSLATOR){
+        if(isset($this->view->triggeringRole) && $this->view->triggeringRole == editor_Workflow_Default::ROLE_TRANSLATOR){
             return '';
         }
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         $stateMap = $states->getLabelMap();
         
-        $this->subSegmentConverter = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
+        $this->mqmConverter = ZfExtended_Factory::get('editor_Models_Segment_Mqm');
         $this->segmentUtility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
         
         $t = $this->view->translate;
@@ -188,7 +187,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
         $result = [];
         $result[] = '<br/>';
         $header = $t->_('Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />');
-        $header = str_replace('{previousRole}', $t->_($this->view->triggeringRole), $header);
+        $header = str_replace('{previousRole}', $t->_($this->view->triggeringStep), $header);
         
         $result[] = $header;
         
@@ -200,7 +199,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             $result[] = $th.$field.'</th>';
         }
         $result[] = $th.$t->_('Status').'</th>';
-        $result[] = $th.$t->_('QM').'</th>';
+        $result[] = $th.$t->_('Manuelle QS (ganzes Segment)').'</th>';
         $result[] = $th.$t->_('Bearbeitungsstatus').'</th>';
         $result[] = $th.$t->_('Matchrate').'</th>';
         $result[] = $th.$t->_('Kommentare').'</th>';
@@ -218,8 +217,8 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
                 $result[] = '<td valign="top">'.$this->prepareSegment($segment[$fieldName]).'</td>';
             }
             $result[] = '<td valign="top" nowrap="nowrap">'.$t->_($this->segmentUtility->convertStateId($segment['stateId'])).'</td>';
-            $qms = array_map($translateQm, $this->segmentUtility->convertQmIds($segment['qmId']));
-            $result[] = '<td valign="top" nowrap="nowrap">'.join(',<br />', $qms).'</td>';
+            $joinedQualities = (array_key_exists('qualities', $segment)) ? join(',<br />', $segment['qualities']) : '';
+            $result[] = '<td valign="top" nowrap="nowrap">'.$joinedQualities.'</td>';
             $result[] = '<td valign="top">'.$t->_($state).'</td>';
             $result[] = '<td valign="top">'.$segment['matchRate'].'%</td>';
             $result[] = '<td valign="top">'.$this->prepareComments($segment['comments']).'</td>';

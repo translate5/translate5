@@ -37,7 +37,7 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
         fieldStep: '#UT#Workflow Schritt',
         fieldUsername: '#UT#Benutzer',
         fieldTargets: '#UT#vorhandene Spalten',
-        fieldNotEditContent: '#UT#Nur MQM-tags bearbeiten',
+        fieldNotEditContent: '#UT#Nur manuelle QS im Segment bearbeiten',
         fieldAnonymous: '#UT#anonymisierte Zieltextspalten',
         fieldVisibility: '#UT#Sichtbarkeit nicht editierbarer Zieltextspalten',
         btnSave: '#UT#Speichern',

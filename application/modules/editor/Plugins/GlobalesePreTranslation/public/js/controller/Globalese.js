@@ -55,12 +55,12 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.controller.Globalese', {
       window.insertCard({
           xtype:'globaleseAuthPanel',
           //index where the card should appear in the group
-          groupIndex:2,
+          groupIndex:3,
       },'postimport');      
       window.insertCard({
           xtype:'globaleseSettingsPanel',
           //index where the card should appear in the group
-          groupIndex:3,
+          groupIndex:4,
       },'postimport');
   }
 });

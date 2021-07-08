@@ -72,7 +72,7 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
      */
     public function testTaskWorkCount() {
         $wordCount = self::$api->getTask()->wordCount;
-        $this->assertEquals(6, $wordCount, 'Task word count is not as expected!');
+        $this->assertEquals(66, $wordCount, 'Task word count is not as expected!');
         
         $this->checkAnalysis('edit100PercentMatch_false.txt');
         
@@ -90,7 +90,7 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
     
     
     /***
-     * Check and validate the analysis results. $validationFileName is file name constant (edit100PercentMatch_false and edit100PercentMatch_true) 
+     * Check and validate the analysis results. $validationFileName is file name constant (edit100PercentMatch_false and edit100PercentMatch_true)
      * which will switch the expected result to compare against.
      * @param string $validationFileName
      */
@@ -144,7 +144,6 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
         $params['pretranslateMatchrate']= 100;
         $params['pretranslateTmAndTerm']= 1;
         $params['pretranslateMt']= 1;
-        $params['termtaggerSegment']= 0;
         $params['isTaskImport']= 0;
         self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', 'PUT', $params,$params);
         error_log("Queue pretranslation and analysis.");
@@ -167,6 +166,7 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
             'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_Moses',
             'serviceName'=> 'Moses',
             'name' => 'API Testing::MosesMt_'.__CLASS__.'_'.$sufix

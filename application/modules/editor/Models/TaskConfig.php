@@ -38,6 +38,7 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
+    
     protected $dbInstanceClass = "editor_Models_Db_TaskConfig";
     protected $validatorInstanceClass = "editor_Models_Validator_TaskConfig";
     
@@ -46,7 +47,7 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
      * Internal cache task config cache
      * @var Zend_Config
      */
-    protected static $taskCustomerConfig=[];
+    protected static $taskCustomerConfig = [];
     
     /***
      *  Return all task specific configs for the given task guid.
@@ -63,6 +64,25 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
         if(isset(self::$taskCustomerConfig[$taskGuid])){
             return self::$taskCustomerConfig[$taskGuid];
         }
+        // retrieves all DB Configs for the task, already overwritten by level
+        $configModel = $this->getTaskConfigModel($taskGuid);
+        
+        $configOperator = ZfExtended_Factory::get('ZfExtended_Resource_DbConfig');
+        /* @var $configOperator ZfExtended_Resource_DbConfig */
+        $configOperator->initDbOptionsTree($configModel);
+        
+        $taskConfig = new Zend_Config($configOperator->getDbOptionTree());
+        $taskConfig->setReadOnly();
+        //cache the config for this request
+        self::$taskCustomerConfig[$taskGuid] = $taskConfig;
+        return self::$taskCustomerConfig[$taskGuid];
+    }
+    /**
+     * Internal API to fetch the raw task's config from DB
+     * @param string $taskGuid
+     * @return array
+     */
+    private function getTaskConfigModel(string $taskGuid){
         $configModel = ZfExtended_Factory::get('editor_Models_Config');
         /* @var $configModel editor_Models_Config */
         
@@ -73,19 +93,10 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
         //for merge set config name as array key
         $base = $configModel->nameAsKey($base);
         
-        //merge task overwrites with task customer overwrites
-        $result = $configModel->mergeTaskValues($taskGuid,$base);
-        
-        $configOperator = ZfExtended_Factory::get('ZfExtended_Resource_DbConfig');
-        /* @var $configOperator ZfExtended_Resource_DbConfig */
-        $configOperator->initDbOptionsTree($result);
-        $taskConfig = new Zend_Config($configOperator->getDbOptionTree());
-        $taskConfig->setReadOnly();
-        //cache the config for this request
-        self::$taskCustomerConfig[$taskGuid] = $taskConfig;
-        return self::$taskCustomerConfig[$taskGuid];
+        // merge task overwrites with task customer overwrites
+        $result = $configModel->mergeTaskValues($taskGuid, $base);
+        return $result;
     }
-    
     /***
      * Load all configs for given taskGuid
      * @param string $taskGuid
@@ -143,8 +154,8 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
     public function getCurrentValue(string $taskGuid, string $name): ?string {
         try {
             $s = $this->db->select()
-            ->where('taskGuid = ?', $taskGuid)
-            ->where('name = ?', $name);
+                ->where('taskGuid = ?', $taskGuid)
+                ->where('name = ?', $name);
             $row = $this->db->fetchRow($s);
         } catch (Exception $e) {
             return null;
@@ -153,5 +164,37 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
             return null;
         }
         return $row['value'];
+    }
+    /**
+     * Fixes the config for a task after Import.
+     * This means, that all configs with task-import-level will be inserted to the task-config table and thus never can be changed again in the lifetime of the task after import
+     */
+    public function fixAfterImport(string $taskGuid){
+        $db = $this->db->getAdapter();
+        // evaluate the configs to fix
+        $newRows = [];
+        $taskConfigs = $this->getTaskConfigModel($taskGuid);
+        foreach($taskConfigs as $config){
+            // TODO AUTOQA: Do we have to add editor_Models_Config::CONFIG_LEVEL_TASK as well ??
+            if($config['level'] == editor_Models_Config::CONFIG_LEVEL_TASKIMPORT){
+                $newRows[] = '('.$db->quote($taskGuid).','.$db->quote($config['name']).','.$db->quote($config['value']).')';
+            }
+        }        
+        // remove the current configs
+        $sql = 'DELETE FROM `LEK_task_config` WHERE taskGuid = '.$db->quote($taskGuid).';';
+        $db->query($sql);
+        
+        // write the ones to fix
+        if(count($newRows) > 0){
+            $sql = 'INSERT INTO `LEK_task_config` (`taskGuid`, `name`, `value`) VALUES '.implode(',', $newRows);
+            $db->query($sql);
+        }
+    }
+
+    /***
+     * Clean the internal config cache variable
+     */
+    public function cleanConfigCache(){
+        self::$taskCustomerConfig = [];
     }
 }

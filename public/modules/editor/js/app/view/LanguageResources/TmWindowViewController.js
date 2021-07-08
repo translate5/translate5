@@ -50,7 +50,6 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     onTmWindowRender:function(){
         var me=this,
             view=me.getView(),
-            resourcesCustomers=view.down('#resourcesCustomers'),
             sdlStore=Ext.StoreManager.get('sdlEngine');
 
         if(sdlStore){
@@ -59,22 +58,8 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         }
         
         view.getViewModel().set('uploadLabel',view.strings.file);
-        me.mergeCustomersToDefault();
-        resourcesCustomers.getStore().on({
-            load:{
-                fn:me.onResourceCustomersStoreLoad,
-                scope:me
-            }
-        })
     },
 
-    /***
-     * On resource customers load event handler
-     */
-    onResourceCustomersStoreLoad:function(){
-        this.mergeCustomersToDefault();
-    },
-    
     /**
      * Resource combo handler
      */
@@ -83,6 +68,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
             view=me.getView(),
             uploadField=view.down('filefield[name="tmUpload"]'),
             serviceName=field.getSelection() && field.getSelection().get('serviceName'),
+            resourceType=field.getSelection() && field.getSelection().get('resourceType'),
             helppage = field.getSelection() && field.getSelection().get('helppage'),
             vm=view.getViewModel(),
             sdlEngineCombo=view.down('#sdlEngine');
@@ -92,6 +78,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         }
         
         vm.set('serviceName',serviceName);
+        vm.set('resourceType',resourceType);
 
         var resourcesStore=Ext.StoreManager.get('Editor.store.LanguageResources.Resources'),
             isSdl=me.isSdlResource(),
@@ -187,53 +174,25 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         me.filterEngines();
     },
 
-    onCustomersTagFieldChange:function(field,newValue,oldValue,eOpts){
-        this.mergeCustomersToDefault();
+    onCustomersTagFieldChange:function(field,newValue){
+        var me=this;
+        // filter out all selected customers in useAsDefault which are not available in the current selection
+        me.removeNotAvailableCustomers(me.getView().down('#useAsDefault'),newValue);
     },
 
-    /**
-     * Add all selected customers from the customers tag field, as select option to the default customers field
+    onCustomersReadTagFieldChange:function(field,newValue){
+        var me=this;
+        // filter out all selected customers in writeAsDefault which are not available in the current selection
+        me.removeNotAvailableCustomers(me.getView().down('#writeAsDefault'),newValue);
+    },
+
+    /***
+     * Remove the selected options in child which are not available in the source
+     * @param child
+     * @param source
      */
-    mergeCustomersToDefault:function(){
-        var me=this,
-            record=me.getView().down('form').getRecord(),
-            resourcesCustomers=me.getView().down('#resourcesCustomers'),
-            asDefaultField=me.getView().down('#useAsDefault'),
-            defaultStore=asDefaultField.getStore(),
-            selection = resourcesCustomers.getPicker().getSelectionModel().getSelection(),
-            asDefaultSelection=asDefaultField.getValue(),
-            records=[],
-            selectedValues=[];
-        
-        if(!asDefaultSelection || asDefaultSelection.length<1 && record){
-            asDefaultSelection=record.get('customerUseAsDefaultIds');
-        }
-        //INFO: bevause of extjs bug, unable to use the selected records from the customers as model data to the defaultCustomers store
-        //https://www.sencha.com/forum/showthread.php?304305-Uncaught-TypeError-Cannot-read-property-internalId-of-undefined
-        //collect all selected customers to additional array
-        selection.forEach(function(r){
-            records.push({
-                id:r.get('id'),
-                name:r.get('name'),
-            });
-
-            //find all allready selected available values
-            asDefaultSelection.forEach(function(sv){
-                if(sv==r.get('id')){
-                    selectedValues.push(sv);
-                }
-            });
-        });
-        
-        //clean the selected values
-        asDefaultField.clearValue();
-        //clean the store
-        defaultStore.removeAll();
-
-        //add the available customers
-        defaultStore.add(records);
-        //apply the merged selected values
-        asDefaultField.setValue(selectedValues);
+    removeNotAvailableCustomers:function(child,source){
+        child.setValue(Ext.Array.intersect(child.getValue(),source));
     },
 
     /**
@@ -261,14 +220,14 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
 
         //preselect when only one result is filtered
         engineComboStore.on({
-            filterchange:function (sdlstore,filters,eOpts){
-                if(sdlstore.getData().length==1){
+            filterchange:function (sdlstore){
+                if(sdlstore.getData().length === 1){
                     engineComboField.suspendEvents();
                     engineComboField.setSelection(sdlstore.getAt(0));
                     engineComboField.resumeEvents();
                 }
             }
-        })
+        });
 
         //clean the selected value in the sdl combo
         engineComboField.suspendEvents();

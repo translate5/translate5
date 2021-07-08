@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -28,48 +28,36 @@ END LICENSE AND COPYRIGHT
 
 
 class editor_Plugins_PangeaMt_Init extends ZfExtended_Plugin_Abstract {
+    protected static $description = 'Provides connector to PangeaMT (offered by Pangeanic)';
     
     /**
      * @var editor_Plugins_PangeaMt_Service
      */
-    protected $service;
-    
-    /**
-     * @var string
-     */
-    protected $serviceType;
-    
-    /**
-     * @var string
-     */
-    protected $serviceName;
-    
-    /**
-     * @var string
-     */
-    protected $serviceColor;
-    
+    protected editor_Plugins_PangeaMt_Service $service;
+
     /**
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
      * @var array
      */
-    protected $frontendControllers = array(
+    protected $frontendControllers = [
         'pluginPangeaMtMain' => 'Editor.plugins.PangeaMt.controller.Main',
-    );
+    ];
     
     public function init() {
-        $this->validateConfig(); // provide user with infos in case the plugin is not configured completely
-        
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
         $serviceManager->addService('editor_Plugins_PangeaMt');
         
         $this->service = ZfExtended_Factory::get('editor_Plugins_PangeaMt_Service');
         /* @var $service editor_Plugins_PangeaMt_Service */
-        
-        if ($this->validateConfig()) {
-            $this->initEvents();
+
+        // If the plugin is not configured, remove the front-end controllers
+        if (!$this->validateConfig()) {
+            $this->frontendControllers = [];
+            return;
         }
+        // init the events only if the plugin is configured.
+        $this->initEvents();
     }
     
     /**
@@ -94,37 +82,24 @@ class editor_Plugins_PangeaMt_Init extends ZfExtended_Plugin_Abstract {
     }
     
     /**
-     * This init code may throw exceptions which are then handled by the calling place 
-     */
-    protected function initThrowable() {
-        $this->serviceType  = $this->service->getServiceNamespace();
-        $this->serviceName  = $this->service->getName();
-        $this->serviceColor = $this->service->getDefaultColor();
-    }
-    
-    /**
      * Check if the user has configured the plug-in so that it can be used.
      * If not, provide information what's missing.
      * Returns true if everything the plug-in needs is configured; otherwise false.
      * @return boolean
      */
-    protected function validateConfig() {
+    protected function validateConfig(): bool{
         try {
             $config = $this->getConfig()->toArray();
         } catch(ZfExtended_Plugin_Exception $e){
             $config = null;
         }
-        $logger = Zend_Registry::get('logger');
         if(empty($config)) {
-            //$logger->error('E1270', 'PangeaMT Plug-In: No config given.');
             return false;
         }
         if(empty($config['server'])) {
-            //$logger->error('E1271', 'PangeaMT Plug-In: API-Server is not defined.');
             return false;
         }
         if(empty($config['apikey'])) {
-            //$logger->error('E1272', 'PangeaMT Plug-In: Apikey is not defined.');
             return false;
         }
         return true;

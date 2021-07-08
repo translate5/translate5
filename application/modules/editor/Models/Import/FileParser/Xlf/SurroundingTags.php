@@ -75,7 +75,7 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTags {
         // 1. because it checks for same tags in source and target
         // 2. because we need the tags from source to be added as leading / trailing in target
         $target = $xmlparser->join($targetChunks);
-        if(empty($target)) {
+        if(empty($target) && $target !== "0") {
             $targetChunks = $sourceChunks;
         }
         

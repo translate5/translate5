@@ -68,6 +68,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },{
         ref:'projectTaskGrid',
         selector:'#projectTaskGrid'
+    },{
+        ref: 'taskAddWindow',
+        selector: '#adminTaskAddWindow'
     }],
     TASK_STATE_ANALYSIS: 'matchanalysis',
     strings:{
@@ -85,7 +88,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         pretranslateTmAndTermTooltip:'#UT#Treffer aus der Terminologie werden bevorzugt vorübersetzt.',
         pretranslateMt:'#UT#Vorübersetzen (MT)',
         pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt',
-        termtaggerSegment:'#UT#Terminologie prüfen und markieren',
         analysisLoadingMsg:'#UT#Analyse läuft'
     },
     
@@ -112,7 +114,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         },
         controller:{
             '#admin.TaskOverview':{
-                taskCreated:'onTaskCreated'
+                taskCreated:'onTaskCreated',
+                wizardCardImportDefaults:'onWizardCardImportDefaults'
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -123,6 +126,14 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 load:'onLanguageResourcesTaskAssocStoreLoad'
             }
         }
+    },
+
+    /***
+     * Queue the analysis when the import with defaults button is clicked
+     * @param task
+     */
+    onWizardCardImportDefaults: function (task) {
+        this.startAnalysis(task.get('id'),'pretranslation');
     },
 
     /***
@@ -170,7 +181,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         window.insertCard({
             xtype:'languageResourcesWizardPanel',
             //index where the card should appear in the group
-            groupIndex:1,
+            groupIndex:2,
             listeners:{
                 activate:{
                     fn:me.onLanguageResourcesWizardPanelActivate,
@@ -259,7 +270,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                             disabled:'{!hasTmOrCollection}'
                         },
                         value: 1,
-                        cls:'checkBoxLableInfoIcon',
+                        cls:'lableInfoIcon',
                         boxLabel:me.strings.pretranslateTmAndTerm,
                         autoEl: {
                             tag: 'div',
@@ -281,7 +292,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                         value:100,
                         displayField: 'value',
                         valueField: 'id',
-                        queryMode: 'local',
+                        queryMode: 'local'
                     }
                 ]
             },{
@@ -290,26 +301,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                     disabled:'{!hasMt}'
                 },
                 value: 1,
-                cls:'checkBoxLableInfoIcon',
+                cls:'lableInfoIcon',
                 boxLabel:me.strings.pretranslateMt,
                 autoEl: {
                     tag: 'div',
                     'data-qtip': me.strings.pretranslateMtTooltip
                 },
-                itemId:'pretranslateMt',
-            },{
-                xtype:'checkbox',
-                bind:{
-                    disabled:'{!hasTermcollection}'
-                },
-                value: 1,
-                cls:'checkBoxLableInfoIcon',
-                boxLabel:me.strings.termtaggerSegment,
-                autoEl: {
-                    tag: 'div',
-                    'data-qtip': me.strings.termtaggerSegment
-                },
-                itemId:'termtaggerSegment',
+                itemId:'pretranslateMt'
             }]
         }]);
     },
@@ -370,14 +368,17 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     /***
      * Start the match analysis or pretranslation for the taskId.
-     * Operation can contains: 
+     * Operation can contains:
      *    'analysis' -> runs only match analysis
      *    'pretranslation' -> runs match analysis with pretranslation
+     *
+     * @param taskId
+     * @param operation
      */
     startAnalysis:function(taskId,operation){
         //'editor/:entity/:id/operation/:operation',
         var me = this;
-        
+
         me.fireEvent('beforeStartAnalysis',taskId,operation);
 
         Ext.Ajax.request({
@@ -388,7 +389,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 pretranslateMatchrate: me.getComponentByItemId('cbMinMatchrate').getValue(),
                 pretranslateTmAndTerm: me.isCheckboxChecked('pretranslateTmAndTerm'),
                 pretranslateMt: me.isCheckboxChecked('pretranslateMt'),
-                termtaggerSegment: me.isCheckboxChecked('termtaggerSegment'),
                 isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0,
                 batchQuery:me.isCheckboxChecked('batchQuery')
             },
@@ -396,7 +396,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             failure: function(response){
                 Editor.app.getController('ServerException').handleException(response);
             }
-        })
+        });
     },
     
     /***

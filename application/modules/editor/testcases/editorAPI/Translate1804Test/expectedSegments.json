@@ -5,10 +5,9 @@
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
-        "pretrans": "1",
+        "pretrans": "0",
         "matchRate": "100",
         "matchRateType": "import;interactive",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "0",
         "fileOrder": "0",
@@ -24,7 +23,8 @@
         "targetEdit": "0",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":1}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":1}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "2",
@@ -32,10 +32,9 @@
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
-        "pretrans": "1",
+        "pretrans": "0",
         "matchRate": "100",
         "matchRateType": "import;auto-aligned",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "0",
         "fileOrder": "0",
@@ -51,7 +50,8 @@
         "targetEdit": "0",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":1}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":1}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "3",
@@ -59,10 +59,9 @@
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
-        "pretrans": "1",
+        "pretrans": "0",
         "matchRate": "100",
         "matchRateType": "import;auto-aligned",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "0",
         "fileOrder": "0",
@@ -78,7 +77,8 @@
         "targetEdit": "0",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":1}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "4",
@@ -86,10 +86,9 @@
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
-        "pretrans": "1",
+        "pretrans": "0",
         "matchRate": "100",
         "matchRateType": "import;auto-aligned",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "4",
         "fileOrder": "0",
@@ -105,7 +104,8 @@
         "targetEdit": "",
         "targetEditToSort": "",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":0}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "5",
@@ -113,10 +113,9 @@
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
-        "pretrans": "1",
+        "pretrans": "0",
         "matchRate": "100",
         "matchRateType": "import;auto-aligned",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "4",
         "fileOrder": "0",
@@ -132,7 +131,8 @@
         "targetEdit": "",
         "targetEditToSort": "",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":0}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "6",
@@ -143,7 +143,6 @@
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;none",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "0",
         "fileOrder": "1",
@@ -160,6 +159,7 @@
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":1}}}}",
         "isWatched": false,
+        "isRepeated": 3,
         "isFirstofFile": true
     },
     {
@@ -171,7 +171,6 @@
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;empty",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "4",
         "fileOrder": "1",
@@ -187,7 +186,8 @@
         "targetEdit": "",
         "targetEditToSort": "",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":0}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     },
     {
         "segmentNrInTask": "8",
@@ -198,7 +198,6 @@
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;empty",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "4",
         "fileOrder": "1",
@@ -214,6 +213,7 @@
         "targetEdit": "",
         "targetEditToSort": "",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":0}}}}",
-        "isWatched": false
+        "isWatched": false,
+        "isRepeated": 3
     }
 ]

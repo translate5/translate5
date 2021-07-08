@@ -30,23 +30,12 @@ END LICENSE AND COPYRIGHT
  * Initial Class of Plugin "TermTagger"
  */
 class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
+    protected static $description = 'Provides term-tagging';
+    
     /**
      * @var ZfExtended_Logger
      */
     protected $log;
-    
-    /**
-     * Fieldname of the source-field of this task
-     * @var string
-     */
-    private $sourceFieldName = '';
-    
-    /**
-     * Fieldname of the source-field of this task if the task is editable
-     * @var string
-     */
-    private $sourceFieldNameOriginal = '';
-    
     /**
      * @var editor_Plugins_TermTagger_RecalcTransFound
      */
@@ -58,12 +47,12 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         if(!$this->assertConfig()) {
             return false;
         }
+        // Adds our Quality Provider to the global Quality Manager
+        editor_Segment_Quality_Manager::registerProvider('editor_Plugins_TermTagger_QualityProvider');
         
         // event-listeners
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),100);
         $this->eventManager->attach('editor_Models_Import_SegmentProcessor_Review', 'process', array($this, 'handleSegmentImportProcess'));
         $this->eventManager->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
-        $this->eventManager->attach('editor_Models_Segment_Updater', 'beforeSegmentUpdate', array($this, 'handleBeforeSegmentUpdate'));
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
         
@@ -87,7 +76,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         
         /* @var $attributes editor_Models_Import_FileParser_SegmentAttributes */
         if(!$attributes->editable && !$config->runtimeOptions->termTagger->tagReadonlySegments) {
-            $attributes->customMetaAttributes['termtagState'] = editor_Plugins_TermTagger_Worker_Abstract::SEGMENT_STATE_IGNORE;
+            $attributes->customMetaAttributes['termtagState'] = editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_IGNORE;
         }
     }
     
@@ -107,8 +96,8 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterTermCollectionAssocChange(Zend_EventManager_Event $event){
-        $entity=$event->getParam('entity');
         
+        $entity = $event->getParam('entity');
         $entityGuid = $entity->getTaskGuid();
 
         $task = ZfExtended_Factory::get('editor_Models_Task');
@@ -118,7 +107,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $taskGuids = [$task->getTaskGuid()];
         //check if the current task is project.
         if($task->isProject()){
-            //collect all project tasks to check the terminologie 
+            //collect all project tasks to check the terminologie
             $taskGuids = $task->loadProjectTasks($task->getProjectId(),true);
             $taskGuids = array_column($taskGuids, 'taskGuid');
         }
@@ -168,192 +157,10 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         }
         return true;
     }
-    
-    /**
-     * Queues the termtagger worker after import
-     *
-     * @param Zend_EventManager_Event $event
-     * @return void|boolean
-     */
-    public function handleAfterTaskImport(Zend_EventManager_Event $event) {
-        $config = Zend_Registry::get('config');
-        $c = $config->runtimeOptions->termTagger->switchOn->import;
-        if((boolean)$c === false) {
-            return;
-        }
-        $task = $event->getParam('task');
-        /* @var $task editor_Models_Task */
-        if (!$task->getTerminologie()) {
-            return;
-        }
-        
-        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
-        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
-        
-        // Create segments_meta-field 'termtagState' if not exists
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-        /* @var $meta editor_Models_Segment_Meta */
-        $meta->addMeta('termtagState', $meta::META_TYPE_STRING, $worker::SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
-        
-        $this->lockOversizedSegments($task, $meta, $config);
-        
-        // init worker and queue it
-        $params = ['resourcePool' => 'import'];
-        if (!$worker->init($task->getTaskGuid(), $params)) {
-            $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [
-                'parameters' => $params,
-            ]);
-            return false;
-        }
-        $worker->queue($event->getParam('parentWorkerId'));
-    }
-    
-    /**
-     * Find oversized segments and mark them as oversized
-     *
-     * @param editor_Models_Task $task
-     * @param editor_Models_Segment_Meta $meta
-     * @param Zend_Config $config
-     */
-    protected function lockOversizedSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta, Zend_Config $config) {
-        $maxWordCount = $config->runtimeOptions->termTagger->maxSegmentWordCount ?? 150;
-        $meta->db->update([
-            'termtagState' => editor_Plugins_TermTagger_Worker_TermTaggerImport::SEGMENT_STATE_OVERSIZE
-        ], [
-            'taskGuid = ?' => $task->getTaskGuid(),
-            'sourceWordCount >= ?' => $maxWordCount,
-        ]);
-    }
-    
-    /**
-     * Re-TermTag the (modified) segment-text.
-     */
-    public function handleBeforeSegmentUpdate(Zend_EventManager_Event $event) {
-        $config = Zend_Registry::get('config');
-        $c = $config->runtimeOptions->termTagger->switchOn->GUI;
-        if((boolean)$c === false) {
-            return;
-        }
-        
-        $segment = $event->getParam('entity');
-        
-        /* @var $segment editor_Models_Segment */
-        $taskGuid = $segment->getTaskGuid();
-        
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        
-        // stop if task has equal source/target languages
-        if(editor_Plugins_TermTagger_Worker_Abstract::isSourceAndTargetLanguageEqual($task)){
-            return;
-        }
-        
-        // stop if task has no terminologie
-        if (!$task->getTerminologie()||!$segment->isDataModified()) {
-            return;
-        }
-
-        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
-        /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
-        
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
-        
-        if($segment->meta()->getTermtagState() == $worker::SEGMENT_STATE_OVERSIZE) {
-            $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden: Das Segment ist zu lang.');
-            return false;
-        }
-        
-        $serverCommunication = $this->fillServerCommunication($task, $segment);
-        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        
-        $params = ['serverCommunication' => $serverCommunication, 'resourcePool' => 'gui'];
-        if (!$worker->init($taskGuid, $params)) {
-            $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [
-                'parameters' => $params,
-            ]);
-            return false;
-        }
-        
-        if (!$worker->run()) {
-            $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
-            return false;
-        }
-        
-        $results = $worker->getResult();
-        $sourceTextTagged = false;
-        foreach ($results as $result) {
-            if ($result->field == 'SourceOriginal') {
-                $segment->set($this->sourceFieldNameOriginal, $result->source);
-                continue;
-            }
-            
-            if (!$sourceTextTagged) {
-                $segment->set($this->sourceFieldName, $result->source);
-                $sourceTextTagged = true;
-            }
-            
-            $segment->set($result->field, $result->target);
-        }
-        
-        return true;
-    }
-    
-    /**
-     * inclusive all fields of the provided $segment
-     * Creates a ServerCommunication-Object initialized with $task
-     *
-     * @param editor_Models_Task $task
-     * @param editor_Models_Segment $segment
-     * @return editor_Plugins_TermTagger_Service_ServerCommunication
-     */
-    private function fillServerCommunication (editor_Models_Task $task, editor_Models_Segment $segment) {
-        
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
-        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        
-        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $fieldManager editor_Models_SegmentFieldManager */
-        $fieldManager->initFields($task->getTaskGuid());
-        
-        $this->sourceFieldName = $fieldManager->getFirstSourceName();
-        $sourceText = $segment->get($this->sourceFieldName);
-        
-        if ($task->getEnableSourceEditing()) {
-            $this->sourceFieldNameOriginal = $this->sourceFieldName;
-            $sourceTextOriginal = $sourceText;
-            $this->sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
-            $sourceText = $segment->get($this->sourceFieldName);
-        }
-        
-        $fields = $fieldManager->getFieldList();
-        $firstField = true;
-        foreach ($fields as $field) {
-            if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
-                continue;
-            }
-            
-            $targetFieldName = $fieldManager->getEditIndex($field->name);
-            
-            // if source is editable compare original Source with first targetField
-            if ($firstField && $task->getEnableSourceEditing()) {
-                $serverCommunication->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($targetFieldName));
-                $firstField = false;
-            }
-            
-            $serverCommunication->addSegment($segment->getId(), $targetFieldName, $sourceText, $segment->get($targetFieldName));
-        }
-        
-        return $serverCommunication;
-    }
-    
     /**
      * is called periodically to check the term tagger instances
      */
     public function handleTermTaggerCheck() {
-        $memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
-        
         $status = $this->termtaggerState();
         $serverList = [];
         $offline = [];
@@ -363,8 +170,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
                 $offline[] = $url;
             }
         }
-        //update the block list of not available term taggers
-        $memCache->save($offline, editor_Plugins_TermTagger_Worker_Abstract::TERMTAGGER_DOWN_CACHE_KEY);
+        editor_Plugins_TermTagger_Configuration::saveDownListToMemCache($offline);
         if(!$status->runningAll) {
             $this->log->error('E1125', 'TermTagger DOWN: one or more configured TermTagger instances are not available: {serverList}', [
                 'serverList' => join('; ', $serverList),
@@ -408,7 +214,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleBeforeSaveAlike(Zend_EventManager_Event $event) {
-        $isSourceEditable = (boolean) $event->getParam('isSourceEditable');
         $masterSegment = $event->getParam('masterSegment');
         /* @var $masterSegment editor_Models_Segment */
         $alikeSegment = $event->getParam('alikeSegment');

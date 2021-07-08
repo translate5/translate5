@@ -40,125 +40,119 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.MetaPanel', {
     alias: 'widget.segmentsMetapanel',
     extend: 'Ext.panel.Panel',
-
     bodyPadding: 10,
     scrollable: 'y',
     frameHeader: false,
     id: 'segment-metadata',
-    itemId:'editorSegmentsMetaData',
     strings:{
         title: '#UT#Segment-Metadaten',
     },
-
+    segmentStateId: -1, // caches the segment state to safely capture user originating radio changes. ExtJs suspendEvent && resumeEvent do not work for radios :-(
     layout: 'auto',
-    item_metaQm_title: '#UT#QM',
-    //Item Strings:
-    item_metaStates_title: '#UT#Status',
+
     item_metaTerms_title: '#UT#Terminologie',
+    item_metaStates_title: '#UT#Status',
     item_metaStates_tooltip: '#UT#Segment auf den ausgewählten Status setzen (ALT + S danach {0})',
     item_metaStates_tooltip_nokey: '#UT#Segment auf den ausgewählten Status setzen',
     
     initComponent: function() {
-      var me = this,
-          showStatus = Editor.app.getTaskConfig('segments.showStatus'),
-          showQM = Editor.app.getTaskConfig('segments.showQM');
-          
-      Ext.applyIf(me, {
-        title:me.title,
-        items: [
-          {
-            xtype: 'form',
-            border: 0,
-            itemId: 'metaInfoForm',
+        var me = this,
+              showStatus = Editor.app.getTaskConfig('segments.showStatus');
+              
+        Ext.applyIf(me, {
+            title:me.title,
             items: [{
-                  xtype: 'fieldset',
-                  itemId: 'metaTerms',
-                  collapsible: true,
-                  title: me.item_metaTerms_title,
-                  anchor: '100%',
-                  items: [
-                    {
-                      autoScroll: true,
-                      xtype: 'panel',
-                      border: 0,
-                      minHeight: 60, //needed so that loader is fully shown on segments without terms
-                      itemId: 'metaTermPanel',
-                      cls: 'metaTermPanel',
-                      loader: {
-                        url: Editor.data.restpath+'segment/terms',
-                        loadMask: true,
-                        renderer: 'html'
-                      }
-                    }
-                  ]
-              },
-              {
-                xtype: 'fieldset',
-                itemId: 'metaQm',
-                defaultType: 'radio',
-                collapsible: true,
-                hideable: showQM, 
-                hidden:  !showQM,
-                title: me.item_metaQm_title
-              },
-              {
-                xtype: 'fieldset',
-                itemId: 'metaStates',
-                collapsible: true,
-                defaultType: 'radio',
-                hideable: showStatus, 
-                hidden:  !showStatus,
-                title: me.item_metaStates_title
+                xtype: 'form',
+                border: 0,
+                itemId: 'metaInfoForm',
+                items: [{
+                      xtype: 'fieldset',
+                      itemId: 'metaTerms',
+                      collapsible: true,
+                      title: me.item_metaTerms_title,
+                      anchor: '100%',
+                      items: [{
+                          autoScroll: true,
+                          xtype: 'panel',
+                          border: 0,
+                          minHeight: 60, //needed so that loader is fully shown on segments without terms
+                          itemId: 'metaTermPanel',
+                          cls: 'metaTermPanel',
+                          loader: {
+                              url: Editor.data.restpath+'segment/terms',
+                              loadMask: true,
+                              renderer: 'html'
+                          }
+                      }]
+                  },{
+                      xtype: 'falsePositives',
+                      itemId: 'falsePositives',
+                      collapsible: true
+                  },{
+                      xtype: 'segmentQm',
+                      itemId: 'segmentQm',
+                      collapsible: true
+                  },{
+                      xtype: 'fieldset',
+                      itemId: 'metaStates',
+                      collapsible: true,
+                      defaultType: 'radio',
+                      hidden:  !showStatus,
+                      title: me.item_metaStates_title
+                  }]
               }
-            ]
-          }
-        ]
+          ]
       });
-
       me.callParent(arguments);
-      me.addQualityFlags();
-      me.addStateFlags();
+      me.addSegmentStateFlags();
+      me.down('#segmentQm').startTaskEditing();
     },
     /**
      * Fügt anhand der php2js Daten die Status Felder hinzu
      */
-    addStateFlags: function() {
+    addSegmentStateFlags: function() {
         var me = this,
             stati = me.down('#metaStates'),
             flags = Editor.data.segments.stateFlags,
             counter = 1;
         
         Ext.each(flags, function(item){
-            var tooltip; 
+            var tooltip;
             if(counter < 10) {
                 tooltip = Ext.String.format(me.item_metaStates_tooltip, counter++);
-            }
-            else {
+            } else {
                 tooltip = me.item_metaStates_tooltip_nokey;
             }
-          stati.add({
-            name: 'stateId',
-            anchor: '100%',
-            inputValue: item.id,
-            boxLabel: '<span data-qtip="'+tooltip+'">'+item.label+'</span>'
-          });
+            stati.add({
+                xtype: 'radio',
+                name: 'stateId',
+                anchor: '100%',
+                inputValue: item.id,
+                boxLabel: '<span data-qtip="'+tooltip+'">'+item.label+'</span>',
+                listeners:{
+                    change: function(control, checked){
+                        if(checked && me.segmentStateId != control.inputValue){
+                            me.fireEvent('segmentStateChanged', control.inputValue, me.segmentStateId);
+                            me.segmentStateId = control.inputValue;
+                        }
+                    }
+                }
+            });
         });
     },
     /**
-     * Fügt anhand der php2js Daten die QM Felder hinzu
+     * Has to be called before our form's record update to be able to distinguish user generated change events from programmatical ones. Sadly, suspending/resuming change events does not work
      */
-    addQualityFlags: function() {
-      var me = this,
-      qm = me.down('#metaQm'),
-      flags = Editor.data.segments.qualityFlags;
-      Ext.each(flags, function(item){
-        qm.add({
-          xtype: 'checkbox',
-          name: 'qmId', 
-          anchor: '100%',
-          inputValue: item.id,
-          boxLabel: item.label
+    setSegmentStateId: function(stateId){
+        this.segmentStateId = stateId;
+    },
+    /**
+     * Sets the state by keyboard value
+     */
+    showSegmentStateId: function(stateId){
+        var boxes = this.query('#metaStates radio');
+        Ext.each(boxes, function(box){
+            box.setValue(box.inputValue == stateId);
         });
-      });
     }
   });

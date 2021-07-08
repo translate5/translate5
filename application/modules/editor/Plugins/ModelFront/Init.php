@@ -30,13 +30,20 @@ END LICENSE AND COPYRIGHT
  * Info: the ModelFront plugin depends on the MatchAnalysis plugin (MatchAnalysis plugin must be active when ModelFront plugin is active).
  */
 class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
-    
+    protected static $description = 'Provides the risk prediction functionality, as offered by ModelFront.';
+
+    /***
+     * @var ZfExtended_Logger
+     */
+    protected ZfExtended_Logger $logger;
+
     /**
      * {@inheritDoc}
      * @see ZfExtended_Plugin_Abstract::init()
      */
     public function init() {
         $this->initEvents();
+        $this->logger = Zend_Registry::get('logger')->cloneMe('plugin.modelfront');
     }
     
     /**
@@ -70,11 +77,12 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
             $this->queueWorker(is_array($task) ? $task['taskGuid'] : $task->getTaskGuid());
         }
     }
-    
+
     /***
-     * After languagersources query action event handler
+     * After language resource query action event handler
      * @param Zend_EventManager_Event $event
-     * @return boolean
+     * @return void
+     * @throws Zend_Exception
      */
     public function handleAfterQueryAction(Zend_EventManager_Event $event){
         $view = $event->getParam('view');
@@ -94,28 +102,31 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
         $task=ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid((string) $session->taskGuid);
-        
+
+        $risk = $this->getRiskPredictionInstance($task);
+        if(empty($risk)){
+            return;
+        }
+
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $metaData=new stdClass();
         $metaData->name=$translate->_('Matchrate');
         $metaData->value='ModelFront';
+
         foreach ($view->rows as &$row){
             try {
-                $risk=ZfExtended_Factory::get('editor_Plugins_ModelFront_TranslationRiskPrediction',[$task]);
-                /* @var $risk editor_Plugins_ModelFront_TranslationRiskPrediction */
                 //INFO: in mt resources source should be the same as the searched string
                 $matchRate=round($risk->riskToMatchrate($row->source, $row->target));
                 $row->matchrate=$matchRate < 1 ? 1 : $matchRate;
-                
+
                 if(!is_array($row->metaData)){
                     settype($row->metaData, 'array');
                 }
-                //add aditional info about the matchrate source
+                // add additional info about the matchrate source
                 $row->metaData[]=$metaData;
             } catch (editor_Plugins_ModelFront_Exception $e) {
-                $logger = Zend_Registry::get('logger')->cloneMe('plugin.modelfront');
-                $logger->exception($e, [
-                    'level' => $logger::LEVEL_WARN
+                $this->logger->exception($e, [
+                    'level' => $this->logger::LEVEL_WARN
                 ]);
                 continue;
             }
@@ -126,33 +137,59 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
      * After segment is pretranslated, update the segment matchrate with modelfront results.
      * NOTE: update only for mt pretranslate segments
      * @param Zend_EventManager_Event $event
-     * @return boolean
+     * @return void
      */
-    public function handleAfterAnalysisSegmentPretranslate(Zend_EventManager_Event $event){
+    public function handleAfterAnalysisSegmentPretranslate(Zend_EventManager_Event $event): void{
         $segment = $event->getParam('entity');
         /* @var $segment editor_Models_Segment */
         $result = $event->getParam('result');
         $analysisId = $event->getParam('analysisId');
         $languageResourceId = $event->getParam('languageResourceId');
-        //mt pretranslated startin matchrate type
+        // Starting prefix for segment matchrate when the segment is pre translated with MT resource
         $prefix=editor_Models_Segment_MatchRateType::PREFIX_PRETRANSLATED.';'.editor_Models_Segment_MatchRateType::TYPE_MT;
         if (strpos($segment->getMatchRateType(), $prefix) !== 0 || empty($result) || empty($analysisId) || empty($languageResourceId)) {
             return;
         }
-        
-        $task=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($segment->getTaskGuid());
+
+        $risk = $this->getRiskPredictionInstance($segment->getTaskGuid());
+
+        if(is_null($risk)){
+            return;
+        }
         try {
-            
-            $risk=ZfExtended_Factory::get('editor_Plugins_ModelFront_TranslationRiskPrediction',[$task]);
-            /* @var $risk editor_Plugins_ModelFront_TranslationRiskPrediction */
             $risk->updateSegmentMatchrate($segment,$analysisId,$languageResourceId);
         } catch (editor_Plugins_ModelFront_Exception $e) {
-            $logger = Zend_Registry::get('logger')->cloneMe('plugin.modelfront');
-            $logger->exception($e, [
-                'level' => $logger::LEVEL_WARN
+            $this->logger->exception($e, [
+                'level' => $this->logger::LEVEL_WARN
             ]);
+        }
+    }
+
+    /***
+     * Return editor_Plugins_ModelFront_TranslationRiskPrediction instance with exception handling.
+     * This will not log an exception if for the ModelFront no api config is provided (The ModelFront should be active by default, which means the auth params most of the time will be empty. That is why we ignore the logging)
+     * @param string $taskGuid
+     * @return editor_Plugins_ModelFront_TranslationRiskPrediction|null
+     */
+    protected function getRiskPredictionInstance(string $taskGuid): ?editor_Plugins_ModelFront_TranslationRiskPrediction{
+        try{
+            // check if the model front api is configured, if not this will throw an exception
+            ZfExtended_Factory::get('editor_Plugins_ModelFront_HttpApi');
+
+            $task=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($taskGuid);
+            return ZfExtended_Factory::get('editor_Plugins_ModelFront_TranslationRiskPrediction',[$task]);
+        }catch (editor_Plugins_ModelFront_Exception $e){
+            // Log the exception only if the error is not for missing api config parameters
+            // The ModelFront should be active by default, which means the auth params most of the time will be empty. That is why we ignore the logging
+            // for missing auth params
+            if($e->getErrorCode() !== 'E1266'){
+                $this->logger->exception($e, [
+                    'level' => $this->logger::LEVEL_WARN
+                ]);
+            }
+            return null;
         }
     }
     
@@ -162,7 +199,7 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
      * @param string $taskGuid
      * @return boolean
      */
-    protected function queueWorker(string $taskGuid){
+    protected function queueWorker(string $taskGuid): bool{
         $worker = ZfExtended_Factory::get('editor_Plugins_ModelFront_Worker');
         /* @var $worker editor_Plugins_ModelFront_Worker */
         // init worker and queue it
@@ -172,7 +209,7 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
         }
         $parent=ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $parent ZfExtended_Models_Worker */
-        $result = $parent->loadByState("editor_Plugins_MatchAnalysis_Worker", ZfExtended_Models_Worker::STATE_PREPARE,$taskGuid);
+        $result = $parent->loadByState(ZfExtended_Models_Worker::STATE_PREPARE, 'editor_Plugins_MatchAnalysis_Worker', $taskGuid);
         $parentWorkerId = null;
         if(!empty($result)){
             $parentWorkerId = $result[0]['id'];

@@ -175,7 +175,7 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
                 $id = $hit[4];
                 $css = $severity[$hit[1]].' qmflag ownttip '.$tags[$hit[2]].' qmflag-'.$type;
                 $img = '/modules/editor/images/imageTags/qmsubsegment-'.$type.'-'.$dir[$hit[2]].'.png';
-                return sprintf('<img  class="%s" data-seq="ext-%s" data-comment="" src="%s" />', $css, $id, $img);
+                return sprintf('<img  class="%s" data-t5qid="ext-%s" data-comment="" src="%s" />', $css, $id, $img);
             }, $tag);
         }, $data));
     }
@@ -206,29 +206,29 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
+        self::$api->isCapturing() && file_put_contents($this->api()->getFile($fileToCompare, null, false), $exportedFile);
         //compare it
         $expectedResult = $this->api()->getFileContent($fileToCompare);
+        $foundIds = [];
         
         //since the mqm ids are generated on each test run differently,
         //we have to replace them, by a unified counter, so that we can compare both files.
         //Just replacing the ids with a fixed text is no solution, since we can not recognize nesting errors then.
         $idReplacer = function($matches) use (&$foundIds){
             //since matches array is not filled up on first matches,
-            //we just have to check from the highest to the lowest key
-            if(!empty($matches[4])){
+            //we just have to check the length of the matches
+            $numMatches = count($matches);
+            if($numMatches == 5 && $matches[4] !== ''){
                 $id = $matches[4];
                 $box = 'idref=""%s""';
-            }
-            elseif(!empty($matches[2])){
+            } else if($numMatches == 4 && $matches[2] !== '' && $matches[3] !== ''){
                 $id = $matches[2];
                 $box = 'xml:id=""xoverlappingTagId-%s_'.$matches[3].'""';
-            }
-            elseif(!empty($matches[1])){
+            } else if($numMatches == 2 && $matches[1] !== ''){
                 $id = $matches[1];
                 $box = 'xml:id=""x%s""';
-            }
-            else {
-                error_log(print_r($matches,1));
+            } else {
+                error_log('ID MATCHING FAILED: '.print_r($matches,1));
             }
             $key = array_search($id, $foundIds, true);
             if($key === false) {
@@ -239,9 +239,9 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
         };
         $regex = '/xml:id=""x([0-9]+)""|xml:id=""xoverlappingTagId-([0-9]+)_([0-9]+)""|idref=""([0-9]+)""/';
         
-        $foundIds = array();
+        $foundIds = [];
         $expectedResult = preg_replace_callback($regex, $idReplacer, $expectedResult);
-        $foundIds = array();
+        $foundIds = [];
         $exportedFile = preg_replace_callback($regex, $idReplacer, $exportedFile);
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
     }

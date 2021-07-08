@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -31,21 +31,13 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_RestController
 {
     /**
-     * @var editor_Plugins_MatchAnalysis_Models_MatchAnalysis
+     * @var string
      */
     protected $entityClass = 'editor_Plugins_MatchAnalysis_Models_MatchAnalysis';
 
     /**
-     * @var editor_Plugins_MatchAnalysis_Export_ExportExcel
+     * @var editor_Plugins_MatchAnalysis_Models_MatchAnalysis
      */
-    protected $helperExcelClass = 'editor_Plugins_MatchAnalysis_Export_ExportExcel';
-
-    /**
-     * @var editor_Plugins_MatchAnalysis_Export_ExportXml
-     */
-    protected $helperXMLClass = 'editor_Plugins_MatchAnalysis_Export_ExportXml';
-
-
     protected $entity;
 
     public function indexAction()
@@ -77,18 +69,44 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
     {
         $params = $this->getAllParams();
 
-        $rows = $this->entity->loadByBestMatchRate($params['taskGuid'], true);
+        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        $task->loadByTaskGuid($params['taskGuid']);
 
-
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $fileName = $translate->_('Trefferanalyse').' - '.$task->getTaskName();
+        $taskNr = $task->getTaskNr();
+        if(!empty($taskNr)) {
+            $fileName = $fileName . ' - ('.$taskNr.')';
+        }
+        
         switch ($params["type"]) {
-            case "excel":
-                ZfExtended_Factory::get($this->helperExcelClass)->generateExcel($rows);
+            case "exportExcel":
+                $rows = $this->entity->loadByBestMatchRate($params['taskGuid']);
+                ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_ExportExcel')->generateExcelAndProvideDownload($rows, $fileName);
                 break;
-            case "xml":
-                $x = ZfExtended_Factory::get($this->helperXMLClass)->generateXML($rows, $params['taskGuid']);
+            case "exportXml":
+                $rows = $this->entity->loadByBestMatchRate($params['taskGuid'], false);
+                $x = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_Xml')->generateXML($rows, $params['taskGuid']);
+                
+                $fileName = $fileName.' '.date('- Y-m-d').'.xml';
+                
+                header("Content-Disposition: attachment; filename*=UTF-8''".rawurlencode($fileName));
+                header('Content-Type:text/xml');
+                // if you want to directly download then set expires time
+                header('Expires: 0');
+                
+                //with XML formatting:
+//                 $dom = dom_import_simplexml($x)->ownerDocument;
+//                 $dom->formatOutput = true;
+//                 echo $dom->saveXML();
+//                 break;
+                
                 echo $x->asXML();
 
                 break;
+            default :
+                throw new ZfExtended_NotFoundException('No analysis for given type found');
         }
     }
 }

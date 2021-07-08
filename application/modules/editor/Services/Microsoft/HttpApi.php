@@ -26,57 +26,11 @@
  END LICENSE AND COPYRIGHT
  */
 
-class editor_Services_Microsoft_HttpApi {
-    /**
-     * @var stdClass
-     */
-    protected $result;
-
-
-    protected $error = array();
-
-    /***
-     * Api key used for authentcication
-     * @var string
-     */
-    protected $apiKey;
-
-    /***
-     *
-     * @var string
-     */
-    protected $apiUrl;
-
-
-    /***
-     * Id dictonary lookup search request
-     * @var string
-     */
-    protected $isDictionaryLookup=false;
-
-    public function __construct() {
-        $this->initApi();
+class editor_Services_Microsoft_HttpApi extends editor_Services_Connector_HttpApiAbstract {
+    public function __construct(editor_Services_Microsoft_Resource $resource) {
+        $this->resource = $resource;
     }
-
-    /***
-     * init api authentication data
-     * @throws ZfExtended_ValidateException
-     */
-    protected function initApi(){
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-
-        $this->apiKey = isset($config->runtimeOptions->LanguageResources->microsoft->apiKey) ? $config->runtimeOptions->LanguageResources->microsoft->apiKey:null ;
-        if(empty($this->apiKey)){
-            throw new ZfExtended_Exception("Microsoft translator api key is not defined");
-        }
-
-        $this->apiUrl=isset($config->runtimeOptions->LanguageResources->microsoft->apiUrl) ?$config->runtimeOptions->LanguageResources->microsoft->apiUrl:null ;
-        if(empty($this->apiUrl)){
-            throw new ZfExtended_Exception("Microsoft translator api url is not defined");
-        }
-    }
-
+    
     /**
      * Search the api for given source/target language by domainCode
      *
@@ -85,17 +39,12 @@ class editor_Services_Microsoft_HttpApi {
      * @param string $targetLang
      * @return boolean
      */
-    public function search($text,$sourceLang,$targetLang) {
+    public function search($text, $sourceLang, $targetLang, $useDictionary = false) {
 
-        //set the default mode, only translation
-        $path="/translate?api-version=3.0";
-        //if it is dictonary lookup, change the path
-
-        $isDirecotrLookup=$this->isValidDictionaryLookup($sourceLang, $targetLang);
-        if($isDirecotrLookup){
-            $path="/dictionary/lookup?api-version=3.0";
-        }
-        $params = "&from=".$sourceLang."&to=".$targetLang;
+        $useDictionary = $useDictionary && $this->isValidDictionaryLookup($sourceLang, $targetLang);
+        
+        $path = $useDictionary ? '/dictionary/lookup' : '/translate';
+        $this->getHttp('POST', $path);
 
         if(!is_array($text)){
             $text = [$text];
@@ -105,53 +54,14 @@ class editor_Services_Microsoft_HttpApi {
             $requestBody[] = ['Text' => $t];
         }
 
-        $content = json_encode($requestBody);
-        $result = $this->searchApi($path,$params, $content);
+        $this->http->setRawData(json_encode($requestBody));
         
-        $result =$this->processTranslateResponse($result);
-        //if the DictionaryLookup produces an error, try with the normal translate request
-        if(empty($this->result) && $this->isDictionaryLookup){
-            //if in directory lookup the result is empty, trigger a normal result so translation from microsoft is received
-            $path="/translate?api-version=3.0";
-            $result = $this->searchApi($path,$params,$content);
-            return $this->processTranslateResponse($result);
-        }
-        
-        return $result;
-    }
+        $this->http->setParameterGet([
+            'from' => $sourceLang,
+            'to' => $targetLang,
+        ]);
 
-    /***
-     * Query the microsoft api
-     *
-     * @param string $path
-     * @param string $params
-     * @param string $content
-     * @return string
-     */
-    protected function searchApi($path,$params,$content) {
-        //reset the errors array
-        $this->error = [];
-        $headers = "Content-type: application/json\r\n" .
-            "Content-length: " . strlen($content) . "\r\n" .
-            "Ocp-Apim-Subscription-Key: $this->apiKey\r\n" .
-            "X-ClientTraceId: " . ZfExtended_Utils::uuid() . "\r\n";
-
-        // NOTE: Use the key 'http' even if you are making an HTTPS request. See:
-        // https://php.net/manual/en/function.stream-context-create.php
-        $options = array (
-            'http' => array (
-                'header' => $headers,
-                'method' => 'POST',
-                'content' => $content
-            )
-        );
-        $context  = stream_context_create ($options);
-        $result = @file_get_contents ($this->apiUrl . $path . $params, false, $context);
-        if (false === $result) {
-            $this->error[] = error_get_last();
-            return false;
-        }
-        return $result;
+        return $this->processResponse($this->http->request());
     }
 
     /***
@@ -163,133 +73,58 @@ class editor_Services_Microsoft_HttpApi {
      * @return boolean
      */
     protected function isValidDictionaryLookup($sourceLang,$targetLang){
-        return $this->isDictionaryLookup && (mb_substr(strtolower($sourceLang), 0,2)=='en' || mb_substr(strtolower($targetLang), 0,2)=='en');
+        //FIXME compare against dictionary language list??? not cached, must be loaded again...
+        return (mb_substr(strtolower($sourceLang), 0,2)=='en' || mb_substr(strtolower($targetLang), 0,2)=='en');
     }
 
-    /** Check the api status
+    /**
+     * Check the api status
      * @return boolean
      */
     public function getStatus(){
-        return true;
-    }
-
-
-    /***
-     * Gets the set of languages currently supported for translation
-     * @return string|boolean
-     */
-    public function getLanguages(){
-        $path = "/languages?api-version=3.0";
-        $headers = "Content-type: application/json\r\n" .
-            "Ocp-Apim-Subscription-Key: $this->apiKey\r\n" .
-            "X-ClientTraceId: " . ZfExtended_Utils::uuid() . "\r\n";
-        
-        // NOTE: Use the key 'http' even if you are making an HTTPS request. See:
-        // https://php.net/manual/en/function.stream-context-create.php
-        $options = array (
-            'http' => array (
-                'header' => $headers,
-                'method' => 'GET'
-            )
-        );
-        //retunr only the supported languages for translation
-        $params = '&scope=translation';
-        $context  = stream_context_create ($options);
-        $response = @file_get_contents ($this->apiUrl . $path.$params, false, $context);
-        
-        if (false === $response) {
-            $this->error[] = error_get_last();
-            $this->badGateway();
-        }
-        $decode = json_decode($response,true);
-        //The value of the translation property is a dictionary of (key, value) pairs. 
-        //Each key is a BCP 47 language tag. A key identifies a language for which text can be translated to or translated from
-        $this->result = $decode['translation'] ?? [];
-        return $this->getResult();
-    }
-
-    /***
-     * Check if the given language code is valid for the api
-     * @param string $languageCode: language code
-     * @return boolean
-     */
-    public function isValidLanguage($languageCode){
-        try {
-            $this->search('Hi','en', $languageCode);
-            return empty($this->error);
-        } catch (Exception $e) {
-            return false;
-        }
-    }
-    
-    /**
-     * returns the found errors
-     */
-    public function getErrors() {
-        return $this->error;
-    }
-
-
-    /**
-     * returns the decoded JSON result
-     */
-    public function getResult() {
-        return $this->result;
-    }
-
-    protected function badGateway() {
-        $errors= $this->getErrors()[0] ?? [];
-        $ex=new editor_Services_Connector_Exception('E1282',[
-            'errors' => $errors
+        //TODO does that produce costs? There is no other way to check the API authentication (the languages call does not check authentication)
+        $this->getHttp('POST', '/dictionary/lookup');
+        $this->http->setConfig(['timeout'=>5]);
+        $this->http->setRawData(json_encode([['Text' => '']]));
+        $this->http->setParameterGet([
+            'from' => 'de',
+            'to' => 'en',
         ]);
-        $ex->setMessage($errors['message'] ?? '');
-        throw $ex;
+        
+        return $this->processResponse($this->http->request());
     }
 
     /**
-     * Set the response result
-     * @return boolean
+     * prepares a Zend_Http_Client, prefilled with the configured URL + the given REST URL Parts
+     * @param string $method
+     * @param string $endpointPath
+     * @return Zend_Http_Client
      */
-    protected function processTranslateResponse($response) {
-        if(!empty($this->error)){
-            throw $this->badGateway();
+    protected function getHttp($method, $endpointPath = '') {
+        parent::getHttp($method, '/'.ltrim($endpointPath, '/'));
+        $this->http->setParameterGet('api-version', '3.0');
+        $this->http->setConfig(['timeout'=>30]);
+        $this->http->setHeaders('Content-type', 'application/json');
+        $this->http->setHeaders('Ocp-Apim-Subscription-Key', $this->resource->getAuthenticationKey());
+        $location = $this->resource->getLocation();
+        if(!empty($location)) {
+            $this->http->setHeaders('Ocp-Apim-Subscription-Region', $location);
         }
-        
-        $result=json_decode($response,true);
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            $ex=new editor_Services_Connector_Exception('E1282');
-            $ex->setMessage(json_last_error_msg());
-            throw $ex;
-        }
-        if(empty($result)){
-            return empty($this->error);
-        }
-        
-        $collection=[];
-        foreach ($result as $res) {
-            //we get only one translation per search
-            $single = reset($res['translations']);
-            if($single === false){
-                continue;
-            }
-            //the response layout contains only text, when no dictonary lookup is used
-            if(isset($single['text'])){
-                $collection[]=[
-                    'text'=>$single['text']
-                ];
-            }else{
-                //the request is triggered for dictonary lookup, collect the additinal translations
-                $collection[]=[
-                    'text'=>isset($single['displayTarget']) ? $single['displayTarget'] : '',
-                    'metaData'=>$single
-                ];
-            }
-        }
-        $this->result=$collection;
-        return empty($this->error);
+        $this->http->setHeaders('X-ClientTraceId', ZfExtended_Utils::uuid());
+        return $this->http;
     }
 
-    public function setIsDictionaryLookup(bool $value){
-        $this->isDictionaryLookup=$value;
+    /***
+     * Gets from API the set of languages currently supported for translation, return bool if the request was successfull
+     * @return array|null
+     */
+    public function getLanguages(): ?array {
+        $this->getHttp('GET', '/languages');
+        $this->http->setParameterGet('scope', 'translation');
+        if($this->processResponse($this->http->request())) {
+            // we consider only the translation languages
+            return array_keys(get_object_vars($this->result->translation));
+        }
+        return null;
     }
 }

@@ -38,7 +38,15 @@ class editor_Models_SegmentFieldManager {
     const LABEL_RELAIS = 'Relaissprache';
     
     const _MAP_DELIM = '#';
+    /**
+     * @FIXME: this is called PREFIX but used as a SUFFIX ...
+     * @var string
+     */
     const _EDIT_PREFIX = 'Edit';
+    /**
+     * @FIXME: this is called PREFIX but used as a SUFFIX ...
+     * @var string
+     */
     const _TOSORT_PREFIX = 'ToSort';
     
     /**
@@ -296,11 +304,17 @@ class editor_Models_SegmentFieldManager {
     }
     
     /**
-     * returns a list of editable field dataindizes
+     * returns a list of editable field data indices
+     * @param boolean $addOriginalTargetWhenDefaultLayout: special flag to enable manipulating the target when the fields are in default layout
      * @return array
      */
-    public function getEditableDataIndexList() {
-        return $this->_getDataIndexList(true);
+    public function getEditableDataIndexList($addOriginalTargetWhenDefaultLayout=false) {
+        $list = $this->_getDataIndexList(true);
+        // special: maybe the original target should be in the list too
+        if($addOriginalTargetWhenDefaultLayout && $this->isDefaultLayout()){
+            array_unshift($list, $this->getFirstTargetName());
+        }
+        return $list;
     }
     
     /**

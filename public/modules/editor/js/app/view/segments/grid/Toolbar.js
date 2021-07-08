@@ -53,8 +53,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_hideTagBtn: '#UT#Tags verbergen',
     item_shortTagBtn: '#UT#Tag-Kurzansicht',
     item_fullTagBtn: '#UT#Tag-Vollansicht',
-    item_qmsummaryBtn: '#UT#MQM',
-    item_qmsummaryTooltip: '#UT#MQM Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
     item_zoomIn: '#UT#Segmentschriftgrad vergrößern',
     item_zoomOut: '#UT#Segmentschriftgrad verkleinern',
@@ -63,8 +61,10 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_watchListFilterBtn: '#UT#Lesezeichen',
     item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
     item_showBookmarkedSegments: '#UT#Nur Segmente mit Lesezeichen anzeigen',
+    item_repeatedFilterBtn: '#UT#Nur wiederholt',
+    item_showRepeatedSegments: '#UT#Nur Segmente mit Wiederholungen anzeigen',
     strings:{
-    	interfaceTranslation:'#UT#Oberfläche'
+        interfaceTranslation:'#UT#Oberfläche'
     },
     viewModel: {
         type:'segmentsToolbar'
@@ -183,17 +183,21 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     },
                     icon: Editor.data.moduleFolder+'images/show_bookmarks.png'
                 },{
-                    xtype: 'tbseparator',
-                    hidden: !Editor.data.task.hasQmSub()
-                },{
                     xtype: 'button',
-                    itemId: 'qmsummaryBtn',
-                    text: me.item_qmsummaryBtn,
+                    glyph: 'f0c5@FontAwesome5FreeSolid',
+                    itemId: 'filterBtnRepeated',
+                    text: me.item_repeatedFilterBtn,
+                    bind: {
+                        hidden: '{!taskHasDefaultLayout}'
+                    },
+                    enableToggle: true,
                     tooltip: {
-                        text: me.item_qmsummaryTooltip,
+                        text: me.item_showRepeatedSegments,
                         showDelay: 0
                     },
-                    hidden: !Editor.data.task.hasQmSub()
+                },{
+                    xtype: 'tbseparator',
+                    hidden: !Editor.data.task.hasMqm()
                 },{
                 	xtype: 'tbfill'
                 },{

@@ -75,7 +75,6 @@ Ext.define('Editor.model.Segment', {
         //{name: 'terms', type: 'string'},
         {name: 'durations', defaultValue: {}}, //we are using an object here
         {name: 'comments', type: 'string', persist: false},
-        {name: 'qmId', type: 'string'},
         {name: 'stateId', type: 'int'},
         {name: 'metaCache', convert: function(val) {
             if(Ext.isObject(val)){
@@ -87,6 +86,7 @@ Ext.define('Editor.model.Segment', {
             return Ext.JSON.decode(val);
         }, persist: false},
         {name: 'isWatched', type: 'boolean', persist: false},
+        {name: 'isRepeated', type: 'int', persist: false},
         {name: 'segmentUserAssocId', type: 'int', persist: false}
     ],
     idProperty: 'id',
@@ -104,27 +104,6 @@ Ext.define('Editor.model.Segment', {
         }
     },
     /**
-     * konvertiert die serverseitig als string gespeicherte QM Liste in ein Array
-     * @returns Integer[]
-     */
-    getQmAsArray: function (){
-        return Ext.Array.map(this.get('qmId').replace(/^[;]+|[;]+$/g, '').split(';'), function(item){
-            return parseInt(item);
-        });
-    },
-    /**
-     * konvertiert ein Array mit QmIds zurück in das serverseitig benötigte String Format
-     * @param {Integer[]} qmArray
-     */
-    setQmFromArray: function (qmArray){
-        if(qmArray.length > 0){
-            this.set('qmId', ';'+qmArray.sort().join(';')+';');
-        }
-        else {
-            this.set('qmId', '');
-        }
-    },
-    /**
      * Updates the segment length in the metaCache for the given editable field name
      * @param {String} fieldname for which the length is changed
      * @param {Integer} new length value
@@ -136,5 +115,7 @@ Ext.define('Editor.model.Segment', {
             meta.siblingData[id].length[field] = length;
             this.set('metaCache', meta);
         }        
-    }
+    },
+    // this is a flag needed when processing taken over matches, which causes the target to be updated in alike segments as well
+    wasOriginalTargetUpdated: false
 });

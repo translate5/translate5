@@ -139,29 +139,29 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
 
     /**
-     * Adds the users of the given cc/bcc role config to the email - if receiverRole is configured in config
+     * Adds the users of the given cc/bcc step config to the email - if receiverStep is configured in config
      * @param stdClass $triggerConfig the config object given in action matrix
-     * @param string $receiverRole the original receiver role of the notification to be sended
+     * @param string $receiverStep the original receiver step of the notification to be sended
      */
-    protected function addCopyReceivers(stdClass $triggerConfig, $receiverRole) {
+    protected function addCopyReceivers(stdClass $triggerConfig, $receiverStep) {
         $task = $this->config->task;
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
 
         $tua = empty($this->tua) ? ZfExtended_Factory::get('editor_Models_TaskUserAssoc') : $this->tua;
-
-        $addReceivers = function($receiverRoleMap, $bcc = false) use ($receiverRole, $task, $user, $tua) {
+        
+        $addReceivers = function($receiverStepMap, $bcc = false) use ($receiverStep, $task, $user, $tua) {
             $users = [];
-            foreach($receiverRoleMap as $recRole => $roles) {
-                if($recRole == '*' || $recRole == $receiverRole) {
-                    foreach($roles as $role) {
-                        $users = array_merge($users,$tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $role,['deadlineDate']));
+            foreach($receiverStepMap as $recStep => $steps) {
+                if($recStep == '*' || $recStep == $receiverStep) {
+                    foreach($steps as $step) {
+                        $users = array_merge($users,$tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $step, ['deadlineDate']));
                     }
                 }
-                if($recRole == 'byUserLogin') {
+                if($recStep == 'byUserLogin') {
                     $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
                     /* @var $userModel ZfExtended_Models_User */
-                    foreach($roles as $singleUser) {
+                    foreach($steps as $singleUser) {
                         try {
                             $userModel->loadByLogin($singleUser);
                             $users[] = (array) $userModel->getDataObject();
@@ -213,40 +213,36 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
 
     /**
-     * Feel free to define additional Notifications
-     */
-    /**
      * Workflow specific Notification after all users of a role have finished a task
-     * @param string $triggeringRole
-     * @param bool $isCron
      */
     public function notifyAllFinishOfARole() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $workflow = $this->config->workflow;
-        $isCron = $workflow->isCalledByCron();
-        $triggeringRole = $this->config->newTua->getRole();
+        $isCron = $this->config->isCalledByCron;
+        $currentStep = $this->config->newTua->getWorkflowStepName();
         $this->tua = clone $this->config->newTua; //we just reuse the already used entity
-        $currentStep = $workflow->getStepOfRole($triggeringRole);
         if($currentStep === false){
             $this->log->warn('E1013', 'No workflow step to Role {role} found! This is actually a workflow config error!', [
                 'task' => $task,
-                'role' => $triggeringRole,
+                'step' => $currentStep,
             ]);
         }
         $segments = $this->getStepSegments($currentStep);
 
         $segmentHash = md5(print_r($segments,1)); //hash to identify the given segments (for internal caching)
-
-        $nextRole = $workflow->getRoleOfStep((string)$workflow->getNextStep($currentStep));
-
-
+        
+        $nextStep = (string)$workflow->getNextStep($task, $currentStep);
+        $nextRole = $workflow->getRoleOfStep($nextStep);
+        
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
-        $users = $tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $nextRole,['deadlineDate']);
-        $previousUsers = $tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggeringRole,['deadlineDate']);
+        $users = empty($nextStep) ? [] : $tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $nextStep,['deadlineDate']);
+        $previousUsers = $tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $currentStep,['deadlineDate']);
         $params = array(
-            'triggeringRole' => $triggeringRole,
+            'triggeringRole' => $this->config->newTua->getRole(),
+            'triggeringStep' => $currentStep,
+            'nextStep' => $nextStep,
             'nextRole' => $nextRole,
             'segmentsHash' => $segmentHash,
             'segments' => $segments,
@@ -260,12 +256,12 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $pms = $this->getTaskPmUsers();
         foreach($pms as $pm) {
             $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
-            $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
-            $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
+            $this->attachXliffSegmentList($segmentHash, $segments, $currentStep);
+            $this->addCopyReceivers($triggerConfig, editor_Workflow_Default::STEP_PM_CHECK);
             $this->notify($pm);
         }
-
-        if(!$nextRole){
+        
+        if(empty($nextStep)){
             return;
         }
 
@@ -273,39 +269,37 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         foreach($users as $user) {
             $params['user'] = $user;
             $this->createNotification($nextRole, __FUNCTION__, $params);
-            $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
-            $this->addCopyReceivers($triggerConfig, $nextRole);
+            $this->attachXliffSegmentList($segmentHash, $segments, $currentStep);
+            $this->addCopyReceivers($triggerConfig, $nextStep);
             $this->notify($user);
         }
     }
 
     /**
      * Workflow specific PM Notification after one users of a role have finished a task
-     * @param string $triggeringRole
-     * @param bool $isCron
      */
     public function notifyOneFinishOfARole() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $workflow = $this->config->workflow;
-        $isCron = $workflow->isCalledByCron();
+        $isCron = $this->config->isCalledByCron;
         if($isCron) {
             //currently we do not trigger the notifyOne on cron actions (since currently there are all users set to finish)
             return;
         }
-        $triggeringRole = $this->config->newTua->getRole();
+        $currentStep = $this->config->newTua->getWorkflowStepName();
         $this->tua = clone $this->config->newTua; //we just reuse the already used entity
-        $currentStep = $workflow->getStepOfRole($triggeringRole);
         if($currentStep === false){
             $this->log->warn('E1013', 'No workflow step to Role {role} found! This is actually a workflow config error!', [
                 'task' => $task,
-                'role' => $triggeringRole,
+                'step' => $currentStep,
             ]);
         }
-
-        $currentUsers = $this->tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggeringRole, ['state','deadlineDate']);
+        
+        $currentUsers = $this->tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $currentStep, ['state','deadlineDate']);
         $params = array(
-            'triggeringRole' => $triggeringRole,
+            'triggeringRole' => $this->config->newTua->getRole(),
+            'triggeringStep' => $currentStep,
             'currentUsers' => $currentUsers,
             'task' => $task,
             'workflow' => $workflow
@@ -323,7 +317,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $pms = $this->getTaskPmUsers();
         foreach($pms as $pm) {
             $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
-            $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
+            $this->addCopyReceivers($triggerConfig, editor_Workflow_Default::STEP_PM_CHECK);
             $this->notify($pm);
         }
     }
@@ -358,12 +352,12 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $user->loadByGuid($deleted['userGuid']);
             $workflow = $this->config->workflow;
             $labels = $workflow->getLabels(false);
-            $roles = $workflow->getRoles();
+            $steps = $workflow->getSteps();
             $params['task'] = $this->config->task;
-            $params['role'] = $labels[array_search($deleted['role'], $roles)];
-
+            $params['role'] = $labels[array_search($deleted['workflowStepName'], $steps)];
+            
             $this->createNotification($deleted['role'], __FUNCTION__, $params);
-            $this->addCopyReceivers($triggerConfig, $deleted['role']);
+            $this->addCopyReceivers($triggerConfig, $deleted['workflowStepName']);
             $this->notifyUser($user);
         }
     }
@@ -375,7 +369,15 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     public function notifyNewTaskAssigned() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $this->tua = $tua = $this->config->newTua;
-
+        
+        //the usage of this config is more a workaround,
+        // since this was the easiest but also straight forward way to transport the information "yes notify"
+        // from one task import wizard page to the final startImport action.
+        // Not using the system config would mean to implement an own way to transport such config information.
+        if(!($this->config->task->getConfig()->runtimeOptions->workflow->notifyAllUsersAboutTask ?? false)) {
+            return;
+        }
+        
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $pm = clone $user;
@@ -392,7 +394,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         ];
 
         $this->createNotification($tua->getRole(), __FUNCTION__, $params);
-        $this->addCopyReceivers($triggerConfig, $tua->getRole());
+        $this->addCopyReceivers($triggerConfig, $tua->getWorkflowStepName());
         $this->notifyUser($user);
     }
 
@@ -405,17 +407,17 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $this->tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-
-        $tuas = $this->tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggerConfig->role ?? null, ['state', 'role','deadlineDate','assignmentDate','finishedDate']);
-
-        $roles = array_column($tuas, 'role');
+        
+        $tuas = $this->tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $triggerConfig->step ?? null, ['state', 'workflowStepName', 'deadlineDate', 'assignmentDate', 'finishedDate']);
+        
+        $steps = array_column($tuas, 'workflowStepName');
         //sort first $roles, then sort $tuas to the same order (via the indexes)
-        array_multisort($roles, SORT_ASC, SORT_STRING, $tuas);
-        $aRoleOccursMultipleTimes = count($roles) !== count(array_flip($roles));
-
-
+        array_multisort($steps, SORT_ASC, SORT_STRING, $tuas);
+        $aStepOccursMultipleTimes = count($steps) !== count(array_flip($steps));
+        
+        
         foreach($tuas as &$tua) {
-            $tua['originalRole'] = $tua['role'];
+            $tua['originalWorkflowStepName'] = $tua['workflowStepName'];
         }
         unset ($tua);
 
@@ -429,16 +431,16 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             'task' => $this->config->task,
             'associatedUsers' => $tuas,
             //the disclaimer is needed only, if from one role multiple users are assigned. If it is only one reviewer then no dislaimer is needed
-            'addCompetitiveDisclaimer' => $aRoleOccursMultipleTimes && $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE
+            'addCompetitiveDisclaimer' => $aStepOccursMultipleTimes && $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE
         ];
 
         foreach($tuas as $tua) {
-            $params['role'] = $tua['role'];
-            $params['taskUserAssoc'] =$tua;
+            $params['role'] = $tua['workflowStepName'];
+            $params['taskUserAssoc'] = $tua;
             //we assume the PM user for all roles, since it is always the same template
             $this->createNotification(ACL_ROLE_PM, 'notifyNewTaskAssigned', $params);
             $user->loadByGuid($tua['userGuid']);
-            $this->addCopyReceivers($triggerConfig, $tua['originalRole']);
+            $this->addCopyReceivers($triggerConfig, $tua['originalWorkflowStepName']);
             $this->notifyUser($user);
         }
     }
@@ -471,7 +473,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         ];
 
         $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params);
-        $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
+        $this->addCopyReceivers($triggerConfig, editor_Workflow_Default::STEP_PM_CHECK);
         $this->notifyUser($user);
     }
 
@@ -599,7 +601,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param array $segments
      * @param string $currentStep
      */
-    protected function attachXliffSegmentList($segmentHash, array $segments,$currentStep) {
+    protected function attachXliffSegmentList($segmentHash, array $segments, $currentStep) {
         $config = $this->config->task->getConfig();
         $notifyConfig = $config->runtimeOptions->editor->notification;
 
@@ -711,79 +713,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         return ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
     }
 
-    public function testNotifications() {
-        $user = [
-            'firstName' => 'Thomas',
-            'surName' => 'Lauria',
-            'login' => 'fakeuser',
-            'email' => 'thomas@mittagqi.com',
-            'locale' => 'en',
-        ];
-        $users = [
-            ['firstName' => 'Thomas', 'surName' => 'Lauria','login' => 'fakeuser','email' => 'thomas@mittagqi.com','role' => 'Testrole','state' => 'Teststatus'],
-            ['firstName' => 'XXX', 'surName' => 'YYY','login' => 'fakeuser2','email' => 'thomas@mittagqi.com','role' => 'Testrole2','state' => 'Teststatus2'],
-        ];
-        $params = [
-            'task' => $this->config->task,
-            'associatedUsers' => $users,
-        ];
-
-        $roles = $this->config->workflow->getRoles();
-
-        foreach($roles as $role){
-            $this->createNotification($role, 'notifyNewTaskAssigned', $params);
-            //$this->addCopyReceivers($triggerConfig, $tua['role']);
-            $this->notify($user);
-        }
-
-        $params = [
-            'task' => $this->config->task,
-            'user' => $user,
-            'sourceLanguage' => 'German',
-            'targetLanguage' => 'English',
-            'relaisLanguage' => 'French Relais'
-        ];
-
-        $this->createNotification(ACL_ROLE_PM, 'notifyNewTaskForPm', $params);
-        //$this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
-        $this->notify($user);
-
-        $segmentHash = "123";
-        $segments = json_decode(file_get_contents(APPLICATION_PATH.'/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegments.json'),true);
-        $segments = array_map(function($item){
-            $item['fileId'] = 1;
-            return $item;
-        }, $segments);
-        $segments = [];
-        $currentStep = 'reviewing';
-        $params = array(
-            'triggeringRole' => 'triggerROLE',
-            'nextRole' => 'nextROLE',
-            'segmentsHash' => $segmentHash,
-            'segments' => $segments,
-            'isCron' => true,
-            'users' => $users,
-            'previousUsers' => $users,
-            'task' => $this->config->task,
-            'workflow' => $this->config->workflow
-        );
-
-        $this->createNotification(ACL_ROLE_PM, 'notifyAllFinishOfARole', $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
-        $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
-        //$this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
-        $this->notify($user);
-
-        $params['user'] = $user;
-        $this->createNotification('translatorCheck', 'notifyAllFinishOfARole', $params);
-        $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
-        //$this->addCopyReceivers($triggerConfig, $nextRole);
-        $this->notify($user);
-        $this->createNotification('reviewer', 'notifyAllFinishOfARole', $params);
-        $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
-        //$this->addCopyReceivers($triggerConfig, $nextRole);
-        $this->notify($user);
-    }
-
     /***
      * Deadline notifier. It will send notification to the configured user assocs days before or after the current day (days +/- can be defined in config default to 1)
      * When the trignotification trigger is periodical, the deadline date select will be between "CRON_PERIODICAL_CALL_FREQUENCY_MIN" minutes period of time
@@ -839,7 +768,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             ];
 
             $this->createNotification($tua['role'], $template, $params);
-            $this->addCopyReceivers($triggerConfig,$tua['role']);
+            $this->addCopyReceivers($triggerConfig, $tua['workflowStepName']);
             $this->notify($assoc);
             $this->logDeadlineNotified($assoc,$this->generateDeadlineNotifiedMessage($isApproaching));
         }
@@ -858,8 +787,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $symbol = $isApproaching ? '+' : '-';
         //date select when this is triggered from the daily action
         $dateSelect = 'DATE(tua.deadlineDate)=DATE(CURRENT_DATE) '.$symbol.' INTERVAL ? DAY';
-
-        if($this->isPeriodical()){
+        
+        if($this->config->trigger == 'doCronPeriodical'){
             //the deadline check date will be between: "days offset date" +/- "cron periodical call frequency"
             $dateSelect='tua.deadlineDate BETWEEN '.
                 ' DATE_SUB(NOW() '.$symbol.' INTERVAL ? DAY,INTERVAL '.Zend_Db_Table::getDefaultAdapter()->quote(self::CRON_PERIODICAL_CALL_FREQUENCY_MIN).' MINUTE)'.
@@ -950,12 +879,3 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     protected function generateDeadlineNotifiedMessage(bool $isApproaching){
         return self::DEADLINE_NOTIFICATION_LOG_MESSAGE.($isApproaching ? 'DeadlineApproaching' : 'OverdueDeadline');
     }
-
-    /***
-     * Is the current request from the periodical trigger
-     * @return boolean
-     */
-    protected function isPeriodical() {
-        return $this->getTrigger()=="doCronPeriodical";
-    }
-}

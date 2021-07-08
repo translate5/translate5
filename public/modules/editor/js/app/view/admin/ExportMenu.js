@@ -40,9 +40,11 @@ Ext.define('Editor.view.admin.ExportMenu', {
       exportReview: '#UT#lektoriert',
       exportDiff: '#UT#SDLXLIFF mit Änderungsmarkierungen',
       export2Def: '#UT#XLIFF 2.1',
-      exportQmField: '#UT#Export QM-Statistik (XML) für Feld: {0}',
+      exportQmField: '#UT#Export QS-Statistik (XML) für Feld: {0}',
       exportExcel: '#UT#Externe Bearbeitung als Excel',
-      downloadImportArchive: '#UT#Importarchiv herunterladen'
+      downloadImportArchive: '#UT#Importarchiv herunterladen',
+      faultyQualityAlertTitle: '#UT#Warnung',
+      faultyQualityAlertText: '#UT#Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern',
   },
   
   makePath: function(path, field) {
@@ -89,6 +91,9 @@ Ext.define('Editor.view.admin.ExportMenu', {
           text: me.messages.exportExcel,
           handler: function() {
               task.set('state', 'ExcelExported');
+              if(task.get('qualityHasFaults')){
+                  me.createFaultyExportAlert();
+              }
           }
       });
      
@@ -99,25 +104,29 @@ Ext.define('Editor.view.admin.ExportMenu', {
   initExportOptions: function() {
       var me = this,
           fields = this.initialConfig.fields,
-          exportAllowed =Editor.app.authenticatedUser.isAllowed('editorExportTask', me.task),
-          exportDiffString=me.task.get('emptyTargets') ? me.messages.exportTranslation : me.messages.exportReview,
+          exportAllowed = Editor.app.authenticatedUser.isAllowed('editorExportTask', me.task),
+          exportDiffString = me.task.get('emptyTargets') ? me.messages.exportTranslation : me.messages.exportReview,
+          alertHandler = (me.task.get('qualityHasFaults')) ? function(){ me.createFaultyExportAlert(); } : null;
           result = [{
               itemId: 'exportItem',
               hidden:!exportAllowed,
               hrefTarget: '_blank',
               href: me.makePath('task/export/id/{0}'),
-              text : Ext.String.format(me.messages.exportDef,exportDiffString)
+              text : Ext.String.format(me.messages.exportDef,exportDiffString),
+              handler: alertHandler
           },{
               itemId: 'exportDiffItem',
               hrefTarget: '_blank',
               href: me.makePath('task/export/id/{0}/diff/1'),
               hidden:!exportAllowed || !me.task.get('diffExportUsable'),
-              text : me.messages.exportDiff
+              text : me.messages.exportDiff,
+              handler: alertHandler
           },{
               itemId: 'exportItemXliff2',
               hrefTarget: '_blank',
               href: me.makePath('task/export/id/{0}?format=xliff2'),
-              text: me.messages.export2Def
+              text: me.messages.export2Def,
+              handler: alertHandler
           }];
       
       if(fields !== false) {
@@ -127,11 +136,14 @@ Ext.define('Editor.view.admin.ExportMenu', {
               }
               result.push({
                   hrefTarget: '_blank',
-                  href: me.makePath('qmstatistics/index/taskGuid/{1}/?type={2}', field.get('name')),
+                  href: me.makePath('quality/downloadstatistics/taskGuid/{1}/?type={2}', field.get('name')),
                   text : Ext.String.format(me.messages.exportQmField, field.get('label'))
               });
           });
       }
       return result;
+  },
+  createFaultyExportAlert: function(){
+      Ext.Msg.alert(this.messages.faultyQualityAlertTitle + '!', this.messages.faultyQualityAlertText);
   }
 });

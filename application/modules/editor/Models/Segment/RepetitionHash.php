@@ -30,9 +30,9 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Segment_RepetitionHash {
     /**
-     * @var editor_Models_Segment_InternalTag
+     * @var editor_Models_Segment_UtilityBroker
      */
-    protected $tagHelper;
+    protected $util;
     
     /**
      * @var boolean
@@ -42,7 +42,7 @@ class editor_Models_Segment_RepetitionHash {
     public function __construct(editor_Models_Task $task) {
         $this->isSourceEditing = (bool) $task->getEnableSourceEditing();
         
-        $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->util = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
     }
     
     /**
@@ -52,6 +52,8 @@ class editor_Models_Segment_RepetitionHash {
      * @return string
      */
     public function hashTarget($target, $source) {
+        //since target may contain also track changes, we have to sanitize them first
+        $target = $this->util->trackChangeTag->removeTrackChanges($target);
         return $this->generateHash($target, $this->getCountSourceEditing($source, $target));
     }
     
@@ -63,7 +65,7 @@ class editor_Models_Segment_RepetitionHash {
      */
     public function hashSource($source, $target) {
         //only the real tag count goes into the hash (whitespace tags are ignored, since they are editable)
-        $stat = $this->tagHelper->statistic($target);
+        $stat = $this->util->internalTag->statistic($target);
         return $this->generateHash($source, $stat['tag']);
     }
     
@@ -93,7 +95,7 @@ class editor_Models_Segment_RepetitionHash {
      * @return string
      */
     protected function generateHash($value, $additionalValue) {
-        $value = $this->tagHelper->replace($value, function($match) {
+        $value = $this->util->internalTag->replace($value, function($match) {
             //whitespace tags and real tags can not replaced by each other, so they must be different in the hash,
             // so: "Das<x>Haus" may not be a repetition anymore of "DasTABHaus", even TAB and <x> are both replaced with an internal tag
             if(in_array($match[3], editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
@@ -122,7 +124,7 @@ class editor_Models_Segment_RepetitionHash {
             return '';
         }
         //only the real tag count goes into the hash (whitespace tags are ignored, since they are editable)
-        $stat = $this->tagHelper->statistic($segmentValue);
+        $stat = $this->util->internalTag->statistic($segmentValue);
         return $stat['tag'];
     }
 }

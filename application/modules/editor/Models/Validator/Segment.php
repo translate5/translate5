@@ -47,6 +47,10 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
     }
     
     public function isValid($data) {
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($data['taskGuid'] ?? $this->entity->getTaskGuid());
+        /* @var $workflow editor_Workflow_Default */
+        $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
+
         if(parent::isValid($data)) {
             return true;
         }
@@ -95,14 +99,6 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $this->addValidator('workflowStepNr', 'int');
         $this->addValidator('pretrans', 'inArray', [ZfExtended_Utils::getConstants('editor_Models_Segment', 'PRETRANS_')]);
         
-        /* simplest way to get the correct workflow here: */
-        $session = new Zend_Session_Namespace();
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($session->taskGuid);
-        /* @var $workflow editor_Workflow_Abstract */
-        $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
-        
-        $this->setQualityValidator(array_keys($config->runtimeOptions->segments->qualityFlags->toArray()));
-        
         $allowedValues = array_keys($config->runtimeOptions->segments->stateFlags->toArray());
         $allowedValues[] = 0; //adding "not set" state
         $this->addValidator('stateId', 'inArray', array($allowedValues));
@@ -111,23 +107,6 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         /* @var $states editor_Models_Segment_AutoStates */
         $this->addValidator('autoStateId', 'inArray', array($states->getStates()));
     }
-  
-  protected function setQualityValidator(array $allowedValues) {
-    $inArray = $this->validatorFactory('inArray', array($allowedValues));
-    $me = $this;
-    $qmIdValidator = function($value) use($inArray, $me) {
-      $value = explode(';', trim($value, ';'));
-      foreach($value as $oneValue){
-        if((strlen($oneValue) > 0) && !$inArray->isValid($oneValue)) {
-          $me->addMessage('qmId', 'invalidQmId', 'invalidQmId');
-          return false;
-        }
-      }
-      return true;
-    };
-    
-    $this->addValidatorCustom('qmId', $qmIdValidator);
-  }
   
   /**
    * validates the given value of the given field with the values of the transunit,
@@ -197,11 +176,11 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
                   $errorsMinWidth[] = ($key+1) . ': ' . $length;
               }
           }
-          if (count($errorsMinWidth) > 0) {
+          if (!empty($errorsMinWidth)) {
               $this->addMessage($field, 'segmentLinesTooShort', 'Not all lines in the segment match the given minimal length: ' . implode('; ', $errorsMinWidth));
               $isValid = false;
           }
-          if (count($errorsMaxWidth) > 0) {
+          if (!empty($errorsMaxWidth)) {
               $this->addMessage($field, 'segmentLinesTooLong', 'Not all lines in the segment match the given maximal length: ' . implode('; ', $errorsMaxWidth));
               $isValid = false;
           }

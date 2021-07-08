@@ -77,6 +77,7 @@ class Application {
         $index = \ZfExtended_BaseIndex::getInstance();
         $index->initApplication()->bootstrap();
         $index->addModuleOptions('default');
+        $index->addModuleOptions('editor');
         
         //set the hostname to the configured one:
         $config = \Zend_Registry::get('config');

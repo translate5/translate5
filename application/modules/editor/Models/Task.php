@@ -171,15 +171,22 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $this->createTaskGuidIfNeeded();
     }
     
-    /**
-     *  Return all task specific configs for the current task.
-     *  For all configs for which there is not task specific overwrite, the overwrite for the task client will be used as a value.
-     *  For all configs for which there is no task customer specific overwrite, the instance-level config value will be used
+
+    /***
+     * Returns all task specific configs for the current task.
+     * For all configs for which there is no task specific overwrite, overwrite for the task client will be used as a value.
+     * For all configs for which there is no task customer specific overwrite, instance-level config value will be used
+     *
+     * @param bool $disableCache : disable the config cache. Load always fresh config from the db
      * @return Zend_Config
+     * @throws editor_Models_ConfigException
      */
-    public function getConfig() {
+    public function getConfig(bool $disableCache = false) {
         $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
         /* @var $taskConfig editor_Models_TaskConfig */
+        if($disableCache){
+            $taskConfig->cleanConfigCache();
+        }
         return $taskConfig->getTaskConfig($this->getTaskGuid());
     }
     
@@ -306,7 +313,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
 
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
         $loadAll = $userModel->isAllowed('backend', 'loadAllTasks');
-        $ignoreAnonStuff = $userModel->readAnonymizedUsers();
+        $ignoreAnonStuff = $this->rolesAllowReadAnonymizedUsers();
 
         $anonSql = '';
         if(!$ignoreAnonStuff) {
@@ -404,14 +411,21 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param bool $asJson if true, json is returned, otherwhise assoc-array
      * @return mixed depending on $asJson
      */
-    public function getQmSubsegmentIssuesTranslated($asJson = true){
+    public function getMqmTypesTranslated($asJson = true){
+        // ugly defaults when no data set to avoid exceptions. Generally, no code should request this when MQMs are not configured
+        if($this->row->qmSubsegmentFlags == NULL){
+            if($asJson){
+                return NULL;
+            }
+            return [];
+        }
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
-        $walk = function(array $qmFlagTree)use ($translate,&$walk){
+        $walk = function(array $qmFlagTree) use ($translate, &$walk){
             foreach ($qmFlagTree as $node) {
                 $node->text = $translate->_($node->text);
                 if(isset($node->children) && is_array($node->children)){
-                  $walk($node->children, $walk);
+                    $walk($node->children, $walk);
                 }
             }
             return $qmFlagTree;
@@ -427,43 +441,35 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return $qmFlagTree;
     }
     /**
-     * @return array qm-flags as tree array of objects; example in json-notation:
-     *      [{"text":"Accuracy","id":1,"children":[{"text":"Terminology","id":2,"children":[]}]}]
+     * @return array('issueId'=>'issueText',...)
      */
-    public function getQmSubsegmentIssues(){
+    public function getMqmTypesFlat(){
+        $flatTree = array();
+        $walk = function(array $qmFlagTree)use (&$walk, &$flatTree){
+            foreach ($qmFlagTree as $node) {
+                $flatTree[$node->id] = $node->text;
+                if(isset($node->children) && is_array($node->children)){
+                    $walk($node->children);
+                }
+            }
+        };
         $tree = Zend_Json::decode($this->row->qmSubsegmentFlags, Zend_Json::TYPE_OBJECT);
         if(!isset($tree->qmSubsegmentFlags)){
             throw new Zend_Exception('qmSubsegmentFlags JSON Structure not OK, missing field qmSubsegmentFlags');
         }
-        return $tree->qmSubsegmentFlags;
-    }
-    /**
-     * @return array('issueId'=>'issueText',...)
-     */
-    public function getQmSubsegmentIssuesFlat(){
-        $flatTree = array();
-        $walk = function(array $qmFlagTree)use (&$walk,&$flatTree){
-            foreach ($qmFlagTree as $node) {
-                $flatTree[$node->id] = $node->text;
-                if(isset($node->children) && is_array($node->children)){
-                  $walk($node->children);
-                }
-            }
-        };
-        $walk($this->getQmSubsegmentIssues());
+        $walk($tree->qmSubsegmentFlags);
         return $flatTree;
     }
     /**
      * @return stdClass
      */
-    public function getQmSubsegmentSeverities(){
+    public function getMqmSeverities(){
         $tree = Zend_Json::decode($this->row->qmSubsegmentFlags, Zend_Json::TYPE_OBJECT);
         if(!isset($tree->severities)){
             throw new Zend_Exception('qmSubsegmentFlags JSON Structure not OK, missing field severities');
         }
         return $tree->severities;
     }
-
     /**
      * returns all configured Severities as JSON or PHP Data Structure:
      * [{
@@ -477,7 +483,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param Zend_Db_Table_Row_Abstract $row | null - if null, $this->row is used
      * @return string|array depends on $asJson
      */
-    public function getQmSubsegmentSeveritiesTranslated($asJson = true, array $row = null) {
+    public function getMqmSeveritiesTranslated($asJson = true, array $row = null) {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */
         if(is_null($row)) {
@@ -595,7 +601,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * This method may not be called directly!
      * Either call editor_Models_Task::updateWorkflowStep
-     * or if you are in Workflow Context call editor_Workflow_Abstract::setNextStep
+     * or if you are in Workflow Context call editor_Workflow_Default::setNextStep
      * @param string $stepName
      * @throws BadMethodCallException
      */
@@ -641,7 +647,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $session = new Zend_Session_Namespace();
         return !empty($session->taskGuid) && $session->taskGuid == $this->getTaskGuid();
     }
-
+    /**
+     * Convenience API
+     * @return boolean
+     */
+    public function isTranslation() {
+        return $this->getEmptyTargets();
+    }
     /**
      * unlocks all tasks, where the associated session is invalid
      */
@@ -1106,10 +1118,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * (2) if the currently logged in user does not have the role admin, PM or api.
      * If the $checkUser-param is set to "false", the user-check is omitted (= only the
      * task's anonymizeUsers-config is taken into account).
-     * @param string|false $checkUser (optional)
+     * @param bool $checkUser optional, set to false to check only the config (and do not consider the ACLs behind the currently logged in user or the roles given in $customRoles)
+     * @param bool $customRoles (optional) if checkUser = true the here provided roles are used for ACL check instead the currently logged in user
      * @return boolean
      */
-    public function anonymizeUsers($checkUser = true) {
+    public function anonymizeUsers(bool $checkUser = true, array $customRoles = null) {
         $config = $this->getConfig();
         if(!$config->runtimeOptions->customers->anonymizeUsers) {
             return false;
@@ -1117,9 +1130,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if($checkUser === false) {
             return $config->runtimeOptions->customers->anonymizeUsers; // = true if we get here
         }
-        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        return !($userModel->readAnonymizedUsers());
+        return !($this->rolesAllowReadAnonymizedUsers($customRoles));
+    }
+    
+    /**
+     * returns true if the given roles (or the roles of the current user) disallow seeing all user data
+     * @param array $rolesToCheck
+     */
+    protected function rolesAllowReadAnonymizedUsers(array $rolesToCheck = null) {
+        if(empty($rolesToCheck)) {
+            $userSession = new Zend_Session_Namespace('user');
+            $rolesToCheck = $userSession->data->roles;
+        }
+        $aclInstance = ZfExtended_Acl::getInstance();
+        return $aclInstance->isInAllowedRoles($rolesToCheck, "frontend", "readAnonymyzedUsers");
     }
 
     /***
@@ -1127,19 +1151,27 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param editor_Models_Task $task
      */
     public function updateSegmentFinishCount(){
-        $stateRoles = $this->getTaskStateRoles($this->getTaskGuid(), $this->getWorkflowStepName());
-        $isWorkflowEnded = $this->getWorkflowStepName() == editor_Workflow_Abstract::STEP_WORKFLOW_ENDED;
-        if(!$stateRoles && !$isWorkflowEnded){
+        $workflow = $this->getTaskActiveWorkflow();
+        if(empty($workflow)) {
             return;
         }
+        $states = $this->getTaskRoleAutoStates();
+        $isWorkflowEnded = $workflow->isEnded($this);
 
-        $adapted=$this->db->getAdapter();
-        //if it is workflow ended, set the count to 100% (segmentFinishCount=segmentCount)
+        $adapted = $this->db->getAdapter();
+        
+        if(!$isWorkflowEnded && !$states) {
+            //if workflow is not ended and we do not have any states to the current steps role, we do not update anything
+            return;
+        }
+        
         if($isWorkflowEnded){
+            //if workflow is ended, set the count to 100% (segmentFinishCount=segmentCount)
             $expression='segmentCount';
-        }else{
+        }
+        else {
             //get the autostates for the valid task workflow states
-            $expression='(SELECT COUNT(*) FROM LEK_segments WHERE autoStateId IN('.implode(',', $stateRoles).') AND taskGuid='.$adapted->quote($this->getTaskGuid()).')';
+            $expression='(SELECT COUNT(*) FROM LEK_segments WHERE autoStateId IN('.implode(',', $states).') AND taskGuid='.$adapted->quote($this->getTaskGuid()).')';
         }
         $this->db->update(['segmentFinishCount'=>new Zend_Db_Expr($expression)],['taskGuid=?' => $this->getTaskGuid()]);
     }
@@ -1151,7 +1183,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param int $oldAutoState
      */
     public function changeSegmentFinishCount(editor_Models_Task $task,int $newAutostate,int $oldAutoState){
-        $stateRoles=$this->getTaskStateRoles($task->getTaskGuid(),$task->getWorkflowStepName());
+        $stateRoles=$this->getTaskRoleAutoStates();
         if(!$stateRoles){
             return;
         }
@@ -1169,18 +1201,16 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /***
      * Get all autostate ids for the active tasks workflow
      *
-     * @param string $taskGuid
-     * @param string $workflowStepName
      * @return boolean|boolean|multitype:string
      */
-    public function getTaskStateRoles(string $taskGuid,string $workflowStepName){
+    protected function getTaskRoleAutoStates(){
         try {
-            $workflow=$this->getTaskActiveWorkflow($taskGuid);
+            $workflow=$this->getTaskActiveWorkflow();
         } catch (ZfExtended_Exception $e) {
             //the workflow with $workflowStepName does not exist
             return false;
         }
-        $roleOfStep=$workflow->getRoleOfStep($workflowStepName);
+        $roleOfStep=$workflow->getRoleOfStep($this->getWorkflowStepName());
         if(empty($roleOfStep)){
             return false;
         }
@@ -1190,15 +1220,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /***
-     * Get the active workflow for the given taskGuid
-     * @param string $taskGuid
-     * @return editor_Workflow_Abstract
+     * Get the active workflow for the current task
+     * @return editor_Workflow_Default|null if task is configured with a non existent workflow
      */
-    public function getTaskActiveWorkflow(string $taskGuid){
+    public function getTaskActiveWorkflow(): ?editor_Workflow_Default {
         //get the current task active workflow
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
-        return $wfm->getActive($taskGuid);
+        return $wfm->getActiveByTask($this);
     }
     
     /***
@@ -1230,7 +1259,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'emptyTargets' => 'Übersetzungsaufgabe (kein Review)',
             'enableSourceEditing' => 'Quellsprache bearbeitbar',
             'fileCount' => 'Dateien',
-            'fullMatchEdit' => 'unveränderte 100% TM Matches sind editierbar',
+            'fullMatchEdit' => 'Unveränderte 100% TM Matches sind editierbar',
             'lockLocked' => 'Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
             'orderdate' => 'Bestelldatum',
             'pmGuid' => 'Projektmanager',
@@ -1251,5 +1280,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'workflow' => 'Workflow',
             'userCount' => 'Zahl zugewiesener Benutzer',
         );
+    }
+
+    /**
+     * Updates the usercount of a task.
+     * @param string|null $taskGuid Optional, if omitted operate on current task
+     */
+    public function updateTask(string $taskGuid = null) {
+        $sql = 'update `LEK_task` t, (select count(*) cnt, ? taskGuid from `LEK_taskUserAssoc` where taskGuid = ? and isPmOverride = 0) tua
+            set t.userCount = tua.cnt where t.taskGuid = tua.taskGuid';
+        $db = $this->db->getAdapter();
+        $sql = $db->quoteInto($sql, $taskGuid ?? $this->getTaskGuid(), 'string', 2);
+        $db->query($sql);
     }
 }

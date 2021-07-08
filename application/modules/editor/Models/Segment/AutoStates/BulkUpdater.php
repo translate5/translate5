@@ -251,10 +251,11 @@ class editor_Models_Segment_AutoStates_BulkUpdater {
             // and not explicitly locked, and if source contains text:
             if($edit100PercentMatch && !$isLocked && $hasText) {
 
-                // BLOCKED → to all previous non blocked states possible from history
+                // BLOCKED → to all previous non blocked and non untranslated states possible from history
                 $latest = $segmentHistory->loadLatestForSegment($segment->getId(), [
                     'editable != ?' => 0,
                     'autoStateId != ?' => $autoState::BLOCKED,
+                    'autoStateId != ?' => $autoState::NOT_TRANSLATED,
                 ]);
                 
                 //if nothing found in history, re calculate it

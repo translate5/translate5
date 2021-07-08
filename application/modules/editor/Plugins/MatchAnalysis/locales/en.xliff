@@ -30,10 +30,10 @@
 		    <target>Start analysis</target>
 		</trans-unit>
 		
-		<trans-unit id='RXhwb3J0'>
-		    <source>Export</source>
-		    <target>Export</target>
-		</trans-unit>
+<trans-unit id='RXhwb3J0IGFscyBFeGNlbA=='>
+  <source>Export als Excel</source>
+  <target>Export as Excel</target>
+</trans-unit>
 		
 		<trans-unit id='U3RhcnQgZGVyIEFuYWx5c2UgaW0gVGFiIOKAnFNwcmFjaHJlc3NvdXJjZW4genV3ZWlzZW7igJw='>
 		    <source>Start der Analyse im Tab “Sprachressourcen zuweisen“</source>
@@ -120,21 +120,17 @@
 		    <target>Match analysis and pretranslation are finished.</target>
 		</trans-unit>
 
-		<trans-unit id='VGVybWlub2xvZ2llIHByw7xmZW4gdW5kIG1hcmtpZXJlbg=='>
-		    <source>Terminologie prüfen und markieren</source>
-		    <target>Check and mark terminology</target>
-		</trans-unit>
-
 		<trans-unit id='QW5hbHlzZSBsw6R1ZnQ='>
 		    <source>Analyse läuft</source>
 		    <target>Analysis in progress</target>
 		</trans-unit>
-
-		<trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse enthalten</source><target>Blocked segments are included in the analysis</target></trans-unit>
-		<trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgbmljaHQgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse nicht enthalten</source><target>Blocked segments are not included in the analysis</target></trans-unit>
-        <trans-unit id='RXhwb3J0IFhNTA=='>
-            <source>Export XML</source>
-            <target>Export XML</target>
+        <trans-unit id='R2VzcGVycnRlIDEwMCUtTWF0Y2hlcyBzaW5kIG5pY2h0IFRlaWwgZGVyIEFuYWx5c2Uu'>
+            <source>Gesperrte 100%-Matches sind nicht Teil der Analyse.</source>
+            <target>Locked 100% matches are not part of the analysis.</target>
+        </trans-unit>
+        <trans-unit id='RXhwb3J0IFRyYWRvcy1saWtlIFhNTA=='>
+          <source>Export Trados-like XML</source>
+          <target>Export Trados-like XML</target>
         </trans-unit>
     </body>
   </file>

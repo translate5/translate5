@@ -8,22 +8,34 @@ fi
 # load config:
 . $CONFIG;
 
-INCLUDES="${APPLICATION_ROOT}application:${APPLICATION_ROOT}library:${APPLICATION_ROOT}application/modules/editor/:.:$ZEND:/usr/share/php5:/usr/share/php"
-export API_URL=$API_URL
-export DATA_DIR=$DATA_DIR
-export LOGOUT_PATH=$LOGOUT_PATH
+INCLUDES="${APPLICATION_ROOT}application:${APPLICATION_ROOT}library:${APPLICATION_ROOT}vendor:${APPLICATION_ROOT}application/modules/editor/:.:$ZEND:/usr/share/php5:/usr/share/php"
 
-#single test to test the "things around" (translate5 internal test framework)
-#phpunit --verbose --include-path $INCLUDES --bootstrap bootstrap.php editorAPI/DummyTest.php
-#exit $?
 
+# check if the capture-option is set (only available for single tests)
+DO_CAPTURE=0
+while getopts :c opt
+do
+   case $opt in
+       c)
+       		shift $((OPTIND-1))
+       		DO_CAPTURE=1 
+       		;;
+   esac
+done
+
+# evaluate if single test or whole suite
 if [ -n "$1" ]; then
 TO_RUN=$@
 else
 TO_RUN="editorAPI"
+DO_CAPTURE=0 # whole suite can not be captured
 fi
 
-#starting test suite:
+# export relevant environment vars
+export APPLICATION_ROOT=$APPLICATION_ROOT
+export DO_CAPTURE=$DO_CAPTURE
+
+# starting test suite:
 
 if phpunit --atleast-version 8.0.0; then
     phpunit --colors --verbose --cache-result-file ${APPLICATION_ROOT}application/modules/editor/testcases/.phpunit.result.cache  --include-path $INCLUDES --bootstrap bootstrap.php $TO_RUN

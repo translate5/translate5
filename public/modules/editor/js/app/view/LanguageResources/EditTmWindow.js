@@ -54,10 +54,13 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen',
         customers:'#UT#Kunden',
-        useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
+        useAsDefault:'#UT#Leserechte standardmäßig',
+        writeAsDefault:'#UT#Schreibrechte standardmäßig',
         collection:'#UT#TBX-Datei',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
         categories: '#UT#Kategorien',
+        useAsDefaultTooltip:'#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert',
+        writeAsDefaultTooltip:'#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden'
     },
     
     listeners:{
@@ -70,9 +73,9 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
     layout:'fit',
     initConfig : function(instanceConfig) {
         var me = this,
-        langField = {
+            langField = {
                 xtype: 'displayfield',
-                renderer: function(value,field) {
+                renderer: function(value) {
                     if(!value){
                         return '';
                     }
@@ -86,122 +89,151 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     return retval.join(',');
                 }
             },
-            config = {},
             defaults = {
                 labelWidth: 160,
                 anchor: '100%'
             },
-        config = {
-            title: me.strings.edit,
-            items : [{
-                xtype: 'form',
-                padding: 5,
-                ui: 'default-frame',
-                defaults: defaults,
-                autoScroll: true,
-                items: [{
-                    xtype: 'displayfield',
-                    name:'resourceId',
-                    id:'resourceId',
-                    renderer: function(id) {
-                        var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
-                            resource = store.getById(id);
-                        return resource ? resource.get('name') : id;
-                    },
-                    fieldLabel: me.strings.resource
-                },{
-                    xtype: 'textfield',
-                    name: 'name',
-                    toolTip: me.strings.name,
-                    fieldLabel: me.strings.name,
-                    maxLength: 255,
-                    allowBlank: false,
-                    toolTip:'Name'
-                },Ext.applyIf({
-                    name: 'sourceLang',
-                    toolTip: me.strings.source,
-                    fieldLabel: me.strings.source
-                }, langField),Ext.applyIf({
-                    name: 'targetLang',
-                    toolTip: me.strings.target,
-                    fieldLabel: me.strings.target
-                }, langField),{
-                    xtype:'customers',
-                    fieldLabel:me.strings.customers,
-                    listeners:{
-                        change:'onCustomersTagFieldChange'
-                    },
-                    itemId:'resourcesCustomers',
-                    name:'customerIds',
-                    dataIndex:'customerIds',
-                    store:Ext.create('Ext.data.Store', {
-                        model:'Editor.model.admin.Customer',
-                        autoLoad:true
-                    })
-                },{
-                    xtype:'tagfield',
-                    name:'customerUseAsDefaultIds',
-                    itemId:'useAsDefault',
-                    fieldLabel:me.strings.useAsDefault,
-                    store:Ext.create('Ext.data.Store', {
-                        model:'Editor.model.admin.Customer'
-                    }),
-                    displayField: 'name', 
-                    valueField: 'id', 
-                    queryMode: 'local', 
-                    dataIndex:'customerUseAsDefaultIds'
-                },{
-                    xtype: 'colorfield',
-                    fieldLabel: me.strings.color,
-                    toolTip: me.strings.colorTooltip, 
-                    labelWidth: 160,
-                    anchor: '100%',
-                    name: 'color'
-                },{
-                    // Categories: currently only active for Plugin
-                    // (here: display the categories only, don't edit them
-                    // after the LanguageResource has been created)
-                    xtype: 'displayfield',
-                    name:'categories',
-                    id:'categories',
-                    renderer: function(value) {
-                        if(!value){
-                            return '';
-                        }
-                        var retval=[];
-                        for(var i=0;i<value.length;i++){
-                            retval.push(value[i]);
-                        }
-                        return retval.join('<br>');
-                    },
-                    toolTip: me.strings.categories,
-                    fieldLabel: me.strings.categories,
-                    disabled: true
-                }]
-            }],
-            dockedItems : [{
-                xtype : 'toolbar',
-                dock : 'bottom',
-                ui: 'footer',
-                layout: {
-                    type: 'hbox',
-                    pack: 'start'
-                },
+            config = {
+                title: me.strings.edit,
                 items : [{
-                    xtype: 'tbfill'
-                },{
-                    xtype: 'button',
-                    glyph: 'f00c@FontAwesome5FreeSolid',
-                    itemId: 'save-tm-btn',
-                    text: me.strings.save
-                }, {
-                    xtype : 'button',
-                    glyph: 'f00d@FontAwesome5FreeSolid',
-                    itemId : 'cancel-tm-btn',
-                    text : me.strings.cancel
+                    xtype: 'form',
+                    padding: 5,
+                    ui: 'default-frame',
+                    defaults: defaults,
+                    autoScroll: true,
+                    items: [{
+                        xtype: 'displayfield',
+                        name:'resourceId',
+                        id:'resourceId',
+                        renderer: function(id) {
+                            var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
+                                resource = store.getById(id);
+                            return resource ? resource.get('name') : id;
+                        },
+                        fieldLabel: me.strings.resource
+                    },{
+                        xtype: 'textfield',
+                        name: 'name',
+                        tooltip: me.strings.name,
+                        fieldLabel: me.strings.name,
+                        maxLength: 255,
+                        allowBlank: false
+                    },Ext.applyIf({
+                        name: 'sourceLang',
+                        tooltip: me.strings.source,
+                        fieldLabel: me.strings.source
+                    }, langField),Ext.applyIf({
+                        name: 'targetLang',
+                        tooltip: me.strings.target,
+                        fieldLabel: me.strings.target
+                    }, langField),{
+                        xtype:'customers',
+                        name:'customerIds',
+                        itemId:'resourcesCustomers',
+                        dataIndex:'customerIds',
+                        reference:'resourcesCustomers',
+                        publishes: 'value',
+                        bind:{
+                            store:'{customers}'
+                        },
+                        listeners:{
+                            change:'onCustomersTagFieldChange'
+                        },
+                        fieldLabel:me.strings.customers,
+                        allowBlank: false
+                    },{
+                        xtype:'tagfield',
+                        name:'customerUseAsDefaultIds',
+                        itemId:'useAsDefault',
+                        dataIndex:'customerUseAsDefaultIds',
+                        reference:'useAsDefault',
+                        publishes: 'value',
+                        bind:{
+                            store:'{customersDefaultRead}'
+                        },
+                        listeners:{
+                            change:'onCustomersReadTagFieldChange'
+                        },
+                        queryMode: 'local',
+                        displayField: 'name',
+                        valueField: 'id',
+                        fieldLabel:me.strings.useAsDefault,
+                        labelClsExtra:'lableInfoIcon',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': me.strings.useAsDefaultTooltip
+                        }
+                    },{
+                        xtype:'tagfield',
+                        name:'customerWriteAsDefaultIds',
+                        itemId:'writeAsDefault',
+                        dataIndex:'customerWriteAsDefaultIds',
+                        bind:{
+                            store:'{customersDefaultWrite}',
+                            hidden:'{!isTmResourceType}',
+                            disabled:'{!isTmResourceType}'
+                        },
+                        displayField: 'name',
+                        valueField: 'id',
+                        queryMode: 'local',
+                        fieldLabel:me.strings.writeAsDefault,
+                        labelClsExtra:'lableInfoIcon',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': me.strings.writeAsDefaultTooltip
+                        }
+                    },{
+                        xtype: 'colorfield',
+                        name: 'color',
+                        fieldLabel: me.strings.color,
+                        toolTip: me.strings.colorTooltip,
+                        labelWidth: 160,
+                        anchor: '100%'
+                    },{
+                        // Categories: currently only active for Plugin
+                        // (here: display the categories only, don't edit them
+                        // after the LanguageResource has been created)
+                        xtype: 'displayfield',
+                        name:'categories',
+                        id:'categories',
+                        renderer: function(value) {
+                            if(!value){
+                                return '';
+                            }
+                            var retval=[];
+                            for(var i=0;i<value.length;i++){
+                                retval.push(value[i]);
+                            }
+                            return retval.join('<br>');
+                        },
+                        toolTip: me.strings.categories,
+                        fieldLabel: me.strings.categories,
+                        disabled: true
+                    }]
+                }],
+                dockedItems : [{
+                    xtype : 'toolbar',
+                    dock : 'bottom',
+                    ui: 'footer',
+                    layout: {
+                        type: 'hbox',
+                        pack: 'start'
+                    },
+                    items : [{
+                        xtype: 'tbfill'
+                    },{
+                        xtype: 'button',
+                        glyph: 'f00c@FontAwesome5FreeSolid',
+                        itemId: 'save-tm-btn',
+                        text: me.strings.save
+                    }, {
+                        xtype : 'button',
+                        glyph: 'f00d@FontAwesome5FreeSolid',
+                        itemId : 'cancel-tm-btn',
+                        text : me.strings.cancel
+                    }]
                 }]
-            }]
-        };
+            };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
@@ -217,5 +249,6 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
 
         me.down('form').loadRecord(record);
         vm.set('serviceName',record.get('serviceName'));
+        vm.set('resourceType',record.get('resourceType'));
     }
 });

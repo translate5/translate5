@@ -63,10 +63,8 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
         close: '#UT#Schließen',
         reimport: '#UT#Aufgaben reimportieren',
         reimportTooltip: '#UT#Ausgewählte Aufgaben erneut ins aktuelle TM importieren',
+        gotoTask: '#UT#zur Aufgabe springen'
     },
-    stores:[
-        'Editor.store.LanguageResources.TaskAssocStore'
-    ],
     controller: 'languageResourceTaskGridWindow',
     viewModel: {
         type: 'languageResourceTaskGridWindow'
@@ -108,6 +106,13 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
                       return Ext.String.format(me.strings.inUse, rec.get('state'));
                   },
                   text: me.strings.state
+              },{
+                  xtype: 'taskActionColumn',
+                  items: [{
+                      tooltip: me.strings.gotoTask,
+                      iconCls: 'ico-task-project',
+                      handler: 'gotoTask'
+                  }]
               }]
           }],
           dockedItems : [{

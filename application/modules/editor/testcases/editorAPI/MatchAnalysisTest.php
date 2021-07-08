@@ -57,6 +57,9 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      * Import all required resources and task before the validation
      */
     public function testSetupData(){
+        //use the following lines to rerun the validation tests on a specific task
+        //$this->api()->reloadTask(9066);
+        //return;
         $this->addTm('resource1.tmx',$this->getLrRenderName('resource1'));
         $this->addTm('resource2.tmx',$this->getLrRenderName('resource2'));
         $this->addTermCollection('collection.tbx', $this->getLrRenderName('resource3'));
@@ -68,13 +71,45 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
     }
     
     /***
+     * Test the xml analysis summary
+     * @depends testSetupData
+     */
+    public function testExportXmlResults()
+    {
+        $taskGuid = self::$api->getTask()->taskGuid;
+        $response = self::$api->request('editor/plugins_matchanalysis_matchanalysis/export', 'GET', [
+            'taskGuid' => $taskGuid,
+            'type' => 'exportXml'
+        ]);
+        
+        self::assertTrue($response->getStatus() === 200, 'export XML HTTP Status is not 200');
+        $actual = self::$api->formatXml($response->getBody());
+
+        //sanitize task information
+        $actual = str_replace('number="'.$taskGuid.'"/>', 'number="UNTESTABLECONTENT"/>', $actual);
+        
+        //sanitize analysis information
+        $actual = preg_replace(
+            '/<taskInfo taskId="([^"]*)" runAt="([^"]*)" runTime="([^"]*)">/',
+            '<taskInfo taskId="UNTESTABLECONTENT" runAt="UNTESTABLECONTENT" runTime="UNTESTABLECONTENT">',
+            $actual);
+        
+        self::$api->isCapturing() && file_put_contents($this->api()->getFile('exportResults.xml', null, false), $actual);
+        $expected = self::$api->getFileContent('exportResults.xml');
+        
+        //check for differences between the expected and the actual content
+        self::assertEquals($expected, $actual, "The expected file(exportResults) an the result file does not match.");
+    }
+    
+    /***
+     * @depends testSetupData
      * Validate the analysis results.
      * 1. the first validation will validate the grouped results for the analysis
      * 2. the second validation will validate the all existing results for the analyis
      */
     public function testValidateResults(){
         $analysis=$this->api()->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
-            'taskGuid'=>$this->api()->getTask()->taskGuid
+            'taskGuid'=> $this->api()->getTask()->taskGuid
         ]);
         
         $this->assertNotEmpty($analysis,'No results found for the matchanalysis.');
@@ -92,9 +127,9 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         
         
         //not test all results and matches
-        $analysis=$this->api()->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
-            'taskGuid'=>$this->api()->getTask()->taskGuid,
-            'notGrouped'=>$this->api()->getTask()->taskGuid
+        $analysis = $this->api()->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
+            'taskGuid' => $this->api()->getTask()->taskGuid,
+            'notGrouped' => $this->api()->getTask()->taskGuid
         ]);
         $this->assertNotEmpty($analysis,'No results found for the matchanalysis.');
         //remove some of the unneeded columns
@@ -123,6 +158,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'customerId'=>self::$api->getCustomer()->id,
+            'edit100PercentMatch' => true,
             'autoStartImport'=>0
         ];
         self::assertLogin('testmanager');
@@ -143,6 +179,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [$this->api()->getCustomer()->id],
             'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_OpenTM2',
             'serviceName'=> 'OpenTM2',
             'name' => $name
@@ -166,6 +203,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $params['serviceType']='editor_Services_TermCollection';
         $params['customerIds'] = [$customer->id];
         $params['customerUseAsDefaultIds'] = [];
+        $params['customerWriteAsDefaultIds'] = [];
         $params['serviceName']='TermCollection';
         $params['mergeTerms']=false;
         
@@ -189,9 +227,8 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $params['pretranslateMatchrate']= 100;
         $params['pretranslateTmAndTerm']= 1;
         $params['pretranslateMt']= 0;
-        $params['termtaggerSegment']= 0;
         $params['isTaskImport']= 0;
-        $this->api()->requestJson('editor/task/'.$this->api()->getTask()->id.'/pretranslation/operation', 'PUT', $params,$params);
+        $this->api()->requestJson('editor/task/'.$this->api()->getTask()->id.'/pretranslation/operation', 'PUT', $params, $params);
         error_log("Queue pretranslation and analysis.");
     }
     

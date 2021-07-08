@@ -167,6 +167,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             //report progress update
             $progressCallback && $progressCallback($progress);
         }
+        
+        if(!empty($segment)) {
+            $segment->syncRepetitions($this->task->getTaskGuid());
+        }
 
         $this->clean();
 
@@ -280,14 +284,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 }
 
                 // If the matchrate is the same, we only check for a new best match if it is from a termcollection
-                if ($matchRateInternal->matchrate == $match->matchrate && $match->languageResourceType != 'termcollection') {
+                if ($matchRateInternal->matchrate == $match->matchrate && $match->languageResourceType != editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
                     continue;
                 }
 
-                if ($match->languageResourceType == 'termcollection') {
+                if ($match->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
                     // - preferred terms > permitted terms
                     // - if multiple permitted terms: take the first
-                    if (!is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == 'termcollection') {
+                    if (!is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
                         $bestMatchMetaData = $bestMatchRateResult->metaData;
                         $bestMatchIsPreferredTerm = editor_Models_Terminology_Models_TermModel::isPreferredTerm($bestMatchMetaData['status']);
                         if ($bestMatchIsPreferredTerm) {
@@ -437,14 +441,19 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setLanguageResourceid($languageResourceid);
         $matchAnalysis->setWordCount($segment->meta()->getSourceWordCount());
         $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
-        $matchAnalysis->setUuid(ZfExtended_Utils::uuid());
+        
+        if($languageResourceid === 0) {
+            $type = editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED;
+        }
+        elseif(array_key_exists($languageResourceid, $this->resources)) {
+            $type = $this->resources[$languageResourceid]->getResourceType();
+        }
+        else {
+            $type = editor_Models_Segment_MatchRateType::TYPE_UNKNOWN;
+        }
+        
+        $matchAnalysis->setType($type);
 
-        $type = '';
-        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
-
-        $languageresource->load($languageResourceid);
-        $matchAnalysis->setType($languageresource->getResourceType());
         $isFuzzy = false;
         $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
         if (isset($matchRateResult) && is_object($matchRateResult)) {
@@ -503,7 +512,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             try {
                 $connector = $manager->getConnector($languageresource, $this->task->getSourceLang(), $this->task->getTargetLang(), $this->task->getConfig());
 
-                //throw a worning if the language resource is not available
+                // set the analysis running user to the connector
+                $connector->setWorkerUserGuid($this->userGuid);
+
+                //throw a warning if the language resource is not available
                 $status = $connector->getStatus($resource);
                 if (!in_array($status, $availableConnectorStatus)) {
                     $this->log->warn('E1239', 'MatchAnalysis Plug-In: Language resource "{name}" has status "{status}" and is not available for match analysis and pre-translations.', [

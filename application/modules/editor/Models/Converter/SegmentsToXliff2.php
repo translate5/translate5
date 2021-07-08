@@ -276,7 +276,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
 
         $tmpUser=[];
         foreach($assocUsers as $user){
-            if(!$user['role'] || $user['role']===editor_Workflow_Abstract::ROLE_VISITOR || $user['role']===''){
+            if(!$user['role'] || $user['role']===editor_Workflow_Default::ROLE_VISITOR || $user['role']===''){
                 continue;
             }
             $this->data['assocUsers'][$user['role']][]=$user;
@@ -403,9 +403,9 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $this->result[] = '<'.join(' ', $unitTag).'>';
 
         //segment QM states
-        $qms=[];
+        $qualityData = [];
         if($this->options[self::CONFIG_ADD_QM]) {
-            $qms=$this->processQm($segment);
+            $qualityData = $this->processQmQualities($segment);
         }
 
         //add the comments
@@ -439,7 +439,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
 
         $fields = $this->sfm->getFieldList();
         foreach($fields as $field) {
-            $this->processSegmentField($field, $segment,$qms);
+            $this->processSegmentField($field, $segment, $qualityData);
         }
 
         $this->result[] = '</segment>';
@@ -482,7 +482,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      * @param Zend_Db_Table_Row $field
      * @param array $segment
      */
-    protected function processSegmentField(Zend_Db_Table_Row $field, array $segment, array $qms = []) {
+    protected function processSegmentField(Zend_Db_Table_Row $field, array $segment, array $qualityData = []) {
         if($field->type == editor_Models_SegmentField::TYPE_SOURCE) {
             return; //handled before
         }
@@ -502,14 +502,14 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             $this->result[] = '<target>';
 
             //if there are qms for the segment add the mrk tag
-            if(!empty($qms)){
-                $this->result[] ='<mrk id="'.$this->escape(self::QM_ID_PREFIX.implode('_',array_keys($qms))).'" its:type="generic" translate="yes" its:locQualityIssuesRef="'.$this->escape(self::QM_ID_PREFIX.implode('_', array_keys($qms))).'">';
+            if(!empty($qualityData)){
+                $this->result[] ='<mrk id="'.$this->escape(self::QM_ID_PREFIX.implode('_',array_keys($qualityData))).'" its:type="generic" translate="yes" its:locQualityIssuesRef="'.$this->escape(self::QM_ID_PREFIX.implode('_', array_keys($qualityData))).'">';
             }
             //add the target edit text
             $this->result[] = $targetEdit;
 
             //if there are qms for this segment close the mark tag
-            if(!empty($qms)){
+            if(!empty($qualityData)){
                 $this->result[] = '</mrk>';
             }
 
@@ -524,29 +524,29 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     protected function initItsPersonGuid($segment){
         $assocUsers=$this->data['assocUsers'];
         //check if user with role translator or translator-check is assigned to the task
-        if(!isset($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR]) && !isset($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATORCHECK])){
+        if(!isset($assocUsers[editor_Workflow_Default::ROLE_TRANSLATOR]) && !isset($assocUsers[editor_Workflow_Default::ROLE_TRANSLATORCHECK])){
             return;
         }
 
         $tmpTranslatorArray=[];
         $this->itsPerson=null;
         $this->itsPersonGuid=null;
-
-        $isTranslatorSet=isset($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR]);
-
+        
+        $isTranslatorSet=isset($assocUsers[editor_Workflow_Default::ROLE_TRANSLATOR]);
+        
         //if only one translator
-        if($isTranslatorSet && count($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR])==1){
-            $this->itsPersonGuid=$assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR][0]['userGuid'];
-        }else if(!$isTranslatorSet || count($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR])==0){//if the there is no translator, check for translatorCheck
-
+        if($isTranslatorSet && count($assocUsers[editor_Workflow_Default::ROLE_TRANSLATOR])==1){
+            $this->itsPersonGuid=$assocUsers[editor_Workflow_Default::ROLE_TRANSLATOR][0]['userGuid'];
+        }else if(!$isTranslatorSet || count($assocUsers[editor_Workflow_Default::ROLE_TRANSLATOR])==0){//if the there is no translator, check for translatorCheck
+            
             //if only one translatorCheck
-            if(count($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATORCHECK])==1){
-                $this->itsPersonGuid=$assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATORCHECK][0]['userGuid'];
-            }else if(count($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATORCHECK])>1){//more than one tanslator check
-                $tmpTranslatorArray=$assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATORCHECK];
+            if(count($assocUsers[editor_Workflow_Default::ROLE_TRANSLATORCHECK])==1){
+                $this->itsPersonGuid=$assocUsers[editor_Workflow_Default::ROLE_TRANSLATORCHECK][0]['userGuid'];
+            }else if(count($assocUsers[editor_Workflow_Default::ROLE_TRANSLATORCHECK])>1){//more than one tanslator check
+                $tmpTranslatorArray=$assocUsers[editor_Workflow_Default::ROLE_TRANSLATORCHECK];
             }
         }else{//more than one translator
-            $tmpTranslatorArray=$assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR];
+            $tmpTranslatorArray=$assocUsers[editor_Workflow_Default::ROLE_TRANSLATOR];
         }
 
         if($this->itsPersonGuid){
@@ -576,12 +576,12 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         if($segment['userGuid'] === $this->task->getPmGuid()){
             //If the workflow step that is currently finishd is translation or translator-check, the PM is used for its:person.
             //If the current workflow step is review, than the project manager is used for its:revPerson
-            if($this->workflowStep===editor_Workflow_Abstract::STEP_TRANSLATION || $this->workflowStep===editor_Workflow_Abstract::STEP_TRANSLATORCHECK){
-                $this->itsPersonGuid=$this->task->getPmGuid();
+            if($this->workflow->isStepOfRole($this->workflowStep, [editor_Workflow_Default::ROLE_TRANSLATOR, $this->workflowStep===editor_Workflow_Default::ROLE_TRANSLATORCHECK])){
+                $this->itsPersonGuid = $this->task->getPmGuid();
             }
-
-            if($segment['workflowStep']===editor_Workflow_Abstract::STEP_REVIEWING){
-                $this->revPersonGuid=$this->task->getPmGuid();
+            
+            if($this->workflow->isStepOfRole($segment['workflowStep'], [editor_Workflow_Default::ROLE_REVIEWER])){
+                $this->revPersonGuid = $this->task->getPmGuid();
             }
         }
 
@@ -606,26 +606,26 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $this->itsRevPersonGuid=null;
 
         //check if there is a reviewer assigned to the task
-        if(!isset($assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER])){
+        if(!isset($assocUsers[editor_Workflow_Default::ROLE_REVIEWER])){
             return;
         }
 
         //check if no lectors are assigned
-        if(count($assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER])==0){
+        if(count($assocUsers[editor_Workflow_Default::ROLE_REVIEWER])==0){
             return;
         }
 
         //if only one reviewer
-        if(count($assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER])==1){
-            $this->itsRevPersonGuid=$assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER][0]['userGuid'];
-
+        if(count($assocUsers[editor_Workflow_Default::ROLE_REVIEWER])==1){
+            $this->itsRevPersonGuid=$assocUsers[editor_Workflow_Default::ROLE_REVIEWER][0]['userGuid'];
+            
             $usr=$this->data['users'][$this->itsRevPersonGuid];
             $this->itsRevPerson=$usr['surName'].' '.$usr['firstName'];
             return;
         }
         //there are multiple reviewer to the task
-        $tmpReviewerArray=$assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER];
-
+        $tmpReviewerArray=$assocUsers[editor_Workflow_Default::ROLE_REVIEWER];
+        
         //check last editor
         foreach ($tmpReviewerArray as $reviewer){
             if($reviewer['userGuid']===$segment['userGuid']){
@@ -642,7 +642,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
 
         //it is no user that is assigned to the task, it can be pm
         if($segment['userGuid'] === $this->task->getPmGuid()){
-            if($this->task->getWorkflowStepName()===editor_Workflow_Abstract::STEP_REVIEWING){
+            if($this->workflow->isStepOfRole($this->task->getWorkflowStepName(), [editor_Workflow_Default::ROLE_REVIEWER])){
                 $this->itsRevPersonGuid=$this->task->getPmGuid();
             }
         }
@@ -808,24 +808,27 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
 
     /**
      * process and convert the segment QM states
+     * TODO FIXME: the processing of the qualities works with QMs only at the moment. If more qualities are included, the processing needs to change as not all qualities have (unique) categoryIndices
      * @param array $segment
      */
-    protected function processQm(array $segment) {
-        $qms = $this->segmentUtility->convertQmIds($segment['qmId']);
-        if(empty($qms)) {
-            return $qms;
+    protected function processQmQualities(array $segment) {
+        $qualityData = $this->fetchQualityData($segment['id']);
+        if(empty($qualityData)) {
+            return [];
         }
-
+        $qmData = [];
+        foreach($qualityData as $item){
+            $qmData[$item['categoryIndex']] = $item['text'];
+        }
         $this->addComments('qmComment');
-
-        $this->result[]='<its:locQualityIssues xml:id="'.$this->escape(self::QM_ID_PREFIX.implode('_', array_keys($qms))).'">';
+        $this->result[] = '<its:locQualityIssues xml:id="'.$this->escape(self::QM_ID_PREFIX.implode('_', array_keys($qmData))).'">';
         $qmXml = '<its:locQualityIssue locQualityIssueType="%1$s" />';
-        foreach ($qms as $qmid => $qm) {
-            $this->result[] = sprintf($qmXml,$qm);
+        foreach ($qmData as $qmIndex => $qmName) {
+            $this->result[] = sprintf($qmXml, $qmName);
         }
         $this->result[]='</its:locQualityIssues>';
-
-        return $qms;
+        
+        return $qmData;
     }
 
     /****

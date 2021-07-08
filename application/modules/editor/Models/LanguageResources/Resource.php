@@ -79,11 +79,13 @@ class editor_Models_LanguageResources_Resource {
      * value is the internal fieldname / getter
      * @var array
      */
+
     protected $fieldsForController = array(
             'id' => 'id',
             'name' => 'name',
             'serviceName' => 'service',
             'serviceType' => 'serviceType',
+            'resourceType' => 'type',
             'filebased' => 'filebased',
             'searchable' => 'searchable',
             'writable' => 'writable',

@@ -117,6 +117,7 @@ class NecTmLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
                     [targetLang] => 5
                     [customerIds] => Array
                     customerUseAsDefaultIds => Array
+                    customerWriteAsDefaultIds => Array
                     [tagfield-2178-inputEl] =>
                     [serviceType] => editor_Plugins_NecTm
                     [serviceName] => NEC-TM

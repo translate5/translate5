@@ -380,15 +380,14 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
      */
     protected function processStateAndQm(array $segment) {
         $this->result[] = '<state stateid="'.$this->escape($segment['stateId']).'">'.$this->escape($this->segmentUtility->convertStateId($segment['stateId']),false).'</state>';
-        $qms = $this->segmentUtility->convertQmIds($segment['qmId']);
-        if(empty($qms)) {
+        $qualityData = $this->fetchQualityData($segment['id']);
+        if(empty($qualityData)) {
             $this->result[] = '<dx:qa-hits></dx:qa-hits>';
-        }
-        else {
+        } else {
             $this->result[] = '<dx:qa-hits>';
             $qmXml = '<dx:qa-hit dx:qa-origin="target" dx:qa-code="%1$s" dx:qa-shorttext="%2$s" />';
-            foreach ($qms as $qmid => $qm) {
-                $this->result[] = sprintf($qmXml, $this->escape($qmid), $this->escape($qm));
+            foreach ($qualityData as $item) {
+                $this->result[] = sprintf($qmXml, $this->escape($item['categoryIndex']), $this->escape($item['text']));
             }
             $this->result[] = '</dx:qa-hits>';
         }
@@ -405,11 +404,11 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
             $text = $this->handleTerminology($text, true);
             return $this->exportParser->exportSingleSegmentContent($text);
         }
-
-        //if plain internal tags are disabled:
+        
+        // if plain internal tags are disabled:
         // 1. toXliff converts the internal tags to xliff g,bx,ex and x tags
         // 2. remove MQM tags
-        //TODO MQM tags are just removed and not supported by our XLIFF exporter so far!
+        // TODO FIXME: MQM tags are just removed and not supported by our XLIFF exporter so far!
         $text = $this->taghelperInternal->toXliffPaired($text, true, $this->tagMap, $this->tagId);
         $text = $this->handleTerminology($text, false); //internaltag replacment not needed, since already converted
         $text = $this->taghelperMqm->remove($text);

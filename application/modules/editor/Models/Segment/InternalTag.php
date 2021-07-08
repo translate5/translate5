@@ -44,10 +44,10 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      *
      * @var string
      */
-    const REGEX_INTERNAL_TAGS = '#<div\s*class="([a-z]*)\s+([gxA-Fa-f0-9]*)[^"]*"\s*.*?(?!</div>)<span[^>]*data-originalid="([^"]*).*?(?!</div>).</div>#s';
-    const REGEX_STARTTAG = '#^<div class="open.+class="short">&lt;([0-9]+)&gt;</span>.+</div>$#';
-    const REGEX_ENDTAG = '#^<div class="close.+class="short">&lt;/([0-9]+)&gt;</span>.+</div>$#';
-    const REGEX_SINGLETAG = '#^<div class="single.+class="short">&lt;([0-9]+)/&gt;</span>.+</div>$#';
+    const REGEX_INTERNAL_TAGS = '#<div\s*class="(open|close|single)\s+([gxA-Fa-f0-9]*)[^"]*"\s*.*?(?!</div>)<span[^>]*data-originalid="([^"]*).*?(?!</div>).</div>#s';
+    const REGEX_STARTTAG = '#^<div class="open.+class="short"[^>]*>&lt;([0-9]+)&gt;</span>.+</div>$#';
+    const REGEX_ENDTAG = '#^<div class="close.+class="short"[^>]*>&lt;/([0-9]+)&gt;</span>.+</div>$#';
+    const REGEX_SINGLETAG = '#^<div class="single.+class="short"[^>]*>&lt;([0-9]+)/&gt;</span>.+</div>$#';
     
     /***
      * Internal tag placeholder template
@@ -117,7 +117,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     public function getLength($tag) {
         $matches = [];
-        if(preg_match('/<span[^>]+data-length="([^"]*)"[^>]+>/', $tag, $matches)) {
+        if(preg_match('/<span[^>]+data-length="([^"]*)"[^>]*>/', $tag, $matches)) {
             return $matches[1];
         }
         return -1;
@@ -326,7 +326,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         $taghelperTrackChanges = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
         /* @var $taghelperTrackChanges editor_Models_Segment_TrackChangeTag */
         $segment = $taghelperTrackChanges->removeTrackChanges($segment);
-        
+       
         $result = $this->replace($segment, function($match) use (&$replaceMap) {
             //original id coming from import format
             $type = $match[1];
@@ -599,7 +599,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     public function getTagNumber(string $tag): ?int {
         $match = null;
-        if(preg_match('#class="short">&lt;/?([0-9]+)/?&gt;</span#', $tag, $match)) {
+        if(preg_match('#class="short"[^>]*>&lt;/?([0-9]+)/?&gt;</span#', $tag, $match)) {
             return (int) $match[1];
         }
         return null;

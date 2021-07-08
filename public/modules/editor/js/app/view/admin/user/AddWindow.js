@@ -76,7 +76,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         languageInfo: '#UT#Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.',
         localeLabel:'#UT#Benutzersprache',
         parentUserLabel: '#UT#Übergeordneter Benutzer',
-        bottomOpenIdNoEditInfo: '#UT# ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.'
+        bottomOpenIdNoEditInfo: '#UT# ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.'
     },
     modal : true,
     layout:'fit',
@@ -120,7 +120,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         });
         config = {
             title: me.title, //see EXT6UPD-9
-            height: Math.min(720, parseInt(Ext.getBody().getViewSize().height * 0.9)),
+            height: Math.min(750, parseInt(Ext.getBody().getViewSize().height * 0.9)),
             width : 900,
             flex:1,
             items : [{
@@ -188,45 +188,6 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                             vtype: 'email',
                             toolTip: me.strings.emailTip,
                             fieldLabel: me.strings.emailLabel
-                        }]
-                    },{
-                        //secound column
-                        xtype: 'fieldset',
-                        margin:5,
-                        flex:1,
-                        title: me.strings.languagesLabel,
-                        items: [{
-                            xtype:'tagfield',
-                            name: 'sourceLanguage',
-                            fieldLabel: me.strings.sourceLangageLabel,
-                            toolTip: me.strings.sourceLangageTip,
-                            //flex: 2,
-                            typeAhead:true,
-                            queryMode: 'local',
-                            displayField: 'label',
-                            valueField: 'id',
-                            store: new Ext.data.ArrayStore({
-                                fields:['id','label'],
-                                data: Editor.data.languages,
-                            })
-                        }, {
-                            xtype:'tagfield',
-                            name: 'targetLanguage',
-                            fieldLabel: me.strings.targetLangageLabel,
-                            toolTip: me.strings.targetLangageTip,
-                            //flex: 3,
-                            typeAhead:true,
-                            queryMode: 'local',
-                            displayField: 'label',
-                            valueField: 'id',
-                            store: new Ext.data.ArrayStore({
-                                fields:['id','label'],
-                                data: Editor.data.languages,
-                            })
-                        },{
-                            xtype: 'panel',
-                            html: me.strings.languageInfo,
-                            ui: 'fieldset'
                         }]
                     }]
                 },{

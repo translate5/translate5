@@ -116,7 +116,7 @@ class editor_Models_Import_FileParser_XmlParser {
             if(!empty($chunk) && $chunk[0] === '<') {
                 $isSingle = mb_substr($chunk, -2) === '/>';
                 $parts = explode(' ', trim($chunk,'</> '));
-                $tag = reset($parts);
+                $tag = trim(reset($parts));
                 
                 if($chunk[1] === '/'){
                     $this->handleElementEnd($key, $tag);
@@ -239,7 +239,7 @@ class editor_Models_Import_FileParser_XmlParser {
      * The handlers can be null, if only one of both is needed
      * @param string $tag CSS selector like tag definition, see $this->parseSelector
      * @param callable $opener Parameters: string $tag, array $attributes, int $key, bool $isSingle
-     * @param callable $closer Parameters: string $tag, int $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes]
+     * @param callable $closer Parameters: string $tag, int $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes, 'isSingle' => true|false, 'preserveWhitespace' => true|false]
      * @return [int] a list of the indizes of the added handlers
      */
     public function registerElement($tag, callable $opener = null, callable $closer = null) {
