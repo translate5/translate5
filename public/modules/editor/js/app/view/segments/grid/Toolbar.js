@@ -239,7 +239,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
 
         Ext.Array.each(uiThemesRecord.get('defaults'), function(i) {
             menuItems.push({
-                text: i.split('/')[3],
+                text: i,
                 value:i,
                 checked: uiThemesRecord.get('value') === i,
                 group: 'uiTheme',

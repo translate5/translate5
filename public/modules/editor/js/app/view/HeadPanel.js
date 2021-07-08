@@ -61,7 +61,7 @@ Ext.define('Editor.view.HeadPanel', {
         });
 
         Ext.Array.each(uiThemesRecord.get('defaults'), function(i) {
-            uiDefaults.push([i, i.split('/')[3]]);
+            uiDefaults.push([i, i]);
         });
 
 

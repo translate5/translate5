@@ -104,17 +104,25 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $this->_helper->layout->disableLayout();
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->view->pathToIMAGES = APPLICATION_RUNDIR.$this->config->runtimeOptions->server->pathToIMAGES;
+
+        $userConfig = ZfExtended_Factory::get('editor_Models_Config');
+        /* @var $userConfig editor_Models_Config */
+        $userConfig = $userConfig->mergeUserValues(editor_User::instance()->getGuid());
+        $userTheme = $userConfig['runtimeOptions.extJs.cssFile']['value'];
+
+        $this->view->userTheme = $userTheme;
+
         $extJs = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
               'ExtJs'
           );
         /* @var $extJs ZfExtended_Controller_Helper_ExtJs */
 
-        $userConfig = ZfExtended_Factory::get('editor_Models_Config');
-        /* @var $userConfig editor_Models_Config */
-        $userConfig = $userConfig->mergeUserValues(editor_User::instance()->getGuid());
+        // set extjs theme from user specific config
+        $extJs->setUserTheme($userTheme);
 
-        // load extjs theme from user specific config
-        $this->view->extJsCss = $extJs->getHttpPath().$userConfig['runtimeOptions.extJs.cssFile']['value'];
+        $extJs->init();
+
+        $this->view->extJsCss = $extJs->getCssPath();
         $this->view->extJsBasepath = $extJs->getHttpPath();
         $this->view->extJsVersion = $extJs->getVersion();
         
@@ -226,6 +234,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $extJs = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'ExtJs'
         );
+      $extJs->init();
       $this->view->Php2JsVars()->set('pathToHeaderFile', $rop->headerOptions->pathToHeaderFile);
       
       $disabledList = $rop->segments->disabledFields->toArray();
