@@ -70,7 +70,7 @@ class Translate2567Test extends editor_Test_JsonTest {
     public function testSegmentValuesAfterImport() {
         $jsonFileName = 'expectedSegments.json';
         $segments = $this->api()->getJson('editor/segment?page=1&start=0&limit=10', [], $jsonFileName);
-        $this->assertModelsEqualsJsonFile('Segment', $jsonFileName, $segments, 'Imported segments are not as expected!');
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
     }
 
     public static function tearDownAfterClass(): void {
@@ -79,6 +79,6 @@ class Translate2567Test extends editor_Test_JsonTest {
         self::$api->login('testlector');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        //self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }

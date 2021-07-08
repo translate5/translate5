@@ -30,7 +30,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "Text mit <div class=\"open 7370616e20646174612d746578743d226226237846363b7365205a65696c656e20556d627226237846433b63686522 internal-tag ownttip\"><span class=\"short\" title=\"&lt;span data-text=&quot;b&amp;#xF6;se Zeilen Umbr&amp;#xFC;che&quot;&gt;\">&lt;1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;span data-text=&quot;b&amp;#xF6;se Zeilen Umbr&amp;#xFC;che&quot;&gt;<\/span><\/div><div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span class=\"short\" title=\"&lt;2\/&gt;: Newline\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"softReturn\" data-length=\"1\">\u21b5<\/span><\/div>Umbr\u00fcchen <div class=\"close 2f7370616e internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/span&gt;\">&lt;\/1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;\/span&gt;<\/span><\/div> im Attribut gab Probleme.",
+        "source": "Invalides XML <div class=\"single 696d67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;img&gt;<\/span><\/div> mit <div class=\"single 7370616e20646174612d746578743d2262c3b673650a5a65696c656e0a556d6272c3bc63686522 internal-tag ownttip\"><span class=\"short\" title=\"&lt;span data-text=&quot;b\u00f6se Zeilen Umbr\u00fcche&quot;&gt;\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"2\" data-length=\"-1\">&lt;span data-text=&quot;b\u00f6se\nZeilen\nUmbr\u00fcche&quot;&gt;<\/span><\/div><div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span class=\"short\" title=\"&lt;4\/&gt;: Newline\">&lt;4\/&gt;<\/span><span class=\"full\" data-originalid=\"softReturn\" data-length=\"1\">\u21b5<\/span><\/div>Umbr\u00fcchen <div class=\"single 2f7370616e internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/span&gt;\">&lt;3\/&gt;<\/span><span class=\"full\" data-originalid=\"3\" data-length=\"-1\">&lt;\/span&gt;<\/span><\/div> im Attribut gab Probleme.",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -49,8 +49,8 @@
         "workflowStepNr": "0",
         "workflowStep": null,
         "isRepeated": "0",
-        "sourceMd5": "d0d483372b53e8363ce27e1871262edd",
-        "sourceToSort": "Text mit Umbr\u00fcchen  im Attribut gab Probleme.",
+        "sourceMd5": "c5135d9d75903577d4c9c4d4655e5c64",
+        "sourceToSort": "Invalides XML  mit Umbr\u00fcchen  im Attribut gab Probleme.",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
         "targetEditToSort": "",

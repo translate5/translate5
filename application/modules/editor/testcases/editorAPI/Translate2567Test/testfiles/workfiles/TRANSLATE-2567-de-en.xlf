@@ -6,9 +6,10 @@
 <source xml:lang="de">Text mit &lt;b&gt;0&lt;/b&gt; in tags gab Probleme.</source>
 </trans-unit>
 <trans-unit id="NFDBB2FA9-tu2" xml:space="preserve">
-<source xml:lang="de">Text mit &lt;span data-text="böse
+<source xml:lang="de">Invalides XML &lt;img&gt; mit &lt;span data-text="böse
 Zeilen
-Umbrüche"&gt;Umbrüchen &lt;/span&gt; im Attribut gab Probleme.</source>
+Umbrüche"&gt;
+Umbrüchen &lt;/span&gt; im Attribut gab Probleme.</source>
 </trans-unit>
 <trans-unit id="NFDBB2FA9-tu3" xml:space="preserve">
 <source xml:lang="de">Invalides XML &lt;img&gt; mit invaliden &lt;donotexist&gt;HTML Tags&lt;/donotexist&gt; müssen encodiert sein!</source>
