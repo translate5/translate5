@@ -24,7 +24,9 @@
 --
 -- END LICENSE AND COPYRIGHT
 -- */
-UPDATE `Zf_configuration` 
-SET `defaults`='/build/classic/theme-aria/resources/theme-aria-all.css,/build/classic/theme-classic/resources/theme-classic-all.css,/build/classic/theme-classic-sandbox/resources/theme-classic-sandbox-all.css,/build/classic/theme-crisp/resources/theme-crisp-all.css,/build/classic/theme-crisp-touch/resources/theme-crisp-touch-all.css,/build/classic/theme-gray/resources/theme-gray-all.css,/build/classic/theme-neptune/resources/theme-neptune-all.css,/build/classic/theme-neptune-touch/resources/theme-neptune-touch-all.css,/build/classic/theme-triton/resources/theme-triton-all.css', 
-`level`='32' 
+
+UPDATE `Zf_configuration`
+SET `defaults`='aria,classic,crisp,crisp-touch,gray,neptune,neptune-touch,triton',
+    `level`='32' ,
+    `default`='triton'
 WHERE `name`='runtimeOptions.extJs.cssFile';
