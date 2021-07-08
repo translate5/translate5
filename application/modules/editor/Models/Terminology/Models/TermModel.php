@@ -31,38 +31,38 @@ END LICENSE AND COPYRIGHT
  *
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
- * @method integer getLanguageId() getLanguageId()
- * @method integer setLanguageId() setLanguageId(integer $languageId)
- * @method string getLanguage() getLanguage()
- * @method string setLanguage() setLanguage(string $language)
- * @method string getTermTbxId() getTermTbxId()
- * @method string setTermTbxId() setTermTbxId(string $termTbxId)
- * @method string getTerm() getTerm()
- * @method string setTerm() setTerm(string $term)
- * @method string getProposal() getProposal()
- * @method void setProposal() setProposal(string $proposal)
+ * @method string getUpdatedBy() getUpdatedBy()
+ * @method void setUpdatedBy() setUpdatedBy(int $userId)
+ * @method string getUpdatedAt() getUpdatedAt()
+ * @method void setUpdatedAt() setUpdatedAt(string $updatedAt)
  * @method integer getCollectionId() getCollectionId()
  * @method integer setCollectionId() setCollectionId(integer $collectionId)
  * @method integer getTermEntryId() getTermEntryId()
  * @method integer setTermEntryId() setTermEntryId(integer $termEntryId)
- * @method string getTermEntryTbxId() getTermEntryTbxId()
- * @method string setTermEntryTbxId() setTermEntryTbxId(string $termEntryTbxId)
- * @method string getTermEntryGuid() getTermEntryGuid()
- * @method string setTermEntryGuid() setTermEntryGuid(string $entryGuid)
+ * @method integer getLanguageId() getLanguageId()
+ * @method integer setLanguageId() setLanguageId(integer $languageId)
+ * @method string getLanguage() getLanguage()
+ * @method string setLanguage() setLanguage(string $language)
+ * @method string getTerm() getTerm()
+ * @method string setTerm() setTerm(string $term)
+ * @method string getProposal() getProposal()
+ * @method void setProposal() setProposal(string $proposal)
  * @method string getStatus() getStatus()
  * @method string setStatus() setStatus(string $Status)
  * @method string getProcessStatus() getProcessStatus()
  * @method string setProcessStatus() setProcessStatus(string $processStatus)
  * @method string getDefinition() getDefinition()
  * @method string setDefinition() setDefinition(string $definition)
+ * @method string getTermEntryTbxId() getTermEntryTbxId()
+ * @method string setTermEntryTbxId() setTermEntryTbxId(string $termEntryTbxId)
+ * @method string getTermTbxId() getTermTbxId()
+ * @method string setTermTbxId() setTermTbxId(string $termTbxId)
+ * @method string getTermEntryGuid() getTermEntryGuid()
+ * @method string setTermEntryGuid() setTermEntryGuid(string $entryGuid)
  * @method string getLangSetGuid() getLangSetGuid()
  * @method string setLangSetGuid() setLangSetGuid(string $langSetGuid)
  * @method string getGuid() getGuid()
  * @method string setGuid() setGuid(string $guid)
- * @method string getUpdatedBy() getUpdatedBy()
- * @method string setUpdatedBy() setUpdatedBy(int $userId)
- * @method string getUpdatedAt() getUpdatedAt()
- * @method void setUpdatedAt() setUpdatedAt(string $updated)
  */
 class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Term';
@@ -129,8 +129,8 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         // Append to $attrA
         $attrA['processStatus'] = [
             'dataTypeId' => $dataTypeId_processStatus,
+            'type' => 'processStatus',
             'value' => $this->getProcessStatus(),
-            'isCreatedLocally' => 1, // 1 or 0 ?
         ];
 
         // If value for note-attr is given
@@ -144,33 +144,58 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             // Append to attrA
             $attrA['note'] = [
                 'dataTypeId' => $dataTypeId_note,
+                'type' => 'note',
                 'value' => $misc['note'],
-                'isCreatedLocally' => 1,
             ];
         }
 
+        // If attributes should be copied from other term
+        if ($misc['copyAttrsFromTermId']) {
+
+            // Array of dataTypeIds to be ignored while copying attributes from other term
+            $except = [$dataTypeId_processStatus]; if ($misc['note']) $except []= $dataTypeId_note;
+
+            // Fetch attributes of existing term, except at least 'processStatus' attribute
+            $attrA += editor_Utils::db()->query('
+                SELECT `dataTypeId`, `type`, `value`, `target`, `elementName`, `attrLang`, `dataType`  
+                FROM `terms_attributes` 
+                WHERE `termId` = ? AND `dataTypeId` NOT IN (' . implode(',', $except) . ') 
+            ', $misc['copyAttrsFromTermId'])->fetchAll();
+        }
+
         // Foreach attribute to be INSERTed
-        foreach ($attrA as $type => $attrI) {
+        foreach ($attrA as $attrI) {
 
             // Create `terms_attributes` model instance
             $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
 
             // Apply data
             $a->init($attrI + [
-                'elementName' => 'termNote',
-                'language' => $this->getLanguage(),
-                'attrLang' => $this->getLanguage(),
-                'type' => $type,
                 'collectionId' => $this->getCollectionId(),
                 'termEntryId' => $this->getTermEntryId(),
-                'termEntryGuid' => $this->getTermEntryGuid(),
+                'language' => $this->getLanguage(),
                 'termId' => $termId,
-                'termGuid' => $this->getGuid(),
-                'guid' => ZfExtended_Utils::uuid(),
+
+                // Below three are surely defined in $attrI
+                //'dataTypeId' => ,
+                //'type' => ,
+                //'value' => ,
+
+                //'target' => null, // This one may be defined in $attrI
+                'isCreatedLocally' => 1,
                 'createdBy' => $misc['userId'],
                 'createdAt' => date('Y-m-d H:i:s'),
                 'updatedBy' => $misc['userId'],
                 'updatedAt' => date('Y-m-d H:i:s'),
+                'termEntryGuid' => $this->getTermEntryGuid(),
+                'langSetGuid' => $this->getLangSetGuid(),
+                'termGuid' => $this->getGuid(),
+                'guid' => ZfExtended_Utils::uuid(),
+
+                // Those three may be defined in $attrI, and if yes, they won't be overwritten by below
+                'elementName' => 'termNote',
+                'attrLang' => $this->getLanguage(),
+                //'dataType' => null
             ]);
 
             // Save attr
@@ -234,7 +259,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         // so that not only termEntry-level's 'modification'-record would be affected, but language-level's as well
         if (!$isTermForNewLanguage) $language = '(' . $language . ' OR `language` = "' . $this->getLanguage() . '")';
 
-        // Update 'modification'-record of termEntry-level
+        // Update 'modification'-record of termEntry-level (and language-level, if need)
         editor_Utils::db()->query('
             UPDATE `terms_transacgrp` 
             SET 
