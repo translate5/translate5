@@ -75,4 +75,19 @@ class editor_Models_UserConfig extends ZfExtended_Models_Entity_Abstract {
         }
         return $row['value'];
     }
+
+    /***
+     * Remove the theme user config if it is configured in the config.
+     */
+    public function cleanUpThemeTemporary()
+    {
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        if(!$config->runtimeOptions->cleanUpUserTheme){
+            return;
+        }
+        $this->db->delete([
+            'name = ?' => 'runtimeOptions.extJs.cssFile'
+        ]);
+    }
 }

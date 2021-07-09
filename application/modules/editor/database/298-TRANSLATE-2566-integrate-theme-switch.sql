@@ -30,3 +30,8 @@ SET `defaults`='aria,classic,crisp,crisp-touch,gray,neptune,neptune-touch,triton
     `level`='32' ,
     `default`='triton'
 WHERE `name`='runtimeOptions.extJs.cssFile';
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`)
+VALUES ('runtimeOptions.frontend.changeUserThemeVisible', '1', 'editor', 'system', '1', '1', '', 'boolean', 'Can the user change the translate5 GUI layout theme from within the translate5 front-end ?', '2', 'User can change GUI layout theme', 'Editor: UI layout & more');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`)
+VALUES ('runtimeOptions.cleanUpUserTheme', '1', 'editor', 'system', '0', '0', '', 'boolean', 'If set to active, a changed GUI layout theme is only temporary for the current user session.', '2', 'Reset GUI layout theme to default with new login.', 'Editor: UI layout & more');
