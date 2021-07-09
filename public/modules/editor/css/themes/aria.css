@@ -24,7 +24,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
+/* This css will be applied when this theme is active. */
 @CHARSET "UTF-8";
 body:not(.loading) > #head-panel {
   background: url(/images/translate5-transparent.png?v=1) no-repeat 19px 19px #3f4757 !important; 
