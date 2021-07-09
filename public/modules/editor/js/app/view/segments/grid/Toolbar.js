@@ -63,7 +63,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_showBookmarkedSegments: '#UT#Nur Segmente mit Lesezeichen anzeigen',
     item_repeatedFilterBtn: '#UT#Nur wiederholt',
     item_showRepeatedSegments: '#UT#Nur Segmente mit Wiederholungen anzeigen',
-    item_themeMenuConfigText:'#UT#Layout wechseln',
+    item_themeMenuConfigText:'#UT#Layout',
     strings:{
         interfaceTranslation:'#UT#Oberfläche'
     },
@@ -134,8 +134,11 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             });
 
 
-            // add themes menu
-            menu.items.push(me.getThemeMenuConfig());
+            // add change user theme only if allowed
+            if(Editor.data.frontend.changeUserThemeVisible){
+                // add themes menu
+                menu.items.push(me.getThemeMenuConfig());
+            }
 
             config = {
                 items: [{

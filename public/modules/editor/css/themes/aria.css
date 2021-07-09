@@ -25,3 +25,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+@CHARSET "UTF-8";
+body:not(.loading) > #head-panel {
+  background: url(/images/translate5-transparent.png?v=1) no-repeat 19px 19px #3f4757 !important; 
+    background-size: 150px !important;
+}
+
+tr.no-users td div {
+    color: #009d7b !important;
+}
+tr.import td div {
+    color: #b642e8 !important;
+}
