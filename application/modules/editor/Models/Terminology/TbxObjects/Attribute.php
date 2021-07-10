@@ -43,7 +43,7 @@ class editor_Models_Terminology_TbxObjects_Attribute {
         // 'isCreatedLocally' => ?
         'createdBy' => false,
         'createdAt' => false,
-        // 'updatedBy' => ?
+        'updatedBy' => false,
         // 'updatedAt' => ?
         'termEntryGuid' => false,
         'langSetGuid' => false,
@@ -64,7 +64,7 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     //protected int $isCreatedLocally = 0;
     protected int $createdBy = 0;
     protected string $createdAt = '';
-    //protected int $updatedBy = 0;
+    protected int $updatedBy = 0;
     //protected string $updatedAt = '';
     protected ?string $termEntryGuid = null;
     protected ?string $langSetGuid = null;
