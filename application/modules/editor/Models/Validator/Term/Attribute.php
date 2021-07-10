@@ -32,25 +32,33 @@ class editor_Models_Validator_Term_Attribute extends ZfExtended_Models_Validator
    * Validators for Term Attributes
    */
   protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible
-    $this->addValidator('id', 'int');
-    $this->addValidator('elementName',  'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('language', 'stringLength', array('min' => 0, 'max' => 45));
-    $this->addValidator('name', 'stringLength', array('min' => 0, 'max' => 45));
-    $this->addValidator('value', 'stringLength', array('min' => 0, 'max' => 65535));
-    $this->addValidator('type', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('target', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('dataType', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('collectionId', 'int');
-    $this->addValidator('entryId', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('termEntryGuid', 'stringLength', array('min' => 0, 'max' => 38));
-    $this->addValidator('langSetGuid', 'stringLength', array('min' => 0, 'max' => 38));
-    $this->addValidator('termId', 'stringLength', array('min' => 0, 'max' => 255));
-    $this->addValidator('dataTypeId', 'int');
-    $this->addValidator('guid', 'stringLength', array('min' => 0, 'max' => 38));
-    //$this->addValidator('internalCount', 'int');
-    $this->addValidator('userGuid', 'stringLength', array('min' => 0, 'max' => 38));
-    $this->addValidator('userName', 'stringLength', array('min' => 0, 'max' => 38));
-    $this->addValidator('isCreatedLocally', 'bool');
+      //comment = string, without length contrain. No validator needed / possible
+      $this->addValidator('id', 'int');
+      $this->addValidator('collectionId', 'int');
+      // termEntryId ?
+      $this->addValidator('language', 'stringLength', array('min' => 0, 'max' => 45));
+      $this->addValidator('termId', 'stringLength', array('min' => 0, 'max' => 255));
+      $this->addValidator('dataTypeId', 'int');
+      $this->addValidator('type', 'stringLength', array('min' => 0, 'max' => 100));
+      $this->addValidator('value', 'stringLength', array('min' => 0, 'max' => 65535));
+      $this->addValidator('target', 'stringLength', array('min' => 0, 'max' => 100));
+      $this->addValidator('isCreatedLocally', 'bool');
+      $this->addValidator('createdBy', 'int');
+      // createdAt ?
+      $this->addValidator('updatedBy', 'int');
+      // updatedAt ?
+      $this->addValidator('termEntryGuid', 'stringLength', array('min' => 0, 'max' => 38));
+      $this->addValidator('langSetGuid', 'stringLength', array('min' => 0, 'max' => 38));
+      // termGuid ?
+      $this->addValidator('guid', 'stringLength', array('min' => 0, 'max' => 38));
+      $this->addValidator('elementName',  'stringLength', array('min' => 0, 'max' => 100));
+      // attrLang ?
+      $this->addValidator('dataType', 'stringLength', array('min' => 0, 'max' => 100));
+
+      $this->addValidator('name', 'stringLength', array('min' => 0, 'max' => 45)); // no such column
+      $this->addValidator('entryId', 'stringLength', array('min' => 0, 'max' => 100)); // no such column
+      //$this->addValidator('internalCount', 'int');
+      //$this->addValidator('userGuid', 'stringLength', array('min' => 0, 'max' => 38));
+      //$this->addValidator('userName', 'stringLength', array('min' => 0, 'max' => 38));
   }
 }
