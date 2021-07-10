@@ -183,9 +183,9 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
                 //'target' => null, // This one may be defined in $attrI
                 'isCreatedLocally' => 1,
-                'createdBy' => $misc['userId'],
+                'createdBy' => $this->getUpdatedBy(),
                 'createdAt' => date('Y-m-d H:i:s'),
-                'updatedBy' => $misc['userId'],
+                'updatedBy' => $this->getUpdatedBy(),
                 'updatedAt' => date('Y-m-d H:i:s'),
                 'termEntryGuid' => $this->getTermEntryGuid(),
                 'langSetGuid' => $this->getLangSetGuid(),
@@ -280,14 +280,14 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     }
 
     /**
-     * If $transacgrpData arg is given, method expects it's an array containing values under 'userName', 'termEntryId'
-     * and 'language' keys, and if so, this method will run UPDATE query to update `date` and `transacNote` for all
+     * If $misc arg is given, method expects it's an array containing values under 'userName', and (optionally) 'updateProcessStatusAttr'
+     * keys, and if so, this method will run UPDATE query to update `date` and `transacNote` for all
      * involved records of `terms_transacgrp` table for entry-, language- and term-level
      *
-     * @param bool|array $transacgrpData
+     * @param array $misc
      * @return mixed
      */
-    public function update($transacgrpData = false) {
+    public function update($misc = ['updateProcessStatusAttr' => true]) {
 
         // Get original data
         $orig = $this->row->getCleanData();
@@ -311,13 +311,32 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             $history->save();
         }
 
+        // If term's processStatus-prop was changed, and we should update processStatus-attr as well (yes, by default)
+        if ($orig['processStatus'] != $this->getProcessStatus() && $misc['updateProcessStatusAttr']) {
+
+            // If we should update processStatus-attribute, but we don't know it's `id` yet - detect it
+            // else just pick that id from $misc['updateProcessStatusAttr']
+            $attrId = $misc['updateProcessStatusAttr'] === true
+                ? editor_Utils::db()->query('
+                        SELECT `id` FROM `terms_attributes` WHERE `termId` = ? AND `type` = "processStatus"
+                    ', $this->getId())->fetchColumn()
+                : $misc['updateProcessStatusAttr'];
+
+            // Update attribute value
+            $attr = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+            $attr->load($attrId);
+            $attr->setValue($this->getProcessStatus());
+            $attr->setUpdatedBy($this->getUpdatedBy());
+            $attr->update();
+        }
+
         // If $transacgrpData arg is given - update 'modification'-records of all levels
-        if ($transacgrpData)
+        if ($misc['userName'])
             ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels(
-                    $transacgrpData['userName'],
-                    $transacgrpData['termEntryId'],
-                    $transacgrpData['language'],
+                    $misc['userName'],
+                    $this->getTermEntryId(),
+                    $this->getLanguage(),
                     $this->getId()
                 );
 
@@ -329,10 +348,10 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      * creates a new, unsaved term history entity
      * @return editor_Models_Term_History
      */
-    public function getNewHistoryEntity(): editor_Models_Term_History
+    /*public function getNewHistoryEntity(): editor_Models_Term_History
     {
         $history = ZfExtended_Factory::get('editor_Models_Term_History');
-        /* @var $history editor_Models_Term_History */
+        /* @var $history editor_Models_Term_History * /
         $history->setTermId($this->getId());
         $history->setHistoryCreated(NOW_ISO);
 
@@ -342,7 +361,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         }
 
         return $history;
-    }
+    }*/
 
     /**
      * returns a map CONSTNAME => value of all term status
@@ -805,7 +824,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      * Get loaded data as object with term attributes included
      * @return stdClass
      */
-    public function getDataObjectWithAttributes(): stdClass
+    /*public function getDataObjectWithAttributes(): stdClass
     {
         $result = $this->getDataObject();
         //load all attributes for the term
@@ -816,7 +835,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         }
 
         return $result;
-    }
+    }*/
 
     public function groupTerms(array $data): ?array
     {
@@ -829,7 +848,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      * @param array $data
      * @return array
      */
-    public function groupTermsAndAttributes(array $data): ?array
+    /*public function groupTermsAndAttributes(array $data): ?array
     {
         if (empty($data)) {
             return $data;
@@ -878,7 +897,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         ];
 
         $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        /* @var $attribute editor_Models_Terminology_Models_AttributeModel */
+        /* @var $attribute editor_Models_Terminology_Models_AttributeModel * /
 
         //Group term-termattribute data by term. For each grouped attributes field will be created
         $oldKey = '';
@@ -886,11 +905,11 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $termProposalData = [];
 
         $termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $termModel editor_Models_Terminology_Models_TermModel */
+        /* @var $termModel editor_Models_Terminology_Models_TermModel * /
         $isTermProposalAllowed = $termModel->isProposableAllowed();
 
         $attributeModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        /* @var $attributeModel editor_Models_Terminology_Models_AttributeModel */
+        /* @var $attributeModel editor_Models_Terminology_Models_AttributeModel * /
         $isAttributeProposalAllowed = $attributeModel->isProposableAllowed();
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
@@ -992,7 +1011,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         }
 
         return $map;
-    }
+    }*/
 
     /**
      * Find term in collection by given language and term value
@@ -1016,7 +1035,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      * @param int $termId
      * @return array
      */
-    public function findTermAndAttributes(int $termId): array
+    /*public function findTermAndAttributes(int $termId): array
     {
         $s = $this->getSearchTermSelect();
         $s->where('terms_term.termTbxId=?', $termId);
@@ -1024,14 +1043,14 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ->order('terms_term.term');
 
         return $this->db->fetchAll($s)->toArray();
-    }
+    }*/
 
     /***
      * Get term search select. It the user is proposal allowed, the term and attribute proposals will be joined.
      *
      * @return Zend_Db_Select
      */
-    protected function getSearchTermSelect(): Zend_Db_Select
+    /*protected function getSearchTermSelect(): Zend_Db_Select
     {
         $attCols = [
             'terms_attributes.dataTypeId as dataTypeId',
@@ -1086,7 +1105,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         }
 
         $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        /* @var $attribute editor_Models_Terminology_Models_AttributeModel */
+        /* @var $attribute editor_Models_Terminology_Models_AttributeModel * /
 
         if($attribute->isProposableAllowed()){
             $s->joinLeft('terms_attributes_proposal', 'terms_attributes_proposal.attributeId = terms_attributes.id',[
@@ -1100,7 +1119,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         }
 
         return $s;
-    }
+    }*/
     /***
      * Find term attributes in the given term entry (lek_terms groupId)
      *
@@ -1108,7 +1127,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      * @param array $collectionIds
      * @return array
      */
-    public function searchTermAttributesInTermEntry(string $termEntryId, array $collectionIds): array
+    /*public function searchTermAttributesInTermEntry(string $termEntryId, array $collectionIds): array
     {
         $s = $this->getSearchTermSelect();
         $s->where('terms_term.termEntryId = ?', (int)$termEntryId)
@@ -1118,7 +1137,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ->order('terms_term.id');
 
         return $this->db->fetchAll($s)->toArray();
-    }
+    }*/
 
     /***
      * Returns all terms of the given $searchTerms that don't exist in
@@ -1600,8 +1619,8 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         //get all terms in the collection older than the date
         $s = $this->db->select()
             ->setIntegrityCheck(false)
-            ->from(['t'=>'terms_term'],['t.id'])
-            ->joinLeft(['p'=>'terms_proposal'],'p.termId=t.id ',['p.term','p.created','p.userGuid','p.userName'])
+            ->from(['t'=>'terms_term'],['t.id', 't.proposal'])
+            //->joinLeft(['p'=>'terms_proposal'],'p.termId=t.id ',['p.term','p.created','p.userGuid','p.userName'])
             ->where('t.updatedAt < ?', $olderThan)
             ->where('t.collectionId in (?)',$collectionIds)
             ->where('t.processStatus NOT IN (?)',self::PROCESS_STATUS_UNPROCESSED);
@@ -1612,49 +1631,60 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         }
         $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         /* @var $term editor_Models_Terminology_Models_TermModel */
-        $transacGrp = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+        //$transacGrp = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
         /* @var $transacGrp editor_Models_Terminology_Models_TransacgrpModel */
+        $session = (new Zend_Session_Namespace('user'))->data;
 
-        $deleteProposals = [];
+        //$deleteProposals = [];
         //for each of the terms with the proposals, use the proposal value as the
         //new term value in the original term, after the original term is updated, remove
         //the proposal
         foreach ($result as $key=>$res){
-            if (empty($res['term'])) {
+            /*if (empty($res['term'])) {*/
+            if (empty($res['proposal'])) {
                 continue;
             }
-            $proposal = ZfExtended_Factory::get('editor_Models_Term_Proposal');
+            /*$proposal = ZfExtended_Factory::get('editor_Models_Term_Proposal');
             /* @var $proposal editor_Models_Term_Proposal */
-            $proposal->init([
+            /*$proposal->init([
                 'created'=>$res['created'],
                 'userGuid'=>$res['userGuid'],
                 'userName'=>$res['userName'],
-            ]);
+            ]);*/
 
             $term->load($res['id']);
-            $term->setTerm($res['term']);
+            /*$term->setTerm($res['term']);
             $term->setCreated($res['created']);
             $term->setUpdated(NOW_ISO);
             $term->setUserGuid($res['userGuid']);
-            $term->setUserName($res['userName']);
+            $term->setUserName($res['userName']);*/
+
+            $term->setTerm($res['proposal']);
+            $term->setProposal('');
+            $term->setUpdatedBy($session->id);
+            //$term->setUpdatedAt(NOW_ISO);
             $term->setProcessStatus(self::PROCESS_STATUS_UNPROCESSED);
             //TODO: with the next termportal step(add new attribute and so)
             //update/merge those new proposal attributes to
             //now only the transac group should be modefied
             // $transacGrp->updateTermTransacGroupFromProposal($term,$proposal);
             // $transacGrp->updateTermProcessStatus($term, $term::PROCESS_STATUS_UNPROCESSED);
-            $term->save();
-            $deleteProposals[] = $res['id'];
+            //$term->save();
+            $term->update([
+                'userName' => $session->userName, // transacGrp will be updated
+                'updateProcessStatusAttr' => true // processStatus-attr will be updated
+            ]);
+            //$deleteProposals[] = $res['id'];
             unset($result[$key]);
         }
-        //remove the collected proposals
+        /*//remove the collected proposals
         if (!empty($deleteProposals)) {
             $proposal = ZfExtended_Factory::get('editor_Models_Term_Proposal');
-            /* @var $proposal editor_Models_Term_Proposal */
+            /* @var $proposal editor_Models_Term_Proposal * /
             $proposal->db->delete([
                 'termId IN(?)' => $deleteProposals
             ]);
-        }
+        }*/
 
         $result = array_column($result,'id');
         if (empty($result)) {

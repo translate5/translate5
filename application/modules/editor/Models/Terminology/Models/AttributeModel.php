@@ -388,7 +388,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
      * Check if for the current term there is a processStatus attribute. When there is no one, create it.
      * @param int $termId
      */
-    public function checkOrCreateProcessStatus(int $termId)
+    /*public function checkOrCreateProcessStatus(int $termId)
     {
         $s=$this->db->select()
             ->where('termId=?',$termId)
@@ -402,11 +402,11 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         }
 
         $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $term editor_Models_Terminology_Models_TermModel */
+        /* @var $term editor_Models_Terminology_Models_TermModel * /
         $term->load($termId);
 
         $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language editor_Models_Languages */
+        /* @var $language editor_Models_Languages * /
 
         $language->loadById($term->getLanguage());
 
@@ -420,7 +420,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $this->setType('processStatus');
 
         $label = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
-        /* @var $label editor_Models_Terminology_Models_AttributeDataType */
+        /* @var $label editor_Models_Terminology_Models_AttributeDataType * /
         $label->loadOrCreate('termNote', 'processStatus',editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_LEVEL_TERM);
         $this->setDataTypeId($label->getId());
 
@@ -432,7 +432,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $this->setValue($term->getProcessStatus());
 
         $this->save();
-    }
+    }*/
 
     /**
      * Loads an attribute for the given term
@@ -472,18 +472,18 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
      * @param string $termText
      * @return editor_Models_Terminology_Models_AttributeModel
      */
-    public function addTermComment(int $termId,string $termText): self
+    /*public function addTermComment(int $termId,string $termText): self
     {
         $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $term editor_Models_Terminology_Models_TermModel */
+        /* @var $term editor_Models_Terminology_Models_TermModel * /
         $term->load($termId);
 
         $lang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $lang editor_Models_Languages */
+        /* @var $lang editor_Models_Languages * /
         $lang->loadById($term->getLanguageId());
 
         $label = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
-        /* @var $label editor_Models_Terminology_Models_AttributeDataType */
+        /* @var $label editor_Models_Terminology_Models_AttributeDataType * /
         $label->loadOrCreate('note');
 
         $this->init([
@@ -508,16 +508,16 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $this->save();
 
         return $this;
-    }
+    }*/
 
     /**
      * creates a new, unsaved term attribute history entity
      * @return editor_Models_Term_AttributeHistory
      */
-    public function getNewHistoryEntity(): editor_Models_Term_AttributeHistory
+    /*public function getNewHistoryEntity(): editor_Models_Term_AttributeHistory
     {
         $history = ZfExtended_Factory::get('editor_Models_Term_AttributeHistory');
-        /* @var $history editor_Models_Term_AttributeHistory */
+        /* @var $history editor_Models_Term_AttributeHistory * /
         $history->setAttributeId($this->getId());
         $history->setHistoryCreated(NOW_ISO);
 
@@ -527,7 +527,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         }
 
         return $history;
-    }
+    }*/
 
     /**
      * @return mixed

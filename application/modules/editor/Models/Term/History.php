@@ -29,43 +29,41 @@ END LICENSE AND COPYRIGHT
 /**
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
+ * @method integer getTermId() getTermId()
+ * @method void setTermId() setTermId(integer $termId)
+ * @method integer getCollectionId() getCollectionId()
+ * @method void setCollectionId() setCollectionId(integer $collectionId)
+ * @method integer getTermEntryId() getTermEntryId()
+ * @method void setTermEntryId() setTermEntryId(integer $termEntryId)
+ * @method integer getLanguageId() getLanguageId()
+ * @method void setLanguageId() setLanguageId(integer $languageId)
+ * @method string getLanguage() getLanguage()
+ * @method void setLanguage() setLanguage(string $language)
  * @method string getTerm() getTerm()
  * @method void setTerm() setTerm(string $term)
- * @method string getDefinition() getDefinition()
- * @method void setDefinition() setDefinition(string $term)
- * @method integer getTermId() getTermId()
- * @method void setTermId() setTermId(integer $id)
- * @method integer getCollectionId() getCollectionId()
- * @method void setCollectionId() setCollectionId(integer $id)
- * @method string getCreated() getCreated()
- * @method void setCreated() setCreated(string $date)
- * @method string getHistoryCreated() getHistoryCreated()
- * @method void setHistoryCreated() setHistoryCreated(string $date)
- * @method string getUpdated() getUpdated()
- * @method void setUpdated() setUpdated(string $date)
+ * @method string getProposal() getProposal()
+ * @method void setProposal() setProposal(string $proposal)
  * @method string getStatus() getStatus()
  * @method void setStatus() setStatus(string $status)
  * @method string getProcessStatus() getProcessStatus()
- * @method void setProcessStatus() setProcessStatus(string $status)
- * @method string getUserGuid() getUserGuid()
- * @method void setUserGuid() setUserGuid(string $status)
- * @method string getUserName() getUserName()
- * @method void setUserName() setUserName(string $status)
+ * @method void setProcessStatus() setProcessStatus(string $processStatus)
+ * @method integer getUpdatedBy() getUpdatedBy()
+ * @method void setUpdatedBy() setUpdatedBy(integer $updatedBy)
+ * @method string getUpdatedAt() getUpdatedAt()
+ * @method void setUpdatedAt() setUpdatedAt(string $updatedAt)
+ * @method string getDefinition() getDefinition()
+ * @method void setDefinition() setDefinition(string $term)
+ * @method string getTermEntryTbxId() getTermEntryTbxId()
+ * @method void setTermEntryTbxId() setTermEntryTbxId(string $termEntryTbxId)
+ * @method string getTermTbxId() getTermTbxId()
+ * @method void setTermTbxId() setTermTbxId(string $termTbxId)
+ * @method string getTermEntryGuid() getTermEntryGuid()
+ * @method void setTermEntryGuid() setTermEntryGuid(string $termEntryGuid)
+ * @method string getLangSetGuid() getLangSetGuid()
+ * @method void setLangSetGuid() setLangSetGuid(string $langSetGuid)
+ * @method string getGuid() getGuid()
+ * @method void setGuid() setGuid(string $guid)
  */
 class editor_Models_Term_History extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Term_History';
-
-    public function getFieldsToUpdate() {
-        return [
-            'collectionId',
-            'term',
-            'status',
-            'processStatus',
-            'definition',
-            'userGuid',
-            'userName',
-            'created',
-            'updatedAt',
-        ];
-    }
 }

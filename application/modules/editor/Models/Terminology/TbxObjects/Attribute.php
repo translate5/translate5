@@ -32,42 +32,46 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     CONST ATTRIBUTE_DEFAULT_DATATYPE = 'plainText';
 
     const TABLE_FIELDS = [
-        'elementName' => true,
-        'language' => true,
-        'attrLang' => false,
-        'value' => true,
-        'type' => true,
-        'target' => true,
         'collectionId' => true,
         'termEntryId' => true,
+        'language' => true,
+        'termId' => false,
+        'dataTypeId' => true,
+        'type' => true,
+        'value' => true,
+        'target' => true,
+        // 'isCreatedLocally' => ?
+        'createdBy' => false,
+        'createdAt' => false,
+        // 'updatedBy' => ?
+        // 'updatedAt' => ?
         'termEntryGuid' => false,
         'langSetGuid' => false,
-        'termId' => false,
         'termGuid' => false,
-        'dataTypeId' => true,
         'guid' => false,
-        'userGuid' => true,
-        'userName' => true,
-        'created' => false
+        'elementName' => true,
+        'attrLang' => false,
     ];
 
     protected int $collectionId = 0;
     protected ?int $termEntryId = null;
+    protected ?string $language = '';
+    protected ?int $termId = null;
+    protected int $dataTypeId = 0;
+    protected string $type = '';
+    protected string $value = '';
+    protected string $target = '';
+    //protected int $isCreatedLocally = 0;
+    protected int $createdBy = 0;
+    protected string $createdAt = '';
+    //protected int $updatedBy = 0;
+    //protected string $updatedAt = '';
     protected ?string $termEntryGuid = null;
     protected ?string $langSetGuid = null;
-    protected string $attrLang = '';
-    protected ?int $termId = null;
     protected ?string $termGuid = null;
     protected ?string $guid = null;
     protected string $elementName = '';
-    protected ?string $language = '';
-    protected string $value = '';
-    protected string $target = '';
-    protected string $type = '';
-    protected int $dataTypeId = 0;
-    protected string $userGuid = '';
-    protected string $userName = '';
-    protected string $created = '';
+    protected string $attrLang = '';
 
     /**
      * @param editor_Models_Terminology_TbxObjects_Attribute $element
@@ -331,56 +335,74 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getUserGuid(): string
+    public function getCreatedBy(): int
     {
-        return $this->userGuid;
+        return $this->createdBy;
     }
 
     /**
-     * @param string $userGuid
+     * @param int $userId
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setUserGuid(string $userGuid): self
+    public function setCreatedBy(int $userId): self
     {
-        $this->userGuid = $userGuid;
+        $this->createdBy = $userId;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getUserName(): string
+    public function getCreatedAt(): string
     {
-        return $this->userName;
+        return $this->createdAt;
     }
 
     /**
-     * @param string $userName
+     * @param string $createdAt
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setUserName(string $userName): self
+    public function setCreatedAt(string $createdAt): self
     {
-        $this->userName = $userName;
+        $this->createdAt = $createdAt;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getCreated(): string
+    public function getUpdatedBy(): int
     {
-        return $this->created;
+        return $this->updatedBy;
     }
 
     /**
-     * @param string $created
+     * @param int $userId
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setCreated(string $created): self
+    public function setUpdatedBy(int $userId): self
     {
-        $this->created = $created;
+        $this->updatedBy = $userId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUpdatedAt(): string
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param string $updatedAt
+     * @return editor_Models_Terminology_TbxObjects_Attribute
+     */
+    public function setUpdatedAt(string $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
         return $this;
     }
 

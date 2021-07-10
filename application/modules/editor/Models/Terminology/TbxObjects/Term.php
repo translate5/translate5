@@ -33,22 +33,22 @@ class editor_Models_Terminology_TbxObjects_Term {
      * 'fieldName' => true -> insert and update
      */
     const TABLE_FIELDS = [
-        'termTbxId' => false,
+        'updatedBy' => true,
+        'updatedAt' => true,
         'collectionId' => false,
         'termEntryId' => false,
-        'termEntryTbxId' => false,
-        'termEntryGuid' => false,
-        'langSetGuid' => false,
-        'guid' => false,
         'languageId' => false,
         'language' => false,
         'term' => true,
+        // 'proposal' => ?
         'status' => false,
         'processStatus' => false,
         'definition' => false,
-        'userGuid' => true,
-        'created' => true,
-        'userName' => true
+        'termEntryTbxId' => false,
+        'termTbxId' => false,
+        'termEntryGuid' => false,
+        'langSetGuid' => false,
+        'guid' => false,
     ];
 
     const TERM_DEFINITION = 'definition';
@@ -66,32 +66,33 @@ class editor_Models_Terminology_TbxObjects_Term {
     const TRANSSTAT_NOT_DEFINED ='transNotDefined';
     const CSS_TERM_IDENTIFIER = 'term';
 
-    protected string $term = '';
-    protected string $termTbxId = '';
-    protected string $language = '';
+    protected int $updatedBy = 0;
+    protected string $updatedAt = '';
+    protected int $collectionId = 0;
+    protected int $termEntryId = 0;
     protected int $languageId = 0;
-    protected string $descrip = '';
-    protected string $descripType = '';
-    protected string $descripTarget = '';
+    protected string $language = '';
+    protected string $term = '';
+    // protected string $proposal = '';
     protected string $status = '';
     protected string $processStatus = '';
     protected string $definition = '';
+    protected string $termEntryTbxId = '';
+    protected string $termTbxId = '';
+    protected ?string $termEntryGuid = null;
+    protected ?string $langSetGuid = null;
+    protected ?string $guid = null;
+
+    protected string $descrip = '';
+    protected string $descripType = '';
+    protected string $descripTarget = '';
     protected array $admin = [];
     protected array $xref = [];
     protected array $ref = [];
     protected array $transacGrp = [];
     protected array $transacNote = [];
-    protected int $collectionId = 0;
     protected array $termNote = [];
     protected array $note = [];
-    protected int $termEntryId = 0;
-    protected string $termEntryTbxId = '';
-    protected ?string $termEntryGuid = null;
-    protected ?string $langSetGuid = null;
-    protected ?string $guid = null;
-    protected string $userGuid = '';
-    protected string $userName = '';
-    protected string $created = '';
 
     /**
      * @param editor_Models_Terminology_TbxObjects_Term $element
@@ -100,6 +101,42 @@ class editor_Models_Terminology_TbxObjects_Term {
     public function getCollectionKey(editor_Models_Terminology_TbxObjects_Term $element): string
     {
         return $element->getTermEntryId().'-'.$element->getLanguage().'-'.$element->getTermTbxId();
+    }
+
+    /**
+     * @return string
+     */
+    public function getUpdatedBy(): int
+    {
+        return $this->updatedBy;
+    }
+
+    /**
+     * @param int $userId
+     * @return editor_Models_Terminology_TbxObjects_Term
+     */
+    public function setUpdatedBy(int $userId): self
+    {
+        $this->updatedBy = $userId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUpdatedAt(): string
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param string $updatedAt
+     * @return editor_Models_Terminology_TbxObjects_Term
+     */
+    public function setUpdatedAt(string $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     /**
@@ -515,59 +552,4 @@ class editor_Models_Terminology_TbxObjects_Term {
         $this->guid = $guid;
         return $this;
     }
-
-    /**
-     * @return string
-     */
-    public function getUserGuid(): string
-    {
-        return $this->userGuid;
-    }
-
-    /**
-     * @param string $userGuid
-     * @return editor_Models_Terminology_TbxObjects_Term
-     */
-    public function setUserGuid(string $userGuid): self
-    {
-        $this->userGuid = $userGuid;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUserName(): string
-    {
-        return $this->userName;
-    }
-
-    /**
-     * @param string $userName
-     * @return editor_Models_Terminology_TbxObjects_Term
-     */
-    public function setUserName(string $userName): self
-    {
-        $this->userName = $userName;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCreated(): string
-    {
-        return $this->created;
-    }
-
-    /**
-     * @param string $created
-     * @return editor_Models_Terminology_TbxObjects_Term
-     */
-    public function setCreated(string $created): self
-    {
-        $this->created = $created;
-        return $this;
-    }
-
 }
