@@ -4174,6 +4174,9 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Allgemein</source>
     <target>General</target>
 </trans-unit>
+<trans-unit id='TGF5b3V0'>
+  <source>Layout</source>
+  <target>Layout</target>
 <trans-unit id='TnVyIGFuc2NoYXVlbg=='>
     <source>Nur anschauen</source>
     <target>View only</target>

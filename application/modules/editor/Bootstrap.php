@@ -69,6 +69,11 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             /* @var $tua editor_Models_TaskUserAssoc */
             $tua->cleanupLocked();
+
+            $config = ZfExtended_Factory::get('editor_Models_UserConfig');
+            /* @var $config editor_Models_UserConfig */
+            $config->cleanUpThemeTemporary();
+
         };
         
         $eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', $cleanUp);

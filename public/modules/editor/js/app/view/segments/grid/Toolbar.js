@@ -63,6 +63,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_showBookmarkedSegments: '#UT#Nur Segmente mit Lesezeichen anzeigen',
     item_repeatedFilterBtn: '#UT#Nur wiederholt',
     item_showRepeatedSegments: '#UT#Nur Segmente mit Wiederholungen anzeigen',
+    item_themeMenuConfigText:'#UT#Layout',
     strings:{
         interfaceTranslation:'#UT#Oberfläche'
     },
@@ -131,7 +132,14 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     group: 'localeMenuGroup'
                 });
             });
-            
+
+
+            // add change user theme only if allowed
+            if(Editor.data.frontend.changeUserThemeVisible){
+                // add themes menu
+                menu.items.push(me.getThemeMenuConfig());
+            }
+
             config = {
                 items: [{
                     xtype: 'button',
@@ -220,5 +228,44 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+
+    /***
+     * Create the theme menu picker config
+     * @returns {{text: string, menu: {items: *[]}}}
+     */
+    getThemeMenuConfig:function(){
+        var me=this,
+            config,
+            uiThemesRecord = Editor.app.getUserConfig('extJs.cssFile',true),
+            menuItems = [];
+
+        Ext.Array.each(uiThemesRecord.get('defaults'), function(i) {
+            menuItems.push({
+                text: i,
+                value:i,
+                checked: uiThemesRecord.get('value') === i,
+                group: 'uiTheme',
+                checkHandler: function (item){
+                    // on item select, change the user state config, and reload the application
+                    // after reload, the user will get the changed theme
+                    uiThemesRecord.set('value',item.value);
+                    uiThemesRecord.save({
+                        callback:function(){
+                            location.reload();
+                        }
+                    });
+                }
+            });
+        });
+
+        config = {
+            text:me.item_themeMenuConfigText,
+            menu:{
+                items:menuItems
+            }
+        };
+
+        return config;
     }
 });
