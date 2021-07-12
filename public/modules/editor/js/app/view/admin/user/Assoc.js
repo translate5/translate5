@@ -159,10 +159,10 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                 labelCls: 'labelInfoIcon',
                                 cls:'userAssocLabelIconField',
                                 listeners:{
-                                    render: function(c) {
-                                        Ext.QuickTips.register({
+                                    afterrender: function(c) {
+                                        new Ext.tip.ToolTip({
                                             target: c.getEl(),
-                                            text: me.strings.deadlineDateInfoTooltip,
+                                            html: me.strings.deadlineDateInfoTooltip,
                                             enabled: true,
                                             showDelay: 20,
                                             trackMouse: true,
