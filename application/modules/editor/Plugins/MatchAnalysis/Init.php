@@ -133,7 +133,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         /* @var $batchCache editor_Plugins_MatchAnalysis_Models_BatchResult */
         $batchCache->deleteOlderRecords();
     }
-    
+
     /***
      * Operation action handler. Run analysis and pretranslate if $pretranslate is true.
      *
@@ -144,11 +144,24 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $task = $event->getParam('entity');
         /* @var $task editor_Models_Task */
         $params = $event->getParam('params');
-        
+
+        $config = $task->getConfig();
+
+        // set the defaults from config if not provided as params
+        if(!isset($params['internalFuzzy'])){
+            $params['internalFuzzy'] = $config->runtimeOptions->plugins->MatchAnalysis->internalFuzzyDefault;
+        }
+        if(!isset($params['pretranslateTmAndTerm'])){
+            $params['pretranslateTmAndTerm'] = $config->runtimeOptions->plugins->MatchAnalysis->pretranslateTmAndTermDefault;
+        }
+        if(!isset($params['pretranslateMt'])){
+            $params['pretranslateMt'] = $config->runtimeOptions->plugins->MatchAnalysis->pretranslateMtDefault;
+        }
+
         settype($params['internalFuzzy'], 'boolean');
-        settype($params['pretranslateMatchrate'], 'integer');
         settype($params['pretranslateTmAndTerm'], 'boolean');
         settype($params['pretranslateMt'], 'boolean');
+        settype($params['pretranslateMatchrate'], 'integer');
         settype($params['isTaskImport'], 'boolean');
         
         $params['pretranslate'] = $pretranslate;

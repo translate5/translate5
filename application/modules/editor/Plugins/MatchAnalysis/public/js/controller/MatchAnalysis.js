@@ -103,7 +103,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 beforerender:'onAdminTaskWindowBeforeRender'
             },
             '#languageResourceTaskAssocPanel':{
-                render:'onLanguageResourcesPanelRender'
+                render:'onLanguageResourcesPanelRender',
+                activate:'onLanguageResourcesPanelActivate',
             },
             '#languageResourcesWizardPanel':{
                 startMatchAnalysis:'onStartMatchAnalysis'
@@ -128,12 +129,22 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         }
     },
 
+    init : function() {
+        var me=this;
+        Ext.StoreManager.get('admin.task.Config').on({
+            load:{
+                fn:'onTaskConfigStoreLoad',
+                scope:me
+            }
+        });
+    },
+
     /***
      * Queue the analysis when the import with defaults button is clicked
      * @param task
      */
     onWizardCardImportDefaults: function (task) {
-        this.startAnalysis(task.get('id'),'pretranslation');
+        this.startAnalysis(task.get('id'),'pretranslation',true);
     },
 
     /***
@@ -204,7 +215,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     onLanguageResourcesPanelRender:function(panel){
         var me=this,
             storeData=[];
-        
+
         //init the pretranslate matchrate options (from 0-103)
         for(var i=0;i<=103;i++){
             storeData.push({
@@ -311,7 +322,12 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             }]
         }]);
     },
-    
+
+    onLanguageResourcesPanelActivate:function (){
+        // update the field defaults from config after the panel is visually visible
+        this.updateDefaultFields();
+    },
+
     /***
      * Event handler after a task was successfully created
      */
@@ -325,6 +341,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         }
         var me=this;
         me.loadTaskAssoc(panel.task);
+
+        // update the field defaults from config after the panel is visually visible
+        me.updateDefaultFields();
     },
     
     onMatchAnalysisMenuClick:function(item){
@@ -341,14 +360,21 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         var taskAssoc=Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc');
         //load the task assoc store
         taskAssoc.handleLoadPreferences(taskAssoc,task);
-        
     },
     
     /***
      * On language resource task assoc store load event handler
      */
     onLanguageResourcesTaskAssocStoreLoad:function(store){
-        this.updateTaskAssocPanelViewModel(store);
+        var me=this;
+        me.updateTaskAssoc(store);
+    },
+
+    /***
+     * On task config store load event handler
+     */
+    onTaskConfigStoreLoad: function (){
+        this.updateDefaultFields();
     },
 
     onStartMatchAnalysis:function(taskId,operation){
@@ -374,24 +400,34 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      *
      * @param taskId
      * @param operation
+     * @param importDefaults : run analysis with defaults
      */
-    startAnalysis:function(taskId,operation){
+    startAnalysis:function(taskId,operation,importDefaults){
         //'editor/:entity/:id/operation/:operation',
-        var me = this;
+        var me = this,
+            removeDefaults = importDefaults===undefined ? false : importDefaults,
+            params = {
+                internalFuzzy: me.isCheckboxChecked('cbInternalFuzzy'),
+                pretranslateTmAndTerm: me.isCheckboxChecked('pretranslateTmAndTerm'),
+                pretranslateMt: me.isCheckboxChecked('pretranslateMt'),
+                pretranslateMatchrate: me.getComponentByItemId('cbMinMatchrate').getValue(),
+                isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0,
+                batchQuery:me.isCheckboxChecked('batchQuery')
+            };
 
         me.fireEvent('beforeStartAnalysis',taskId,operation);
+
+        // when importing with defaults, those fields will be set on the backend
+        if(removeDefaults){
+            delete params.internalFuzzy;
+            delete params.pretranslateTmAndTerm;
+            delete params.pretranslateMt;
+        }
 
         Ext.Ajax.request({
             url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
             method: "PUT",
-            params: {
-                internalFuzzy: me.isCheckboxChecked('cbInternalFuzzy'),
-                pretranslateMatchrate: me.getComponentByItemId('cbMinMatchrate').getValue(),
-                pretranslateTmAndTerm: me.isCheckboxChecked('pretranslateTmAndTerm'),
-                pretranslateMt: me.isCheckboxChecked('pretranslateMt'),
-                isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0,
-                batchQuery:me.isCheckboxChecked('batchQuery')
-            },
+            params:params,
             scope: this,
             failure: function(response){
                 Editor.app.getController('ServerException').handleException(response);
@@ -403,13 +439,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * Language resource to task assoc after save event handler
      */
     onTaskAssocSavingFinished:function(record,store){
-        this.updateTaskAssocPanelViewModel(store);
+        this.updateTaskAssoc(store);
     },
 
     /***
-     * Update the language resources task assoc panel view model
+     * Updates task assoc panel fields and view model fields
      */
-    updateTaskAssocPanelViewModel:function(assocStore){
+    updateTaskAssoc:function(assocStore){
         var me=this,
             panels=Ext.ComponentQuery.query('languageResourceTaskAssocPanel'),
             store=assocStore ? assocStore : (me.getTaskAssocGrid() ? me.getTaskAssocGrid() : null);
@@ -423,12 +459,37 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             vm && vm.set('items',(store.getData().getSource() || store.getData()).getRange());
         }
     },
+
+    /***
+     * Update analysis default checkbox values from the task config
+     * @param panel
+     */
+    updateDefaultFields: function(){
+        var me=this,
+            cbInternalFuzzy = me.getComponentByItemId('cbInternalFuzzy'),
+            pretranslateMt = me.getComponentByItemId('pretranslateMt'),
+            pretranslateTmAndTerm = me.getComponentByItemId('pretranslateTmAndTerm');
+
+        cbInternalFuzzy && cbInternalFuzzy.setValue(Editor.app.getTaskConfig('plugins.MatchAnalysis.internalFuzzyDefault'));
+        pretranslateMt && pretranslateMt.setValue(Editor.app.getTaskConfig('plugins.MatchAnalysis.pretranslateMtDefault'));
+        pretranslateTmAndTerm && pretranslateTmAndTerm.setValue(Editor.app.getTaskConfig('plugins.MatchAnalysis.pretranslateTmAndTermDefault'));
+    },
     
     /***
      * Get component by itemId
      */
     getComponentByItemId:function(itemId){
-        var cmp=Ext.ComponentQuery.query('#'+itemId);
+        var context = Ext.ComponentQuery.query('adminTaskAddWindow')[0], // for import use the import window as context
+            cmp=null;
+
+        // for non import call, use the default language resources reference
+        if(context === undefined){
+            context = Ext.ComponentQuery.query('languageResourceTaskAssocPanel')[0];
+        }
+        if(context === undefined){
+            return null;
+        }
+        cmp=context.query('#'+itemId);
         if(cmp.length<1){
             return null;
         }
