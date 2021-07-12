@@ -62,7 +62,7 @@ class editor_Models_Terminology_Models_TermEntryModel extends ZfExtended_Models_
                 'elementName' => 'date',
                 'transac' => $type,
                 'date' => time(),
-                'transacNote' => $misc['transacNote'],
+                'transacNote' => $misc['userName'],
                 'transacType' => $type,
                 'collectionId' => $this->getCollectionId(),
                 'termEntryId' => $termEntryId,

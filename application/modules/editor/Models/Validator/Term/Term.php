@@ -31,16 +31,19 @@ class editor_Models_Validator_Term_Term extends ZfExtended_Models_Validator_Abst
    * Validators for Terms
    */
   protected function defineValidators() {
-    $this->addValidator('id', 'int');
-    $this->addValidator('term', 'stringLength', ['min' => 0, 'max' => 16386]);
-    $this->addValidator('termId', 'stringLength', ['min' => 0, 'max' => 60]);
-    $this->addDontValidateField('definition');
-    $this->addValidator('collectionId', 'int');
-    $this->addValidator('termEntryId', 'int');
-    $this->addValidator('termEntryTbxId', 'stringLength', ['min' => 0, 'max' => 255]);
-    $this->addValidator('languageId', 'int');
-    $this->addValidator('language', 'stringLength', ['min' => 0, 'max' => 60]);
-    $this->addValidator('status', 'inArray', [editor_Models_Terminology_Models_TermModel::getAllStatus()]);
-    $this->addValidator('processStatus', 'inArray', [editor_Models_Terminology_Models_TermModel::getAllProcessStatus()]);
+      $this->addValidator('id', 'int');
+      // updated by, updatedAt - ignored ?
+      $this->addValidator('collectionId', 'int');
+      $this->addValidator('termEntryId', 'int');
+      $this->addValidator('languageId', 'int');
+      $this->addValidator('language', 'stringLength', ['min' => 0, 'max' => 60]);
+      $this->addValidator('term', 'stringLength', ['min' => 0, 'max' => 16386]);
+      $this->addValidator('proposal', 'stringLength', ['min' => 0, 'max' => 16386]);
+      $this->addValidator('status', 'inArray', [editor_Models_Terminology_Models_TermModel::getAllStatus()]);
+      $this->addValidator('processStatus', 'inArray', [editor_Models_Terminology_Models_TermModel::getAllProcessStatus()]);
+      $this->addDontValidateField('definition');
+      $this->addValidator('termEntryTbxId', 'stringLength', ['min' => 0, 'max' => 255]);
+      // termEntryGuid, langSetGuid, guid - ignored ?
+      $this->addValidator('termId', 'stringLength', ['min' => 0, 'max' => 60]); // no such column
   }
 }

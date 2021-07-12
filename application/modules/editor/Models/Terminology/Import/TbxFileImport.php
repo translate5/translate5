@@ -546,22 +546,22 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         /** SimpleXMLElement $tig */
         /** @var editor_Models_Terminology_TbxObjects_Term $newTerm */
         $newTerm = new $this->termObject;
-        $newTerm->setTermTbxId($this->getIdOrGenerate($tig->term, $this->tbxMap[$this::TBX_TIG]));
+        $newTerm->setUpdatedBy($this->user->getId());
+        $newTerm->setUpdatedAt(NOW_ISO);
         $newTerm->setCollectionId($this->collectionId);
         $newTerm->setTermEntryId($this->termEntryDbId);
+        $newTerm->setLanguageId((int)$this->language['id']);
+        $newTerm->setLanguage($this->language['language']);
+        $newTerm->setTerm((string)$tig->term);
         $newTerm->setTermEntryTbxId($this->termEntryTbxId);
+        $newTerm->setTermTbxId($this->getIdOrGenerate($tig->term, $this->tbxMap[$this::TBX_TIG]));
         $newTerm->setTermEntryGuid($this->termEntryGuid);
         $newTerm->setLangSetGuid($this->langSetGuid);
         $newTerm->setGuid($this->termGuid);
-        $newTerm->setLanguage($this->language['language']);
-        $newTerm->setLanguageId((int)$this->language['id']);
-        $newTerm->setTerm((string)$tig->term);
+
         $newTerm->setDescrip($parsedLangSet->getDescrip());
         $newTerm->setDescripTarget($parsedLangSet->getDescripTarget());
         $newTerm->setDescripType($parsedLangSet->getDescripType());
-        $newTerm->setUserGuid($this->user->getUserGuid());
-        $newTerm->setUserName($this->user->getUserName());
-        $newTerm->setCreated(NOW_ISO);
 
         $this->termTigId = $newTerm->getTermTbxId();
 
@@ -619,22 +619,26 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         foreach ($element as $key => $value) {
             /** @var editor_Models_Terminology_TbxObjects_Attribute $attribute */
             $attribute = new $this->attributesObject;
-            $attribute->setElementName($key);
             $attribute->setCollectionId($this->collectionId);
             $attribute->setTermEntryId($this->termEntryDbId);
+            $attribute->setLanguage($this->language['language']);
+            // termId ?
+            $attribute->setType((string)$value->attributes()->{'type'});
+            $attribute->setValue((string)$value);
+            $attribute->setTarget((string)$value->attributes()->{'target'});
+            $attribute->setCreatedBy($this->user->getId());
+            $attribute->setCreatedAt(NOW_ISO);
+            $attribute->setUpdatedBy($this->user->getId());
+            $attribute->setUpdatedAt(NOW_ISO);
+
             $attribute->setTermEntryGuid($this->termEntryGuid);
             $attribute->setLangSetGuid($this->langSetGuid);
             $attribute->setTermGuid($this->termGuid);
             $attribute->setGuid($this->getGuid());
-            $attribute->setLanguage($this->language['language']);
-            $attribute->setValue((string)$value);
-            $attribute->setType((string)$value->attributes()->{'type'});
-            $attribute->setTarget((string)$value->attributes()->{'target'});
+
+            $attribute->setElementName($key);
 //            $attribute->setAttrLang($this->getActualLanguageAttribute($value));
             $attribute->setAttrLang($this->language['language'] ? $this->language['language'] : '');
-            $attribute->setUserGuid($this->user->getUserGuid());
-            $attribute->setUserName($this->user->getUserName());
-            $attribute->setCreated(NOW_ISO);
 
             // check if the dataType exist for the element
             $labelId = $this->dataType->getForAttribute($attribute);

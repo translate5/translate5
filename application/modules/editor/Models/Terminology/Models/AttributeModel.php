@@ -31,46 +31,46 @@ END LICENSE AND COPYRIGHT
  *
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
- * @method string getType() getType()
- * @method string setType() setType(string $type)
- * @method string getDataType() getDataType()
- * @method string setDataType() setDataType(string $dataType)
- * @method string getLanguage() getLanguage()
- * @method string setLanguage() setLanguage(string $language)
- * @method string getElementName() getElementName()
- * @method string setElementName() setElementName(string $elementName)
- * @method string getTarget() getTarget()
- * @method string setTarget() setTarget(string $target)
- * @method int getTermId() getTermId()
- * @method int setTermId() setTermId(int $termId)
- * @method string getTermGuid() getTermGuid()
- * @method string setTermGuid() setTermGuid(string $termGuid)
- * @method string getAttrLang() getAttrLang()
- * @method string setAttrLang() setAttrLang(string $attrLang)
- * @method string getValue() getValue()
- * @method string setValue() setValue(string $value)
  * @method integer getCollectionId() getCollectionId()
  * @method integer setCollectionId() setCollectionId(integer $collectionId)
  * @method string getTermEntryId() getTermEntryId()
  * @method string setTermEntryId() setTermEntryId(string $termEntryId)
+ * @method string getLanguage() getLanguage()
+ * @method string setLanguage() setLanguage(string $language)
+ * @method int getTermId() getTermId()
+ * @method int setTermId() setTermId(int $termId)
  * @method string getDataTypeId() getDataTypeId()
- * @method string setDataTypeId() setDataTypeId(string $dataTypeId)
+ * @method string setDataTypeId() setDataTypeId(int $dataTypeId)
+ * @method string getType() getType()
+ * @method string setType() setType(string $type)
+ * @method string getValue() getValue()
+ * @method string setValue() setValue(string $value)
+ * @method string getTarget() getTarget()
+ * @method string setTarget() setTarget(string $target)
+ * @method string getIsCreatedLocally() getIsCreatedLocally()
+ * @method void setIsCreatedLocally() setIsCreatedLocally(int $isCreatedLocally)
+ * @method string getCreatedBy() getCreatedBy()
+ * @method void setCreatedBy() setCreatedBy(int $userId)
+ * @method string getCreatedAt() getCreatedAt()
+ * @method void setCreatedAt() setCreatedAt(string $createdAt)
+ * @method string getUpdatedBy() getUpdatedBy()
+ * @method void setUpdatedBy() setUpdatedBy(int $userId)
+ * @method string getUpdatedAt() getUpdatedAt()
+ * @method void setUpdatedAt() setUpdatedAt(string $updatedAt)
  * @method string getTermEntryGuid() getTermEntryGuid()
  * @method string setTermEntryGuid() setTermEntryGuid(string $termEntryGuid)
  * @method string getLangSetGuid() getLangSetGuid()
  * @method string setLangSetGuid() setLangSetGuid(string $langSetGuid)
- * @method string getUserName() getUserName()
- * @method string setUserName() setUserName(string $userName)
- * @method string getUserGuid() getUserGuid()
- * @method string setUserGuid() setUserGuid(string $userGuid)
+ * @method string getTermGuid() getTermGuid()
+ * @method string setTermGuid() setTermGuid(string $termGuid)
  * @method string getGuid() getGuid()
  * @method string setGuid() setGuid(string $guid)
- * @method string getCreated() getCreated()
- * @method void setCreated() setCreated(string $created)
- * @method string getUpdated() getUpdated()
- * @method void setUpdated() setUpdated(string $updated)
- * @method string getProcessStatus() getProcessStatus()
- * @method void setProcessStatus() setProcessStatus(string $processStatus)
+ * @method string getElementName() getElementName()
+ * @method string setElementName() setElementName(string $elementName)
+ * @method string getAttrLang() getAttrLang()
+ * @method string setAttrLang() setAttrLang(string $attrLang)
+ * @method string getDataType() getDataType()
+ * @method string setDataType() setDataType(string $dataType)
  */
 class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_Entity_Abstract
 {
@@ -388,7 +388,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
      * Check if for the current term there is a processStatus attribute. When there is no one, create it.
      * @param int $termId
      */
-    public function checkOrCreateProcessStatus(int $termId)
+    /*public function checkOrCreateProcessStatus(int $termId)
     {
         $s=$this->db->select()
             ->where('termId=?',$termId)
@@ -402,11 +402,11 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         }
 
         $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $term editor_Models_Terminology_Models_TermModel */
+        /* @var $term editor_Models_Terminology_Models_TermModel * /
         $term->load($termId);
 
         $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language editor_Models_Languages */
+        /* @var $language editor_Models_Languages * /
 
         $language->loadById($term->getLanguage());
 
@@ -420,7 +420,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $this->setType('processStatus');
 
         $label = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
-        /* @var $label editor_Models_Terminology_Models_AttributeDataType */
+        /* @var $label editor_Models_Terminology_Models_AttributeDataType * /
         $label->loadOrCreate('termNote', 'processStatus',editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_LEVEL_TERM);
         $this->setDataTypeId($label->getId());
 
@@ -432,7 +432,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $this->setValue($term->getProcessStatus());
 
         $this->save();
-    }
+    }*/
 
     /**
      * Loads an attribute for the given term
@@ -472,18 +472,18 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
      * @param string $termText
      * @return editor_Models_Terminology_Models_AttributeModel
      */
-    public function addTermComment(int $termId,string $termText): self
+    /*public function addTermComment(int $termId,string $termText): self
     {
         $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $term editor_Models_Terminology_Models_TermModel */
+        /* @var $term editor_Models_Terminology_Models_TermModel * /
         $term->load($termId);
 
         $lang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $lang editor_Models_Languages */
+        /* @var $lang editor_Models_Languages * /
         $lang->loadById($term->getLanguageId());
 
         $label = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
-        /* @var $label editor_Models_Terminology_Models_AttributeDataType */
+        /* @var $label editor_Models_Terminology_Models_AttributeDataType * /
         $label->loadOrCreate('note');
 
         $this->init([
@@ -508,16 +508,16 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $this->save();
 
         return $this;
-    }
+    }*/
 
     /**
      * creates a new, unsaved term attribute history entity
      * @return editor_Models_Term_AttributeHistory
      */
-    public function getNewHistoryEntity(): editor_Models_Term_AttributeHistory
+    /*public function getNewHistoryEntity(): editor_Models_Term_AttributeHistory
     {
         $history = ZfExtended_Factory::get('editor_Models_Term_AttributeHistory');
-        /* @var $history editor_Models_Term_AttributeHistory */
+        /* @var $history editor_Models_Term_AttributeHistory * /
         $history->setAttributeId($this->getId());
         $history->setHistoryCreated(NOW_ISO);
 
@@ -527,7 +527,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         }
 
         return $history;
-    }
+    }*/
 
     /**
      * @return mixed
