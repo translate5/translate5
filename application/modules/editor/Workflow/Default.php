@@ -256,13 +256,13 @@ class editor_Workflow_Default {
     protected function checkForMissingConfiguration() {
         /* @var $config Zend_Config */
         $config = Zend_Registry::get('config');
-        if(isset($config->runtimeOptions->workflow->{$this->definition->name})){
-           return;
-        }
         /* @var $configModel editor_Models_Config */
         $configModel = ZfExtended_Factory::get('editor_Models_Config');
 
         foreach($this->definition->steps as $key => $step) {
+            if(isset($config->runtimeOptions->workflow->{$this->definition->name}->$step)){
+               continue;
+            }
             $configModel->init([
                 'name' => join('.', [
                     'runtimeOptions.workflow',

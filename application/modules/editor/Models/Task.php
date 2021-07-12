@@ -1024,6 +1024,16 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         ]);
     }
 
+    /**
+     * returns a logger instance with the given domain and the current task as default extra data
+     * @param string $domain
+     * @return ZfExtended_Logger
+     * @throws Zend_Exception
+     */
+    public function logger(string $domain = 'editor.task'): ZfExtended_Logger {
+        return Zend_Registry::get('logger')->cloneMe($domain, ['task' => $this]);
+    }
+
     /***
      * Search task by given search string.
      * The search will provide any match on taskName field.
