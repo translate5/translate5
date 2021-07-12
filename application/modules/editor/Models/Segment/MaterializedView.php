@@ -85,7 +85,7 @@ class editor_Models_Segment_MaterializedView {
         $this->checkTaskGuid();
         //$start = microtime(true);
         if($this->createMutexed()) {
-            $this->getTask()->logger('editor.task.mv')->info('E1348', 'The tasks materialized view was created.');
+            $this->getTask()->logger('editor.task.mv')->info('E1348', 'The tasks materialized view {matView} was created.', ['matView' => $this->viewName]);
             $this->addFields();
             $this->fillWithData();
             return;
@@ -343,7 +343,7 @@ class editor_Models_Segment_MaterializedView {
      * @param string $taskGuid
      */
     public function drop() {
-        $this->getTask()->logger('editor.task.mv')->info('E1349', 'The tasks materialized view was dropped.');
+        $this->getTask()->logger('editor.task.mv')->info('E1349', 'The tasks materialized view {matView} was dropped.', ['matView' => $this->viewName]);
         $db = Zend_Db_Table::getDefaultAdapter();
         $db->query("DROP TABLE IF EXISTS " . $this->viewName);
     }
