@@ -84,12 +84,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      */
     protected $tagHandler;
     
-    /***
-     * Filename by file id cache
-     * @var array
-     */
-    public $fileNameCache=array();
-    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::__construct()
