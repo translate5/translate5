@@ -99,11 +99,7 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
         
         //For each mt result, calculate the matchrate using modelfront
         $session = new Zend_Session_Namespace();
-        $task=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid((string) $session->taskGuid);
-
-        $risk = $this->getRiskPredictionInstance($task);
+        $risk = $this->getRiskPredictionInstance((string) $session->taskGuid);
         if(empty($risk)){
             return;
         }
