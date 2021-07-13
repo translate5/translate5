@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd" xmlns:translate5="http://www.translate5.net/" translate5:taskname="C:\fakepath\simple-en-de" translate5:taskguid="{86b10bf5-02f3-4f0c-b264-f3877aa15d96}">
+<file original="simple-en-de.sdlxliff" source-language="en" target-language="de" xml:space="preserve" datatype="x-translate5">
+<body>
+<trans-unit id="1" maxwidth="450" size-unit="char">
+  <source><ph id="1">&lt;p_in&gt;</ph>Stellen Sie sich hier einen langen Text vor. Einen sehr langen Text. <ph id="2">&lt;/p_in&gt;</ph></source>
+  <seg-source><mrk mtype="seg" mid="1"><ph id="1">&lt;p_in&gt;</ph>Stellen Sie sich hier einen langen Text vor.</mrk> <mrk mtype="seg" mid="2">Einen sehr langen Text. </mrk><ph id="2">&lt;/p_in&gt;</ph></seg-source>
+  <target><mrk mtype="seg" mid="1"><ph id="1">&lt;p_in&gt;</ph>Imagine here a long text.</mrk> <mrk mtype="seg" mid="2">A very long text.</mrk> <ph id="2">&lt;/p_in&gt;</ph></target>
+</trans-unit>
+</body>
+</file>
+</xliff>

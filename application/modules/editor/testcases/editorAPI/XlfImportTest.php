@@ -79,7 +79,7 @@ class XlfImportTest extends editor_Test_JsonTest {
         //FIXME get task and test wordcount!!!
         //get segment list (just the ones of the first file for that tests)
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=47');
-        
+
         $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
     }
     
@@ -192,13 +192,14 @@ class XlfImportTest extends editor_Test_JsonTest {
     }
     
     /**
-     * check if the whitespace between mrk tags on the import are also exported again
+     * check if several fixed issues are still fixed
      * @depends testSegmentEditing
      */
     public function testIssueExports() {
         $task = $this->api()->getTask();
         //start task export
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, '05-Translate1971-de-en.xlf', 'Translate1971-exporttest.xlf');
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, '06-Translate2525-de-en.xlf', 'Translate2525-exporttest.xlf');
     }
     
     /**
@@ -217,11 +218,13 @@ class XlfImportTest extends editor_Test_JsonTest {
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/'.$fileToExport);
+
+        if($this->api()->isCapturing()) {
+            file_put_contents($this->api()->getFile($fileToCompare, null, false), rtrim($exportedFile));
+        }
+
         //compare it
         $expectedResult = $this->api()->getFileContent($fileToCompare);
-        //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
-        //file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
-        //file_put_contents('/home/tlauria/foo-'.$fileToCompare, rtrim($exportedFile));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
     }
     
