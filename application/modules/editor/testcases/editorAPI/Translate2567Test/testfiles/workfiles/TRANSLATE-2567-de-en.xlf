@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file original="word/document.xml" source-language="de" target-language="en" datatype="x-undefined">
+<body>
+<trans-unit id="NFDBB2FA9-tu1" xml:space="preserve">
+<source xml:lang="de">Text mit &lt;b&gt;0&lt;/b&gt; in tags gab Probleme.</source>
+</trans-unit>
+<trans-unit id="NFDBB2FA9-tu2" xml:space="preserve">
+<source xml:lang="de">Invalides XML &lt;img&gt; mit &lt;span data-text="böse
+Zeilen
+Umbrüche"&gt;
+Umbrüchen &lt;/span&gt; im Attribut gab Probleme.</source>
+</trans-unit>
+<trans-unit id="NFDBB2FA9-tu3" xml:space="preserve">
+<source xml:lang="de">Invalides XML &lt;img&gt; mit invaliden &lt;donotexist&gt;HTML Tags&lt;/donotexist&gt; müssen encodiert sein!</source>
+</trans-unit>
+</body>
+</file>
+</xliff>

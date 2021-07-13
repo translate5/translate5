@@ -320,7 +320,7 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
         // example: <mrk mtype="seg">allowed</mrk> not allowed <mrk...
         // we allow tags between the mrk tags, they are preserved too, so we remove them for the check before
         $otherContent = join(array_merge($otherContentSource, $otherContentTarget));
-        if(!empty($otherContent) && preg_match('/[^\s]+/', $this->contentConverter->removeXlfTags($otherContent))) {
+        if(!empty($otherContent) && preg_match('/[^\s]+/', $this->contentConverter->removeXlfTagsAndProtectedWhitespace($otherContent))) {
             $data = array_merge($otherContentSource, $otherContentTarget);
             foreach ($data as &$d) {
                 //print the code point for non printable characters
