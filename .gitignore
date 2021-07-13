@@ -19,3 +19,4 @@ public/scheduled-tests/*
 cghooks.lock
 /.idea
 .idea
+/windows-installer-config.ini
