@@ -160,6 +160,7 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_repeatedFilterBtn = '<?php echo $this->translate->_('Nur wiederholt');?>';
   	gridToolbar.item_showRepeatedSegments = '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>';
     gridToolbar.strings.interfaceTranslation = '<?php echo $this->translate->_('Oberfläche');?>';
+    gridToolbar.item_themeMenuConfigText = '<?php echo $this->translate->_('Layout');?>';
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
     
@@ -1282,7 +1283,8 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.HeadPanel",
         strings: {
             logout: '<?php echo $this->translate->_('Abmelden');?>',
-            readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
+            readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>',
+            uiThemeComboLabelText: '<?php echo $this->translate->_('Layout');?>'
         }
     });
 
