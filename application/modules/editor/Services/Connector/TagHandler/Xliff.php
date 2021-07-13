@@ -49,16 +49,34 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
     protected $mapCount = 0;
     
     /**
-     * Flag if the restoreInResult call removed some content tags, reset on prepareQuery
-     * @var boolean
+     * Counter for additional tags in one segment content block
+     * @var integer
      */
-    protected $removeContentTags = false;
+    protected $additionalTagCount = 1;
     
     public function __construct() {
         parent::__construct();
-        $this->xmlparser->registerElement('t5xliffresult > it,t5xliffresult > ph,t5xliffresult > ept,t5xliffresult > bpt',null, function($tag, $key, $opener){
-            $this->xmlparser->replaceChunk($opener['openerKey'],'',$opener['isSingle'] ? 1 : $key-$opener['openerKey']);
-        });
+        
+        //replace unusable <ph|it etc> tags with usable <x|bx etc> tags
+        $this->xmlparser->registerElement(
+            't5xliffresult > it,t5xliffresult > ph,t5xliffresult > ept,t5xliffresult > bpt',
+            null,
+            function($tag, $key, $opener){
+                switch ($tag) {
+                    case 'bpt':
+                        $tag = '<bx';
+                        break;
+                    case 'ept':
+                        $tag = '<ex';
+                        break;
+                    default:
+                        $tag = '<x';
+                        break;
+                }
+                $this->xmlparser->replaceChunk($opener['openerKey'], '', $opener['isSingle'] ? 1 : ($key-$opener['openerKey']+1));
+                $this->xmlparser->replaceChunk($opener['openerKey'], $tag.' mid="additional-'.($this->additionalTagCount++).'" />');
+            }
+        );
     }
     
     /**
@@ -71,7 +89,6 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
      */
     public function prepareQuery(string $queryString): string {
         $this->realTagCount = 0;
-        $this->removeContentTags = false;
         $queryString = $this->restoreWhitespaceForQuery($queryString);
         
         //$map is set by reference
@@ -90,7 +107,7 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
     public function restoreInResult(string $resultString): ?string {
         $this->hasRestoreErrors = false;
         //strip other then x|ex|bx|g|/g
-        $resultString = strip_tags($this->removeTagsWithContent($resultString), '<x><x/><bx><bx/><ex><ex/><g>');
+        $resultString = strip_tags($this->replaceTagsWithContent($resultString), '<x><x/><bx><bx/><ex><ex/><g>');
         //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied,
         // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
         // this is triggered here with the parse call
@@ -111,21 +128,15 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
     }
     
     /**
-     * Checks Xliff result on valid segments: <it> ,<ph>,<bpt> and <ept> are invalid since they can not handled by the replaceAdditionalTags method
-     * Also we add only <x><bx><ex><g></g> tags in the communication with the language resource, so all others may not be remapped, and must be just removed
+     * If the XLF result from a TM contains <it> ,<ph>,<bpt> and <ept> tags, they could not be replaced by the sent <x|bx|ex|g> tags in the source,
+     *   so they have to be considered as additional tags then
      * @param string $segmentContent
      */
-    protected function removeTagsWithContent(string $content): string {
+    protected function replaceTagsWithContent(string $content): string {
         //just concat source and target to check both:
         if(preg_match('#<(it|ph|ept|bpt)[^>]*>#', $content)) {
-            $this->logger->info('E1301', 'The LanguageResource answer did contain it|ph|ept|bpt tags, which are removed since they can not be handled.',[
-                'givenContent' => $content,
-            ]);
-            
             //surround the content with tmp tags(used later as selectors)
             $content = $this->xmlparser->parse('<t5xliffresult>'.$content.'</t5xliffresult>');
-            
-            $this->removeContentTags = true;
             
             //remove the helper tags
             return strtr($content, [
@@ -159,13 +170,5 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
             ]);
         }
         return $result;
-    }
-    
-    /**
-     * returns if the restoreInResult call removed some unusable content tags (it|ph|ept|bpt tags), reset on prepareQuery
-     * @return bool
-     */
-    public function hasRemovedContentTags(): bool {
-        return $this->removeContentTags;
     }
 }

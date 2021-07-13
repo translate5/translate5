@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -36,33 +35,33 @@ END LICENSE AND COPYRIGHT
  * Editor.controller.Segments kapselt die Funktionalität des Grids
  * @class Editor.controller.Segments
  * @extends Ext.app.Controller
- * 
- * SaveChain: 
- * Saving a segment triggers several asynchronous actions, which are depending on each other. 
- * To preserve the order of this actions, the complete save process is implemented as a set of functions, 
- * named as "saveChain". The next Step / Function in the save chain is either called directly or used 
+ *
+ * SaveChain:
+ * Saving a segment triggers several asynchronous actions, which are depending on each other.
+ * To preserve the order of this actions, the complete save process is implemented as a set of functions,
+ * named as "saveChain". The next Step / Function in the save chain is either called directly or used
  * as callback method if the previous method has used AJAX.
- * 
- * The way through the chain depends on the actual application state 
+ *
+ * The way through the chain depends on the actual application state
  * (for example change alike settings, segment specific, etc).
- * 
+ *
  * Starting the save chain is done calling "saveChainStart".
- * 
+ *
  * The following Methods belongs to the save chain:
- * saveChainStart (accepts config with one time bindings to events "chainEnd" and "segmentUsageFinished")
+ * saveChainStart (accepts config with one time bindings to events "segmentEditSaved" and "segmentUsageFinished")
  * saveChainCheckAlikes
  * saveChainSave (fires event "afterSaveCall", returning false in the event prevents next step)
  * saveChainSaveCallback (fires event "saveComplete", returning false in the event prevents next step)
- * saveChainEnd (fires event "chainEnd")
+ * saveChainEnd (fires event "segmentEditSaved")
  * 
  * additional events:
- * segmentUsageFinished: called once after change alike handling or on chainEnd, if bound by config not called in case of an error on completing the editor
- * chainEnd: called at the very end of the save process, if bound by config not called in case of an error on completing the editor
+ * segmentUsageFinished: called once after change alike handling or on segmentEditSaved, if bound by config not called in case of an error on completing the editor
+ * segmentEditSaved: called at the very end of the save process, if bound by config not called in case of an error on completing the editor
  * 
  * The ChangeAlike Controller hooks into the save chain, @see Editor.controller.ChangeAlike
- * 
+ *
  * They are called in this order.
- * Additional Infos see on each method comment. 
+ * Additional Infos see on each method comment.
  */
 Ext.define('Editor.controller.Segments', {
   extend : 'Ext.app.Controller',
@@ -83,6 +82,7 @@ Ext.define('Editor.controller.Segments', {
   loadingMaskRequests: 0,
   saveChainMutex: false,
   changeAlikeOperation: null,
+  isQualityFiltered: false,
   defaultRowHeight: 15,
   refs : [{
     ref : 'segmentGrid',
@@ -100,8 +100,14 @@ Ext.define('Editor.controller.Segments', {
       ref : 'watchListFilterBtn',
       selector : '#watchListFilterBtn'
   },{
+      ref: 'filterBtnRepeated',
+      selector: '#filterBtnRepeated'
+  },{
 	  ref:'segmentsToolbar',
 	  selector:'segmentsToolbar'
+  },{
+      ref:'qualityFilterPanel',
+      selector:'qualityFilterPanel'
   }],
   listen: {
       controller: {
@@ -121,13 +127,17 @@ Ext.define('Editor.controller.Segments', {
           },
           '#Fileorder': {
               itemsaved: 'handleFileSaved'
+          },
+          'qualityFilterPanel': {
+              qualityFilterChanged: 'onQualityFilterChanged'
           }
       },
       component: {
           '#segmentgrid' : {
               afterrender: 'gridAfterRender',
               columnhide: 'handleColumnVisibility',
-              columnshow: 'handleColumnVisibility'
+              columnshow: 'handleColumnVisibility',
+              canceledit:'handleCancelEdit'
           },
           '#fileorderTree': {
               itemclick: 'handleFileClick'
@@ -137,6 +147,9 @@ Ext.define('Editor.controller.Segments', {
           },
           'segmentsToolbar #watchListFilterBtn': {
               click: 'watchListFilter'
+          },
+          'segmentsToolbar #filterBtnRepeated': {
+              click: 'repeatedFilter'
           }
       },
       store: {
@@ -169,36 +182,34 @@ Ext.define('Editor.controller.Segments', {
           newTotal = store.totalCount,
           cls = 'activated',
           btn = me.getResetFilterBtn(),
-          btnWatchList = me.getWatchListFilterBtn(),
           filters = store.filters;
     
       me.updateFilteredCountDisplay(newTotal);
-    
-    
-      if(filters.length > 0){
+
+      if(filters.length > 0 || me.isQualityFiltered){
           btn.addCls(cls);
-      }
-      else {
+      } else {
           btn.removeCls(cls);
-          btnWatchList.removeCls(cls);
-    }
+      }
   },
   /**
    * Displays / Updates the segment count in the reset button
    * @param {Integer} new segment count to be displayed
    */
   updateFilteredCountDisplay: function(newTotal) {
-    var btn_text = this.getSegmentsToolbar().item_clearSortAndFilterBtn;
-    btn_text = Ext.String.format('{0} ({1})', btn_text, newTotal);
-    this.getResetFilterBtn().setText(btn_text);
+      var btn_text = this.getSegmentsToolbar().item_clearSortAndFilterBtn;
+      btn_text = Ext.String.format('{0} ({1})', btn_text, newTotal);
+      this.getResetFilterBtn().setText(btn_text);
   },
+  /**
+   * 
+   */
   gridAfterRender: function(grid) {
       var me = this,
-          params = [],
           task = Editor.data.task,
           title = Ext.String.ellipsis(task.get('taskName'), 60),
           store = grid.store,
-          proxy = store.getProxy(),
+          repeated = grid.down('isRepeatedColumn'),
           initialGridFilters = Editor.data.initialGridFilters;
       
       grid.getHeader().getTitle().getEl().set({
@@ -211,6 +222,10 @@ Ext.define('Editor.controller.Segments', {
 
       if(task.isUnconfirmed()) {
           title = title + grid.title_addition_unconfirmed;
+      }
+      
+      if(!task.get('defaultSegmentLayout')) {
+          repeated && repeated.hide();
       }
       
       initialGridFilters = initialGridFilters && initialGridFilters.segmentgrid;
@@ -227,8 +242,7 @@ Ext.define('Editor.controller.Segments', {
               grid.down('gridcolumn[dataIndex="'+item.dataIndex+'"]').show();
           });
           grid.filters.addFilters(initialGridFilters);
-          params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
-          me.reloadFilemap(params);
+          me.reloadFilemap(store.getFilterParams());
       }
       else {
         //reset suppressNextFilter to reenable normal filtering (suppressNextFilter needed for initialGridFilters)
@@ -257,54 +271,71 @@ Ext.define('Editor.controller.Segments', {
     var me = this,
         store = me.getSegmentsStore(),
         grid = me.getSegmentGrid(),
-        filters = me.getSegmentGrid().filters;
+        filters = me.getSegmentGrid().filters,
+        qualityPanel = me.getQualityFilterPanel();
     grid.selModel.deselectAll();
     me.clearSegmentSort();
+    // reset the quality filter and uncheck any checked qualities
+    store.setQualityFilter('');
+    me.isQualityFiltered = false;
+    if(qualityPanel){
+        qualityPanel.uncheckAll();
+    }
     store.removeAll();
     if(store.getFilters().length > 0){
       //reloading of the store is caused by clearFilter call
       filters.clearFilters();
-    }
-    else {
+    } else {
       store.reload();
     }
   },
   /**
    * Toggle filtering by watch list.
    */
-  watchListFilter: function() {
-    var me = this,
-        grid = me.getSegmentGrid(),
-        gridFilters = grid.filters,
-        filters = gridFilters.store.filters,
-        found = false,
-        otherFound = false,
-        column;
-
-    filters.each(function(filter, index, len){
-        var isWatched = filter.getProperty() == 'isWatched';
-        found = found || isWatched;
-        otherFound = otherFound || !isWatched && filter.getDisabled() === false;
-    });
-    //remove watchlist filter
-    if (found) {
-        column = grid.columnManager.getHeaderByDataIndex('isWatched');
-        if (column && column.filter && column.filter.isGridFilter) {
-            column.filter.setActive(false);
-        }
-        return;
-    } 
-    //add watchlist filter
-    gridFilters.addFilter({
-        dataIndex: 'isWatched',
-        type: 'boolean',
-        value: true,
-        disabled: false
-    });
-    // currently enabled at least one more filter:
-    if (otherFound) {
-        Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
-    }
+  watchListFilter: function (btn) {
+      var me = this,
+          grid = me.getSegmentGrid(),
+          gridFilters = grid.filters,
+          filters = gridFilters.store.filters,
+          otherFound = false,
+          column = grid.down('[dataIndex=isWatched]');
+          
+      filters.each(function (filter, index, len) {
+          var isWatched = filter.getProperty() == 'isWatched';
+          otherFound = otherFound || !isWatched && filter.getDisabled() === false;
+      });
+      
+      if(column && column.filter) {
+          if(btn.pressed) {
+              column.filter.filter.setValue(true);
+              column.filter.setActive(true);
+          }
+          else {
+              column.filter.setActive(false);
+          }
+      }
+      
+      // currently enabled at least one more filter:
+      if (btn.pressed && otherFound) {
+          Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
+      }
+  },
+  
+  repeatedFilter: function (btn) {
+      var me = this,
+          grid = me.getSegmentGrid(),
+          column = grid.down('[dataIndex=isRepeated]');
+      
+      if(column && column.filter) {
+          if(btn.pressed) {
+              column.filter.setActive(true);
+              //1,2,3 contain in filter source only (1), target only (2), and segments repeatead in both (3)
+              column.filter.filter.setValue([1,2,3]);
+          }
+          else {
+              column.filter.setActive(false);
+          }
+      }
   },
   /**
    * removes the segment from the grid if removed from the watchlist and watchlist filter is set
@@ -343,21 +374,25 @@ Ext.define('Editor.controller.Segments', {
    * nach einem ändern der Filter muss das mapping zwischen Datei und Startsegmenten neu geladen werden.
    * @return void
    */
-  handleFilterChange: function() {
+  handleFilterChange: function () {
       var me = this,
           grid = me.getSegmentGrid(),
           gridFilters = grid.filters,
           store = gridFilters.store,
           filters = store.filters,
           proxy = store.getProxy(),
-          btn = me.getWatchListFilterBtn(),
-          found = false,
+          tbar = me.getSegmentsToolbar(),
+          watchListFound = false,
+          isRepeatedFound = false,
           params = {};
-          
-      filters.each(function(filter, index, len){
-         found = found || (filter.getProperty() == 'isWatched');
+
+      filters.each(function (filter, index, len) {
+          watchListFound = watchListFound || filter.getProperty() == 'isWatched';
+          isRepeatedFound = isRepeatedFound || filter.getProperty() == 'isRepeated';
       });
-      btn.toggle(found);
+      
+      tbar.down('#watchListFilterBtn').toggle(watchListFound, false);
+      tbar.down('#filterBtnRepeated').toggle(isRepeatedFound, false);
 
       params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
 
@@ -467,7 +502,7 @@ Ext.define('Editor.controller.Segments', {
    * blocks with a loading mask if another savechain is running
    * next step in chain: saveChainCheckAlikes
    * @param {Object} config possible values are: 
-   *    chainEnd: callback method called ONCE after finishing the save chain
+   *    segmentEditSaved: callback method called ONCE after finishing the save chain
    *    segmentUsageFinished: callback method called ONCE after finishing the usage of the currently loaded segment
    *    scope: the scope of the given callbacks 
    */
@@ -495,7 +530,7 @@ Ext.define('Editor.controller.Segments', {
       //if completeEdit fails, the plugin remains editing
       if(ed.editing) {
           //TODO the below by config bound handlers can also be bound elsewhere and get no information about success or failed chainend!
-          me.saveChainEnd(); 
+          me.saveChainEnd(record); 
           return;
       }
       
@@ -503,8 +538,8 @@ Ext.define('Editor.controller.Segments', {
       //same again after segment was saved successfully
 
       //the following handlers should only be bound if no 
-      if(config.chainEnd && Ext.isFunction(config.chainEnd)) {
-          me.on('chainEnd', config.chainEnd, (config.scope || me), {single: true});
+      if(config.segmentEditSaved && Ext.isFunction(config.segmentEditSaved)) {
+          me.on('segmentEditSaved', config.segmentEditSaved, (config.scope || me), { single: true });
       }
       if(config.segmentUsageFinished && Ext.isFunction(config.segmentUsageFinished)) {
           me.on('segmentUsageFinished', config.segmentUsageFinished, (config.scope || me), {single: true});
@@ -551,14 +586,14 @@ Ext.define('Editor.controller.Segments', {
       
       //its possible that the editor is already destroyed by editorDomCleanUp, then the save process wouldn't work.
       if(!ed || !ed.editor){
-          Editor.MessageBox.addError(Ext.String.format(me.messages.segmentNotSaved,record.get('segmentNrInTask')));
-          me.saveChainEnd();
+          Editor.MessageBox.addError(Ext.String.format(me.messages.segmentNotSaved, record.get('segmentNrInTask')));
+          me.saveChainEnd(record);
           return;
       }
       
       //this check also prevents saving if RowEditor.completeEdit was returning false!
       if(! record.dirty) {
-          me.saveChainEnd();
+          me.saveChainEnd(record);
           return;
       }
       
@@ -577,7 +612,7 @@ Ext.define('Editor.controller.Segments', {
       //parameters are the callback to the final save chain call,
       //for later usage in ChangeAlike Handling and the saved record
       me.fireEvent('afterSaveCall', function(){
-          me.saveChainEnd();
+          me.saveChainEnd(record);
       }, record);
   },
   /**
@@ -593,7 +628,7 @@ Ext.define('Editor.controller.Segments', {
       if(!operation.success){
           errorHandler = Editor.app.getController('ServerException');
           errorHandler.handleCallback.apply(errorHandler, arguments);
-          me.saveChainEnd();
+          me.saveChainEnd(record);
           return;
       }
       me.updateSiblingsMetaCache(record);
@@ -618,7 +653,7 @@ Ext.define('Editor.controller.Segments', {
       
       //invoking change alike handling:
       if(me.fireEvent('saveComplete')){
-          me.saveChainEnd(); //NEXT step in save chain
+          me.saveChainEnd(record); //NEXT step in save chain
       }
   },
   /**
@@ -664,14 +699,16 @@ Ext.define('Editor.controller.Segments', {
   
   /**
    * End of the save chain.
-   * fires event "chainEnd".
+   * fires event "segmentEditSaved".
    */
-  saveChainEnd: function() {
+  saveChainEnd: function(record) {
       var me = this;
       me.delLoadMask();
       me.saveChainMutex = false;
       me.onSegmentUsageFinished();
-      me.fireEvent('chainEnd', me);
+      // crucial: reset the trigger flag indicating a original target update when save chain ended
+      record.wasOriginalTargetUpdated = false;
+      me.fireEvent('segmentEditSaved', me, record);
   },
   addLoadMask: function() {
       var me = this;
@@ -690,14 +727,34 @@ Ext.define('Editor.controller.Segments', {
       }
   },
   
-  /***
+  /**
    * Update the segmentFinishCount segments grid view model.
    */
   updateSegmentFinishCountViewModel:function(record){
 	  var me=this,
-	  	grid=me.getSegmentGrid(),
-	  	vm=grid.getViewModel(),
-	  	value=Ext.isNumber(record) ? record : record.get('segmentFinishCount');
+	  	grid = me.getSegmentGrid(),
+	  	vm = grid.getViewModel(),
+	  	value = Ext.isNumber(record) ? record : record.get('segmentFinishCount');
 	  vm.set('segmentFinishCount',value);
+  },
+  /**
+   * Handles the cancel edit of the segment grid
+   * Some View Controllers like qualities FilterPanelController can not listen to the #segmentgrid directly but can listen to this controller (Why???) so we forward the event
+   * Generally it would be great to have all events regarding segment editing being dispatched from one source which centralizes them
+   */
+  handleCancelEdit(){
+      this.fireEvent('segmentEditCanceled', this);
+  },
+  /**
+   * Listens to the filter panel controller and delegates it to our store and changes the view if the stored filter changed
+   */
+  onQualityFilterChanged: function(filter){
+      var store = this.getSegmentsStore();
+      // the store checks if the filter actually changed and we adjut the view only if requested
+      if(store.setQualityFilter(filter)){
+          this.isQualityFiltered = (filter && filter != '');
+          store.removeAll();
+          store.reload();
+      }
   }
 });

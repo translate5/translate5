@@ -1,0 +1,490 @@
+{
+    "qid": -1,
+    "qtype": "root",
+    "qcount": 487,
+    "qtotal": 487,
+    "qcategory": null,
+    "qcomplete": true,
+    "expanded": true,
+    "expandable": false,
+    "checked": false,
+    "text": "All categories",
+    "children": [
+        {
+            "qid": -1,
+            "qtype": "internal",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "internal",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "internal_tags_missing",
+                    "text": "Internal tags missing",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "internal",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "internal_tags_added",
+                    "text": "Internal tags have been added",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "internal",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "whitespace_tags_added",
+                    "text": "Whitespace has been added",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "internal",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "whitespace_tags_missing",
+                    "text": "Whitespace has been removed",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "internal",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "internal_tag_structure_faulty",
+                    "text": "Internal tags have incorrect structure",
+                    "leaf": true,
+                    "checked": false,
+                    "qfaulty": true
+                }
+            ],
+            "qcategory": null,
+            "text": "Internal tags",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "qm",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "qm_1",
+                    "text": "Demo QM error 1",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "qm_2",
+                    "text": "Mistranslation",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "qm_3",
+                    "text": "Terminology problem",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "qm_4",
+                    "text": "Fluency issue",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "qm_5",
+                    "text": "Inconsistency",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "text": "Manual QA (complete segment)",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "mqm",
+            "qcount": 487,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "mqm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "children": [
+                        {
+                            "qid": "7506",
+                            "qtype": "mqm",
+                            "qcount": 171,
+                            "qcomplete": true,
+                            "qcategory": "mqm_2",
+                            "qcatidx": "2",
+                            "text": "Terminology",
+                            "qtotal": 171,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": "7501",
+                            "qtype": "mqm",
+                            "qcount": 105,
+                            "qcomplete": true,
+                            "qcategory": "mqm_3",
+                            "qcatidx": "3",
+                            "text": "Mistranslation",
+                            "qtotal": 105,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": "7632",
+                            "qtype": "mqm",
+                            "qcount": 12,
+                            "qcomplete": true,
+                            "qcategory": "mqm_4",
+                            "qcatidx": "4",
+                            "text": "Omission",
+                            "qtotal": 12,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": "7505",
+                            "qtype": "mqm",
+                            "qcount": 3,
+                            "qcomplete": true,
+                            "qcategory": "mqm_5",
+                            "qcatidx": "5",
+                            "text": "Addition",
+                            "qtotal": 3,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": "7495",
+                            "qtype": "mqm",
+                            "qcount": 13,
+                            "qcomplete": true,
+                            "qcategory": "mqm_6",
+                            "qcatidx": "6",
+                            "text": "Untranslated",
+                            "qtotal": 13,
+                            "leaf": true,
+                            "checked": false
+                        }
+                    ],
+                    "qcategory": "mqm_1",
+                    "text": "Accuracy",
+                    "qcatidx": 1,
+                    "qtotal": 304,
+                    "expanded": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "mqm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "children": [
+                        {
+                            "qid": "7498",
+                            "qtype": "mqm",
+                            "qcount": 21,
+                            "qcomplete": true,
+                            "qcategory": "mqm_8",
+                            "qcatidx": "8",
+                            "text": "Style\/register",
+                            "qtotal": 21,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": "7635",
+                            "qtype": "mqm",
+                            "qcount": 6,
+                            "qcomplete": true,
+                            "children": [
+                                {
+                                    "qid": "7494",
+                                    "qtype": "mqm",
+                                    "qcount": 12,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_10",
+                                    "qcatidx": "10",
+                                    "text": "Punctuation",
+                                    "qtotal": 12,
+                                    "leaf": true,
+                                    "checked": false
+                                }
+                            ],
+                            "qcategory": "mqm_9",
+                            "qcatidx": "9",
+                            "text": "Typography",
+                            "qtotal": 18,
+                            "expanded": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": "7529",
+                            "qtype": "mqm",
+                            "qcount": 2,
+                            "qcomplete": true,
+                            "children": [
+                                {
+                                    "qid": "7542",
+                                    "qtype": "mqm",
+                                    "qcount": 4,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_12",
+                                    "qcatidx": "12",
+                                    "text": "Capitalization",
+                                    "qtotal": 4,
+                                    "leaf": true,
+                                    "checked": false
+                                }
+                            ],
+                            "qcategory": "mqm_11",
+                            "qcatidx": "11",
+                            "text": "Spelling",
+                            "qtotal": 6,
+                            "expanded": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": "7523",
+                            "qtype": "mqm",
+                            "qcount": 10,
+                            "qcomplete": true,
+                            "children": [
+                                {
+                                    "qid": -1,
+                                    "qtype": "mqm",
+                                    "qcount": 0,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_14",
+                                    "text": "Morphology (word form)",
+                                    "qcatidx": 14,
+                                    "qtotal": 0,
+                                    "leaf": true,
+                                    "checked": false
+                                },
+                                {
+                                    "qid": -1,
+                                    "qtype": "mqm",
+                                    "qcount": 0,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_15",
+                                    "text": "Part of speech",
+                                    "qcatidx": 15,
+                                    "qtotal": 0,
+                                    "leaf": true,
+                                    "checked": false
+                                },
+                                {
+                                    "qid": "7496",
+                                    "qtype": "mqm",
+                                    "qcount": 32,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_16",
+                                    "qcatidx": "16",
+                                    "text": "Agreement",
+                                    "qtotal": 32,
+                                    "leaf": true,
+                                    "checked": false
+                                },
+                                {
+                                    "qid": "7513",
+                                    "qtype": "mqm",
+                                    "qcount": 28,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_17",
+                                    "qcatidx": "17",
+                                    "text": "Word order",
+                                    "qtotal": 28,
+                                    "leaf": true,
+                                    "checked": false
+                                },
+                                {
+                                    "qid": "7504",
+                                    "qtype": "mqm",
+                                    "qcount": 51,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_18",
+                                    "qcatidx": "18",
+                                    "text": "Function words",
+                                    "qtotal": 51,
+                                    "leaf": true,
+                                    "checked": false
+                                },
+                                {
+                                    "qid": "7656",
+                                    "qtype": "mqm",
+                                    "qcount": 17,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_19",
+                                    "qcatidx": "19",
+                                    "text": "Tense\/aspect\/mood",
+                                    "qtotal": 17,
+                                    "leaf": true,
+                                    "checked": false
+                                }
+                            ],
+                            "qcategory": "mqm_13",
+                            "qcatidx": "13",
+                            "text": "Grammar",
+                            "qtotal": 138,
+                            "expanded": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_20",
+                            "text": "Unintelligible",
+                            "qcatidx": 20,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        }
+                    ],
+                    "qcategory": "mqm_7",
+                    "text": "Fluency",
+                    "qcatidx": 7,
+                    "qtotal": 183,
+                    "expanded": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "text": "Manual QA (inside segment)",
+            "qtotal": 487,
+            "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "term",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "not_found_in_target",
+                    "text": "Not found in target",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "not_defined_in_target",
+                    "text": "Not defined in target terminology",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "forbidden_in_target",
+                    "text": "Forbidden in target",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "forbidden_in_source",
+                    "text": "Forbidden in source",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "text": "Terminology",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "matchrate",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "matchrate",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "unedited_fuzzy_match",
+                    "text": "Unedited fuzzy match",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "matchrate",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "edited_100percent_match",
+                    "text": "Edited 100% match",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "text": "Usage of TM-matches",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        }
+    ]
+}

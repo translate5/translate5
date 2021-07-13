@@ -52,6 +52,7 @@ Ext.define('Editor.model.LanguageResources.Resource', {
     {name: 'filebased', type: 'boolean'},
     {name: 'serviceType', type: 'string'},
     {name: 'serviceName', type: 'string'},
+    {name: 'resourceType', type: 'string'},
     {name: 'defaultColor', type: 'string'}
   ],
   idProperty: 'id',

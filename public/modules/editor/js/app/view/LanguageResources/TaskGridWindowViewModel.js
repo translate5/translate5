@@ -44,7 +44,8 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindowViewModel', {
         'Ext.util.Sorter',
         'Ext.data.Store',
         'Ext.data.field.Integer',
-        'Ext.data.field.String'
+        'Ext.data.field.String',
+        'Editor.model.LanguageResources.Task'
     ],
     data: {
         record: null
@@ -57,7 +58,7 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindowViewModel', {
                         buffered: true,
                         pageSize: 200,
                         autoLoad: false,
-                        model: 'Editor.model.admin.Task',
+                        model: 'Editor.model.LanguageResources.Task',
                         sorters: [{
                             property: 'taskName',
                             direction: 'DESC'

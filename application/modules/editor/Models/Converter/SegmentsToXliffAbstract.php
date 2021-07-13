@@ -89,6 +89,11 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     protected $task;
     
     /**
+     * @var editor_Workflow_Default
+     */
+    protected $workflow;
+    
+    /**
      * @var editor_Models_Export_FileParser_Sdlxliff
      */
     protected $exportParser;
@@ -152,7 +157,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     protected $taghelperTerm;
     
     /**
-     * @var editor_Models_Segment_QmSubsegments
+     * @var editor_Models_Segment_Mqm
      */
     protected $taghelperMqm;
     
@@ -273,6 +278,15 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
         }
         return null;
     }
+    /**
+     * Retrieves the qualities for a segment as an assoc with the following keys: 'id', 'segmentId', 'type', 'category', 'categoryIndex', 'text'
+     * @param int $segmentId
+     * @return array
+     */
+    protected function fetchQualityData(int $segmentId){
+        $qualityExport = new editor_Models_Quality_XliffExport($this->task, [ $segmentId ]);
+        return $qualityExport->get($segmentId);
+    }
     
     protected function finishResult() {
         $this->result[] = '</xliff>';
@@ -284,6 +298,10 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
      */
     protected function initConvertionData() {
         $task = $this->task;
+        
+        $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wm editor_Workflow_Manager */
+        $this->workflow = $wm->getByTask($task);
         
         /**
          * define autostates
@@ -406,7 +424,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
             $this->taghelperTerm = ZfExtended_Factory::get('editor_Models_Segment_TermTag',[$this->taghelperInternal]);
         }
         if(empty($this->taghelperMqm)) {
-            $this->taghelperMqm = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
+            $this->taghelperMqm = ZfExtended_Factory::get('editor_Models_Segment_Mqm');
         }
         if(empty($this->taghelperTrackChanges)) {
             $this->taghelperTrackChanges = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');

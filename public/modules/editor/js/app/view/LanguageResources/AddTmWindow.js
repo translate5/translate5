@@ -58,10 +58,13 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen',
         customers:'#UT#Für diese Kunden nutzen',
-        useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
+        useAsDefault:'#UT#Leserechte standardmäßig',
+        writeAsDefault:'#UT#Schreibrechte standardmäßig',
         mergeTerms:'#UT#Termeinträge verschmelzen',
         collection:'#UT#TBX-Datei',
-        importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!'
+        importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
+        useAsDefaultTooltip:'#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert',
+        writeAsDefaultTooltip:'#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden'
     },
     height : 500,
     width : 500,
@@ -150,29 +153,59 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                 },{
                     xtype:'customers',
                     name:'customerIds[]',
+                    itemId:'resourcesCustomers',
+                    dataIndex:'customerIds',
+                    reference:'resourcesCustomers',
+                    publishes: 'value',
+                    bind:{
+                        store:'{customers}'
+                    },
                     listeners:{
                         change:'onCustomersTagFieldChange'
                     },
                     fieldLabel:me.strings.customers,
-                    itemId:'resourcesCustomers',
-                    dataIndex:'customerIds',
-                    allowBlank: false,
-                    store:Ext.create('Ext.data.Store', {
-                        model:'Editor.model.admin.Customer',
-                        autoLoad:true
-                    })
+                    allowBlank: false
                 },{
                     xtype:'tagfield',
                     name:'customerUseAsDefaultIds[]',
                     itemId:'useAsDefault',
+                    dataIndex:'customerUseAsDefaultIds',
+                    reference:'useAsDefault',
+                    publishes: 'value',
+                    bind:{
+                        store:'{customersDefaultRead}'
+                    },
+                    listeners:{
+                        change:'onCustomersReadTagFieldChange'
+                    },
+                    queryMode: 'local',
+                    displayField: 'name',
+                    valueField: 'id',
                     fieldLabel:me.strings.useAsDefault,
-                    store:Ext.create('Ext.data.Store', {
-                        model:'Editor.model.admin.Customer',
-                    }),
-                    displayField: 'name', 
-                    valueField: 'id', 
-                    queryMode: 'local', 
-                    dataIndex:'customerUseAsDefaultIds'
+                    labelClsExtra:'lableInfoIcon',
+                    autoEl: {
+                        tag: 'div',
+                        'data-qtip': me.strings.useAsDefaultTooltip
+                    }
+                },{
+                    xtype:'tagfield',
+                    name:'customerWriteAsDefaultIds[]',
+                    itemId:'writeAsDefault',
+                    dataIndex:'customerWriteAsDefaultIds',
+                    bind:{
+                        store:'{customersDefaultWrite}',
+                        hidden:'{!isTmResourceType}',
+                        disabled:'{!isTmResourceType}'
+                    },
+                    displayField: 'name',
+                    valueField: 'id',
+                    queryMode: 'local',
+                    fieldLabel:me.strings.writeAsDefault,
+                    labelClsExtra:'lableInfoIcon',
+                    autoEl: {
+                        tag: 'div',
+                        'data-qtip': me.strings.writeAsDefaultTooltip
+                    }
                 },{
                     xtype: 'hiddenfield',
                     name: 'serviceType',

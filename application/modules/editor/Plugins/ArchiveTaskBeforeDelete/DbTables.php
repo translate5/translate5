@@ -41,7 +41,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
     
     //  → mysqldump mit --where zur Einschränkung, im Where Statement kann ein subselect verwendet werden, allerdings nur mit --single-transaction, z.B.:
     //mysqldump -h mittagqi -u root -p icorrectT5 LEK_segments2terms --single-transaction --where="segmentId in (select id from LEK_segments where taskGuid = '{35f7268b-6cc1-4dd6-9a76-46e1b81dbd40}')"
-    
+
     /**
      * Here are defined all Editor tables, and how to deal with them on using the archiver:
      * false → means do not archive the table at all (since it has no correlation with the task at all)
@@ -51,74 +51,79 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
      * @var array
      */
     protected $tables = array(
-            'LEK_browser_log' => false,
-            'LEK_customer' => false,
-            'LEK_categories' => false,
-            'LEK_languageresources_category_assoc' => false,
-            'LEK_change_log' => false,
-            'LEK_comments' => 'taskGuid',
-            'LEK_comment_meta' => 'taskGuid',
-            'LEK_customer_config' => false,
-            'LEK_files' => 'taskGuid',
-            'LEK_file_filter' => 'taskGuid',
-            'LEK_foldertree' => 'taskGuid',
-            'LEK_languages' => false,
-            // languageresources tables disabled for archiving, since task data is not depending from them, and existence of languageresources does not depend on the existence of the task
-            'LEK_languageresources_customerassoc' => false,
-            'LEK_languageresources_internal_tm' => false,
-            'LEK_languageresources_languages' => false,
-            'LEK_languageresources_log' => false,
-            'LEK_languageresources_usage_log' => false,
-            'LEK_languageresources_usage_log_sum' => false,
-            'LEK_languageresources_taskassoc' => false,
-            'LEK_languageresources' => false,
-            'LEK_match_analysis' => 'taskGuid',
-            'LEK_match_analysis_batchresults' => false,
-            'LEK_match_analysis_taskassoc' => 'taskGuid',
-            'LEK_pixel_mapping' => false,
-            'LEK_plugin_segmentstatistic_terms' => 'taskGuid',
-            'LEK_plugin_segmentstatistics' => 'taskGuid',
-            'LEK_qmsubsegments' => 'taskGuid',
-            'LEK_workflow_log' => false, //its just logging, we dont archive that
-            'LEK_segment_data' => 'taskGuid',
-            'LEK_segment_field' => 'taskGuid',
-            'LEK_segment_history' => 'taskGuid',
-            'LEK_segment_history_data' => 'taskGuid',
-            'LEK_segment_user_assoc' => 'taskGuid',
-            'LEK_segments' => 'taskGuid',
-            'LEK_segments_meta' => 'taskGuid',
-            //not needed anymore, but keeping as reference how to to implement filters
-            //'LEK_skeletonfiles' => array('--single-transaction', "--where=fileId in (select id from LEK_files where taskGuid = '{TASKGUID}')"),
-            'LEK_task' => 'taskGuid',
-            'LEK_task_config' => 'taskGuid',
-            'LEK_task_excelexport' => 'taskGuid',
-            'LEK_taskUserAssoc' => 'taskGuid',
-            'LEK_taskUserTracking' => 'taskGuid',
-            'LEK_task_log' => 'taskGuid',
-            'LEK_task_meta' => 'taskGuid',
-            'LEK_task_migration' => 'taskGuid',
-            'LEK_task_usage_log' => false,
-            'LEK_terms' => false,
-            'LEK_term_attributes'=>false,
-            'terms_attributes_datatype'=>false,
-            'LEK_term_attribute_history'=>false,
-            'terms_attributes_proposal'=>false,
-            'LEK_term_entry'=>false,
-            'LEK_term_history'=>false,
-            'terms_proposal'=>false,
-            'LEK_user_changelog_info' => false,
-            'LEK_user_config' => false,
-            'LEK_user_meta' => false,
-            'LEK_visualreview_files' => 'taskGuid',
-            'LEK_visualreview_segmentmapping' => 'taskGuid',
-            // visualreview font tables disabled for archiving, since task data is not depending from them and fonts can be reapplied
-            'LEK_visualreview_font' => false,
-            'LEK_visualreview_font_taskassoc' => false,
-            'LEK_workflow_action' => false,
-            'LEK_workflow_userpref' => 'taskGuid',
-            'Zf_dbversion' => true
+        'LEK_browser_log' => false,
+        'LEK_customer' => false,
+        'LEK_categories' => false,
+        'LEK_languageresources_category_assoc' => false,
+        'LEK_change_log' => false,
+        'LEK_comments' => 'taskGuid',
+        'LEK_comment_meta' => 'taskGuid',
+        'LEK_customer_config' => false,
+        'LEK_files' => 'taskGuid',
+        'LEK_file_filter' => 'taskGuid',
+        'LEK_foldertree' => 'taskGuid',
+        'LEK_languages' => false,
+        // languageresources tables disabled for archiving, since task data is not depending from them, and existence of languageresources does not depend on the existence of the task
+        'LEK_languageresources_customerassoc' => false,
+        'LEK_languageresources_internal_tm' => false,
+        'LEK_languageresources_languages' => false,
+        'LEK_languageresources_log' => false,
+        'LEK_languageresources_usage_log' => false,
+        'LEK_languageresources_usage_log_sum' => false,
+        'LEK_languageresources_taskassoc' => false,
+        'LEK_languageresources' => false,
+        'LEK_match_analysis' => 'taskGuid',
+        'LEK_match_analysis_batchresults' => false,
+        'LEK_match_analysis_taskassoc' => 'taskGuid',
+        'LEK_pixel_mapping' => false,
+        'LEK_plugin_segmentstatistic_terms' => 'taskGuid',
+        'LEK_plugin_segmentstatistics' => 'taskGuid',
+        'LEK_workflow_log' => false, //its just logging, we dont archive that
+        'LEK_segment_data' => 'taskGuid',
+        'LEK_segment_field' => 'taskGuid',
+        'LEK_segment_history' => 'taskGuid',
+        'LEK_segment_history_data' => 'taskGuid',
+        'LEK_segment_user_assoc' => 'taskGuid',
+        'LEK_segments' => 'taskGuid',
+        'LEK_segments_meta' => 'taskGuid',
+        'LEK_segment_quality' => 'taskGuid',
+        // LEK_segment_tags is just a temorary datamodel during import
+        'LEK_segment_tags' => false,
+        //not needed anymore, but keeping as reference how to to implement filters
+        //'LEK_skeletonfiles' => array('--single-transaction', "--where=fileId in (select id from LEK_files where taskGuid = '{TASKGUID}')"),
+        'LEK_task' => 'taskGuid',
+        'LEK_task_config' => 'taskGuid',
+        'LEK_task_excelexport' => 'taskGuid',
+        'LEK_taskUserAssoc' => 'taskGuid',
+        'LEK_taskUserTracking' => 'taskGuid',
+        'LEK_task_log' => 'taskGuid',
+        'LEK_task_meta' => 'taskGuid',
+        'LEK_task_migration' => 'taskGuid',
+        'LEK_task_usage_log' => false,
+        'LEK_terms' => false,
+        'LEK_term_attributes'=>false,
+        'LEK_term_attributes_label'=>false,
+        'LEK_term_attribute_history'=>false,
+        'LEK_term_attribute_proposal'=>false,
+        'LEK_term_entry'=>false,
+        'LEK_term_history'=>false,
+        'LEK_term_proposal'=>false,
+        'LEK_user_assoc_default' => false,
+        'LEK_user_changelog_info' => false,
+        'LEK_user_config' => false,
+        'LEK_user_meta' => false,
+        'LEK_visualreview_files' => 'taskGuid',
+        'LEK_visualreview_segmentmapping' => 'taskGuid',
+        // visualreview font tables disabled for archiving, since task data is not depending from them and fonts can be reapplied
+        'LEK_visualreview_font' => false,
+        'LEK_visualreview_font_taskassoc' => false,
+        'LEK_workflow' => false,
+        'LEK_workflow_action' => false,
+        'LEK_workflow_step' => false,
+        'LEK_workflow_userpref' => 'taskGuid',
+        'Zf_dbversion' => true
     );
-    
+
     /**
      * This method is intended to be called directly from CLI, in the build scripts of translate5.
      * So it is ensured, that no new LEK table (relating to tasks) is forgotten in the archive plugin
@@ -142,13 +147,21 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
         }
         exit(1); //since used as CLI use CLI exit codes here, 0 is true, other than 0 is error
     }
-    
+
     /**
      * This method is intended to be called directly from CLI, in the build scripts of translate5.
      * So it is ensured, that no new LEK table (relating to tasks) is forgotten in the archive plugin
      */
     public static function run($projectRoot, $zendLib): array {
         self::initCliRuntime($projectRoot, $zendLib);
+        $instance = ZfExtended_Factory::get(__CLASS__);
+        return $instance->checkMissingInList();
+    }
+    /**
+     * Runs our check for unit-test
+     * @return array
+     */
+    public static function runTest(): array {
         $instance = ZfExtended_Factory::get(__CLASS__);
         return $instance->checkMissingInList();
     }

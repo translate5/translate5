@@ -61,7 +61,16 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
         unset($event->extra['task']);
         unset($event->extraFlat['task']);
         $taskLog->setExtra($event->getExtraAsJson());
-        $taskLog->save();
+        try {
+            $taskLog->save();
+        }
+        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            //do nothing here! The error itself was logged in the system log,
+            // the task seems to be deleted in the meantime, so no need and way to log it here
+            // this can happen for example if error happens in a worker (async from GUI),
+            // and the mail logger needs some time to send the mail, and the task writer is the last writer,
+            // so the task may be deleted while the worker is not finished yet doing the logging
+        }
     }
     
     public function isAccepted(ZfExtended_Logger_Event $event) {

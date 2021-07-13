@@ -108,7 +108,8 @@ Ext.define('Editor.controller.ChangeAlike', {
           },
           '#changealikeWindow' : {
               show: 'focusButton',
-              onEscape: 'handleCancelChangeAlike'
+              onEscape: 'handleCancelChangeAlike',
+              onCtrlS: 'handleSaveChangeAlike'
           },
           '#changealikeWindow #cancelBtn' : {
               click: 'handleCancelChangeAlike'
@@ -262,7 +263,7 @@ Ext.define('Editor.controller.ChangeAlike', {
 
 	  //If it is set to true, the repetition editor only pops up (processes automatically) 
 	  //when the target of the current segment is empty
-	  if(Editor.app.getUserConfig('alike.showOnEmptyTarget') && record.get('target')!=""){
+	  if(Editor.app.getUserConfig('alike.showOnEmptyTarget') && record.get('target') != ''){
 		  me.fireEvent('segmentUsageFinished', me);
 		  me.callbackToSaveChain();
 		  return;
@@ -312,7 +313,6 @@ Ext.define('Editor.controller.ChangeAlike', {
     //Hier wird auch das Alike Segment vorübergehend auf nicht editierbar gesetzt, bis das OK vom Server kommt
     data = {
       stateId: rec.data.stateId,
-      qmId: rec.data.qmId,
       editable: 0,
       autoStateId: 999
     };
@@ -327,6 +327,11 @@ Ext.define('Editor.controller.ChangeAlike', {
         data.source = rec.data.source;
     }
     data.targetEdit = rec.data.targetEdit;
+    // when a LanguageResource match was taken over, we will have to update the original target as well
+    // this affects only the view, the actual copying in the backend is based on evaluations there
+    if(rec.wasOriginalTargetUpdated) {
+        data.target = rec.get('target');
+    }
     me.alikesToProcess = me.getAlikesToProcess();
     me.calculateUsedTime();
     

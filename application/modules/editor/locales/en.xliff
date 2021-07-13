@@ -1089,9 +1089,9 @@
 	<source>Exportoptionen</source>
 	<target>export options</target>
       </trans-unit>
-      <trans-unit id='RXhwb3J0IFFNLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='>
-	<source>Export QM-Statistik (XML) für Feld: {0}</source>
-	<target>Export QM-statistics (XML) for field: {0}</target>
+      <trans-unit id='RXhwb3J0IFFTLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='>
+	<source>Export QS-Statistik (XML) für Feld: {0}</source>
+	<target>Export QA-statistics (XML) for field: {0}</target>
       </trans-unit>
       <trans-unit id='QXVmZ2FiZSB3aXJkIHZlcmxhc3Nlbi4uLg=='>
 	<source>Aufgabe wird verlassen...</source>
@@ -1181,7 +1181,7 @@
     <source>wird momentan verwendet</source>
     <target>is currently in use</target>
 </trans-unit>
-<trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgTVFNLUF1c3plaWNobnVuZ2VuKQ=='><source>(CSV-Dateiformat mit MQM-Auszeichnungen)</source><target>(CSV file with MQM markup)</target></trans-unit>
+<trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgTVFNLUF1c3plaWNobnVuZ2VuKQ=='><source>(CSV-Dateiformat mit MQM-Auszeichnungen)</source><target>(CSV file with manual QA markup)</target></trans-unit>
 <trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgbWVocmVyZW4gemllbHNwcmFjaGxpY2hlbiBBbHRlcm5hdGl2c3BhbHRlbik='><source>(CSV-Dateiformat mit mehreren zielsprachlichen Alternativspalten)</source><target>(CSV file with multiple target alternatives)</target></trans-unit>
 <trans-unit id='SW5zdGFsbGF0aW9uZW4gJmFtcDsgSG9zdGluZw=='><source>Installationen &amp; Hosting</source><target>Installations &amp; Hosting</target></trans-unit>
 <trans-unit id='U3VwcG9ydCAmYW1wOyBVcGRhdGVz'><source>Support &amp; Updates</source><target>Support &amp; Updates</target></trans-unit>
@@ -1237,7 +1237,7 @@
   </trans-unit>
   <trans-unit id='U2VnbWVudCB2b24gTGVzZXplaWNoZW5saXN0ZSBlbnRmZXJuZW4gKFNUUkcgKyBEKQ=='>
     <source>Segment von Lesezeichenliste entfernen (STRG + D)</source>
-    <target>remove segment bookmarks (CTRL + D)</target>
+    <target>Remove segment bookmarks (CTRL + D)</target>
   </trans-unit>  
 <trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW4gKFNUUkcgKyBBTFQgKyBFTlRFUik='>
   <source>Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)</source>
@@ -1281,7 +1281,7 @@
 </trans-unit>
 <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
   <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
-  <target>The segment content was resetted to the original import state.</target>
+  <target>The segment content was reset to the original import state.</target>
 </trans-unit>
 <trans-unit id='U2VnbWVudCBhdWYgaW5pdGlhbGVuIEluaGFsdCB6dXLDvGNrc2V0emVuIChBTFQgKyBFTlRGKQ=='>
   <source>Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)</source>
@@ -1315,9 +1315,9 @@
   <source>Filtertext eingeben...</source>
   <target>Enter filtering text...</target>
 </trans-unit>
-<trans-unit id='TnVyIE1RTS10YWdzIGJlYXJiZWl0ZW4='>
-  <source>Nur MQM-tags bearbeiten</source>
-  <target>Edit only MQM-tags</target>
+<trans-unit id='TnVyIG1hbnVlbGxlIFFTIGltIFNlZ21lbnQgYmVhcmJlaXRlbg=='>
+  <source>Nur manuelle QS im Segment bearbeiten</source>
+  <target>Edit only manual QA inside segments</target>
 </trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dA=='>
   <source>Die Aufgabe wird von einem Benutzer benutzt</source>
@@ -1374,7 +1374,7 @@
 <trans-unit id='SGlud2VpcyE='><source>Hinweis!</source><target>Note!</target></trans-unit>
 <trans-unit id='RGllIGdld8O8bnNjaHRlIEFrdGlvbiBrYW5uIG5pY2h0IGR1cmNoZ2Vmw7xocnQgd2VyZGVuISBEYXMgYWt0dWVsbCBnZcO2ZmZuZXRlIFNlZ21lbnQgbXVzcyB6dW7DpGNoc3QgZ2VzcGVpY2hlcnQgYnp3LiBnZXNjaGxvc3NlbiB3ZXJkZW4u'>
   <source>Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.</source>
-  <target>The desired action cannot be processed! The currenlty opened segment has to be saved / closed first.</target>
+  <target>The desired action cannot be processed! The currently opened segment has to be saved / closed first.</target>
 </trans-unit>
 <trans-unit id='RGllc2VyIEFubWVsZGVuYW1lIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'>
   <source>Dieser Anmeldename wird bereits verwendet.</source>
@@ -1472,7 +1472,7 @@
 </trans-unit>
 <trans-unit id='RGFzIHZlcndlbmRldGUgw5xiZXJzZXR6dW5nc3dlcmt6ZXVnIGhhdCBrZWluZSBJbmZvcm1hdGlvbiB6dXIgSGVya3VuZnQgZGVzIE1hdGNoZXMgenVyIFZlcmbDvGd1bmcgZ2VzdGVsbHQu'>
     <source>Das verwendete Übersetzungswerkzeug hat keine Information zur Herkunft des Matches zur Verfügung gestellt.</source>
-    <target>The previously used translation tool did not provide information to the origin of the match.</target>
+    <target>The translation tool used did not provided information on the origin of the match.</target>
 </trans-unit>
 <trans-unit id='RGllc2VyIFRhc2sgd3VyZGUgaW1wb3J0aWVydCwgYmV2b3IgZGFzIE1hdGNoIFJhdGUgVHlwLUZlYXR1cmUgaW1wbGVtZW50aWVydCB3dXJkZS4='>
     <source>Dieser Task wurde importiert, bevor das Match Rate Typ-Feature implementiert wurde.</source>
@@ -1584,7 +1584,7 @@
 </trans-unit>
 <trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='>
     <source>(zur Importzeit)</source>
-    <target>(at time of import)</target>
+    <target>(at time of import / pretranslation)</target>
 </trans-unit>
 <trans-unit id='WmllbHRleHQ='>
     <source>Zieltext</source>
@@ -1614,14 +1614,6 @@
     <source>Schließen</source>
     <target>Close</target>
 </trans-unit>
-<trans-unit id='TVFN'>
-    <source>MQM</source>
-    <target>MQM</target>
-</trans-unit>
-<trans-unit id='TVFNIFN0YXRpc3Rpaw=='>
-    <source>MQM Statistik</source>
-    <target>MQM statistics</target>
-</trans-unit>
 <trans-unit id='VGFiZWxsZSB6dXLDvGNrc2V0emVu'>
     <source>Tabelle zurücksetzen</source>
     <target>Reset grid</target>
@@ -1650,9 +1642,9 @@
     <source>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</source>
     <target>Some non representable characters were removed from the segment (multiple white-spaces, tabs, line-breaks etc.)!</target>
 </trans-unit>
-<trans-unit id='TVFNIGhpbnp1ZsO8Z2Vu'>
-    <source>MQM hinzufügen</source>
-    <target>add MQM</target>
+<trans-unit id='TWFudWVsbGUgUVMgaGluenVmw7xnZW4='>
+    <source>Manuelle QS hinzufügen</source>
+    <target>Add manual QA</target>
 </trans-unit>
 
 <trans-unit id='UmVmZXJlbnotRGF0ZWllbg=='>
@@ -2325,7 +2317,7 @@ A task was associated to you in the task-portal {portalLink}.<br />
 
 <trans-unit id="QWxsZSBlcnNldHplbiB3aXJkIGbDvHIgQXVmZ2FiZW4gbWl0IFNlZ21lbnRlbiBtaXQgTVFNLVRhZ3MgbmljaHQgdW50ZXJzdMO8dHp0">
     <source>Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt</source>
-    <target>Replace all is not supported for task with segments with mqm tags</target>
+    <target>Replace all is not supported for task with segments with manual QA tags</target>
 </trans-unit>
 
 <trans-unit id="U2VnbWVudGUgbWl0IFN1Y2h0cmVmZmVyOg==">
@@ -3067,9 +3059,9 @@ A task was associated to you in the task-portal {portalLink}.<br />
     <source>Info zum Term-Collection</source>
     <target>Term-Collection info</target>
 </trans-unit>
-<trans-unit id='U3RhbmRhcmRtw6Rzc2lnIGFrdGl2IGbDvHI='>
-    <source>Standardmässig aktiv für</source>
-    <target>Language Ressource used by default for</target>
+<trans-unit id='TGVzZXJlY2h0ZSBzdGFuZGFyZG3DpMOfaWc='>
+    <source>Leserechte standardmäßig</source>
+    <target>Read access by default</target>
 </trans-unit>
 <trans-unit id='RsO8ciBkaWVzZSBLdW5kZW4gbnV0emVu'>
     <source>Für diese Kunden nutzen</source>
@@ -3281,22 +3273,17 @@ A task was associated to you in the task-portal {portalLink}.<br />
   <source>Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment nicht von der Aufgabe entfernt werden!</source>
   <target>The Task is in use, the language resource can not be removed from the task at the meoment!</target>
 </trans-unit>
-
-<trans-unit id='T3BlbklkIEVtaXR0ZW4='>
-    <source>OpenId Emitten</source>
-    <target>OpenId Issuer</target>
-</trans-unit>
-
-<trans-unit id='4oG0IERlciBCZW51dHplciBrYW5uIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuLiBEaWVzZXIgQmVudXR6ZXIgd2lyZCB2b24gdHJhbnNsYXRlNSBuYWNoIGRlciBPcGVuSWQtQXV0aGVudGlmaXppZXJ1bmcgYXV0b21hdGlzY2ggZXJzdGVsbHQu'>
-    <source>⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.</source>
-    <target>⁴ Unable to edit the user. This user is auto created by translate5 after OpenId authentication.</target>
+<trans-unit id='T3BlbklEIEVtaXR0ZW4='><source>OpenID Emitten</source><target>OpenID Issuer</target></trans-unit>
+<trans-unit id='4oG0IERlciBCZW51dHplciBrYW5uIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuLiBEaWVzZXIgQmVudXR6ZXIgd2lyZCB2b24gdHJhbnNsYXRlNSBuYWNoIGRlciBPcGVuSUQtQXV0aGVudGlmaXppZXJ1bmcgYXV0b21hdGlzY2ggZXJzdGVsbHQu'>
+    <source>⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.</source>
+    <target>⁴ Unable to edit the user. This user is auto created by translate5 after OpenID authentication.</target>
 </trans-unit>
 <trans-unit id='dHJhbnNsYXRlNSB3aXJkIGdlbGFkZW46'><source>translate5 wird geladen:</source><target>translate5 is loading:</target></trans-unit>
 <trans-unit id='dHJhbnNsYXRlNSBEb21haW4='><source>translate5 Domain</source><target>translate5 domain</target></trans-unit>
-<trans-unit id='T3BlbklkIHNlcnZlcg=='><source>OpenId server</source><target>OpenId server</target></trans-unit>
-<trans-unit id='T3BlbklkIEJlbnV0emVybmFtZQ=='><source>OpenId Benutzername</source><target>OpenId user name</target></trans-unit>
-<trans-unit id='T3BlbklkIFBhc3N3b3J0'><source>OpenId Passwort</source><target>OpenId password</target></trans-unit>
-<trans-unit id='T3BlbklkIE9BdXRoIFVSTA=='><source>OpenId OAuth URL</source><target>OpenId OAuth URL</target></trans-unit>
+<trans-unit id='T3BlbklEIHNlcnZlcg=='><source>OpenID server</source><target>OpenID server</target></trans-unit>
+<trans-unit id='T3BlbklEIEJlbnV0emVybmFtZQ=='><source>OpenID Benutzername</source><target>OpenID user name</target></trans-unit>
+<trans-unit id='T3BlbklEIFBhc3N3b3J0'><source>OpenID Passwort</source><target>OpenID password</target></trans-unit>
+<trans-unit id='T3BlbklEIE9BdXRoIFVSTA=='><source>OpenID OAuth URL</source><target>OpenID OAuth URL</target></trans-unit>
 <trans-unit id='VmVybGlua3RlciBUZXh0IExvZ2luc2VpdGU='><source>Verlinkter Text Loginseite</source><target>Linked text on login page</target></trans-unit>
 <trans-unit id='QW5tZWxkZXNlaXRlIG5pY2h0IGFuemVpZ2VuOiBBdXRvbWF0aXNjaCB6dW0gT3BlbklEIENvbm5lY3QtU2VydmVyIHVtbGVpdGVuLCB3ZW5uIGtlaW5lIEJlbnV0emVyc2l0enVuZyBpbiB0cmFuc2xhdGU1IHZvcmhhbmRlbiBpc3QuIFdlbm4gZGllc2UgQ2hlY2tib3ggbmljaHQgYWt0aXZpZXJ0IGlzdCwgd2lyZCBkZXIgaW0gdW50ZW5zdGVoZW5kZW4gVGV4dGZlbGQgZGVmaW5pZXJ0ZSBUZXh0IGF1ZiBkZXIgTG9naW5zZWl0ZSB2b24gdHJhbnNsYXRlNSBtaXQgZGVtIE9wZW5JRCBDb25uZWN0IFNlcnZlciB2ZXJsaW5rdC4='><source>Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.</source><target>Do not show login page: Automatically redirect to OpenID Connect server if there is no user session in translate5. If this checkbox is not activated, the text defined in the text box below will be linked to the OpenID Connect server on the login page of translate5.</target></trans-unit>
 <trans-unit id='TnIu'><source>Nr.</source><target>Nr.</target></trans-unit>
@@ -3603,9 +3590,9 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source>
     <target>System roles the OpenID server is allowed to set in translate5.</target>
 </trans-unit>
-<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='>
-    <source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source>
-    <target>Default system roles are used, if the OpenId server does not pass any system roles for the user, that logs on.</target>
+<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklELVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='>
+    <source>Standardsystemrollen werden verwendet, wenn der OpenID-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source>
+    <target>Default system roles are used, if the OpenID server does not pass any system roles for the user, that logs on.</target>
 </trans-unit>
 <trans-unit id='RXJsYXVidGUgUm9sbGVu'>
     <source>Erlaubte Rollen</source>
@@ -3619,9 +3606,9 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>In Bearbeitung</source>
     <target>In process</target>
 </trans-unit>
-<trans-unit id='dW52ZXLDpG5kZXJ0ZSAxMDAlIFRNIE1hdGNoZXMgc2luZCBlZGl0aWVyYmFy'>
-  <source>unveränderte 100% TM Matches sind editierbar</source>
-  <target>edit unchanged 100% TM matches</target>
+<trans-unit id='VW52ZXLDpG5kZXJ0ZSAxMDAlIFRNIE1hdGNoZXMgc2luZCBlZGl0aWVyYmFy'>
+  <source>Unveränderte 100% TM Matches sind editierbar</source>
+  <target>Edit unchanged 100% TM matches</target>
 </trans-unit>
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Delete proposals older than current import</target></trans-unit>
@@ -3637,7 +3624,6 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='UHJvemVudCBkZXIgQXVmZ2FiZW4sIGJlaSBkZW5lbiBkZXIgRXhjZWwtRXhwb3J0IGRlciBTZWdtZW50dGFiZWxsZSBnZW51dHp0IHd1cmRlLg=='><source>Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.</source><target>Percentage of the tasks, where the exporting of segments as Excel has been used within the process.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRyb2xsZW4='><source>Standardrollen</source><target>Default roles</target></trans-unit>
 <trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>System roles the OpenID server is allowed to set in translate5.</target></trans-unit>
-<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Default system roles are used, if the OpenId server does not pass any system roles for the user, that logs on.</target></trans-unit>
 <trans-unit id='RXJsYXVidGUgUm9sbGVu'><source>Erlaubte Rollen</source><target>Allowed roles</target></trans-unit>
 <trans-unit id='RGVyIHJlZmVyZW56aWVydGUgQmVudXR6ZXIgaXN0IGRlciBBdWZnYWJlIG5pY2h0IG1laHIgenVnZXdpZXNlbiBvZGVyIGV4aXN0aWVydCBuaWNodCBtZWhyLg=='><source>Der referenzierte Benutzer ist der Aufgabe nicht mehr zugewiesen oder existiert nicht mehr.</source><target>The referenced user is not associated to the task or does event not exist anymore.</target></trans-unit>
 <trans-unit id='TcO2Y2h0ZW4gU2llIGRpZSBBdWZnYWJlIGJlZW5kZW4gdW5kIHp1csO8Y2tzZW5kZW4sIG9kZXIgbcO2Y2h0ZW4gU2llIGRpZXNlIHNww6R0ZXIgd2VpdGVyYmVhcmJlaXRlbj8='><source>Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?</source><target>Do you want to finish the task and submit it, or edit it again later?</target></trans-unit>
@@ -3908,13 +3894,12 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QWxsZXMgenVrbGFwcGVu'><source>Alles zuklappen</source><target>Collapse all</target></trans-unit>
 <trans-unit id='QWxsZXMgYXVma2xhcHBlbg=='><source>Alles aufklappen</source><target>Expand all</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRrb25maWd1cmF0aW9uIEt1bmRlIMO8YmVyc2NocmVpYmVu'><source>Standardkonfiguration Kunde überschreiben</source><target>Configuration</target></trans-unit>
-<trans-unit id='U3RhbmRhcmRrb25maWd1cmF0aW9uIGRlcyBTeXN0ZW1z'><source>Standardkonfiguration des Systems</source><target>Client configuration (overwrites system configuration)</target></trans-unit>
+<trans-unit id='w5xiZXJzY2hyZWlidW5nIGRlciBTeXN0ZW1rb25maWd1cmF0aW9u'><source>Überschreibung der Systemkonfiguration</source><target>System configuration overwrites</target></trans-unit>
 <trans-unit id='w5xiZXJzY2hyaWViZW4='><source>Überschrieben</source><target>Overwrite</target></trans-unit>
 <trans-unit id='QXVmIGViZW5lIGdlc2V0enQ='><source>Auf ebene gesetzt</source><target>Set on level</target></trans-unit>
 <trans-unit id='S3VyemVyIE5hbWU='><source>Konfigurationsoption</source><target>Configuration option</target></trans-unit>
 <trans-unit id='QWt0aXZpZXJ0'><source>Aktiviert</source><target>Activated</target></trans-unit>
 <trans-unit id='RGVha3RpdmllcnQ='><source>Deaktiviert</source><target>Disabled</target></trans-unit>
-<trans-unit id='UU0='><source>QM</source><target>QA</target></trans-unit>
 <trans-unit id='S2FubiBhdWYgRWJlbmUgw7xiZXJzY2hyaWViZW4gd2VyZGVuOg=='><source>Kann auf Ebene überschrieben werden:</source><target>Kann auf Ebene überschrieben werden:</target></trans-unit>
 <trans-unit id='w5xiZXJzY2hyZWliYmFyIGF1ZiBFYmVuZTo='><source>Überschreibbar auf Ebene:</source><target>Overwrite levels:</target></trans-unit>
 <trans-unit id='U2NocmVpYmdlc2Now7x0enRlIEtvbmZpZ3VyYXRpb25lbiBzaWNodGJhcjo='><source>Schreibgeschützte Konfigurationen sichtbar:</source><target>Show write-protected</target></trans-unit>
@@ -4005,17 +3990,68 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Anwendung verlassen</source>
     <target>Leave application</target>
 </trans-unit>
-<trans-unit id='V2VubiBha3RpdmllcnQsIHdlcmRlbiBibG9ja2llcnRlIFNlZ21lbnRlIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4='>
-  <source>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</source>
-  <target>If enabled, blocked segments are included in the analysis and word count</target>
+<trans-unit id='V2VubiBha3RpdmllcnQgd2VyZGVuIHp1dm9yIGdlc3BlcnJ0ZSBTZWdtZW50ZSBpbiBkaWUgQW5hbHlzZSB1bmQgV29ydGFuemFobCBlaW5iZXpvZ2VuLg=='>
+  <source>Wenn aktiviert werden zuvor gesperrte Segmente in die Analyse und Wortanzahl einbezogen.</source>
+  <target>If enabled, locked segments are included in the analysis and word count.</target>
 </trans-unit>
-<trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGJsb2NraWVydGUgU2VnbWVudGUgbmljaHQgaW4gZGllIEFuYWx5c2UgdW5kIFdvcnRhbnphaGwgZWluYmV6b2dlbg=='>
-  <source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source>
-  <target>If disabled, blocked segments are not included in the analysis and word count</target>
+<trans-unit id='V2VubiBkZWFrdGl2aWVydCB3ZXJkZW4gZ2VzcGVycnRlIDEwMCUtTWF0Y2hlcyBuaWNodCBtZWhyIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4u'>
+  <source>Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.</source>
+  <target>If disabled, locked 100% matches will no longer be included in the analysis and word count.</target>
 </trans-unit>
+<trans-unit id='UVMgU3RhdGlzdGlr'><source>QS Statistik</source><target>QA statistics</target></trans-unit>
+<trans-unit id='TWF0Y2gtQW5hbHlzZQ=='><source>Match-Analyse</source><target>Match analysis</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Internal tags</target></trans-unit>
+<trans-unit id='VmVyYm90ZW4gaW4gWmllbA=='><source>Verboten in Ziel</source><target>Forbidden in target</target></trans-unit>
+<trans-unit id='VmVyYm90ZW4gaW4gUXVlbGxl'><source>Verboten in Quelle</source><target>Forbidden in source</target></trans-unit>
+<trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unedited fuzzy match</target></trans-unit>
+<trans-unit id='QmVhcmJlaXRldGVyIDEwMCUgTWF0Y2g='><source>Bearbeiteter 100% Match</source><target>Edited 100% match</target></trans-unit>
+<trans-unit id='TmljaHQgZ2VmdW5kZW4gaW4gWmllbA=='><source>Nicht gefunden in Ziel</source><target>Not found in target</target></trans-unit>
+<trans-unit id='TmljaHQgZGVmaW5pZXJ0IGluIHppZWxzcHJhY2hsLiBUZXJtaW5vbG9naWU='><source>Nicht definiert in zielsprachl. Terminologie</source><target>Not defined in target terminology</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIGZlaGxlbg=='><source>Interne Tags fehlen</source><target>Internal tags missing</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIHd1cmRlbiBoaW56dWdlZsO8Z3Q='><source>Interne Tags wurden hinzugefügt</source><target>Internal tags have been added</target></trans-unit>
+<trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBlbnRmZXJudA=='><source>Whitespace wurde entfernt</source><target>Whitespace has been removed</target></trans-unit>
+<trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Whitespace wurde hinzugefügt</source><target>Whitespace has been added</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIGhhYmVuIGVpbmUgdW5nw7xsdGlnZSBTdHJ1a3R1cg=='><source>Interne Tags haben eine ungültige Struktur</source><target>Internal tags have incorrect structure</target></trans-unit>
+<trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGdlcHLDvGZ0'><source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source><target>This category was not or only partly analyzed</target></trans-unit>
+<trans-unit id='Qml0dGUgc3Rvw59lbiBTaWUgdW50ZW4gZWluZSBuZXVlIFByw7xmdW5nIGFuIHVtIGRhcyBQcm9ibGVtIHp1IGJlaGViZW4='><source>Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben</source><target>Please initiate a new re-check below to resolve the problem</target></trans-unit>
+<trans-unit id='UVMgJmFtcDsgRGF0ZWllbg=='><source>QS &amp; Dateien</source><target>QA &amp; Files</target></trans-unit>
+<trans-unit id='TnV0enVuZyB2b24gVE0tVHJlZmZlcm4='><source>Nutzung von TM-Treffern</source><target>Usage of TM-matches</target></trans-unit>
+<trans-unit id='TWFudWVsbGUgUVMgKGltIFNlZ21lbnQp'><source>Manuelle QS (im Segment)</source><target>Manual QA (inside segment)</target></trans-unit>
+<trans-unit id='TWFudWVsbGUgUVMgKGdhbnplcyBTZWdtZW50KQ=='><source>Manuelle QS (ganzes Segment)</source><target>Manual QA (complete segment)</target></trans-unit>
+<trans-unit id='QWxsZSBTZWdtZW50ZSB3dXJkZW4gc2VpdCBkZXIgbGV0enRlbiDDhG5kZXJ1bmcgZ2VwcsO8ZnQ='>
+	<source>Alle Segmente wurden seit der letzten Änderung geprüft</source>
+	<target>All segments checked after last segment change</target>
+</trans-unit>
+<trans-unit id='UXVhbGl0w6R0c3NpY2hlcnVuZw=='><source>Qualitätssicherung</source><target>Quality assurance</target></trans-unit>
+<trans-unit id='QWxsZSB6ZWlnZW4='><source>Alle zeigen</source><target>Show all</target></trans-unit>
+<trans-unit id='TnVyIEZlaGxlcg=='><source>Nur Fehler</source><target>Only errors</target></trans-unit>
+<trans-unit id='TnVyIEZhbHNjaC1Qb3NpdGl2ZQ=='><source>Nur Falsch-Positive</source><target>Only false positives</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgdW52b2xsc3TDpG5kaWcgZ2VwcsO8ZnQ='><source>Segmente unvollständig geprüft</source><target>Segment check incomplete</target></trans-unit>
+<trans-unit id='TmV1IMO8YmVycHLDvGZlbg=='><source>Neu überprüfen</source><target>Re-check</target></trans-unit>
+<trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>All categories</target></trans-unit>
+<trans-unit id='S2F0ZWdvcmll'><source>Kategorie</source><target>Category</target></trans-unit>
+<trans-unit id='QW56YWhs'><source>Anzahl</source><target>Amount</target></trans-unit>
+<trans-unit id='RmFsc2NoIGVya2FubnRlIEZlaGxlcg=='><source>Falsch erkannte Fehler</source><target>False positives</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWcgRmVobGVy'><source>Interne Tag Fehler</source><target>Internal tag errors</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIGVpbmVuIGZlaGxlcmZyZWllbiBFeHBvcnQgZGVyIEF1ZmdhYmUgdmVyaGluZGVybg=='>
+	<source>Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern</source>
+	<target>There are problems with internal tags that prevent exporting this task</target>
+</trans-unit>
+<trans-unit id='UVMgRmVobGVy'><source>QS Fehler</source><target>QA Errors</target></trans-unit>
+<trans-unit id='RGVyIFNlZ21lbnQgU3RhdHVzIHd1cmRlIGdlc3BlaWNoZXJ0'><source>Der Segment Status wurde gespeichert</source><target>The segment‘s state has been saved</target></trans-unit>
+<trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Die Qualität wurde hinzugefügt</source><target>The quality has been added</target></trans-unit>
+<trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBlbnRmZXJudA=='><source>Die Qualität wurde entfernt</source><target>The quality has been removed</target></trans-unit>
+<trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='><source>Der False-Positive Status wurde aktualisiert</source><target>The false-positive state has been updated</target></trans-unit>
+<trans-unit id='QWNodHVuZw=='><source>Achtung</source><target>Warning</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBpbiBkaWVzZXIgQXVmZ2FiZSBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIHUuVS4gZWluZW4gZmVobGVyZnJlaWVuIEV4cG9ydCBkZXIgQXVmZ2FiZSB2ZXJoaW5kZXJu'><source>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</source><target>There are problems with internal tags in this task that may prevent exporting this task properly</target></trans-unit>
+<trans-unit id='TGFkZS4uLg=='><source>Lade...</source><target>Loading...</target></trans-unit>
 <trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='>
   <source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source>
   <target>The parameter login containing the desired username is missing.</target>
+</trans-unit>
+<trans-unit id='U2NocmVpYnJlY2h0ZSBzdGFuZGFyZG3DpMOfaWc='>
+    <source>Schreibrechte standardmäßig</source>
+    <target>Write access by default</target>
 </trans-unit>
 <trans-unit id='U2VyYmlzY2ggKExhdGVpbiBTZXJiaWVuKQ=='><source>Serbisch (Latein Serbien)</source><target>Serbian (Latin Serbia)</target></trans-unit>
 <trans-unit id='U29tYWxpIChTb21hbGlhKQ=='><source>Somali (Somalia)</source><target>Somali (Somalia)</target></trans-unit>
@@ -4026,6 +4062,126 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbiBBc2VyYmFpZHNjaGFuKQ=='><source>Aserbaidschanisch (Latein Aserbaidschan)</source><target>Azerbaijani (Latin Azerbaijan)</target></trans-unit>
 <trans-unit id='VXNiZWtpc2NoIChMYXRlaW4gVXNiZWtpc3Rhbik='><source>Usbekisch (Latein Usbekistan)</source><target>Uzbek (Latin Uzbekistan)</target></trans-unit>
 <trans-unit id='Qm9zbmlzY2ggKExhdGVpbiBCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Bosnisch (Latein Bosnien und Herzegowina)</source><target>Bosnian (Latin Bosnia and Herzegovina)</target></trans-unit>
+<trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbg=='>
+  <source>Nur Segmente mit Wiederholungen anzeigen</source>
+  <target>Show only repeated segments</target>
+</trans-unit>
+<trans-unit id='TWl0IFdpZWRlcmhvbHVuZ2Vu'>
+    <source>Mit Wiederholungen</source>
+    <target>With repetitions</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgb2huZSBXaWVkZXJob2x1bmdlbg=='>
+    <source>Segmente ohne Wiederholungen</source>
+    <target>Segments without repetitions</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgUXVlbGxzcHJhY2hl'>
+    <source>Segmente mit Wiederholungen nur in der Quellsprache</source>
+    <target>Segments with repetitions in the source text</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIG51ciBpbiBkZXIgWmllbHNwcmFjaGU='>
+    <source>Segmente mit Wiederholungen nur in der Zielsprache</source>
+    <target>Segments with repetitions in the target text</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIGluIGRlciBRdWVsbC0gdW5kIFppZWxzcHJhY2hl'>
+    <source>Segmente mit Wiederholungen in der Quell- und Zielsprache</source>
+    <target>Segments with repetitions in source and target text</target>
+</trans-unit>
+<trans-unit id="S2VpbmUgw4RuZGVydW5nZW4gZHVyY2hmw7xocmVu">
+    <source>Keine Änderungen durchführen</source>
+    <target>Do not conduct changes</target>
+</trans-unit>
+<trans-unit id='S2VpbmUgw4RuZGVydW5nZW4gZHVyY2hmw7xocmVuIFtFU0Nd'>
+  <source>Keine Änderungen durchführen [ESC]</source>
+  <target>Do not conduct changes [ESC]</target>
+</trans-unit>
+<trans-unit id="w4RuZGVydW5nZW4gw7xiZXJuZWhtZW4=">
+    <source>Änderungen übernehmen</source>
+    <target>Accept changes</target>
+</trans-unit>
+<trans-unit id='w4RuZGVydW5nZW4gw7xiZXJuZWhtZW4gW1NUUkcrU10='>
+  <source>Änderungen übernehmen [STRG+S]</source>
+  <target>Accept changes [CTRL+S]</target>
+</trans-unit>
+<trans-unit id='LQ=='>
+    <source>-</source>
+    <target>-</target>
+</trans-unit>
+<trans-unit id='TnVyIFF1ZWxsZQ=='>
+    <source>Nur Quelle</source>
+    <target>source only</target>
+</trans-unit>
+<trans-unit id='TnVyIFppZWw='>
+    <source>Nur Ziel</source>
+    <target>target only</target>
+</trans-unit>
+<trans-unit id='QmVpZGVz'>
+    <source>Beides</source>
+    <target>both</target>
+</trans-unit>
+<trans-unit id='w4RuZGVydW5nZW4gZGVzIFdpZWRlcmhvbHVuZ3NzdGF0dXMgZHVyY2ggU2VnbWVudMOkbmRlcnVuZ2VuIHdlcmRlbiBuaWNodCBzb2ZvcnQgYW5nZXplaWd0LCBkaWUgU2VnbWVudGUgbcO8c3NlbiBuZXVnZWxhZGVuIHdlcmRlbiE='>
+  <source>Änderungen des Wiederholungsstatus durch Segmentänderungen werden nicht sofort angezeigt, die Segmente müssen neugeladen werden!</source>
+  <target>The repetition state is not updated automatically on editing a segment, the segments have to be reloaded!</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRtw6TDn2lnIHdpcmQgYmVpIG5ldWVuIEF1ZmdhYmVuIGbDvHIgZGllIGdld8OkaGx0ZW4gS3VuZGVuIExlc2VyZWNodCBmw7xyIGRpZXNlIFNwcmFjaHJlc291cmNlIGFrdGl2aWVydA=='>
+  <source>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert</source>
+  <target>By default, read permission for this language resource is enabled for new tasks for the selected clients</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRtw6TDn2lnIHdpcmQgYmVpIG5ldWVuIEF1ZmdhYmVuIGbDvHIgZGllIGdld8OkaGx0ZW4gS3VuZGVuIGdlc2V0enQsIGRhc3MgU2VnbWVudGUgYmVpbSBTZWdtZW50IHNwZWljaGVybiBpbiBkaWUgU3ByYWNocmVzb3VyY2UgZ2VzY2hyaWViZW4gd2VyZGVu'>
+  <source>Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden</source>
+  <target>By default it is enabled for new tasks for the selected clients, that saved segments are saved to the language resource as well.</target>
+</trans-unit>
+<trans-unit id='SW1wb3J0aWVyZW4gKFN0YW5kYXJkcyBudXR6ZW4p'>
+  <source>Importieren (Standards nutzen)</source>
+  <target>Import (use defaults)</target>
+</trans-unit>
+<trans-unit id='TnVyIHdpZWRlcmhvbHQ='>
+  <source>Nur wiederholt</source>
+  <target>Only repeated</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmQtQmVudXR6ZXJ6dXdlaXN1bmdlbg=='>
+    <source>Standard-Benutzerzuweisungen</source>
+    <target>User assignment defaults</target>
+</trans-unit>
+<trans-unit id='V29ya2Zsb3ctU2Nocml0dA=='>
+  <source>Workflow-Schritt</source>
+  <target>Workflow-step</target>
+</trans-unit>
+<trans-unit id='V29ya2Zsb3dzY2hyaXR0'>
+    <source>Workflowschritt</source>
+    <target>Workflow-step</target>
+</trans-unit>
+<trans-unit id='RGVyIEJlbnV0emVyIGhhdCBkYXMgUmVjaHQsIGRpZSBTcHJhY2hyZXNzb3VyY2VuIGluIEluc3RhbnRUcmFuc2xhdGUgJmFtcDsgVGVybVBvcnRhbCB6dSBudXR6ZW4sIGRpZSBkZW5zZWxiZW4gS3VuZGVuIHp1Z2VvcmRuZXQgc2luZCwgZGVuZW4gZGVyIEJlbnV0emVyIGhpZXIgenVnZW9yZG5ldCBpc3Qu'>
+  <source>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</source>
+  <target>User has the right to use those language resources in InstantTranslate &amp; TermPortal, that are assigned to the same clients, as the user is assigned to here.</target>
+</trans-unit>
+<trans-unit id='S3VuZGVuIEluc3RhbnRUcmFuc2xhdGUgJmFtcDsgVGVybVBvcnRhbA=='>
+  <source>Kunden InstantTranslate &amp; TermPortal</source>
+  <target>Clients InstantTranslate &amp; TermPortal</target>
+</trans-unit>
+<trans-unit id='QmVudXR6ZXIgbmFjaCBJbXBvcnQgYmVuYWNocmljaHRpZ2Vu'>
+    <source>Benutzer nach Import benachrichtigen</source>
+    <target>Notify users after import</target>
+</trans-unit>
+<trans-unit id='RGVmaW5pZXJ0IGRpZSBBbnphaGwgVGFnZSwgZGllIGRpZSBEZWFkbGluZSBpbiBkZXIgWnVrdW5mdCBsaWVnZW4gc29sbCAtIGdlc2VoZW4gdm9tIFplaXRwdW5rdCBkZXIgUHJvamVrdGFubGFnZSBhbi4gV2VydCBzZXR6dCBzZWxiZSBLb25maWd1cmF0aW9uLCBkaWUgYXVjaCBkaWUgIsOcYmVyc2NocmVpYnVuZyBkZXIgU3lzdGVta29uZmlndXJhdGlvbiIgbWl0IE5hbWVuICJEZWZhdWx0IGRlYWRsaW5lIGRhdGUiIHNldHp0Lg=='>
+    <source>Definiert die Anzahl Tage, die die Deadline in der Zukunft liegen soll - gesehen vom Zeitpunkt der Projektanlage an. Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.</source>
+    <target>Defines the number of days that the deadline should be in the future - seen from the time of of the project creation. Value sets the same config, as the "System configuration overwrite" of the same name.</target>
+</trans-unit>
+<trans-unit id='Qml0dGUga29uZmlndXJpZXJlbiBTaWUgenVuw6RjaHN0IGRhcyBGZWxkICJ0cmFuc2xhdGU1IERvbWFpbiIgaW0gVGFiICJBbGxnZW1laW4iLiBEYW5hY2gga8O2bm5lbiBTaWUgT3BlbklEIENvbm5lY3QgZsO8ciBkaWVzZW4gS3VuZGVuIGVpbnJpY2h0ZW4u'>
+    <source>Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.</source>
+    <target>Please configure the "translate5 domain" field in the "General" tab first. After that you can set up OpenID Connect for this customer.</target>
+</trans-unit>
+<trans-unit id='QWxsZ2VtZWlu'>
+    <source>Allgemein</source>
+    <target>General</target>
+</trans-unit>
+<trans-unit id='TGF5b3V0'>
+  <source>Layout</source>
+  <target>Layout</target>
+</trans-unit>
+<trans-unit id='TnVyIGFuc2NoYXVlbg=='>
+    <source>Nur anschauen</source>
+    <target>View only</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

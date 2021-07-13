@@ -49,21 +49,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      */
     protected $entity;
     
-    /**
-     * mappt einen eingehenden Filtertyp auf einen anderen Filtertyp für ein bestimmtes
-     * Feld.
-     * @var array array($field => array(origType => newType),...)
-     */
-    protected $_filterTypeMap = [
-        'qmId' => ['list' => 'listAsString']
-    ];
-    
-    
     public function preDispatch() {
         parent::preDispatch();
         $this->entity->setEnableWatchlistJoin();
     }
-    
     /**
      * lädt das Zielsegment, und übergibt die Alikes zu diesem Segment an die View zur JSON Rückgabe
      * @see ZfExtended_RestController::getAction()
@@ -106,7 +95,8 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
 
         $duration = new stdClass();
         
-        $this->fieldLoop(function($field, $editField, $getter, $setter) use ($duration){
+        $this->fieldLoop(function($field) use ($duration){
+            $editField = $field.editor_Models_SegmentFieldManager::_EDIT_PREFIX;
             $duration->$editField = (int)$this->_getParam('duration');
         });
         
@@ -116,30 +106,17 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         /* @var $entity editor_Models_Segment */
         $result = array();
         
-        $config = $task->getConfig();
-        $qmSubsegmentAlikes = array();
-        if($config->runtimeOptions->editor->enableQmSubSegments) {
-            $qmSubsegmentAlikes = $this->fieldLoop(function($field, $editField, $getter, $setter) use ($editedSegmentId){
-                $qmSubsegmentAlikes = ZfExtended_Factory::get('editor_Models_QmsubsegmentAlikes');
-                /* @var $qmSubsegmentAlikesSource editor_Models_QmsubsegmentAlikes */
-                $qmSubsegmentAlikes->parseSegment($this->entity->{$getter}(), $editedSegmentId);
-                return $qmSubsegmentAlikes;
-            });
-        }
-        
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         
         $userGuid = (new Zend_Session_Namespace('user'))->data->userGuid;
         
-        $tua=editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $task);
+        $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $task);
         
-        $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [
-            $this->entity,
-            $config,
-            $qmSubsegmentAlikes
-        ]);
+        $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [ $this->entity, $task->getConfig() ]);
         /* @var $repetitionUpdater editor_Models_Segment_RepetitionUpdater */
+        
+        $alikeQualities = new editor_Segment_Alike_Qualities($this->entity->getId());
         
         $alikeCount = count($ids);
         foreach($ids as $id) {
@@ -149,7 +126,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity = ZfExtended_Factory::get($this->entityClass);
                 //Load alike segment, create a history entry, and overwrite with the data of the target segment
                 $entity->load($id);
+                $oldHash = $entity->getTargetMd5();
                 
+                //if neither source nor target hashes are matching,
+                // then the segment is no alike of the edited segment => we ignore and log it
                 if(! $this->isValidSegment($entity, $editedSegmentId, $hasher)) {
                     error_log('Falsche Segmente per WDHE bearbeitet: MasterSegment:'.$editedSegmentId.' per PUT übergebene Ids:'.print_r($ids, 1).' IP:'.$_SERVER['REMOTE_ADDR']);
                     continue;
@@ -165,15 +145,16 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
 
                 $repetitionUpdater->setRepetition($entity);
                 //if source editing = true, then fieldLoop loops also over the source field
-                    //replace the masters tags with the original repetition ones
-                    //if there was an error in taking over the segment content into the repetition, we return false, so the segment is inored later on
+                //replace the masters tags with the original repetition ones
+                //if there was an error in taking over the segment content into the repetition, we return false, so the segment is inored later on
                 $fieldLoopResult = $this->fieldLoop([$repetitionUpdater, 'updateSegmentContent']);
                 if($fieldLoopResult['target'] === false || $this->isSourceEditable && $fieldLoopResult['source'] === false ) {
                     //the segment has to be ignored!
                     continue;
                 }
-                
-                $entity->setQmId((string) $this->entity->getQmId());
+                // process all quality related stuff
+                editor_Segment_Quality_Manager::instance()->processAlikeSegment($entity, $task, $alikeQualities);
+  
                 if(!is_null($this->entity->getStateId())) {
                     $entity->setStateId($this->entity->getStateId());
                 }
@@ -212,6 +193,8 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $history->save();
                 $entity->setTimestamp(NOW_ISO); //see TRANSLATE-922
                 $entity->save();
+                $entity->updateIsTargetRepeated($entity->getTargetMd5(), $oldHash);
+
             }
             catch (Exception $e) {
                 /**
@@ -304,19 +287,22 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         //the current targetMd5 hash is valid in any case
         $validTargetMd5[] = $this->entity->getTargetMd5();
         
-        //if neither source nor target hashes are matching,
-        // then the segment is no alike of the edited segment => we ignore and log it
-        $sourceMatch = $this->entity->getSourceMd5() === $entity->getSourceMd5();
-        //either the targets are different, or both targets are empty => the empty target case is also no alike match!
-        $targetMatch = (in_array($entity->getTargetMd5(), $validTargetMd5)) && (strlen(trim($entity->getTarget())) > 0);
+        //remove the empty segment hashes from the valid list, since empty targets are no repetition
+        $validTargetMd5 = array_diff(array_unique($validTargetMd5), [$this->entity::EMPTY_STRING_HASH]);
         
+        //the source hash must be just equal
+        $sourceMatch = $this->entity->getSourceMd5() === $entity->getSourceMd5();
+
+        //the target hash must be one of the previous hashes or the current one:
+        $targetMatch = in_array($entity->getTargetMd5(), $validTargetMd5);
+
         return $sourceMatch || $targetMatch;
     }
     
     /**
      * Applies the given Closure for each editable segment field
      * (currently only source and target! Since ChangeAlikes are deactivated for alternatives)
-     * Closure Parameters: $field, $editField, $getter, $setter → 'target', 'targetEdit', 'getTargetEdit', 'setTargetEdit'
+     * Closure Parameters: $field → 'target' or 'source'
      *
      * @param Callable $callback
      * @return array
@@ -324,9 +310,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     protected function fieldLoop(Callable $callback) {
         $result = array();
         if($this->isSourceEditable) {
-            $result['source'] = $callback('source', 'sourceEdit', 'getSourceEdit', 'setSourceEdit');
+            $result['source'] = $callback('source');
         }
-        $result['target'] = $callback('target', 'targetEdit', 'getTargetEdit', 'setTargetEdit');
+        $result['target'] = $callback('target');
         return $result;
     }
 

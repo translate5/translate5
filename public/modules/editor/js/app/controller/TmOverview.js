@@ -84,7 +84,7 @@ Ext.define('Editor.controller.TmOverview', {
     listen: {
         component: {
             '#tmOverviewPanel':{
-                celldblclick: 'handleEditTm'
+                celldblclick: 'onTmOverviewPanelCellDblClick'
             },
             '#btnAddTm':{
                 click:'handleOnAddTmClick'
@@ -164,6 +164,23 @@ Ext.define('Editor.controller.TmOverview', {
             interval: 5000
         });
     },
+
+    /***
+     * Tm overview panel cell double click event handler
+     * @param view
+     * @param cell
+     * @param cellIndex
+     * @param record
+     */
+    onTmOverviewPanelCellDblClick:function( view, cell, cellIndex, record){
+        var me = this,
+            grid=view.up('tmOverviewPanel');
+        // call the selection row handler. This will also fetch fresh record version
+        grid.onGridRowSelect(grid,[record],function (newRecord){
+            me.handleEditTm(view,cell,cellIndex,newRecord);
+        });
+    },
+
     handleOnAddTmClick : function(){
         var win = Ext.widget('addTmWindow');
         win.show();
@@ -188,8 +205,6 @@ Ext.define('Editor.controller.TmOverview', {
         if (!windowViewController.isValidService(serviceName, helppage)) {
             return;
         }
-
-        me.mergeCustomerFieldIds(form);
 
         //check and update the form fields from the engine
         me.handleEngineSelect(form);
@@ -230,7 +245,7 @@ Ext.define('Editor.controller.TmOverview', {
     
     handleSaveEditClick: function(button){
         var me = this,
-            window = button.up('window');
+            window = button.up('window'),
             form = window.down('form'),
             record = form.getRecord();
 
@@ -239,7 +254,6 @@ Ext.define('Editor.controller.TmOverview', {
         }
         record.reject();
 
-        me.mergeCustomerFieldIds(form);
         form.updateRecord(record);
         
         window.setLoading(true);
@@ -290,7 +304,7 @@ Ext.define('Editor.controller.TmOverview', {
                 }
                 //If success false and errors is an array, this errors are shown in the form directly,
                 // so we dont need the handleException
-                if(res.success || !Ext.isArray(res.errors) || !res.message || res.message != 'NOT OK') {
+                if(res.success || !Ext.isArray(res.errors) || !res.message || res.message !== 'NOT OK') {
                     Editor.app.getController('ServerException').handleException(submit.response);
                 }
                 if(Ext.isArray(res.errors)) {
@@ -306,8 +320,7 @@ Ext.define('Editor.controller.TmOverview', {
      * @param {Ext.data.Store} store
      */
     addRecordToImportCheck: function(store, record) {
-        var me = this,
-            checkImporting;
+        var me = this;
         if(record.get('status') === record.STATUS_IMPORT) {
             me.importingRecords.push(record);
             me.checkImportingRecordsTask.start();
@@ -321,7 +334,7 @@ Ext.define('Editor.controller.TmOverview', {
             if(!item.id || item.id === -1) {
                 Editor.MessageBox.getInstance().showDirectError(item.msg || item._errorMessage, item.data);
             }
-        })
+        });
     },
     handleCancelClick: function(button){
         var window = button.up('window'),
@@ -339,8 +352,10 @@ Ext.define('Editor.controller.TmOverview', {
     },
     handleEditTm : function(view, cell, cellIdx, rec){
         var win = Ext.widget('editTmWindow');
-        win.loadRecord(rec);
-        win.show();
+        win.getViewModel().getStore('customers').load(function(){
+            win.loadRecord(rec);
+            win.show();
+        });
     },
     handleShowTasks: function(view, cell, cellIdx, rec){
         var win = Ext.widget('languageResourceTaskGridWindow');
@@ -358,33 +373,34 @@ Ext.define('Editor.controller.TmOverview', {
         var me = this,
             grid=view.up('tmOverviewPanel'),
             f = ev.getTarget().className.match(/ico-tm-([^ ]+)/);
-        
-        //call the selection row handler
-        grid.onGridRowSelect(grid,[record]);
 
-        switch(f && f[1] || '') {
-            case 'edit':
-                me.handleEditTm(view,cell,col,record);
-                break;
-            case 'tasks':
-                me.handleShowTasks(view,cell,col,record);
-                break;
-            case 'import':
-                me.handleImportTm(view,cell,col,record);
-                break;
-            case 'download':
-                me.handleDownloadTm(view,cell,col,record, ev);
-                break;
-            case 'delete':
-                me.handleDeleteTm(view,cell,col,record);
-                break;
-            case 'export':
-                me.handleExportProposalClick(view,cell,col,record);
-                break;
-            case 'log':
-                me.handleLogTm(view,cell,col,record);
-                break;
-        }
+
+        // call the selection row handler. This will also fetch fresh record version
+        grid.onGridRowSelect(grid,[record],function (newRecord){
+            switch(f && f[1]) {
+                case 'edit':
+                    me.handleEditTm(view,cell,col,newRecord);
+                    break;
+                case 'tasks':
+                    me.handleShowTasks(view,cell,col,newRecord);
+                    break;
+                case 'import':
+                    me.handleImportTm(view,cell,col,newRecord);
+                    break;
+                case 'download':
+                    me.handleDownloadTm(view,cell,col,newRecord, ev);
+                    break;
+                case 'delete':
+                    me.handleDeleteTm(view,cell,col,newRecord);
+                    break;
+                case 'export':
+                    me.handleExportProposalClick(view,cell,col,newRecord);
+                    break;
+                case 'log':
+                    me.handleLogTm(view,cell,col,newRecord);
+                    break;
+            }
+        });
     },
     handleDownloadTm : function(view, cell, cellIdx, rec, ev){
         var me = this,
@@ -435,7 +451,7 @@ Ext.define('Editor.controller.TmOverview', {
     handleDeleteTm : function(view, cell, cellIdx, rec){
         var msg = this.strings,
             store = view.getStore(),
-            noConn = rec.get('status') == rec.STATUS_NOCONNECTION,
+            noConn = rec.get('status') === rec.STATUS_NOCONNECTION,
             info = Ext.String.format(noConn ? msg.deleteConfirmLocalText : msg.deleteConfirmText, rec.get('name')),
             //force local deletion when no connection to resource
             params = noConn ? {deleteLocally: true} : {};
@@ -482,10 +498,10 @@ Ext.define('Editor.controller.TmOverview', {
             sortable: false,
             cls: 'taskassocs',
             text:me.strings.taskassocgridcell,
-            renderer: function(v, meta, rec){
+            renderer: function(v, meta){
                 var strservices = [],
                     i, languageResource;
-                if(!v || v.length == 0){
+                if(!v || v.length === 0){
                     meta.tdAttr = 'data-qtip="'+me.strings.noResourcesAssigned+'"';
                     //meta.tdCls  = meta.tdCls  + ' info-icon';
                     return '';
@@ -502,7 +518,7 @@ Ext.define('Editor.controller.TmOverview', {
         grid.headerCt.insert((grid.down('gridcolumn[dataIndex=userCount]').fullColumnIndex + 1), column);//inserting the dynamic column into grid
         grid.getView().refresh();
     },
-    handleResourceChanged: function(combo, record, index) {
+    handleResourceChanged: function(combo, record) {
         var form = this.getAddTmForm().getForm(),
             disableUpload = !record.get('filebased'),
             filefield = form.findField('tmUpload');
@@ -535,20 +551,6 @@ Ext.define('Editor.controller.TmOverview', {
                 targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
             }
         }
-    },
-
-    /**
-     * Merge customer field values as comma separated values
-     */
-    mergeCustomerFieldIds:function(form){
-        
-        //ensure that resourcesCustomers also contains the useAsDefault values!
-        
-        var customers = form.down('tagfield#resourcesCustomers'),
-            useAsDefault = form.down('tagfield#useAsDefault'),
-            customersToSet = Ext.Array.unique(useAsDefault.getValue().concat(customers.getValue()));
-
-        customers.setValue(customersToSet);
     },
 
     /**

@@ -6,13 +6,15 @@
         "segmentrange": null,
         "usedState": null,
         "isPmOverride": "0",
-        "deadlineDate": "2020-11-26",
-        "assignmentDate": "2020-11-21 00:00:00",
+        "deadlineDate": "2020-11-26 22:49:00",
+        "assignmentDate": "2020-11-21 18:01:00",
         "finishedDate": null,
         "login": "testtranslator",
         "surName": "test",
         "firstName": "translator",
-        "parentIds": null
+        "parentIds": null,
+        "workflowStepName": "reviewing",
+        "workflow": "default"
     },
     {
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
@@ -21,13 +23,15 @@
         "segmentrange": null,
         "usedState": null,
         "isPmOverride": "0",
-        "deadlineDate": "2020-11-24",
-        "assignmentDate": "2020-11-21 00:00:00",
+        "deadlineDate": "2020-11-24 18:01:00",
+        "assignmentDate": "2020-11-21 18:01:00",
         "finishedDate": null,
         "login": "testtranslator",
         "surName": "test",
         "firstName": "translator",
-        "parentIds": null
+        "parentIds": null,
+        "workflowStepName": "translation",
+        "workflow": "default"
     },
     {
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
@@ -36,12 +40,14 @@
         "segmentrange": null,
         "usedState": null,
         "isPmOverride": "0",
-        "deadlineDate": "2020-11-30",
-        "assignmentDate": "2020-11-21 00:00:00",
+        "deadlineDate": "2020-11-30 18:01:00",
+        "assignmentDate": "2020-11-21 18:01:00",
         "finishedDate": null,
         "login": "testtranslator",
         "surName": "test",
         "firstName": "translator",
-        "parentIds": null
+        "parentIds": null,
+        "workflowStepName": "translatorCheck",
+        "workflow": "default"
     }
 ]

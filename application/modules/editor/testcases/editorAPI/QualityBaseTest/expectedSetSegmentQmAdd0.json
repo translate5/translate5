@@ -1,0 +1,20 @@
+{
+    "success": 1,
+    "row": {
+        "id": "7981",
+        "segmentId": "233690",
+        "field": "",
+        "type": "qm",
+        "category": "qm_4",
+        "categoryIndex": "4",
+        "falsePositive": "0",
+        "typeText": "Manual QA (complete segment)",
+        "text": "Fluency issue",
+        "filterable": true,
+        "falsifiable": true,
+        "hasTag": false,
+        "tagName": "",
+        "cssClass": ""
+    },
+    "action": "add"
+}

@@ -180,7 +180,7 @@ Ext.define('Editor.util.SegmentEditor', {
      * @returns {Boolean}
      */ 
     isMQMTag: function(node) {
-        return (Ext.fly(node).hasCls('qmflag') && node.hasAttribute('data-seq'));
+        return (Ext.fly(node).hasCls('qmflag') && this.hasQualityId(node));
     },
     /**
      * Is the given node an img-content-tag?
@@ -328,8 +328,8 @@ Ext.define('Editor.util.SegmentEditor', {
             for(i = 0; i < arrLength; i++){
                 imgOnCheck = imgInEditorTotal[i];
                 if (Ext.fly(imgOnCheck).hasCls('qmflag')
-                        && imgOnCheck.hasAttribute('data-seq')
-                        && (imgOnCheck.getAttribute('data-seq') == mqmImgNode.getAttribute('data-seq') )
+                        && me.hasQualityId(imgOnCheck)
+                        && (me.fetchQualityId(imgOnCheck) == me.fetchQualityId(mqmImgNode))
                         && (imgOnCheck.id != mqmImgNode.id ) ) {
                     return imgOnCheck;
                 }
@@ -442,5 +442,25 @@ Ext.define('Editor.util.SegmentEditor', {
                 trackChangeNode.parentNode.removeChild(trackChangeNode);
             }
         });
+    },
+    /**
+     * Comapatibility function to retrieve the quality id from a DOM node
+     * NOTE: historically the quality-id was encoded as "data-seq"
+     */
+    fetchQualityId: function(ele){
+        if(ele.hasAttribute('data-t5qid')){
+            return ele.getAttribute('data-t5qid');
+        }
+        if(ele.hasAttribute('data-seq')){
+            return ele.getAttribute('data-seq');
+        }
+        return null;
+    },
+    /**
+     * Comapatibility function to check if the quality id is set on a DOM node
+     * NOTE: historically the quality-id was encoded as "data-seq"
+     */
+    hasQualityId: function(ele){
+        return ele.hasAttribute('data-t5qid') || ele.hasAttribute('data-seq');
     }
 });

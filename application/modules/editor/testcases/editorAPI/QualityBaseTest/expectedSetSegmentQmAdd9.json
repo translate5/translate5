@@ -1,0 +1,20 @@
+{
+    "success": 1,
+    "row": {
+        "id": "7983",
+        "segmentId": "233699",
+        "field": "",
+        "type": "qm",
+        "category": "qm_3",
+        "categoryIndex": "3",
+        "falsePositive": "0",
+        "typeText": "Manual QA (complete segment)",
+        "text": "Terminology problem",
+        "filterable": true,
+        "falsifiable": true,
+        "hasTag": false,
+        "tagName": "",
+        "cssClass": ""
+    },
+    "action": "add"
+}

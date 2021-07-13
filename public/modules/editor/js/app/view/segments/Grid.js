@@ -46,7 +46,6 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.ContentEditable',
         'Editor.view.segments.column.SegmentNrInTask',
         'Editor.view.segments.column.State',
-        'Editor.view.segments.column.Quality',
         'Editor.view.segments.column.MatchrateType',
         'Editor.view.segments.column.Matchrate',
         'Editor.view.segments.column.AutoState',
@@ -55,6 +54,7 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.WorkflowStep',
         'Editor.view.segments.column.Editable',
         'Editor.view.segments.column.IsWatched',
+        'Editor.view.segments.column.IsRepeated',
         'Editor.util.SegmentContent',
         'Editor.view.segments.GridViewModel',
         'Editor.view.segments.grid.Header'
@@ -297,14 +297,6 @@ Ext.define('Editor.view.segments.Grid', {
                 stateId:'stateColumn',
             });
         }
-        if(Editor.app.getTaskConfig('segments.showQM')){
-            columns.push({
-                xtype: 'qualityColumn',
-                itemId: 'qualityColumn',
-                stateId:'qualityColumn',
-            });
-        }
-    
         columns.push.apply(columns, [{
             xtype: 'usernameColumn',
             itemId: 'usernameColumn',
@@ -313,11 +305,16 @@ Ext.define('Editor.view.segments.Grid', {
         },{
             xtype: 'editableColumn',
             itemId: 'editableColumn',
-            stateId:'editableColumn',
+            stateId:'editableColumn'
         },{
             xtype: 'iswatchedColumn',
             itemId: 'iswatchedColumn',
-            stateId:'iswatchedColumn',
+            stateId:'iswatchedColumn'
+        }, {
+            xtype: 'isRepeatedColumn',
+            itemId: 'isRepeatedColumn',
+            stateId:'isRepeatedColumn',
+            hideable: Editor.data.task.get('defaultSegmentLayout')
         }]);
     
         //allow the view mode controller to prepare (and store) the columns setup
@@ -479,15 +476,15 @@ Ext.define('Editor.view.segments.Grid', {
      * @returns {Object} { top:topIndex, bottom:bottomIndex }
      */
     getVisibleRowIndexBoundaries:function(){
-        var view=this.getView(),
+        var view = this.getView(),
             vTop = view.el.getTop(),
             vBottom = view.el.getBottom(),
             top=-1, bottom=-1;
 
 
         Ext.each(view.getNodes(), function (node) {
-            if (top<0 && Ext.fly(node).getBottom() > vTop) {
-                top=view.indexOf(node);
+            if (top < 0 && Ext.fly(node).getBottom() > vTop) {
+                top = view.indexOf(node);
             }
             if (Ext.fly(node).getTop() < vBottom) {
                 bottom = view.indexOf(node);
@@ -504,13 +501,8 @@ Ext.define('Editor.view.segments.Grid', {
      * Search for segment position in the current store filtering
      */
     searchPosition:function(segmentNrInTask){
-        var me=this,
-            segmentStore=me.getStore(),
-            proxy = segmentStore.getProxy(),
-            params = {};
-        
-        params[proxy.getFilterParam()] = proxy.encodeFilters(segmentStore.getFilters().items);
-        params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
+        var me = this,
+            params = me.getStore().getParams();        
         return new Promise((res,rej) => {
             Ext.Ajax.request({
                 url: Editor.data.restpath+'segment/'+segmentNrInTask+'/position',
@@ -519,7 +511,7 @@ Ext.define('Editor.view.segments.Grid', {
                 scope: me,
                 success: function(response){
                     var responseData = Ext.JSON.decode(response.responseText),
-                        index=responseData ? responseData.index : -1;
+                        index = responseData ? responseData.index : -1;
                     res(index);
                 },
                 failure: function(response){

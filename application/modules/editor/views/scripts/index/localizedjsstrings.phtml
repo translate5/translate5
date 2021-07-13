@@ -35,9 +35,7 @@ $this->translate->setJsonEncode(true);
   //mehrfachverwendete Strings:
   $yes = $this->translate->_('Ja');
   $no  = $this->translate->_('Nein');
-  
-  $config = Zend_Registry::get('config');
-?>
+ ?>
 /*
 Editor Translation Files
 */
@@ -66,7 +64,9 @@ Ext.define('Editor.controller.Localizer', {
       otherFiltersActive: '<?php echo $this->translate->_('ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind');?>',
       noSegmentToFilter: '<?php echo $this->translate->_('Kein Segment dieser Datei entspricht den Filterkriterien');?>'
     };
-
+    Editor.controller.MetaPanel.prototype.messages = {
+    	stateIdSaved: '<?php echo $this->translate->_('Der Segment Status wurde gespeichert');?>'
+    };
     Editor.controller.ServerException.prototype.strings = {
         "401_title": '<?php echo $this->translate->_('Erneute Anmeldung');?>',
         "401_msg": '<?php echo $this->translate->_('Ihre Sitzungsdaten sind abgelaufen. Sie werden nun zur Anmeldeseite weitergeleitet.');?>',
@@ -118,8 +118,12 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.app.Application.prototype.browserAdviceTextTitle = '<?php echo $this->translate->_('Nicht unterstützte Browser-Version');?>';
     Ext.app.Application.prototype.browserAdviceText = '<?php echo $disclaimer;?>';
+    
+    Editor.view.QuickTip.prototype.strings = {
+		loading: '<?php echo $this->translate->_('Lade...');?>'
+	};
 
-    Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
+    Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('QS &amp; Dateien');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
   	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_(' - [LESEMODUS]');?>';
   	Editor.view.segments.Grid.prototype.title_addition_unconfirmed = '<?php echo $this->translate->_(' - [AUFGABE UNBESTÄTIGT]');?>';
@@ -145,9 +149,6 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>';
   	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
   	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
-  	//gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>';
-  	gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('MQM');?>';
-  	gridToolbar.item_qmsummaryTooltip = '<?php echo $this->translate->_('MQM Statistik');?>';
   	gridToolbar.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>';
   	gridToolbar.item_zoomIn = '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>';
   	gridToolbar.item_zoomOut = '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>';
@@ -156,10 +157,11 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Lesezeichen');?>';
   	gridToolbar.item_helpTooltip = '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>';
   	gridToolbar.item_showBookmarkedSegments = '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>';
+  	gridToolbar.item_repeatedFilterBtn = '<?php echo $this->translate->_('Nur wiederholt');?>';
+  	gridToolbar.item_showRepeatedSegments = '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>';
     gridToolbar.strings.interfaceTranslation = '<?php echo $this->translate->_('Oberfläche');?>';
+    gridToolbar.item_themeMenuConfigText = '<?php echo $this->translate->_('Layout');?>';
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
-
-  	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
     
     Ext.define("Editor.locale.view.segments.column.Content", {
@@ -174,6 +176,26 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.segments.column.IsWatched",
         text: '<?php echo $this->translate->_('Lesezeichen');?>',
         text_tip: '<?php echo $this->translate->_('mit Lesezeichen versehen');?>'
+    });
+    
+    Ext.define("Editor.locale.de.view.segments.column.IsRepeated", {
+        override: "Editor.view.segments.column.IsRepeated",
+        text: '<?php echo $this->translate->_('Mit Wiederholungen');?>',
+        strings: {
+            ttip: '<?php echo $this->translate->_('Änderungen des Wiederholungsstatus durch Segmentänderungen werden nicht sofort angezeigt, die Segmente müssen neugeladen werden!');?>',
+            filter: {
+                none: '<?php echo $this->translate->_('Segmente ohne Wiederholungen');?>',
+                source: '<?php echo $this->translate->_('Segmente mit Wiederholungen nur in der Quellsprache');?>',
+                target: '<?php echo $this->translate->_('Segmente mit Wiederholungen nur in der Zielsprache');?>',
+                both: '<?php echo $this->translate->_('Segmente mit Wiederholungen in der Quell- und Zielsprache');?>'
+            },
+            col: {
+                none: '<?php echo $this->translate->_('-');?>',
+                source: '<?php echo $this->translate->_('Nur Quelle');?>',
+                target: '<?php echo $this->translate->_('Nur Ziel');?>',
+                both: '<?php echo $this->translate->_('Beides');?>'
+            }
+        }
     });
     
     Ext.define("Editor.locale.de.view.segments.column.MatchrateType", {
@@ -246,22 +268,50 @@ Ext.define('Editor.controller.Localizer', {
 
   	Editor.view.preferences.Window.prototype.title = '<?php echo $this->translate->_('Einstellungen');?>';
     
-    Editor.view.qmsubsegments.Window.prototype.title = '<?php echo $this->translate->_('MQM Statistik');?>';
-  	Editor.view.qmsubsegments.Window.prototype.tab_title_field = '<?php echo $this->translate->_('In Feld: {0}');?>';
-  	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_text = '<?php echo $this->translate->_('Fehlertyp');?>';
-  	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_totalTotal = '<?php echo $this->translate->_('Gesamt');?>';
-  	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_total = '<?php echo $this->translate->_('Summe');?>';
-
-  	Editor.view.qmsubsegments.AddFlagFieldset.prototype.strings = {
+  	Editor.view.quality.FilterPanel.prototype.title = '<?php echo $this->translate->_('QS Statistik');?>';
+  	Editor.view.quality.FilterPanel.prototype.strings = {
+		modeAll: '<?php echo $this->translate->_('Alle zeigen');?>',
+		modeErrors: '<?php echo $this->translate->_('Nur Fehler');?>',
+		modeFalsePositives: '<?php echo $this->translate->_('Nur Falsch-Positive');?>',
+		incompleteCatCaption: '<?php echo $this->translate->_('Segmente unvollständig geprüft');?>',
+		incompleteCatText: '<?php echo $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig geprüft');?>',
+		startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
+        newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
+	};
+  	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('Manuelle QS (im Segment)');?>';
+  	Editor.view.quality.mqm.Fieldset.prototype.strings = {
 		severityLabel: '<?php echo $this->translate->_('Gewichtung');?>',
 		commentLabel: '<?php echo $this->translate->_('Kommentar');?>',
-		qmAddBtn: '<?php echo $this->translate->_('MQM hinzufügen');?>'
+		qmAddBtn: '<?php echo $this->translate->_('Manuelle QS hinzufügen');?>'
 	};
-  	Editor.view.qmsubsegments.AddFlagFieldset.prototype.title = '<?php echo $this->translate->_('MQM');?>';
-	Editor.controller.QmSubSegments.prototype.strings = {
+	Editor.controller.QualityMqm.prototype.strings = {
     	buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
     	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
     };
+    Editor.view.quality.SegmentQm.prototype.title = '<?php echo $this->translate->_('Manuelle QS (ganzes Segment)');?>';
+    Editor.view.quality.SegmentQmController.prototype.messages = {
+        qmHasBeenAdded: '<?php echo $this->translate->_('Die Qualität wurde hinzugefügt');?>',
+        qmHasBeenRemoved: '<?php echo $this->translate->_('Die Qualität wurde entfernt');?>'
+    };
+    Editor.view.quality.FalsePositives.prototype.title = '<?php echo $this->translate->_('Falsch erkannte Fehler');?>';
+    Editor.view.quality.FalsePositivesController.prototype.messages = {
+    	falsePositiveUpdated: '<?php echo $this->translate->_('Der False-Positive Status wurde aktualisiert');?>'
+    };
+    Editor.view.quality.admin.TaskQualities.prototype.title = '<?php echo $this->translate->_('Qualitätssicherung');?>';
+  	Editor.view.quality.admin.TaskQualities.prototype.strings = {
+		category: '<?php echo $this->translate->_('Kategorie');?>',
+        total: '<?php echo $this->translate->_('Anzahl');?>',
+        errors: '<?php echo $this->translate->_('Fehler');?>',
+        falsePositives: '<?php echo $this->translate->_('Falsch erkannte Fehler');?>',
+        status: '<?php echo $this->translate->_('Status');?>',
+        completeTipCaption: '<?php echo $this->translate->_('Alle Segmente wurden seit der letzten Änderung geprüft');?>',
+        incompleteTipCaption: '<?php echo $this->translate->_('Segmente unvollständig geprüft');?>',
+        incompleteTipText: '<?php echo $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig geprüft');?>',
+        startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
+        faultyTipCaption: '<?php echo $this->translate->_('Interne Tag Fehler');?>',
+        faultyTipText: '<?php echo $this->translate->_('Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern');?>',
+        newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
+	};
     
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';
@@ -272,7 +322,6 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.preferences.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
 
     Editor.view.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
-    Editor.view.segments.MetaPanel.prototype.item_metaQm_title = '<?php echo $this->translate->_('QM');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen (ALT + S danach {0})');?>';
@@ -380,16 +429,18 @@ Ext.define('Editor.controller.Localizer', {
         edit100pWarning: '<?php echo $this->translate->_('Achtung, Sie editieren einen 100% Match!');?>'
     };
 
-    Ext.define("Editor.locale.view.ui.changealike.Window", {
-        override: "Editor.view.ui.changealike.Window",
+    Ext.define("Editor.locale.view.changealike.Window", {
+        override: "Editor.view.changealike.Window",
         title: '<?php echo $this->translate->_('Aktuelles Segment für die folgenden Segmente übernehmen?');?>',
-        item_cancelBtn: '<?php echo $this->translate->_('Keine Änderungen durchführen');?>',
-        item_saveBtn: '<?php echo $this->translate->_('Änderungen übernehmen');?>'
+        strings: {
+            cancelBtn: '<?php echo $this->translate->_('Keine Änderungen durchführen [ESC]');?>',
+            saveBtn: '<?php echo $this->translate->_('Änderungen übernehmen [STRG+S]');?>',
+            help: <?php echo json_encode($this->translate->_('Hilfe:'));?>,
+            segmentData: <?php echo json_encode('{edited}{addition}'); ?>,
+            overwriteSource: '<?php echo $this->translate->_('<b><i>Überschreibe Quelltext mit:</i></b> ');?>',
+            overwriteTarget: '<?php echo $this->translate->_('<b><i>Überschreibe Zieltext mit:</i></b> ');?>'
+        }
     });
-  	Editor.view.changealike.Window.prototype.items_help = <?php echo json_encode($this->translate->_('Hilfe:'));?>;
-  	Editor.view.changealike.Window.prototype.items_segmentData = <?php echo json_encode('{edited}{addition}'); ?>;
-  	Editor.view.changealike.Window.prototype.overwriteSource = '<?php echo $this->translate->_('<b><i>Überschreibe Quelltext mit:</i></b> ');?>';
-  	Editor.view.changealike.Window.prototype.overwriteTarget = '<?php echo $this->translate->_('<b><i>Überschreibe Zieltext mit:</i></b> ');?>';
 
   	Editor.view.ui.changealike.Grid.prototype.item_segmentNrInTaskColumn = '<?php echo $this->translate->_('Nr.');?>';
   	Editor.view.ui.changealike.Grid.prototype.item_sourceColumn = '<?php echo $this->translate->_('Quelle');?>';
@@ -530,7 +581,8 @@ Ext.define('Editor.controller.Localizer', {
             assignmentDateHeader: '<?php echo $this->translate->_('Zuweisungsdatum');?>',
             finishedDateHeader: '<?php echo $this->translate->_('Abschlussdatum');?>',
             deadlineDateHeader: '<?php echo $this->translate->_('Deadline Datum');?>',
-            exelExportedTooltip: '<?php echo $this->translate->_('Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.');?>'
+            exelExportedTooltip: '<?php echo $this->translate->_('Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.');?>',
+            qualityErrorCount: '<?php echo $this->translate->_('QS Fehler');?>'
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
@@ -549,7 +601,7 @@ Ext.define('Editor.controller.Localizer', {
             orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             referenceFiles: '<?php echo $this->translate->_('Referenzdateien');?>',
             terminologie: '<?php echo $this->translate->_('Terminologie');?>',
-            fullMatchEdit: '<?php echo $this->translate->_('unveränderte 100% TM Matches sind editierbar');?>',
+            fullMatchEdit: '<?php echo $this->translate->_('Unveränderte 100% TM Matches sind editierbar');?>',
             lockLocked: '<?php echo $this->translate->_('Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt');?>',
             enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>',
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>',
@@ -563,7 +615,7 @@ Ext.define('Editor.controller.Localizer', {
             workflow: '<?php echo $this->translate->_('Workflow');?>',
             taskassocs: '<?php echo $this->translate->_('Zugewiesene Sprachressourcen');?>',
             pmName: '<?php echo $this->translate->_('Projektmanager');?>',
-            edit100PercentMatch: '<?php echo $this->translate->_('unveränderte 100% TM Matches sind editierbar');?>',
+            edit100PercentMatch: '<?php echo $this->translate->_('Unveränderte 100% TM Matches sind editierbar');?>',
             userCount: '<?php echo $this->translate->_('Zahl zugewiesener Benutzer');?>',
             workflowStepName: '<?php echo $this->translate->_('Aktueller Workflow-Schritt');?>',
             userState: '<?php echo $this->translate->_('Mein Job-Status');?>',
@@ -658,7 +710,7 @@ Ext.define('Editor.controller.Localizer', {
             successUpdate: '<?php echo $this->translate->_('Die Aufgabe wurde erfolgreich aktualisiert');?>',
             btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
             btnReload: '<?php echo $this->translate->_('Aktualisieren');?>',
-            fullMatchLabel: '<?php echo $this->translate->_('unveränderte 100% TM Matches sind editierbar');?>',
+            fullMatchLabel: '<?php echo $this->translate->_('Unveränderte 100% TM Matches sind editierbar');?>',
             editTrue: '<?php echo $this->translate->_('Ja');?>',
             editFalse: '<?php echo $this->translate->_('Nein');?>',
             usageModeTitle: '<?php echo $this->translate->_('Mehrere Benutzer');?>',
@@ -670,8 +722,8 @@ Ext.define('Editor.controller.Localizer', {
             usageModeCoopInfo: '<?php echo $this->translate->_('Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.');?>',
             usageModeCompetitiveInfo: '<?php echo $this->translate->_('Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.');?>',
             usageModeSimultaneousInfo: '<?php echo $this->translate->_('Alle zugewiesenen Nutzer eines Workflowschritts können gleichzeitig arbeiten');?>',
-            edit100PercentMatchEnabledMessage: '<?php echo $this->translate->_('Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen');?>',
-            edit100PercentMatchDisabledMessage: '<?php echo $this->translate->_('Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen');?>'
+            edit100PercentMatchEnabledMessage: '<?php echo $this->translate->_('Wenn aktiviert werden zuvor gesperrte Segmente in die Analyse und Wortanzahl einbezogen.');?>',
+            edit100PercentMatchDisabledMessage: '<?php echo $this->translate->_('Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.');?>'
         }
     });
     
@@ -694,7 +746,7 @@ Ext.define('Editor.controller.Localizer', {
             relaisLangLabel: '<?php echo $this->translate->_('Relaissprache');?>',
             numberFieldLabel: '<?php echo $this->translate->_('Anzahl Wörter');?>',
             targetDeliveryLabel: '<?php echo $this->translate->_('Lieferdatum');?>',
-            fullMatchLabel: '<?php echo $this->translate->_('unveränderte 100% TM Matches sind editierbar');?>',
+            fullMatchLabel: '<?php echo $this->translate->_('Unveränderte 100% TM Matches sind editierbar');?>',
             lockLockedLabel: '<?php echo $this->translate->_('Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt');?>',
             orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             sourceEditLabel: '<?php echo $this->translate->_('Ausgangstext ist editierbar');?>',
@@ -705,7 +757,8 @@ Ext.define('Editor.controller.Localizer', {
             addBtnWizard: '<?php echo $this->translate->_('Importieren (weitere überspringen)');?>',
             btnNextWizard: '<?php echo $this->translate->_('Weiter');?>',
             cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
-            btnSkip: '<?php echo $this->translate->_('Importieren (weitere überspringen)');?>'
+            btnSkip: '<?php echo $this->translate->_('Importieren (weitere überspringen)');?>',
+            importDefaultsButtonText: '<?php echo $this->translate->_('Importieren (Standards nutzen)');?>'
         }
     });
     
@@ -785,11 +838,13 @@ Ext.define('Editor.controller.Localizer', {
             exportDef: '<?php echo $this->translate->_('Originalformat, {0}');?>',
             exportDiff: '<?php echo $this->translate->_('SDLXLIFF mit Änderungsmarkierungen');?>',
             export2Def: '<?php echo $this->translate->_('XLIFF 2.1');?>',
-            exportQmField: '<?php echo $this->translate->_('Export QM-Statistik (XML) für Feld: {0}');?>',
+            exportQmField: '<?php echo $this->translate->_('Export QS-Statistik (XML) für Feld: {0}');?>',
             exportExcel: '<?php echo $this->translate->_('Externe Bearbeitung als Excel');?>',
             downloadImportArchive: '<?php echo $this->translate->_('Importarchiv herunterladen');?>',
             exportTranslation: '<?php echo $this->translate->_('übersetzt');?>',
-            exportReview: '<?php echo $this->translate->_('lektoriert');?>'
+            exportReview: '<?php echo $this->translate->_('lektoriert');?>',
+            faultyQualityAlertTitle: '<?php echo $this->translate->_('Achtung');?>',
+            faultyQualityAlertText: '<?php echo $this->translate->_('Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern');?>',
         }
     });
     
@@ -916,7 +971,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.task.UserAssoc",
         title: '<?php echo $this->translate->_('Benutzer-Plural');?>',
         strings: {
-            fieldRole: '<?php echo $this->translate->_('Rolle');?>',
+            fieldStep: '<?php echo $this->translate->_('Workflowschritt');?>',
             fieldState: '<?php echo $this->translate->_('Status');?>',
             fieldUser: '<?php echo $this->translate->_('Benutzer');?>',
             btnSave: '<?php echo $this->translate->_('Speichern');?>',
@@ -927,6 +982,82 @@ Ext.define('Editor.controller.Localizer', {
             fieldSegmentrange: '<?php echo $this->translate->_('Editierbare Segmente');?>',
         	fieldSegmentrangeInfo: '<?php echo $this->translate->_('Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)');?>',
         	deadlineDateInfoTooltip: '<?php echo $this->translate->_('translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.admin.user.Assoc", {
+        override: "Editor.view.admin.user.Assoc",
+        title: '<?php echo $this->translate->_('Standard-Benutzerzuweisungen');?>',
+        strings: {
+            fieldRole: '<?php echo $this->translate->_('Rolle');?>',
+            fieldState: '<?php echo $this->translate->_('Status');?>',
+            fieldUser: '<?php echo $this->translate->_('Benutzer');?>',
+            btnSave: '<?php echo $this->translate->_('Speichern');?>',
+            btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            formTitleAdd: '<?php echo $this->translate->_('Benutzerzuweisung hinzufügen:');?>',
+            formTitleEdit: '<?php echo $this->translate->_('Bearbeite Benutzer "{0}"');?>',
+            fieldDeadline: '<?php echo $this->translate->_('Deadline');?>',
+            deadlineDateInfoTooltip: '<?php echo $this->translate->_('Definiert die Anzahl Tage, die die Deadline in der Zukunft liegen soll - gesehen vom Zeitpunkt der Projektanlage an. Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.');?>',
+            fieldWorkflowStepName: '<?php echo $this->translate->_('Workflow-Schritt');?>',
+            fieldWorkflow: '<?php echo $this->translate->_('Workflow');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.admin.user.AssocViewController", {
+        override: "Editor.view.admin.user.AssocViewController",
+        strings: {
+            deleteUserMessage: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
+            deleteUserTitle: '<?php echo $this->translate->_('Eintrag löschen?');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.admin.task.UserAssocWizard", {
+        override: "Editor.view.admin.task.UserAssocWizard",
+        strings: {
+            wizardTitle: '<?php echo $this->translate->_('Standard-Benutzerzuweisungen');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+            fieldRole: '<?php echo $this->translate->_('Rolle');?>',
+            fieldState: '<?php echo $this->translate->_('Status');?>',
+            fieldUser: '<?php echo $this->translate->_('Benutzer');?>',
+            btnSave: '<?php echo $this->translate->_('Speichern');?>',
+            btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            formTitleAdd: '<?php echo $this->translate->_('Benutzerzuweisung hinzufügen:');?>',
+            formTitleEdit: '<?php echo $this->translate->_('Bearbeite Benutzer "{0}"');?>',
+            fieldDeadline: '<?php echo $this->translate->_('Deadline');?>',
+            deadlineDateInfoTooltip: '<?php echo $this->translate->_('translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.');?>',
+            fieldWorkflowStepName: '<?php echo $this->translate->_('Workflow-Schritt');?>',
+            fieldWorkflow: '<?php echo $this->translate->_('Workflow');?>',
+            usageModeCoop: '<?php echo $this->translate->_('Sequentielles Arbeiten');?>',
+            usageModeCompetitive: '<?php echo $this->translate->_('Konkurrierende Zuweisung');?>',
+            usageModeSimultaneous: '<?php echo $this->translate->_('Gleichzeitiges Arbeiten');?>',
+            usageModeTitle: '<?php echo $this->translate->_('Mehrere Benutzer');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.admin.user.AssocGrid", {
+        override: "Editor.view.admin.user.AssocGrid",
+        strings: {
+            userGuidCol: '<?php echo $this->translate->_('Benutzer');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+            roleCol: '<?php echo $this->translate->_('Rolle');?>',
+            stepCol: '<?php echo $this->translate->_('Workflowschritt');?>',
+            segmentrangeCol: '<?php echo $this->translate->_('Segmente');?>',
+            stateCol: '<?php echo $this->translate->_('Status');?>',
+            addUser: '<?php echo $this->translate->_('Hinzufügen');?>',
+            reload: '<?php echo $this->translate->_('Aktualisieren');?>',
+            addUserTip: '<?php echo $this->translate->_('Einen Benutzer dieser Aufgabe zuordnen.');?>',
+            removeUser: '<?php echo $this->translate->_('Entfernen');?>',
+            removeUserTip: '<?php echo $this->translate->_('Den gewählten Benutzer aus dieser Aufgabe entfernen.');?>',
+            save: '<?php echo $this->translate->_('Änderungen speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
+            deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
+            notifyButtonText: '<?php echo $this->translate->_('Benutzer nach Import benachrichtigen');?>',
+            notifyButtonTooltip: '<?php echo $this->translate->_('Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen');?>',
+            workflowStepNameCol: '<?php echo $this->translate->_('Workflow-Schritt');?>',
+            fieldWorkflow: '<?php echo $this->translate->_('Workflow');?>'
         }
     });
     
@@ -947,7 +1078,22 @@ Ext.define('Editor.controller.Localizer', {
             canNotBeEditedByUsers: '<?php echo $this->translate->_('(können derzeit von niemandem bearbeitet werden)');?>'
         }
     });
-    
+
+
+    Ext.define("Editor.view.admin.task.UserAssocWizardViewModel", {
+        override: "Editor.view.admin.task.UserAssocWizardViewModel",
+        strings: {
+            editInfo: '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>',
+            segmentrangeError: '<?php echo $this->translate->_('Nicht zugewiesene Segmente');?>',
+            translator: '<?php echo $this->translate->_('Übersetzer');?>',
+            reviewer: '<?php echo $this->translate->_('Lektor');?>',
+            translatorCheck: '<?php echo $this->translate->_('Zweiter Lektor');?>',
+            visitor: '<?php echo $this->translate->_('Besucher');?>',
+            allEditedByUsers: '<?php echo $this->translate->_('(alle Segmente können von allen Nutzern editiert werden)');?>',
+            canNotBeEditedByUsers: '<?php echo $this->translate->_('(können derzeit von niemandem bearbeitet werden)');?>'
+        }
+    });
+
     Ext.define("Editor.locale.de.view.admin.task.UserAssocGrid", {
         override: "Editor.view.admin.task.UserAssocGrid",
         strings: {
@@ -955,6 +1101,7 @@ Ext.define('Editor.controller.Localizer', {
             confirmDelete: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
             userGuidCol: '<?php echo $this->translate->_('Benutzer');?>',
             roleCol: '<?php echo $this->translate->_('Rolle');?>',
+            stepCol: '<?php echo $this->translate->_('Workflowschritt');?>',
             segmentrangeCol: '<?php echo $this->translate->_('Segmente');?>',
             stateCol: '<?php echo $this->translate->_('Status');?>',
             addUser: '<?php echo $this->translate->_('Hinzufügen');?>',
@@ -1136,7 +1283,8 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.HeadPanel",
         strings: {
             logout: '<?php echo $this->translate->_('Abmelden');?>',
-            readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
+            readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>',
+            uiThemeComboLabelText: '<?php echo $this->translate->_('Layout');?>'
         }
     });
 
@@ -1175,7 +1323,7 @@ Ext.define('Editor.controller.Localizer', {
             confirmResetPwMsg: '<?php echo $this->translate->_('Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.user.Grid", {
         override: "Editor.view.admin.user.Grid",
         title: '<?php echo $this->translate->_('Benutzer');?>',
@@ -1187,7 +1335,7 @@ Ext.define('Editor.controller.Localizer', {
             email: '<?php echo $this->translate->_('E-Mail');?>',
             locale: '<?php echo $this->translate->_('Sprache');?>',
             roles: '<?php echo $this->translate->_('Systemrollen');?>',
-            openIdIssuer: '<?php echo $this->translate->_('OpenId Emitten');?>'
+            openIdIssuer: '<?php echo $this->translate->_('OpenID Emitten');?>'
         },
         strings: {
             addUser: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
@@ -1200,10 +1348,6 @@ Ext.define('Editor.controller.Localizer', {
             gender_neutral: '<?php echo $this->translate->_('keine Angabe');?>',
             reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
             reloadBtnTip: '<?php echo $this->translate->_('Benutzerliste vom Server aktualisieren.');?>',
-            sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
-            sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
-            targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
-            targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
             localeTooltip: '<?php echo $this->translate->_('Benutzersprache');?>'
         }
     });
@@ -1252,14 +1396,10 @@ Ext.define('Editor.controller.Localizer', {
             saveBtn: '<?php echo $this->translate->_('Benutzer speichern');?>',
             cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
             languagesLabel: '<?php echo $this->translate->_('Automatische Zuweisung');?>',
-            sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
-            sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
-            targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
-            targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
             languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>',
             localeLabel: '<?php echo $this->translate->_('Benutzersprache');?>',
             parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>',
-            bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.');?>'
+            bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.');?>'
         }
     });
     Editor.view.admin.task.UserPrefsGrid.prototype.strings = {
@@ -1269,7 +1409,7 @@ Ext.define('Editor.controller.Localizer', {
         colStep: '<?php echo $this->translate->_('Workflow Schritt');?>',
         colUsername: '<?php echo $this->translate->_('Benutzer');?>',
         colTargets: '<?php echo $this->translate->_('Spalten (vorhanden)');?>',
-        colNotEditContent: '<?php echo $this->translate->_('Nur MQM-tags bearbeiten');?>',
+        colNotEditContent: '<?php echo $this->translate->_('Nur manuelle QS im Segment bearbeiten');?>',
         colAnonymous: '<?php echo $this->translate->_('Anonymisiert');?>',
         colVisibility: '<?php echo $this->translate->_('Sichtbarkeit');?>',
         add: '<?php echo $this->translate->_('Eintrag hinzufügen');?>',
@@ -1286,7 +1426,7 @@ Ext.define('Editor.controller.Localizer', {
         fieldStep: '<?php echo $this->translate->_('Workflow Schritt');?>',
         fieldUsername: '<?php echo $this->translate->_('Benutzer');?>',
         fieldTargets: '<?php echo $this->translate->_('vorhandene Spalten');?>',
-        fieldNotEditContent: '<?php echo $this->translate->_('Nur MQM-tags bearbeiten');?>',
+        fieldNotEditContent: '<?php echo $this->translate->_('Nur manuelle QS im Segment bearbeiten');?>',
         fieldAnonymous: '<?php echo $this->translate->_('anonymisierte Zieltextspalten');?>',
         fieldVisibility: '<?php echo $this->translate->_('Sichtbarkeit nicht editierbarer Zieltextspalten');?>',
         btnSave: '<?php echo $this->translate->_('Speichern');?>',
@@ -1310,13 +1450,12 @@ Ext.define('Editor.controller.Localizer', {
       customerTip: '<?php echo $this->translate->_('Kunde der Aufgabe (Angabe notwendig)');?>',
       customerLabel: '<?php echo $this->translate->_('Kunde');?>'
     };
-	Ext.define("Editor.locale.controller.admin.Customer", {
-		override: "Editor.controller.admin.Customer",
-        strings: {
-            customer:'<?php echo $this->translate->_("Kunden");?>',
-            allCustomers:'<?php echo $this->translate->_("Alle Kunden");?>',
-        }
-    });
+
+    Editor.controller.admin.Customer.prototype.strings = {
+        customerLabelText:'<?php echo $this->translate->_("Kunden InstantTranslate &amp; TermPortal");?>',
+        customerInfoIconTooltip:'<?php echo $this->translate->_("Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.");?>',
+        allCustomers:'<?php echo $this->translate->_("Alle Kunden");?>'
+    };
 
     Ext.define("Editor.locale.view.admin.customer.Panel", {
     	override: "Editor.view.admin.customer.Panel",
@@ -1328,7 +1467,6 @@ Ext.define('Editor.controller.Localizer', {
             save:'<?php echo $this->translate->_("Speichern");?>',
             cancel:'<?php echo $this->translate->_("Abbrechen");?>',
             remove:'<?php echo $this->translate->_("Löschen");?>',
-            editCustomerTitle:'<?php echo $this->translate->_("Kunde bearbeiten");?>',
             addCustomerTitle:'<?php echo $this->translate->_("Kunde hinzufügen");?>',
             saveCustomerMsg:'<?php echo $this->translate->_("Kunde wird gespeichert...");?>',
             customerSavedMsg:'<?php echo $this->translate->_("Kunde gespeichert!");?>',
@@ -1337,21 +1475,46 @@ Ext.define('Editor.controller.Localizer', {
             customerDeletedMsg:'<?php echo $this->translate->_("Kunde gelöscht");?>',
             export:'<?php echo $this->translate->_("Ressourcen-Nutzung Exportieren");?>',
             domain:'<?php echo $this->translate->_("translate5 Domain");?>',
-            openIdServer:'<?php echo $this->translate->_("OpenId server");?>',
-            openIdIssuer:'<?php echo $this->translate->_("OpenId Issuer");?>',
-            openIdAuth2Url:'<?php echo $this->translate->_("OpenId OAuth URL");?>',
+            openIdServer:'<?php echo $this->translate->_("OpenID server");?>',
+            openIdIssuer:'<?php echo $this->translate->_("OpenID Issuer");?>',
+            openIdAuth2Url:'<?php echo $this->translate->_("OpenID OAuth URL");?>',
             defaultRolesGroupLabel:'<?php echo $this->translate->_("Standardrollen");?>',
             serverRolesGroupLabel:'<?php echo $this->translate->_("Erlaubte Rollen");?>',
-            openIdClientId:'<?php echo $this->translate->_("OpenId Benutzername");?>',
-            openIdClientSecret:'<?php echo $this->translate->_("OpenId Passwort");?>',
+            openIdClientId:'<?php echo $this->translate->_("OpenID Benutzername");?>',
+            openIdClientSecret:'<?php echo $this->translate->_("OpenID Passwort");?>',
             openIdRedirectLabel:'<?php echo $this->translate->_("Verlinkter Text Loginseite");?>',
             openIdRedirectCheckbox:'<?php echo $this->translate->_("Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.");?>',
-            defaultRolesGroupLabelTooltip:'<?php echo $this->translate->_("Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.");?>',
+            defaultRolesGroupLabelTooltip:'<?php echo $this->translate->_("Standardsystemrollen werden verwendet, wenn der OpenID-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.");?>',
             serverRolesGroupLabelTooltip:'<?php echo $this->translate->_("Systemrollen, die der OpenID-Server in translate5 festlegen darf.");?>',
-            propertiesTabPanelTitle:'<?php echo $this->translate->_("Eigenschaften");?>',
-            configTabTitle:'<?php echo $this->translate->_("Standardkonfiguration des Systems");?>',
+            propertiesTabPanelTitle:'<?php echo $this->translate->_("Allgemein");?>',
+            configTabTitle:'<?php echo $this->translate->_("Überschreibung der Systemkonfiguration");?>',
             actionColumn:'<?php echo $this->translate->_("Aktionen");?>',
-            customerEditActionIcon:'<?php echo $this->translate->_("Kunden bearbeiten");?>'
+            customerEditActionIcon:'<?php echo $this->translate->_("Kunden bearbeiten");?>',
+            helpButtonText:'<?php echo $this->translate->_("Hilfe");?>',
+            openIdTabPanelDisabledTooltip:'<?php echo $this->translate->_('Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.');?>'
+        }
+    });
+
+
+    Ext.define("Editor.locale.view.admin.customer.OpenIdPanel", {
+    	override: "Editor.view.admin.customer.OpenIdPanel",
+        strings: {
+            save:'<?php echo $this->translate->_("Speichern");?>',
+            cancel:'<?php echo $this->translate->_("Abbrechen");?>',
+            saveCustomerMsg:'<?php echo $this->translate->_("Kunde wird gespeichert...");?>',
+            customerSavedMsg:'<?php echo $this->translate->_("Kunde gespeichert!");?>',
+            openIdServer:'<?php echo $this->translate->_("OpenID server");?>',
+            openIdIssuer:'<?php echo $this->translate->_("OpenID Issuer");?>',
+            openIdAuth2Url:'<?php echo $this->translate->_("OpenID OAuth URL");?>',
+            defaultRolesGroupLabel:'<?php echo $this->translate->_("Standardrollen");?>',
+            serverRolesGroupLabel:'<?php echo $this->translate->_("Erlaubte Rollen");?>',
+            openIdClientId:'<?php echo $this->translate->_("OpenID Benutzername");?>',
+            openIdClientSecret:'<?php echo $this->translate->_("OpenID Passwort");?>',
+            openIdRedirectLabel:'<?php echo $this->translate->_("Verlinkter Text Loginseite");?>',
+            openIdRedirectCheckbox:'<?php echo $this->translate->_("Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.");?>',
+            defaultRolesGroupLabelTooltip:'<?php echo $this->translate->_("Standardsystemrollen werden verwendet, wenn der OpenID-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.");?>',
+            serverRolesGroupLabelTooltip:'<?php echo $this->translate->_("Systemrollen, die der OpenID-Server in translate5 festlegen darf.");?>',
+            helpButtonText:'<?php echo $this->translate->_("Hilfe");?>'
         }
     });
 
@@ -1501,11 +1664,14 @@ Ext.define('Editor.controller.Localizer', {
             colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
             cancel: '<?php echo $this->translate->_('Abbrechen');?>',
-            useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
+            useAsDefault: '<?php echo $this->translate->_('Leserechte standardmäßig');?>',
+            writeAsDefault: '<?php echo $this->translate->_('Schreibrechte standardmäßig');?>',
             customers: '<?php echo $this->translate->_('Für diese Kunden nutzen');?>',
             mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
             collection: '<?php echo $this->translate->_('TBX-Datei');?>',
-            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
+            useAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert');?>',
+            writeAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden');?>'
         }
     });
     
@@ -1530,11 +1696,14 @@ Ext.define('Editor.controller.Localizer', {
             colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
             cancel: '<?php echo $this->translate->_('Abbrechen');?>',
-            useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
+            useAsDefault: '<?php echo $this->translate->_('Leserechte standardmäßig');?>',
+            writeAsDefault: '<?php echo $this->translate->_('Schreibrechte standardmäßig');?>',
             customers: '<?php echo $this->translate->_('Für diese Kunden nutzen');?>',
             collection: '<?php echo $this->translate->_('TBX-Datei');?>',
             importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
-            categories: '<?php echo $this->translate->_('Kategorien');?>'
+            categories: '<?php echo $this->translate->_('Kategorien');?>',
+            useAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert');?>',
+            writeAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden');?>',
         }
     });
     
@@ -1570,7 +1739,8 @@ Ext.define('Editor.controller.Localizer', {
             taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
             customers: '<?php echo $this->translate->_('Kunden');?>',
         	defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
-        	useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
+        	useAsDefault: '<?php echo $this->translate->_('Leserechte standardmäßig');?>',
+        	writeAsDefault: '<?php echo $this->translate->_('Schreibrechte standardmäßig');?>',
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>'
         }
     });
@@ -1636,7 +1806,8 @@ Ext.define('Editor.controller.Localizer', {
             inUse: '<?php echo $this->translate->_('Status "{0}" durch einen anderen Benutzer');?>',
             close: '<?php echo $this->translate->_('Schließen');?>',
             reimport: '<?php echo $this->translate->_('Aufgaben reimportieren');?>',
-            reimportTooltip: '<?php echo $this->translate->_('Ausgewählte Aufgaben erneut ins aktuelle TM importieren');?>'
+            reimportTooltip: '<?php echo $this->translate->_('Ausgewählte Aufgaben erneut ins aktuelle TM importieren');?>',
+            gotoTask: '<?php echo $this->translate->_('zur Aufgabe springen');?>'
         }
     });
 

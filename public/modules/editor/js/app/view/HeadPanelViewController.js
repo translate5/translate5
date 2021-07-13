@@ -43,17 +43,38 @@ Ext.define('Editor.view.HeadPanelViewController', {
             },
             '#logoutSingle' : {
                 click: 'handleLogout'
+            },
+            '#uiTheme' : {
+                change: 'onUiThemeChange'
             }
         }
     },
+
     handleInitAdmin: function() {
         var hp = this.getView();
         hp.down('#applicationInfoPanel').update(hp.down('#applicationInfoPanel').getAdminTplData());
     },
+
     handleLogout: function() {
         Editor.app.logout();
     },
+
     changeLocale: function(combo, locale) {
         Editor.app.setTranslation(locale);
+    },
+
+    /***
+     * On ui change combo event handler
+     * @param combo
+     * @param newValue
+     */
+    onUiThemeChange:function(combo, newValue){
+        var uiThemesRecord = Editor.app.getUserConfig('extJs.cssFile',true);
+        uiThemesRecord.set('value',newValue);
+        uiThemesRecord.save({
+            callback:function(){
+                location.reload();
+            }
+        });
     }
 });

@@ -33,7 +33,20 @@ Ext.define('Editor.view.admin.customer.ViewModel', {
 
     data: {
         title: '',
-        record: false,
-        isOpenIdRequired:false
+        record: false
+    },
+
+    formulas: {
+        isOpenIdHidden:{
+            get: function (get) {
+                return get('record') &&
+                    (get('record').get('number') === Editor.model.admin.Customer.DEFAULTCUSTOMER_NUMBER && !Editor.data.customers.openid.showOpenIdDefaultCustomerData);
+            }
+        },
+        isNewRecord:{
+            get: function (get) {
+                return get('record') && !Ext.isNumber(get('record').get('id'));
+            }
+        }
     }
 });

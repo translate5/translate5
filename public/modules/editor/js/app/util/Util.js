@@ -43,10 +43,16 @@ Ext.define('Editor.util.Util', {
         /***
         *
         * @param {Date} date The date to modify
-        * @param {Number} days The amount to add to the current date.
+        * @param {Number} days The amount to add to the current date. If decimal provided, it will be converted to hours
         * @return {Date} The new Date instance.
         */
         addBusinessDays:function(date,days){
+            // if it is float number, calculate the hours from the floating point number.
+            var hours = days - parseInt(days);
+            if(hours > 0){
+                hours = 24 * hours;
+                date = Ext.Date.add(date, Ext.Date.HOUR, hours);
+            }
             for(var i=1;i<=days;){
                 date = Ext.Date.add(date, Ext.Date.DAY, 1);
                 if(!Ext.Date.isWeekend(date)){
@@ -54,6 +60,58 @@ Ext.define('Editor.util.Util', {
                 }
             }
             return date;
+        },
+        /**
+         * Creates an CSS-Selector from props
+         * @param nodeName {String} the relevant node-name of the serched elements
+         * @param classNames {Array,String} like [class1, ..., classN] OR String the relevant class/classes of the searched elements
+         * @param dataProps {Array} like [{ name:'name1', value:'val1' }, ..., { name:'nameN', value:'valN' }] the relevant data-properties of the searched elements
+         * @return String
+         */
+        createSelectorFromProps(nodeName, classNames, dataProps){
+            var selector = (nodeName) ? nodeName : '';
+                if(classNames){
+                selector += (Array.isArray(classNames)) ? ('.' + classNames.join('.')) : ('.' + classNames.split(' ').join('.'));
+            }
+            if(dataProps && Array.isArray(dataProps)){
+                dataProps.forEach(function(prop){
+                    if(prop.name && prop.value){
+                        selector += ("[data-" + prop.name + "='" + prop.value + "']");
+                    }
+                });
+            }
+            return selector;
+        },
+
+        /**
+         * renders the value of the language columns
+         * @param {String} val
+         * @returns {String}
+         */
+        gridColumnLanguageRenderer: function(val, md) {
+            var lang = Ext.StoreMgr.get('admin.Languages').getById(val),
+                label;
+            if(lang){
+                label = lang.get('label');
+                md.tdAttr = 'data-qtip="' + label + '"';
+                return label;
+            }
+            return '';
+        },
+
+        /***
+         * Return the translated workflowStep name
+         */
+        getWorkflowStepNameTranslated:function(stepName){
+            if(!stepName){
+                return "";
+            }
+            var store=Ext.StoreManager.get('admin.WorkflowSteps'),
+                rec=store.getById(stepName);
+            if(rec){
+                stepName=rec.get('text');
+            }
+            return stepName;
         }
     }
     

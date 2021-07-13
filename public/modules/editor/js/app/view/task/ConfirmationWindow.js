@@ -53,7 +53,7 @@ Ext.define('Editor.view.task.ConfirmationWindow', {
             config,
             msg = me.strings.confirmMsg;
               
-        if(Editor.data.task.get('usageMode') == Editor.data.task.USAGE_MODE_COMPETITIVE) {
+        if(Editor.data.task.get('usageMode') == Editor.model.admin.Task.USAGE_MODE_COMPETITIVE) {
             msg += me.strings.confirmCompetitive;
         }
                 

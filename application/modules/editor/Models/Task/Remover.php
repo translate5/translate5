@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -50,21 +50,25 @@ class editor_Models_Task_Remover {
     }
     
     /**
-     * Removes a task completly from translate5 if task is not locked and therefore removable
+     * Removes a task completely from translate5 if task is not locked and therefore removable
      */
     public function remove($forced = false) {
         $taskGuid = $this->task->getTaskGuid();
         $projectId = $this->task->getProjectId();
+        $isProject = $this->task->isProject();
         if(empty($taskGuid)) {
             return false;
         }
-        if(!$forced) {
-            $this->checkRemovable();
+        if(!$isProject){
+            $this->removeTask($forced);
+        }else{
+            $this->removeProject($projectId,$forced,true);
         }
-        $this->removeDataDirectory();
-        $this->removeRelatedDbData();
-        $this->task->delete();
-        $this->cleanupProject($projectId);
+
+        // on import error project may not be created:
+        if(!is_null($projectId)) {
+            $this->cleanupProject($projectId);
+        }
     }
     
     /**
@@ -74,20 +78,62 @@ class editor_Models_Task_Remover {
     public function removeForced($removeFiles = true) {
         $taskGuid = $this->task->getTaskGuid();
         $projectId = $this->task->getProjectId();
+        $isProject = $this->task->isProject();
         if(empty($taskGuid)) {
             return false;
         }
         //tries to lock the task, but delete it regardless if could be locked or not.
         $this->task->lock(NOW_ISO);
-        
-        if($removeFiles) {
+
+        if(!$isProject){
+            $this->removeTask(true,$removeFiles);
+        }else{
+            $this->removeProject($projectId,true,$removeFiles);
+        }
+
+        // on import error project may not be created:
+        if(!is_null($projectId)) {
+            $this->cleanupProject($projectId);
+        }
+    }
+
+    /***
+     * Remove the current loaded task. The task data on the disk will be removed by default ($removeFiles). To disable this set $removeFiles to false.
+     * @param false $forced
+     * @param true $removeFiles: should the task files be removed
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_Conflict
+     */
+    protected function removeTask(bool $forced = false, bool $removeFiles = true){
+        if(!$forced) {
+            $this->checkRemovable();
+        }
+        if($removeFiles){
             $this->removeDataDirectory();
         }
         $this->removeRelatedDbData();
         $this->task->delete();
-        $this->cleanupProject($projectId);
     }
-    
+
+    /***
+     * Remove project and all of his tasks and related data
+     *
+     * @param int $projectId
+     * @param bool $forced
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_Conflict
+     */
+    protected function removeProject(int $projectId, bool $forced,bool $removeFiles){
+        $model=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $model editor_Models_Task */
+        $tasks=$model->loadProjectTasks($projectId);
+        $tasks = array_reverse($tasks);
+        foreach ($tasks as $projectTask){
+            $this->task->init($projectTask);
+            $this->removeTask($forced,$removeFiles);
+        }
+    }
+
     /**
      * Remove the project if there are no tasks in the project
      * @param int $projectId
@@ -155,8 +201,8 @@ class editor_Models_Task_Remover {
     
     /**
      * drops the tasks Materialized View and deletes several data (segments, terms, file entries)
-     * All mentioned data has foreign keys to the task, to reduce locks while deletion this 
-     * data is deleted directly instead of relying on referential integrity. 
+     * All mentioned data has foreign keys to the task, to reduce locks while deletion this
+     * data is deleted directly instead of relying on referential integrity.
      * Also removes the task related term collection
      */
     protected function removeRelatedDbData() {

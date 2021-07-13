@@ -33,7 +33,9 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.admin.TaskAddWindowViewModel',
         'Editor.view.admin.customer.UserCustomersCombo',
         'Editor.view.LanguageCombo',
-        'Editor.view.admin.config.ConfigWizard'
+        'Editor.view.admin.config.ConfigWizard',
+        'Editor.view.admin.task.UserAssocWizard',
+        'Editor.view.admin.task.UserAssocWizardViewModel'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -61,7 +63,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         relaisLangLabel: '#UT#Relaissprache',
         numberFieldLabel: '#UT#Anzahl Wörter',
         orderdate: '#UT#Bestelldatum',
-        fullMatchLabel: '#UT#unveränderte 100% TM Matches sind editierbar',
+        fullMatchLabel: '#UT#Unveränderte 100% TM Matches sind editierbar',
         lockLockedLabel: '#UT#Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
         sourceEditLabel: '#UT#Ausgangstext ist editierbar',
         bottomInfo: '#UT# ¹ Diese Angaben / Daten werden für den Import zwingend benötigt.',
@@ -72,9 +74,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         btnNextWizard:'#UT#Weiter',
         cancelBtn: '#UT#Abbrechen',
         btnSkip:'#UT#Importieren (weitere überspringen)',
+        importDefaultsButtonText:'#UT#Importieren (Standards nutzen)'
     },
-    height : 550,
-    width : 1000,
     modal : true,
     layout: 'anchor',
     autoScroll: true,
@@ -83,21 +84,30 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
      * The groups are:preimport, import and postimport
      */
     groupCards:[],
-    
+
+    maximizable:true,
+
     listeners:{
         beforerender:function(win){
             //insert the taskUpload card in before render
             win.insertCard({
                 xtype:'taskUpload', 
                 itemId:'taskUploadCard',
-                groupIndex:4,
+                groupIndex:5
             },'postimport');
-            
+
             win.insertCard({
-                xtype:'adminConfigWizard', 
-                itemId:'adminConfigWizard',
-                groupIndex:2,//index 1 is language resources assoc
+                xtype:'adminTaskUserAssocWizard',
+                itemId:'adminTaskUserAssocWizard',
+                groupIndex:1//index 2 is language resources assoc
             },'postimport');
+
+            win.insertCard({
+                xtype:'adminConfigWizard',
+                itemId:'adminConfigWizard',
+                groupIndex:3//index 2 is language resources assoc
+            },'postimport');
+
         },
         render:function(win){
             
@@ -151,19 +161,40 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         config = {
                 title: me.title, //see EXT6UPD-9
                 layout: 'card',
+                height: parseInt(Editor.app.viewport.getHeight() * 0.70),
+                width: parseInt(Editor.app.viewport.getWidth() * 0.70),
                 items:[
                     {
                         xtype:'panel',
                         itemId: 'taskMainCard',
                         importType:'import',
                         scrollable:'y',
+                        listeners: {
+                            drop: {
+                                element: 'el',
+                                fn: 'onMainCardDrop'
+                            }
+                        },
+                        onMainCardDrop: function(e) {
+                            var dt = new DataTransfer(),
+                                be = e.browserEvent,
+                                bedt = be && be.dataTransfer,
+                                file =  bedt.files && bedt.files[0],
+                                fileField = this.down('filefield[name="importUpload"]');
+                            if(!file) {
+                                return;
+                            }
+                            dt.items.add(file);
+                            fileField.fileInputEl.dom.files = dt.files;
+                            fileField.onFileChange(null, null, file.name);
+                        },
                         items:[{
                             xtype: 'form',
                             padding: 5,
                             ui: 'default-frame',
                             layout: 'hbox',
                             layoutConfig : {
-                                align : 'stretch',
+                                align : 'stretch'
                             },
                             anchor: '100%',
                             items: [{
@@ -209,7 +240,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                 },{
                                     xtype: 'languagecombo',
                                     name: 'relaisLang',
-                                    visible:Editor.data.frontend.importTask.pivotDropdownVisible, // the default value is system default
+                                    hidden:!Editor.data.frontend.importTask.pivotDropdownVisible, // the default value is system default
                                     getSubmitValue: function() {
                                         return this.getValue();
                                     },
@@ -310,6 +341,10 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
 
                         disableCancelButton:function(get){
                             return false;
+                        },
+
+                        disableImportDefaults:function(get){
+                            return false;
                         }
                     }
                 ],
@@ -343,6 +378,15 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     text : me.strings.btnSkip
                 },{
                     xtype : 'button',
+                    glyph: 'f560@FontAwesome5FreeSolid',
+                    itemId : 'importdefaults-wizard-btn',
+                    bind:{
+                        disabled:'{disableImportDefaults}',
+                        visible:'{!disableImportDefaults}'
+                    },
+                    text : me.strings.importDefaultsButtonText
+                },{
+                    xtype : 'button',
                     glyph: 'f00c@FontAwesome5FreeSolid',
                     itemId : 'add-task-btn',
                     bind:{
@@ -367,7 +411,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         }
         return me.callParent([config]);
     },
-    
     /***
      * Insert card in window at given group
      * The groups are: preimport,import,postimport

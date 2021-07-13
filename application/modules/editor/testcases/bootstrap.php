@@ -29,18 +29,47 @@ END LICENSE AND COPYRIGHT
 /**
  * Bootstrapping the API tests
  */
-require_once 'Zend/Loader/Autoloader.php';
-$auto = Zend_Loader_Autoloader::getInstance();
-$auto->registerNamespace('ZfExtended_');
-$auto->registerNamespace('Editor_');
+
+$APPLICATION_ROOT = rtrim(getenv('APPLICATION_ROOT'), '/');
+$DO_CAPTURE = (getenv('DO_CAPTURE') === "1");
+
+$zendLib = $APPLICATION_ROOT.'/vendor/shardj/zf1-future/library/';
+
+//include optional composer vendor autoloader. TODO FIXME: why needs this to be done here, shouldn't the bootstarpper make that happen ?
+if(file_exists($APPLICATION_ROOT.'/vendor/autoload.php')) {
+    require_once $APPLICATION_ROOT.'/vendor/autoload.php';
+}
+
+//presetting Zend include path, get from outside!
+$path = get_include_path();
+set_include_path($APPLICATION_ROOT.PATH_SEPARATOR.$path.PATH_SEPARATOR.$zendLib);
+   
+$_SERVER['REQUEST_URI'] = '/';
+$_SERVER['SERVER_NAME'] = 'localhost';
+$_SERVER['HTTP_HOST'] = 'localhost';
+define('APPLICATION_ROOT', $APPLICATION_ROOT);
+define('APPLICATION_PATH', $APPLICATION_ROOT.DIRECTORY_SEPARATOR.'application');
+define('APPLICATION_ENV', 'application');
+// define a general marker for unit tests
+// be aware, that this marker affects the TESTING installation and the tests running in it, not the via API tested installation
+define('T5_IS_UNIT_TEST', true);
+
+  
+require_once 'Zend/Session.php';
+Zend_Session::$_unitTestEnabled = true;
+require_once 'library/ZfExtended/BaseIndex.php';
+$index = ZfExtended_BaseIndex::getInstance();
+$index->initApplication()->bootstrap();
+$index->addModuleOptions('default');
+
+// runtimeOptions.dir.taskData
+$config = Zend_Registry::get('config');
+$API_URL = $config->runtimeOptions->server->protocol.$config->runtimeOptions->server->name;
+$DATA_DIR = $config->runtimeOptions->dir->taskData;
+$LOGOUT_PATH = $config->runtimeOptions->loginUrl;
+
+// crucial: setup the test-API with the neccessary pathes & url's
+ZfExtended_Test_ApiHelper::setup($API_URL, $DATA_DIR, $LOGOUT_PATH, $DO_CAPTURE);
+
 //forcing cwd to testcases dir
 chdir(dirname(__FILE__));
-
-global $T5_API_URL;
-$T5_API_URL = getenv('API_URL');
-
-//FIXME the next two variables could be get by api call to editor/config, this would imply a testmanager login before each testcase!
-global $T5_DATA_DIR;
-$T5_DATA_DIR = getenv('DATA_DIR');
-global $T5_LOGOUT_PATH;
-$T5_LOGOUT_PATH = getenv('LOGOUT_PATH');

@@ -85,7 +85,7 @@ class DevelopmentCreatetestCommand extends Translate5AbstractCommand
         $path = APPLICATION_PATH.'/modules/editor/testcases/editorAPI';
         
         if($name = $input->getOption('name')) {
-            $issue = $name = $this->getFileName($path, $name);
+            $issue = $name;
         }
         else {
             $gitout = [];
@@ -151,7 +151,7 @@ END LICENSE AND COPYRIGHT
  * Testcase for '.$issue.' Mixing XLF id and rid values led to wrong tag numbering
  * For details see the issue.
  */
-class '.$name.' extends \ZfExtended_Test_ApiTestcase {
+class '.$name.' extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
@@ -200,12 +200,11 @@ class '.$name.' extends \ZfExtended_Test_ApiTestcase {
      * Testing segment values directly after import
      */
     public function testSegmentValuesAfterImport() {
-        $segments = $this->api()->requestJson(\'editor/segment?page=1&start=0&limit=10\');
-        
-        $data = array_map([self::$api,\'removeUntestableSegmentContent\'], $segments);
-//TODO FOR TEST USAGE: run the test, the next line creates the expected content json, comment the line out, validate if the produced JSON is as expected
-        file_put_contents($this->api()->getFile(\'/expectedSegments.json\', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent(\'expectedSegments.json\'), $data, \'Imported segments are not as expected!\');
+        $jsonFileName = \'expectedSegments.json\';
+// REMINDER FOR TEST USAGE:
+// when the option -c is set on calling this test as a single test (e.g /var/www/translate5/application/modules/editor/testcases/apitest.sh -c editorAPI/MyFunnyTest.php), the files are automatically saved after fetching with the passed filename (third argument)
+        $segments = $this->api()->getJson(\'editor/segment?page=1&start=0&limit=10\', [], $jsonFileName);
+        $this->assertModelsEqualsJsonFile(\'Segment\', $jsonFileName, $segments, \'Imported segments are not as expected!\');
     }
     
     /**
@@ -226,11 +225,11 @@ class '.$name.' extends \ZfExtended_Test_ApiTestcase {
         $this->api()->requestJson(\'editor/segment/\'.$segToTest->id, \'PUT\', $segmentData);
         
         //check direct PUT result
-        $segments = $this->api()->requestJson(\'editor/segment?page=1&start=0&limit=10\');
-        $data = array_map([self::$api,\'removeUntestableSegmentContent\'], $segments);
-//TODO FOR TEST USAGE: run the test, the next line creates the expected content json, comment the line out, validate if the produced JSON is as expected
-        file_put_contents($this->api()->getFile(\'/expectedSegments-edited.json\', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent(\'expectedSegments-edited.json\'), $data, \'Edited segments are not as expected!\');
+        $jsonFileName = \'expectedSegments-edited.json\';
+// REMINDER FOR TEST USAGE:
+// when the option -c is set on calling this test as a single test (e.g /var/www/translate5/application/modules/editor/testcases/apitest.sh -c editorAPI/MyFunnyTest.php), the files are automatically saved after fetching with the passed filename (third argument)
+        $segments = $this->api()->getJson(\'editor/segment?page=1&start=0&limit=10\', [], $jsonFileName);
+        $this->assertModelsEqualsJsonFile(\'Segment\', $jsonFileName, $segments, \'Imported segments are not as expected!\');
     }
     
     /**
@@ -250,12 +249,16 @@ class '.$name.' extends \ZfExtended_Test_ApiTestcase {
         $pathToZip = $path.\'export.zip\';
         $this->assertFileExists($pathToZip);
         
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.\'/'.$issue.'-de-en.xlf\');
-//TODO FOR TEST USAGE: run the test, the next line creates the expected export file, comment the line out, validate if the produced export is as expected
-        file_put_contents($this->api()->getFile(\'export-'.$issue.'-de-en.xlf\', null, false), $exportedFile);
-        $expectedResult = $this->api()->getFileContent(\'export-'.$issue.'-de-en.xlf\');
+        $exportFileName = \'export-\'.$issue.\'-de-en.xlf\';
+        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.\'/\'.$issue.\'-de-en.xlf\');
+// REMINDER FOR TEST USAGE:
+// This is the manual way to save files when the command-option -c (= capture) was set
+        if($this->api()->isCapturing()){
+            file_put_contents($this->api()->getFile($exportFileName, null, false), $exportedFile);
+        }
+        $expectedResult = $this->api()->getFileContent($exportFileName);
         
-        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), \'Exported result does not equal to export-'.$issue.'-de-en.xlf\');
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), \'Exported result does not equal to export-\'.$issue.\'-de-en.xlf\');
     }
 
     public static function tearDownAfterClass(): void {
@@ -306,7 +309,6 @@ $json = <<<EOF
         "pretrans": "0",
         "matchRate": "0",
         "matchRateType": "import;empty",
-        "qmId": null,
         "stateId": "0",
         "autoStateId": "4",
         "fileOrder": "0",

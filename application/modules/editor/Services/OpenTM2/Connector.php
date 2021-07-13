@@ -26,12 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
  * OpenTM2 Connector
  */
@@ -41,13 +35,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @var editor_Services_OpenTM2_HttpApi
      */
     protected $api;
-    
-    /***
-     * Filename by file id cache
-     * @var array
-     */
-    public $fileNameCache=array();
-    
     
     /**
      * Using Xliff based tag handler here
@@ -143,9 +130,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_Abstract::addAdditionalTm()
      */
     public function addAdditionalTm(array $fileinfo = null,array $params=null){
-        //FIXME refactor to streaming (for huge files) if possible by underlying HTTP client
-        if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
-            return true;
+        try {
+            if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
+                return true;
+            }
+        }
+        catch(editor_Models_Import_FileParser_InvalidXMLException $e) {
+            $e->addExtraData([
+                'languageResource' => $this->languageResource,
+            ]);
+            $this->logger->exception($e);
         }
         $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
             'languageResource' => $this->languageResource,
@@ -190,14 +184,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function update(editor_Models_Segment $segment) {
         $messages = Zend_Registry::get('rest_messages');
         /* @var $messages ZfExtended_Models_Messages */
-        
-        $file = ZfExtended_Factory::get('editor_Models_File');
-        /* @var $file editor_Models_File */
-        $file->load($segment->getFileId());
-        
+
+        $fileName = $this->getFileName($segment);
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
-        if($this->api->update($source, $target, $segment, $file->getFileName())) {
+        if($this->api->update($source, $target, $segment, $fileName)) {
             return;
         }
         
@@ -218,15 +209,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        if(!isset($this->fileNameCache[$segment->getFileId()])){
-            $file = ZfExtended_Factory::get('editor_Models_File');
-            /* @var $file editor_Models_File */
-            $file->load($segment->getFileId());
-            $this->fileNameCache[$segment->getFileId()]=$file->getFileName();
-        }
-        
-        $fileName=$this->fileNameCache[$segment->getFileId()];
-        
+        $fileName = $this->getFileName($segment);
         $queryString = $this->getQueryString($segment);
         
         //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
@@ -244,7 +227,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 return $this->resultList;
             }
             foreach($result->results as $found) {
-                
                 $target = $this->tagHandler->restoreInResult($found->target);
                 $hasTargetErrors = $this->tagHandler->hasRestoreErrors();
                 
@@ -256,11 +238,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                     $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
                 }
 
-                if($this->tagHandler->hasRemovedContentTags()) {
-                    //the invalid tags are removed, reduce the matchrate by 2 percent
-                    $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
-                }
-                
                 $matchrate = $this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$segment, $fileName);
                 $this->resultList->addResult($target, $matchrate, $this->getMetaData($found));
                 $this->resultList->setSource($source);
@@ -268,6 +245,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return $this->getResultListGrouped();
         }
         $this->throwBadGateway();
+    }
+
+    /**
+     * returns the filename to a segment
+     * @param editor_Models_Segment $segment
+     * @return string
+     */
+    protected function getFileName(editor_Models_Segment $segment): string {
+        $file = editor_ModelInstances::file($segment->getFileId());
+        return $file->getFileName();
     }
     
     /**
@@ -458,6 +445,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // - the requested TM is currently not loaded, so there is no info about the existence
         // - So we display the STATUS_NOT_LOADED instead
         if($this->api->getResponse()->getStatus() == 404) {
+            if($status == self::STATUS_ERROR) {
+                $this->lastStatusInfo = 'Es gab einen Fehler beim Import, bitte prüfen Sie das Fehlerlog.';
+                return self::STATUS_ERROR;
+            }
             $this->lastStatusInfo = 'Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.';
             return self::STATUS_NOT_LOADED;
         }
@@ -520,7 +511,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             if($data->name=="documentName" && $data->value==$filename){
                 $isExacExac=true;
             }
-            
+
             //context metch
             if($data->name=="context" && $data->value==$segment->getMid()){
                 $isContext=true;
@@ -570,8 +561,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $connector = ZfExtended_Factory::get(get_class($this));
         /* @var $connector editor_Services_Connector */
         $connector->connectTo($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());
-        //copy the current config (for task specific config)
+        // copy the current config (for task specific config)
         $connector->setConfig($this->getConfig());
+        // copy the worker user guid
+        $connector->setWorkerUserGuid($this->getWorkerUserGuid());
         $connector->isInternalFuzzy = true;
         return $connector;
     }

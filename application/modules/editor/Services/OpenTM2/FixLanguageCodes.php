@@ -93,13 +93,14 @@ class editor_Services_OpenTM2_FixLanguageCodes {
     public function tmxOnUpload(string $tmxData): string {
         //fix datatype from unknown to plaintext
         //if file is utf-16, convert it first to utf-8 and check, if it is utf-16
-        $tmxData_utf16 = iconv('utf-16','utf-8',$tmxData);
+        //TODO improve that and make iconv only if it was detected as utf-16
+        $tmxData_utf16 = @iconv('utf-16','utf-8',$tmxData);
         if(preg_match('#^<\?xml[^>]*encoding="utf-16"[^>]*\?>#i',$tmxData_utf16)){
             $tmxData = $tmxData_utf16;
             $tmxData = preg_replace('#^(<\?xml[^>]*encoding=")utf-16("[^>]*\?>)#i','${1}utf-8${2}', $tmxData, 1);
         }
         unset($tmxData_utf16);
-        $tmxData = preg_replace('#(<header[^>]+)datatype="unknown"([^>]*>)#i', '${1}datatype="plaintext"${2}', $tmxData, 1);        
+        $tmxData = preg_replace('#(<header[^>]+)datatype="unknown"([^>]*>)#i', '${1}datatype="plaintext"${2}', $tmxData, 1);
         $tmxData = preg_replace_callback('#(<header[^>]+)srclang="([^"]*)"([^>]+>)#i', function($matches){
             return $matches[1].'srclang="'.($this->languageMap[$matches[2]] ?? $matches[2]).'"'.$matches[3];
         }, $tmxData);

@@ -85,6 +85,7 @@ class editor_Models_Segment_MaterializedView {
         $this->checkTaskGuid();
         //$start = microtime(true);
         if($this->createMutexed()) {
+            $this->getTask()->logger('editor.task.mv')->info('E1348', 'The tasks materialized view {matView} was created.', ['matView' => $this->viewName]);
             $this->addFields();
             $this->fillWithData();
             return;
@@ -166,7 +167,7 @@ class editor_Models_Segment_MaterializedView {
         };
         
         $addColSql = $sfm->walkFields($walker);
-        $addColSql[] = 'ADD COLUMN `metaCache` longText NOT NULL';
+        $addColSql[] = 'ADD COLUMN `metaCache` longtext NOT NULL';
         
         $sql = 'ALTER TABLE `'.$this->viewName.'` '.join(', ', $addColSql).';';
         $db->query($sql);
@@ -342,8 +343,20 @@ class editor_Models_Segment_MaterializedView {
      * @param string $taskGuid
      */
     public function drop() {
+        $this->getTask()->logger('editor.task.mv')->info('E1349', 'The tasks materialized view {matView} was dropped.', ['matView' => $this->viewName]);
         $db = Zend_Db_Table::getDefaultAdapter();
         $db->query("DROP TABLE IF EXISTS " . $this->viewName);
+    }
+
+    /**
+     * returns the current task
+     * @return editor_Models_Task
+     */
+    protected function getTask(): editor_Models_Task {
+        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        $task->loadByTaskGuid($this->taskGuid);
+        return $task;
     }
     
     /**

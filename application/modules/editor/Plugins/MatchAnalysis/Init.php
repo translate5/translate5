@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
+    protected static $description = 'Provides the match-analysis and pre-translation against language-resources.';
     
     /**
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
@@ -132,7 +133,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         /* @var $batchCache editor_Plugins_MatchAnalysis_Models_BatchResult */
         $batchCache->deleteOlderRecords();
     }
-    
+
     /***
      * Operation action handler. Run analysis and pretranslate if $pretranslate is true.
      *
@@ -143,12 +144,24 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $task = $event->getParam('entity');
         /* @var $task editor_Models_Task */
         $params = $event->getParam('params');
-        
+
+        $config = $task->getConfig();
+
+        // set the defaults from config if not provided as params
+        if(!isset($params['internalFuzzy'])){
+            $params['internalFuzzy'] = $config->runtimeOptions->plugins->MatchAnalysis->internalFuzzyDefault;
+        }
+        if(!isset($params['pretranslateTmAndTerm'])){
+            $params['pretranslateTmAndTerm'] = $config->runtimeOptions->plugins->MatchAnalysis->pretranslateTmAndTermDefault;
+        }
+        if(!isset($params['pretranslateMt'])){
+            $params['pretranslateMt'] = $config->runtimeOptions->plugins->MatchAnalysis->pretranslateMtDefault;
+        }
+
         settype($params['internalFuzzy'], 'boolean');
-        settype($params['pretranslateMatchrate'], 'integer');
         settype($params['pretranslateTmAndTerm'], 'boolean');
         settype($params['pretranslateMt'], 'boolean');
-        settype($params['termtaggerSegment'], 'boolean');
+        settype($params['pretranslateMatchrate'], 'integer');
         settype($params['isTaskImport'], 'boolean');
         
         $params['pretranslate'] = $pretranslate;
@@ -205,6 +218,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             return false;
         }
         
+        $user = new Zend_Session_Namespace('user');
+        $workerParameters['userGuid'] = $user->data->userGuid;
+        $workerParameters['userName'] = $user->data->userName;
+
         //enable bath query via config
         $workerParameters['batchQuery'] = (boolean) $this->config->enableBatchQuery;
         if(!empty($this->batchAssocs) && $workerParameters['batchQuery']){
@@ -214,10 +231,6 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $worker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Worker');
         /* @var $worker editor_Plugins_MatchAnalysis_Worker */
 
-        $user = new Zend_Session_Namespace('user');
-        $workerParameters['userGuid'] = $user->data->userGuid;
-        $workerParameters['userName'] = $user->data->userName;
-        
         // init worker and queue it
         if (!$worker->init($taskGuid, $workerParameters)) {
             $this->addWarn($task,'MatchAnalysis-Error on worker init(). Worker could not be initialized');
@@ -255,6 +268,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             }
             
             $workerParameters['languageResourceId'] = $languageRessource->getId();
+            $workerParameters['userGuid'] = $eventParams['userGuid'];
+            
             if (!$batchWorker->init($task->getTaskGuid(), $workerParameters)) {
                 //we log that fact, queue nothing and rely on the normal match analysis processing
                 $this->addWarn($task,'MatchAnalysis-Error on batchWorker init(). Worker could not be initialized');
@@ -274,7 +289,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     {
         $parent = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $parent ZfExtended_Models_Worker */
-        $result = $parent->loadByState('editor_Models_Import_Worker', ZfExtended_Models_Worker::STATE_PREPARE, $taskGuid);
+        $result = $parent->loadByState(ZfExtended_Models_Worker::STATE_PREPARE, 'editor_Models_Import_Worker', $taskGuid);
         if(count($result) > 0){
             return $result[0]['id'];
         }

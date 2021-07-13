@@ -163,7 +163,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      * @param $groupId
      * @return string
      */
-    protected function insertTransFoundInSegmentClass(string $seg,$mid, $groupId) {
+    protected function insertTransFoundInSegmentClass(string $seg, $mid, $groupId) {
         settype($this->groupCounter[$groupId], 'integer');
         $transFound =& $this->groupCounter[$groupId];
         $presentInTbxTarget = empty($this->notPresentInTbxTarget[$groupId]);

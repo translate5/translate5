@@ -63,7 +63,7 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $filterClass = 'editor_Models_Filter_TaskSpecific';
 
     /**
-     * @var editor_Workflow_Abstract
+     * @var editor_Workflow_Default
      */
     protected $workflow;
 
@@ -320,22 +320,21 @@ class editor_TaskController extends ZfExtended_RestController {
 
     /**
      * returns all (filtered) tasks with added user data
-     * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
-     * set qmSubEnabled for all rows
+     * uses $this->entity->loadAll
      */
     protected function loadAllForProjectOverview() {
         $rows = $this->loadAll();
         $customerData = $this->getCustomersForRendering($rows);
         foreach ($rows as &$row) {
+            unset($row['qmSubsegmentFlags']); // unneccessary in the project overview
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
         }
         return $rows;
     }
     
     /**
-     * returns all (filtered) tasks with added user data
-     * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
-     * set qmSubEnabled for all rows
+     * returns all (filtered) tasks with added user data and quality data
+     * uses $this->entity->loadAll
      */
     protected function loadAllForTaskOverview() {
         $rows = $this->loadAll();
@@ -369,15 +368,13 @@ class editor_TaskController extends ZfExtended_RestController {
         $customerData = $this->getCustomersForRendering($rows);
 
         if($isMailTo){
-            $userData=$this->getUsersForRendering($rows);
+            $userData = $this->getUsersForRendering($rows);
         }
 
         foreach ($rows as &$row) {
             $row['lastErrors'] = $this->getLastErrorMessage($row['taskGuid'], $row['state']);
             $this->initWorkflow($row['workflow']);
-            
-            unset($row['qmSubsegmentFlags']);
-
+    
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
 
             $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
@@ -399,18 +396,29 @@ class editor_TaskController extends ZfExtended_RestController {
             if(empty($this->entity->getTaskGuid())){
                 $this->entity->init($row);
             }
-            //TODO: for now we leave this as it is, if this produces performance problems, find better way for loading this config
-            $taskConfig = $this->entity->getConfig();
-            //adding QM SubSegment Infos to each Task
-            $row['qmSubEnabled'] = false;
-            if($taskConfig->runtimeOptions->editor->enableQmSubSegments && !empty($row['qmSubsegmentFlags'])) {
-                $row['qmSubEnabled'] = true;
-            }
+            // add quality related stuff
+            $this->addQualitiesToResult($row);
+            // add user-segment assocs
             $this->addMissingSegmentrangesToResult($row);
         }
         return $rows;
     }
-    
+    /**
+     * Adds the quality related props to the task model for the task overview (not project overview)
+     * @param array $row
+     */
+    protected function addQualitiesToResult(array &$row){
+        //TODO: for now we leave this as it is, if this produces performance problems, find better way for loading this config
+        $taskConfig = $this->entity->getConfig();
+        $qualityProps = editor_Models_Db_SegmentQuality::getNumQualitiesAndFaultsForTask($row['taskGuid']);
+        // adding number of quality errors, evaluated in the export actions
+        $row['qualityErrorCount'] = $qualityProps->numQualities;
+        // adding if the task has internal tag errors, will prevent xliff exports (Note: this can be emulated for dev, see editor_Models_Quality_AbstractView::EMULATE_PROBLEMS
+        $row['qualityHasFaults'] = (editor_Models_Quality_AbstractView::EMULATE_PROBLEMS) ? true : ($qualityProps->numFaults > 0);
+        // adding QM SubSegment Infos to each Task, evaluated in the export actions
+        $row['qualityHasMqm'] = ($taskConfig->runtimeOptions->autoQA->enableMqmTags && !empty($row['qmSubsegmentFlags']));
+        unset($row['qmSubsegmentFlags']); // unneccessary in the task overview
+    }
     /**
      * Add the number of segments that are not assigned to a user
      * although some other segments ARE assigned to users of this role.
@@ -525,11 +533,16 @@ class editor_TaskController extends ZfExtended_RestController {
             $meta->setMappingType($this->data['mappingType']);
         }
 
-        $this->prepareCustomer();
+        $customer = $this->prepareCustomer();
 
-        //init workflow id for the task
-        $defaultWorkflow = $this->config->runtimeOptions->import->taskWorkflow;
-        $this->entity->setWorkflow($this->workflowManager->getIdToClass($defaultWorkflow));
+        if($customer) {
+            $c = $customer->getConfig();
+        }
+        else {
+            $c = $this->config;
+        }
+        //init workflow id for the task, based on customer or general config as fallback
+        $this->entity->setWorkflow($c->runtimeOptions->workflow->initialWorkflow);
 
         if($this->validate()) {
             $this->initWorkflow();
@@ -541,6 +554,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $upload->initAndValidate();
             $dp = $dpFactory->createFromUpload($upload);
 
+            $projectTasks = [];
             //PROJECT with multiple target languages
             if($this->entity->isProject()) {
                 $entityId=$this->entity->save();
@@ -565,10 +579,14 @@ class editor_TaskController extends ZfExtended_RestController {
                     $task->setTargetLang($target);
                     $task->setTaskName($this->entity->getTaskName().' - '.$languages[$task->getSourceLang()].' / '.$languages[$task->getTargetLang()]);
                     $this->processUploadedFile($task, $dpFactory->createFromTask($this->entity));
-                    $this->addDefaultLanguageResources($task);
+
+                    // add task defaults (user associations and language resources)
+                    $this->setTaskDefaults($task);
                     
                     //update the task usage log for the this project-task
                     $this->insertTaskUsageLog($task);
+
+                    $projectTasks[] = $task->getDataObject();
                 }
                 
                 $this->entity->setState($this->entity::INITIAL_TASKTYPE_PROJECT);
@@ -581,9 +599,9 @@ class editor_TaskController extends ZfExtended_RestController {
                 //$this->entity->save(); => is done by the import call!
                 //handling project tasks is also done in processUploadedFile
                 $this->processUploadedFile($this->entity, $dp);
-                // Language resources that are assigned as default language resource for a client,
-                // are associated automatically with tasks for this client.
-                $this->addDefaultLanguageResources($this->entity);
+
+                // add task defaults (user associations and language resources)
+                $this->setTaskDefaults($this->entity);
 
                 //if the current task type is for instant translate pretransaltion, the usage log requires different handling
                 if($this->entity->isHiddenTask() == false){
@@ -608,6 +626,9 @@ class editor_TaskController extends ZfExtended_RestController {
 
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
+
+            settype($this->view->rows->projectTasks,'array');
+            $this->view->rows->projectTasks = $projectTasks;
         }
         else {
             //we have to prevent attached events, since when we get here the task is not created, which would lead to task not found errors,
@@ -650,9 +671,10 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * Loads the customer by id, or number, or the default customer
      * stores the customerid internally and in this->data
+     * @return editor_Models_Customer the loaded customer if any
      */
-    protected function prepareCustomer() {
-        $customer = ZfExtended_Factory::get('editor_Models_Customer');
+    protected function prepareCustomer(): ?editor_Models_Customer {
+        $result = $customer = ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $customer editor_Models_Customer */
 
         if(empty($this->data['customerId'])) {
@@ -668,50 +690,25 @@ class editor_TaskController extends ZfExtended_RestController {
                 }
                 catch (ZfExtended_Models_Entity_NotFoundException $e) {
                     // do nothing here, then the validation is triggered to feedback the user
+                    $result = null;
                 }
             }
         }
 
         $this->entity->setCustomerId((int) $customer->getId());
         $this->data['customerId'] = (int) $customer->getId();
+        return $result;
     }
 
-    /**
-     * Assign language resources by default that are set as useAsDefault for the task's client
-     * (but only if the language combination matches).
+    /***
+     * Sets task defaults for given task (default languageResources, default userAssocs)
      * @param editor_Models_Task $task
      */
-    protected function addDefaultLanguageResources(editor_Models_Task $task) {
-        $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
-        
-        $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsDefault($this->data['customerId']);
-        
-        if(empty($allUseAsDefaultCustomers)) {
-            return;
-        }
-        
-        $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
-        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
-        /* @var $languages editor_Models_LanguageResources_Languages */
-        $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language ZfExtended_Languages */
-        
-        $sourceLanguages = $language->getFuzzyLanguages($task->getSourceLang(),'id',true);
-        $targetLanguages = $language->getFuzzyLanguages($task->getTargetLang(),'id',true);
-        
-        foreach ($allUseAsDefaultCustomers as $defaultCustomer) {
-            $languageResourceId = $defaultCustomer['languageResourceId'];
-            $sourceLangMatch = $languages->isInCollection($sourceLanguages, 'sourceLang', $languageResourceId);
-            $targetLangMatch = $languages->isInCollection($targetLanguages, 'targetLang', $languageResourceId);
-            if ($sourceLangMatch && $targetLangMatch) {
-                $taskAssoc->init();
-                $taskAssoc->setLanguageResourceId($languageResourceId);
-                $taskAssoc->setTaskGuid($task->getTaskGuid());
-                $taskAssoc->save();
-            }
-        }
+    protected function setTaskDefaults(editor_Models_Task $task){
+        $defaults = $this->_helper->taskDefaults;
+        /* @var $defaults Editor_Controller_Helper_TaskDefaults */
+        $defaults->addDefaultLanguageResources($task,$this->data['customerId']);
+        $defaults->addDefaultUserAssoc($task);
     }
 
     /**
@@ -722,6 +719,49 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->startImportWorkers();
     }
 
+    /***
+     * Operation for pre task-import operations (change task config, task property or queue custom workers)
+     */
+    public function preimportOperation(){
+
+        $projectId = $this->entity->getProjectId();
+        $usageMode = $this->getParam('usageMode',false);
+        $workflow = $this->getParam('workflow',false);
+        $notifyAssociatedUsers = $this->getParam('notifyAssociatedUsers',false);
+        if(!$projectId){
+            return;
+        }
+        $projectLoader = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $projectLoader editor_Models_Task */
+        $projectTaks = $projectLoader->loadProjectTasks($projectId,true);
+
+
+        foreach ($projectTaks as $task) {
+            $saveModel = false;
+            $model = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $model editor_Models_Task */
+            $model->load($task['id']);
+
+            if(!empty($usageMode)){
+                $saveModel = true;
+                $model->setUsageMode($usageMode);
+            }
+
+            if(!empty($workflow)){
+                $saveModel = true;
+                $model->setWorkflow($workflow);
+            }
+
+            if($notifyAssociatedUsers !== false){
+                $saveModel = true;
+                $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
+                /* @var $taskConfig editor_Models_TaskConfig */
+                $taskConfig->updateInsertConfig($model->getTaskGuid(),'runtimeOptions.workflow.notifyAllUsersAboutTask',$notifyAssociatedUsers);
+            }
+
+            $saveModel && $model->save();
+        }
+    }
 
     /**
      * Starts the export of a task into an excel file
@@ -752,7 +792,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 'filename' => $tempFilename,
                 'currentUserGuid' => $this->user->data->userGuid,
             ]);
-            //TODO should be an synchronous process (queue instead run)
+            //TODO should be an asynchronous process (queue instead run)
             // currently running import as direct run / synchronous process.
             // Reason is just the feedback for the user, which the user should get directly in the browser
             $worker->run();
@@ -823,28 +863,34 @@ class editor_TaskController extends ZfExtended_RestController {
             $task = $this->entity;
         }
 
-        $tasks=[];
+        $tasks = [];
         //if it is a project, start the import workers for each task project
         if($task->isProject()) {
             $tasks=$task->loadProjectTasks($task->getProjectId(),true);
-        }else{
-            $tasks[]=$task;
+        } else {
+            $tasks[] = $task;
         }
 
-        $model=ZfExtended_Factory::get('editor_Models_Task');
+        $model = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $model editor_Models_Task */
         foreach ($tasks as $task){
             
             if(is_array($task)){
                 $model->load($task['id']);
-            }else{
-                $model=$task;
+            } else {
+                $model = $task;
             }
             
             //import workers can only be started for tasks
             if($model->isProject()) {
                 continue;
             }
+
+            // we fix all task-specific configs of the task for it's remaining lifetime
+            // this is crucial to ensure, that important configs are changed throughout the lifetime that are usually not designed to be dynamical (AutoQA, Visual, ...)
+            $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
+            /* @var $taskConfig editor_Models_TaskConfig */
+            $taskConfig->fixAfterImport($model->getTaskGuid());
     
             $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
             /* @var $workerModel ZfExtended_Models_Worker */
@@ -1071,7 +1117,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //opening a task must be done before all workflow "do" calls which triggers some events
         $this->openAndLock();
 
-        $this->workflow->doWithTask($oldTask, $this->entity);
+        $this->workflow->hookin()->doWithTask($oldTask, $this->entity);
 
         if($oldTask->getState() != $this->entity->getState()) {
             $this->logInfo('Status change to {status}', ['status' => $this->entity->getState()]);
@@ -1093,7 +1139,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //if the edit100PercentMatch is changed, update the value for all segments in the task
         if(isset($this->data->edit100PercentMatch)){
             $bulkUpdater = ZfExtended_Factory::get('editor_Models_Segment_AutoStates_BulkUpdater');
-            /* @var editor_Models_Segment_Utility $bulkUpdater */
+            /* @var editor_Models_Segment_AutoStates_BulkUpdater $bulkUpdater */
             $bulkUpdater->updateSegmentsEdit100PercentMatch($this->entity, (boolean)$this->data->edit100PercentMatch);
         }
 
@@ -1117,11 +1163,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->view->rows = (object)$row;
 
         if($this->isOpenTaskRequest()){
-            $this->addQmSubToResult();
+            $this->addMqmQualities();
         }
-        else {
-            unset($this->view->rows->qmSubsegmentFlags);
-        }
+        unset($this->view->rows->qmSubsegmentFlags);
 
         // Add pixelMapping-data for the fonts used in the task.
         // We do this here to have it immediately available e.g. when opening segments.
@@ -1413,6 +1457,8 @@ class editor_TaskController extends ZfExtended_RestController {
             }
             $userTaskAssoc->setUserGuid($userGuid);
             $userTaskAssoc->setTaskGuid($this->entity->getTaskGuid());
+            $userTaskAssoc->setWorkflow($this->workflow->getName());
+            $userTaskAssoc->setWorkflowStepName('');
             $userTaskAssoc->setRole('');
             $userTaskAssoc->setState('');
             $isPmOverride = true;
@@ -1438,14 +1484,14 @@ class editor_TaskController extends ZfExtended_RestController {
             $userTaskAssoc->setState($this->data->userState);
         }
 
-        if(!$disableWorkflowEvents) {
-            $this->workflow->triggerBeforeEvents($oldUserTaskAssoc, $userTaskAssoc);
+
+        if($disableWorkflowEvents) {
+            $userTaskAssoc->save();
         }
-
-        $userTaskAssoc->save();
-
-        if(!$disableWorkflowEvents) {
-            $this->workflow->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc);
+        else {
+            $this->workflow->hookin()->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc, function() use ($userTaskAssoc) {
+                $userTaskAssoc->save();
+            });
         }
 
         if($oldUserTaskAssoc->getState() != $this->data->userState){
@@ -1461,17 +1507,15 @@ class editor_TaskController extends ZfExtended_RestController {
      * Adds the Task Specific QM SUb Segment Infos to the request result.
      * Not usable for indexAction, must be called after entity->save and this->view->rows = Data
      */
-    protected function addQmSubToResult() {
-        $qmSubFlags = $this->entity->getQmSubsegmentFlags();
-        $this->view->rows->qmSubEnabled = false;
+    protected function addMqmQualities() {
+        $qualityMqmCategories = $this->entity->getQmSubsegmentFlags();
+        $this->view->rows->qualityHasMqm = false;
         $taskConfig = $this->entity->getConfig();
-        if($taskConfig->runtimeOptions->editor->enableQmSubSegments &&
-                !empty($qmSubFlags)) {
-            $this->view->rows->qmSubFlags = $this->entity->getQmSubsegmentIssuesTranslated(false);
-            $this->view->rows->qmSubSeverities = $this->entity->getQmSubsegmentSeveritiesTranslated(false);
-            $this->view->rows->qmSubEnabled = true;
+        if($taskConfig->runtimeOptions->autoQA->enableMqmTags && !empty($qualityMqmCategories)) {
+            $this->view->rows->qualityMqmCategories = $this->entity->getMqmTypesTranslated(false);
+            $this->view->rows->qualityMqmSeverities = $this->entity->getMqmSeveritiesTranslated(false);
+            $this->view->rows->qualityHasMqm = true;
         }
-        unset($this->view->rows->qmSubsegmentFlags);
     }
 
     /**
@@ -1556,12 +1600,11 @@ class editor_TaskController extends ZfExtended_RestController {
     public function deleteAction() {
         $forced = $this->getParam('force', false) && $this->isAllowed('backend', 'taskForceDelete');
         $this->entityLoad();
-        //if task is erroneous then it is also deleteable, regardless of its locking state
-        if(!$this->entity->isImporting() && !$this->entity->isErroneous() && !$forced){
-            $this->entity->checkStateAllowsActions();
-        }
+
+        $this->checkStateDelete($this->entity,$forced);
+
         //we enable task deletion for importing task
-        $forced=$forced || $this->entity->isImporting();
+        $forced=$forced || $this->entity->isImporting() || $this->entity->isProject();
 
         $this->processClientReferenceVersion();
         $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
@@ -1803,14 +1846,14 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->log->request();
         $this->initWorkflow($this->entity->getWorkflow());
         $this->view->trigger = $this->getParam('trigger');
-        $this->view->success = $this->workflow->doDirectTrigger($this->entity, $this->getParam('trigger'));
+        $this->view->success = $this->workflow->hookin()->doDirectTrigger($this->entity, $this->getParam('trigger'));
         if($this->view->success) {
             return;
         }
         $errors = array('trigger' => 'Trigger is invalid. Valid triggers are listed below.');
         $e = new ZfExtended_ValidateException();
         $e->setErrors($errors);
-        $this->view->validTrigger = $this->workflow->getDirectTrigger();
+        $this->view->validTrigger = $this->workflow->hookin()->getDirectTrigger();
         $this->handleValidateException($e);
     }
     
@@ -1993,13 +2036,14 @@ class editor_TaskController extends ZfExtended_RestController {
         $log->setYearAndMonth(date('Y-m'));
         $log->updateInsertTaskCount();
     }
-    
+
     /***
      * Check if the session allows the task to be opened for editing by the current user.
      * If the user tries to open different task then the one in the session, exception is thrown
      * INFO: the pmOverride is counted as opened editor
-     *       the user is not able to edit task propertie if he already edits different task
+     *       the user is not able to edit task properties if he already edits different task
      * @param string $taskGuid
+     * @throws ZfExtended_UnprocessableEntity
      */
     protected function checkUserSessionAllowsOpen(string $taskGuid) {
         $session = new Zend_Session_Namespace();
@@ -2010,16 +2054,46 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         $assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $assoc editor_Models_TaskUserAssoc */
-        
+
+        $tuas = $assoc->isUserInUse($this->user->data->userGuid);
         //check if for the current user, there are task in use
-        if(empty($assoc->isUserInUse($this->user->data->userGuid))){
+        if(empty($tuas)){
             return;
         }
         ZfExtended_UnprocessableEntity::addCodes([
             'E1341' => 'You tried to open or edit another task, but you have already opened another one in another window. Please press F5 to open the previous one here, or close this message to stay in the Taskoverview.'
         ], 'editor.task');
         throw new ZfExtended_UnprocessableEntity('E1341',[
-            'task' =>$this->entity //TODO: is this realy required ?
+            'task' =>$this->entity, //TODO: is this really required ?,
+            'sessionGuid'=>$sessionGuid,
+            'taskGuid'=>$taskGuid,
+            'tuas' => $tuas,
+            'internalSessionUniqId' => $session->internalSessionUniqId
         ]);
+    }
+
+    /***
+     * Check if the given task/project can be deleted based on the task state. When project task is provided,
+     * all project tasks will be checked
+     */
+    protected function checkStateDelete(editor_Models_Task $taskEntity, bool $forced){
+
+        // if it is not project, do regular check
+        if(!$taskEntity->isProject()){
+
+            //if task is erroneous then it is also deleteable, regardless of its locking state
+            if(!$taskEntity->isImporting() && !$taskEntity->isErroneous() && !$forced){
+                $taskEntity->checkStateAllowsActions();
+            }
+        }else{
+            $model=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $model editor_Models_Task */
+            $tasks=$model->loadProjectTasks($this->entity->getProjectId(),true);
+            // if it is project, load all project tasks, and check the state for each one of them
+            foreach ($tasks as $projectTask){
+                $model->init($projectTask);
+                $this->checkStateDelete($model,$forced);
+            }
+        }
     }
 }

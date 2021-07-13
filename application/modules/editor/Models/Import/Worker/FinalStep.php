@@ -42,7 +42,7 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if(empty($parameters['config']) || !$parameters['config'] instanceof editor_Models_Import_Configuration) {
+        if(empty($parameters['config']) || !$parameters['config'] instanceof editor_Models_Import_Configuration){
             throw new ZfExtended_Exception('missing or wrong parameter config, must be if instance editor_Models_Import_Configuration');
         }
         return true;
@@ -56,7 +56,7 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
-        
+
         $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $workflowManager editor_Workflow_Manager */
         //we have to initialize the workflow so that it can listen to further events (like importCompleted)

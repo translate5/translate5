@@ -113,7 +113,7 @@ class editor_Models_Segment_MatchRateType {
      *
      * @var string
      */
-    const TYPE_INTERNAL_FUZZY_AVAILABLE='internal-fuzzy-available';
+    const TYPE_INTERNAL_FUZZY_AVAILABLE = 'internal-fuzzy-available';
     
     /**
      * Uses as match rate prefix when the value comes from import
@@ -150,6 +150,11 @@ class editor_Models_Segment_MatchRateType {
      * @var array
      */
     const PRETRANSLATION_TYPES = [self::TYPE_TM, self::TYPE_MT];
+    /**
+     * Defines the types to be considered as language resources and can be taken over from the matches panel
+     * @var array
+     */
+    const RESOURCE_TYPES = [self::TYPE_TM, self::TYPE_MT, self::TYPE_TERM_COLLECTION];
     
     /***
      * All match rate types which are requiring an icon
@@ -235,9 +240,88 @@ class editor_Models_Segment_MatchRateType {
         }
         return true;
     }
+    /**
+     * Evaluates if a matchRateType reflects a pretranslation
+     * @param string $type
+     * @return boolean
+     */
+    public static function isTypePretranslated($type) {
+        $type = explode(';', $type);
+        return in_array(self::PREFIX_PRETRANSLATED, $type);
+    }
     
     /**
-     * generates the matchrate type by imported segment data
+     * Evaluates if a matchRateType reflects a user edit
+     * @param string $type
+     * @return boolean
+     */
+    public static function isTypeEdited($type) {
+        $type = explode(';', $type);
+        return in_array(self::PREFIX_EDITED, $type);
+    }
+    /**
+     * retrieves if the matchRateType generally originates from a Machine Translation / MT
+     * @param string $type
+     * @return bool
+     */
+    public static function isTypeMT(string $type): bool {
+        return in_array(self::TYPE_MT, explode(';', $type));
+    }
+    /**
+     * returns true if the given matchRateType was imported or is pretranslated from a Machine Translation / MT
+     * TODO / FIXME: the naming should better differntiate from ::isTypeMT
+     * @param string $type
+     * @return bool
+     */
+    public static function isFromMT(string $type): bool {
+        return strpos($type, self::PREFIX_IMPORT.';'.self::TYPE_MT) === 0 || strpos($type, self::PREFIX_PRETRANSLATED.';'.self::TYPE_MT) === 0;
+    }
+    /**
+     * retrieves if the matchRateType originates from a taken over Machine Translation / MT match
+     * @param string $type
+     * @return bool
+     */
+    public static function isEditedMT(string $type): bool {
+        $types = explode(';', $type);
+        return $types[0] == self::PREFIX_EDITED && in_array(self::TYPE_MT, $types);
+    }
+    /**
+     * retrieves if the matchRateType generally originates from a Translation Memory / TM
+     * @param string $type
+     * @return bool
+     */
+    public static function isTypeTM(string $type): bool {
+        return in_array(self::TYPE_TM, explode(';', $type));
+    }
+    /**
+     * returns true if the given matchtype was imported or is pretranslated from a Translation Memory / TM
+     * TODO / FIXME: the naming should better differntiate from ::isTypeTM
+     * @param string $type
+     * @return bool
+     */
+    public static function isFromTM(string $type): bool {
+        return strpos($type, self::PREFIX_IMPORT.';'.self::TYPE_TM) === 0 || strpos($type, self::PREFIX_PRETRANSLATED.';'.self::TYPE_TM) === 0;
+    }
+    /**
+     * retrieves if the matchRateType originates from a taken over Translation Memory / TM match
+     * @param string $type
+     * @return bool
+     */
+    public static function isEditedTM(string $type): bool {
+        $types = explode(';', $type);
+        return $types[0] == self::PREFIX_EDITED && in_array(self::TYPE_TM, $types);
+    }
+    /**
+     * retrieves if the matchRateType results from a taken over (TM, MT, TermCollection) or pretranslated (TM, MT) Language Resource
+     * @param string $type
+     * @return bool
+     */
+    public static function isTypeLanguageResource(string $type): bool {
+        $types = explode(';', $type);
+        return (count(array_intersect($types, self::RESOURCE_TYPES)) > 0);
+    }
+    /**
+     * generates the matchRateType type by imported segment data
      * @param editor_Models_Import_FileParser_SegmentAttributes $importedValue the plain value from
      * @param mixed $mid segment mid for logging purposes only
      * @return editor_Models_Segment_MatchRateType
@@ -246,6 +330,17 @@ class editor_Models_Segment_MatchRateType {
         $importedValue = $attributes->matchRateType;
         
         $this->data = [self::PREFIX_IMPORT];
+        
+        $previousOrigin = null;
+        if(array_key_exists(self::DATA_PREVIOUS_ORIGIN, $attributes->customMetaAttributes)){
+            $previousOrigin = strtoupper($attributes->customMetaAttributes[self::DATA_PREVIOUS_ORIGIN]);
+            unset($attributes->customMetaAttributes[self::DATA_PREVIOUS_ORIGIN]);
+        }
+        $previousName = null;
+        if(array_key_exists(self::DATA_PREVIOUS_NAME, $attributes->customMetaAttributes)){
+            $previousName = $attributes->customMetaAttributes[self::DATA_PREVIOUS_NAME];
+            unset($attributes->customMetaAttributes[self::DATA_PREVIOUS_NAME]);
+        }
         
         if($importedValue == self::TYPE_MISSING_SOURCE_MRK || $importedValue == self::TYPE_MISSING_TARGET_MRK) {
             $this->data[] = $importedValue;
@@ -270,14 +365,13 @@ class editor_Models_Segment_MatchRateType {
             $this->errors->add('E1193', ['mid' => $mid, 'matchRateType' => $value]);
             $this->data[] = self::TYPE_UNKNOWN;
         }
+        
         $this->data[] = $value;
-        if(array_key_exists(self::DATA_PREVIOUS_ORIGIN, $attributes->customMetaAttributes)){
-            $this->data[] = strtoupper($attributes->customMetaAttributes[self::DATA_PREVIOUS_ORIGIN]);
-            unset($attributes->customMetaAttributes[self::DATA_PREVIOUS_ORIGIN]);
+        if(!is_null($previousOrigin)) {
+            $this->data[] = $previousOrigin;
         }
-        if(array_key_exists(self::DATA_PREVIOUS_NAME, $attributes->customMetaAttributes)){
-            $this->data[] = $attributes->customMetaAttributes[self::DATA_PREVIOUS_NAME];
-            unset($attributes->customMetaAttributes[self::DATA_PREVIOUS_NAME]);
+        if(!is_null($previousName)) {
+            $this->data[] = $previousName;
         }
         return $this;
     }
@@ -419,16 +513,6 @@ class editor_Models_Segment_MatchRateType {
     public function isImported() {
         return isset($this->data[0]) && $this->data[0] == self::PREFIX_IMPORT;
     }
-    
-    /**
-     * returns true if the given matchtype was imported from a TM
-     * @param string $type
-     * @return bool
-     */
-    public static function isFromTM(string $type): bool {
-        return strpos($type, self::PREFIX_IMPORT.';'.self::TYPE_TM) === 0 || strpos($type, self::PREFIX_PRETRANSLATED.';'.self::TYPE_TM) === 0;
-    }
-    
     /**
      * returns true if the given type (as string parameter) is a pretranslation type (currently TM and MT)
      * @param string $type
@@ -437,7 +521,6 @@ class editor_Models_Segment_MatchRateType {
     public function isPretranslationType(string $type): bool {
         return in_array($type, self::PRETRANSLATION_TYPES);
     }
-    
     /**
      * returns the string representation of this match rate type
      */

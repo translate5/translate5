@@ -12,6 +12,230 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+## [5.2.4] - 2021-07-06
+
+### Important Notes:
+#### [TRANSLATE-2560](https://jira.translate5.net/browse/TRANSLATE-2560)
+These changes must not be applied with running imports!
+
+#### [TRANSLATE-2545](https://jira.translate5.net/browse/TRANSLATE-2545)
+The usage of at least PHP >= 7.4 is mandatory now! (PHP 8 is not yet supported).
+The field role on associating a user to a task is deprecated. Use the field workflowStepName instead. The change is downwards compatible and creates a warning on further usage of the role field. See https://confluence.translate5.net/display/TAD/Task+User+Associations
+
+#### [TRANSLATE-2081](https://jira.translate5.net/browse/TRANSLATE-2081)
+The form field group "Auto-Assignment" based on languages in the user management is removed completely.
+If you now want to pre-define, if a user should be assigned to a task automatically, please use the new very extended mechanisms in the client management panel.
+Existing pre-definitions are NOT migrated.
+The OpenID-Connect configuration is moved into a separate tab.
+ 
+
+
+### Added
+**[TRANSLATE-2081](https://jira.translate5.net/browse/TRANSLATE-2081): Preset of user to task assignments** <br>
+Provides the functionality to configure auto-assignment of users to tasks on client configuration level, filtered by language, setting the to be used user and workflow step.
+
+
+### Changed
+**[TRANSLATE-2545](https://jira.translate5.net/browse/TRANSLATE-2545): Flexibilize workflow by putting role and step definitions in database** <br>
+The definition of all available workflow steps and roles is now stored in the database instead in a fixed workflow class. A new complex workflow is added for demonstration purposes and usage if wanted.
+
+**[TRANSLATE-2516](https://jira.translate5.net/browse/TRANSLATE-2516): Add user column to Excel language resource usage log** <br>
+The spreadsheet with the usage log of language resources is extended with a user column, that shows, who actually did the request.
+
+
+### Bugfixes
+**[TRANSLATE-2563](https://jira.translate5.net/browse/TRANSLATE-2563): Adjust texts that connect analysis and locking of 100%-Matches** <br>
+Adjust texts that connect analysis and locking of 100%-Matches.
+
+**[TRANSLATE-2560](https://jira.translate5.net/browse/TRANSLATE-2560): Combination of term-tagging and enabled source editing duplicates tags on saving a segment, AutoQA removes/merges TrackChanges from different Users** <br>
+FIXED BUG in the TermTagger leading to duplication of internal tags when source editing was activated
+FIXED BUG in the AutoQA leading to TrackChanges tags from different users being merged
+
+**[TRANSLATE-2557](https://jira.translate5.net/browse/TRANSLATE-2557): Select correct okapi file filter for txt-files by default** <br>
+By default the file format conversion used for txt-files the okapi-filter "moses-text". In this filter xml-special characters like & < > where kept in encoded version when the file was reconverted back to txt after export from translate5. This was wrong. Now the default was changed to the okapi plain-text filter, what handles the xml-special chars correctly.
+
+**[TRANSLATE-2547](https://jira.translate5.net/browse/TRANSLATE-2547): Clean-up project tasks** <br>
+Deleting a project deletes all files from database but not from disk. This is fixed.
+
+**[TRANSLATE-2536](https://jira.translate5.net/browse/TRANSLATE-2536): Task Configuration Panel does show old Values after Import** <br>
+FIX: Task Qualities & Task Configuration panels now update their view automatically after import to avoid outdated date is being shown
+
+**[TRANSLATE-2533](https://jira.translate5.net/browse/TRANSLATE-2533): Line breaks in InstantTranslate are deleted** <br>
+InstantTranslate dealing of line breaks is fixed.
+
+
+## [5.2.3] - 2021-06-24
+
+### Important Notes:
+This release contains important Hotfixes for the releases 5.2.0 / 5.2.1 / 5.2.2!
+
+### Bugfixes
+**[TRANSLATE-2556](https://jira.translate5.net/browse/TRANSLATE-2556): PHP Error Specified column previousOrigin is not in the row** <br>
+This error was triggered in certain circumstances by the import of SDLXLIFF files containing empty origin information.
+
+**[TRANSLATE-2555](https://jira.translate5.net/browse/TRANSLATE-2555): XML errors in uploaded TMX files are not shown properly in the TM event log** <br>
+The XML error was logged in the system log, but was not added to the specific log of the TM. This is changed now so that the PM can see what is wrong.
+
+**[TRANSLATE-2554](https://jira.translate5.net/browse/TRANSLATE-2554): BUG TermTagger Worker: Workers are scheduled exponentially** <br>
+FIXED: Bug in TermTagger Worker leads to scheduling workers exponentially what causes database deadlocks
+
+**[TRANSLATE-2552](https://jira.translate5.net/browse/TRANSLATE-2552): Typos in translate5** <br>
+Fixes couple of typos in translate5 locales
+
+
+## [5.2.2] - 2021-06-09
+
+### Important Notes:
+ 
+**This release contains important Hotfixes for [TRANSLATE-2196](https://jira.translate5.net/browse/TRANSLATE-2196): Complete Auto QA for translate5 released in version 5.2.0.**
+
+
+### Bugfixes
+**[TRANSLATE-2500](https://jira.translate5.net/browse/TRANSLATE-2500): Worker Architecture: Solving Problems with Deadlocks and related Locking/Mutex Quirks** <br>
+Improved the internal worker handling regarding DB dead locks and a small opportunity that workers run twice.
+
+
+## [5.2.1] - 2021-06-08
+
+### Important Notes:
+In addition to the below listed fixes, several minor fixes for the new features of major release 5.2.0 were implemented.
+
+
+### Changed
+**[TRANSLATE-2501](https://jira.translate5.net/browse/TRANSLATE-2501): Create table that contains all attribute types of a termCollection** <br>
+All available data type attributes for term collection are saved in database.
+
+
+### Bugfixes
+**[TRANSLATE-2532](https://jira.translate5.net/browse/TRANSLATE-2532): ERROR in core: E9999 - Call to a member function getMessage() on null** <br>
+Fix a seldom PHP error, only happening when translate5 instance is tried to be crawled.
+
+**[TRANSLATE-2531](https://jira.translate5.net/browse/TRANSLATE-2531): Microsoft Translator language resource connector is not properly implemented** <br>
+The Microsoft Translator language resource connector is not properly implemented regarding error handling and if a location restriction is used in the azure API configuration.
+
+**[TRANSLATE-2529](https://jira.translate5.net/browse/TRANSLATE-2529): Brute-Force attacks may produce: ERROR in core: E9999 - $request->getParam('locale') war keine gültige locale** <br>
+Providing invalid locales as parameter on application loading has produced an error. Now the invalid locale is ignored and the default one is loaded.
+
+**[TRANSLATE-2526](https://jira.translate5.net/browse/TRANSLATE-2526): Run analysis on task import wizard** <br>
+Fixes problem with analysis and pre-translation not triggered for default associated resources on task import (without opening the language resources wizard)
+
+
+## [5.2.0] - 2021-05-31
+
+### Important Notes:
+#### [TRANSLATE-2417](https://jira.translate5.net/browse/TRANSLATE-2417)
+The default enabled for configuration of language resources is now split up into read default rights and write default rights, so that reading and writing is configurable separately. The write default right is not automatically set for existing language resources.
+The old API field "resourcesCustomersHidden" in language-resources to customers association will no longer be supported. It was marked as deprecated since April 2020. Please use only customerUseAsDefaultIds from now on.
+
+#### [TRANSLATE-2410](https://jira.translate5.net/browse/TRANSLATE-2410)
+This was no bug in translate5 - everything correct here - but a problem with Firefox on Windows for Korean and Vietnamese, preventing the users to enter Asiatic characters. Translate5 users with Korean or Vietnamese target language will get a warning message now, that they should switch to Chrome or Edge.
+
+#### [TRANSLATE-2315](https://jira.translate5.net/browse/TRANSLATE-2315)
+Added a filter in the segments grid to filter for repeated segments. For the already imported tasks some data must be recalculated, so the database migration could need some time. The corresponding database migration script can be restarted if it should stop unexpected.
+
+#### [TRANSLATE-2196](https://jira.translate5.net/browse/TRANSLATE-2196)
+Introducing a new Quality Assurance, for details see below change log entry.
+The REST API Endpoint for the download of quality statistics (MQM subsegment tags) was renamed from "editor/qmstatistics" to "editor/quality/downloadstatistics"
+
+#### [TRANSLATE-1643](https://jira.translate5.net/browse/TRANSLATE-1643)
+Introduced new processing state (AutoStatus) "pretranslated".
+This state is used for segments pre-translated in translate5, but also for imported segments which provide such information. For example SDLXLIFF: 
+if edit100%percentMatch is disabled, used full TM matches not edited in Trados manually are not editable. So edited 100% matches are editable in translate5 by the reviewer now. Not changed has the behaviour for auto-propagated segments and segments with a match-rate < 100%: they are still editable as usual.
+
+#### [TRANSLATE-1481](https://jira.translate5.net/browse/TRANSLATE-1481)
+The TMX files imported into OpenTM2 are modified. The internal tags are modified (removing type attribute and convert tags with content to single placeholder tags) to improve matching when finding segments.
+ 
+
+
+### Added
+**[TRANSLATE-2417](https://jira.translate5.net/browse/TRANSLATE-2417): OpenTM: writeable by default** <br>
+The default enabled for configuration of language resources is now split up into read default rights and write default rights, so that reading and writing is configurable separately. The write default right is not automatically set for existing language resources.
+The old API field "resourcesCustomersHidden" in language-resources to customers association will no longer be supported. It was marked as deprecated since April 2020. Please use only customerUseAsDefaultIds from now on.
+
+**[TRANSLATE-2315](https://jira.translate5.net/browse/TRANSLATE-2315): Filtering for Repeated segments in translate5s editor** <br>
+Added a filter in the segments grid to filter for repeated segments.
+
+**[TRANSLATE-2196](https://jira.translate5.net/browse/TRANSLATE-2196): Complete Auto QA for translate5** <br>
+Introduces a new Quality Assurance:
+
+* Panel to filter the Segment Grid by quality
+* GUI to set evaluated quality errors as "false positives"
+* Improved panels to set the manual QA for the whole segment and within the segment (now independant from saving edited segment content)
+* Automatic evaluation of several quality problems (AutoQA)
+
+For an overview how to use the new feature, please see https://confluence.translate5.net/pages/viewpage.action?pageId=557218
+
+For an overview of the new REST API, please see https://confluence.translate5.net/pages/viewpage.action?pageId=256737288
+
+**[TRANSLATE-2077](https://jira.translate5.net/browse/TRANSLATE-2077): Offer export of Trados-Style analysis xml** <br>
+The match analysis report can be exported now in a widely usable XML format.
+
+
+### Changed
+**[TRANSLATE-2494](https://jira.translate5.net/browse/TRANSLATE-2494): Plugins enabled by default** <br>
+Enables ModelFront, IpAuthentication and PangeaMt plugins to be active by default.
+
+**[TRANSLATE-2481](https://jira.translate5.net/browse/TRANSLATE-2481): Enable default deadline in configuration to be also decimal values (number of days in the future)** <br>
+Default deadline date configuration accepts decimal number as configuration. You will be able to define 1 and a half day for the deadline when setting the config to 1.5
+
+**[TRANSLATE-2473](https://jira.translate5.net/browse/TRANSLATE-2473): Show language names in language drop downs in InstantTranslate** <br>
+The languages drop-down in instant translate will now show the full language name + language code
+
+
+### Bugfixes
+**[TRANSLATE-2527](https://jira.translate5.net/browse/TRANSLATE-2527): Remove instant-Translate default rest api routes** <br>
+The default rest-routes in instant translate are removed.
+
+**[TRANSLATE-2517](https://jira.translate5.net/browse/TRANSLATE-2517): NULL as string in Zf_configuration defaults instead real NULL values** <br>
+Some default values in the configuration are not as expected.
+
+**[TRANSLATE-2515](https://jira.translate5.net/browse/TRANSLATE-2515): Remove the limit from customers drop-down** <br>
+Fixes the customer limit in language resources customers combobox.
+
+**[TRANSLATE-2511](https://jira.translate5.net/browse/TRANSLATE-2511): PHP error on deleting tasks** <br>
+Fixed seldom problem on deleting tasks:
+ERROR in core: E9999 - Argument 1 passed to editor_Models_Task_Remover::cleanupProject() must be of the type int, null given
+
+**[TRANSLATE-2509](https://jira.translate5.net/browse/TRANSLATE-2509): Bugfix: target "_blank" in Links in the visual review causes unwanted popups with deactivated links** <br>
+External Links opening a new window still cause unwanted popups in the Visual Review
+
+**[TRANSLATE-2499](https://jira.translate5.net/browse/TRANSLATE-2499): Search window saved position can be moved outside of the viewport** <br>
+Search window saved position can be moved outside of the viewport and the user is then not able to move it back. This is fixed now for the search window, for other windows the bad position is not saved, so after reopening the window it is accessible again.
+Also fixed logged configuration changes, always showing old value the system value instead the overwritten level value.
+
+**[TRANSLATE-2496](https://jira.translate5.net/browse/TRANSLATE-2496): Enable target segmentation in Okapi** <br>
+So far target segmentation had not been activated in okapi segmentation settings. For PO files with partly existing target this let to <mrk>-segment tags in the source, but not in the target and thus to an import error in translate5. This is changed now.
+
+
+**[TRANSLATE-2484](https://jira.translate5.net/browse/TRANSLATE-2484): Buffered grid "ensure visible" override** <br>
+Fixes problems with the segment grid.
+
+**[TRANSLATE-2482](https://jira.translate5.net/browse/TRANSLATE-2482): Serialization failure: 1213 Deadlock found when trying to get lock** <br>
+Fixes update worker progress mysql deadlock.
+
+**[TRANSLATE-2480](https://jira.translate5.net/browse/TRANSLATE-2480): Instant-translate expired user session** <br>
+On expired session, the user will be redirected to the login page in instant translate or term portal.
+
+**[TRANSLATE-2478](https://jira.translate5.net/browse/TRANSLATE-2478): Add missing languages** <br>
+Adds additional languages: 
+sr-latn-rs, so-so, am-et, es-419, rm-ch, es-us, az-latn-az, uz-latn-uz, bs-latn-ba
+
+**[TRANSLATE-2455](https://jira.translate5.net/browse/TRANSLATE-2455): Empty Segment Grid after opening a task** <br>
+Fixing a seldom issue where the segment grid remains empty after opening a task.
+
+**[TRANSLATE-2439](https://jira.translate5.net/browse/TRANSLATE-2439): prevent configuration mismatch on level task-import** <br>
+Task import specific configurations are now fixed after the task import and can neither be changed for the rest of the task's lifetime nor can they be overwritten otherwise
+
+**[TRANSLATE-2410](https://jira.translate5.net/browse/TRANSLATE-2410): Add Warning for users editing Korean, Vietnamese or Japanese tasks when working with Firefox** <br>
+This was no bug in translate5 - everything correct here - but a problem with Firefox on Windows for Korean and Vietnamese, preventing the users to enter Asiatic characters. Translate5 users with Korean or Vietnamese target language will get a warning message now, that they should switch to Chrome or Edge.
+
+**[TRANSLATE-1643](https://jira.translate5.net/browse/TRANSLATE-1643): A separate autostatus pretranslated is missing for pretranslation** <br>
+Introduced new processing state (AutoStatus) "pretranslated".
+This state is used for segments pre-translated in translate5, but also for imported segments which provide such information. For example SDLXLIFF: 
+if edit100%percentMatch is disabled, used full TM matches not edited in Trados manually are not editable. So edited 100% matches are editable in translate5 by the reviewer now. Not changed has the behaviour for auto-propagated segments and segments with a match-rate < 100%: they are still editable as usual.
+
+**[TRANSLATE-1481](https://jira.translate5.net/browse/TRANSLATE-1481): Improve tag handling with matches coming from OpenTM2** <br>
+The TMX files imported into OpenTM2 are modified. The internal tags are modified (removing type attribute and convert tags with content to single placeholder tags) to improve matching when finding segments.
 
 
 ## [5.1.3] - 2021-04-15

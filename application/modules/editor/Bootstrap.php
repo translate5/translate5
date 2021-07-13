@@ -69,11 +69,17 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             /* @var $tua editor_Models_TaskUserAssoc */
             $tua->cleanupLocked();
+
+            $config = ZfExtended_Factory::get('editor_Models_UserConfig');
+            /* @var $config editor_Models_UserConfig */
+            $config->cleanUpThemeTemporary();
+
         };
         
         $eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', $cleanUp);
         $eventManager->attach('LoginController', 'afterLogoutAction', $cleanUp);
         $eventManager->attach('editor_SessionController', 'afterDeleteAction', $cleanUp);
+        $eventManager->attach('ZfExtended_Session', 'afterSessionCleanForUser', $cleanUp);
         $eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
     }
     
@@ -105,10 +111,10 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     {
         
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
-            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'qmstatistics', 'comment',
+            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                                 'config', 'segmentuserassoc', 'session', 'language','termcollection','languageresourceresource','languageresourcetaskassoc',
-                                'languageresourceinstance','taskusertracking', 'term', 'termattribute', 'category'
+                                'languageresourceinstance','taskusertracking', 'term', 'termattribute', 'category', 'quality','userassocdefault'
             ],
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -212,7 +218,17 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'task',
                 'action' => 'position'
         )));
-        
+
+        $this->front->getRouter()->addRoute('editorTaskUserAssocProject', new ZfExtended_Controller_RestLikeRoute(
+            'editor/taskuserassoc/project',
+            array(
+                'module' => 'editor',
+                'controller' => 'taskuserassoc',
+                'action' => 'project'
+        )));
+
+
+
         //FIXME convert me to RestLikeRoute (see filemap)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/nextsegments/*',
@@ -250,6 +266,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                         'action' => 'replaceall'
                 ));
         $this->front->getRouter()->addRoute('editorReplaceallSegment', $replaceAllRoute);
+        
+        $replaceAllRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/segment/stateid/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'segment',
+                'action' => 'stateid'
+            ));
+        $this->front->getRouter()->addRoute('editorSegmentStateId', $replaceAllRoute);
 
         $authUserRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/user/authenticated/*',
@@ -474,7 +499,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'exportresource'
             ));
         $this->front->getRouter()->addRoute('customer_resourceexport', $customerResourceExport);
-        
+
         $sessionImpersonate = new ZfExtended_Controller_RestLikeRoute(
             'editor/session/impersonate',
             array(
@@ -483,6 +508,62 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'impersonate'
             ));
         $this->front->getRouter()->addRoute('editorSessionImpersonate', $sessionImpersonate);
+        
+        // quality subroutes
+        $this->front->getRouter()->addRoute(
+            'editorQualityDownloadStatistics',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/downloadstatistics/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'downloadstatistics'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorSegmentQuality',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/segment/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'segment'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorTaskQuality',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/task/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'task'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorTaskQualityTooltip',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/tasktooltip/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'tasktooltip'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorQualityFalsepositive',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/falsepositive/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'falsepositive'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorQualitySegmentQm',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/segmentqm/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'segmentqm'
+                )));
     }
     
     
