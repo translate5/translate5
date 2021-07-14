@@ -475,7 +475,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $newEntry->setDescrip($this->setAttributeTypes($termEntry->descrip));
         }
 
-        if (isset($transacGrp)) {
+        if (isset($termEntry->transacGrp)) {
             foreach ($termEntry->transacGrp as $transacGrp) {
                 $newEntry->setTransacGrp($this->setTransacAttributes($transacGrp, false, 'termEntry'));
             }
@@ -517,8 +517,10 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $newLangSet->setDescrip((string)$descripGrp->descrip);
             $newLangSet->setDescripTarget((string)$descripGrp->descrip->attributes()->{'target'});
             $newLangSet->setDescripType((string)$descripGrp->descrip->attributes()->{'type'});
-            if (isset($languageGroup->descripGrp->transacGrp)) {
-                $newLangSet->setDescripGrp($this->setTransacAttributes($languageGroup->descripGrp->transacGrp, true, 'langSet'));
+            if (isset($descripGrp->transacGrp)) {
+                foreach ($descripGrp->transacGrp as $transac) {
+                    $newLangSet->setDescripGrp($this->setTransacAttributes($transac, true, 'langSet'));
+                }
             }
         }
 
@@ -595,7 +597,9 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $newTerm->setRef($this->setAttributeTypes($tig->ref));
         }
         if (isset($tig->transacGrp)) {
-            $newTerm->setTransacGrp($this->setTransacAttributes($tig->transacGrp, false, 'tig'));
+            foreach ($tig->transacGrp as $transac){
+                $newTerm->setTransacGrp($this->setTransacAttributes($transac, false, 'tig'));
+            }
         }
         $this->terms[] = $newTerm;
 
@@ -665,44 +669,44 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     }
 
     /**
-     * @param SimpleXMLElement $transacGrps
+     * @param SimpleXMLElement $transacGrp
      * @param bool $ifDescripGrp
      * @param string $elementName
      * @return array
      */
-    private function setTransacAttributes(SimpleXMLElement $transacGrps, bool $ifDescripGrp, string $elementName): array
+    private function setTransacAttributes(SimpleXMLElement $transacGrp, bool $ifDescripGrp, string $elementName): array
     {
         $parsedTransacGrp = [];
-        foreach ($transacGrps as $key => $transacGrp) {
-            /** @var editor_Models_Terminology_TbxObjects_TransacGrp $transacGrpObject */
-            $transacGrpObject = new $this->transacGrpObject;
-            $transacGrpObject->setCollectionId($this->collectionId);
-            $transacGrpObject->setTermEntryId($this->termEntryDbId);
-            $transacGrpObject->setTermId($this->termId);
-            $transacGrpObject->setTermGuid($this->termGuid);
-            $transacGrpObject->setTermEntryGuid($this->termEntryGuid);
-            $transacGrpObject->setLangSetGuid($this->langSetGuid);
-            $transacGrpObject->setDescripGrpGuid($this->descripGrpGuid);
-            $transacGrpObject->setGuid($this->getGuid());
-            $transacGrpObject->setElementName($elementName);
-            $transacGrpObject->setLanguage($this->language['language']);
-            $transacGrpObject->setAttrLang($this->getActualLanguageAttribute($transacGrp));
+        /** @var editor_Models_Terminology_TbxObjects_TransacGrp $transacGrpObject */
+        $transacGrpObject = new $this->transacGrpObject;
+        $transacGrpObject->setCollectionId($this->collectionId);
+        $transacGrpObject->setTermEntryId($this->termEntryDbId);
+        $transacGrpObject->setTermId($this->termId);
+        $transacGrpObject->setTermGuid($this->termGuid);
+        $transacGrpObject->setTermEntryGuid($this->termEntryGuid);
+        $transacGrpObject->setLangSetGuid($this->langSetGuid);
+        $transacGrpObject->setDescripGrpGuid($this->descripGrpGuid);
+        $transacGrpObject->setGuid($this->getGuid());
+        $transacGrpObject->setElementName($elementName);
 
-            if (isset($transacGrp->transac)) {
-                $transacGrpObject->setTransac((string)$transacGrp->transac);
-            }
-            if (isset($transacGrp->date)) {
-                $transacGrpObject->setDate((string)$transacGrp->date);
-            }
-            if (isset($transacGrp->transacNote)) {
-                $transacGrpObject->setTransacType((string)$transacGrp->transacNote->attributes()->{'type'});
-                $transacGrpObject->setTransacNote((string)$transacGrp->transacNote);
-            }
+        // for term entry transac group there is no language
+        $transacGrpObject->setLanguage($this->language['language']);
+        $transacGrpObject->setAttrLang($this->getActualLanguageAttribute($transacGrp));
 
-            $transacGrpObject->setIfDescripGrp((int)$ifDescripGrp);
-            $parsedTransacGrp[] = $transacGrpObject;
-            $this->transacGrps[] = $transacGrpObject;
+        if (isset($transacGrp->transac)) {
+            $transacGrpObject->setTransac((string)$transacGrp->transac);
         }
+        if (isset($transacGrp->date)) {
+            $transacGrpObject->setDate((string)$transacGrp->date);
+        }
+        if (isset($transacGrp->transacNote)) {
+            $transacGrpObject->setTransacType((string)$transacGrp->transacNote->attributes()->{'type'});
+            $transacGrpObject->setTransacNote((string)$transacGrp->transacNote);
+        }
+
+        $transacGrpObject->setIfDescripGrp((int)$ifDescripGrp);
+        $parsedTransacGrp[] = $transacGrpObject;
+        $this->transacGrps[] = $transacGrpObject;
 
         return $parsedTransacGrp;
     }

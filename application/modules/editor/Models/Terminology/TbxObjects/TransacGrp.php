@@ -59,7 +59,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
     protected ?string $descripGrpGuid = null;
     protected ?string $guid = null;
     protected string $elementName = '';
-    protected string $language = '';
+    protected ?string $language = null;
     protected string $attrLang = '';
     protected string $transac = '';
     protected string $date = '';
@@ -240,7 +240,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
     /**
      * @return string
      */
-    public function getLanguage(): string
+    public function getLanguage(): ?string
     {
         return $this->language;
     }
@@ -249,7 +249,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
      * @param string $language
      * @return editor_Models_Terminology_TbxObjects_TransacGrp
      */
-    public function setLanguage(string $language): self
+    public function setLanguage(?string $language): self
     {
         $this->language = $language;
         return $this;
