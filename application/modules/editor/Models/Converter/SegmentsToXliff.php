@@ -404,7 +404,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
             $text = $this->handleTerminology($text, true);
             return $this->exportParser->exportSingleSegmentContent($text);
         }
-        
+
         // if plain internal tags are disabled:
         // 1. toXliff converts the internal tags to xliff g,bx,ex and x tags
         // 2. remove MQM tags

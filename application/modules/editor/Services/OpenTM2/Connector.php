@@ -26,12 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
  * OpenTM2 Connector
  */
@@ -41,13 +35,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @var editor_Services_OpenTM2_HttpApi
      */
     protected $api;
-    
-    /***
-     * Filename by file id cache
-     * @var array
-     */
-    public $fileNameCache=array();
-    
     
     /**
      * Using Xliff based tag handler here
@@ -197,14 +184,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function update(editor_Models_Segment $segment) {
         $messages = Zend_Registry::get('rest_messages');
         /* @var $messages ZfExtended_Models_Messages */
-        
-        $file = ZfExtended_Factory::get('editor_Models_File');
-        /* @var $file editor_Models_File */
-        $file->load($segment->getFileId());
-        
+
+        $fileName = $this->getFileName($segment);
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
-        if($this->api->update($source, $target, $segment, $file->getFileName())) {
+        if($this->api->update($source, $target, $segment, $fileName)) {
             return;
         }
         
@@ -225,15 +209,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        if(!isset($this->fileNameCache[$segment->getFileId()])){
-            $file = ZfExtended_Factory::get('editor_Models_File');
-            /* @var $file editor_Models_File */
-            $file->load($segment->getFileId());
-            $this->fileNameCache[$segment->getFileId()]=$file->getFileName();
-        }
-        
-        $fileName=$this->fileNameCache[$segment->getFileId()];
-        
+        $fileName = $this->getFileName($segment);
         $queryString = $this->getQueryString($segment);
         
         //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
@@ -269,6 +245,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return $this->getResultListGrouped();
         }
         $this->throwBadGateway();
+    }
+
+    /**
+     * returns the filename to a segment
+     * @param editor_Models_Segment $segment
+     * @return string
+     */
+    protected function getFileName(editor_Models_Segment $segment): string {
+        $file = editor_ModelInstances::file($segment->getFileId());
+        return $file->getFileName();
     }
     
     /**
@@ -525,7 +511,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             if($data->name=="documentName" && $data->value==$filename){
                 $isExacExac=true;
             }
-            
+
             //context metch
             if($data->name=="context" && $data->value==$segment->getMid()){
                 $isContext=true;

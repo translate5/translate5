@@ -311,7 +311,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             'untaggableSegments' => $segmentsToLog,
         ]);
     }
-    
+
     /*************************** SINGLE SEGMENT PROCESSING ***************************/
     
     protected function processSegmentTags(editor_Segment_Tags $tags, string $slot) : bool {

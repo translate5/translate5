@@ -297,7 +297,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $customerAssocs = $customerAssoc->loadByLanguageResourceId($this->entity->getId());
         // all assoc customers with customerId as key and useAsDefault flag as value
         $useAsDefault = array_column($customerAssocs,'useAsDefault','customerId');
-        
+
         $this->view->rows->customerIds = array_keys($useAsDefault);
         // filter out all useAsDefault with value 0
         $this->view->rows->customerUseAsDefaultIds = array_keys(array_filter($useAsDefault));

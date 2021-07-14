@@ -531,7 +531,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $tmpTranslatorArray=[];
         $this->itsPerson=null;
         $this->itsPersonGuid=null;
-        
+
         $isTranslatorSet=isset($assocUsers[editor_Workflow_Default::ROLE_TRANSLATOR]);
         
         //if only one translator
@@ -579,7 +579,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             if($this->workflow->isStepOfRole($this->workflowStep, [editor_Workflow_Default::ROLE_TRANSLATOR, $this->workflowStep===editor_Workflow_Default::ROLE_TRANSLATORCHECK])){
                 $this->itsPersonGuid = $this->task->getPmGuid();
             }
-            
+
             if($this->workflow->isStepOfRole($segment['workflowStep'], [editor_Workflow_Default::ROLE_REVIEWER])){
                 $this->revPersonGuid = $this->task->getPmGuid();
             }
@@ -827,7 +827,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             $this->result[] = sprintf($qmXml, $qmName);
         }
         $this->result[]='</its:locQualityIssues>';
-        
+
         return $qmData;
     }
 

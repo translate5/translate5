@@ -83,7 +83,7 @@ class editor_Models_Segment_TagProtection {
         catch (Exception $e) {
             return $this->parseSegmentProtectInvalidHtml5($textNode);
         }
-        
+
         // mark single- or paired-tags
         foreach ($tempXml->find('segment *') as $element) {
             $tagType = 'singleTag';
@@ -91,13 +91,14 @@ class editor_Models_Segment_TagProtection {
                 //if it is already a protectedTag, we just do nothing with it
                 continue;
             }
-            if (!empty($element->innerXml())) {
+
+            if (!ZfExtended_Utils::emptyString($element->innerXml())) {
                 $tagType = 'pairedTag';
             }
             $element->wrap('<'.$tagType.'_'.$this->tagId++.'/>');
         }
         $textNode = $tempXml->find('segment')->innerXml();
-        
+
         return $this->convertToPlaceholderTag($textNode);
         //result is now: Dies <protectedTag>ist ein</protectedTag> Test. _ (Where _ is the nbsp as character!)
     }
@@ -139,10 +140,14 @@ class editor_Models_Segment_TagProtection {
      */
     protected function parseSegmentProtectInvalidHtml5($segment) {
         $replacer = function ($matches){
-            $tagName = preg_replace('/<[\/]*([^ ]*).*>/i', '$1', $matches[0]);
+            $tagName = preg_replace('/<[\/]*([^ ]*).*>/is', '$1', $matches[0]);
             // only replace HTML5 tags, keep protectedTag in any case as original
-            if (!in_array($tagName, $this->html5Tags) || $tagName == 'protectedTag') {
+            if ($tagName == 'protectedTag') {
                 return $matches[0];
+            }
+            if(!in_array($tagName, $this->html5Tags)) {
+                //everything else is returned as encoded to string since it seems not to be a valid tag
+                return htmlspecialchars($matches[0], ENT_XML1);
             }
             
             $originalTag = editor_Models_Segment_InternalTag::encodeTagContent($matches[0]);

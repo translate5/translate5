@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * The Worker to process the termtagging for a import or a subsequent analysis
  */
 class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_TermTagger_Worker_Abstract {
-    
+
     protected $resourcePool = 'import';
     
     /***

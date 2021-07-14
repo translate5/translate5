@@ -329,11 +329,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     }
     
     /**
-     * removes all Xlf Tags and the masked content from the given string
+     * removes all Xlf Tags and the masked content from the given string, also removes protected whitespace
      * @param string $content
      * @return string
      */
-    public function removeXlfTags($content) {
+    public function removeXlfTagsAndProtectedWhitespace($content) {
         $this->result = [];
         //by setting removeTags to false, currently all side effects related to $this->shortTag* fields are prevented.
         // Keep in mind if changing getShortTagNumber code or usage,
@@ -341,7 +341,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->removeTags = true;
         $this->preserveWhitespace = false;
         $this->xmlparser->parse($content);
-        return $this->xmlparser->join($this->result);
+        //all XLF tags are removed, internal tags produced by the parser (protected whitespace) is also removed.
+        return $this->utilities->internalTag->replace($this->xmlparser->join($this->result),'');
     }
     
     /**

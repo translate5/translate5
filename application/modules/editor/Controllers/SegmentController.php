@@ -41,7 +41,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
      * @var editor_Models_Segment
      */
     protected $entity;
-    
+
     /**
      * Number to divide the segment duration
      *

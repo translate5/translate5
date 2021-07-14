@@ -149,7 +149,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         /* @var $user ZfExtended_Models_User */
 
         $tua = empty($this->tua) ? ZfExtended_Factory::get('editor_Models_TaskUserAssoc') : $this->tua;
-        
+
         $addReceivers = function($receiverStepMap, $bcc = false) use ($receiverStep, $task, $user, $tua) {
             $users = [];
             foreach($receiverStepMap as $recStep => $steps) {
@@ -231,7 +231,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $segments = $this->getStepSegments($currentStep);
 
         $segmentHash = md5(print_r($segments,1)); //hash to identify the given segments (for internal caching)
-        
+
         $nextStep = (string)$workflow->getNextStep($task, $currentStep);
         $nextRole = $workflow->getRoleOfStep($nextStep);
         
@@ -260,7 +260,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $this->addCopyReceivers($triggerConfig, editor_Workflow_Default::STEP_PM_CHECK);
             $this->notify($pm);
         }
-        
+
         if(empty($nextStep)){
             return;
         }
@@ -295,7 +295,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
                 'step' => $currentStep,
             ]);
         }
-        
+
         $currentUsers = $this->tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $currentStep, ['state','deadlineDate']);
         $params = array(
             'triggeringRole' => $this->config->newTua->getRole(),
@@ -369,7 +369,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     public function notifyNewTaskAssigned() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $this->tua = $tua = $this->config->newTua;
-        
+
         //the usage of this config is more a workaround,
         // since this was the easiest but also straight forward way to transport the information "yes notify"
         // from one task import wizard page to the final startImport action.
@@ -407,7 +407,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $this->tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        
+
         $tuas = $this->tua->loadUsersOfTaskWithStep($task->getTaskGuid(), $triggerConfig->step ?? null, ['state', 'workflowStepName', 'deadlineDate', 'assignmentDate', 'finishedDate']);
         
         $steps = array_column($tuas, 'workflowStepName');
@@ -787,7 +787,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $symbol = $isApproaching ? '+' : '-';
         //date select when this is triggered from the daily action
         $dateSelect = 'DATE(tua.deadlineDate)=DATE(CURRENT_DATE) '.$symbol.' INTERVAL ? DAY';
-        
+
         if($this->config->trigger == 'doCronPeriodical'){
             //the deadline check date will be between: "days offset date" +/- "cron periodical call frequency"
             $dateSelect='tua.deadlineDate BETWEEN '.
@@ -879,3 +879,4 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     protected function generateDeadlineNotifiedMessage(bool $isApproaching){
         return self::DEADLINE_NOTIFICATION_LOG_MESSAGE.($isApproaching ? 'DeadlineApproaching' : 'OverdueDeadline');
     }
+}
