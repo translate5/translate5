@@ -47,8 +47,17 @@ class editor_Workflow_Manager {
      */
     public function __construct() {
         /* @var $workflow editor_Models_Workflow */
-        $workflow = ZfExtended_Factory::get('editor_Models_Workflow');
-        $workflows = $workflow->loadAll();
+	try {
+            $workflow = ZfExtended_Factory::get('editor_Models_Workflow');
+	    $workflows = $workflow->loadAll();
+	}
+	catch(Zend_Db_Statement_Exception $e) {
+            if($this->isDefaultFallbackOnUpdate($e)) {
+                $this->addWorkflow('default', 'editor_Workflow_DefaultFallback');
+                return;
+            }
+        }
+
         
         foreach($workflows as $workflowData) {
             //if the workflow exists already, it was added by a plug-in with a different class
@@ -57,6 +66,16 @@ class editor_Workflow_Manager {
                 $this->addWorkflow($workflowData['name']);
             }
         }
+    }
+
+    /**
+     * On updating to the version where Workflow definitions from DB where introduced, 
+     * we are getting a chicken egg problem on updating if there were some PHP alter files to be executed using workflow code 
+     * since the PHP code tries to load from LEK_workflow but the table was not yet created. Therefore we need some fallbacks to deal with that situation.
+     */
+    protected function isDefaultFallbackOnUpdate(Zend_Db_Statement_Exception $e): bool {
+        $msg = $e->getMessage();
+	return strpos($msg, 'Base table or view not found') !== false && strpos($msg, 'LEK_workflow') !== false;
     }
     
     /**
