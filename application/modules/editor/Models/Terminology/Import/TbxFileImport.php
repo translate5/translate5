@@ -241,6 +241,11 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     protected editor_Models_Terminology_Import_TermEntryMerge $termEntryMerge;
 
     /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events = false;
+
+    /**
      * editor_Models_Import_TermListParser_TbxFileImport constructor.
      * @throws Zend_Exception
      */
@@ -251,6 +256,8 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         }
         $this->config = Zend_Registry::get('config');
         $this->logger = Zend_Registry::get('logger');
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+
         $this->taskModel = ZfExtended_Factory::get('editor_Models_Task');
 
         $this->termCollectionModel = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
@@ -359,6 +366,8 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     {
         $this->tbxMap[$this::TBX_TERM_ENTRY] = $tbxAsSimpleXml->text->body->termEntry ? 'termEntry' : 'conceptEntry';
 
+        $totalCount = count($tbxAsSimpleXml->text->body->{$this->tbxMap[$this::TBX_TERM_ENTRY]});
+        $importCount = 0;
         foreach ($tbxAsSimpleXml->text->body->{$this->tbxMap[$this::TBX_TERM_ENTRY]} as $termEntry) {
             $parsedEntry = null;
             $this->emptyVariables();
@@ -381,6 +390,9 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
                 }
             }
             $this->saveParsedTbx();
+            $importCount++;
+
+            $this->events->trigger('afterTermEntrySave',max(99,($importCount/$totalCount)*100));
         }
 
         if ($tbxAsSimpleXml->text->back->refObjectList) {
