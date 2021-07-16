@@ -43,6 +43,11 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
     
     listen:{
+        messagebus: {
+            '#translate5 task': {
+                updateProgress: 'onUpdateProgress'
+            }
+        },
         component:{
             '#reloadProjectbtn':{
                 click:'onReloadProjectBtnClick'
@@ -60,7 +65,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             }
         }
     },
-    
+
     /***
      * Redirect to project focus route
      */
@@ -117,7 +122,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
     
     /***
-     * Focus project task grid row. This is called afte project task store is loaded.
+     * Focus project task grid row. This is called after project task store is loaded.
      * The taskId is calculated based on the current window hash
      */
     focusProjectTask:function(store){
@@ -137,6 +142,14 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         }
         me.selectProjectTaskRecord(record);
         me.lookup('projectGrid').setLoading(false);
+    },
+
+    onUpdateProgress: function(params) {
+        var me = this;
+        if(params.progress === 100){
+            // after the task is imported, reload the user assoc store
+            me.getView().down('adminTaskUserAssocGrid').getStore().load();
+        }
     },
     
     /***
