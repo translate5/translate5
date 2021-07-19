@@ -4182,6 +4182,10 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Nur anschauen</source>
     <target>View only</target>
 </trans-unit>
+<trans-unit id='UHJvamVrdGJlc2NocmVpYnVuZw=='>
+  <source>Projektbeschreibung</source>
+  <target>Project description</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

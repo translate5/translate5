@@ -50,6 +50,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
 	      sourceLang: '#UT#Quellsprache',
 	      pmGuid: '#UT#Projektmanager',
 	      orderdate: '#UT#Bestelldatum',
+	      description: '#UT#Projektbeschreibung',
 		  id:'#UT#Id',
 		  notFound: '#UT#nicht gefunden',
 		  resetFilterText:'#UT#Filter zurücksetzen'
@@ -153,6 +154,16 @@ Ext.define('Editor.view.project.ProjectGrid', {
                     },
                     tdCls: 'taskNr',
                     text: me.text_cols.taskNr
+        		},{
+                    xtype: 'gridcolumn',
+                    width: 110,
+                    dataIndex: 'description',
+                    stateId: 'description',
+                    filter: {
+                        type: 'string'
+                    },
+                    tdCls: 'description',
+                    text: me.text_cols.description
         		},{
                     xtype: 'datecolumn',
                     width: 100,
