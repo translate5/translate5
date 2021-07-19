@@ -270,6 +270,33 @@ class Models_Installer_Standalone {
         $this->cli->run($input);
         $this->log('');
     }
+
+    /**
+     * Asks the user for his timezone while installation
+     * @return string|null
+     * @throws Exception
+     */
+    protected function askTimzone(): ?string {
+        if(is_array($this->options) && ($this->options['license-ignore'] ?? false)){
+            //FIXME check log after next installation and remove the below md5 based check if not needed anymore!
+            error_log("IGNORE LICENSE BY PARAM");
+            return null;
+        }
+        //FIXME since above options is not usable yet, we just check for the host to ignore the license question
+        //when using console kit we can replace this with an undocumented switch
+        if(md5(gethostname()) === '52c30971e2fe1d24879b307b44e0966f') {
+            //FIXME check log after next installation and remove the below md5 based check if not needed anymore!
+            error_log("IGNORE LICENSE BY HOST");
+            return null;
+        }
+        $this->initTranslate5CliBridge();
+        $input = new Symfony\Component\Console\Input\ArrayInput([
+            'command' => 'installer:timezone',
+        ]);
+        $this->cli->run($input);
+        $this->log('');
+        return $this->cli->get('installer:timezone')->getTimezone();
+    }
     
     protected function initTranslate5CliBridge()
     {
@@ -285,6 +312,7 @@ class Models_Installer_Standalone {
         $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceSetCommand());
         $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceDisableCommand());
         $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceCommand());
+        $this->cli->add(new Translate5\MaintenanceCli\Command\InstallerTimezoneCommand());
     }
     
     protected function checkMyselfForUpdates() {
@@ -332,8 +360,10 @@ class Models_Installer_Standalone {
             $this->dbCredentials['password'] = $options['db::password'];
             $this->dbCredentials['database'] = $options['db::database'];
         }
+
+        $timezone = $this->askTimzone();
         
-        $this->createInstallationIni();
+        $this->createInstallationIni(['timezone' => $timezone]);
         if(! $this->checkDb()) {
             unlink($this->currentWorkingDir.self::INSTALL_INI);
             $this->log("\nFix the above errors and restart the installer! DB Config ".self::INSTALL_INI." was automatically removed therefore.\n");
@@ -458,11 +488,15 @@ class Models_Installer_Standalone {
      */
     protected function acceptLicenses(array $depsToAccept) {
         if(is_array($this->options) && ($this->options['license-ignore'] ?? false)){
+            //FIXME check log after next installation and remove the below md5 based check if not needed anymore!
+            error_log("IGNORE LICENSE BY PARAM");
             return;
         }
         //FIXME since above options is not usable yet, we just check for the host to ignore the license question
         //when using console kit we can replace this with an undocumented switch
         if(md5(gethostname()) === '52c30971e2fe1d24879b307b44e0966f') {
+            //FIXME check log after next installation and remove the below md5 based check if not needed anymore!
+            error_log("IGNORE LICENSE BY HOST");
             return;
         }
         $first = true;
@@ -559,9 +593,10 @@ class Models_Installer_Standalone {
     
     /**
      * Creates the installation.ini
+     * @param array $additionalParameters
      * @return boolean
      */
-    protected function createInstallationIni() {
+    protected function createInstallationIni(array $additionalParameters) {
         $content = array();
         $content[] = '[application]';
         $content[] = 'resources.db.params.host = "'.$this->dbCredentials['host'].'"';
@@ -570,6 +605,10 @@ class Models_Installer_Standalone {
         $content[] = 'resources.db.params.dbname = "'.$this->dbCredentials['database'].'"';
         if(!empty($this->dbCredentials['executable'])) {
             $content[] = 'resources.db.executable = "'.$this->dbCredentials['executable'].'"';
+        }
+        if(!empty($additionalParameters['timezone'])) {
+            $content[] = '';
+            $content[] = 'phpSettings.date.timezone = "'.$additionalParameters['timezone'].'"';
         }
         $content[] = '';
         $content[] = 'resources.mail.defaultFrom.email = support@translate5.net';

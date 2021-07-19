@@ -1,4 +1,13 @@
 #!/bin/bash
+
+# Translate5 may be run under windows in a bash, so if this is the case use the PHP conf from there
+if [ -f "windows-installer-config.ini" ]; then
+  source <(grep INSTALL_PHP_PATH windows-installer-config.ini | sed "s/\\\/\//g")
+  CMD_PHP=$INSTALL_PHP_PATH
+else
+  CMD_PHP="${CMD_PHP:-/usr/bin/php}"
+fi
+
 CMD_PHP="${CMD_PHP:-/usr/bin/php}"
  
 # make sure PHP and MySQL binary exist; else die with an error message
