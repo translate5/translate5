@@ -87,7 +87,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
         ];
 
         // Build param bindings
-        $bind = [':date' => time(), ':userName' => $user, ':termEntryId' => $termEntryId];
+        $bind = [':date' => $time = time(), ':userName' => $user, ':termEntryId' => $termEntryId];
         if ($level == 'language' || $level == 'term') $bind[':language'] = strtolower($language);
         if ($level == 'term') $bind[':termId'] = $termId;
 
@@ -102,6 +102,9 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
               AND `transac` = "modification" 
               AND ' . $where[$level],
         $bind);
+
+        // Return affection info
+        return $user . ', ' . date('d.m.Y H:i:s', $time);
     }
 
     public function getTransacGrpCollectionByEntryId($collectionId, $termEntryId): array

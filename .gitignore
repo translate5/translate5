@@ -3,6 +3,7 @@ application/config/installation.ini
 data/editorImportedTasks*
 data/editorVisualReviewFonts*
 data/tbx-import/*
+!data/tbx-import/term-images-public
 data/dummyTm_*
 /nbproject/
 .buildpath

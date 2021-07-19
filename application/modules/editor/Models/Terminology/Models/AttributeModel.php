@@ -532,23 +532,9 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
     /**
      * @return mixed
      */
-    public function update(/*$orig = []*/) {
+    public function update($misc = []) {
 
-        /*//$this->row->setFromArray(['value' => 'full form']);
-        if (json_encode($this->toArray()) != json_encode($orig)) {
-            d('modified');
-        } else {
-            d('not modified');
-        }
-        d($this->getModifiedValues());
-        d($this->getModifiedData());
-        d($this->toArray());
-        d($orig);
-        die();*/
-
-        //d($this);
         $orig = $this->row->getCleanData();
-        //die();
 
         // Call parent
         $return = parent::save();
@@ -568,6 +554,45 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             // Save
             $history->save();
         }
+
+        // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
+        if ($misc['userName'])
+            $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
+                ->affectLevels($misc['userName'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
+
+        // Return
+        return $return;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function insert($misc = []) {
+
+        // Call parent
+        $return = parent::save();
+
+        // Affect transacgrp-records
+        if ($misc['userName'])
+            ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
+                ->affectLevels($misc['userName'], $this->getTermEntryId(), $this->getLanguage());
+
+        // Return
+        return $return;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function delete($misc = []) {
+
+        // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
+        if ($misc['userName'])
+            $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
+                ->affectLevels($misc['userName'], $this->getTermEntryId(), $this->getLanguage());
+
+        // Call parent
+        parent::delete();
 
         // Return
         return $return;
