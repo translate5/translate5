@@ -38,7 +38,8 @@ Ext.define('Editor.view.segments.GridViewController', {
             }
         }
     },
-    onToggleTaskDesc: function(btn, toggled){
+    onToggleTaskDesc: function(btn, toggled) {
+        btn.setText(toggled ? btn.hideText : btn.showText);
         this.getView().down('#taskDescPanel').setVisible(toggled);
     }
 });

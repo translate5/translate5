@@ -1992,6 +1992,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='TGF5b3V0'><source>Layout</source><target>Layout</target></trans-unit>
 <trans-unit id='TnVyIGFuc2NoYXVlbg=='><source>Nur anschauen</source><target>Nur anschauen</target></trans-unit>
 <trans-unit id='UHJvamVrdGJlc2NocmVpYnVuZw=='><source>Projektbeschreibung</source><target>Projektbeschreibung</target></trans-unit>
+<trans-unit id='UHJvamVrdGJlc2Noci4gYW56ZWlnZW4='><source>Projektbeschr. anzeigen</source><target>Projektbeschr. anzeigen</target></trans-unit>
+<trans-unit id='UHJvamVrdGJlc2Noci4gYXVzYmxlbmRlbg=='><source>Projektbeschr. ausblenden</source><target>Projektbeschr. ausblenden</target></trans-unit>
   </body>
  </file>
 </xliff>

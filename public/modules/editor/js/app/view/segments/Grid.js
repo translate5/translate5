@@ -376,7 +376,8 @@ Ext.define('Editor.view.segments.Grid', {
                     dock: 'top',
                     itemId: 'taskDescPanel',
                     bind: {
-                        html: '{taskDescription}'
+                        html: '{taskDescription}',
+                        hidden: '{!taskDescription}'
                     },
                     bodyPadding: 10
                 },{

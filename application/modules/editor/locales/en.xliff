@@ -4186,6 +4186,14 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Projektbeschreibung</source>
   <target>Project description</target>
 </trans-unit>
+<trans-unit id='UHJvamVrdGJlc2Noci4gYW56ZWlnZW4='>
+  <source>Projektbeschr. anzeigen</source>
+  <target>Show project description</target>
+</trans-unit>
+<trans-unit id='UHJvamVrdGJlc2Noci4gYXVzYmxlbmRlbg=='>
+  <source>Projektbeschr. ausblenden</source>
+  <target>Hide project description</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
