@@ -68,8 +68,8 @@ class editor_Models_Quality_RequestState {
             $this->mode = (count($parts) < 2 || empty($parts[1])) ? editor_Models_Quality_AbstractView::FILTER_MODE_DEFAULT : $parts[1];
             $this->collapsed = (count($parts) < 3 || empty($parts[2]) || $parts[2] == 'NONE') ? '' : $parts[2];
         }
-        //  our user restriction, depends on if the user is a normal editor or pm/admin
-        if(!editor_User::instance()->isA([ ACL_ROLE_PM, ACL_ROLE_ADMIN ])){
+        //  our user restriction, depends on if the user is a normal editor or has the right to manage qualities (and thus sees other users qualities)
+        if(!ZfExtended_Acl::getInstance()->isInAllowedRoles(editor_User::instance()->getRoles(), 'frontend', 'editorManageQualities')){
             $this->userGuid = editor_User::instance()->getGuid();
         }
     }
