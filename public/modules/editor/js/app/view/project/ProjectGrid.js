@@ -156,7 +156,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
                     text: me.text_cols.taskNr
         		},{
                     xtype: 'gridcolumn',
-                    width: 110,
+                    width: 137,
                     dataIndex: 'description',
                     stateId: 'description',
                     filter: {

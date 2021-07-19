@@ -29,9 +29,12 @@ Ext.define('Editor.view.segments.GridViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.segmentsGrid',
     data: {
-        segmentFinishCount:null
+        segmentFinishCount: null
     },
     formulas: {
+        taskDescription: function(){
+            return Editor.data.task.get('description');
+        },
         segmentFinishCountPercent:function(get){
         	var value=get('segmentFinishCount'),
         		totalCount=Editor.data.task.get('segmentCount');

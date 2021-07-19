@@ -64,6 +64,12 @@ Ext.define('Editor.view.segments.grid.Header', {
                     margin:'0 0 0 4'
                 },
                 items: [{
+                    xtype: 'button',
+                    itemId: 'toggleTaskDesc',
+                    enableToggle: true,
+                    pressed: true,
+                    text: "Project description"
+                },{
                     xtype: 'helpButton'
                 },{
                     xtype: 'button',
