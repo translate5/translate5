@@ -57,7 +57,8 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.IsRepeated',
         'Editor.util.SegmentContent',
         'Editor.view.segments.GridViewModel',
-        'Editor.view.segments.grid.Header'
+        'Editor.view.segments.grid.Header',
+        'Editor.view.segments.GridViewController'
     ],
     plugins: ['gridfilters'],
     alias: 'widget.segments.grid',
@@ -67,6 +68,7 @@ Ext.define('Editor.view.segments.Grid', {
     viewModel: {
         type:'segmentsGrid'
     },
+    controller: 'segmentsGrid',
     store: 'Segments',
     title: '#UT#Segmentliste und Editor',
     title_readonly: '#UT# - [LESEMODUS]',
@@ -370,8 +372,17 @@ Ext.define('Editor.view.segments.Grid', {
                     }
                 },
                 dockedItems: [{
-                    xtype: 'segmentsToolbar',
+                    xtype: 'panel',
                     dock: 'top',
+                    itemId: 'taskDescPanel',
+                    bind: {
+                        html: '{taskDescription}',
+                        hidden: '{!taskDescription}'
+                    },
+                    bodyPadding: 10
+                },{
+                    xtype: 'segmentsToolbar',
+                    dock: 'top'
                 }]
             };
         if (instanceConfig) {
