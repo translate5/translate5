@@ -48,7 +48,7 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
         },
         {name: 'state', type: 'string'},
         {name: 'role', type: 'string'},
-        {name: 'workflow', type: 'string'},
+        {name: 'workflow', type: 'string',critical: true},
         {name: 'workflowStepName', type: 'string'},
         {name: 'segmentrange', type: 'string'},
         {name: 'deletable', type: 'boolean'},
