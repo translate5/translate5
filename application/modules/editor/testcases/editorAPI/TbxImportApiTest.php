@@ -68,7 +68,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         //change existing term attribute
         //change existing term content
         //add new term to term collection
-//        $this->singleTest('Term1.tbx', 9, 29, 20);
+        $this->singleTest('Term1.tbx', 9, 29, 20);
 
         //different term entry id, different term id, same language and term content -> update the term and
         //check if the other terms in the tbx term entry can be merged
@@ -94,8 +94,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
     private function singleTest($fileName,$termCount,$termsAtributeCount,$termsEntryAtributeCount)
     {
         $this->api()->addFile($fileName, $this->api()->getFile($fileName), "application/xml");
-        $this->api()->requestJson('editor/termcollection/import', 'POST', ['collectionId' => self::$collId, 'customerIds' => [7],'mergeTerms' => true]);
-//        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' => self::$collId, 'customerIds' => $this->api()->getCustomer()->id,'mergeTerms' => true));
+        $this->api()->requestJson('editor/termcollection/import', 'POST', ['collectionId' => self::$collId, 'customerIds' => [$this->api()->getCustomer()->id],'mergeTerms' => true]);
 
         //export the generated file
         $response = $this->api()->requestJson('editor/termcollection/export', 'POST', ['collectionId' => self::$collId]);

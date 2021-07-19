@@ -136,12 +136,13 @@ class editor_Models_Export_Terminology_Tbx {
                 $tigId = $row->tigId;
             }
             if (empty($tigId)) {
-                $tigId = $this->convertToTigId($row->termId);
+                $tigId = $this->convertToTigId($row->termTbxId);
             }
+
             $tig->addAttribute('id', $tigId);
 
             $term = $tig->addChild('term', $row->term);
-            $term->addAttribute('id', $row->termId);
+            $term->addAttribute('id', $row->termTbxId);
 
             $termNote = $tig->addChild('termNote', $row->status); //FIXME Status gemapped???
             $termNote->addAttribute('type', 'normativeAuthorization');
