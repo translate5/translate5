@@ -95,6 +95,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     }, {
         ref: 'taskAddWindowRelaisLangCombo',
         selector: 'adminTaskAddWindow combo[name="relaisLang"]'
+    },{
+        ref:'userAssocGrid',
+        selector: '#adminTaskUserAssocGrid'
     }],
     alias: 'controller.taskOverviewController',
 
@@ -176,7 +179,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
     listeners: {
         afterTaskDelete: 'onAfterTaskDeleteEventHandler',
-        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler'
+        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler',
+        taskCreated:'onTaskCreated'
     },
     listen: {
         controller: {
@@ -1101,15 +1105,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 var task = me.getModel('admin.Task').create(submit.result.rows);
                 me.fireEvent('taskCreated', task);
                 win.setLoading(false);
-                me.getAdminTasksStore().load();
-                me.getProjectGrid().getController().reloadProjects().then(function(){
-                    me.handleProjectAfterImport(task);
-                })
-
-                //set the store reference to the model(it is missing), it is used later when the task is deleted
-                task.store = me.getAdminTasksStore();
-
-                me.setCardsTask(task);
 
                 //call the callback if exist
                 if (successCallback) {
@@ -1240,10 +1235,29 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         Ext.StoreManager.get('admin.Tasks').remove(task);
         return true;
     },
+
     /***
      * After the task is removed event handler
      */
     onAfterTaskDeleteEventHandler: function () {
         Ext.StoreManager.get('admin.Tasks').load();
+    },
+
+    /***
+     * On task created event listener
+     * @param task
+     */
+    onTaskCreated:function (task){
+        var me = this;
+
+        me.getAdminTasksStore().load();
+        me.getProjectGrid().getController().reloadProjects().then(function(){
+            me.handleProjectAfterImport(task);
+        });
+
+        //set the store reference to the model(it is missing), it is used later when the task is deleted
+        task.store = me.getAdminTasksStore();
+
+        me.setCardsTask(task);
     }
 });
