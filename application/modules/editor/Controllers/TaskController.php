@@ -523,7 +523,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->setDataInEntity();
 
         $this->prepareLanguages();
-        $this->entity->setUsageMode($this->config->runtimeOptions->import->initialTaskUsageMode);
+        
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
 
@@ -541,6 +541,9 @@ class editor_TaskController extends ZfExtended_RestController {
         else {
             $c = $this->config;
         }
+        
+        $this->entity->setUsageMode($c->runtimeOptions->import->initialTaskUsageMode);
+
         //init workflow id for the task, based on customer or general config as fallback
         $this->entity->setWorkflow($c->runtimeOptions->workflow->initialWorkflow);
 

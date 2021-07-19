@@ -254,26 +254,33 @@ class editor_Plugins_MatchAnalysis_Export_Xml
     protected function createBatchTotalNode() {
         $batchTotal = $this->rootNode->addChild('batchTotal');
         $analyseNode = $batchTotal->addChild('analyse');
-        $addedNodes = [];
+
+        //the order of the elements is important, so we generate the desired order first.
+        $orderedNodes = array_fill_keys(self::NODES, []);
+
+        //copy now the collected data into the ordered list
         foreach($this->analyseNodes as $nodeData) {
-            $node = $analyseNode->addChild($nodeData['tagName']);
-            $addedNodes[] = $nodeData['tagName'];
+            $tag = $nodeData['tagName'];
             unset ($nodeData['tagName']);
-            foreach($nodeData as $attribute => $value) {
-                $node->addAttribute($attribute, $value);
-            }
+            $orderedNodes[$tag][] = $nodeData;
         }
-        
-        //add missing nodes with empty values
-        $missingEmptyNodes = array_diff(self::NODES, $addedNodes);
-        foreach($missingEmptyNodes as $node) {
-            //fuzzy tags are only added with content
-            if($node == 'internalFuzzy' || $node == 'fuzzy') {
-                continue;
+
+        //out of the ordered list we create the XML nodes
+        foreach($orderedNodes as $nodeTag => $subNodeList) {
+            if(empty($subNodeList)) {
+                $node = $analyseNode->addChild($nodeTag);
+                foreach(self::ATTRIBUTES as $attribute) {
+                    $node->addAttribute($attribute, 0);
+                }
             }
-            $node = $analyseNode->addChild($node);
-            foreach(self::ATTRIBUTES as $attribute) {
-                $node->addAttribute($attribute, 0);
+            else {
+                //subnode list count will only be > 1 for fuzzy and internalFuzzy, for all other there is exactly one node
+                foreach($subNodeList as $subNode) {
+                    $node = $analyseNode->addChild($nodeTag);
+                    foreach($subNode as $attribute => $value) {
+                        $node->addAttribute($attribute, $value);
+                    }
+                }
             }
         }
     }

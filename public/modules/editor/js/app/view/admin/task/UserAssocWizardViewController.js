@@ -105,10 +105,14 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
     onUserAssocWizardActivate:function(){
         var me=this,
             view = me.getView(),
-            workflowCombo = view.down('#workflowCombo');
+            task = view.task,
+            workflowCombo = view.down('#workflowCombo'),
+            usageMode = view.down('#usageMode');
 
         // first set the combo value on panel activate then load the store.
-        workflowCombo.setValue(view.task.get('workflow'));
+        workflowCombo.setValue(task.get('workflow'));
+        // set the usageMode default from the task. The default value is set from the config after the task is created
+        usageMode.setValue(task.get('usageMode') ? task.get('usageMode') : Editor.model.admin.Task.USAGE_MODE_COOPERATIVE);
 
         me.loadAssocData();
     },
@@ -222,7 +226,6 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         me.updatePreImportOnChange(newValue, oldValue);
     },
 
-
     /***
      *
      * @param combo
@@ -236,6 +239,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             Editor.MessageBox.addError('In order to use that mode the FrontEndMessageBus plug-in must be active!');
             return false;
         }
+        this.updatePreImportOnChange(record.get('id'), combo.getValue());
     },
 
     /***

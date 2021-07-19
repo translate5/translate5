@@ -156,7 +156,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             Zend_Registry::get('logger')->warn('E1232', 'Job creation: role "lector" is deprecated, use "reviewer" instead!');
         }
 
-        //on post the task is not intialized yet
+        //on post the task is not initialized yet
         if($this->task->getId() == 0) {
             $this->task->loadByTaskGuid($this->data->taskGuid);
         }
@@ -165,7 +165,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         /* @var $manager editor_Workflow_Manager */
 
 
-        // if the workflow is defined by the api use it from there, otherwize load it from the task
+        // if the workflow is defined by the api use it from there, otherwise load it from the task
         if(property_exists($this->data, 'workflow') && !empty($this->data->workflow)){
             $workflow = $manager->getCached($this->data->workflow);
         }else{
