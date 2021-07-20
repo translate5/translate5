@@ -15,33 +15,31 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-Ext.define('Editor.view.segments.GridViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.segmentsGrid',
-    data: {
-        segmentFinishCount: null
-    },
-    formulas: {
-        taskDescription: function(){
-            return Editor.data.task.get('description');
-        },
-        segmentFinishCountPercent:function(get){
-        	var value=get('segmentFinishCount'),
-        		totalCount=Editor.data.task.get('segmentCount');
-        	if(value>0 && totalCount>0){
-    			value=value/totalCount;
-    		}
-    		return value;
+
+Ext.define('Editor.view.segments.GridViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.segmentsGrid',
+
+    listen: {
+        component: {
+            '#toggleTaskDesc':{
+                toggle:'onToggleTaskDesc'
+            }
         }
+    },
+    onToggleTaskDesc: function(btn, toggled) {
+        btn.setText(toggled ? btn.hideText : btn.showText);
+        this.getView().down('#taskDescPanel').setVisible(toggled);
     }
 });

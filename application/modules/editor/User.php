@@ -93,9 +93,9 @@ class editor_User {
     }
     /**
      * 
-     * @return string
+     * @return array
      */
-    public function getRoles() : string {
+    public function getRoles() : array {
         return $this->session->data->roles;
     }
     /**
