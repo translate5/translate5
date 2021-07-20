@@ -123,7 +123,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      * TBX id for each term
      * @var string
      */
-    protected string $termTigId;
+    protected ?string $termTbxId;
     /**
      * file path for collection
      * @var string
@@ -382,9 +382,11 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
                     foreach ($languageGroup->{$this->tbxMap[$this::TBX_TIG]} as $termGroup) {
                         $this->termId = null;
+                        $this->termTbxId = null;
                         $this->termGuid = null;
                         $this->handleTermGroup($termGroup, $parsedLangSet);
                         $this->termId = null;
+                        $this->termTbxId = null;
                         $this->termGuid = null;
                     }
                 }
@@ -422,6 +424,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->termGuid = null;
         $this->transacGrps = [];
         $this->termId = null;
+        $this->termTbxId = null;
     }
 
     /**
@@ -577,7 +580,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $newTerm->setDescripTarget($parsedLangSet->getDescripTarget());
         $newTerm->setDescripType($parsedLangSet->getDescripType());
 
-        $this->termTigId = $newTerm->getTermTbxId();
+        $this->termTbxId = $newTerm->getTermTbxId();
 
         if (strtolower($parsedLangSet->getDescripType()) === $newTerm::TERM_DEFINITION) {
             $newTerm->setDefinition($parsedLangSet->getDescrip());
@@ -694,6 +697,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $transacGrpObject->setCollectionId($this->collectionId);
         $transacGrpObject->setTermEntryId($this->termEntryDbId);
         $transacGrpObject->setTermId($this->termId);
+        $transacGrpObject->setTermTbxId($this->termTbxId);
         $transacGrpObject->setTermGuid($this->termGuid);
         $transacGrpObject->setTermEntryGuid($this->termEntryGuid);
         $transacGrpObject->setLangSetGuid($this->langSetGuid);
