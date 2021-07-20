@@ -175,6 +175,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         me.getUserAssocForm().show();
         me.getUserAssocForm().setDisabled(false);
         me.getUserAssocSegmentrange().setDisabled(usageMode !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS);
+        me.filterStepsCombo(newRec);
         me.getUserAssoc().loadRecord(newRec);
         me.initState(null, step, '');
     },
@@ -186,22 +187,32 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
      */
     handleAssocSelection: function (grid, selection) {
         var me = this,
+            formPanel = me.getUserAssocForm(),
             emptySel = selection.length === 0,
             record = !emptySel ? selection[0] : null,
             userEditable = record && record.get('editable'),
             userDeletable = record && record.get('deletable'),
             task = me.getPrefWindow().getCurrentTask();
+
         me.getAssocDelBtn().setDisabled(emptySel || !userDeletable);
+
         me.getEditInfo().setVisible(emptySel);
-        me.getUserAssocForm().setVisible(!emptySel);
-        me.getUserAssocForm().setDisabled(emptySel || !userEditable);
+
+        formPanel.setVisible(!emptySel);
+
+        formPanel.setDisabled(emptySel || !userEditable);
+
         me.getUserAssocSegmentrange().setDisabled(task.get('usageMode') !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS);
+
+        me.filterStepsCombo(selection[0]);
+
         if (emptySel) {
-            me.getUserAssocForm().getForm().reset();
+            formPanel.getForm().reset();
         } else {
             me.getUserAssoc().loadRecord(selection[0]);
         }
     },
+
     /**
      * Removes the selected User Task Association
      */
@@ -312,7 +323,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
             meta = task.getWorkflowMetaData(),
             initialStates = meta.initialStates[task.get('workflowStepName')];
 
-        stateCombo.store.clearFilter();
+        stateCombo.getStore().clearFilter();
 
         //set the default deadline date when the form state is initialized
         me.setWorkflowStepDefaultDeadline(task, step, rec);
@@ -337,7 +348,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
     },
 
     /***
-     * Filter the user combo store based on the selected user role. The user can be assigned only onece per role.
+     * Filter the user combo store based on the selected user role. The user can be assigned only once per role.
      */
     filterUserCombo: function (userStep) {
         var me = this,
@@ -357,6 +368,41 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         usersCombo.getStore().addFilter([{
             property: 'userGuid',
             value: tuaUsers,
+            operator: 'notin'
+        }], true);
+    },
+
+    /***
+     * Filter out all used options in the workflowStep combo based on the selected assoc record.
+     * One user is only able to be assigned to one workflowStep of a workflow.
+     * @param selectedRecord
+     */
+    filterStepsCombo: function (selectedRecord){
+        var me = this,
+            form = me.getUserAssocForm(),
+            userAssocGrid = me.getUserAssocGrid(),
+            workflowStepNameCombo = form.down('combo[name="workflowStepName"]'),
+            workflowStepStore = workflowStepNameCombo.getStore(),
+            usedSteps = [];
+
+
+        if(!selectedRecord){
+            return;
+        }
+        
+        workflowStepStore.clearFilter();
+
+        //collect all used steps for selected record user
+        userAssocGrid.getStore().each(function (rec) {
+            if (selectedRecord.get('userGuid') === rec.get('userGuid') && selectedRecord.get('workflowStepName')!==rec.get('workflowStepName')) {
+                usedSteps.push(rec.get('workflowStepName'));
+            }
+        });
+
+        // filter out the used workflow steps from the workflow combo
+        workflowStepStore.addFilter([{
+            property: 'id',
+            value: usedSteps,
             operator: 'notin'
         }], true);
     },
