@@ -194,83 +194,47 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
     public $_primary = 'id';
 
     /**
-     * 
+     * Central API to fetch quality rows, mostly for frontend purposes
      * @param string $taskGuid
      * @param int|array $segmentIds
      * @param string|array $types
-     * @param bool $typesIsBlacklist
+     * @param bool $typesAreBlacklist
      * @param string|array $categories
-     * @param int $falsePositive
-     * @param string $userGuid
-     * @param string $field
-     * @param string|array $order
      * @return Zend_Db_Table_Rowset_Abstract
      */
-    public function fetchFiltered(string $taskGuid=NULL, $segmentIds=NULL, $types=NULL, bool $typesIsBlacklist=false, $categories=NULL, int $falsePositive=NULL, array $segmentNrs=NULL, string $field=NULL, $order=NULL) : Zend_Db_Table_Rowset_Abstract {
-        $prefix = '';
+    public function fetchFiltered(string $taskGuid=NULL, $segmentIds=NULL, $types=NULL, bool $typesAreBlacklist=false, $categories=NULL) : Zend_Db_Table_Rowset_Abstract {
         $select = $this->select();
-        // if a segmentNrs restriction is set we have to join with the segment table
-        if($segmentNrs !== NULL){
-            if(count($segmentNrs) > 0){
-                $prefix = 'qualities.';
-                $select
-                    ->from(['qualities' => $this->_name])
-                    ->join(['segments' => 'LEK_segments'], $prefix.'segmentId = segments.id', []);
-                if(count($segmentNrs) > 1){
-                    $select->where('segments.segmentNrInTask IN (?)', $segmentNrs);
-                } else {
-                    $select->where('segments.segmentNrInTask = ?', $segmentNrs[0]);
-                }
-            } else {
-                // an empty array means the user has no segments to edit and thus disables the filter
-                $select->where('0 = 1');
-            }
-            
-        }
         if(!empty($taskGuid)){
-            $select->where($prefix.'taskGuid = ?', $taskGuid);
+            $select->where('taskGuid = ?', $taskGuid);
         }
         if($segmentIds !== NULL){
             if(is_array($segmentIds) && count($segmentIds) > 1){
-                $select->where($prefix.'segmentId IN (?)', $segmentIds, Zend_Db::INT_TYPE);
+                $select->where('segmentId IN (?)', $segmentIds, Zend_Db::INT_TYPE);
             } else if(!is_array($segmentIds) || count($segmentIds) == 1){
                 $segmentId = is_array($segmentIds) ? $segmentIds[0] : $segmentIds;
-                $select->where($prefix.'segmentId = ?', $segmentId, Zend_Db::INT_TYPE);
+                $select->where('segmentId = ?', $segmentId, Zend_Db::INT_TYPE);
             }
-        }
-        if($field != NULL){
-            // a quality with no field set applies for all fields !
-            $select->where($prefix.'field = ? OR '.$prefix.'field = \'\'', $field);
         }
         if(!empty($types)){ // $types can not be "0"...
             if(is_array($types) && count($types) > 1){
-                $operator = ($typesIsBlacklist) ? 'NOT IN' : 'IN';
-                $select->where($prefix.'type '.$operator.' (?)', $types);
+                $operator = ($typesAreBlacklist) ? 'NOT IN' : 'IN';
+                $select->where('type '.$operator.' (?)', $types);
             } else {
                 $type = is_array($types) ? $types[0] : $types;
-                $operator = ($typesIsBlacklist) ? '!=' : '=';
-                $select->where($prefix.'type '.$operator.' ?', $type);
+                $operator = ($typesAreBlacklist) ? '!=' : '=';
+                $select->where('type '.$operator.' ?', $type);
             }
         }
         if(!empty($categories)){ // $categories can not be "0"...
             if(is_array($categories) && count($categories) > 1){
-                $select->where($prefix.'category IN (?)', $categories);
+                $select->where('category IN (?)', $categories);
             } else {
                 $category = is_array($categories) ? $categories[0] : $categories;
-                $select->where($prefix.'category = ?', $category);
+                $select->where('category = ?', $category);
             }
         }
-        if($falsePositive !== NULL){
-            $select->where($prefix.'falsePositive = ?', $falsePositive, Zend_Db::INT_TYPE);
-        }
-        if($order == NULL){
-            $order = [ $prefix.'type ASC', $prefix.'category ASC' ];
-        } else if($prefix != '') {
-            $order = preg_filter('/^/', $prefix, $order);
-        }
-
+        $order = [ 'type ASC', 'category ASC' ];
         // error_log('FETCH FILTERD QUALITIES: '.$select->__toString().' / order: '.implode(', ', $order)); 
-        
         return $this->fetchAll($select, $order);
     }
     /**

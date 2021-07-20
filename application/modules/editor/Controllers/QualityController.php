@@ -59,6 +59,7 @@ class editor_QualityController extends ZfExtended_RestController {
      */
     public function downloadstatisticsAction(){
         $task = $this->fetchTask();
+        // the field name is unfortunately called "type" in the frontend code
         $field = $this->getRequest()->getParam('type');
         $statisticsProvider = new editor_Models_Quality_StatisticsView($task, $field);
 

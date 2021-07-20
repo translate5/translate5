@@ -31,6 +31,8 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractView {
     
+    // in generl superflous but may we ever create this view for uneditable segments
+    protected $excludeUneditableSegments = false;    
     /**
      * Creates an entry for the frontends segment-quality model (Editor.model.quality.Segment)
      * @param editor_Models_Db_SegmentQualityRow $qualityRow
@@ -82,8 +84,9 @@ class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractVi
      * {@inheritDoc}
      * @see editor_Models_Quality_AbstractView::create()
      */
-    protected function create(){
-        foreach($this->dbRows as $dbRow){
+    protected function create(string $taskGuid, int $segmentId=NULL, array $blacklist=NULL, string $field=NULL){
+        $dbRows = $this->table->fetchFiltered($taskGuid, $segmentId);
+        foreach($dbRows as $dbRow){
             /* @var $dbRow editor_Models_Db_SegmentQualityRow */
             $row = self::createResultRow($dbRow, $this->manager, $this->task);
             $this->rows[] = $row;
