@@ -38,6 +38,12 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
     public function init($taskGuid = NULL, $parameters = array()) {
         $this->behaviour->setConfig(['isMaintenanceScheduled' => true]);
         return parent::init($taskGuid, $parameters);
+
+
+        $workerModel = $this->workerModel;
+        $this->events->attach('editor_Models_Terminology_Import_TbxFileImport', 'afterTermEntrySave', function($progress) use($workerModel){
+            $workerModel->updateProgress($progress);
+        }, 0);
     }
     
     /**

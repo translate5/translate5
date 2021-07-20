@@ -52,6 +52,8 @@ END LICENSE AND COPYRIGHT
  * @method string setLanguage() setLanguage(string $language)
  * @method string getTermId() getTermId()
  * @method string setTermId() setTermId(string $termId)
+ * @method string getTermTbxId() getTermTbxId()
+ * @method string setTermTbxId() setTermTbxId(string $termTbxId)
  * @method string getTermEntryGuid() getTermEntryGuid()
  * @method string setTermEntryGuid() setTermEntryGuid(string $termEntryGuid)
  * @method string getTermGuid() getTermGuid()
@@ -129,7 +131,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
         $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
 
         foreach ($queryResults as $key => $transacGrp) {
-            $transacGrpByKey[$transacGrp['elementName'].'-'.$transacGrp['transac'].'-'.$transacGrp['ifDescripgrp'].'-'.$transacGrp['termId']] = $transacGrp;
+            $transacGrpByKey[$transacGrp['elementName'].'-'.$transacGrp['transac'].'-'.$transacGrp['ifDescripgrp'].'-'.$transacGrp['termTbxId']] = $transacGrp;
         }
 
         return $transacGrpByKey;

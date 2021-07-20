@@ -43,6 +43,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
         'collectionId' => false,
         'termEntryId' => false,
         'termId' => false,
+        'termTbxId' => true,
         'termGuid' => false,
         'termEntryGuid' => false,
         'langSetGuid' => false,
@@ -53,6 +54,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
 
     protected int $termEntryId = 0;
     protected ?int $termId = null;
+    protected ?string $termTbxId = null;
     protected ?string $termGuid = null;
     protected ?string $termEntryGuid = null;
     protected ?string $langSetGuid = null;
@@ -73,7 +75,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
      */
     public function getCollectionKey(editor_Models_Terminology_TbxObjects_TransacGrp $element): string
     {
-        return $element->getElementName() . '-' . $element->getTransac() . '-' . $element->getIfDescripGrp() . '-' . $element->getTermId();
+        return $element->getElementName() . '-' . $element->getTransac() . '-' . $element->getIfDescripGrp() . '-' . $element->getTermTbxId();
     }
     /**
      * @return int
@@ -128,6 +130,26 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
         $this->termId = $termId;
         return $this;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getTermTbxId(): ?string
+    {
+        return $this->termTbxId;
+    }
+
+    /**
+     * @param string|null $termTbxId
+     * @return editor_Models_Terminology_TbxObjects_TransacGrp
+     */
+    public function setTermTbxId(?string $termTbxId): self
+    {
+        $this->termTbxId = $termTbxId;
+        return $this;
+    }
+
 
     /**
      * @return string|null
