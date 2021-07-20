@@ -137,9 +137,8 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
             }
         },
         stepsData: {
-            get: function (get) {
+            get: function (task) {
                 var me = this,
-                    task = get('currentTask'),
                     metaData = task && task.getWorkflowMetaData(),
                     steps = [],
                     added = [];
@@ -162,7 +161,8 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                 });
 
                 return steps;
-            }
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
         }
     }
 });
