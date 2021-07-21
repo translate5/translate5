@@ -441,7 +441,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         }
 
         // the deadline will be order date + defaultDeadlineDate days config
-        $this->data->deadlineDate = editor_Utils::addBusinessDays($model->getOrderdate(),$configValue);
+        $this->data->deadlineDate = editor_Utils::addBusinessDays($this->task->getOrderdate(),$configValue);
         $this->entity->setDeadlineDate($this->data->deadlineDate);
     }
 }
