@@ -234,7 +234,12 @@ class editor_Workflow_Default_Hooks {
             $task->loadByTaskGuid($newTua->getTaskGuid());
             $this->newTask = $task;
         }
-        
+
+        if($this->newTask->isImporting()) {
+            //when task is importing, we may not trigger workflow stuff
+            return;
+        }
+
         /* @var $jobHandler editor_Workflow_Default_JobHandler */
         $jobHandler = ZfExtended_Factory::get('editor_Workflow_Default_JobHandler');
         $jobHandler->executeSave($this->getActionConfig(), $saveCallback);
