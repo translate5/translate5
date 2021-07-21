@@ -154,26 +154,31 @@ class editor_Workflow_Manager {
     public function getWorkflowData() {
         $result = [];
         
-        //updating the config defaults list if needed FIXME move to workflow configurator on workflow creation if implemented in the future
-        $config = ZfExtended_Factory::get('editor_Models_Config');
-        /* @var $model editor_Models_Config */
-        $config->loadByName('runtimeOptions.workflow.initialWorkflow');
         $workflows = array_keys(self::$workflowList);
-        $workflowList = join(',', $workflows);
-        
-        if($config->getDefaults() != $workflowList) {
-            $config->setDefaults($workflowList);
-            $config->save();
+
+        try {
+            //updating the config defaults list if needed FIXME move to workflow configurator on workflow creation if implemented in the future
+            $config = ZfExtended_Factory::get('editor_Models_Config');
+            /* @var $config editor_Models_Config */
+            $config->loadByName('runtimeOptions.workflow.initialWorkflow');
+            $workflowList = join(',', $workflows);
+
+            if($config->getDefaults() != $workflowList) {
+                $config->setDefaults($workflowList);
+                $config->save();
+            }
+        } catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //if the config could not be found, we can not update the defaults,
+            // but that should happen only while updating older installations, so no need to handle it more in detail
         }
-        
+
         foreach($workflows as $name) {
             $wf = $this->get($name);
             /* @var $wf editor_Workflow_Default */
             $data = new stdClass();
             $data->id = $name;
             $data->label = $wf->getLabel();
-            $data->anonymousFieldLabel = false; //FIXME true | false, comes from app.ini not from wf class
-            
+
             $data->roles = $wf->labelize($wf->getRoles());
             
             $data->usableSteps = $wf->labelize($wf->getUsableSteps());
