@@ -488,15 +488,10 @@ class Models_Installer_Standalone {
      */
     protected function acceptLicenses(array $depsToAccept) {
         if(is_array($this->options) && ($this->options['license-ignore'] ?? false)){
-            //FIXME check log after next installation and remove the below md5 based check if not needed anymore!
-            error_log("IGNORE LICENSE BY PARAM");
             return;
         }
-        //FIXME since above options is not usable yet, we just check for the host to ignore the license question
-        //when using console kit we can replace this with an undocumented switch
+        //if install-and-update.sh is called on the server and above options is not usable, there fore this fallback
         if(md5(gethostname()) === '52c30971e2fe1d24879b307b44e0966f') {
-            //FIXME check log after next installation and remove the below md5 based check if not needed anymore!
-            error_log("IGNORE LICENSE BY HOST");
             return;
         }
         $first = true;

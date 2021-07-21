@@ -95,5 +95,10 @@ foreach ($configs as $config){
     $tmp = explode('.', str_replace(['runtimeOptions.workflow.','.defaultDeadlineDate'], '',$config ));
     $model->setGuiName('Default deadline date: workflow:'.$tmp[0].',step:'.$labels[$tmp[1]] ?? $tmp[1]);
     $model->setName($config);
-    $model->save();
+    try {
+        $model->save();
+    }
+    catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+        //ignore this case, may happen on installation when struggling with the order of the SQL alter files
+    }
 }
