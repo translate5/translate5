@@ -818,7 +818,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
                             }
 
                             $image->setHexOrXbaseValue('');
-                            $this->saveFileLocal($this->tbxFilePath, $image->getName(), $img);
+                            $this->saveImageLocal($image->getName(), $img);
                         }
 
                         $this->createOrUpdateElement($this->tbxImagesModel, $tbxImagesAsObject, $this->tbxImagesCollection, $this->mergeTerms);
@@ -978,35 +978,33 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
 
     /***
-     * Save the imported file to the disk.
-     * The file location will be "trasnalte5 parh" /data/tbx-import/tbx-for-filesystem-import/tc_"collectionId"/the file"
-     *
-     * @param string $filepath: source file location
-     * @param string|null $name: source file name
+     * Save the given image to the term collection images folder. This function will check and create the required folder structure
+     * @param string $imageName
+     * @param string $imageContent
      */
-    private function saveFileLocal(string $filepath, string $name, $image)
+    private function saveImageLocal(string $imageName, string $imageContent)
     {
         $tbxImportDirectoryPath = APPLICATION_PATH.'/../data/tbx-import/';
-        $newFilePath = $tbxImportDirectoryPath.'tbx-for-filesystem-import/tc_'.$this->collectionId.'/images';
+        $imagePath = $tbxImportDirectoryPath.'term-images-public/tc_'.$this->collectionId.'/images';
 
         //check if the directory exist and it is writable
         if (is_dir($tbxImportDirectoryPath) && !is_writable($tbxImportDirectoryPath)) {
-            $this->log("Unable to save the tbx file to the tbx import path. The file is not writable. Import path: ".$tbxImportDirectoryPath." , termcollectionId: ".$this->collectionId);
+            $this->log("Unable to save the image file to the tbx import path. The file is not writable. Import path: ".$tbxImportDirectoryPath." , termcollectionId: ".$this->collectionId);
             return;
         }
 
         try {
-            if (!file_exists($newFilePath) && !@mkdir($newFilePath, 0777, true)) {
-                $this->log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$this->collectionId);
+            if (!file_exists($imagePath) && !@mkdir($imagePath, 0777, true)) {
+                $this->log("Unable to create directory for imported image files. Directory path: ".$imagePath." , termcollectionId: ".$this->collectionId);
                 return;
             }
         } catch (Exception $e) {
-            $this->log("Unable to create directory for imported image files. Directory path: ".$newFilePath." , termcollectionId: ".$this->collectionId);
+            $this->log("Unable to create directory for imported image files. Directory path: ".$imagePath." , termcollectionId: ".$this->collectionId);
             return;
         }
 
-        $newFileName = $newFilePath.'/'.$name;
+        $newFileName = $imagePath.'/'.$imageName;
 
-        file_put_contents($newFileName, $image);
+        file_put_contents($newFileName, $imageContent);
     }
 }
