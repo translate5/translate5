@@ -27,12 +27,11 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * Creates the quality view for a Segment
  * 
  */
-class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractView {
+class editor_Models_Quality_SegmentView {
     
-    // in generl superflous but may we ever create this view for uneditable segments
-    protected $excludeUneditableSegments = false;    
     /**
      * Creates an entry for the frontends segment-quality model (Editor.model.quality.Segment)
      * @param editor_Models_Db_SegmentQualityRow $qualityRow
@@ -78,19 +77,40 @@ class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractVi
         }
         return strnatcasecmp($a->typeText, $b->typeText);
     }
-    
     /**
-     * Overrides to only supply the qualities for a single segment
-     * {@inheritDoc}
-     * @see editor_Models_Quality_AbstractView::create()
+     * @var stdClass[]
      */
-    protected function create(string $taskGuid, int $segmentId=NULL, array $blacklist=NULL, string $field=NULL){
-        $dbRows = $this->table->fetchFiltered($taskGuid, $segmentId);
+    protected $rows = [];
+    /**
+     * @var editor_Models_Task
+     */
+    protected $task;
+    /**
+     * @var editor_Segment_Quality_Manager
+     */
+    protected $manager;
+    /**
+     *
+     * @param editor_Models_Task $task
+     * @param int $segmentId
+     */
+    public function __construct(editor_Models_Task $task, int $segmentId){
+        $this->task = $task;
+        $this->manager = editor_Segment_Quality_Manager::instance();
+        $table = new editor_Models_Db_SegmentQuality();
+        $dbRows = $table->fetchFiltered($task->getTaskGuid(), $segmentId);
         foreach($dbRows as $dbRow){
             /* @var $dbRow editor_Models_Db_SegmentQualityRow */
             $row = self::createResultRow($dbRow, $this->manager, $this->task);
             $this->rows[] = $row;
         }
         usort($this->rows, 'editor_Models_Quality_SegmentView::compareByTypeTitle');
+    }
+    /**
+     * Retrieves the processed data
+     * @return stdClass[]
+     */
+    public function getRows() : array {
+        return $this->rows;
     }
 }

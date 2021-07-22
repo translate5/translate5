@@ -89,6 +89,9 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
 
             case editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY:
                 return $translate->_('Interne Tags haben eine ungültige Struktur');
+            // this is a virtual category that con not be found in the database  
+            case editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE:
+                return $translate->_('Interne Tags nicht editierbarer Segmente haben eine ungültige Struktur');
         }
         return NULL;
     }

@@ -45,7 +45,8 @@ class editor_Segment_Internal_TagComparision {
      * @return bool
      */
     public static function isFault(string $type, string $category) : bool {
-        return ($type == editor_Segment_Tag::TYPE_INTERNAL && $category == self::TAG_STRUCTURE_FAULTY);
+        // we take the virtual category TAG_STRUCTURE_FAULTY_NONEDITABLE also into account to keep the API independent of the processing state
+        return ($type == editor_Segment_Tag::TYPE_INTERNAL && ($category == self::TAG_STRUCTURE_FAULTY || $category == self::TAG_STRUCTURE_FAULTY_NONEDITABLE));
     }
     /**
      * @var string
@@ -66,7 +67,13 @@ class editor_Segment_Internal_TagComparision {
     /**
      * @var string
      */
-    const TAG_STRUCTURE_FAULTY = 'internal_tag_structure_faulty';        
+    const TAG_STRUCTURE_FAULTY = 'internal_tag_structure_faulty';
+    /**
+     * This is a purely virtual category that is created when fetching qualities
+     * Non-editable/locked segments will have a different category when having tag-errors
+     * @var string
+     */
+    const TAG_STRUCTURE_FAULTY_NONEDITABLE = 'internal_tag_structure_faulty_noneditable'; 
     /**
      * 
      * @var string;
