@@ -65,6 +65,7 @@ class Translate2417Test extends editor_Test_JsonTest {
 
     /***
      * Test if all the segments are as expected after import.
+     * @depends testSetupData
      */
     public function testSegmentValuesAfterImport() {
         $segments = $this->api()->requestJson('editor/segment');
@@ -75,6 +76,8 @@ class Translate2417Test extends editor_Test_JsonTest {
     /***
      * Test the tm->query results before and after segment editing. After the segment is edited, and because of the writable as default flag,
      * the translated targetEdit should be offered as result from the tm when we query for the segment
+     * @depends testSetupData
+     * @depends testSegmentValuesAfterImport
      */
     public function testTmResultQuery() {
         $tm = $this->api()->getResources()[0];
