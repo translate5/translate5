@@ -114,14 +114,12 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         if(Ext.Array.contains([record.CONFIG_LEVEL_INSTANCE,record.CONFIG_LEVEL_CLIENT],parseInt(record.get('level')))){
             Ext.Msg.alert('',view.strings.configChangeReloadMessageBoxText);
         }
-        view.getStore().sync({
+        record.save({
             success: function(rec, operation){
                 Editor.MessageBox.addSuccess(view.strings.updateConfigSuccessMessage);
-                record.commit();
             },
-            failure: function(response) {
-                Editor.app.getController('ServerException').handleException(response);
-                record.reject();
+            failure: function(rec, operation) {
+                Editor.app.getController('ServerException').handleCallback(rec, operation, false);
             }
         });
     },
