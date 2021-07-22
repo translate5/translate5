@@ -58,7 +58,15 @@ class editor_Models_Terminology_TbxObjects_DataType {
     public function getForAttribute(editor_Models_Terminology_TbxObjects_Attribute $attribute){
         $labelTypeMatches = [];
         foreach ($this->data as $data) {
-            if($data['label'] === $attribute->getElementName() && $data['type'] === $attribute->getType()){
+
+            // if the label does not match the element name, continue with the search
+            if($data['label'] !== $attribute->getElementName()){
+                continue;
+            }
+
+            // if the type is empty or if the type matches the attribute dataType, use this as valid label match
+            // there are attributes without type defined (ex: note) and they are valid tbx basic
+            if(empty($data['type']) || ($data['type'] === $attribute->getType())){
                 $labelTypeMatches[] = $data;
             }
         }
