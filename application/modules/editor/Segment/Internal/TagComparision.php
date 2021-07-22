@@ -111,8 +111,8 @@ class editor_Segment_Internal_TagComparision {
         $this->numCheckTags = count($this->checkTags);
         // the structural check can be done without against tags
         $this->checkStructure();
-        // there is a against and it is not empty
-        if($against != NULL && !$against->isEmpty()){
+        // there is a against and it is not empty and toCheck also is not empty
+        if($against != NULL && !$against->isEmpty() && !$toCheck->isEmpty()){
             $against->sort();
             $this->againstTags = $against->getByType(editor_Segment_Tag::TYPE_INTERNAL);
             $this->numAgainstTags = count($this->againstTags);

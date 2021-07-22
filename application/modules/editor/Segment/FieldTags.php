@@ -958,9 +958,9 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     public function debug(){
         $newline = "\n";
-        $debug = 'FIELD TEXT: '.$newline.trim($this->fieldText).$newline;
+        $debug = 'FIELD TEXT: "'.trim($this->fieldText).'"'.$newline;
           for($i=0; $i < count($this->tags); $i++){
-              $debug .= $newline.'TAG '.$i.':'.$newline.trim($this->tags[$i]->debug()).$newline;
+              $debug .= 'TAG '.$i.':'.$newline.trim($this->tags[$i]->debug()).$newline;
         }
         return $debug;
     }

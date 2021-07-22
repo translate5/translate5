@@ -36,6 +36,11 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Quality_RequestState {
     
     /**
+     * 
+     * @var editor_Models_Task
+     */
+    private $task;
+    /**
      * Represents the sent filter mode
      * @var string
      */
@@ -54,14 +59,30 @@ class editor_Models_Quality_RequestState {
      * Represents the transformed list of qualities
      * @var string
      */
-    private $catsByType = null;
+    private $catsByType = NULL;
     /**
      * The current user restriction
      * @var string
      */
-    private $userGuid = null;
+    private $userGuid = NULL;
+    /**
+     * 
+     * @var int
+     */
+    private $editableRestriction = NULL;
+    /**
+     * 
+     * @var array
+     */
+    private $segmentIdsRestriction = NULL;
+    /**
+     * 
+     * @var boolean
+     */
+    private $hasEditableFaults = false;
    
-    public function __construct(string $requestValue=NULL){
+    public function __construct(string $requestValue=NULL, editor_Models_Task $task){
+        $this->task = $task;
         if($requestValue != NULL && strpos($requestValue, '|') !== false){
             $parts = explode('|', $requestValue);
             $this->checked = (count($parts) < 1 || empty($parts[0]) || $parts[0] == 'NONE' || $parts[0] == 'root') ? '' : $parts[0];
@@ -79,6 +100,8 @@ class editor_Models_Quality_RequestState {
     private function createSegmentFilters(){
         if($this->catsByType === null){
             $this->catsByType = [];
+            $hasNonEditableFaults = false;
+            $hasOtherCats = false;
             if($this->checked != ''){
                 foreach(explode(',', $this->checked) as $quality){
                     if(strpos($quality, ':') !== false){
@@ -86,8 +109,26 @@ class editor_Models_Quality_RequestState {
                         if(!array_key_exists($type, $this->catsByType)){
                             $this->catsByType[$type] = [];
                         }
-                        $this->catsByType[$type][] = $category;
+                        if($type == editor_Segment_Tag::TYPE_INTERNAL && ($category == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY || $category == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE)){
+                            $this->catsByType[$type][] = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY;
+                            if($category == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY){
+                                $this->hasEditableFaults = true;
+                                $hasOtherCats = true;
+                            } else {
+                                $hasNonEditableFaults = true;
+                            }
+                        } else {
+                            $this->catsByType[$type][] = $category;
+                            $hasOtherCats = true;
+                        }
                     }
+                }
+                // prevent the potential duplication of the TAG_STRUCTURE_FAULTY category and evaluate the needed editable restriction
+                if($hasNonEditableFaults){
+                    $this->catsByType[editor_Segment_Tag::TYPE_INTERNAL] = array_unique($this->catsByType[editor_Segment_Tag::TYPE_INTERNAL]);
+                    $this->editableRestriction = ($hasOtherCats) ? NULL : 0;
+                } else {
+                    $this->editableRestriction = 1;
                 }
             }
         }
@@ -128,6 +169,14 @@ class editor_Models_Quality_RequestState {
         return $list;
     }
     /**
+     * Retrieves, if we have checked categories
+     * @return bool
+     */
+    public function hasCheckedCategoriesByType() : bool {
+        $this->createSegmentFilters();
+        return (count($this->catsByType) > 0);
+    }
+    /**
      * Retrieves a nested hashtable of checked qualities as used for editor_Models_Db_SegmentQuality::getSegmentIdsForQualityFilter
      * Structure like [ 'mqm' => true, 'mqm:mqm_1' => true, 'term' => true, 'term:termSuperseded' => true, ....  ]
      * @return array
@@ -136,14 +185,18 @@ class editor_Models_Quality_RequestState {
         $this->createSegmentFilters();
         return $this->catsByType;
     }
+    
     /**
      * Retrieves, if we have checked categories
      * @return bool
      */
-    public function hasCheckedCategoriesByType() : bool {
-        $this->createSegmentFilters();
-        return (count($this->catsByType) > 0);
+    public function getSegmentIdsRestriction() : array {
+        if($this->segmentIdsRestriction === NULL){
+            $this->segmentIdsRestriction = editor_Models_Db_SegmentQuality::getSegmentIdsForQualityFilter($this, $this->task->getTaskGuid());
+        }
+        return $this->segmentIdsRestriction;
     }
+    
     /**
      * Retrieves the needed restriction for the falsePositive column
      * @return int|NULL
@@ -172,6 +225,22 @@ class editor_Models_Quality_RequestState {
         return ($this->getFalsePositiveRestriction() !== NULL);
     }
     /**
+     * Retrieves, if the shown segments should be restricted to editable segments in the main segment filter
+     * @return bool
+     */
+    public function hasEditableRestriction() : bool {
+        $this->createSegmentFilters();
+        return ($this->editableRestriction !== NULL);
+    }
+    /**
+     * 
+     * @return int
+     */
+    public function getEditableRestriction() : ?int {
+        $this->createSegmentFilters();
+        return $this->editableRestriction;
+    }
+    /**
      * Retrieves if we have a user restriction (by userGuid)
      * @return bool
      */
@@ -179,19 +248,27 @@ class editor_Models_Quality_RequestState {
         return ($this->userGuid != NULL);
     }
     /**
-     *
+     * Retrieves, if the category TAG_STRUCTURE_FAULTY of the type "internal" was present
+     * @return bool
+     */
+    public function hasCategoryEditableInternalTagFaults() : bool {
+        $this->createSegmentFilters();
+        return $this->hasEditableFaults;
+    }
+    /**
+     * TODO REMOVE param $task
      * @param editor_Models_Task $task
      * @return array|NULL
      */
-    public function getUserRestrictedSegmentNrs(editor_Models_Task $task) : ?array {
+    public function getUserRestrictedSegmentNrs() : ?array {
         if($this->userGuid != NULL){
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($this->userGuid, $task);
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($this->userGuid, $this->task);
             /* @var $tua editor_Models_TaskUserAssoc */
             $step = $tua->getWorkflowStepName();
-            if(!$tua->isSegmentrangedTaskForStep($task, $step)){
+            if(!$tua->isSegmentrangedTaskForStep($this->task, $step)){
                 return NULL;
             }
-            return $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $this->userGuid, $step);
+            return $tua->getAllAssignedSegmentsByUserAndStep($this->task->getTaskGuid(), $this->userGuid, $step);
         }
         return NULL;
     }

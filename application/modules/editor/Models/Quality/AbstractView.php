@@ -175,17 +175,17 @@ abstract class editor_Models_Quality_AbstractView {
         $this->excludeMQM = $excludeMQM;
         // generate hashtable of filtered qualities and respect filter mode if the current state was sent
         if($currentState !== NULL){
-            $requestState = new editor_Models_Quality_RequestState($currentState);
+            $requestState = new editor_Models_Quality_RequestState($currentState, $this->task);
             $this->checkedQualities = $requestState->getCheckedList();
             $this->collapsedQualities = $requestState->getCollapsedList();
             $this->falsePositiveRestriction = $requestState->getFalsePositiveRestriction();
             // The qualities may have to be limited to the visible segment-nrs for the current editor
-            $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs($this->task);
+            $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs();
             
         } else if($this->isTree){
             // In tree mode we need the user-restriction of the state also when no filtered state was send
-            $requestState = new editor_Models_Quality_RequestState('');
-            $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs($this->task);
+            $requestState = new editor_Models_Quality_RequestState('', $this->task);
+            $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs();
         }
         $blacklist = ($onlyFilterTypes) ? $this->manager->getFilterTypeBlacklist() : [];
         if($excludeMQM){
@@ -249,6 +249,7 @@ abstract class editor_Models_Quality_AbstractView {
     protected function create(string $taskGuid, array $typeBlacklist=NULL, string $field=NULL){
         // create ordered rubrics
         $rubrics = [];
+        $hasNonEditableInternalTagFaults = false;
         foreach($this->manager->getAllFilterableTypes($this->task) as $type){
             if(!$this->excludeMQM || $type != editor_Segment_Tag::TYPE_MQM){
                 $rubrics[] = $this->createRubricRow($type);
@@ -265,21 +266,23 @@ abstract class editor_Models_Quality_AbstractView {
         foreach($table->fetchForFrontend($taskGuid, $typeBlacklist, $this->segmentNrRestriction, $this->falsePositiveRestriction, $field) as $row){
             /* @var $row array */
             $type = $row['type'];
+            // for non-editable segments that have structural internal tag-errors we create a special virtual category
+            if($row['editable'] == 0 && $type == editor_Segment_Tag::TYPE_INTERNAL && $row['category'] == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY){
+                $row['category'] = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE;
+                $hasNonEditableInternalTagFaults = true;
+            }
             if(array_key_exists($type, $this->rowsByType)){
-                // We create a virtual category for structural tag errors in non-editable segments
-                $category = ($row['editable'] == 0 && $type == editor_Segment_Tag::TYPE_INTERNAL && $row['category'] == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY) ?
-                    editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE : $row['category'];
                 $this->rowsByType[$type][self::RUBRIC]->qcount++;
                 if($this->hasNumFalsePositives && $row['falsePositive'] == 1){
                     $this->rowsByType[$type][self::RUBRIC]->qcountfp++;
                 }
                 if($this->isTree){
-                    if(!array_key_exists($category, $this->rowsByType[$type])){
-                        $this->rowsByType[$type][$category] = $this->createCategoryRow($row, false);
+                    if(!array_key_exists($row['category'], $this->rowsByType[$type])){
+                        $this->rowsByType[$type][$row['category']] = $this->createCategoryRow($row, false);
                     }
-                    $this->rowsByType[$type][$category]->qcount++;
+                    $this->rowsByType[$type][$row['category']]->qcount++;
                     if($this->hasNumFalsePositives && $row['falsePositive'] == 1){
-                        $this->rowsByType[$type][$category]->qcountfp++;
+                        $this->rowsByType[$type][$row['category']]->qcountfp++;
                     }
                 }
                 $this->numQualities++;
@@ -290,13 +293,13 @@ abstract class editor_Models_Quality_AbstractView {
             }
         }
         // create result rows
-        $this->createRows($rubrics);
+        $this->createRows($rubrics, $hasNonEditableInternalTagFaults);
     }
     /**
      * Create the resulting view out of the database data
      * @param stdClass[] $rubrics
      */
-    protected function createRows(array $rubrics){
+    protected function createRows(array $rubrics, bool $hasNonEditableInternalTagFaults){
         foreach($rubrics as $rubric){
             if($this->isTree){
                 $rubric->qtotal = $rubric->qcount;
@@ -309,7 +312,11 @@ abstract class editor_Models_Quality_AbstractView {
                     $rubric->children = [];
                     $qualityProvider = $this->manager->getProvider($rubric->qtype);
                     $rubricCats = ($this->hasEmptyCategories) ? $qualityProvider->getAllCategories($this->task) : array_keys($this->rowsByType[$rubric->qtype]);
-                    ksort($rubricCats);
+                    // important: when we use the predefined categories and have internal tag faults of non-editable segments we need to make sure this virtual category is there
+                    if($hasNonEditableInternalTagFaults && $rubric->qtype == editor_Segment_Tag::TYPE_INTERNAL && !in_array(editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE, $rubricCats)){
+                        $rubricCats[] = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE;
+                    }
+                    sort($rubricCats);
                     foreach($rubricCats as $category){
                         if($category != self::RUBRIC){
                             if(array_key_exists($category, $this->rowsByType[$rubric->qtype])){

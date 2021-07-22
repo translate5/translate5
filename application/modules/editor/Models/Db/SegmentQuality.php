@@ -99,9 +99,27 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
         /* @var $table editor_Models_Db_SegmentQuality */
         $adapter = $table->getAdapter();
-        $select = $table->select()
-            ->from($table->getName(), ['segmentId'])
-            ->where('taskGuid = ?', $taskGuid);
+        $select = $adapter->select();
+        $select
+            ->from(['qualities' => $table->getName()], 'qualities.segmentId')
+            ->where('qualities.taskGuid = ?', $taskGuid);
+        // if the state has no editable restriction this means, that the editable restriction must be applied here but not for internal tag faults
+        if(!$state->hasEditableRestriction()){
+            $faultyType = "'".editor_Segment_Tag::TYPE_INTERNAL."'";
+            $faultyCat = "'".editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY."'";
+            $select
+                ->from(['segments' => 'LEK_segments'], [])
+                ->where('qualities.segmentId = segments.id');
+            // here it's where it get's really finnicky: we have to evaluate the editable-category only, if it vcan't be applied in editor_Models_Filter_SegmentSpecific
+            // that means, we do have other categories apart of the non-editable faulty tags, but that may also includes the editable faulty-tags
+            if($state->hasCategoryEditableInternalTagFaults()){
+                $select->where('(segments.editable = 1 OR (qualities.type = '.$faultyType.' AND qualities.category = '.$faultyCat.'))');
+            } else {
+                $select->where(
+                    '((segments.editable = 1 AND NOT (qualities.type = '.$faultyType.' AND qualities.category = '.$faultyCat.')) '
+                    .'OR (segments.editable = 0 AND qualities.type = '.$faultyType.' AND qualities.category = '.$faultyCat.'))');
+            }
+        }
         if($state->hasCheckedCategoriesByType()){
             $nested = $table->select();
             foreach($state->getCheckedCategoriesByType() as $type => $categories){
@@ -116,7 +134,9 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             }
         }
         $segmentIds = [];
-        foreach($table->fetchAll($select, 'segmentId')->toArray() as $row){
+        // DEBUG
+        // error_log('FETCH SEGMENT-IDS FOR QUALITY FILTER: '.$select->__toString());
+        foreach($adapter->fetchAll($select, [], Zend_Db::FETCH_ASSOC) as $row){
             $segmentIds[] = $row['segmentId'];
         }
         return $segmentIds;
@@ -234,6 +254,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             }
         }
         $order = [ 'type ASC', 'category ASC' ];
+        // DEBUG
         // error_log('FETCH FILTERD QUALITIES: '.$select->__toString().' / order: '.implode(', ', $order)); 
         return $this->fetchAll($select, $order);
     }
@@ -287,15 +308,9 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             $select->where('qualities.falsePositive = ?', $falsePositiveRestriction, Zend_Db::INT_TYPE);
         }
         $select->order([ 'qualities.type ASC', 'qualities.category ASC' ]);
-        
-        error_log('FETCH QUALITIES FOR FRONTEND: '.$select->__toString());
-        
-        $result = $this->getAdapter()->fetchAll($select, [], Zend_Db::FETCH_ASSOC);
-        if($result == NULL){
-            return [];
-        }
-        
-        return $result;
+        // DEBUG
+        // error_log('FETCH QUALITIES FOR FRONTEND: '.$select->__toString());
+        return $this->getAdapter()->fetchAll($select, [], Zend_Db::FETCH_ASSOC);
     }
     /**
      * Deletes quality-entries by their ID

@@ -163,7 +163,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     /**
      * Retrieves all Categories a quality can have
      * @param editor_Models_Task $task
-     * @return array
+     * @return string[]
      */
     public function getAllCategories(editor_Models_Task $task) : array {
         return [];
