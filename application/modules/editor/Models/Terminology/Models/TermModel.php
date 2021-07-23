@@ -149,11 +149,29 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ];
         }
 
+        // If new term's processStatus is 'rejected'
+        if ($this->getProcessStatus() == 'rejected') {
+
+            // Get normativeAuthorization-attr dataTypeId
+            $dataTypeId_normativeAuthorization = editor_Utils::db()->query('
+                SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = "normativeAuthorization" LIMIT 1
+            ')->fetchColumn();
+
+            // Append to attrA
+            $attrA['normativeAuthorization'] = [
+                'dataTypeId' => $dataTypeId_normativeAuthorization,
+                'type' => 'normativeAuthorization',
+                'value' => 'deprecatedTerm',
+            ];
+        }
+
         // If attributes should be copied from other term
         if ($misc['copyAttrsFromTermId']) {
 
             // Array of dataTypeIds to be ignored while copying attributes from other term
-            $except = [$dataTypeId_processStatus]; if ($misc['note']) $except []= $dataTypeId_note;
+            $except = [$dataTypeId_processStatus];
+            if ($misc['note']) $except []= $dataTypeId_note;
+            if ($this->getProcessStatus() == 'rejected') $except []= $dataTypeId_normativeAuthorization;
 
             // Fetch attributes of existing term, except at least 'processStatus' attribute
             $attrA += editor_Utils::db()->query('
@@ -164,43 +182,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         }
 
         // Foreach attribute to be INSERTed
-        foreach ($attrA as $attrI) {
-
-            // Create `terms_attributes` model instance
-            $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-
-            // Apply data
-            $a->init($attrI + [
-                'collectionId' => $this->getCollectionId(),
-                'termEntryId' => $this->getTermEntryId(),
-                'language' => $this->getLanguage(),
-                'termId' => $termId,
-
-                // Below three are surely defined in $attrI
-                //'dataTypeId' => ,
-                //'type' => ,
-                //'value' => ,
-
-                //'target' => null, // This one may be defined in $attrI
-                'isCreatedLocally' => 1,
-                'createdBy' => $this->getUpdatedBy(),
-                'createdAt' => date('Y-m-d H:i:s'),
-                'updatedBy' => $this->getUpdatedBy(),
-                'updatedAt' => date('Y-m-d H:i:s'),
-                'termEntryGuid' => $this->getTermEntryGuid(),
-                'langSetGuid' => $this->getLangSetGuid(),
-                'termGuid' => $this->getGuid(),
-                'guid' => ZfExtended_Utils::uuid(),
-
-                // Those three may be defined in $attrI, and if yes, they won't be overwritten by below
-                'elementName' => 'termNote',
-                'attrLang' => $this->getLanguage(),
-                //'dataType' => null
-            ]);
-
-            // Save attr
-            $a->save();
-        }
+        foreach ($attrA as $attrI) $this->initAttr($attrI)->save();
 
         // Check whether there were no terms for this language previously within same termEntryId
         $isTermForNewLanguage = !editor_Utils::db()->query('
@@ -293,7 +275,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $orig = $this->row->getCleanData();
 
         // Call parent
-        $return = parent::save();
+        parent::save();
 
         // If current data is not equal to original data
         if ($this->toArray() != $orig) {
@@ -328,6 +310,15 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             $attr->setValue($this->getProcessStatus());
             $attr->setUpdatedBy($this->getUpdatedBy());
             $attr->update();
+
+            // If processStatus became 'rejected'
+            if ($orig['processStatus'] != 'rejected' && $this->getProcessStatus() == 'rejected')
+
+                // Set 'normativeAuthorization' attribute to 'deprecatedTerm'
+                // If no such attribute yet exists - it will be created
+                $return['normativeAuthorization'] = $this
+                    ->setAttr('normativeAuthorization', 'deprecatedTerm')
+                    ->toArray();
         }
 
         // If $transacgrpData arg is given - update 'modification'-records of all levels
@@ -342,6 +333,102 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
         // Return
         return $return;
+    }
+
+    /**
+     * Init a new attr with main props given by $data arg and the rest copied from $this
+     *
+     * @return editor_Models_Terminology_Models_AttributeModel
+     */
+    public function initAttr($data = []) {
+
+        /** @var editor_Models_Terminology_Models_AttributeModel $a */
+        $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+
+        // Do init using $data arg having priority over props copied from $this
+        $a->init($data + [
+            'collectionId' => $this->getCollectionId(),
+            'termEntryId' => $this->getTermEntryId(),
+            'language' => $this->getLanguage(),
+            'termId' => $this->getId(),
+
+            // Below four can be provided by $data
+            //'dataTypeId' => ,
+            //'type' => ,
+            //'value' => ,
+            //'target' => ,
+
+            'isCreatedLocally' => 1,
+            'createdBy' => $this->getUpdatedBy(),
+            'createdAt' => date('Y-m-d H:i:s'),
+            'updatedBy' => $this->getUpdatedBy(),
+            'updatedAt' => date('Y-m-d H:i:s'),
+            'termEntryGuid' => $this->getTermEntryGuid(),
+            'langSetGuid' => $this->getLangSetGuid(),
+            'termGuid' => $this->getGuid(),
+            'guid' => ZfExtended_Utils::uuid(),
+
+            // Those three may be defined in $data, and if yes, they won't be overwritten by below
+            'elementName' => 'termNote',
+            'attrLang' => $this->getLanguage(),
+            //'dataType' => null
+        ]);
+
+        // Return $a
+        return $a;
+    }
+
+    /**
+     * Set term's attribute, found by dataTypeId, identified by $type arg
+     * If no such attribute yet exists - it will be created
+     *
+     * @param $type
+     * @param $value
+     * @return editor_Models_Terminology_Models_AttributeModel|void
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function setAttr($type, $value) {
+
+        // Get dataTypeId todo: throw exception if not found
+        if (!$dataTypeId = editor_Utils::db()->query('
+            SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = ? LIMIT 1
+        ', $type)->fetchColumn()) return;
+
+        // Try to find id of existing attribute having such $dataTypeId
+        $attrId = editor_Utils::db()->query(
+            'SELECT `id` FROM `terms_attributes` WHERE `termId` = ? AND `dataTypeId` = ? LIMIT 1',
+        [$this->getId(), $dataTypeId])->fetchColumn();
+
+        // If exists
+        if ($attrId) {
+
+            /** @var editor_Models_Terminology_Models_AttributeModel $a */
+            $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+
+            // Load
+            $a->load($attrId);
+
+            // Set value
+            $a->setValue($value);
+
+            // Update. Here we use update method for history record to be created
+            $a->update();
+
+        // Else
+        } else {
+
+            /** @var editor_Models_Terminology_Models_AttributeModel $a */
+            $a = $this->initAttr(['dataTypeId' => $dataTypeId, 'type' => $type]);
+
+            // Set value
+            $a->setValue($value);
+
+            // Insert
+            $a->insert();
+        }
+
+        // Return attribute
+        return $a;
     }
 
     /**
