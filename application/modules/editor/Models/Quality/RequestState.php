@@ -256,8 +256,8 @@ class editor_Models_Quality_RequestState {
         return $this->hasEditableFaults;
     }
     /**
-     * TODO REMOVE param $task
-     * @param editor_Models_Task $task
+     * Retrieves the segment-nrs the current user can edit in case we have a restricted segment range from worklow.
+     * Returns NULL if no restriction is in place. An empty array means, the user can edit no segments
      * @return array|NULL
      */
     public function getUserRestrictedSegmentNrs() : ?array {
