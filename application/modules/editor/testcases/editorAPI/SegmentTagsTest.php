@@ -288,6 +288,13 @@ class SegmentTagsTest extends editor_Test_SegmentTagsTest {
         $this->createOriginalDataTest($segmentId, $original, $markup);
     }
     
+    public function testRealDataTags10(){
+        // testing "real" segment content
+        $segmentId = 688447;
+        $markup = '<div class="open 672069643d223122 internal-tag ownttip"><span class="short" title="&lt;g id=&quot;1&quot;&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;g id=&quot;1&quot;&gt;</span></div>T<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/g&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/g&gt;</span></div><div class="open 672069643d223222 internal-tag ownttip"><span class="short" title="&lt;g id=&quot;2&quot;&gt;">&lt;2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;g id=&quot;2&quot;&gt;</span></div>ranslation <div class="open 672069643d223322 internal-tag ownttip"><span class="short" title="&lt;g id=&quot;3&quot;&gt;">&lt;3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;g id=&quot;3&quot;&gt;</span></div>M<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/g&gt;">&lt;/3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;/g&gt;</span></div>anagement <div class="open 672069643d223422 internal-tag ownttip"><span class="short" title="&lt;g id=&quot;4&quot;&gt;">&lt;4&gt;</span><span class="full" data-originalid="4" data-length="-1">&lt;g id=&quot;4&quot;&gt;</span></div>S<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/g&gt;">&lt;/4&gt;</span><span class="full" data-originalid="4" data-length="-1">&lt;/g&gt;</span></div>ystem<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/g&gt;">&lt;/2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;/g&gt;</span></div>';
+        $this->createDataTest($segmentId, $markup);
+    }
+
     public function testMqmTags1(){
         // testing "real" segment content
         $segmentId = 688501;
