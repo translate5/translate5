@@ -1,5 +1,5 @@
 {
-    "text": "{d5e99721-0326-498a-8c68-fa414aa41286}",
+    "text": "{99e5cd10-7bb6-4309-9daf-2a4edb23b7a8}",
     "children": [
         {
             "qid": -1,
@@ -8,19 +8,19 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "8485",
+                    "qid": "55762",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "internal_tag_structure_faulty",
                     "qcatidx": "-1",
                     "qcountfp": 0,
-                    "text": "Internal tags have incorrect structure",
+                    "text": "Internal tags have an incorrect structure",
                     "leaf": true,
                     "qfaulty": true
                 },
                 {
-                    "qid": "8486",
+                    "qid": "55763",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -31,7 +31,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "8487",
+                    "qid": "55764",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -77,18 +77,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "8474",
-                    "qtype": "term",
-                    "qcount": 7,
-                    "qcomplete": true,
-                    "qcategory": "not_defined_in_target",
-                    "qcatidx": "-1",
-                    "qcountfp": 0,
-                    "text": "Not defined in target terminology",
-                    "leaf": true
-                },
-                {
-                    "qid": "8478",
+                    "qid": "55755",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -99,7 +88,18 @@
                     "leaf": true
                 },
                 {
-                    "qid": "8480",
+                    "qid": "55751",
+                    "qtype": "term",
+                    "qcount": 7,
+                    "qcomplete": true,
+                    "qcategory": "not_defined_in_target",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Not defined in target terminology",
+                    "leaf": true
+                },
+                {
+                    "qid": "55757",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
