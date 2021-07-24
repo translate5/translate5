@@ -43,9 +43,11 @@
 final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
  
     /**
+     * REGEX to remove internal tags from a markup string
      * Based on the internal-tag template, see editor_ImageTag::$htmlTagTpl
      * NOTE: only opening tag-brackets "<" are reliably escaped in the contents of the inner spans - what is against XML specs unfortunately
      * NOTE: the tilte-attribute of the first inner "short" span may contain unescaped markup - what again is against XML specs unfortunately
+     * NOTE: editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS does stumble over the afromentioned problems, that's why here is another regex
      * @var string
      */
     const REGEX_REMOVE = '~<div\s*class="[^"]*internal-tag[^"]*"[^>]*><span[^>]*title="[^"]*"[^>]*>[^<]*</span><span[^>]*full[^>]*>[^<]*</span></div>~s';
