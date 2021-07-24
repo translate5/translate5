@@ -453,24 +453,14 @@ class editor_Tag {
         return (count($this->children) > 0);
     }
     /**
-     * 
-     * @return editor_Tag|NULL
-     */
-    public function getFirstChild(){
-        if($this->hasChildren()){
-            return $this->children[0];
-        }
-        return NULL;
-    }
-    /**
      * Retrieves the last child if there are any
      * @return editor_Tag|NULL
      */
-    public function getLastChild(){
+    public function getLastChildsTextLength() : int {
         if($this->hasChildren()){
-            return $this->children[count($this->children) - 1];
+            return $this->children[count($this->children) - 1]->getTextLength();
         }
-        return NULL;
+        return 0;
     }
     /**
      * 
@@ -885,7 +875,7 @@ class editor_Tag {
         return ($this->getName() == '' && count($this->children) == 0);
     }
     /**
-     * Retrieves, if the tag is a sungular tag like <tag /> or a complete tag with opening and closing part
+     * Retrieves, if the tag is a singular tag like <tag /> or a complete tag with opening and closing part
      * @return bool
      */
     public function isSingular() : bool {
@@ -1026,17 +1016,11 @@ class editor_Tag {
      * @param boolean $withDataAttribs
      * @return string
      */
-    protected function renderStart($withDataAttribs=true) : string {
+    protected function renderStart(bool $withDataAttribs=true) : string {
         if($this->getName() == ''){
             return '';
         }
-        $tag = '<'.$this->getName();
-        $tag .= self::classAttr($this->getClasses());
-        foreach($this->attribs as $name => $val){
-            if($withDataAttribs || substr($name, 0, 5) != 'data-'){
-                $tag .= self::createAttribute($name, $val);
-            }
-        }
+        $tag = '<'.$this->getName().$this->renderAttributes($withDataAttribs);
         if($this->isSingular()){
             // QUIRK: The blank before the space is against the HTML-Spec and superflous BUT termtagger does double img-tags if they do not have a blank before the trailing slash ...
             return $tag.' />';
@@ -1052,5 +1036,39 @@ class editor_Tag {
             return '';
         }
         return '</'.$this->getName().'>';
+    }
+    /**
+     * Creates all our attributes as string starting with a blank
+     * @param boolean $withDataAttribs
+     * @return string
+     */
+    protected function renderAttributes(bool $withDataAttribs=true) : string {
+        $attribs = self::classAttr($this->getClasses());
+        foreach($this->attribs as $name => $val){
+            if($withDataAttribs || substr($name, 0, 5) != 'data-'){
+                $attribs .= self::createAttribute($name, $val);
+            }
+        }
+        return $attribs;
+    }
+    /**
+     * Helper to debug nested tags
+     * @param string $indentation
+     */
+    public function debugStructure(string $indentation=''){
+        $text = $indentation.' '.get_class($this).' '.$this->debugProps()."\n";
+        if($this->hasChildren()){
+            foreach($this->getChildren() as $child){
+                $text .= $child->debugStructure('**'.$indentation);
+            }
+        }
+        return $text;
+    }
+    /**
+     * Helper to create debug structure
+     * @return string
+     */
+    public function debugProps() : string {
+        return '';
     }
 }

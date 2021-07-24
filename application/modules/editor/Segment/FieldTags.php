@@ -79,7 +79,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * Can be used to validate the unparsing-process. Use only for Development !!
      * @var boolean
      */
-    const VALIDATION_MODE = false;
+    const VALIDATION_MODE = true;
     /**
      * The counterpart to ::toJson: creates the tags from the serialized JSON data
      * @param editor_Models_Task $task
@@ -119,6 +119,9 @@ class editor_Segment_FieldTags implements JsonSerializable {
     }
     /**
      * Helper to sort Internal tags or rendered tags by startIndex
+     * This is a central part of the rendering logic
+     * Note, that for rendering, ags, that potentially contain other tags, must come first, otherwise this will lead to rendering errors
+     * The nesting may be corrected with the ::findHolderByOrder API but for rendering this "longer first" logic must apply
      * @param editor_Segment_Tag $a
      * @param editor_Segment_Tag $b
      * @return int
@@ -126,7 +129,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
     public static function compare(editor_Segment_Tag $a, editor_Segment_Tag $b){
         if($a->startIndex === $b->startIndex){
             // only tags at the exact same position that do not contain each other will need the order-property evaluated when sorting !
-            if($a->endIndex == $b->endIndex && $a->order > -1 && $b->order > -1 && $a->parentOrder != $b->order && $a->order != $b->parentOrder){
+            if($b->endIndex == $a->endIndex && $a->order > -1 && $b->order > -1 && $a->parentOrder != $b->order && $a->order != $b->parentOrder){
                 return $a->order - $b->order;
             }
             // crucial: we must make sure, that a "normal" tag may contain a single tag at the same index (no text-content). Thus, the normal tags always must weight less / come first
@@ -136,6 +139,23 @@ class editor_Segment_FieldTags implements JsonSerializable {
                 return -1;
             }
             return $b->endIndex - $a->endIndex;
+        }
+        return $a->startIndex - $b->startIndex;
+    }
+    /**
+     * Sorting of children of segment tags in the rendering phase: Here the singular tags (where startIndex == endIndex) MUST come first!
+     * This is crucial for the text-distribution to work properly (::addSegmentText)
+     * @param editor_Segment_Tag $a
+     * @param editor_Segment_Tag $b
+     * @return number
+     */
+    public static function compareChildren(editor_Segment_Tag $a, editor_Segment_Tag $b){
+        if($a->startIndex === $b->startIndex){
+             // only tags at the exact same position that do not contain each other will need the order-property evaluated when sorting !
+            if($b->endIndex == $a->endIndex && $a->order > -1 && $b->order > -1){
+                return $a->order - $b->order;
+            }
+            return $a->endIndex - $b->endIndex;
         }
         return $a->startIndex - $b->startIndex;
     }
@@ -382,49 +402,19 @@ class editor_Segment_FieldTags implements JsonSerializable {
                 $result[] = $tag;
             } else {
                 $replace = true;
-                if($tag->getType() == editor_Segment_Tag::TYPE_INTERNAL){
-                    $this->removeInternalTagText($tag);
-                }
             }
         }
         if($replace){
             $this->tags = $result;
+            $this->fixParentOrders();
         }
     }
     /**
      * Removes all tags, so only the raw text will be left
      */
     public function removeAll(){
-        // CRUCIAL: remove the internal tags first to remove the text-contents of the internal tags as well
-        $this->removeByType(editor_Segment_Tag::TYPE_INTERNAL, true);
         $this->tags = [];
         $this->orderIndex = -1;
-    }
-    /**
-     * Removes the text belonging to the internal tag
-     * All indexes of all following tags will be adjusted, the internal tag will be reset to contain no text
-     * @param editor_Segment_Internal_Tag $tag
-     */
-    private function removeInternalTagText(editor_Segment_Internal_Tag $internalTag){
-        $text = ($internalTag->startIndex == 0) ? '' : mb_substr($this->fieldText, 0, $internalTag->startIndex);
-        if($internalTag->endIndex < $this->getFieldTextLength() - 1){
-            $text .= mb_substr($this->fieldText, $internalTag->endIndex);
-        }
-        $this->fieldText = $text;
-        // CRUCIAL: adjusting all text-indices of all following tags
-        $cut = $internalTag->endIndex - $internalTag->startIndex;
-        foreach($this->tags as $tag){
-            if($tag->startIndex > $internalTag->startIndex){
-                $discount = min(($tag->startIndex - $internalTag->startIndex), $cut);
-                $tag->startIndex -= $discount;
-            }
-            if($tag->endIndex > $internalTag->startIndex){
-                $discount = min(($tag->endIndex - $internalTag->startIndex), $cut);
-                $tag->endIndex -= $discount;
-            }
-        }
-        $internalTag->startIndex = 0;
-        $internalTag->endIndex = 0;
     }
     /**
      * 
@@ -515,74 +505,77 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return string
      */
     public function render(array $skippedTypes=NULL) : string {
+   
         if(count($this->tags) == 0){
             return $this->fieldText;
         }
         $this->sort();
-        // first, clone our tags to have a disposable rendering model
+        // first, clone our tags to have a disposable rendering model. This may split some tags that are allowed to overlap into "subtags" (like mqm)
         $clones = [];
         /* @var $clones editor_Segment_Tag[] */
         foreach($this->tags as $tag){
             $tag->addRenderingClone($clones);
         }
-        // the final rendered model
-        $rtags = [];
-        /* @var $rtags editor_Segment_Tag[] */
-        // creating a datamodel where the overlapping tags are segmented to pieces that do not overlap
-        // therefore, all tags are compared with the tags after them and are cut into pieces if needed
-        // this will lead to tags being cut into pieces not nesseccarily in the order as they have been added but in the order of their start-indexes / weight
+        usort($clones, array($this, 'compare'));
         $numClones = count($clones);
+        // cutting the overlaps
         if($numClones > 1){
-            while($numClones > 0){
-                $tag = array_shift($clones);
-                $numClones--;
-                $rtags[] = $tag;
-                $added = false;
-                for($i = 0; $i < $numClones; $i++){
-                    $compare = $clones[$i];
-                      // if the tag to compare overlaps we have to cut one of the two in pieces
-                    if($compare->startIndex < $tag->endIndex && $compare->endIndex > $tag->endIndex){
-                        if($tag->isSplitable() || $compare->isSplitable()){
-                            if($tag->isSplitable()){
-                                // cut the current tag at the next tags start index
-                                $part = $tag->cloneForRendering();
-                                $tag->endIndex = $compare->startIndex;
-                                $part->startIndex = $compare->startIndex;
+            // first, evaluate the needed cuts
+            for($i = 0; $i < $numClones; $i++){
+                $tag = $clones[$i];
+                if($i < $numClones - 1){
+                    for($j = $i + 1; $j < $numClones; $j++){
+                        $compare = $clones[$j];
+                        if($compare->startIndex < $tag->endIndex && $compare->endIndex > $tag->endIndex){
+                            if($tag->isSplitable() || $compare->isSplitable()){
+                                // add cut to the tag that actually is cutable
+                                $bread = ($tag->isSplitable()) ? $tag : $compare;
+                                $knife = ($tag->isSplitable()) ? $compare : $tag;
+                                // add a cut only, if it's not there already
+                                if(!in_array($knife->startIndex, $bread->cuts)){
+                                    $bread->cuts[] = $knife->startIndex;
+                                }
                             } else {
-                                // cut the following tag at the tag's end index
-                                $part = $compare->cloneForRendering();
-                                $compare->endIndex = $tag->endIndex;
-                                $part->startIndex = $tag->endIndex;
+                                // we have an overlap with tags, that both are not allowed to overlap. this must not happen.
+                                // TODO FIXME: Add Proper Exception
+                                $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.tags');
+                                /* @var $logger ZfExtended_Logger */
+                                $logger->error('E9999', 'Two non-splittable tags interleave each other. Segment-ID: '.$this->segmentId);
+                                // we simply do not add the next tag which will not be rendered this way
                             }
-                            // tricky: since we add the part at the end, it will not be evaluated again in the current camparision run
-                            $clones[] = $part;
-                            $added = true;
-                        } else {
-                            // we have an overlap with tags, that both are not allowed to overlap. this must not happen.
-                            // TODO FIXME: Add Proper Exception
-                            $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.tags');
-                            /* @var $logger ZfExtended_Logger */
-                            $logger->error('E9999', 'Two non-splittable tags interleave each other. Segment-ID: '.$this->segmentId);
-                            // we simply do not add the next tag which will not be rendered this way
                         }
                     }
                 }
-                // the number may changed when adding to the clones when following tags are cut. Also, reordering is needed then
-                if($added){
-                    usort($clones, array($this, 'compare'));
-                    $numClones = count($clones);
+            }
+            // then clone the cutted tags into pieces
+            for($i = 0; $i < $numClones; $i++){
+                if(count($clones[$i]->cuts) > 0){
+                    sort($clones[$i]->cuts, SORT_NUMERIC);
+                    $last = $clones[$i];
+                    $end = $last->endIndex;
+                    foreach($clones[$i]->cuts as $cut){
+                        $last->endIndex = $cut;
+                        $last = $clones[$i]->cloneForRendering();
+                        $last->startIndex = $cut;
+                        $last->endIndex = $end;
+                        $clones[] = $last;
+                    }
                 }
             }
-            usort($rtags, array($this, 'compare'));
-        } else {
-            $rtags = $clones;
+            usort($clones, array($this, 'compare'));
+            $numClones = count($clones);
         }
         // now we create the nested data-model from the up to now sequential but sorted $rtags model. We also add the text-portions of the segment as text nodes
         // this container just acts as the master container 
         $holder = new editor_Segment_AnyTag(0, $this->getFieldTextLength());
         $container = $holder;
-        foreach($rtags as $tag){
-            $nearest = $container->getNearestContainer($tag);
+        $processed = [ $holder ]; // holds all tags that have been processed
+        foreach($clones as $tag){
+            // this "mechanic" is just to correct problems with singular tags on the right boundry of non-singular tags: The will be sorted right after the non-singular but may are nested into. We have to correct this ...
+            $nearest = $this->findHolderByOrder($processed, $tag);
+            if($nearest == NULL){
+                $nearest = $container->getNearestContainer($tag); // this is the "normal" way of nesting the sorted cloned tags
+            }
             // Will log rendering problems
             if(self::VALIDATION_MODE && $nearest == null){
                 error_log("\n============== HOLDER =============\n");
@@ -595,9 +588,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
             }
             $nearest->addChild($tag);
             $container = $tag;
+            $processed[] = $tag;
         }
         // distributes the text-portions to the now re-nested structure
         $holder->addSegmentText($this);
+        $processed = $clones = null;
         // finally, render the holder's children
         return $holder->renderChildren($skippedTypes);
     }
@@ -685,125 +680,168 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * Clones the tags with only the types of tags specified
      * Note, that you will not be able to filter trackchanges-tags out, use ::cloneWithoutTrackChanges instead for this
      * @param array $includedTypes
+     * @param bool $finalize: Usually required, fixes any lost order-connections
      * @return editor_Segment_FieldTags
      */
-    public function cloneFiltered(array $includedTypes=NULL) : editor_Segment_FieldTags {
-        // UGLY: The Internal tags can not be filtered out but must be removed from the cloned tags if they should be filtered out due to the text-contents of the internal tags
-        $cloneHasInternal = ($includedTypes == NULL || in_array(editor_Segment_Tag::TYPE_INTERNAL, $includedTypes));
+    public function cloneFiltered(array $includedTypes=NULL, bool $finalize=true) : editor_Segment_FieldTags {
         $clonedTags = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->field, $this->fieldText, $this->saveTo, $this->ttName);
         foreach($this->tags as $tag){
-            if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES || $tag->getType() == editor_Segment_Tag::TYPE_INTERNAL || ($includedTypes == NULL || in_array($tag->getType(), $includedTypes))){
+            if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES || ($includedTypes == NULL || in_array($tag->getType(), $includedTypes))){
                 $clonedTags->addTag($tag->clone(true, true), $tag->order, $tag->parentOrder);
             }
         }
-        if(!$cloneHasInternal){
-            $clonedTags->removeByType(editor_Segment_Tag::TYPE_INTERNAL, true);
+        if($finalize){
+            $clonedTags->fixParentOrders();
         }
-        $clonedTags->evaluateDeletedInserted();
         return $clonedTags;
     }
     /**
      * Clones without trackchanges tags. Deleted contents (in del-tags) will be removed and all text-lengths/indices will be adjusted
-     * @param array $includedTypes: if set, filters the existing types of tags to the specified 
+     * @param array $includedTypes: if set, filters the existing types of tags to the specified
+     * @param bool $condenseBlanks: if set (default), blanks around del-tags will be condensed, mimics behaviour of editor_Models_Segment_TrackChangeTag::removeTrackChanges
      * @return editor_Segment_FieldTags
      */
-    public function cloneWithoutTrackChanges(array $includedTypes=NULL) : editor_Segment_FieldTags {
-        // UGLY: The Internal tags can not be filtered out but must be removed from the cloned tags if they should be filtered out due to the text-contents of the internal tags
-        $cloneHasInternal = ($includedTypes == NULL || in_array(editor_Segment_Tag::TYPE_INTERNAL, $includedTypes));
-        $deleteTags = [];
-        $otherTags = [];
-        $fieldText = '';
-        foreach($this->tags as $tag){
-            if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES){
-                if($tag->isDeleteTag()){
-                    $del = $tag->clone(true, true);
-                    // if the del-tag is surrounded by blanks, we remove one of the blanks to avoid doubled whitespace
-                    if($del->startIndex > 0 && $del->endIndex < $this->getFieldTextLength() && $this->getFieldTextPart($del->startIndex - 1, $del->startIndex) == ' ' && $this->getFieldTextPart($del->endIndex, $del->endIndex + 1) == ' '){
-                        $del->startIndex -= 1;
-                    }
-                    $deleteTags[] = $del;
-                }
-            } else if(!$tag->wasDeleted && ($tag->getType() == editor_Segment_Tag::TYPE_INTERNAL || $includedTypes == NULL || in_array($tag->getType(), $includedTypes))){
-                $clone = $tag->clone(true, true);
-                $clone->cloneOrder($tag);
-                $otherTags[] = $clone;
-            }
-        }
-        usort($deleteTags, array($this, 'compare'));
-        $numDeleteTags = count($deleteTags);
-        if($numDeleteTags > 0){
-            // condense any overlapping del tags
-            for($i=0; $i < $numDeleteTags; $i++){
-                if($i > 0){
-                    $before = $i - 1;
-                    if($deleteTags[$i]->startIndex <= $deleteTags[$before]->endIndex){
-                        $deleteTags[$before]->endIndex = max($deleteTags[$i]->endIndex, $deleteTags[$before]->endIndex);
-                        $deleteTags[$i] = NULL;
-                    }
-                }
-            }
-            // cut the "holes" out of the tags and the field text
-            $start = 0; // holds the next index to start with for the field text
-            $gap = 0; // holds the sum of all holes, which must be substracted from each hole as the whole structure shifts to the left when "punching holes"
-            for($i=0; $i < $numDeleteTags; $i++){
-                if($deleteTags[$i] != NULL){
-                    $this->cutIndicesOut($otherTags, ($deleteTags[$i]->startIndex - $gap), ($deleteTags[$i]->endIndex - $gap));
-                    if($deleteTags[$i]->startIndex > $start){
-                        $fieldText .= $this->getFieldTextPart($start, $deleteTags[$i]->startIndex);
-                    }
-                    $start = $deleteTags[$i]->endIndex;
-                    $gap += ($deleteTags[$i]->endIndex - $deleteTags[$i]->startIndex);
-                }
-            }
-            if($start < $this->getFieldTextLength()){
-                $fieldText .= $this->getFieldTextPart($start, $this->getFieldTextLength());
-            }
-        } else {
-            $fieldText = $this->fieldText;
-        }
-        // create the clone & add all non-trackchanges tags
-        $clonedTags = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->field, $fieldText, $this->saveTo, $this->ttName);
-        foreach($otherTags as $tag){
-            // the "hole punching" may created more deleted tags - should not happen though
-            if(!$tag->wasDeleted){
-                $clonedTags->addTag($tag, $tag->order, $tag->parentOrder);
-            }
-        }
-        if(!$cloneHasInternal){
-            $clonedTags->removeByType(editor_Segment_Tag::TYPE_INTERNAL, true);
+    public function cloneWithoutTrackChanges(array $includedTypes=NULL, bool $condenseBlanks=true) : editor_Segment_FieldTags {
+        $clonedTags = $this->cloneFiltered($includedTypes, false);
+        if(!$clonedTags->deleteTrackChangesTags($condenseBlanks)){
+            $clonedTags->fixParentOrders();
         }
         return $clonedTags;
     }
     /**
-     * Removes a portion of the referenced Text of the passed segment-tags
-     * @param editor_Segment_Tag[] $tags
+     * Helper for the rendering-phase: Finds a tag by it's (valid) order-index
+     * Please note that this may fails when multiple tags with the same order have been added
+     * @param editor_Segment_Tag[] $holders
+     * @param editor_Segment_Tag $tag
+     * @return editor_Segment_Tag|NULL
+     */
+    private function findHolderByOrder(array &$holders, editor_Segment_Tag $tag) : ?editor_Segment_Tag {
+        if($tag->parentOrder > -1){
+            foreach($holders as $holder){
+                if($tag->parentOrder == $holder->order && $holder->canContain($tag)){
+                    return $holder;
+                }
+            }
+        }
+        return NULL;
+    }
+    /**
+     * Removes all TrackChanges tags, also deletes all contents of del-tags
+     * @param boolean $condenseBlanks
+     * @return boolean
+     */
+    private function deleteTrackChangesTags($condenseBlanks=true) : bool {
+        $this->evaluateDeletedInserted(); // ensure this is properly set (normally always the case)
+        $this->sort(); // making sure we're in order
+        $hasTrackChanges = false;
+        foreach($this->tags as $tag){
+            if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES){
+                $tag->wasDeleted = true;
+                if($tag->isDeleteTag() && $tag->endIndex > $tag->startIndex){
+                    if($condenseBlanks){
+                        $boundries = $this->getRemovableBlanksBoundries($tag->startIndex, $tag->endIndex);
+                        if($boundries->left < $tag->startIndex && $boundries->right > $tag->endIndex){
+                            // if there are removable blanks on both sides it is meaningless, on which side we leave one
+                            $tag->startIndex = $boundries->left;
+                            $tag->endIndex = $boundries->right - 1;
+                        }
+                    }
+                    $this->cutIndicesOut($tag->startIndex, $tag->endIndex);
+                }
+                $hasTrackChanges = true;
+            }
+        }
+        if($hasTrackChanges){
+            $newTags = [];
+            foreach($this->tags as $tag){
+                // removes the del-tags the "hole punching" may created more deleted tags - should not happen though
+                if(!$tag->wasDeleted){
+                    if($tag->wasInserted){
+                        $tag->wasInserted = null;
+                    }
+                    $newTags[] = $tag;
+                }
+            }
+            $this->tags = $newTags;
+            $this->fixParentOrders();
+            $this->sort();
+        }
+        return $hasTrackChanges;
+    }
+    /**
+     * Retrieves the boundries of a del-tag increased by the blanks that can be removed without affecting other tags
+     * @param int $start
+     * @param int $end
+     * @return stdClass
+     */
+    private function getRemovableBlanksBoundries(int $start, int $end) : stdClass {
+        $length = $this->getFieldTextLength();
+        $boundries = new stdClass();
+        $boundries->left = $start;
+        $boundries->right = $end;
+        // increase the boundries to cover all blanks left and right
+        while(($boundries->left - 1) > 0 && $this->getFieldTextPart($boundries->left - 1, $boundries->left) == ' '){
+            $boundries->left -= 1;
+        }
+        while(($boundries->right + 1) < $length && $this->getFieldTextPart($boundries->right, $boundries->right + 1) == ' '){
+            $boundries->right += 1;
+        }
+        // reduce the boundries if there are tags covered
+        foreach($this->tags as $tag){
+            if(!$tag->wasDeleted && $tag->getType() != editor_Segment_Tag::TYPE_TRACKCHANGES){
+                if($tag->startIndex >= $boundries->left && $tag->startIndex <= $start){
+                    $boundries->left = $tag->startIndex;
+                }
+                if($tag->endIndex <= $boundries->right && $tag->endIndex >= $end){
+                    $boundries->right = $tag->endIndex;
+                }
+            }
+        }
+        return $boundries;        
+    }
+    /**
+     * Removes the text-portion from our field-text and the our tags
      * @param int $start
      * @param int $end
      */
-    private function cutIndicesOut(array &$tags, int $start, int $end){
+    private function cutIndicesOut(int $start, int $end) {
         $dist = $end - $start;
         if($dist <= 0){
             return;
         }
-        $numTags = count($tags);
-        for($i=0; $i < $numTags; $i++){            
+        // adjust the tags
+        foreach($this->tags as $tag){            
             // the tag is only affected if not completely  before the hole
-            if($tags[$i]->endIndex > $start){                
+            if($tag->endIndex > $start){                
                 // if we're completely behind, just shift
-                if($tags[$i]->startIndex >= $end){
-                    $tags[$i]->startIndex -= $dist;
-                    $tags[$i]->endIndex -= $dist;
-                } else if($tags[$i]->startIndex >= $start && $tags[$i]->endIndex <= $end) {
-                    // we should create an error here since this must not happen !
-                    $tags[$i]->startIndex = $tags[$i]->endIndex = 0;
-                    $tags[$i]->wasDeleted = true;
+                if($tag->startIndex >= $end){
+                    $tag->startIndex -= $dist;
+                    $tag->endIndex -= $dist;
+                } else if($tag->startIndex >= $start && $tag->endIndex <= $end) {
+                    // singular boundry tags will only be shifted
+                    if($tag->endIndex == $start || $tag->startIndex == $end){
+                        $tag->startIndex -= $dist;
+                        $tag->endIndex -= $dist;
+                    } else {
+                        // this can only happen, if non-trackchanges tags overlap with trackchanges tags. TODO: generate an error here ?
+                        if($tag->getType() != editor_Segment_Tag::TYPE_TRACKCHANGES && !$tag->wasDeleted && self::VALIDATION_MODE){
+                            error_log("\n##### TRACKCHANGES CLONING: FOUND TAG THAT HAS TO BE REMOVED ALTHOUGH NOT MARKED AS DELETED ($start|$end) ".$tag->debugProps()." #####\n");
+                        }
+                        $tag->startIndex = $tag->endIndex = 0;
+                        $tag->wasDeleted = true;
+                    }
                 } else {
                     // tag is somehow overlapping the hole
-                    $tags[$i]->startIndex = ($tags[$i]->startIndex <= $start) ? $tags[$i]->startIndex : $start;
-                    $tags[$i]->endIndex = ($tags[$i]->endIndex >= $end) ? ($tags[$i]->endIndex - $dist) : ($end - $dist);
+                    $tag->startIndex = ($tag->startIndex <= $start) ? $tag->startIndex : $start;
+                    $tag->endIndex = ($tag->endIndex >= $end) ? ($tag->endIndex - $dist) : ($end - $dist);
                 }
             }
         }
+        // adjust the field text
+        $length = $this->getFieldTextLength();
+        $newFieldText = ($start > 0) ? $this->getFieldTextPart(0, $start) : '';
+        $newFieldText .= ($end < $length) ? $this->getFieldTextPart($end, $length) : '';
+        $this->fieldText = $newFieldText;
     }
     /**
      * Creates a nested structure of Internal tags & text-nodes recursively out of a HtmlNode structure
@@ -817,11 +855,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
             foreach($node->getChildren() as $childNode){
                 if($childNode->isTextNode()){
                     if($tag->addText($childNode->text())){
-                        $startIndex += $tag->getLastChild()->getTextLength();
+                        $startIndex += $tag->getLastChildsTextLength();
                     }
                 } else if(is_a($childNode, 'PHPHtmlParser\Dom\Node\HtmlNode')){
                     if($tag->addChild($this->fromHtmlNode($childNode, $startIndex))){
-                        $startIndex += $tag->getLastChild()->getTextLength();
+                        $startIndex += $tag->getLastChildsTextLength();
                     }
                 } else if(self::VALIDATION_MODE){
                     error_log("\n##### FROM HTML NODE ADDS UNKNOWN NODE TYPE '".get_class($childNode)."' #####\n");
@@ -846,11 +884,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
                 $child = $element->childNodes->item($i);
                 if($child->nodeType == XML_TEXT_NODE){
                     if($tag->addText(editor_Tag::convertDOMText($child->nodeValue))){
-                        $startIndex += $tag->getLastChild()->getTextLength();
+                        $startIndex += $tag->getLastChildsTextLength();
                     }
                 } else if($child->nodeType == XML_ELEMENT_NODE){
                     if($tag->addChild($this->fromDomElement($child, $startIndex))){
-                        $startIndex += $tag->getLastChild()->getTextLength();
+                        $startIndex += $tag->getLastChildsTextLength();
                     }
                 } else if(self::VALIDATION_MODE){
                     error_log("\n##### FROM DOM ELEMENT ADDS UNWANTED ELEMENT TYPE '".$child->nodeType."' #####\n");
@@ -885,7 +923,6 @@ class editor_Segment_FieldTags implements JsonSerializable {
                         }
                     }
                 }
-                
                 // we may already removed the current element, so check
                 if($i < $numTags){
                     $tag = $this->tags[$i];
@@ -935,7 +972,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
         foreach($this->tags as $tag){
             if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES){
                 $propName = ($tag->isDeleteTag()) ? 'wasDeleted' : 'wasInserted';
-                $this->setContainedTagsProp($tag->startIndex, $tag->endIndex, $propName);
+                $this->setContainedTagsProp($tag->startIndex, $tag->endIndex, $tag->order, $propName);
             }
         }
     }
@@ -945,10 +982,26 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @param int $end
      * @param string $propName
      */
-    private function setContainedTagsProp(int $start, int $end, string $propName){
+    private function setContainedTagsProp(int $start, int $end, int $order, string $propName){
         foreach($this->tags as $tag){
             if($tag->startIndex >= $start && $tag->endIndex <= $end && $tag->getType() != editor_Segment_Tag::TYPE_TRACKCHANGES){
-                $tag->$propName = true;
+                if(!($tag->endIndex == $start || $tag->startIndex == $end) || $tag->parentOrder == $order){
+                    $tag->$propName = true;
+                }
+            }
+        }
+    }
+    /**
+     * Removes any parentOrder indices that point to non-existing indices
+     */
+    private function fixParentOrders(){
+        $orders = [];
+        foreach($this->tags as $tag){
+            $orders[] = $tag->order;
+        }
+        foreach($this->tags as $tag){
+            if(!in_array($tag->parentOrder, $orders)){
+                $tag->parentOrder = -1;
             }
         }
     }
@@ -970,5 +1023,12 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     public function debugProps(){
         return '[ segment:'.$this->segmentId.' | field:'.$this->field.' | saveTo:'.$this->saveTo.' | ttName:'.$this->ttName.' ]';
+    }
+    /**
+     * Debug formatted JSON
+     * @return string
+     */
+    public function debugJson(){
+        return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     }
 }

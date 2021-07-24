@@ -57,16 +57,21 @@ class SegmentTagsOverlapTest extends editor_Test_SegmentTagsTest {
     }
     
     public function testOverlappingTags2(){
-        $markup = '<1>Lorem ipsum dolor sit amet, <2>consetetur sadipscing elitr</1>, sed diam nonumy eirmod tempor <3>invidunt ut labore et dolore magna aliquyam erat,</2> sed diam voluptua.</3>';
+        $markup = '<8>Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing</2><9/> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<10/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.</8>';
         $this->createReplacedTest(12345, $markup);
     }
     
     public function testOverlappingTags3(){
-        $markup = '<1>Lorem ipsum dolor <9/>sit amet, <2>consetetur sadipscing elitr</1>, sed <4>diam nonumy</4> eirmod tempor <3>invidunt ut labore et dolore <5>magna</5> aliquyam erat,</2> sed diam voluptua.</3>';
+        $markup = '<1>Lorem ipsum dolor sit amet, <2>consetetur sadipscing elitr</1>, sed diam nonumy eirmod tempor <3>invidunt ut labore et dolore magna aliquyam erat,</2> sed diam voluptua.</3>';
         $this->createReplacedTest(12345, $markup);
     }
     
     public function testOverlappingTags4(){
+        $markup = '<1>Lorem ipsum dolor <9/>sit amet, <2>consetetur sadipscing elitr</1>, sed <4>diam nonumy</4> eirmod tempor <3>invidunt ut labore et dolore <5>magna</5> aliquyam erat,</2> sed diam voluptua.</3>';
+        $this->createReplacedTest(12345, $markup);
+    }
+    
+    public function testOverlappingTags5(){
         $markup = '<1>Lorem ipsum dolor <9/>sit amet, <2>consetetur sadipscing elitr</1>, sed <4>diam <3>nonumy</4> eirmod tempor invidunt ut labore et dolore <5>magna</5> aliquyam erat,</2> sed diam voluptua.</3>';
         $this->createReplacedTest(12345, $markup);
     }

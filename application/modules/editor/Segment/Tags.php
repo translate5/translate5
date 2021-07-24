@@ -672,4 +672,11 @@ class editor_Segment_Tags implements JsonSerializable {
         }
         return $debug;
     }
+    /**
+     * Debug formatted JSON
+     * @return string
+     */
+    public function debugJson(){
+        return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    }
 }

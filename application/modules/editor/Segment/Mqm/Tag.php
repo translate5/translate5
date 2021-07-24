@@ -173,6 +173,11 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      */
     private $comment = '';
     /**
+     * Holds the order of our closer in the phase of serialization
+     * @var int
+     */
+    private $rightOrder = -1;
+    /**
      * 
      * @return int
      */
@@ -192,14 +197,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      */
     public function getComment() : string {
         return $this->comment;
-    }
-    /**
-     * 
-     * @return bool
-     */
-    public function isPaired() : bool {
-        return $this->paired;
-    }
+    }    
     /**
      * MQM tags can not be Splitted as they are explicitly allowed to overlap
      * {@inheritDoc}
@@ -227,27 +225,21 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
 
     /* Overwritten API to reflect pairing */
     
-    public function clone(bool $withDataAttribs=false, bool $withId=false){
-        $clone = parent::clone($withDataAttribs, $withId);
-        /* @var $clone editor_Segment_Mqm_Tag */
-        $clone->setMqmProps($this->paired, $this->categoryIndex, $this->severity, $this->comment);
-        return $clone;
-    }
     /**
      * Special API to set the rendering props in the rendering phase
-     * @param array $config
+     * @param string $renderingMode
+     * @param int $order
      * @return editor_Segment_Mqm_Tag
      */
-    private function setRendering(array $config=NULL){
-        if(is_array($config) && array_key_exists('rendering', $config)){
-            $this->rendering = $config['rendering'];
-            $this->singular = true; // crucial to deactivate "canContain" API
-            $this->parentOrder = -1; // crucial to invalidate any vertical nesting as long as we have be seen as tag with expansion. This we elevate us to the top-level
-            if($this->rendering == 'left'){
-                $this->endIndex = $this->startIndex; 
-            } else {
-                $this->startIndex = $this->endIndex;
-            }
+    private function setRendering(string $renderingMode, int $order){
+        $this->rendering = $renderingMode;
+        $this->singular = true; // crucial to deactivate "canContain" API
+        $this->order = $order;
+        $this->parentOrder = -1; // crucial to invalidate any vertical nesting as long as we have be seen as tag with expansion. This we elevate us to the top-level
+        if($this->rendering == 'left'){
+            $this->endIndex = $this->startIndex;
+        } else {
+            $this->startIndex = $this->endIndex;
         }
         return $this;
     }
@@ -257,8 +249,8 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      * @see editor_Segment_Tag::addRenderingClone()
      */
     public function addRenderingClone(array &$renderingQueue){
-        $renderingQueue[] = $this->cloneForRendering()->setRendering(['rendering' => 'left']);
-        $renderingQueue[] = $this->cloneForRendering()->setRendering(['rendering' => 'right']);
+        $renderingQueue[] = $this->cloneForRendering()->setRendering('left', $this->order);
+        $renderingQueue[] = $this->cloneForRendering()->setRendering('right', $this->rightOrder);
     }
     /**
      * Overwritten since we act as a single image tag in the rendering phase
@@ -268,7 +260,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     public function render(array $skippedTypes=NULL) : string {
         if($this->rendering == NULL){
             return parent::render($skippedTypes);
-        }
+        } 
         if($this->rendering == 'left'){
             return $this->renderImageTag(true);
         }
@@ -279,7 +271,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      * {@inheritDoc}
      * @see editor_Tag::renderStart()
      */
-    protected function renderStart($withDataAttribs=true) : string {
+    protected function renderStart(bool $withDataAttribs=true) : string {
         if($this->paired){
             return $this->renderImageTag(true);
         }
@@ -310,24 +302,12 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         $tag->prependClass($className);
         return $tag->render();
     }
-    /**
-     * Adds additional clone properties
-     * @param bool $paired
-     * @param int $categoryIndex
-     * @param string $severity
-     * @param string $comment
-     * @return editor_Segment_Mqm_Tag
-     */
-    private function setMqmProps(bool $paired, int $categoryIndex, string $severity, string $comment) : editor_Segment_Mqm_Tag{
-        $this->paired = $paired;
-        $this->singular = !$paired;
-        $this->categoryIndex = $categoryIndex;
-        $this->severity = $severity;
-        $this->comment = $comment;
-        return $this;
-    }
     
     /* Consolidation API */
+    
+    public function isPaired() : bool {
+        return $this->paired;
+    }
     
     public function isPairedOpener() : bool {
         return ($this->hasClass(self::CSS_CLASS_OPEN));
@@ -370,6 +350,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         $this->paired = true;
         $this->singular = false;
         $this->endIndex = $tag->startIndex;
+        $this->rightOrder = $tag->order;
         $this->removeClass(self::CSS_CLASS_OPEN)->removeClass(self::CSS_CLASS_OPEN);
         $src = $this->getAttribute('src');
         $matches = array();
@@ -386,17 +367,28 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         $this->severity = editor_Segment_Mqm_Configuration::instance($task)->findMqmSeverity($this->classes, '');
     }
     
+    public function clone(bool $withDataAttribs=false, bool $withId=false){
+        $clone = parent::clone($withDataAttribs, $withId);
+        /* @var $clone editor_Segment_Mqm_Tag */
+        $data = new stdClass();
+        $this->furtherSerialize($data);
+        $clone->furtherUnserialize($data);
+        return $clone;
+    }
+    
     protected function furtherSerialize(stdClass $data){
         $data->paired = $this->paired;
         $data->categoryIndex = $this->categoryIndex;
-        $data->comment = $this->comment;
         $data->severity = $this->severity;
+        $data->comment = $this->comment;
+        $data->rightOrder = $this->rightOrder;
     }
     
     protected function furtherUnserialize(stdClass $data){
         $this->paired = $data->paired;
         $this->categoryIndex = $data->categoryIndex;
-        $this->comment = $data->comment;
         $this->severity = $data->severity;
+        $this->comment = $data->comment;
+        $this->rightOrder = $data->rightOrder;
     }
 }

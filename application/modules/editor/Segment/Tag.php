@@ -122,11 +122,11 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     }
     /**
      * Strips all segment tags from a string
-     * Note, that (currently) the internal tags text-contents are part of the returned text
      * @param string $markup
      * @return string
      */
     public static function strip(string $markup) : string {
+        $markup = preg_replace(editor_Segment_Internal_Tag::REGEX_REMOVE, '', $markup);
         return strip_tags($markup);
     }
     /**
@@ -208,6 +208,11 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @var string
      */
     public $content = '';
+    /**
+     * Only needed in the rendering process
+     * @var array
+     */
+    public $cuts = [];
     /**
      * The category of tag we have, a further specification of type
      * might not be used by all internal tags
@@ -507,6 +512,14 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     }
     /**
      * Some Internal Tags are IMG-tags that are paired (parted into an opening and closing tag represented by images)
+     * This API can be used after the consolidation to identify paired tags
+     * @return bool
+     */
+    public function isPaired() : bool {
+        return false;
+    }
+    /**
+     * Some Internal Tags are IMG-tags that are paired (parted into an opening and closing tag represented by images)
      * These tags will be joined to one tag in the consolidation process.
      * API is used in the consolidation phase only
      * @return bool
@@ -541,8 +554,8 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         if(!$this->isSingular()){
             if($this->startIndex <= $tag->startIndex && $this->endIndex >= $tag->endIndex){
                 // when tag are aligned with our boundries it is unclear if they are inside or outside, so let's decide by the parentship on creation
-                if($tag->endIndex == $this->startIndex || $tag->startIndex == $this->endIndex){
-                    return $tag->parentOrder == $this->order;
+                if(($tag->endIndex == $this->startIndex || $tag->startIndex == $this->endIndex)){
+                    return ($tag->parentOrder == $this->order);
                 }
                 return true;
             }
@@ -599,7 +612,9 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     public function addSegmentText(editor_Segment_FieldTags $tags){
         if($this->startIndex < $this->endIndex){
             if($this->hasChildren()){
-                // fil the text-gaps around our children with text-parts of the segments & fill our children with text
+                // crucial: we need to sort our children as tags with the same start-position but length 0 must come first
+                usort($this->children, array('editor_Segment_FieldTags', 'compareChildren'));
+                // fill the text-gaps around our children with text-parts of the segments & fill our children with text
                 $chldrn = [];
                 $last = $this->startIndex;
                 foreach($this->children as $child){
@@ -664,5 +679,9 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         $debug .= 'START: '.$this->startIndex.' | END: '.$this->endIndex.' | FULLENGTH: '.($this->isFullLength?'true':'false').$newline;
         $debug .= 'DELETED: '.($this->wasDeleted?'true':'false').' | INSERTED: '.($this->wasInserted?'true':'false').$newline;
         return $debug;
+    }
+
+    public function debugProps() : string {
+        return '['.$this->startIndex.'|'.$this->endIndex.'|'.$this->order.'|'.$this->parentOrder.']';
     }
 }
