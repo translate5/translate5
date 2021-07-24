@@ -120,7 +120,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
     /**
      * Helper to sort Internal tags or rendered tags by startIndex
      * This is a central part of the rendering logic
-     * Note, that for rendering, ags, that potentially contain other tags, must come first, otherwise this will lead to rendering errors
+     * Note, that for rendering, tags, that potentially contain other tags, must come first, otherwise this will lead to rendering errors
      * The nesting may be corrected with the ::findHolderByOrder API but for rendering this "longer first" logic must apply
      * @param editor_Segment_Tag $a
      * @param editor_Segment_Tag $b
