@@ -79,7 +79,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * Can be used to validate the unparsing-process. Use only for Development !!
      * @var boolean
      */
-    const VALIDATION_MODE = true;
+    const VALIDATION_MODE = false;
     /**
      * The counterpart to ::toJson: creates the tags from the serialized JSON data
      * @param editor_Models_Task $task

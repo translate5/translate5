@@ -110,7 +110,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             $select
                 ->from(['segments' => 'LEK_segments'], [])
                 ->where('qualities.segmentId = segments.id');
-            // here it's where it get's really finnicky: we have to evaluate the editable-category only, if it vcan't be applied in editor_Models_Filter_SegmentSpecific
+            // here it's where it get's really finnicky: we have to evaluate the editable-category only, if it can't be applied in editor_Models_Filter_SegmentSpecific
             // that means, we do have other categories apart of the non-editable faulty tags, but that may also includes the editable faulty-tags
             if($state->hasCategoryEditableInternalTagFaults()){
                 $select->where('(segments.editable = 1 OR (qualities.type = '.$faultyType.' AND qualities.category = '.$faultyCat.'))');

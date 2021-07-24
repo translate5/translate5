@@ -76,7 +76,7 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
                 $this->addFilter($filter);
             }
         }
-        // normally, quaality filtering filters for editable segments
+        // normally, quality filtering filters for editable segments
         if($requestState->hasEditableRestriction()){
             $filter = new stdClass();
             $filter->field = 'editable';
