@@ -244,7 +244,8 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         return $this;
     }
     /**
-     * Overwritten to add two clones acting as image tags instead of a single clone
+     * Overwritten to add two clones acting as image tags instead of a single Tag.
+     * That's the main "trick" why MQM-tags are handled as mates but as independent tags when rendering leading to overlaps being rendered as such
      * {@inheritDoc}
      * @see editor_Segment_Tag::addRenderingClone()
      */
