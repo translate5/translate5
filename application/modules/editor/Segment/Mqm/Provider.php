@@ -69,7 +69,8 @@ class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider {
         $mqmConfig = editor_Segment_Mqm_Configuration::instance($task);
         $mqmType = $mqmConfig->getMqmTypeForId($mqmIndex);
         if($mqmType != NULL){
-            return $translate->_($mqmType);
+            // currently, there are no translations for the usually english names. To change, use: return $translate->_($mqmType);
+            return $mqmType;
         }
         // not worth an exception, should not happen if configuration correct
         return 'UNKNOWN MQM-TYPE-ID '.$mqmIndex;
