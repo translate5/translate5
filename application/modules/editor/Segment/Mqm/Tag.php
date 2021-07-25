@@ -176,7 +176,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      * Holds the order of our closer in the phase of serialization
      * @var int
      */
-    private $rightOrder = -1;
+    public $rightOrder = -1;
     /**
      * 
      * @return int
@@ -209,6 +209,15 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     
     /* Overwritten API */
     
+    /**
+     * A MQM tag will act as singular tag in the unparsig phase, wil be turned to a real non-singular tag when pairing in the consolidation phase and act as a singular tag again in the rendering phase
+     * {@inheritDoc}
+     * @see editor_Tag::isSingular()
+     */
+    public function isSingular() : bool {
+        return !$this->paired;
+    }
+    
     public function getCategory() : string {
         return self::createCategoryVal($this->categoryIndex);
     }
@@ -229,13 +238,14 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      * Special API to set the rendering props in the rendering phase
      * @param string $renderingMode
      * @param int $order
+     * @param int $parentOrder
      * @return editor_Segment_Mqm_Tag
      */
-    private function setRendering(string $renderingMode, int $order){
+    private function setRendering(string $renderingMode, int $order, int $parentOrder){
         $this->rendering = $renderingMode;
-        $this->singular = true; // crucial to deactivate "canContain" API
+        $this->paired = false; // crucial to avoid nonsense in the rendering model
         $this->order = $order;
-        $this->parentOrder = -1; // crucial to invalidate any vertical nesting as long as we have be seen as tag with expansion. This we elevate us to the top-level
+        $this->parentOrder = $parentOrder;
         if($this->rendering == 'left'){
             $this->endIndex = $this->startIndex;
         } else {
@@ -246,12 +256,13 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     /**
      * Overwritten to add two clones acting as image tags instead of a single Tag.
      * That's the main "trick" why MQM-tags are handled as mates but as independent tags when rendering leading to overlaps being rendered as such
+     * The nesting of the MQM tags already was corrected in the consolidation phase by manipulating order & right order
      * {@inheritDoc}
      * @see editor_Segment_Tag::addRenderingClone()
      */
     public function addRenderingClone(array &$renderingQueue){
-        $renderingQueue[] = $this->cloneForRendering()->setRendering('left', $this->order);
-        $renderingQueue[] = $this->cloneForRendering()->setRendering('right', $this->rightOrder);
+        $renderingQueue[] = $this->cloneForRendering()->setRendering('left', $this->order, -1);
+        $renderingQueue[] = $this->cloneForRendering()->setRendering('right', $this->rightOrder, -1);
     }
     /**
      * Overwritten since we act as a single image tag in the rendering phase
@@ -349,7 +360,6 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
             error_log("\n##### MQM TAG: INVALID INDEXES FOUND [open: (".$this->startIndex."|".$this->endIndex.") close: (".$tag->startIndex."|".$tag->endIndex.")] #####\n");
         }
         $this->paired = true;
-        $this->singular = false;
         $this->endIndex = $tag->startIndex;
         $this->rightOrder = $tag->order;
         $this->removeClass(self::CSS_CLASS_OPEN)->removeClass(self::CSS_CLASS_OPEN);

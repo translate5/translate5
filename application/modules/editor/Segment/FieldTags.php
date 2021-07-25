@@ -673,8 +673,10 @@ class editor_Segment_FieldTags implements JsonSerializable {
             }
         }
         $this->consolidate();
-        // Crucial: finalize, set the tag-props
+        // Crucial: set the tag-props
         $this->addTagProps();
+        // finally, we set the wasDeleted / wasInserted properties of our tags
+        $this->evaluateDeletedInserted();
     }
     /**
      * Clones the tags with only the types of tags specified
@@ -945,6 +947,48 @@ class editor_Segment_FieldTags implements JsonSerializable {
                     $this->tags[] = $tag;
                 }
             }
+            // the tags that were singular but now are real tags (paired tags) may have a improper nesting. We have to correct that
+            // it can be assumed, all tags have a proper order here. Since when rendering, the paired tags again will be singular, we correct the nesting by applying a proper order & rightOrder
+            foreach($this->tags as $inner){
+                foreach($this->tags as $outer){
+                    if($outer->startIndex > $inner->endIndex){
+                        break;
+                    } else {
+                        // the $outer->order != $inner->order condition ensures, a tag will not contain itself!
+                        if($outer->order != $inner->order && $inner->isPaired() && $outer->isPaired() && $outer->startIndex <= $inner->startIndex && $outer->endIndex >= $inner->endIndex){
+                            // this ensures, that when tags with the same start & end index have the order respected for nesting
+                            if($outer->startIndex < $inner->startIndex || $outer->endIndex > $inner->endIndex || $outer->order < $inner->order){
+                                // if we detect a "wrong order" for nested paired tags (this assumes, all paired tags have the public property "rightOrder")
+                                if($inner->startIndex == $outer->startIndex && $inner->order < $outer->order){
+                                    $this->swapOrder($outer, $inner, 'order');
+                                }
+                                if($inner->endIndex == $outer->endIndex && $inner->rightOrder > $outer->rightOrder) {
+                                    $this->swapOrder($outer, $inner, 'rightOrder');
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * Swaps the order (or rightOrder for paired tags) of two tags, adjusts any connected tags
+     * @param editor_Segment_Tag $tag1
+     * @param editor_Segment_Tag $tag2
+     * @param string $propName
+     */
+    private function swapOrder(editor_Segment_Tag $tag1, editor_Segment_Tag $tag2, string $propName){
+        $cache = $tag1->$propName;
+        $tag1->$propName = $tag2->$propName;
+        $tag2->$propName = $cache;
+        // the order must be adjusted in all other tags that may are nested into to the swapped tags
+        if($propName == 'order'){
+            foreach($this->tags as $tag){
+                if($tag->order != $tag1->order && $tag->order != $tag2->order && ($tag->parentOrder == $tag1->order || $tag->parentOrder == $tag2->order)){
+                    $tag->parentOrder = ($tag->parentOrder == $tag1->order) ? $tag2->order : $tag1->order;
+                }
+            }
         }
     }
     /**
@@ -960,8 +1004,6 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $tag->content = $this->getFieldTextPart($tag->startIndex, $tag->endIndex);
             $tag->finalize($this, $this->task);
         }
-        // finally, we set the wasDeleted / wasInserted properties of our tags
-        $this->evaluateDeletedInserted();
     }
     /**
      * Sets the deleted / inserted properties for all tags. 
