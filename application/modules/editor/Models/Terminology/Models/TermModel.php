@@ -309,6 +309,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             $attr->load($attrId);
             $attr->setValue($this->getProcessStatus());
             $attr->setUpdatedBy($this->getUpdatedBy());
+            $attr->setIsCreatedLocally(1);
             $attr->update();
 
             // If processStatus became 'rejected'
@@ -410,6 +411,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
             // Set value
             $a->setValue($value);
+            $a->setIsCreatedLocally(1);
 
             // Update. Here we use update method for history record to be created
             $a->update();
