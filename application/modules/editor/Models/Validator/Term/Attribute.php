@@ -37,7 +37,8 @@ class editor_Models_Validator_Term_Attribute extends ZfExtended_Models_Validator
       $this->addValidator('collectionId', 'int');
       // termEntryId ?
       $this->addValidator('language', 'stringLength', array('min' => 0, 'max' => 45));
-      $this->addValidator('termId', 'stringLength', array('min' => 0, 'max' => 255));
+      $this->addValidator('termId', 'int');
+      $this->addValidator('termTbxId', 'stringLength', array('min' => 0, 'max' => 100));
       $this->addValidator('dataTypeId', 'int');
       $this->addValidator('type', 'stringLength', array('min' => 0, 'max' => 100));
       $this->addValidator('value', 'stringLength', array('min' => 0, 'max' => 65535));
@@ -53,7 +54,6 @@ class editor_Models_Validator_Term_Attribute extends ZfExtended_Models_Validator
       $this->addValidator('guid', 'stringLength', array('min' => 0, 'max' => 38));
       $this->addValidator('elementName',  'stringLength', array('min' => 0, 'max' => 100));
       // attrLang ?
-      $this->addValidator('dataType', 'stringLength', array('min' => 0, 'max' => 100));
 
       $this->addValidator('name', 'stringLength', array('min' => 0, 'max' => 45)); // no such column
       $this->addValidator('entryId', 'stringLength', array('min' => 0, 'max' => 100)); // no such column

@@ -36,6 +36,8 @@ END LICENSE AND COPYRIGHT
  * @method string setTargetId() setTargetId(string $targetId)
  * @method string getName() getName()
  * @method string setName() setName(string $name)
+ * @method string getUniqueName() getUniqueName()
+ * @method string setUniqueName() setUniqueName(string $uniqueName)
  * @method string getEncoding() getEncoding()
  * @method string setEncoding() setEncoding(string $encoding)
  * @method string getFormat() getFormat()

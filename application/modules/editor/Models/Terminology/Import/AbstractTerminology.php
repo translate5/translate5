@@ -125,22 +125,24 @@ abstract class editor_Models_Terminology_Import_AbstractTerminology
      */
     public function checkIsForUpdate(object $elementObject, array $elementCollection, string $collectionKey): array
     {
-        $isUpdate = false;
-        $isCreate = false;
 
-        if (isset($elementCollection[$collectionKey])) {
-            $preparedArrayForDiff = $this->prepareDiffArrayToCheck($elementObject, $elementCollection[$collectionKey]);
-            $result = array_diff($preparedArrayForDiff[0], $preparedArrayForDiff[1]);
-            if ($result) {
-                $isUpdate = true;
-            }
-        } else {
-            $isUpdate = false;
-            $isCreate = true;
+        // if it is not found in the cache, create new element
+        if(!isset($elementCollection[$collectionKey])){
+            return [
+                'isUpdate' => false,
+                'isCreate' => true
+            ];
         }
 
-        return ['isUpdate' => $isUpdate, 'isCreate' => $isCreate];
+        $preparedArrayForDiff = $this->prepareDiffArrayToCheck($elementObject, $elementCollection[$collectionKey]);
+        $result = array_diff($preparedArrayForDiff[0], $preparedArrayForDiff[1]);
+
+        return [
+            'isUpdate' => !empty($result),
+            'isCreate' => false
+        ];
     }
+
     /**
      * @param object $element
      * @param int $count

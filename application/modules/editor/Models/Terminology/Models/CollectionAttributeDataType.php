@@ -29,4 +29,15 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Terminology_Models_CollectionAttributeDataType extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_CollectionAttributeDataType';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Term_CollectionAttributeDataType';
+
+    /***
+     * Update the attribute data-type associations for the given term collection.
+     * If the attribute data type exist for the collection, no row will be inserted.
+     *
+     * @param int $collectionId
+     */
+    public function updateCollectionAttributeAssoc(int $collectionId){
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $db->query("INSERT INTO `terms_collection_attribute_datatype` (collectionId,dataTypeId) (SELECT collectionId,dataTypeId FROM `terms_attributes` WHERE collectionId = ? GROUP BY collectionId,dataTypeId) ON DUPLICATE KEY UPDATE id = id",[$collectionId]);
+    }
 }

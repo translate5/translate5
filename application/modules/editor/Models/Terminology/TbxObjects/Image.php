@@ -36,6 +36,7 @@ class editor_Models_Terminology_TbxObjects_Image {
         'collectionId' => false,
         'targetId' => false,
         'name' => true,
+        'uniqueName' => false,
         'encoding' => true,
         'format' => true
     ];
@@ -53,6 +54,11 @@ class editor_Models_Terminology_TbxObjects_Image {
      * @var string
      */
     protected string $name = '';
+
+    /***
+     * @var string Unique image name used to save the image on the disk
+     */
+    protected string $uniqueName = '';
 
     /**
      * what encoding format is used (HEX or xBase64)
@@ -132,6 +138,24 @@ class editor_Models_Terminology_TbxObjects_Image {
     public function setName(string $name): self
     {
         $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUniqueName(): string
+    {
+        return $this->uniqueName;
+    }
+
+    /**
+     * @param string $uniqueName
+     * @return editor_Models_Terminology_TbxObjects_Image
+     */
+    public function setUniqueName(string $uniqueName): self
+    {
+        $this->uniqueName = $uniqueName;
         return $this;
     }
 

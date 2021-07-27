@@ -157,7 +157,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
             // Fetch attributes of existing term, except at least 'processStatus' attribute
             $attrA += editor_Utils::db()->query('
-                SELECT `dataTypeId`, `type`, `value`, `target`, `elementName`, `attrLang`, `dataType`  
+                SELECT `dataTypeId`, `type`, `value`, `target`, `elementName`, `attrLang`  
                 FROM `terms_attributes` 
                 WHERE `termId` = ? AND `dataTypeId` NOT IN (' . implode(',', $except) . ') 
             ', $misc['copyAttrsFromTermId'])->fetchAll();
@@ -194,8 +194,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
                 // Those three may be defined in $attrI, and if yes, they won't be overwritten by below
                 'elementName' => 'termNote',
-                'attrLang' => $this->getLanguage(),
-                //'dataType' => null
+                'attrLang' => $this->getLanguage()
             ]);
 
             // Save attr
@@ -1065,7 +1064,6 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             'terms_attributes.value AS attrValue',
             'terms_attributes.created AS attrCreated',
             'terms_attributes.updatedAt AS attrUpdated',
-            'terms_attributes.dataType AS attrDataType',
             'terms_attributes.isCreatedLocally AS attrIsCreatedLocally',
             'terms_attributes.termId AS termGuid',
             'terms_attributes.langSetGuid AS langSetGuid',
@@ -1991,15 +1989,15 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     public function updateAttributeAndTransacTermIdAfterImport($collectionId)
     {
         $sqlAttribute = 'UPDATE terms_attributes termsAtt
-                            JOIN terms_term tt on termsAtt.termGuid = tt.guid
+                            JOIN terms_term tt on termsAtt.termTbxId = tt.termTbxId
                         SET termsAtt.termId = tt.id
-                        WHERE termsAtt.termGuid = tt.guid
+                        WHERE termsAtt.termTbxId = tt.termTbxId
                         AND termsAtt.collectionId = :collectionId';
 
         $sqlTransacGrp = 'UPDATE terms_transacgrp termsTrg
-                            JOIN terms_term tt on termsTrg.termGuid = tt.guid
+                            JOIN terms_term tt on termsTrg.termTbxId = tt.termTbxId
                         SET termsTrg.termId = tt.id
-                        WHERE termsTrg.termGuid = tt.guid
+                        WHERE termsTrg.termTbxId = tt.termTbxId
                         AND termsTrg.collectionId = :collectionId';
 
         $this->db->getAdapter()->query($sqlAttribute, ['collectionId' => $collectionId]);

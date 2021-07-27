@@ -36,6 +36,7 @@ class editor_Models_Terminology_TbxObjects_Attribute {
         'termEntryId' => true,
         'language' => true,
         'termId' => false,
+        'termTbxId' =>true,
         'dataTypeId' => true,
         'type' => true,
         'value' => true,
@@ -57,6 +58,7 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     protected ?int $termEntryId = null;
     protected ?string $language = '';
     protected ?int $termId = null;
+    protected ?string $termTbxId = '';
     protected int $dataTypeId = 0;
     protected string $type = '';
     protected string $value = '';
@@ -79,7 +81,7 @@ class editor_Models_Terminology_TbxObjects_Attribute {
      */
     public function getCollectionKey(editor_Models_Terminology_TbxObjects_Attribute $element): string
     {
-        return $element->getElementName() . '-' . $element->getLanguage() . '-' . $element->getTermId();
+        return $element->getElementName() . '-' .$element->getType() . '-' . $element->getTermEntryId() . '-' . $element->getLanguage() . '-' . $element->getTermTbxId();
     }
 
     /**
@@ -190,6 +192,25 @@ class editor_Models_Terminology_TbxObjects_Attribute {
         return $this;
     }
 
+
+    /**
+     * @return null|string
+     */
+    public function getTermTbxId(): ?string
+    {
+        return $this->termTbxId;
+    }
+
+    /**
+     * @param string|null $termTbxId
+     * @return editor_Models_Terminology_TbxObjects_Attribute
+     */
+    public function setTermTbxId(?string $termTbxId): self
+    {
+        $this->termTbxId = $termTbxId;
+        return $this;
+    }
+
     /**
      * @return string|null
      */
@@ -279,6 +300,7 @@ class editor_Models_Terminology_TbxObjects_Attribute {
         $this->language = $language;
         return $this;
     }
+
 
     /**
      * @return string

@@ -66,7 +66,8 @@ class editor_Models_Terminology_TbxObjects_DataType {
 
             // if the type is empty or if the type matches the attribute dataType, use this as valid label match
             // there are attributes without type defined (ex: note) and they are valid tbx basic
-            if(empty($data['type']) || ($data['type'] === $attribute->getType())){
+            // compare with lowercase to ignore case sensitive
+            if(empty($data['type']) || (strtolower($data['type']) === strtolower($attribute->getType()))){
                 $labelTypeMatches[] = $data;
             }
         }

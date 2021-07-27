@@ -408,8 +408,10 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
         $this->termModel->updateAttributeAndTransacTermIdAfterImport($this->collectionId);
 
+        $dataTypeAssoc = ZfExtended_Factory::get('editor_Models_Terminology_Models_CollectionAttributeDataType');
+        /* @var $dataTypeAssoc editor_Models_Terminology_Models_CollectionAttributeDataType */
         // insert all attribute data types for current collection in the terms_collection_attribute_datatype table
-        $this->updateCollectionAttributeAssoc();
+        $dataTypeAssoc->updateCollectionAttributeAssoc($this->collectionId);
 
         return $this->attributes;
     }
@@ -446,15 +448,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->createOrUpdateElement($this->transacGrpModel, $this->transacGrps, $this->transacGrpCollection, $this->mergeTerms);
             $this->transacGrps = [];
         }
-    }
-
-    /***
-     * Update the collection to attribute data-type association for the current term collection.
-     * If the attribute data type exist for the collection, no row will be inserted.
-     */
-    public function updateCollectionAttributeAssoc(){
-        $db = Zend_Db_Table::getDefaultAdapter();
-        $db->query("INSERT INTO `terms_collection_attribute_datatype` (collectionId,dataTypeId) (SELECT collectionId,dataTypeId FROM `terms_attributes` WHERE collectionId = ? GROUP BY collectionId,dataTypeId) ON DUPLICATE KEY UPDATE id = id",[$this->collectionId]);
     }
 
     /**
@@ -525,6 +518,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $newLangSet->setEntryId($this->termEntryDbId);
         $newLangSet->setTermEntryGuid($parsedEntry->getEntryGuid());
 
+        //TODO: validate if this loop works !!!!!!!!!!!!!!
         foreach ($languageGroup->descripGrp as $descripGrp) {
             $this->descripGrpGuid = $this->getGuid();
             $this->setAttributeTypes($descripGrp->descrip);
@@ -574,6 +568,8 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $newTerm->setTermTbxId($this->getIdOrGenerate($tig->term, $this->tbxMap[$this::TBX_TIG]));
         $newTerm->setTermEntryGuid($this->termEntryGuid);
         $newTerm->setLangSetGuid($this->langSetGuid);
+
+        //TODO: Merge todo: this must be changed if the term exist in the database.
         $newTerm->setGuid($this->termGuid);
 
         $newTerm->setDescrip($parsedLangSet->getDescrip());
@@ -642,6 +638,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $attribute->setTermEntryId($this->termEntryDbId);
             $attribute->setLanguage($this->language['language']);
             // termId ?
+            $attribute->setTermTbxId($this->termTbxId);
             $attribute->setType((string)$value->attributes()->{'type'});
             $attribute->setValue((string)$value);
             $attribute->setTarget((string)$value->attributes()->{'target'});
@@ -713,7 +710,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $transacGrpObject->setTransac((string)$transacGrp->transac);
         }
         if (isset($transacGrp->date)) {
-            $transacGrpObject->setDate((string)$transacGrp->date);
+            $transacGrpObject->setDate(ZfExtended_Utils::toMysqlDateTime((string)$transacGrp->date));
         }
         if (isset($transacGrp->transacNote)) {
             $transacGrpObject->setTransacType((string)$transacGrp->transacNote->attributes()->{'type'});
@@ -798,6 +795,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
                         $tbxImage->setEncoding($parsedTbxImages[$count]['codePage']);
                     }
 
+                    $tbxImage->setUniqueName(ZfExtended_Utils::uuid());
                     $tbxImage->setFormat($parsedTbxImages[$count]['format']);
 //                    $tbxImage->setXbase('');
                     $tbxImage->setHexOrXbaseValue($parsedTbxImages[$count]['data']);
@@ -818,7 +816,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
                             }
 
                             $image->setHexOrXbaseValue('');
-                            $this->saveImageLocal($image->getName(), $img);
+                            $this->saveImageLocal($image->getUniqueName(), $img);
                         }
 
                         $this->createOrUpdateElement($this->tbxImagesModel, $tbxImagesAsObject, $this->tbxImagesCollection, $this->mergeTerms);
@@ -898,16 +896,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     }
 
     /**
-     * @return string
-     */
-    private function getGuid(): string
-    {
-        $set_uuid = ZfExtended_Utils::guid();
-
-        return trim($set_uuid, '{}');
-    }
-
-    /**
      * returns the translate5 termNote processStatus to the one given in TBX
      * @param array $termNotes
      * @return string
@@ -923,6 +911,16 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         }
 
         return $processStatus;
+    }
+
+    /**
+     * @return string
+     */
+    private function getGuid(): string
+    {
+        $set_uuid = ZfExtended_Utils::guid();
+
+        return trim($set_uuid, '{}');
     }
     /**
      * returns the translate5 internal available term status to the one given in TBX
@@ -1006,5 +1004,34 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $newFileName = $imagePath.'/'.$imageName;
 
         file_put_contents($newFileName, $imageContent);
+    }
+
+
+    /***
+     *
+     * @override checkIsForUpdate
+     * @param object $elementObject
+     * @param array $elementCollection
+     * @param string $collectionKey
+     * @return array
+     */
+    public function checkIsForUpdate(object $elementObject, array $elementCollection, string $collectionKey): array
+    {
+
+        // if it is not found in the cache, create new element
+        if(!isset($elementCollection[$collectionKey])){
+            return [
+                'isUpdate' => false,
+                'isCreate' => true
+            ];
+        }
+
+        $preparedArrayForDiff = $this->prepareDiffArrayToCheck($elementObject, $elementCollection[$collectionKey]);
+        $result = array_diff($preparedArrayForDiff[0], $preparedArrayForDiff[1]);
+
+        return [
+            'isUpdate' => !empty($result),
+            'isCreate' => false
+        ];
     }
 }

@@ -39,6 +39,8 @@ END LICENSE AND COPYRIGHT
  * @method string setLanguage() setLanguage(string $language)
  * @method int getTermId() getTermId()
  * @method int setTermId() setTermId(int $termId)
+ * @method string getTermTbxId() getTermTbxId()
+ * @method string setTermTbxId() setTermTbxId(string $termTbxId)
  * @method string getDataTypeId() getDataTypeId()
  * @method string setDataTypeId() setDataTypeId(int $dataTypeId)
  * @method string getType() getType()
@@ -69,8 +71,6 @@ END LICENSE AND COPYRIGHT
  * @method string setElementName() setElementName(string $elementName)
  * @method string getAttrLang() getAttrLang()
  * @method string setAttrLang() setAttrLang(string $attrLang)
- * @method string getDataType() getDataType()
- * @method string setDataType() setDataType(string $dataType)
  */
 class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_Entity_Abstract
 {
@@ -95,7 +95,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId, 'termEntryId' => $termEntryId]);
 
         foreach ($queryResults as $key => $attribute) {
-            $attributeByKey[$attribute['elementName'].'-'.$attribute['language'].'-'.$attribute['termId']] = $attribute;
+            $attributeByKey[$attribute['elementName'].'-'.$attribute['type'].'-'.$attribute['termEntryId'].'-'.$attribute['language'].'-'.$attribute['termTbxId']] = $attribute;
         }
 
         return $attributeByKey;
@@ -109,7 +109,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
 
         foreach ($queryResults as $key => $attribute) {
-            $attributeByKey[$attribute['elementName'].'-'.$attribute['language'].'-'.$attribute['termId']] = $attribute;
+            $attributeByKey[$attribute['elementName'].'-'.$attribute['type'].'-'.$attribute['termEntryId'].'-'.$attribute['language'].'-'.$attribute['termTbxId']] = $attribute;
         }
 
         return $attributeByKey;
@@ -121,7 +121,6 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $insertValues = rtrim($sqlParam, ',');
 
         $query = "INSERT INTO terms_attributes ($sqlFields) VALUES $insertValues";
-
         return $this->db->getAdapter()->query($query, $sqlValue);
     }
 
@@ -320,7 +319,6 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             'terms_attributes.language AS language',
             'terms_attributes.elementName AS name',
             'terms_attributes.type AS attrType',
-            'terms_attributes.dataType AS attrDataType',
             'terms_attributes.target AS attrTarget',
             'terms_attributes.guid AS attrId',
             'terms_attributes.value AS attrValue',
