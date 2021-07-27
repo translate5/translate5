@@ -30,7 +30,8 @@ END LICENSE AND COPYRIGHT
  * CsvMqmTest tests the correct export MQM Tags.
  *   Especially the cases of overlapping and misordered MQM tags
  */
-class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
+class QualityCsvMqmTest extends editor_Test_JsonTest {
+    
     const CSV_TARGET = 'target is coming from test edit';
     
     protected $testData = array(
@@ -206,7 +207,9 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
-        self::$api->isCapturing() && file_put_contents($this->api()->getFile($fileToCompare, null, false), $exportedFile);
+        if(self::$api->isCapturing()) {
+            file_put_contents($this->api()->getFile($fileToCompare, null, false), $exportedFile);
+        }
         //compare it
         $expectedResult = $this->api()->getFileContent($fileToCompare);
         $foundIds = [];

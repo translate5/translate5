@@ -123,7 +123,7 @@ class editor_Models_Quality_StatisticsView {
         $this->createMqmTree();
         if(!$this->onlyMqm){
             // we use the filter-panel-views intermediate model to add the other types
-            $panelView = new editor_Models_Quality_FilterPanelView($this->task, NULL, false, NULL, true, $this->field);
+            $panelView = new editor_Models_Quality_FilterPanelView($this->task, false, NULL, true, $this->field);
             foreach($panelView->getRowsByType() as $type => $typeRows){
                 $row = $typeRows[editor_Models_Quality_FilterPanelView::RUBRIC];
                 if($row->qcount > 0){

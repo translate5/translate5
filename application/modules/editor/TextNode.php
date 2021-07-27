@@ -134,7 +134,7 @@ final class editor_TextNode extends editor_Tag {
         return $this->text;
     }
 
-    protected function renderStart($withDataAttribs=true) : string {
+    protected function renderStart(bool $withDataAttribs=true) : string {
         return '';
     }
 
@@ -154,5 +154,9 @@ final class editor_TextNode extends editor_Tag {
     public function unserialize(stdClass $data){
         $this->text = $data->text;
         return $this;
+    }
+    
+    public function debugProps() : string {
+        return '"'.$this->getText().'"';
     }
 }

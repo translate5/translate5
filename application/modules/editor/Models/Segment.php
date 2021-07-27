@@ -1416,6 +1416,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             foreach($list as $item){
                 $segmentIds[] = $item['id'];
             }
+            // we do not need to filter out locked segments here as locked segments are not fetched above anyway
             $qualityNotifications = new editor_Models_Quality_Notifications($task, $segmentIds);
             foreach($list as $item){
                 $item['qualities'] = $qualityNotifications->get($item['id'], []);

@@ -41,7 +41,16 @@
  * @method editor_Segment_Internal_Tag createBaseClone()
  */
 final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
-    
+ 
+    /**
+     * REGEX to remove internal tags from a markup string
+     * Based on the internal-tag template, see editor_ImageTag::$htmlTagTpl
+     * NOTE: only opening tag-brackets "<" are reliably escaped in the contents of the inner spans - what is against XML specs unfortunately
+     * NOTE: the tilte-attribute of the first inner "short" span may contain unescaped markup - what again is against XML specs unfortunately
+     * NOTE: editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS does stumble over the afromentioned problems, that's why here is another regex
+     * @var string
+     */
+    const REGEX_REMOVE = '~<div\s*class="[^"]*internal-tag[^"]*"[^>]*><span[^>]*title="[^"]*"[^>]*>[^<]*</span><span[^>]*full[^>]*>[^<]*</span></div>~s';
     /**
      * @var string
      */
@@ -179,6 +188,14 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
     /* *************************************** Overwritten Tag API *************************************** */
     
     /**
+     * As soon as our internal spans are added we act as singular tags
+     * {@inheritDoc}
+     * @see editor_Tag::isSingular()
+     */
+    public function isSingular() : bool {
+        return ($this->contentTags !== NULL);
+    }
+    /**
      * Internal tags must not be splitted nor joined !
      * {@inheritDoc}
      * @see editor_Segment_Tag::isSplitable()
@@ -197,27 +214,29 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
         }
         return false;
     }
-    
+    /**
+     * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
+     * {@inheritDoc}
+     * @see editor_Tag::getText()
+     */
     public function getText(){
-        if($this->contentTags === null){
-            return parent::getText();
-        }
-        $text = '';
-        foreach($this->contentTags as $contentTag){
-            $text .= $contentTag->getText();
-        }
-        return $text;
+        return '';
     }
-
+    /**
+     * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
+     * {@inheritDoc}
+     * @see editor_Tag::getTextLength()
+     */
     public function getTextLength(){
-        if($this->contentTags === null){
-            return parent::getTextLength();
-        }
-        $length = 0;
-        foreach($this->contentTags as $contentTag){
-            $length += $contentTag->getTextLength();
-        }
-        return $length;
+        return 0;
+    }
+    /**
+     * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
+     * {@inheritDoc}
+     * @see editor_Tag::getLastChildsTextLength()
+     */
+    public function getLastChildsTextLength() : int {
+        return 0;
     }
     /**
      * This renders our inner HTML
@@ -233,6 +252,22 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
             $html .= $contentTag->render();
         }
         return $html;
+    }
+    /**
+     * Needs to be overwritten to ignore the singular-prop when rendering 
+     * {@inheritDoc}
+     * @see editor_Tag::renderStart()
+     */
+    protected function renderStart(bool $withDataAttribs=true) : string {
+        return '<'.$this->getName().$this->renderAttributes($withDataAttribs).'>';
+    }
+    /**
+     * Needs to be overwritten to ignore the singular-prop when rendering 
+     * {@inheritDoc}
+     * @see editor_Tag::renderEnd()
+     */
+    protected function renderEnd() : string {
+        return '</'.$this->getName().'>';
     }
     /**
      * We do not add children to the tags-container but we build our inner tags from the tags-structure
@@ -279,5 +314,9 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
                 $this->addContentTag(editor_Segment_Internal_ContentTag::fromJsonData($data));
             }
         }
+    }
+    
+    public function debugProps() : string {
+        return parent::debugProps().' <'.($this->isClosing()?'/':'').$this->getTagIndex().($this->isSingle()?'/':'').'>';
     }
 }

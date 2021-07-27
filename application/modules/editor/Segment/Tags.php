@@ -658,19 +658,25 @@ class editor_Segment_Tags implements JsonSerializable {
      * Debug output
      * @return string
      */
-    public function debug($asMarkup=false){
+    public function debug(){
         $debug = '';
-        $processor = ($asMarkup) ? 'htmlspecialchars' : 'trim';
-        $newline = ($asMarkup) ? '<br/>' : "\n";
+        $newline = "\n";
         if($this->source != NULL){
-            $debug .= 'SOURCE '.$this->source->debugProps().': '.$processor($this->source->render()).$newline;
+            $debug .= 'SOURCE '.$this->source->debugProps().': '.trim($this->source->render()).$newline;
         }
         if($this->sourceOriginal != NULL){
-            $debug .= 'SOURCE ORIGINAL '.$this->sourceOriginal->debugProps().': '.$processor($this->sourceOriginal->render()).$newline;
+            $debug .= 'SOURCE ORIGINAL '.$this->sourceOriginal->debugProps().': '.trim($this->sourceOriginal->render()).$newline;
         }
         for($i=0; $i < count($this->targets); $i++){
-            $debug .= 'TARGET '.$i.' '.$this->targets[$i]->debugProps().': '.$processor($this->targets[$i]->render()).$newline;
+            $debug .= 'TARGET '.$i.' '.$this->targets[$i]->debugProps().': '.trim($this->targets[$i]->render()).$newline;
         }
         return $debug;
+    }
+    /**
+     * Debug formatted JSON
+     * @return string
+     */
+    public function debugJson(){
+        return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     }
 }

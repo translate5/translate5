@@ -65,7 +65,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
         newAnalysis: '#UT#Neu überprüfen',
     },
     initConfig: function(instanceConfig) {
-        this.isQualityManager = Editor.app.authenticatedUser.hasRoles(['pm','admin']);
+        this.isQualityManager = Editor.app.authenticatedUser.isAllowed('editorManageQualities');
         var me = this,
         filterMode = Editor.app.getController('Quality').getFilterMode(),
         config = {

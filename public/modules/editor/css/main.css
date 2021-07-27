@@ -581,9 +581,9 @@ tr.customState td div {font-style: italic;}
 .adminTaskGrid tr.import div.x-action-col-icon.ico-task-edit {display:none; background-repeat: no-repeat; background-position: center;}
 
 /* display the actionicons when thay are enabled with class */
-.adminTaskGrid tr.editorMenuTask .ico-task-menu {display:inline-block;}
-.adminTaskGrid tr.editorProjectTask .ico-task-project {display:inline-block;}
-.adminTaskGrid tr.editorEditTask .ico-task-edit {display:inline-block;}
+.adminTaskGrid tr.editorMenuTask .ico-task-menu {display:inline-block; position:relative; top:1px;}
+.adminTaskGrid tr.editorEditTask .ico-task-edit {display:inline-block; margin-left:3px;}
+.adminTaskGrid tr.editorProjectTask .ico-task-project {display:inline-block; margin-left:4px;}
 
 /* hide the edit and jump icon in project grid */
 .projectGrid .ico-task-edit {display:none; background-repeat: no-repeat; background-position: center;}

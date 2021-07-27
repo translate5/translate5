@@ -29,14 +29,8 @@ END LICENSE AND COPYRIGHT
 /**
  * Several "classic" PHPUnit tests to check the OOP Tag-Parsing API againsted selected test data
  */
-class SegmentTagsTest extends \ZfExtended_Test_Testcase {
+class SegmentTagsTest extends editor_Test_SegmentTagsTest {
     
-    /**
-     * 
-     * @var editor_Models_Task
-     */
-    private static $testTask = NULL;
-
     public function testUnicodeTag(){
         $expected = '<div><p>イリノイ州シカゴにて、アイルランド系の家庭に、</p></div>';
         $dom = new editor_Utils_Dom();
@@ -287,12 +281,20 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
     
     public function testRealDataTags9(){
         // testing "real" segment content
+        // NOTE: when editor_Segment_FieldTags is in VALIDATION_MODE the duplicatesavecheck tag will throw a warning that the UNPARSED HTML DOM DOES NOT MATCH
         $segmentId = 688445;
         $original = '<del class="trackchanges ownttip deleted" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00" data-historylist="1625486496000" data-action_history_1625486496000="INS" data-usertrackingid_history_1625486496000="4269">F</del><ins class="trackchanges ownttip" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00">f</ins><ins class="trackchanges ownttip" data-usertrackingid="4269" data-usercssnr="usernr2" data-workflowstep="review1stlanguage3" data-timestamp="2021-07-05T14:01:36+02:00">ür Industriekunden</ins><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="duplicatesavecheck" data-segmentid="4395852" data-fieldname="targetEdit">';
         $markup = '<del class="trackchanges ownttip deleted" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00" data-historylist="1625486496000" data-action_history_1625486496000="INS" data-usertrackingid_history_1625486496000="4269">F</del><ins class="trackchanges ownttip" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00">f</ins><ins class="trackchanges ownttip" data-usertrackingid="4269" data-usercssnr="usernr2" data-workflowstep="review1stlanguage3" data-timestamp="2021-07-05T14:01:36+02:00">ür Industriekunden</ins><img class="duplicatesavecheck" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-segmentid="4395852" data-fieldname="targetEdit" />';
         $this->createOriginalDataTest($segmentId, $original, $markup);
     }
     
+    public function testRealDataTags10(){
+        // testing "real" segment content
+        $segmentId = 688447;
+        $markup = '<div class="open 672069643d223122 internal-tag ownttip"><span class="short" title="&lt;g id=&quot;1&quot;&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;g id=&quot;1&quot;&gt;</span></div>T<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/g&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/g&gt;</span></div><div class="open 672069643d223222 internal-tag ownttip"><span class="short" title="&lt;g id=&quot;2&quot;&gt;">&lt;2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;g id=&quot;2&quot;&gt;</span></div>ranslation <div class="open 672069643d223322 internal-tag ownttip"><span class="short" title="&lt;g id=&quot;3&quot;&gt;">&lt;3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;g id=&quot;3&quot;&gt;</span></div>M<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/g&gt;">&lt;/3&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;/g&gt;</span></div>anagement <div class="open 672069643d223422 internal-tag ownttip"><span class="short" title="&lt;g id=&quot;4&quot;&gt;">&lt;4&gt;</span><span class="full" data-originalid="4" data-length="-1">&lt;g id=&quot;4&quot;&gt;</span></div>S<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/g&gt;">&lt;/4&gt;</span><span class="full" data-originalid="4" data-length="-1">&lt;/g&gt;</span></div>ystem<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/g&gt;">&lt;/2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;/g&gt;</span></div>';
+        $this->createDataTest($segmentId, $markup);
+    }
+
     public function testMqmTags1(){
         // testing "real" segment content
         $segmentId = 688501;
@@ -333,120 +335,9 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
     public function testMqmTags6(){
         // testing "real" segment content
         $segmentId = 688501;
-        // these are illegal, overlapping tags
+        // these are overlapping MQM tags (which is allowed)
         $markup = '<img class="open critical qmflag ownttip qmflag-19" data-t5qid="633" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" />Apache 2.x<img class="open critical qmflag ownttip qmflag-4" data-t5qid="631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" /> auf<img class="close critical qmflag ownttip qmflag-19" data-t5qid="633" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" /> Unix-Systemen<img class="close critical qmflag ownttip qmflag-4" data-t5qid="631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
-        $compare = '<img class="open critical qmflag ownttip qmflag-19" data-t5qid="633" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" />Apache 2.x<img class="close critical qmflag ownttip qmflag-19" data-t5qid="633" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" /><img class="open critical qmflag ownttip qmflag-4" data-t5qid="631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" /><img class="open critical qmflag ownttip qmflag-19" data-t5qid="633" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" /> auf<img class="close critical qmflag ownttip qmflag-19" data-t5qid="633" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" /> Unix-Systemen<img class="close critical qmflag ownttip qmflag-4" data-t5qid="631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
+        $compare = '<img class="open critical qmflag ownttip qmflag-19" data-t5qid="633" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" />Apache 2.x<img class="open critical qmflag ownttip qmflag-4" data-t5qid="631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" /> auf<img class="close critical qmflag ownttip qmflag-19" data-t5qid="633" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" /> Unix-Systemen<img class="close critical qmflag ownttip qmflag-4" data-t5qid="631" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
         $this->createMqmDataTest($segmentId, $markup, $compare);
-    }
-    /**
-     *
-     * @return editor_Segment_FieldTags
-     */
-    private function createTags() : editor_Segment_FieldTags {
-        $segmentId = 1234567;
-        $segmentText = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'; // 80 characters
-        return new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $segmentText, 'target', 'targetEdit');
-    }
-    /**
-     *
-     * @param editor_Segment_FieldTags $tags
-     * @param string $expectedMarkup
-     */
-    private function createTagsTest(editor_Segment_FieldTags $tags, string $expectedMarkup){
-        // compare rendered Markup
-        $this->assertEquals($expectedMarkup, $tags->render());
-        // re-create from JSON
-        $expectedJSON = $tags->toJson();
-        $jsonTags = editor_Segment_FieldTags::fromJson($this->getTestTask(), $expectedJSON);
-        $this->assertEquals($expectedJSON, $jsonTags->toJson());
-        // unparse test
-        $unparseTags = new editor_Segment_FieldTags($this->getTestTask(), $tags->getSegmentId(), $tags->getField(), $tags->getFieldText(), $tags->getSaveToFields(), $tags->getTermtaggerName());
-        $unparseTags->unparse($expectedMarkup);
-        $this->assertEquals($expectedMarkup, $unparseTags->render());
-    }
-    /**
-     *
-     * @param int $segmentId
-     * @param string $markup
-     */
-    private function createDataTest($segmentId, $markup){
-        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $markup, 'target', 'target');
-        // compare unparsed markup
-        $this->assertEquals($markup, $tags->render());
-        // compare field-texts vs stripped markup
-        $this->assertEquals(strip_tags($markup), $tags->getFieldText());
-        // re-create from JSON
-        $expectedJSON = $tags->toJson();
-        $jsonTags = editor_Segment_FieldTags::fromJson($this->getTestTask(), $expectedJSON);
-        $this->assertEquals($expectedJSON, $jsonTags->toJson());
-    }
-    /**
-     *
-     * @param int $segmentId
-     * @param string $original
-     * @param string $markup
-     */
-    private function createOriginalDataTest($segmentId, $original, $markup){
-        $originalTags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $original, 'target', 'target');
-        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $markup, 'target', 'target');
-        // compare unparsed markup
-        $this->assertEquals($markup, $tags->render());
-        // compare field-text original vs "sorted" markup
-        $this->assertEquals($originalTags->getFieldText(), $tags->getFieldText());
-        // compare field-text vs stripped markup
-        $this->assertEquals(strip_tags($markup), $tags->getFieldText());
-        // re-create from JSON
-        $expectedJSON = $tags->toJson();
-        $jsonTags = editor_Segment_FieldTags::fromJson($this->getTestTask(), $expectedJSON);
-        $this->assertEquals($expectedJSON, $jsonTags->toJson());
-    }
-    /**
-     *
-     * @param int $segmentId
-     * @param string $markup
-     * @param string $compare
-     */
-    private function createMqmDataTest($segmentId, $markup, $compare=null){
-        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $markup, 'target', 'target');
-        // compare unparsed markup
-        if($compare == null){
-            $this->assertEquals($markup, $tags->render());
-        } else {
-            // if the markup cpontaines invalid mqm we may need a special compare markup
-            $this->assertEquals($compare, $tags->render());
-        }
-        // compare field-texts vs stripped markup
-        $this->assertEquals(strip_tags($markup), $tags->getFieldText());
-        if($compare != null){
-            $this->assertEquals(strip_tags($compare), $tags->getFieldText());
-        }
-        // re-create from JSON
-        $expectedJSON = $tags->toJson();
-        $jsonTags = editor_Segment_FieldTags::fromJson($this->getTestTask(), $expectedJSON);
-        $this->assertEquals($expectedJSON, $jsonTags->toJson());
-    }
-    /**
-     * Retrieves a test-tak to init field-tags with
-     * @return editor_Models_Task
-     */
-    private function getTestTask() : editor_Models_Task {
-        if(static::$testTask == NULL){
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->setId(1234);
-            $task->setEntityVersion(280);
-            $task->setTaskGuid('{c56eadf5-ca66-43ae-931f-a09ff22643ab}');
-            $task->setTaskName('UNIT_TEST_TASK');
-            $task->setForeignName('');
-            $task->setSourceLang(5);
-            $task->setTargetLang(4);
-            $task->setRelaisLang(0);
-            $task->setState('open');
-            $task->setQmSubsegmentFlags('{"qmSubsegmentFlags":[{"text":"Accuracy","id":1,"children":[{"text":"Terminology","id":2},{"text":"Mistranslation","id":3},{"text":"Omission","id":4},{"text":"Untranslated","id":5},{"text":"Addition","id":6}]},{"text":"Fluency","id":7,"children":[{"text":"Content","id":8,"children":[{"text":"Register","id":9},{"text":"Style","id":10},{"text":"Inconsistency","id":11}]},{"text":"Mechanical","id":12,"children":[{"text":"Spelling","id":13},{"text":"Typography","id":14},{"text":"Grammar","id":15},{"text":"Locale violation","id":16}]},{"text":"Unintelligible","id":17}]},{"text":"Verity","id":18,"children":[{"text":"Completeness","id":19},{"text":"Legal requirements","id":20},{"text":"Locale applicability","id":21}]}],"severities":{"critical":"Critical","major":"Major","minor":"Minor"}}');
-            $task->setTaskType('default');
-            $task->setProjectId(1233);
-            static::$testTask = $task;
-        }
-        return static::$testTask;
     }
 }
