@@ -33,7 +33,7 @@
  */
 
 /**
- * 
+ * FIXME must be moved to ZfExtended since there is the authenticated user used too!!!
  * Represents the session based User and provides a convenience API accessing it
  */
 class editor_User {

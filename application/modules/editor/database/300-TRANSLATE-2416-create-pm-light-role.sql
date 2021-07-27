@@ -51,6 +51,7 @@ values  ('editor', 'pmlight', 'applicationconfigLevel', 'task'),
         ('editor', 'pmlight', 'editor_user', 'index'),
         ('editor', 'pmlight', 'editor_customer', 'index'),
         ('editor', 'pmlight', 'editor_workflowuserpref', 'all'),
+        ('editor', 'pmlight', 'editor_languageresourcetaskassoc', 'all'),
         ('editor', 'pmlight', 'frontend', 'editorAddTask'),
         ('editor', 'pmlight', 'frontend', 'editorAnalysisTask'),
         ('editor', 'pmlight', 'frontend', 'editorChangeUserAssocTask'),
@@ -81,6 +82,8 @@ values  ('editor', 'pmlight', 'applicationconfigLevel', 'task'),
         ('editor', 'pmlight', 'frontend', 'pluginVisualReviewFontPrefs'),
         ('editor', 'pmlight', 'frontend', 'pluginVisualReviewGlobal'),
         ('editor', 'pmlight', 'frontend', 'pluginVisualReviewSegmentMapping'),
+        ('editor', 'pmlight', 'frontend', 'languageResourcesTaskassoc'),
+        ('editor', 'pmlight', 'frontend', 'taskUserAssocFrontendController'),
         ('editor', 'pmlight', 'frontend', 'readAnonymyzedUsers'),
         ('editor', 'pmlight', 'initial_tasktype', 'default'),
         ('editor', 'pmlight', 'initial_tasktype', 'project'),
@@ -91,6 +94,13 @@ values  ('editor', 'pmlight', 'applicationconfigLevel', 'task'),
         ('editor', 'pmlight', 'setaclrole', 'termProposer');
 
 DELETE FROM `Zf_acl_rules` WHERE resource = 'backend' and `right` = 'customerAdministration';
+
+-- duplication of adminUserFrontendController to separate job and user management
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+    SELECT `module`, `role`, `resource`, 'taskUserAssocFrontendController' as `right` FROM `Zf_acl_rules`
+    WHERE `right` = 'adminUserFrontendController';
+
+UPDATE `Zf_acl_rules` SET `right` = 'userAdministration' WHERE `right` = 'adminUserFrontendController';
 
 insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values
 ('editor', 'pm', 'setaclrole', 'pmlight'),

@@ -81,7 +81,7 @@ Ext.define('Editor.view.ViewPort', {
         if(user.isAllowed('languageResourcesOverview')) {
             mainSections.push({xtype: 'tmOverviewPanel'});
         }
-        if(user.isAllowed('adminUserFrontendController')) {
+        if(user.isAllowed('userAdministration')) {
             mainSections.push({xtype: 'adminUserGrid'});
         }
         if(user.isAllowed('customerAdministration')) {
