@@ -213,4 +213,13 @@ class editor_Models_Terminology_TbxObjects_Image {
         $this->hexOrXbaseValue = $hexOrXbaseValue;
         return $this;
     }
+
+    /***
+     * Create unique name for the current image object
+     */
+    public function createUniqueName(){
+        $d = strrpos($this->getName(),".");
+        $extension = ($d===false) ? "" : substr($this->getName(),$d+1);
+        return ZfExtended_Utils::uuid().'.'.$extension;
+    }
 }

@@ -32,6 +32,13 @@ ALTER TABLE `terms_images`
 ADD COLUMN `uniqueName` VARCHAR(100) NULL AFTER `name`,
 ADD UNIQUE INDEX `uniqueName_UNIQUE` (`uniqueName` ASC);
 
+ALTER TABLE `terms_images`
+ADD CONSTRAINT `fk_terms_images_languageresources`
+    FOREIGN KEY (`collectionId`)
+        REFERENCES `translate5`.`LEK_languageresources` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE;
+
 # attribute data type attribute is not tbx basic. No need to have this field in the database
 ALTER TABLE `terms_attributes` 
 DROP COLUMN `dataType`;

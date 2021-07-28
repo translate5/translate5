@@ -795,7 +795,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
                         $tbxImage->setEncoding($parsedTbxImages[$count]['codePage']);
                     }
 
-                    $tbxImage->setUniqueName(ZfExtended_Utils::uuid());
+                    $tbxImage->setUniqueName($tbxImage->createUniqueName());
                     $tbxImage->setFormat($parsedTbxImages[$count]['format']);
 //                    $tbxImage->setXbase('');
                     $tbxImage->setHexOrXbaseValue($parsedTbxImages[$count]['data']);
