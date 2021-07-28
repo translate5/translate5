@@ -42,12 +42,6 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
      */
     protected $qualityState = NULL;
     /**
-     * 
-     * @var editor_Models_Task
-     */
-    protected $task = NULL;
-    
-    /**
      * sets the fields which should be filtered lowercase
      * @param array $fields
      */
@@ -59,15 +53,14 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
      * @param editor_Models_Quality_RequestState $requestState
      * @param editor_Models_Task $task
      */
-    public function setQualityFilter(editor_Models_Quality_RequestState $requestState, editor_Models_Task $task) {
+    public function setQualityFilter(editor_Models_Quality_RequestState $requestState) {
         $this->qualityState = $requestState;
-        $this->task = $task;
         // if a quality filter is applied we must filter the qualities so that normal users just see their qualities
         // this filtering is done in the main select and nod in the filtered segment-ids via ::getSegmentIdsForQualityFilter because it's much cheaper to do it there
-        if($this->qualityState->hasCheckedCategoriesByType() && $requestState->hasUserRestriction()){
+        if($requestState->hasCheckedCategoriesByType() && $requestState->hasUserRestriction()){
             // if the returned data is NULL this means, the state workflow does not justify filtering
-            $filteredSegmentNrs = $requestState->getUserRestrictedSegmentNrs($task);
-            if($filteredSegmentNrs !== NULL){                
+            $filteredSegmentNrs = $requestState->getUserRestrictedSegmentNrs();
+            if($filteredSegmentNrs !== NULL){
                 $filter = new stdClass();
                 $filter->field = 'segmentNrInTask';
                 if(count($filteredSegmentNrs) < 2){
@@ -83,6 +76,15 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
                 $this->addFilter($filter);
             }
         }
+        // normally, quality filtering filters for editable segments
+        if($requestState->hasEditableRestriction()){
+            $filter = new stdClass();
+            $filter->field = 'editable';
+            $filter->type = 'numeric';
+            $filter->comparison = 'eq';
+            $filter->value = $requestState->getEditableRestriction();
+            $this->addFilter($filter);
+        }
     }
     /**
      * Overwritten to apply the additional qualities filter
@@ -95,19 +97,18 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
         
         if($this->qualityState != NULL){
             $colPrefix = (empty($this->defaultTable)) ? '' : '`'.$this->defaultTable.'`.';
-            $adapter = $this->entity->db->getAdapter();
             $conditions = [];
             if($this->qualityState->hasCheckedCategoriesByType()){
                 // Note: the quality state's user filter is handled with a filter on the segment table so we don't need it here
-                $segmentIds = editor_Models_Db_SegmentQuality::getSegmentIdsForQualityFilter($this->qualityState, $this->task->getTaskGuid());
+                $segmentIds = $this->qualityState->getSegmentIdsRestriction();
                 if(count($segmentIds) > 1){
-                    $conditions[] = $adapter->quoteInto($colPrefix.'id IN (?)', $segmentIds, Zend_Db::INT_TYPE);
+                    $this->select->where($colPrefix.'id IN (?)', $segmentIds, Zend_Db::INT_TYPE);
                 } else if(count($segmentIds) == 1){
-                    $conditions[] = $adapter->quoteInto($colPrefix.'id = ?', $segmentIds[0], Zend_Db::INT_TYPE);
+                    $this->select->where($colPrefix.'id = ?', $segmentIds[0], Zend_Db::INT_TYPE);
                 } else {
                     // no segment ids, trigger empty result
                     // error_log('editor_Models_Filter_SegmentSpecific: TRIGGER EMPTY SEGMENT-IDs');
-                    $conditions[] = '1 = 0';
+                    $this->select->where('1 = 0');
                 }
             }
             if(count($conditions) > 0){

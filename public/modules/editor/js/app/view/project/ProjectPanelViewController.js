@@ -43,6 +43,11 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
     
     listen:{
+        messagebus: {
+            '#translate5 task': {
+                updateProgress: 'onUpdateProgress'
+            }
+        },
         component:{
             '#reloadProjectbtn':{
                 click:'onReloadProjectBtnClick'
@@ -60,7 +65,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             }
         }
     },
-    
+
     /***
      * Redirect to project focus route
      */
@@ -117,7 +122,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
     
     /***
-     * Focus project task grid row. This is called afte project task store is loaded.
+     * Focus project task grid row. This is called after project task store is loaded.
      * The taskId is calculated based on the current window hash
      */
     focusProjectTask:function(store){
@@ -137,6 +142,30 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         }
         me.selectProjectTaskRecord(record);
         me.lookup('projectGrid').setLoading(false);
+    },
+
+    /***
+     * After current selected task import is finished, reload the selected task and with this all view model bindings will be triggered
+     * @param params
+     */
+    onUpdateProgress: function(params) {
+        if(params.progress !== 100){
+            return;
+        }
+        var me = this,
+            preferences = me.getView().down('adminTaskPreferencesWindow'),
+            currentTask = preferences.getCurrentTask();
+
+        if(!currentTask || currentTask.get('taskGuid')!== params.taskGuid){
+            return;
+        }
+
+        currentTask.load({
+            callback:function (){
+                preferences.setCurrentTask(currentTask);
+                me.getView().down('adminTaskUserAssocGrid').getStore().load();
+            }
+        });
     },
     
     /***
@@ -242,7 +271,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             grid=me.lookup('projectGrid'),
             record=null;
 
-        //serch for the task store record index
+        //search for the task store record index
         me.searchIndex(id,grid).then(function(index){
             //do not scroll on empty store
             if(grid.getStore().getTotalCount()==0){
@@ -375,7 +404,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
     
     /***
-     * Focus and select grid record without fiering the selectionchange event.
+     * Focus and select grid record without firing the selectionchange event.
      * This will also update the viw model variable name with the record
      */
     focusRecordSilent:function(grid,record,name){

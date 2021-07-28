@@ -114,6 +114,7 @@ Ext.define('Editor.model.admin.Task', {
         {name: 'segmentCount', type: 'int', persist: false},
         {name: 'segmentFinishCount', type: 'int', persist: false},
         {name: 'diffExportUsable', type: 'boolean'},
+        {name: 'description', type: 'string'},
         {
             name: 'projectTasks', persist: false,
             convert: function (tasks) {

@@ -51,6 +51,8 @@ Ext.define('Editor.view.segments.grid.Header', {
         leaveBtn: '#UT#Zurück zur Aufgabenübersicht',
         leaveTaskWindowTitle:'#UT#Zurück zur Aufgabenübersicht',
         closeBtn: '#UT#Anwendung verlassen',
+        showDesc: '#UT#Projektbeschr. anzeigen',
+        hideDesc: '#UT#Projektbeschr. ausblenden',
         leaveTaskWindowMessage:'#UT#Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?',
         leaveTaskWindowFinishBtn:'#UT#Alles fertig - Aufgabe abschließen',
         leaveTaskWindowCancelBtn:'#UT#Aufgabe später weiterbearbeiten'
@@ -64,6 +66,17 @@ Ext.define('Editor.view.segments.grid.Header', {
                     margin:'0 0 0 4'
                 },
                 items: [{
+                    xtype: 'button',
+                    itemId: 'toggleTaskDesc',
+                    enableToggle: true,
+                    pressed: true,
+                    bind: {
+                        hidden: '{!taskDescription}'
+                    },
+                    showText: me.strings.showDesc,
+                    hideText: me.strings.hideDesc,
+                    text: me.strings.hideDesc
+                },{
                     xtype: 'helpButton'
                 },{
                     xtype: 'button',

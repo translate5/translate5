@@ -109,11 +109,13 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         if(!$this->_request->isPost()) {
             return parent::validate();
         }
-        $this->setDefaultAssignmentDate();
-        $this->setDefaultDeadlineDate();
+
         settype($this->data->taskGuid, 'string');
         $this->task->loadByTaskGuid($this->data->taskGuid);
-        
+
+        $this->setDefaultAssignmentDate();
+        $this->setDefaultDeadlineDate();
+
         $this->setLegacyDeadlineDate();
         
         $valid = parent::validate();
@@ -156,7 +158,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             Zend_Registry::get('logger')->warn('E1232', 'Job creation: role "lector" is deprecated, use "reviewer" instead!');
         }
 
-        //on post the task is not intialized yet
+        //on post the task is not initialized yet
         if($this->task->getId() == 0) {
             $this->task->loadByTaskGuid($this->data->taskGuid);
         }
@@ -165,7 +167,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         /* @var $manager editor_Workflow_Manager */
 
 
-        // if the workflow is defined by the api use it from there, otherwize load it from the task
+        // if the workflow is defined by the api use it from there, otherwise load it from the task
         if(property_exists($this->data, 'workflow') && !empty($this->data->workflow)){
             $workflow = $manager->getCached($this->data->workflow);
         }else{
@@ -265,7 +267,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $workflow->hookin()->doWithUserAssoc($oldEntity, $this->entity, function() {
             $this->entity->save();
         });
-        
+
         $this->view->rows = $this->entity->getDataObject();
         $this->addUserInfoToResult();
         if(isset($this->data->state) && $oldEntity->getState() != $this->data->state){
@@ -421,29 +423,25 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             return;
         }
 
-        $model = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $model editor_Models_Task */
-        $model->loadByTaskGuid($this->data->taskGuid);
-
         //check if the order date is set. With empty order data, no deadline date from config is possible
-        if(empty($model->getOrderdate()) || is_null($model->getOrderdate())){
+        if(empty($this->task->getOrderdate()) || is_null($this->task->getOrderdate())){
             return;
         }
         
         $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wm editor_Workflow_Manager */
         
-        $workflow = $wm->get($model->getWorkflow());
+        $workflow = $wm->get($this->task->getWorkflow());
 
         $step = $this->data->workflowStepName;
         //get the config for the task workflow and the user assoc role workflow step
-        $configValue = $model->getConfig()->runtimeOptions->workflow->{$model->getWorkflow()}->{$step}->defaultDeadlineDate ?? 0;
+        $configValue = $this->task->getConfig()->runtimeOptions->workflow->{$this->task->getWorkflow()}->{$step}->defaultDeadlineDate ?? 0;
         if($configValue <= 0){
             return;
         }
 
         // the deadline will be order date + defaultDeadlineDate days config
-        $this->data->deadlineDate = editor_Utils::addBusinessDays($model->getOrderdate(),$configValue);
+        $this->data->deadlineDate = editor_Utils::addBusinessDays($this->task->getOrderdate(),$configValue);
         $this->entity->setDeadlineDate($this->data->deadlineDate);
     }
 }

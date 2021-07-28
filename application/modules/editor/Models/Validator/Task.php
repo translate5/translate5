@@ -60,6 +60,7 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('lockLocked', 'int');
     $this->addValidator('enableSourceEditing', 'int');
     $this->addValidator('importAppVersion', 'stringLength', array('min' => 0, 'max' => 64));
+    $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 500));
     $this->addValidator('customerId', 'int');
     $this->addValidator('segmentCount', 'int');
     $this->addValidator('segmentFinishCount', 'int');

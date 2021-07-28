@@ -11,6 +11,16 @@
   </taskInfo>
   <batchTotal>
     <analyse>
+      <perfect segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <inContextExact segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <exact segments="50" words="385" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <locked segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <crossFileRepeated segments="13" words="56" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <repeated segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <total segments="163" words="1270" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <new segments="73" words="478" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <newBaseline segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <newLearnings segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <fuzzy min="50" max="59" segments="2" words="9" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <fuzzy min="60" max="69" segments="4" words="61" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <fuzzy min="70" max="79" segments="1" words="11" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
@@ -21,16 +31,6 @@
       <internalFuzzy min="70" max="79" segments="1" words="3" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <internalFuzzy min="80" max="89" segments="4" words="28" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <internalFuzzy min="90" max="99" segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <crossFileRepeated segments="13" words="56" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <total segments="163" words="1270" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <exact segments="50" words="385" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <new segments="73" words="478" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <perfect segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <inContextExact segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <locked segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <repeated segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <newBaseline segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <newLearnings segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
     </analyse>
   </batchTotal>
 </task>
