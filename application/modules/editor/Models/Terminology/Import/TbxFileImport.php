@@ -176,7 +176,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      * Collection of attributes (note, ref, xref, descrip...) as object prepared for insert or update.
      * @var array
      */
-    protected array $attributes;
+    protected array $attributes = [];
     /**
      * Collection of term as object prepared for insert or update.
      * @var array
@@ -621,10 +621,9 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      * Prepare all Elements for Attribute table
      * Elements - termNote, descrip, transacNote, admin, note
      * @param SimpleXMLElement $element
-     * @param bool $addToAttributesCollection
      * @return array
      */
-    private function setAttributeTypes(SimpleXMLElement $element, bool $addToAttributesCollection = true): array
+    private function setAttributeTypes(SimpleXMLElement $element): array
     {
         if (!isset($this->language['language'])) {
             $this->language['language'] = null;
@@ -672,9 +671,8 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
             $attributes[] = $attribute;
 
-            if ($addToAttributesCollection) {
-                $this->attributes[] = $attribute;
-            }
+            // add the attribute to the global attributes collection
+            $this->attributes[] = $attribute;
         }
 
         return $attributes;

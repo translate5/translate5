@@ -35,7 +35,7 @@ ADD UNIQUE INDEX `uniqueName_UNIQUE` (`uniqueName` ASC);
 ALTER TABLE `terms_images`
 ADD CONSTRAINT `fk_terms_images_languageresources`
     FOREIGN KEY (`collectionId`)
-        REFERENCES `translate5`.`LEK_languageresources` (`id`)
+        REFERENCES `LEK_languageresources` (`id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE;
 
@@ -45,4 +45,14 @@ DROP COLUMN `dataType`;
 
 ALTER TABLE `terms_attributes` 
 ADD COLUMN `termTbxId` VARCHAR(100) NULL AFTER `termId`;
+
+ALTER TABLE `terms_attributes`
+ ADD INDEX `termTbxId_idx` (`termTbxId` ASC);
+
+ALTER TABLE `terms_term`
+ ADD INDEX `termTbxId_idx` (`termTbxId` ASC);
+
+ALTER TABLE `terms_transacgrp`
+ ADD INDEX `termTbxId` (`termTbxId` ASC);
+
 
