@@ -59,11 +59,11 @@ class editor_Models_Terminology_Models_TermEntryModel extends ZfExtended_Models_
 
             // Setup data
             $t->init([
-                'elementName' => 'date',
+                'elementName' => 'termEntry',
                 'transac' => $type,
-                'date' => time(),
+                'date' => date('Y-m-d H:i:s'),
                 'transacNote' => $misc['userName'],
-                'transacType' => $type,
+                'transacType' => 'responsiblePerson',
                 'collectionId' => $this->getCollectionId(),
                 'termEntryId' => $termEntryId,
                 'termEntryGuid' => $this->getEntryGuid(),

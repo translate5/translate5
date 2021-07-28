@@ -201,13 +201,15 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
         // Prepare transacgrp-props relevant for term-level
         $levelA['term'] = [
+            'elementName' => 'tig',
             'termId' => $this->getId(),
+            'termTbxId' => $this->getTermTbxId(),
             'termGuid' => $this->getGuid(),
         ];
 
         // Prepare transacgrp-props relevant for language-level
         // No props actually, but this allows us to cycle through $levelA
-        if ($isTermForNewLanguage) $levelA['language'] = [];
+        if ($isTermForNewLanguage) $levelA['language'] = ['elementName' => 'langSet'];
 
         // Create 'creation' and 'modification' `terms_transacgroup`-entries for term-level (and language-level, if need)
         foreach ($levelA as $byLevel) foreach (['creation', 'modification'] as $type) {
@@ -217,13 +219,13 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
             // Setup data
             $t->init($byLevel + [
-                'elementName' => 'date',
+                'elementName' => $byLevel['elementName'],
                 'transac' => $type,
-                'date' => time(),
+                'date' => date('Y-m-d H:i:s'),
                 'transacNote' => $misc['userName'],
-                'transacType' => $type,
+                'transacType' => 'responsiblePerson',
                 'language' => $this->getLanguage(),
-                'attrLang' => $this->getLanguage(),
+                // 'attrLang' => $this->getLanguage(), // ?
                 'collectionId' => $this->getCollectionId(),
                 'termEntryId' => $this->getTermEntryId(),
                 'termEntryGuid' => $this->getTermEntryGuid(),
@@ -252,7 +254,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
               AND ' . $language . '
               AND `transac` = "modification" 
         ', [
-            ':date' => time(),
+            ':date' => date('Y-m-d H:i:s'),
             ':userName' => $misc['userName'],
             ':termEntryId' => $this->getTermEntryId(),
         ]);

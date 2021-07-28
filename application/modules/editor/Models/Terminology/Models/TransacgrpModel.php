@@ -89,7 +89,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
         ];
 
         // Build param bindings
-        $bind = [':date' => $time = time(), ':userName' => $user, ':termEntryId' => $termEntryId];
+        $bind = [':date' => date('Y-m-d H:i:s', $time = time()), ':userName' => $user, ':termEntryId' => $termEntryId];
         if ($level == 'language' || $level == 'term') $bind[':language'] = strtolower($language);
         if ($level == 'term') $bind[':termId'] = $termId;
 
