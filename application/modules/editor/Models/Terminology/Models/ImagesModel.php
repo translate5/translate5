@@ -81,4 +81,21 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
         return $this->db->getAdapter()->query($query, $sqlValue);
     }
 
+
+    public function loadByTargetId(string $targetId): Zend_Db_Table_Row
+    {
+        return $this->row = $this->db->fetchRow('`targetId` = "' . $targetId . '"');
+    }
+
+    public function delete() {
+
+        // If file exists
+        if (is_file($src = 'term-images-public/tc_' . $this->getCollectionId() . '/images/' . $this->getUniqueName()))
+
+            // Delete it
+            unlink($src);
+
+        // Call parent
+        return parent::delete();
+    }
 }
