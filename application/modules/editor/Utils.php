@@ -61,6 +61,7 @@ class editor_Utils {
         'base64' => '^~(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$~',
         'wskey' => '~^[A-Za-z0-9+/]{22}==$~',
         'rfc5646' => '~^[a-z]{2,3}(-[a-zA-Z0-9]{2,4}|)(-[a-zA-Z]{2}|)$~',
+        'ext' => '~\.([a-z0-9]+)$~i',
         'json' => '/
           (?(DEFINE)
              (?<number>   -? (?= [1-9]|0(?!\d) ) \d+ (\.\d+)? ([eE] [+-]? \d+)? )
@@ -362,12 +363,35 @@ class editor_Utils {
 
             // If prop is required, but has empty/null/zero value - flush error
             if (($rule['req'] || $rule['unq'])
-                && (!strlen($value) || (!$value && $rule['key'])))
+                && ((!is_array($value) && !strlen($value)) || (!$value && $rule['key'])))
                 throw new ZfExtended_Mismatch('E2000', [$label]);
 
             // If prop's value should match certain regular expression, but it does not - flush error
             if ($rule['rex'] && strlen($value) && !self::rexm($rule['rex'], $value))
                 throw new ZfExtended_Mismatch('E2001', [$value, $label]);
+
+            // If file's extension should match certain regular expression, but it does not - flush error
+            if ($rule['ext']) {
+
+                // Get extension
+                $ext = strtolower(self::rexm('ext', $value['name'], 1));
+
+                // If extension is allowed -
+                if (self::rexm($rule['ext'], $ext)) {
+
+                    // Pass file info into return value
+                    $rowA[$prop] = $value;
+
+                    // Append extension
+                    $rowA[$prop]['ext'] = $ext;
+
+                    // Append extension prepended with dot
+                    $rowA[$prop]['.ext'] = '.' . $ext;
+                }
+
+                // Else throw an exception
+                else throw new ZfExtended_Mismatch('E2007', [$ext, $label]);
+            }
 
             // If value should be a json-encoded expression, and it is - decode
             if ($rule['rex'] == 'json') $rowA[$prop] = json_decode($value);
@@ -755,6 +779,7 @@ class ZfExtended_Mismatch extends ZfExtended_ErrorCodeException {
         'E2004' => 'Value "{0}" of param "{1}" - is not in the list of allowed values',    // FIS
         'E2005' => 'Value "{0}" of param "{1}" - is in the list of disabled values',       // DIS
         'E2006' => 'Value "{0}" of param "{1}" - is not unique. It should be unique.',     // UNQ
+        'E2007' => 'Extension "{0}" of file "{1}" - is not in the list of allowed values', // EXT
     ];
 }
 
