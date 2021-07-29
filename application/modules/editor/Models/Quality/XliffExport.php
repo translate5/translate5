@@ -28,7 +28,8 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Provides the data for the qualities filter panel in the frontend
- * TODO: currently we process only QM qualities for Export (and MQM, which are exported on tag-level). When other qualities are included, the consuming code needs to be adjusted and preferrably the generation of tags shoul be moved into this class
+ * TODO: currently we process only QM qualities for Export (and MQM, which are exported on tag-level).
+ * When other qualities are included, the consuming code needs to be adjusted and preferrably the generation of tags shoul be moved into this class
  */
 class editor_Models_Quality_XliffExport extends editor_Models_Quality_AbstractData {
     

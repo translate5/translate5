@@ -80,9 +80,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         $task->loadByTaskGuid($taskGuid);
         // apply quality filter
         if($this->getRequest()->getParam('qualities', '') != ''){
-            $qualityState = new editor_Models_Quality_RequestState($this->getRequest()->getParam('qualities'));
+            $qualityState = new editor_Models_Quality_RequestState($this->getRequest()->getParam('qualities'), $task);
             $filter = $this->entity->getFilter();
-            $filter->setQualityFilter($qualityState, $task);
+            $filter->setQualityFilter($qualityState);
         }
         $rows = $this->entity->loadByTaskGuid($taskGuid);
         $this->view->rows = $rows;

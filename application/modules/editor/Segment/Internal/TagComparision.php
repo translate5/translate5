@@ -45,7 +45,8 @@ class editor_Segment_Internal_TagComparision {
      * @return bool
      */
     public static function isFault(string $type, string $category) : bool {
-        return ($type == editor_Segment_Tag::TYPE_INTERNAL && $category == self::TAG_STRUCTURE_FAULTY);
+        // we take the virtual category TAG_STRUCTURE_FAULTY_NONEDITABLE also into account to keep the API independent of the usage context
+        return ($type == editor_Segment_Tag::TYPE_INTERNAL && ($category == self::TAG_STRUCTURE_FAULTY || $category == self::TAG_STRUCTURE_FAULTY_NONEDITABLE));
     }
     /**
      * @var string
@@ -66,7 +67,13 @@ class editor_Segment_Internal_TagComparision {
     /**
      * @var string
      */
-    const TAG_STRUCTURE_FAULTY = 'internal_tag_structure_faulty';        
+    const TAG_STRUCTURE_FAULTY = 'internal_tag_structure_faulty';
+    /**
+     * This is a purely virtual category that is created when fetching qualities, it will not be used in the database
+     * Non-editable/locked segments will have a different category when having tag-errors
+     * @var string
+     */
+    const TAG_STRUCTURE_FAULTY_NONEDITABLE = 'internal_tag_structure_faulty_noneditable'; 
     /**
      * 
      * @var string;
@@ -104,8 +111,8 @@ class editor_Segment_Internal_TagComparision {
         $this->numCheckTags = count($this->checkTags);
         // the structural check can be done without against tags
         $this->checkStructure();
-        // there is a against and it is not empty
-        if($against != NULL && !$against->isEmpty()){
+        // there is a against and it is not empty and toCheck also is not empty
+        if($against != NULL && !$against->isEmpty() && !$toCheck->isEmpty()){
             $against->sort();
             $this->againstTags = $against->getByType(editor_Segment_Tag::TYPE_INTERNAL);
             $this->numAgainstTags = count($this->againstTags);

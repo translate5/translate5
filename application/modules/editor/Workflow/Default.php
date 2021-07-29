@@ -488,10 +488,7 @@ class editor_Workflow_Default {
      */
     public function getUsableSteps(): array {
         $steps = $this->getAssignableSteps();
-        //FIXME instead of checking the roles a user have,
-        //this must come from ACL table analogous to setaclrole, use a setwfrole then
-        $user = new Zend_Session_Namespace('user');
-        if(in_array(ACL_ROLE_PM, $user->data->roles)) {
+        if(editor_User::instance()->getModel()->isAllowed('frontend', 'editorChangeUserAssocTask')) {
             return $steps;
         }
         return [];

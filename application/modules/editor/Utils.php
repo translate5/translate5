@@ -751,6 +751,36 @@ class editor_Utils {
         $weekdaysTemplate = $inputDate[0].' +'.((int)$daysToAdd).' Weekday';
         return date ('Y-m-d' , strtotime($weekdaysTemplate)).' '.$inputDate[1];
     }
+    /**
+     * 
+     * @param string $url
+     * @return string
+     */
+    public static function removeQueryString(string $url) : string {
+        if(strpos($url,'?') !== false) {
+            return explode('?',$url)[0];
+        }
+        return $url;
+    }
+    /**
+     * 
+     * @param string $url
+     * @return string
+     */
+    public static function removeFragment(string $url) : string {
+        if(strpos($url,'#') !== false) {
+            return explode('#',$url)[0];
+        }
+        return $url;
+    }
+    /**
+     * Removes query-string & fragment from an URL
+     * @param string $url
+     * @return string
+     */
+    public static function cleanUrl(string $url) : string {
+        return(self::removeQueryString(self::removeFragment($url)));
+    }
 }
 
 class ZfExtended_Mismatch extends ZfExtended_ErrorCodeException {

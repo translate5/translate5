@@ -74,7 +74,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         btnNextWizard:'#UT#Weiter',
         cancelBtn: '#UT#Abbrechen',
         btnSkip:'#UT#Importieren (weitere überspringen)',
-        importDefaultsButtonText:'#UT#Importieren (Standards nutzen)'
+        importDefaultsButtonText:'#UT#Importieren (Standards nutzen)',
+        description: '#Projektbeschreibung'
     },
     modal : true,
     layout: 'anchor',
@@ -277,6 +278,11 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     maxLength: 120,
                                     name: 'taskNr',
                                     fieldLabel: me.strings.taskNrLabel
+                                },{
+                                    xtype: 'textarea',
+                                    maxLength: 500,
+                                    name: 'description',
+                                    fieldLabel: me.strings.description
                                 },{
                                     xtype: 'datefield',
                                     name: 'orderdate',

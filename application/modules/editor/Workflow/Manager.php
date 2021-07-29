@@ -47,8 +47,17 @@ class editor_Workflow_Manager {
      */
     public function __construct() {
         /* @var $workflow editor_Models_Workflow */
-        $workflow = ZfExtended_Factory::get('editor_Models_Workflow');
-        $workflows = $workflow->loadAll();
+	try {
+            $workflow = ZfExtended_Factory::get('editor_Models_Workflow');
+	    $workflows = $workflow->loadAll();
+	}
+	catch(Zend_Db_Statement_Exception $e) {
+            if($this->isDefaultFallbackOnUpdate($e)) {
+                $this->addWorkflow('default', 'editor_Workflow_DefaultFallback');
+                return;
+            }
+        }
+
         
         foreach($workflows as $workflowData) {
             //if the workflow exists already, it was added by a plug-in with a different class
@@ -57,6 +66,16 @@ class editor_Workflow_Manager {
                 $this->addWorkflow($workflowData['name']);
             }
         }
+    }
+
+    /**
+     * On updating to the version where Workflow definitions from DB where introduced, 
+     * we are getting a chicken egg problem on updating if there were some PHP alter files to be executed using workflow code 
+     * since the PHP code tries to load from LEK_workflow but the table was not yet created. Therefore we need some fallbacks to deal with that situation.
+     */
+    protected function isDefaultFallbackOnUpdate(Zend_Db_Statement_Exception $e): bool {
+        $msg = $e->getMessage();
+	return strpos($msg, 'Base table or view not found') !== false && strpos($msg, 'LEK_workflow') !== false;
     }
     
     /**
@@ -135,26 +154,31 @@ class editor_Workflow_Manager {
     public function getWorkflowData() {
         $result = [];
         
-        //updating the config defaults list if needed FIXME move to workflow configurator on workflow creation if implemented in the future
-        $config = ZfExtended_Factory::get('editor_Models_Config');
-        /* @var $model editor_Models_Config */
-        $config->loadByName('runtimeOptions.workflow.initialWorkflow');
         $workflows = array_keys(self::$workflowList);
-        $workflowList = join(',', $workflows);
-        
-        if($config->getDefaults() != $workflowList) {
-            $config->setDefaults($workflowList);
-            $config->save();
+
+        try {
+            //updating the config defaults list if needed FIXME move to workflow configurator on workflow creation if implemented in the future
+            $config = ZfExtended_Factory::get('editor_Models_Config');
+            /* @var $config editor_Models_Config */
+            $config->loadByName('runtimeOptions.workflow.initialWorkflow');
+            $workflowList = join(',', $workflows);
+
+            if($config->getDefaults() != $workflowList) {
+                $config->setDefaults($workflowList);
+                $config->save();
+            }
+        } catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //if the config could not be found, we can not update the defaults,
+            // but that should happen only while updating older installations, so no need to handle it more in detail
         }
-        
+
         foreach($workflows as $name) {
             $wf = $this->get($name);
             /* @var $wf editor_Workflow_Default */
             $data = new stdClass();
             $data->id = $name;
             $data->label = $wf->getLabel();
-            $data->anonymousFieldLabel = false; //FIXME true | false, comes from app.ini not from wf class
-            
+
             $data->roles = $wf->labelize($wf->getRoles());
             
             $data->usableSteps = $wf->labelize($wf->getUsableSteps());

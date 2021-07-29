@@ -523,11 +523,11 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->setDataInEntity();
 
         $this->prepareLanguages();
-        $this->entity->setUsageMode($this->config->runtimeOptions->import->initialTaskUsageMode);
+        
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
 
-        //if the visual review mapping type is set, se the task meta data
+        //if the visual review mapping type is set, se the task meta data overridable
         if(isset($this->data['mappingType'])){
             $meta = $this->entity->meta();
             $meta->setMappingType($this->data['mappingType']);
@@ -541,6 +541,10 @@ class editor_TaskController extends ZfExtended_RestController {
         else {
             $c = $this->config;
         }
+
+        // set the usageMode from config if not set
+        $this->entity->setUsageMode($this->data['usageMode'] ?? $c->runtimeOptions->import->initialTaskUsageMode);
+
         //init workflow id for the task, based on customer or general config as fallback
         $this->entity->setWorkflow($c->runtimeOptions->workflow->initialWorkflow);
 

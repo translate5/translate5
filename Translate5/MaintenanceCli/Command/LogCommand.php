@@ -215,7 +215,8 @@ the format is:
         if(!$this->input->isInteractive() || $this->io->confirm('Really delete that log records?', false)) {
             //a little bit hacky: prevent logged config changes from deletion
             $s->where('eventCode != ?', 'E1324');
-            $log->db->delete($s->getPart($s::WHERE));
+            $where = $s->getPart($s::WHERE);
+            $log->db->delete(is_array($where) ? join(' ', $where) : $where);
             $this->io->success('Above shown log record(s) deleted!');
         }
     }

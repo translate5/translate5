@@ -52,14 +52,18 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
         var me=this;
         me.mask();
         me.getCurrentTask().save({
-            failure: function(record, operation) {
-                me.unmask();
-                Editor.app.getController('ServerException').handleException(operation.error.response);
-            },
             success: function(record, operation) {
+                var project = Ext.getStore('project.Project').getById(record.get('id'));
+                if(project) {
+                    project.load();
+                }
                 me.unmask();
                 Editor.MessageBox.addSuccess(me.getView().strings.successUpdate);
             },
+            failure: function(record, operation) {
+                me.unmask();
+                Editor.app.getController('ServerException').handleException(operation.error.response);
+            }
         });
     },
     

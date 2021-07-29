@@ -51,7 +51,7 @@ class editor_Models_Segment_TagProtection {
     /**
      * decodes encoded entities, and protects the resulting tags then
      * @param string $textNode A string plain containing XML/HTML
-     * @param bool $entityCleanup
+     * @param bool $entityCleanup true when used in XML context, normally called with false in plain text (CSV) context
      * @return string
      */
     public function protectTags(string $textNode, bool $entityCleanup = true) {
@@ -81,7 +81,7 @@ class editor_Models_Segment_TagProtection {
             /* @var $tempXml \QueryPath\DOMQuery */
         }
         catch (Exception $e) {
-            return $this->parseSegmentProtectInvalidHtml5($textNode);
+            return $this->parseSegmentProtectInvalidHtml5($textNode, $entityCleanup);
         }
 
         // mark single- or paired-tags
@@ -134,12 +134,15 @@ class editor_Models_Segment_TagProtection {
         }
         return $text;
     }
-    
+
     /**
      * Fallback if content is not wellformed
+     * @param string $segment
+     * @param bool $entityCleanup
+     * @return string|null
      */
-    protected function parseSegmentProtectInvalidHtml5($segment) {
-        $replacer = function ($matches){
+    protected function parseSegmentProtectInvalidHtml5(string $segment, bool $entityCleanup) {
+        $replacer = function ($matches) use ($entityCleanup) {
             $tagName = preg_replace('/<[\/]*([^ ]*).*>/is', '$1', $matches[0]);
             // only replace HTML5 tags, keep protectedTag in any case as original
             if ($tagName == 'protectedTag') {
@@ -147,7 +150,7 @@ class editor_Models_Segment_TagProtection {
             }
             if(!in_array($tagName, $this->html5Tags)) {
                 //everything else is returned as encoded to string since it seems not to be a valid tag
-                return htmlspecialchars($matches[0], ENT_XML1);
+                return $entityCleanup ? htmlspecialchars($matches[0], ENT_XML1) : $matches[0];
             }
             
             $originalTag = editor_Models_Segment_InternalTag::encodeTagContent($matches[0]);

@@ -78,14 +78,6 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $translate;
     /**
-     * @var editor_Models_Db_SegmentQuality
-     */
-    protected $table;
-    /**
-     * @var Zend_Db_Table_Rowset_Abstract
-     */
-    protected $dbRows;
-    /**
      * @var stdClass[]
      */
     protected $rows = [];
@@ -102,17 +94,17 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $numQualities = 0;
     /**
-     * Configures the generated data
+     * Configurable option set by inheritance: Configures the generated data
      * @var boolean
      */
     protected $isTree = false;
     /**
-     * If set (only for Trees) all nodes will have a "checked" property
+     * Configurable option set by inheritance: If set (only for Trees) all nodes will have a "checked" property
      * @var boolean
      */
     protected $hasCheckboxes = false;
     /**
-     * Configures the generated data (currently unused)
+     * Configurable option set by inheritance: Configures the generated data
      * @var boolean
      */
     protected $hasNumFalsePositives = false;
@@ -122,20 +114,28 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $hasEmptyCategories = false;
     /**
-     * If set, all categories will be collapsed
+     * Configurable option set by inheritance: If set, all categories will be collapsed
      * @var boolean
      */    
     protected $allCategoriesCollapsed = false;
     /**
-     * If set, the mqm are shown flat, otherwise as a deeper nested tree
+     * Configurable option set by inheritance: If set, the mqm are shown flat, otherwise as a deeper nested tree
      * @var boolean
      */
     protected $mqmIsFlat = false;
     /**
+     * Used while processing
      * @var boolean
      */
     protected $hasFaultyInternalTags = false;
     /**
+     * Configurable option set by inheritance: We do not want uneditable segments to be shown in frontends
+     * As an exception from the exception internal-tag errors should be shown even for uneditable segments
+     * @var boolean
+     */
+    protected $excludeUneditableSegments = true;
+    /**
+     * Set via constructor
      * @var boolean
      */
     protected $excludeMQM;
@@ -162,60 +162,38 @@ abstract class editor_Models_Quality_AbstractView {
     /**
      * 
      * @param editor_Models_Task $task
-     * @param int $segmentId
-     * @param bool $onlyFilterTypes
+     * @param bool $onlyFilterTypes: Restricts to those quality types, that are "filterable" types (should show up in the quality filter panel)
      * @param string $currentState: The format of the value equals that of the filter-value $type:$category for the qualities-grid-filter but may has additional entries for types only
      * @param bool $excludeMQM: only needed for Statistics view
      * @param string $field: optional to limit the fetched qualities to a certain field
      */
-    public function __construct(editor_Models_Task $task, int $segmentId=NULL, bool $onlyFilterTypes=false, string $currentState=NULL, bool $excludeMQM=false, string $field=NULL){
+    public function __construct(editor_Models_Task $task, bool $onlyFilterTypes=false, string $currentState=NULL, bool $excludeMQM=false, string $field=NULL){
         $this->task = $task;
         $this->taskConfig = $this->task->getConfig();
         $this->manager = editor_Segment_Quality_Manager::instance();
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->excludeMQM = $excludeMQM;
-        $this->table = new editor_Models_Db_SegmentQuality();
         // generate hashtable of filtered qualities and respect filter mode if the current state was sent
         if($currentState !== NULL){
-            $requestState = new editor_Models_Quality_RequestState($currentState);
+            $requestState = new editor_Models_Quality_RequestState($currentState, $this->task);
             $this->checkedQualities = $requestState->getCheckedList();
             $this->collapsedQualities = $requestState->getCollapsedList();
             $this->falsePositiveRestriction = $requestState->getFalsePositiveRestriction();
             // The qualities may have to be limited to the visible segment-nrs for the current editor
-            $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs($this->task);
+            $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs();
             
         } else if($this->isTree){
             // In tree mode we need the user-restriction of the state also when no filtered state was send
-            $requestState = new editor_Models_Quality_RequestState('');
-            $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs($this->task);
+            $requestState = new editor_Models_Quality_RequestState('', $this->task);
+            $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs();
         }
-        $blacklist = NULL;
-        if($onlyFilterTypes){
-            $blacklist = $this->manager->getFilterTypeBlacklist();
-        }
+        $blacklist = ($onlyFilterTypes) ? $this->manager->getFilterTypeBlacklist() : [];
         if($excludeMQM){
-            if($blacklist == NULL){
-                $blacklist = [];
-            }
             if(!in_array(editor_Segment_Tag::TYPE_MQM, $blacklist)){
                 $blacklist[] = editor_Segment_Tag::TYPE_MQM;
             }
         }
-        // ordering is crucial !
-        $this->dbRows = $this->table->fetchFiltered(
-            $task->getTaskGuid(),
-            $segmentId,
-            $blacklist,
-            true,
-            NULL,
-            $this->falsePositiveRestriction,
-            $this->segmentNrRestriction,
-            $field,
-            ['type ASC','category ASC']);
-        
-        // error_log('PRESETS: checked: '.print_r($this->checkedQualities, true).' / falsePositives:'.$this->falsePositiveRestriction.' / collapsed: '.print_r($this->collapsedQualities, true).' / DBrows: '.count($this->dbRows));
-     
-        $this->create();
+        $this->create($task->getTaskGuid(), $blacklist, $field);
     }
     /**
      * Retrieves the root node for the quality filter store wrapped in an array
@@ -263,11 +241,15 @@ abstract class editor_Models_Quality_AbstractView {
         return $this->rowsByType;
     }
     /**
-     * Evaluates the view rows for counted views
+     * Fetches the rows from the DB and creates the internal row model
+     * @param string $taskGuid
+     * @param array $blacklist
+     * @param string $field
      */
-    protected function create(){
+    protected function create(string $taskGuid, array $typeBlacklist=NULL, string $field=NULL){
         // create ordered rubrics
         $rubrics = [];
+        $hasNonEditableInternalTagFaults = false;
         foreach($this->manager->getAllFilterableTypes($this->task) as $type){
             if(!$this->excludeMQM || $type != editor_Segment_Tag::TYPE_MQM){
                 $rubrics[] = $this->createRubricRow($type);
@@ -279,37 +261,45 @@ abstract class editor_Models_Quality_AbstractView {
             $this->rowsByType[$rubric->qtype] = [];
             $this->rowsByType[$rubric->qtype][self::RUBRIC] = $rubric;
         }
-        // add categories to intermediate model
-        foreach($this->dbRows as $row){
-            /* @var $row editor_Models_Db_SegmentQualityRow */
-            if(array_key_exists($row->type, $this->rowsByType)){
-                $this->rowsByType[$row->type][self::RUBRIC]->qcount++;
-                if($this->hasNumFalsePositives && $row->falsePositive == 1){
-                    $this->rowsByType[$row->type][self::RUBRIC]->qcountfp++;
+        // fetch the data and add to the intermediate model
+        $table = new editor_Models_Db_SegmentQuality();
+        foreach($table->fetchForFrontend($taskGuid, $typeBlacklist, $this->segmentNrRestriction, $this->falsePositiveRestriction, $field) as $row){
+            /* @var $row array */
+            $type = $row['type'];
+            // for non-editable segments that have structural internal tag-errors we create a special virtual category
+            if($row['editable'] == 0 && $type == editor_Segment_Tag::TYPE_INTERNAL && $row['category'] == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY){
+                $row['category'] = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE;
+                $hasNonEditableInternalTagFaults = true;
+            }
+            if(array_key_exists($type, $this->rowsByType)){
+                $this->rowsByType[$type][self::RUBRIC]->qcount++;
+                if($this->hasNumFalsePositives && $row['falsePositive'] == 1){
+                    $this->rowsByType[$type][self::RUBRIC]->qcountfp++;
                 }
                 if($this->isTree){
-                    if(!array_key_exists($row->category, $this->rowsByType[$row->type])){
-                        $this->rowsByType[$row->type][$row->category] = $this->createCategoryRow($row, false);
+                    if(!array_key_exists($row['category'], $this->rowsByType[$type])){
+                        $this->rowsByType[$type][$row['category']] = $this->createCategoryRow($row, false);
                     }
-                    $this->rowsByType[$row->type][$row->category]->qcount++;
-                    if($this->hasNumFalsePositives && $row->falsePositive == 1){
-                        $this->rowsByType[$row->type][$row->category]->qcountfp++;
+                    $this->rowsByType[$type][$row['category']]->qcount++;
+                    if($this->hasNumFalsePositives && $row['falsePositive'] == 1){
+                        $this->rowsByType[$type][$row['category']]->qcountfp++;
                     }
                 }
                 $this->numQualities++;
             }
-            if($row->type == editor_Segment_Tag::TYPE_INTERNAL && editor_Segment_Internal_TagComparision::isFault($row->type, $row->category)){
+            // for evaluating if we hav internal tag faults we need to check the category from DB
+            if($row['type'] == editor_Segment_Tag::TYPE_INTERNAL && editor_Segment_Internal_TagComparision::isFault($row['type'], $row['category'])){
                 $this->hasFaultyInternalTags = true;
             }
         }
         // create result rows
-        $this->createRows($rubrics);
+        $this->createRows($rubrics, $hasNonEditableInternalTagFaults);
     }
     /**
      * Create the resulting view out of the database data
      * @param stdClass[] $rubrics
      */
-    protected function createRows(array $rubrics){
+    protected function createRows(array $rubrics, bool $hasNonEditableInternalTagFaults){
         foreach($rubrics as $rubric){
             if($this->isTree){
                 $rubric->qtotal = $rubric->qcount;
@@ -322,7 +312,11 @@ abstract class editor_Models_Quality_AbstractView {
                     $rubric->children = [];
                     $qualityProvider = $this->manager->getProvider($rubric->qtype);
                     $rubricCats = ($this->hasEmptyCategories) ? $qualityProvider->getAllCategories($this->task) : array_keys($this->rowsByType[$rubric->qtype]);
-                    ksort($rubricCats);
+                    // important: when we use the predefined categories and have internal tag faults of non-editable segments we need to make sure this virtual category is there
+                    if($hasNonEditableInternalTagFaults && $rubric->qtype == editor_Segment_Tag::TYPE_INTERNAL && !in_array(editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE, $rubricCats)){
+                        $rubricCats[] = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE;
+                    }
+                    sort($rubricCats);
                     foreach($rubricCats as $category){
                         if($category != self::RUBRIC){
                             if(array_key_exists($category, $this->rowsByType[$rubric->qtype])){
@@ -379,7 +373,7 @@ abstract class editor_Models_Quality_AbstractView {
             }
         }
         // mark the faulty item
-        if($row->qtype == editor_Segment_Tag::TYPE_INTERNAL && $row->qcategory == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY){
+        if($row->qtype == editor_Segment_Tag::TYPE_INTERNAL && ($row->qcategory == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY || $row->qcategory == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE)){
             $row->qfaulty = true;
         }
         // To easily test the incomplete & faulty configs in the frontend
@@ -421,21 +415,21 @@ abstract class editor_Models_Quality_AbstractView {
      * @param editor_Models_Db_SegmentQualityRow $dbRow
      * @return stdClass
      */
-    protected function createCategoryRow(editor_Models_Db_SegmentQualityRow $dbRow) : stdClass {
+    protected function createCategoryRow(array $dbRow) : stdClass {
         $row = new stdClass();
-        $row->qid = $dbRow->id;
-        $row->qtype = $dbRow->type;
+        $row->qid = $dbRow['id'];
+        $row->qtype = $dbRow['type'];
         $row->qcount = 0;
         $row->qcomplete = true;
         if($this->isTree){
             $row->children = [];
-            $row->qcategory = $dbRow->category;
-            $row->qcatidx = $dbRow->categoryIndex;
+            $row->qcategory = $dbRow['category'];
+            $row->qcatidx = $dbRow['categoryIndex'];
         }
         if($this->hasNumFalsePositives){
             $row->qcountfp = 0;
         }
-        $row->text = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
+        $row->text = $this->manager->translateQualityCategory($dbRow['type'], $dbRow['category'], $this->task);
         return $row;
     }
     /**

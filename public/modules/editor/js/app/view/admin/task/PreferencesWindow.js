@@ -70,7 +70,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
         
-        if(Editor.app.authenticatedUser.hasRoles(['pm','admin'])) {
+        if(auth.isAllowed('editorManageQualities')) {
             tabs.push({
                 xtype: 'taskQualities',
                 bind:{

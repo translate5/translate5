@@ -35,6 +35,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
     alias: 'widget.taskattributes',
     strings: {
         taskName:'#UT#Aufgabenname',
+        description:'#UT#Projektbeschreibung',
         customerName:'#UT#Kunde',
         orderDate:'#UT#Bestelldatum',
         pmGuid:'#UT#Projektmanager',
@@ -159,6 +160,15 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             bind:'{currentTask.taskName}',
             name:'taskName',
             itemId:'taskName'
+        });
+
+        items.push({
+            //lazy: just use the same right as for editTaskName
+            xtype: auth.isAllowed('editorEditTaskTaskName') ? 'textarea' : 'displayfield',
+            fieldLabel: me.strings.description,
+            bind:'{currentTask.description}',
+            name:'description',
+            itemId:'description'
         });
 
         items.push(me.getPmFieldConfig());

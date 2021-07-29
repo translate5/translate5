@@ -33,7 +33,7 @@
  */
 
 /**
- * 
+ * FIXME must be moved to ZfExtended since there is the authenticated user used too!!!
  * Represents the session based User and provides a convenience API accessing it
  */
 class editor_User {
@@ -42,7 +42,12 @@ class editor_User {
      * @var editor_User
      */
     private static $_instance = NULL;
-    
+
+    /**
+     * @var ZfExtended_Models_User
+     */
+    private static $modelInstance = NULL;
+
     /**
      * 
      * @return editor_User
@@ -62,6 +67,8 @@ class editor_User {
     private function __construct(){
         $this->session = new Zend_Session_Namespace('user');
         // TODO FIXME: add some validation to catch an inexisting session or an invalid user
+        self::$modelInstance = ZfExtended_Factory::get('ZfExtended_Models_User');
+        self::$modelInstance->load($this->getId());
     }
     /**
      * 
@@ -86,9 +93,9 @@ class editor_User {
     }
     /**
      * 
-     * @return string
+     * @return array
      */
-    public function getRoles() : string {
+    public function getRoles() : array {
         return $this->session->data->roles;
     }
     /**
@@ -98,8 +105,13 @@ class editor_User {
     public function getData() {
         return $this->session->data;
     }
+
+    public function getModel(): ZfExtended_Models_User {
+        return self::$modelInstance;
+    }
+
     /**
-     * 
+     * @deprecated should not be used, ACL checks must be used instead
      * @param string $role
      * @return bool
      */
@@ -107,7 +119,7 @@ class editor_User {
         return (!empty($role) && in_array($role, $this->session->data->roles));
     }
     /**
-     * 
+     * @deprecated should not be used, ACL checks must be used instead
      * @param string[] $roles
      * @return bool
      */
@@ -120,7 +132,7 @@ class editor_User {
         return true;
     }
     /**
-     * 
+     * @deprecated should not be used, ACL checks must be used instead
      * @param string|string[] $role
      * @return bool
      */
@@ -131,21 +143,21 @@ class editor_User {
         return $this->hasRole($role);
     }
     /**
-     *
+     * @deprecated should not be used, ACL checks must be used instead
      * @return bool
      */
     public function isProjectManager() : bool {
         return $this->hasRole(ACL_ROLE_PM);
     }
     /**
-     *
+     * @deprecated should not be used, ACL checks must be used instead
      * @return bool
      */
     public function isAdmin() : bool {
         return $this->hasRole(ACL_ROLE_ADMIN);
     }
     /**
-     *
+     * @deprecated should not be used, ACL checks must be used instead
      * @return bool
      */
     public function isPM() : bool {

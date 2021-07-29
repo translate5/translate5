@@ -143,7 +143,6 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
             name:'usageMode',
             itemId:'usageMode',
             forceSelection: true,
-            value:Editor.model.admin.Task.USAGE_MODE_COOPERATIVE, // the default value according to the database default. Should we use config ?
             store:  Ext.create('Ext.data.Store', {
                 fields: ['id', 'label'],
                 data : [

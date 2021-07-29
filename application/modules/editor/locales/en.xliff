@@ -4011,7 +4011,8 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='SW50ZXJuZSBUYWdzIHd1cmRlbiBoaW56dWdlZsO8Z3Q='><source>Interne Tags wurden hinzugefügt</source><target>Internal tags have been added</target></trans-unit>
 <trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBlbnRmZXJudA=='><source>Whitespace wurde entfernt</source><target>Whitespace has been removed</target></trans-unit>
 <trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Whitespace wurde hinzugefügt</source><target>Whitespace has been added</target></trans-unit>
-<trans-unit id='SW50ZXJuZSBUYWdzIGhhYmVuIGVpbmUgdW5nw7xsdGlnZSBTdHJ1a3R1cg=='><source>Interne Tags haben eine ungültige Struktur</source><target>Internal tags have incorrect structure</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIGhhYmVuIGVpbmUgdW5nw7xsdGlnZSBTdHJ1a3R1cg=='><source>Interne Tags haben eine ungültige Struktur</source><target>Internal tags have an incorrect structure</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIG5pY2h0IGVkaXRpZXJiYXJlciBTZWdtZW50ZSBoYWJlbiBlaW5lIHVuZ8O8bHRpZ2UgU3RydWt0dXI='><source>Interne Tags nicht editierbarer Segmente haben eine ungültige Struktur</source><target>Internal tags of non-editable segments have an incorrect structure</target></trans-unit>
 <trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGdlcHLDvGZ0'><source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source><target>This category was not or only partly analyzed</target></trans-unit>
 <trans-unit id='Qml0dGUgc3Rvw59lbiBTaWUgdW50ZW4gZWluZSBuZXVlIFByw7xmdW5nIGFuIHVtIGRhcyBQcm9ibGVtIHp1IGJlaGViZW4='><source>Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben</source><target>Please initiate a new re-check below to resolve the problem</target></trans-unit>
 <trans-unit id='UVMgJmFtcDsgRGF0ZWllbg=='><source>QS &amp; Dateien</source><target>QA &amp; Files</target></trans-unit>
@@ -4181,6 +4182,18 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='TnVyIGFuc2NoYXVlbg=='>
     <source>Nur anschauen</source>
     <target>View only</target>
+</trans-unit>
+<trans-unit id='UHJvamVrdGJlc2NocmVpYnVuZw=='>
+  <source>Projektbeschreibung</source>
+  <target>Project description</target>
+</trans-unit>
+<trans-unit id='UHJvamVrdGJlc2Noci4gYW56ZWlnZW4='>
+  <source>Projektbeschr. anzeigen</source>
+  <target>Show project description</target>
+</trans-unit>
+<trans-unit id='UHJvamVrdGJlc2Noci4gYXVzYmxlbmRlbg=='>
+  <source>Projektbeschr. ausblenden</source>
+  <target>Hide project description</target>
 </trans-unit>
 </body>
   </file>
