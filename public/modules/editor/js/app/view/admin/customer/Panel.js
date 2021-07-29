@@ -38,7 +38,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
         'Editor.view.admin.customer.OpenIdPanel'
     ],
 
-    stores:['Editor.stores.admin.Customers'],
+    stores:['admin.Customers'],
     controller: 'customerPanel',
     viewModel: {
         type: 'customerPanel'

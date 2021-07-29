@@ -33,11 +33,20 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.admin.TaskPreferences', {
   extend : 'Ext.app.Controller',
-  requires: ['Editor.view.admin.customer.Combo'],
+  requires: [
+      'Editor.view.admin.customer.Combo',
+      'Editor.view.admin.customer.UserCustomersCombo',
+  ],
   models: ['admin.TaskUserAssoc','admin.Task','admin.task.UserPref'],
   //constant to be used as value in the frontend for null values in userGuid and workflowStep:
   FOR_ALL: '',
-  stores: ['admin.Users', 'admin.TaskUserAssocs', 'admin.task.UserPrefs'],
+  stores: [
+      'admin.Users',
+      'admin.Customers',
+      'admin.UserCustomers',
+      'admin.TaskUserAssocs',
+      'admin.task.UserPrefs',
+  ],
   views: ['Editor.view.admin.task.PreferencesWindow', 'Editor.view.admin.task.UserAssocGrid','Editor.view.admin.task.Preferences'],
   refs : [{
 	  ref: 'editorAdminTaskPreferences',
@@ -495,7 +504,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    * this customer is preselected.
    */
   onTaskMainCardRender: function(taskMainCard,eOpts) {
-      var me = this,
+      var me = this, store,
           auth = Editor.app.authenticatedUser,
           taskMainCardContainer = taskMainCard.down('#taskSecondCardContainer');
       
@@ -509,6 +518,10 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               fieldLabel: me.strings.customerLabel + '¹'
           });
       } else {
+          store = Ext.getStore('userCustomers');
+          if(!store.isLoaded()) {
+              store.load();
+          }
           taskMainCardContainer.insert(0, {
               xtype: 'usercustomerscombo', // show only those customers that are assigned to the user
               name: 'customerId',
