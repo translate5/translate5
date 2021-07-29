@@ -206,12 +206,9 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
         $path = $this->api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
-        if(self::$api->isCapturing()) {
-            file_put_contents($this->api()->getFile($fileToCompare, null, false), $exportedFile);
-        }
-        //compare it
-        $expectedResult = $this->api()->getFileContent($fileToCompare);
+        $exportedFileContent = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
+        // get the expected content
+        $expectedResult = $this->api()->getFileContent($fileToCompare, $exportedFileContent);
         $foundIds = [];
         
         //since the mqm ids are generated on each test run differently,
@@ -245,8 +242,8 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
         $foundIds = [];
         $expectedResult = preg_replace_callback($regex, $idReplacer, $expectedResult);
         $foundIds = [];
-        $exportedFile = preg_replace_callback($regex, $idReplacer, $exportedFile);
-        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
+        $exportedFileContent = preg_replace_callback($regex, $idReplacer, $exportedFileContent);
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFileContent), 'Exported result does not equal to '.$fileToCompare);
     }
     
     public static function tearDownAfterClass(): void {
