@@ -30,7 +30,15 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action
 {
     public function indexAction()
     {
-        Zend_Layout::getMvcInstance()->setLayout('termportal');
-        Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
+        //Zend_Layout::getMvcInstance()->setLayout('termportal');
+	//Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
+
+	$this->view->layout()->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+	if(ZfExtended_Utils::getAppVersion() == ZfExtended_Utils::VERSION_DEVELOPMENT) {
+            require APPLICATION_ROOT.'/application/modules/editor/PrivatePlugins/TermPortal/public/resources/build/production/TermPortal/index.html';
+	} else {
+            require APPLICATION_ROOT.'/application/modules/editor/PrivatePlugins/TermPortal/public/resources/index.html';
+	}
     }
 }
