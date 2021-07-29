@@ -36,9 +36,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action
 	$this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
 	if(ZfExtended_Utils::getAppVersion() == ZfExtended_Utils::VERSION_DEVELOPMENT) {
-            require APPLICATION_ROOT.'/application/modules/editor/PrivatePlugins/TermPortal/public/resources/build/production/TermPortal/index.html';
+            require APPLICATION_ROOT.'/application/modules/editor/Plugins/TermPortal/public/resources/build/production/TermPortal/index.html';
 	} else {
-            require APPLICATION_ROOT.'/application/modules/editor/PrivatePlugins/TermPortal/public/resources/index.html';
+            require APPLICATION_ROOT.'/application/modules/editor/Plugins/TermPortal/public/resources/index.html';
 	}
     }
 }
