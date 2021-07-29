@@ -147,9 +147,7 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
 
     protected function _testExportSdlXliff(string $pathToZip) {
         $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $this->api()->getTask()->taskGuid.'/01-sdlxliff-en-de.sdlxliff');
-        //file_put_contents('/home/tlauria/foo.sdlxliff', $exportedFile);
-        $expectedResult = $this->api()->getFileContent('export-assert.sdlxliff');
-
+        $expectedResult = $this->api()->getFileContent('export-assert.sdlxliff', $exportedFile);
         //Since we replace only our own comments, we can leave Medium and 1.0 as fixed string, since they are currently not modifiable by translate5
         $s = [
             '/<Comment severity="Medium" user="lector test" date="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\+[0-9]{2}:[0-9]{2}" version="1\.0">/',
@@ -171,9 +169,7 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
 
     protected function _testExportMemoQXliff(string $pathToZip) {
         $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $this->api()->getTask()->taskGuid.'/02-memoq-de-en.mqxliff');
-        //file_put_contents('/home/tlauria/foo.mqxliff', $exportedFile);
-        $expectedResult = $this->api()->getFileContent('export-assert.mqxliff');
-
+        $expectedResult = $this->api()->getFileContent('export-assert.mqxliff', $exportedFile);
         //Since we replace only our own comments, we can leave Medium and 1.0 as fixed string, since they are currently not modifiable by translate5
         $s = [
             '/<mq:comment id="[0-9abcdef-]{36}" creatoruser="lector test" time="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"/'
