@@ -5,10 +5,6 @@ ALTER TABLE LEK_term_entry ADD tmpTermId LONGTEXT;
 ALTER TABLE LEK_term_attributes ADD tmpLangSetGuid LONGTEXT;
 DELETE FROM LEK_terms WHERE term IS NULL OR term = '';
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (1, 'delete term where empty');
-
-
 # UUID for new terms and attributes before migration
 UPDATE LEK_term_attributes t1, (
     SELECT collectionId, termEntryId, attrLang, UUID() newLangSetUuid -- oder language, evaluieren welches.
@@ -21,8 +17,6 @@ WHERE t1.collectionId = t2.collectionId
   AND t1.termEntryId = t2.termEntryId
   AND t1.attrLang = t2.attrLang;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (2, 'UUID for new terms and attributes before migration');
 # END UUID migration
 
 
@@ -49,9 +43,6 @@ ALTER TABLE terms_transacgrp ADD tmpOldTermEntryId int(11) NOT NULL;
 CREATE INDEX idx_tmpOldTermEntryId_ta ON terms_transacgrp (tmpOldTermEntryId);
 
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (3, 'After alter and create table');
-
 INSERT INTO terms_term_entry (
     collectionId,
     termEntryTbxId,
@@ -65,9 +56,6 @@ SELECT old_term_entry.collectionId,
        UUID() AS guid,
        old_term_entry.id
 FROM LEK_term_entry old_term_entry;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (4, 'INSERT INTO terms_term_entry ');
 
 # INSERT FOR TERMS
 INSERT INTO terms_term (
@@ -112,9 +100,6 @@ SELECT old_terms.mid AS termId,
        old_terms.termEntryId
 FROM LEK_terms old_terms;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (5, 'INSERT INTO terms_terms');
-
 # ToDo: it is ok to update termEntryTbxId (groupId) twice?
 #  in corrupt LEK_term table it's possible that groupId is null,
 #  but in terms_term_entry (LEK_term_entry) groupId exist, that reason why i check with this update.
@@ -125,16 +110,10 @@ SET terms.termEntryId = tte.id,
     terms.termEntryGuid = tte.entryGuid
 WHERE terms.tmpOldTermEntryId = tte.tmpOldId;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (6, 'Update terms_terms 1');
-
 UPDATE terms_term terms
     JOIN LEK_languages lng on lng.id = terms.languageId
 SET terms.language = LOWER(lng.rfc5646)
 WHERE lng.id = terms.languageId;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (7, 'Update terms_terms 2');
 
 # INSERT FOR ATTRIBUTES
 INSERT INTO terms_attributes (
@@ -189,17 +168,11 @@ WHERE attrType != 'modification'
   AND attrType != 'date'
   AND attrType != 'responsiblePerson';
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (9, 'Insert terms_attributes');
-
 UPDATE terms_attributes termAtt
     JOIN terms_term_entry tte on termAtt.tmpOldTermEntryId = tte.tmpOldId
 SET termAtt.termEntryId = tte.id,
     termAtt.termEntryGuid = tte.entryGuid
 WHERE termAtt.tmpOldTermEntryId = tte.tmpOldId;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (10, 'Update terms_attributes 1');
 
 UPDATE terms_attributes termAtt
     JOIN terms_term lt on termAtt.tmpOldTermId = lt.tmpOldId
@@ -207,25 +180,16 @@ SET termAtt.termId = lt.id,
     termAtt.termGuid = lt.guid
 WHERE termAtt.tmpOldTermId = lt.tmpOldId;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (11, 'Update terms_attributes 2');
-
 UPDATE terms_attributes termAtt
     JOIN LEK_term_attributes lta on termAtt.tmpOldId = lta.id
 SET termAtt.langSetGuid = lta.tmpLangSetGuid
 WHERE termAtt.tmpOldId = lta.id;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (12, 'Update terms_attributes 3');
 
 # how handle if term has no attributes in LEK_attributes
 UPDATE terms_term terms
     JOIN LEK_term_attributes LekT on LekT.termId = terms.tmpOldId
 SET terms.langSetGuid = LekT.tmpLangSetGuid
 WHERE LekT.termId = terms.tmpOldId;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (122, 'Update terms_terms after attributes');
 
 # INSERT FOR TRANSACGRP
 INSERT INTO terms_transacgrp (
@@ -267,49 +231,31 @@ SELECT t1.name AS elementName,
 FROM LEK_term_attributes t1
 WHERE attrType = 'modification' OR attrType = 'creation';
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (13, 'Insert terms_transacgrp');
-
 UPDATE terms_transacgrp termAtt
     JOIN terms_term_entry tte on termAtt.tmpOldTermEntryId = tte.tmpOldId
 SET termAtt.termEntryId = tte.id,
     termAtt.termEntryGuid = tte.entryGuid
 WHERE termAtt.tmpOldTermEntryId = tte.tmpOldId;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (14, 'Update terms_transacgrp 1');
-
 UPDATE terms_transacgrp termTrg
     JOIN LEK_terms lta on termTrg.tmpOldTermId = lta.id
 SET termTrg.termId = lta.id
 WHERE termTrg.tmpOldTermId = lta.id;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (15, 'Update terms_transacgrp 2');
 
 UPDATE terms_transacgrp termTrg
     JOIN LEK_term_attributes lta on termTrg.tmpOldId = lta.parentId
 SET termTrg.date = lta.value
 WHERE lta.name = 'date';
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (16, 'Update terms_transacgrp 3');
-
 UPDATE terms_transacgrp termTrg
     JOIN LEK_term_attributes lta on termTrg.tmpOldId = lta.parentId
 SET termTrg.elementName = lta.name
 WHERE termTrg.tmpOldId = lta.parentId;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (17, 'Update terms_transacgrp 4');
-
 UPDATE terms_transacgrp termTrg
     JOIN LEK_term_attributes lta on termTrg.tmpOldId = lta.parentId
 SET termTrg.transacNote = lta.value
 WHERE lta.attrType = 'responsiblePerson';
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (18, 'Update terms_transacgrp 5');
 
 UPDATE terms_transacgrp termTrg
     JOIN LEK_term_attributes lta on termTrg.collectionId = lta.collectionId
@@ -321,9 +267,6 @@ UPDATE terms_transacgrp termTrg
 SET termTrg.termId = lta.id
 WHERE termTrg.tmpOldTermId = lta.tmpOldId;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (19, 'Update terms_transacgrp 6');
-
 # before we can update new termId we must drop foreign key, after update we add new FK
 alter table LEK_term_proposal drop foreign key LEK_term_proposal_ibfk_1;
 UPDATE LEK_term_proposal termProposal
@@ -331,16 +274,10 @@ UPDATE LEK_term_proposal termProposal
 SET termProposal.termId = lt.id
 WHERE termProposal.termId = lt.tmpOldId;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (20, 'Update LEK_term_proposal 1');
-
 alter table LEK_term_proposal
     add constraint LEK_term_proposal_ibfk_1
         foreign key (termId) references terms_term (id)
             on update cascade on delete cascade;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (21, 'Alter Table 1');
 
 alter table LEK_term_attribute_proposal drop foreign key LEK_term_attribute_proposal_ibfk_1;
 alter table LEK_term_attribute_proposal
@@ -348,17 +285,11 @@ alter table LEK_term_attribute_proposal
         foreign key (attributeId) references terms_attributes (id)
             on update cascade on delete cascade;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (22, 'Alter Table 2');
-
 alter table LEK_term_attribute_history drop foreign key LEK_term_attribute_history_ibfk_1;
 alter table LEK_term_attribute_history
     add constraint LEK_term_attribute_history_ibfk_1
         foreign key (attributeId) references terms_attributes (id)
             on update cascade on delete cascade;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (23, 'Alter Table 3');
 
 alter table LEK_term_history drop foreign key LEK_term_history_ibfk_1;
 alter table LEK_term_history
@@ -366,80 +297,50 @@ alter table LEK_term_history
         foreign key (termId) references terms_term (id)
             on update cascade on delete cascade;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (24, 'Alter Table 4');
-
 alter table terms_term
     add constraint terms_termentry_ibfk_1
         foreign key (termEntryId) references terms_term_entry (id)
             on update cascade on delete cascade;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (25, 'Alter Table 5');
 
 alter table terms_term
     add constraint terms_term_entry_ibfk_1
         foreign key (termEntryId) references terms_term_entry (id)
             on update cascade on delete cascade;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (26, 'Alter Table 6');
-
 alter table terms_term
     add constraint terms_term_collection_ibfk_1
         foreign key (collectionId) references LEK_languageresources (id)
             on update cascade on delete cascade;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (27, 'Alter Table 7');
 
 alter table terms_attributes
     add constraint terms_term_ibfk_1
         foreign key (termId) references terms_term (id)
             on update cascade on delete cascade;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (28, 'Alter Table 8');
-
 alter table terms_attributes
     add constraint terms_entry_ibfk_1
         foreign key (termEntryId) references terms_term_entry (id)
             on update cascade on delete cascade;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (29, 'Alter Table 9');
 
 alter table terms_attributes
     add constraint terms_collection_ibfk_1
         foreign key (collectionId) references LEK_languageresources (id)
             on update cascade on delete cascade;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (30, 'Alter Table 10');
-
 alter table terms_transacgrp
     add constraint terms_tgrp_term_ibfk_1
         foreign key (termId) references terms_term (id)
             on update cascade on delete cascade;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (31, 'Alter Table 11');
 
 alter table terms_transacgrp
     add constraint terms_tgrp_entry_ibfk_1
         foreign key (termEntryId) references terms_term_entry (id)
             on update cascade on delete cascade;
 
-INSERT INTO Zf_errorlog (level, message)
-VALUES (32, 'Alter Table 12');
-
 alter table terms_transacgrp
     add constraint terms_tgrp_collection_ibfk_1
         foreign key (collectionId) references LEK_languageresources (id)
             on update cascade on delete cascade;
-
-INSERT INTO Zf_errorlog (level, message)
-VALUES (33, 'FINISH');
 
 # ALTER TABLE terms_term DROP COLUMN tmpOldId;
 # ALTER TABLE terms_term DROP COLUMN tmpOldTermEntryId;
