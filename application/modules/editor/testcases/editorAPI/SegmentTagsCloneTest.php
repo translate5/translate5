@@ -196,6 +196,7 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
         $this->assertEquals($expected, $reconvertedCloned);
         $this->assertEquals($expectedConverted, $renderedCloned);
         $this->assertEquals($expectedTags->render(), $renderedCloned);
+        $this->assertEquals($expectedTags->getFieldText(), $markupTags->getFieldText(true));
         // ther order in the cloned json still has the old values, so we ignore the ordering
         $this->assertEquals($this->cleanOrderInJSON($expectedTags->toJson()), $this->cleanOrderInJSON($markupTagsNoTrackChanges->toJson()));
         // make sure the original tags do not become manipulated.
@@ -227,6 +228,7 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
         // compare
         $this->assertEquals($expectedTags->render(), $markupTagsNoTrackChanges->render());
         $this->assertEquals($this->cleanOrderInJSON($expectedTags->toJson()), $this->cleanOrderInJSON($markupTagsNoTrackChanges->toJson()));
+        $this->assertEquals($expectedTags->getFieldText(), $markupTags->getFieldText(true));
         // compare full clone
         $this->assertEquals($markupTags->render(), $markupTagsCloned->render());
         $this->assertEquals($this->cleanOrderInJSON($markupTags->toJson()), $this->cleanOrderInJSON($markupTagsCloned->toJson()));
