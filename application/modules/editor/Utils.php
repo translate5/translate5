@@ -421,7 +421,7 @@ class editor_Utils {
             }
 
             // If value should not be in the list of disabled values - flush error
-            if ($rule['dis'] && in_array($value, $rule['dis']))
+            if ($rule['dis'] && in_array($value, self::ar($rule['dis'])))
                 throw new ZfExtended_Mismatch('E2005', [$value, $label]);
 
             // If prop's value should be an identifier of an existing object, but such object not found - flush error
