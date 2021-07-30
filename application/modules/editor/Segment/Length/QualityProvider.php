@@ -44,28 +44,42 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
     const TOO_SHORT = 'too_short';
 
     protected static $type = 'length';
-    /**
-     * 
-     * @var string[]
-     */
-    private $typesByIndex = null;
-    /**
-     * Creates the category of a QM tag out of it's category index (which will be saved seperately - what can be seen as a redundancy)
-     * @param int $categoryIndex
-     * @return string
-     */
-    public static function createCategoryVal(int $categoryIndex) : string {
-        return editor_Segment_Tag::TYPE_QM.'_'.strval($categoryIndex);
-    }
 
     public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
-        return ($qualityConfig->enableQm == 1);
+        return ($qualityConfig->enableSegmentLengthCheck == 1);
     }
     
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
-        if($processingMode == editor_Segment_Processing::ALIKE && $qualityConfig->enableQm == 1){
-            // the only task we ever have to do is cloning the qm qualities in the alike copying process
-            $tags->cloneAlikeQualitiesByType(self::$type);
+        
+        if(!$qualityConfig->enableSegmentLengthCheck){
+            return $tags;
+        }
+        if($processingMode == editor_Segment_Processing::ALIKE){
+            
+            // the only task in an alike process is cloning the qualities ...
+            $tags->cloneAlikeQualitiesByType(static::$type);
+            
+        } else if($processingMode == editor_Segment_Processing::EDIT || $processingMode == editor_Segment_Processing::IMPORT) {
+            
+            $segment = $tags->getSegment();
+            // on Import, check only pretranslated segments
+            if($processingMode == editor_Segment_Processing::IMPORT && !$segment->isPretranslated()){
+                return $tags;
+            }
+            // TODO: limit to an imported pretranslation & editing
+            
+            
+            $data = $segment->getDataObject();
+            $meta = (property_exists($data, 'metaCache') && !empty($data->metaCache)) ? json_decode($data->metaCache, true) : NULL;
+            if($meta != NULL){
+                
+                $sizeUnit = empty($meta['sizeUnit']) ? editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT : $meta['sizeUnit'];
+                $isPixelBased = ($sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING);
+                
+                
+                
+                
+            }
         }
         return $tags;
     }
