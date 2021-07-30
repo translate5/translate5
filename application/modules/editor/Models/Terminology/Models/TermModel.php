@@ -354,6 +354,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             'termEntryId' => $this->getTermEntryId(),
             'language' => $this->getLanguage(),
             'termId' => $this->getId(),
+            'termTbxId' => $this->getTermTbxId(),
 
             // Below four can be provided by $data
             //'dataTypeId' => ,
