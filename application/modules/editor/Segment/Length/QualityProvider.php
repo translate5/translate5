@@ -108,15 +108,18 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         switch($category){
             
-            case editor_Segment_Length_Check::TOO_LONG_PIXEL:
+            case editor_Segment_Length_Check::TOO_LONG:
                 return $translate->_('Segment ist länger als erlaubt');
                 
-            case editor_Segment_Length_Check::TOO_SHORT_PIXEL:
+            case editor_Segment_Length_Check::NOT_LONG_ENOUGH:
                 $translation = $translate->_('Segment ist relevant kürzer als erlaubt (mehr als {0}% zu kurz oder min. {1} Pixel zu kurz)');
                 // ugly: we need the task-config to evaluate the translation
                 $taskConfig = $task->getConfig();
                 $restriction = static::getRestriction($taskConfig->runtimeOptions->autoQA, $taskConfig);
-                return str_replace('{0}', strval($restriction->minLengthPercent), str_replace('{1}', strval($restriction->minLengthThresh), $translation));
+                return str_replace('{0}', strval($restriction->maxLengthMinPercent), str_replace('{1}', strval($restriction->maxLengthMinThresh), $translation));
+                
+            case editor_Segment_Length_Check::TOO_SHORT:
+                return $translate->_('Segment ist kürzer als erlaubt');
                 
             case editor_Segment_Length_Check::TOO_MANY_LINES:
                 return $translate->_('Zu viele Zeilenumbrüche im Segment');
@@ -126,9 +129,10 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
     
     public function getAllCategories(editor_Models_Task $task) : array {
         return [
-            editor_Segment_Length_Check::TOO_LONG_PIXEL,
-            editor_Segment_Length_Check::TOO_SHORT_PIXEL
-            // Currently, segments with too many lines can not be saved. Whenever this changes, activate this line
+            editor_Segment_Length_Check::TOO_LONG,
+            editor_Segment_Length_Check::NOT_LONG_ENOUGH
+            // Currently, min-length & num of lines are not checked. If that changes, activate
+            //, editor_Segment_Length_Check::TOO_SHORT
             //, editor_Segment_Length_Check::TOO_MANY_LINES
         ];
     }

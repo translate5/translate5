@@ -56,12 +56,12 @@ class editor_Segment_Length_Restriction {
      *
      * @var int
      */
-    public $minLengthPercent = 0;
+    public $maxLengthMinPercent = 0;
     /**
      *
      * @var int
      */
-    public $minLengthThresh = 0;
+    public $maxLengthMinThresh = 0;
     /**
      *
      * @var int
@@ -79,8 +79,8 @@ class editor_Segment_Length_Restriction {
             $this->sizeUnit = editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING;
             if(!empty($qualityConfig->segmentPixelLengthTooShortThresh)){
                 $data = $qualityConfig->segmentPixelLengthTooShortThresh->toArray();
-                $this->minLengthPercent = array_key_exists('percent', $data) ? intval($data['percent']) : 0;
-                $this->minLengthThresh = array_key_exists('pixel', $data) ? intval($data['pixel']) : 0;
+                $this->maxLengthMinPercent = array_key_exists('percent', $data) ? intval($data['percent']) : 0;
+                $this->maxLengthMinThresh = array_key_exists('pixel', $data) ? intval($data['pixel']) : 0;
             }
         }
         // DEBUG

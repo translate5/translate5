@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * 
  * evaluates the quality state of a segment regarding length-restrictions
+ * NOTE: Currently we only evaluate the pixel length and the fullfillment of the maxLength (either if a segment is longer or not long enough relative to the max-length
  *
  */
 class editor_Segment_Length_Check {
@@ -36,11 +37,15 @@ class editor_Segment_Length_Check {
     /**
      * @var string
      */
-    const TOO_LONG_PIXEL = 'too_long_pixel';
+    const TOO_LONG = 'too_long';
     /**
      * @var string
      */
-    const TOO_SHORT_PIXEL = 'too_short_pixel';
+    const NOT_LONG_ENOUGH = 'not_long_enough';
+    /**
+     * @var string
+     */
+    const TOO_SHORT = 'too_short';
     /**
      * currently unused
      * @var string
@@ -131,13 +136,18 @@ class editor_Segment_Length_Check {
      * CURRENTLY this is always pixel-based
      * @param editor_Segment_Length_Restriction $lengthRestriction
      */
-    protected function evaluateTransUnitLength(editor_Segment_Length_Restriction $restriction){
-        if(($restriction->minLength > 0 || $restriction->maxLength > 0) && $restriction->sizeUnit == $this->sizeUnit && !empty($this->metaCache['siblingData'])) {
+    private function evaluateTransUnitLength(editor_Segment_Length_Restriction $restriction){
+        if($restriction->maxLength > 0 && $restriction->sizeUnit == $this->sizeUnit && !empty($this->metaCache['siblingData'])) {
             // calculate trans-unit length
             $length = 0;
             foreach($this->metaCache['siblingData'] as $id => $data) {
+                // TODO FIXME
+                // The fieldtags Do not hold the index of the field where the field text originated from
+                // this is majot problem as it reduces the use-cases of the field-text API
+                // we have to dirtily re-create this index her (is valid only for targets !!)
+                $editIndex = $this->fieldTags->getField().editor_Models_SegmentFieldManager::_EDIT_PREFIX;
                 //if we don't have any information about the givens field length, we assume all OK
-                if(!array_key_exists($this->fieldTags->getField(), $data['length'])){
+                if(!array_key_exists($editIndex, $data['length'])){
                     return;
                 }
                 if($id == $this->segment->getId()) {
@@ -150,18 +160,15 @@ class editor_Segment_Length_Check {
                     //for the current segment this is added below, the siblings in the next line contain their additionalMrk data already
                 } else {
                     //add the text length of desired field
-                    $length += (int) $data['length'][$this->fieldTags->getField()];
+                    $length += (int) $data['length'][$editIndex];
                 }
             }
             $length += intval($this->metaCache['additionalUnitLength']);
             $length += intval($this->metaCache['additionalMrkLength']);
             if($restriction->maxLength > 0 && $length > $restriction->maxLength){
-                $this->states[] = self::TOO_LONG_PIXEL;
-            }
-            if($restriction->minLength > 0 && 
-                (($restriction->minLengthThresh > 0 && $length <= ($restriction->minLength - $restriction->minLengthThresh))
-                || ($restriction->minLengthPercent > 0 && ($length < ($restriction->minLength * (100 - $restriction->minLengthPercent) / 100))))){
-                    $this->states[] = self::TOO_SHORT_PIXEL;
+                $this->states[] = self::TOO_LONG;
+            } else if($this->isNotLongEnough($length, $restriction)){
+                $this->states[] = self::NOT_LONG_ENOUGH;
             }
         }
     }
@@ -170,25 +177,40 @@ class editor_Segment_Length_Check {
      * CURRENTLY this is always pixel-based
      * @param editor_Segment_Length_Restriction $restriction
      */
-    protected function evaluateLinesLength(editor_Segment_Length_Restriction $restriction){
+    private function evaluateLinesLength(editor_Segment_Length_Restriction $restriction){
         $lines = $this->fieldTags->getFieldTextLines(true);
         $numLines = count($lines);
         if($numLines > $this->metaCache['maxNumberOfLines']){
             // Currently, segments with too many lines can not be saved. Whenever this changes, activate this line
             // $this->states[] = self::TOO_MANY_LINES;
         }
-        if($restriction->minLength > 0 || $restriction->maxLength > 0){
+        if($restriction->maxLength > 0){
             foreach ($lines as $line) {
                 $length = (int) $this->segment->textLengthByMeta($line, $this->segmentMeta, $this->segment->getFileId());
-                if($restriction->maxLength > 0 && $length > $restriction->maxLength && !in_array(self::TOO_LONG_PIXEL, $this->states)){
-                    $this->states[] = self::TOO_LONG_PIXEL;
+                if($restriction->maxLength > 0 && $length > $restriction->maxLength && !in_array(self::TOO_LONG, $this->states)){
+                    $this->states[] = self::TOO_LONG;
                 }
-                if($restriction->minLength > 0 && !in_array(self::TOO_SHORT_PIXEL, $this->states) &&
-                    (($restriction->minLengthThresh > 0 && $length <= ($restriction->minLength - $restriction->minLengthThresh))
-                        || ($restriction->minLengthPercent > 0 && ($length < ($restriction->minLength * (100 - $restriction->minLengthPercent) / 100))))){
-                            $this->states[] = self::TOO_SHORT_PIXEL;
+                if($this->isNotLongEnough($length, $restriction) && !in_array(self::NOT_LONG_ENOUGH, $this->states)){
+                    $this->states[] = self::NOT_LONG_ENOUGH;
                 }
             }
         }
+    }
+    /**
+     * Checks if "Not long enough"
+     * @param int $length
+     * @param editor_Segment_Length_Restriction $restriction
+     * @return bool
+     */
+    private function isNotLongEnough(int $length, editor_Segment_Length_Restriction $restriction) : bool {
+        if($restriction->maxLength > 0){
+            if($restriction->maxLengthMinThresh > 0 && $length <= ($restriction->maxLength - $restriction->maxLengthMinThresh)){
+                return true;
+            }
+            if($restriction->maxLengthMinPercent > 0 && ($length < round($restriction->maxLength * (100 - $restriction->maxLengthMinPercent) / 100))){
+                return true;
+            }
+        }
+        return false;
     }
 }

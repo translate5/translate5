@@ -165,6 +165,7 @@ class editor_Segment_Tags implements JsonSerializable {
     }
     /** 
      * Initializes from scratch (used in the initial quality worker), creates the inital data structure
+     * TODO: the ugly ttName-logic should be removed and instead add prop for the originationg field of the field-text should be added !!
      * @param editor_Models_SegmentFieldManager $fieldManager
      */ 
     private function init(){
