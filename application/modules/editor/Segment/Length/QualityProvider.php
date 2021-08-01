@@ -34,24 +34,44 @@
 
 /**
  * 
- * Adds the Segment Quality Entries for the QM tags that are referenscing he whole segment and are set completely outside of the segment processing
+ * The Quality provider 
  * This class just provides the translations for the filter backend
  */
 class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provider {
-    
-    const TOO_LONG = 'too_long';
-    
-    const TOO_SHORT = 'too_short';
 
     protected static $type = 'length';
+    /**
+     * Holds the current restriction based on the quality config
+     * This needs to be evaluated only once per request so it is static
+     * @var editor_Segment_Length_Restriction
+     */
+    private static $restriction = NULL;
+    /**
+     * 
+     * @return editor_Segment_Length_Restriction
+     */
+    public static function getRestriction(Zend_Config $qualityConfig, Zend_Config $taskConfig){
+        if(static::$restriction === NULL){
+            static::$restriction = new editor_Segment_Length_Restriction($qualityConfig, $taskConfig);
+        }
+        return static::$restriction;
+    }
 
     public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
-        return ($qualityConfig->enableSegmentLengthCheck == 1);
+        return ($qualityConfig->enableSegmentLengthCheck == 1 && static::getRestriction($qualityConfig, $taskConfig)->active);
     }
-    
+    /**
+     * 
+     * {@inheritDoc}
+     * @see editor_Segment_Quality_Provider::processSegment()
+     */
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
-        
-        if(!$qualityConfig->enableSegmentLengthCheck){
+
+        if(!$qualityConfig->enableSegmentLengthCheck == 1){
+            return $tags;
+        }
+        $restriction = static::getRestriction($qualityConfig, $task->getConfig());
+        if(!$restriction->active){
             return $tags;
         }
         if($processingMode == editor_Segment_Processing::ALIKE){
@@ -66,19 +86,16 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
             if($processingMode == editor_Segment_Processing::IMPORT && !$segment->isPretranslated()){
                 return $tags;
             }
-            // TODO: limit to an imported pretranslation & editing
-            
-            
-            $data = $segment->getDataObject();
-            $meta = (property_exists($data, 'metaCache') && !empty($data->metaCache)) ? json_decode($data->metaCache, true) : NULL;
-            if($meta != NULL){
-                
-                $sizeUnit = empty($meta['sizeUnit']) ? editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT : $meta['sizeUnit'];
-                $isPixelBased = ($sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING);
-                
-                
-                
-                
+            foreach($tags->getTargets() as $target){ /* @var $target editor_Segment_FieldTags */
+                // if the target is empty, we do not need to check
+                if(!$target->isEmpty()){
+                    $check = new editor_Segment_Length_Check($target, $segment, $restriction);
+                    if($check->hasStates()){
+                        foreach($check->getStates() as $state){
+                            $tags->addQuality($target->getField(), static::$type, $state);
+                        }
+                    }
+                }
             }
         }
         return $tags;
@@ -87,28 +104,32 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
         return $translate->_('Längen Prüfung');
     }
-    /**
-     *
-    segment longer than allowed
-    segment relevantly shorter than allowed ("more than x% shorter than allowed OR at least Y Pixel shorter than allowed" / x and y definable in config and overwriteable on instance, client and import level)
 
-     */
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         switch($category){
             
-            case self::TOO_LONG:
-                return $translate->_('Interne Tags fehlen');
+            case editor_Segment_Length_Check::TOO_LONG_PIXEL:
+                return $translate->_('Segment ist länger als erlaubt');
                 
-            case self::TOO_SHORT:
-                return $translate->_('Interne Tags wurden hinzugefügt');
+            case editor_Segment_Length_Check::TOO_SHORT_PIXEL:
+                $translation = $translate->_('Segment ist relevant kürzer als erlaubt (mehr als {0}% zu kurz oder min. {1} Pixel zu kurz)');
+                // ugly: we need the task-config to evaluate the translation
+                $taskConfig = $task->getConfig();
+                $restriction = static::getRestriction($taskConfig->runtimeOptions->autoQA, $taskConfig);
+                return str_replace('{0}', strval($restriction->minLengthPercent), str_replace('{1}', strval($restriction->minLengthThresh), $translation));
+                
+            case editor_Segment_Length_Check::TOO_MANY_LINES:
+                return $translate->_('Zu viele Zeilenumbrüche im Segment');
         }
         return NULL;
     }
     
     public function getAllCategories(editor_Models_Task $task) : array {
         return [
-            self::TOO_LONG,
-            self::TOO_SHORT
+            editor_Segment_Length_Check::TOO_LONG_PIXEL,
+            editor_Segment_Length_Check::TOO_SHORT_PIXEL
+            // Currently, segments with too many lines can not be saved. Whenever this changes, activate this line
+            //, editor_Segment_Length_Check::TOO_MANY_LINES
         ];
     }
 }

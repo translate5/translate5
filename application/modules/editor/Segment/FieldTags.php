@@ -261,6 +261,17 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return $this->fieldText;
     }
     /**
+     * Retrieves our field-text lines.
+     * This means, that all TrackChanges Del Contents are removed and our fild-text is splitted by all existing Internal Newline tags
+     * @param bool $condenseBlanks
+     * @return string[]
+     */
+    public function getFieldTextLines(bool $condenseBlanks=true) : array {
+        $clone = $this->cloneWithoutTrackChanges([ editor_Segment_Tag::TYPE_INTERNAL ], $condenseBlanks);
+        $clone->replaceTagsForLines();
+        return explode(editor_Segment_NewlineTag::RENDERED, $clone->render());
+    }
+    /**
      *
      * @param bool $stripTrackChanges: if set, trackchanges will be removed
      * @param bool $condenseBlanks: if set, a removed trackchanges will have a condensed whitespace for the removed tags
@@ -905,6 +916,20 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $text .= $this->getFieldTextPart($start, $length);
         }
         return $text;
+    }
+    /**
+     * Special API to render all internal newline tags as lines
+     * This expects TrackChanges Tags to be removed, otherwise the result will contain trackchanges contents
+     */
+    private function replaceTagsForLines() {
+        $tags = [];
+        foreach($this->tags as $tag){
+            // the tag is only affected if not completely  before the hole
+            if($tag->getType() == editor_Segment_Tag::TYPE_INTERNAL && $tag->isNewline()){
+                $tags[] = editor_Segment_NewlineTag::createNew($tag->startIndex, $tag->endIndex);
+            }
+        }
+        $this->tags = $tags;
     }
     /**
      * Creates a nested structure of Internal tags & text-nodes recursively out of a HtmlNode structure

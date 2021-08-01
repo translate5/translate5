@@ -88,6 +88,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     /**
      * Processes the Segment and it's tags for the editing (which is unthreaded)
      * Note: the return value is used for further processing so it might even be possible to create a new tags-object though this is highly unwanted
+     * Note: When the provider is not active, this must be considered in the implementing code
      * @param editor_Models_Task $task
      * @param Zend_Config $qualityConfig: the quality configuration as defined in runtimeOptions.autoQA.XXX
      * @param editor_Segment_Tags $tags
