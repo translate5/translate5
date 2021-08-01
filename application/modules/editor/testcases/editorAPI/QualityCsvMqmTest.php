@@ -4,18 +4,18 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -206,12 +206,9 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
         $path = $this->api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
-        if(self::$api->isCapturing()) {
-            file_put_contents($this->api()->getFile($fileToCompare, null, false), $exportedFile);
-        }
-        //compare it
-        $expectedResult = $this->api()->getFileContent($fileToCompare);
+        $exportedFileContent = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
+        // get the expected content
+        $expectedResult = $this->api()->getFileContent($fileToCompare, $exportedFileContent);
         $foundIds = [];
         
         //since the mqm ids are generated on each test run differently,
@@ -245,8 +242,8 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
         $foundIds = [];
         $expectedResult = preg_replace_callback($regex, $idReplacer, $expectedResult);
         $foundIds = [];
-        $exportedFile = preg_replace_callback($regex, $idReplacer, $exportedFile);
-        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
+        $exportedFileContent = preg_replace_callback($regex, $idReplacer, $exportedFileContent);
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFileContent), 'Exported result does not equal to '.$fileToCompare);
     }
     
     public static function tearDownAfterClass(): void {

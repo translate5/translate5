@@ -4,18 +4,18 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -53,30 +53,30 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      * @var array
      */
     protected $frontendEndControllers = [
-        'ServerException' => true,
-        'ViewModes' => true,
-        'Segments' => true,
-        'Preferences' => true,
-        'MetaPanel' => true,
-        'Editor' => true,
-        'Fileorder' => true,
-        'ChangeAlike' => true,
-        'Comments' => true,
-        'SearchReplace' => true,
-        'SnapshotHistory' => true,
-        'Termportal' => true,
-        'JsLogger' => true,
-        'editor.CustomPanel' => true,
-        'admin.TaskOverview' => false,           //disabled by default, controlled by ACL
-        'admin.TaskPreferences' => false,        //disabled by default, controlled by ACL
-        'admin.TaskUserAssoc' => false,          //disabled by default, controlled by ACL
-        'admin.Customer' => false,               //disabled by default, controlled by ACL
-        'LanguageResourcesTaskassoc' => false,   //disabled by default, controlled by ACL
-        'LanguageResources' => false,            //disabled by default, controlled by ACL
-        'TmOverview' => false,                   //disabled by default, controlled by ACL
-        'Localizer' => true,
-        'Quality' => true,
-        'QualityMqm' => true //the check if this controller is active is task specific (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
+        'ServerException'               => true,
+        'ViewModes'                     => true,
+        'Segments'                      => true,
+        'Preferences'                   => true,
+        'MetaPanel'                     => true,
+        'Editor'                        => true,
+        'Fileorder'                     => true,
+        'ChangeAlike'                   => true,
+        'Comments'                      => true,
+        'SearchReplace'                 => true,
+        'SnapshotHistory'               => true,
+        'Termportal'                    => true,
+        'JsLogger'                      => true,
+        'editor.CustomPanel'            => true,
+        'admin.TaskOverview'            => ['taskOverviewFrontendController'], //controlled by ACL, enabling frontend rights given here
+        'admin.TaskPreferences'         => ['taskOverviewFrontendController'], //controlled by ACL, enabling frontend rights given here
+        'admin.TaskUserAssoc'           => ['taskUserAssocFrontendController'], //controlled by ACL, enabling frontend rights given here
+        'admin.Customer'                => ['customerAdministration'], //controlled by ACL, enabling frontend rights given here
+        'LanguageResourcesTaskassoc'    => ['languageResourcesTaskassoc'], //controlled by ACL, enabling frontend rights given here
+        'LanguageResources'             => ['languageResourcesMatchQuery', 'languageResourcesSearchQuery'], //controlled by ACL, enabling frontend rights given here
+        'TmOverview'                    => ['languageResourcesOverview'], //controlled by ACL, enabling frontend rights given here
+        'Localizer'                     => true,
+        'Quality'                       => true,
+        'QualityMqm'                    => true //the check if this controller is active is task specific (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
     ];
 
     public function init()
@@ -485,36 +485,26 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
 
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'taskOverviewFrontendController')) {
-            $this->frontendEndControllers['admin.TaskOverview'] = true;
-            $this->frontendEndControllers['admin.TaskPreferences'] = true;
-        }
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'adminUserFrontendController')) {
-            $this->frontendEndControllers['admin.TaskUserAssoc'] = true;
-        }
-
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'customerAdministration')) {
-            $this->frontendEndControllers['admin.Customer'] = true;
-        }
-
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesTaskassoc')) {
-            $this->frontendEndControllers['LanguageResourcesTaskassoc'] = true;
-        }
-
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesMatchQuery') || $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesSearchQuery')) {
-            $this->frontendEndControllers['LanguageResources'] = true;
-        }
-
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesOverview')) {
-            $this->frontendEndControllers['TmOverview'] = true;
-        }
-
         //ensure Localizer beeing the last one, so we remove it and add it later to be at the arrays end
         unset($this->frontendEndControllers['Localizer']);
 
-        //get only the active controller names
-        $activeControllers = array_keys(array_filter($this->frontendEndControllers));
+        //store only the enabled controller names
+        $activeControllers = [];
+        foreach($this->frontendEndControllers as $controller => $enabled) {
+            if(is_array($enabled)) {
+                foreach($enabled as $neededRightForController) {
+                    if($acl->isInAllowedRoles($userSession->data->roles, 'frontend', $neededRightForController)) {
+                        $enabled = true;
+                        break; //at least only one right is needed out of the list
+                    }
+                }
+            }
+            if($enabled === true) {
+                $activeControllers[] = $controller;
+            }
+        }
 
+        //add the active controllers from plugins
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
         $pluginFrontendControllers = $pm->getActiveFrontendControllers();

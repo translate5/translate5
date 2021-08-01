@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:ax="AcrossXliff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd" xmlns:translate5="http://www.translate5.net/" translate5:taskname="C:\fakepath\simple-en-de" translate5:taskguid="{86b10bf5-02f3-4f0c-b264-f3877aa15d96}">
+<file original="simple-en-de.sdlxliff" source-language="en" target-language="de" xml:space="preserve" datatype="x-translate5">
+<body>
+      <trans-unit id="327" translate="no" ax:state-name="KeepSource" ax:state-id="1" ax:state-flags="1024">
+        <source>Satz eins. Satz zwei.</source>
+        <seg-source><mrk mtype="seg" mid="1">Satz eins.</mrk> <mrk mtype="seg" mid="2">Satz zwei.</mrk></seg-source>
+        <target>Satz eins. Satz zwei.</target>
+      </trans-unit>
+</body>
+</file>
+</xliff>
