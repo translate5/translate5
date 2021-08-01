@@ -2,10 +2,10 @@
 <rainbowPipeline version="1"><step class="net.sf.okapi.steps.common.RawDocumentToFilterEventsStep"></step>
 <step class="net.sf.okapi.steps.segmentation.SegmentationStep">#v1
 segmentSource.b=true
-segmentTarget.b=false
+segmentTarget.b=true
 renumberCodes.b=false
-sourceSrxPath=languages.srx
-targetSrxPath=languages.srx
+sourceSrxPath=/home/marc/Schreibtisch/test-new-bconf/languages.srx
+targetSrxPath=/home/marc/Schreibtisch/test-new-bconf/languages.srx
 copySource.b=false
 checkSegments.b=false
 trimSrcLeadingWS.i=-1
