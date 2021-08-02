@@ -4200,6 +4200,10 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Projektbeschr. ausblenden</source>
   <target>Hide project description</target>
 </trans-unit>
+<trans-unit id='cG1saWdodA=='>
+    <source>pmlight</source>
+    <target>PM Light</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
