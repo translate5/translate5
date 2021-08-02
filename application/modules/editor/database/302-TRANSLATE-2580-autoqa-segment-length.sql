@@ -26,7 +26,13 @@
 -- */
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
-('runtimeOptions.autoQA.enableSegmentLengthCheck', 1, 'editor', 'system', 1, 1, '', 'boolean', 'If activated (default), AutoQA covers checking the segment length', 8, 'Enables segment length check', 'Editor: QA', '');
+('runtimeOptions.autoQA.segmentPixelLengthTooShortPercent', 1, 'editor', 'system', 20, 20, '', 'integer', 'If given, defines how long of the max defined length a segment has to be in percent', 8, 'Defines the length check for segments being too short in percent', 'Editor: QA', '');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
-('runtimeOptions.autoQA.segmentPixelLengthTooShortThresh', 1, 'editor', 'system', '', '', '', 'map', 'If given, defines the evaluation of the minimal pixel length of a segment. Structure must be like: {"percent":5,"pixel":20}', 8, 'Defines the Pixel length check for segments being too short', 'Editor: QA', '');
+('runtimeOptions.autoQA.segmentPixelLengthTooShortPixel', 1, 'editor', 'system', 100, 100, '', 'integer', 'If given, defines how much shorter a segment can be than the defined length in pixels', 8, 'Defines the length check for segments being too short in pixels', 'Editor: QA', '');
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
+('runtimeOptions.autoQA.segmentPixelLengthTooShortChars', 1, 'editor', 'system', 20, 20, '', 'integer', 'If given, defines how much shorter a segment can be than the defined length in characters', 8, 'Defines the length check for segments being too short in characters', 'Editor: QA', '');
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
+('runtimeOptions.autoQA.enableSegmentLengthCheck', 1, 'editor', 'system', 1, 1, '', 'boolean', 'If activated (default), AutoQA covers checking the segment length', 8, 'Enables segment length check', 'Editor: QA', '');

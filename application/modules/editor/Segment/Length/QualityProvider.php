@@ -112,11 +112,11 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
                 return $translate->_('Segment ist länger als erlaubt');
                 
             case editor_Segment_Length_Check::NOT_LONG_ENOUGH:
-                $translation = $translate->_('Segment ist relevant kürzer als erlaubt (mehr als {0}% zu kurz oder min. {1} Pixel zu kurz)');
+                $translation = $translate->_('Segment ist relevant kürzer als erlaubt (mehr als {0}% oder min. {1} Pixel oder min. {2} Zeichen zu kurz)');
                 // ugly: we need the task-config to evaluate the translation
                 $taskConfig = $task->getConfig();
                 $restriction = static::getRestriction($taskConfig->runtimeOptions->autoQA, $taskConfig);
-                return str_replace('{0}', strval($restriction->maxLengthMinPercent), str_replace('{1}', strval($restriction->maxLengthMinThresh), $translation));
+                return str_replace('{0}', strval($restriction->maxLengthMinPercent), str_replace('{1}', strval($restriction->maxLengthMinPixel), str_replace('{2}', strval($restriction->maxLengthMinChars), $translation)));
                 
             case editor_Segment_Length_Check::TOO_SHORT:
                 return $translate->_('Segment ist kürzer als erlaubt');
@@ -129,11 +129,10 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
     
     public function getAllCategories(editor_Models_Task $task) : array {
         return [
+            editor_Segment_Length_Check::TOO_SHORT,
+            editor_Segment_Length_Check::NOT_LONG_ENOUGH,
             editor_Segment_Length_Check::TOO_LONG,
-            editor_Segment_Length_Check::NOT_LONG_ENOUGH
-            // Currently, min-length & num of lines are not checked. If that changes, activate
-            //, editor_Segment_Length_Check::TOO_SHORT
-            //, editor_Segment_Length_Check::TOO_MANY_LINES
+            editor_Segment_Length_Check::TOO_MANY_LINES
         ];
     }
 }

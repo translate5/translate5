@@ -39,11 +39,6 @@ class editor_Segment_Length_Restriction {
     public $active = false;
     /**
      *
-     * @var string
-     */
-    public $sizeUnit = 'NONE';
-    /**
-     *
      * @var int
      */
     public $minLength = 0;
@@ -61,7 +56,12 @@ class editor_Segment_Length_Restriction {
      *
      * @var int
      */
-    public $maxLengthMinThresh = 0;
+    public $maxLengthMinPixel = 0;
+    /**
+     *
+     * @var int
+     */
+    public $maxLengthMinChars = 0;
     /**
      *
      * @var int
@@ -72,18 +72,24 @@ class editor_Segment_Length_Restriction {
         $this->minLength = is_int($taskConfig->runtimeOptions->lengthRestriction->minWidth) ? $taskConfig->runtimeOptions->lengthRestriction->minWidth : 0;
         $this->maxLength = is_int($taskConfig->runtimeOptions->lengthRestriction->maxWidth) ? $taskConfig->runtimeOptions->lengthRestriction->maxWidth : 0;
         $this->maxNumLines = is_int($taskConfig->runtimeOptions->lengthRestriction->maxNumberOfLines) ? $taskConfig->runtimeOptions->lengthRestriction->maxNumberOfLines : 0;
-        // TODO AutoQA: does the size-unit define which length-restrictions can happen ??? // $this->sizeUnit == $taskConfig->lengthRestriction->sizeUnit
         if($qualityConfig->enableSegmentLengthCheck == 1){
             $this->active = true;
-            // currently, we only have a pixel length check
-            $this->sizeUnit = editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING;
-            if(!empty($qualityConfig->segmentPixelLengthTooShortThresh)){
-                $data = $qualityConfig->segmentPixelLengthTooShortThresh->toArray();
-                $this->maxLengthMinPercent = array_key_exists('percent', $data) ? intval($data['percent']) : 0;
-                $this->maxLengthMinThresh = array_key_exists('pixel', $data) ? intval($data['pixel']) : 0;
-            }
-        }
+            $this->maxLengthMinPercent = is_int($qualityConfig->segmentPixelLengthTooShortPercent) ? $qualityConfig->segmentPixelLengthTooShortPercent : 0;
+            $this->maxLengthMinPixel = is_int($qualityConfig->segmentPixelLengthTooShortPixel) ? $qualityConfig->segmentPixelLengthTooShortPixel : 0;
+            $this->maxLengthMinChars = is_int($qualityConfig->segmentPixelLengthTooShortChars) ? $qualityConfig->segmentPixelLengthTooShortChars : 0;
+         }
         // DEBUG
         // error_log('editor_Segment_Length_Restriction: '.print_r($this, true));
+    }
+    /**
+     * 
+     * @param string $sizeUnit
+     * @return int
+     */
+    public function getMinLengthOffset(string $sizeUnit) : int {
+        if($sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING){
+            return $this->maxLengthMinPixel;
+        }
+        return $this->maxLengthMinChars;
     }
 }
