@@ -107,6 +107,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             view = me.getView(),
             task = view.task,
             workflowCombo = view.down('#workflowCombo'),
+            usersStore = Ext.StoreManager.get('admin.Users'),
             usageMode = view.down('#usageMode');
 
         // first set the combo value on panel activate then load the store.
@@ -115,6 +116,11 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         usageMode.setValue(task.get('usageMode') ? task.get('usageMode') : Editor.model.admin.Task.USAGE_MODE_COOPERATIVE);
 
         me.loadAssocData();
+
+        // if the users are not loaded (ex: pmlight roles), load the store
+        if(usersStore.getCount() === 0){
+            usersStore.load();
+        }
     },
 
     /***
