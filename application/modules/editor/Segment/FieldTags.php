@@ -244,23 +244,49 @@ class editor_Segment_FieldTags implements JsonSerializable {
     }
     /**
      * Returns the field text (which covers the textual contents of internal tags as well !)
+     * @param bool $stripTrackChanges: if set, trackchanges will be removed
+     * @param bool $condenseBlanks: if set, a removed trackchanges will have a condensed whitespace for the removed tags
      * @return string
      */
-    public function getFieldText() : string {
+    public function getFieldText(bool $stripTrackChanges=false, bool $condenseBlanks=true) : string {
+        if($stripTrackChanges && (count($this->tags) > 0)){
+            return $this->getFieldTextWithoutTrackChanges($condenseBlanks);
+        }
         return $this->fieldText;
     }
     /**
+     * Retrieves our field-text lines.
+     * This means, that all TrackChanges Del Contents are removed and our fild-text is splitted by all existing Internal Newline tags
+     * @param bool $condenseBlanks
+     * @return string[]
+     */
+    public function getFieldTextLines(bool $condenseBlanks=true) : array {
+        $clone = $this->cloneWithoutTrackChanges([ editor_Segment_Tag::TYPE_INTERNAL ], $condenseBlanks);
+        $clone->replaceTagsForLines();
+        return explode(editor_Segment_NewlineTag::RENDERED, $clone->render());
+    }
+    /**
      *
+     * @param bool $stripTrackChanges: if set, trackchanges will be removed
+     * @param bool $condenseBlanks: if set, a removed trackchanges will have a condensed whitespace for the removed tags
      * @return string
      */
-    public function getFieldTextLength() : int {
+    public function getFieldTextLength(bool $stripTrackChanges=false, bool $condenseBlanks=true) : int {
+        if($stripTrackChanges && (count($this->tags) > 0)){
+            return mb_strlen($this->getFieldTextWithoutTrackChanges($condenseBlanks));
+        }
         return mb_strlen($this->fieldText);
     }
     /**
      *
+     * @param bool $stripTrackChanges: if set, trackchanges will be removed
+     * @param bool $condenseBlanks: if set, a removed trackchanges will have a condensed whitespace for the removed tags
      * @return bool
      */
-    public function isFieldTextEmpty() : bool {
+    public function isFieldTextEmpty(bool $stripTrackChanges=false, bool $condenseBlanks=true) : bool {
+        if($stripTrackChanges && (count($this->tags) > 0)){
+            return ($this->getFieldTextLength(true, $condenseBlanks) == 0);
+        }
         return mb_strlen($this->fieldText) == 0;
     }
     /**
@@ -458,6 +484,19 @@ class editor_Segment_FieldTags implements JsonSerializable {
             }
         }
         return false;
+    }
+    /**
+     * Retrieves, how many internal tags representing whitespace, are present
+     * @return int
+     */
+    public function getNumLineBreaks() : int {
+        $numLineBreaks = 0;
+        foreach($this->tags as $tag){
+            if($tag->getType() == editor_Segment_Tag::TYPE_INTERNAL && $tag->isNewline()){
+                $numLineBreaks++;
+            }
+        }
+        return $numLineBreaks;
     }
     /**
      * Sorts the items ascending, takes the second index into account when items have the same startIndex
@@ -838,6 +877,53 @@ class editor_Segment_FieldTags implements JsonSerializable {
         $newFieldText = ($start > 0) ? $this->getFieldTextPart(0, $start) : '';
         $newFieldText .= ($end < $length) ? $this->getFieldTextPart($end, $length) : '';
         $this->fieldText = $newFieldText;
+    }
+    /**
+     * Retrieves the text with the TrackChanges removed
+     * @param boolean $condenseBlanks
+     * @return string
+     */
+    private function getFieldTextWithoutTrackChanges(bool $condenseBlanks=true) : string {
+        $this->sort();
+        $text = '';
+        $start = 0;
+        $length = $this->getFieldTextLength();
+        foreach($this->tags as $tag){
+            // the tag is only affected if not completely  before the hole
+            if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES && $tag->isDeleteTag() && $tag->endIndex > $tag->startIndex && $tag->endIndex > $start){
+                $boundries = ($condenseBlanks) ? $this->getRemovableBlanksBoundries($tag->startIndex, $tag->endIndex) : NULL;
+                if($boundries != NULL && $boundries->left < $tag->startIndex && $boundries->right > $tag->endIndex){
+                    // if there are removable blanks on both sides it is meaningless, on which side we leave one
+                    if($boundries->left > $start){
+                        $text .= $this->getFieldTextPart($start, $boundries->left);
+                    }
+                    $start = $boundries->right - 1;
+                } else {
+                    if($tag->startIndex > $start){
+                        $text .= $this->getFieldTextPart($start, $tag->startIndex);
+                    }
+                    $start = $tag->endIndex;
+                }
+            }
+        }
+        if($start < $length){
+            $text .= $this->getFieldTextPart($start, $length);
+        }
+        return $text;
+    }
+    /**
+     * Special API to render all internal newline tags as lines
+     * This expects TrackChanges Tags to be removed, otherwise the result will contain trackchanges contents
+     */
+    private function replaceTagsForLines() {
+        $tags = [];
+        foreach($this->tags as $tag){
+            // the tag is only affected if not completely  before the hole
+            if($tag->getType() == editor_Segment_Tag::TYPE_INTERNAL && $tag->isNewline()){
+                $tags[] = editor_Segment_NewlineTag::createNew($tag->startIndex, $tag->endIndex);
+            }
+        }
+        $this->tags = $tags;
     }
     /**
      * Creates a nested structure of Internal tags & text-nodes recursively out of a HtmlNode structure

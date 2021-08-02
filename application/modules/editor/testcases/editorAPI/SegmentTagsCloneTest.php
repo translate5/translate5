@@ -46,6 +46,8 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
     private $single5 = '<div class="single tab internal-tag ownttip"><span class="short" title="&lt;5/&gt;: 1 tab character">&lt;5/&gt;</span><span class="full" data-originalid="tab" data-length="1">→</span></div>';
     private $single6 = '<div class="single internal-tag ownttip"><span class="short" title="&lt;char name=&quot;Indent&quot;/&gt;">&lt;6/&gt;</span><span class="full" data-originalid="259" data-length="-1">&lt;char name=&quot;Indent&quot;/&gt;</span></div>';
     private $single7 = '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;7/&gt;: Newline">&lt;7/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>';
+    private $single8 = '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;8/&gt;: Newline">&lt;8/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>';
+    private $single9 = '<div class="single newline internal-tag ownttip"><span class="short" title="&lt;9/&gt;: Newline">&lt;9/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">↵</span></div>';
     private $insX = '<ins class="trackchanges ownttip" data-usertrackingid="1868" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2021-05-27T20:04:17+02:00">';
     private $delX = '<del class="trackchanges ownttip deleted" data-usertrackingid="1868" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2021-05-27T22:51:24+02:00">';
 
@@ -169,6 +171,33 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
         $this->createTrackChangesFilterCloneTest($expected, $markup);
         $this->createTrackChangesMqmFilterCloneTest(editor_Segment_Tag::strip($expected), $markup);
     }
+    
+    public function testLines1(){
+        // testing content without ins/del
+        $markup = 'Lorem <del><1>ipsum dolor</1></del> sit amet, <del><2>consetetur sadipscing<5/></2></del> elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins> <del>ut</del><6/> labore et <ins><8/>dolore magna</ins> aliquyam erat</3><del>, sed</del> diam<9/> voluptua.';
+        $expected = 'Lorem sit amet, elitr, sed diam nonumy eirmod tempor <3>invidunt <6/> labore et <8/>dolore magna aliquyam erat</3> diam<9/> voluptua.';
+        $this->createTrackChangesCloneTest($expected, $markup);
+        $this->createTrackChangesFilterCloneTest($expected, $markup);
+        $this->createMarkupLinesTest($expected, $markup);
+    }
+    
+    public function testLines2(){
+        // testing content without ins/del
+        $markup = 'Lorem <del><1>ipsum dolor</1></del> sit amet, <2>consetetur<8/> sadipscing<del><5/></del></2> elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins> <del>ut</del><9/><6/> labore et <ins><4>dolore magna</4></ins> aliquyam erat</3><del>, sed diam voluptua.<7/></del>';
+        $expected = 'Lorem sit amet, <2>consetetur<8/> sadipscing</2> elitr, sed diam nonumy eirmod tempor <3>invidunt <9/><6/> labore et <4>dolore magna</4> aliquyam erat</3>';
+        $this->createTrackChangesCloneTest($expected, $markup);
+        $this->createTrackChangesFilterCloneTest($expected, $markup);
+        $this->createMarkupLinesTest($expected, $markup);
+    }
+    
+    public function testLines3(){
+        // testing content without ins/del
+        $markup = 'Lorem  <del><1>ipsum dolor</1></del> sit amet,    <del><2>consetetur sadipscing<5/></2></del>    elitr, sed diam nonumy eirmod tempor <3><ins>invidunt</ins>   <del>ut</del><6/> labore et <ins><8/>dolore magna</ins> aliquyam erat</3><del>, <9/>sed</del> diam voluptua.<7/>';
+        $expected = 'Lorem sit amet, elitr, sed diam nonumy eirmod tempor <3>invidunt   <6/> labore et <8/>dolore magna aliquyam erat</3> diam voluptua.<7/>';
+        $this->createTrackChangesCloneTest($expected, $markup);
+        $this->createTrackChangesFilterCloneTest($expected, $markup);
+        $this->createMarkupLinesTest($expected, $markup);
+    }
 
     /**
      * Creates a test for the tags cloning. The passed markup will have the following short-tags replaced with "real" internal tags
@@ -196,6 +225,7 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
         $this->assertEquals($expected, $reconvertedCloned);
         $this->assertEquals($expectedConverted, $renderedCloned);
         $this->assertEquals($expectedTags->render(), $renderedCloned);
+        $this->assertEquals($expectedTags->getFieldText(), $markupTags->getFieldText(true));
         // ther order in the cloned json still has the old values, so we ignore the ordering
         $this->assertEquals($this->cleanOrderInJSON($expectedTags->toJson()), $this->cleanOrderInJSON($markupTagsNoTrackChanges->toJson()));
         // make sure the original tags do not become manipulated.
@@ -227,6 +257,7 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
         // compare
         $this->assertEquals($expectedTags->render(), $markupTagsNoTrackChanges->render());
         $this->assertEquals($this->cleanOrderInJSON($expectedTags->toJson()), $this->cleanOrderInJSON($markupTagsNoTrackChanges->toJson()));
+        $this->assertEquals($expectedTags->getFieldText(), $markupTags->getFieldText(true));
         // compare full clone
         $this->assertEquals($markupTags->render(), $markupTagsCloned->render());
         $this->assertEquals($this->cleanOrderInJSON($markupTags->toJson()), $this->cleanOrderInJSON($markupTagsCloned->toJson()));
@@ -254,6 +285,17 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
         // compare full clone
         $this->assertEquals($markupTags->render(), $markupTagsCloned->render());
         $this->assertEquals($this->cleanOrderInJSON($markupTags->toJson()), $this->cleanOrderInJSON($markupTagsCloned->toJson()));
+    }
+    /**
+     * Test the ::getFieldTextLines API of the Fieldtags (which uses the clone-API internally)
+     * @param string $expected
+     * @param string $markup
+     */
+    private function createMarkupLinesTest($expected, $markup){
+        $markupConverted = $this->replaceTags($markup);
+        $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $markupConverted, 'target', 'target');
+        $expectedMarkup = $this->replaceNewlineTags($expected);
+        $this->assertEquals(explode(editor_Segment_NewlineTag::RENDERED, $expectedMarkup), $markupTags->getFieldTextLines(true));
     }
     /**
      * Removes the order / parentOrder props in the json-data as they are not sequenced (but valid!) in the cloned tags
@@ -336,6 +378,8 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
         $markup = str_replace('<5/>', $this->single5, $markup);
         $markup = str_replace('<6/>', $this->single6, $markup);
         $markup = str_replace('<7/>', $this->single7, $markup);
+        $markup = str_replace('<8/>', $this->single8, $markup);
+        $markup = str_replace('<9/>', $this->single9, $markup);
         return $markup;
     }
     /**
@@ -355,6 +399,20 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
         $markup = str_replace($this->single5, '<5/>', $markup);
         $markup = str_replace($this->single6, '<6/>', $markup);
         $markup = str_replace($this->single7, '<7/>', $markup);
+        $markup = str_replace($this->single8, '<8/>', $markup);
+        $markup = str_replace($this->single9, '<9/>', $markup);
+        return $markup;
+    }
+    /**
+     * Replaces all Internal Linebreak tags with Linebreaks, removes all other tags
+     * @param string $markup
+     * @return string
+     */
+    private function replaceNewlineTags($markup){
+        $markup = str_replace('<7/>', editor_Segment_NewlineTag::RENDERED, $markup);
+        $markup = str_replace('<8/>', editor_Segment_NewlineTag::RENDERED, $markup);
+        $markup = str_replace('<9/>', editor_Segment_NewlineTag::RENDERED, $markup);
+        $markup = preg_replace('~</*[1-6]/*>~', '', $markup);
         return $markup;
     }
 }

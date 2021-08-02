@@ -55,6 +55,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     const TYPE_QM = 'qm';
     /**
+     * A special Type only used for tests and as a default for unknown tags in segment content
      * @var string
      */
     const TYPE_ANY = 'any';
