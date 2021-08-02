@@ -17,7 +17,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "55762",
+                    "qid": "69317",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -29,7 +29,7 @@
                     "qfaulty": true
                 },
                 {
-                    "qid": "55763",
+                    "qid": "69318",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -40,7 +40,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "55764",
+                    "qid": "69319",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -75,6 +75,59 @@
             "text": "Internal tags",
             "qtotal": 3,
             "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "length",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "length",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "not_long_enough",
+                    "text": "Segment relevantly shorter than allowed (more than 20% shorter or at least 100 Pixel shorter or at least 20 characters shorter)",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "length",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "too_long",
+                    "text": "Segment longer than allowed",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "length",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "too_many_lines",
+                    "text": "Segment has too many lines",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "length",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "too_short",
+                    "text": "Segment shorter than allowed",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "text": "Length check",
+            "qtotal": 0,
+            "expanded": false,
             "checked": false
         },
         {
@@ -432,7 +485,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "55755",
+                    "qid": "69310",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -443,7 +496,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "55751",
+                    "qid": "69306",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -454,7 +507,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "55757",
+                    "qid": "69312",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
