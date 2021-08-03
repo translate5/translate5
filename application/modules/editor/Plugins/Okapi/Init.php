@@ -93,6 +93,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         return $bconfPathes;
     }
     
+    protected $localePath = 'locales';
+    
     /**
      * Supported file-types by okapi
      *
