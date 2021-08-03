@@ -68,10 +68,6 @@ class editor_Segment_Length_Check {
      */
     private $metaCache;
     /**
-     * @var string
-     */
-    private $sizeUnit;
-    /**
      * @var boolean
      */
     private $valid = true;
@@ -90,7 +86,6 @@ class editor_Segment_Length_Check {
         if(!$lengthRestriction->active){
             return;
         }
-        $this->sizeUnit = editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT;
         $this->fieldTags = $fieldTags;
         $this->segment = $segment;
         $data = $this->segment->getDataObject();
@@ -99,21 +94,23 @@ class editor_Segment_Length_Check {
         if ($this->metaCache == NULL || (is_null($this->metaCache['minWidth']) && is_null($this->metaCache['maxWidth']) && is_null($this->metaCache['maxNumberOfLines']))) {
             return;
         }
-
         $this->segmentMeta = $this->segment->meta();
-        $this->sizeUnit = $this->segmentMeta->getSizeUnit();
-        if(array_key_exists('minWidth', $this->metaCache) && !is_null($this->metaCache['minWidth'])){
-            $lengthRestriction->minLength = intval($this->metaCache['minWidth']);
-        }
-        if(array_key_exists('maxWidth', $this->metaCache) && !is_null($this->metaCache['maxWidth'])){
-            $lengthRestriction->maxLength = intval($this->metaCache['maxWidth']);
-        }
-        // if number of lines given, validate this way
-        if (array_key_exists('maxNumberOfLines', $this->metaCache) && !is_null($this->metaCache['maxNumberOfLines'])) {
-            $lengthRestriction->maxNumLines = intval($this->metaCache['maxNumberOfLines']);
-            $this->evaluateLinesLength($lengthRestriction);
-        } else {
-            $this->evaluateTransUnitLength($lengthRestriction);
+        // set the current limits
+        $lengthRestriction->sizeUnit = $this->segmentMeta->getSizeUnit();
+        $lengthRestriction->minLength = (array_key_exists('minWidth', $this->metaCache) && !is_null($this->metaCache['minWidth'])) ? intval($this->metaCache['minWidth']) : 0;
+        $lengthRestriction->maxLength = (array_key_exists('maxWidth', $this->metaCache) && !is_null($this->metaCache['maxWidth'])) ? intval($this->metaCache['maxWidth']) : 0;
+        $lengthRestriction->maxNumLines = (array_key_exists('maxNumberOfLines', $this->metaCache) && !is_null($this->metaCache['maxNumberOfLines'])) ? intval($this->metaCache['maxNumberOfLines']) : 0;
+        
+        // DEBUG
+        // error_log("PROCESS SEGMENT ".$this->segment->getSegmentNrInTask()." ".print_r($lengthRestriction, true));
+        
+        if($lengthRestriction->isRestricted()){
+            // if number of lines given, validate this way
+            if ($lengthRestriction->maxNumLines > 0){
+                $this->evaluateLinesLength($lengthRestriction);
+            } else {
+                $this->evaluateTransUnitLength($lengthRestriction);
+            }
         }
     }
     /**
@@ -135,7 +132,8 @@ class editor_Segment_Length_Check {
      * @param editor_Segment_Length_Restriction $lengthRestriction
      */
     private function evaluateTransUnitLength(editor_Segment_Length_Restriction $restriction){
-        if($restriction->maxLength > 0 && !empty($this->metaCache['siblingData'])) {
+        
+        if($restriction->isLengthRestricted() && !empty($this->metaCache['siblingData'])) {
             // calculate trans-unit length
             $length = 0;
             foreach($this->metaCache['siblingData'] as $id => $data) {
@@ -184,7 +182,7 @@ class editor_Segment_Length_Check {
         if($numLines > $restriction->maxNumLines){
             $this->states[] = self::TOO_MANY_LINES;
         }
-        if($restriction->maxLength > 0){
+        if($restriction->isLengthRestricted()){
             foreach ($lines as $line) {
                 $length = (int) $this->segment->textLengthByMeta($line, $this->segmentMeta, $this->segment->getFileId());
                 if($restriction->maxLength > 0 && $length > $restriction->maxLength && !in_array(self::TOO_LONG, $this->states)){
@@ -207,7 +205,7 @@ class editor_Segment_Length_Check {
      */
     private function isNotLongEnough(int $length, editor_Segment_Length_Restriction $restriction) : bool {
         if($restriction->maxLength > 0){
-            if($restriction->getMinLengthOffset($this->sizeUnit) > 0 && $length <= ($restriction->maxLength - $restriction->getMinLengthOffset($this->sizeUnit))){
+            if($restriction->getMinLengthOffset() > 0 && $length <= ($restriction->maxLength - $restriction->getMinLengthOffset())){
                 return true;
             }
             if($restriction->maxLengthMinPercent > 0 && ($length < round($restriction->maxLength * (100 - $restriction->maxLengthMinPercent) / 100))){
