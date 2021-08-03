@@ -327,7 +327,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * @param string|array $clientIds
      * @return array
      */
-    public function getCollectionForAuthenticatedUser($dict = null, $clientIds = ''): array
+    public function getCollectionForAuthenticatedUser($dict = false, $clientIds = ''): array
     {
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
