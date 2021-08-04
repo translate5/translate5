@@ -91,7 +91,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
         
-        if(auth.isAllowed('configOverwriteGrid')) {
+        if(auth.isAllowed('taskConfigOverwriteGrid')) {
             tabs.push({
                 xtype: 'adminConfigGrid',
                 store:'admin.task.Config',

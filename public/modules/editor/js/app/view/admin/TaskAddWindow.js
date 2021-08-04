@@ -103,11 +103,13 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 groupIndex:1//index 2 is language resources assoc
             },'postimport');
 
-            win.insertCard({
-                xtype:'adminConfigWizard',
-                itemId:'adminConfigWizard',
-                groupIndex:3//index 2 is language resources assoc
-            },'postimport');
+            if(Editor.app.authenticatedUser.isAllowed('taskConfigOverwriteGrid')) {
+                win.insertCard({
+                    xtype: 'adminConfigWizard',
+                    itemId: 'adminConfigWizard',
+                    groupIndex: 3//index 2 is language resources assoc
+                }, 'postimport');
+            }
 
         },
         render:function(win){
