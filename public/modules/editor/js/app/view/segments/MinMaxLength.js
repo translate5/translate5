@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * This component implementsall features regarding minLength & maxLength & maxNumberLines for segments
+ * IMPORTANT: When opening a segment for editing with a line-number restriction, linebreaks are automatically inserted at positions prone for a linebreak
+ */
 Ext.define('Editor.view.segments.MinMaxLength', {
     extend: 'Ext.Component',
     alias: 'widget.segment.minmaxlength',
