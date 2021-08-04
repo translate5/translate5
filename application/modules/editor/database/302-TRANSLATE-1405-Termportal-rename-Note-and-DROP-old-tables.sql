@@ -29,7 +29,7 @@
 UPDATE `terms_attributes_datatype` SET `labelText` = "Kommentar", `name` = "Comment" WHERE `label` = "note";
 
 -- DROP old tables
-DROP TABLE IF EXISTS `terms_attributes_proposal`;
-DROP TABLE IF EXISTS `LEK_term_attributes`;
-DROP TABLE IF EXISTS `LEK_terms`;
-DROP TABLE IF EXISTS `LEK_term_entry`;
+-- DROP TABLE IF EXISTS `terms_attributes_proposal`;
+-- DROP TABLE IF EXISTS `LEK_term_attributes`;
+-- DROP TABLE IF EXISTS `LEK_terms`;
+-- DROP TABLE IF EXISTS `LEK_term_entry`;
