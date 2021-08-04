@@ -175,20 +175,18 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
         $newRows = [];
         $taskConfigs = $this->getTaskConfigModel($taskGuid);
         foreach($taskConfigs as $config){
-            // TODO AUTOQA: Do we have to add editor_Models_Config::CONFIG_LEVEL_TASK as well ??
             if($config['level'] == editor_Models_Config::CONFIG_LEVEL_TASKIMPORT){
                 $newRows[] = '('.$db->quote($taskGuid).','.$db->quote($config['name']).','.$db->quote($config['value']).')';
             }
-        }        
-        // remove the current configs
-        $sql = 'DELETE FROM `LEK_task_config` WHERE taskGuid = '.$db->quote($taskGuid).';';
-        $db->query($sql);
-        
-        // write the ones to fix
-        if(count($newRows) > 0){
-            $sql = 'INSERT INTO `LEK_task_config` (`taskGuid`, `name`, `value`) VALUES '.implode(',', $newRows);
-            $db->query($sql);
         }
+
+        if(count($newRows) < 1){
+            return;
+        }
+
+        // inset all new values, and leave the existing one inside the table.
+        $sql = 'INSERT INTO `LEK_task_config` (`taskGuid`, `name`, `value`) VALUES '.implode(',', $newRows). '  ON DUPLICATE KEY UPDATE `value`=`value`';
+        $db->query($sql);
     }
 
     /***
