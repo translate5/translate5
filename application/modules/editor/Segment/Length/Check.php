@@ -173,7 +173,6 @@ class editor_Segment_Length_Check {
     }
     /**
      * Evaluates the error-states for a lines based length restriction
-     * CURRENTLY this is always pixel-based
      * @param editor_Segment_Length_Restriction $restriction
      */
     private function evaluateLinesLength(editor_Segment_Length_Restriction $restriction){
@@ -183,17 +182,20 @@ class editor_Segment_Length_Check {
             $this->states[] = self::TOO_MANY_LINES;
         }
         if($restriction->isLengthRestricted()){
+            $lengthOverall = 0;
             foreach ($lines as $line) {
                 $length = (int) $this->segment->textLengthByMeta($line, $this->segmentMeta, $this->segment->getFileId());
+                $lengthOverall += $length;
                 if($restriction->maxLength > 0 && $length > $restriction->maxLength && !in_array(self::TOO_LONG, $this->states)){
                     $this->states[] = self::TOO_LONG;
-                }
-                if($this->isNotLongEnough($length, $restriction) && !in_array(self::NOT_LONG_ENOUGH, $this->states)){
-                    $this->states[] = self::NOT_LONG_ENOUGH;
                 }
                 if($restriction->minLength > 0 && $length < $restriction->minLength && !in_array(self::TOO_SHORT, $this->states)){
                     $this->states[] = self::TOO_SHORT;
                 }
+            }
+            // the "not long enough" state relates to the overall length. This is a bit unlogical here but it's the way the customers want the feature
+            if($this->isNotLongEnough($lengthOverall, $restriction)){
+                $this->states[] = self::NOT_LONG_ENOUGH;
             }
         }
     }
