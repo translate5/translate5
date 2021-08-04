@@ -94,7 +94,7 @@ Ext.define('Editor.controller.Termportal', {
      */
     isTermportalAllowed:function(){
         var userRoles=Editor.data.app.user.roles.split(",");
-        return (Ext.Array.indexOf(userRoles, "termCustomerSearch") >= 0) || (Ext.Array.indexOf(userRoles, "termProposer") >= 0) ;
+        return (Ext.Array.indexOf(userRoles, "termSearch") >= 0) || (Ext.Array.indexOf(userRoles, "termProposer") >= 0) ;
     }
 });
     
