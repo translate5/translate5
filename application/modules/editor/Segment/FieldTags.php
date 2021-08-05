@@ -63,9 +63,6 @@ use PHPHtmlParser\Dom\Node\HtmlNode;
  * - The generated markup may be different then in earlier times (order of attributes!)
  * - This may creates problems with regex-based tag processing that relies on a fixed order of attributes or css-classes
  * - Generally, RegEx based processing of Markup often fails with nested Markup (especially when the expressions cover the start and end tag) and should be replaced with OOP code
- * 
- * 
- * TODO/FIXME the prop "ttName" (representing the source field of the text in the datamodel) is used by the Termtagger only. Investigate, if this is really neccessary...
  */
 class editor_Segment_FieldTags implements JsonSerializable {
     
@@ -97,7 +94,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     public static function fromJsonData(editor_Models_Task $task, stdClass $data) : editor_Segment_FieldTags {
         try {
-            $tags = new editor_Segment_FieldTags($task, $data->segmentId, $data->field, $data->fieldText, $data->saveTo, $data->ttName);
+            $tags = new editor_Segment_FieldTags($task, $data->segmentId, $data->fieldText, $data->field, $data->dataField, $data->saveTo, $data->ttName);
             $creator = editor_Segment_TagCreator::instance();
             foreach($data->tags as $tag){
                 $segmentTag = $creator->fromJsonData($tag);
@@ -164,24 +161,29 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     private $segmentId;
     /**
-     * The field our fieldtext comes from
-     * @var string
-     */
-    private $field;
-    /**
      * The text of the relevant segment field
      * This text unfortunately covers the text-contents of Internal Tags
      * @var string
      */
     private $fieldText;
     /**
+     * The field our fieldtext comes from e.g. 'source', 'target'
+     * @var string
+     */
+    private $field;
+    /**
+     * The data-index our fieldtext comes from e.g. 'targetEdit'
+     * @var string
+     */
+    private $dataField;
+    /**
      * The field of the segment's data we will be saved to
      * @var string
      */
     private $saveTo;
     /**
-     * Only neccessary for the termtagger, will be used as the fieldname there. A target will be sent with it original field name (but saved to the edit-field) when importing
-     * TODO: there is no obvious reason why this is done and this may is obsolete ...
+     * Special Helper to Track the field-name as used in the TermTagger Code
+     * TODO: Check, if this is really neccessary
      * @var string
      */
     private $ttName;
@@ -196,20 +198,23 @@ class editor_Segment_FieldTags implements JsonSerializable {
     private $orderIndex = -1;
     
     /**
+     * 
      * @param editor_Models_Task $task
      * @param int $segmentId
-     * @param string $field
-     * @param string $fieldText
-     * @param string | string[] $saveTo
-     * @param string $ttName
+     * @param string $fieldText: the text content of the segment field
+     * @param string $field: the field name, e.g. source or target
+     * @param string $dataField: the field's data index, e.g targetEdit
+     * @param string $saveTo: only used for processing within editor_Segment_Tags, adds a dataField / field index, the segment will be saved to when flushed or saved
+     * @param string $ttName: only used for processing within editor_Segment_Tags
      */
-    public function __construct(editor_Models_Task $task, int $segmentId, string $field, ?string $fieldText, $saveTo, string $ttName=null) {
+    public function __construct(editor_Models_Task $task, int $segmentId, ?string $fieldText, string $field, string $dataField, string $additionalSaveTo=NULL, string $ttName=NULL) {
         $this->task = $task;
         $this->segmentId = $segmentId;
-        $this->field = $field;
         $this->fieldText = '';
-        $this->saveTo = is_array($saveTo) ? implode(',', $saveTo) : $saveTo;
-        $this->ttName = (empty($ttName)) ? $this->getFirstSaveToField() : $ttName;
+        $this->field = $field;
+        $this->dataField = $dataField;
+        $this->saveTo = $additionalSaveTo;
+        $this->ttName = ($ttName == NULL) ? $field : $ttName;
         // if HTML was passed as field text we have to unparse it
         if(!empty($fieldText) && $fieldText != editor_Segment_Tag::strip($fieldText)){
             $this->unparse($fieldText);
@@ -241,6 +246,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     public function getField() : string {
         return $this->field;
+    }
+    /**
+     * Retrieves the field's data index as defined by editor_Models_SegmentFieldManager::getDataLocationByKey
+     * @return string
+     */
+    public function getDataField() : string {
+        return $this->dataField;
     }
     /**
      * Returns the field text (which covers the textual contents of internal tags as well !)
@@ -311,7 +323,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return !$this->isSourceField();
     }
     /**
-     *
+     * TODO: might be unneccessary
      * @return string
      */
     public function getTermtaggerName() : string {
@@ -322,25 +334,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return string[]
      */
     public function getSaveToFields() : array {
-        if(empty($this->saveTo)){
-            return [];
+        $fields = [ $this->dataField ];
+        if(!empty($this->saveTo)){
+            $fields[] = $this->saveTo;
         }
-        return explode(',', $this->saveTo);
-    }
-    /**
-     * return string
-     */
-    public function getFirstSaveToField(){
-        return $this->getSaveToFields()[0];
-    }
-    /**
-     * 
-     * @param string $fieldName
-     */
-    public function addSaveToField(string $fieldName){
-        $fields = $this->getSaveToFields();
-        $fields[] = $fieldName;
-        $this->saveTo = implode(',', $fields);
+        return $fields;
     }
     /**
      * We expect the passed text to be identical
@@ -523,8 +521,9 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $data->tags[] = $tag->jsonSerialize();
         }
         $data->segmentId = $this->segmentId;
-        $data->field = $this->field;
         $data->fieldText = $this->fieldText;
+        $data->field = $this->field;
+        $data->dataField = $this->dataField;
         $data->saveTo = $this->saveTo;
         $data->ttName = $this->ttName;
         return $data;
@@ -719,7 +718,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return editor_Segment_FieldTags
      */
     public function cloneFiltered(array $includedTypes=NULL, bool $finalize=true) : editor_Segment_FieldTags {
-        $clonedTags = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->field, $this->fieldText, $this->saveTo, $this->ttName);
+        $clonedTags = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->fieldText, $this->field, $this->dataField, $this->saveTo, $this->ttName);
         foreach($this->tags as $tag){
             if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES || ($includedTypes == NULL || in_array($tag->getType(), $includedTypes))){
                 $clonedTags->addTag($tag->clone(true, true), $tag->order, $tag->parentOrder);
@@ -1144,7 +1143,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return string
      */
     public function debugProps(){
-        return '[ segment:'.$this->segmentId.' | field:'.$this->field.' | saveTo:'.$this->saveTo.' | ttName:'.$this->ttName.' ]';
+        return '[ segment:'.$this->segmentId.' | field:'.$this->field.' | dataField:'.$this->dataField.' | saveTo:'.$this->saveTo.' ]';
     }
     /**
      * Debug formatted JSON

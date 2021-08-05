@@ -1918,7 +1918,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $location = $this->segmentFieldManager->getDataLocationByKey($editField);
         if($location !== false && array_key_exists($location['field'], $this->segmentdata)) {
             $fieldText = $this->segmentdata[$location['field']]->__get($location['column']);
-            return new editor_Segment_FieldTags($task, $this->getId(), $location['field'], $fieldText, $editField);
+            return new editor_Segment_FieldTags($task, $this->getId(), $fieldText, $location['field'], $editField);
         }
         return NULL;
     }
