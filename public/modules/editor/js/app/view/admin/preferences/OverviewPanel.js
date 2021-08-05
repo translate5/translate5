@@ -31,7 +31,8 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
     requires: [
         'Editor.view.admin.preferences.OverviewPanelViewController',
         'Editor.view.admin.preferences.User',
-        'Editor.view.admin.config.Grid'
+        'Editor.view.admin.config.Grid',
+        'Editor.view.admin.okapi.filter.BConfGrid'
     ],
     alias: 'widget.preferencesOverviewPanel',
     itemId: 'preferencesOverviewPanel',
@@ -83,7 +84,13 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
                 items: configSections,
                 hidden: true //is enabled if there are children
             };
-        
+        //bconf main view
+        if(user.isAllowed('pluginOkapiBconfPrefs')) {
+            configSections.push({
+                xtype: 'okapiFilterGrid'
+            });
+        }
+
         if(user.isAllowed('userPrefFrontendController')) {
             configSections.push({xtype: 'preferencesUser'});
         }
