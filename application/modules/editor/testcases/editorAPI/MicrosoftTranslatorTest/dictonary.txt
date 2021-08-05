@@ -44,6 +44,60 @@
                         "frequencyCount": 132
                     }
                 ]
+            },
+            {
+                "normalizedTarget": "cart",
+                "displayTarget": "cart",
+                "posTag": "OTHER",
+                "confidence": 0.3589,
+                "prefixWord": "",
+                "backTranslations": [
+                    {
+                        "normalizedText": "wagen",
+                        "displayText": "wagen",
+                        "numExamples": 1,
+                        "frequencyCount": 2150
+                    },
+                    {
+                        "normalizedText": "karren",
+                        "displayText": "karren",
+                        "numExamples": 0,
+                        "frequencyCount": 402
+                    },
+                    {
+                        "normalizedText": "schleppen",
+                        "displayText": "schleppen",
+                        "numExamples": 0,
+                        "frequencyCount": 25
+                    }
+                ]
+            },
+            {
+                "normalizedTarget": "wagon",
+                "displayTarget": "wagon",
+                "posTag": "NOUN",
+                "confidence": 0.2382,
+                "prefixWord": "",
+                "backTranslations": [
+                    {
+                        "normalizedText": "wagen",
+                        "displayText": "wagen",
+                        "numExamples": 0,
+                        "frequencyCount": 1427
+                    },
+                    {
+                        "normalizedText": "waggon",
+                        "displayText": "waggon",
+                        "numExamples": 0,
+                        "frequencyCount": 374
+                    },
+                    {
+                        "normalizedText": "fuhrwerk",
+                        "displayText": "fuhrwerk",
+                        "numExamples": 0,
+                        "frequencyCount": 8
+                    }
+                ]
             }
         ]
     }
