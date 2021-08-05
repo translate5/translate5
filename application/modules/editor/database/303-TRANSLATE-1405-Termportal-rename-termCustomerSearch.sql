@@ -29,3 +29,4 @@
 UPDATE `Zf_acl_rules` SET `role` = "termSearch" WHERE `role` = "termCustomerSearch";
 UPDATE `Zf_acl_rules` SET `resource` = "termSearch" WHERE `resource` = "termCustomerSearch";
 UPDATE `Zf_acl_rules` SET `right` = "termSearch" WHERE `right` = "termCustomerSearch";
+UPDATE `Zf_users` SET `roles` = REPLACE(`roles`, "termCustomerSearch", "termSearch");
