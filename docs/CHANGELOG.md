@@ -14,6 +14,21 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.2.7] - 2021-08-06
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-2596](https://jira.translate5.net/browse/TRANSLATE-2596): Message bus session synchronization rights** <br>
+Solves the problem where the message bus did not have the rights to synchronize the session.
+
+**[TRANSLATE-2595](https://jira.translate5.net/browse/TRANSLATE-2595): Customers store autoload for not authorized users** <br>
+Solves the problem with loading of the customers for not-authorized users.
+
+
 ## [5.2.6] - 2021-08-04
 
 ### Important Notes:
