@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 13,
-    "qtotal": 13,
+    "qcount": 12,
+    "qtotal": 12,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -13,11 +13,11 @@
         {
             "qid": -1,
             "qtype": "internal",
-            "qcount": 3,
+            "qcount": 2,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "69317",
+                    "qid": "70520",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -29,23 +29,22 @@
                     "qfaulty": true
                 },
                 {
-                    "qid": "69318",
+                    "qid": -1,
                     "qtype": "internal",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "internal_tags_added",
-                    "qcatidx": "0",
                     "text": "Internal tags have been added",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "69319",
+                    "qid": "70521",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "internal_tags_missing",
-                    "qcatidx": "0",
+                    "qcatidx": "-1",
                     "text": "Internal tags missing",
                     "leaf": true,
                     "checked": false
@@ -73,7 +72,7 @@
             ],
             "qcategory": null,
             "text": "Internal tags",
-            "qtotal": 3,
+            "qtotal": 2,
             "expanded": true,
             "checked": false
         },
@@ -485,7 +484,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "69310",
+                    "qid": "70513",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -496,7 +495,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "69306",
+                    "qid": "70509",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -507,7 +506,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "69312",
+                    "qid": "70515",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
