@@ -141,7 +141,7 @@ class SegmentTagsOverlapTest extends editor_Test_SegmentTagsTest {
      */
     private function createReplacedTest($segmentId, $markup, $expected=NULL){
         $replacedMarkup = $this->replaceTags($markup);
-        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $replacedMarkup, 'target', 'target');
+        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $replacedMarkup, 'target', 'targetEdit');
         // compare unparsed markup
         if($expected == NULL){
             $this->assertEquals($replacedMarkup, $tags->render());

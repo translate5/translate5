@@ -207,7 +207,7 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
      */
     private function createTrackChangesCloneTest($expected, $markup, $testAgainstRegEx=true){
         $markupConverted = $this->replaceTags($markup);
-        $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $markupConverted, 'target', 'target');
+        $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $markupConverted, 'target', 'targetEdit');
         $markupRendered = $markupTags->render();
         $this->assertEquals($markupConverted, $markupRendered);
         $markupUnconverted = $this->revertTags($markupRendered);
@@ -216,7 +216,7 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
         $markupTagsNoTrackChanges = $markupTags->cloneWithoutTrackChanges();
         // process the expectation
         $expectedConverted = $this->replaceTags($expected);
-        $expectedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $expectedConverted, 'target', 'target');
+        $expectedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $expectedConverted, 'target', 'targetEdit');
         // render the cloned tags
         $renderedCloned = $markupTagsNoTrackChanges->render();
         // revert the structure to a human readable form
@@ -245,13 +245,13 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
     private function createTrackChangesFilterCloneTest($expected, $markup){
         // we filter for internal tags only
         $filter = [ editor_Segment_Tag::TYPE_INTERNAL ];
-        $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $this->replaceTags($markup), 'target', 'target');
+        $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $this->replaceTags($markup), 'target', 'targetEdit');
         // a full clone without filter
         $markupTagsCloned = $markupTags->cloneFiltered();
         // create clone without trackchanges and only filtered tags
         $markupTagsNoTrackChanges = $markupTags->cloneWithoutTrackChanges($filter);
         // also process the expectation
-        $expectedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $this->replaceTags($expected), 'target', 'target');
+        $expectedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $this->replaceTags($expected), 'target', 'targetEdit');
         // create expected clone and only filtered tags
         $expectedTags = $expectedTags->cloneFiltered($filter);
         // compare
@@ -271,13 +271,13 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
     private function createTrackChangesMqmFilterCloneTest($expected, $markup){
         // we filter for internal tags only
         $filter = [ editor_Segment_Tag::TYPE_MQM ];
-        $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $this->replaceTags($markup), 'target', 'target');
+        $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $this->replaceTags($markup), 'target', 'targetEdit');
         // a full clone without filter
         $markupTagsCloned = $markupTags->cloneFiltered();
         // Remove all tags from the full Clone
         $markupTagsNoTags = $markupTags->cloneWithoutTrackChanges($filter);
         // also process the expectation
-        $expectedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $this->replaceTags($expected), 'target', 'target');
+        $expectedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $this->replaceTags($expected), 'target', 'targetEdit');
         // create expected clone and only filtered tags
         $expectedTags = $expectedTags->cloneFiltered($filter);
         // compare expected. Note, we cann't compare the whitespace as the cloned expected tags still have multiple blanks
@@ -293,7 +293,7 @@ class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest {
      */
     private function createMarkupLinesTest($expected, $markup){
         $markupConverted = $this->replaceTags($markup);
-        $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $markupConverted, 'target', 'target');
+        $markupTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $markupConverted, 'target', 'targetEdit');
         $expectedMarkup = $this->replaceNewlineTags($expected);
         $this->assertEquals(explode(editor_Segment_NewlineTag::RENDERED, $expectedMarkup), $markupTags->getFieldTextLines(true));
     }
