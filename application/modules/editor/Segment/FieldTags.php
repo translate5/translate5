@@ -63,9 +63,6 @@ use PHPHtmlParser\Dom\Node\HtmlNode;
  * - The generated markup may be different then in earlier times (order of attributes!)
  * - This may creates problems with regex-based tag processing that relies on a fixed order of attributes or css-classes
  * - Generally, RegEx based processing of Markup often fails with nested Markup (especially when the expressions cover the start and end tag) and should be replaced with OOP code
- * 
- * 
- * TODO/FIXME the prop "ttName" (representing the source field of the text in the datamodel) is used by the Termtagger only. Investigate, if this is really neccessary...
  */
 class editor_Segment_FieldTags implements JsonSerializable {
     
@@ -97,7 +94,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     public static function fromJsonData(editor_Models_Task $task, stdClass $data) : editor_Segment_FieldTags {
         try {
-            $tags = new editor_Segment_FieldTags($task, $data->segmentId, $data->field, $data->fieldText, $data->saveTo, $data->ttName);
+            $tags = new editor_Segment_FieldTags($task, $data->segmentId, $data->fieldText, $data->field, $data->dataField, $data->saveTo, $data->ttName);
             $creator = editor_Segment_TagCreator::instance();
             foreach($data->tags as $tag){
                 $segmentTag = $creator->fromJsonData($tag);
@@ -164,24 +161,29 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     private $segmentId;
     /**
-     * The field our fieldtext comes from
-     * @var string
-     */
-    private $field;
-    /**
      * The text of the relevant segment field
      * This text unfortunately covers the text-contents of Internal Tags
      * @var string
      */
     private $fieldText;
     /**
+     * The field our fieldtext comes from e.g. 'source', 'target'
+     * @var string
+     */
+    private $field;
+    /**
+     * The data-index our fieldtext comes from e.g. 'targetEdit'
+     * @var string
+     */
+    private $dataField;
+    /**
      * The field of the segment's data we will be saved to
      * @var string
      */
     private $saveTo;
     /**
-     * Only neccessary for the termtagger, will be used as the fieldname there. A target will be sent with it original field name (but saved to the edit-field) when importing
-     * TODO: there is no obvious reason why this is done and this may is obsolete ...
+     * Special Helper to Track the field-name as used in the TermTagger Code
+     * TODO: Check, if this is really neccessary
      * @var string
      */
     private $ttName;
@@ -196,20 +198,23 @@ class editor_Segment_FieldTags implements JsonSerializable {
     private $orderIndex = -1;
     
     /**
+     * 
      * @param editor_Models_Task $task
      * @param int $segmentId
-     * @param string $field
-     * @param string $fieldText
-     * @param string | string[] $saveTo
-     * @param string $ttName
+     * @param string $fieldText: the text content of the segment field
+     * @param string $field: the field name, e.g. source or target
+     * @param string $dataField: the field's data index, e.g targetEdit
+     * @param string $saveTo: only used for processing within editor_Segment_Tags, adds a dataField / field index, the segment will be saved to when flushed or saved
+     * @param string $ttName: only used for processing within editor_Segment_Tags
      */
-    public function __construct(editor_Models_Task $task, int $segmentId, string $field, ?string $fieldText, $saveTo, string $ttName=null) {
+    public function __construct(editor_Models_Task $task, int $segmentId, ?string $fieldText, string $field, string $dataField, string $additionalSaveTo=NULL, string $ttName=NULL) {
         $this->task = $task;
         $this->segmentId = $segmentId;
-        $this->field = $field;
         $this->fieldText = '';
-        $this->saveTo = is_array($saveTo) ? implode(',', $saveTo) : $saveTo;
-        $this->ttName = (empty($ttName)) ? $this->getFirstSaveToField() : $ttName;
+        $this->field = $field;
+        $this->dataField = $dataField;
+        $this->saveTo = $additionalSaveTo;
+        $this->ttName = ($ttName == NULL) ? $field : $ttName;
         // if HTML was passed as field text we have to unparse it
         if(!empty($fieldText) && $fieldText != editor_Segment_Tag::strip($fieldText)){
             $this->unparse($fieldText);
@@ -243,24 +248,57 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return $this->field;
     }
     /**
-     * Returns the field text (which covers the textual contents of internal tags as well !)
+     * Retrieves the field's data index as defined by editor_Models_SegmentFieldManager::getDataLocationByKey
      * @return string
      */
-    public function getFieldText() : string {
+    public function getDataField() : string {
+        return $this->dataField;
+    }
+    /**
+     * Returns the field text (which covers the textual contents of internal tags as well !)
+     * @param bool $stripTrackChanges: if set, trackchanges will be removed
+     * @param bool $condenseBlanks: if set, a removed trackchanges will have a condensed whitespace for the removed tags
+     * @return string
+     */
+    public function getFieldText(bool $stripTrackChanges=false, bool $condenseBlanks=true) : string {
+        if($stripTrackChanges && (count($this->tags) > 0)){
+            return $this->getFieldTextWithoutTrackChanges($condenseBlanks);
+        }
         return $this->fieldText;
     }
     /**
+     * Retrieves our field-text lines.
+     * This means, that all TrackChanges Del Contents are removed and our fild-text is splitted by all existing Internal Newline tags
+     * @param bool $condenseBlanks
+     * @return string[]
+     */
+    public function getFieldTextLines(bool $condenseBlanks=true) : array {
+        $clone = $this->cloneWithoutTrackChanges([ editor_Segment_Tag::TYPE_INTERNAL ], $condenseBlanks);
+        $clone->replaceTagsForLines();
+        return explode(editor_Segment_NewlineTag::RENDERED, $clone->render());
+    }
+    /**
      *
+     * @param bool $stripTrackChanges: if set, trackchanges will be removed
+     * @param bool $condenseBlanks: if set, a removed trackchanges will have a condensed whitespace for the removed tags
      * @return string
      */
-    public function getFieldTextLength() : int {
+    public function getFieldTextLength(bool $stripTrackChanges=false, bool $condenseBlanks=true) : int {
+        if($stripTrackChanges && (count($this->tags) > 0)){
+            return mb_strlen($this->getFieldTextWithoutTrackChanges($condenseBlanks));
+        }
         return mb_strlen($this->fieldText);
     }
     /**
      *
+     * @param bool $stripTrackChanges: if set, trackchanges will be removed
+     * @param bool $condenseBlanks: if set, a removed trackchanges will have a condensed whitespace for the removed tags
      * @return bool
      */
-    public function isFieldTextEmpty() : bool {
+    public function isFieldTextEmpty(bool $stripTrackChanges=false, bool $condenseBlanks=true) : bool {
+        if($stripTrackChanges && (count($this->tags) > 0)){
+            return ($this->getFieldTextLength(true, $condenseBlanks) == 0);
+        }
         return mb_strlen($this->fieldText) == 0;
     }
     /**
@@ -285,7 +323,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return !$this->isSourceField();
     }
     /**
-     *
+     * TODO: might be unneccessary
      * @return string
      */
     public function getTermtaggerName() : string {
@@ -296,25 +334,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return string[]
      */
     public function getSaveToFields() : array {
-        if(empty($this->saveTo)){
-            return [];
+        $fields = [ $this->dataField ];
+        if(!empty($this->saveTo)){
+            $fields[] = $this->saveTo;
         }
-        return explode(',', $this->saveTo);
-    }
-    /**
-     * return string
-     */
-    public function getFirstSaveToField(){
-        return $this->getSaveToFields()[0];
-    }
-    /**
-     * 
-     * @param string $fieldName
-     */
-    public function addSaveToField(string $fieldName){
-        $fields = $this->getSaveToFields();
-        $fields[] = $fieldName;
-        $this->saveTo = implode(',', $fields);
+        return $fields;
     }
     /**
      * We expect the passed text to be identical
@@ -460,6 +484,19 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return false;
     }
     /**
+     * Retrieves, how many internal tags representing whitespace, are present
+     * @return int
+     */
+    public function getNumLineBreaks() : int {
+        $numLineBreaks = 0;
+        foreach($this->tags as $tag){
+            if($tag->getType() == editor_Segment_Tag::TYPE_INTERNAL && $tag->isNewline()){
+                $numLineBreaks++;
+            }
+        }
+        return $numLineBreaks;
+    }
+    /**
      * Sorts the items ascending, takes the second index into account when items have the same startIndex
      */
     public function sort(){
@@ -484,8 +521,9 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $data->tags[] = $tag->jsonSerialize();
         }
         $data->segmentId = $this->segmentId;
-        $data->field = $this->field;
         $data->fieldText = $this->fieldText;
+        $data->field = $this->field;
+        $data->dataField = $this->dataField;
         $data->saveTo = $this->saveTo;
         $data->ttName = $this->ttName;
         return $data;
@@ -680,7 +718,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return editor_Segment_FieldTags
      */
     public function cloneFiltered(array $includedTypes=NULL, bool $finalize=true) : editor_Segment_FieldTags {
-        $clonedTags = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->field, $this->fieldText, $this->saveTo, $this->ttName);
+        $clonedTags = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->fieldText, $this->field, $this->dataField, $this->saveTo, $this->ttName);
         foreach($this->tags as $tag){
             if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES || ($includedTypes == NULL || in_array($tag->getType(), $includedTypes))){
                 $clonedTags->addTag($tag->clone(true, true), $tag->order, $tag->parentOrder);
@@ -838,6 +876,53 @@ class editor_Segment_FieldTags implements JsonSerializable {
         $newFieldText = ($start > 0) ? $this->getFieldTextPart(0, $start) : '';
         $newFieldText .= ($end < $length) ? $this->getFieldTextPart($end, $length) : '';
         $this->fieldText = $newFieldText;
+    }
+    /**
+     * Retrieves the text with the TrackChanges removed
+     * @param boolean $condenseBlanks
+     * @return string
+     */
+    private function getFieldTextWithoutTrackChanges(bool $condenseBlanks=true) : string {
+        $this->sort();
+        $text = '';
+        $start = 0;
+        $length = $this->getFieldTextLength();
+        foreach($this->tags as $tag){
+            // the tag is only affected if not completely  before the hole
+            if($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES && $tag->isDeleteTag() && $tag->endIndex > $tag->startIndex && $tag->endIndex > $start){
+                $boundries = ($condenseBlanks) ? $this->getRemovableBlanksBoundries($tag->startIndex, $tag->endIndex) : NULL;
+                if($boundries != NULL && $boundries->left < $tag->startIndex && $boundries->right > $tag->endIndex){
+                    // if there are removable blanks on both sides it is meaningless, on which side we leave one
+                    if($boundries->left > $start){
+                        $text .= $this->getFieldTextPart($start, $boundries->left);
+                    }
+                    $start = $boundries->right - 1;
+                } else {
+                    if($tag->startIndex > $start){
+                        $text .= $this->getFieldTextPart($start, $tag->startIndex);
+                    }
+                    $start = $tag->endIndex;
+                }
+            }
+        }
+        if($start < $length){
+            $text .= $this->getFieldTextPart($start, $length);
+        }
+        return $text;
+    }
+    /**
+     * Special API to render all internal newline tags as lines
+     * This expects TrackChanges Tags to be removed, otherwise the result will contain trackchanges contents
+     */
+    private function replaceTagsForLines() {
+        $tags = [];
+        foreach($this->tags as $tag){
+            // the tag is only affected if not completely  before the hole
+            if($tag->getType() == editor_Segment_Tag::TYPE_INTERNAL && $tag->isNewline()){
+                $tags[] = editor_Segment_NewlineTag::createNew($tag->startIndex, $tag->endIndex);
+            }
+        }
+        $this->tags = $tags;
     }
     /**
      * Creates a nested structure of Internal tags & text-nodes recursively out of a HtmlNode structure
@@ -1058,7 +1143,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return string
      */
     public function debugProps(){
-        return '[ segment:'.$this->segmentId.' | field:'.$this->field.' | saveTo:'.$this->saveTo.' | ttName:'.$this->ttName.' ]';
+        return '[ segment:'.$this->segmentId.' | field:'.$this->field.' | dataField:'.$this->dataField.' | saveTo:'.$this->saveTo.' ]';
     }
     /**
      * Debug formatted JSON

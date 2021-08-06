@@ -166,29 +166,49 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
         return $row['value'];
     }
     /**
-     * Fixes the config for a task after Import.
+     * Fixes the config for a task/project after Import.
      * This means, that all configs with task-import-level will be inserted to the task-config table and thus never can be changed again in the lifetime of the task after import
+     *
+     * @param array $tasks
      */
-    public function fixAfterImport(string $taskGuid){
+    public function fixAfterImport(array $tasks){
+
         $db = $this->db->getAdapter();
-        // evaluate the configs to fix
-        $newRows = [];
-        $taskConfigs = $this->getTaskConfigModel($taskGuid);
-        foreach($taskConfigs as $config){
-            // TODO AUTOQA: Do we have to add editor_Models_Config::CONFIG_LEVEL_TASK as well ??
-            if($config['level'] == editor_Models_Config::CONFIG_LEVEL_TASKIMPORT){
-                $newRows[] = '('.$db->quote($taskGuid).','.$db->quote($config['name']).','.$db->quote($config['value']).')';
+        $values = [];
+
+        $model = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $model editor_Models_Task */
+        foreach ($tasks as $task){
+
+            if(is_array($task)){
+                $model->load($task['id']);
+            } else {
+                $model = $task;
             }
-        }        
-        // remove the current configs
-        $sql = 'DELETE FROM `LEK_task_config` WHERE taskGuid = '.$db->quote($taskGuid).';';
-        $db->query($sql);
-        
-        // write the ones to fix
-        if(count($newRows) > 0){
-            $sql = 'INSERT INTO `LEK_task_config` (`taskGuid`, `name`, `value`) VALUES '.implode(',', $newRows);
-            $db->query($sql);
+
+            //import workers can only be started for tasks
+            if($model->isProject()) {
+                continue;
+            }
+
+            // evaluate the configs to fix
+            $values = [];
+            $taskConfigs = $this->getTaskConfigModel($model->getTaskGuid());
+            foreach($taskConfigs as $config){
+                if($config['level'] == editor_Models_Config::CONFIG_LEVEL_TASKIMPORT){
+                    $values[] = '('.$db->quote($model->getTaskGuid()).','.$db->quote($config['name']).','.$db->quote($config['value']).')';
+                }
+            }
+
         }
+
+        if(count($values) < 1){
+            return;
+        }
+
+        // inset all new values, and leave the existing one inside the table.
+        $sql = 'INSERT INTO `LEK_task_config` (`taskGuid`, `name`, `value`) VALUES '.implode(',', $values). '  ON DUPLICATE KEY UPDATE `value`=`value`';
+        $db->query($sql);
     }
 
     /***

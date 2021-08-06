@@ -13,6 +13,65 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.2.6] - 2021-08-04
+
+### Important Notes:
+#### [TRANSLATE-2570](https://jira.translate5.net/browse/TRANSLATE-2570)
+FIX must not be applied when imports are running
+
+#### [TRANSLATE-2564](https://jira.translate5.net/browse/TRANSLATE-2564)
+FIX must not be applied when imports are running
+
+#### [TRANSLATE-2416](https://jira.translate5.net/browse/TRANSLATE-2416)
+In order to use (set to a user) the new role PM-light, the admin or PM has to re-login and reload the application.
+ 
+
+
+### Added
+**[TRANSLATE-2580](https://jira.translate5.net/browse/TRANSLATE-2580): Add segment length check to AutoQA** <br>
+AutoQA now incorporates a check of the(pixel based)  segment-length
+
+**[TRANSLATE-2416](https://jira.translate5.net/browse/TRANSLATE-2416): Create PM-light system role** <br>
+A new role PM-light is created, which may only administrate its own projects and tasks and has no access to user management or language resources management.
+
+
+### Changed
+**[TRANSLATE-2586](https://jira.translate5.net/browse/TRANSLATE-2586): Check the URLs in the reviewHtml.txt file for the visual** <br>
+ENHANCEMENT: Warn and clean visual source URLs that can not be imported because they have a fragment "#"
+ENHANCEMENT: Skip duplicates and clean URLs in the reviewHtml.txt file
+
+**[TRANSLATE-2583](https://jira.translate5.net/browse/TRANSLATE-2583): Save config record instead of model sync** <br>
+Code improvements in the configuration overview grid.
+
+
+### Bugfixes
+**[TRANSLATE-2589](https://jira.translate5.net/browse/TRANSLATE-2589): Exclude meta data of images for word files by default** <br>
+By default translate5 will now not extract any more meta data of images, that are embedded in MS Word files.
+
+**[TRANSLATE-2587](https://jira.translate5.net/browse/TRANSLATE-2587): Improve error logging** <br>
+Improves error messages in instant-translate.
+
+**[TRANSLATE-2585](https://jira.translate5.net/browse/TRANSLATE-2585): Evaluate auto_set_role acl for OpenID authentications** <br>
+All missing mandatory translate roles for users authentication via SSO will be automatically added.
+
+**[TRANSLATE-2584](https://jira.translate5.net/browse/TRANSLATE-2584): Across XLF with translate no may contain invalid segmented content** <br>
+Across XLF may contain invalid segmented content for not translatable (not editable) segments. This is fixed by using the not segment content in that case.
+
+**[TRANSLATE-2570](https://jira.translate5.net/browse/TRANSLATE-2570): AutoQA checks blocked segments / finds unedited fuzzy errors in unedited bilingual segments** <br>
+ENHANCEMENT: blocked segments will no longer be evaluated in the quality-management, only if they have structural internal tag-errors they will appear in a new category for this
+FIX: Missing internal tags may have been detected in untranslated empty segments
+FIX: Added task-name & guid to error-logs regarding structural internal tag errors
+FIX: Quality-Management is now bound to a proper ACL
+FIX: Re-establish proper layout of action icons in Task-Grid
+
+
+
+**[TRANSLATE-2564](https://jira.translate5.net/browse/TRANSLATE-2564): Do not render MQM-Tags parted by overlappings** <br>
+FIX: MQM-Tags now are visualized with overlappings unresolved (not cut into pieves)
+
+
+
 ## [5.2.5] - 2021-07-20
 
 ### Important Notes:

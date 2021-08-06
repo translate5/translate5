@@ -123,7 +123,7 @@ Ext.define('Editor.controller.admin.Customer', {
         }
         var me=this,
             loginFieldset=adminWindow.down('#loginDetailsFieldset');
-        
+
         loginFieldset.add({
             xtype:'customers',
             fieldLabel:me.strings.customerLabelText

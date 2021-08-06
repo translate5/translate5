@@ -1918,6 +1918,11 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='><source>Der False-Positive Status wurde aktualisiert</source><target>Der False-Positive Status wurde aktualisiert</target></trans-unit>
 <trans-unit id='QWNodHVuZw=='><source>Achtung</source><target>Achtung</target></trans-unit>
 <trans-unit id='RXMgZ2lidCBpbiBkaWVzZXIgQXVmZ2FiZSBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIHUuVS4gZWluZW4gZmVobGVyZnJlaWVuIEV4cG9ydCBkZXIgQXVmZ2FiZSB2ZXJoaW5kZXJu'><source>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</source><target>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</target></trans-unit>
+<trans-unit id='TMOkbmdlbiBQcsO8ZnVuZw=='><source>Längen Prüfung</source><target>Längen Prüfung</target></trans-unit>
+<trans-unit id='U2VnbWVudCBpc3QgbMOkbmdlciBhbHMgZXJsYXVidA=='><source>Segment ist länger als erlaubt</source><target>Segment ist länger als erlaubt</target></trans-unit>
+<trans-unit id='U2VnbWVudCBpc3QgcmVsZXZhbnQga8O8cnplciBhbHMgZXJsYXVidCAobWVociBhbHMgezB9JSBvZGVyIG1pbi4gezF9IFBpeGVsIG9kZXIgbWluLiB7Mn0gWmVpY2hlbiB6dSBrdXJ6KQ=='><source>Segment ist relevant kürzer als erlaubt (mehr als {0}% oder min. {1} Pixel oder min. {2} Zeichen zu kurz)</source><target>Segment ist relevant kürzer als erlaubt (mehr als {0}% oder min. {1} Pixel oder min. {2} Zeichen zu kurz)</target></trans-unit>
+<trans-unit id='U2VnbWVudCBpc3Qga8O8cnplciBhbHMgZXJsYXVidA=='><source>Segment ist kürzer als erlaubt</source><target>Segment ist kürzer als erlaubt</target></trans-unit>
+<trans-unit id='WnUgdmllbGUgWmVpbGVudW1icsO8Y2hlIGltIFNlZ21lbnQ='><source>Zu viele Zeilenumbrüche im Segment</source><target>Zu viele Zeilenumbrüche im Segment</target></trans-unit>
 <trans-unit id='TGFkZS4uLg=='><source>Lade...</source><target>Lade...</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>
 <trans-unit id='Q29udGVudA=='><source>Content</source><target>Content</target></trans-unit>
@@ -1995,6 +2000,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='UHJvamVrdGJlc2NocmVpYnVuZw=='><source>Projektbeschreibung</source><target>Projektbeschreibung</target></trans-unit>
 <trans-unit id='UHJvamVrdGJlc2Noci4gYW56ZWlnZW4='><source>Projektbeschr. anzeigen</source><target>Projektbeschr. anzeigen</target></trans-unit>
 <trans-unit id='UHJvamVrdGJlc2Noci4gYXVzYmxlbmRlbg=='><source>Projektbeschr. ausblenden</source><target>Projektbeschr. ausblenden</target></trans-unit>
+<trans-unit id='cG1saWdodA=='><source>pmlight</source><target>PM Light</target></trans-unit>
   </body>
  </file>
 </xliff>

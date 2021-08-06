@@ -30,6 +30,6 @@ Ext.define('Editor.store.admin.Customers', {
     extend : 'Ext.data.Store',
     pageSize: 0,
     model: 'Editor.model.admin.Customer',
-    autoLoad: true,
+    autoLoad: false,
     storeId:'customersStore'
 });
