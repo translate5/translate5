@@ -168,7 +168,7 @@ class SegmentTagsComparisionTest extends editor_Test_SegmentTagsTest {
      * @param array|string $expectedState
      */
     private function createStructuralTest($markup, $expectedState){
-        $tags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $markup, 'target', 'target');
+        $tags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $markup, 'target', 'targetEdit');
         $tagComparision = new editor_Segment_Internal_TagComparision($tags, null);
         $this->assertEquals($expectedState, $tagComparision->getStati());
     }
@@ -179,7 +179,7 @@ class SegmentTagsComparisionTest extends editor_Test_SegmentTagsTest {
      * @param string $compareState
      */
     private function createComparisionTest($segmentId, $markup, $compareState){
-        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $markup, 'target', 'target');
+        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $markup, 'target', 'targetEdit');
         // compare unparsed markup
         $this->assertEquals($markup, $tags->render());
         // compare field-texts vs stripped markup
@@ -202,8 +202,8 @@ class SegmentTagsComparisionTest extends editor_Test_SegmentTagsTest {
         if(!is_array($expectedState)){
             $expectedState = array($expectedState);
         }
-        $originalTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $original, 'target', 'target');
-        $editedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $edited, 'target', 'target');
+        $originalTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $original, 'target', 'targetEdit');
+        $editedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $edited, 'target', 'targetEdit');
         $tagComparision = new editor_Segment_Internal_TagComparision($editedTags, $originalTags);
         $this->assertEquals($expectedState, $tagComparision->getStati());
     }
@@ -218,8 +218,8 @@ class SegmentTagsComparisionTest extends editor_Test_SegmentTagsTest {
         if(!is_array($expectedState)){
             $expectedState = array($expectedState);
         }
-        $originalTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $this->replaceInternalComparisionTags($original), 'target', 'target');
-        $editedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, 'target', $this->replaceInternalComparisionTags($edited), 'target', 'target');
+        $originalTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $this->replaceInternalComparisionTags($original), 'target', 'targetEdit');
+        $editedTags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $this->replaceInternalComparisionTags($edited), 'target', 'targetEdit');
         $tagComparision = new editor_Segment_Internal_TagComparision($editedTags, $originalTags);
         $this->assertEquals($expectedState, $tagComparision->getStati());
     }

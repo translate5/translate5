@@ -47,7 +47,7 @@ abstract class editor_Test_SegmentTagsTest extends \ZfExtended_Test_ApiTestcase 
     protected function createTags() : editor_Segment_FieldTags {
         $segmentId = 1234567;
         $segmentText = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'; // 80 characters
-        return new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $segmentText, 'target', 'targetEdit');
+        return new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $segmentText, 'target', 'targetEdit');
     }
     /**
      *
@@ -62,7 +62,7 @@ abstract class editor_Test_SegmentTagsTest extends \ZfExtended_Test_ApiTestcase 
         $jsonTags = editor_Segment_FieldTags::fromJson($this->getTestTask(), $expectedJSON);
         $this->assertEquals($expectedJSON, $jsonTags->toJson());
         // unparse test
-        $unparseTags = new editor_Segment_FieldTags($this->getTestTask(), $tags->getSegmentId(), $tags->getField(), $tags->getFieldText(), $tags->getSaveToFields(), $tags->getTermtaggerName());
+        $unparseTags = new editor_Segment_FieldTags($this->getTestTask(), $tags->getSegmentId(), $tags->getFieldText(), $tags->getField(), $tags->getDataField());
         $unparseTags->unparse($expectedMarkup);
         $this->assertEquals($expectedMarkup, $unparseTags->render());
     }
@@ -72,7 +72,7 @@ abstract class editor_Test_SegmentTagsTest extends \ZfExtended_Test_ApiTestcase 
      * @param string $markup
      */
     protected function createDataTest($segmentId, $markup){
-        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $markup, 'target', 'target');
+        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $markup, 'target', 'targetEdit');
         // compare unparsed markup
         $this->assertEquals($markup, $tags->render());
         // compare field-texts vs stripped markup
@@ -89,8 +89,8 @@ abstract class editor_Test_SegmentTagsTest extends \ZfExtended_Test_ApiTestcase 
      * @param string $markup
      */
     protected function createOriginalDataTest($segmentId, $original, $markup){
-        $originalTags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $original, 'target', 'target');
-        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $markup, 'target', 'target');
+        $originalTags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $original, 'target', 'targetEdit');
+        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $markup, 'target', 'targetEdit');
         // compare unparsed markup
         $this->assertEquals($markup, $tags->render());
         // compare field-text original vs "sorted" markup
@@ -109,7 +109,7 @@ abstract class editor_Test_SegmentTagsTest extends \ZfExtended_Test_ApiTestcase 
      * @param string $compare
      */
     protected function createMqmDataTest($segmentId, $markup, $compare=null){
-        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $markup, 'target', 'target');
+        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $markup, 'target', 'targetEdit');
         // compare unparsed markup
         if($compare == null){
             $this->assertEquals($markup, $tags->render());

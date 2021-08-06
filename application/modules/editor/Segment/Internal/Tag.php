@@ -182,7 +182,11 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * Retrieves a hash that can be used to compare tags
      * @return string
      */
-    public function getHash(){
+    public function getComparisionHash(){
+        // we use our visual representation like "</6>" as key to compare tags
+        if($this->shortTag != NULL){
+            return htmlspecialchars_decode($this->shortTag->getText());
+        }
         return md5($this->render());
     }
     
