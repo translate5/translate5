@@ -315,8 +315,10 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
     public function delete()
     {
-        //remove the termcollection from the disk
+        // remove the termcollection tbx files from the disk
         $this->removeCollectionDir($this->getId());
+        // clean up the collection images
+        $this->removeCollectionImagesDir($this->getId());
         parent::delete();
     }
 
@@ -327,7 +329,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * @param string|array $clientIds
      * @return array
      */
-    public function getCollectionForAuthenticatedUser($dict = null, $clientIds = ''): array
+    public function getCollectionForAuthenticatedUser($dict = false, $clientIds = ''): array
     {
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
@@ -361,19 +363,38 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
 
     /***
+     * Remove recursive the given directory path
+     *
+     * @param string $path
+     */
+    protected function removeDirectoryRecursive(string $path){
+        if (is_dir($path)) {
+            /* @var $recursiveDirCleaner ZfExtended_Controller_Helper_Recursivedircleaner */
+            $recursiveDirCleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+                'Recursivedircleaner'
+            );
+            $recursiveDirCleaner->delete($path);
+        }
+    }
+
+    /***
      * Remove term collection from the disk
      * @param int $collectionId
      */
     public function removeCollectionDir(int $collectionId)
     {
         $collectionPath = editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().'tc_'.$collectionId;
-        if (is_dir($collectionPath)) {
-            /* @var $recursiveDirCleaner ZfExtended_Controller_Helper_Recursivedircleaner */
-            $recursiveDirCleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                'Recursivedircleaner'
-                );
-            $recursiveDirCleaner->delete($collectionPath);
-        }
+        $this->removeDirectoryRecursive($collectionPath);
+    }
+
+    /***
+     * Remove term collection images from the disk
+     * @param imt $collectionId
+     */
+    public function removeCollectionImagesDir(int $collectionId)
+    {
+        $imagesPath = editor_Models_Import_TermListParser_Tbx::getFilesystemImagesDir().'tc_'.$collectionId;
+        $this->removeDirectoryRecursive($imagesPath);
     }
 
     /***

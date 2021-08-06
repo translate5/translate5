@@ -1799,10 +1799,27 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $termYoungerSql = $attrYoungerSql = '';
         if (!empty($youngerAs)) {
             $bindParams[] = $youngerAs;
-            $bindParams[] = $youngerAs;
-            $termYoungerSql = ' and (t.created >=? || tp.created >= ?)';
-            $attrYoungerSql = ' and (ta.created >=? || tap.created >=?)';
+            //$bindParams[] = $youngerAs;
+            $termYoungerSql = ' AND t.updatedAt >=?';
+            $attrYoungerSql = ' AND ta.createdAt >=?';
         }
+
+        /*return [[
+            'termEntryId' => 'zxc111',
+            'definition' => 'zxc211',
+            'language' => 'zxc2',
+            'termTbxId' => 'zxc2',
+            'term' => 'zxc2',
+            'termProposal' => 'zxc2',
+            'processStatus' => 'zxc2',
+            'attributeName' => 'zxc2',
+            'attribute' => 'zxc2',
+            'attributeProposal' => 'zxc2',
+            'lastEditor' => 'zxc2',
+            'lastEditedDate' => 'zxc2',
+        ]];*/
+
+
         //Info: why collection ids is not in bindParams
         //binding multiple values to single param is not posible with $adapter->query . For more info see PDOStatement::execute
         $termSql = "SELECT
@@ -1812,12 +1829,12 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                     t.id as 'term-Id',
                     t.term as 'term-term',
                     t.processStatus as 'term-processStatus',
-                    t.userName as 'term-lastEditor',
+                    t.updatedBy as 'term-lastEditor',
                     t.updatedAt as 'term-lastEditedDate',
-                    tp.id as 'termproposal-id',
-                    tp.term as 'termproposal-term',
-                    tp.created as 'termproposal-lastEditedDate',
-                    tp.userName as 'termproposal-lastEditor',
+                    t.id as 'termproposal-id',
+                    t.proposal as 'termproposal-term',
+                    t.updatedAt as 'termproposal-lastEditedDate',
+                    t.updatedBy as 'termproposal-lastEditor',
                     null as 'attribute-id',
                     null as 'attribute-name',
                     null as 'attribute-value',
@@ -1828,11 +1845,10 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                     null as 'attributeproposal-lastEditedDate',
                     null as 'attributeproposal-lastEditor'
                     FROM terms_term t
-                    LEFT OUTER JOIN terms_proposal tp ON tp.termId = t.id
-                    INNER JOIN LEK_languages l ON t.language = l.id
+                    INNER JOIN LEK_languages l ON t.language = l.rfc5646
                 WHERE ".$adapter->quoteInto('t.collectionId IN(?)',$collectionIds)
             .$termYoungerSql."
-                AND (tp.term is not null or t.processStatus = 'unprocessed')
+                AND (t.proposal IS NOT NULL or t.processStatus = 'unprocessed')
                 ORDER BY t.termEntryTbxId, t.term";
 
         $termResult = $adapter->query($termSql,$bindParams)->fetchAll();
@@ -1842,40 +1858,60 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                         ta.termId as 'term-Id',
                         ta.termEntryId as 'attribute-termEntryId',
                         ta.elementName as 'attribute-name',
-                        ta.value as 'attribute-value',
+                        IF(ISNULL(tah.id), ta.value, tah.value) as 'attribute-value',
                         ta.updatedAt as 'attribute-lastEditedDate',
-                        ta.userName as 'attribute-lastEditor',
+                        ta.updatedBy as 'attribute-lastEditor',
                         ta.isCreatedLocally as 'attribute-isCreatedLocally',
                         l.langName as 'term-language',
-                        tap.id as 'attributeproposal-id',
-                        tap.value as 'attributeproposal-value',
-                        tap.created as 'attributeproposal-lastEditedDate',
-                        tap.userName as 'attributeproposal-lastEditor',
+                        tah.id as 'attributeproposal-id',
+                        IF(ISNULL(tah.id), tah.value, ta.value) as 'attributeproposal-value',
+                        tah.updatedAt as 'attributeproposal-lastEditedDate',
+                        tah.updatedBy as 'attributeproposal-lastEditor',
                         t.termEntryId as 'term-termEntryId',
                         t.definition as 'term-definition',
                         t.id as 'term-Id',
                         t.term as 'term-term',
                         t.processStatus as 'term-processStatus',
-                        t.userName as 'term-lastEditor',
+                        t.updatedBy as 'term-lastEditor',
                         t.updatedAt as 'term-lastEditedDate',
-                        tp.id as 'termproposal-id',
-                        tp.term as 'termproposal-term',
-                        tp.created as 'termproposal-lastEditedDate',
-                        tp.userName as 'termproposal-lastEditor'
+                        t.id as 'termproposal-id',
+                        t.proposal as 'termproposal-term',
+                        t.updatedAt as 'termproposal-lastEditedDate',
+                        t.updatedBy as 'termproposal-lastEditor'
                     FROM terms_attributes ta
-                        LEFT OUTER JOIN terms_attributes_proposal tap ON tap.attributeId = ta.id
+                        LEFT OUTER JOIN terms_attributes_history tah ON (tah.attrId = ta.id AND tah.isCreatedLocally = 0)
                         LEFT OUTER JOIN terms_term t on ta.termId = t.id
-                        LEFT OUTER JOIN terms_proposal tp on tp.termId = t.id
-                        LEFT OUTER JOIN LEK_languages l ON t.language = l.id
+                        LEFT OUTER JOIN LEK_languages l ON t.language = l.rfc5646
                     WHERE ".$adapter->quoteInto('ta.collectionId IN(?)', $collectionIds).
             $attrYoungerSql."
-                    AND (tap.value is not null or ta.isCreatedLocally = 1)
+                    AND ta.isCreatedLocally = 1
                     ORDER BY ta.termEntryId, ta.termId";
 
         $attributeResult = $adapter->query($attributeSql,$bindParams)->fetchAll();
 
         //merge term proposals with term attributes and term entry attributes proposals
         $resultArray = array_merge($termResult, $attributeResult);
+
+        // Collect distinct editor-user ids
+        $userIdA = [];
+        foreach ($resultArray as $idx => $item)
+            foreach ($item as $prop => $value)
+                if (preg_match('~-lastEditor$~', $prop))
+                    if ($userId = $resultArray[$idx][$prop])
+                        $userIdA[$userId] = true;
+
+        // Get user names by ids array
+        $userNameA = $adapter->query('
+            SELECT `id`, CONCAT(`firstName`, " ", `surName`) 
+            FROM `Zf_users` 
+            WHERE `id` IN ('  . (implode(',', array_keys($userIdA)) ?: 0) . ')
+        ')->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // Spoof user ids with user names
+        foreach ($resultArray as $idx => $item)
+            foreach ($item as $prop => $value)
+                if (preg_match('~-lastEditor$~', $prop))
+                    $resultArray[$idx][$prop] = $userNameA[$value];
 
         if (empty($resultArray)) {
             return [];

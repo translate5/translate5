@@ -121,23 +121,37 @@ class editor_Models_Terminology_Models_TermEntryModel extends ZfExtended_Models_
         $collectionIds = join(',', array_map(function($i){
             return (int) $i;
         }, $collectionIds));
-        $sql='SELECT id FROM LEK_term_entry WHERE LEK_term_entry.groupId NOT IN (
+
+
+        /*$sql='SELECT id FROM LEK_term_entry WHERE LEK_term_entry.groupId NOT IN (
                 SELECT LEK_term_entry.groupId from LEK_term_entry
                 JOIN LEK_terms USING(groupId)
                 WHERE LEK_terms.collectionId=LEK_term_entry.collectionId
                       AND LEK_terms.collectionId in (?)
                 GROUP BY LEK_term_entry.groupId
-            ) AND collectionId in (?)';
-        $toRemove=$this->db->getAdapter()->query($sql, [$collectionIds, $collectionIds])->fetchAll();
+            ) AND collectionId in (?)';*/
+
+        $sql = '
+            SELECT 
+              `te`.`id`,
+              COUNT(`t`.`id`) AS `qty`
+            FROM
+              `terms_term_entry` `te`
+              LEFT JOIN `terms_term` `t` ON (`te`.`id` = `t`.`termEntryId`)
+            WHERE `te`.`collectionId` IN (' . $collectionIds . ')
+            GROUP BY `te`.`id`
+            HAVING `qty` = "0"';
+
+        $toRemove = $this->db->getAdapter()->query($sql)->fetchAll(PDO::FETCH_COLUMN);
 
         if(empty($toRemove)){
             return false;
         }
 
         return $this->db->delete([
-                'id IN (?)'=>$toRemove,
-                'collectionId IN (?)'=>$collectionIds,
-            ])>0;
+            'id IN (?)' => $toRemove,
+            'collectionId IN (?)' => explode(',', $collectionIds),
+        ]) > 0;
     }
 
     /***

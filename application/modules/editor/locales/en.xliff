@@ -3413,7 +3413,7 @@ A task was associated to you in the task-portal {portalLink}.<br />
 <trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIEF0dHJpYnV0cy1XZXJ0'><source>Änderung zu bestehendem Attributs-Wert</source><target>Change to existing attribute</target></trans-unit>
 <trans-unit id='RWludHJhZw=='><source>Eintrag</source><target>Entry</target></trans-unit>
 <trans-unit id='TGV0enRlciBCZWFyYmVpdGVy'><source>Letzter Bearbeiter</source><target>Last editor</target></trans-unit>
-<trans-unit id='QmVhcmJlaXR1bmdzZGF0dW0='><source>Bearbeitungsdatum</source><target>Edit date</target></trans-unit>
+<trans-unit id='QmVhcmJlaXR1bmdzZGF0dW0='><source>Bearbeitungsdatum</source><target>Last modified date</target></trans-unit>
 <trans-unit id='RXhjZWwgUmUtSW1wb3J0aWVyZW4='>
     <source>Excel Re-Importieren</source>
     <target>Excel Re-Import</target>

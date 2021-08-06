@@ -500,4 +500,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     {
         return APPLICATION_PATH.'/../data/tbx-import/tbx-for-filesystem-import/';
     }
+
+    /***
+     * Path to term collection images folder on the disk
+     * @return string
+     */
+    static public function getFilesystemImagesDir(): string
+    {
+        return APPLICATION_PATH.'/../data/tbx-import/term-images-public/';
+    }
 }
