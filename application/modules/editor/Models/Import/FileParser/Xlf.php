@@ -4,18 +4,18 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -411,12 +411,31 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             'opener' => $opener['openerKey'],
             'closer' => $key,
             'openerMeta' => $opener,
+            'unsegmentedSource' => null,
         ];
+
+        if($tag == 'source'){
+            //set <source> only if no seg-source was set already, seg-source can always be used, seg-source is more important as source tag
+            if(empty($this->currentPlainSource)) {
+                //point to the plain/real source tag, needed for <target> injection
+                $this->currentPlainSource = $source;
+            }
+            else {
+                //seg-source was set before, we just store the unsegmented source
+                $this->currentPlainSource['unsegmentedSource'] = $source;
+            }
+        }
+
         //set <source> only if no seg-source was set already, seg-source can always be used, seg-source is more important as source tag
-        if($tag == 'source' && empty($this->currentPlainSource) || $tag == 'seg-source'){
+        if($tag == 'seg-source'){
+            //source was set before, store it as unsegmentedSource in the plain source
+            if(!empty($this->currentPlainSource)) {
+                $source['unsegmentedSource'] = $this->currentPlainSource;
+            }
             //point to the plain/real source tag, needed for <target> injection
             $this->currentPlainSource = $source;
         }
+
         $sourceImportance = $this->compareSourceOrigin($tag);
         
         //source content with heigher importance was set before, ignore current content
@@ -652,8 +671,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         
         if(!$this->processSegment) {
-            //add also translate="no" segments but readonly
-            $segmentAttributes->editable = false;
+            //add also translate="no" segments but readonly and locked!
+            $segmentAttributes->editable = false; //this is to mark the segment non editable in the application
+            $segmentAttributes->locked = true; //this is to mark it explicitly locked (so that editable can not be changed)
         }
         
         // since a transunitId can exist in each file of a translate5 task the fileId must be added for uniqness of the transunitId in the DB
@@ -704,19 +724,30 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $placeHolders = [];
         
         //must be set before the loop, since in the loop the currentTarget is cleared on success
-        $hasTargets = !(empty($this->currentTarget) && $this->currentTarget !=="0");
+        $hasTargets = !(empty($this->currentTarget));
         $sourceEdit = $this->task->getEnableSourceEditing();
-        
-        //find mrk mids missing in source and add them marked as missing
-        $this->padSourceMrkTags();
-        //find mrk mids missing in target and add them marked as missing
-        $this->padTargetMrkTags();
-        
+
         $hasNoTarget = is_null($this->currentPlainTarget);
         $hasTargetSingle = !$hasNoTarget && $this->currentPlainTarget['openerMeta']['isSingle'];
         //$hasEmptyTarget includes $hasTargetSingle
         $hasEmptyTarget = !$hasNoTarget && $this->isEmptyTarget($this->currentPlainTarget['openerMeta'], $this->currentPlainTarget['closer']);
-        
+
+        //for processSegment == false (translate="no") (which evaluates later to locked == true && editable == true) it may happen that
+        // seg-source is segmented, but since it is translate="no" the target contains the content unsegmented.
+        // In that case we have to ignore the seg-source content and just import source and target, for read-only access
+        // and add no placeholders for export for such segments so that the original content is kept.
+        if(!$this->processSegment && !$hasNoTarget && !$hasEmptyTarget && !empty(array_diff(array_keys($this->currentSource), array_keys($this->currentTarget)))) {
+            $mid = $this->calculateMid(['tag' => 'source', 'attributes' => $transUnit], true);
+            $this->sourceProcessOrder = [$mid];
+            $this->currentSource = [$mid => $this->currentPlainSource['unsegmentedSource'] ?? $this->currentPlainSource];
+            $this->currentTarget = [$mid => $this->currentPlainTarget];
+        }
+
+        //find mrk mids missing in source and add them marked as missing
+        $this->padSourceMrkTags();
+        //find mrk mids missing in target and add them marked as missing
+        $this->padTargetMrkTags();
+
         if($hasNoTarget || $hasTargetSingle) {
             $preserveWhitespace = $this->currentPlainSource['openerMeta']['preserveWhitespace'];
         }
@@ -854,8 +885,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             ]);
         }
         
-        //if we dont find any usable segment, we dont have to place the placeholder
-        if(empty($placeHolders)){
+        //if we dont find any usable segment or the segment is locked, we dont have to place the placeholder
+        if(empty($placeHolders) || !$this->processSegment){
             return;
         }
         

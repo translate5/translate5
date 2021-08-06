@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -30,6 +30,6 @@ Ext.define('Editor.store.admin.Customers', {
     extend : 'Ext.data.Store',
     pageSize: 0,
     model: 'Editor.model.admin.Customer',
-    autoLoad: true,
+    autoLoad: false,
     storeId:'customersStore'
 });
