@@ -504,12 +504,16 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    * this customer is preselected.
    */
   onTaskMainCardRender: function(taskMainCard,eOpts) {
-      var me = this, store,
+      var me = this,
+          store,
           auth = Editor.app.authenticatedUser,
           taskMainCardContainer = taskMainCard.down('#taskSecondCardContainer');
-      
+
       // add the customer field to the taskUpload window
       if (auth.isAllowed('editorCustomerSwitch')) {
+
+          store = Ext.getStore('customersStore');
+
           taskMainCardContainer.insert(0, {
               xtype: 'customersCombo', // user is allowed to see the CustomerSwitch => show all customers
               name: 'customerId',
@@ -518,10 +522,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               fieldLabel: me.strings.customerLabel + '¹'
           });
       } else {
+
           store = Ext.getStore('userCustomers');
-          if(!store.isLoaded()) {
-              store.load();
-          }
+
           taskMainCardContainer.insert(0, {
               xtype: 'usercustomerscombo', // show only those customers that are assigned to the user
               name: 'customerId',
@@ -529,6 +532,11 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               toolTip: me.strings.customerTip,
               fieldLabel: me.strings.customerLabel + '¹'
           });
+      }
+
+      // load the store if not loaded
+      if(!store.isLoaded()) {
+          store.load();
       }
   },
   

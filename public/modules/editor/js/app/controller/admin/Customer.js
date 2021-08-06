@@ -122,8 +122,14 @@ Ext.define('Editor.controller.admin.Customer', {
             return;
         }
         var me=this,
-            loginFieldset=adminWindow.down('#loginDetailsFieldset');
-        
+            loginFieldset=adminWindow.down('#loginDetailsFieldset'),
+            store = Ext.getStore('customersStore');
+
+        // load the store if not loaded
+        if(!store.isLoaded()) {
+            store.load();
+        }
+
         loginFieldset.add({
             xtype:'customers',
             fieldLabel:me.strings.customerLabelText
