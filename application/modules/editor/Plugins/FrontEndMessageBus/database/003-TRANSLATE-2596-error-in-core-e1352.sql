@@ -25,4 +25,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'editor_session', 'resyncOperation');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'editor_session', 'resyncOperation')
+ON DUPLICATE KEY UPDATE `id` = `id`;
+
