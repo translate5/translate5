@@ -103,7 +103,7 @@ class editor_QualityController extends ZfExtended_RestController {
                     foreach($tags as $tag){
                         if($tag->getQualityId() == $this->entity->getId()){
                             $tag->setFalsePositive($this->entity->getFalsePositive());
-                            $segment->set($fieldTags->getFirstSaveToField(), $tag->render());
+                            $segment->set($fieldTags->getDataField(), $tag->render());
                             $tagAdjusted = true;
                             break;
                         }

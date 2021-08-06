@@ -137,13 +137,8 @@ class editor_Segment_Length_Check {
             // calculate trans-unit length
             $length = 0;
             foreach($this->metaCache['siblingData'] as $id => $data) {
-                // TODO FIXME
-                // The fieldtags Do not hold the index of the field where the field text originated from
-                // this is majot problem as it reduces the use-cases of the field-text API
-                // we have to dirtily re-create this index her (is valid only for targets !!)
-                $editIndex = $this->fieldTags->getField().editor_Models_SegmentFieldManager::_EDIT_PREFIX;
                 //if we don't have any information about the givens field length, we assume all OK
-                if(!array_key_exists($editIndex, $data['length'])){
+                if(!array_key_exists($this->fieldTags->getDataField(), $data['length'])){
                     return;
                 }
                 if($id == $this->segment->getId()) {
@@ -156,7 +151,7 @@ class editor_Segment_Length_Check {
                     //for the current segment this is added below, the siblings in the next line contain their additionalMrk data already
                 } else {
                     //add the text length of desired field
-                    $length += (int) $data['length'][$editIndex];
+                    $length += (int) $data['length'][$this->fieldTags->getDataField()];
                 }
             }
             $length += intval($this->metaCache['additionalUnitLength']);

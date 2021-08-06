@@ -126,17 +126,17 @@ class editor_Segment_Internal_TagComparision {
         foreach($this->checkTags as $tag){
             /* @var $tag editor_Segment_Internal_Tag */
             if($tag->isWhitespace()){
-                $hashesWhitespaceCheck[] = $tag->getHash();
+                $hashesWhitespaceCheck[] = $tag->getComparisionHash();
             } else {
-                $hashesInternalCheck[] = $tag->getHash();
+                $hashesInternalCheck[] = $tag->getComparisionHash();
             }
         }
         foreach($this->againstTags as $tag){
             /* @var $tag editor_Segment_Internal_Tag */
             if($tag->isWhitespace()){
-                $hashesWhitespaceAgainst[] = $tag->getHash();
+                $hashesWhitespaceAgainst[] = $tag->getComparisionHash();
             } else {
-                $hashesInternalAgainst[] = $tag->getHash();
+                $hashesInternalAgainst[] = $tag->getComparisionHash();
             }
         } 
         // first, we compare 'check' against 'against', this will give uns added tags
