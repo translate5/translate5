@@ -25,5 +25,9 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'pluginOkapiBconfPrefs');
+DELETE FROM `Zf_acl_rules` WHERE `module` = 'editor' AND `resource` = 'frontend' AND `right` IN ('pluginOkapiBconfPrefs');
+DELETE FROM `Zf_acl_rules` WHERE `module` = 'editor' AND `resource` = 'editor_plugins_okapi_bconf' AND `right` IN ('all');
+DELETE FROM `Zf_acl_rules` WHERE `module` = 'editor' AND `resource` = 'editor_plugins_okapi_bconffilter' AND `right` IN ('all');
 
+DROP TABLE `LEK_okapi_bconf`;
+DROP TABLE `LEK_okapi_bconf_filter`;

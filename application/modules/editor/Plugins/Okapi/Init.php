@@ -195,6 +195,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     protected $task;
     
     /**
+     * @var array
+     */
+    protected $frontendControllers = array(
+        'pluginOkapiBconfPrefs' => 'Editor.plugins.Okapi.controller.BconfPrefs'
+
+    );
+    
+    /**
      * @var editor_Models_Import_SupportedFileTypes
      */
     protected $fileTypes;
@@ -206,6 +214,31 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $this->fileTypes->register($ext);
         }
         $this->initEvents();
+        $this->addController('BconfController');
+        $this->addController('BconfFilterController');
+        $this->initRoutes();
+    }
+    
+    protected function initRoutes() {
+        $f = Zend_Registry::get('frontController');
+        /* @var $f Zend_Controller_Front */
+        $r = $f->getRouter();
+        
+        // route for bconf
+        $restRoute = new Zend_Rest_Route($f, array(), array(
+            'editor' => array('plugins_okapi_bconf'),
+        ));
+        $r->addRoute('plugins_okapibconf_restdefault', $restRoute);
+        
+        // route for bconf filter
+        $restRoute = new Zend_Rest_Route($f, array(), array(
+            'editor' => array('plugins_okapi_bconffilter'),
+        ));
+        $r->addRoute('plugins_okapibconffilter_restdefault', $restRoute);
+    }
+    
+    public function getFrontendControllers(){
+        return $this->getFrontendControllersFromAcl();
     }
     
     protected function initEvents() {
