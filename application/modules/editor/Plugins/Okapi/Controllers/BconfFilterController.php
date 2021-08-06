@@ -49,16 +49,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction(){
-        $this->view->rows = [];
-        $this->view->total = 0;
-    }
-    /**
-     * sends one bconf filter as JSON
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::indexAction()
-     */
-    public function getAction(){
-        $this->view->rows = [];
-        $this->view->total = 0;
+        $this->view->rows = $this->entity->loadAll();
+        $this->view->total = $this->entity->getTotalCount();
     }
 }
