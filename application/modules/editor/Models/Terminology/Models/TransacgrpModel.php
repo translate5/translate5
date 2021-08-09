@@ -131,7 +131,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
         $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
 
         foreach ($queryResults as $key => $transacGrp) {
-            $transacGrpByKey[$transacGrp['elementName'].'-'.$transacGrp['transac'].'-'.$transacGrp['ifDescripgrp'].'-'.$transacGrp['termTbxId']] = $transacGrp;
+            $transacGrpByKey[$transacGrp['elementName'].'-'.$transacGrp['transac'].'-'.$transacGrp['ifDescripgrp'].'-'.$transacGrp['termEntryId'].'-'.$transacGrp['termTbxId']] = $transacGrp;
         }
 
         return $transacGrpByKey;
