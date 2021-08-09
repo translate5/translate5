@@ -1021,6 +1021,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function deleteAction(){
         //load the entity
         $this->entityLoad();
+
+        // if the current entity is term collection, init the entity as term collection
+        if($this->entity->isTc()){
+            $collection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+            /* @var $collection editor_Models_TermCollection_TermCollection */
+            $collection->init($this->entity->toArray());
+            $this->entity = $collection;
+        }
         $this->processClientReferenceVersion();
 
         //encapsulate the deletion in a transaction to rollback if for example the real file based resource can not be deleted
