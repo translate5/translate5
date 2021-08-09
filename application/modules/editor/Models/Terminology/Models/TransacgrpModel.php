@@ -216,18 +216,4 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
 
         return true;
     }
-
-
-    /***
-     * Update the term transac group attributes from the proposal attributes
-     * @param editor_Models_Terminology_Models_TermModel $term
-     * @param editor_Models_Term_Proposal $proposal
-     * @return boolean
-     */
-    public function updateTermTransacGroupFromProposal(editor_Models_Terminology_Models_TermModel $term,editor_Models_Term_Proposal $proposal): bool
-    {
-
-        return true;
-    }
-
 }

@@ -549,14 +549,16 @@ class editor_Plugins_TermImport_Services_Import {
      * @param string $olderThan
      */
     protected function removeOldProposals(array $collectionIds,string $olderThan){
-        $proposals=ZfExtended_Factory::get('editor_Models_Term_Proposal');
-        /* @var $proposals editor_Models_Term_Proposal */
-        $proposals->removeOlderThan($collectionIds,$olderThan);
 
-        $attributeProposals=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
-        /* @var $attributeProposals editor_Models_Term_AttributeProposal */
-        //remove the attirubte proposals
-        $attributeProposals->removeOlderThan($collectionIds,$olderThan);
+        // Remove term proposals
+        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $term editor_Models_Terminology_Models_TermModel */
+        $term->removeProposalsOlderThan($collectionIds,$olderThan);
+
+        // Remove attribute proposals
+        $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+        /* @var $attribute editor_Models_Terminology_Models_AttributeModel */
+        $attribute->removeProposalsOlderThan($collectionIds,$olderThan);
     }
 
 
