@@ -534,6 +534,9 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
 
         $orig = $this->row->getCleanData();
 
+        // Set up `isCreatedLocally` flag to 1 if not explicitly given
+        if (!$this->isModified('isCreatedLocally')) $this->setIsCreatedLocally(1);
+
         // Call parent
         $return = parent::save();
 
@@ -615,10 +618,64 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
      */
     public function removeProposalsOlderThan(array $collectionIds,string $olderThan): bool
     {
-        return $this->db->delete([
-            'isCreatedLocally' => 1,
+        // Get ids of attrs, that were created or updated after tbx-import
+        if (!$attrIdA = editor_Utils::db()->query('
+            SELECT `id` 
+            FROM `terms_attributes` 
+            WHERE TRUE
+              AND `isCreatedLocally` = "1" 
+              AND `collectionId` IN (' . implode(',', $collectionIds) . ')
+        ')->fetchAll(PDO::FETCH_COLUMN)) return false;
+
+        // Get tbx-imported values for `value` and `target` props, that now have changed values in attributes-table
+        $tbxA = editor_Utils::db()->query('
+            SELECT `attrId`, `value`, `target` 
+            FROM `terms_attributes_history`
+            WHERE TRUE
+              AND `isCreatedLocally` = "0"
+              AND `attrId` IN (' . implode(',', $attrIdA) . ')
+        ')->fetchAll(PDO::FETCH_UNIQUE);
+
+        // Distinct between created and updated
+        $attrIdA_updated = array_keys($tbxA);
+        $attrIdA_created = array_diff($attrIdA, $attrIdA_updated);
+
+        // Affected counter
+        $affectedQty = 0;
+
+        // Delete created attrs, that are older than $olderThan
+        if ($attrIdA_created) $affectedQty += $this->db->delete([
             'createdAt < ?' => $olderThan,
-            'collectionId in (?)' => $collectionIds,
-        ]) > 0;
+            'id in (?)' => $attrIdA_created,
+        ]);
+
+        // Overwrite $attrIdA_updated array for it to keep only ids of attributes, that were last updated before $olderThan arg
+        if ($attrIdA_updated) $attrIdA_updated = editor_Utils::db()->query($sql = '
+            SELECT `id` 
+            FROM `terms_attributes` 
+            WHERE TRUE
+              AND `id` IN (' . implode(',', $attrIdA_updated) . ')
+              AND `updatedAt` < ? 
+        ', $olderThan)->fetchAll(PDO::FETCH_COLUMN);
+
+        // Revert updated attrs' `value` and `target` props to tbx-imported values
+        foreach ($attrIdA_updated as $attrId) {
+            $this->load($attrId);
+            $this->setValue($tbxA[$attrId]['value']);
+            $this->setTarget($tbxA[$attrId]['target']);
+            $this->setIsCreatedLocally(0);
+            $this->save();
+
+            // Increase counter
+            $affectedQty ++;
+        }
+
+        // Delete history-records for $attrIdA_updated attrs
+        if ($attrIdA_updated) ZfExtended_Factory::get('editor_Models_Term_AttributeHistory')->db->delete([
+            'attrId in (?)' => $attrIdA_updated,
+        ]);
+
+        // Return
+        return $affectedQty > 0;
     }
 }
