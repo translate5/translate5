@@ -1758,7 +1758,6 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             //TODO: with the next termportal step(add new attribute and so)
             //update/merge those new proposal attributes to
             //now only the transac group should be modefied
-            // $transacGrp->updateTermTransacGroupFromProposal($term,$proposal);
             // $transacGrp->updateTermProcessStatus($term, $term::PROCESS_STATUS_UNPROCESSED);
             //$term->save();
             $term->update([
@@ -2133,4 +2132,32 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $this->db->getAdapter()->query($sqlTransacGrp, ['collectionId' => $collectionId]);
     }
 
+    /***
+     * Remove old term proposals by given date.
+     *
+     * @param array $collectionIds
+     * @param string $olderThan
+     * @return boolean
+     */
+    public function removeProposalsOlderThan(array $collectionIds,string $olderThan){
+
+        // Delete entries having processStatus=unprocessed
+        $rowsCount = $this->db->delete([
+            'updatedAt < ?' => $olderThan,
+            'collectionId in (?)' => $collectionIds,
+            'processStatus = ?' => self::PROCESS_STATUS_UNPROCESSED
+        ]);
+
+        // Setup `proposal` column to be empty string todo: history tables to be involved ?
+        return ($this->db->update(['proposal' => ''], [
+            'updatedAt < ?' => $olderThan,
+            'collectionId in (?)' => $collectionIds,
+            'LENGTH(`proposal`) > ?' => 0
+        ]) + $rowsCount) > 0;
+
+        /*return ($this->db->delete([
+            'created < ?' => $olderThan,
+            'collectionId in (?)' => $collectionIds,
+        ]) + $rowsCount) > 0;*/
+    }
 }

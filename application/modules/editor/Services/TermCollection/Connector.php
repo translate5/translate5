@@ -108,14 +108,16 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
 
         //delete term proposals
         if(!empty($deleteProposalsDate)){
-            $proposals=ZfExtended_Factory::get('editor_Models_Term_Proposal');
-            /* @var $proposals editor_Models_Term_Proposal */
-            //remove the term proposals
-            $proposals->removeOlderThan([$this->languageResource->getId()],$deleteProposalsDate);
-            $attributeProposals=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
-            /* @var $attributeProposals editor_Models_Term_AttributeProposal */
-            //remove the attirubte proposals
-            $attributeProposals->removeOlderThan([$this->languageResource->getId()],$deleteProposalsDate);
+
+            // Remove term proposals
+            $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+            /* @var $term editor_Models_Terminology_Models_TermModel */
+            $term->removeProposalsOlderThan([$this->languageResource->getId()], $deleteProposalsDate);
+
+            // Remove attribute proposals
+            $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+            /* @var $attribute editor_Models_Terminology_Models_AttributeModel */
+            $attribute->removeProposalsOlderThan([$this->languageResource->getId()],$deleteProposalsDate);
         }
 
         //remove all empty term entries from the same term collection

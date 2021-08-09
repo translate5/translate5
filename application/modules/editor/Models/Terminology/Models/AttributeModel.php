@@ -605,4 +605,20 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         // Return
         return $return;
     }
+
+    /***
+     * Remove old attribute proposals from the collection by given date.
+     *
+     * @param array $collectionIds
+     * @param string $olderThan
+     * @return boolean
+     */
+    public function removeProposalsOlderThan(array $collectionIds,string $olderThan): bool
+    {
+        return $this->db->delete([
+            'isCreatedLocally' => 1,
+            'createdAt < ?' => $olderThan,
+            'collectionId in (?)' => $collectionIds,
+        ]) > 0;
+    }
 }
