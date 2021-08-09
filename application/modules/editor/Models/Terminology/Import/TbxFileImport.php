@@ -368,6 +368,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
         $totalCount = count($tbxAsSimpleXml->text->body->{$this->tbxMap[$this::TBX_TERM_ENTRY]});
         $importCount = 0;
+        $progress = 0;
         foreach ($tbxAsSimpleXml->text->body->{$this->tbxMap[$this::TBX_TERM_ENTRY]} as $termEntry) {
             $parsedEntry = null;
             $this->emptyVariables();
@@ -394,7 +395,10 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->saveParsedTbx();
             $importCount++;
 
-            $this->events->trigger('afterTermEntrySave',max(99,($importCount/$totalCount)*100));
+            $progress = min(100,($importCount/$totalCount)*100);
+            $this->events->trigger('afterTermEntrySave',$progress);
+            // Uncomment this to print the progress
+            //error_log("Update progress: [".$importCount.'/'.$totalCount.'] ( progress: '.$progress.'  %)');
         }
 
         if ($tbxAsSimpleXml->text->back->refObjectList) {

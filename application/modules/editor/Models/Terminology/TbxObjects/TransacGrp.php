@@ -75,7 +75,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
      */
     public function getCollectionKey(editor_Models_Terminology_TbxObjects_TransacGrp $element): string
     {
-        return $element->getElementName() . '-' . $element->getTransac() . '-' . $element->getIfDescripGrp() . '-' . $element->getTermTbxId();
+        return $element->getElementName() . '-' . $element->getTransac() . '-' . $element->getIfDescripGrp() . '-' . $element->getTermEntryId().'-'.$element->getTermTbxId();
     }
     /**
      * @return int

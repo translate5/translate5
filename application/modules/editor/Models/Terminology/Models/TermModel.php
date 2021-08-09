@@ -1700,7 +1700,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     }
     /***
      * Remove terms where the updated date is older than the given one.
-     *
+     * TODO: Import performance bottleneck. Optimize this if possible!
      * @param array $collectionIds
      * @param string $olderThan
      * @return boolean
