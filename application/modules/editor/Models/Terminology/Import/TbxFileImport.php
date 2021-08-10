@@ -420,17 +420,22 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         return $this->attributes;
     }
 
+    /***
+     * Empty all helper variables before each termEntry loop
+     */
     private function emptyVariables()
     {
         $this->termEntryDbId = 0;
         $this->termEntryTbxId = '';
         $this->termEntryGuid = null;
         $this->langSetGuid = null;
+        $this->language = [];
         $this->descripGrpGuid = null;
         $this->termGuid = null;
         $this->transacGrps = [];
         $this->termId = null;
         $this->termTbxId = null;
+
     }
 
     /**

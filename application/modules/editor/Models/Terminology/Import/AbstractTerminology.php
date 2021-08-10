@@ -73,6 +73,12 @@ abstract class editor_Models_Terminology_Import_AbstractTerminology
 
         $count = 0;
         foreach ($parsedElements as $element) {
+
+            // reset the binding values array on each new element update/create chunk
+            if ($count === 0) {
+                $this->tableValues = [];
+            }
+
             if ($mergeTerms) {
                 $collectionKey = $element->getCollectionKey($element); // getCollectionKey will get ArrayKey for each element to check if exist
                 $checked = $this->checkIsForUpdate($element, $elementCollection, $collectionKey);
@@ -150,9 +156,6 @@ abstract class editor_Models_Terminology_Import_AbstractTerminology
      */
     public function prepareSqlInsert(object $element, int $count): array
     {
-        if ($count === 0) {
-            $this->tableValues = [];
-        }
         $tableParam = ''; // string contents generated param names for sql insert
 
         // iterate over fields and set $table param and transacGrpInsertParams for multiple sql insert
