@@ -41,11 +41,9 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
     extend: 'Ext.app.Controller',
-    /*
-    requires: ['Editor.plugins.Okapi.view.preferences.BconfGrid'],
-    models: ['Editor.plugins.Okapi.model.Bconf'],
-    stores: ['Editor.plugins.Okapi.store.Bconf'],
-    */
+
+    requires: ['Editor.plugins.Okapi.view.filter.BConfGrid'],
+
     listen: {
         component: {
             '#preferencesOverviewPanel': {
@@ -54,9 +52,9 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             }
         }
     },
-    refs : [{
-        ref : 'preferencesOverviewPanel',
-        selector : '#preferencesOverviewPanel'
+    refs: [{
+        ref: 'preferencesOverviewPanel',
+        selector: '#preferencesOverviewPanel'
     }],
     routes: {
         'bconfprefs': 'onBconfRoute'
@@ -64,39 +62,32 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
     // just a reference to our view
     bconfPanel: null,
     // shows the preference panel in the preferences (bconf-section is shown via 'showBconfInOverviewPanel' afterwards)
-    onBconfRoute: function() {
-        
+    onBconfRoute: function () {
+
         console.log('onBconfRoute');
-        return;
-        
-        if(Editor.app.authenticatedUser.isAllowed('pluginOkapiFontPrefs')){
+
+
+        if (Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')) {
             // QUIRK: just to make sure, not the same thing can happen as with Quirk in ::showBconfInOverviewPanel
             var pop = this.getPreferencesOverviewPanel();
-            if(pop){
+            if (pop) {
                 Editor.app.openAdministrationSection(pop, 'reviewbconf');
             }
         }
     },
     // adds the Font-Prefs-Panel to the Overview Panel if the right is present
-    addBconfToOverviewPanel: function(panel, opts){
-        
-        console.log('addBconfToOverviewPanel', panel, opts);
-        return;
-        
-        if(Editor.app.authenticatedUser.isAllowed('pluginOkapiFontPrefs')){
-            this.bconfPanel = panel.add({xtype: 'okapiBconf'});
+    addBconfToOverviewPanel: function (panel, opts) {
+        if (Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')) {
+            this.bconfPanel = panel.insert(0, { xtype: 'okapiFilterGrid' });
         }
     },
     // shows the bconf-section in the preferences panel if the hash tells so
-    showBconfInOverviewPanel: function(panel, opts){
-        
-        console.log('showBconfInOverviewPanel', panel, opts);
-        return;
-        
-        if(window.location.hash == '#reviewbconf' && Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
+    showBconfInOverviewPanel: function (panel, opts) {
+
+        if (window.location.hash == '#reviewbconf' && Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')) {
             // TODO QUIRK: How can we be instantiated without the overview-Panel not being instatiated ? It happens, when the #reviewbconf hash is set on login
             var pop = this.getPreferencesOverviewPanel();
-            if(pop){
+            if (pop) {
                 pop.setActiveItem(this.bconfPanel);
             }
         }
