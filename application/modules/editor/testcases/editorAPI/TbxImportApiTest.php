@@ -59,62 +59,65 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $this->assertEquals('Test api collection', $termCollection->name);
 
-        self::$collId = $termCollection->id;
+        self::$collId =$termCollection->id;
 
-        //import the first tbx file, OK
-        $this->singleTest('Term.tbx', 8, 27, 18);
+
+        //import the first tbx file,
+        $this->singleTest('Term.tbx', 8, 41, 6,3);
 
         //change existing term entry attribute
         //change existing term attribute
         //change existing term content
         //add new term to term collection
-        $this->singleTest('Term1.tbx', 9, 29, 20);
+        $this->singleTest('Term1.tbx', 9, 47, 6,3);
 
         //different term entry id, different term id, same language and term content -> update the term and
         //check if the other terms in the tbx term entry can be merged
-//        $this->singleTest('Term2.tbx', 11, 101, 21);
+        //$this->singleTest('Term2.tbx', 11, 101, 21);
 
         //add new terms to the term collection
         //handle the unknown tags
-//        $this->singleTest('Export.tbx', 13, 128, 37);
+        //$this->singleTest('Export.tbx', 13, 128, 37);
 
         //one term attribute is removed and the term text is changed
         //add two new term attributes
-//        $this->singleTest('ExportTermChange.tbx', 13, 131, 37);
+        //$this->singleTest('ExportTermChange.tbx', 13, 131, 37);
     }
 
     /***
+     *
      * Run single test for each file. Test against the content and attributes count
      *
      * @param string $fileName
      * @param int $termCount : the count of the terms after the import
      * @param int $termsAtributeCount : the count afo the term attributes after the import
      * @param int $termsEntryAtributeCount : the count of the term entry attributes after the import
+     * @param int $languageAtributeCount: the count of the language level attributes after the import
      */
-    private function singleTest($fileName,$termCount,$termsAtributeCount,$termsEntryAtributeCount)
-    {
+    private function singleTest(string $fileName,int $termCount,int $termsAtributeCount,int $termsEntryAtributeCount,int $languageAtributeCount){
         $this->api()->addFile($fileName, $this->api()->getFile($fileName), "application/xml");
-        $this->api()->requestJson('editor/termcollection/import', 'POST', ['collectionId' => self::$collId, 'customerIds' => [$this->api()->getCustomer()->id],'mergeTerms' => true]);
+        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>self::$collId, 'customerIds' => $this->api()->getCustomer()->id,'mergeTerms'=>true));
 
         //export the generated file
-        $response = $this->api()->requestJson('editor/termcollection/export', 'POST', ['collectionId' => self::$collId]);
+        $response=$this->api()->requestJson('editor/termcollection/export', 'POST', array('collectionId' =>self::$collId));
 
         $this->assertTrue(is_object($response),"Unable to export the terms by term collection");
         $this->assertNotEmpty($response->filedata,"The exported tbx file by collection is empty");
 
         //file_put_contents($this->api()->getFile('/E_'.$fileName, null, false), $response->filedata);
-        $expected = $this->api()->getFileContent('E_'.$fileName);
-        $actual = $response->filedata;
+        $expected=$this->api()->getFileContent('E_'.$fileName);
+        $actual=$response->filedata;
 
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file an the result file does not match.Test file name: ".$fileName);
 
-//        $attributes = $this->api()->requestJson('editor/termcollection/testgetattributes', 'GET', ['collectionId' => self::$collId]);
-//
-//        //check if the generated attributes are matching
-//        $this->assertTrue($termCount == $attributes->termsCount, $fileName.' file test.Invalid number of terms created.Terms count:'.$attributes->termsCount.', expected:'.$termCount);
-//        $this->assertTrue($termsAtributeCount == $attributes->termsAtributeCount, $fileName.' file test.Invalid number of term attribute created.Terms attribute count:'.$attributes->termsAtributeCount.', expected:'.$termsAtributeCount);
-//        $this->assertTrue($termsEntryAtributeCount == $attributes->termsEntryAtributeCount, $fileName.' file test.Invalid and number of entry attribute created.Terms entry attribute count:'.$attributes->termsEntryAtributeCount.', expected:'.$termsEntryAtributeCount);
+        $attributes=$this->api()->requestJson('editor/termcollection/testgetattributes', 'GET', array('collectionId' =>self::$collId));
+
+        //check if the generated attributes are matching
+        $this->assertTrue($termCount==$attributes->termsCount, $fileName.' file test.Invalid number of terms created.Terms count:'.$attributes->termsCount.', expected:'.$termCount);
+        $this->assertTrue($termsAtributeCount==$attributes->termsAtributeCount, $fileName.' file test.Invalid number of term attribute created.Terms attribute count:'.$attributes->termsAtributeCount.', expected:'.$termsAtributeCount);
+        $this->assertTrue($termsEntryAtributeCount==$attributes->termsEntryAtributeCount, $fileName.' file test.Invalid and number of entry attribute created.Terms entry attribute count:'.$attributes->termsEntryAtributeCount.', expected:'.$termsEntryAtributeCount);
+        $this->assertTrue($languageAtributeCount==$attributes->languageAtributeCount, $fileName.' file test.Invalid and number of language level attribute created.Language level attribute count:'.$attributes->languageAtributeCount.', expected:'.$languageAtributeCount);
     }
 
     public static function tearDownAfterClass(): void {

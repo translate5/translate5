@@ -1012,33 +1012,4 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
         file_put_contents($newFileName, $imageContent);
     }
-
-
-    /***
-     *
-     * @override checkIsForUpdate
-     * @param object $elementObject
-     * @param array $elementCollection
-     * @param string $collectionKey
-     * @return array
-     */
-    public function checkIsForUpdate(object $elementObject, array $elementCollection, string $collectionKey): array
-    {
-
-        // if it is not found in the cache, create new element
-        if(!isset($elementCollection[$collectionKey])){
-            return [
-                'isUpdate' => false,
-                'isCreate' => true
-            ];
-        }
-
-        $preparedArrayForDiff = $this->prepareDiffArrayToCheck($elementObject, $elementCollection[$collectionKey]);
-        $result = array_diff($preparedArrayForDiff[0], $preparedArrayForDiff[1]);
-
-        return [
-            'isUpdate' => !empty($result),
-            'isCreate' => false
-        ];
-    }
 }
