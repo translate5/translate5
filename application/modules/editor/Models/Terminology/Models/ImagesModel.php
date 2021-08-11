@@ -82,7 +82,7 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     }
 
 
-    public function loadByTargetId(string $targetId): Zend_Db_Table_Row
+    public function loadByTargetId(string $targetId)
     {
         return $this->row = $this->db->fetchRow('`targetId` = "' . $targetId . '"');
     }
