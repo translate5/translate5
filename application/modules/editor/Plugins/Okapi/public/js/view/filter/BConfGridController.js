@@ -45,14 +45,19 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
     //Add new row at last with default okapi filter
     addNewFilterSet: function () {
         var me = this, view = me.getView(), store = view.getStore();
-        var defaultFilterSet = store.getAt(0).getData();
+        var defaultRecord = store.findRecord('default','1');
+        if(!defaultRecord){
+            return false;
+        }
+        var defaultFilterSet=defaultRecord.getData();
         delete defaultFilterSet['id'];
+        defaultFilterSet['default']=0;
         me.addnewRecord(defaultFilterSet);
     },
 
     editbconf: function (grid, rowIndex, colIndex) {
         var rec = grid.getStore().getAt(rowIndex);
-        var win = Ext.create('Editor.view.admin.okapi.filter.BConfFilterWindow', {
+        var win = Ext.create('Editor.plugins.Okapi.view.filterDetails.BConfFilterWindow', {
             title: 'Filter Configuration -' + rec.get('name'),
         })
         win.show();
@@ -62,13 +67,27 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
     },
 
     copybconf: function (grid, rowIndex, colIndex) {
-        var rec = grid.getStore().getAt(rowIndex);
+        var rec = grid.getStore().getAt(rowIndex).getData();
         delete rec['id'];
+        rec['default']=0;
         this.addnewRecord(rec);
     },
 
     exportbconf: function (grid, rowIndex, colIndex) {
         var rec = grid.getStore().getAt(rowIndex);
         alert("Expoting");
+    },
+    getActionStatus:function (view, rowIndex, colIndex, item, record) {
+        return record.get('default')=="1";
+    },
+    filterByText: function (text){
+        var me = this, view = me.getView(), store = view.getStore();
+        var searchFilterValue =text.getValue().trim().toLowerCase();
+        store.clearFilter();
+        if (searchFilterValue !="") {
+            store.filterBy((item)=>{
+               return item.get('name').toLowerCase().indexOf(searchFilterValue)>-1 || item.get('extensions').toLowerCase().indexOf(searchFilterValue)>-1  || item.get('description').toLowerCase().indexOf(searchFilterValue)>-1
+            })
+        }
     }
 });

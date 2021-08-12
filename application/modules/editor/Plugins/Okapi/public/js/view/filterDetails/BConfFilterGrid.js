@@ -29,12 +29,12 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.Okapi.view.filterDetails.BConfFilterGrid', {
     extend: 'Ext.grid.Panel',
     requires: [
-        'Editor.store.bconf.BconfFilterStore'
+        'Editor.plugins.Okapi.store.BconfFilterStore'
     ],
     alias: 'widget.bconfFilterGrid',
     plugins: ['gridfilters'],
     helpSection: 'useroverview',
-    cls: 'bconfFilterGrid',
+    cls: 'customFilterGrid',
     text_cols: {
         customFilterName: '#UT#Customized Okapi Filter Type',
         name: '#UT#Name',

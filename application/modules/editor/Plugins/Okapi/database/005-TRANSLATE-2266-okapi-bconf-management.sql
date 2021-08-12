@@ -30,10 +30,15 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('edit
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_okapi_bconffilter', 'all');
 
 CREATE TABLE `LEK_okapi_bconf` (
-  `id` INT (11) NOT NULL AUTO_INCREMENT,
-
-  PRIMARY KEY (`id`)
+    `id` INT (11) NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(50),
+    `customer_id` VARCHAR(50),
+    `default` BOOLEAN,
+    `extensions` VARCHAR(200),
+    `description` TEXT,
+    PRIMARY KEY (`id`)
 );
+
 CREATE TABLE `LEK_okapi_bconf_filter` (
   `id` INT (11) NOT NULL AUTO_INCREMENT,
 

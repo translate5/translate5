@@ -31,16 +31,16 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.VisualReview.store.Fonts
  * @extends Ext.data.Store
  */
-Ext.define('Editor.plugins.Okapi.store.BconfStore', {
+Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
   extend: 'Ext.data.Store',
-  storeId: 'bconfStore',
-  alias: 'store.bconfStore',
-  autoLoad: true,
+  storeId: 'bconfFilterStore',
+  alias: 'store.bconfFilterStore',
+  autoLoad: false,
   pageSize: 15,
   idProperty: 'id',
   proxy: {
     type: 'rest',
-    url: Editor.data.restpath + 'plugins_okapi_bconf',
+    //url: Editor.data.restpath + 'plugins_visualreview_fonts',
     reader: {
       rootProperty: 'rows',
       type: 'json'

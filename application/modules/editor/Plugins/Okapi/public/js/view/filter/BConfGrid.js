@@ -117,58 +117,58 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
                         xtype: "actioncolumn",
                         stateId: "okapiGridActionColumn",
                         align: "center",
+                        dataIndex: "default",
                         width: 200,
                         text: me.text_cols.action,
-                        items: Ext.Array.filter(
-                            [
-                                {
-                                    tooltip: me.strings.edit,
-                                    isAllowedFor: "bconfEdit",
-                                    glyph: "f044@FontAwesome5FreeSolid",
-                                    handler: "editbconf",
-                                },
-                                {
-                                    tooltip: me.strings.remove,
-                                    isAllowedFor: "bconfDelete",
-                                    glyph: "f2ed@FontAwesome5FreeSolid",
-                                    handler: "deletebconf",
-                                },
-                                {
-                                    tooltip: me.strings.copy,
-                                    isAllowedFor: "bconfCopy",
-                                    margin: "0 0 0 10px",
-                                    glyph: "f24d@FontAwesome5FreeSolid",
-                                    handler: "copybconf",
-                                },
-                                {
-                                    tooltip: me.strings.export,
-                                    isAllowedFor: "bconfDelete",
-                                    glyph: "f56e@FontAwesome5FreeSolid",
-                                    handler: "exportbconf",
-                                },
-                            ],
-                            itemFilter
-                        ),
+                        items: [
+                            {
+                                tooltip: me.strings.edit,
+                                isAllowedFor: "bconfEdit",
+                                glyph: "f044@FontAwesome5FreeSolid",
+                                handler: "editbconf",
+                                isDisabled:'getActionStatus'
+                            },
+                            {
+                                tooltip: me.strings.remove,
+                                isAllowedFor: "bconfDelete",
+                                glyph: "f2ed@FontAwesome5FreeSolid",
+                                handler: "deletebconf",
+                                isDisabled:'getActionStatus'
+                            },
+                            {
+                                tooltip: me.strings.copy,
+                                isAllowedFor: "bconfCopy",
+                                margin: "0 0 0 10px",
+                                glyph: "f24d@FontAwesome5FreeSolid",
+                                handler: "copybconf",
+                            },
+                            {
+                                tooltip: me.strings.export,
+                                isAllowedFor: "bconfDelete",
+                                glyph: "f56e@FontAwesome5FreeSolid",
+                                handler: "exportbconf",
+                            },
+                        ],
                     },
                     {
                         xtype: "actioncolumn",
                         align: "center",
                         text: me.text_cols.srx,
-                        items: Ext.Array.filter(
-                            [
+                        items: [
                                 {
                                     tooltip: me.strings.upload,
                                     isAllowedFor: "bconfEdit",
                                     glyph: "f093@FontAwesome5FreeSolid",
+                                    bind: {
+                                        hidden: '{default}'
+                                    }
                                 },
                                 {
                                     tooltip: me.strings.export,
                                     isAllowedFor: "bconfDelete",
                                     glyph: "f56e@FontAwesome5FreeSolid",
                                 },
-                            ],
-                            itemFilter
-                        ),
+                            ]
                     },
                     {
                         xtype: "actioncolumn",
@@ -216,6 +216,9 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
                                 margin: "0 0 0 20px",
                                 fieldLabel: me.strings.searchText,
                                 emptyText: me.strings.searchEmptyText,
+                                listeners:{
+                                    change:'filterByText'
+                                }
                             },
                         ],
                     },
