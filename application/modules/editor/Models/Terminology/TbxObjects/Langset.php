@@ -25,7 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_TbxObjects_Langset {
+class editor_Models_Terminology_TbxObjects_Langset extends editor_Models_Terminology_TbxObjects_Abstract{
     const TABLE_FIELDS = [
         'descrip',
         'transacNote',

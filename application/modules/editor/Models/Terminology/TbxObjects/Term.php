@@ -25,7 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_TbxObjects_Term {
+class editor_Models_Terminology_TbxObjects_Term extends editor_Models_Terminology_TbxObjects_Abstract{
     /**
      * Table field for insert or update.
      * If:
@@ -101,6 +101,42 @@ class editor_Models_Terminology_TbxObjects_Term {
     public function getCollectionKey(editor_Models_Terminology_TbxObjects_Term $element): string
     {
         return $element->getTermEntryId().'-'.$element->getLanguage().'-'.$element->getTermTbxId();
+    }
+
+    /***
+     * Search for tbx object in the data array with the element key
+     * @param array $data
+     * @return array|mixed
+     */
+    public function findInArray(array $data, bool $mergeTerms = false){
+
+        $languageMatch = $data[$this->getTermEntryId().'-'.$this->getLanguage()];
+        if(empty($languageMatch)){
+            return [];
+        }
+
+        // check for direct match
+        if(isset($languageMatch[$this->getTermTbxId()])){
+            return $languageMatch[$this->getTermTbxId()];
+        }
+
+        foreach ($languageMatch as $match) {
+            if($this->getTerm() === $match['term']){
+                return $match;
+            }
+        }
+
+        if($mergeTerms === false){
+            return [];
+        }
+
+        // check for langauge and term match.
+        if(isset($data[$this->getLanguage().'-'.$this->getTerm()])){
+            return $data[$this->getLanguage().'-'.$this->getTerm()];
+        }
+
+        // no item for merge found
+        return [];
     }
 
     /**

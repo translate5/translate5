@@ -82,7 +82,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
     protected array $importMap;
     protected array $allowedTypes;
-    protected bool $mergeTerms;
 
     /**
      * Actual collection Id
@@ -172,21 +171,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      * @var array
      */
     protected array $tbxImagesCollection;
-    /**
-     * Collection of attributes (note, ref, xref, descrip...) as object prepared for insert or update.
-     * @var array
-     */
-    protected array $attributes = [];
-    /**
-     * Collection of term as object prepared for insert or update.
-     * @var array
-     */
-    protected array $terms;
-    /**
-     * Collection of transacGrp as object prepared for insert or update.
-     * @var array
-     */
-    protected array $transacGrps;
     /**
      * Collection of images from <back> as object prepared for insert or update.
      * @var array

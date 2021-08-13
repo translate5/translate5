@@ -498,8 +498,14 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      * Load all terms for given collection and custom array key for each term.
      * The result array will be:
      * [
-     *   'termEntryId-language-termTbxId' => [ term results ]
+     *   'termEntryId-language' =>
+     *          [
+     *             'termTbxId' => [ term results ],
+     *              ...
+     *          ]
+     *    'language-term' = > [term results]
      * ]
+     * NOTO: this is term import specific function and should not be used outside term import context!
      * @param int $collectionId
      * @return array[]
      */
@@ -511,7 +517,22 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
 
         foreach ($queryResults as $key => $term) {
-            $fullResult[$term['termEntryId'].'-'.$term['language'].'-'.$term['termTbxId']] = $term;
+
+            $termKey = $term['termEntryId'].'-'.$term['language'];
+
+            // used for mergeTerm check for term matching by language and term content
+            $langaugeTermMergeKey = $term['language'].'-'.$term['term'];
+
+            // group by termEntry and langauge for easy merge terms check
+            if(!isset($fullResult[$termKey])){
+                $fullResult[$termKey] = [];
+            }
+            $fullResult[$termKey][$term['termTbxId']] = $term;
+
+            if(!isset($fullResult[$langaugeTermMergeKey])){
+                // hold only the first match. Merge terms uses always the first match
+                $fullResult[$langaugeTermMergeKey] = $term;
+            }
         }
 
         return $fullResult;

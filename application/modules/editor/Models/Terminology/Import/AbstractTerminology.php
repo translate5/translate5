@@ -50,6 +50,27 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Models_Terminology_Import_AbstractTerminology
 {
+    /***
+     * @var bool
+     */
+    protected bool $mergeTerms;
+
+    /**
+     * Collection of attributes (note, ref, xref, descrip...) as object prepared for insert or update.
+     * @var array
+     */
+    protected array $attributes = [];
+    /**
+     * Collection of term as object prepared for insert or update.
+     * @var array
+     */
+    protected array $terms;
+    /**
+     * Collection of transacGrp as object prepared for insert or update.
+     * @var array
+     */
+    protected array $transacGrps;
+
     public array $tableValues;
     protected string $elementClass; // get Class from $elementObject
     protected ?string $firstTableField; // first field from array
@@ -57,13 +78,13 @@ abstract class editor_Models_Terminology_Import_AbstractTerminology
 
     /**
      * Iterate over $element from given element and check if merge is set and than check if element to update.
-     * @param object $termsModel
+     * @param object $model
      * @param array $parsedElements
      * @param array $elementCollection
      * @param bool $mergeTerms
      * @return array[]
      */
-    public function createOrUpdateElement(object $termsModel, array $parsedElements, array $elementCollection, bool $mergeTerms): array
+    public function createOrUpdateElement(object $model, array $parsedElements, array $elementCollection, bool $mergeTerms): array
     {
         $sqlUpdate = [];
         $sqlInsert = [];
@@ -79,19 +100,12 @@ abstract class editor_Models_Terminology_Import_AbstractTerminology
                 $this->tableValues = [];
             }
 
-            if ($mergeTerms) {
-                $collectionKey = $element->getCollectionKey($element); // getCollectionKey will get ArrayKey for each element to check if exist
-                $checked = $this->checkIsForUpdate($element, $elementCollection, $collectionKey);
+            $checked = $this->checkIsForUpdate($element, $elementCollection);
 
-                if ($checked['isUpdate']) {
-                    $sqlUpdate[] = $this->prepareSqlUpdate($element, $elementCollection[$collectionKey]['id']);
-                }
-                if ($checked['isCreate']) {
-                    $sqlInsert = $this->prepareSqlInsert($element, $count);
-                    $sqlParam .= $sqlInsert['tableParam'];
-                }
-
-            } else {
+            // it is direct match, update the object
+            if ($checked['isUpdate']) {
+                $sqlUpdate[] = $this->prepareSqlUpdate($element, $checked['match']['id']);
+            }elseif ($checked['isCreate']){
                 $sqlInsert = $this->prepareSqlInsert($element, $count);
                 $sqlParam .= $sqlInsert['tableParam'];
             }
@@ -99,11 +113,11 @@ abstract class editor_Models_Terminology_Import_AbstractTerminology
         }
 
         if ($sqlUpdate) {
-            $termsModel->updateImportTbx($sqlUpdate);
+            $model->updateImportTbx($sqlUpdate);
         }
 
         if ($sqlInsert) {
-            $termsModel->createImportTbx($sqlParam, $sqlInsert['tableFields'], $sqlInsert['tableValue']);
+            $model->createImportTbx($sqlParam, $sqlInsert['tableFields'], $sqlInsert['tableValue']);
         }
 
         return ['sqlUpdate' => $sqlUpdate, 'sqlInsert' => $sqlInsert, 'sqlParam' => $sqlParam];
@@ -124,28 +138,48 @@ abstract class editor_Models_Terminology_Import_AbstractTerminology
      * if $result from array_diff is true set '$isUpdate = true'
      * if isset elementCollection is false do nothing.
      *
-     * @param object $elementObject
+     * @param editor_Models_Terminology_TbxObjects_Abstract $elementObject
      * @param array $elementCollection
-     * @param string $collectionKey
      * @return array
      */
-    public function checkIsForUpdate(object $elementObject, array $elementCollection, string $collectionKey): array
+    public function checkIsForUpdate(editor_Models_Terminology_TbxObjects_Abstract $elementObject, array $elementCollection): array
     {
 
+        $match = $elementObject->findInArray($elementCollection);
+
         // if it is not found in the cache, create new element
-        if(!isset($elementCollection[$collectionKey])){
+        if(empty($match)){
             return [
+                'isCreate' => true,
                 'isUpdate' => false,
-                'isCreate' => true
+                'match' => $match
             ];
         }
 
-        $preparedArrayForDiff = $this->prepareDiffArrayToCheck($elementObject, $elementCollection[$collectionKey]);
+
+        //TODO: after TERM-MATCH for merging is found, all term attributes must be merged to. Which means, set forceMerge for all term attributes and term transac groups
+        if($elementObject instanceof editor_Models_Terminology_TbxObjects_Term){
+
+            foreach ($this->attributes as $attribute) {
+                if($attribute->getTermGuid() === $elementObject->getTermGuid()){
+                    $attribute->setForceMerge(true);
+                }
+            }
+
+            foreach ($this->transacGrps as $attribute) {
+                if($attribute->getTermGuid() === $elementObject->getTermGuid()){
+                    $attribute->setForceMerge(true);
+                }
+            }
+        }
+
+        $preparedArrayForDiff = $this->prepareDiffArrayToCheck($elementObject, $match);
         $result = array_diff($preparedArrayForDiff[0], $preparedArrayForDiff[1]);
 
         return [
             'isUpdate' => !empty($result),
-            'isCreate' => false
+            'isCreate' => false,
+            'match' => $match
         ];
     }
 
