@@ -721,6 +721,41 @@ class editor_AttributeController extends ZfExtended_RestController
             $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
             $t->load($params['termId']);
 
+            // Get current value of processStatus attribute, that should be involved in validation
+            $current = $t->getProposal() ? 'unprocessed' : $_['attrId']['value'];
+
+            // Define which old values can be changed to which new values
+            $allow = false; $allowByRole = [
+                'termSearch' => false, // no change allowed
+                'termReviewer' =>  ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
+                'termFinalizer' => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
+                'termProposer' =>  [],
+                'termPM' => true, // any change allowed
+                'termPM_allClients' => true,
+            ];
+
+            // Setup roles
+            $role = array_flip($this->_session->roles); array_walk($role, fn(&$a) => $a = true);
+
+            // Merge allowed
+            foreach ($allowByRole as $i => $info)
+                if ($role[$i])
+                    $allow = is_bool($info) || is_bool($allow)
+                        ? $info
+                        : $info + $allow;
+
+            // Prepare list of allowed values
+            $allowed = []; foreach(explode(',', $_['dataTypeId']['picklistValues']) as $possible)
+                if ($allow === true || (is_array($allow[$current]) && $allow[$current][$possible]))
+                    $allowed []= $possible;
+
+            // Make sure only allowed values can be set as new value of processStatus attribute
+            editor_Utils::jcheck([
+                'value' => [
+                    'fis' => implode(',', $allowed ?: ['wontpass'])
+                ]
+            ], $params);
+
             // If term, that we're going to change processStatus for - has a proposal
             if ($t->getProposal()) {
 
@@ -792,7 +827,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
                 }
 
-                // Else
+            // Else
             } else {
 
                 // Update `processStatus` on `terms_term`-record
@@ -825,7 +860,7 @@ class editor_AttributeController extends ZfExtended_RestController
                 'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s'),
             ];
 
-            // Else
+        // Else
         } else {
 
             // Update attribute value
