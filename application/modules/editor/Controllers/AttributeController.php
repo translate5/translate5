@@ -42,6 +42,13 @@ class editor_AttributeController extends ZfExtended_RestController
     protected $entity;
 
     /**
+     * Collections, allowed for current user
+     *
+     * @var
+     */
+    protected $collectionIds = false;
+
+    /**
      * @throws Zend_Session_Exception
      */
     public function init() {
@@ -51,6 +58,12 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Pick session
         $this->_session = (new Zend_Session_Namespace('user'))->data;
+
+        // If current user has 'termPM_allClients' role, it means all collections are accessible
+        // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
+        $this->collectionIds =
+            in_array($this->_session->roles, 'termPM_allClients')
+            ?: ZfExtended_Factory::get('ZfExtended_Models_User')->getAccessibleCollectionIds();
     }
 
     /**
@@ -79,18 +92,30 @@ class editor_AttributeController extends ZfExtended_RestController
         $params = $this->getRequest()->getParams();
 
         // Validate params
-        editor_Utils::jcheck([
+        $_ = editor_Utils::jcheck([
+            'termEntryId' => [
+                'req' => true,
+                'rex' => 'int11',
+                'key' => 'terms_term_entry'
+            ],
             'mode' => [
                 // 'req' => false
                 'fis' => 'xref,ref,figure'
             ],
         ], $params);
 
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) editor_Utils::jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid'
+            ],
+        ], $_['termEntryId']);
+
         // Call the appropriate method depend on attr's `elementName` or `type` prop
-        if ($params['mode'] == 'xref') $this->xrefcreateAction();
-        else if ($params['mode'] == 'ref') $this->refcreateAction();
-        else if ($params['mode'] == 'figure') $this->figurecreateAction();
-        else $this->attrcreateAction();
+        if ($params['mode'] == 'xref') $this->xrefcreateAction($_);
+        else if ($params['mode'] == 'ref') $this->refcreateAction($_);
+        else if ($params['mode'] == 'figure') $this->figurecreateAction($_);
+        else $this->attrcreateAction($_);
     }
 
     /**
@@ -111,6 +136,13 @@ class editor_AttributeController extends ZfExtended_RestController
                 'key' => 'terms_attributes'
             ],
         ], $params);
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) editor_Utils::jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid'
+            ],
+        ], $_['attrId']);
 
         // Call the appropriate method depend on attr's `elementName` or `type` prop
         if ($_['attrId']['elementName'] == 'xref') $this->xrefupdateAction($_);
@@ -138,6 +170,13 @@ class editor_AttributeController extends ZfExtended_RestController
             ]
         ], $params);
 
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) editor_Utils::jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid'
+            ],
+        ], $_['attrId']);
+
         // If it's a processStatus-attribute - do nothing
         if ($_['attrId']['type'] == 'processStatus') return;
 
@@ -154,18 +193,13 @@ class editor_AttributeController extends ZfExtended_RestController
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
-    public function xrefcreateAction() {
+    public function xrefcreateAction($_) {
 
         // Get request params
         $params = $this->getRequest()->getParams();
 
         // Validate params
-        $_ = editor_Utils::jcheck([
-            'termEntryId' => [
-                'req' => true,
-                'rex' => 'int11',
-                'key' => 'terms_term_entry'
-            ],
+        editor_Utils::jcheck([
             'language' => [
                 'req' => $params['level'] == 'language',
                 'rex' => 'rfc5646'
@@ -237,18 +271,13 @@ class editor_AttributeController extends ZfExtended_RestController
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
-    public function refcreateAction() {
+    public function refcreateAction($_) {
 
         // Get request params
         $params = $this->getRequest()->getParams();
 
         // Validate params
-        $_ = editor_Utils::jcheck([
-            'termEntryId' => [
-                'req' => true,
-                'rex' => 'int11',
-                'key' => 'terms_term_entry'
-            ],
+        $_ += editor_Utils::jcheck([
             'level' => [
                 'req' => true,
                 'fis' => 'entry,term'
@@ -315,18 +344,13 @@ class editor_AttributeController extends ZfExtended_RestController
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
-    public function figurecreateAction() {
+    public function figurecreateAction($_) {
 
         // Get request params
         $params = $this->getRequest()->getParams();
 
         // Validate params
-        $_ = editor_Utils::jcheck([
-            'termEntryId' => [
-                'req' => true,
-                'rex' => 'int11',
-                'key' => 'terms_term_entry'
-            ],
+        editor_Utils::jcheck([
             'language' => [
                 'req' => $params['level'] == 'language',
                 'rex' => 'rfc5646'
@@ -391,13 +415,13 @@ class editor_AttributeController extends ZfExtended_RestController
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
-    public function attrcreateAction() {
+    public function attrcreateAction($_) {
 
         // Get request params
         $params = $this->getRequest()->getParams();
 
         // Validate dataTypeId first
-        $_ = editor_Utils::jcheck([
+        $_ += editor_Utils::jcheck([
             'dataTypeId' => [
                 'req' => true,
                 'rex' => 'int11',
@@ -407,11 +431,6 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Validate others params
         $_ += editor_Utils::jcheck([
-            'termEntryId' => [
-                'req' => true,
-                'rex' => 'int11',
-                'key' => 'terms_term_entry'
-            ],
             'language' => [
                 'req' => $params['level'] != 'entry',
                 'rex' => 'rfc5646'
