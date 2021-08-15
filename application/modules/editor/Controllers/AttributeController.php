@@ -62,8 +62,8 @@ class editor_AttributeController extends ZfExtended_RestController
         // If current user has 'termPM_allClients' role, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
         $this->collectionIds =
-            in_array($this->_session->roles, 'termPM_allClients')
-            ?: ZfExtended_Factory::get('ZfExtended_Models_User')->getAccessibleCollectionIds();
+            in_array('termPM_allClients', $this->_session->roles)
+                ?: ZfExtended_Factory::get('ZfExtended_Models_User')->getAccessibleCollectionIds();
     }
 
     /**
