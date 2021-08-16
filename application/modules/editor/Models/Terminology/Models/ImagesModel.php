@@ -90,7 +90,7 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     public function delete() {
 
         // If file exists
-        if (is_file($src = 'term-images-public/tc_' . $this->getCollectionId() . '/images/' . $this->getUniqueName()))
+        if (is_file($src = 'term-images-public/tc_' . $this->getCollectionId() . '/' . $this->getUniqueName()))
 
             // Delete it
             unlink($src);

@@ -663,7 +663,7 @@ class editor_AttributeController extends ZfExtended_RestController
         //rename($_['figure']['tmp_name'], 'D:/img.jpg');
 
         // Build src
-        $src = ($dir = 'term-images-public/tc_' . $_['attrId']['collectionId'] . '/images/') . $i->getUniqueName();
+        $src = ($dir = 'term-images-public/tc_' . $_['attrId']['collectionId'] . '/') . $i->getUniqueName();
 
         // Check if dir exists and if no - try to create it
         if (!is_dir($dir)) mkdir($dir, umask(), true);
