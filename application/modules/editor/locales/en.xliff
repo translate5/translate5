@@ -4195,6 +4195,12 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Projektbeschr. ausblenden</source>
   <target>Hide project description</target>
 </trans-unit>
+<trans-unit id='VGVybVNlYXJjaA=='><source>TermSearch</source><target>Term search</target></trans-unit>
+<trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>Propose terms</target></trans-unit>
+<trans-unit id='VGVybVJldmlld2Vy'><source>TermReviewer</source><target>Review terms</target></trans-unit>
+<trans-unit id='VGVybUZpbmFsaXplcg=='><source>TermFinalizer</source><target>Finalize terms</target></trans-unit>
+<trans-unit id='VGVybVBN'><source>TermPM</source><target>Term PM</target></trans-unit>
+<trans-unit id='VGVybVBNX2FsbENsaWVudHM'><source>TermPM_allClients</source><target>Term PM (all clients)</target></trans-unit>
 </body>
   </file>
 </xliff>

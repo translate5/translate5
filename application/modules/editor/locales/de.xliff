@@ -1273,7 +1273,6 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='QUNIVFVORzogUVVFTExTUFJBQ0hMSUNIRVIgSU5IQUxUIElOIFZPUkhFUklHRU0gT0RFUiBOQUNIRk9MR0VOREVNIFNFR01FTlQ='><source>ACHTUNG: QUELLSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</source><target>ACHTUNG: QUELLSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</target></trans-unit>
 <trans-unit id='QUNIVFVORzogWklFTFNQUkFDSExJQ0hFUiBJTkhBTFQgSU4gVk9SSEVSSUdFTSBPREVSIE5BQ0hGT0xHRU5ERU0gU0VHTUVOVA=='><source>ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</source><target>ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</target></trans-unit>
 <trans-unit id='V2llZGVyaG9sdW5nIG51ciBhdXRvbWF0aXNjaCBlcnNldHplbiBiencuIEVyc2V0enVuZyBkZXIgV2llZGVyaG9sdW5nIHZvcnNjaGxhZ2VuLCB3ZW5uIFppZWwgbGVlciBpc3Q='><source>Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist</source><target>Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist</target></trans-unit>
-<trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermSearch</source><target>TermSearch</target></trans-unit>
 <trans-unit id='VGVybVBvcnRhbA=='><source>TermPortal</source><target>TermPortal</target></trans-unit>
 <trans-unit id='RGFzIFByb2pla3QgZW50aMOkbHQgYWx0ZXJuYXRpdmUgw5xiZXJzZXR6dW5nZW4uIEJlaSBkZXIgw5xiZXJuYWhtZSB2b24gTWF0Y2hlcyB3aXJkIGRpZSBTZWdtZW50IE1hdGNocmF0ZSBkYWhlciBuaWNodCB2ZXLDpG5kZXJ0Lg=='><source>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</source><target>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</target></trans-unit>
 <trans-unit id='QmVpbSBCZWFyYmVpdGVuIGRlciBRdWVsbHNwYWx0ZSBrw7ZubmVuIE1hdGNoZXMgbmljaHQgw7xiZXJub21tZW4gd2VyZGVuLg=='><source>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</source><target>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</target></trans-unit>
@@ -1531,7 +1530,12 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='VGVybVBvcnRhbCBTcHJhY2hlbg=='><source>TermPortal Sprachen</source><target>TermPortal Sprachen</target></trans-unit>
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>Alle verfügbaren Sprachen</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</target></trans-unit>
-<trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>TermProposer</target></trans-unit>
+<trans-unit id='VGVybVNlYXJjaA=='><source>TermSearch</source><target>Term-Suche</target></trans-unit>
+<trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>Terme vorschlagen</target></trans-unit>
+<trans-unit id='VGVybVJldmlld2Vy'><source>TermReviewer</source><target>Terme prüfen</target></trans-unit>
+<trans-unit id='VGVybUZpbmFsaXplcg=='><source>TermFinalizer</source><target>Terme freigeben</target></trans-unit>
+<trans-unit id='VGVybVBN'><source>TermPM</source><target>Term PM</target></trans-unit>
+<trans-unit id='VGVybVBNX2FsbENsaWVudHM'><source>TermPM_allClients</source><target>Term PM (alle Kunden)</target></trans-unit>
 <trans-unit id='T3BlbklEIElzc3Vlcg=='><source>OpenID Issuer</source><target>OpenID Issuer</target></trans-unit>
 <trans-unit id='SsO8bmdlciBhbHMgb2RlciBnbGVpY2g='><source>Jünger als oder gleich</source><target>Jünger als oder gleich</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Vorschläge löschen, deren letzte Berührung länger her ist als</source><target>Vorschläge löschen, deren letzte Berührung länger her ist als</target></trans-unit>
