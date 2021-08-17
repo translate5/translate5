@@ -813,7 +813,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         }
         $sessionUser = new Zend_Session_Namespace('user');
         $sessionUserGuid = $sessionUser->data->userGuid;
-        $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($sessionUserGuid, $task);
+        $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUserGuid, $task);
         /* @var $tua editor_Models_TaskUserAssoc */
         $step = $tua->getWorkflowStepName();
         $handleSegmentranges = $tua->isSegmentrangedTaskForStep($task, $step);
