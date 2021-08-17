@@ -110,17 +110,14 @@ class editor_Models_Terminology_TbxObjects_Term extends editor_Models_Terminolog
      */
     public function findInArray(array $data, bool $mergeTerms = false){
 
-        $languageMatch = $data[$this->getTermEntryId().'-'.$this->getLanguage()];
-        if(empty($languageMatch)){
-            return [];
-        }
+        $entryLanguageMatch = $data[$this->getTermEntryId().'-'.$this->getLanguage()] ?? [];
 
         // check for direct match
-        if(isset($languageMatch[$this->getTermTbxId()])){
-            return $languageMatch[$this->getTermTbxId()];
+        if(isset($entryLanguageMatch[$this->getTermTbxId()])){
+            return $entryLanguageMatch[$this->getTermTbxId()];
         }
 
-        foreach ($languageMatch as $match) {
+        foreach ($entryLanguageMatch as $match) {
             if($this->getTerm() === $match['term']){
                 return $match;
             }

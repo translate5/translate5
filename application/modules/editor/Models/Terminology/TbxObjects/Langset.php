@@ -47,6 +47,7 @@ class editor_Models_Terminology_TbxObjects_Langset extends editor_Models_Termino
     protected string $descripType = '';
     protected string $descripTarget = '';
     protected array $descripGrp = [];
+    protected array $note = [];
 
     /**
      * @return int
@@ -243,6 +244,24 @@ class editor_Models_Terminology_TbxObjects_Langset extends editor_Models_Termino
     public function setDescripGrp(array $descripGrp): self
     {
         $this->descripGrp[] = $descripGrp;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNote(): array
+    {
+        return $this->note;
+    }
+
+    /**
+     * @param array $note
+     * @return editor_Models_Terminology_TbxObjects_Term
+     */
+    public function setNote(array $note): self
+    {
+        $this->note[] = $note;
         return $this;
     }
 

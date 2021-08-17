@@ -28,13 +28,6 @@ END LICENSE AND COPYRIGHT
 abstract class editor_Models_Terminology_TbxObjects_Abstract
 {
 
-    /***
-     * Merge this attribute if the parent attribute is also merged.
-     * Ex: when term is merged, all term attributes should be merged to
-     * @var bool
-     */
-    protected bool $forceMerge = false;
-
     /**
      * @param editor_Models_Terminology_TbxObjects_TransacGrp $element
      * @return string
@@ -52,27 +45,6 @@ abstract class editor_Models_Terminology_TbxObjects_Abstract
      * @return array|mixed
      */
     public function findInArray(array $data, bool $mergeTerms = false){
-        // if force merge is set, merge the attribute
-        if($this->getForceMerge()){
-            return [];
-        }
         return $data[$this->getCollectionKey($this)] ?? [];
     }
-
-    /**
-     * @return bool
-     */
-    public function getForceMerge(): bool
-    {
-        return $this->forceMerge;
-    }
-
-    /**
-     * @param bool $forceMerge
-     */
-    public function setForceMerge(bool $forceMerge): void
-    {
-        $this->forceMerge = $forceMerge;
-    }
-
 }

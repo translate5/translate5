@@ -401,6 +401,11 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         // insert all attribute data types for current collection in the terms_collection_attribute_datatype table
         $dataTypeAssoc->updateCollectionAttributeAssoc($this->collectionId);
 
+        // remove all empty term entries after the tbx import
+        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
+        $termEntry->removeEmptyFromCollection([$this->collectionId]);
+
         return $this->attributes;
     }
 
@@ -511,7 +516,8 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $newLangSet->setEntryId($this->termEntryDbId);
         $newLangSet->setTermEntryGuid($parsedEntry->getEntryGuid());
 
-        //TODO: validate if this loop works !!!!!!!!!!!!!!
+        // INFO: In TBX-Basic, the <descripGrp> element is used only to associate a source to a definition or to
+        //a context. The following child elements are not supported: <descripNote>, <admin>,<adminGrp>, <note>, <ref>, and <xref>.
         foreach ($languageGroup->descripGrp as $descripGrp) {
             $this->descripGrpGuid = $this->getGuid();
             $this->setAttributeTypes($descripGrp->descrip);
@@ -524,6 +530,16 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
                     $newLangSet->setDescripGrp($this->setTransacAttributes($transac, true, 'langSet'));
                 }
             }
+
+            // INFO: if note appears on <descripGrp> level, import the note as normal attribute.
+            // This kind of note is not supported by tbx basic
+            if (isset($descripGrp->note)) {
+                $newLangSet->setNote($this->setAttributeTypes($descripGrp->note));
+            }
+        }
+
+        if (isset($languageGroup->note)) {
+            $newLangSet->setNote($this->setAttributeTypes($languageGroup->note));
         }
 
         return $newLangSet;

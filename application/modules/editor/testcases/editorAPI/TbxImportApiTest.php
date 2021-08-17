@@ -69,19 +69,21 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         //change existing term attribute
         //change existing term content
         //add new term to term collection
-        $this->singleTest('Term1.tbx', 9, 47, 6,3);
+        $this->singleTest('Term1.tbx', 9, 45, 6,3);
 
-        //different term entry id, different term id, same language and term content -> update the term and
-        //check if the other terms in the tbx term entry can be merged
-        //$this->singleTest('Term2.tbx', 11, 101, 21);
+        // different term entry id, different term id, same language and term content -> update the term and
+        // check if the other terms in the tbx term entry can be merged
+        // Merge: the term <term id="462bed50-6779-4cb1-be6b-223e78b54f26">Desk</term> will be merged to: <term id="462bed50-6779-4cb1-be6b-223e78b54f26">Table</term>
+        // reason is because other terms in the importing term entry are merged and the found term entry is used to merge "Desk" to "Table"
+        $this->singleTest('Term2.tbx', 9, 45, 6,3);
 
         //add new terms to the term collection
         //handle the unknown tags
-        //$this->singleTest('Export.tbx', 13, 128, 37);
+        $this->singleTest('Export.tbx', 11, 64, 10,7);
 
         //one term attribute is removed and the term text is changed
         //add two new term attributes
-        //$this->singleTest('ExportTermChange.tbx', 13, 131, 37);
+        $this->singleTest('ExportTermChange.tbx', 11, 67, 10,7);
     }
 
     /***
@@ -104,7 +106,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertTrue(is_object($response),"Unable to export the terms by term collection");
         $this->assertNotEmpty($response->filedata,"The exported tbx file by collection is empty");
 
-        //file_put_contents($this->api()->getFile('/E_'.$fileName, null, false), $response->filedata);
+        file_put_contents($this->api()->getFile('/E_'.$fileName, null, false), $response->filedata);
         $expected=$this->api()->getFileContent('E_'.$fileName);
         $actual=$response->filedata;
 
