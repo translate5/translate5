@@ -106,7 +106,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertTrue(is_object($response),"Unable to export the terms by term collection");
         $this->assertNotEmpty($response->filedata,"The exported tbx file by collection is empty");
 
-        file_put_contents($this->api()->getFile('/E_'.$fileName, null, false), $response->filedata);
+        //file_put_contents($this->api()->getFile('/E_'.$fileName, null, false), $response->filedata);
         $expected=$this->api()->getFileContent('E_'.$fileName);
         $actual=$response->filedata;
 

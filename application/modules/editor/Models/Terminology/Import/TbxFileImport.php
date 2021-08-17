@@ -182,11 +182,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     protected array $unknownStates = [];
     /**
-     * Collected term states not listed in statusMap
-     * @var array
-     */
-    protected array $unknownLanguages = [];
-    /**
      * The array have an assignment of the TBX-enabled Term Static that be used in the editor
      * @var array
      */
@@ -204,6 +199,11 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         'deprecated' => editor_Models_Terminology_TbxObjects_Term::STAT_DEPRECATED,
         'admitted' => editor_Models_Terminology_TbxObjects_Term::STAT_ADMITTED,
     ];
+    /**
+     * Collected term states not listed in statusMap
+     * @var array
+     */
+    protected array $unknownLanguages = [];
 
     /** @var editor_Models_Terminology_TbxObjects_TermEntry|mixed  */
     protected editor_Models_Terminology_TbxObjects_TermEntry $termEntryObject;
@@ -458,14 +458,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     {
         $this->termEntryTbxId = $this->getIdOrGenerate($termEntry, $this->tbxMap[$this::TBX_TERM_ENTRY]);
         $this->termEntryGuid = $this->getGuid();
-
-//        $allObjectsFromTbxElement = get_object_vars($termEntry);
-//        foreach($termEntry->rows->row as $name => $row)
-//        {
-//            if (!$name->{$name}) {
-////                Store unknown element to DB
-//            }
-//        }
 
         /** @var editor_Models_Terminology_TbxObjects_TermEntry $newEntry */
         $newEntry = new $this->termEntryObject;
@@ -898,7 +890,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     private function getUniqueId($prefixType): string
     {
-        // ToDo: Sinisa, mit Alex besprechen welcher wert uebergeben werden soll
         return uniqid($prefixType);
     }
 
@@ -990,7 +981,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     private function saveImageLocal(string $imageName, string $imageContent)
     {
         $tbxImportDirectoryPath = APPLICATION_PATH.'/../data/tbx-import/';
-        $imagePath = $tbxImportDirectoryPath.'term-images-public/tc_'.$this->collectionId.'/images';
+        $imagePath = $tbxImportDirectoryPath.'term-images-public/tc_'.$this->collectionId;
 
         //check if the directory exist and it is writable
         if (is_dir($tbxImportDirectoryPath) && !is_writable($tbxImportDirectoryPath)) {
