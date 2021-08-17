@@ -42,6 +42,13 @@ class editor_TermController extends ZfExtended_RestController
     protected $entity;
 
     /**
+     * Collections, allowed for current user
+     *
+     * @var
+     */
+    protected $collectionIds = false;
+
+    /**
      * @throws Zend_Session_Exception
      */
     public function init() {
@@ -51,6 +58,12 @@ class editor_TermController extends ZfExtended_RestController
 
         // Pick session
         $this->_session = (new Zend_Session_Namespace('user'))->data;
+
+        // If current user has 'termPM_allClients' role, it means all collections are accessible
+        // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
+        $this->collectionIds =
+            in_array('termPM_allClients', $this->_session->roles)
+                ?: ZfExtended_Factory::get('ZfExtended_Models_User')->getAccessibleCollectionIds();
     }
 
     /**
@@ -77,6 +90,13 @@ class editor_TermController extends ZfExtended_RestController
 
         // Get request params
         $params = $this->getRequest()->getParams();
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) editor_Utils::jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid'
+            ],
+        ], $params);
 
         // Validate params
         $_ = editor_Utils::jcheck([
@@ -197,14 +217,9 @@ class editor_TermController extends ZfExtended_RestController
 
         // Validate params
         $_ = editor_Utils::jcheck([
-            'collectionId,termId' => [
-                'req' => true,
-                'rex' => 'int11'
-            ],
-            'collectionId' => [
-                'key' => 'LEK_languageresources',
-            ],
             'termId' => [
+                'req' => true,
+                'rex' => 'int11',
                 'key' => 'terms_term',
             ],
             'proposal' => [
@@ -212,6 +227,13 @@ class editor_TermController extends ZfExtended_RestController
                 'rex' => '~[^\s]~'
             ]
         ], $params);
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) editor_Utils::jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid'
+            ],
+        ], $_['termId']);
 
         // Instantiate term model
         /** @var editor_Models_Terminology_Models_TermModel $t */
@@ -252,6 +274,13 @@ class editor_TermController extends ZfExtended_RestController
                 'key' => 'terms_term'
             ]
         ], $params);
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) editor_Utils::jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid'
+            ],
+        ], $_['termId']);
 
         // Get data, that will help to detect whether this term is the last in it's termEntry or language
         $isLast_data = editor_Utils::db()->query('

@@ -42,6 +42,13 @@ class editor_AttributeController extends ZfExtended_RestController
     protected $entity;
 
     /**
+     * Collections, allowed for current user
+     *
+     * @var
+     */
+    protected $collectionIds = false;
+
+    /**
      * @throws Zend_Session_Exception
      */
     public function init() {
@@ -51,6 +58,12 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Pick session
         $this->_session = (new Zend_Session_Namespace('user'))->data;
+
+        // If current user has 'termPM_allClients' role, it means all collections are accessible
+        // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
+        $this->collectionIds =
+            in_array('termPM_allClients', $this->_session->roles)
+                ?: ZfExtended_Factory::get('ZfExtended_Models_User')->getAccessibleCollectionIds();
     }
 
     /**
@@ -79,18 +92,30 @@ class editor_AttributeController extends ZfExtended_RestController
         $params = $this->getRequest()->getParams();
 
         // Validate params
-        editor_Utils::jcheck([
+        $_ = editor_Utils::jcheck([
+            'termEntryId' => [
+                'req' => true,
+                'rex' => 'int11',
+                'key' => 'terms_term_entry'
+            ],
             'mode' => [
                 // 'req' => false
                 'fis' => 'xref,ref,figure'
             ],
         ], $params);
 
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) editor_Utils::jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid'
+            ],
+        ], $_['termEntryId']);
+
         // Call the appropriate method depend on attr's `elementName` or `type` prop
-        if ($params['mode'] == 'xref') $this->xrefcreateAction();
-        else if ($params['mode'] == 'ref') $this->refcreateAction();
-        else if ($params['mode'] == 'figure') $this->figurecreateAction();
-        else $this->attrcreateAction();
+        if ($params['mode'] == 'xref') $this->xrefcreateAction($_);
+        else if ($params['mode'] == 'ref') $this->refcreateAction($_);
+        else if ($params['mode'] == 'figure') $this->figurecreateAction($_);
+        else $this->attrcreateAction($_);
     }
 
     /**
@@ -111,6 +136,13 @@ class editor_AttributeController extends ZfExtended_RestController
                 'key' => 'terms_attributes'
             ],
         ], $params);
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) editor_Utils::jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid'
+            ],
+        ], $_['attrId']);
 
         // Call the appropriate method depend on attr's `elementName` or `type` prop
         if ($_['attrId']['elementName'] == 'xref') $this->xrefupdateAction($_);
@@ -138,6 +170,13 @@ class editor_AttributeController extends ZfExtended_RestController
             ]
         ], $params);
 
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) editor_Utils::jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid'
+            ],
+        ], $_['attrId']);
+
         // If it's a processStatus-attribute - do nothing
         if ($_['attrId']['type'] == 'processStatus') return;
 
@@ -154,18 +193,13 @@ class editor_AttributeController extends ZfExtended_RestController
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
-    public function xrefcreateAction() {
+    public function xrefcreateAction($_) {
 
         // Get request params
         $params = $this->getRequest()->getParams();
 
         // Validate params
-        $_ = editor_Utils::jcheck([
-            'termEntryId' => [
-                'req' => true,
-                'rex' => 'int11',
-                'key' => 'terms_term_entry'
-            ],
+        editor_Utils::jcheck([
             'language' => [
                 'req' => $params['level'] == 'language',
                 'rex' => 'rfc5646'
@@ -237,18 +271,13 @@ class editor_AttributeController extends ZfExtended_RestController
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
-    public function refcreateAction() {
+    public function refcreateAction($_) {
 
         // Get request params
         $params = $this->getRequest()->getParams();
 
         // Validate params
-        $_ = editor_Utils::jcheck([
-            'termEntryId' => [
-                'req' => true,
-                'rex' => 'int11',
-                'key' => 'terms_term_entry'
-            ],
+        $_ += editor_Utils::jcheck([
             'level' => [
                 'req' => true,
                 'fis' => 'entry,term'
@@ -315,18 +344,13 @@ class editor_AttributeController extends ZfExtended_RestController
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
-    public function figurecreateAction() {
+    public function figurecreateAction($_) {
 
         // Get request params
         $params = $this->getRequest()->getParams();
 
         // Validate params
-        $_ = editor_Utils::jcheck([
-            'termEntryId' => [
-                'req' => true,
-                'rex' => 'int11',
-                'key' => 'terms_term_entry'
-            ],
+        editor_Utils::jcheck([
             'language' => [
                 'req' => $params['level'] == 'language',
                 'rex' => 'rfc5646'
@@ -391,13 +415,13 @@ class editor_AttributeController extends ZfExtended_RestController
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
-    public function attrcreateAction() {
+    public function attrcreateAction($_) {
 
         // Get request params
         $params = $this->getRequest()->getParams();
 
         // Validate dataTypeId first
-        $_ = editor_Utils::jcheck([
+        $_ += editor_Utils::jcheck([
             'dataTypeId' => [
                 'req' => true,
                 'rex' => 'int11',
@@ -407,11 +431,6 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Validate others params
         $_ += editor_Utils::jcheck([
-            'termEntryId' => [
-                'req' => true,
-                'rex' => 'int11',
-                'key' => 'terms_term_entry'
-            ],
             'language' => [
                 'req' => $params['level'] != 'entry',
                 'rex' => 'rfc5646'
@@ -644,7 +663,7 @@ class editor_AttributeController extends ZfExtended_RestController
         //rename($_['figure']['tmp_name'], 'D:/img.jpg');
 
         // Build src
-        $src = ($dir = 'term-images-public/tc_' . $_['attrId']['collectionId'] . '/images/') . $i->getUniqueName();
+        $src = ($dir = 'term-images-public/tc_' . $_['attrId']['collectionId'] . '/') . $i->getUniqueName();
 
         // Check if dir exists and if no - try to create it
         if (!is_dir($dir)) mkdir($dir, umask(), true);
@@ -721,6 +740,41 @@ class editor_AttributeController extends ZfExtended_RestController
             $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
             $t->load($params['termId']);
 
+            // Get current value of processStatus attribute, that should be involved in validation
+            $current = $t->getProposal() ? 'unprocessed' : $_['attrId']['value'];
+
+            // Define which old values can be changed to which new values
+            $allow = false; $allowByRole = [
+                'termSearch' => false, // no change allowed
+                'termReviewer' =>  ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
+                'termFinalizer' => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
+                'termProposer' =>  [],
+                'termPM' => true, // any change allowed
+                'termPM_allClients' => true,
+            ];
+
+            // Setup roles
+            $role = array_flip($this->_session->roles); array_walk($role, fn(&$a) => $a = true);
+
+            // Merge allowed
+            foreach ($allowByRole as $i => $info)
+                if ($role[$i])
+                    $allow = is_bool($info) || is_bool($allow)
+                        ? $info
+                        : $info + $allow;
+
+            // Prepare list of allowed values
+            $allowed = []; foreach(explode(',', $_['dataTypeId']['picklistValues']) as $possible)
+                if ($allow === true || (is_array($allow[$current]) && $allow[$current][$possible]))
+                    $allowed []= $possible;
+
+            // Make sure only allowed values can be set as new value of processStatus attribute
+            editor_Utils::jcheck([
+                'value' => [
+                    'fis' => implode(',', $allowed ?: ['wontpass'])
+                ]
+            ], $params);
+
             // If term, that we're going to change processStatus for - has a proposal
             if ($t->getProposal()) {
 
@@ -792,7 +846,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
                 }
 
-                // Else
+            // Else
             } else {
 
                 // Update `processStatus` on `terms_term`-record
@@ -825,7 +879,7 @@ class editor_AttributeController extends ZfExtended_RestController
                 'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s'),
             ];
 
-            // Else
+        // Else
         } else {
 
             // Update attribute value

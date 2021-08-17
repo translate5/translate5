@@ -853,7 +853,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
                 && is_file($abs = $_SERVER['DOCUMENT_ROOT']
                     . '/term-images-public/tc_'
                     . $collectionId
-                    . '/images/' . $name))
+                    . '/' . $name))
                 unlink($abs);
 
         // Delete records from `terms_images` table
