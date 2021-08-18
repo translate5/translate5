@@ -25,7 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_TbxObjects_Attribute {
+class editor_Models_Terminology_TbxObjects_Attribute extends editor_Models_Terminology_TbxObjects_Abstract{
     CONST ATTRIBUTE_LEVEL_ENTRY = 'entry';
     CONST ATTRIBUTE_LEVEL_LANGUAGE = 'language';
     CONST ATTRIBUTE_LEVEL_TERM = 'term';
@@ -427,6 +427,7 @@ class editor_Models_Terminology_TbxObjects_Attribute {
         $this->updatedAt = $updatedAt;
         return $this;
     }
+
 
     public function getLevel(){
         if(empty($this->language)){

@@ -369,6 +369,10 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         // clean up the collection images
         $this->removeCollectionImagesDir($this->getId());
         parent::delete();
+        //remove all empty term entries from the same term collection
+        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
+        $termEntry->removeEmptyFromCollection([$this->getId()]);
     }
 
     /***
