@@ -151,7 +151,7 @@ class editor_TermController extends ZfExtended_RestController
             // Apply data
             $termEntryR->init([
                 'collectionId' => $params['collectionId'],
-                'termEntryTbxId' => $termEntryTbxId = ZfExtended_Utils::uuid(),
+                'termEntryTbxId' => $termEntryTbxId = 'id' . ZfExtended_Utils::uuid(),
                 'entryGuid' => $termEntryGuid = ZfExtended_Utils::uuid(),
                 'isCreatedLocally' => 1, // Just a flag, indicating that termEntry was created manually, e.g. not via tbx import
             ]);
@@ -166,7 +166,7 @@ class editor_TermController extends ZfExtended_RestController
 
         // Apply data
         $termR->init([
-            'termTbxId' => $termTbxId = ZfExtended_Utils::uuid(),
+            'termTbxId' => $termTbxId = 'id' . ZfExtended_Utils::uuid(),
             'collectionId' => $params['collectionId'],
             'termEntryId' => $termEntryId,
             'termEntryTbxId' => $termEntryTbxId,

@@ -683,17 +683,31 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
      * @param array $refA
      * @param $refTargetIdA
      * @param array $prefLangA
+     * @param string $level
      * @throws Zend_Db_Statement_Exception
      */
-    public static function refTarget(array &$refA, $refTargetIdA, array $prefLangA) {
+    public static function refTarget(array &$refA, $refTargetIdA, array $prefLangA, $level = null) {
 
         // If no ref-attributes found - return
         if (!$refA) return;
 
+        // Shortcut to arg passed to IN (?)
+        $in = '"' . implode('","', array_keys($refTargetIdA)) . '"';
+
+        // Which tbx column to use
+        $tbxCol = $level
+            ? '`' . ($level == 'term' ? 'termTbxId' : 'termEntryTbxId') . '`'
+            : 'IF(`termTbxId` IN (' . $in .'), `termTbxId`, `termEntryTbxId`)';
+
+        // Build WHERE clause
+        $where = $level
+            ? '`' . ($level == 'term' ? 'termTbxId' : 'termEntryTbxId') . '` IN (' . $in . ')'
+            : '`termTbxId` IN (' . $in . ') OR `termEntryTbxId` IN (' . $in . ')';
+
         // Get data by ref targets
         $dataByRefTargetIdA = editor_Utils::db()->query($_ = '
             SELECT
-              `termEntryTbxId`,
+              ' . $tbxCol . ',
               `termEntryId`,
               `collectionId`,
               JSON_OBJECTAGG(
@@ -701,7 +715,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
                 CONCAT(`id`, ",", `languageId`, ",", `term`, ",", `processStatus`, ",", `status`)
               ) AS `json`
             FROM `terms_term`
-            WHERE `termEntryTbxId` IN ("' . implode('","', array_keys($refTargetIdA)) . '")
+            WHERE ' . $where . '
             GROUP BY `termEntryId`            
         ')->fetchAll(PDO::FETCH_UNIQUE);
 

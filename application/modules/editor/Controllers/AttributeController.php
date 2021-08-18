@@ -617,7 +617,7 @@ class editor_AttributeController extends ZfExtended_RestController
             $prefLangA = array_unique([$params['termLang'], $params['mainLang']]);
 
             // Call $this->_refTarget() with that args
-            editor_Models_Terminology_Models_AttributeModel::refTarget($refA, $refTargetIdA, $prefLangA);
+            editor_Models_Terminology_Models_AttributeModel::refTarget($refA, $refTargetIdA, $prefLangA, $level);
 
             // Append refTarget data to the response
             $data += $refA[$level][$params['attrId']];
@@ -787,7 +787,7 @@ class editor_AttributeController extends ZfExtended_RestController
                     $init['processStatus'] = $params['value'];
                     $init['term'] = $t->getProposal();
                     $init['guid'] = ZfExtended_Utils::uuid();
-                    $init['termTbxId'] = ZfExtended_Utils::uuid();
+                    $init['termTbxId'] = 'id' . ZfExtended_Utils::uuid();
                     $init['updatedBy'] = $this->_session->id;
                     $p->init($init);
                     $p->insert([
