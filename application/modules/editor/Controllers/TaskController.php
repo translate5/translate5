@@ -487,6 +487,10 @@ class editor_TaskController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::postAction()
      */
     public function postAction() {
+//FIXME remove debug here!
+error_log(print_r($_REQUEST,1));
+error_log(print_r($_FILES,1));
+error_log(print_r($this->_getParam('data'),1));
         $this->entity->init();
         //$this->decodePutData(); → not needed, data was set directly out of params because of file upload
         $this->data = $this->getAllParams();

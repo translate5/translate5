@@ -35,7 +35,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.LanguageCombo',
         'Editor.view.admin.config.ConfigWizard',
         'Editor.view.admin.task.UserAssocWizard',
-        'Editor.view.admin.task.UserAssocWizardViewModel'
+        'Editor.view.admin.task.UserAssocWizardViewModel',
+        'Editor.view.admin.projectWizard.UploadGrid'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -173,7 +174,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         importType:'import',
                         scrollable:'y',
                         listeners: {
-                            drop: {
+                            XXXdrop: {
                                 element: 'el',
                                 fn: 'onMainCardDrop'
                             }
@@ -219,63 +220,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     toolTip: me.strings.taskNameTip,
                                     fieldLabel: me.strings.taskNameLabel
                                 },{
-                                    xtype: 'languagecombo',
-                                    name: 'sourceLang',
-                                    toolTip: me.strings.sourceLangTip,
-                                    fieldLabel: me.strings.sourceLangLabel
-                                },{
-                                    xtype:'tagfield',
-                                    name:'targetLang[]',
-                                    toolTip: me.strings.targetLangTip,
-                                    fieldLabel: me.strings.targetLangLabel,
-                                    //each combo needs its own store instance, see EXT6UPD-8
-                                    store: Ext.create(Editor.store.admin.Languages),
-                                    typeAhead: false,
-                                    autoSelect:true,
-                                    //autoSelectLast:false,
-                                    displayField: 'label',
-                                    forceSelection: true,
-                                    //encodeSubmitValue: true, // → as JSON
-                                    anyMatch: true,
-                                    queryMode: 'local',
-                                    valueField: 'id',
-                                    allowBlank: false
-                                },{
-                                    xtype: 'languagecombo',
-                                    name: 'relaisLang',
-                                    hidden:!Editor.data.frontend.importTask.pivotDropdownVisible, // the default value is system default
-                                    getSubmitValue: function() {
-                                        return this.getValue();
-                                    },
-                                    allowBlank: true,
-                                    toolTip: me.strings.relaisLangTip,
-                                    fieldLabel: me.strings.relaisLangLabel
-                                },{
-                                    xtype: 'filefield',
-                                    name: 'importUpload',
-                                    regex: new RegExp('\.('+Editor.data.import.validExtensions.join('|')+')$', 'i'),
-                                    regexText: me.strings.importUploadType,
-                                    allowBlank: false,
-                                    toolTip: me.strings.importUploadTip,
-                                    fieldLabel: me.strings.importUploadLabel
-                                },{
-                                    xtype: 'container',
-                                    layout: 'auto',
-                                    padding: '0 0 10 0',
-                                    html: Ext.String.format(me.strings.importNews, Editor.data.pathToRunDir)
-                                }]
-                                // + item for assigning customers to the task
-                                // (added dynamically by Editor.controller.admin.TaskPreferences)
-                            },{
-                                xtype: 'container',
-                                itemId: 'taskSecondCardContainer',
-                                flex: 1,
-                                layout: 'anchor',
-                                defaults: {
-                                    labelWidth: 200,
-                                    anchor: '100%'
-                                },
-                                items: [{
                                     xtype: 'textfield',
                                     maxLength: 120,
                                     name: 'taskNr',
@@ -311,6 +255,70 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     name: 'lockLocked',
                                     checked: true,
                                     fieldLabel: me.strings.lockLockedLabel
+                                }]
+                                // + item for assigning customers to the task
+                                // (added dynamically by Editor.controller.admin.TaskPreferences)
+                            },{
+                                xtype: 'container',
+                                itemId: 'taskSecondCardContainer',
+                                flex: 1,
+                                layout: 'anchor',
+                                defaults: {
+                                    labelWidth: 200,
+                                    anchor: '100%'
+                                },
+                                items: [{
+                                    xtype: 'wizardUploadGrid',
+                                    margin: '0 0 10 0'
+                                },{
+                                    xtype: 'container',
+                                    layout: 'auto',
+                                    padding: '0 0 10 0',
+                                    html: Ext.String.format(me.strings.importNews, Editor.data.pathToRunDir)
+                                },{
+                                    xtype: 'languagecombo',
+                                    name: 'sourceLang',
+                                    toolTip: me.strings.sourceLangTip,
+                                    fieldLabel: me.strings.sourceLangLabel
+                                },{
+                                    xtype:'tagfield',
+                                    name:'targetLang[]',
+                                    toolTip: me.strings.targetLangTip,
+                                    fieldLabel: me.strings.targetLangLabel,
+                                    //each combo needs its own store instance, see EXT6UPD-8
+                                    store: Ext.create(Editor.store.admin.Languages),
+                                    typeAhead: false,
+                                    autoSelect:true,
+                                    //autoSelectLast:false,
+                                    displayField: 'label',
+                                    forceSelection: true,
+                                    //encodeSubmitValue: true, // → as JSON
+                                    anyMatch: true,
+                                    queryMode: 'local',
+                                    valueField: 'id',
+                                    allowBlank: false
+                                },{
+                                    //TRANSLATE-2080 FIXME make me a hidden fieled since set by choosing bilingual files
+                                    xtype: 'languagecombo',
+                                    name: 'relaisLang',
+                                    emptyText: 'FIXME MAKE ME a HIDDEN FIELD!',
+                                    hidden:!Editor.data.frontend.importTask.pivotDropdownVisible, // the default value is system default
+                                    getSubmitValue: function() {
+                                        return this.getValue();
+                                    },
+                                    allowBlank: true,
+                                    toolTip: me.strings.relaisLangTip,
+                                    fieldLabel: me.strings.relaisLangLabel
+                                },{
+                                    //TRANSLATE-2080 FIXME remove me but adopt regex (file type) checks to the workfiles
+                                    xtype: 'filefield',
+                                    name: 'importUpload',
+                                    regex: new RegExp('\.('+Editor.data.import.validExtensions.join('|')+')$', 'i'),
+                                    regexText: me.strings.importUploadType,
+                                    allowBlank: false,
+                                    emptyText: 'FIXME REMOVE ME!',
+                                    toolTip: me.strings.importUploadTip,
+                                    fieldLabel: me.strings.importUploadLabel
                                 }]
                             }]
                         
