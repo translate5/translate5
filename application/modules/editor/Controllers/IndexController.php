@@ -546,13 +546,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     public function applicationstateAction()
     {
         $this->_helper->layout->disableLayout();
+        $userSession = new Zend_Session_Namespace('user');
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
 
-        $userSession = new Zend_Session_Namespace('user');
-        //since application state contains sensibile information we show that only to API users
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'backend', 'applicationstate')) {
-            $this->view->applicationstate = ZfExtended_Debug::applicationState();
+        $config = Zend_Registry::get('config');
+        $isCronIP = $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR'];
+        $hasAppStateACL = $acl->isInAllowedRoles($userSession->data->roles, 'backend', 'applicationstate');
+        //since application state contains sensible information we show that only to the cron TP, or with more details to the API users
+        if ($isCronIP || $hasAppStateACL) {
+            $this->view->applicationstate = ZfExtended_Debug::applicationState($hasAppStateACL);
         }
     }
 
