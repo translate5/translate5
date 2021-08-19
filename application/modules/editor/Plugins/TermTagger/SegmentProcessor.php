@@ -42,20 +42,20 @@ class editor_Plugins_TermTagger_SegmentProcessor {
     public static function getQualityState(array $cssClasses, bool $isSourceField) : string {
         foreach($cssClasses as $cssClass){
             switch($cssClass){                
-                case editor_Models_Term::TRANSSTAT_NOT_FOUND:
+                case editor_Models_Terminology_Models_TermModel::TRANSSTAT_NOT_FOUND:
                     if($isSourceField){
                         return editor_Plugins_TermTagger_QualityProvider::NOT_FOUND_IN_TARGET;
                     }
                     break;
                     
-                case editor_Models_Term::TRANSSTAT_NOT_DEFINED:
+                case editor_Models_Terminology_Models_TermModel::TRANSSTAT_NOT_DEFINED:
                     if($isSourceField){
                         return editor_Plugins_TermTagger_QualityProvider::NOT_DEFINED_IN_TARGET;
                     }
                     break;
                     
-                case editor_Models_Term::STAT_SUPERSEDED:
-                case editor_Models_Term::STAT_DEPRECATED:
+                case editor_Models_Terminology_Models_TermModel::STAT_SUPERSEDED:
+                case editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED:
                     if($isSourceField){
                         return editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_SOURCE;
                     } else {

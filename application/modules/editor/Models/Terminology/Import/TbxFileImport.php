@@ -82,7 +82,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
     protected array $importMap;
     protected array $allowedTypes;
-    protected bool $mergeTerms;
 
     /**
      * Actual collection Id
@@ -173,21 +172,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     protected array $tbxImagesCollection;
     /**
-     * Collection of attributes (note, ref, xref, descrip...) as object prepared for insert or update.
-     * @var array
-     */
-    protected array $attributes = [];
-    /**
-     * Collection of term as object prepared for insert or update.
-     * @var array
-     */
-    protected array $terms;
-    /**
-     * Collection of transacGrp as object prepared for insert or update.
-     * @var array
-     */
-    protected array $transacGrps;
-    /**
      * Collection of images from <back> as object prepared for insert or update.
      * @var array
      */
@@ -197,11 +181,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      * @var array
      */
     protected array $unknownStates = [];
-    /**
-     * Collected term states not listed in statusMap
-     * @var array
-     */
-    protected array $unknownLanguages = [];
     /**
      * The array have an assignment of the TBX-enabled Term Static that be used in the editor
      * @var array
@@ -220,6 +199,11 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         'deprecated' => editor_Models_Terminology_TbxObjects_Term::STAT_DEPRECATED,
         'admitted' => editor_Models_Terminology_TbxObjects_Term::STAT_ADMITTED,
     ];
+    /**
+     * Collected term states not listed in statusMap
+     * @var array
+     */
+    protected array $unknownLanguages = [];
 
     /** @var editor_Models_Terminology_TbxObjects_TermEntry|mixed  */
     protected editor_Models_Terminology_TbxObjects_TermEntry $termEntryObject;
@@ -368,6 +352,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
         $totalCount = count($tbxAsSimpleXml->text->body->{$this->tbxMap[$this::TBX_TERM_ENTRY]});
         $importCount = 0;
+        $progress = 0;
         foreach ($tbxAsSimpleXml->text->body->{$this->tbxMap[$this::TBX_TERM_ENTRY]} as $termEntry) {
             $parsedEntry = null;
             $this->emptyVariables();
@@ -394,7 +379,10 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->saveParsedTbx();
             $importCount++;
 
-            $this->events->trigger('afterTermEntrySave',max(99,($importCount/$totalCount)*100));
+            $progress = min(100,($importCount/$totalCount)*100);
+            $this->events->trigger('afterTermEntrySave',$progress);
+            // Uncomment this to print the progress
+            //error_log("Update progress: [".$importCount.'/'.$totalCount.'] ( progress: '.$progress.'  %)');
         }
 
         if ($tbxAsSimpleXml->text->back->refObjectList) {
@@ -413,20 +401,30 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         // insert all attribute data types for current collection in the terms_collection_attribute_datatype table
         $dataTypeAssoc->updateCollectionAttributeAssoc($this->collectionId);
 
+        // remove all empty term entries after the tbx import
+        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
+        $termEntry->removeEmptyFromCollection([$this->collectionId]);
+
         return $this->attributes;
     }
 
+    /***
+     * Empty all helper variables before each termEntry loop
+     */
     private function emptyVariables()
     {
         $this->termEntryDbId = 0;
         $this->termEntryTbxId = '';
         $this->termEntryGuid = null;
         $this->langSetGuid = null;
+        $this->language = [];
         $this->descripGrpGuid = null;
         $this->termGuid = null;
         $this->transacGrps = [];
         $this->termId = null;
         $this->termTbxId = null;
+
     }
 
     /**
@@ -460,14 +458,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     {
         $this->termEntryTbxId = $this->getIdOrGenerate($termEntry, $this->tbxMap[$this::TBX_TERM_ENTRY]);
         $this->termEntryGuid = $this->getGuid();
-
-//        $allObjectsFromTbxElement = get_object_vars($termEntry);
-//        foreach($termEntry->rows->row as $name => $row)
-//        {
-//            if (!$name->{$name}) {
-////                Store unknown element to DB
-//            }
-//        }
 
         /** @var editor_Models_Terminology_TbxObjects_TermEntry $newEntry */
         $newEntry = new $this->termEntryObject;
@@ -518,7 +508,8 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $newLangSet->setEntryId($this->termEntryDbId);
         $newLangSet->setTermEntryGuid($parsedEntry->getEntryGuid());
 
-        //TODO: validate if this loop works !!!!!!!!!!!!!!
+        // INFO: In TBX-Basic, the <descripGrp> element is used only to associate a source to a definition or to
+        //a context. The following child elements are not supported: <descripNote>, <admin>,<adminGrp>, <note>, <ref>, and <xref>.
         foreach ($languageGroup->descripGrp as $descripGrp) {
             $this->descripGrpGuid = $this->getGuid();
             $this->setAttributeTypes($descripGrp->descrip);
@@ -531,6 +522,16 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
                     $newLangSet->setDescripGrp($this->setTransacAttributes($transac, true, 'langSet'));
                 }
             }
+
+            // INFO: if note appears on <descripGrp> level, import the note as normal attribute.
+            // This kind of note is not supported by tbx basic
+            if (isset($descripGrp->note)) {
+                $newLangSet->setNote($this->setAttributeTypes($descripGrp->note));
+            }
+        }
+
+        if (isset($languageGroup->note)) {
+            $newLangSet->setNote($this->setAttributeTypes($languageGroup->note));
         }
 
         return $newLangSet;
@@ -889,7 +890,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     private function getUniqueId($prefixType): string
     {
-        // ToDo: Sinisa, mit Alex besprechen welcher wert uebergeben werden soll
         return uniqid($prefixType);
     }
 
@@ -981,7 +981,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     private function saveImageLocal(string $imageName, string $imageContent)
     {
         $tbxImportDirectoryPath = APPLICATION_PATH.'/../data/tbx-import/';
-        $imagePath = $tbxImportDirectoryPath.'term-images-public/tc_'.$this->collectionId.'/images';
+        $imagePath = $tbxImportDirectoryPath.'term-images-public/tc_'.$this->collectionId;
 
         //check if the directory exist and it is writable
         if (is_dir($tbxImportDirectoryPath) && !is_writable($tbxImportDirectoryPath)) {
@@ -1002,34 +1002,5 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $newFileName = $imagePath.'/'.$imageName;
 
         file_put_contents($newFileName, $imageContent);
-    }
-
-
-    /***
-     *
-     * @override checkIsForUpdate
-     * @param object $elementObject
-     * @param array $elementCollection
-     * @param string $collectionKey
-     * @return array
-     */
-    public function checkIsForUpdate(object $elementObject, array $elementCollection, string $collectionKey): array
-    {
-
-        // if it is not found in the cache, create new element
-        if(!isset($elementCollection[$collectionKey])){
-            return [
-                'isUpdate' => false,
-                'isCreate' => true
-            ];
-        }
-
-        $preparedArrayForDiff = $this->prepareDiffArrayToCheck($elementObject, $elementCollection[$collectionKey]);
-        $result = array_diff($preparedArrayForDiff[0], $preparedArrayForDiff[1]);
-
-        return [
-            'isUpdate' => !empty($result),
-            'isCreate' => false
-        ];
     }
 }

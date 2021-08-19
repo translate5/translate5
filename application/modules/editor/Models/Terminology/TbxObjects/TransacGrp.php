@@ -25,7 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_TbxObjects_TransacGrp {
+class editor_Models_Terminology_TbxObjects_TransacGrp extends editor_Models_Terminology_TbxObjects_Abstract{
     /**
      * Table field for insert or update.
      * If:
@@ -75,7 +75,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
      */
     public function getCollectionKey(editor_Models_Terminology_TbxObjects_TransacGrp $element): string
     {
-        return $element->getElementName() . '-' . $element->getTransac() . '-' . $element->getIfDescripGrp() . '-' . $element->getTermTbxId();
+        return $element->getElementName() . '-' . $element->getTransac() . '-' . $element->getIfDescripGrp() . '-' . $element->getTermEntryId().'-'.$element->getTermTbxId();
     }
     /**
      * @return int

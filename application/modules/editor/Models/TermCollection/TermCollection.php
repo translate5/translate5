@@ -40,6 +40,9 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $import->mergeTerms = $params['mergeTerms'] ?? false;
         //import source (filesystem or crossApi)
         $import->importSource = $params['importSource'] ?? "";
+        if(is_string($params['customerIds'])){
+            $params['customerIds'] = explode(',',$params['customerIds']);
+        }
         $import->customerIds = $params['customerIds'];
 
         $sessionUser = new Zend_Session_Namespace('user');
@@ -175,6 +178,79 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
 
     /***
+     * Get the attribute count for the collection
+     * The return array will be in format:
+     *  [
+     *      'termsCount'=>number,
+     *      'termsEntryAttributeCount'=>number,
+     *      'languageAtributeCount'=>number,
+     *      'termsAtributeCount'=>number,
+     *  ]
+     * @param int $collectionId
+     * @return array
+     */
+    public function getAttributesCountForCollection(int $collectionId): array
+    {
+
+        $query = "SELECT 
+                        (SELECT count(DISTINCT id) FROM terms_term WHERE collectionId = ?) AS termsCount,
+                        SUM(entry) AS termsEntryAtributeCount, SUM(language) languageAtributeCount, SUM(term) AS termsAtributeCount
+                    FROM
+                        ((SELECT 
+                            SUM(CASE
+                                    WHEN
+                                        termId IS NULL AND language IS NULL
+                                            AND termEntryId IS NOT NULL
+                                    THEN
+                                        1
+                                    ELSE 0
+                                END) AS entry,
+                                SUM(CASE
+                                    WHEN termId IS NOT NULL THEN 1
+                                    ELSE 0
+                                END) AS term,
+                                SUM(CASE
+                                    WHEN
+                                        termId IS NULL AND language IS NOT NULL
+                                            AND termEntryId IS NOT NULL
+                                    THEN
+                                        1
+                                    ELSE 0
+                                END) AS language
+                        FROM
+                            terms_transacgrp
+                        WHERE
+                            collectionId = ?) UNION ALL (SELECT 
+                            SUM(CASE
+                                    WHEN
+                                        termId IS NULL AND language IS NULL
+                                            AND termEntryId IS NOT NULL
+                                    THEN
+                                        1
+                                    ELSE 0
+                                END) AS entry,
+                                SUM(CASE
+                                    WHEN termId IS NOT NULL THEN 1
+                                    ELSE 0
+                                END) AS term,
+                                SUM(CASE
+                                    WHEN
+                                        termId IS NULL AND language IS NOT NULL
+                                            AND termEntryId IS NOT NULL
+                                    THEN
+                                        1
+                                    ELSE 0
+                                END) AS language
+                        FROM
+                            terms_attributes
+                        WHERE
+                            collectionId = ?)) AS e;";
+
+        return $this->db->getAdapter()->query($query,[$collectionId,$collectionId,$collectionId])->fetchAll()[0] ?? [];
+    }
+
+
+    /***
      * Get all TermCollections ids assigned to the given customers.
      * @param array $customerIds
      * @param bool $dict
@@ -199,33 +275,6 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
             : array_column($rows, 'id');
 
         return [];
-    }
-
-
-    /***
-     * Get the attribute count for the collection
-     * The return array will be in format:
-     *  [
-     *      'termsCount'=>number,
-     *      'termsAttributeCount'=>number,
-     *      'termsEntryAttributeCount'=>number,
-     *  ]
-     * @param int $collectionId
-     * @return array
-     */
-    public function getAttributesCountForCollection(int $collectionId): array
-    {
-        $s = $this->db->select()
-        ->setIntegrityCheck(false)
-        ->from(['tc' => 'LEK_languageresources'], ['id'])
-        ->join(['t' => 'terms_term'],'tc.id = t.collectionId', ['count(DISTINCT t.id) as termsCount'])
-        ->join(['ta' => 'terms_attributes'],'tc.id = ta.collectionId AND not ta.termId is null', ['count(DISTINCT ta.id) as termsAtributeCount'])
-        ->join(['tea' => 'terms_transacgrp'],'tc.id = tea.collectionId', ['count(DISTINCT tea.id) as termsEntryAtributeCount'])
-        ->where('tc.id =?', $collectionId);
-
-        $result = $this->db->fetchRow($s)->toArray();
-
-        return $result;
     }
 
     /***
@@ -320,6 +369,10 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         // clean up the collection images
         $this->removeCollectionImagesDir($this->getId());
         parent::delete();
+        //remove all empty term entries from the same term collection
+        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
+        $termEntry->removeEmptyFromCollection([$this->getId()]);
     }
 
     /***

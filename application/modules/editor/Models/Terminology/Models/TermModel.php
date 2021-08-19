@@ -498,8 +498,14 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      * Load all terms for given collection and custom array key for each term.
      * The result array will be:
      * [
-     *   'termEntryId-language-termTbxId' => [ term results ]
+     *   'termEntryId-language' =>
+     *          [
+     *             'termTbxId' => [ term results ],
+     *              ...
+     *          ]
+     *    'language-term' = > [term results]
      * ]
+     * NOTO: this is term import specific function and should not be used outside term import context!
      * @param int $collectionId
      * @return array[]
      */
@@ -511,7 +517,22 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
 
         foreach ($queryResults as $key => $term) {
-            $fullResult[$term['termEntryId'].'-'.$term['language'].'-'.$term['termTbxId']] = $term;
+
+            $termKey = $term['termEntryId'].'-'.$term['language'];
+
+            // used for mergeTerm check for term matching by language and term content
+            $langaugeTermMergeKey = $term['language'].'-'.$term['term'];
+
+            // group by termEntry and langauge for easy merge terms check
+            if(!isset($fullResult[$termKey])){
+                $fullResult[$termKey] = [];
+            }
+            $fullResult[$termKey][$term['termTbxId']] = $term;
+
+            if(!isset($fullResult[$langaugeTermMergeKey])){
+                // hold only the first match. Merge terms uses always the first match
+                $fullResult[$langaugeTermMergeKey] = $term;
+            }
         }
 
         return $fullResult;
@@ -1700,7 +1721,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     }
     /***
      * Remove terms where the updated date is older than the given one.
-     *
+     * TODO: Import performance bottleneck. Optimize this if possible!
      * @param array $collectionIds
      * @param string $olderThan
      * @return boolean
@@ -1758,7 +1779,6 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             //TODO: with the next termportal step(add new attribute and so)
             //update/merge those new proposal attributes to
             //now only the transac group should be modefied
-            // $transacGrp->updateTermTransacGroupFromProposal($term,$proposal);
             // $transacGrp->updateTermProcessStatus($term, $term::PROCESS_STATUS_UNPROCESSED);
             //$term->save();
             $term->update([
@@ -2133,4 +2153,32 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $this->db->getAdapter()->query($sqlTransacGrp, ['collectionId' => $collectionId]);
     }
 
+    /***
+     * Remove old term proposals by given date.
+     *
+     * @param array $collectionIds
+     * @param string $olderThan
+     * @return boolean
+     */
+    public function removeProposalsOlderThan(array $collectionIds,string $olderThan){
+
+        // Delete entries having processStatus=unprocessed
+        $rowsCount = $this->db->delete([
+            'updatedAt < ?' => $olderThan,
+            'collectionId in (?)' => $collectionIds,
+            'processStatus = ?' => self::PROCESS_STATUS_UNPROCESSED
+        ]);
+
+        // Setup `proposal` column to be empty string todo: history tables to be involved ?
+        return ($this->db->update(['proposal' => ''], [
+            'updatedAt < ?' => $olderThan,
+            'collectionId in (?)' => $collectionIds,
+            'LENGTH(`proposal`) > ?' => 0
+        ]) + $rowsCount) > 0;
+
+        /*return ($this->db->delete([
+            'created < ?' => $olderThan,
+            'collectionId in (?)' => $collectionIds,
+        ]) + $rowsCount) > 0;*/
+    }
 }

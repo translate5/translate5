@@ -25,7 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_TbxObjects_Image {
+class editor_Models_Terminology_TbxObjects_Image extends editor_Models_Terminology_TbxObjects_Abstract{
     /**
      * Table field for insert or update.
      * If:

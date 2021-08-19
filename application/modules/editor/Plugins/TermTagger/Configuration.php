@@ -221,7 +221,7 @@ class editor_Plugins_TermTagger_Configuration {
     /**
      * marks terms in the source with transFound, if translation is present in the target
      * and with transNotFound if not. A translation which is of type
-     * editor_Models_Term::STAT_DEPRECATED or editor_Models_Term::STAT_SUPERSEDED
+     * editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED or editor_Models_Terminology_Models_TermModel::STAT_SUPERSEDED
      * is handled as transNotFound
      *
      * @param array $segments array of stdClass. example: array(object(stdClass)#529 (4) {

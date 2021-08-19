@@ -534,6 +534,9 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
 
         $orig = $this->row->getCleanData();
 
+        // Set up `isCreatedLocally` flag to 1 if not explicitly given
+        if (!$this->isModified('isCreatedLocally')) $this->setIsCreatedLocally(1);
+
         // Call parent
         $return = parent::save();
 
@@ -604,5 +607,275 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
 
         // Return
         return $return;
+    }
+
+    /***
+     * Remove old attribute proposals from the collection by given date.
+     *
+     * @param array $collectionIds
+     * @param string $olderThan
+     * @return boolean
+     */
+    public function removeProposalsOlderThan(array $collectionIds,string $olderThan): bool
+    {
+        // Get ids of attrs, that were created or updated after tbx-import
+        if (!$attrIdA = editor_Utils::db()->query('
+            SELECT `id` 
+            FROM `terms_attributes` 
+            WHERE TRUE
+              AND `isCreatedLocally` = "1" 
+              AND `collectionId` IN (' . implode(',', $collectionIds) . ')
+        ')->fetchAll(PDO::FETCH_COLUMN)) return false;
+
+        // Get tbx-imported values for `value` and `target` props, that now have changed values in attributes-table
+        $tbxA = editor_Utils::db()->query('
+            SELECT `attrId`, `value`, `target` 
+            FROM `terms_attributes_history`
+            WHERE TRUE
+              AND `isCreatedLocally` = "0"
+              AND `attrId` IN (' . implode(',', $attrIdA) . ')
+        ')->fetchAll(PDO::FETCH_UNIQUE);
+
+        // Distinct between created and updated
+        $attrIdA_updated = array_keys($tbxA);
+        $attrIdA_created = array_diff($attrIdA, $attrIdA_updated);
+
+        // Affected counter
+        $affectedQty = 0;
+
+        // Delete created attrs, that are older than $olderThan
+        if ($attrIdA_created) $affectedQty += $this->db->delete([
+            'createdAt < ?' => $olderThan,
+            'id in (?)' => $attrIdA_created,
+        ]);
+
+        // Overwrite $attrIdA_updated array for it to keep only ids of attributes, that were last updated before $olderThan arg
+        if ($attrIdA_updated) $attrIdA_updated = editor_Utils::db()->query($sql = '
+            SELECT `id` 
+            FROM `terms_attributes` 
+            WHERE TRUE
+              AND `id` IN (' . implode(',', $attrIdA_updated) . ')
+              AND `updatedAt` < ? 
+        ', $olderThan)->fetchAll(PDO::FETCH_COLUMN);
+
+        // Revert updated attrs' `value` and `target` props to tbx-imported values
+        foreach ($attrIdA_updated as $attrId) {
+            $this->load($attrId);
+            $this->setValue($tbxA[$attrId]['value']);
+            $this->setTarget($tbxA[$attrId]['target']);
+            $this->setIsCreatedLocally(0);
+            $this->save();
+
+            // Increase counter
+            $affectedQty ++;
+        }
+
+        // Delete history-records for $attrIdA_updated attrs
+        if ($attrIdA_updated) ZfExtended_Factory::get('editor_Models_Term_AttributeHistory')->db->delete([
+            'attrId in (?)' => $attrIdA_updated,
+        ]);
+
+        // Return
+        return $affectedQty > 0;
+    }
+
+    /**
+     * @param array $refA
+     * @param $refTargetIdA
+     * @param array $prefLangA
+     * @param string $level
+     * @throws Zend_Db_Statement_Exception
+     */
+    public static function refTarget(array &$refA, $refTargetIdA, array $prefLangA, $level = null) {
+
+        // If no ref-attributes found - return
+        if (!$refA) return;
+
+        // Shortcut to arg passed to IN (?)
+        $in = '"' . implode('","', array_keys($refTargetIdA)) . '"';
+
+        // Which tbx column to use
+        $tbxCol = $level
+            ? '`' . ($level == 'term' ? 'termTbxId' : 'termEntryTbxId') . '`'
+            : 'IF(`termTbxId` IN (' . $in .'), `termTbxId`, `termEntryTbxId`)';
+
+        // Build WHERE clause
+        $where = $level
+            ? '`' . ($level == 'term' ? 'termTbxId' : 'termEntryTbxId') . '` IN (' . $in . ')'
+            : '`termTbxId` IN (' . $in . ') OR `termEntryTbxId` IN (' . $in . ')';
+
+        // Get data by ref targets
+        $dataByRefTargetIdA = editor_Utils::db()->query($_ = '
+            SELECT
+              ' . $tbxCol . ',
+              `termEntryId`,
+              `collectionId`,
+              JSON_OBJECTAGG(
+                `language`,
+                CONCAT(`id`, ",", `languageId`, ",", `term`, ",", `processStatus`, ",", `status`)
+              ) AS `json`
+            FROM `terms_term`
+            WHERE ' . $where . '
+            GROUP BY `termEntryId`            
+        ')->fetchAll(PDO::FETCH_UNIQUE);
+
+        // Simulate situation when current search-term language is 'en-us', but refData contains term only for 'en-gb'
+        /*$dataByRefTargetIdA['626a86ec-4979-43e5-8293-6bb6532b7cf5']['json']
+            = str_replace('de-de', 'fr-fr', $dataByRefTargetIdA['626a86ec-4979-43e5-8293-6bb6532b7cf5']['json']);*/
+
+        // Get preferred languages groups
+        $prefLangGroupA = [];
+        foreach ($prefLangA as $prefLang)
+            $prefLangGroupA[substr($prefLang, 0, 2)] = true;
+
+        // Foreach data item
+        foreach ($dataByRefTargetIdA as $tbxId => &$refData) {
+
+            // Decode json
+            $refData['json'] = json_decode($refData['json'], true);
+
+            // If preferred languages belong to same group, try to find such terms as a priority choice
+            // For example we have:
+            // 1. $prefLangA = ['en-gb', 'en-us'], where
+            //   'en-us' is a priority 1 (center-panel clicked term's language), and
+            //   'en-gb' is a priority 2 (main term-search language)
+            // 2. reference-terms found for 'en-gb' and 'en-au' languages
+            // So, 'en-au' may be chosen if it appears first before 'en-gb' in the database,
+            // despite 'en-gb' is more preferable, so below we're preventing that
+            if (count($prefLangGroupA) == 1)
+                foreach ($prefLangA as $prefLang)
+                    if ($value = $refData['json'][$prefLang]) {
+                        $refData['language'] = $prefLang;
+                        list (
+                            $refData['termId'],
+                            $refData['languageId'],
+                            $refData['value'],
+                            $refData['processStatus'],
+                            $refData['status']
+                            ) = explode(',', $value);
+
+                        // Jump to next $refData
+                        continue 2;
+                    }
+
+            // Foreach preferred language
+            foreach ($prefLangA as $prefLang) {
+
+                // If term exists for the preferred language
+                if (count($prefLangGroupA) >= 1 && $value = $refData['json'][$prefLang]) {
+                    $refData['language'] = $prefLang;
+                    list (
+                        $refData['termId'],
+                        $refData['languageId'],
+                        $refData['value'],
+                        $refData['processStatus'],
+                        $refData['status']
+                        ) = explode(',', $value);
+
+                    //
+                    break;
+
+                    // Else if language of clicked left result is like 'xx-yy',
+                    // e.g. belongs to a group 'xx', or is like 'xx'
+                } else {
+
+                    // Try to find term for the language within that group
+                    foreach ($refData['json'] as $lang => $value) {
+                        if (substr($lang, 0, 2) == substr($prefLang, 0, 2)) {
+                            $refData['language'] = $lang;
+                            list (
+                                $refData['termId'],
+                                $refData['languageId'],
+                                $refData['value'],
+                                $refData['processStatus'],
+                                $refData['status']
+                                ) = explode(',', $value);
+                            break 2;
+                        }
+                    }
+                }
+            }
+
+            // If term for preferred languages is still not found - just use first
+            if (!$refData['language']) {
+                $refData['language'] = array_keys($refData['json'])[0];
+                list (
+                    $refData['termId'],
+                    $refData['languageId'],
+                    $refData['value'],
+                    $refData['processStatus'],
+                    $refData['status']
+                    ) = explode(',', $refData['json'][$refData['language']]);
+            }
+
+            // Unset data for other languages
+            unset($refData['json']);
+        }
+
+        // Apply ref data. Actually, the following props will be:
+        // 1. Overwritten: language, value
+        // 2. Added: termEntryId
+        foreach ($refTargetIdA as $refTargetId => $info) {
+
+            // Pick level and attributeId
+            list($level, $attributeId) = $info;
+
+            // Setup a shortcut
+            $_ = $dataByRefTargetIdA[$refTargetId] ?: [];
+
+            // Add isValidTbx flag
+            $_ += ['isValidTbx' => !!$_];
+
+            // Merge into attribute, with a priority
+            $refA[$level][$attributeId] = $_ + $refA[$level][$attributeId];
+        }
+    }
+
+    /**
+     * @param $collectionId
+     * @param $termEntryId
+     * @param null $language
+     * @throws Zend_Db_Statement_Exception
+     */
+    public static function deleteImages($collectionId, $termEntryId, $language = null) {
+
+        // Setup query param bindings
+        $bind[':termEntryId'] = $termEntryId; if ($language) $bind[':language'] = $language;
+
+        // Build WHERE clause using bindings
+        $where = []; foreach ($bind as $key => $value) $where []= '`' . ltrim($key, ':') . '` = ' . $key;
+
+        // Get image-attribute targets
+        $targetIdA = editor_Utils::db()->query('
+            SELECT `target`, `id` FROM `terms_attributes` WHERE ' . implode(' AND ', $where) . ' AND `type` = "figure" 
+        ', $bind)->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // Get quote-wrapped comma-separated list of `target`-values to be used in sql IN (...) clause
+        $targetIds = '"' . implode('","', array_keys($targetIdA)) . '"';
+
+        // Get filenames by targetIds
+        $nameByTargetIdA = editor_Utils::db()->query('
+            SELECT `targetId`, `uniqueName` 
+            FROM `terms_images` 
+            WHERE `targetId` IN (' . $targetIds . ')
+              AND `collectionId` = "' . $collectionId . '"
+        ')->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // Delete image files
+        foreach ($targetIdA as $targetId => $attributeId)
+            if (($name = $nameByTargetIdA[$targetId])
+                && is_file($abs = $_SERVER['DOCUMENT_ROOT']
+                    . '/term-images-public/tc_'
+                    . $collectionId
+                    . '/' . $name))
+                unlink($abs);
+
+        // Delete records from `terms_images` table
+        editor_Utils::db()->query('
+            DELETE 
+            FROM `terms_images` 
+            WHERE `targetId` IN (' . $targetIds . ')
+              AND `collectionId` = "' . $collectionId . '"
+        ')->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 }
