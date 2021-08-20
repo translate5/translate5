@@ -52,6 +52,7 @@ class editor_Utils {
         'datetime' => '/^[0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/',
         'url' => '/^(ht|f)tp(s?)\:\/\/(([a-zA-Z0-9\-\._]+(\.[a-zA-Z0-9\-\._]+)+)|localhost)(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_]*)?([\d\w\.\/\%\+\-\=\&amp;\?\:\\\&quot;\'\,\|\~\;]*)$/',
         'varchar255' => '/^([[:print:]]{0,255})$/',
+        'varchar255s' => '/^([[:print:]\s]{0,255})$/',
         'dir' => ':^([A-Z][\:])?/.*/$:', // directory (Windows-style 'C:/xxx' also supported)
         'grs' => '/^[a-zA-Z0-9]{15}$/', // generated random sequence
         'phone' => '/^\+7 \([0-9]{3}\) [0-9]{3}-[0-9]{2}-[0-9]{2}$/', // ?

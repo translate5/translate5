@@ -628,11 +628,19 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             $codeA = [];
             foreach (explode(',', $params['language']) as $langId)
                 $codeA []= $codeByLangIdA[$langId];
+
+            // Get text-attributes datatype ids
+            $textA = editor_Utils::db()
+                ->query('SELECT `id`, 1 FROM `terms_attributes_datatype` WHERE `dataType` != "picklist"')
+                ->fetchAll(PDO::FETCH_KEY_PAIR);
         }
 
 
         // Get the comma-separated list of termEntryIds matching attr-filters
         foreach ($params['attrs'] as $aDataTypeId => $aValue) {
+
+            // Fuzzy search for text-attrs
+            if ($textA[$aDataTypeId]) $aValue = '*' . trim($aValue, '*?') . '*';
 
             // If wildcards are used, convert them to the mysql syntax
             $expr = str_replace(['*', '?'], ['%', '_'], $aValue);
