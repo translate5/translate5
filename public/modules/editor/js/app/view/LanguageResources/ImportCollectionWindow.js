@@ -73,7 +73,7 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
             fieldLabel: me.strings.mergeTerms,
             itemId:'mergeTerms',
             name:'mergeTerms',
-            value:true
+            value:false
         },{
             xtype:'datefield',
             fieldLabel: me.strings.deleteTermEntriesDate,

@@ -149,7 +149,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     fieldLabel: me.strings.mergeTerms,
                     itemId:'mergeTerms',
                     name:'mergeTerms',
-                    value:true
+                    value:false
                 },{
                     xtype:'customers',
                     name:'customerIds[]',
