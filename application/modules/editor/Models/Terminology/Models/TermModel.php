@@ -259,8 +259,25 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ':termEntryId' => $this->getTermEntryId(),
         ]);
 
+        // Update collection languages
+        $this->updateCollectionLangs();
+
         // Return
         return $termId;
+    }
+
+    /**
+     *
+     */
+    public function updateCollectionLangs() {
+
+        // Remove old language assocs
+        ZfExtended_Factory
+            ::get('editor_Models_LanguageResources_Languages')
+            ->removeByResourceId([$this->getCollectionId()]);
+
+        // Add the new language assocs
+        $this->updateAssocLanguages([$this->getCollectionId()]);
     }
 
     /**
@@ -336,6 +353,24 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
         // Return
         return $return;
+    }
+
+    /**
+     *
+     */
+    public function delete() {
+
+        // Backup collectionId
+        $collectionId = $this->getCollectionId();
+
+        // Call parent
+        parent::delete();
+
+        // Restore collectionId
+        $this->setCollectionId($collectionId);
+
+        // Update collection languages
+        $this->updateCollectionLangs();
     }
 
     /**
