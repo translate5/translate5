@@ -215,11 +215,13 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
       if (userCanModifyWhitespaceTags && userCanInsertWhitespaceTags) {
     	  items.push({
   	 		 	xtype: 'buttongroup',
-  	 		 	width:'97%',
+  	 		 	width:'96%',
   	 		 	height:45,
+  	 		 	columns: 7,
   	 			items:[{
   	 				xtype: 'displayfield',
-  	 	            value: me.item_whitespaceButtonGroup
+  	 	            value: me.item_whitespaceButtonGroup,
+  	 	            width: 182
   	 			},{
   	 				xtype: 'button',
   	 				border: 1,
