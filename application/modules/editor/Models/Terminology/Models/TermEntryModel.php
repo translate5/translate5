@@ -111,6 +111,28 @@ class editor_Models_Terminology_Models_TermEntryModel extends ZfExtended_Models_
         $id = $this->save();
     }
 
+    /**
+     *
+     */
+    public function delete() {
+
+        // Remember collectionId
+        $collectionId = $this->getCollectionId();
+
+        // Call parent
+        parent::delete();
+
+        // Remove old language assocs
+        ZfExtended_Factory
+            ::get('editor_Models_LanguageResources_Languages')
+            ->removeByResourceId([$collectionId]);
+
+        // Add the new language assocs
+        ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_TermModel')
+            ->updateAssocLanguages([$collectionId]);
+    }
+
     /***
      * Remove empty term entries (term entries without any term in it).
      * Only the empty term entries from the same term collection will be removed.

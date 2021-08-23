@@ -206,7 +206,7 @@ class editor_AttributeController extends ZfExtended_RestController
             ],
             'level' => [
                 'req' => true,
-                'fis' => 'entry,language'
+                'fis' => 'entry,language,term'
             ],
             'type' => [
                 'req' => true,

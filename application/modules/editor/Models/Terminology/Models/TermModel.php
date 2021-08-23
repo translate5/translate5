@@ -259,8 +259,25 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ':termEntryId' => $this->getTermEntryId(),
         ]);
 
+        // Update collection languages
+        $this->updateCollectionLangs();
+
         // Return
         return $termId;
+    }
+
+    /**
+     *
+     */
+    public function updateCollectionLangs() {
+
+        // Remove old language assocs
+        ZfExtended_Factory
+            ::get('editor_Models_LanguageResources_Languages')
+            ->removeByResourceId([$this->getCollectionId()]);
+
+        // Add the new language assocs
+        $this->updateAssocLanguages([$this->getCollectionId()]);
     }
 
     /**
@@ -336,6 +353,24 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
         // Return
         return $return;
+    }
+
+    /**
+     *
+     */
+    public function delete() {
+
+        // Backup collectionId
+        $collectionId = $this->getCollectionId();
+
+        // Call parent
+        parent::delete();
+
+        // Restore collectionId
+        $this->setCollectionId($collectionId);
+
+        // Update collection languages
+        $this->updateCollectionLangs();
     }
 
     /**
@@ -628,11 +663,19 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             $codeA = [];
             foreach (explode(',', $params['language']) as $langId)
                 $codeA []= $codeByLangIdA[$langId];
+
+            // Get text-attributes datatype ids
+            $textA = editor_Utils::db()
+                ->query('SELECT `id`, 1 FROM `terms_attributes_datatype` WHERE `dataType` != "picklist"')
+                ->fetchAll(PDO::FETCH_KEY_PAIR);
         }
 
 
         // Get the comma-separated list of termEntryIds matching attr-filters
         foreach ($params['attrs'] as $aDataTypeId => $aValue) {
+
+            // Fuzzy search for text-attrs
+            if ($textA[$aDataTypeId]) $aValue = '*' . trim($aValue, '*?') . '*';
 
             // If wildcards are used, convert them to the mysql syntax
             $expr = str_replace(['*', '?'], ['%', '_'], $aValue);

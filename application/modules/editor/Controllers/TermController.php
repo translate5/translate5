@@ -125,7 +125,7 @@ class editor_TermController extends ZfExtended_RestController
             'note' => [
                 'req' => Zend_Registry::get('config')                               // required
                     ->runtimeOptions->termportal->commentAttributeMandatory,
-                'rex' => 'varchar255'                                               // regular expression preset key or raw expression
+                'rex' => 'varchar255s'                                              // regular expression preset key or raw expression
             ]
         ], $params);
 
