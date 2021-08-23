@@ -9,7 +9,7 @@
 .srt	okf_regex-srt
 .xlf	okf_xliff2
 .pdf	okf_pdf
-.txt	okf_mosestext
+.txt	okf_plaintext
 .yaml	okf_yaml
 .pptm	okf_openxml
 .ttx	okf_ttx

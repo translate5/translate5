@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -914,21 +914,37 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   checkTagOrder: function(nodelist) {
 	  var me = this, open = {}, clean = true;
 	  Ext.each(nodelist, function(img) {
-		  if(me.isDuplicateSaveTag(img) || /^remove/.test(img.id) || /(-single|-whitespace)/.test(img.id)){
-			  //ignore tags marked to remove
-			  return;
-		  }
-		  if(/-open/.test(img.id)){
-			  open[img.id] = true;
-			  return;
-		  }
-		  var o = img.id.replace(/-close/, '-open');
-		  if(! open[o]) {
-			  clean = false;
-			  return false; //break each
-		  }
+	      // crucial: for the tag-order, we only have to check tags that are not already deleted
+	      if(!me.isDeletedTag(img)){
+    		  if(me.isDuplicateSaveTag(img) || /^remove/.test(img.id) || /(-single|-whitespace)/.test(img.id)){
+    			  //ignore tags marked to remove
+    			  return;
+    		  }
+    		  if(/-open/.test(img.id)){
+    			  open[img.id] = true;
+    			  return;
+    		  }
+    		  var o = img.id.replace(/-close/, '-open');
+    		  if(! open[o]) {
+    			  clean = false;
+    			  return false; //break each
+    		  }
+	      }
 	  });
 	  this.isTagOrderClean = clean;
+  },
+  /**
+   * Checks if a tag is inside a del-tag and thus can be regarded as a deleted tag
+   * @param {Node} node
+   */
+  isDeletedTag: function(node){
+      while(node.parentElement && node.parentElement.tagName.toLowerCase() != 'body'){
+          if(node.parentElement.tagName.toLowerCase() == 'del'){
+              return true;
+          }
+          node = node.parentElement;
+      }
+      return false;
   },
   /**
    * Fixes duplicate img ids in the opened editor on unmarkup (MQM tags)

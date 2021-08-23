@@ -1,10 +1,9 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -33,58 +32,57 @@ END LICENSE AND COPYRIGHT
  *
  */
 Ext.Loader.setConfig({
-  enabled: true
+    enabled: true
 });
 Ext.data.Connection.disableCaching = false;
 Ext.data.JsonP.disableCaching = false;
 Ext.data.proxy.Server.prototype.noCache = false;
 Ext.Ajax.disableCaching = false;
 
-Ext.ariaWarn = Ext.emptyFn; 
+Ext.ariaWarn = Ext.emptyFn;
 
 Ext.override(Ext.data.Connection, {
     timeout: 60000
 });
 Ext.Ajax.timeout = 60000;
-Ext.override(Ext.data.proxy.Ajax, { timeout: 60000 });
-Ext.override(Ext.form.action.Action, { timeout: 60 });
+Ext.override(Ext.data.proxy.Ajax, {timeout: 60000});
+Ext.override(Ext.form.action.Action, {timeout: 60});
 
-Ext.Loader.setPath('Editor.controller.Localizer', Editor.data.basePath+'/editor/js/app-localized.js');
+Ext.Loader.setPath('Editor.controller.Localizer', Editor.data.basePath + '/editor/js/app-localized.js');
 Ext.Loader.setPath('Editor.plugins', Editor.data.pluginFolder);
 
 Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
 Editor.DATE_HOUR_MINUTE_ISO_FORMAT = 'Y-m-d H:i';
 Editor.DATEONLY_ISO_FORMAT = 'Y-m-d';
-Editor.DATE_TIME_LOCALIZED_FORMAT = Ext.form.field.Date.prototype.format +' '+ Ext.form.field.Time.prototype.format;//localized date time format
+Editor.DATE_TIME_LOCALIZED_FORMAT = Ext.form.field.Date.prototype.format + ' ' + Ext.form.field.Time.prototype.format;//localized date time format
 
-Ext.ClassManager.onCreated(function(className) {
+Ext.ClassManager.onCreated(function (className) {
     var boot = Ext.fly('loading-indicator-text');
-    if(boot) {
+    if (boot) {
         boot.update(className);
-    }
-    else {
-        Ext.Logger.info("Lazy load of: "+className);
+    } else {
+        Ext.Logger.info("Lazy load of: " + className);
     }
 });
 
 Ext.application({
-    name : 'Editor',
-    models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field','Config','TaskConfig','CustomerConfig','admin.UserAssocDefault'],
-    stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages','UserConfig','admin.Config','admin.CustomerConfig','admin.task.Config','admin.UserAssocDefault'],
+    name: 'Editor',
+    models: ['File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field', 'Config', 'TaskConfig', 'CustomerConfig', 'admin.UserAssocDefault'],
+    stores: ['Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages', 'UserConfig', 'admin.Config', 'admin.CustomerConfig', 'admin.task.Config', 'admin.UserAssocDefault'],
     requires: [
         'Editor.view.ViewPort',
         'Editor.view.ViewPortEditor',
         'Editor.view.ViewPortSingle',
         'Editor.view.QuickTip',
         'Editor.view.QuickTipLoader',
-        'Editor.model.ModelOverride', 
+        'Editor.model.ModelOverride',
         'Editor.util.TaskActions',
         'Editor.util.messageBus.MessageBus',
         'Editor.util.messageBus.EventDomain',
         'Editor.util.HttpStateProvider'
     ].concat(Editor.data.app.controllers.require),
     controllers: Editor.data.app.controllers.active,
-    appFolder : Editor.data.appFolder,
+    appFolder: Editor.data.appFolder,
     windowTitle: '',
     viewport: null,
     //***********************************************************************************
@@ -106,13 +104,13 @@ Ext.application({
      * @event adminViewportOpened
      * Fires after the admin viewport was opened by the app (nothing to do with ext rendered or show).
      */
-    
+
     /**
      * @event editorConfigLoaded
      * Fires after the task specific and customer specific config is loaded. After successful config load the editor viewport
      * will be opened
      */
-    
+
     //***********************************************************************************
     //End Events
     //***********************************************************************************
@@ -123,7 +121,7 @@ Ext.application({
             }
         }
     },
-    init: function() {
+    init: function () {
 
         //enable json in our REST interface
         Ext.Ajax.setDefaultHeaders({
@@ -131,103 +129,110 @@ Ext.application({
         });
         //init the plugins namespace
         Ext.ns('Editor.plugins');
-  
+
         //create and set the application state provider
         var provider = Ext.create('Editor.util.HttpStateProvider');
         //load the store data directly. With this no initial store load is required (the app state can be applied directly)
         provider.store.loadRawData(Editor.data.app.configData ? Editor.data.app.configData : []);
         Ext.state.Manager.setProvider(provider);
-        
+
         // the init of the QuickTips has to be done here otherwise it's too late to set the internal tip class
-        Ext.tip.QuickTipManager.init(true, { className: 'Editor.view.QuickTip' });
-        
+        Ext.tip.QuickTipManager.init(true, {className: 'Editor.view.QuickTip'});
+
         this.callParent(arguments);
         this.logoutOnWindowClose();
     },
-  
-    launch : function() {
-        var me=this;
+
+    launch: function () {
+        var me = this;
         me.initViewportLaunch();
     },
-  
+
     /***
      * Init and prepare the viewport for application launch
      */
-    initViewportLaunch:function(){
+    initViewportLaunch: function () {
         var me = this,
             viewSize = Ext.getBody().getViewSize(),
             initMethod = Editor.data.app.initMethod;
 
-            me.windowTitle = Ext.getDoc().dom.title;
-        
-            me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
+        me.windowTitle = Ext.getDoc().dom.title;
 
-            //Check if it is task route. If yes, use the redirect to task method.
-            //if it is not a task route, open the administration
-            //if no route is provided, use the defautl me[Editor.data.app.initMethod]();
-            if(me.isEditTaskRoute()){
-                //check if the taskid is provided in the hash
-                var taskId=me.parseTaskIdFromTaskEditHash(false);
-                if(taskId>0 && !Editor.data.task){
-                    Editor.data.task={};
-                    //set the taskId to the task global object
-                    //translate5 will try to load task with this id
-                    Editor.data.task.id = taskId;
-                    //the state is edit since the route is for task editing
-                    Editor.data.app.initState = 'edit';
-                    initMethod = 'openEditor';
-                }
-            }else if(window.location.hash !== ''){
-                initMethod = 'openAdministration';
+        me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
+
+        // load the customers store if the user is allowed
+        if (me.authenticatedUser.isAllowed('customerAdministration')) {
+            Ext.getStore('customersStore').load();
+        }
+
+        //Check if it is task route. If yes, use the redirect to task method.
+        //if it is not a task route, open the administration
+        //if no route is provided, use the defautl me[Editor.data.app.initMethod]();
+        if (me.isEditTaskRoute()) {
+            //check if the taskid is provided in the hash
+            var taskId = me.parseTaskIdFromTaskEditHash(false);
+            if (taskId > 0 && !Editor.data.task) {
+                Editor.data.task = {};
+                //set the taskId to the task global object
+                //translate5 will try to load task with this id
+                Editor.data.task.id = taskId;
+                //the state is edit since the route is for task editing
+                Editor.data.app.initState = 'edit';
+                initMethod = 'openEditor';
             }
+        } else if (window.location.hash !== '') {
+            initMethod = 'openAdministration';
+        }
 
-            me[initMethod]();
+        me[initMethod]();
 
-            me.browserAdvice();
-            Editor.MessageBox.showInitialMessages();
-            
-            //Logs the users userAgent and screen size for usability improvements:
-            Ext.Ajax.request({
-                url: Editor.data.pathToRunDir+'/editor/index/logbrowsertype',
-                method: 'post',
-                params: {
-                    appVersion: navigator.appVersion,
-                    userAgent: navigator.userAgent,
-                    browserName: navigator.appName,
-                    maxHeight: window.screen.availHeight,
-                    maxWidth: window.screen.availWidth,
-                    usedHeight: viewSize.height,
-                    usedWidth: viewSize.width
-                }
-            });
-            
-            me.fireEvent('editorAppLaunched');
+        me.browserAdvice();
+        Editor.MessageBox.showInitialMessages();
+
+        //Logs the users userAgent and screen size for usability improvements:
+        Ext.Ajax.request({
+            url: Editor.data.pathToRunDir + '/editor/index/logbrowsertype',
+            method: 'post',
+            params: {
+                appVersion: navigator.appVersion,
+                userAgent: navigator.userAgent,
+                browserName: navigator.appName,
+                maxHeight: window.screen.availHeight,
+                maxWidth: window.screen.availWidth,
+                usedHeight: viewSize.height,
+                usedWidth: viewSize.width
+            }
+        });
+
+        me.fireEvent('editorAppLaunched');
     },
     /**
      * If configured the user is logged out on window close
      */
-    logoutOnWindowClose: function() {
-        if(!Editor.data.logoutOnWindowClose) {
+    logoutOnWindowClose: function () {
+        if (!Editor.data.logoutOnWindowClose) {
             return;
-        }      
-        var me=this,
-            logout =function(e) {
-                if(!Editor.data.logoutOnWindowClose){
+        }
+        var me = this,
+            logout = function (e) {
+                if (!Editor.data.logoutOnWindowClose) {
                     return;
                 }
                 //send logout request, this will destroy the user session
-                navigator.sendBeacon(Editor.data.pathToRunDir+'/login/logout');
+                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout');
+
                 function sleep(delay) {
                     const start = new Date().getTime();
-                    while (new Date().getTime() < start + delay);
+                    while (new Date().getTime() < start + delay) ;
                 }
+
                 //wait 0,5 second for the logout request to be processed
                 //the beforeunload is also triggered with application reload(browser reload)
                 //so we need to give the logout request some time untill the new page reload is requested
                 sleep(500);
             };
         Ext.get(window).on({
-            beforeunload:logout
+            beforeunload: logout
         });
     },
     /**
@@ -235,43 +240,42 @@ Ext.application({
      * firing the adminViewportClosed event
      * @param {Editor.model.admin.Task} task
      */
-    openEditor: function(task) {
+    openEditor: function (task) {
         var me = this,
             languages = Ext.getStore('admin.Languages'),
             closeEvent;
-        
-        if(! (task instanceof Editor.model.admin.Task)) {
+
+        if (!(task instanceof Editor.model.admin.Task)) {
             me.openTaskDirect();
             return;
         }
-        
-        me.loadEditorConfigData(task,function(){
-            
+
+        me.loadEditorConfigData(task, function () {
+
             me.fireEvent('editorConfigLoaded', me, task);
-            
+
             Editor.data.task = task;
             Editor.model.Segment.redefine(task.segmentFields());
-            
+
             Editor.data.taskLanguages = {
                 source: languages.getById(task.get('sourceLang')),
                 relais: languages.getById(task.get('relaisLang')),
                 target: languages.getById(task.get('targetLang'))
             }
-            
-            if(me.viewport){
+
+            if (me.viewport) {
                 //trigger closeEvent depending on which viewport was open
                 closeEvent = me.viewport.isEditorViewport ? 'editorViewportClosed' : 'adminViewportClosed';
                 me.viewport.destroy();
                 me.fireEvent(closeEvent);
-            }
-            else {
+            } else {
                 Ext.getBody().removeCls('loading');
                 Ext.select("body > div.loading").destroy();
             }
             task.initWorkflow();
             me.getController('ViewModes').activate();
             me.viewport = Ext.create(Editor.data.app.viewport, {
-                renderTo : Ext.getBody()
+                renderTo: Ext.getBody()
             });
             me.viewport.show();
             //vp.doLayout();
@@ -282,20 +286,20 @@ Ext.application({
             //enable logout split button
             //disable logout normal Button
             me.fireEvent('editorViewportOpened', me, task);
-            Ext.getDoc().dom.title = me.windowTitle + ' - ' + task.getTaskName(); 
+            Ext.getDoc().dom.title = me.windowTitle + ' - ' + task.getTaskName();
             me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
         });
     },
     /**
      * Used to open a task directly by URL / page reload with already opened task / sessionAuth and not over task overview
      */
-    openTaskDirect: function(){
+    openTaskDirect: function () {
         var me = this;
         Editor.model.admin.Task.load(Editor.data.task.id, {
             preventDefaultHandler: true,
             scope: me,
-            success: function(task) {
-                task.set('userState',Editor.data.app.initState);
+            success: function (task) {
+                task.set('userState', Editor.data.app.initState);
                 task.save({
                     scope: me,
                     preventDefaultHandler: true,
@@ -306,10 +310,10 @@ Ext.application({
             failure: me.handleOpenTaskDirectError
         });
     },
-    handleOpenTaskDirectError: function(record, op, success) {
-        if(!Editor.data.editor.toolbar.hideLeaveTaskButton) {
+    handleOpenTaskDirectError: function (record, op, success) {
+        if (!Editor.data.editor.toolbar.hideLeaveTaskButton) {
             this.openAdministration();
-            if(op.error.status == 404 && record.get('taskGuid') == '') {
+            if (op.error.status == 404 && record.get('taskGuid') == '') {
                 Editor.MessageBox.getInstance().showDirectError('The requested task does not exist anymore.');
             } else {
                 Editor.app.getController('ServerException').handleFailedRequest(op.error.status, op.error.statusText, op.error.response);
@@ -320,22 +324,22 @@ Ext.application({
             title = 'Uups... The requested task could not be opened',
             respText = response && response.responseText;
 
-        if(op.error.status == 404 && record.get('taskGuid') == '') {
+        if (op.error.status == 404 && record.get('taskGuid') == '') {
             this.showInlineError('The requested task does not exist anymore.', title);
-        }else if(respText) {
+        } else if (respText) {
             this.showInlineError(Editor.app.getController('ServerException').renderHtmlMessage(title, Ext.JSON.decode(respText)));
         }
     },
     /**
      * shows a nice inline error
      */
-    showInlineError: function(text, title) {
+    showInlineError: function (text, title) {
         var loadBox = Ext.select("body > div.loading"),
             msg = '<div id="head-panel"></div>';
-        if(title) {
-            msg += '<h1>'+title+'</h1>';
+        if (title) {
+            msg += '<h1>' + title + '</h1>';
         }
-        if(loadBox) {
+        if (loadBox) {
             loadBox.setCls('loading-error');
             loadBox.update(msg + text);
         }
@@ -344,17 +348,16 @@ Ext.application({
      * opens the admin viewport
      * firing the editorViewportClosed event
      */
-    openAdministration: function(task) {
+    openAdministration: function (task) {
         var me = this, tabPanel;
-        if(!Editor.controller.admin || ! Editor.controller.admin.TaskOverview) {
+        if (!Editor.controller.admin || !Editor.controller.admin.TaskOverview) {
             return;
         }
-        if(me.viewport){
+        if (me.viewport) {
             me.getController('ViewModes').deactivate();
             me.viewport.destroy();
             me.fireEvent('editorViewportClosed');
-        }
-        else {
+        } else {
             Ext.getBody().removeCls('loading');
             Ext.select("body > div.loading").destroy();
         }
@@ -362,9 +365,9 @@ Ext.application({
             renderTo: Ext.getBody()
         });
         me.viewport.show();
-        
+
         me.getController('admin.TaskOverview').loadTasks();
-        
+
         /*
         - hides all editor components, inits all admin components, stores, etc.
         - empty editor stores
@@ -375,25 +378,25 @@ Ext.application({
         tabPanel = me.viewport.down('#adminMainSection');
 
         // on intial load we have to trigger the change manually
-        me.onAdminMainSectionChange(tabPanel, tabPanel.getActiveTab(),task);
-        
+        me.onAdminMainSectionChange(tabPanel, tabPanel.getActiveTab(), task);
+
         //set the value used for displaying the help pages
         Ext.getDoc().dom.title = me.windowTitle;
     },
     /**
      * requests the application to open the desired application section, and redirects the route to the given one
      */
-    openAdministrationSection: function(panel, redirectRoute) {
+    openAdministrationSection: function (panel, redirectRoute) {
         var me = this,
             mainTabs = me.viewport.down('> #adminMainSection');
 
-        if(Ext.isString(panel)) {
+        if (Ext.isString(panel)) {
             panel = me.viewport.down(panel);
         }
         //what  happens if panel does not belong to the tabpanel?
         mainTabs.setActiveTab(panel);
         me.redirectTo(redirectRoute);
-        
+
         //if we are in a task, we have to stop routing, leave it, and resume routing after the task was closed (a new one was loaded, for routing open tasks)
     },
     /**
@@ -402,36 +405,36 @@ Ext.application({
      * @param {Ext.tab.Panel} tabpanel
      * @param {Ext.Component} activatedPanel
      */
-    onAdminMainSectionChange: function(tabpanel, activatedPanel,task) {
+    onAdminMainSectionChange: function (tabpanel, activatedPanel, task) {
         var me = this,
             ctrl = activatedPanel.getController(),
             conf = ctrl && ctrl.defaultConfig,
             mainRoute = conf && conf.routes && Object.keys(conf.routes)[0];
         me.fireEvent('adminSectionChanged', activatedPanel);
 
-        if(!mainRoute) {
+        if (!mainRoute) {
             return;
         }
         me.redirectTo(mainRoute);
     },
-    mask: function(msg, title) {
-        if(!this.appMask) {
+    mask: function (msg, title) {
+        if (!this.appMask) {
             this.appMask = Ext.widget('messagebox');
         }
         this.appMask.wait(msg, title);
     },
-    unmask: function() {
+    unmask: function () {
         //no "this" usage, so we can use this method directly as failure handler 
         Editor.app.appMask && Editor.app.appMask.close();
     },
-    logout: function() {
+    logout: function () {
         window.location = Editor.data.loginUrl;
     },
     /**
      * sets the locale / language to be used by the application. Restarts the application.
      * @param {String} lang
      */
-    setTranslation: function(lang) {
+    setTranslation: function (lang) {
         var formSpec = {
                 tag: 'form',
                 action: window.location.href,
@@ -451,42 +454,42 @@ Ext.application({
         Editor.data.logoutOnWindowClose = false;
         form.submit();
     },
-    browserAdvice: function() {
+    browserAdvice: function () {
         var me = this,
             supportedBrowser = false;
         //Feature disabled
-        if(!Editor.data.supportedBrowsers) {
+        if (!Editor.data.supportedBrowsers) {
             return;
         }
-        Ext.Object.each(Editor.data.supportedBrowsers, function(idx, version) {
-            if(Ext.browser.name == idx && Ext.browser.version.major >= version) {
+        Ext.Object.each(Editor.data.supportedBrowsers, function (idx, version) {
+            if (Ext.browser.name == idx && Ext.browser.version.major >= version) {
                 supportedBrowser = true;
                 return false;
             }
         });
-        if(!supportedBrowser) {
+        if (!supportedBrowser) {
             Ext.MessageBox.alert(me.browserAdviceTextTitle, me.browserAdviceText);
         }
     },
-    
+
     /***
      * Get all classes with which are using the mixin
      */
-    getClassesByMixin:function(mixinName){
-        var classes=[];
-        Ext.iterate(Ext.ClassManager.classes,function(className,c){
-            if(c.prototype &&c.prototype.mixins &&  c.prototype.mixins[mixinName]){
+    getClassesByMixin: function (mixinName) {
+        var classes = [];
+        Ext.iterate(Ext.ClassManager.classes, function (className, c) {
+            if (c.prototype && c.prototype.mixins && c.prototype.mixins[mixinName]) {
                 classes.push(className);
             }
         });
         return classes;
     },
 
-     /**
+    /**
      * Check if in the current hash, the edit task route is defined. The edit task route is only valid
      * when the segments-editor is opened
      */
-    isEditTaskRoute:function(){
+    isEditTaskRoute: function () {
         return window.location.hash.startsWith('#task') && window.location.hash.endsWith('/edit');
     },
 
@@ -494,38 +497,38 @@ Ext.application({
      * Get task id from the task edit route.
      * {Boolean} checkEditTaskRoute : validate if the current route is task edit route
      */
-    parseTaskIdFromTaskEditHash:function(checkEditTaskRoute){
-        if(checkEditTaskRoute && !this.isEditTaskRoute()){
+    parseTaskIdFromTaskEditHash: function (checkEditTaskRoute) {
+        if (checkEditTaskRoute && !this.isEditTaskRoute()) {
             return -1;
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return (h && h.length>1) ? parseInt(h[1]) : -1;
+        return (h && h.length > 1) ? parseInt(h[1]) : -1;
     },
 
     /***
      * Get segmentNrInTask from the task edit route
      * {Boolean} checkEditTaskRoute : validate if the current route is task edit route
      */
-    parseSegmentIdFromTaskEditHash:function(checkEditTaskRoute){
-        if(checkEditTaskRoute && !this.isEditTaskRoute()){
+    parseSegmentIdFromTaskEditHash: function (checkEditTaskRoute) {
+        if (checkEditTaskRoute && !this.isEditTaskRoute()) {
             return -1;
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return (h && h.length==4) ? parseInt(h[2]) : -1;
+        return (h && h.length == 4) ? parseInt(h[2]) : -1;
     },
-    
+
     /***
      * Load the task specific config store.
      */
-    loadEditorConfigData:function(task,callback){
-        var me=this,
+    loadEditorConfigData: function (task, callback) {
+        var me = this,
             store = Ext.StoreManager.get('admin.task.Config');
-        
-        store.loadByTaskGuid(task.get('taskGuid'),function(records, operation, success){
+
+        store.loadByTaskGuid(task.get('taskGuid'), function (records, operation, success) {
             me.unmask();
-            if(!success){
+            if (!success) {
                 Editor.app.getController('ServerException').handleCallback(records, operation, false);
                 return;
             }
@@ -533,30 +536,30 @@ Ext.application({
             callback();
         });
     },
-    
+
     /***
      * Return the task specific config value by given config name
      */
-    getTaskConfig:function(configName){
+    getTaskConfig: function (configName) {
         return Ext.StoreManager.get('admin.task.Config').getConfig(configName);
     },
-    
+
     /***
      * Get the user specific config by given config name.
      * INFO: currently the user configs are loaded also in the state provider and with that,
      * no need for separate user config store, just load the data from there.
-     * 
+     *
      * {Boolean} returnRecord : the record will be returned instead of the record value
      */
-    getUserConfig:function(configName,returnRecord){
-        var store=Ext.state.Manager.getProvider().store,
-            pos = store.findExact('name', 'runtimeOptions.'+configName),
+    getUserConfig: function (configName, returnRecord) {
+        var store = Ext.state.Manager.getProvider().store,
+            pos = store.findExact('name', 'runtimeOptions.' + configName),
             row;
         if (pos < 0) {
             return null;
         }
         row = store.getAt(pos);
-        if(returnRecord){
+        if (returnRecord) {
             return row;
         }
         return row.get('value');

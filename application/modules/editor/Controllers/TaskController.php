@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
-
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ 
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-
+  
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
-
+  
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -875,27 +875,27 @@ class editor_TaskController extends ZfExtended_RestController {
             $tasks[] = $task;
         }
 
+        // we fix all task-specific configs of the task for it's remaining lifetime
+        // this is crucial to ensure, that important configs are changed throughout the lifetime that are usually not designed to be dynamical (AutoQA, Visual, ...)
+        $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
+        /* @var $taskConfig editor_Models_TaskConfig */
+        $taskConfig->fixAfterImport($tasks);
+
         $model = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $model editor_Models_Task */
         foreach ($tasks as $task){
-            
+
             if(is_array($task)){
                 $model->load($task['id']);
             } else {
                 $model = $task;
             }
-            
+
             //import workers can only be started for tasks
             if($model->isProject()) {
                 continue;
             }
 
-            // we fix all task-specific configs of the task for it's remaining lifetime
-            // this is crucial to ensure, that important configs are changed throughout the lifetime that are usually not designed to be dynamical (AutoQA, Visual, ...)
-            $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
-            /* @var $taskConfig editor_Models_TaskConfig */
-            $taskConfig->fixAfterImport($model->getTaskGuid());
-    
             $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
             /* @var $workerModel ZfExtended_Models_Worker */
             try {

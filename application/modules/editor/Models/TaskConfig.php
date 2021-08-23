@@ -3,29 +3,29 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
-
- Copyright (c) 2013 - 2020 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ 
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-
+  
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
-
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
+
 /***
 * @method void setId() setId(int $id)
 * @method int getId() getId()
@@ -166,29 +166,49 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
         return $row['value'];
     }
     /**
-     * Fixes the config for a task after Import.
+     * Fixes the config for a task/project after Import.
      * This means, that all configs with task-import-level will be inserted to the task-config table and thus never can be changed again in the lifetime of the task after import
+     *
+     * @param array $tasks
      */
-    public function fixAfterImport(string $taskGuid){
+    public function fixAfterImport(array $tasks){
+
         $db = $this->db->getAdapter();
-        // evaluate the configs to fix
-        $newRows = [];
-        $taskConfigs = $this->getTaskConfigModel($taskGuid);
-        foreach($taskConfigs as $config){
-            // TODO AUTOQA: Do we have to add editor_Models_Config::CONFIG_LEVEL_TASK as well ??
-            if($config['level'] == editor_Models_Config::CONFIG_LEVEL_TASKIMPORT){
-                $newRows[] = '('.$db->quote($taskGuid).','.$db->quote($config['name']).','.$db->quote($config['value']).')';
+        $values = [];
+
+        $model = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $model editor_Models_Task */
+        foreach ($tasks as $task){
+
+            if(is_array($task)){
+                $model->load($task['id']);
+            } else {
+                $model = $task;
             }
-        }        
-        // remove the current configs
-        $sql = 'DELETE FROM `LEK_task_config` WHERE taskGuid = '.$db->quote($taskGuid).';';
-        $db->query($sql);
-        
-        // write the ones to fix
-        if(count($newRows) > 0){
-            $sql = 'INSERT INTO `LEK_task_config` (`taskGuid`, `name`, `value`) VALUES '.implode(',', $newRows);
-            $db->query($sql);
+
+            //import workers can only be started for tasks
+            if($model->isProject()) {
+                continue;
+            }
+
+            // evaluate the configs to fix
+            $values = [];
+            $taskConfigs = $this->getTaskConfigModel($model->getTaskGuid());
+            foreach($taskConfigs as $config){
+                if($config['level'] == editor_Models_Config::CONFIG_LEVEL_TASKIMPORT){
+                    $values[] = '('.$db->quote($model->getTaskGuid()).','.$db->quote($config['name']).','.$db->quote($config['value']).')';
+                }
+            }
+
         }
+
+        if(count($values) < 1){
+            return;
+        }
+
+        // inset all new values, and leave the existing one inside the table.
+        $sql = 'INSERT INTO `LEK_task_config` (`taskGuid`, `name`, `value`) VALUES '.implode(',', $values). '  ON DUPLICATE KEY UPDATE `value`=`value`';
+        $db->query($sql);
     }
 
     /***
