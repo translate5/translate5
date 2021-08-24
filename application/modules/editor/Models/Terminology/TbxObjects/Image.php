@@ -79,12 +79,11 @@ class editor_Models_Terminology_TbxObjects_Image extends editor_Models_Terminolo
     protected string $hexOrXbaseValue = '';
 
     /**
-     * @param editor_Models_Terminology_TbxObjects_Image $element
      * @return string
      */
-    public function getCollectionKey(editor_Models_Terminology_TbxObjects_Image $element): string
+    public function getCollectionKey(): string
     {
-        return $element->getCollectionId() . '-' . $element->getTargetId();
+        return $this->getCollectionId() . '-' . $this->getTargetId();
     }
 
     /**

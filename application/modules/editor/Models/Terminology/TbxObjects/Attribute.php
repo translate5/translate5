@@ -76,12 +76,11 @@ class editor_Models_Terminology_TbxObjects_Attribute extends editor_Models_Termi
     protected string $attrLang = '';
 
     /**
-     * @param editor_Models_Terminology_TbxObjects_Attribute $element
      * @return string
      */
-    public function getCollectionKey(editor_Models_Terminology_TbxObjects_Attribute $element): string
+    public function getCollectionKey(): string
     {
-        return $element->getElementName() . '-' .$element->getType() . '-' . $element->getTermEntryId() . '-' . $element->getLanguage() . '-' . $element->getTermTbxId();
+        return $this->getElementName() . '-' .$this->getType() . '-' . $this->getTermEntryId() . '-' . $this->getLanguage() . '-' . $this->getTermTbxId();
     }
 
     /**
@@ -393,7 +392,7 @@ class editor_Models_Terminology_TbxObjects_Attribute extends editor_Models_Termi
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getUpdatedBy(): int
     {
@@ -429,7 +428,7 @@ class editor_Models_Terminology_TbxObjects_Attribute extends editor_Models_Termi
     }
 
 
-    public function getLevel(){
+    public function getLevel(): string {
         if(empty($this->language)){
             return self::ATTRIBUTE_LEVEL_ENTRY;
         }

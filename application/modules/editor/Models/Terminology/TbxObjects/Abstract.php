@@ -29,13 +29,9 @@ abstract class editor_Models_Terminology_TbxObjects_Abstract
 {
 
     /**
-     * @param editor_Models_Terminology_TbxObjects_TransacGrp $element
      * @return string
      */
-    public function getCollectionKey(editor_Models_Terminology_TbxObjects_TransacGrp $element): string
-    {
-        return '';
-    }
+    abstract protected function getCollectionKey(): string;
 
     /***
      * Search for tbx object in the data array with the element key
@@ -45,6 +41,6 @@ abstract class editor_Models_Terminology_TbxObjects_Abstract
      * @return array|mixed
      */
     public function findInArray(array $data, bool $mergeTerms = false){
-        return $data[$this->getCollectionKey($this)] ?? [];
+        return $data[$this->getCollectionKey()] ?? [];
     }
 }
