@@ -30,3 +30,4 @@ ALTER TABLE `terms_term`
    CHANGE `proposal` `proposal` TINYTEXT NULL;
 
 ALTER TABLE `terms_term` ADD FULLTEXT KEY `fulltext` (`term`,`proposal`);
+ALTER TABLE `terms_term` ADD  INDEX `languageId_collectionId_idx` (`collectionId`, `languageId`);
