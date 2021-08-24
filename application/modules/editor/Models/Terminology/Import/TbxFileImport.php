@@ -124,11 +124,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     protected ?string $termTbxId;
     /**
-     * file path for collection
-     * @var string
-     */
-    protected string $tbxFilePath;
-    /**
      * Unique Guid for each descripGrpGuid
      * @var string|null
      */
@@ -227,7 +222,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     /**
      * @var ZfExtended_EventManager
      */
-    protected $events = false;
+    protected ZfExtended_EventManager $events;
 
     /**
      * editor_Models_Import_TermListParser_TbxFileImport constructor.
@@ -274,21 +269,20 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     public function importXmlFile(string $tbxFilePath, editor_Models_TermCollection_TermCollection $collection, ZfExtended_Models_User $user, bool $mergeTerms): array
     {
-        $termEntries = [];
-        $this->tbxFilePath = $tbxFilePath;
+        $this->prepareImportArrays($collection, $user, $mergeTerms);
 
-        try {
-            $tbxAsSimpleXml = new SimpleXMLElement(file_get_contents($tbxFilePath), LIBXML_NOERROR);
-        } catch (Exception $e) {
+        $xmlReader = new XMLReader();
+        if(!$xmlReader->open($tbxFilePath)) {
             throw new Zend_Exception('TBX file can not be opened.');
         }
 
-        if ($tbxAsSimpleXml) {
-            $this->prepareImportArrays($collection, $user, $mergeTerms);
-            $termEntries = $this->importTbx($tbxAsSimpleXml);
-        }
+        $totalCount = $this->countTermEntries($xmlReader);
 
-        return $termEntries;
+        //since there is no reset we have to reopen the file
+        $xmlReader->close();
+        $xmlReader->open($tbxFilePath);
+
+        return $this->importTbx($xmlReader, $totalCount);
     }
 
     /**
@@ -304,12 +298,14 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->mergeTerms = $mergeTerms;
         $this->dataType->resetData();
 
-        $this->tbxMap[$this::TBX_TERM_ENTRY] = 'termEntry';
+
+        //TODO how to distinguish between TBX V2 (termEntry) and V3 (conceptEntry)?
+        $this->tbxMap[$this::TBX_TERM_ENTRY] = $this::TBX_TERM_ENTRY; //for V3 set conceptEntry here (implement as subclass???)
         $this->tbxMap[$this::TBX_LANGSET] = 'langSet';
         $this->tbxMap[$this::TBX_TIG] = 'tig';
 
         $languagesModel = ZfExtended_Factory::get('editor_Models_Languages')->getAvailableLanguages();
-        foreach ($languagesModel as $key => $language) {
+        foreach ($languagesModel as $language) {
             $this->languages[strtolower($language['value'])] = $language['id'];
         }
 
@@ -336,6 +332,23 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     }
 
     /**
+     * Counts the term entries in the loaded document
+     * @param XMLReader $xmlReader
+     * @return int
+     */
+    private function countTermEntries(XMLReader $xmlReader): int {
+        // find first termEntry and count them from there
+        while ($xmlReader->read() && $xmlReader->name !== $this->tbxMap[$this::TBX_TERM_ENTRY]);
+        $totalCount = 0;
+        while ($xmlReader->name === $this->tbxMap[$this::TBX_TERM_ENTRY])
+        {
+            $totalCount++;
+            $xmlReader->next($this->tbxMap[$this::TBX_TERM_ENTRY]);
+        }
+        return $totalCount;
+    }
+
+    /**
      * Iterate over the TBX structure and call handler for each element.
      * There will be parsed all child elements.
      * Only a termEntry row in terms_termEntry table will be created (or not, if import to exist collection and exist!)
@@ -343,21 +356,60 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      *
      * LangSet and Terms will be created or updated after each termEntry
      *
-     * @param SimpleXMLElement $tbxAsSimpleXml
+     * @param XMLReader $xmlReader
      * @return array
      */
-    private function importTbx(SimpleXMLElement $tbxAsSimpleXml): array
+    private function importTbx(XMLReader $xmlReader, int $totalCount): array
     {
-        $this->tbxMap[$this::TBX_TERM_ENTRY] = $tbxAsSimpleXml->text->body->termEntry ? 'termEntry' : 'conceptEntry';
+        while ($xmlReader->read()) {
+            //process either term entries or refObjectList what ever comes first
+            switch ($xmlReader->name) {
+                case 'refObjectList':
+                    $this->processRefObjects($xmlReader);
+                    break;
+                case $this->tbxMap[$this::TBX_TERM_ENTRY]:
+                    $this->processTermEntries($xmlReader, $totalCount);
+                    break;
+                default :
+                    //no processable item, just go the next
+                    break;
+            }
+        }
 
-        $totalCount = count($tbxAsSimpleXml->text->body->{$this->tbxMap[$this::TBX_TERM_ENTRY]});
+        $this->logUnknownLanguages();
+
+        $this->termModel->updateAttributeAndTransacTermIdAfterImport($this->collectionId);
+
+        $dataTypeAssoc = ZfExtended_Factory::get('editor_Models_Terminology_Models_CollectionAttributeDataType');
+        /* @var $dataTypeAssoc editor_Models_Terminology_Models_CollectionAttributeDataType */
+        // insert all attribute data types for current collection in the terms_collection_attribute_datatype table
+        $dataTypeAssoc->updateCollectionAttributeAssoc($this->collectionId);
+
+        // remove all empty term entries after the tbx import
+        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
+        $termEntry->removeEmptyFromCollection([$this->collectionId]);
+
+        return $this->attributes;
+    }
+
+    /**
+     * processes the term entries found in the XML
+     * @param XMLReader $xmlReader
+     * @param int $totalCount
+     * @throws Exception
+     */
+    protected function processTermEntries(XMLReader $xmlReader, int $totalCount) {
         $importCount = 0;
         $progress = 0;
-        foreach ($tbxAsSimpleXml->text->body->{$this->tbxMap[$this::TBX_TERM_ENTRY]} as $termEntry) {
+
+        //process termentry
+        while ($xmlReader->name === $this->tbxMap[$this::TBX_TERM_ENTRY]) {
+            $termEntryNode = new SimpleXMLElement($xmlReader->readOuterXML());
             $parsedEntry = null;
             $this->emptyVariables();
-            $parsedEntry = $this->handleTermEntry($termEntry);
-            foreach ($termEntry->{$this->tbxMap[$this::TBX_LANGSET]} as $languageGroup) {
+            $parsedEntry = $this->handleTermEntry($termEntryNode);
+            foreach ($termEntryNode->{$this->tbxMap[$this::TBX_LANGSET]} as $languageGroup) {
                 $this->langSetGuid = null;
                 $this->language = $this->checkIfLanguageIsProceed($languageGroup);
 
@@ -379,34 +431,31 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->saveParsedTbx();
             $importCount++;
 
-            $progress = min(100,($importCount/$totalCount)*100);
-            $this->events->trigger('afterTermEntrySave',$progress);
+            //since we do not want to kill the worker table by updating the progress too often,
+            // we do that only 100 times per import, in other words once per percent
+            $newProgress = min(100, round(($importCount/$totalCount)*100));
+            if($newProgress > $progress) {
+                $progress = $newProgress;
+                $this->events->trigger('afterTermEntrySave', $this, ['progress' => $progress]);
+            }
+
             // Uncomment this to print the progress
             //error_log("Update progress: [".$importCount.'/'.$totalCount.'] ( progress: '.$progress.'  %)');
+            $xmlReader->next($this->tbxMap[$this::TBX_TERM_ENTRY]);
         }
+    }
 
-        if ($tbxAsSimpleXml->text->back->refObjectList) {
-            $this->getTbxImages($tbxAsSimpleXml->text->back->refObjectList);
-            $this->getTbxRespUserBack($tbxAsSimpleXml->text->back->refObjectList);
+    protected function processRefObjects(XMLReader $xmlReader) {
+        while ($xmlReader->name === 'refObjectList') {
+            if($xmlReader->getAttribute('type') == 'binaryData') {
+                $this->getTbxImages(new SimpleXMLElement($xmlReader->readOuterXML()));
+            }
+            //FIXME implement getTbxRespUserBack
+//            if($xmlReader->getAttribute('type') == 'respPerson') {
+//                $this->getTbxRespUserBack(new SimpleXMLElement($xmlReader->readOuterXML()));
+//            }
+            $xmlReader->next('refObjectList');
         }
-
-        if ($this->unknownLanguages) {
-            $this->logUnknownLanguages();
-        }
-
-        $this->termModel->updateAttributeAndTransacTermIdAfterImport($this->collectionId);
-
-        $dataTypeAssoc = ZfExtended_Factory::get('editor_Models_Terminology_Models_CollectionAttributeDataType');
-        /* @var $dataTypeAssoc editor_Models_Terminology_Models_CollectionAttributeDataType */
-        // insert all attribute data types for current collection in the terms_collection_attribute_datatype table
-        $dataTypeAssoc->updateCollectionAttributeAssoc($this->collectionId);
-
-        // remove all empty term entries after the tbx import
-        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
-        /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
-        $termEntry->removeEmptyFromCollection([$this->collectionId]);
-
-        return $this->attributes;
     }
 
     /***
@@ -763,95 +812,80 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     }
 
     /**
-     * @param SimpleXMLElement $element
-     * @return array
+     * @param SimpleXMLElement $refObjectList
      */
-    private function getTbxImages(SimpleXMLElement $element): array
+    private function getTbxImages(SimpleXMLElement $refObjectList)
     {
         $parsedTbxImages = [];
         $tbxImagesAsObject = [];
-        /** @var SimpleXMLElement $refObjectList */
-        foreach ($element as $refObjectList) {
-            if ((string)$refObjectList->attributes()->{'type'} === 'binaryData') {
-                $count = 0;
-                /** @var SimpleXMLElement $refObject */
-                foreach ($refObjectList as $refObject) {
-                    $parsedTbxImages[$count]['id'] = (string)$refObject->attributes()->{'id'};
-                    foreach ($refObject->item as $key => $item) {
-                        $parsedTbxImages[$count][(string)$item->attributes()->{'type'}] = (string)$item;
-                    }
-                    /** @var editor_Models_Terminology_TbxObjects_Image $tbxImage */
-                    $tbxImage = new $this->tbxImageObject;
-                    $tbxImage->setTargetId((string)$refObject->attributes()->{'id'});
+        $count = 0;
+        /** @var SimpleXMLElement $refObject */
+        foreach ($refObjectList as $refObject) {
+            $parsedTbxImages[$count]['id'] = (string)$refObject->attributes()->{'id'};
+            foreach ($refObject->item as $item) {
+                $parsedTbxImages[$count][(string)$item->attributes()->{'type'}] = (string)$item;
+            }
+            /** @var editor_Models_Terminology_TbxObjects_Image $tbxImage */
+            $tbxImage = new $this->tbxImageObject;
+            $tbxImage->setTargetId((string)$refObject->attributes()->{'id'});
 //                    $tbxImage->setName($parsedTbxImages[$count]['name']);
 //                    $tbxImage->setEncoding($parsedTbxImages[$count]['encoding']);
 
-                    if (isset($parsedTbxImages[$count]['encoding'])) {
-                        $tbxImage->setName($parsedTbxImages[$count]['name']);
-                        $tbxImage->setEncoding($parsedTbxImages[$count]['encoding']);
-                    } else {
-                        $tbxImage->setName((string)$refObject->attributes()->{'id'}.'.'.$parsedTbxImages[$count]['format']);
-                        $tbxImage->setEncoding($parsedTbxImages[$count]['codePage']);
-                    }
+            if (isset($parsedTbxImages[$count]['encoding'])) {
+                $tbxImage->setName($parsedTbxImages[$count]['name']);
+                $tbxImage->setEncoding($parsedTbxImages[$count]['encoding']);
+            } else {
+                $tbxImage->setName((string)$refObject->attributes()->{'id'}.'.'.$parsedTbxImages[$count]['format']);
+                $tbxImage->setEncoding($parsedTbxImages[$count]['codePage']);
+            }
 
-                    $tbxImage->setUniqueName($tbxImage->createUniqueName());
-                    $tbxImage->setFormat($parsedTbxImages[$count]['format']);
+            $tbxImage->setUniqueName($tbxImage->createUniqueName());
+            $tbxImage->setFormat($parsedTbxImages[$count]['format']);
 //                    $tbxImage->setXbase('');
-                    $tbxImage->setHexOrXbaseValue($parsedTbxImages[$count]['data']);
+            $tbxImage->setHexOrXbaseValue($parsedTbxImages[$count]['data']);
 
-                    $tbxImage->setCollectionId($this->collectionId);
-                    $tbxImagesAsObject[] = $tbxImage;
-                    $count++;
+            $tbxImage->setCollectionId($this->collectionId);
+            $tbxImagesAsObject[] = $tbxImage;
+            $count++;
 
-                    if ($tbxImagesAsObject) {
-                        foreach ($tbxImagesAsObject as $image) {
-                            $hexOrXbaseWithoutSpace = str_replace(' ', '', $image->getHexOrXbaseValue());
-                            if ($image->getEncoding() === 'hex') {
-                                # convert the hex string to binary
-                                $img = hex2bin($hexOrXbaseWithoutSpace);
-                            } else {
-                                # convert the base64 string to binary
-                                $img = base64_decode($hexOrXbaseWithoutSpace);
-                            }
-
-                            $image->setHexOrXbaseValue('');
-                            $this->saveImageLocal($image->getUniqueName(), $img);
-                        }
-
-                        $this->createOrUpdateElement($this->tbxImagesModel, $tbxImagesAsObject, $this->tbxImagesCollection, $this->mergeTerms);
-                        $tbxImagesAsObject = [];
+            if ($tbxImagesAsObject) {
+                foreach ($tbxImagesAsObject as $image) {
+                    $hexOrXbaseWithoutSpace = str_replace(' ', '', $image->getHexOrXbaseValue());
+                    if ($image->getEncoding() === 'hex') {
+                        # convert the hex string to binary
+                        $img = hex2bin($hexOrXbaseWithoutSpace);
+                    } else {
+                        # convert the base64 string to binary
+                        $img = base64_decode($hexOrXbaseWithoutSpace);
                     }
+
+                    $image->setHexOrXbaseValue('');
+                    $this->saveImageLocal($image->getUniqueName(), $img);
                 }
+
+                $this->createOrUpdateElement($this->tbxImagesModel, $tbxImagesAsObject, $this->tbxImagesCollection, $this->mergeTerms);
+                $tbxImagesAsObject = [];
             }
         }
-
-        return $tbxImagesAsObject;
     }
 
     /**
-     * @param SimpleXMLElement $element
+     * ToDo: Sinisa, Update user in table... define how and what is mean in: TRANSLATE-1274
+     * @param SimpleXMLElement $refObjectList
      * @return array
      */
-    private function getTbxRespUserBack(SimpleXMLElement $element): array
+    private function getTbxRespUserBack(SimpleXMLElement $refObjectList): array
     {
         $parsedTbxRespUser = [];
-        /** @var SimpleXMLElement $refObjectList */
-        foreach ($element as $refObjectList) {
-            if ((string)$refObjectList->attributes()->{'type'} === 'respPerson') {
-                $count = 0;
-                /** @var SimpleXMLElement $refObject */
-                foreach ($refObjectList as $refObject) {
-                    $parsedTbxRespUser[$count]['target'] = (string)$refObject->attributes()->{'id'};
-                    foreach ($refObject->item as $key => $item) {
-                        $parsedTbxRespUser[$count][(string)$item->attributes()->{'type'}] = (string)$item;
-                    }
-                    $count++;
-                }
+        $count = 0;
+        /** @var SimpleXMLElement $refObject */
+        foreach ($refObjectList as $refObject) {
+            $parsedTbxRespUser[$count]['target'] = (string)$refObject->attributes()->{'id'};
+            foreach ($refObject->item as $item) {
+                $parsedTbxRespUser[$count][(string)$item->attributes()->{'type'}] = (string)$item;
             }
+            $count++;
         }
-
-        // ToDo: Sinisa, Update user in table... define how and what is mean in: TRANSLATE-1274
-        $testUsers = $parsedTbxRespUser;
 
         return $parsedTbxRespUser;
     }
@@ -861,15 +895,18 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     private function logUnknownLanguages()
     {
+        if(empty($this->unknownLanguages)) {
+            return;
+        }
         foreach ($this->unknownLanguages as $key => $language) {
-            $this->log("Unable to import terms in this language set. Invalid Rfc5646 language code. Language code: " . $key);
+            $this->log('Unable to import terms in this language set. Invalid Rfc5646 language code. Language code: ' . $key);
         }
     }
 
     /**
      * - $this->getIdOrGenerate($elementName, 'term')
      * this will return 'id' attribute as string from given element,
-     * if element dont have 'id' attribute we will generate one.
+     * if element don't have 'id' attribute we will generate one.
      *
      * @param SimpleXMLElement $xmlElement
      * @param string $map
@@ -932,7 +969,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $tbxStatus = $attribute->getValue();
             $tbxType = $attribute->getType();
 
-            //if current termNote is no starttag or type is not allowed to provide a status the we jump out
+            //if current termNote is no starttag or type is not allowed to provide a status then we jump out
             if (in_array($tbxType, $this->allowedTypes)) {
                 // termNote type administrativeStatus are similar to normativeAuthorization,
                 // expect that the values have a suffix which must be removed

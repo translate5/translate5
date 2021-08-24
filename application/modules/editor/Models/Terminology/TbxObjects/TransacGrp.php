@@ -70,12 +70,11 @@ class editor_Models_Terminology_TbxObjects_TransacGrp extends editor_Models_Term
     protected int $ifDescripGrp = 0;
 
     /**
-     * @param editor_Models_Terminology_TbxObjects_TransacGrp $element
      * @return string
      */
-    public function getCollectionKey(editor_Models_Terminology_TbxObjects_TransacGrp $element): string
+    public function getCollectionKey(): string
     {
-        return $element->getElementName() . '-' . $element->getTransac() . '-' . $element->getIfDescripGrp() . '-' . $element->getTermEntryId().'-'.$element->getTermTbxId();
+        return $this->getElementName() . '-' . $this->getTransac() . '-' . $this->getIfDescripGrp() . '-' . $this->getTermEntryId().'-'.$this->getTermTbxId();
     }
     /**
      * @return int
