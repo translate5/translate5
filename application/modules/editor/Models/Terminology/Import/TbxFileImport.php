@@ -401,6 +401,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     protected function processTermEntries(XMLReader $xmlReader, int $totalCount) {
         $importCount = 0;
+        $progress = 0;
 
         //process termentry
         while ($xmlReader->name === $this->tbxMap[$this::TBX_TERM_ENTRY]) {
@@ -430,8 +431,13 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->saveParsedTbx();
             $importCount++;
 
-            $progress = min(100,($importCount/$totalCount)*100);
-            $this->events->trigger('afterTermEntrySave', $progress);
+            //since we do not want to kill the worker table by updating the progress too often,
+            // we do that only 100 times per import, in other words once per percent
+            $newProgress = min(100, round(($importCount/$totalCount)*100));
+            if($newProgress > $progress) {
+                $progress = $newProgress;
+                $this->events->trigger('afterTermEntrySave', $this, ['progress' => $progress]);
+            }
 
             // Uncomment this to print the progress
             //error_log("Update progress: [".$importCount.'/'.$totalCount.'] ( progress: '.$progress.'  %)');

@@ -109,6 +109,7 @@ class WorkerListCommand extends Translate5AbstractCommand
             'endtime'   => 'Endtime:',
             'taskGuid'  => 'TaskGuid:',
             'worker'    => 'Worker:',
+            'progress'  => 'Progress:',
         ];
         
         $resultNotListed = [];
