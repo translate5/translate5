@@ -30,14 +30,18 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action
 {
     public function indexAction()
     {
-        //Zend_Layout::getMvcInstance()->setLayout('termportal');
-	//Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
-
-	$this->view->layout()->disableLayout();
-    $this->_helper->viewRenderer->setNoRender(true);
-    $which = ZfExtended_Utils::getAppVersion() == ZfExtended_Utils::VERSION_DEVELOPMENT
-        ? 'build/production/TermPortal/index.php'
-        : 'index.php';
-    require APPLICATION_ROOT.'/application/modules/editor/Plugins/TermPortal/public/resources/' . $which;
+        $pluginmanager = Zend_Registry::get('PluginManager');
+        /* @var $pluginmanager ZfExtended_Plugin_Manager */
+        $plugin = $pluginmanager->get('TermPortal');
+        if(empty($plugin)) {
+            //load default screen to show plugin disable message
+            return;
+        }
+        $this->view->layout()->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $which = ZfExtended_Utils::getAppVersion() == ZfExtended_Utils::VERSION_DEVELOPMENT
+            ? 'build/production/TermPortal/index.php'
+            : 'index.php';
+        require APPLICATION_ROOT.'/application/modules/editor/Plugins/TermPortal/public/resources/' . $which;
     }
 }
