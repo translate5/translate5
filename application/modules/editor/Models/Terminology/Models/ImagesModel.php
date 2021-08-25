@@ -49,6 +49,29 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Images';
 
     /**
+     * returns the image paths to a collection ID and a list of targets
+     * @param int $collectionId
+     * @param array $targetIds
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getImagePathsByTargetIds(int $collectionId, array $targetIds): array {
+        $sql = $this->db->select()
+            ->from($this->db, ['targetId', 'uniqueName'])
+            ->where('targetId IN (?)', $targetIds);
+        $images = $this->db->fetchAll($sql)->toArray();
+
+        //generate the paths
+        foreach($images as $image) {
+            $uniqueNames[$image['targetId']] = '/term-images-public/tc_'.$collectionId.'/'.$image['uniqueName'];
+        }
+        error_log("ID: ".$collectionId);
+        error_log(print_r($targetIds,1));
+        error_log(print_r($uniqueNames,1));
+        return $uniqueNames;
+    }
+
+    /**
      * $fullResult[$term['mid'].'-'.$term['groupId'].'-'.$term['collectionId']]
      * $fullResult['termId-termEntryId-collectionId'] = TERM
      *
@@ -64,7 +87,7 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
         $query = "SELECT * FROM terms_images WHERE collectionId = :collectionId";
         $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
 
-        foreach ($queryResults as $key => $image) {
+        foreach ($queryResults as $image) {
             $fullResult[$image['collectionId'].'-'.$image['targetId']] = $image;
         }
 
@@ -88,14 +111,11 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     }
 
     public function delete() {
-
-        // If file exists
-        if (is_file($src = 'term-images-public/tc_' . $this->getCollectionId() . '/' . $this->getUniqueName()))
-
-            // Delete it
+        // If file exists delete it
+        if (is_file($src = 'term-images-public/tc_' . $this->getCollectionId() . '/' . $this->getUniqueName())) {
             unlink($src);
+        }
 
-        // Call parent
         return parent::delete();
     }
 }

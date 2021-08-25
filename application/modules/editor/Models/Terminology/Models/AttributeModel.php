@@ -104,11 +104,8 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
     public function getAttributeByCollectionId(int $collectionId): array
     {
         $attributeByKey = [];
-
-        $query = "SELECT * FROM terms_attributes WHERE collectionId = :collectionId";
-        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
-
-        foreach ($queryResults as $key => $attribute) {
+        $stmt = $this->db->select()->where('collectionId = ?', $collectionId)->query(Zend_Db::FETCH_ASSOC);
+        while($attribute = $stmt->fetch(Zend_Db::FETCH_ASSOC)) {
             $attributeByKey[$attribute['elementName'].'-'.$attribute['type'].'-'.$attribute['termEntryId'].'-'.$attribute['language'].'-'.$attribute['termTbxId']] = $attribute;
         }
 
@@ -686,7 +683,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
      * @param string $level
      * @throws Zend_Db_Statement_Exception
      */
-    public static function refTarget(array &$refA, $refTargetIdA, array $prefLangA, $level = null) {
+    public static function refTarget(array &$refA, array $refTargetIdA, array $prefLangA, $level = null) {
 
         // If no ref-attributes found - return
         if (!$refA) return;

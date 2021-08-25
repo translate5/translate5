@@ -703,7 +703,9 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             }
 
             // Mind previous query results to apply intersection
-            if ($termEntryIds) $attrWHERE []= '`termEntryId` IN (' . $termEntryIds . ')';
+            if (isset($termEntryIds)) {
+                $attrWHERE []= '`termEntryId` IN (' . $termEntryIds . ')';
+            }
 
             // Get termEntryIds of matched attributes
             $termEntryIds = implode(',', editor_Utils::db()->query('
@@ -753,7 +755,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         else if (!$isProposer)        $where []= '`t`.`processStatus` != "' . self::PROCESS_STATUS_UNPROCESSED . '"';
 
         // Mind attr-filters in WHERE clause
-        if ($termEntryIds) array_unshift($where, '`t`.`termEntryId` IN (' . $termEntryIds . ')');
+        if (isset($termEntryIds)) array_unshift($where, '`t`.`termEntryId` IN (' . $termEntryIds . ')');
 
         // If 'noTermDefinedFor' param is given
         if ($_ = (int) $params['noTermDefinedFor']) {
@@ -833,14 +835,14 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         if ($total === true) {
 
             // Render query for getting total count of results in terms-table
-            $totalQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor, $keywordWHERE);
+            $totalQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor ?? '', $keywordWHERE);
 
             // Setup &$total variable by reference
             $total = (int) editor_Utils::db()->query($totalQuery, $bindParam)->fetchColumn();
         }
 
         // Render query for getting actual results from terms table
-        $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor, $keywordWHERE)
+        $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor ?? '', $keywordWHERE)
             . 'LIMIT ' . (int) $offset . ',' . (int) $limit;
 
         // Return results

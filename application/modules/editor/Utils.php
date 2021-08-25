@@ -354,6 +354,14 @@ class editor_Utils {
         // Foreach prop having mismatch rules
         foreach ($ruleA as $props => $rule) foreach (self::ar($props) as $prop) {
 
+            settype($rule['ext'], 'string');
+            settype($rule['rex'], 'string');
+            settype($rule['req'], 'string');
+            settype($rule['unq'], 'string');
+            settype($rule['key'], 'string');
+            settype($rule['fis'], 'string');
+            settype($rule['dis'], 'string');
+
             // Shortcut to $data[$prop]
             $value = $data[$prop];
 
@@ -361,7 +369,7 @@ class editor_Utils {
             $meta = isset($data['_meta'][$prop]) ? $data['_meta'][$prop] : [];
 
             // Get label, or use $prop if label/meta is not given
-            $label = $meta['fieldLabel'] ?: $prop;
+            $label = $meta['fieldLabel'] ?? $prop;
 
             // Flush fn
             //$flushFn = ($fn == 'mflush' ? 'mflush' : 'jflush');

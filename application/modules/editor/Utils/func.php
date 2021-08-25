@@ -25,6 +25,7 @@ $mt = 0; function mt($stage = null){
     $n = $s + $mc;
     $ret = $n - $GLOBALS['mt'];
     $GLOBALS['mt'] = $n;
+    settype($GLOBALS['_mt'], 'array');
     if ($stage !== false) {
         if (!$stage || $stage === true) $GLOBALS['_mt'] [count($GLOBALS['_mt']) . ': true'] = $ret;
         else $GLOBALS['_mt'][count($GLOBALS['_mt']) . ': ' . $stage] = $ret;

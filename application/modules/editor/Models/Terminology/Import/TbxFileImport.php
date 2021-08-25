@@ -271,18 +271,40 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     {
         $this->prepareImportArrays($collection, $user, $mergeTerms);
 
-        $xmlReader = new XMLReader();
+        $xmlReader = (new class() extends XMLReader {
+            public function reopen(string $tbxFilePath) {
+                $this->close();
+                $this->open($tbxFilePath);
+            }
+        });
+
         if(!$xmlReader->open($tbxFilePath)) {
             throw new Zend_Exception('TBX file can not be opened.');
         }
 
         $totalCount = $this->countTermEntries($xmlReader);
 
-        //since there is no reset we have to reopen the file
-        $xmlReader->close();
-        $xmlReader->open($tbxFilePath);
+        $xmlReader->reopen($tbxFilePath); //reset pointer to beginning
+        $this->processTermEntries($xmlReader, $totalCount);
 
-        return $this->importTbx($xmlReader, $totalCount);
+        $xmlReader->reopen($tbxFilePath); //reset pointer to beginning
+        $this->processRefObjects($xmlReader);
+
+        $this->logUnknownLanguages();
+
+        $this->termModel->updateAttributeAndTransacTermIdAfterImport($this->collectionId);
+
+        $dataTypeAssoc = ZfExtended_Factory::get('editor_Models_Terminology_Models_CollectionAttributeDataType');
+        /* @var $dataTypeAssoc editor_Models_Terminology_Models_CollectionAttributeDataType */
+        // insert all attribute data types for current collection in the terms_collection_attribute_datatype table
+        $dataTypeAssoc->updateCollectionAttributeAssoc($this->collectionId);
+
+        // remove all empty term entries after the tbx import
+        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
+        $termEntry->removeEmptyFromCollection([$this->collectionId]);
+
+        return $this->attributes;
     }
 
     /**
@@ -349,51 +371,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     }
 
     /**
-     * Iterate over the TBX structure and call handler for each element.
-     * There will be parsed all child elements.
-     * Only a termEntry row in terms_termEntry table will be created (or not, if import to exist collection and exist!)
-     * after handleTermEntry() method in foreach termEntry.
-     *
-     * LangSet and Terms will be created or updated after each termEntry
-     *
-     * @param XMLReader $xmlReader
-     * @return array
-     */
-    private function importTbx(XMLReader $xmlReader, int $totalCount): array
-    {
-        while ($xmlReader->read()) {
-            //process either term entries or refObjectList what ever comes first
-            switch ($xmlReader->name) {
-                case 'refObjectList':
-                    $this->processRefObjects($xmlReader);
-                    break;
-                case $this->tbxMap[$this::TBX_TERM_ENTRY]:
-                    $this->processTermEntries($xmlReader, $totalCount);
-                    break;
-                default :
-                    //no processable item, just go the next
-                    break;
-            }
-        }
-
-        $this->logUnknownLanguages();
-
-        $this->termModel->updateAttributeAndTransacTermIdAfterImport($this->collectionId);
-
-        $dataTypeAssoc = ZfExtended_Factory::get('editor_Models_Terminology_Models_CollectionAttributeDataType');
-        /* @var $dataTypeAssoc editor_Models_Terminology_Models_CollectionAttributeDataType */
-        // insert all attribute data types for current collection in the terms_collection_attribute_datatype table
-        $dataTypeAssoc->updateCollectionAttributeAssoc($this->collectionId);
-
-        // remove all empty term entries after the tbx import
-        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
-        /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
-        $termEntry->removeEmptyFromCollection([$this->collectionId]);
-
-        return $this->attributes;
-    }
-
-    /**
      * processes the term entries found in the XML
      * @param XMLReader $xmlReader
      * @param int $totalCount
@@ -403,6 +380,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $importCount = 0;
         $progress = 0;
 
+        while ($xmlReader->read() && $xmlReader->name !== $this->tbxMap[$this::TBX_TERM_ENTRY]);
         //process termentry
         while ($xmlReader->name === $this->tbxMap[$this::TBX_TERM_ENTRY]) {
             $termEntryNode = new SimpleXMLElement($xmlReader->readOuterXML());
@@ -446,6 +424,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     }
 
     protected function processRefObjects(XMLReader $xmlReader) {
+        while ($xmlReader->read() && $xmlReader->name !== 'refObjectList');
         while ($xmlReader->name === 'refObjectList') {
             if($xmlReader->getAttribute('type') == 'binaryData') {
                 $this->getTbxImages(new SimpleXMLElement($xmlReader->readOuterXML()));
