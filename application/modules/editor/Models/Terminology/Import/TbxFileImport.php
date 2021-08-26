@@ -795,6 +795,8 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     private function getTbxImages(SimpleXMLElement $refObjectList)
     {
+        $this->tbxImagesModel->checkImageTermCollectionFolder($this->collectionId);
+
         $parsedTbxImages = [];
         $tbxImagesAsObject = [];
         $count = 0;
@@ -839,7 +841,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
                     }
 
                     $image->setHexOrXbaseValue('');
-                    $this->saveImageLocal($image->getUniqueName(), $img);
+                    $this->tbxImagesModel->saveImageToDisk($this->collectionId, $image->getUniqueName(), $img);
                 }
 
                 $this->createOrUpdateElement($this->tbxImagesModel, $tbxImagesAsObject, $this->tbxImagesCollection, $this->mergeTerms);
@@ -986,37 +988,5 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $data['userGuid'] = $this->user->getUserGuid();
         $data['userName'] = $this->user->getUserName();
         $this->logger->info($code, $logMessage, $data);
-    }
-
-
-    /***
-     * Save the given image to the term collection images folder. This function will check and create the required folder structure
-     * @param string $imageName
-     * @param string $imageContent
-     */
-    private function saveImageLocal(string $imageName, string $imageContent)
-    {
-        $tbxImportDirectoryPath = APPLICATION_PATH.'/../data/tbx-import/';
-        $imagePath = $tbxImportDirectoryPath.'term-images-public/tc_'.$this->collectionId;
-
-        //check if the directory exist and it is writable
-        if (is_dir($tbxImportDirectoryPath) && !is_writable($tbxImportDirectoryPath)) {
-            $this->log("Unable to save the image file to the tbx import path. The file is not writable. Import path: ".$tbxImportDirectoryPath." , termcollectionId: ".$this->collectionId);
-            return;
-        }
-
-        try {
-            if (!file_exists($imagePath) && !@mkdir($imagePath, 0777, true)) {
-                $this->log("Unable to create directory for imported image files. Directory path: ".$imagePath." , termcollectionId: ".$this->collectionId);
-                return;
-            }
-        } catch (Exception $e) {
-            $this->log("Unable to create directory for imported image files. Directory path: ".$imagePath." , termcollectionId: ".$this->collectionId);
-            return;
-        }
-
-        $newFileName = $imagePath.'/'.$imageName;
-
-        file_put_contents($newFileName, $imageContent);
     }
 }

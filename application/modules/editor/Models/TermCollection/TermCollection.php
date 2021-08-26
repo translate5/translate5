@@ -253,7 +253,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     /***
      * Get all TermCollections ids assigned to the given customers.
      * @param array $customerIds
-     * @param bool $dict
+     * @param bool $dict if true return ids mapped to name, if false array of IDs only
      * @return array
      */
     public function getCollectionsIdsForCustomer(array $customerIds, bool $dict = false): array
@@ -270,9 +270,12 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         ->group('lr.id');
         $rows = $this->db->fetchAll($s)->toArray();
 
-        if (!empty($rows)) return $dict
-            ? array_combine(array_column($rows, 'id'), array_column($rows, 'name'))
-            : array_column($rows, 'id');
+        if (!empty($rows)) {
+            if($dict) {
+                return array_combine(array_column($rows, 'id'), array_column($rows, 'name'));
+            }
+            return array_column($rows, 'id');
+        }
 
         return [];
     }
@@ -375,23 +378,22 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $termEntry->removeEmptyFromCollection([$this->getId()]);
     }
 
-    /***
-     * Get the available collections for the currently logged user
+    /**
+     * Get the available collections for the currently authenticated user
      *
-     * @param bool $dict
-     * @param string|array $clientIds
+     * @param bool $dict if true return ids mapped to name, if false array of IDs only
+     * @param array $clientIds if given, intersect the loaded collection IDs with the ones given as parameter
      * @return array
      */
-    public function getCollectionForAuthenticatedUser($dict = false, $clientIds = ''): array
+    public function getCollectionForAuthenticatedUser(bool $dict = false, array $clientIds = []): array
     {
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
         $customers = $userModel->getUserCustomersFromSession();
 
-        // If $clientIds arg is given - use intersection
-        if ($clientIds) $customers = array_intersect($customers,
-            is_array($clientIds) ? $clientIds : explode(',', $clientIds)
-        );
+        if (!empty($clientIds)) {
+            $customers = array_intersect($customers, $clientIds);
+        }
 
         if (empty($customers)) {
             return [];

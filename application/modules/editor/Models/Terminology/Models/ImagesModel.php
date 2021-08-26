@@ -49,6 +49,11 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Images';
 
     /**
+     * @string
+     */
+    protected $tbxImportDirectoryPath = APPLICATION_PATH.'/../data/tbx-import/';
+
+    /**
      * returns the image paths to a collection ID and a list of targets
      * @param int $collectionId
      * @param array $targetIds
@@ -62,12 +67,11 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
         $images = $this->db->fetchAll($sql)->toArray();
 
         //generate the paths
+        $uniqueNames = [];
         foreach($images as $image) {
-            $uniqueNames[$image['targetId']] = '/term-images-public/tc_'.$collectionId.'/'.$image['uniqueName'];
+            $uniqueNames[$image['targetId']] = APPLICATION_RUNDIR.'/editor/plugins/termimage/TermPortal/tc_'.$collectionId.'/'.$image['uniqueName'];
         }
-        error_log("ID: ".$collectionId);
-        error_log(print_r($targetIds,1));
-        error_log(print_r($uniqueNames,1));
+
         return $uniqueNames;
     }
 
@@ -112,10 +116,74 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
 
     public function delete() {
         // If file exists delete it
-        if (is_file($src = 'term-images-public/tc_' . $this->getCollectionId() . '/' . $this->getUniqueName())) {
-            unlink($src);
-        }
+        $src = $this->getImagePath($this->getCollectionId(), $this->getUniqueName());
+        is_file($src) && unlink($src);
 
         return parent::delete();
+    }
+
+    /**
+     * returns false if the termcollection folder is not usable
+     * @throws editor_Models_Terminology_Import_Exception
+     */
+    public function checkImageTermCollectionFolder(int $collectionId) {
+        if(!is_dir($this->tbxImportDirectoryPath) || !is_writable($this->tbxImportDirectoryPath)) {
+            //TBX Import: Folder to save images does not exist or is not writable!
+            throw new editor_Models_Terminology_Import_Exception('E1353', [
+                'path' => $this->tbxImportDirectoryPath
+            ]);
+        }
+
+        $imagePath = $this->getImagePath($collectionId);
+
+        try {
+            if (file_exists($imagePath) || @mkdir($imagePath, 0777, true)) {
+                return; //in case of success return here
+            }
+        } catch (Throwable $e) {
+        }
+        //if we reach here the folder could not be created
+        //TBX Import: Folder to save termcollection images could not be created!
+        throw new editor_Models_Terminology_Import_Exception('E1354', [
+            'path' => $imagePath
+        ]);
+    }
+
+    /**
+     * Returns the absolute path to term collection folder for images
+     * @param int $collectionId
+     * @param string $file if given append the file to the path
+     * @return string
+     */
+    public function getImagePath(int $collectionId, string $file = null): string {
+        return $this->tbxImportDirectoryPath.'term-images-public/tc_'.$collectionId.($file ? ('/'.$file) : '');
+    }
+
+    /**
+     * tests if the given unique id is valid
+     * @param boolean $uniqueId
+     * @return boolean
+     */
+    public function isValidUniqueId($uniqueId): bool {
+        return (bool) preg_match('/[a-z0-9-]{36}\.[a-zA-Z0-9]{3,4}/', $uniqueId);
+    }
+
+
+    /**
+     * converts the term collection string to a valid integer
+     */
+    public function readCollectionIdFromUrlPart(string $tcIdURL): int {
+        return (int) str_replace('tc_', '', $tcIdURL);
+    }
+
+    /**
+     * Save the given image to the term collection images folder. This function will check and create the required folder structure
+     * @param int $collectionId
+     * @param string $imageName
+     * @param string $imageContent
+     */
+    public function saveImageToDisk(int $collectionId, string $imageName, string $imageContent)
+    {
+        file_put_contents($this->getImagePath($collectionId, $imageName), $imageContent);
     }
 }

@@ -623,12 +623,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // get requested file from router
         $requestedType = $this->getParam(1);
         $requestedFile = $this->getParam(2);
-        $js = explode($slash, $requestedFile);
+        $requestedFileParts = explode($slash, $requestedFile);
         $extension = strtolower(pathinfo($requestedFile, PATHINFO_EXTENSION));
 
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase!
-        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js)));
+        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($requestedFileParts)));
 
         // DEBUG
         // error_log("INDEXCONTROLLER: pluginpublicAction: plugin: ".$plugin." / requestedType: ".$requestedType." / requestedFile: ".$requestedFile." / extension: ".$extension);
@@ -647,20 +647,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         }
 
         // check if requested "fileType" is allowed
-        if (!$plugin->isPublicFileType($requestedType)) {
+        if (!$plugin->isPublicSubFolder($requestedType)) {
             throw new ZfExtended_NotFoundException();
         }
 
-        $absolutePath = null;
-        //get public files of the plugin to make a whitelist check of the file string from userland
-        $allowedFiles = $plugin->getPublicFiles($requestedType, $absolutePath);
-        $file = join($slash, $js);
-        if (empty($allowedFiles) || !in_array($file, $allowedFiles)) {
-            throw new ZfExtended_NotFoundException();
-        }
-        //concat the absPath from above with filepath
-        $wholePath = $absolutePath . '/' . $file;
-        if (!file_exists($wholePath)) {
+        $publicFile = $plugin->getPublicFile($requestedType, $requestedFileParts);
+        if (empty($publicFile) || !$publicFile->isFile()) {
             throw new ZfExtended_NotFoundException();
         }
         if (array_key_exists($extension, $types)) {
@@ -671,7 +663,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             header('Content-Type: ');
         }
         //FIXME add version URL suffix to plugin.css inclusion
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $publicFile->getMTime()));
         //with etags we would have to use the values of $_SERVER['HTTP_IF_NONE_MATCH'] too!
         //makes sense to do so!
         //header('ETag: '.md5(of file content));
@@ -689,7 +681,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         */
 
 
-        readfile($wholePath);
+        readfile($publicFile);
         //FIXME: Optimierung bei den Plugin Assets: public Dateien die durch die Plugins geroutet werden, sollten chachebar sein und B keine Plugin Inits triggern. Geht letzteres überhaupt wg. VisualReview welches die Dateien ebenfalls hier durchschiebt?
         exit;
     }
