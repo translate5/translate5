@@ -74,8 +74,22 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
     },
 
     exportbconf: function (grid, rowIndex, colIndex) {
-        var rec = grid.getStore().getAt(rowIndex);
-        alert("Expoting");
+        var okapiName = grid.getStore().getAt(rowIndex).get('name')
+        var form = Ext.create('Ext.form.Panel',{
+            timeout: 60000
+        });
+
+        form.submit({
+            url     : Editor.data.restpath + 'plugins_okapi_bconf',
+            method  : 'POST',
+            params  : {
+                okapiName:okapiName
+            },
+            scope   : this,
+            success : function(responseText){
+            },
+            target: '_blank'
+        });
     },
     getActionStatus:function (view, rowIndex, colIndex, item, record) {
         return record.get('default')=="1";

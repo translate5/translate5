@@ -41,6 +41,18 @@ CREATE TABLE `LEK_okapi_bconf` (
 
 CREATE TABLE `LEK_okapi_bconf_filter` (
   `id` INT (11) NOT NULL AUTO_INCREMENT,
-
-  PRIMARY KEY (`id`)
+  okapiId INT (11) NOT NULL,
+  filterId VARCHAR(20), NOT NULL,
+  okapiName VARCHAR(50),
+  mime VARCHAR(20),
+  PRIMARY KEY (`id`),
+  default bit,
+  name VARCHAR(50),
+  notes VARCHAR (200),
+  extensions VARCHAR(200),
+  configuration text,
+  codeId VARCHAR(50),
+  CONSTRAINT `fk_LEK_okapi_bconf_filter`
+      FOREIGN KEY (`okapiId`)
+          REFERENCES `LEK_okapi_bconf` (`id`)
 );
