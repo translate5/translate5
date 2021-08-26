@@ -4,18 +4,18 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
 
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
 
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -253,7 +253,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     /***
      * Get all TermCollections ids assigned to the given customers.
      * @param array $customerIds
-     * @param bool $dict
+     * @param bool $dict if true return ids mapped to name, if false array of IDs only
      * @return array
      */
     public function getCollectionsIdsForCustomer(array $customerIds, bool $dict = false): array
@@ -270,9 +270,12 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         ->group('lr.id');
         $rows = $this->db->fetchAll($s)->toArray();
 
-        if (!empty($rows)) return $dict
-            ? array_combine(array_column($rows, 'id'), array_column($rows, 'name'))
-            : array_column($rows, 'id');
+        if (!empty($rows)) {
+            if($dict) {
+                return array_combine(array_column($rows, 'id'), array_column($rows, 'name'));
+            }
+            return array_column($rows, 'id');
+        }
 
         return [];
     }
@@ -375,23 +378,22 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $termEntry->removeEmptyFromCollection([$this->getId()]);
     }
 
-    /***
-     * Get the available collections for the currently logged user
+    /**
+     * Get the available collections for the currently authenticated user
      *
-     * @param bool $dict
-     * @param string|array $clientIds
+     * @param bool $dict if true return ids mapped to name, if false array of IDs only
+     * @param array $clientIds if given, intersect the loaded collection IDs with the ones given as parameter
      * @return array
      */
-    public function getCollectionForAuthenticatedUser($dict = false, $clientIds = ''): array
+    public function getCollectionForAuthenticatedUser(bool $dict = false, array $clientIds = []): array
     {
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
         $customers = $userModel->getUserCustomersFromSession();
 
-        // If $clientIds arg is given - use intersection
-        if ($clientIds) $customers = array_intersect($customers,
-            is_array($clientIds) ? $clientIds : explode(',', $clientIds)
-        );
+        if (!empty($clientIds)) {
+            $customers = array_intersect($customers, $clientIds);
+        }
 
         if (empty($customers)) {
             return [];

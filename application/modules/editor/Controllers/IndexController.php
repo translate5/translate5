@@ -4,18 +4,18 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -546,13 +546,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     public function applicationstateAction()
     {
         $this->_helper->layout->disableLayout();
+        $userSession = new Zend_Session_Namespace('user');
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
 
-        $userSession = new Zend_Session_Namespace('user');
-        //since application state contains sensibile information we show that only to API users
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'backend', 'applicationstate')) {
-            $this->view->applicationstate = ZfExtended_Debug::applicationState();
+        $config = Zend_Registry::get('config');
+        $isCronIP = $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR'];
+        $hasAppStateACL = $acl->isInAllowedRoles($userSession->data->roles, 'backend', 'applicationstate');
+        //since application state contains sensible information we show that only to the cron TP, or with more details to the API users
+        if ($isCronIP || $hasAppStateACL) {
+            $this->view->applicationstate = ZfExtended_Debug::applicationState($hasAppStateACL);
         }
     }
 
@@ -620,12 +623,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // get requested file from router
         $requestedType = $this->getParam(1);
         $requestedFile = $this->getParam(2);
-        $js = explode($slash, $requestedFile);
+        $requestedFileParts = explode($slash, $requestedFile);
         $extension = strtolower(pathinfo($requestedFile, PATHINFO_EXTENSION));
 
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase!
-        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js)));
+        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($requestedFileParts)));
 
         // DEBUG
         // error_log("INDEXCONTROLLER: pluginpublicAction: plugin: ".$plugin." / requestedType: ".$requestedType." / requestedFile: ".$requestedFile." / extension: ".$extension);
@@ -644,20 +647,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         }
 
         // check if requested "fileType" is allowed
-        if (!$plugin->isPublicFileType($requestedType)) {
+        if (!$plugin->isPublicSubFolder($requestedType)) {
             throw new ZfExtended_NotFoundException();
         }
 
-        $absolutePath = null;
-        //get public files of the plugin to make a whitelist check of the file string from userland
-        $allowedFiles = $plugin->getPublicFiles($requestedType, $absolutePath);
-        $file = join($slash, $js);
-        if (empty($allowedFiles) || !in_array($file, $allowedFiles)) {
-            throw new ZfExtended_NotFoundException();
-        }
-        //concat the absPath from above with filepath
-        $wholePath = $absolutePath . '/' . $file;
-        if (!file_exists($wholePath)) {
+        $publicFile = $plugin->getPublicFile($requestedType, $requestedFileParts);
+        if (empty($publicFile) || !$publicFile->isFile()) {
             throw new ZfExtended_NotFoundException();
         }
         if (array_key_exists($extension, $types)) {
@@ -668,7 +663,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             header('Content-Type: ');
         }
         //FIXME add version URL suffix to plugin.css inclusion
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $publicFile->getMTime()));
         //with etags we would have to use the values of $_SERVER['HTTP_IF_NONE_MATCH'] too!
         //makes sense to do so!
         //header('ETag: '.md5(of file content));
@@ -686,7 +681,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         */
 
 
-        readfile($wholePath);
+        readfile($publicFile);
         //FIXME: Optimierung bei den Plugin Assets: public Dateien die durch die Plugins geroutet werden, sollten chachebar sein und B keine Plugin Inits triggern. Geht letzteres überhaupt wg. VisualReview welches die Dateien ebenfalls hier durchschiebt?
         exit;
     }

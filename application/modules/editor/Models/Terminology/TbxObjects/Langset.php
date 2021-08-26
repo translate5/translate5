@@ -50,6 +50,14 @@ class editor_Models_Terminology_TbxObjects_Langset extends editor_Models_Termino
     protected array $note = [];
 
     /**
+     * @return string
+     */
+    public function getCollectionKey(): string
+    {
+        return $this->getTermEntryId().'-'.$this->getLanguage();
+    }
+
+    /**
      * @return int
      */
     public function getCollectionId(): int

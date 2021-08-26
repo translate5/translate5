@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 13,
-    "qtotal": 13,
+    "qcount": 12,
+    "qtotal": 12,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -13,11 +13,11 @@
         {
             "qid": -1,
             "qtype": "internal",
-            "qcount": 3,
+            "qcount": 2,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "55762",
+                    "qid": "70520",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -29,23 +29,22 @@
                     "qfaulty": true
                 },
                 {
-                    "qid": "55763",
+                    "qid": -1,
                     "qtype": "internal",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "internal_tags_added",
-                    "qcatidx": "0",
                     "text": "Internal tags have been added",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "55764",
+                    "qid": "70521",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "internal_tags_missing",
-                    "qcatidx": "0",
+                    "qcatidx": "-1",
                     "text": "Internal tags missing",
                     "leaf": true,
                     "checked": false
@@ -73,8 +72,61 @@
             ],
             "qcategory": null,
             "text": "Internal tags",
-            "qtotal": 3,
+            "qtotal": 2,
             "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "length",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "length",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "not_long_enough",
+                    "text": "Segment relevantly shorter than allowed (more than 20% shorter or at least 100 Pixel shorter or at least 20 characters shorter)",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "length",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "too_long",
+                    "text": "Segment longer than allowed",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "length",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "too_many_lines",
+                    "text": "Segment has too many lines",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "length",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "too_short",
+                    "text": "Segment shorter than allowed",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "text": "Length check",
+            "qtotal": 0,
+            "expanded": false,
             "checked": false
         },
         {
@@ -432,7 +484,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "55755",
+                    "qid": "70513",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -443,7 +495,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "55751",
+                    "qid": "70509",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -454,7 +506,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "55757",
+                    "qid": "70515",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,

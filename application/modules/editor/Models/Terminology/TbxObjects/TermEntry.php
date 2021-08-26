@@ -49,6 +49,14 @@ class editor_Models_Terminology_TbxObjects_TermEntry extends editor_Models_Termi
     protected array $ref = [];
 
     /**
+     * @return string
+     */
+    public function getCollectionKey(): string
+    {
+        return $this->getTermEntryId();
+    }
+
+    /**
      * @return int
      */
     public function getCollectionId(): int

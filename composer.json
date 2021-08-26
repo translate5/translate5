@@ -33,10 +33,11 @@
 		}
 	],
 	"require" : {
-		"ext-simplexml" : "*",
-		"ext-libxml" : "*",
-		"ext-pdo" : "*",
-		"ext-mysqli" : "*",
+        "ext-simplexml": "*",
+        "ext-libxml": "*",
+        "ext-pdo": "*",
+        "ext-mysqli": "*",
+        "ext-xmlreader": "*",
 		"shardj/zf1-future" : "dev-master",
 		"symfony/console" : "^5.0",
 		"wikimedia/composer-merge-plugin" : "~1.4",

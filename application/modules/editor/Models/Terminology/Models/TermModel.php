@@ -703,7 +703,9 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             }
 
             // Mind previous query results to apply intersection
-            if ($termEntryIds) $attrWHERE []= '`termEntryId` IN (' . $termEntryIds . ')';
+            if (isset($termEntryIds)) {
+                $attrWHERE []= '`termEntryId` IN (' . $termEntryIds . ')';
+            }
 
             // Get termEntryIds of matched attributes
             $termEntryIds = implode(',', editor_Utils::db()->query('
@@ -746,11 +748,14 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $where = [
             '`t`.`languageId` IN (' . $params['language'] . ')',
             '`t`.`collectionId` IN (' . $params['collectionIds'] . ')',
-            '`t`.`processStatus` IN ("' . str_replace(',', '","', $params['processStatus']) . '")',
         ];
 
+        // Append clause for prosessStatus
+        if ($params['processStatus']) $where []= '`t`.`processStatus` IN ("' . str_replace(',', '","', $params['processStatus']) . '")';
+        else if (!$isProposer)        $where []= '`t`.`processStatus` != "' . self::PROCESS_STATUS_UNPROCESSED . '"';
+
         // Mind attr-filters in WHERE clause
-        if ($termEntryIds) array_unshift($where, '`t`.`termEntryId` IN (' . $termEntryIds . ')');
+        if (isset($termEntryIds)) array_unshift($where, '`t`.`termEntryId` IN (' . $termEntryIds . ')');
 
         // If 'noTermDefinedFor' param is given
         if ($_ = (int) $params['noTermDefinedFor']) {
@@ -778,47 +783,66 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
           `t`.`termEntryTbxId` 
         ';
 
-        // Term query template
-        $termQueryTpl = '
-            SELECT %s 
-            FROM `terms_term` `t` %s
-            WHERE %s AND ' . implode(' AND ', $where) . '
-            ORDER BY `t`.`term` ASC
-        ';
-
         // Assume limit arg can be comma-separated string containing '<LIMIT>,<OFFSET>'
         list($limit, $offset) = explode(',', $params['limit']);
 
-        // Keyword WHERE clauses
-        $keywordWHERE = [
-            'LOWER(`t`.`term`)     LIKE LOWER(:keyword) COLLATE utf8mb4_bin',
-            'LOWER(`t`.`proposal`) LIKE LOWER(:keyword) COLLATE utf8mb4_bin',
-        ];
+        // Cols that we're going to search in by default
+        $cols = ['`t`.`term`', '`t`.`proposal`'];
 
         // If we should only search for `term`-column (e.g. `proposal`-column won't be involved)
-        if (!$isProposer || !in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus'])))
+        if (!$isProposer || ($params['processStatus'] && !in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus']))))
 
-            // Drop proposal-clause from $keywordWHERE
-            array_pop($keywordWHERE);
+            // Drop proposal-col from $cols, so it won't be mentioned in $keywordWHERE
+            array_pop($cols);
+
+        // Keyword WHERE clauses using LIKE
+        foreach ($cols as $col) $keywordWHERE []= sprintf('LOWER(%s) LIKE LOWER(:keyword) COLLATE utf8mb4_bin', $col);
 
         // Render keyword WHERE string
         $keywordWHERE = '(' . implode(' OR ', $keywordWHERE) . ')';
 
+        // If wildcards are used, convert them to the mysql syntax
+        $against = str_replace('?', '*', $params['query']);
+
+        // If we're not going to count $total - it means we're in autocomplete mode
+        if ($total === false) $against = trim($against, '*') . '*';
+
+        // Build match-against WHERE string
+        $againstWHERE = 'MATCH(' . implode(', ', $cols) . ') AGAINST(:against IN BOOLEAN MODE)';
+
+        // If it's a non '*'-query (e.g. non 'any'-query)
+        if (!preg_match('~^\*+$~', $against)) {
+
+            // Prepend $where with $keywordWHERE
+            array_unshift($where, $keywordWHERE);
+
+            // Prepend $where with $againstWHERE
+            array_unshift($where, $againstWHERE);
+        }
+
+        // Term query template
+        $termQueryTpl = '
+            SELECT %s 
+            FROM `terms_term` `t` %s
+            WHERE ' . implode(' AND ', $where) . '
+            ORDER BY `t`.`term` ASC
+        ';
+
         // Prepare params array
-        $bindParam = [':keyword' => $keyword];
+        $bindParam = [':keyword' => $keyword, ':against' => $against];
 
         // If we have to calculate total
         if ($total === true) {
 
             // Render query for getting total count of results in terms-table
-            $totalQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor, $keywordWHERE);
+            $totalQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor ?? '', $keywordWHERE);
 
             // Setup &$total variable by reference
             $total = (int) editor_Utils::db()->query($totalQuery, $bindParam)->fetchColumn();
         }
 
         // Render query for getting actual results from terms table
-        $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor, $keywordWHERE)
+        $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor ?? '', $keywordWHERE)
             . 'LIMIT ' . (int) $offset . ',' . (int) $limit;
 
         // Return results

@@ -95,12 +95,11 @@ class editor_Models_Terminology_TbxObjects_Term extends editor_Models_Terminolog
     protected array $note = [];
 
     /**
-     * @param editor_Models_Terminology_TbxObjects_Term $element
      * @return string
      */
-    public function getCollectionKey(editor_Models_Terminology_TbxObjects_Term $element): string
+    public function getCollectionKey(): string
     {
-        return $element->getTermEntryId().'-'.$element->getLanguage().'-'.$element->getTermTbxId();
+        return $this->getTermEntryId().'-'.$this->getLanguage().'-'.$this->getTermTbxId();
     }
 
     /***

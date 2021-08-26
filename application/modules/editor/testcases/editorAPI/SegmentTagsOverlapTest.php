@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -141,7 +141,7 @@ class SegmentTagsOverlapTest extends editor_Test_SegmentTagsTest {
      */
     private function createReplacedTest($segmentId, $markup, $expected=NULL){
         $replacedMarkup = $this->replaceTags($markup);
-        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, 'target', $replacedMarkup, 'target', 'target');
+        $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $replacedMarkup, 'target', 'targetEdit');
         // compare unparsed markup
         if($expected == NULL){
             $this->assertEquals($replacedMarkup, $tags->render());
