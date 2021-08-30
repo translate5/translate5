@@ -111,6 +111,7 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
      */
     public function getAllImagesByCollectionId(int $collectionId): array
     {
+        $this->purgeImageTable($collectionId);
         $fullResult = [];
 
         $query = "SELECT * FROM terms_images WHERE collectionId = :collectionId";
@@ -242,5 +243,38 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
         $d = strrpos($name,".");
         $extension = ($d===false) ? "" : ('.'.substr($name,$d+1));
         return ZfExtended_Utils::uuid().$extension;
+    }
+
+    /**
+     * the images files on the disk, which are not in the images table, and returns the unique names in the DB where the file is missing
+     * @param int $collectionId
+     * @param array $filesInDb
+     * @return array file table entries where the file on the disk is missing
+     */
+    public function purgeImageFiles(int $collectionId, array $filesInDb): array {
+        $found = scandir($this->getImagePath($collectionId));
+        $filesInDb[] = '.';
+        $filesInDb[] = '..';
+        $toBeDeleted = array_diff($found, $filesInDb);
+        $missingOnDisk = array_diff($filesInDb, $found);
+        foreach($toBeDeleted as $file) {
+            $file = $this->getImagePath($collectionId, $file);
+            if(file_exists($file)) {
+                unlink($file);
+            }
+        }
+        return $missingOnDisk;
+    }
+
+    /**
+     * deletes terms_images entries which are not referenced by any attribute
+     * @param int $collectionId
+     */
+    protected function purgeImageTable(int $collectionId) {
+        $this->db->getAdapter()->query('DELETE i FROM `terms_images` i
+                LEFT JOIN (
+                    SELECT id, target FROM `terms_attributes` WHERE collectionId = ?
+                ) a ON i.targetId = a.target  
+                WHERE a.id IS NULL AND i.collectionId = ?', [$collectionId, $collectionId]);
     }
 }

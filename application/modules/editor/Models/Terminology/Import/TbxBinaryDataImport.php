@@ -60,13 +60,22 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
             unset($image['data']);
 
             if(empty($image['id'])) {
-                $imagesModel->db->insert($image);
+                $image['id'] = $imagesModel->db->insert($image);
+                //collect the inserted images for later file clean up
+                $tbxImagesCollection[$image['targetId']] = $image;
             }
             else {
                 $id = $image['id'];
                 unset($image['id']);
                 $imagesModel->db->update($image, ['id = ?' => $id]);
             }
+        }
+        $missingFiles = $imagesModel->purgeImageFiles($collectionId, array_column($tbxImagesCollection, 'uniqueName'));
+        if(!empty($missingFiles)) {
+            $this->logger->warn('E1028', 'TBX Import: there are image files in the database which are missing on the disk', [
+                'termCollectionId' => $collectionId,
+                'missingFiles' => $missingFiles,
+            ]);
         }
     }
 
@@ -119,7 +128,4 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
 
         return $image;
     }
-
-    //FIXME clean non existent files from DB (out from target attribute)
-    //FIXME clean non existent files from folder after import
 }
