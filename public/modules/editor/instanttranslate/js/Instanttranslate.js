@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-if (window.parent.location.hash == '#itranslate') $('#containerHeader').hide();
+if (window.parent.location.hash.match(/itranslate|termportal/)) $('#containerHeader').hide();
 var editIdleTimer = null,
     NOT_AVAILABLE_CLS = 'notavailable', // css if a (source-/target-)locale is not available in combination with the other (target-/source-)locale that is set
     uploadedFiles,//Variable to store uploaded files
