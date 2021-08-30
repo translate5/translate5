@@ -591,7 +591,9 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
             // If `terms_images` record found by attr's target - delete that record
-            if ($i->loadByTargetId($this->getTarget())) $i->delete();
+            if ($i->loadByTargetId($this->getCollectionId(), $this->getTarget())){
+                $i->delete();
+            }
         }
 
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'

@@ -134,9 +134,18 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     }
 
 
-    public function loadByTargetId(string $targetId)
+    /**
+     * loads a image by given collection and target internally
+     * @param int $collectionId
+     * @param string $targetId
+     * @return mixed
+     */
+    public function loadByTargetId(int $collectionId, string $targetId)
     {
-        return $this->row = $this->db->fetchRow('`targetId` = "' . $targetId . '"');
+        return $this->row = $this->db->fetchRow([
+            'collectionId = ?' => $collectionId,
+            'targetId = ?' => $targetId,
+        ]);
     }
 
     public function delete() {
@@ -222,6 +231,6 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     public function moveImage(string $source, int $collectionId, string $targetFile = null): bool {
         $targetFile ?? $this->getUniqueName();
         $this->checkImageTermCollectionFolder($collectionId);
-        return rename($source, );
+        return rename($source, $this->getImagePath($collectionId, $targetFile));
     }
 }
