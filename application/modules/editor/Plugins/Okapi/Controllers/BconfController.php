@@ -42,14 +42,14 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
      /**
       * @var editor_Plugins_Okapi_Models_Bconf
       */
-     const OKAPI_BCONF_EXPORT_NAME = 'okapi_default_export.bconf';
+     const OKAPI_BCONF_EXPORT_NAME = 'D:/okapi/php.bconf';
      const MAXBUFFERSIZE = 1024 * 8;
      const MAXBLOCKLEN = 45000;
      const SIGNATURE = "batchConf";
      const VERSION = 2;
      const  NUMPLUGINS = 0;
      const PIPELINEFILE = "D:/okapi/pipeline.pln";
-     
+     const EXTFILESDIR="G:/projects/Marc/projects/translate5/application/modules/editor/Plugins/Okapi/data/okapi-import-bconf-generation/testfiles";
      /**
       * sends all bconfs as JSON
       * (non-PHPdoc)
@@ -74,7 +74,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
 
           //Read the pipeline and extract steps
           self::processPipeline(self::PIPELINEFILE, $bcongFile);
-         self::filterConfiguration(3,$bcongFile);
+         self::filterConfiguration('3',$bcongFile);
+          self::extensionsMapping(self::EXTFILESDIR,$bcongFile);
           fclose($bcongFile);
      }
      
@@ -112,6 +113,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
      {
           $pipeLineFileOpen = fopen($pipeLine, 'r') or die("Unable to open file!");
           $data = fread($pipeLineFileOpen, self::MAXBUFFERSIZE);
+          //force to add new line
           
           $xmlData = new SimpleXMLElement($data);
           $id = 0;
@@ -125,14 +127,29 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
           }
           // Last ID=-1 to mark no more references
           self::writeInt(-1, $bcongFile);
-          $fileSize = strlen(preg_replace('/[\n]{0,}/m', '', $data));
           
-          $r = ($fileSize % self::MAXBLOCKLEN);
-		$n = ($fileSize / self::MAXBLOCKLEN);
-		
+          $fileSize = strlen(preg_replace('/[\n]{0,}/m', '', $data));
+          ++$fileSize;
+          $r = (int)($fileSize % self::MAXBLOCKLEN);
+		$n = (int)($fileSize / self::MAXBLOCKLEN);
+          // Number of blocks
 		$count = $n + (($r > 0) ? 1 : 0);
-		self::writeInt($count,$bcongFile); // Number of blocks
-          fwrite($bcongFile, $data);
+		self::writeInt($count,$bcongFile);
+          
+          // Write the full blocks
+          $pos = 0;
+          $data .="\n";
+          
+//          for ( $i=0; $i<$n; $i++ ) {
+//               self::writeUTF(substr($data,$pos, $pos+self::MAXBLOCKLEN),$bcongFile);
+//               $pos +=self::MAXBLOCKLEN;
+//          }
+//
+//          // Write the remaining text
+//          if ( $r > 0 ) {
+//               self::writeUTF(substr($data,$pos),$bcongFile);
+//          }
+          self::writeUTF($data,$bcongFile);
           fclose($pipeLineFileOpen);
      }
      
@@ -159,23 +176,46 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
           }
           fclose($file);
      }
+     //=== Section 4: The filter configurations
      /**
       *
       */
      protected function filterConfiguration($bconfId,$bcongFile){
-          $FilterConfiguration= json_encode($this->entity->loadByOkapiId($bconfId));
+          //$filterConfiguration =new editor_Plugins_Okapi_Models_Bconf;
+          $json = file_get_contents("C:/Users/gurum/Downloads/LEK_okapi_bconf_filter.json");
+          $filterConfiguration = json_decode($json, true);
           $count = 0;
-          foreach ($FilterConfiguration as $filter){
-               if($filter->custom==1){
+          foreach ($filterConfiguration as $filter){
+               if($filter['default']==1){
                     $count++;
                }
           }
           self::writeInt($count,$bcongFile);
-          foreach ($FilterConfiguration as $filter){
-               if($filter->custom==1){
-                    self::writeUTF($filter->configId);
-                    self::writeUTF($filter->configuration);
+          foreach ($filterConfiguration as $filter){
+               if($filter['default']==1){
+                    self::writeUTF($filter['configId'],$bcongFile);
+                    self::writeUTF($filter['configuration'],$bcongFile);
                }
           }
      }
+     
+     /**Section 5: Mapping extensions -> filter configuration id
+      * @param $bconfId
+      * @param $bcongFile
+      */
+    protected  function extensionsMapping($filesDir,$bcongFile){
+         $filters = file_get_contents("C:/Users/gurum/Downloads/LEK_okapi_bconf_filter.json");
+         $extMap=[];
+         if($filters != null){
+          foreach ($filters as $filter){
+               $temp= explode('.',$filter);
+               $extension = end($temp);
+              
+          }
+         }
+         else{
+              self::writeInt(0,$bcongFile); // None
+         }
+    }
+     
 }
