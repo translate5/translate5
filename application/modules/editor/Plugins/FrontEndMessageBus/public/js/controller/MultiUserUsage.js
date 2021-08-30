@@ -98,7 +98,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
                 renderrowclass: 'onSegmentRender',
                 itemclick: 'clickSegment',
                 beforestartedit: 'enterSegment',
-                canceledit: 'leaveSegment',
+                canceledit: 'leaveSegment'
             }
         }
     },
@@ -119,7 +119,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
                 serverId: Editor.data.app.serverId,
                 connectionId: conf.connectionId,
                 version: conf.clientVersion
-            }
+            };
         }
         
         url.push(conf.socketServer.schema, '://');
@@ -142,7 +142,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
                 //needed to identify different browser windows with same sessionId persistent over reconnections
                 connectionId: conf.connectionId,
                 //to compare server and client version
-                version: conf.clientVersion,
+                version: conf.clientVersion
                 
             }
         });
@@ -217,6 +217,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
     },
     enterSegment: function(plugin, context) {
         var me = this,
+            msg = me.strings,
             rec = context[0],
             meta = me.segmentUsageData.get(rec.get('id'));
         if(!me.bus.isReady()) {
