@@ -4208,6 +4208,34 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Pmlight</source>
     <target>PM Light</target>
 </trans-unit>
+<trans-unit id='MS4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'>
+  <source>1. Lektorat (sprachlich)</source>
+  <target>1st revision - language</target>
+</trans-unit>
+<trans-unit id='MS4gTGVrdG9yYXQgKHRlY2huaXNjaCk='>
+  <source>1. Lektorat (technisch)</source>
+  <target>1st revision - technical</target>
+</trans-unit>
+<trans-unit id='Mi4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'>
+  <source>2. Lektorat (sprachlich)</source>
+  <target>2nd revision - language</target>
+</trans-unit>
+<trans-unit id='Mi4gTGVrdG9yYXQgKHRlY2huaXNjaCk='>
+  <source>2. Lektorat (technisch)</source>
+  <target>2nd revision - technical</target>
+</trans-unit>
+<trans-unit id='VGV4dGZyZWlnYWJl'>
+  <source>Textfreigabe</source>
+  <target>Text approval</target>
+</trans-unit>
+<trans-unit id='RXh0ZXJuZXMgRFRQIChudXIgTGVzZXJlY2h0ZSBpbiB0cmFuc2xhdGU1KQ=='>
+  <source>Externes DTP (nur Leserechte in translate5)</source>
+  <target>External DTP (read-only inside translate5)</target>
+</trans-unit>
+<trans-unit id='RmluYWxlIFRleHRmcmVpZ2FiZQ=='>
+  <source>Finale Textfreigabe</source>
+  <target>Final text approval</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
