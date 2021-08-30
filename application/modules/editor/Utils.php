@@ -354,13 +354,18 @@ class editor_Utils {
         // Foreach prop having mismatch rules
         foreach ($ruleA as $props => $rule) foreach (self::ar($props) as $prop) {
 
-            settype($rule['ext'], 'string');
-            settype($rule['rex'], 'string');
-            settype($rule['req'], 'string');
-            settype($rule['unq'], 'string');
-            settype($rule['key'], 'string');
-            settype($rule['fis'], 'string');
-            settype($rule['dis'], 'string');
+            // Explicitly set up the rule-type keys for which not exist
+            foreach (['ext', 'rex', 'req', 'unq', 'key', 'fis', 'dis'] as $type)
+                if (!isset($rule[$type]))
+                    $rule[$type] = '';
+
+             // settype($rule['ext'], 'string');
+             // settype($rule['rex'], 'string');
+             // settype($rule['req'], 'string');
+             // settype($rule['unq'], 'string');
+             // settype($rule['key'], 'string');
+             // settype($rule['fis'], 'string'); // If this is given as array, it becomes 'Array', so validation fails
+             // settype($rule['dis'], 'string');
 
             // Shortcut to $data[$prop]
             $value = $data[$prop];
@@ -489,7 +494,7 @@ class editor_Utils {
      * @return null
      */
     public static function rex($alias){
-        return $alias ? self::$_rex[$alias] : null;
+        return $alias ? (self::$_rex[$alias] ?? null) : null;
     }
 
     /**

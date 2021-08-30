@@ -448,8 +448,9 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      */
     public function removeCollectionImagesDir(int $collectionId)
     {
-        $imagesPath = editor_Models_Import_TermListParser_Tbx::getFilesystemImagesDir().'tc_'.$collectionId;
-        $this->removeDirectoryRecursive($imagesPath);
+        /* @var $i editor_Models_Terminology_Models_ImagesModel */
+        $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
+        $this->removeDirectoryRecursive($i->getImagePath($collectionId));
     }
 
     /***

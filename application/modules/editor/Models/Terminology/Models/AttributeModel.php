@@ -591,7 +591,9 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
             // If `terms_images` record found by attr's target - delete that record
-            if ($i->loadByTargetId($this->getTarget())) $i->delete();
+            if ($i->loadByTargetId($this->getCollectionId(), $this->getTarget())){
+                $i->delete();
+            }
         }
 
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
@@ -829,15 +831,19 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
     }
 
     /**
-     * @param $collectionId
-     * @param $termEntryId
+     * @param int $collectionId
+     * @param int $termEntryId
      * @param null $language
      * @throws Zend_Db_Statement_Exception
      */
-    public static function deleteImages($collectionId, $termEntryId, $language = null) {
+    public static function deleteImages(int $collectionId, int $termEntryId, $language = null) {
 
         // Setup query param bindings
-        $bind[':termEntryId'] = $termEntryId; if ($language) $bind[':language'] = $language;
+        $bind[':collectionId'] = $collectionId;
+        $bind[':termEntryId'] = $termEntryId;
+        if ($language) {
+            $bind[':language'] = $language;
+        }
 
         // Build WHERE clause using bindings
         $where = []; foreach ($bind as $key => $value) $where []= '`' . ltrim($key, ':') . '` = ' . $key;
@@ -847,32 +853,14 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             SELECT `target`, `id` FROM `terms_attributes` WHERE ' . implode(' AND ', $where) . ' AND `type` = "figure" 
         ', $bind)->fetchAll(PDO::FETCH_KEY_PAIR);
 
-        // Get quote-wrapped comma-separated list of `target`-values to be used in sql IN (...) clause
-        $targetIds = '"' . implode('","', array_keys($targetIdA)) . '"';
+        /* @var $i editor_Models_Terminology_Models_ImagesModel */
+        $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
-        // Get filenames by targetIds
-        $nameByTargetIdA = editor_Utils::db()->query('
-            SELECT `targetId`, `uniqueName` 
-            FROM `terms_images` 
-            WHERE `targetId` IN (' . $targetIds . ')
-              AND `collectionId` = "' . $collectionId . '"
-        ')->fetchAll(PDO::FETCH_KEY_PAIR);
-
-        // Delete image files
-        foreach ($targetIdA as $targetId => $attributeId)
-            if (($name = $nameByTargetIdA[$targetId])
-                && is_file($abs = $_SERVER['DOCUMENT_ROOT']
-                    . '/term-images-public/tc_'
-                    . $collectionId
-                    . '/' . $name))
-                unlink($abs);
-
-        // Delete records from `terms_images` table
-        editor_Utils::db()->query('
-            DELETE 
-            FROM `terms_images` 
-            WHERE `targetId` IN (' . $targetIds . ')
-              AND `collectionId` = "' . $collectionId . '"
-        ')->fetchAll(PDO::FETCH_KEY_PAIR);
+        //delete the images then
+        $images = $i->loadByTargetIdList($collectionId, array_keys($targetIdA));
+        foreach($images as $image) {
+            $i->init($image);
+            $i->delete();
+        }
     }
 }
