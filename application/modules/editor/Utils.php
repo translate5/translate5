@@ -494,7 +494,7 @@ class editor_Utils {
      * @return null
      */
     public static function rex($alias){
-        return $alias ? self::$_rex[$alias] : null;
+        return $alias ? (self::$_rex[$alias] ?? null) : null;
     }
 
     /**

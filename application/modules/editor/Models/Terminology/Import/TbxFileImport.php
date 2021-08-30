@@ -63,9 +63,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     /** @var editor_Models_Terminology_Models_TransacgrpModel */
     protected editor_Models_Terminology_Models_TransacgrpModel $transacGrpModel;
 
-    /** @var editor_Models_Terminology_Models_ImagesModel */
-    protected editor_Models_Terminology_Models_ImagesModel $tbxImagesModel;
-
     /** @var editor_Models_Terminology_Models_AttributeDataType */
     protected editor_Models_Terminology_Models_AttributeDataType $attributeDataTypeModel;
 
@@ -162,16 +159,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     protected array $termCollection;
     /**
-     * All images from terms_images to check if image isset.
-     * @var array
-     */
-    protected array $tbxImagesCollection;
-    /**
-     * Collection of images from <back> as object prepared for insert or update.
-     * @var array
-     */
-    protected array $tbxImages;
-    /**
      * Collected term states not listed in statusMap
      * @var array
      */
@@ -210,8 +197,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     protected editor_Models_Terminology_TbxObjects_Attribute $attributesObject;
     /** @var editor_Models_Terminology_TbxObjects_TransacGrp|mixed  */
     protected editor_Models_Terminology_TbxObjects_TransacGrp $transacGrpObject;
-    /** @var editor_Models_Terminology_TbxObjects_Image|mixed  */
-    protected editor_Models_Terminology_TbxObjects_Image $tbxImageObject;
 
     /**
      * In this class is the whole merge logic
@@ -245,14 +230,12 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->attributeModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
         $this->attributeDataTypeModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
         $this->transacGrpModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
-        $this->tbxImagesModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
         $this->termEntryObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_TermEntry');
         $this->langsetObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_Langset');
         $this->termObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_Term');
         $this->attributesObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_Attribute');
         $this->transacGrpObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_TransacGrp');
-        $this->tbxImageObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_Image');
         $this->dataType = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_DataType');
 
         $this->termEntryMerge = ZfExtended_Factory::get('editor_Models_Terminology_Import_TermEntryMerge');
@@ -315,6 +298,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     private function prepareImportArrays(object $collection, ZfExtended_Models_User $user, bool $mergeTerms)
     {
+        error_log('MEM 1 '.memory_get_usage());
         $this->user = $user;
         $this->collectionId = $collection->getId();
         $this->mergeTerms = $mergeTerms;
@@ -326,6 +310,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->tbxMap[$this::TBX_LANGSET] = 'langSet';
         $this->tbxMap[$this::TBX_TIG] = 'tig';
 
+        error_log('MEM 2 '.memory_get_usage());
         $languagesModel = ZfExtended_Factory::get('editor_Models_Languages')->getAvailableLanguages();
         foreach ($languagesModel as $language) {
             $this->languages[strtolower($language['value'])] = $language['id'];
@@ -343,13 +328,11 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->attributesCollection = $this->attributeModel->getAttributeByCollectionId($this->collectionId);
             $this->termCollection = $this->termModel->getAllTermsByCollectionId($this->collectionId);
             $this->transacGrpCollection = $this->transacGrpModel->getTransacGrpByCollectionId($this->collectionId);
-            $this->tbxImagesCollection = $this->tbxImagesModel->getAllImagesByCollectionId($this->collectionId);
         } else {
             $this->termEntriesCollection = [];
             $this->termCollection = [];
             $this->attributesCollection = [];
             $this->transacGrpCollection = [];
-            $this->tbxImagesCollection = [];
         }
     }
 
@@ -427,9 +410,13 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         while ($xmlReader->read() && $xmlReader->name !== 'refObjectList');
         while ($xmlReader->name === 'refObjectList') {
             if($xmlReader->getAttribute('type') == 'binaryData') {
-                $this->getTbxImages(new SimpleXMLElement($xmlReader->readOuterXML()));
+                /** @var $binImport editor_Models_Terminology_Import_TbxBinaryDataImport */
+                $binImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxBinaryDataImport');
+                $binImport->import($this->collectionId, new SimpleXMLElement($xmlReader->readOuterXML()));
             }
-            //FIXME implement getTbxRespUserBack
+            //FIXME implement getTbxRespUserBack → neuen Issue hierzu anlegen:
+//            Marc Mittag  17:09 Uhr @Thomas Lauria I do not know. I know, that we discussed this and said, that we will link these person references to a translate5 user, if the id match the user-guid or the mail address matches. And if not, we will simply put the user as creator / modifier in the termportal. Yet this is not very important to the overall termportal - so if not implemented, we should put it into an issue of remaining todos and park it in our JIRA until someone misses it.
+//            Thomas Lauria  17:10 Uhr Ok, then I will do that.
 //            if($xmlReader->getAttribute('type') == 'respPerson') {
 //                $this->getTbxRespUserBack(new SimpleXMLElement($xmlReader->readOuterXML()));
 //            }
@@ -791,66 +778,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
     }
 
     /**
-     * @param SimpleXMLElement $refObjectList
-     */
-    private function getTbxImages(SimpleXMLElement $refObjectList)
-    {
-        $this->tbxImagesModel->checkImageTermCollectionFolder($this->collectionId);
-
-        $parsedTbxImages = [];
-        $tbxImagesAsObject = [];
-        $count = 0;
-        /** @var SimpleXMLElement $refObject */
-        foreach ($refObjectList as $refObject) {
-            $parsedTbxImages[$count]['id'] = (string)$refObject->attributes()->{'id'};
-            foreach ($refObject->item as $item) {
-                $parsedTbxImages[$count][(string)$item->attributes()->{'type'}] = (string)$item;
-            }
-            /** @var editor_Models_Terminology_TbxObjects_Image $tbxImage */
-            $tbxImage = new $this->tbxImageObject;
-            $tbxImage->setTargetId((string)$refObject->attributes()->{'id'});
-//                    $tbxImage->setName($parsedTbxImages[$count]['name']);
-//                    $tbxImage->setEncoding($parsedTbxImages[$count]['encoding']);
-
-            if (isset($parsedTbxImages[$count]['encoding'])) {
-                $tbxImage->setName($parsedTbxImages[$count]['name']);
-                $tbxImage->setEncoding($parsedTbxImages[$count]['encoding']);
-            } else {
-                $tbxImage->setName((string)$refObject->attributes()->{'id'}.'.'.$parsedTbxImages[$count]['format']);
-                $tbxImage->setEncoding($parsedTbxImages[$count]['codePage']);
-            }
-
-            $tbxImage->setUniqueName($tbxImage->createUniqueName());
-            $tbxImage->setFormat($parsedTbxImages[$count]['format']);
-//                    $tbxImage->setXbase('');
-            $tbxImage->setHexOrXbaseValue($parsedTbxImages[$count]['data']);
-
-            $tbxImage->setCollectionId($this->collectionId);
-            $tbxImagesAsObject[] = $tbxImage;
-            $count++;
-
-            if ($tbxImagesAsObject) {
-                foreach ($tbxImagesAsObject as $image) {
-                    $hexOrXbaseWithoutSpace = str_replace(' ', '', $image->getHexOrXbaseValue());
-                    if ($image->getEncoding() === 'hex') {
-                        # convert the hex string to binary
-                        $img = hex2bin($hexOrXbaseWithoutSpace);
-                    } else {
-                        # convert the base64 string to binary
-                        $img = base64_decode($hexOrXbaseWithoutSpace);
-                    }
-
-                    $image->setHexOrXbaseValue('');
-                    $this->tbxImagesModel->saveImageToDisk($this->collectionId, $image->getUniqueName(), $img);
-                }
-
-                $this->createOrUpdateElement($this->tbxImagesModel, $tbxImagesAsObject, $this->tbxImagesCollection, $this->mergeTerms);
-                $tbxImagesAsObject = [];
-            }
-        }
-    }
-
-    /**
      * ToDo: Sinisa, Update user in table... define how and what is mean in: TRANSLATE-1274
      * @param SimpleXMLElement $refObjectList
      * @return array
@@ -942,6 +869,10 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      * returns the translate5 internal available term status to the one given in TBX
      * @param array $termNotes
      * @return string
+     *
+     *
+     * FIXME wir brauchen eine Funktion die den terms_term status aus den Attributen liefert, verwendbar when one attribute is updated.
+     * statusMap is coming here already from config - regarding client overwriting???
      */
     protected function getTermNoteStatus(array $termNotes) : string
     {

@@ -648,6 +648,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ], $params);
 
         // Create `terms_images` model instance
+        /** @var $i editor_Models_Terminology_Models_ImagesModel */
         $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
         // Apply data
@@ -660,16 +661,8 @@ class editor_AttributeController extends ZfExtended_RestController
             'collectionId' => $_['attrId']['collectionId']
         ]);
 
-        //rename($_['figure']['tmp_name'], 'D:/img.jpg');
-
-        // Build src
-        $src = ($dir = 'term-images-public/tc_' . $_['attrId']['collectionId'] . '/') . $i->getUniqueName();
-
-        // Check if dir exists and if no - try to create it
-        if (!is_dir($dir)) mkdir($dir, umask(), true);
-
         // If uploaded file is successfully moved into proper location
-        if (rename($_['figure']['tmp_name'], $src)) {
+        if ($i->moveImage($_['figure']['tmp_name'], $_['attrId']['collectionId'])) {
 
             // Save `terms_images` record
             $i->save();
@@ -684,7 +677,7 @@ class editor_AttributeController extends ZfExtended_RestController
                 );
 
             // Flush response data
-            $this->view->assign(['src' => '/' . $src, 'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s')]);
+            $this->view->assign(['src' => $i->getPublicPath(), 'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s')]);
 
             // Else flush empty src
         } else $this->view->assign(['src' => ''] + $_);
