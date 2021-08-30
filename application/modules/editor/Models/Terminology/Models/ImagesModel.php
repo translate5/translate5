@@ -117,7 +117,7 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
         $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
 
         foreach ($queryResults as $image) {
-            $fullResult[$image['collectionId'].'-'.$image['targetId']] = $image;
+            $fullResult[$image['targetId']] = $image;
         }
 
         return $fullResult;
@@ -229,8 +229,18 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
      * @return bool
      */
     public function moveImage(string $source, int $collectionId, string $targetFile = null): bool {
-        $targetFile ?? $this->getUniqueName();
         $this->checkImageTermCollectionFolder($collectionId);
-        return rename($source, $this->getImagePath($collectionId, $targetFile));
+        return rename($source, $this->getImagePath($collectionId, $targetFile ?? $this->getUniqueName()));
+    }
+
+    /**
+     * creates a unique name out of the given one
+     * @param string $name
+     * @return string
+     */
+    public function createUniqueName(string $name): string {
+        $d = strrpos($name,".");
+        $extension = ($d===false) ? "" : ('.'.substr($name,$d+1));
+        return ZfExtended_Utils::uuid().$extension;
     }
 }

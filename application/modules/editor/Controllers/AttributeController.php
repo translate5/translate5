@@ -648,7 +648,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ], $params);
 
         // Create `terms_images` model instance
-        /* @var $i editor_Models_Terminology_Models_ImagesModel */
+        /** @var $i editor_Models_Terminology_Models_ImagesModel */
         $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
         // Apply data
