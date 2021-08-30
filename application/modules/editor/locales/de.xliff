@@ -2001,6 +2001,13 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='UHJvamVrdGJlc2Noci4gYW56ZWlnZW4='><source>Projektbeschr. anzeigen</source><target>Projektbeschr. anzeigen</target></trans-unit>
 <trans-unit id='UHJvamVrdGJlc2Noci4gYXVzYmxlbmRlbg=='><source>Projektbeschr. ausblenden</source><target>Projektbeschr. ausblenden</target></trans-unit>
 <trans-unit id='UG1saWdodA=='><source>Pmlight</source><target>PM Light</target></trans-unit>
+<trans-unit id='MS4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'><source>1. Lektorat (sprachlich)</source><target>1. Lektorat (sprachlich)</target></trans-unit>
+<trans-unit id='MS4gTGVrdG9yYXQgKHRlY2huaXNjaCk='><source>1. Lektorat (technisch)</source><target>1. Lektorat (technisch)</target></trans-unit>
+<trans-unit id='Mi4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'><source>2. Lektorat (sprachlich)</source><target>2. Lektorat (sprachlich)</target></trans-unit>
+<trans-unit id='Mi4gTGVrdG9yYXQgKHRlY2huaXNjaCk='><source>2. Lektorat (technisch)</source><target>2. Lektorat (technisch)</target></trans-unit>
+<trans-unit id='VGV4dGZyZWlnYWJl'><source>Textfreigabe</source><target>Textfreigabe</target></trans-unit>
+<trans-unit id='RXh0ZXJuZXMgRFRQIChudXIgTGVzZXJlY2h0ZSBpbiB0cmFuc2xhdGU1KQ=='><source>Externes DTP (nur Leserechte in translate5)</source><target>Externes DTP (nur Leserechte in translate5)</target></trans-unit>
+<trans-unit id='RmluYWxlIFRleHRmcmVpZ2FiZQ=='><source>Finale Textfreigabe</source><target>Finale Textfreigabe</target></trans-unit>
   </body>
  </file>
 </xliff>
