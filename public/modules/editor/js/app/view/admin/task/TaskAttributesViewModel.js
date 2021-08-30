@@ -37,10 +37,10 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewModel', {
             bind:{bindTo:'{currentTask}',deep:true}
         },
     	disableUsageMode: {
-            get: function(get) {
-            	var currentTask=get('currentTask');
-                return Ext.getStore('admin.TaskUserAssocs').getCount() > 0;
-            }
+            get: function(task) {
+                return task && task.get('userCount') > 0;
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
         }
     }
 });

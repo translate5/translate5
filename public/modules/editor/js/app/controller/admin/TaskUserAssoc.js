@@ -50,9 +50,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         ref: 'userAssocForm',
         selector: 'adminTaskUserAssoc form'
     }, {
-        ref: 'userAssocSegmentrange',
-        selector: 'adminTaskUserAssoc #segmentrange'
-    }, {
         ref: 'editInfo',
         selector: 'adminTaskUserAssoc #editInfoOverlay'
     }, {
@@ -175,7 +172,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         me.getEditInfo().hide();
         me.getUserAssocForm().show();
         me.getUserAssocForm().setDisabled(false);
-        me.getUserAssocSegmentrange().setDisabled(usageMode !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS);
         me.filterStepsCombo(newRec);
         me.getUserAssoc().loadRecord(newRec);
         me.initState(null, step, '');
@@ -202,8 +198,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         formPanel.setVisible(!emptySel);
 
         formPanel.setDisabled(emptySel || !userEditable);
-
-        me.getUserAssocSegmentrange().setDisabled(task.get('usageMode') !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS);
 
         me.filterStepsCombo(selection[0]);
 
