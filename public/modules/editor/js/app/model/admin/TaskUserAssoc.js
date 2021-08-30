@@ -47,10 +47,10 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
                 return Editor.model.admin.User.getLongUserName(rec);
             }
         },
-        {name: 'state', type: 'string'},
+        {name: 'state', type: 'string', critical: true},
         {name: 'role', type: 'string'},
-        {name: 'workflow', type: 'string',critical: true},
-        {name: 'workflowStepName', type: 'string'},
+        {name: 'workflow', type: 'string', critical: true},
+        {name: 'workflowStepName', type: 'string', critical: true},
         {name: 'segmentrange', type: 'string'},
         {name: 'deletable', type: 'boolean'},
         {name: 'editable', type: 'boolean'},
