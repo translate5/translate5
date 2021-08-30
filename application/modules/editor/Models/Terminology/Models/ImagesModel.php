@@ -54,6 +54,20 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     protected $tbxImportDirectoryPath = APPLICATION_PATH.'/../data/tbx-import/';
 
     /**
+     * returns the image data arrays for a given list of targetIds
+     * @param int $collectionId
+     * @param array $targetIds
+     * @return array
+     */
+    public function loadByTargetIdList(int $collectionId, array $targetIds): array
+    {
+        $sql = $this->db->select()
+            ->where('targetId IN (?)', $targetIds)
+            ->where('collectionId = ?', $collectionId);
+        return $this->db->fetchAll($sql)->toArray();
+    }
+
+    /**
      * returns the image paths to a collection ID and a list of targets
      * @param int $collectionId
      * @param array $targetIds
@@ -63,16 +77,27 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     public function getImagePathsByTargetIds(int $collectionId, array $targetIds): array {
         $sql = $this->db->select()
             ->from($this->db, ['targetId', 'uniqueName'])
-            ->where('targetId IN (?)', $targetIds);
+            ->where('targetId IN (?)', $targetIds)
+            ->where('collectionId = ?', $collectionId);
         $images = $this->db->fetchAll($sql)->toArray();
 
         //generate the paths
         $uniqueNames = [];
         foreach($images as $image) {
-            $uniqueNames[$image['targetId']] = APPLICATION_RUNDIR.'/editor/plugins/termimage/TermPortal/tc_'.$collectionId.'/'.$image['uniqueName'];
+            $uniqueNames[$image['targetId']] = $this->getPublicPath($collectionId, $image['uniqueName']);
         }
 
         return $uniqueNames;
+    }
+
+    /**
+     * return the public webpath to an image
+     * @param int|null $collectionId if omitted use the internal collectionId
+     * @param string|null $imageName if omitted use the internal unique name
+     * @return string
+     */
+    public function getPublicPath(int $collectionId = null, string $imageName = null): string {
+        return APPLICATION_RUNDIR.'/editor/plugins/termimage/TermPortal/tc_'.($collectionId ?? $this->getCollectionId()).'/'.($imageName ?? $this->getUniqueName());
     }
 
     /**
@@ -185,5 +210,18 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     public function saveImageToDisk(int $collectionId, string $imageName, string $imageContent)
     {
         file_put_contents($this->getImagePath($collectionId, $imageName), $imageContent);
+    }
+
+    /**
+     * renames / moves a given file to the unique file name / given filename
+     * @param string $source
+     * @param int $collectionId
+     * @param string|null $targetFile if omitted use internal unique ID
+     * @return bool
+     */
+    public function moveImage(string $source, int $collectionId, string $targetFile = null): bool {
+        $targetFile ?? $this->getUniqueName();
+        $this->checkImageTermCollectionFolder($collectionId);
+        return rename($source, );
     }
 }
