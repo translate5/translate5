@@ -114,7 +114,7 @@ class LoginController extends ZfExtended_Controllers_Login {
             if($meta->getId()!=null && $meta->getLastUsedApp()!=''){
                 $rdr=$meta->getLastUsedApp();
             }
-            $this->applicationRedirect($rdr);
+            $this->applicationRedirect($rdr, $isTermPortalAllowed);
         }
         
         //is instanttranslate allowed
@@ -135,10 +135,12 @@ class LoginController extends ZfExtended_Controllers_Login {
         exit;
     }
     
-    protected function applicationRedirect(string $applicationName){
+    protected function applicationRedirect(string $applicationName, $isTermPortalAllowed = null){
         header ('HTTP/1.1 302 Moved Temporarily');
         $apiUrl=APPLICATION_RUNDIR.'/editor/'.$applicationName;
-        $url=APPLICATION_RUNDIR.'/editor/apps?name='.$applicationName.'&apiUrl='.$apiUrl;
+        $url = $applicationName == 'termportal' || $isTermPortalAllowed
+            ? APPLICATION_RUNDIR.'/editor/termportal#'.$applicationName
+            : APPLICATION_RUNDIR.'/editor/apps?name='.$applicationName.'&apiUrl='.$apiUrl;
         header ('Location: '.$url);
         exit;
     }
