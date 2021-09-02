@@ -853,10 +853,13 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             SELECT `target`, `id` FROM `terms_attributes` WHERE ' . implode(' AND ', $where) . ' AND `type` = "figure" 
         ', $bind)->fetchAll(PDO::FETCH_KEY_PAIR);
 
+        // If nothing found - return
+        if (!$targetIdA) return;
+
         /* @var $i editor_Models_Terminology_Models_ImagesModel */
         $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
-        //delete the images then
+        // Delete the images then
         $images = $i->loadByTargetIdList($collectionId, array_keys($targetIdA));
         foreach($images as $image) {
             $i->init($image);
