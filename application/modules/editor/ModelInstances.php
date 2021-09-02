@@ -113,7 +113,7 @@ class editor_ModelInstances {
 
     protected static function store(ZfExtended_Models_Entity_Abstract $instance): ZfExtended_Models_Entity_Abstract {
         $cls = get_class($instance);
-        if(!is_array(self::$instances[$cls])) {
+        if(!array_key_exists($cls, self::$instances) || !is_array(self::$instances[$cls])) {
             self::$instances[$cls] = [];
         }
         //we assume that all of our models have a getId function!

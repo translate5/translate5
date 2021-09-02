@@ -159,6 +159,9 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                         fieldLabel: me.strings.fieldSegmentrange,
                         labelCls: 'labelInfoIcon',
                         cls: 'userAssocLabelIconField',
+                        bind:{
+                            disabled: '{disableRanges}'
+                        },
                         autoEl: {
                             tag: 'span',
                             'data-qtip': me.strings.fieldSegmentrangeInfo
