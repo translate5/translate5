@@ -995,6 +995,18 @@ $(document).on('click', '.term-proposal' , function() {
         langProposal = $("#targetLocale").val(),
         isTermProposalFromInstantTranslate = 'true';
         params = "text="+text+"&lang="+lang+"&textProposal="+textProposal+"&langProposal="+langProposal+"&isTermProposalFromInstantTranslate="+isTermProposalFromInstantTranslate;
+    if (location.search.match(/termId/)) {
+        var q = top.window.Ext.ComponentQuery.query,
+            vm = q('main').pop().getViewModel(),
+            b = q('[reference=termportalBtn]').pop();
+        vm.set('itranslate', {
+            target: {
+                lang: langProposal,
+                text: textProposal
+            }
+        });
+        b.el.dom.click();
+    } else
     openTermPortal(params);
 });
 
