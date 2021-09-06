@@ -96,14 +96,26 @@ class LoginController extends ZfExtended_Controllers_Login {
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
         $roles=$sessionUser->data->roles;
-        
+
+        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
+        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
+
+        // If user was not logged in during the attempt to load termportal, but now is logged and allowed to do that
+        if (($hash = $this->_session->redirecthash)
+            && preg_match('~^#(termportal|itranslate)~', $hash)
+            && $isTermPortalAllowed) {
+
+                // Drop redirecthash prop from session
+                $this->_session->redirecthash = '';
+
+                // Do redirect
+                $this->applicationRedirect(substr($hash, 1), true);
+        }
+
         if($acl->isInAllowedRoles($roles, 'initial_page','editor')) {
             $this->editorRedirect();
         }
-        
-        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
-        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
-        
+
         //the user has termportal and instantranslate roles
         if($isTermPortalAllowed && $isInstantTranslateAllowed){
             //find the last used app, if none use the instantranslate as default
