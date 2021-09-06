@@ -37,9 +37,9 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      *
      * @var string
      */
-    protected $entityClass = 'editor_Plugins_Okapi_Models_Bconf';
+    protected $entityClass = 'editor_Plugins_Okapi_Models_BconfFilter';
     /**
-     * @var editor_Plugins_Okapi_Models_Bconf
+     * @var editor_Plugins_Okapi_Models_BconfFilter
      */
     protected $entity;
     

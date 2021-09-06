@@ -28,43 +28,40 @@ END LICENSE AND COPYRIGHT
 
 /**
  *
- * REST Endpoint Controller to serve the Bconf List for the Bconf-Management in the Preferences
+ * Common util class for bconf export and import
  *
  */
-class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
-{
+class editor_Plugins_Okapi_Bconf_BconfUtil{
+    
      
-     /**
-      *
-      * @var string
+     /** Write the UTF-8 value in bconf
+      * @param $string
+      * @param $bcongFile
       */
-     protected $entityClass = 'editor_Plugins_Okapi_Models_Bconf';
-     /**
-      * @var editor_Plugins_Okapi_Models_Bconf
-      */
-     /**
-      * sends all bconfs as JSON
-      * (non-PHPdoc)
-      * @see ZfExtended_RestController::indexAction()
-      */
-     public function indexAction()
+     public static function writeUTF($string, $bcongFile)
      {
-          $this->view->rows = $this->entity->loadAll();
-          $this->view->total = $this->entity->getTotalCount();
+          $utfString = utf8_encode($string);
+          $length = strlen($utfString);
+          fwrite($bcongFile, pack("n", $length));
+          fwrite($bcongFile, $utfString);
      }
      
-     /**
-      * Export bconf
+     /** Write the Integer value in bconf
+      * @param $intValue
+      * @param $bcongFile
       */
-     public function postAction()
+     public static function writeInt($intValue, $bcongFile)
      {
-          $bconf = new editor_Plugins_Okapi_Bconf_BconfExport();
-          $okapiName = $this->getParam('okapiName');
-          $okapiId = $this->getParam('okapiId');
-          if($okapiId ==null || $okapiId ==""){
-               return false;
-          }
-          $bconf->ExportBconf($okapiName,$okapiId);
+          fwrite($bcongFile, pack("N", $intValue));
+     }
+     
+     /** Write the Long  value in bcong
+      * @param $pipeLine
+      * @param $bcongFile
+      */
+     public static function writeLong($longValue, $bcongFile)
+     {
+          fwrite($bcongFile, pack("J", $longValue));
      }
      
 }
