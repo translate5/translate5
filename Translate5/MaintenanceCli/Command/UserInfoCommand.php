@@ -74,6 +74,7 @@ class UserInfoCommand extends UserAbstractCommand
             $this->writeTitle('Searching one user with ID "'.$identifier.'"');
             $userModel->load($identifier);
             $this->printOneUser($userModel->getDataObject());
+            $this->printAdditionalInfo($userModel->getDataObject());
             return 0;
         }
         
@@ -82,19 +83,68 @@ class UserInfoCommand extends UserAbstractCommand
             $this->writeTitle('Searching one user with GUID "'.$identifier.'"');
             $userModel->loadByGuid($identifier);
             $this->printOneUser($userModel->getDataObject());
+            $this->printAdditionalInfo($userModel->getDataObject());
             return 0;
         }
         if($guid->isValid($identifier)){
             $this->writeTitle('Searching one user with GUID "'.$identifier.'"');
             $userModel->loadByGuid($identifier);
             $this->printOneUser($userModel->getDataObject());
+            $this->printAdditionalInfo($userModel->getDataObject());
             return 0;
         }
         $this->writeTitle('Searching users with login or e-mail "'.$identifier.'"');
         $users = $userModel->loadAllByLoginPartOrEMail($identifier);
+        $isOne = count($users) === 1;
         foreach($users as $user) {
             $this->printOneUser((object) $user);
+            if($isOne) {
+                $this->printAdditionalInfo((object) $user);
+            }
+            $this->io->text('');
         }
         return 0;
+    }
+
+    protected function printAdditionalInfo(\stdClass $user) {
+        $this->printLoginLog($user->userGuid);
+        $this->printSessions($user->id);
+        $this->printTasksUsed($user->userGuid);
+    }
+
+    protected function printTasksUsed(string $userGuid) {
+        $jobDb = \ZfExtended_Factory::get('editor_Models_Db_TaskUserAssoc');
+        /* @var $jobDb \editor_Models_Db_TaskUserAssoc */
+        $jobs = $jobDb->fetchAll($jobDb->select()
+            ->where('userGuid = ?', $userGuid)
+            ->where('usedState is not null')
+        )->toArray();
+
+        if(empty($jobs)) {
+            return;
+        }
+        else {
+            $this->io->section('Current opened jobs - should not be more as one');
+        }
+        foreach($jobs as $job) {
+            $this->writeAssoc($job);
+        }
+    }
+
+    protected function printSessions(int $userId) {
+        $sessionDb = \ZfExtended_Factory::get('ZfExtended_Models_Db_Session');
+        /* @var $sessionDb \ZfExtended_Models_Db_Session */
+        $sessions = $sessionDb->fetchAll($sessionDb->select()
+            ->where('userId = ?', $userId)
+        )->toArray();
+        if(empty($sessions)) {
+            $this->io->info('No current sessions');
+        }
+        else {
+            $this->io->section('Current sessions (session_id, last modfied)');
+        }
+        foreach($sessions as $session) {
+            $this->io->text(substr($session['session_id'],0, 4).'... '.date('Y-m-d H:i:s', $session['modified']));
+        }
     }
 }
