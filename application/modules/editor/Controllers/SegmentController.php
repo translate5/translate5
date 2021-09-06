@@ -160,6 +160,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         $context = new stdClass(); // this needs to be an object to make sure it is passed by reference through the events API
         $context->result = [];
         $context->types = explode(',', $this->_getParam('parsertypes', 'editable,workflow'));
+        $context->field = $this->_getParam('editedField', null);
         
         foreach($context->types as $type){
             if($type == 'editable' || $type == 'workflow'){
@@ -176,7 +177,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
             }
         }
         // this gives plugins (which may add types in the frontend) the chance to add the corresponding data
-        $this->events->trigger('nextsegmentsAction', $this, array('context' => $context));
+        $this->events->trigger('nextsegmentsAction', $this, array('context' => $context, 'segment' => $this->entity));
 
         echo Zend_Json::encode((object) $context->result, Zend_Json::TYPE_OBJECT);
     }

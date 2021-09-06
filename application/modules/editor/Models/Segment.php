@@ -1093,19 +1093,24 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $s->order($this->tableName . '.segmentNrInTask ASC');
         return parent::loadFilterdCustom($s);
     }
-
+    /**
+     * Prepares the entity for using it in an editable finder
+     * @return editor_Models_Segment
+     */
+    public function reInitForEditablesFinder(){
+        $this->reInitDb($this->getTaskGuid());
+        $this->initDefaultSort();
+        return $this;
+    }
     /**
      * inits and returns the editor_Models_Segment_EditablesFinder
      * @return editor_Models_Segment_EditablesFinder
      */
-    protected function initSegmentFinder()
-    {
-        $this->reInitDb($this->getTaskGuid());
-        $this->initDefaultSort();
-
-        return ZfExtended_Factory::get('editor_Models_Segment_EditablesFinder', array($this));
+    protected function initSegmentFinder(){
+        return ZfExtended_Factory::get(
+            'editor_Models_Segment_EditablesFinder',
+            array($this->reInitForEditablesFinder()));
     }
-
     /**
      * returns the first and the last EDITABLE segment of the actual filtered request
      * @param array $autoStateIds a list of autoStates where the prev/next page segments are additionaly compared to

@@ -51,13 +51,13 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         /**
          * just a dummy implementation for a consistent coding
          */
-        editable: function(record){
+        editable: function(record, field){
             return true;
         },
         /**
          * returns true if segment was not edited by the current role yet
          */
-        workflow: function(record){
+        workflow: function(record, field){
             var role = Editor.data.task.get('userRole') || 'pm',
                 map = Editor.data.segments.roleAutoStateMap,
                 autoState = record.get('autoStateId');
@@ -170,12 +170,19 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
      * @param {Object} context current edit context
      */
     calculateRows: function(context) {
-        var me = this;
+        var me = this,
+            editedField =   this.editingPlugin.editor.getEditedField();
+        // TODO FIXME / QUIRK
+        // When the segment editor was opened, this API will return NULL. Presumably due to problems in the initiaization-order
+        // Also, when editing an editable source, this will give "sourceEdit" whereas the prev-next mechanic in Editor.controller.editor.PrevNextSegment will only work with targets
+        if(!editedField || editedField.substr(0, 6) == 'source'){
+            editedField = 'targetEdit';
+        }
         me.context = context;
-        me.prev = me.calculateRow(-1);
-        me.next = me.calculateRow(1);
+        me.prev = me.calculateRow(-1, editedField);
+        me.next = me.calculateRow(1, editedField);
         //fetches missing information from server, if needed.
-        me.fetchFromServer();
+        me.fetchFromServer(editedField);
         if(!me.isLoading){
             me.fireEvent('prevnextloaded', me);
         }
@@ -184,7 +191,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
      * @param {int} rowIdxChange
      * @return {}
      */
-    calculateRow: function(rowIdxChange) {
+    calculateRow: function(rowIdxChange, editedField) {
         var me = this, i,
             store = me.editingPlugin.grid.store,
             total = store.getTotalCount(),
@@ -211,7 +218,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
             }
             for(i=0; i < this.types.length; i++){
                 evaluate = this.parsers[this.types[i]];
-                if(!ret[this.types[i] + 'Next'] && evaluate(newRec)){
+                if(!ret[this.types[i] + 'Next'] && evaluate(newRec, editedField)){
                     ret[this.types[i] + 'Next'] = {
                         rec: newRec,
                         idx: newIdx
@@ -290,7 +297,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         return map[role].indexOf(autoState) < 0 && autoState != 999; //if segment is saving, consider it as edited!
     },
     
-    fetchFromServer: function(){
+    fetchFromServer: function(editedField){
         var me = this,
             store = me.editingPlugin.grid.store,
             rec = me.context.record,
@@ -305,8 +312,8 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
             me.isLoading = false;
             return;
         }
-        //we have to send the flag as integer instead of bool, 
-        //since bool would be recognized as string on server side here
+        // we have to send the flag as integer instead of bool, 
+        // since bool would be recognized as string on server side here
         for(i=0; i < this.types.length; i++){
             fields.push('prev_' + this.types[i]);
             if(!me.prev.isBorderReached){
@@ -318,10 +325,12 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
             }
         }
         // we transfere the types to expect as well
+        params.segmentId = rec.get('id');
         params.parsertypes = this.types.join(',');
+        params.editedField = editedField;
         params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
         params[proxy.getSortParam()] = proxy.encodeSorters(store.getSorters().items);
-        params.segmentId = rec.get('id');
+        
         
         me.isLoading = Ext.Ajax.request({
             url: Editor.data.pathToRunDir+'/editor/segment/nextsegments',

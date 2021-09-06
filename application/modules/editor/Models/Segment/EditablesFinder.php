@@ -128,11 +128,11 @@ class editor_Models_Segment_EditablesFinder {
      * @return NULL|integer
      */
     public function find(bool $next, array $autoStateIds = null) {
+        
         $outerSql = $this->getOuterSql();
-
         //for the inner sort we have to swap the direction for the prev filter
         if(!$next) {
-            $this->filterInner->swapSortDirection(); 
+            $this->filterInner->swapSortDirection();
         }
         $this->prepareInnerFilter($autoStateIds);
         $innerSql = $this->getInnerSql();
@@ -140,7 +140,7 @@ class editor_Models_Segment_EditablesFinder {
         foreach($this->sortParameter as $sort) {
             $isAsc = strtolower($sort->direction) === 'asc';
             $prop = $this->getSortProperty($sort);
-
+            
             //if we ever will have multiple sort parameters, this should work out of the box because of the loop
             $this->addSortInner($innerSql, $prop, $next, $isAsc);
             $this->addSortOuter($outerSql, $prop, $isAsc);
@@ -148,7 +148,7 @@ class editor_Models_Segment_EditablesFinder {
         
         $outerSql->from(array('pos' => $innerSql), null);
         $this->filterOuter->applyToSelect($outerSql);
-
+        
         $this->debug($outerSql);
         
         $stmt = $this->segment->db->getAdapter()->query($outerSql);
@@ -158,11 +158,6 @@ class editor_Models_Segment_EditablesFinder {
         }
         return (int) $res['cnt'];
     }
-    
-    public function search(){
-        
-    }
-    
     /**
      * gets the segment position (grid index) to the given segmentId and the configured filters
      * returns null if the segment is not in the filtered list 
@@ -213,7 +208,7 @@ class editor_Models_Segment_EditablesFinder {
         }
         return (int) $res['cnt'];
     }
-    
+
     /**
      * Adds the watchList defitions to the needed filters
      * @param ZfExtended_Models_Filter $filter
@@ -263,7 +258,6 @@ class editor_Models_Segment_EditablesFinder {
         $sql->orWhere('('.sprintf($where, $prop, ' = '));
         $sql->where(sprintf($where, 'id', $comparator).'))');
     }
-    
     /**
      * prepares the outer SQL and returns it
      * @return Zend_Db_Table_Select
@@ -274,7 +268,6 @@ class editor_Models_Segment_EditablesFinder {
         $this->watchList($this->filterOuter, 'list');
         return $this->segment->addWatchlistJoin($outerSql, 'list');
     }
-    
     /**
      * prepares the inner SQL and returns it
      * @return Zend_Db_Table_Select
@@ -289,7 +282,6 @@ class editor_Models_Segment_EditablesFinder {
         $this->watchList($this->filterInner, $tableName);
         return $this->filterInner->applyToSelect($innerSql);
     }
-    
     /**
      * prepares the inner filter: adds the filterung condition for only editable and if provided the filter for specific autostates 
      * @param array $autoStateIds
@@ -302,11 +294,17 @@ class editor_Models_Segment_EditablesFinder {
                 'value' => $autoStateIds,
             ]);
         }
-        $this->filterInner->addFilter((object)[
-            'field' => 'editable',
-            'value' => 1,
-            'type' => 'boolean',
-        ]);
+        $editableFilter = null;
+        if($this->filterInner->hasFilter('editable', $editableFilter)){
+            $editableFilter->value = 1;
+            $editableFilter->type = 'boolean';
+        } else {
+            $this->filterInner->addFilter((object)[
+                'field' => 'editable',
+                'value' => 1,
+                'type' => 'boolean',
+            ]);
+        }
     }
     
     /**
