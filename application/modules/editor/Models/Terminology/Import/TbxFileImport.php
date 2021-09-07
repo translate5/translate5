@@ -597,9 +597,13 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         if (strtolower($parsedLangSet->getDescripType()) === $newTerm::TERM_DEFINITION) {
             $newTerm->setDefinition($parsedLangSet->getDescrip());
         }
-
-        if (isset($tig->termNote)) {
-            $newTerm->setTermNote($this->setAttributeTypes($tig->termNote));
+        $hasTermNote = isset($tig->termNote);
+        $this->addProcessStatusNodeIfNotExists($tig);
+        $newTerm->setTermNote($this->setAttributeTypes($tig->termNote));
+        if ($hasTermNote) {
+            //file_put_contents('log.txt', print_r($tig->termNote, true), FILE_APPEND);
+            //file_put_contents('log.txt', print_r($tig->termNote->asXML(), true), FILE_APPEND);
+            //file_put_contents('log.txt', print_r($newTerm->getTermNote(), true), FILE_APPEND);
             $newTerm->setStatus($this->getTermNoteStatus($newTerm->getTermNote()));
             $newTerm->setProcessStatus($this->getProcessStatus($newTerm->getTermNote()));
         } else {
@@ -631,6 +635,31 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->terms[] = $newTerm;
 
         return $newTerm;
+    }
+
+    /**
+     * Check whether <termNote type="processStatus">-node exists within given <tig>-node,
+     * and if no - add it, so that 'processStatus' attribute will be added in a way
+     * like it would be defined by tbx-file
+     *
+     * @param $tig
+     */
+    public function addProcessStatusNodeIfNotExists($tig) {
+
+        // If '<termNote type="processStatus">'-node already exists - return
+        if (isset($tig->termNote))
+            foreach ($tig->termNote as $termNote)
+                if ((string) $termNote->attributes()->{'type'} == 'processStatus')
+                    return;
+
+        // Get default processStatus
+        $defaultProcessStatus = $this->config->runtimeOptions->tbx->defaultTermAttributeStatus;
+
+        //$value = $defaultProcessStatus ?: editor_Models_Terminology_TbxObjects_Term::TERM_STANDARD_PROCESS_STATUS;
+        //file_put_contents('log.txt', print_r($this->config->runtimeOptions->tbx, true), FILE_APPEND);
+
+        // Create '<termNote type="processStatus">finalized</termNote>'-node
+        $tig->addChild('termNote', $defaultProcessStatus)->addAttribute('type', 'processStatus');
     }
 
     /**
