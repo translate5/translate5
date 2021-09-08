@@ -303,12 +303,27 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      */
     public function getLanguagesInTermCollections(array $collectionIds): array
     {
+        /*$languageIdA = editor_Utils::db()->query('
+            SELECT DISTINCT `languageId`
+            FROM `terms_term` 
+            WHERE `collectionId` IN (' . implode(',', $collectionIds) . ')
+        ')->fetchAll(PDO::FETCH_COLUMN);*/
+
+        /*$languageIdA = editor_Utils::db()->query('
+            SELECT DISTINCT `sourceLang` AS `id` 
+            FROM `LEK_languageresources_languages` 
+            WHERE `languageResourceId` IN (' . implode(',', $collectionIds) . ')
+        ')->fetchAll(PDO::FETCH_COLUMN);
+
+        //d($languageIdA);
+        mt('_lang: $languageIdA');*/
+
         $s = $this->db->select()
         ->setIntegrityCheck(false)
-        ->from('terms_term', ['terms_term.languageId as id'])
-        ->join('LEK_languages', 'LEK_languages.id = terms_term.languageId', ['LEK_languages.rfc5646','LEK_languages.iso3166Part1alpha2','LEK_languages.langName'])
-        ->where('terms_term.collectionId IN(?)', $collectionIds)
-        ->group('terms_term.languageId');
+        ->from('LEK_languageresources_languages', ['LEK_languageresources_languages.sourceLang as id'])
+        ->join('LEK_languages', 'LEK_languages.id = LEK_languageresources_languages.sourceLang', ['LEK_languages.rfc5646','LEK_languages.iso3166Part1alpha2','LEK_languages.langName'])
+        ->where('LEK_languageresources_languages.languageResourceId IN(?)', $collectionIds)
+        ->group('LEK_languageresources_languages.sourceLang');
         $rows = $this->db->fetchAll($s)->toArray();
 
         if (!empty($rows)) {
