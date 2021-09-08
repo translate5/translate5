@@ -687,8 +687,8 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
      */
     public static function refTarget(array &$refA, array $refTargetIdA, array $prefLangA, $level = null) {
 
-        // If no ref-attributes found - return
-        if (!$refA) return;
+        // If no ref-attributes having non-empty target-prop found - return
+        if (!$refTargetIdA) return;
 
         // Shortcut to arg passed to IN (?)
         $in = '"' . implode('","', array_keys($refTargetIdA)) . '"';
