@@ -27,8 +27,14 @@ END LICENSE AND COPYRIGHT
 */
 class editor_Models_Terminology_BulkOperation_TermEntry extends editor_Models_Terminology_BulkOperation_Abstract
 {
-    protected editor_Models_Terminology_Models_TermEntryModel|editor_Models_Terminology_Models_Abstract $model;
-    protected editor_Models_Terminology_TbxObjects_TermEntry|editor_Models_Terminology_TbxObjects_Abstract $importObject;
+    /**
+     * @var editor_Models_Terminology_Models_TermEntryModel
+     */
+    protected $model;
+    /**
+     * @var editor_Models_Terminology_TbxObjects_TermEntry
+     */
+    protected $importObject;
 
     public function __construct() {
         $this->model = new editor_Models_Terminology_Models_TermEntryModel();

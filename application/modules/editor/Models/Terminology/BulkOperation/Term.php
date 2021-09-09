@@ -87,8 +87,15 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
      */
     protected array $allTerms = [];
 
-    protected editor_Models_Terminology_Models_TermModel|editor_Models_Terminology_Models_Abstract $model;
-    protected editor_Models_Terminology_TbxObjects_Term|editor_Models_Terminology_TbxObjects_Abstract $importObject;
+    /**
+     * @var editor_Models_Terminology_Models_TermModel
+     */
+    protected $model;
+
+    /**
+     * @var editor_Models_Terminology_TbxObjects_Term
+     */
+    protected $importObject;
 
     public function __construct() {
         $this->model = new editor_Models_Terminology_Models_TermModel();

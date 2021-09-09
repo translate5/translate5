@@ -50,8 +50,15 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
      */
     protected array $existing = [];
 
-    protected editor_Models_Terminology_Models_Abstract $model;
-    protected editor_Models_Terminology_TbxObjects_Abstract $importObject;
+    /**
+     * @var editor_Models_Terminology_Models_Abstract
+     */
+    protected $model;
+
+    /**
+     * @var editor_Models_Terminology_TbxObjects_Abstract
+     */
+    protected $importObject;
 
     /**
      * counters how many elements are processed

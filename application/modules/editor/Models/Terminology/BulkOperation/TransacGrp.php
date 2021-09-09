@@ -28,8 +28,14 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Terminology_BulkOperation_TransacGrp extends editor_Models_Terminology_BulkOperation_Abstract {
 
 
-    protected editor_Models_Terminology_Models_TransacgrpModel|editor_Models_Terminology_Models_Abstract $model;
-    protected editor_Models_Terminology_TbxObjects_TransacGrp|editor_Models_Terminology_TbxObjects_Abstract $importObject;
+    /**
+     * @var editor_Models_Terminology_Models_TransacgrpModel
+     */
+    protected $model;
+    /**
+     * @var editor_Models_Terminology_TbxObjects_TransacGrp
+     */
+    protected $importObject;
 
     public function __construct() {
         $this->model = new editor_Models_Terminology_Models_TransacgrpModel();

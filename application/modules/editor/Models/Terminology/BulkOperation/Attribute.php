@@ -28,8 +28,14 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Terminology_BulkOperation_Abstract {
 
 
-    protected editor_Models_Terminology_Models_AttributeModel|editor_Models_Terminology_Models_Abstract $model;
-    protected editor_Models_Terminology_TbxObjects_Attribute|editor_Models_Terminology_TbxObjects_Abstract $importObject;
+    /**
+     * @var editor_Models_Terminology_Models_AttributeModel
+     */
+    protected $model;
+    /**
+     * @var editor_Models_Terminology_TbxObjects_Attribute
+     */
+    protected $importObject;
 
     public function __construct() {
         $this->model = new editor_Models_Terminology_Models_AttributeModel();
