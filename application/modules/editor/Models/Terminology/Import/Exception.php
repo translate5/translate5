@@ -37,5 +37,7 @@ class editor_Models_Terminology_Import_Exception extends ZfExtended_ErrorCodeExc
     protected static $localErrorCodes = [
         'E1353' => 'TBX Import: Folder to save images does not exist or is not writable!',
         'E1354' => 'TBX Import: Folder to save termcollection images could not be created!',
+        'E1356' => 'TBX Import: Import error - {msg}',
+        'E1357' => 'TBX Import: Could not import due unknown attribute level',
     ];
 }

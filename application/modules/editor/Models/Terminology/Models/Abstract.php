@@ -25,33 +25,33 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_TbxObjects_Langset extends editor_Models_Terminology_TbxObjects_Abstract{
-    const TABLE_FIELDS = [
-        'descrip' => true,
-        'transacNote' => true,
-        'transacType' => true,
-        'collectionId' => false,
-        'entryId' => false,
-        'termEntryGuid' => false,
-        'langSetGuid' => false,
-        'guid' => false
-    ];
-    public int $collectionId = 0;
-    public int $entryId = 0;
-    public ?string $termEntryGuid = null;
-    public ?string $langSetGuid = null;
-    public string $language = '';
-    public string $languageId = '';
-    public string $descrip = '';
-    public string $descripType = '';
-    public string $descripTarget = '';
-    public array $note = [];
+/**
+ */
+class editor_Models_Terminology_Models_Abstract extends ZfExtended_Models_Entity_Abstract
+{
+    /**
+     * @param string $bindings
+     * @param array $fields
+     * @param array $data
+     * @return Zend_Db_Statement
+     * @throws Zend_Db_Table_Exception
+     */
+    public function createImportTbx(string $bindings, array $fields, array $data): Zend_Db_Statement
+    {
+        $query = 'INSERT INTO '.$this->db->info($this->db::NAME).' ('.join(',', $fields).') VALUES '.$bindings;
+        return $this->db->getAdapter()->query($query, $data);
+    }
 
     /**
-     * @return string
+     * @param array $attributes
+     * @return bool
      */
-    public function getCollectionKey(): string
+    public function updateImportTbx(array $attributes): bool
     {
-        return $this->termEntryGuid.'-'.$this->language;
+        foreach ($attributes as $attribute) {
+            $this->db->update($attribute, ['id=?'=> $attribute['id']]);
+
+        }
+        return true;
     }
 }

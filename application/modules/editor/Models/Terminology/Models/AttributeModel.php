@@ -72,7 +72,7 @@ END LICENSE AND COPYRIGHT
  * @method string getAttrLang() getAttrLang()
  * @method string setAttrLang() setAttrLang(string $attrLang)
  */
-class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_Entity_Abstract
+class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Terminology_Models_Abstract
 {
     const ATTR_LEVEL_ENTRY = 'termEntry';
     const ATTR_LEVEL_LANGSET = 'langSet';
@@ -99,39 +99,6 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         }
 
         return $attributeByKey;
-    }
-
-    public function getAttributeByCollectionId(int $collectionId): array
-    {
-        $attributeByKey = [];
-        $stmt = $this->db->select()->where('collectionId = ?', $collectionId)->query(Zend_Db::FETCH_ASSOC);
-        while($attribute = $stmt->fetch(Zend_Db::FETCH_ASSOC)) {
-            $attributeByKey[$attribute['elementName'].'-'.$attribute['type'].'-'.$attribute['termEntryId'].'-'.$attribute['language'].'-'.$attribute['termTbxId']] = $attribute;
-        }
-
-        return $attributeByKey;
-    }
-
-    public function createImportTbx(string $sqlParam, string $sqlFields, array $sqlValue)
-    {
-        $this->init();
-        $insertValues = rtrim($sqlParam, ',');
-
-        $query = "INSERT INTO terms_attributes ($sqlFields) VALUES $insertValues";
-        return $this->db->getAdapter()->query($query, $sqlValue);
-    }
-
-    /**
-     * @param array $attributes
-     * @return bool
-     */
-    public function updateImportTbx(array $attributes): bool
-    {
-        foreach ($attributes as $attribute) {
-            $this->db->update($attribute, ['id=?'=> $attribute['id']]);
-        }
-
-        return true;
     }
 
     /***

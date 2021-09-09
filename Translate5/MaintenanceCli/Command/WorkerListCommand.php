@@ -129,7 +129,11 @@ class WorkerListCommand extends Translate5AbstractCommand
             }
             $row = [];
             foreach($headlines as $key => $title) {
-                $row[] = $worker[$key];
+                if($key == 'progress') {
+                    $row[] = round($worker[$key]).'%';
+                }else {
+                    $row[] = $worker[$key];
+                }
             }
             $rows[] = $row;
         }

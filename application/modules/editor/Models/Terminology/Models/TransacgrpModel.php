@@ -65,7 +65,7 @@ END LICENSE AND COPYRIGHT
  * @method string getElementName() getElementName()
  * @method string setElementName() setElementName(string $elementName)
  */
-class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Terminology_Models_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Transacgrp';
 
     /**
@@ -101,7 +101,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
               `transacNote` = :userName 
             WHERE TRUE
               AND `termEntryId` = :termEntryId 
-              AND `transac` = "modification" 
+              AND `transac` = \'modification\'
               AND ' . $where[$level],
         $bind);
 
@@ -122,42 +122,6 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
 
         return $transacGrpByKey;
     }
-
-    public function getTransacGrpByCollectionId(int $collectionId): array
-    {
-        $transacGrpByKey = [];
-
-        $query = "SELECT * FROM terms_transacgrp WHERE collectionId = :collectionId";
-        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
-
-        foreach ($queryResults as $key => $transacGrp) {
-            $transacGrpByKey[$transacGrp['elementName'].'-'.$transacGrp['transac'].'-'.$transacGrp['ifDescripgrp'].'-'.$transacGrp['termEntryId'].'-'.$transacGrp['termTbxId']] = $transacGrp;
-        }
-
-        return $transacGrpByKey;
-    }
-
-    public function createImportTbx(string $sqlParam, string $sqlFields, array $sqlValue)
-    {
-        $this->init();
-        $insertTerms = rtrim($sqlParam, ',');
-        $query = "INSERT INTO terms_transacgrp ($sqlFields) VALUES $insertTerms";
-
-        return $this->db->getAdapter()->query($query, $sqlValue);
-    }
-    /**
-     * @param array $transacGrps
-     * @return bool
-     */
-    public function updateImportTbx(array $transacGrps): bool
-    {
-        foreach ($transacGrps as $transacGrp) {
-            $this->db->update($transacGrp, ['id=?'=> $transacGrp['id']]);
-        }
-
-        return true;
-    }
-
 
     /***
      * Handle transac attributes group. If no transac group attributes exist for the entity, new one will be created.
