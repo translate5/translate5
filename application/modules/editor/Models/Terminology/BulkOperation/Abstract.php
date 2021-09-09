@@ -97,7 +97,7 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
 
         /* @var $attribute editor_Models_Terminology_TbxObjects_Attribute */
         while($row = $stmt->fetch(Zend_Db::FETCH_ASSOC)) {
-            $this->processOneExistingRow($row['id'], new ($this->importObject)($row));
+            $this->processOneExistingRow($row['id'], new $this->importObject($row));
         }
         $conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
     }
