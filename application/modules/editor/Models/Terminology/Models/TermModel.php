@@ -64,7 +64,7 @@ END LICENSE AND COPYRIGHT
  * @method string getGuid() getGuid()
  * @method string setGuid() setGuid(string $guid)
  */
-class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminology_Models_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Term';
     protected $validatorInstanceClass = 'editor_Models_Validator_Term_Term';
 
@@ -650,50 +650,6 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     }
 
     /***
-     * Load all terms for given collection and custom array key for each term.
-     * The result array will be:
-     * [
-     *   'termEntryId-language' =>
-     *          [
-     *             'termTbxId' => [ term results ],
-     *              ...
-     *          ]
-     *    'language-term' = > [term results]
-     * ]
-     * NOTO: this is term import specific function and should not be used outside term import context!
-     * @param int $collectionId
-     * @return array[]
-     */
-    public function getAllTermsByCollectionId(int $collectionId): array
-    {
-        $fullResult = [];
-
-        $query = "SELECT * FROM terms_term WHERE collectionId = :collectionId";
-        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
-
-        foreach ($queryResults as $key => $term) {
-
-            $termKey = $term['termEntryId'].'-'.$term['language'];
-
-            // used for mergeTerm check for term matching by language and term content
-            $langaugeTermMergeKey = $term['language'].'-'.$term['term'];
-
-            // group by termEntry and langauge for easy merge terms check
-            if(!isset($fullResult[$termKey])){
-                $fullResult[$termKey] = [];
-            }
-            $fullResult[$termKey][$term['termTbxId']] = $term;
-
-            if(!isset($fullResult[$langaugeTermMergeKey])){
-                // hold only the first match. Merge terms uses always the first match
-                $fullResult[$langaugeTermMergeKey] = $term;
-            }
-        }
-
-        return $fullResult;
-    }
-
-    /***
      * check if the term with the same termEntry,collection but different termId exist
      *
      * @return Zend_Db_Table_Rowset_Abstract
@@ -706,28 +662,6 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ->where('collectionId = ?',$collectionId);
 
         return $this->db->fetchAll($s);
-    }
-
-    public function createImportTbx(string $sqlParam, string $sqlFields, array $sqlValue)
-    {
-        $this->init();
-        $insertTerms = rtrim($sqlParam, ',');
-
-        $query = "INSERT INTO terms_term ($sqlFields) VALUES $insertTerms";
-
-        return $this->db->getAdapter()->query($query, $sqlValue);
-    }
-    /**
-     * @param array $terms
-     * @return bool
-     */
-    public function updateImportTbx(array $terms): bool
-    {
-        foreach ($terms as $term) {
-            $this->db->update($term, ['id=?'=> $term['id']]);
-        }
-
-        return true;
     }
 
     /***
@@ -2323,24 +2257,6 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     public function getTermInfosFromSegment(string $seg): array
     {
         return $this->tagHelper->getInfos($seg);
-    }
-
-    public function updateAttributeAndTransacTermIdAfterImport($collectionId)
-    {
-        $sqlAttribute = 'UPDATE terms_attributes termsAtt
-                            JOIN terms_term tt on termsAtt.termTbxId = tt.termTbxId
-                        SET termsAtt.termId = tt.id
-                        WHERE termsAtt.termTbxId = tt.termTbxId
-                        AND termsAtt.collectionId = :collectionId';
-
-        $sqlTransacGrp = 'UPDATE terms_transacgrp termsTrg
-                            JOIN terms_term tt on termsTrg.termTbxId = tt.termTbxId
-                        SET termsTrg.termId = tt.id
-                        WHERE termsTrg.termTbxId = tt.termTbxId
-                        AND termsTrg.collectionId = :collectionId';
-
-        $this->db->getAdapter()->query($sqlAttribute, ['collectionId' => $collectionId]);
-        $this->db->getAdapter()->query($sqlTransacGrp, ['collectionId' => $collectionId]);
     }
 
     /***

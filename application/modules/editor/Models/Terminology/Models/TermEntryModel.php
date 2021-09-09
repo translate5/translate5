@@ -43,7 +43,7 @@ END LICENSE AND COPYRIGHT
  * @method string getEntryGuid() getEntryGuid()
  * @method string setEntryGuid() setEntryGuid(string $uniqueId)
  */
-class editor_Models_Terminology_Models_TermEntryModel extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Terminology_Models_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_TermEntry';
 
     public function insert($misc = []) {
@@ -76,39 +76,6 @@ class editor_Models_Terminology_Models_TermEntryModel extends ZfExtended_Models_
 
         // Return
         return $termEntryId;
-    }
-
-    /**
-     * groupId = termEntryId
-     * collectionId = LEK_languageresources->id
-     * @param $collectionId
-     * @return array
-     */
-    public function getAllTermEntryAndCollection($collectionId): array
-    {
-        $query = "SELECT id, collectionId, termEntryTbxId, descrip, isCreatedLocally, entryGuid FROM terms_term_entry WHERE collectionId = :collectionId";
-        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
-
-        $simpleResult = [];
-        foreach ($queryResults as $key => $termEntry) {
-            $simpleResult[$termEntry['collectionId'].'-'.$termEntry['termEntryTbxId']] =
-                $termEntry['id'].'-'.$termEntry['descrip'].'-'.$termEntry['entryGuid'];
-        }
-
-        return $simpleResult;
-    }
-
-    /***
-     * Create a term entry record in the database, for the current collection and the
-     * actual termEntryId
-     * @param array $termEntry
-     */
-    public function updateTermEntryRecord(array $termEntry)
-    {
-        $this->load($termEntry['id']);
-        $this->setDescrip($termEntry['descrip']);
-        $this->setEntryGuid($termEntry['entryGuid']);
-        $id = $this->save();
     }
 
     /**

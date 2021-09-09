@@ -258,7 +258,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 //save the imported tbx to the disc
                 $this->saveFileLocal($tmpName, $fileName);
 
-                $tbxAsSimpleXml = $this->tbxFileImport->importXmlFile($tmpName, $this->termCollection, $this->user, $this->mergeTerms);
+                $this->tbxFileImport->importXmlFile($tmpName, $this->termCollection, $this->user, $this->mergeTerms);
 
                 $this->updateCollectionLanguage();
             }

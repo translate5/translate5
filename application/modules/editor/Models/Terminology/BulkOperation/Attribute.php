@@ -25,42 +25,33 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_TbxObjects_TermEntry extends editor_Models_Terminology_TbxObjects_Abstract{
-    /**
-     * Table field for insert or update.
-     * If:
-     * 'fieldName' => false -> only insert no check for update attribute
-     * 'fieldName' => true -> insert and update
-     */
-    const TABLE_FIELDS = [
-        'termEntryTbxId' => true,
-        'entryGuid' => false,
-        'descrip' => true,
-    ];
+class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Terminology_BulkOperation_Abstract {
 
-    const GUID_FIELD = 'entryGuid';
-
-    public int $id = 0;
-    public int $collectionId = 0;
-    public string $termEntryTbxId = '';
-    public ?string $entryGuid = null;
-    public string $descrip = '';
-    public array $transacGrp = [];
-    public array $ref = [];
 
     /**
-     * @return string
+     * @var editor_Models_Terminology_Models_AttributeModel
      */
-    public function getCollectionKey(): string
-    {
-        return $this->termEntryTbxId;
+    protected $model;
+    /**
+     * @var editor_Models_Terminology_TbxObjects_Attribute
+     */
+    protected $importObject;
+
+    public function __construct() {
+        $this->model = new editor_Models_Terminology_Models_AttributeModel();
+        $this->importObject = new editor_Models_Terminology_TbxObjects_Attribute();
     }
 
     /**
-     * return the data hash + the entry guid attached with an #
-     * @return string
+     * @param editor_Models_Terminology_TbxObjects_Attribute $elementObject
      */
-    public function getDataHash(): string {
-        return parent::getDataHash().'#'.$this->entryGuid;
+    protected function fillParentIds(editor_Models_Terminology_TbxObjects_Abstract $elementObject)
+    {
+        $elementObject->termEntryId = $elementObject->parentEntry->id;
+        $elementObject->termEntryGuid = $elementObject->parentEntry->entryGuid;
+        $elementObject->langSetGuid = $elementObject->parentLangset->langSetGuid ?? null;
+        $elementObject->termId = $elementObject->parentTerm->id ?? null;
+        $elementObject->termTbxId = $elementObject->parentTerm->termTbxId ?? null;
+        $elementObject->termGuid = $elementObject->parentTerm->guid ?? null;
     }
 }

@@ -27,20 +27,77 @@ END LICENSE AND COPYRIGHT
 */
 abstract class editor_Models_Terminology_TbxObjects_Abstract
 {
+    const TABLE_FIELDS = [];
+    const GUID_FIELD = 'guid';
+
+    protected static array $updatableTableFields = [];
+
+    public ?editor_Models_Terminology_TbxObjects_TermEntry $parentEntry = null;
+    public ?editor_Models_Terminology_TbxObjects_Langset $parentLangset = null;
+    public ?editor_Models_Terminology_TbxObjects_Term $parentTerm = null;
+
+    public function __construct(array $data = null)
+    {
+        if(!is_array($data)) {
+            return;
+        }
+        foreach ($data as $key => $val) {
+            if(property_exists($this, $key)) {
+                $this->{$key} = $val;
+            }
+        }
+    }
+
+    /**
+     * Sets all needed parent nodes by just setting the latest available
+     * @param editor_Models_Terminology_TbxObjects_Abstract $parentNode
+     */
+    public function setParent(editor_Models_Terminology_TbxObjects_Abstract $parentNode) {
+        //init polymorphic parent nodes:
+        $this->parentEntry = null;
+        $this->parentLangset = null;
+        $this->parentTerm = null;
+
+        if($parentNode instanceof editor_Models_Terminology_TbxObjects_Term) {
+            $this->parentTerm = $parentNode;
+            $this->parentLangset = $parentNode->parentLangset;
+            $this->parentEntry = $this->parentLangset->parentEntry;
+        }elseif($parentNode instanceof editor_Models_Terminology_TbxObjects_Langset) {
+            $this->parentLangset = $parentNode;
+            $this->parentEntry = $parentNode->parentEntry;
+        }elseif($parentNode instanceof editor_Models_Terminology_TbxObjects_TermEntry) {
+            //can be only the entry then.
+            $this->parentEntry = $parentNode;
+        }
+    }
 
     /**
      * @return string
      */
-    abstract protected function getCollectionKey(): string;
+    abstract public function getCollectionKey(): string;
 
-    /***
-     * Search for tbx object in the data array with the element key
-     *
-     * @param array $data
-     * @param bool $mergeTerms
-     * @return array|mixed
+    /**
+     * returns the field names which are updateable
+     * @return string[]
      */
-    public function findInArray(array $data, bool $mergeTerms = false){
-        return $data[$this->getCollectionKey()] ?? [];
+    public function getUpdateableFields(): array {
+        $cls = get_class($this);
+        if(empty(static::$updatableTableFields[$cls])) {
+            $fields = array_filter(static::TABLE_FIELDS);
+            //the GUID field of the element is never updateable!
+            if(isset($fields[self::GUID_FIELD])) {
+                unset($fields[self::GUID_FIELD]);
+            }
+            static::$updatableTableFields[$cls] = $fields;
+        }
+        return array_keys(static::$updatableTableFields[$cls]);
+    }
+
+    /**
+     * returns a hash of the updateable data of this ImportObject
+     * @return string
+     */
+    public function getDataHash(): string {
+        return md5(print_r(array_intersect_key(get_object_vars($this), static::$updatableTableFields[get_class($this)]),1));
     }
 }
