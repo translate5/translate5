@@ -373,8 +373,9 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
      */
     private function handleTermEntry(SimpleXMLElement $termEntry): editor_Models_Terminology_TbxObjects_TermEntry
     {
+        $cls = $this->bulkTermEntry->getNewImportObject();
         /** @var editor_Models_Terminology_TbxObjects_TermEntry $newEntry */
-        $newEntry = new ($this->bulkTermEntry->getNewImportObject())();
+        $newEntry = new $cls();
         $newEntry->collectionId = $this->collection->getId();
         $newEntry->termEntryTbxId = $this->getIdOrGenerate($termEntry);
 
@@ -472,15 +473,16 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
      */
     private function handleTermGroup(SimpleXMLElement $tigElement, editor_Models_Terminology_TbxObjects_Langset $parsedLangSet)
     {
+        /** @var SimpleXMLElement $tig */
         if ($tigElement->termGrp) {
             $tig = $tigElement->termGrp;
         } else {
             $tig = $tigElement;
         }
 
-        /** SimpleXMLElement $tig */
+        $cls = $this->bulkTerm->getNewImportObject();
         /** @var editor_Models_Terminology_TbxObjects_Term $newTerm */
-        $newTerm = new ($this->bulkTerm->getNewImportObject())();
+        $newTerm = new $cls();
         $newTerm->setParent($parsedLangSet);
         $newTerm->updatedBy = $this->user->getId();
         $newTerm->updatedAt = NOW_ISO;
