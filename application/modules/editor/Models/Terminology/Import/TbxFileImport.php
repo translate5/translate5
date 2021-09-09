@@ -632,8 +632,9 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
     private function setTransacAttributes(SimpleXMLElement $transacGrp, bool $ifDescripGrp, string $elementName, editor_Models_Terminology_TbxObjects_Abstract $parentNode): array
     {
         $parsedTransacGrp = [];
+        $cls = $this->bulkTransacGrp->getNewImportObject();
         /** @var editor_Models_Terminology_TbxObjects_TransacGrp $transacGrpObject */
-        $transacGrpObject = new ($this->bulkTransacGrp->getNewImportObject())();
+        $transacGrpObject = new $cls();
         $transacGrpObject->setParent($parentNode);
         $transacGrpObject->collectionId = $this->collection->getId();
         $transacGrpObject->termEntryId = $transacGrpObject->parentEntry->id;
