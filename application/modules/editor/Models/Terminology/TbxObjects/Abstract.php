@@ -98,9 +98,6 @@ abstract class editor_Models_Terminology_TbxObjects_Abstract
      * @return string
      */
     public function getDataHash(): string {
-        if($this instanceof editor_Models_Terminology_TbxObjects_Term) {
-            error_log(print_r(array_intersect_key(get_object_vars($this), static::$updatableTableFields[get_class($this)]),1));
-        }
         return md5(print_r(array_intersect_key(get_object_vars($this), static::$updatableTableFields[get_class($this)]),1));
     }
 }
