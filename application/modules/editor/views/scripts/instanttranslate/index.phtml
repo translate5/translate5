@@ -313,7 +313,7 @@ $( function() {
 </script>
 
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/ErrorHandler.js<?php echo $version; ?>"></script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js<?php echo $version; ?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js?<?=filemtime('modules/editor/instanttranslate/js/Instanttranslate.js')?>"></script>
 
 <script type="text/javascript">
 // show list of available files

@@ -502,8 +502,10 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
             $newTerm->definition = $parsedLangSet->descrip;
         }
 
-        if (isset($tig->termNote)) {
-            $newTerm->termNote = $this->setAttributeTypes($tig->termNote, $newTerm);
+        $hasTermNote = isset($tig->termNote);
+        $this->addProcessStatusNodeIfNotExists($tig);
+        $newTerm->termNote = $this->setAttributeTypes($tig->termNote, $newTerm);
+        if ($hasTermNote) {
             $newTerm->status = $this->getTermNoteStatus($newTerm->termNote);
             $newTerm->processStatus = $this->getProcessStatus($newTerm->termNote);
         } else {
@@ -533,6 +535,31 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
             }
         }
         $this->bulkTerm->add($newTerm);
+    }
+
+    /**
+     * Check whether <termNote type="processStatus">-node exists within given <tig>-node,
+     * and if no - add it, so that 'processStatus' attribute will be added in a way
+     * like it would be defined by tbx-file
+     *
+     * @param $tig
+     */
+    public function addProcessStatusNodeIfNotExists($tig) {
+
+        // If '<termNote type="processStatus">'-node already exists - return
+        if (isset($tig->termNote))
+            foreach ($tig->termNote as $termNote)
+                if ((string) $termNote->attributes()->{'type'} == 'processStatus')
+                    return;
+
+        // Get default processStatus
+        $defaultProcessStatus = $this->config->runtimeOptions->tbx->defaultTermAttributeStatus;
+
+        //$value = $defaultProcessStatus ?: editor_Models_Terminology_TbxObjects_Term::TERM_STANDARD_PROCESS_STATUS;
+        //file_put_contents('log.txt', print_r($this->config->runtimeOptions->tbx, true), FILE_APPEND);
+
+        // Create '<termNote type="processStatus">finalized</termNote>'-node
+        $tig->addChild('termNote', $defaultProcessStatus)->addAttribute('type', 'processStatus');
     }
 
     /**

@@ -735,11 +735,14 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Render keyword WHERE string
         $keywordWHERE = '(' . implode(' OR ', $keywordWHERE) . ')';
 
-        // If wildcards are used, convert them to the mysql syntax
-        $against = str_replace('?', '*', $params['query']);
+        //$params['query'] = '!@ asd123 + qwe#$ ZXC)base de données fédérée';
+        //$params['query'] = '!@ asd123';
+        //$params['query'] = '*';
+        //die(preg_replace('~[^a-zA-Z0-9]~u', '-', ));
 
-        // If we're not going to count $total - it means we're in autocomplete mode
-        if ($total === false) $against = trim($against, '*') . '*';
+        // Keep letters, numbers and underscores only
+        $against = trim(preg_replace('/[^\p{L}\p{N}_]+/u', ' ', $params['query'])) . '*';
+        if (preg_match('~ ~', $against)) $against = '+' . preg_replace('~ ~', ' +', $against);
 
         // Build match-against WHERE string
         $againstWHERE = 'MATCH(' . implode(', ', $cols) . ') AGAINST(:against IN BOOLEAN MODE)';
