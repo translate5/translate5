@@ -204,17 +204,26 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
 
         parent::createOrUpdateElement($mergeTerms);
 
-        if(empty($this->insertedTbxIds)) {
-            // no inserts performed
-            return;
-        }
-
         if(empty($collectionId)) {
             //this may not happen!
             throw new editor_Models_Terminology_Import_Exception('E1356', [
                 'msg' => 'No collection ID found in inserted term',
             ]);
         }
+
+        // we have to bulk update the timestamp of the existing terms, otherwise they are deleted with deleteTermsOlderThanCurrentImport = true
+        $this->model->db->update([
+            'updatedAt' => NOW_ISO
+        ], [
+            'collectionId = ?' => $collectionId,
+            'id in (?)' => $this->unchangedIds,
+        ]);
+
+        if(empty($this->insertedTbxIds)) {
+            // no inserts performed
+            return;
+        }
+
         //fetch the newly inserted IDs
         $s = $this->model->db->select()
             ->from($this->model->db, ['id', 'termTbxId'])

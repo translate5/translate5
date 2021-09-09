@@ -39,6 +39,12 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
     protected array $toBeProcessed = [];
 
     /**
+     * contains all element IDs not updated (for bulk post processing)
+     * @var array
+     */
+    protected array $unchangedIds = [];
+
+    /**
      * collection of existing elements in DB of the type to be processed (constructed key => hashvalue)
      * @var string[]
      */
@@ -124,6 +130,7 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
         $sqlUpdate = [];
         $sqlInsertData = [];
         $sqlInsertBindings = [];
+        $this->unchangedIds = [];
 
         $count = 0;
         // reset the binding values array on each new element update/create chunk
@@ -144,8 +151,7 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
                     $this->processedCount['updated']++;
                 }
                 else {
-    //FIXME problem! timestamps are not updated anymore...
-    //collect all unchanged IDs and make a bulk updateAt update therefore!
+                    $this->unchangedIds[] = $existing;
                     $this->processedCount['unchanged']++;
                 }
             }
