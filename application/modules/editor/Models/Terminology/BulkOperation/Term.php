@@ -219,12 +219,7 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
         }
 
         // we have to bulk update the timestamp of the existing terms, otherwise they are deleted with deleteTermsOlderThanCurrentImport = true
-        $this->model->db->update([
-            'updatedAt' => NOW_ISO
-        ], [
-            'collectionId = ?' => $collectionId,
-            'id in (?)' => $this->unchangedIds,
-        ]);
+        $this->updateEditTimestamp($collectionId);
 
         if(empty($this->insertedTbxIds)) {
             // no inserts performed
@@ -250,6 +245,22 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
             $this->insertedTbxIds[$id['termTbxId']]->id = $id['id'];
         }
         $this->insertedTbxIds = [];
+    }
+
+    /**
+     * bulk update the edit timestamp of not changed terms (deletion prevention)
+     * @param int $collectionId
+     */
+    protected function updateEditTimestamp(int $collectionId) {
+        if(empty($this->unchangedIds)) {
+            return;
+        }
+        $this->model->db->update([
+            'updatedAt' => NOW_ISO
+        ], [
+            'collectionId = ?' => $collectionId,
+            'id in (?)' => $this->unchangedIds,
+        ]);
     }
 
     /**
