@@ -61,13 +61,10 @@ class editor_Models_Terminology_BulkOperation_TermEntry extends editor_Models_Te
     /**
      * Create or update a term entry record in the database, for the current collection and the actual termEntryId
      * (where groupId = termEntryId, where collectionId = termCollectionId)
-     *
-     * @param bool $mergeTerms
      */
-    public function createOrUpdateElement(bool $mergeTerms) //FIXME mergeTerms clean up
+    public function createOrUpdateElement()
     {
         $payload = null;
-        $this->mergeTerms = $mergeTerms;
 
         //find an existing term entry along the termEntryTbxId
         $existing = $this->findExisting($this->importObject, $payload);

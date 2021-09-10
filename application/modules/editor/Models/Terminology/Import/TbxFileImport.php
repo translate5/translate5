@@ -175,7 +175,8 @@ class editor_Models_Terminology_Import_TbxFileImport
     public function importXmlFile(string $tbxFilePath, editor_Models_TermCollection_TermCollection $collection, ZfExtended_Models_User $user, bool $mergeTerms)
     {
         $this->collection = $collection;
-        $this->prepareImportArrays($user, $mergeTerms);
+        $this->mergeTerms = $mergeTerms;
+        $this->prepareImportArrays($user);
 
         $xmlReader = (new class() extends XMLReader {
             public function reopen(string $tbxFilePath) {
@@ -223,16 +224,14 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
     /**
      * Prepare init array variables for merge procedure and check isset function.
      * @param ZfExtended_Models_User $user
-     * @param bool $mergeTerms
      * @throws Zend_Db_Statement_Exception
      */
-    private function prepareImportArrays(ZfExtended_Models_User $user, bool $mergeTerms)
+    private function prepareImportArrays(ZfExtended_Models_User $user)
     {
 $memLog = function($msg) {
     error_log($msg.round(memory_get_usage()/2**20).' MB');
 };
         $this->user = $user;
-        $this->mergeTerms = $mergeTerms;
         $this->dataType->resetData();
 
 
@@ -350,7 +349,7 @@ $memLog('Loaded attributes:   ');
 
     /**
      * Save parsed elements.
-     * @throws Zend_Db_Table_Exception
+     * @throws Zend_Db_Table_Exception|editor_Models_Terminology_Import_Exception
      */
     private function saveParsedTermEntryNode()
     {
@@ -358,10 +357,10 @@ $memLog('Loaded attributes:   ');
         $this->bulkTerm->mergeTerms($this->bulkTermEntry, $this->mergeTerms);
 
         //bulkTerm create or update must be called before attributes and transacGrps in order to save the termId there correctly
-        $this->bulkTermEntry->createOrUpdateElement($this->mergeTerms);
-        $this->bulkTerm->createOrUpdateElement($this->mergeTerms);
-        $this->bulkAttribute->createOrUpdateElement($this->mergeTerms);
-        $this->bulkTransacGrp->createOrUpdateElement($this->mergeTerms);
+        $this->bulkTermEntry->createOrUpdateElement();
+        $this->bulkTerm->createOrUpdateElement();
+        $this->bulkAttribute->createOrUpdateElement();
+        $this->bulkTransacGrp->createOrUpdateElement();
     }
 
     /**
