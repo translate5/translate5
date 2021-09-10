@@ -260,7 +260,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         ]);
 
         // Update collection languages
-        $this->updateCollectionLangs();
+        $this->updateCollectionLangs('insert');
 
         // Return
         return $termId;
@@ -269,15 +269,133 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      *
      */
-    public function updateCollectionLangs() {
+    public function updateCollectionLangs($event) {
+
+        // Query params
+        $params = [$this->getCollectionId(), $this->getLanguageId()];
+
+        // If $event is 'delete'
+        if ($event == 'delete') {
+
+            // Check whether deleted term was last having it's languageId within it's collectionId
+            $wasLast = !$this->db->getAdapter()->query('
+                SELECT `id` 
+                FROM `terms_term` 
+                WHERE `collectionId` = ? AND `languageId` = ? 
+                LIMIT 1
+            ', $params
+            )->fetchColumn();
+
+            // If it was last term for it's language
+            if ($wasLast) {
+
+                // Get info about
+                $languageA = $this->db->getAdapter()->query('
+                    SELECT * FROM `LEK_languageresources_languages` WHERE `languageResourceId` = ? LIMIT 3
+                ', $params[0])->fetchAll();
+
+                // Remove that language mentions from LEK_languageresources_languages-table
+                $this->db->getAdapter()->query('
+                    DELETE FROM `LEK_languageresources_languages` 
+                    WHERE `languageResourceId` = ? AND ? IN (`sourceLang`, `targetLang`) 
+                ', $params);
+
+                // If there were only two `LEK_languageresources_languages`-records before DELETE-ion
+                if (count($languageA) == 2) {
+
+                    // Get prop
+                    $prop = $params[1] == $languageA[0]['sourceLang'] ? 'targetLang' : 'sourceLang';
+
+                    // Insert using existing language as source and new language as target
+                    $m = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+                    $m->init([
+                        'sourceLang' => $languageA[0][$prop],
+                        'sourceLangCode' => $languageA[0][$prop . 'Code'],
+                        'targetLang' => $languageA[0][$prop],
+                        'targetLangCode' => $languageA[0][$prop . 'Code'],
+                        'languageResourceId' => $params[0],
+                    ]);
+                    $m->save();
+                }
+            }
+
+        // Else if $event is  'insert'
+        } else if ($event == 'insert') {
+
+            // Get info
+            $info = $this->db->getAdapter()->query('
+                SELECT * 
+                FROM `LEK_languageresources_languages` 
+                WHERE `languageResourceId` = ? 
+                ORDER BY `sourceLang` = ? DESC
+                LIMIT 2
+            ', $params)->fetchAll();
+
+            // If $info is an emty array, it means that INSERTed term was the first term in that collection
+            if (!$info) {
+
+                // So we insert single `LEK_languageresources_languages`-record having same source and target
+                $m = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+                $m->init([
+                    'sourceLang' => $params[1],
+                    'sourceLangCode' => $this->getLanguage(),
+                    'targetLang' => $params[1],
+                    'targetLangCode' => $this->getLanguage(),
+                    'languageResourceId' => $params[0],
+                ]);
+                $m->save();
+
+            // Else if it was not the first term in that collection, but was the first term for that language
+            } else if ($info[0]['sourceLang'] != $this->getLanguage()) {
+
+                // Get existing languages
+                $existingA = $this->db->getAdapter()->query('
+                    SELECT DISTINCT `sourceLang`, `sourceLangCode` 
+                    FROM `LEK_languageresources_languages`
+                    WHERE `languageResourceId` = ?
+                ', $params[0])->fetchAll(PDO::FETCH_KEY_PAIR);
+
+                // Foreach of existing languages
+                foreach ($existingA as $sourceLang => $sourceLangCode) {
+
+                    // Insert using existing language as source and new language as target
+                    $m = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+                    $m->init([
+                        'sourceLang' => $sourceLang,
+                        'sourceLangCode' => $sourceLangCode,
+                        'targetLang' => $this->getLanguageId(),
+                        'targetLangCode' => $this->getLanguage(),
+                        'languageResourceId' => $params[0],
+                    ]);
+                    $m->save();
+
+                    // Flip source and target and insert again
+                    $m = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+                    $m->init([
+                        'sourceLang' => $this->getLanguageId(),
+                        'sourceLangCode' => $this->getLanguage(),
+                        'targetLang' => $sourceLang,
+                        'targetLangCode' => $sourceLangCode,
+                        'languageResourceId' => $params[0],
+                    ]);
+                    $m->save();
+                }
+
+                // Since we just inserted non-the-first term into collection,
+                // we need to remove `LEK_languageresources_languages`-record having same source and target
+                if (count($info) === 1) $this->db->getAdapter()->query('
+                    DELETE FROM `LEK_languageresources_languages` WHERE `id` = ?
+                ', $info[0]['id'])->fetchAll(PDO::FETCH_KEY_PAIR);
+            }
+        }
 
         // Remove old language assocs
-        ZfExtended_Factory
+        /*ZfExtended_Factory
             ::get('editor_Models_LanguageResources_Languages')
             ->removeByResourceId([$this->getCollectionId()]);
 
         // Add the new language assocs
-        $this->updateAssocLanguages([$this->getCollectionId()]);
+        $this->updateAssocLanguages([$this->getCollectionId()]);*/
     }
 
     /**
@@ -360,17 +478,19 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      */
     public function delete() {
 
-        // Backup collectionId
+        // Backup collectionId and languageId
         $collectionId = $this->getCollectionId();
+        $languageId = $this->getLanguageId();
 
         // Call parent
         parent::delete();
 
-        // Restore collectionId
+        // Restore collectionId and languageId
         $this->setCollectionId($collectionId);
+        $this->setLanguageId($languageId);
 
         // Update collection languages
-        $this->updateCollectionLangs();
+        $this->updateCollectionLangs('delete');
     }
 
     /**
