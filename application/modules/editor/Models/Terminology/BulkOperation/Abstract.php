@@ -70,11 +70,6 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
         'unchanged' => 0,
     ];
 
-    /**
-     * @var bool
-     */
-    protected bool $mergeTerms;
-
     abstract public function __construct();
 
     public function getNewImportObject(): editor_Models_Terminology_TbxObjects_Abstract{
@@ -124,15 +119,13 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
 
     /**
      * Iterate over $element from given element and check if merge is set and than check if element to update.
-     * @param bool $mergeTerms
      * @throws Zend_Db_Table_Exception
      */
-    public function createOrUpdateElement(bool $mergeTerms)
+    public function createOrUpdateElement()
     {
         if(empty($this->toBeProcessed)) {
             return;
         }
-        $this->mergeTerms = $mergeTerms;
 
         $sqlUpdate = [];
         $sqlInsertData = [];

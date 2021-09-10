@@ -58,11 +58,6 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Terminology_BulkOperation_Abstract {
-    /***
-     * @var bool
-     */
-    protected bool $mergeTerms;
-
     /**
      * Since the langset guids are only persisted implicitly in the terms table, we just them here too
      * @var array
@@ -194,22 +189,20 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
 
     /**
      * saves the term as described, but additionally fetches the inserted ids for new terms
-     * @param bool $mergeTerms
      * @throws editor_Models_Terminology_Import_Exception|Zend_Db_Table_Exception
      */
-    public function createOrUpdateElement(bool $mergeTerms)
+    public function createOrUpdateElement()
     {
         if(empty($this->toBeProcessed)) {
             return;
         }
 
         $this->insertedTbxIds = []; // insertedTbxIds is filled inside parent createOrUpdateElement
-        $this->mergeTerms = $mergeTerms;
 
         //find the collection ID from the to be processed terms
         $collectionId = reset($this->toBeProcessed)->collectionId ?? 0;
 
-        parent::createOrUpdateElement($mergeTerms);
+        parent::createOrUpdateElement();
 
         if(empty($collectionId)) {
             //this may not happen!
@@ -276,6 +269,7 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
     }
 
     /**
+     * Performs the default merging (by TBX IDs if matched, and advanced merging if enabled)
      * @param editor_Models_Terminology_BulkOperation_TermEntry $bulkEntry
      * @param bool $mergeTerms
      */
