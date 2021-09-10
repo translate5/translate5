@@ -228,7 +228,9 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
      */
     private function prepareImportArrays(ZfExtended_Models_User $user, bool $mergeTerms)
     {
-        error_log('MEM 1 '.memory_get_usage());
+$memLog = function($msg) {
+    error_log($msg.round(memory_get_usage()/2**20).' MB');
+};
         $this->user = $user;
         $this->mergeTerms = $mergeTerms;
         $this->dataType->resetData();
@@ -239,7 +241,7 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
         $this->tbxMap[$this::TBX_LANGSET] = 'langSet';
         $this->tbxMap[$this::TBX_TIG] = 'tig';
 
-        error_log('MEM 2 '.memory_get_usage());
+$memLog('Start Loading Data:  ');
         $languagesModel = ZfExtended_Factory::get('editor_Models_Languages')->getAvailableLanguages();
         foreach ($languagesModel as $language) {
             $this->languages[strtolower($language['value'])] = $language['id'];
@@ -250,22 +252,20 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
         $this->allowedTypes = array_merge($this::ATTRIBUTE_ALLOWED_TYPES, array_keys($this->importMap));
 
         // get custom attribute label text and prepare array to check if custom label text exist.
-        error_log('MEM 3 '.memory_get_usage());
+$memLog('Loaded languages:    ');
         $this->dataType->loadData();
-        error_log('MEM 4 '.memory_get_usage());
+$memLog('Loaded datatype:     ');
 
-        error_log('MEM 5 '.memory_get_usage());
         $this->bulkTermEntry->loadExisting($this->collection->getId());  //FIXME
-        error_log('MEM 6 '.memory_get_usage());
+$memLog('Loaded term entries: ');
         $this->bulkTerm->loadExisting($this->collection->getId());
-        error_log('MEM 7 '.memory_get_usage());
+$memLog('Loaded terms:        ');
         //FIXME would be ok to load before each term entry to keep memory lower
         $this->bulkTransacGrp->loadExisting($this->collection->getId());
-        error_log('MEM 8 '.memory_get_usage());
+$memLog('Loaded transacs:     ');
         //FIXME would be ok to load before each term entry to keep memory lower
         $this->bulkAttribute->loadExisting($this->collection->getId());
-        error_log('MEM 9 '.memory_get_usage());
-        error_log('MEM 11'.memory_get_usage());
+$memLog('Loaded attributes:   ');
     }
 
     /**
