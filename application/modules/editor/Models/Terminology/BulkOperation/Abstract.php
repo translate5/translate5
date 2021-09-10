@@ -89,12 +89,12 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
         //this saves a lot of RAM:
         $conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
         $stmt = $db->select()->from($db, $this->getFieldsToLoad())->where('collectionId = ?', $collectionId)->query(Zend_Db::FETCH_ASSOC);
+        $conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
 
         /* @var $attribute editor_Models_Terminology_TbxObjects_Attribute */
         while($row = $stmt->fetch(Zend_Db::FETCH_ASSOC)) {
             $this->processOneExistingRow($row['id'], new $this->importObject($row));
         }
-        $conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
     }
 
     /**
