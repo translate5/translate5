@@ -65,8 +65,8 @@ Ext.define('Editor.view.admin.user.Assoc', {
 
     /***
      */
-    customer:null,
-
+    customer: null,
+    
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
@@ -91,6 +91,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
                             bodyPadding: 10,
                             region: 'east',
                             reference: 'assocForm',
+                            itemId: 'userAssocForm',
                             defaults: {
                                 labelAlign: 'top',
                                 duplicateRecord: false,
@@ -197,7 +198,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
                         }]
                     }]
             };
-
+        
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
@@ -214,16 +215,18 @@ Ext.define('Editor.view.admin.user.Assoc', {
         me.setDefaultWorkflow();
         me.loadAssocData();
     },
-
-    getCustomer:function (){
+    /**
+     * 
+     */
+    getCustomer: function(){
         return this.customer;
     },
 
     /***
      * Update the assoc grid filters with current selected customer and workflow
      */
-    loadAssocData : function (){
-        var me=this,
+    loadAssocData: function (){
+        var me = this,
             workflowCombo = me.down('#workflowCombo'),
             customerId = me.getCustomer() ? me.getCustomer().get('id') : false,
             currentWorkflow = !Ext.isEmpty(workflowCombo.getValue()) ? workflowCombo.getValue() : false;
@@ -245,8 +248,8 @@ Ext.define('Editor.view.admin.user.Assoc', {
      * Set the default workflow in the workflow combo. If there is not no value defined
      * in the config, the "default" workflow will be set as default
      */
-    setDefaultWorkflow:function (){
-        var me=this,
+    setDefaultWorkflow: function(){
+        var me = this,
             workflowCombo = me.down('#workflowCombo'),
             newValue = Ext.getStore('admin.CustomerConfig').getConfig('workflow.initialWorkflow');
 

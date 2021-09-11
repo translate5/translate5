@@ -106,12 +106,15 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
         var me=this,
             formPanel = me.lookup('assocForm'),
             workflowCombo = me.getView().down('#workflowCombo');
+            newRecord = Ext.create('Editor.model.admin.UserAssocDefault',{
+                customerId : me.getView().getCustomer().get('id'),
+                deadlineDate: null,
+                workflow: workflowCombo.getValue()
+            });
+            
+        me.getView().fireEvent('addnewassoc', newRecord, formPanel);
 
-        me.resetRecord(Ext.create('Editor.model.admin.UserAssocDefault',{
-            customerId : me.getView().getCustomer().get('id'),
-            deadlineDate:null,
-            workflow: workflowCombo.getValue()
-        }));
+        me.resetRecord(newRecord);
 
         formPanel.setDisabled(false);
     },

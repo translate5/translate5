@@ -64,6 +64,10 @@ END LICENSE AND COPYRIGHT
  * @method void setFinishedDate() setFinishedDate(string $datetime)
  * @method string getDeadlineDate() getDeadlineDate()
  * @method void setDeadlineDate() setDeadlineDate(string $datetime)
+ * @method int getTrackchangesShow() getTrackchangesShow()
+ * @method void setTrackchangesShow() setTrackchangesShow(int $isAllowed)
+ * @method int getTrackchangesAcceptReject() getTrackchangesAcceptReject()
+ * @method void setTrackchangesAcceptReject() setTrackchangesAcceptReject(int $isAllowed)
  *
  */
 class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {

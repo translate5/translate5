@@ -64,6 +64,8 @@ class editor_Models_Validator_TaskUserAssoc extends ZfExtended_Models_Validator_
         $this->addValidator('assignmentDate', 'date', array('Y-m-d H:i:s'),true);
         $this->addValidator('finishedDate', 'date', array('Y-m-d H:i:s'),true);
         $this->addValidator('deadlineDate', 'date', array('Y-m-d H:i:s'),true);
+        $this->addValidator('trackchangesShow', 'int');
+        $this->addValidator('trackchangesAcceptReject', 'int');
         
         return parent::isValid($data);
     }

@@ -43,7 +43,9 @@ Ext.define('Editor.model.admin.UserAssocDefault', {
       {name: 'workflowStepName', type: 'string'},
       {name: 'workflow', type: 'string'},
       {name: 'segmentrange', type: 'string'},
-      {name: 'deadlineDate'}
+      {name: 'deadlineDate'},
+      {name: 'trackchangesShow', type: 'int'},
+      {name: 'trackchangesAcceptReject', type: 'int'}
     ],
 
     /***
