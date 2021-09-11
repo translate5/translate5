@@ -457,8 +457,13 @@ class editor_Utils {
                 // Setup $s as a flag indicating whether *_Row (single row) or *_Rowset should be fetched
                 $isSingleRow = $table == $rule['key'];
 
+                // Check
+                list ($table, $column) = explode('.', $table); if (!$column) $column = 'id';
+
                 // Setup WHERE clause and method name to be used for fetching
-                $where = $isSingleRow ? '`id` = "' . $value . '"' : '`id` IN (' . $value . ')';
+                $where = $isSingleRow
+                    ? self::db()->quoteInto('`' . $column . '` = ?', $value)
+                    : self::db()->quoteInto('`' . $column . '` IN (?)', self::ar($value));
 
                 // Prepare statement
                 $stmt = self::db()->query('

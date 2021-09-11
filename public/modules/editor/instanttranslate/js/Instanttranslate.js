@@ -995,19 +995,21 @@ $(document).on('click', '.term-proposal' , function() {
         langProposal = $("#targetLocale").val(),
         isTermProposalFromInstantTranslate = 'true';
         params = "text="+text+"&lang="+lang+"&textProposal="+textProposal+"&langProposal="+langProposal+"&isTermProposalFromInstantTranslate="+isTermProposalFromInstantTranslate;
-    if (location.search.match(/termId/)) {
-        var q = top.window.Ext.ComponentQuery.query,
-            vm = q('main').pop().getViewModel(),
-            b = q('[reference=termportalBtn]').pop();
-        vm.set('itranslate', {
-            target: {
-                lang: langProposal,
-                text: textProposal
-            }
-        });
-        b.el.dom.click();
-    } else
-    openTermPortal(params);
+
+    var q = top.window.Ext.ComponentQuery.query,
+        vm = q('main').pop().getViewModel(),
+        b = q('[reference=termportalBtn]').pop(),
+        itranslate = { target: {lang: langProposal, term: textProposal} };
+
+    // If termId-param is not given, it means that source termEntry is not known,
+    // so we append data for trying to find it
+    if (!location.search.match(/termId/)) itranslate.source = {lang: lang, term: text};
+
+    // Set main viewModel's itranslate-prop
+    vm.set('itranslate', itranslate);
+
+    // Click on TermPortal-button
+    b.el.dom.click();
 });
 
 $('#translations').on('touchstart click','.term-info',function(){

@@ -116,16 +116,25 @@ class editor_TermController extends ZfExtended_RestController
             ],                                                                      // $_['termEntryId'] will contain that record
             'term' => [
                 'req' => true,                                                      // required
-                'rex' => '~[^\s]~'                                               // regular expression preset key or raw expression
+                'rex' => '~[^\s]~'                                                  // regular expression preset key or raw expression
             ],
             'language' => [
                 'req' => true,                                                      // required
-                'rex' => 'rfc5646'                              // regular expression preset key or raw expression
+                'rex' => 'rfc5646'                                                  // regular expression preset key or raw expression
             ],
             'note' => [
                 'req' => Zend_Registry::get('config')                               // required
                     ->runtimeOptions->termportal->commentAttributeMandatory,
                 'rex' => 'varchar255s'                                              // regular expression preset key or raw expression
+            ],
+            'sourceTerm' => [
+                'req' => isset($params['sourceLang']),
+                'rex' => '~[^\s]~'
+            ],
+            'sourceLang' => [
+                'req' => isset($params['sourceTerm']),
+                'rex' => 'rfc5646',
+                'key' => 'LEK_languages.rfc5646'
             ]
         ], $params);
 
@@ -163,6 +172,34 @@ class editor_TermController extends ZfExtended_RestController
         // Instantiate term-model instance
         /** @var editor_Models_Terminology_Models_TermModel $termR */
         $termR = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+
+        // If 'sourceLang' and 'sourceTerm' params are given, it means we here because of
+        // InstantTranslate usage in a way that assume that we found no existing termEntry by sourceTerm-param
+        // so we save both terms (source and target) under same newly created termEntry
+        if ($_['sourceLang']) {
+
+            // Apply data
+            $termR->init([
+                'termTbxId' => 'id' . ZfExtended_Utils::uuid(),
+                'collectionId' => $params['collectionId'],
+                'termEntryId' => $termEntryId,
+                'termEntryTbxId' => $termEntryTbxId,
+                'termEntryGuid' => $termEntryGuid,
+                //'langSetGuid' => $langSetGuid = '???',
+                'guid' => ZfExtended_Utils::uuid(),
+                'languageId' => $_['sourceLang']['id'],
+                'language' => $_['sourceLang']['rfc5646'],
+                'term' => trim($params['sourceTerm']),
+                'status' => 'preferredTerm', // which status should be set initially ?
+                'processStatus' => 'unprocessed',
+                //'definition' => '',
+                'updatedBy' => $this->_session->id,
+                'updatedAt' => date('Y-m-d H:i:s')
+            ]);
+
+            // Insert source term
+            $termR->insert(['userName' => $this->_session->userName]);
+        }
 
         // Apply data
         $termR->init([
