@@ -175,7 +175,8 @@ class editor_Models_Terminology_Import_TbxFileImport
     public function importXmlFile(string $tbxFilePath, editor_Models_TermCollection_TermCollection $collection, ZfExtended_Models_User $user, bool $mergeTerms)
     {
         $this->collection = $collection;
-        $this->prepareImportArrays($user, $mergeTerms);
+        $this->mergeTerms = $mergeTerms;
+        $this->prepareImportArrays($user);
 
         $xmlReader = (new class() extends XMLReader {
             public function reopen(string $tbxFilePath) {
@@ -223,14 +224,14 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
     /**
      * Prepare init array variables for merge procedure and check isset function.
      * @param ZfExtended_Models_User $user
-     * @param bool $mergeTerms
      * @throws Zend_Db_Statement_Exception
      */
-    private function prepareImportArrays(ZfExtended_Models_User $user, bool $mergeTerms)
+    private function prepareImportArrays(ZfExtended_Models_User $user)
     {
-        error_log('MEM 1 '.memory_get_usage());
+$memLog = function($msg) {
+    error_log($msg.round(memory_get_usage()/2**20).' MB');
+};
         $this->user = $user;
-        $this->mergeTerms = $mergeTerms;
         $this->dataType->resetData();
 
 
@@ -239,7 +240,7 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
         $this->tbxMap[$this::TBX_LANGSET] = 'langSet';
         $this->tbxMap[$this::TBX_TIG] = 'tig';
 
-        error_log('MEM 2 '.memory_get_usage());
+$memLog('Start Loading Data:  ');
         $languagesModel = ZfExtended_Factory::get('editor_Models_Languages')->getAvailableLanguages();
         foreach ($languagesModel as $language) {
             $this->languages[strtolower($language['value'])] = $language['id'];
@@ -250,22 +251,20 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
         $this->allowedTypes = array_merge($this::ATTRIBUTE_ALLOWED_TYPES, array_keys($this->importMap));
 
         // get custom attribute label text and prepare array to check if custom label text exist.
-        error_log('MEM 3 '.memory_get_usage());
+$memLog('Loaded languages:    ');
         $this->dataType->loadData();
-        error_log('MEM 4 '.memory_get_usage());
+$memLog('Loaded datatype:     ');
 
-        error_log('MEM 5 '.memory_get_usage());
         $this->bulkTermEntry->loadExisting($this->collection->getId());  //FIXME
-        error_log('MEM 6 '.memory_get_usage());
+$memLog('Loaded term entries: ');
         $this->bulkTerm->loadExisting($this->collection->getId());
-        error_log('MEM 7 '.memory_get_usage());
+$memLog('Loaded terms:        ');
         //FIXME would be ok to load before each term entry to keep memory lower
         $this->bulkTransacGrp->loadExisting($this->collection->getId());
-        error_log('MEM 8 '.memory_get_usage());
+$memLog('Loaded transacs:     ');
         //FIXME would be ok to load before each term entry to keep memory lower
         $this->bulkAttribute->loadExisting($this->collection->getId());
-        error_log('MEM 9 '.memory_get_usage());
-        error_log('MEM 11'.memory_get_usage());
+$memLog('Loaded attributes:   ');
     }
 
     /**
@@ -350,7 +349,7 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
 
     /**
      * Save parsed elements.
-     * @throws Zend_Db_Table_Exception
+     * @throws Zend_Db_Table_Exception|editor_Models_Terminology_Import_Exception
      */
     private function saveParsedTermEntryNode()
     {
@@ -358,10 +357,10 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
         $this->bulkTerm->mergeTerms($this->bulkTermEntry, $this->mergeTerms);
 
         //bulkTerm create or update must be called before attributes and transacGrps in order to save the termId there correctly
-        $this->bulkTermEntry->createOrUpdateElement($this->mergeTerms);
-        $this->bulkTerm->createOrUpdateElement($this->mergeTerms);
-        $this->bulkAttribute->createOrUpdateElement($this->mergeTerms);
-        $this->bulkTransacGrp->createOrUpdateElement($this->mergeTerms);
+        $this->bulkTermEntry->createOrUpdateElement();
+        $this->bulkTerm->createOrUpdateElement();
+        $this->bulkAttribute->createOrUpdateElement();
+        $this->bulkTransacGrp->createOrUpdateElement();
     }
 
     /**
