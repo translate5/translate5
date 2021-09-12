@@ -47,6 +47,10 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
     calculated: null,
     context: null,
     types: ['editable', 'workflow'],
+    addParams: {
+        editable: null,
+        workflow: null
+    },
     parsers: {
         /**
          * just a dummy implementation for a consistent coding
@@ -70,12 +74,14 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
     /**
      * @param {String} type
      * @param {function} parser
+     * @param {Object} additionalParams
      */
-    addType: function(type, parser){
+    addType: function(type, parser, additionalParams){
         if(this.types.indexOf(type) == -1){
             this.types.push(type);
-            this.parsers[type] = parser;
         }
+        this.parsers[type] = parser;
+        this.addParams[type] = additionalParams;
     },
     /**
      * @return {Object}
@@ -303,7 +309,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
             rec = me.context.record,
             proxy = store.getProxy(),
             params = {},
-            fields = [], i;
+            fields = [], i, j, type;
         if(!rec) {
             return;
         }
@@ -314,19 +320,25 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         }
         // we have to send the flag as integer instead of bool, 
         // since bool would be recognized as string on server side here
-        for(i=0; i < this.types.length; i++){
-            fields.push('prev_' + this.types[i]);
+        for(i=0; i < me.types.length; i++){
+            type = me.types[i];
+            fields.push('prev_' + type);
             if(!me.prev.isBorderReached){
-                params['prev_' + this.types[i]] = me.prev[this.types[i] + 'Next'] ? 0 : 1;
+                params['prev_' + type] = me.prev[type + 'Next'] ? 0 : 1;
             }
-            fields.push('next_' +  this.types[i]);
+            fields.push('next_' +  type);
             if(!me.next.isBorderReached){
-                params['next_' +  this.types[i]] = me.next[this.types[i] + 'Next'] ? 0 : 1;
+                params['next_' +  type] = me.next[type + 'Next'] ? 0 : 1;
+            }
+            if(me.addParams[type] && typeof me.addParams[type] === 'object'){
+                for(j in me.addParams[type]){
+                    params[j] = me.addParams[type][j];
+                }
             }
         }
         // we transfere the types to expect as well
         params.segmentId = rec.get('id');
-        params.parsertypes = this.types.join(',');
+        params.parsertypes = me.types.join(',');
         params.editedField = editedField;
         params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
         params[proxy.getSortParam()] = proxy.encodeSorters(store.getSorters().items);

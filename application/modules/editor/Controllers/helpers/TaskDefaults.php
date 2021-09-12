@@ -118,14 +118,9 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
             if($configValue > 0){
                 $model->setDeadlineDate(editor_Utils::addBusinessDays($task->getOrderdate(), $configValue));
             }
-            
             // processing some trackchanges properties that can't be parted out to the trackchanges-plugin
-            if(array_key_exists('trackchangesShow', $assoc)){
-                $model->setTrackchangesShow($assoc['trackchangesShow']);
-            }
-            if(array_key_exists('trackchangesAcceptReject', $assoc)){
-                $model->setTrackchangesAcceptReject($assoc['trackchangesAcceptReject']);
-            }
+            $model->setTrackchangesShow($assoc['trackchangesShow']);
+            $model->setTrackchangesAcceptReject($assoc['trackchangesAcceptReject']);
 
             $model->save();
         }

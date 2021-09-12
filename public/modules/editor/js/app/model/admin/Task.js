@@ -107,6 +107,8 @@ Ext.define('Editor.model.admin.Task', {
         {name: 'userRole', type: 'string', persist: false},
         {name: 'isUsed', type: 'boolean', persist: false}, //actually not used, so no isUsed method
         {name: 'userStep', type: 'string', persist: false},
+        {name: 'userTrackchangesShow', type: 'integer', persist: false},
+        {name: 'userTrackchangesAcceptReject', type: 'integer', persist: false},
         {name: 'users', type: 'auto', persist: false},
         {name: 'userCount', type: 'integer', persist: false},
         {name: 'defaultSegmentLayout', type: 'boolean', persist: false},

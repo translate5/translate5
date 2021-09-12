@@ -97,9 +97,13 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
         $taskguid = $row['taskGuid'];
         //Add actual User Assoc Infos to each Task
         if(isset($this->userAssocInfos[$taskguid])) {
-            $row['userRole'] = $this->userAssocInfos[$taskguid]['role'];
-            $row['userState'] = $this->userAssocInfos[$taskguid]['state'];
-            $row['userStep'] = $this->userAssocInfos[$taskguid]['workflowStepName'];
+            $assoc = $this->userAssocInfos[$taskguid];
+            $row['userRole'] = $assoc['role'];
+            $row['userState'] = $assoc['state'];
+            $row['userStep'] = $assoc['workflowStepName'];
+            // processing some trackchanges properties that can't be parted out to the trackchanges-plugin
+            $row['userTrackchangesShow'] = $assoc['trackchangesShow'];
+            $row['userTrackchangesAcceptReject'] = $assoc['trackchangesAcceptReject'];
         }
         elseif($isEditAll && !empty($givenUserState)) {
             $row['userState'] = $givenUserState; //returning the given userState for usage in frontend

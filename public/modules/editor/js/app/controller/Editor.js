@@ -1896,9 +1896,9 @@ Ext.define('Editor.controller.Editor', {
     /**
      * Adds types to the prev-next controller
      */
-    addPrevNextSegmentType: function(type, parser){
+    addPrevNextSegmentType: function(type, parser, additionalParams){
         if(this.prevNextSegment){
-            this.prevNextSegment.addType(type, parser);
+            this.prevNextSegment.addType(type, parser, additionalParams);
         }
     }
 });
