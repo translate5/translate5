@@ -2008,6 +2008,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='VGV4dGZyZWlnYWJl'><source>Textfreigabe</source><target>Textfreigabe</target></trans-unit>
 <trans-unit id='RXh0ZXJuZXMgRFRQIChudXIgTGVzZXJlY2h0ZSBpbiB0cmFuc2xhdGU1KQ=='><source>Externes DTP (nur Leserechte in translate5)</source><target>Externes DTP (nur Leserechte in translate5)</target></trans-unit>
 <trans-unit id='RmluYWxlIFRleHRmcmVpZ2FiZQ=='><source>Finale Textfreigabe</source><target>Finale Textfreigabe</target></trans-unit>
+<trans-unit id='U3ByYWNoZSDDpG5kZXJu'><source>Sprache ändern</source><target>Sprache ändern</target></trans-unit>
+<trans-unit id='YXJpYQ=='><source>aria</source><target>Dunkles Layout (Aria)</target></trans-unit>
+<trans-unit id='dHJpdG9u'><source>triton</source><target>Standard Layout (Triton)</target></trans-unit>
   </body>
  </file>
 </xliff>
