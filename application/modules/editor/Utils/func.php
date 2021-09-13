@@ -44,3 +44,41 @@ function d($value) {
     // Wrap the $value with the '<pre>' tag, and write it to the output
     echo '<pre>'; print_r($value); echo '</pre>';
 }
+
+/**
+ * Write the contents of $value to a file - 'debug.txt' by default, located in the document root
+ * This is handy when you need to check some variables or something, but flushing in to the output
+ * will break the response json
+ *
+ * Usages:
+ *  i($_POST);
+ *  i($_GET, 'a'); // 'a' is here for dump of $_GET to be appended to the $file instead of overwriting
+ *
+ * @param $value
+ * @param string $mode This arg is a 2nd arg for fopen($filename, $mode) call and accepts same values
+ * @param string $file
+ */
+function i($value, $mode = 'w', $file = 'debug.txt') {
+
+    // Get the document root, with trimmed right trailing slash
+    $doc = rtrim($_SERVER['DOCUMENT_ROOT'], '\\/');
+
+    // Get the absolute path of a file, that will be used for writing data to
+    $abs = $doc . '/' . $file;
+
+    // If value is bool
+    if (is_bool($value)) {
+
+        // Use var_dump for dumping, as print_r() will give 1 or 0 instead of 'bool(true)' or 'bool(false)'
+        ob_start(); var_dump($value); $value = ob_get_clean();
+
+    // Else
+    } else {
+
+        // Use print_r() for dumping
+        $value = print_r($value, true);
+    }
+
+    // Write the data
+    $fp = fopen($abs, $mode); fwrite($fp, $value . "\n"); fclose($fp);
+}

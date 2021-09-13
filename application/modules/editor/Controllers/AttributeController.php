@@ -251,7 +251,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ]);
 
         // Save attr and affect transacgrp-records
-        $a->insert($misc = ['userName' => $this->_session->userName]);
+        $updated = $a->insert($misc = ['userName' => $this->_session->userName]);
 
         // Prepare inserted data to be flushed into response json
         $inserted = [
@@ -264,7 +264,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ];
 
         // Flush response data
-        $this->view->assign(['inserted' => $inserted, 'updated' => $inserted['updated']]);
+        $this->view->assign(['inserted' => $inserted, 'updated' => $updated]);
     }
 
     /**
@@ -324,7 +324,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ]);
 
         // Save attr and affect transacgrp-records
-        $a->insert($misc = ['userName' => $this->_session->userName]);
+        $updated = $a->insert($misc = ['userName' => $this->_session->userName]);
 
         // Prepare inserted data to be flushed into response json
         $inserted = [
@@ -337,7 +337,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ];
 
         // Flush response data
-        $this->view->assign(['inserted' => $inserted, 'updated' => $inserted['updated']]);
+        $this->view->assign(['inserted' => $inserted, 'updated' => $updated]);
     }
 
     /**
@@ -391,7 +391,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ]);
 
         // Save attr and affect transacgrp-records
-        $a->insert($misc = ['userName' => $this->_session->userName]);
+        $updated = $a->insert($misc = ['userName' => $this->_session->userName]);
 
         // Prepare inserted data to be flushed into response json
         $inserted = [
@@ -408,7 +408,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ];
 
         // Flush response data
-        $this->view->assign(['inserted' => $inserted, 'updated' => $inserted['updated']]);
+        $this->view->assign(['inserted' => $inserted, 'updated' => $updated]);
     }
 
     /**
@@ -527,7 +527,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ]);
 
         // Save attr and affect transacgrp-records
-        $a->insert($misc = ['userName' => $this->_session->userName]);
+        $updated = $a->insert($misc = ['userName' => $this->_session->userName]);
 
         // Prepare inserted data to be flushed into response json
         $inserted = [
@@ -542,7 +542,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ];
 
         // Flush response data
-        $this->view->assign(['inserted' => $inserted, 'updated' => $inserted['updated']]);
+        $this->view->assign(['inserted' => $inserted, 'updated' => $updated]);
     }
 
 
@@ -669,7 +669,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Update `date` and `transacNote` of 'modification'-records
             // for all levels starting from term-level and up to top
-            ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
+            $updated = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels(
                     $this->_session->userName,
                     $_['attrId']['termEntryId'],
@@ -677,7 +677,7 @@ class editor_AttributeController extends ZfExtended_RestController
                 );
 
             // Flush response data
-            $this->view->assign(['src' => $i->getPublicPath(), 'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s')]);
+            $this->view->assign(['src' => $i->getPublicPath(), 'updated' => $updated]);
 
             // Else flush empty src
         } else $this->view->assign(['src' => ''] + $_);
@@ -884,7 +884,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Update `date` and `transacNote` of 'modification'-records
         // for all levels starting from term-level and up to top
-        ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
+        $data['updated'] = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
             ->affectLevels(
                 $this->_session->userName,
                 $_['attrId']['termEntryId'],

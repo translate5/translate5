@@ -461,7 +461,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // If $transacgrpData arg is given - update 'modification'-records of all levels
         if ($misc['userName'])
-            ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
+            $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels(
                     $misc['userName'],
                     $this->getTermEntryId(),
@@ -879,7 +879,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Term query template
         $termQueryTpl = '
-            SELECT %s 
+            SELECT SQL_NO_CACHE %s 
             FROM `terms_term` `t` %s
             WHERE ' . implode(' AND ', $where) . '
             ORDER BY `t`.`term` ASC

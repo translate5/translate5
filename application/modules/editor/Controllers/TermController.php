@@ -284,12 +284,13 @@ class editor_TermController extends ZfExtended_RestController
         $t->setUpdatedBy($this->_session->id);
 
         // Save, and pass params required to update `terms_transacgrp`-records of type 'modification' for all 3 levels
-        $t->update(['userName' => $this->_session->userName]);
+        $updated = $t->update(['userName' => $this->_session->userName]);
 
         // Flush response data
         $this->view->assign([
+            'updated' => $updated,
             'proposal' => $t->getProposal(),
-            'processStatus' => $t->getProposal() ? 'unprocessed' : $t->getProcessStatus()
+            'processStatus' => $t->getProposal() ? 'unprocessed' : $t->getProcessStatus(),
         ]);
     }
 

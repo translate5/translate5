@@ -94,7 +94,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
         if ($level == 'term') $bind[':termId'] = $termId;
 
         // Run query
-        editor_Utils::db()->query('
+        $affectedFact = editor_Utils::db()->query('
             UPDATE `terms_transacgrp` 
             SET 
               `date` = :date, 
@@ -103,10 +103,134 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
               AND `termEntryId` = :termEntryId 
               AND `transac` = \'modification\'
               AND ' . $where[$level],
-        $bind);
+        $bind)->rowCount();
 
-        // Return affection info
-        return $user . ', ' . date('d.m.Y H:i:s', $time);
+        // How many row should be affected
+        $affectedPlan = [
+            'term'     => 3,
+            'language' => 2,
+            'entry'    => 1
+        ];
+
+        // If number of affected rows is less than it should be
+        // it mean that terms_transacgrp-records for at least one level are missing
+        if ($missing = $affectedFact < $affectedPlan[$level]) {
+
+            // Setup definition for level-column
+            $levelColumnToBeGroupedBy['term'] = '
+              IF (`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`), "entry", 
+                IF (`termEntryId` = :termEntryId AND `language` = :language AND ISNULL(`termId`), "language", 
+                  IF (`termId` = :termId, "term", 
+                    "other"))) AS `level`';
+
+            // Setup definition for level-column
+            $levelColumnToBeGroupedBy['language'] = '
+              IF (`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`), "entry", 
+                IF (`termEntryId` = :termEntryId AND `language` = :language AND ISNULL(`termId`), "language", 
+                  "other")) AS `level`';
+
+            // Setup definition for level-column
+            $levelColumnToBeGroupedBy['entry'] = '
+              IF (`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`), "entry", 
+                  "other") AS `level`';
+
+            //
+            unset($bind[':date'], $bind[':userName']);
+
+            $sql = '
+                SELECT 
+                  ' . $levelColumnToBeGroupedBy[$level] . '                   
+                FROM `terms_transacgrp`
+                WHERE TRUE # TRUE here is just to beautify WHERE clause
+                  AND `termEntryId` = :termEntryId 
+                  AND `transac` = "modification"
+                  AND ' . $where[$level];
+            i($sql);
+            i($bind, 'a');
+            // Get levels, that terms_transacgrp-records are exist
+            $levelA['exist'] = editor_Utils::db()->query($sql,
+            $bind)->fetchAll(PDO::FETCH_COLUMN);
+
+            // Define which level should exist
+            $levelA['should'] = [
+                'term'     => ['term', 'language', 'entry'],
+                'language' => [        'language', 'entry'],
+                'entry'    => [                    'entry'],
+            ];
+
+            // Get levels, that transacgrp-records are missing for
+            $levelA['missing'] = array_diff($levelA['should'][$level], $levelA['exist']);
+
+            // If $level is 'term' - fetch terms_term-record by $termId arg
+            if ($level == 'term') {
+                $source = editor_Utils::db()->query('SELECT * FROM `terms_term` WHERE `id` = ?', $termId)->fetch();
+                $info['termEntryGuid'] = $source['termEntryGuid'];
+                $info['termTbxId'] = $source['termTbxId'];
+                $info['termGuid'] = $source['guid'];
+
+            // Else fetch terms_term_entry-record by $termEntryId arg
+            } else {
+                $source = editor_Utils::db()->query('SELECT * FROM `terms_term_entry` WHERE `id` = ?', $termEntryId)->fetch();
+                $info['termEntryGuid'] = $source['entryGuid'];
+            }
+
+            // Setup 'collectionId'
+            $info['collectionId'] = $source['collectionId'];
+
+            // Create missing terms_transacgrp-records
+            foreach ($levelA['missing'] as $level) {
+
+                // Props applicable for all levels
+                $byLevel = [
+                    'collectionId' => $info['collectionId'],
+                    'termEntryId' => $termEntryId,
+                    'termEntryGuid' => $info['termEntryGuid'],
+                ];
+
+                // Props applicable for term- and language-levels
+                if ($level == 'term' || $level == 'language') $byLevel += [
+                    'language' => $language,
+                    'attrLang' => $language,
+                ];
+
+                // Props, applicable for term-level only
+                if ($level == 'term') $byLevel += [
+                    'termId' => $termId,
+                    'termTbxId' => $info['termTbxId'],
+                    'termGuid' => $info['termGuid'],
+                ];
+
+                // Setup 'elementName'
+                if ($level == 'term')          $byLevel += ['elementName' => 'tig'];
+                else if ($level == 'language') $byLevel += ['elementName' => 'langSet'];
+                else if ($level == 'entry')    $byLevel += ['elementName' => 'termEntry'];
+
+                // Create `terms_transacgrp`-records
+                foreach (['creation', 'modification'] as $type) {
+
+                    // Create `terms_transacgrp` model instance
+                    $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+
+                    // Setup remaining props
+                    $t->init($byLevel + [
+                        'transac' => $type,
+                        'date' => date('Y-m-d H:i:s'),
+                        'transacNote' => $user,
+                        'transacType' => 'responsiblePerson',
+                        'guid' => ZfExtended_Utils::uuid(),
+                    ]);
+
+                    // Save `terms_transacgrp` entry
+                    $t->save();
+                }
+            }
+        }
+
+        // Return affection info, appending a whitespace at the ending to indicate that
+        // transacgrp-records at least for one level were missing, but as long as we created
+        // them we should pass that to client-side app, so it can detect the whitespace and
+        // update not only 'updated' viewModel's prop, but 'created' prop as well where it was missing
+        return $user . ', ' . date('d.m.Y H:i:s', $time) . editor_Utils::rif($missing, ' ');
     }
 
     public function getTransacGrpCollectionByEntryId($collectionId, $termEntryId): array
