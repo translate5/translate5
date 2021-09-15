@@ -94,7 +94,7 @@ class editor_Models_Terminology_TbxObjects_Attribute extends editor_Models_Termi
         if(!empty($this->parentEntry)){
             return self::ATTRIBUTE_LEVEL_ENTRY;
         }
-        // non existing level. this should never happen, if it does, this is not a valid attribute
+        // non-existing level. this should never happen, if it does, this is not a valid attribute
         // 'E1357' => 'TBX Import: Could not import due unknown attribute level',
         throw new editor_Models_Terminology_Import_Exception('E1357', [
             'tbxAttribute values' => array_intersect_key(get_object_vars($this), $this::TABLE_FIELDS)

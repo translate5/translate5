@@ -43,6 +43,25 @@ class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Te
     }
 
     /**
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function loadExisting(int $entryId) {
+        $db = $this->model->db;
+        $conn = $db->getAdapter()->getConnection();
+        //this saves a lot of RAM:
+        $conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+        $stmt = $db->select()->from($db, $this->getFieldsToLoad())->where('termEntryId = ?', $entryId)->query(Zend_Db::FETCH_ASSOC);
+        $conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
+
+        // empty the existing attributes because this is loaded for each term entry
+        $this->existing = [];
+        /* @var $attribute editor_Models_Terminology_TbxObjects_Attribute */
+        while($row = $stmt->fetch(Zend_Db::FETCH_ASSOC)) {
+            $this->processOneExistingRow($row['id'], new $this->importObject($row));
+        }
+    }
+
+    /**
      * @param editor_Models_Terminology_TbxObjects_Attribute $elementObject
      */
     protected function fillParentIds(editor_Models_Terminology_TbxObjects_Abstract $elementObject)
