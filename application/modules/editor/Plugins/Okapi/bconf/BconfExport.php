@@ -150,6 +150,7 @@ class editor_Plugins_Okapi_Bconf_BconfExport extends editor_Plugins_Okapi_Bconf_
          
           foreach ($data as $filter){
                if($filter['default']==1){
+                    //TODO get dir path
                     $configFilePath=self::OKAPI_BCONF_BASE_PATH.$filter['configId'].'.fprm';
                     $file = fopen( $configFilePath, "r") or die("Unable to open file!");
                     $configData = fread($file, filesize($configFilePath));

@@ -40,19 +40,19 @@ CREATE TABLE `LEK_okapi_bconf` (
 );
 
 CREATE TABLE `LEK_okapi_bconf_filter` (
-  `id` INT (11) NOT NULL AUTO_INCREMENT,
-  okapiId INT (11) NOT NULL,
-  filterId VARCHAR(20), NOT NULL,
-  okapiName VARCHAR(50),
-  mime VARCHAR(20),
-  PRIMARY KEY (`id`),
-  default bit,
-  name VARCHAR(50),
-  notes VARCHAR (200),
-  extensions VARCHAR(200),
-  configuration text,
-  codeId VARCHAR(50),
+`id` int(11) NOT NULL,
+`okapiId` int(11) NOT NULL,
+`configId` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+`okapiName` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+`mime` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+`default` bit(1) DEFAULT NULL,
+`name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+`notes` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+`extensions` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+`configuration` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+`codeId` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   CONSTRAINT `fk_LEK_okapi_bconf_filter`
       FOREIGN KEY (`okapiId`)
           REFERENCES `LEK_okapi_bconf` (`id`)
 );
+
