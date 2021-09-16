@@ -49,7 +49,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     public function addTm(array $fileinfo = null,array $params=null) {
         if(empty($fileinfo)){
             //empty term collection
-            return false;
+            return true;
         }
 
         $import=ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');

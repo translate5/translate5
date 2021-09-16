@@ -259,12 +259,7 @@ $memLog('Loaded datatype:     ');
 $memLog('Loaded term entries: ');
         $this->bulkTerm->loadExisting($this->collection->getId());
 $memLog('Loaded terms:        ');
-        //FIXME would be ok to load before each term entry to keep memory lower
-        $this->bulkTransacGrp->loadExisting($this->collection->getId());
-$memLog('Loaded transacs:     ');
-        //FIXME would be ok to load before each term entry to keep memory lower
-        $this->bulkAttribute->loadExisting($this->collection->getId());
-$memLog('Loaded attributes:   ');
+
     }
 
     /**
@@ -299,7 +294,9 @@ $memLog('Loaded attributes:   ');
         while ($xmlReader->name === $this->tbxMap[$this::TBX_TERM_ENTRY]) {
             $termEntryNode = new SimpleXMLElement($xmlReader->readOuterXML());
             $parentEntry = $this->handleTermEntry($termEntryNode);
+
             foreach ($termEntryNode->{$this->tbxMap[$this::TBX_LANGSET]} as $languageGroup) {
+
                 $parentLangSet = $this->handleLanguageGroup($languageGroup, $parentEntry);
                 if (is_null($parentLangSet)) {
                     continue;
@@ -358,6 +355,11 @@ $memLog('Loaded attributes:   ');
 
         //bulkTerm create or update must be called before attributes and transacGrps in order to save the termId there correctly
         $this->bulkTermEntry->createOrUpdateElement();
+
+        // Load the attributes and transac for the current term entry. Loading this on each term entry saves memory and it is faster as loading all at once.
+        $this->bulkTransacGrp->loadExisting($this->bulkTermEntry->getCurrentEntry()->id);
+        $this->bulkAttribute->loadExisting($this->bulkTermEntry->getCurrentEntry()->id);
+
         $this->bulkTerm->createOrUpdateElement();
         $this->bulkAttribute->createOrUpdateElement();
         $this->bulkTransacGrp->createOrUpdateElement();

@@ -118,7 +118,8 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
         else {
             $this->allTerms[$key] = [$value];
         }
-        parent::processOneExistingRow($id, $element);
+        // we need to store the guid to for setting it later for new term attributes in existing terms
+        $this->existing[$element->getCollectionKey()] = $id.'#'.$element->guid.'#'.$element->getDataHash();
     }
 
     protected function getAllTermsKey(editor_Models_Terminology_TbxObjects_Term $term): string
@@ -219,9 +220,10 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
             return;
         }
 
+        //TODO: what is the point of this code ? Validation only or ? since the attar is reset right after it is filled up
         //fetch the newly inserted IDs
         $s = $this->model->db->select()
-            ->from($this->model->db, ['id', 'termTbxId'])
+            ->from($this->model->db, ['id', 'termTbxId','guid'])
             ->where('termTbxId in (?)', array_keys($this->insertedTbxIds))
             ->where('collectionId = ?', $collectionId);
         $ids = $this->model->db->fetchAll($s)->toArray();
@@ -282,12 +284,22 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
 
         /* @var editor_Models_Terminology_TbxObjects_Term $term */
         foreach($this->toBeProcessed as $term) {
+
             $termId = $this->findExisting($term);
             $termExistsByTbxIds = !is_null($termId);
 
             //termEntry with the parsed termEntryTbxID exists in DB
             // and term with the parsed termTbxID exists in DB
             if($entryExistsByTbxId && $termExistsByTbxIds) {
+
+                // those values are used by the term attributes and must be set here
+                $term->id = $termId;
+                // we have direct match from above, base on that, get the term from the existing pull, and set the guid from there
+                // setting the guid is required when new attributes are inserted for terms which are merged
+                $existing = $this->existing[$term->getCollectionKey()];
+                $existing = explode('#',$existing);
+                $term->guid = $existing[1];
+
                 // term data is merged automatically via createOrUpdateElement later on
                 continue;
             }
