@@ -993,13 +993,14 @@ $(document).on('click', '.term-proposal' , function() {
         lang = $("#sourceLocale").val(),
         textProposal = $(this).attr('data-term'),
         langProposal = $("#targetLocale").val(),
-        isTermProposalFromInstantTranslate = 'true';
+        isTermProposalFromInstantTranslate = 'true',
+        isMT = $(this).parents('.copyable').find('.translation-result').data('languageresource-type') == 'mt',
         params = "text="+text+"&lang="+lang+"&textProposal="+textProposal+"&langProposal="+langProposal+"&isTermProposalFromInstantTranslate="+isTermProposalFromInstantTranslate;
 
     var q = top.window.Ext.ComponentQuery.query,
         vm = q('main').pop().getViewModel(),
         b = q('[reference=termportalBtn]').pop(),
-        itranslate = { target: {lang: langProposal, term: textProposal} };
+        itranslate = { target: {lang: langProposal, term: textProposal, isMT: isMT} };
 
     // If termId-param is not given, it means that source termEntry is not known,
     // so we append data for trying to find it

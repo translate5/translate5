@@ -855,11 +855,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Render keyword WHERE string
         $keywordWHERE = '(' . implode(' OR ', $keywordWHERE) . ')';
 
-        //$params['query'] = '!@ asd123 + qwe#$ ZXC)base de données fédérée';
-        //$params['query'] = '!@ asd123';
-        //$params['query'] = '*';
-        //die(preg_replace('~[^a-zA-Z0-9]~u', '-', ));
-
+        //i($params['query']);
         // Keep letters, numbers and underscores only
         $against = trim(preg_replace('/[^\p{L}\p{N}_]+/u', ' ', $params['query'])) . '*';
         if (preg_match('~ ~', $against)) $against = '+' . preg_replace('~ ~', ' +', $against);
@@ -873,8 +869,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             // Prepend $where with $keywordWHERE
             array_unshift($where, $keywordWHERE);
 
-            // Prepend $where with $againstWHERE
-            array_unshift($where, $againstWHERE);
+            // Check if wildcard prefix is going to be used in LIKE(:keyword), and if no
+            if (!preg_match('~[%_][^\s]~', $keyword))
+
+                // Prepend $where with $againstWHERE, because
+                // FULLTEXT-search does not support wildcard prefixes
+                array_unshift($where, $againstWHERE);
         }
 
         // Term query template
@@ -901,6 +901,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Render query for getting actual results from terms table
         $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor ?? '', $keywordWHERE)
             . 'LIMIT ' . (int) $offset . ',' . (int) $limit;
+
+        //i($termQuery, 'a');
+        //i($bindParam, 'a');
 
         // Return results
         return editor_Utils::db()->query($termQuery, $bindParam)->fetchAll();

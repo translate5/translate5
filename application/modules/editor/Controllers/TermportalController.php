@@ -37,11 +37,44 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action
             //load default screen to show plugin disable message
             return;
         }
+
+        // Get config's runtimeOptions
+        $rop = Zend_Registry::get('config')->runtimeOptions;
+
+        // Get enableJsLogger param
+        $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
+
+        // If it is turned On
+        if ($this->view->enableJsLogger) {
+
+            // Get current user data
+            $user = (new Zend_Session_Namespace('user'))->data;
+
+            // Assign view params, required for RootCause usage
+            $this->view->assign([
+                'appVersion' => ZfExtended_Utils::getAppVersion(),
+                'extJsVersion' => '7.0.0.168 GPL',
+                'Editor' => [
+                    'data' => [
+                        'app' => [
+                            'controllers' => [],
+                            'user' => [
+                                'login' => $user->login,
+                                'email' => $user->email,
+                                'userGuid' => $user->userGuid
+                            ]
+                        ]
+                    ]
+                ]
+            ]);
+        }
+
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
+        $this->view->addScriptPath(APPLICATION_ROOT.'/application/modules/editor/Plugins/TermPortal/public/resources/');
         $which = ZfExtended_Utils::getAppVersion() == ZfExtended_Utils::VERSION_DEVELOPMENT
             ? 'build/production/TermPortal/index.php'
             : 'index.php';
-        require APPLICATION_ROOT.'/application/modules/editor/Plugins/TermPortal/public/resources/' . $which;
+        echo $this->view->render($which);
     }
 }
