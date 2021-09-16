@@ -34,7 +34,7 @@ class editor_Models_Terminology_TbxObjects_Term extends editor_Models_Terminolog
      */
     const TABLE_FIELDS = [
         'updatedBy' => true,
-        'updatedAt' => false, // is updated autmatically in DB
+        'updatedAt' => false, // is updated automatically in DB
         'collectionId' => false,
         'termEntryId' => false,
         'languageId' => false,

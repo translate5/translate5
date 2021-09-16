@@ -361,8 +361,6 @@ $memLog('Loaded terms:        ');
         $this->bulkAttribute->loadExisting($this->bulkTermEntry->getCurrentEntry()->id);
 
         $this->bulkTerm->createOrUpdateElement();
-
-
         $this->bulkAttribute->createOrUpdateElement();
         $this->bulkTransacGrp->createOrUpdateElement();
     }

@@ -48,9 +48,9 @@ class editor_Models_Terminology_Models_Abstract extends ZfExtended_Models_Entity
      */
     public function updateImportTbx(array $attributes): bool
     {
+        //TODO: Question for Thomas, why not building the sql and exec in one query ?
         foreach ($attributes as $attribute) {
             $this->db->update($attribute, ['id=?'=> $attribute['id']]);
-
         }
         return true;
     }

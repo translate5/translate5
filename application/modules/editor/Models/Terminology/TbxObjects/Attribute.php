@@ -81,7 +81,7 @@ class editor_Models_Terminology_TbxObjects_Attribute extends editor_Models_Termi
      */
     public function getCollectionKey(): string
     {
-        return $this->elementName . '-' .$this->type . '-' . $this->termEntryGuid . '-' . $this->language . '-' . $this->termTbxId;
+        return $this->elementName . '-' .$this->type . '-' .$this->target .'-'. $this->termEntryGuid . '-' . $this->language . '-' . $this->termTbxId;
     }
 
     public function getLevel(): string {
