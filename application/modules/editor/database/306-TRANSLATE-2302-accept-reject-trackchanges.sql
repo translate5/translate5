@@ -25,5 +25,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-ALTER TABLE `LEK_taskUserAssoc` ADD COLUMN `trackchangesShow` TINYINT (1) NOT NULL DEFAULT 1, ADD COLUMN `trackchangesAcceptReject` TINYINT (1) NOT NULL DEFAULT 1;
-ALTER TABLE `LEK_user_assoc_default` ADD COLUMN `trackchangesShow` TINYINT (1) NOT NULL DEFAULT 1, ADD COLUMN `trackchangesAcceptReject` TINYINT (1) NOT NULL DEFAULT 1;
+ALTER TABLE `LEK_taskUserAssoc` ADD COLUMN `trackchangesShow` TINYINT (1) NOT NULL DEFAULT 1, ADD COLUMN `trackchangesShowAll` TINYINT (1) NOT NULL DEFAULT 1, ADD COLUMN `trackchangesAcceptReject` TINYINT (1) NOT NULL DEFAULT 1;
+ALTER TABLE `LEK_user_assoc_default` ADD COLUMN `trackchangesShow` TINYINT (1) NOT NULL DEFAULT 1, ADD COLUMN `trackchangesShowAll` TINYINT (1) NOT NULL DEFAULT 1, ADD COLUMN `trackchangesAcceptReject` TINYINT (1) NOT NULL DEFAULT 1;

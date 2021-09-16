@@ -120,6 +120,7 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
             }
             // processing some trackchanges properties that can't be parted out to the trackchanges-plugin
             $model->setTrackchangesShow($assoc['trackchangesShow']);
+            $model->setTrackchangesShowAll($assoc['trackchangesShowAll']);
             $model->setTrackchangesAcceptReject($assoc['trackchangesAcceptReject']);
 
             $model->save();

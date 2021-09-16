@@ -38,6 +38,7 @@ class editor_Models_Validator_UserAssocDefault extends ZfExtended_Models_Validat
         $this->addValidator("segmentrange","stringLength", array("min" => 0, "max" => 255));
         $this->addValidator("deadlineDate", "float",[],true);
         $this->addValidator('trackchangesShow', 'int');
+        $this->addValidator('trackchangesShowAll', 'int');
         $this->addValidator('trackchangesAcceptReject', 'int');
     }
 }

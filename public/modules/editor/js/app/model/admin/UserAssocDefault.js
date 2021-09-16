@@ -45,6 +45,7 @@ Ext.define('Editor.model.admin.UserAssocDefault', {
       {name: 'segmentrange', type: 'string'},
       {name: 'deadlineDate'},
       {name: 'trackchangesShow', type: 'int'},
+      {name: 'trackchangesShowAll', type: 'int'},
       {name: 'trackchangesAcceptReject', type: 'int'}
     ],
 

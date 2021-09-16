@@ -66,6 +66,8 @@ END LICENSE AND COPYRIGHT
  * @method void setDeadlineDate() setDeadlineDate(string $datetime)
  * @method int getTrackchangesShow() getTrackchangesShow()
  * @method void setTrackchangesShow() setTrackchangesShow(int $isAllowed)
+ * @method int getTrackchangesShowAll() getTrackchangesShowAll()
+ * @method void setTrackchangesShowAll() setTrackchangesShowAll(int $isAllowed)
  * @method int getTrackchangesAcceptReject() getTrackchangesAcceptReject()
  * @method void setTrackchangesAcceptReject() setTrackchangesAcceptReject(int $isAllowed)
  *

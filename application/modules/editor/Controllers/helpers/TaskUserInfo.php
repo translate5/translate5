@@ -103,6 +103,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
             $row['userStep'] = $assoc['workflowStepName'];
             // processing some trackchanges properties that can't be parted out to the trackchanges-plugin
             $row['userTrackchangesShow'] = $assoc['trackchangesShow'];
+            $row['userTrackchangesShowAll'] = $assoc['trackchangesShowAll'];
             $row['userTrackchangesAcceptReject'] = $assoc['trackchangesAcceptReject'];
         }
         elseif($isEditAll && !empty($givenUserState)) {
