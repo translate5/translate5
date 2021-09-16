@@ -33,19 +33,19 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_Okapi_Bconf_BconfExport extends editor_Plugins_Okapi_Bconf_BconfUtil
 {
-     const OKAPI_BCONF_BASE_PATH = 'D:/okapi/';
-     const MAXBUFFERSIZE = 1024 * 8;
-     const MAXBLOCKLEN = 45000;
-     const SIGNATURE = "batchConf";
-     const VERSION = 2;
-     const  NUMPLUGINS = 0;
-     const PIPELINEFILE = "D:/okapi/pipeline.pln";
-     const EXTFILESDIR="G:/projects/Marc/projects/translate5/application/modules/editor/Plugins/Okapi/data/okapi-import-bconf-generation/testfiles";
+    const OKAPI_BCONF_BASE_PATH = 'D:/okapi/';
+    const MAXBUFFERSIZE = 1024 * 8;
+    const MAXBLOCKLEN = 45000;
+    const SIGNATURE = "batchConf";
+    const VERSION = 2;
+    const  NUMPLUGINS = 0;
+    const PIPELINEFILE = "D:/okapi/pipeline.pln";
+    const EXTFILESDIR="G:/projects/Marc/projects/translate5/application/modules/editor/Plugins/Okapi/data/okapi-import-bconf-generation/testfiles";
     
      /**
       * Export bconf
       */
-     public function ExportBconf($okapiName,$okapiId)
+     public function ExportBconf($okapiName, $okapiId)
      {
           $fileExist = file_exists(self::OKAPI_BCONF_BASE_PATH.$okapiName.'.bconf');
           if($fileExist){

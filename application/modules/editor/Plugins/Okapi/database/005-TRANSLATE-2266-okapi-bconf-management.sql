@@ -30,7 +30,7 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('edit
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_okapi_bconffilter', 'all');
 
 CREATE TABLE `LEK_okapi_bconf` (
-    `id` INT (11) NOT NULL AUTO_INCREMENT,
+	`id` INT (11) NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(50),
     `customer_id` VARCHAR(50),
     `default` BOOLEAN,
@@ -40,19 +40,17 @@ CREATE TABLE `LEK_okapi_bconf` (
 );
 
 CREATE TABLE `LEK_okapi_bconf_filter` (
-`id` int(11) NOT NULL,
-`okapiId` int(11) NOT NULL,
-`configId` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-`okapiName` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-`mime` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-`default` bit(1) DEFAULT NULL,
-`name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-`notes` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-`extensions` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-`configuration` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-`codeId` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  CONSTRAINT `fk_LEK_okapi_bconf_filter`
-      FOREIGN KEY (`okapiId`)
-          REFERENCES `LEK_okapi_bconf` (`id`)
+	`id` int(11) NOT NULL,
+	`okapiId` int(11) NOT NULL,
+	`configId` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+	`okapiName` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`mime` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`default` bit(1) DEFAULT NULL,
+	`name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`notes` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`extensions` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`configuration` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`codeId` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `fk_LEK_okapi_bconf_filter` FOREIGN KEY (`okapiId`) REFERENCES `LEK_okapi_bconf` (`id`) ON DELETE CASCADE
 );
-
