@@ -142,6 +142,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $this->view->appVersion = $this->getAppVersion();
         $this->setJsVarsInView();
+        $this->setThemeVarsInView($userConfig['runtimeOptions.extJs.cssFile']['defaults']);
         $this->checkForUpdates($this->view->appVersion);
     }
 
@@ -355,6 +356,19 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->setJsAppData();
     }
 
+    /***
+     * Add translated theme names to a frontend variable
+     * @param string $themes
+     * @throws Zend_Exception
+     */
+    protected function setThemeVarsInView(string $themes){
+        $themes = explode(',',$themes);
+        $translated = [];
+        foreach ($themes as $item) {
+            $translated[$item] = $this->translate->_($item);
+        }
+        $this->view->Php2JsVars()->set('frontend.config.themesName', $translated);
+    }
     /***
      * Set language resources frontend vars
      */
