@@ -451,8 +451,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     /**
      * Checks if segment data is changed in this entity, compared against last loaded content
      */
-    public function isDataModified($typeFilter = null)
-    {
+    public function isDataModified($typeFilter = null) {
         if (!is_null($this->isDataModified)) {
             return $this->isDataModified;
         }
@@ -465,8 +464,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             if (!$isEditable || !$edited || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
-            if ($this->stripTermTagsAndTrackChanges($data->edited) !== $this->stripTermTagsAndTrackChanges($this->getOldValue($fieldName))) {
+            $oldValue = $this->getOldValue($fieldName);
+            if($this->stripTermTagsAndTrackChanges($data->edited) !== $this->stripTermTagsAndTrackChanges($oldValue)) {
                 $this->isDataModified = true;
+            } else {
+                // when the text-contents are identical we check, if this may is a removal initiated by the accept/reject feature of trackchanges
+                if($data->edited == $this->trackChangesTagHelper->removeTrackChanges($oldValue)){
+                    $this->isDataModified = true;
+                }
             }
         }
         return $this->isDataModified;
