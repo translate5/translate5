@@ -248,6 +248,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return $this->field;
     }
     /**
+     *
+     * @return editor_Models_Task
+     */
+    public function getTask() : editor_Models_Task {
+        return $this->task;
+    }
+    /**
      * Retrieves the field's data index as defined by editor_Models_SegmentFieldManager::getDataLocationByKey
      * @return string
      */
