@@ -141,6 +141,29 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         return $segmentIds;
     }
     /**
+     * Generates a list of segmentIds of all faulty segments (= Segments with internal tag errors) off a task
+     * @param string $taskGuid
+     * @return array
+     */
+    public static function getFaultySegmentIds(string $taskGuid) : array {
+        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
+        /* @var $table editor_Models_Db_SegmentQuality */
+        $adapter = $table->getAdapter();
+        $select = $adapter->select();
+        $select
+            ->from($table->getName(), 'segmentId')
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('type = ?', editor_Segment_Tag::TYPE_INTERNAL)
+            ->where('category = ?', editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY);
+        $segmentIds = [];
+        // DEBUG
+        // error_log('FETCH SEGMENT-IDS FOR QUALITY FILTER: '.$select->__toString());
+        foreach($adapter->fetchAll($select, [], Zend_Db::FETCH_ASSOC) as $row){
+            $segmentIds[] = $row['segmentId'];
+        }
+        return $segmentIds;
+    }
+    /**
      * 
      * @param string $taskGuid
      * @param int $segmentId

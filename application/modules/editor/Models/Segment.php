@@ -1026,6 +1026,20 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         }
         return $this->segmentdata[$field]->edited;
     }
+    /**
+     * Returns the edited content of a field preprocessed for export
+     * @param string $field
+     * @param editor_Models_Task $task
+     * @return editor_Segment_Export
+     */
+    public function getFieldExport(string $field, editor_Models_Task $task) : editor_Segment_Export {
+        //since fields can be merged from different files, data for a field can be empty
+        if (empty($this->segmentdata[$field])) {
+            return NULL;
+        }
+        $fieldTags = new editor_Segment_FieldTags($task, $this->getId(), $this->segmentdata[$field]->edited, $field, $this->segmentFieldManager->getEditIndex($field));
+        return editor_Segment_Export::create($fieldTags);
+    }
 
     /**
      * returns a list with editable dataindex

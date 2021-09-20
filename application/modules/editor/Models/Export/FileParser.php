@@ -317,10 +317,14 @@ abstract class editor_Models_Export_FileParser {
     protected function getSegmentContent($segmentId, $field) {
         $this->_segmentEntity = $segment = $this->getSegment($segmentId);
         $segmentMeta = $segment->meta();
+        $segmentExport = $segment->getFieldExport($field, $this->_task);
         
-        $edited = (string) $segment->getFieldEdited($field);
+        // Todo: the following operations could also be done in a more object-oriented manner with the segmentExport ...
+        $edited = ($segmentExport == NULL) ? '' : $segmentExport->process();
         
-        $trackChange=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        // TODO EXPORT: adjust
+        
+        $trackChange = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
         /* @var $trackChange editor_Models_Segment_TrackChangeTag */
         
         $edited= $trackChange->removeTrackChanges($edited);
@@ -333,7 +337,7 @@ abstract class editor_Models_Export_FileParser {
         //count length after removing removeTrackChanges and removeTermTags
         // so that the same remove must not be done again inside of textLength
         //also add additionalMrkLength to the segment length for final length calculation
-        $this->lastSegmentLength = $segment->textLengthByMeta($edited,$segmentMeta,$segment->getFileId()) + $segmentMeta->getAdditionalMrkLength();
+        $this->lastSegmentLength = $segment->textLengthByMeta($edited, $segmentMeta, $segment->getFileId()) + $segmentMeta->getAdditionalMrkLength();
         
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);
