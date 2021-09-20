@@ -735,10 +735,15 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         // Lines array
         $line = [];
 
+        // Prepare indends
+        for ($i = 0; $i < 20; $i++) {
+            $t[$i] = str_pad('', $i * 4, ' ');
+        }
+
         // Append text and body nodes
         $line []= '<martif>';
-        $line []= '<text>';
-        $line []= '<body>';
+        $line []= $t[1] . '<text>';
+        $line []= $t[2] . '<body>';
 
         // Fetch usages by $limit at a time
         for ($p = 1; $p <= ceil($qty/$limit); $p++) {
@@ -749,14 +754,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             // Get termEntryIds
             $termEntryIdA = array_column($termEntryA, 'id') ?: [0];
 
-            // Get terms
+            // Get term-records
             $termA = array_group_by(editor_Utils::db()->query('
                 SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId` 
                 FROM `terms_term`
                 WHERE `termEntryId` IN (' . join(',', $termEntryIdA) . ')
             ')->fetchAll(), 'termEntryId', 'language');
 
-            // Get attributes
+            // Get attribute-records
             $attrA = array_group_by(editor_Utils::db()->query('
                 SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`  
                 FROM `terms_attributes`
@@ -772,27 +777,27 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             // Foreach termEntry
             foreach ($termEntryA as $termEntry) {
-                $line []= '<termEntry id="' . $termEntry['termEntryTbxId'] . '">';
-                $this->attributeNodes($line, $attrA, $termEntry['id']);
-                $this->transacGrpNodes($line, $trscA, $termEntry['id']);
+                $line []= $t[3] . '<termEntry id="' . $termEntry['termEntryTbxId'] . '">';
+                $this->attributeNodes($t[4], $line, $attrA, $termEntry['id']);
+                $this->transacGrpNodes($t[4], $line, $trscA, $termEntry['id']);
                 foreach ($termA[$termEntry['id']] as $lang => $terms) {
-                    $line []= '<langSet xml:lang="' . $lang . '">';
-                    $this->attributeNodes($line, $attrA, $termEntry['id'], $lang);
-                    $this->transacGrpNodes($line, $trscA, $termEntry['id'], $lang);
+                    $line []= $t[4] . '<langSet xml:lang="' . $lang . '">';
+                    $this->attributeNodes($t[5], $line, $attrA, $termEntry['id'], $lang);
+                    $this->transacGrpNodes($t[5], $line, $trscA, $termEntry['id'], $lang);
                     foreach ($terms as $term) {
-                        $line []= '<tig>';
-                        $line []= '<term id="' . $term['termTbxId'] . '">' . $term['term'] . '</term>';
-                        $this->attributeNodes($line, $attrA, $termEntry['id'], $lang, $term['id']);
-                        $this->transacGrpNodes($line, $trscA, $termEntry['id'], $lang, $term['id']);
-                        $line []= '</tig>';
+                        $line []= $t[5] . '<tig>';
+                        $line []= $t[6] . '<term id="' . $term['termTbxId'] . '">' . $term['term'] . '</term>';
+                        $this->attributeNodes($t[6], $line, $attrA, $termEntry['id'], $lang, $term['id']);
+                        $this->transacGrpNodes($t[6], $line, $trscA, $termEntry['id'], $lang, $term['id']);
+                        $line []= $t[5] . '</tig>';
                     }
-                    $line []= '</langSet>';
+                    $line []= $t[4] . '</langSet>';
                 }
-                $line []= '</termEntry>';
+                $line []= $t[3] . '</termEntry>';
             }
         }
-        $line []= '</body>';
-        $line []= '<back>';
+        $line []= $t[2] . '</body>';
+        $line []= $t[2] . '<back>';
 
         // Get terms_images-records for a given collection
         if ($qty = editor_Utils::db()->query('
@@ -803,7 +808,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
             // Open refObjectList-node
-            $line []= '<refObjectList type="binaryData">';
+            $line []= $t[3] . '<refObjectList type="binaryData">';
 
             // Calc last page number
             $last = ceil($qty/$limit);
@@ -816,24 +821,24 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
                 // Foreach image
                 foreach ($imgA as $imgI) {
-                    $line []= '<refObject id="' . $imgI['targetId'] . '">';
+                    $line []= $t[4] . '<refObject id="' . $imgI['targetId'] . '">';
                     $path = $i->getImagePath($_['collectionId']['id'], $imgI['uniqueName']);
                     $file = file_get_contents($path);
-                    $line []= '<item type="name">' . $imgI['name'] . '</item>';
-                    $line []= '<item type="encoding">hex</item>';
-                    $line []= '<item type="format">' . (preg_match('~/~', $imgI['format']) ? '' : 'image/') . $imgI['format'] . '</item>';
+                    $line []= $t[5] . '<item type="name">' . $imgI['name'] . '</item>';
+                    $line []= $t[5] . '<item type="encoding">hex</item>';
+                    $line []= $t[5] . '<item type="format">' . (preg_match('~/~', $imgI['format']) ? '' : 'image/') . $imgI['format'] . '</item>';
                     $text = preg_replace('~.{2}~', '$0 ', bin2hex($file));
-                    $line []= '<item type="data">' . $text . '</item>';
-                    $line []= '</refObject>';
+                    $line []= $t[5] . '<item type="data">' . $text . '</item>';
+                    $line []= $t[4] . '</refObject>';
                 }
             }
 
             // Close refObjectList-node
-            $line []= '</refObjectList>';
+            $line []= $t[3] . '</refObjectList>';
         }
 
-        $line []= '</back>';
-        $line []= '</text>';
+        $line []= $t[2] . '</back>';
+        $line []= $t[1] . '</text>';
         $line []= '</martif>';
         header('Content-Type: text/xml;');
         $file = editor_Models_LanguageResources_LanguageResource::exportFilename($_['collectionId']['id']);
@@ -843,25 +848,25 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         die();
     }
 
-    public function attributeNodes(&$line, $attrA, $termEntryId, $language = '', $termId = '') {
+    public function attributeNodes($indent, &$line, $attrA, $termEntryId, $language = '', $termId = '') {
         foreach ($attrA[$termEntryId][$language][$termId] as $attr) {
             $_attr = [];
             if ($attr['type']) $_attr []= 'type="' . $attr['type'] . '"';
             if ($attr['elementName'] == 'xref' || $attr['elementName'] == 'ref' || $attr['target'])
                 $_attr []= 'target="' . $attr['target'] . '"';
-            $line []= '<' . $attr['elementName'] . ' ' . join(' ', $_attr) . '>'
+            $line []= $indent . '<' . $attr['elementName'] . ' ' . join(' ', $_attr) . '>'
                 . $attr['value']
                 . '</' . $attr['elementName'] . '>';
         }
     }
 
-    public function transacGrpNodes(&$line, $trscA, $termEntryId, $language = '', $termId = '') {
+    public function transacGrpNodes($indent, &$line, $trscA, $termEntryId, $language = '', $termId = '') {
         foreach ($trscA[$termEntryId][$language][$termId] as $trsc) {
-            $line []= '<transacGrp>';
-            $line []= '<transac type="transactionType">'. $trsc['transac'] . '</transac>';
-            $line []= '<transacNote type="' . $trsc['transacType'] . '">Jane</transacNote>';
-            $line []= '<date>' . explode(' ', $trsc['date'])[0] . '</date>';
-            $line []= '</transacGrp>';
+            $line []= $indent . '<transacGrp>';
+            $line []= $indent . '    <transac type="transactionType">'. $trsc['transac'] . '</transac>';
+            $line []= $indent . '    <transacNote type="' . $trsc['transacType'] . '">Jane</transacNote>';
+            $line []= $indent . '    <date>' . explode(' ', $trsc['date'])[0] . '</date>';
+            $line []= $indent . '</transacGrp>';
         }
     }
 
