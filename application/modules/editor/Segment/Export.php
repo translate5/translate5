@@ -34,9 +34,10 @@ class editor_Segment_Export {
     /**
      * Processes a segment for export (fix internal tag faults, remove internal tags)
      * @param editor_Segment_FieldTags $fieldTags
+     * @param boolean $fixFaultyTags
      * @return editor_Segment_Export
      */
-    public static function create(editor_Segment_FieldTags $fieldTags) : editor_Segment_Export {
+    public static function create(editor_Segment_FieldTags $fieldTags, bool $fixFaultyTags=true) : editor_Segment_Export {
         return new editor_Segment_Export($fieldTags);
     }
     /**
@@ -46,13 +47,22 @@ class editor_Segment_Export {
     /**
      * @var boolean
      */
+    private $fixFaulty;
+    /**
+     * @var boolean
+     */
     private $isFaultyInTask;
     
-    public function __construct(editor_Segment_FieldTags $fieldTags){
+    private function __construct(editor_Segment_FieldTags $fieldTags, bool $fixFaultyTags){
         $this->fieldTags = $fieldTags;
-        $fieldTags->getTask()->getFaultySegmentIds()
+        $this->fixFaulty = $fixFaultyTags;
+        $this->isFaultyInTask = in_array($fieldTags->getSegmentId(), $fieldTags->getTask()->getFaultySegmentIds());
     }
+    /**
+     * Processes the 
+     * @return string
+     */
     public function process() : string {
-        
+        return $this->fieldTags->render();
     }
 }
