@@ -393,6 +393,8 @@ $memLog('Loaded terms:        ');
             $this->setAttributeTypes($termEntry->descrip, $newEntry);
         }
 
+        $this->setDiscriptGrp($termEntry,$newEntry,'termEntry');
+
         if (isset($termEntry->transacGrp)) {
             foreach ($termEntry->transacGrp as $transacGrp) {
                 $newEntry->transacGrp = $this->setTransacAttributes($transacGrp, false, 'termEntry', $newEntry);
@@ -437,25 +439,8 @@ $memLog('Loaded terms:        ');
         $newLangSet->entryId = $parentEntry->id;
         $newLangSet->termEntryGuid = $parentEntry->entryGuid;
 
-        // INFO: In TBX-Basic, the <descripGrp> element is used only to associate a source to a definition or to
-        //a context. The following child elements are not supported: <descripNote>, <admin>,<adminGrp>, <note>, <ref>, and <xref>.
-        foreach ($languageGroup->descripGrp as $descripGrp) {
-            $this->setAttributeTypes($descripGrp->descrip, $newLangSet);
-            $newLangSet->descrip = (string)$descripGrp->descrip;
-            $newLangSet->descripTarget = (string)$descripGrp->descrip->attributes()->{'target'};
-            $newLangSet->descripType = (string)$descripGrp->descrip->attributes()->{'type'};
-            if (isset($descripGrp->transacGrp)) {
-                foreach ($descripGrp->transacGrp as $transac) {
-                    $this->setTransacAttributes($transac, true, 'langSet', $newLangSet);
-                }
-            }
 
-            // INFO: if note appears on <descripGrp> level, import the note as normal attribute.
-            // This kind of note is not supported by tbx basic
-            if (isset($descripGrp->note)) {
-                $this->setAttributeTypes($descripGrp->note, $newLangSet);
-            }
-        }
+        $this->setDiscriptGrp($languageGroup,$newLangSet,'langSet');
 
         if (isset($languageGroup->note)) {
             $this->setAttributeTypes($languageGroup->note, $newLangSet);
@@ -537,6 +522,8 @@ $memLog('Loaded terms:        ');
                 $this->setTransacAttributes($transac, false, 'tig', $newTerm);
             }
         }
+        $this->setDiscriptGrp($tig,$newTerm,'tig');
+
         $this->bulkTerm->add($newTerm);
     }
 
@@ -573,7 +560,7 @@ $memLog('Loaded terms:        ');
      * @return array
      * @throws ZfExtended_ErrorCodeException
      */
-    private function setAttributeTypes(SimpleXMLElement $element, editor_Models_Terminology_TbxObjects_Abstract $parentNode): array
+    private function setAttributeTypes(SimpleXMLElement $element, editor_Models_Terminology_TbxObjects_Abstract $parentNode, bool $isDescripGrp = false): array
     {
         $attributes = [];
         /** @var SimpleXMLElement $value */
@@ -613,6 +600,8 @@ $memLog('Loaded terms:        ');
             }
 
             $attribute->dataTypeId = (int)$labelId;
+
+            $attribute->isDescripGrp = (int)$isDescripGrp;
 
             $attributes[] = $attribute;
 
@@ -666,6 +655,44 @@ $memLog('Loaded terms:        ');
         $this->bulkTransacGrp->add($transacGrpObject);
         return $parsedTransacGrp;
     }
+
+    /***
+     * Handle discriptGrp element. This can exist on entry, language and term level.
+     * Used instead of descrip to document a definition and its source. Contains: one descrip and one admin element.
+     * If the source of the definition is not required or available, use only a descrip.
+     * @param SimpleXMLElement $parent
+     * @param editor_Models_Terminology_TbxObjects_Abstract $tbxObject
+     * @param string $elementName
+     * @throws ZfExtended_ErrorCodeException
+     */
+    private function setDiscriptGrp(SimpleXMLElement $parent, editor_Models_Terminology_TbxObjects_Abstract $tbxObject, string $elementName){
+
+        // INFO: In TBX-Basic, the <descripGrp> element is used only to associate a source to a definition or to
+        //a context. The following child elements are not supported: <descripNote>, <admin>,<adminGrp>, <note>, <ref>, and <xref>.
+        foreach ($parent->descripGrp as $descripGrp) {
+
+            $this->setAttributeTypes($descripGrp->descrip, $tbxObject,true);
+
+            $tbxObject->descrip = (string)$descripGrp->descrip;
+            $tbxObject->descripTarget = (string)$descripGrp->descrip->attributes()->{'target'};
+            $tbxObject->descripType = (string)$descripGrp->descrip->attributes()->{'type'};
+
+            $this->setAttributeTypes($descripGrp->admin, $tbxObject,true);
+
+            if (isset($descripGrp->transacGrp)) {
+                foreach ($descripGrp->transacGrp as $transac) {
+                    $this->setTransacAttributes($transac, true, $elementName, $tbxObject);
+                }
+            }
+
+            // INFO: if note appears on <descripGrp> level, import the note as normal attribute.
+            // This kind of note is not supported by tbx basic
+            if (isset($descripGrp->note)) {
+                $this->setAttributeTypes($descripGrp->note, $tbxObject,true);
+            }
+        }
+    }
+
     /**
      * Get actual language from xmlElement.
      * We need to check if attribute is defined as lang or xml:lang,

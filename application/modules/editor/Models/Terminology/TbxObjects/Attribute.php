@@ -53,6 +53,7 @@ class editor_Models_Terminology_TbxObjects_Attribute extends editor_Models_Termi
         'guid' => false,
         'elementName' => true,
         'attrLang' => false,
+        'isDescripGrp' => false
     ];
 
     public int $collectionId = 0;
@@ -75,6 +76,7 @@ class editor_Models_Terminology_TbxObjects_Attribute extends editor_Models_Termi
     public ?string $guid = null;
     public string $elementName = '';
     public string $attrLang = '';
+    public ?int $isDescripGrp = 0;
 
     /**
      * @return string
