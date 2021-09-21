@@ -32,6 +32,8 @@ END LICENSE AND COPYRIGHT
 abstract class editor_Models_Terminology_BulkOperation_Abstract
 {
 
+    const LOAD_EXISTING = 'collectionId = ?';
+
     /**
      * Items to be processed (saved into DB)
      * @var editor_Models_Terminology_TbxObjects_Abstract[]
@@ -83,15 +85,14 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
     /**
      * @throws Zend_Db_Statement_Exception
      */
-    public function loadExisting(int $collectionId) {
+    public function loadExisting(int $id) {
         $db = $this->model->db;
         $conn = $db->getAdapter()->getConnection();
         //this saves a lot of RAM:
         $conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
-        $stmt = $db->select()->from($db, $this->getFieldsToLoad())->where('collectionId = ?', $collectionId)->query(Zend_Db::FETCH_ASSOC);
+        $stmt = $db->select()->from($db, $this->getFieldsToLoad())->where($this::LOAD_EXISTING, $id)->query(Zend_Db::FETCH_ASSOC);
         $conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
 
-        /* @var $attribute editor_Models_Terminology_TbxObjects_Attribute */
         while($row = $stmt->fetch(Zend_Db::FETCH_ASSOC)) {
             $this->processOneExistingRow($row['id'], new $this->importObject($row));
         }
@@ -115,6 +116,15 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
      */
     protected function processOneExistingRow(int $id, editor_Models_Terminology_TbxObjects_Abstract $element) {
         $this->existing[$element->getCollectionKey()] = $id.'#'.$element->getDataHash();
+    }
+
+    /**
+     * frees the internal storage
+     */
+    public function freeMemory() {
+        $this->existing = [];
+        $this->unchangedIds = [];
+        $this->toBeProcessed = [];
     }
 
     /**

@@ -34,6 +34,8 @@ END LICENSE AND COPYRIGHT
  * @method void setId() setId(integer $id)
  * @method string getTransac() getTransac()
  * @method string setTransac() setTransac(string $transac)
+ * @method string getTarget() getTarget()
+ * @method string setTarget() setTarget(string $transac)
  * @method string getDate() getDate()
  * @method string setDate() setDate(string $admin)
  * @method string getTransacNote() getTransacNote()

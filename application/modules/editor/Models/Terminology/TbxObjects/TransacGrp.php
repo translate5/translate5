@@ -44,6 +44,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp extends editor_Models_Term
         'termEntryId' => false,
         'termId' => false,
         'termTbxId' => true,
+        'target' => true,
         'termGuid' => false,
         'termEntryGuid' => true,
         'langSetGuid' => true,
@@ -62,6 +63,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp extends editor_Models_Term
     public string $elementName = '';
     public ?string $language = null;
     public string $attrLang = '';
+    public ?string $target = null;
     public string $transac = '';
     public string $date = '';
     public string $transacNote = '';

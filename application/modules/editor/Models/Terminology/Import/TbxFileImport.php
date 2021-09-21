@@ -197,6 +197,7 @@ class editor_Models_Terminology_Import_TbxFileImport
         $xmlReader->reopen($tbxFilePath); //reset pointer to beginning
         $this->processRefObjects($xmlReader);
 
+
         $this->logUnknownLanguages();
 
         $dataTypeAssoc = ZfExtended_Factory::get('editor_Models_Terminology_Models_CollectionAttributeDataType');
@@ -320,6 +321,7 @@ $memLog('Loaded terms:        ');
             //error_log("Update progress: [".$importCount.'/'.$totalCount.'] ( progress: '.$progress.'  %)');
             $xmlReader->next($this->tbxMap[$this::TBX_TERM_ENTRY]);
         }
+        $this->bulkFreeMemory();
     }
 
     /**
@@ -327,26 +329,27 @@ $memLog('Loaded terms:        ');
      * @throws Exception
      */
     protected function processRefObjects(XMLReader $xmlReader) {
+        $bulkRefObjects = new editor_Models_Terminology_BulkOperation_RefObject();
+        $bulkRefObjects->loadExisting((int) $this->collection->getId());
         while ($xmlReader->read() && $xmlReader->name !== 'refObjectList');
         while ($xmlReader->name === 'refObjectList') {
-            if($xmlReader->getAttribute('type') == 'binaryData') {
+            $listType = $xmlReader->getAttribute('type');
+            $node = new SimpleXMLElement($xmlReader->readOuterXML());
+            if($listType == 'binaryData') {
                 /** @var $binImport editor_Models_Terminology_Import_TbxBinaryDataImport */
                 $binImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxBinaryDataImport');
-                $binImport->import($this->collection->getId(), new SimpleXMLElement($xmlReader->readOuterXML()));
+                $binImport->import($this->collection->getId(), $node);
             }
-            //FIXME implement getTbxRespUserBack → neuen Issue hierzu anlegen:
-//            Marc Mittag  17:09 Uhr @Thomas Lauria I do not know. I know, that we discussed this and said, that we will link these person references to a translate5 user, if the id match the user-guid or the mail address matches. And if not, we will simply put the user as creator / modifier in the termportal. Yet this is not very important to the overall termportal - so if not implemented, we should put it into an issue of remaining todos and park it in our JIRA until someone misses it.
-//            Thomas Lauria  17:10 Uhr Ok, then I will do that.
-//            if($xmlReader->getAttribute('type') == 'respPerson') {
-//                $this->getTbxRespUserBack(new SimpleXMLElement($xmlReader->readOuterXML()));
-//            }
+            else {
+                $this->importOtherRefObjects($bulkRefObjects, $node, $listType);
+            }
             $xmlReader->next('refObjectList');
         }
     }
 
     /**
      * Save parsed elements.
-     * @throws Zend_Db_Table_Exception|editor_Models_Terminology_Import_Exception
+     * @throws Zend_Db_Table_Exception|editor_Models_Terminology_Import_Exception|Zend_Db_Statement_Exception
      */
     private function saveParsedTermEntryNode()
     {
@@ -658,6 +661,7 @@ $memLog('Loaded terms:        ');
         }
         if (isset($transacGrp->transacNote)) {
             $transacGrpObject->transacType = (string)$transacGrp->transacNote->attributes()->{'type'};
+            $transacGrpObject->target = (string)$transacGrp->transacNote->attributes()->{'target'};
             $transacGrpObject->transacNote = (string)$transacGrp->transacNote;
         }
 
@@ -700,24 +704,20 @@ $memLog('Loaded terms:        ');
     }
 
     /**
-     * ToDo: Sinisa, Update user in table... define how and what is mean in: TRANSLATE-1274
+     * import the resp persons into the database
      * @param SimpleXMLElement $refObjectList
-     * @return array
+     * @throws Zend_Db_Statement_Exception
      */
-    private function getTbxRespUserBack(SimpleXMLElement $refObjectList): array
+    private function importOtherRefObjects(editor_Models_Terminology_BulkOperation_RefObject $bulk, SimpleXMLElement $refObjectList, string $listType)
     {
-        $parsedTbxRespUser = [];
-        $count = 0;
-        /** @var SimpleXMLElement $refObject */
         foreach ($refObjectList as $refObject) {
-            $parsedTbxRespUser[$count]['target'] = (string)$refObject->attributes()->{'id'};
+            $data = [];
+            $key = (string)$refObject->attributes()->{'id'};
             foreach ($refObject->item as $item) {
-                $parsedTbxRespUser[$count][(string)$item->attributes()->{'type'}] = (string)$item;
+                $data[(string)$item->attributes()->{'type'}] = (string)$item;
             }
-            $count++;
+            $bulk->createOrUpdateRefObject($listType, $key, $data);
         }
-
-        return $parsedTbxRespUser;
     }
 
     /**
@@ -825,5 +825,16 @@ $memLog('Loaded terms:        ');
             $extra['task'] = $this->task;
         }
         $this->logger->info($code, $logMessage, $extra);
+    }
+
+    /**
+     * reset bulk operations to free memory
+     */
+    protected function bulkFreeMemory()
+    {
+        $this->bulkTerm->freeMemory();
+        $this->bulkTransacGrp->freeMemory();
+        $this->bulkAttribute->freeMemory();
+        $this->bulkTermEntry->freeMemory();
     }
 }

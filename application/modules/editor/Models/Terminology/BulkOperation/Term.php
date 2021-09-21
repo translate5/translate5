@@ -65,12 +65,6 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
     protected array $langsetGuids = [];
 
     /**
-     * @deprecated
-     * @var array
-     */
-    public array $tableValues;
-
-    /**
      * inserted tbx guids, so that their ids can be loaded afterwards
      * @var array
      */
@@ -95,6 +89,14 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
     public function __construct() {
         $this->model = new editor_Models_Terminology_Models_TermModel();
         $this->importObject = new editor_Models_Terminology_TbxObjects_Term();
+    }
+
+    public function freeMemory()
+    {
+        parent::freeMemory();
+        $this->allTerms = [];
+        $this->insertedTbxIds = [];
+        $this->langsetGuids = [];
     }
 
     /**
