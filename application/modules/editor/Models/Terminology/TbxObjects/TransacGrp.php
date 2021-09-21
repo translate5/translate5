@@ -39,7 +39,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp extends editor_Models_Term
         'attrLang' => false,
         'transacNote' => true,
         'transacType' => true,
-        'ifDescripGrp' => true,
+        'isDescripGrp' => true,
         'collectionId' => false,
         'termEntryId' => false,
         'termId' => false,
@@ -66,13 +66,13 @@ class editor_Models_Terminology_TbxObjects_TransacGrp extends editor_Models_Term
     public string $date = '';
     public string $transacNote = '';
     public string $transacType = '';
-    public int $ifDescripGrp = 0;
+    public int $isDescripGrp = 0;
 
     /**
      * @return string
      */
     public function getCollectionKey(): string
     {
-        return $this->elementName . '-' . $this->transac . '-' . $this->ifDescripGrp . '-' . $this->termEntryGuid. '-' . $this->language.'-'.$this->termTbxId;
+        return $this->elementName . '-' . $this->transac . '-' . $this->isDescripGrp . '-' . $this->termEntryGuid. '-' . $this->language.'-'.$this->termTbxId;
     }
 }
