@@ -614,12 +614,12 @@ $memLog('Loaded terms:        ');
 
     /**
      * @param SimpleXMLElement $transacGrp
-     * @param bool $ifDescripGrp
+     * @param bool $isDescripGrp
      * @param string $elementName
      * @param editor_Models_Terminology_TbxObjects_Abstract $parentNode parent main TBX node
      * @return array
      */
-    private function setTransacAttributes(SimpleXMLElement $transacGrp, bool $ifDescripGrp, string $elementName, editor_Models_Terminology_TbxObjects_Abstract $parentNode): array
+    private function setTransacAttributes(SimpleXMLElement $transacGrp, bool $isDescripGrp, string $elementName, editor_Models_Terminology_TbxObjects_Abstract $parentNode): array
     {
         $parsedTransacGrp = [];
         $cls = $this->bulkTransacGrp->getNewImportObject();
@@ -650,7 +650,7 @@ $memLog('Loaded terms:        ');
             $transacGrpObject->transacNote = (string)$transacGrp->transacNote;
         }
 
-        $transacGrpObject->ifDescripGrp = (int)$ifDescripGrp;
+        $transacGrpObject->isDescripGrp = (int)$isDescripGrp;
         $parsedTransacGrp[] = $transacGrpObject;
         $this->bulkTransacGrp->add($transacGrpObject);
         return $parsedTransacGrp;
