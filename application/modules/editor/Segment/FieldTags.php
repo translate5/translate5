@@ -463,6 +463,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return false;
     }
     /**
+     * Retrieves if there are trackchanges tags present
+     * @return bool
+     */
+    public function hasTrackChanges() : bool {
+        return $this->hasType(editor_Segment_Tag::TYPE_TRACKCHANGES, true);
+    }
+    /**
      * Checks if a internal tag of a certain type and class is present
      * @param string $type
      * @param string $className

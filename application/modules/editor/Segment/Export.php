@@ -38,7 +38,7 @@ class editor_Segment_Export {
      * @return editor_Segment_Export
      */
     public static function create(editor_Segment_FieldTags $fieldTags, bool $fixFaultyTags=true) : editor_Segment_Export {
-        return new editor_Segment_Export($fieldTags);
+        return new editor_Segment_Export($fieldTags, $fixFaultyTags);
     }
     /**
      * @var editor_Segment_FieldTags
@@ -63,6 +63,13 @@ class editor_Segment_Export {
      * @return string
      */
     public function process() : string {
+        // this removes all segment tags not needed for export
+        $this->fieldTags = ($this->fieldTags->hasTrackChanges()) ?        
+            $this->fieldTags->cloneWithoutTrackChanges(editor_Segment_Quality_Manager::instance()->getAllExportedTypes()) : 
+            $this->fieldTags->cloneFiltered(editor_Segment_Quality_Manager::instance()->getAllExportedTypes());
+        if($this->isFaultyInTask && $this->fixFaulty){
+            
+        }
         return $this->fieldTags->render();
     }
 }

@@ -74,4 +74,8 @@ class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider {
         $mqmConfig = editor_Segment_Mqm_Configuration::instance($task);
         return array_map(function ($id){ return editor_Segment_Mqm_Tag::createCategoryVal($id); }, $mqmConfig->getAllIds());
     }
+    
+    public function isExportedTag() : bool {
+        return true;
+    }
 }

@@ -317,21 +317,12 @@ abstract class editor_Models_Export_FileParser {
     protected function getSegmentContent($segmentId, $field) {
         $this->_segmentEntity = $segment = $this->getSegment($segmentId);
         $segmentMeta = $segment->meta();
-        $segmentExport = $segment->getFieldExport($field, $this->_task);
+        $segmentExport = $segment->getFieldExport($field, $this->_task, true);
         
-        // Todo: the following operations could also be done in a more object-oriented manner with the segmentExport ...
+        // This removes all segment tags but the ones needed for export
         $edited = ($segmentExport == NULL) ? '' : $segmentExport->process();
-        
-        // TODO EXPORT: adjust
-        
-        $trackChange = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-        /* @var $trackChange editor_Models_Segment_TrackChangeTag */
-        
-        $edited= $trackChange->removeTrackChanges($edited);
-        
-        $edited = $this->utilities->internalTag->protect($edited);
-        $edited = $this->removeTermTags($edited);
-        $edited = $this->utilities->internalTag->unprotect($edited);
+       
+        // TODO EXPORT: adjust, solve with segmen-tags code
         $this->compareTags($segment, $edited, $field);
         
         //count length after removing removeTrackChanges and removeTermTags
@@ -345,11 +336,10 @@ abstract class editor_Models_Export_FileParser {
         if(!$this->options['diff']){
             return $this->unprotectContent($edited);
         }
-        
-        $original = (string) $segment->getFieldOriginal($field);
-        $original = $this->utilities->internalTag->protect($original);
-        $original = $this->removeTermTags($original);
-        $original = $this->utilities->internalTag->unprotect($original);
+        $segmentOriginal = $segment->getFieldExport($field, $this->_task, false, false);
+        // This removes all segment tags but the ones needed for export
+        $original = ($segmentOriginal == NULL) ? '' : $segmentOriginal->process();
+
         $original = $this->parseSegment($original);
         try {
             $diffed = $this->_diffTagger->diffSegment($original, $edited, $segment->getTimestamp(), $segment->getUserName());
