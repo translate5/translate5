@@ -94,7 +94,6 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
             'collectionId' => $collectionId,
             'name' => null,
             'uniqueName' => null,
-            'encoding' => null,
             'format' => null,
             'contentMd5hash' => null,
         ];
@@ -107,10 +106,8 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
 
         if (isset($items['encoding'])) {
             $image['name'] = $items['name'];
-            $image['encoding'] = $items['encoding'];
         } else {
             $image['name'] = (string)$targetId.'.'.$items['format'];
-            $image['encoding'] = $items['codePage']; //codepage never tested, overtaken from original code
         }
         $image['format'] = $items['format'];
 

@@ -112,7 +112,7 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
             $this->langsetGuids[$langsetKey] = $element->langSetGuid;
         }
         $key = $this->getAllTermsKey($element);
-        $value = $element->termTbxId.'#'.$element->termEntryTbxId.'#'.$element->guid;
+        $value = $element->termTbxId.'#'.$element->termEntryTbxId.'#'.$element->guid.'#'.$element->id;
         //we need all terms, but separated for each termentry where it is contained
         if(array_key_exists($key, $this->allTerms)) {
             $this->allTerms[$key][] = $value;
@@ -316,6 +316,7 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
 
             // 3. if there is a matching term in the same termEntry / or in all terms, we reuse its TBX IDs so that it is merged into that term then
             if(!empty($foundLocalTerm)) {
+                $term->id = $foundLocalTerm[3];
                 $term->guid = $foundLocalTerm[2];
                 $term->termTbxId = $foundLocalTerm[0];
                 $term->termEntryTbxId = $foundLocalTerm[1];
