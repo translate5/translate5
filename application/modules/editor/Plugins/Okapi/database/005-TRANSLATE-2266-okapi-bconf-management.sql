@@ -40,7 +40,7 @@ CREATE TABLE `LEK_okapi_bconf` (
 );
 
 CREATE TABLE `LEK_okapi_bconf_filter` (
-	`id` int(11) NOT NULL,
+	`id` int(11) NOT NULL AUTO_INCREMENT,
 	`okapiId` int(11) NOT NULL,
 	`configId` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
 	`okapiName` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -54,3 +54,13 @@ CREATE TABLE `LEK_okapi_bconf_filter` (
 	PRIMARY KEY (`id`),
 	CONSTRAINT `fk_LEK_okapi_bconf_filter` FOREIGN KEY (`okapiId`) REFERENCES `LEK_okapi_bconf` (`id`) ON DELETE CASCADE
 );
+
+CREATE TABLE `LEK_okapi_bconf_default_filter` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `configId` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mimeType` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extensions` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    PRIMARY KEY (`id`)
+)
