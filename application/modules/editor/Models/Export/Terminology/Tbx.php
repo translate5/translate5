@@ -232,14 +232,17 @@ class editor_Models_Export_Terminology_Tbx {
     }
 
     /**
-     *
+     * Export collection as a TBX file
      *
      * @param int $collectionId
+     * @param bool $tbxBasicOnly
+     * @param bool $exportImages
      * @param int $byTermEntryQty How many termEntries should be processed at once
      * @param int $byImageQty How many image binaries should be processed at once
      * @throws Zend_Db_Statement_Exception
      */
-    public function exportCollectionById(int $collectionId, $byTermEntryQty = 1, $byImageQty = 1) {
+    public function exportCollectionById(int $collectionId, $tbxBasicOnly = false, $exportImages = true,
+                                         $byTermEntryQty = 1000, $byImageQty = 50) {
 
         // Setup export file absolute path
         $this->file = editor_Models_LanguageResources_LanguageResource::exportFilename($collectionId);
@@ -257,6 +260,11 @@ class editor_Models_Export_Terminology_Tbx {
 
         // Lines array
         $line = [];
+
+        // If $tbxBasicOnly arg is true, overwrite it with comma-separated dataTypeIds of tbx-basic attributes
+        if ($tbxBasicOnly) $tbxBasicOnly = implode(',', editor_Utils::db()->query('
+            SELECT `id` FROM `terms_attributes_datatype` WHERE `isTbxBasic` = 1
+        ')->fetchAll(PDO::FETCH_COLUMN));
 
         // Prepare indents
         for ($i = 0; $i < 20; $i++) {
@@ -290,8 +298,8 @@ class editor_Models_Export_Terminology_Tbx {
             $attrA = array_group_by(editor_Utils::db()->query('
                 SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`  
                 FROM `terms_attributes`
-                WHERE `termEntryId` IN (' . join(',', $termEntryIdA) . ')
-            ')->fetchAll(), 'termEntryId', 'language', 'termId');
+                WHERE `termEntryId` IN (' . join(',', $termEntryIdA) . ')' . editor_Utils::rif($tbxBasicOnly, ' AND `dataTypeId` IN ($1)')
+            )->fetchAll(), 'termEntryId', 'language', 'termId');
 
             // Get transacgrp-records
             $trscA = array_group_by(editor_Utils::db()->query('
@@ -331,7 +339,7 @@ class editor_Models_Export_Terminology_Tbx {
         $this->write($line);
 
         // Get terms_images-records for a given collection
-        if ($qty = editor_Utils::db()->query('
+        if ($exportImages && $qty = editor_Utils::db()->query('
             SELECT COUNT(`id`) FROM `terms_images` WHERE `collectionId` = ?'
         , $collectionId)->fetchColumn()) {
 

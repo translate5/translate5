@@ -712,6 +712,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 'req' => true,
                 'rex' => 'int11',
                 'key' => 'LEK_languageresources'
+            ],
+            'tbxBasicOnly,exportImages' => [
+                'req' => true,
+                'rex' => '~(0|1)~'
             ]
         ], $params);
 
@@ -719,7 +723,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         ignore_user_abort(1); set_time_limit(0);
 
         // Export collection
-        ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx')->exportCollectionById($params['collectionId']);
+        ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx')->exportCollectionById(
+            $params['collectionId'],
+            $params['tbxBasicOnly'],
+            $params['exportImages']
+        );
     }
 
     public function exportAction() {
