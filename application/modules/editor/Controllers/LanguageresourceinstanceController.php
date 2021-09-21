@@ -698,6 +698,38 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->success = $this->validateUpload();
     }
 
+    public function tbxexportAction() {
+
+        // Load utils
+        class_exists('editor_Utils');
+
+        // Get params
+        $params = $this->getRequest()->getParams();
+
+        // Check params
+        editor_Utils::jcheck([
+            'collectionId' => [
+                'req' => true,
+                'rex' => 'int11',
+                'key' => 'LEK_languageresources'
+            ],
+            'tbxBasicOnly,exportImages' => [
+                'req' => true,
+                'rex' => '~(0|1)~'
+            ]
+        ], $params);
+
+        // Turn off limitations?
+        ignore_user_abort(1); set_time_limit(0);
+
+        // Export collection
+        ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx')->exportCollectionById(
+            $params['collectionId'],
+            $params['tbxBasicOnly'],
+            $params['exportImages']
+        );
+    }
+
     public function exportAction() {
         $proposals=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         /* @var $proposals editor_Models_Terminology_Models_TermModel */

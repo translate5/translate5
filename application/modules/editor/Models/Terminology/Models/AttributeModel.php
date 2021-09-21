@@ -239,7 +239,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             $transacGrpChild['internalCount'] = $tGrp['adminValue'];
             $transacGrpChild['language'] = $tGrp['transacNote'];
             $transacGrpChild['name'] = $tGrp['transacType'];
-            $transacGrpChild['attrType'] = $tGrp['ifDescripgrp'];
+            $transacGrpChild['attrType'] = $tGrp['isDescripGrp'];
             $transacGrpChild['attrDataType'] = $tGrp['collectionId'];
             $transacGrpChild['attrTarget'] = $tGrp['termEntryId'];
             $transacGrpChild['attrId'] = $tGrp['termId'];

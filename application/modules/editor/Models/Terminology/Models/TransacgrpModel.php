@@ -42,8 +42,8 @@ END LICENSE AND COPYRIGHT
  * @method string setTransacNote() setTransacNote(string $transacNote)
  * @method string getTransacType() getTransacType()
  * @method string setTransacType() setTransacType(string $transacType)
- * @method string getIfDescripgrp() getIfDescripgrp()
- * @method string setIfDescripgrp() setIfDescripgrp(string $ifDescripgrp)
+ * @method string getIsDescripGrp() getIsDescripGrp()
+ * @method string setIsDescripGrp() setIsDescripGrp(string $isDescripGrp)
  * @method integer getCollectionId() getCollectionId()
  * @method integer setCollectionId() setCollectionId(integer $collectionId)
  * @method string getTermEntryId() getTermEntryId()
@@ -243,7 +243,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
         $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId, 'termEntryId' => $termEntryId]);
 
         foreach ($queryResults as $key => $transacGrp) {
-            $transacGrpByKey[$transacGrp['elementName'].'-'.$transacGrp['transac'].'-'.$transacGrp['ifDescripgrp'].'-'.$transacGrp['termId']] = $transacGrp;
+            $transacGrpByKey[$transacGrp['elementName'].'-'.$transacGrp['transac'].'-'.$transacGrp['isDescripGrp'].'-'.$transacGrp['termId']] = $transacGrp;
         }
 
         return $transacGrpByKey;
