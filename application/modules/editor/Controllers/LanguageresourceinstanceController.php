@@ -707,7 +707,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $params = $this->getRequest()->getParams();
 
         // Check params
-        $_ = editor_Utils::jcheck([
+        editor_Utils::jcheck([
             'collectionId' => [
                 'req' => true,
                 'rex' => 'int11',
@@ -715,159 +715,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             ]
         ], $params);
 
-        // Turn off limitations
+        // Turn off limitations?
         ignore_user_abort(1); set_time_limit(0);
 
-        // Get total qty of entries to be processed
-        $qty = editor_Utils::db()->query('
-            SELECT COUNT(*) FROM `terms_term_entry` WHERE `collectionId` = ?'
-        , $_['collectionId']['id'])->fetchColumn();
-
-        /** @var editor_Models_Terminology_Models_TermEntryModel $m */
-        $m = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
-
-        // Build WHERE clause
-        $where = 'collectionId = ' . $_['collectionId']['id'];
-
-        // How many termEntries should be processed at once
-        $limit = 1;
-
-        // Lines array
-        $line = [];
-
-        // Prepare indends
-        for ($i = 0; $i < 20; $i++) {
-            $t[$i] = str_pad('', $i * 4, ' ');
-        }
-
-        // Append text and body nodes
-        $line []= '<martif>';
-        $line []= $t[1] . '<text>';
-        $line []= $t[2] . '<body>';
-
-        // Fetch usages by $limit at a time
-        for ($p = 1; $p <= ceil($qty/$limit); $p++) {
-
-            // Get termEntries
-            $termEntryA = $m->db->fetchAll($where, null, $limit, ($p - 1) * $limit)->toArray();
-
-            // Get termEntryIds
-            $termEntryIdA = array_column($termEntryA, 'id') ?: [0];
-
-            // Get term-records
-            $termA = array_group_by(editor_Utils::db()->query('
-                SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId` 
-                FROM `terms_term`
-                WHERE `termEntryId` IN (' . join(',', $termEntryIdA) . ')
-            ')->fetchAll(), 'termEntryId', 'language');
-
-            // Get attribute-records
-            $attrA = array_group_by(editor_Utils::db()->query('
-                SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`  
-                FROM `terms_attributes`
-                WHERE `termEntryId` IN (' . join(',', $termEntryIdA) . ')
-            ')->fetchAll(), 'termEntryId', 'language', 'termId');
-
-            // Get transacgrp-records
-            $trscA = array_group_by(editor_Utils::db()->query('
-                SELECT `termEntryId`, `language`, `termId`, `elementName`, `transac`, `date`, `transacNote`, `transacType`, `ifDescripgrp`  
-                FROM `terms_transacgrp`
-                WHERE `termEntryId` IN (' . join(',', $termEntryIdA) . ')
-            ')->fetchAll(), 'termEntryId', 'language', 'termId');
-
-            // Foreach termEntry
-            foreach ($termEntryA as $termEntry) {
-                $line []= $t[3] . '<termEntry id="' . $termEntry['termEntryTbxId'] . '">';
-                $this->attributeNodes($t[4], $line, $attrA, $termEntry['id']);
-                $this->transacGrpNodes($t[4], $line, $trscA, $termEntry['id']);
-                foreach ($termA[$termEntry['id']] as $lang => $terms) {
-                    $line []= $t[4] . '<langSet xml:lang="' . $lang . '">';
-                    $this->attributeNodes($t[5], $line, $attrA, $termEntry['id'], $lang);
-                    $this->transacGrpNodes($t[5], $line, $trscA, $termEntry['id'], $lang);
-                    foreach ($terms as $term) {
-                        $line []= $t[5] . '<tig>';
-                        $line []= $t[6] . '<term id="' . $term['termTbxId'] . '">' . $term['term'] . '</term>';
-                        $this->attributeNodes($t[6], $line, $attrA, $termEntry['id'], $lang, $term['id']);
-                        $this->transacGrpNodes($t[6], $line, $trscA, $termEntry['id'], $lang, $term['id']);
-                        $line []= $t[5] . '</tig>';
-                    }
-                    $line []= $t[4] . '</langSet>';
-                }
-                $line []= $t[3] . '</termEntry>';
-            }
-        }
-        $line []= $t[2] . '</body>';
-        $line []= $t[2] . '<back>';
-
-        // Get terms_images-records for a given collection
-        if ($qty = editor_Utils::db()->query('
-            SELECT COUNT(`id`) FROM `terms_images` WHERE `collectionId` = ?'
-        , $_['collectionId']['id'])->fetchColumn()) {
-
-            // Images model shortcut
-            $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
-
-            // Open refObjectList-node
-            $line []= $t[3] . '<refObjectList type="binaryData">';
-
-            // Calc last page number
-            $last = ceil($qty/$limit);
-
-            // Foreach page by $limit at a time
-            for ($p = 1; $p <= $last; $p++) {
-
-                // Fetch images
-                $imgA = $i->db->fetchAll($where, null, $limit, ($p - 1) * $limit)->toArray();
-
-                // Foreach image
-                foreach ($imgA as $imgI) {
-                    $line []= $t[4] . '<refObject id="' . $imgI['targetId'] . '">';
-                    $path = $i->getImagePath($_['collectionId']['id'], $imgI['uniqueName']);
-                    $file = file_get_contents($path);
-                    $line []= $t[5] . '<item type="name">' . $imgI['name'] . '</item>';
-                    $line []= $t[5] . '<item type="encoding">hex</item>';
-                    $line []= $t[5] . '<item type="format">' . (preg_match('~/~', $imgI['format']) ? '' : 'image/') . $imgI['format'] . '</item>';
-                    $text = preg_replace('~.{2}~', '$0 ', bin2hex($file));
-                    $line []= $t[5] . '<item type="data">' . $text . '</item>';
-                    $line []= $t[4] . '</refObject>';
-                }
-            }
-
-            // Close refObjectList-node
-            $line []= $t[3] . '</refObjectList>';
-        }
-
-        $line []= $t[2] . '</back>';
-        $line []= $t[1] . '</text>';
-        $line []= '</martif>';
-        header('Content-Type: text/xml;');
-        $file = editor_Models_LanguageResources_LanguageResource::exportFilename($_['collectionId']['id']);
-        array_unshift($line, '<?xml version=\'1.0\'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">');
-        file_put_contents($file, join("\n", $line));
-        readfile($file);
-        die();
-    }
-
-    public function attributeNodes($indent, &$line, $attrA, $termEntryId, $language = '', $termId = '') {
-        foreach ($attrA[$termEntryId][$language][$termId] as $attr) {
-            $_attr = [];
-            if ($attr['type']) $_attr []= 'type="' . $attr['type'] . '"';
-            if ($attr['elementName'] == 'xref' || $attr['elementName'] == 'ref' || $attr['target'])
-                $_attr []= 'target="' . $attr['target'] . '"';
-            $line []= $indent . '<' . $attr['elementName'] . ' ' . join(' ', $_attr) . '>'
-                . $attr['value']
-                . '</' . $attr['elementName'] . '>';
-        }
-    }
-
-    public function transacGrpNodes($indent, &$line, $trscA, $termEntryId, $language = '', $termId = '') {
-        foreach ($trscA[$termEntryId][$language][$termId] as $trsc) {
-            $line []= $indent . '<transacGrp>';
-            $line []= $indent . '    <transac type="transactionType">'. $trsc['transac'] . '</transac>';
-            $line []= $indent . '    <transacNote type="' . $trsc['transacType'] . '">Jane</transacNote>';
-            $line []= $indent . '    <date>' . explode(' ', $trsc['date'])[0] . '</date>';
-            $line []= $indent . '</transacGrp>';
-        }
+        // Export collection
+        ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx')->exportCollectionById($params['collectionId']);
     }
 
     public function exportAction() {

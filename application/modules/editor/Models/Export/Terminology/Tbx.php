@@ -63,6 +63,19 @@ class editor_Models_Export_Terminology_Tbx {
      */
     protected int $counterTig = 0;
 
+    /**
+     * Whitespace-indents by levels
+     * That is not actually tabs, but whitespaces.
+     *
+     * @var array
+     */
+    protected array $tabs = [];
+
+    /**
+     * @var string
+     */
+    protected string $file = '';
+
     public function __construct()
     {
         $tbxImport = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
@@ -216,5 +229,186 @@ class editor_Models_Export_Terminology_Tbx {
                         .'_'.$midParts[3];
 
         return $tempReturn;
+    }
+
+    /**
+     *
+     *
+     * @param int $collectionId
+     * @param int $byTermEntryQty How many termEntries should be processed at once
+     * @param int $byImageQty How many image binaries should be processed at once
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function exportCollectionById(int $collectionId, $byTermEntryQty = 1, $byImageQty = 1) {
+
+        // Setup export file absolute path
+        $this->file = editor_Models_LanguageResources_LanguageResource::exportFilename($collectionId);
+
+        // Get total qty of entries to be processed
+        $qty = editor_Utils::db()->query('
+            SELECT COUNT(*) FROM `terms_term_entry` WHERE `collectionId` = ?'
+        , $collectionId)->fetchColumn();
+
+        /** @var editor_Models_Terminology_Models_TermEntryModel $m */
+        $m = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+
+        // Build WHERE clause
+        $where = 'collectionId = ' . $collectionId;
+
+        // Lines array
+        $line = [];
+
+        // Prepare indents
+        for ($i = 0; $i < 20; $i++) {
+            $this->tabs[$i] = str_pad('', $i * 4, ' ');
+        }
+
+        // Prepare and write tbx header into export.tbx file
+        $line []= '<?xml version=\'1.0\'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">';
+        $line []= '<martif>';
+        $line []= $this->tabs[1] . '<text>';
+        $line []= $this->tabs[2] . '<body>';
+        $this->write($line, true);
+
+        // Fetch usages by $byTermEntryQty at a time
+        for ($p = 1; $p <= ceil($qty / $byTermEntryQty); $p++) {
+
+            // Get termEntries
+            $termEntryA = $m->db->fetchAll($where, null, $byTermEntryQty, ($p - 1) * $byTermEntryQty)->toArray();
+
+            // Get termEntryIds
+            $termEntryIdA = array_column($termEntryA, 'id') ?: [0];
+
+            // Get term-records
+            $termA = array_group_by(editor_Utils::db()->query('
+                SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId` 
+                FROM `terms_term`
+                WHERE `termEntryId` IN (' . join(',', $termEntryIdA) . ')
+            ')->fetchAll(), 'termEntryId', 'language');
+
+            // Get attribute-records
+            $attrA = array_group_by(editor_Utils::db()->query('
+                SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`  
+                FROM `terms_attributes`
+                WHERE `termEntryId` IN (' . join(',', $termEntryIdA) . ')
+            ')->fetchAll(), 'termEntryId', 'language', 'termId');
+
+            // Get transacgrp-records
+            $trscA = array_group_by(editor_Utils::db()->query('
+                SELECT `termEntryId`, `language`, `termId`, `elementName`, `transac`, `date`, `transacNote`, `transacType`, `ifDescripgrp`  
+                FROM `terms_transacgrp`
+                WHERE `termEntryId` IN (' . join(',', $termEntryIdA) . ')
+            ')->fetchAll(), 'termEntryId', 'language', 'termId');
+
+            // Foreach termEntry
+            foreach ($termEntryA as $termEntry) {
+                $line []= $this->tabs[3] . '<termEntry id="' . $termEntry['termEntryTbxId'] . '">';
+                $this->attributeNodes(4, $line, $attrA, $termEntry['id']);
+                $this->transacGrpNodes(4, $line, $trscA, $termEntry['id']);
+                foreach ($termA[$termEntry['id']] as $lang => $terms) {
+                    $line []= $this->tabs[4] . '<langSet xml:lang="' . $lang . '">';
+                    $this->attributeNodes(5, $line, $attrA, $termEntry['id'], $lang);
+                    $this->transacGrpNodes(5, $line, $trscA, $termEntry['id'], $lang);
+                    foreach ($terms as $term) {
+                        $line []= $this->tabs[5] . '<tig>';
+                        $line []= $this->tabs[6] . '<term id="' . $term['termTbxId'] . '">' . $term['term'] . '</term>';
+                        $this->attributeNodes(6, $line, $attrA, $termEntry['id'], $lang, $term['id']);
+                        $this->transacGrpNodes(6, $line, $trscA, $termEntry['id'], $lang, $term['id']);
+                        $line []= $this->tabs[5] . '</tig>';
+                    }
+                    $line []= $this->tabs[4] . '</langSet>';
+                }
+                $line []= $this->tabs[3] . '</termEntry>';
+            }
+
+            // Append into tbx file
+            $this->write($line);
+        }
+
+        // Append closing body- and opening back-node
+        $line []= $this->tabs[2] . '</body>';
+        $line []= $this->tabs[2] . '<back>';
+        $this->write($line);
+
+        // Get terms_images-records for a given collection
+        if ($qty = editor_Utils::db()->query('
+            SELECT COUNT(`id`) FROM `terms_images` WHERE `collectionId` = ?'
+        , $collectionId)->fetchColumn()) {
+
+            // Images model shortcut
+            $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
+
+            // Open refObjectList-node
+            $line []= $this->tabs[3] . '<refObjectList type="binaryData">';
+
+            // Foreach page by $byImageQty at a time
+            for ($p = 1; $p <= ceil($qty / $byImageQty); $p++) {
+
+                // Fetch images
+                $imgA = $i->db->fetchAll($where, null, $byImageQty, ($p - 1) * $byImageQty)->toArray();
+
+                // Foreach image
+                foreach ($imgA as $imgI) {
+                    $line []= $this->tabs[4] . '<refObject id="' . $imgI['targetId'] . '">';
+                    $path = $i->getImagePath($collectionId, $imgI['uniqueName']);
+                    $file = file_get_contents($path);
+                    $line []= $this->tabs[5] . '<item type="name">' . $imgI['name'] . '</item>';
+                    $line []= $this->tabs[5] . '<item type="encoding">hex</item>';
+                    $line []= $this->tabs[5] . '<item type="format">' . (preg_match('~/~', $imgI['format']) ? '' : 'image/') . $imgI['format'] . '</item>';
+                    $text = preg_replace('~.{2}~', '$0 ', bin2hex($file));
+                    $line []= $this->tabs[5] . '<item type="data">' . $text . '</item>';
+                    $line []= $this->tabs[4] . '</refObject>';
+                }
+
+                // Append into tbx file
+                $this->write($line);
+            }
+
+            // Close refObjectList-node
+            $line []= $this->tabs[3] . '</refObjectList>';
+        }
+        $line []= $this->tabs[2] . '</back>';
+        $line []= $this->tabs[1] . '</text>';
+        $line []= '</martif>';
+        $this->write($line);
+
+        // Read
+        header('Content-Type: text/xml;');
+        readfile($this->file);
+        die();
+    }
+
+    public function attributeNodes($level, &$line, $attrA, $termEntryId, $language = '', $termId = '') {
+        foreach ($attrA[$termEntryId][$language][$termId] as $attr) {
+            $_attr = [];
+            if ($attr['type']) $_attr []= 'type="' . $attr['type'] . '"';
+            if ($attr['elementName'] == 'xref' || $attr['elementName'] == 'ref' || $attr['target'])
+                $_attr []= 'target="' . $attr['target'] . '"';
+            $line []= $this->tabs[$level] . '<' . $attr['elementName'] . ' ' . join(' ', $_attr) . '>'
+                . $attr['value']
+                . '</' . $attr['elementName'] . '>';
+        }
+    }
+
+    public function transacGrpNodes($level, &$line, $trscA, $termEntryId, $language = '', $termId = '') {
+        foreach ($trscA[$termEntryId][$language][$termId] as $trsc) {
+            $line []= $this->tabs[$level] . '<transacGrp>';
+            $line []= $this->tabs[$level + 1] . '<transac type="transactionType">'. $trsc['transac'] . '</transac>';
+            $line []= $this->tabs[$level + 1] . '<transacNote type="' . $trsc['transacType'] . '">Jane</transacNote>';
+            $line []= $this->tabs[$level + 1] . '<date>' . explode(' ', $trsc['date'])[0] . '</date>';
+            $line []= $this->tabs[$level] . '</transacGrp>';
+        }
+    }
+
+    /**
+     * @param $lines
+     */
+    public function write(&$lines, $overwrite = false) {
+
+        // Write lines
+        file_put_contents($this->file, join("\n", $lines) . "\n", $overwrite ? null : FILE_APPEND);
+
+        // Clear lines
+        $lines = [];
     }
 }
