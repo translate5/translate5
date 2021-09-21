@@ -128,6 +128,11 @@ class editor_Models_Terminology_Import_TbxFileImport
     protected editor_Models_Terminology_BulkOperation_Term $bulkTerm;
 
     /**
+     * @var editor_Models_Terminology_BulkOperation_RefObject
+     */
+    protected editor_Models_Terminology_BulkOperation_RefObject $bulkRefObject;
+
+    /**
      * In this class is the whole merge logic
      * @var editor_Models_Terminology_BulkOperation_TermEntry
      */
@@ -215,6 +220,7 @@ class editor_Models_Terminology_Import_TbxFileImport
             'terms' => $this->bulkTerm->getStatistics(),
             'attributes' => $this->bulkAttribute->getStatistics(),
             'transacGroups' => $this->bulkTransacGrp->getStatistics(),
+            'refObjects' => $this->bulkRefObject->getStatistics(),
             'collection' => $this->collection->getName(),
             'maxMemUsed in MB' => round(memory_get_peak_usage() / 2**20),
         ];
@@ -329,8 +335,8 @@ $memLog('Loaded terms:        ');
      * @throws Exception
      */
     protected function processRefObjects(XMLReader $xmlReader) {
-        $bulkRefObjects = new editor_Models_Terminology_BulkOperation_RefObject();
-        $bulkRefObjects->loadExisting((int) $this->collection->getId());
+        $this->bulkRefObject = new editor_Models_Terminology_BulkOperation_RefObject();
+        $this->bulkRefObject->loadExisting((int) $this->collection->getId());
         while ($xmlReader->read() && $xmlReader->name !== 'refObjectList');
         while ($xmlReader->name === 'refObjectList') {
             $listType = $xmlReader->getAttribute('type');
@@ -341,7 +347,7 @@ $memLog('Loaded terms:        ');
                 $binImport->import($this->collection->getId(), $node);
             }
             else {
-                $this->importOtherRefObjects($bulkRefObjects, $node, $listType);
+                $this->importOtherRefObjects($node, $listType);
             }
             $xmlReader->next('refObjectList');
         }
@@ -735,7 +741,7 @@ $memLog('Loaded terms:        ');
      * @param SimpleXMLElement $refObjectList
      * @throws Zend_Db_Statement_Exception
      */
-    private function importOtherRefObjects(editor_Models_Terminology_BulkOperation_RefObject $bulk, SimpleXMLElement $refObjectList, string $listType)
+    private function importOtherRefObjects(SimpleXMLElement $refObjectList, string $listType)
     {
         foreach ($refObjectList as $refObject) {
             $data = [];
@@ -743,7 +749,7 @@ $memLog('Loaded terms:        ');
             foreach ($refObject->item as $item) {
                 $data[(string)$item->attributes()->{'type'}] = (string)$item;
             }
-            $bulk->createOrUpdateRefObject($listType, $key, $data);
+            $this->bulkRefObject->createOrUpdateRefObject($listType, $key, $data);
         }
     }
 

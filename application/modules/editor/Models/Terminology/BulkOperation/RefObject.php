@@ -65,7 +65,7 @@ class editor_Models_Terminology_BulkOperation_RefObject extends editor_Models_Te
     {
         parent::loadExisting($id);
         $this->collectionId = $id;
-        $this->preparedStmt = $this->model->db->getAdapter()->prepare('INSERT IGNORE INTO terms_ref_object (`collectionId`, `key`, `data`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE');
+        $this->preparedStmt = $this->model->db->getAdapter()->prepare('INSERT INTO terms_ref_object (`collectionId`, `listType`, `key`, `data`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE data = VALUES(data)');
     }
 
     public function createOrUpdateElement()
@@ -77,10 +77,9 @@ class editor_Models_Terminology_BulkOperation_RefObject extends editor_Models_Te
         $obj = $this->getNewImportObject();
         /* @var $obj editor_Models_Terminology_TbxObjects_RespPerson */
         $obj->key = $key;
+        $obj->listType = $listType;
         $obj->data = json_encode($data);
         $existing = $this->findExisting($obj, $payload);
-
-        $this->preparedStmt->execute([$this->collectionId, $key, $obj->data]);
 
         $upsert = true;
         if(is_null($existing)) {

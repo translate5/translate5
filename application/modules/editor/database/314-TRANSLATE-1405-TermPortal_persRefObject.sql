@@ -32,7 +32,7 @@ CREATE TABLE `terms_ref_object` (
   `collectionId` int(11) NOT NULL,
   `listType` varchar(64) NOT NULL,
   `key` varchar(64) NOT NULL,
-  `data` varchar(1024) NOT NULL,
+  `data` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY (`collectionId`, `listType`, `key`),
   CONSTRAINT FOREIGN KEY (`collectionId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
