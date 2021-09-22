@@ -352,11 +352,17 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         /* @var $config editor_Models_Config */
         $this->view->Php2JsVars()->set('frontend.config.configLabelMap', $config->getLabelMap());
 
+        $tmFileUploadSizeText = $this->translate->_("Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.");
+        $uploadMaxFilesize = preg_replace('/\D/', '', ini_get('upload_max_filesize'));
+
+        $tmFileUploadSizeText = str_replace('{upload_max_filesize}',$uploadMaxFilesize,$tmFileUploadSizeText);
+
+
         //Info: custom vtype text must be translated here and set as frontend var. There is no way of doing this with localizedjsstrings
-        $this->view->Php2JsVars()->set('frontend.override.VTypes.tmFileUploadSizeText', $this->translate->_("Ihre Datei ist größer als die zulässige Grenze. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support"));
+        $this->view->Php2JsVars()->set('frontend.override.VTypes.tmFileUploadSizeText', $tmFileUploadSizeText);
 
         // set the max allowed upload filesize into frontend variable. This is used for upload file size validation in tm import
-        $this->view->Php2JsVars()->set('frontend.php.upload_max_filesize',preg_replace('/\D/', '', ini_get('upload_max_filesize')) );
+        $this->view->Php2JsVars()->set('frontend.php.upload_max_filesize',$uploadMaxFilesize);
 
         $this->setJsAppData();
     }

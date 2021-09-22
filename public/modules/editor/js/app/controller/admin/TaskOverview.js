@@ -45,7 +45,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         'admin.WorkflowUserRoles',
         'admin.WorkflowState',
         'admin.WorkflowSteps',
-        'admin.Workflow',
+        'admin.Workflow'
     ],
     views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow', 'StatefulWindow'],
     refs: [{
@@ -296,11 +296,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             idx,
             customerId,
             langs = val.match(/-([a-zA-Z_]{2,5})-([a-zA-Z_]{2,5})\.[^.]+$/);
-        if (name && name.getValue() == '') {
+        if (name && name.getValue() === '') {
             name.setValue(val.replace(/\.[^.]+$/, '').replace(/^C:\\fakepath\\/, ''));
         }
         //simple algorithmus to get the language from the filename
-        if (langs && langs.length == 3) {
+        if (langs && langs.length === 3) {
             //try to convert deDE language to de-DE for searching in the store
             var regex = /^([a-z]+)_?([A-Z]+)$/;
             if (regex.test(langs[1])) {

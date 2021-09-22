@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,38 +25,32 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.project.ProjectActionMenu', {
-  extend: 'Ext.menu.Menu',
-  itemId: 'projectActionMenu',
-  requires: ['Editor.view.project.ProjectActionMenuViewModel'],
-  viewModel:{
-	  type:'projectActionMenu'
-  },
-  messages: {
-      actionDeleteProject: '#UT#Projekt komplett löschen'
-  },
-  alias: 'widget.projectActionMenu',
+Ext.define('Editor.view.LanguageResources.TermCollectionExportActionMenu', {
+	extend: 'Ext.menu.Menu',
+	itemId: 'termCollectionExportActionMenu',
+	alias: 'widget.termCollectionExportActionMenu',
 
-  constructor: function(instanceConfig) {
-	    var me = this,
-	    config = {
-	        items:[{
-		        text: me.messages.actionDeleteProject,
-		        action: 'editorDeleteProject',
-		        glyph: 'f2ed@FontAwesome5FreeSolid',
-		        hidden:true,
-		        bind:{
-		        	hidden:'{!isEditorDeleteProject}'
-		        },
-		        sortIndex:1
-		    }]
-	    };
-	    if (instanceConfig) {
-	        me.self.getConfigurator().merge(me, config, instanceConfig);
-	    }
-	    
-	    me.callParent([Ext.apply({
-	        items: config.items
-	    }, config)]);
+	strings:{
+		exportProposal:'#UT#Vorschläge exportieren',
+		exportCollection:'#UT#Exportieren'
+	},
+
+	record : null, // current language resources record
+
+	initConfig: function (instanceConfig) {
+		var me = this,
+			config = {
+				items: [{
+					text: me.strings.exportProposal,
+					action: 'exportProposal'
+				}, {
+					text: me.strings.exportCollection,
+					action: 'exportCollection'
+				}]
+			};
+		if (instanceConfig) {
+			me.self.getConfigurator().merge(me, config, instanceConfig);
+		}
+		return me.callParent([config]);
 	}
 });
