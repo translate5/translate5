@@ -215,6 +215,9 @@ class editor_Models_Terminology_Import_TbxFileImport
         /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
         $termEntry->removeEmptyFromCollection([$this->collection->getId()]);
 
+        // update the collection import statistics with the new counted totals
+        $this->setCollectionImportStatistic();
+
         $data = [
             'termEntries' => $this->bulkTermEntry->getStatistics(),
             'terms' => $this->bulkTerm->getStatistics(),
@@ -336,7 +339,7 @@ $memLog('Loaded terms:        ');
      */
     protected function processRefObjects(XMLReader $xmlReader) {
         $this->bulkRefObject = new editor_Models_Terminology_BulkOperation_RefObject();
-        $this->bulkRefObject->loadExisting((int) $this->collection->getId());
+        $this->bulkRefObject->loadExisting($this->collection->getId());
         while ($xmlReader->read() && $xmlReader->name !== 'refObjectList');
         while ($xmlReader->name === 'refObjectList') {
             $listType = $xmlReader->getAttribute('type');
@@ -388,13 +391,6 @@ $memLog('Loaded terms:        ');
         $newEntry = new $cls();
         $newEntry->collectionId = $this->collection->getId();
         $newEntry->termEntryTbxId = $this->getIdOrGenerate($termEntry);
-
-        if (isset($termEntry->descrip)) {
-            //FIXME there was no definition which descrip element should be used as text value for the entry
-            // so we use the first descrip only, if multiple
-            //FIXME use the descrip with type = "thesaurusDescriptor" as discussed with pavel
-            $newEntry->descrip = reset($termEntry->descrip)->value ?? '';
-        }
 
         $this->bulkTermEntry->add($newEntry);
 
@@ -566,8 +562,10 @@ $memLog('Loaded terms:        ');
      * Elements - termNote, descrip, transacNote, admin, note
      * @param SimpleXMLElement $element
      * @param editor_Models_Terminology_TbxObjects_Abstract $parentNode parent main TBX node
+     * @param bool $isDescripGrp
      * @return array
      * @throws ZfExtended_ErrorCodeException
+     * @throws editor_Models_Terminology_Import_Exception
      */
     private function setAttributeTypes(SimpleXMLElement $element, editor_Models_Terminology_TbxObjects_Abstract $parentNode, bool $isDescripGrp = false): array
     {
@@ -739,7 +737,7 @@ $memLog('Loaded terms:        ');
     /**
      * import the resp persons into the database
      * @param SimpleXMLElement $refObjectList
-     * @throws Zend_Db_Statement_Exception
+     * @param string $listType
      */
     private function importOtherRefObjects(SimpleXMLElement $refObjectList, string $listType)
     {
@@ -869,5 +867,17 @@ $memLog('Loaded terms:        ');
         $this->bulkTransacGrp->freeMemory();
         $this->bulkAttribute->freeMemory();
         $this->bulkTermEntry->freeMemory();
+    }
+
+    /***
+     * Update and save the counted collection import totals as specific data attribute
+     */
+    protected function setCollectionImportStatistic(){
+
+        $this->collection->addSpecificData('termEntry',$this->bulkTermEntry->getStatistics()['totalCount']);
+        $this->collection->addSpecificData('term',$this->bulkTerm->getStatistics()['totalCount']);
+        $this->collection->addSpecificData('attribute',$this->bulkAttribute->getStatistics()['totalCount']);
+
+        $this->collection->save();
     }
 }

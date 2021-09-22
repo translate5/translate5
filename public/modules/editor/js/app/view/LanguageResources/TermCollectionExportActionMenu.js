@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,7 +25,32 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Db_Term_AttributeProposal extends Zend_Db_Table_Abstract {
-    protected $_name    = 'terms_attributes_proposal';
-    public $_primary = 'id';
-}
+Ext.define('Editor.view.LanguageResources.TermCollectionExportActionMenu', {
+	extend: 'Ext.menu.Menu',
+	itemId: 'termCollectionExportActionMenu',
+	alias: 'widget.termCollectionExportActionMenu',
+
+	strings:{
+		exportProposal:'#UT#Vorschläge exportieren',
+		exportCollection:'#UT#Exportieren'
+	},
+
+	record : null, // current language resources record
+
+	initConfig: function (instanceConfig) {
+		var me = this,
+			config = {
+				items: [{
+					text: me.strings.exportProposal,
+					action: 'exportProposal'
+				}, {
+					text: me.strings.exportCollection,
+					action: 'exportCollection'
+				}]
+			};
+		if (instanceConfig) {
+			me.self.getConfigurator().merge(me, config, instanceConfig);
+		}
+		return me.callParent([config]);
+	}
+});

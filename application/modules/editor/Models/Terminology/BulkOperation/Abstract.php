@@ -70,6 +70,7 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
         'created' => 0,
         'updated' => 0,
         'unchanged' => 0,
+        'totalCount' => 0
     ];
 
     abstract public function __construct();
@@ -96,6 +97,7 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
         while($row = $stmt->fetch(Zend_Db::FETCH_ASSOC)) {
             $this->processOneExistingRow($row['id'], new $this->importObject($row));
         }
+
     }
 
     /**
@@ -116,6 +118,7 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
      */
     protected function processOneExistingRow(int $id, editor_Models_Terminology_TbxObjects_Abstract $element) {
         $this->existing[$element->getCollectionKey()] = $id.'#'.$element->getDataHash();
+        $this->processedCount['totalCount']++;
     }
 
     /**
@@ -153,6 +156,7 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
                 $element->{$element::GUID_FIELD} = ZfExtended_Utils::uuid();
                 $sqlInsertBindings[] = $this->prepareSqlInsert($element, $count, $sqlInsertData);
                 $this->processedCount['created']++;
+                $this->processedCount['totalCount']++;
             }
             else {
                 $hash = array_shift($payload);

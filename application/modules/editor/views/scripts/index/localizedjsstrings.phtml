@@ -1746,14 +1746,23 @@ Ext.define('Editor.controller.Localizer', {
         	defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
         	useAsDefault: '<?php echo $this->translate->_('Leserechte standardmäßig');?>',
         	writeAsDefault: '<?php echo $this->translate->_('Schreibrechte standardmäßig');?>',
-            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>'
+            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
+            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
+            specificDataText: '<?php echo $this->translate->_('Zusätzliche Infos');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.view.LanguageResources.TermCollectionExportActionMenu", {
+        override: "Editor.view.LanguageResources.TermCollectionExportActionMenu",
+        strings: {
+            exportProposal: '<?php echo $this->translate->_('Vorschläge exportieren');?>',
+            exportCollection: '<?php echo $this->translate->_('Exportieren');?>'
         }
     });
 
     Ext.define("Editor.locale.view.LanguageResources.services.TermCollection", {
         override: "Editor.view.LanguageResources.services.TermCollection",
-        addTooltip: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen');?>',
-        exportTooltip: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
+        addTooltip: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen');?>'
     });
 
     Ext.define("Editor.locale.view.LanguageResources.services.Default", {

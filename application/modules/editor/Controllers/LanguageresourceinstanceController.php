@@ -166,6 +166,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageresource['categories'] = $categoryLabels;
 
             $languageresource['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
+
+
+            $languageresource['specificData'] = $this->translateSpecificData($languageresource['specificData'],$languageresource['serviceName']);
         }
     }
 
@@ -281,6 +284,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $connector = $serviceManager->getConnector($this->entity);
         $this->view->rows->status = $connector->getStatus($this->entity->getResource());
         $this->view->rows->statusInfo = $t->_($connector->getLastStatusInfo());
+
+        $this->view->rows->specificData = $this->translateSpecificData($this->view->rows->specificData,$this->view->rows->serviceName);
     }
 
     /**
@@ -1272,5 +1277,34 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected function unprotectTags($segment, array $tags) {
         return str_replace(array_keys($tags), array_values($tags), $segment);
+    }
+
+    /***
+     * @param string $specificData
+     * @param string $serviceName
+     * @return string
+     * @throws Zend_Exception
+     * @throws Zend_Json_Exception
+     */
+    protected function translateSpecificData(string $specificData, string $serviceName): string
+    {
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+
+        $data = Zend_Json::decode($specificData);
+        $return = [];
+
+        $keysToIgnore = ['status'];
+
+        foreach ($data as $key=>$value) {
+            if(in_array($key,$keysToIgnore)){
+                continue;
+            }
+            $return[] = [
+                "type" => $translate->_($key.'_'.$serviceName),
+                "value" => $value
+            ];
+        }
+        return Zend_Json::encode($return);
     }
 }

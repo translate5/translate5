@@ -38,8 +38,6 @@ END LICENSE AND COPYRIGHT
  * @method string setTermEntryTbxId() setTermEntryTbxId(string $termEntryTbxId)
  * @method string getIsCreatedLocally() getIsCreatedLocally()
  * @method string setIsCreatedLocally() setIsCreatedLocally(string $isCreatedLocally)
- * @method string getDescrip() getDescrip()
- * @method string setDescrip() setDescrip(string $descrip)
  * @method string getEntryGuid() getEntryGuid()
  * @method string setEntryGuid() setEntryGuid(string $uniqueId)
  */
