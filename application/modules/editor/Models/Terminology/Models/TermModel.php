@@ -223,6 +223,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 'transac' => $type,
                 'date' => date('Y-m-d H:i:s'),
                 'transacNote' => $misc['userName'],
+                'target' => $misc['userGuid'],
                 'transacType' => 'responsiblePerson',
                 'language' => $this->getLanguage(),
                 // 'attrLang' => $this->getLanguage(), // ?
@@ -248,7 +249,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             UPDATE `terms_transacgrp` 
             SET 
               `date` = :date, 
-              `transacNote` = :userName 
+              `transacNote` = :userName,
+              `target` = :userGuid,
             WHERE TRUE
               AND `termEntryId` = :termEntryId 
               AND ' . $language . '
@@ -256,6 +258,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         ', [
             ':date' => date('Y-m-d H:i:s'),
             ':userName' => $misc['userName'],
+            ':userGuid' => $misc['userGuid'],
             ':termEntryId' => $this->getTermEntryId(),
         ]);
 
@@ -464,6 +467,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels(
                     $misc['userName'],
+                    $misc['userGuid'],
                     $this->getTermEntryId(),
                     $this->getLanguage(),
                     $this->getId()
@@ -1910,6 +1914,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             //$term->save();
             $term->update([
                 'userName' => $session->userName, // transacGrp will be updated
+                'userGuid' => $session->userGuid, // transacGrp will be updated
                 'updateProcessStatusAttr' => true // processStatus-attr will be updated
             ]);
             //$deleteProposals[] = $res['id'];
@@ -2289,5 +2294,20 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             'created < ?' => $olderThan,
             'collectionId in (?)' => $collectionIds,
         ]) + $rowsCount) > 0;*/
+    }
+
+    /**
+     * Get data for tbx-export
+     *
+     * @param $termEntryIds Comma-separated list of ids
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getExportData($termEntryIds) {
+        return array_group_by($this->db->getAdapter()->query('
+            SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId` 
+            FROM `terms_term`
+            WHERE `termEntryId` IN (' . $termEntryIds . ')
+        ')->fetchAll(), 'termEntryId', 'language');
     }
 }

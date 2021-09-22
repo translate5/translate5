@@ -166,7 +166,10 @@ class editor_TermController extends ZfExtended_RestController
             ]);
 
             // Save and get id
-            $termEntryId = $termEntryR->insert(['userName' => $this->_session->userName]);
+            $termEntryId = $termEntryR->insert([
+                'userName' => $this->_session->userName,
+                'userGuid' => $this->_session->userGuid
+            ]);
         }
 
         // Instantiate term-model instance
@@ -198,7 +201,10 @@ class editor_TermController extends ZfExtended_RestController
             ]);
 
             // Insert source term
-            $termR->insert(['userName' => $this->_session->userName]);
+            $termR->insert([
+                'userName' => $this->_session->userName,
+                'userGuid' => $this->_session->userGuid
+            ]);
         }
 
         // Apply data
@@ -224,6 +230,7 @@ class editor_TermController extends ZfExtended_RestController
         $termId = $termR->insert([
             'note' => trim($params['note']),
             'userName' => $this->_session->userName,
+            'userGuid' => $this->_session->userGuid,
         ]);
 
         // Flush params so that GUI to be redirected to that newly created term
@@ -284,7 +291,10 @@ class editor_TermController extends ZfExtended_RestController
         $t->setUpdatedBy($this->_session->id);
 
         // Save, and pass params required to update `terms_transacgrp`-records of type 'modification' for all 3 levels
-        $updated = $t->update(['userName' => $this->_session->userName]);
+        $updated = $t->update([
+            'userName' => $this->_session->userName,
+            'userGuid' => $this->_session->userGuid
+        ]);
 
         // Flush response data
         $this->view->assign([
@@ -363,7 +373,12 @@ class editor_TermController extends ZfExtended_RestController
 
                 // Affect `terms_transacgrp` 'modification'-records for entry- and language-level
                 ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
-                    ->affectLevels($this->_session->userName, $_['termId']['termEntryId'], $_['termId']['language']);
+                    ->affectLevels(
+                        $this->_session->userName,
+                        $this->_session->userGuid,
+                        $_['termId']['termEntryId'],
+                        $_['termId']['language']
+                    );
             }
 
             /** @var editor_Models_Terminology_Models_TermModel $term */
@@ -375,6 +390,7 @@ class editor_TermController extends ZfExtended_RestController
             ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels(
                     $this->_session->userName,
+                    $this->_session->userGuid,
                     $_['termId']['termEntryId'],
                     $data['isLast'] == 'language' ? null : $_['termId']['language']
                 );

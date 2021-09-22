@@ -188,4 +188,17 @@ class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Term
             	WHERE t.termId is null AND t.collectionId = '.$collectionId.' AND t.updatedAt < ?
             	GROUP BY t.termEntryId)'=>$olderThan])>0;
     }
+
+    /**
+     * Get termEntry-recors quantity per given collectionId
+     *
+     * @param int $collectionId
+     * @return string
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getQtyByCollectionId(int $collectionId) {
+        return $this->db->getAdapter()->query('
+            SELECT COUNT(*) FROM `terms_term_entry` WHERE `collectionId` = ?'
+        , $collectionId)->fetchColumn();
+    }
 }

@@ -183,7 +183,10 @@ class editor_AttributeController extends ZfExtended_RestController
         // Create `terms_attributes` model instance
         $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
         $a->load($params['attrId']);
-        $updated = $a->delete($misc = ['userName' => $this->_session->userName]);
+        $updated = $a->delete($misc = [
+            'userName' => $this->_session->userName,
+            'userGuid' => $this->_session->userGuid,
+        ]);
 
         // Flush response data
         $this->view->assign(['updated' => $updated]);
@@ -251,7 +254,10 @@ class editor_AttributeController extends ZfExtended_RestController
         ]);
 
         // Save attr and affect transacgrp-records
-        $updated = $a->insert($misc = ['userName' => $this->_session->userName]);
+        $updated = $a->insert($misc = [
+            'userName' => $this->_session->userName,
+            'userGuid' => $this->_session->userGuid,
+        ]);
 
         // Prepare inserted data to be flushed into response json
         $inserted = [
@@ -324,7 +330,10 @@ class editor_AttributeController extends ZfExtended_RestController
         ]);
 
         // Save attr and affect transacgrp-records
-        $updated = $a->insert($misc = ['userName' => $this->_session->userName]);
+        $updated = $a->insert($misc = [
+            'userName' => $this->_session->userName,
+            'userGuid' => $this->_session->userGuid,
+        ]);
 
         // Prepare inserted data to be flushed into response json
         $inserted = [
@@ -391,7 +400,10 @@ class editor_AttributeController extends ZfExtended_RestController
         ]);
 
         // Save attr and affect transacgrp-records
-        $updated = $a->insert($misc = ['userName' => $this->_session->userName]);
+        $updated = $a->insert($misc = [
+            'userName' => $this->_session->userName,
+            'userGuid' => $this->_session->userGuid,
+        ]);
 
         // Prepare inserted data to be flushed into response json
         $inserted = [
@@ -527,7 +539,10 @@ class editor_AttributeController extends ZfExtended_RestController
         ]);
 
         // Save attr and affect transacgrp-records
-        $updated = $a->insert($misc = ['userName' => $this->_session->userName]);
+        $updated = $a->insert($misc = [
+            'userName' => $this->_session->userName,
+            'userGuid' => $this->_session->userGuid
+        ]);
 
         // Prepare inserted data to be flushed into response json
         $inserted = [
@@ -570,7 +585,10 @@ class editor_AttributeController extends ZfExtended_RestController
         $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
         $a->load($params['attrId']);
         $a->{'set' . ucfirst($params['dataIndex'])}($params['value']);
-        $updated = $a->update($misc = ['userName' => $this->_session->userName]);
+        $updated = $a->update($misc = [
+            'userName' => $this->_session->userName,
+            'userGuid' => $this->_session->userGuid,
+        ]);
 
         // Setup $isValidUrl flag indicating whether `target`-prop contains a valid url
         $isValidUrl = preg_match('~ href="([^"]+)"~', editor_Utils::url2a($a->getTarget()));
@@ -603,7 +621,10 @@ class editor_AttributeController extends ZfExtended_RestController
         $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
         $a->load($params['attrId']);
         $a->setTarget($params['target']);
-        $data['updated'] = $a->update($misc = ['userName' => $this->_session->userName]);
+        $data['updated'] = $a->update($misc = [
+            'userName' => $this->_session->userName,
+            'userGuid' => $this->_session->userGuid,
+        ]);
 
         // If given target is not empty
         if ($params['target']) {
@@ -672,6 +693,7 @@ class editor_AttributeController extends ZfExtended_RestController
             $updated = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels(
                     $this->_session->userName,
+                    $this->_session->userGuid,
                     $_['attrId']['termEntryId'],
                     $_['attrId']['language']
                 );
@@ -785,6 +807,7 @@ class editor_AttributeController extends ZfExtended_RestController
                     $p->init($init);
                     $p->insert([
                         'userName' => $this->_session->userName,
+                        'userGuid' => $this->_session->userGuid,
                         'copyAttrsFromTermId' => $t->getId()
                     ]);
 
@@ -887,6 +910,7 @@ class editor_AttributeController extends ZfExtended_RestController
         $data['updated'] = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
             ->affectLevels(
                 $this->_session->userName,
+                $this->_session->userGuid,
                 $_['attrId']['termEntryId'],
                 $_['attrId']['language'],
                 $_['attrId']['termId']

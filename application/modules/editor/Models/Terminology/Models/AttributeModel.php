@@ -523,7 +523,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
         if ($misc['userName'])
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
-                ->affectLevels($misc['userName'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
+                ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
 
         // Return
         return $return;
@@ -540,7 +540,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         // Affect transacgrp-records
         if ($misc['userName'])
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
-                ->affectLevels($misc['userName'], $this->getTermEntryId(), $this->getLanguage());
+                ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage());
 
         // Return
         return $return;
@@ -566,7 +566,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
         if ($misc['userName'])
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
-                ->affectLevels($misc['userName'], $this->getTermEntryId(), $this->getLanguage());
+                ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage());
 
         // Call parent
         parent::delete();
@@ -832,5 +832,21 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             $i->init($image);
             $i->delete();
         }
+    }
+
+    /**
+     * Get data for tbx-export
+     *
+     * @param string $termEntryIds Comma-separated list of ids
+     * @param bool $tbxBasicOnly
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getExportData($termEntryIds, $tbxBasicOnly = false) {
+        return array_group_by($this->db->getAdapter()->query('
+            SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`, `isDescripGrp` 
+            FROM `terms_attributes`
+            WHERE `termEntryId` IN (' . $termEntryIds . ')' . editor_Utils::rif($tbxBasicOnly, ' AND `dataTypeId` IN ($1)')
+        )->fetchAll(), 'termEntryId', 'language', 'termId');
     }
 }

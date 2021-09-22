@@ -231,6 +231,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                 },{
                     xtype: 'filefield',
                     name: 'tmUpload',
+                    vtype:'tmFileUploadSize',
                     allowBlank: true,
                     disabled:true,
                     toolTip: me.strings.file,

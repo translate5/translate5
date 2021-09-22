@@ -275,4 +275,10 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
                 ) a ON i.targetId = a.target  
                 WHERE a.id IS NULL AND i.collectionId = ?', [$collectionId, $collectionId]);
     }
+
+    public function getQtyByCollectionId($collectionId) {
+        return $this->db->getAdapter()->query('
+            SELECT COUNT(`id`) FROM `terms_images` WHERE `collectionId` = ?'
+        , $collectionId)->fetchColumn();
+    }
 }
