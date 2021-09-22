@@ -48,6 +48,7 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.ImportCollectionWindow',
         'Editor.view.LanguageResources.log.LogWindow',
         'Editor.view.LanguageResources.ProposalExport',
+        'Editor.view.LanguageResources.TbxExport',
         'Editor.view.LanguageResources.services.Default'
     ],
     models: ['Editor.model.admin.Task', 'Editor.model.LanguageResources.Resource','Editor.model.LanguageResources.LanguageResource'],
@@ -646,7 +647,10 @@ Ext.define('Editor.controller.TmOverview', {
      * @param rec
      */
     exportCollection:function (rec){
-        //TODO: Pavel implementation goes here
+        var tbxWindow=Ext.create('Editor.view.LanguageResources.TbxExport',{
+            record:rec
+        });
+        tbxWindow.show();
     }
 
 });
