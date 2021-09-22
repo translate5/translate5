@@ -464,7 +464,7 @@ class editor_Models_Export_Terminology_Tbx {
             header('Cache-Control: no-cache');
             header('X-Accel-Buffering: no');
             header('Content-Type: text/xml');
-            //header('Content-Disposition: attachment; filename=export.tbx');
+            header('Content-Disposition: attachment; filename=export.tbx');
 
             // Set up output buffering implicit flush mode
             ob_implicit_flush(true);
