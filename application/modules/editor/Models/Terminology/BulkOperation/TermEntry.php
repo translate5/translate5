@@ -78,7 +78,6 @@ class editor_Models_Terminology_BulkOperation_TermEntry extends editor_Models_Te
                 'collectionId' => $this->importObject->collectionId,
                 'termEntryTbxId' => $this->importObject->termEntryTbxId,
                 'entryGuid' => $this->importObject->entryGuid,
-                'descrip' => $this->importObject->descrip
             ]);
             $this->importObject->id = $this->model->save();
             $this->processedCount['created']++;
@@ -94,16 +93,7 @@ class editor_Models_Terminology_BulkOperation_TermEntry extends editor_Models_Te
         $this->importObject->entryGuid = array_shift($payload);
         $this->importObject->id = $existing;
 
-        if($this->importObject->getDataHash() !== $hash.'#'.$this->importObject->entryGuid) {
-            //just update the descrip field, the only field which may change in an termentry
-            $this->model->updateImportTbx([[
-                'id' => $existing,
-                'descrip' => $this->importObject->descrip,
-            ]]);
-            $this->processedCount['updated']++;
-        }
-        else {
-            $this->processedCount['unchanged']++;
-        }
+        //currently there is nothing in term entry to be updated, so just do nothing and track it as unchanged
+        $this->processedCount['unchanged']++;
     }
 }
