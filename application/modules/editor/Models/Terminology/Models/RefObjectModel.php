@@ -45,4 +45,43 @@ class editor_Models_Terminology_Models_RefObjectModel extends editor_Models_Term
     public function getData(): string {
         return json_decode($this->get('data'));
     }
+
+    /**
+     * Get export data
+     *
+     * @param int $collectionId
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getExportData(int $collectionId) {
+
+        // Get distinct transacgrp's targets (some of them may be userGuid-s)
+        $targets = '"' . join('","', $this->db->getAdapter()->query('
+            SELECT DISTINCT `target` FROM `terms_transacgrp` WHERE `collectionId` = ?        
+        ', $collectionId)->fetchAll(PDO::FETCH_COLUMN)) . '"';
+
+        // Get refObject data lists saved during the tbx import
+        $refObjectListA = $this->db->getAdapter()->query('
+            SELECT `listType`, `key`, `data` 
+            FROM `terms_ref_object` 
+            WHERE TRUE 
+              AND `collectionId` = ?
+              AND (`listType` != "respPerson" OR `key` IN (' . $targets . '))
+        ', $collectionId)->fetchAll(PDO::FETCH_GROUP);
+
+        // Get respPerson-data logged during termportal usage (after tbx import)
+        $respPerson = $this->db->getAdapter()->query('
+            SELECT 
+               `userGuid` AS `key`, 
+               JSON_OBJECT("fn", CONCAT(`firstName`, " ", `surName`), "email", `email`, "role", `roles`) AS `data` 
+            FROM `Zf_users`
+            WHERE `userGuid` IN (' . $targets . ')
+        ')->fetchAll();
+
+        // Append data to the respPerson-list
+        $refObjectListA['respPerson'] = array_merge($refObjectListA['respPerson'] ?? [], $respPerson);
+
+        // Return ref object lists
+        return $refObjectListA;
+    }
 }

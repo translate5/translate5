@@ -392,13 +392,6 @@ $memLog('Loaded terms:        ');
         $newEntry->collectionId = $this->collection->getId();
         $newEntry->termEntryTbxId = $this->getIdOrGenerate($termEntry);
 
-        if (isset($termEntry->descrip)) {
-            //FIXME there was no definition which descrip element should be used as text value for the entry
-            // so we use the first descrip only, if multiple
-            //FIXME use the descrip with type = "thesaurusDescriptor" as discussed with pavel
-            $newEntry->descrip = reset($termEntry->descrip)->value ?? '';
-        }
-
         $this->bulkTermEntry->add($newEntry);
 
         if (isset($termEntry->descrip)) {

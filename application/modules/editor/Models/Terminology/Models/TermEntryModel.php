@@ -38,8 +38,6 @@ END LICENSE AND COPYRIGHT
  * @method string setTermEntryTbxId() setTermEntryTbxId(string $termEntryTbxId)
  * @method string getIsCreatedLocally() getIsCreatedLocally()
  * @method string setIsCreatedLocally() setIsCreatedLocally(string $isCreatedLocally)
- * @method string getDescrip() getDescrip()
- * @method string setDescrip() setDescrip(string $descrip)
  * @method string getEntryGuid() getEntryGuid()
  * @method string setEntryGuid() setEntryGuid(string $uniqueId)
  */
@@ -189,5 +187,18 @@ class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Term
             	tm ON t.termEntryId = tm.termEntryId AND t.updatedAt = tm.MaxDate
             	WHERE t.termId is null AND t.collectionId = '.$collectionId.' AND t.updatedAt < ?
             	GROUP BY t.termEntryId)'=>$olderThan])>0;
+    }
+
+    /**
+     * Get termEntry-recors quantity per given collectionId
+     *
+     * @param int $collectionId
+     * @return string
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getQtyByCollectionId(int $collectionId) {
+        return $this->db->getAdapter()->query('
+            SELECT COUNT(*) FROM `terms_term_entry` WHERE `collectionId` = ?'
+        , $collectionId)->fetchColumn();
     }
 }

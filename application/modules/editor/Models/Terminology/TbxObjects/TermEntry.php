@@ -35,7 +35,6 @@ class editor_Models_Terminology_TbxObjects_TermEntry extends editor_Models_Termi
     const TABLE_FIELDS = [
         'termEntryTbxId' => true,
         'entryGuid' => false,
-        'descrip' => true,
     ];
 
     const GUID_FIELD = 'entryGuid';
@@ -44,7 +43,6 @@ class editor_Models_Terminology_TbxObjects_TermEntry extends editor_Models_Termi
     public int $collectionId = 0;
     public string $termEntryTbxId = '';
     public ?string $entryGuid = null;
-    public string $descrip = '';
     public array $transacGrp = [];
     public array $ref = [];
 
