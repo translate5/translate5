@@ -2290,4 +2290,19 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             'collectionId in (?)' => $collectionIds,
         ]) + $rowsCount) > 0;*/
     }
+
+    /**
+     * Get data for tbx-export
+     *
+     * @param $termEntryIds Comma-separated list of ids
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getExportData($termEntryIds) {
+        return array_group_by($this->db->getAdapter()->query('
+            SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId` 
+            FROM `terms_term`
+            WHERE `termEntryId` IN (' . $termEntryIds . ')
+        ')->fetchAll(), 'termEntryId', 'language');
+    }
 }

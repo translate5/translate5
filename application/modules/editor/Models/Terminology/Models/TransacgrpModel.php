@@ -306,4 +306,19 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
 
         return true;
     }
+
+    /**
+     * Get data for tbx-export
+     *
+     * @param $termEntryIds Comma-separated list of ids
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getExportData($termEntryIds) {
+        return array_group_by($this->db->getAdapter()->query('
+            SELECT `termEntryId`, `language`, `termId`, `elementName`, `transac`, `date`, `transacNote`, `transacType`, `isDescripGrp`  
+            FROM `terms_transacgrp`
+            WHERE `termEntryId` IN (' . $termEntryIds . ')
+        ')->fetchAll(), 'termEntryId', 'language', 'termId');
+    }
 }

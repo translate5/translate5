@@ -833,4 +833,20 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             $i->delete();
         }
     }
+
+    /**
+     * Get data for tbx-export
+     *
+     * @param string $termEntryIds Comma-separated list of ids
+     * @param bool $tbxBasicOnly
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getExportData($termEntryIds, $tbxBasicOnly = false) {
+        return array_group_by($this->db->getAdapter()->query('
+            SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`, `isDescripGrp` 
+            FROM `terms_attributes`
+            WHERE `termEntryId` IN (' . $termEntryIds . ')' . editor_Utils::rif($tbxBasicOnly, ' AND `dataTypeId` IN ($1)')
+        )->fetchAll(), 'termEntryId', 'language', 'termId');
+    }
 }

@@ -248,9 +248,9 @@ class editor_Models_Export_Terminology_Tbx {
         $this->file = editor_Models_LanguageResources_LanguageResource::exportFilename($collectionId);
 
         // Get total qty of entries to be processed
-        $qty = editor_Utils::db()->query('
-            SELECT COUNT(*) FROM `terms_term_entry` WHERE `collectionId` = ?'
-        , $collectionId)->fetchColumn();
+        $qty = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_TermEntryModel')
+            ->getQtyByCollectionId($collectionId);
 
         /** @var editor_Models_Terminology_Models_TermEntryModel $m */
         $m = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
@@ -262,9 +262,9 @@ class editor_Models_Export_Terminology_Tbx {
         $line = [];
 
         // If $tbxBasicOnly arg is true, overwrite it with comma-separated dataTypeIds of tbx-basic attributes
-        if ($tbxBasicOnly) $tbxBasicOnly = implode(',', editor_Utils::db()->query('
-            SELECT `id` FROM `terms_attributes_datatype` WHERE `isTbxBasic` = 1
-        ')->fetchAll(PDO::FETCH_COLUMN));
+        if ($tbxBasicOnly) $tbxBasicOnly = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_AttributeDataType')
+            ->getTbxBasicIds();
 
         // Prepare indents
         for ($i = 0; $i < 20; $i++) {
@@ -278,6 +278,11 @@ class editor_Models_Export_Terminology_Tbx {
         $line []= $this->tabs[2] . '<body>';
         $this->write($line, true);
 
+        // Models shortcuts
+        $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        $attrM = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+        $trscM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+
         // Fetch usages by $byTermEntryQty at a time
         for ($p = 1; $p <= ceil($qty / $byTermEntryQty); $p++) {
 
@@ -285,32 +290,17 @@ class editor_Models_Export_Terminology_Tbx {
             $termEntryA = $m->db->fetchAll($where, null, $byTermEntryQty, ($p - 1) * $byTermEntryQty)->toArray();
 
             // Get termEntryIds
-            $termEntryIdA = array_column($termEntryA, 'id') ?: [0];
+            $termEntryIds = join(',', array_column($termEntryA, 'id') ?: [0]);
 
-            // Get term-records
-            $termA = array_group_by(editor_Utils::db()->query('
-                SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId` 
-                FROM `terms_term`
-                WHERE `termEntryId` IN (' . join(',', $termEntryIdA) . ')
-            ')->fetchAll(), 'termEntryId', 'language');
-
-            // Get attribute-records
-            $attrA = array_group_by(editor_Utils::db()->query('
-                SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`  
-                FROM `terms_attributes`
-                WHERE `termEntryId` IN (' . join(',', $termEntryIdA) . ')' . editor_Utils::rif($tbxBasicOnly, ' AND `dataTypeId` IN ($1)')
-            )->fetchAll(), 'termEntryId', 'language', 'termId');
-
-            // Get transacgrp-records
-            $trscA = array_group_by(editor_Utils::db()->query('
-                SELECT `termEntryId`, `language`, `termId`, `elementName`, `transac`, `date`, `transacNote`, `transacType`, `ifDescripgrp`  
-                FROM `terms_transacgrp`
-                WHERE `termEntryId` IN (' . join(',', $termEntryIdA) . ')
-            ')->fetchAll(), 'termEntryId', 'language', 'termId');
+            // Get inner data for given termEntries
+            $termA = $termM->getExportData($termEntryIds);
+            $attrA = $attrM->getExportData($termEntryIds, $tbxBasicOnly);
+            $trscA = $trscM->getExportData($termEntryIds);
 
             // Foreach termEntry
             foreach ($termEntryA as $termEntry) {
                 $line []= $this->tabs[3] . '<termEntry id="' . $termEntry['termEntryTbxId'] . '">';
+                $this->descripGrpNodes(4, $line, $attrA, $trscA, $termEntry['id']);
                 $this->attributeNodes(4, $line, $attrA, $termEntry['id']);
                 $this->transacGrpNodes(4, $line, $trscA, $termEntry['id']);
                 foreach ($termA[$termEntry['id']] as $lang => $terms) {
@@ -339,9 +329,9 @@ class editor_Models_Export_Terminology_Tbx {
         $this->write($line);
 
         // Get terms_images-records for a given collection
-        if ($exportImages && $qty = editor_Utils::db()->query('
-            SELECT COUNT(`id`) FROM `terms_images` WHERE `collectionId` = ?'
-        , $collectionId)->fetchColumn()) {
+        if ($exportImages && $qty = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_ImagesModel')
+            ->getQtyByCollectionId($collectionId)) {
 
             // Images model shortcut
             $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
@@ -381,17 +371,53 @@ class editor_Models_Export_Terminology_Tbx {
         $this->write($line);
 
         // Read
-        header('Content-Type: text/xml;');
-        readfile($this->file);
+        //header('Content-Type: text/xml;');
+        //readfile($this->file);
         die();
     }
 
+    public function descripGrpNodes($level, &$line, &$attrA, &$trscA, $termEntryId, $language = '', $termId = '') {
+
+        //
+        $descripGrp = ['attr' => [], 'trsc' => []];
+
+        // Cut attrs, having isDescripGrp flag
+        foreach ($attrA[$termEntryId][$language][$termId] as $idx => $attr)
+            if ($attr['isDescripGrp'])
+                if ($descripGrp['attr'][$termEntryId][$language][$termId] []= $attr)
+                    unset($attrA[$termEntryId][$language][$termId][$idx]);
+
+        // Cut trscs, having isDescripGrp flag
+        foreach ($trscA[$termEntryId][$language][$termId] as $idx => $trsc)
+            if ($trsc['isDescripGrp'])
+                if ($descripGrp['trsc'][$termEntryId][$language][$termId] []= $trsc)
+                    unset($trscA[$termEntryId][$language][$termId][$idx]);
+
+        //
+        if ($descripGrp['attr'] || $descripGrp['trsc']) {
+            $line []= $this->tabs[$level] . '<descripGrp>';
+            $this->attributeNodes($level + 1, $line, $descripGrp['attr'], $termEntryId, $language, $termId);
+            $this->transacGrpNodes($level + 1, $line, $descripGrp['trsc'], $termEntryId, $language, $termId);
+            $line []= $this->tabs[$level] . '</descripGrp>';
+        }
+    }
+
     public function attributeNodes($level, &$line, $attrA, $termEntryId, $language = '', $termId = '') {
+
+        //
         foreach ($attrA[$termEntryId][$language][$termId] as $attr) {
+
+            //
             $_attr = [];
+
+            // Append 'type' node-attr
             if ($attr['type']) $_attr []= 'type="' . $attr['type'] . '"';
+
+            // Append 'target' node-attr
             if ($attr['elementName'] == 'xref' || $attr['elementName'] == 'ref' || $attr['target'])
                 $_attr []= 'target="' . $attr['target'] . '"';
+
+            // Build and append node
             $line []= $this->tabs[$level] . '<' . $attr['elementName'] . ' ' . join(' ', $_attr) . '>'
                 . $attr['value']
                 . '</' . $attr['elementName'] . '>';
@@ -413,8 +439,30 @@ class editor_Models_Export_Terminology_Tbx {
      */
     public function write(&$lines, $overwrite = false) {
 
+        // If $overwrite arg is true
+        if ($overwrite) {
+
+            // Set up headers
+            header('Cache-Control: no-cache');
+            header('X-Accel-Buffering: no');
+            header('Content-Type: text/xml');
+            //header('Content-Disposition: attachment; filename=export.tbx');
+
+            // Set up output buffering implicit flush mode
+            ob_implicit_flush(true);
+
+            // Flush
+            ob_end_flush();
+        }
+
+        // Build raw output
+        $raw = join("\n", $lines) . "\n";
+
+        // Flush raw output
+        echo $raw;
+
         // Write lines
-        file_put_contents($this->file, join("\n", $lines) . "\n", $overwrite ? null : FILE_APPEND);
+        //file_put_contents($this->file, $raw, $overwrite ? null : FILE_APPEND);
 
         // Clear lines
         $lines = [];

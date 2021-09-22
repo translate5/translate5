@@ -82,4 +82,15 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
 
         return $labels;
     }
+
+    /**
+     * Get comma-separated list of ids of tbx-basic attributes
+     *
+     * @return string
+     */
+    public function getTbxBasicIds() {
+        return implode(',', $this->db->getAdapter()->query('
+            SELECT `id` FROM `terms_attributes_datatype` WHERE `isTbxBasic` = 1
+        ')->fetchAll(PDO::FETCH_COLUMN));
+    }
 }
