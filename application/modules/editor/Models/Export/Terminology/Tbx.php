@@ -328,6 +328,24 @@ class editor_Models_Export_Terminology_Tbx {
         $line []= $this->tabs[2] . '<back>';
         $this->write($line);
 
+        // Get refobject export data
+        $refObjectListA = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_RefObjectModel')
+            ->getExportData($collectionId);
+
+        // Foreach refObjectList
+        foreach ($refObjectListA as $listType => $refObjectListI) {
+            $line []= $this->tabs[3] . '<refObjectList type="' . $listType . '">';
+            foreach ($refObjectListI as $refObject) {
+                $line []= $this->tabs[4] . '<refObject id="' . $refObject['key'] . '">';
+                foreach (json_decode($refObject['data']) as $type => $value) {
+                    $line []= $this->tabs[5] . '<item type="' . $type . '">' . $value . '</item>';
+                }
+                $line []= $this->tabs[4] . '</refObject>';
+            }
+            $line []= $this->tabs[3] . '</refObjectList>';
+        }
+
         // Get terms_images-records for a given collection
         if ($exportImages && $qty = ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_ImagesModel')
@@ -428,7 +446,7 @@ class editor_Models_Export_Terminology_Tbx {
         foreach ($trscA[$termEntryId][$language][$termId] as $trsc) {
             $line []= $this->tabs[$level] . '<transacGrp>';
             $line []= $this->tabs[$level + 1] . '<transac type="transactionType">'. $trsc['transac'] . '</transac>';
-            $line []= $this->tabs[$level + 1] . '<transacNote type="' . $trsc['transacType'] . '">Jane</transacNote>';
+            $line []= $this->tabs[$level + 1] . '<transacNote type="' . $trsc['transacType'] . '" target="' . $trsc['target'] . '">Jane</transacNote>';
             $line []= $this->tabs[$level + 1] . '<date>' . explode(' ', $trsc['date'])[0] . '</date>';
             $line []= $this->tabs[$level] . '</transacGrp>';
         }

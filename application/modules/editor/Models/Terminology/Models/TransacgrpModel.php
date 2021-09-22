@@ -76,7 +76,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
      * @param null $language
      * @param null $termId
      */
-    public function affectLevels($user, $termEntryId, $language = null, $termId = null) {
+    public function affectLevels($userName, $userGuid, $termEntryId, $language = null, $termId = null) {
 
         // Detect level that levels should be affected from and up to top
         if ($termEntryId && $language && $termId) $level = 'term';
@@ -91,7 +91,12 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
         ];
 
         // Build param bindings
-        $bind = [':date' => date('Y-m-d H:i:s', $time = time()), ':userName' => $user, ':termEntryId' => $termEntryId];
+        $bind = [
+            ':date' => date('Y-m-d H:i:s', $time = time()),
+            ':userName' => $userName,
+            ':userGuid' => $userGuid,
+            ':termEntryId' => $termEntryId
+        ];
         if ($level == 'language' || $level == 'term') $bind[':language'] = strtolower($language);
         if ($level == 'term') $bind[':termId'] = $termId;
 
@@ -100,7 +105,8 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
             UPDATE `terms_transacgrp` 
             SET 
               `date` = :date, 
-              `transacNote` = :userName 
+              `transacNote` = :userName,
+              `target` = :userGuid
             WHERE TRUE
               AND `termEntryId` = :termEntryId 
               AND `transac` = \'modification\'
@@ -137,7 +143,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                   "other") AS `level`';
 
             //
-            unset($bind[':date'], $bind[':userName']);
+            unset($bind[':date'], $bind[':userName'], $bind[':userGuid']);
 
             $sql = '
                 SELECT 
@@ -147,8 +153,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                   AND `termEntryId` = :termEntryId 
                   AND `transac` = "modification"
                   AND ' . $where[$level];
-            i($sql);
-            i($bind, 'a');
+
             // Get levels, that terms_transacgrp-records are exist
             $levelA['exist'] = editor_Utils::db()->query($sql,
             $bind)->fetchAll(PDO::FETCH_COLUMN);
@@ -217,7 +222,8 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                     $t->init($byLevel + [
                         'transac' => $type,
                         'date' => date('Y-m-d H:i:s'),
-                        'transacNote' => $user,
+                        'transacNote' => $userName,
+                        'target' => $userGuid,
                         'transacType' => 'responsiblePerson',
                         'guid' => ZfExtended_Utils::uuid(),
                     ]);
@@ -232,7 +238,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
         // transacgrp-records at least for one level were missing, but as long as we created
         // them we should pass that to client-side app, so it can detect the whitespace and
         // update not only 'updated' viewModel's prop, but 'created' prop as well where it was missing
-        return $user . ', ' . date('d.m.Y H:i:s', $time) . editor_Utils::rif($missing, ' ');
+        return $userName . ', ' . date('d.m.Y H:i:s', $time) . editor_Utils::rif($missing, ' ');
     }
 
     public function getTransacGrpCollectionByEntryId($collectionId, $termEntryId): array
@@ -316,7 +322,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
      */
     public function getExportData($termEntryIds) {
         return array_group_by($this->db->getAdapter()->query('
-            SELECT `termEntryId`, `language`, `termId`, `elementName`, `transac`, `date`, `transacNote`, `transacType`, `isDescripGrp`  
+            SELECT `termEntryId`, `language`, `termId`, `elementName`, `transac`, `date`, `transacNote`, `transacType`, `isDescripGrp`, `target`  
             FROM `terms_transacgrp`
             WHERE `termEntryId` IN (' . $termEntryIds . ')
         ')->fetchAll(), 'termEntryId', 'language', 'termId');
