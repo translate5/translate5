@@ -55,3 +55,7 @@ UPDATE `Zf_acl_rules` SET `role` = "termSearch" WHERE `role` = "termCustomerSear
 UPDATE `Zf_acl_rules` SET `resource` = "termSearch" WHERE `resource` = "termCustomerSearch";
 UPDATE `Zf_acl_rules` SET `right` = "termSearch" WHERE `right` = "termCustomerSearch";
 UPDATE `Zf_users` SET `roles` = REPLACE(`roles`, "termCustomerSearch", "termSearch");
+
+INSERT IGNORE INTO `Zf_configuration` (name, confirmed, `module`, category, `value`, `default`, defaults, type, description, level, guiName, guiGroup, comment)
+VALUES ('runtimeOptions.termportal.liveSearchMinChars','1','editor','termportal','3','3','','integer','Number of typed characters to start live search in the search field','2','When to start live search','TermPortal','');
+
