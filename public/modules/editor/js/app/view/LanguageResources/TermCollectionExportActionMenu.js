@@ -32,7 +32,7 @@ Ext.define('Editor.view.LanguageResources.TermCollectionExportActionMenu', {
 
 	strings:{
 		exportProposal:'#UT#Vorschläge exportieren',
-		exportCollection:'#UT#Exportieren'
+		exportCollection:'#UT#Als TBX exportieren'
 	},
 
 	record : null, // current language resources record

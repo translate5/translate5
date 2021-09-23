@@ -1613,6 +1613,16 @@ Ext.define('Editor.controller.Localizer', {
             title: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
         }
     });
+    Ext.define("Editor.locale.view.LanguageResources.TbxExport", {
+        override: "Editor.view.LanguageResources.TbxExport",
+        strings: {
+            tbxBasicOnlyLabel: '<?php echo $this->translate->_('Nur TBX Basic Standardattribute + processStatus exportieren');?>',
+            exportImagesLabel: '<?php echo $this->translate->_('Bilder im Hex-Format exportieren, eingebettet in TBX');?>',
+            exportButtonText: '<?php echo $this->translate->_('Exportieren');?>',
+            cancelButtonText: '<?php echo $this->translate->_('Abbrechen');?>',
+            title: '<?php echo $this->translate->_('Als TBX exportieren');?>'
+        }
+    });
     Ext.define("Editor.locale.controller.TaskAssoc", {
         override: "Editor.controller.LanguageResourcesTaskassoc",
         strings: {
@@ -1756,7 +1766,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.LanguageResources.TermCollectionExportActionMenu",
         strings: {
             exportProposal: '<?php echo $this->translate->_('Vorschläge exportieren');?>',
-            exportCollection: '<?php echo $this->translate->_('Exportieren');?>'
+            exportCollection: '<?php echo $this->translate->_('Als TBX exportieren');?>'
         }
     });
 

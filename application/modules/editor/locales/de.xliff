@@ -2017,6 +2017,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='dG1JZF90YXJnZXRMYW5n'><source>tmId_targetLang</source><target>Zielsprache</target></trans-unit>
 <trans-unit id='ZG9tYWluQ29kZV9TRExMYW5ndWFnZUNsb3Vk'><source>domainCode_SDLLanguageCloud</source><target>Domaincode</target></trans-unit>
 <trans-unit id='ZW5naW5lTmFtZV9TRExMYW5ndWFnZUNsb3Vk'><source>engineName_SDLLanguageCloud</source><target>Engine name</target></trans-unit>
+<trans-unit id='TnVyIFRCWCBCYXNpYyBTdGFuZGFyZGF0dHJpYnV0ZSArIHByb2Nlc3NTdGF0dXMgZXhwb3J0aWVyZW4='><source>Nur TBX Basic Standardattribute + processStatus exportieren</source><target>Nur TBX Basic Standardattribute + processStatus exportieren</target></trans-unit>
+<trans-unit id='QmlsZGVyIGltIEhleC1Gb3JtYXQgZXhwb3J0aWVyZW4sIGVpbmdlYmV0dGV0IGluIFRCWA=='><source>Bilder im Hex-Format exportieren, eingebettet in TBX</source><target>Bilder im Hex-Format exportieren, eingebettet in TBX</target></trans-unit>
+<trans-unit id='QWxzIFRCWCBleHBvcnRpZXJlbg=='><source>Als TBX exportieren</source><target>Als TBX exportieren</target></trans-unit>
   </body>
  </file>
 </xliff>

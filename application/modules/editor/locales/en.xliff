@@ -4262,6 +4262,9 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>engineName_SDLLanguageCloud</source>
     <target>Enginename</target>
 </trans-unit>
+<trans-unit id='TnVyIFRCWCBCYXNpYyBTdGFuZGFyZGF0dHJpYnV0ZSArIHByb2Nlc3NTdGF0dXMgZXhwb3J0aWVyZW4='><source>Nur TBX Basic Standardattribute + processStatus exportieren</source><target>Export only TBX Basic standard attributes + processStatus</target></trans-unit>
+<trans-unit id='QmlsZGVyIGltIEhleC1Gb3JtYXQgZXhwb3J0aWVyZW4sIGVpbmdlYmV0dGV0IGluIFRCWA=='><source>Bilder im Hex-Format exportieren, eingebettet in TBX</source><target>Export images in hex format, embedded in TBX</target></trans-unit>
+<trans-unit id='QWxzIFRCWCBleHBvcnRpZXJlbg=='><source>Als TBX exportieren</source><target>Export as TBX</target></trans-unit>
 </body>
   </file>
 </xliff>
