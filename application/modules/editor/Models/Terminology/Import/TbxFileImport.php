@@ -710,7 +710,7 @@ $memLog('Loaded terms:        ');
      */
     private function getActualLanguageAttribute(SimpleXMLElement $language): string
     {
-        if (!(string)$language) {
+        if (empty($language)) {
             return '';
         }
 
