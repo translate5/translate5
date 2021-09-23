@@ -171,7 +171,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $this->termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         $this->termEntryModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
         $this->termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        $this->tbxFileImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxFileImport');
     }
 
     /**
@@ -252,6 +251,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             $this->resetTaskTbxHash();
 
             foreach ($filePath as $path){
+
+                $this->tbxFileImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxFileImport');
+
                 $tmpName = $path['tmp_name'] ?? $path;
                 $fileName = $path['name'] ?? null;
 
