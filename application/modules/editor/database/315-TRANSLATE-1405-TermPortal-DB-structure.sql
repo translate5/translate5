@@ -36,6 +36,7 @@ DROP TABLE IF EXISTS `terms_term_history`;
 DROP TABLE IF EXISTS `terms_transacgrp`;
 DROP TABLE IF EXISTS `terms_term`;
 DROP TABLE IF EXISTS `terms_term_entry`;
+DROP TABLE IF EXISTS `terms_migration_langset`;
 
 CREATE TABLE `terms_term_entry` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -266,7 +267,7 @@ CREATE TABLE `terms_migration_langset` (
    `termEntryId` int(11) DEFAULT NULL,
    `languageId` int(11) NOT NULL,
    `language` varchar(36) DEFAULT NULL,
-   `langSetGuid` varchar(36) DEFAULT NULL,
+   `langSetGuid` varchar(36) NOT NULL DEFAULT '',
    PRIMARY KEY (`langSetGuid`),
    KEY `collectionId_idx` (`collectionId`),
    UNIQUE `languageId_collectionId_idx` (`collectionId`,`termEntryId`,`languageId`)
