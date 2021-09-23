@@ -45,8 +45,7 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
 
 $db = Zend_Db_Table::getDefaultAdapter();
 
-// fix the termNote level in attributes datatype
-$db->query("UPDATE `terms_attributes_datatype` SET `level`='term' WHERE `label`='termNote';");
+
 
 
 // load all duplicated attribute data types.
