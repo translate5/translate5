@@ -183,8 +183,7 @@ CREATE TABLE `terms_attributes_datatype` (
   `dataType` enum('plainText','noteText','basicText','picklist','Language code','date') DEFAULT 'plainText',
   `picklistValues` varchar(255) DEFAULT NULL COMMENT 'Available comma separated values for selecting for the attribute when the attributa dataType is picklist.',
   `isTbxBasic` tinyint(1) DEFAULT 0,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_term_attributes_label_type_level` (`label`,`type`,`level`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `terms_attributes_history` (
