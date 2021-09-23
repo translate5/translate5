@@ -2005,7 +2005,21 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='UHJvamVrdGJlc2Noci4gYW56ZWlnZW4='><source>Projektbeschr. anzeigen</source><target>Projektbeschr. anzeigen</target></trans-unit>
 <trans-unit id='UHJvamVrdGJlc2Noci4gYXVzYmxlbmRlbg=='><source>Projektbeschr. ausblenden</source><target>Projektbeschr. ausblenden</target></trans-unit>
 <trans-unit id='UG1saWdodA=='><source>Pmlight</source><target>PM Light</target></trans-unit>
-<trans-unit id='SWhyZSBEYXRlaSBpc3QgZ3LDtsOfZXIgYWxzIGRpZSB6dWzDpHNzaWdlIEdyZW56ZS4gVW0gZ3LDtsOfZXJlIERhdGVpZW4gaG9jaGxhZGVuIHp1IGvDtm5uZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gdHJhbnNsYXRlNS1TdXBwb3J0'><source>Ihre Datei ist größer als die zulässige Grenze. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support</source><target>Ihre Datei ist größer als die zulässige Grenze. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support</target></trans-unit>
+<trans-unit id='SWhyZSBEYXRlaSBpc3QgZ3LDtsOfZXIgYWxzIGRhcyB6dWzDpHNzaWdlIE1heGltdW0gdm9uIHt1cGxvYWRfbWF4X2ZpbGVzaXplfSBNQi4gVW0gZ3LDtsOfZXJlIERhdGVpZW4gaG9jaGxhZGVuIHp1IGvDtm5uZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gdHJhbnNsYXRlNS1TdXBwb3J0Lg=='><source>Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.</source><target>Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.</target></trans-unit>
+<trans-unit id='WnVzw6R0emxpY2hlIEluZm9z'><source>Zusätzliche Infos</source><target>Zusätzliche Infos</target></trans-unit>
+<trans-unit id='ZmlsZU5hbWVfT3BlblRNMg=='><source>fileName_OpenTM2</source><target>Datenbankname</target></trans-unit>
+<trans-unit id='ZmlsZU5hbWVfVGVybUNvbGxlY3Rpb24='><source>fileName_TermCollection</source><target>Zuletzt importierte Datei</target></trans-unit>
+<trans-unit id='dGVybV9UZXJtQ29sbGVjdGlvbg=='><source>term_TermCollection</source><target>Benennungen</target></trans-unit>
+<trans-unit id='YXR0cmlidXRlX1Rlcm1Db2xsZWN0aW9u'><source>attribute_TermCollection</source><target>Attribute</target></trans-unit>
+<trans-unit id='dGVybUVudHJ5X1Rlcm1Db2xsZWN0aW9u'><source>termEntry_TermCollection</source><target>Einträge</target></trans-unit>
+<trans-unit id='dG1JZF9Hcm91cFNoYXJl'><source>tmId_GroupShare</source><target>Id</target></trans-unit>
+<trans-unit id='dG1JZF9zb3VyY2VMYW5n'><source>tmId_sourceLang</source><target>Quellsprache</target></trans-unit>
+<trans-unit id='dG1JZF90YXJnZXRMYW5n'><source>tmId_targetLang</source><target>Zielsprache</target></trans-unit>
+<trans-unit id='ZG9tYWluQ29kZV9TRExMYW5ndWFnZUNsb3Vk'><source>domainCode_SDLLanguageCloud</source><target>Domaincode</target></trans-unit>
+<trans-unit id='ZW5naW5lTmFtZV9TRExMYW5ndWFnZUNsb3Vk'><source>engineName_SDLLanguageCloud</source><target>Engine name</target></trans-unit>
+<trans-unit id='TnVyIFRCWCBCYXNpYyBTdGFuZGFyZGF0dHJpYnV0ZSArIHByb2Nlc3NTdGF0dXMgZXhwb3J0aWVyZW4='><source>Nur TBX Basic Standardattribute + processStatus exportieren</source><target>Nur TBX Basic Standardattribute + processStatus exportieren</target></trans-unit>
+<trans-unit id='QmlsZGVyIGltIEhleC1Gb3JtYXQgZXhwb3J0aWVyZW4sIGVpbmdlYmV0dGV0IGluIFRCWA=='><source>Bilder im Hex-Format exportieren, eingebettet in TBX</source><target>Bilder im Hex-Format exportieren, eingebettet in TBX</target></trans-unit>
+<trans-unit id='QWxzIFRCWCBleHBvcnRpZXJlbg=='><source>Als TBX exportieren</source><target>Als TBX exportieren</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -121,7 +121,7 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
             	}
             }
         });
-        me.down('filefield[name="tmUpload"]').regex=/\.tbx$/i;
+        me.down('filefield[name="tmUpload"]').regex=/\.(tbx|zip)$/i;
     },
     /**
      * loads the record into the form

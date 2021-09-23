@@ -84,7 +84,10 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
         } else {
             $return = $connector->addAdditionalTm($params['fileinfo'],$params);
         }
-        
+
+        // Must be reloaded because the status or additional info can be changed in addTem/addAdditionalTm
+        $this->languageResource->load($params['languageResourceId']);
+
         $this->updateLanguageResourceStatus($return);
         
         if(isset($params['fileinfo']['tmp_name']) && !empty($params['fileinfo']['tmp_name']) && file_exists($params['fileinfo']['tmp_name'])){

@@ -122,6 +122,9 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
         }
         // we need to store the guid to for setting it later for new term attributes in existing terms
         $this->existing[$element->getCollectionKey()] = $id.'#'.$element->guid.'#'.$element->getDataHash();
+
+        // increment the total term count
+        $this->processedCount['totalCount']++;
     }
 
     protected function getAllTermsKey(editor_Models_Terminology_TbxObjects_Term $term): string

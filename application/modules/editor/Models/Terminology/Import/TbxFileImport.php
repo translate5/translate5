@@ -215,6 +215,9 @@ class editor_Models_Terminology_Import_TbxFileImport
         /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
         $termEntry->removeEmptyFromCollection([$this->collection->getId()]);
 
+        // update the collection import statistics with the new counted totals
+        $this->setCollectionImportStatistic();
+
         $data = [
             'termEntries' => $this->bulkTermEntry->getStatistics(),
             'terms' => $this->bulkTerm->getStatistics(),
@@ -336,7 +339,7 @@ $memLog('Loaded terms:        ');
      */
     protected function processRefObjects(XMLReader $xmlReader) {
         $this->bulkRefObject = new editor_Models_Terminology_BulkOperation_RefObject();
-        $this->bulkRefObject->loadExisting((int) $this->collection->getId());
+        $this->bulkRefObject->loadExisting($this->collection->getId());
         while ($xmlReader->read() && $xmlReader->name !== 'refObjectList');
         while ($xmlReader->name === 'refObjectList') {
             $listType = $xmlReader->getAttribute('type');
@@ -559,8 +562,10 @@ $memLog('Loaded terms:        ');
      * Elements - termNote, descrip, transacNote, admin, note
      * @param SimpleXMLElement $element
      * @param editor_Models_Terminology_TbxObjects_Abstract $parentNode parent main TBX node
+     * @param bool $isDescripGrp
      * @return array
      * @throws ZfExtended_ErrorCodeException
+     * @throws editor_Models_Terminology_Import_Exception
      */
     private function setAttributeTypes(SimpleXMLElement $element, editor_Models_Terminology_TbxObjects_Abstract $parentNode, bool $isDescripGrp = false): array
     {
@@ -704,7 +709,7 @@ $memLog('Loaded terms:        ');
      */
     private function getActualLanguageAttribute(SimpleXMLElement $language): string
     {
-        if (!(string)$language) {
+        if (empty($language)) {
             return '';
         }
 
@@ -861,5 +866,17 @@ $memLog('Loaded terms:        ');
         $this->bulkTransacGrp->freeMemory();
         $this->bulkAttribute->freeMemory();
         $this->bulkTermEntry->freeMemory();
+    }
+
+    /***
+     * Update and save the counted collection import totals as specific data attribute
+     */
+    protected function setCollectionImportStatistic(){
+
+        $this->collection->addSpecificData('termEntry',$this->bulkTermEntry->getStatistics()['totalCount']);
+        $this->collection->addSpecificData('term',$this->bulkTerm->getStatistics()['totalCount']);
+        $this->collection->addSpecificData('attribute',$this->bulkAttribute->getStatistics()['totalCount']);
+
+        $this->collection->save();
     }
 }

@@ -787,8 +787,10 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // If wildcards are used, convert them to the mysql syntax
         $keyword = str_replace(['*', '?'], ['%', '_'], $params['query']);
 
-        // If we're not going to count $total - it means we're in autocomplete mode
-        if ($total === false) $keyword .= '%';
+        // If we're not going to count $total -
+        // it means we're in autocomplete mode,
+        // so append wildcard if not already added
+        if ($total === false) $keyword = rtrim($keyword, '%') . '%';
 
         // Flag, indicating whether or not current user is allowed to propose terms
         $isProposer = ZfExtended_Factory::get('ZfExtended_Models_User')->hasRole('termProposer');

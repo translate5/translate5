@@ -166,6 +166,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageresource['categories'] = $categoryLabels;
 
             $languageresource['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
+
+
+            $languageresource['specificData'] = $this->translateSpecificData($languageresource['specificData'],$languageresource['serviceName']);
         }
     }
 
@@ -281,6 +284,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $connector = $serviceManager->getConnector($this->entity);
         $this->view->rows->status = $connector->getStatus($this->entity->getResource());
         $this->view->rows->statusInfo = $t->_($connector->getLastStatusInfo());
+
+        $this->view->rows->specificData = $this->translateSpecificData($this->view->rows->specificData,$this->view->rows->serviceName);
     }
 
     /**
@@ -840,14 +845,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     protected function handleInitialFileUpload(editor_Services_Manager $manager) {
         $connector = $manager->getConnector($this->entity);
         /* @var $connector editor_Services_Connector */
-        $importInfo = $this->handleFileUpload($connector);
 
-        //currently the initial upload is optional
-        // if this will be depending on the resource,
-        // here would be a good place to implement the check with
-        //if(!$importInfo && $resource file is mandatory) {
-            //$this->uploadErrors = "dadada"
-        //}
+        $importInfo = $this->handleFileUpload($connector);
 
         if(!empty($this->uploadErrors)){
             return ;
@@ -965,7 +964,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return $importInfo;
         }
 
-        //currently an error means wrong filetype
+        //currently, an error means wrong filetype
         if($upload->hasErrors()) {
             $this->uploadErrors[] = 'Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!';
         }
@@ -977,11 +976,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     /***
-     * Init and queue the servce import worker
+     * Init and queue the service import worker
      * @param array $importInfo
-     * @param boolean $addnew
+     * @param boolean $addNew
      */
-    protected function queueServiceImportWorker($importInfo,$addnew){
+    protected function queueServiceImportWorker(array $importInfo, bool $addNew){
         $worker=ZfExtended_Factory::get('editor_Services_ImportWorker');
         /* @var $worker editor_Services_ImportWorker */
 
@@ -989,13 +988,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $this->handleUploadLanguageResourcesFile($importInfo[self::FILE_UPLOAD_NAME]);
 
-
-        $userSession = new Zend_Session_Namespace('user');
-
         $params['languageResourceId']=$this->entity->getId();
         $params['fileinfo']=!empty($importInfo[self::FILE_UPLOAD_NAME])? $importInfo[self::FILE_UPLOAD_NAME]:[];
-        $params['addnew']=$addnew;
-        $params['userGuid']=$userSession->data->userGuid;
+        $params['addnew']=$addNew;
+        $params['userGuid']=editor_User::instance()->getGuid();
 
         if (!$worker->init(null, $params)) {
             $this->uploadErrors[] = 'File import in language resources Error on worker init()';
@@ -1011,13 +1007,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     /***
      * Move the upload file to the tem directory so it can be used by the worker.
-     * The fileinfo temp_name will be modefied
+     * The fileinfo temp_name will be modified
      * @param array $fileinfo
      */
-    protected function handleUploadLanguageResourcesFile(&$fileinfo){
+    protected function handleUploadLanguageResourcesFile(array &$fileinfo){
         if(!$fileinfo){
             return;
         }
+
         //create unique temp file name
         $newFileLocation=tempnam(sys_get_temp_dir(), 'LanguageResources'.$fileinfo['name']);
         if (!is_dir(dirname($newFileLocation))) {
@@ -1272,5 +1269,34 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected function unprotectTags($segment, array $tags) {
         return str_replace(array_keys($tags), array_values($tags), $segment);
+    }
+
+    /***
+     * @param string $specificData
+     * @param string $serviceName
+     * @return string
+     * @throws Zend_Exception
+     * @throws Zend_Json_Exception
+     */
+    protected function translateSpecificData(string $specificData, string $serviceName): string
+    {
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+
+        $data = Zend_Json::decode($specificData);
+        $return = [];
+
+        $keysToIgnore = ['status'];
+
+        foreach ($data as $key=>$value) {
+            if(in_array($key,$keysToIgnore)){
+                continue;
+            }
+            $return[] = [
+                "type" => $translate->_($key.'_'.$serviceName),
+                "value" => $value
+            ];
+        }
+        return Zend_Json::encode($return);
     }
 }

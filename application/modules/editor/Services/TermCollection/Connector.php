@@ -46,10 +46,19 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
-    public function addTm(array $fileinfo = null,array $params=null) {
+    public function addTm(array $fileinfo = null,array $params=null): bool
+    {
         if(empty($fileinfo)){
             //empty term collection
             return true;
+        }
+
+        // check and prepare the import files (handle the zip)
+        $fileinfo = $this->prepareImportFiles($fileinfo);
+
+        if(empty($fileinfo)){
+
+            return false;
         }
 
         $import=ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
@@ -57,73 +66,17 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
 
         $import->mergeTerms=isset($params['mergeTerms']) ? filter_var($params['mergeTerms'], FILTER_VALIDATE_BOOLEAN) : false;
 
-        $sessionUser = new Zend_Session_Namespace('user');
-        $userGuid=$params['userGuid'] ?? $sessionUser->data->userGuid;
+        $userGuid=$params['userGuid'] ?? editor_User::instance()->getGuid();
         $import->loadUser($userGuid);
 
         //import the term collection
-        if(!$import->parseTbxFile([$fileinfo],$this->languageResource->getId())){
+        if(!$import->parseTbxFile($fileinfo,$this->languageResource->getId())){
             $this->logger->error('E1321', 'Term Collection Import: Errors on parsing the TBX, the file could not be imported.');
             return false;
         }
 
-        $termModel=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $termModel editor_Models_Terminology_Models_TermModel */
-        $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $collection editor_Models_TermCollection_TermCollection */
-        $validator = new Zend_Validate_Date();
-        $validator->setFormat('Y-m-d H:i:s');
-
-        //delete collection term entries older then the parameter date
-        if(isset($params['deleteTermsLastTouchedOlderThan']) && !empty($params['deleteTermsLastTouchedOlderThan'])){
-
-            if(!$validator->isValid($params['deleteTermsLastTouchedOlderThan'])){
-                $params['deleteTermsLastTouchedOlderThan'] = date('Y-m-d H:i:s', strtotime($params['deleteTermsLastTouchedOlderThan']));
-            }
-            $termModel->removeOldTerms([$this->languageResource->getId()], $params['deleteTermsLastTouchedOlderThan']);
-            //clean the old tbx files from the disc
-            $collection->removeOldCollectionTbxFiles($this->languageResource->getId(), strtotime($params['deleteTermsLastTouchedOlderThan']));
-        }
-
-        $deleteOlderThanCurrentImport=isset($params['deleteTermsOlderThanCurrentImport']) && filter_var($params['deleteTermsOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
-        //delete termcollection terms older then current import date
-        if($deleteOlderThanCurrentImport){
-            $termModel->removeOldTerms([$this->languageResource->getId()], NOW_ISO);
-            //clean the old tbx files from the disc
-            $collection->removeOldCollectionTbxFiles($this->languageResource->getId(), strtotime(NOW_ISO));
-        }
-
-        //check if the delete proposal older than date is set
-        $deleteProposalsDate=null;
-        if(!empty($params['deleteProposalsLastTouchedOlderThan']) && !$validator->isValid($params['deleteProposalsLastTouchedOlderThan'])){
-            //the date is set but it is not in the required format
-            $deleteProposalsDate = date('Y-m-d H:i:s', strtotime($params['deleteProposalsLastTouchedOlderThan']));
-        }
-
-        //the delet proposals older than the current import is set, use the now_iso as reference date
-        $deleteProposalsOlderThanCurrentImport=isset($params['deleteProposalsOlderThanCurrentImport']) && filter_var($params['deleteProposalsOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
-        if(empty($deleteProposalsDate) && $deleteProposalsOlderThanCurrentImport){
-            $deleteProposalsDate=NOW_ISO;
-        }
-
-        //delete term proposals
-        if(!empty($deleteProposalsDate)){
-
-            // Remove term proposals
-            $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-            /* @var $term editor_Models_Terminology_Models_TermModel */
-            $term->removeProposalsOlderThan([$this->languageResource->getId()], $deleteProposalsDate);
-
-            // Remove attribute proposals
-            $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-            /* @var $attribute editor_Models_Terminology_Models_AttributeModel */
-            $attribute->removeProposalsOlderThan([$this->languageResource->getId()],$deleteProposalsDate);
-        }
-
-        //remove all empty term entries from the same term collection
-        $termEntry=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
-        /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
-        $termEntry->removeEmptyFromCollection([$this->languageResource->getId()]);
+        // run all post import functions
+        $this->doAfterImport($params);
 
         return true;
     }
@@ -227,12 +180,121 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         return $status;
     }
 
+    /***
+     * Run post import functions.
+     * @param array $params
+     */
+    protected function doAfterImport(array $params){
+
+        $termModel=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $termModel editor_Models_Terminology_Models_TermModel */
+        $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $collection editor_Models_TermCollection_TermCollection */
+        $validator = new Zend_Validate_Date();
+        $validator->setFormat('Y-m-d H:i:s');
+
+        //delete collection term entries older than the parameter date
+        if(isset($params['deleteTermsLastTouchedOlderThan']) && !empty($params['deleteTermsLastTouchedOlderThan'])){
+
+            if(!$validator->isValid($params['deleteTermsLastTouchedOlderThan'])){
+                $params['deleteTermsLastTouchedOlderThan'] = date('Y-m-d H:i:s', strtotime($params['deleteTermsLastTouchedOlderThan']));
+            }
+            $termModel->removeOldTerms([$this->languageResource->getId()], $params['deleteTermsLastTouchedOlderThan']);
+            //clean the old tbx files from the disc
+            $collection->removeOldCollectionTbxFiles($this->languageResource->getId(), strtotime($params['deleteTermsLastTouchedOlderThan']));
+        }
+
+        $deleteOlderThanCurrentImport=isset($params['deleteTermsOlderThanCurrentImport']) && filter_var($params['deleteTermsOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
+        //delete termcollection terms older then current import date
+        if($deleteOlderThanCurrentImport){
+            $termModel->removeOldTerms([$this->languageResource->getId()], NOW_ISO);
+            //clean the old tbx files from the disc
+            $collection->removeOldCollectionTbxFiles($this->languageResource->getId(), strtotime(NOW_ISO));
+        }
+
+        //check if the delete proposal older than date is set
+        $deleteProposalsDate=null;
+        if(!empty($params['deleteProposalsLastTouchedOlderThan']) && !$validator->isValid($params['deleteProposalsLastTouchedOlderThan'])){
+            //the date is set but it is not in the required format
+            $deleteProposalsDate = date('Y-m-d H:i:s', strtotime($params['deleteProposalsLastTouchedOlderThan']));
+        }
+
+        //the delet proposals older than the current import is set, use the now_iso as reference date
+        $deleteProposalsOlderThanCurrentImport=isset($params['deleteProposalsOlderThanCurrentImport']) && filter_var($params['deleteProposalsOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
+        if(empty($deleteProposalsDate) && $deleteProposalsOlderThanCurrentImport){
+            $deleteProposalsDate=NOW_ISO;
+        }
+
+        //delete term proposals
+        if(!empty($deleteProposalsDate)){
+
+            // Remove term proposals
+            $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+            /* @var $term editor_Models_Terminology_Models_TermModel */
+            $term->removeProposalsOlderThan([$this->languageResource->getId()], $deleteProposalsDate);
+
+            // Remove attribute proposals
+            $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+            /* @var $attribute editor_Models_Terminology_Models_AttributeModel */
+            $attribute->removeProposalsOlderThan([$this->languageResource->getId()],$deleteProposalsDate);
+        }
+
+        //remove all empty term entries from the same term collection
+        $termEntry=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
+        $termEntry->removeEmptyFromCollection([$this->languageResource->getId()]);
+    }
+
+    /***
+     *
+     * @param array $fileInfo
+     * @return array|array[]
+     */
+    protected function prepareImportFiles(array $fileInfo): array
+    {
+        $validator = new Zend_Validate_File_IsCompressed();
+        if(!$validator->isValid($fileInfo['tmp_name'])){
+            return [$fileInfo];
+        }
+
+        $zip = new ZipArchive();
+        if (! $zip->open($fileInfo['tmp_name'])) {
+            // Zip file could not be opened
+            $this->logger->error('E1358', 'Term Collection Import: Unable to open zip file from file-path:'.$fileInfo['tmp_name']);
+            return [];
+        }
+
+        $filename = pathinfo($fileInfo['name'], PATHINFO_FILENAME);
+
+        $newPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.$filename;
+        if (! $zip->extractTo($newPath)) {
+            //Content from zip file could not be extracted
+            $this->logger->error('E1359', 'Term Collection Import: Content from zip file could not be extracted.');
+            return [];
+        }
+        $zip->close();
+
+        // list all extracted tbx files from the location
+        $list = glob($newPath.DIRECTORY_SEPARATOR."*.tbx");
+
+        $newFileInfo = [];
+
+        foreach ($list as $item) {
+            $newFileInfo[] = [
+                'tmp_name' => $item,
+                'name' => basename($item),
+            ];
+        }
+        return $newFileInfo;
+    }
+
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypes()
      */
     public function getValidFiletypes() {
         return [
+            'ZIP' => ['application/zip'],
             'TBX' => ['application/xml','text/xml'],
         ];
     }
