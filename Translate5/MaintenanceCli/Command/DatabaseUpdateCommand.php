@@ -58,7 +58,13 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             'i',
             InputOption::VALUE_NONE,
             'Imports all new database files or a single file if a filename / hash was given.');
-        
+
+//        $this->addOption(
+//            'select',
+//            's',
+//            InputOption::VALUE_NONE,
+//            'Provides an interactive menu to select the files to be imported.');
+
         $this->addOption(
             'assume-imported',
             null,
@@ -117,7 +123,21 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             $this->io->warning('--assume-imported can only be used on one single file! Nothing is assumed as imported.');
             return 1;
         }
-        if($this->input->getOption('import')) {
+        $import = $this->input->getOption('import');
+
+//        //print_r($modified);
+//        //print_r($newFiles);
+//        if($this->input->getOption('select')) {
+//            $selected = $this->io->choice("Select file to be imported", $toProcess);
+//            print_r($selected);
+//        }
+//        return 0;
+
+        if(!$import) {
+            $import = $this->io->confirm('Import listed files?', false);
+        }
+
+        if($import) {
             $importedCount = $dbupdater->applyNew($toProcess);
             $dbupdater->updateModified($toProcess);
             $errors = $dbupdater->getErrors();

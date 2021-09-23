@@ -48,8 +48,6 @@ END LICENSE AND COPYRIGHT
  * @method integer setCollectionId() setCollectionId(integer $collectionId)
  * @method string getTermEntryId() getTermEntryId()
  * @method string setTermEntryId() setTermEntryId(string $TermEntryId)
- * @method string getAttrLang() getAttrLang()
- * @method string setAttrLang() setAttrLang(string $attrLang)
  * @method string getLanguage() getLanguage()
  * @method string setLanguage() setLanguage(string $language)
  * @method string getTermId() getTermId()
@@ -197,7 +195,6 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                 // Props applicable for term- and language-levels
                 if ($level == 'term' || $level == 'language') $byLevel += [
                     'language' => $language,
-                    'attrLang' => $language,
                 ];
 
                 // Props, applicable for term-level only
