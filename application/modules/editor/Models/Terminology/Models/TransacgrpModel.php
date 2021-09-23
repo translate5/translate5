@@ -48,8 +48,6 @@ END LICENSE AND COPYRIGHT
  * @method integer setCollectionId() setCollectionId(integer $collectionId)
  * @method string getTermEntryId() getTermEntryId()
  * @method string setTermEntryId() setTermEntryId(string $TermEntryId)
- * @method string getAttrLang() getAttrLang()
- * @method string setAttrLang() setAttrLang(string $attrLang)
  * @method string getLanguage() getLanguage()
  * @method string setLanguage() setLanguage(string $language)
  * @method string getTermId() getTermId()
