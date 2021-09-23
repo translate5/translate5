@@ -194,7 +194,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
 
                 // Props applicable for term- and language-levels
                 if ($level == 'term' || $level == 'language') $byLevel += [
-                    'language' => $language,
+                    'language' => $language
                 ];
 
                 // Props, applicable for term-level only
