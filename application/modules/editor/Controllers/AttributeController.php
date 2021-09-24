@@ -116,6 +116,15 @@ class editor_AttributeController extends ZfExtended_RestController
         else if ($params['mode'] == 'ref') $this->refcreateAction($_);
         else if ($params['mode'] == 'figure') $this->figurecreateAction($_);
         else $this->attrcreateAction($_);
+
+        // Update
+        ZfExtended_Factory
+            ::get('editor_Models_TermCollection_TermCollection')
+            ->updateStats($_['termEntryId']['collectionId'], [
+                'termEntry' => 0,
+                'term' => 0,
+                'attribute' => 1
+            ]);
     }
 
     /**
@@ -190,6 +199,15 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Flush response data
         $this->view->assign(['updated' => $updated]);
+
+        // Update
+        ZfExtended_Factory
+            ::get('editor_Models_TermCollection_TermCollection')
+            ->updateStats($_['attrId']['collectionId'], [
+                'termEntry' => 0,
+                'term' => 0,
+                'attribute' => -1
+            ]);
     }
 
     /**
@@ -857,7 +875,12 @@ class editor_AttributeController extends ZfExtended_RestController
                             'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s', strtotime($naa['updatedAt'])),
                         ];
 
-                    // Else do nothing
+                    // Update
+                    ZfExtended_Factory
+                        ::get('editor_Models_TermCollection_TermCollection')
+                        ->updateStats($_['termId']['collectionId'], ['termEntry' => 0, 'term' => 1]);
+
+                // Else do nothing
                 } else {
 
                 }
@@ -874,7 +897,7 @@ class editor_AttributeController extends ZfExtended_RestController
                 // it means that term processStatus was changed to 'rejected', so 'normativeAuthorization'
                 // attribute was set to 'deprecatedTerm', and in case if there was no such attribute previously
                 // we need to pass attr info to client side for attr-field to be added into the attr-panel
-                if ($naa = $__['normativeAuthorization'])
+                if ($naa = $__['normativeAuthorization']) {
                     $data['normativeAuthorization'] = [
                         'id' => $naa['id'],
                         'value' => $naa['value'],
@@ -883,6 +906,16 @@ class editor_AttributeController extends ZfExtended_RestController
                         'created' => $this->_session->userName . ', ' . date('d.m.Y H:i:s', strtotime($naa['createdAt'])),
                         'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s', strtotime($naa['updatedAt'])),
                     ];
+
+                    // Increment collection stats 'attribute'-prop only
+                    ZfExtended_Factory
+                        ::get('editor_Models_TermCollection_TermCollection')
+                        ->updateStats($_['termId']['collectionId'], [
+                            'termEntry' => 0,
+                            'term' => 0,
+                            'attribute' => 1
+                        ]);
+                }
             }
 
             // Append processStatus to response data

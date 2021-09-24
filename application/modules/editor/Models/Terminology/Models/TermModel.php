@@ -250,7 +250,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             SET 
               `date` = :date, 
               `transacNote` = :userName,
-              `target` = :userGuid,
+              `target` = :userGuid
             WHERE TRUE
               AND `termEntryId` = :termEntryId 
               AND ' . $language . '
