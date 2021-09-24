@@ -64,11 +64,14 @@ WHERE t.collectionId = te.collectionId AND t.groupId = te.groupId AND t.termEntr
 
 -- term entries without terms are removed
 DELETE FROM LEK_term_entry WHERE id IN (
-    SELECT  LEK_term_entry.id
-    FROM    LEK_term_entry
-                LEFT JOIN LEK_terms
-                          ON LEK_terms.termEntryId = LEK_term_entry.id
-    WHERE   LEK_terms.termEntryId IS NULL);
+    SELECT id FROM (
+        SELECT  LEK_term_entry.id
+        FROM    LEK_term_entry
+        LEFT JOIN LEK_terms
+        ON LEK_terms.termEntryId = LEK_term_entry.id
+        WHERE   LEK_terms.termEntryId IS NULL
+    ) as subselect
+);
 
 call translate5Logger('deleted term entries without terms');
 
