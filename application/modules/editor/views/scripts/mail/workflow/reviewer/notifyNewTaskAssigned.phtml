@@ -65,7 +65,7 @@ $this->textbody = strip_tags($this->templateApply($template, $params));
 
 if(!empty($this->associatedUsers)) {
     $params['reviewersFragment'] = $this->translate->_("\n<br/>".'<b>Alle der Aufgabe zugeordneten Benutzer:</b>'."\n<br/>");
-    $params['reviewersFragment'] .= $this->workflowNotifyMail()->renderUserList($this->associatedUsers);
+    $params['reviewersFragment'] .= $this->workflowNotifyMail()->renderUserList($this->associatedUsers, $this->receiver->userGuid);
 }
 if($this->addCompetitiveDisclaimer) {
     //the disclaimer is injected to the role for correct positioning also we do not have to touch all client overwritten templates

@@ -58,15 +58,17 @@ abstract class editor_Models_Export_FileParser_Xlf_Namespaces_Abstract {
      * @throws Zend_Exception
      */
     protected function loadComments(array $attributes, editor_Models_Import_FileParser_XmlParser $xmlparser, editor_Models_Task $task) {
-        if(empty($attributes['id']) && $attributes['id'] !== '0') {
-            throw new Zend_Exception('Missing id attribute in '.$xmlparser->current()['openerKey']);
+        if(empty($attributes['ids']) && $attributes['ids'] !== '0') {
+            throw new Zend_Exception('Missing ids attribute in '.$xmlparser->current()['openerKey']);
         }
+        $ids = explode(',', $attributes['ids']);
         $comment = ZfExtended_Factory::get('editor_Models_Comment');
         /* @var $comment editor_Models_Comment */
-        $commentForSegment = $comment->loadBySegmentAndTaskPlain((int) $attributes['id'], $task->getTaskGuid());
-        if(empty($commentForSegment)) {
-            return;
+        foreach($ids as $id) {
+            $commentForSegment = $comment->loadBySegmentAndTaskPlain((int) $id, $task->getTaskGuid());
+            if(!empty($commentForSegment)) {
+                $this->comments = array_merge($commentForSegment, $this->comments);
+            }
         }
-        $this->comments = array_merge($commentForSegment, $this->comments);
     }
 }

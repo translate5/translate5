@@ -2020,6 +2020,16 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='TnVyIFRCWCBCYXNpYyBTdGFuZGFyZGF0dHJpYnV0ZSArIHByb2Nlc3NTdGF0dXMgZXhwb3J0aWVyZW4='><source>Nur TBX Basic Standardattribute + processStatus exportieren</source><target>Nur TBX Basic Standardattribute + processStatus exportieren</target></trans-unit>
 <trans-unit id='QmlsZGVyIGltIEhleC1Gb3JtYXQgZXhwb3J0aWVyZW4sIGVpbmdlYmV0dGV0IGluIFRCWA=='><source>Bilder im Hex-Format exportieren, eingebettet in TBX</source><target>Bilder im Hex-Format exportieren, eingebettet in TBX</target></trans-unit>
 <trans-unit id='QWxzIFRCWCBleHBvcnRpZXJlbg=='><source>Als TBX exportieren</source><target>Als TBX exportieren</target></trans-unit>
+<trans-unit id='MS4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'><source>1. Lektorat (sprachlich)</source><target>1. Lektorat (sprachlich)</target></trans-unit>
+<trans-unit id='MS4gTGVrdG9yYXQgKHRlY2huaXNjaCk='><source>1. Lektorat (technisch)</source><target>1. Lektorat (technisch)</target></trans-unit>
+<trans-unit id='Mi4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'><source>2. Lektorat (sprachlich)</source><target>2. Lektorat (sprachlich)</target></trans-unit>
+<trans-unit id='Mi4gTGVrdG9yYXQgKHRlY2huaXNjaCk='><source>2. Lektorat (technisch)</source><target>2. Lektorat (technisch)</target></trans-unit>
+<trans-unit id='VGV4dGZyZWlnYWJl'><source>Textfreigabe</source><target>Textfreigabe</target></trans-unit>
+<trans-unit id='RXh0ZXJuZXMgRFRQIChudXIgTGVzZXJlY2h0ZSBpbiB0cmFuc2xhdGU1KQ=='><source>Externes DTP (nur Leserechte in translate5)</source><target>Externes DTP (nur Leserechte in translate5)</target></trans-unit>
+<trans-unit id='RmluYWxlIFRleHRmcmVpZ2FiZQ=='><source>Finale Textfreigabe</source><target>Finale Textfreigabe</target></trans-unit>
+<trans-unit id='U3ByYWNoZSDDpG5kZXJu'><source>Sprache ändern</source><target>Sprache ändern</target></trans-unit>
+<trans-unit id='YXJpYQ=='><source>aria</source><target>Dunkles Layout (Aria)</target></trans-unit>
+<trans-unit id='dHJpdG9u'><source>triton</source><target>Standard Layout (Triton)</target></trans-unit>
   </body>
  </file>
 </xliff>

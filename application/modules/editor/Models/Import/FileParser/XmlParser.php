@@ -202,6 +202,10 @@ class editor_Models_Import_FileParser_XmlParser {
      * @return array
      */
     public function getChunks($offset, $length = 1) {
+        // we must reject negative length's as array_splice supports those and will surely not work as intended by this API
+        if($length < 0){
+            throw new ZfExtended_Exception('Wrong usage of editor_Models_Import_FileParser_XmlParser::getChunks, a negative length is not supported');
+        }
         return array_slice($this->xmlChunks, $offset, $length);
     }
     
