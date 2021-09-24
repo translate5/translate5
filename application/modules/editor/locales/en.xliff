@@ -4262,6 +4262,10 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>engineName_SDLLanguageCloud</source>
     <target>Enginename</target>
 </trans-unit>
+<trans-unit id='RXJsYXVidGUgRGF0ZWlmb3JtYXRlOiBUQlggb2RlciBlaW5lIFppcC1EYXRlaSwgZGllIGVpbmUgb2RlciBtZWhyZXJlIFRCWC1EYXRlaWVuIGVudGjDpGx0Lg=='>
+    <source>Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.</source>
+    <target>Allowed file formats: TBX or a zip file containing one or multiple TBX files.</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

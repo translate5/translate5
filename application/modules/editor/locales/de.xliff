@@ -2017,6 +2017,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='dG1JZF90YXJnZXRMYW5n'><source>tmId_targetLang</source><target>Zielsprache</target></trans-unit>
 <trans-unit id='ZG9tYWluQ29kZV9TRExMYW5ndWFnZUNsb3Vk'><source>domainCode_SDLLanguageCloud</source><target>Domaincode</target></trans-unit>
 <trans-unit id='ZW5naW5lTmFtZV9TRExMYW5ndWFnZUNsb3Vk'><source>engineName_SDLLanguageCloud</source><target>Engine name</target></trans-unit>
+<trans-unit id='RXJsYXVidGUgRGF0ZWlmb3JtYXRlOiBUQlggb2RlciBlaW5lIFppcC1EYXRlaSwgZGllIGVpbmUgb2RlciBtZWhyZXJlIFRCWC1EYXRlaWVuIGVudGjDpGx0Lg=='><source>Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.</source><target>Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.</target></trans-unit>
   </body>
  </file>
 </xliff>
