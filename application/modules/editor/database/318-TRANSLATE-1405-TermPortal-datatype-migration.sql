@@ -74,7 +74,7 @@ DEALLOCATE PREPARE stmt1;
 If @recCount > 0 THEN
 
     SET @picklistValues = if(picklistValuesParam is null,'", `picklistValues` = NULL ',concat('", `picklistValues` = "',picklistValuesParam,'"'));
-    SET @updateQuery := CONCAT('UPDATE `terms_attributes_datatype` SET `level` = "',levelParam,'",`name` = "',nameParam,'",`dataType` = "',dataTypeParam,@picklistValues,',`isTbxBasic` = ',isTbxBasicParam,' WHERE `label`= "',labelParam,'" AND ', @typeFilter);
+    SET @updateQuery := CONCAT('UPDATE `terms_attributes_datatype` SET `level` = "',levelParam,'",`l10nCustom` = "',nameParam,'",`dataType` = "',dataTypeParam,@picklistValues,',`isTbxBasic` = ',isTbxBasicParam,' WHERE `label`= "',labelParam,'" AND ', @typeFilter);
 
     PREPARE stmt2 FROM @updateQuery;
 EXECUTE stmt2;
