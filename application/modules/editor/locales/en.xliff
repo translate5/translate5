@@ -4044,7 +4044,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBlbnRmZXJudA=='><source>Die Qualität wurde entfernt</source><target>The quality has been removed</target></trans-unit>
 <trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='><source>Der False-Positive Status wurde aktualisiert</source><target>The false-positive state has been updated</target></trans-unit>
 <trans-unit id='QWNodHVuZw=='><source>Achtung</source><target>Warning</target></trans-unit>
-<trans-unit id='RXMgZ2lidCBpbiBkaWVzZXIgQXVmZ2FiZSBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIHUuVS4gZWluZW4gZmVobGVyZnJlaWVuIEV4cG9ydCBkZXIgQXVmZ2FiZSB2ZXJoaW5kZXJu'><source>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</source><target>There are problems with internal tags in this task that may prevent exporting this task properly</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBpbiBkaWVzZXIgQXVmZ2FiZSBpbnRlcm5lIFRhZyBGZWhsZXIsIGRpZSBmw7xyIGVpbmVuIGZlaGxlcmZyZWllbiBFeHBvcnQgYXV0b21hdGlzY2gga29ycmlnaWVydCB3dXJkZW4='>
+	<source>Es gibt in dieser Aufgabe interne Tag Fehler, die für einen fehlerfreien Export automatisch korrigiert wurden</source>
+	<target>There are problems with internal tags in this task that have been automatically resolved for a proper export</target>
+</trans-unit>
 <trans-unit id='TMOkbmdlbiBQcsO8ZnVuZw=='><source>Längen Prüfung</source><target>Length check</target></trans-unit>
 <trans-unit id='U2VnbWVudCBpc3QgbMOkbmdlciBhbHMgZXJsYXVidA=='><source>Segment ist länger als erlaubt</source><target>Segment longer than allowed</target></trans-unit>
 <trans-unit id='U2VnbWVudCBpc3QgcmVsZXZhbnQga8O8cnplciBhbHMgZXJsYXVidCAobWVociBhbHMgezB9JSB6dSBrdXJ6IG9kZXIgbWluLiB7MX0gUGl4ZWwgenUga3Vyeik='><source>Segment ist relevant kürzer als erlaubt (mehr als {0}% zu kurz oder min. {1} Pixel zu kurz)</source><target>Segment relevantly shorter than allowed (more than {0}% shorter than allowed or at least {1} Pixel shorter than allowed)</target></trans-unit>

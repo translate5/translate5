@@ -27,7 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Processes a single segment for export
+ * Processes a single segment field for export
+ * Removes all internal tags albeit those needed for further processing (internal & mqm tags)
+ * Repairs Segments with tag-faults that have been detected by the AutoQA
  */
 class editor_Segment_Export {
     
@@ -52,11 +54,16 @@ class editor_Segment_Export {
      * @var boolean
      */
     private $isFaultyInTask;
+    /**
+     * @var boolean
+     */
+    private $tagErrorsFixed;
     
     private function __construct(editor_Segment_FieldTags $fieldTags, bool $fixFaultyTags){
         $this->fieldTags = $fieldTags;
         $this->fixFaulty = $fixFaultyTags;
         $this->isFaultyInTask = in_array($fieldTags->getSegmentId(), $fieldTags->getTask()->getFaultySegmentIds());
+        $this->tagErrorsFixed = false;
     }
     /**
      * Processes the 
@@ -68,8 +75,13 @@ class editor_Segment_Export {
             $this->fieldTags->cloneWithoutTrackChanges(editor_Segment_Quality_Manager::instance()->getAllExportedTypes()) : 
             $this->fieldTags->cloneFiltered(editor_Segment_Quality_Manager::instance()->getAllExportedTypes());
         if($this->isFaultyInTask && $this->fixFaulty){
-            
+            $repair = new editor_Segment_Internal_TagRepair($this->fieldTags, NULL);
+            $this->tagErrorsFixed = $repair->hadErrors();
         }
         return $this->fieldTags->render();
+    }
+    
+    public function tagErrorsHaveBeenFixed() : bool {
+        return $this->tagErrorsFixed;
     }
 }

@@ -400,6 +400,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return NULL;
     }
     /**
+     * 
+     * @return editor_Segment_Tag[]
+     */
+    public function getAll() : array {
+        return $this->tags;
+    }
+    /**
      * Retrieves the internal tags of a certain type
      * @param string $type
      * @param boolean $includeDeleted: if set, internal tags that represent deleted content will be processed as well
@@ -417,16 +424,16 @@ class editor_Segment_FieldTags implements JsonSerializable {
     /**
      * Removes the internal tags of a certain type
      * @param string $type
-     * @param boolean $includeDeleted: if set, field tags that represent deleted content will be processed as well
+     * @param boolean $skipDeleted: if set, field tags that represent deleted content will be skipped
      */
-    public function removeByType(string $type, bool $includeDeleted=false){
+    public function removeByType(string $type, bool $skipDeleted=false){
         $result = [];
         $replace = false;
         foreach($this->tags as $tag){
-            if($tag->getType() != $type || (!$includeDeleted && $tag->wasDeleted)){
-                $result[] = $tag;
-            } else {
+            if($tag->getType() == $type && (!$skipDeleted || !$tag->wasDeleted)){
                 $replace = true;
+            } else {
+                $result[] = $tag;
             }
         }
         if($replace){

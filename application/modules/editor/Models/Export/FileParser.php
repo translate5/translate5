@@ -321,8 +321,14 @@ abstract class editor_Models_Export_FileParser {
         
         // This removes all segment tags but the ones needed for export
         $edited = ($segmentExport == NULL) ? '' : $segmentExport->process();
+        
+        if($segmentExport != NULL && $segmentExport->tagErrorsHaveBeenFixed()){
+            // TODO INSTANTTRANSLATE: If we need a remark in the instant translate frontend, that there were errors automatically fixed, 
+            // this has to be initiated here
+            error_log('Task '.$this->_task->getTaskGuid().' Export: Internal Tag Faults have been fixed automatically');
+        }
        
-        // TODO EXPORT: adjust, solve with segmen-tags code
+        // TODO: rework, solve with segment-tags code (-> editor_Segment_Internal_TagComparision)
         $this->compareTags($segment, $edited, $field);
         
         //count length after removing removeTrackChanges and removeTermTags
