@@ -37,14 +37,8 @@ Ext.define('Editor.view.HeadPanelViewController', {
             }
         },
         component: {
-            '#languageSwitch' : {
-                change: 'changeLocale'
-            },
             '#logoutSingle' : {
                 click: 'handleLogout'
-            },
-            '#uiTheme' : {
-                change: 'onUiThemeChange'
             }
         }
     },
@@ -56,24 +50,6 @@ Ext.define('Editor.view.HeadPanelViewController', {
 
     handleLogout: function() {
         Editor.app.logout();
-    },
-
-    changeLocale: function(combo, locale) {
-        Editor.app.setTranslation(locale);
-    },
-
-    /***
-     * On ui change combo event handler
-     * @param combo
-     * @param newValue
-     */
-    onUiThemeChange:function(combo, newValue){
-        var uiThemesRecord = Editor.app.getUserConfig('extJs.cssFile',true);
-        uiThemesRecord.set('value',newValue);
-        uiThemesRecord.save({
-            callback:function(){
-                location.reload();
-            }
-        });
     }
+
 });

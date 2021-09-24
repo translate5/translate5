@@ -250,7 +250,7 @@ If you did not send the request yourself, please inform us of this.
 <trans-unit id='e1ByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVVcmx9'><source>{PreferencesYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/MhbafT1KBhI</target></trans-unit>
 <trans-unit id='e1ByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'><source>{PreferencesYoutubeVideoGuideDescriptionContent}</source><target><br/>
 <figure>
-    <figcaption><b>Übersicht:</b></figcaption>
+    <figcaption><b>Overview:</b></figcaption>
       <a target="youtubevideoframe" href="https://www.youtube.com/embed/MhbafT1KBhI?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
       <a target="youtubevideoframe" href="https://www.youtube.com/embed/MhbafT1KBhI?start=11&amp;autoplay=1" dir="auto">0:11</a> System configuration<br/>
       <a target="youtubevideoframe" href="https://www.youtube.com/embed/MhbafT1KBhI?start=74&amp;autoplay=1" dir="auto">1:14</a> Configuration - Client<br/>
@@ -259,10 +259,26 @@ If you did not send the request yourself, please inform us of this.
       <a target="youtubevideoframe" href="https://www.youtube.com/embed/MhbafT1KBhI?start=133&amp;autoplay=1" dir="auto">2:13</a> In-Context Fonts<br/>
       <a target="youtubevideoframe" href="https://www.youtube.com/embed/MhbafT1KBhI?start=202&amp;autoplay=1" dir="auto">3:22</a> Contactinformation<br/>
 </figure>
-</target></trans-unit>
+</target>
+</trans-unit>
 <trans-unit id='UG1saWdodA=='>
     <source>Pmlight</source>
     <target>PM Light</target>
+</trans-unit>
+<trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{CliYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/v_laJ7b_cXA</target></trans-unit>
+<trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{CliYoutubeVideoGuideDescriptionContent}</source>
+<target><br/>
+<figure>
+    <figcaption><b>Overview:</b></figcaption>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/v_laJ7b_cXA?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/v_laJ7b_cXA?start=31&amp;autoplay=1" dir="auto">0:31</a> Command overview<br/>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/v_laJ7b_cXA?start=40&amp;autoplay=1" dir="auto">0:40</a> Help for a command<br/>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/v_laJ7b_cXA?start=48&amp;autoplay=1" dir="auto">0:48</a> Setting options<br/>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/v_laJ7b_cXA?start=95&amp;autoplay=1" dir="auto">1:35</a> Plugin overview<br/>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/v_laJ7b_cXA?start=114&amp;autoplay=1" dir="auto">1:54</a> System log<br/>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/v_laJ7b_cXA?start=154&amp;autoplay=1" dir="auto">2:34</a> Contact information<br/>
+</figure>
+</target>
 </trans-unit>
         </body>
     </file>

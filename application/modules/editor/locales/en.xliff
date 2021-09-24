@@ -398,7 +398,7 @@
       </trans-unit>
       <trans-unit id="UGFzc3dvcnQgw6RuZGVybg==">
         <source>Passwort &#xE4;ndern</source>
-        <target>change password</target>
+        <target>Change password</target>
       </trans-unit>
       <trans-unit id="UGFzc3dvcnQgS29udHJvbGxl">
         <source>Passwort Kontrolle</source>
@@ -1472,7 +1472,7 @@
 </trans-unit>
 <trans-unit id='RGFzIHZlcndlbmRldGUgw5xiZXJzZXR6dW5nc3dlcmt6ZXVnIGhhdCBrZWluZSBJbmZvcm1hdGlvbiB6dXIgSGVya3VuZnQgZGVzIE1hdGNoZXMgenVyIFZlcmbDvGd1bmcgZ2VzdGVsbHQu'>
     <source>Das verwendete Übersetzungswerkzeug hat keine Information zur Herkunft des Matches zur Verfügung gestellt.</source>
-    <target>The translation tool used did not provided information on the origin of the match.</target>
+    <target>The translation tool used did not provide information on the origin of the match.</target>
 </trans-unit>
 <trans-unit id='RGllc2VyIFRhc2sgd3VyZGUgaW1wb3J0aWVydCwgYmV2b3IgZGFzIE1hdGNoIFJhdGUgVHlwLUZlYXR1cmUgaW1wbGVtZW50aWVydCB3dXJkZS4='>
     <source>Dieser Task wurde importiert, bevor das Match Rate Typ-Feature implementiert wurde.</source>
@@ -4262,9 +4262,53 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>engineName_SDLLanguageCloud</source>
     <target>Enginename</target>
 </trans-unit>
+<trans-unit id='RXJsYXVidGUgRGF0ZWlmb3JtYXRlOiBUQlggb2RlciBlaW5lIFppcC1EYXRlaSwgZGllIGVpbmUgb2RlciBtZWhyZXJlIFRCWC1EYXRlaWVuIGVudGjDpGx0Lg=='>
+    <source>Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.</source>
+    <target>Allowed file formats: TBX or a zip file containing one or multiple TBX files.</target>
+</trans-unit>
 <trans-unit id='TnVyIFRCWCBCYXNpYyBTdGFuZGFyZGF0dHJpYnV0ZSArIHByb2Nlc3NTdGF0dXMgZXhwb3J0aWVyZW4='><source>Nur TBX Basic Standardattribute + processStatus exportieren</source><target>Export only TBX Basic standard attributes + processStatus</target></trans-unit>
 <trans-unit id='QmlsZGVyIGltIEhleC1Gb3JtYXQgZXhwb3J0aWVyZW4sIGVpbmdlYmV0dGV0IGluIFRCWA=='><source>Bilder im Hex-Format exportieren, eingebettet in TBX</source><target>Export images in hex format, embedded in TBX</target></trans-unit>
 <trans-unit id='QWxzIFRCWCBleHBvcnRpZXJlbg=='><source>Als TBX exportieren</source><target>Export as TBX</target></trans-unit>
+<trans-unit id='MS4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'>
+  <source>1. Lektorat (sprachlich)</source>
+  <target>1st revision - language</target>
+</trans-unit>
+<trans-unit id='MS4gTGVrdG9yYXQgKHRlY2huaXNjaCk='>
+  <source>1. Lektorat (technisch)</source>
+  <target>1st revision - technical</target>
+</trans-unit>
+<trans-unit id='Mi4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'>
+  <source>2. Lektorat (sprachlich)</source>
+  <target>2nd revision - language</target>
+</trans-unit>
+<trans-unit id='Mi4gTGVrdG9yYXQgKHRlY2huaXNjaCk='>
+  <source>2. Lektorat (technisch)</source>
+  <target>2nd revision - technical</target>
+</trans-unit>
+<trans-unit id='VGV4dGZyZWlnYWJl'>
+  <source>Textfreigabe</source>
+  <target>Text approval</target>
+</trans-unit>
+<trans-unit id='RXh0ZXJuZXMgRFRQIChudXIgTGVzZXJlY2h0ZSBpbiB0cmFuc2xhdGU1KQ=='>
+  <source>Externes DTP (nur Leserechte in translate5)</source>
+  <target>External DTP (read-only inside translate5)</target>
+</trans-unit>
+<trans-unit id='RmluYWxlIFRleHRmcmVpZ2FiZQ=='>
+  <source>Finale Textfreigabe</source>
+  <target>Final text approval</target>
+</trans-unit>
+<trans-unit id='U3ByYWNoZSDDpG5kZXJu'>
+    <source>Sprache ändern</source>
+    <target>Change language</target>
+</trans-unit>
+<trans-unit id='YXJpYQ=='>
+    <source>aria</source>
+    <target>Dark theme (Aria)</target>
+</trans-unit>
+<trans-unit id='dHJpdG9u'>
+    <source>triton</source>
+    <target>Default theme (Triton)</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

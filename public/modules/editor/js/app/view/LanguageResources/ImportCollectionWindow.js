@@ -43,7 +43,8 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         deleteTermEitriesImport:'#UT#Termeinträge löschen älter als aktueller Import',
         helpButtonTooltip:'#UT#Info zum Term-Collection',
         deleteTermProposals:'#UT#Vorschläge löschen, deren letzte Berührung länger her ist als',
-        deleteTermProposalsImport:'#UT#Vorschläge löschen älter als aktueller Import'
+        deleteTermProposalsImport:'#UT#Vorschläge löschen älter als aktueller Import',
+        collectionUploadTooltip:'#UT#Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.'
     },
     tools:[{
         type:'help',
@@ -121,7 +122,10 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
             	}
             }
         });
-        me.down('filefield[name="tmUpload"]').regex=/\.(tbx|zip)$/i;
+        var uploadField = me.down('filefield[name="tmUpload"]');
+        uploadField.regex=/\.(tbx|zip)$/i;
+        uploadField.labelClsExtra = 'lableInfoIcon';
+        uploadField.autoEl = { tag: 'div', 'data-qtip': me.strings.collectionUploadTooltip};
     },
     /**
      * loads the record into the form

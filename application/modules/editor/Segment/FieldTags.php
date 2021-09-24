@@ -357,7 +357,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $logger->warn(
                 'E1343',
                 'Setting the FieldTags tags by text led to a changed text-content presumably because the encoded tags have been improperly processed',
-                ['segmentId' => $this->segmentId, 'textBefore' => $textBefore, 'textAfter' => $this->fieldText ]
+                ['task' => $this->task, 'segmentId' => $this->segmentId, 'textBefore' => $textBefore, 'textAfter' => $this->fieldText]
             );
         }
     }
