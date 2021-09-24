@@ -28,6 +28,7 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
@@ -88,6 +89,16 @@ abstract class Translate5AbstractCommand extends Command
             '   <info>Version:</> '.$this->translate5->getVersion(),
             '',
         ]);
+    }
+
+    protected function writeAssoc(array $data) {
+        $keys = array_keys($data);
+        $maxlen = max(array_map('strlen', $keys)) + 1;
+        foreach($data as $key => $value) {
+            $key = str_pad($key, $maxlen, ' ', STR_PAD_LEFT);
+            $key = '<info>'.$key.'</info> ';
+            $this->output->writeln($key.OutputFormatter::escape((string) $value));
+        }
     }
     
     /***

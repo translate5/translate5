@@ -63,8 +63,8 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ extends editor_Models
         $xmlparser->registerElement('trans-unit mq:comments mq:comment', null, function($tag, $key, $opener) use ($xmlparser) {
             $attr = $opener['attributes'];
 
-            //if the comment is marked as deleted, we just do not import it
-            if(!empty($attr['deleted']) && strtolower($attr['deleted']) == 'true') {
+            //if the comment is marked as deleted or is empty (a single attribute), we just do not import it
+            if($opener['isSingle'] || (!empty($attr['deleted']) && strtolower($attr['deleted']) == 'true')) {
                 return;
             }
 

@@ -91,12 +91,13 @@ class editor_Workflow_Anonymize {
      * @param string $taskGuid
      * @param string $userGuid
      * @param array $data
+     * @param string $currentUserGuid optional, if null use the current authenticated users guid
      * @return array
      */
-    public function anonymizeUserdata(string $taskGuid, string $userGuid, array $data) {
+    public function anonymizeUserdata(string $taskGuid, string $userGuid, array $data, string $currentUserGuid = null) {
         $this->taskGuid = $taskGuid;
         $this->userGuid = $userGuid;
-        if ($this->isCurrentUserOrPM()) {
+        if ($this->isCurrentUserOrPM($currentUserGuid ?? $this->sessionUserGuid)) {
             return $data;
         }
         $keysToAnonymize = ['comments','email','firstName','lockingUser','lockingUsername','login','userGuid','userName','surName'];
@@ -127,10 +128,11 @@ class editor_Workflow_Anonymize {
      * anonymize data about OTHER workflow users only
      * and if the other user is NOT the task's PM; 
      * check here:
+     * @param string $currentUserGuid the user guid to be used as current user
      * @return boolean
      */
-    protected function isCurrentUserOrPM(): bool {
-        if ($this->userGuid == $this->sessionUserGuid) {
+    protected function isCurrentUserOrPM(string $currentUserGuid): bool {
+        if ($this->userGuid == $currentUserGuid) {
             return true;
         }
         $task = ZfExtended_Factory::get('editor_Models_Task');

@@ -810,6 +810,36 @@ class editor_Utils {
     public static function cleanUrl(string $url) : string {
         return(self::removeQueryString(self::removeFragment($url)));
     }
+    /**
+     * 
+     * @param string $url
+     * @return bool
+     */
+    public static function urlIsAccessible(string $url) : bool {
+        if(!empty($url)){
+            $opts = array(
+                'http' => array(
+                    'method' => 'HEAD'
+                )
+            );
+            $context = stream_context_create($opts);
+            $headers = get_headers($url, 0, $context);
+            $code == -1;
+            $matches = [];
+            if ($headers != false && count($headers) > 0) {
+                foreach($headers as $header){
+                    // grabs the last $header $code, in case of redirect(s):
+                    if(preg_match("/^HTTP.+\s(\d\d\d)\s/", $header, $matches)){
+                        $code = $matches[1];
+                    }
+                }
+            }
+            if($code >= 200 && $code <= 300){
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 class ZfExtended_Mismatch extends ZfExtended_ErrorCodeException {

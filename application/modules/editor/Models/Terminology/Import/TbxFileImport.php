@@ -644,7 +644,6 @@ $memLog('Loaded terms:        ');
 
         // for term entry transac group there is no language
         $transacGrpObject->language = $transacGrpObject->parentLangset->language ?? null;
-        $transacGrpObject->attrLang = $this->getActualLanguageAttribute($transacGrp);
 
         if (isset($transacGrp->transac)) {
             $transacGrpObject->transac = (string)$transacGrp->transac;

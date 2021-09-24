@@ -574,7 +574,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 //</trans-unit>
         }, function($tag, $key, $opener) {
             try {
-                $this->extractSegment($opener['attributes']);
+                $createdSegmentIds = $this->extractSegment($opener['attributes']);
+                //we collect all created segmentIds fur further usage on export (if needed by namespace)
+                $this->xmlparser->replaceChunk($key, '<t5:unitSegIds ids="'.join(',', $createdSegmentIds).'" />'.$this->xmlparser->getChunk($key));
             }
             catch(ZfExtended_ErrorCodeException $e){
                 $e->addExtraData(['trans-unit' => $opener['attributes']]);
@@ -713,10 +715,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * and saves this segments into database
      *
      * @param array $transUnit In this class this are the trans-unit attributes only
-     * @return array $transUnit contains replacement-tags <lekSourceSeg id=""/> and <lekTargetSeg id=""/>
-     *          instead of the original segment content. attribut id contains the id of db-table LEK_segments
+     * @return array array of segmentIds created from that trans unit
      */
-    protected function extractSegment($transUnit) {
+    protected function extractSegment($transUnit): array {
         //define the fieldnames where the data should be stored
         $sourceName = $this->segmentFieldManager->getFirstSourceName();
         $targetName = $this->segmentFieldManager->getFirstTargetName();
@@ -755,7 +756,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $preserveWhitespace = $this->currentPlainTarget['openerMeta']['preserveWhitespace'];
         }
         $this->otherContent->initOnUnitEnd($hasNoTarget || $hasEmptyTarget, $preserveWhitespace);
-        
+
+        $createdSegmentIds = [];
         foreach($this->sourceProcessOrder as $mid) {
             if($mid === '') {
                 //if mid was empty string there was an error, ignore the segment, logging was already done
@@ -862,7 +864,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->otherContent->addIgnoredSegmentLength($emptyInitialTarget ? $sourceChunks : $targetChunks, $attributes);
                 continue;
             }
-            $segmentId = $this->setAndSaveSegmentValues();
+            $createdSegmentIds[] = $segmentId = $this->setAndSaveSegmentValues();
             //only with a segmentId (in case of ProofProcessor) we can save comments
             if($segmentId !== false && is_numeric($segmentId)) {
                 $this->importComments((int) $segmentId);
@@ -887,7 +889,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         //if we dont find any usable segment or the segment is locked, we dont have to place the placeholder
         if(empty($placeHolders) || !$this->processSegment){
-            return;
+            return $createdSegmentIds;
         }
         
         foreach($placeHolders as $mid => $placeHolder) {
@@ -933,6 +935,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 return $placeHolder.$oldChunk;
             });
         }
+
+        return $createdSegmentIds;
     }
     
     /**

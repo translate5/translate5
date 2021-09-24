@@ -45,7 +45,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
      * @param array $users
      * @return string
      */
-    public function renderUserList(array $users) {
+    public function renderUserList(array $users, string $receiverUserGuid = null) {
         // anonymize users?
         $task = $this->view->task;
         
@@ -64,7 +64,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
             /* @var $workflowAnonymize editor_Workflow_Anonymize */
             foreach($users as &$user) {
-                $user = $workflowAnonymize->anonymizeUserdata($taskGuid, $user['userGuid'], $user);
+                $user = $workflowAnonymize->anonymizeUserdata($taskGuid, $user['userGuid'], $user, $receiverUserGuid);
             }
         }
         //reset the tmp user variable

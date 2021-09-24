@@ -25,22 +25,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-DROP TABLE `terms_resp_person`;
+UPDATE `Zf_configuration` SET `defaults` = "aria,triton" WHERE `name` = "runtimeOptions.extJs.cssFile";
+UPDATE `LEK_user_config` SET `value` = "triton" WHERE `value` NOT IN ("triton","aria") AND `name` = "runtimeOptions.extJs.cssFile";
 
-CREATE TABLE `terms_ref_object` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `collectionId` int(11) NOT NULL,
-  `listType` varchar(64) NOT NULL,
-  `key` varchar(64) NOT NULL,
-  `data` text NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY (`collectionId`, `listType`, `key`),
-  CONSTRAINT FOREIGN KEY (`collectionId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
-ALTER TABLE `terms_attributes` 
-ADD COLUMN `isDescripGrp` TINYINT(1) NULL DEFAULT 0 AFTER `attrLang`;
-
-ALTER TABLE `terms_transacgrp` 
-CHANGE `ifDescripgrp` `isDescripGrp` TINYINT(1) DEFAULT 0 NULL;

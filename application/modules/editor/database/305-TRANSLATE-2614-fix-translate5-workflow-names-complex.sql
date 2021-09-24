@@ -25,7 +25,11 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
-ALTER TABLE `terms_transacgrp` 
-ADD COLUMN `termTbxId` VARCHAR(100) NULL AFTER `termId`;
-
+UPDATE `LEK_workflow_step` SET `label` = "Übersetzung" WHERE `name` = 'firsttranslation';
+UPDATE `LEK_workflow_step` SET `label` = "1. Lektorat (sprachlich)" WHERE `name` = 'review1stlanguage';
+UPDATE `LEK_workflow_step` SET `label` = "1. Lektorat (technisch)" WHERE `name` = 'review1sttechnical';
+UPDATE `LEK_workflow_step` SET `label` = "2. Lektorat (sprachlich)" WHERE `name` = 'review2ndlanguage';
+UPDATE `LEK_workflow_step` SET `label` = "2. Lektorat (technisch)" WHERE `name` = 'review2ndtechnical';
+UPDATE `LEK_workflow_step` SET `label` = "Textfreigabe" WHERE `name` = 'textapproval';
+UPDATE `LEK_workflow_step` SET `label` = "Externes DTP (nur Leserechte in translate5)" WHERE `name` = 'graphicimplementation';
+UPDATE `LEK_workflow_step` SET `label` = "Finale Textfreigabe" WHERE `name` = 'finaltextapproval';

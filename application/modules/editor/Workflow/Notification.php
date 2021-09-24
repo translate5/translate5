@@ -417,6 +417,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         
         foreach($tuas as &$tua) {
+            $tua['role'] = $tua['workflowStepName'];
             $tua['originalWorkflowStepName'] = $tua['workflowStepName'];
         }
         unset ($tua);
