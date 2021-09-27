@@ -69,8 +69,8 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
         type: "bconfStore",
     },
     viewConfig: {
-        getRowClass: function (bcong) {
-            if (!bcong.get("editable")) {
+        getRowClass: function (bconf) {
+            if (!bconf.get("editable")) {
                 return "not-editable";
             }
             return "";

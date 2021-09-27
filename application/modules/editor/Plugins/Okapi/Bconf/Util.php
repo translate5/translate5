@@ -31,37 +31,37 @@ END LICENSE AND COPYRIGHT
  * Common util class for bconf export and import
  *
  */
-class editor_Plugins_Okapi_Bconf_BconfUtil{
+class editor_Plugins_Okapi_Bconf_Util{
     
      
      /** Write the UTF-8 value in bconf
       * @param $string
-      * @param $bcongFile
+      * @param $bconfFile
       */
-     public static function writeUTF($string, $bcongFile)
+     public static function writeUTF($string, $bconfFile)
      {
           $utfString = utf8_encode($string);
           $length = strlen($utfString);
-          fwrite($bcongFile, pack("n", $length));
-          fwrite($bcongFile, $utfString);
+          fwrite($bconfFile, pack("n", $length));
+          fwrite($bconfFile, $utfString);
      }
      
      /** Write the Integer value in bconf
       * @param $intValue
-      * @param $bcongFile
+      * @param $bconfFile
       */
-     public static function writeInt($intValue, $bcongFile)
+     public static function writeInt($intValue, $bconfFile)
      {
-          fwrite($bcongFile, pack("N", $intValue));
+          fwrite($bconfFile, pack("N", $intValue));
      }
      
-     /** Write the Long  value in bcong
+     /** Write the Long  value in bconf
       * @param $pipeLine
-      * @param $bcongFile
+      * @param $bconfFile
       */
-     public static function writeLong($longValue, $bcongFile)
+     public static function writeLong($longValue, $bconfFile)
      {
-          fwrite($bcongFile, pack("J", $longValue));
+          fwrite($bconfFile, pack("J", $longValue));
      }
      
 }

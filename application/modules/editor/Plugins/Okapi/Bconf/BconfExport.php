@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * Generate new bconf file
  *
  */
-class editor_Plugins_Okapi_Bconf_BconfExport extends editor_Plugins_Okapi_Bconf_BconfUtil
+class editor_Plugins_Okapi_Bconf_BconfExport
 {
 	const OKAPI_BCONF_BASE_PATH = 'D:/okapi/test/';
 	const MAXBUFFERSIZE = 1024 * 8;
@@ -41,32 +41,38 @@ class editor_Plugins_Okapi_Bconf_BconfExport extends editor_Plugins_Okapi_Bconf_
 	const  NUMPLUGINS = 0;
 	const PIPELINEFILE = "D:/okapi/pipeline.pln";
 	const EXTFILESDIR = "G:/projects/Marc/projects/translate5/application/modules/editor/Plugins/Okapi/data/okapi-import-bconf-generation/testfiles";
-	
+
+	protected $util;
+	public function __construct(){
+		$this->util = new editor_Plugins_Okapi_Bconf_Util();
+	}
 	/**
 	 * Export bconf
 	 */
 	public function ExportBconf($okapiName, $okapiId)
 	{
+		
 		$fileExist = file_exists(self::OKAPI_BCONF_BASE_PATH . $okapiName . '.bconf');
 		if ($fileExist) {
 			//handle if file already exist
 		}
-		$bcongFile = fopen(self::OKAPI_BCONF_BASE_PATH . $okapiName . '.bconf', "w") or die("Unable to open file!");
-		$this->writeUTF(self::SIGNATURE, $bcongFile);
-		$this->writeInt(self::VERSION, $bcongFile);
+		$bconfFile = fopen(self::OKAPI_BCONF_BASE_PATH . $okapiName . '.bconf', "w") or die("Unable to open file!");
+		$this->util->writeUTF(self::SIGNATURE, $bconfFile);
+		$this->util->writeInt(self::VERSION, $bconfFile);
 		//TODO check the Plugins currentlly not in use
-		$this->writeInt(self::NUMPLUGINS, $bcongFile);
+		$this->util->writeInt(self::NUMPLUGINS, $bconfFile);
 		
 		//Read the pipeline and extract steps
-		$this->processPipeline(self::PIPELINEFILE, $bcongFile);
-		$this->filterConfiguration($okapiId, $bcongFile);
-		$this->extensionsMapping($okapiId, $bcongFile);
-		fclose($bcongFile);
+		$this->processPipeline(self::PIPELINEFILE, $bconfFile);
+		$this->filterConfiguration($okapiId, $bconfFile);
+		$this->extensionsMapping($okapiId, $bconfFile);
+		fclose($bconfFile);
 	}
 	
-	protected function processPipeline($pipeLine, $bcongFile)
+	protected function processPipeline($pipeLine, $bconfFile)
 	{
 		$pipeLineFileOpen = fopen($pipeLine, 'r') or die("Unable to open file!");
+		
 		$data = fread($pipeLineFileOpen, self::MAXBUFFERSIZE);
 		//force to add new line
 		
@@ -76,47 +82,48 @@ class editor_Plugins_Okapi_Bconf_BconfExport extends editor_Plugins_Okapi_Bconf_
 			$methods = explode("\n", $key);
 			foreach ($methods as $method) {
 				if (str_contains($method, 'Path')) {
-					self::harvestReferencedFile($bcongFile, ++$id, explode("=", $method)[1]);
+					self::harvestReferencedFile($bconfFile, ++$id, explode("=", $method)[1]);
 				}
 			}
 		}
 		// Last ID=-1 to mark no more references
-		self::writeInt(-1, $bcongFile);
+		$this->util->writeInt(-1, $bconfFile);
 		
-		$fileSize = strlen(preg_replace('/[\n]{0,}/m', '', $data));
-		++$fileSize;
+		$withOutNewLine = preg_replace('/[\n]{0,}/m', '', $data);
+		$fileSize = strlen($withOutNewLine);
+		//++$fileSize;
 		$r = (int)($fileSize % self::MAXBLOCKLEN);
 		$n = (int)($fileSize / self::MAXBLOCKLEN);
 		// Number of blocks
 		$count = $n + (($r > 0) ? 1 : 0);
-		self::writeInt($count, $bcongFile);
+		$this->util->writeInt($count, $bconfFile);
 		
 		// Write the full blocks
 		$pos = 0;
-		$data = "\n";
 		
 		//          for ( $i=0; $i<$n; $i++ ) {
-		//               self::writeUTF(substr($data,$pos, $pos+self::MAXBLOCKLEN),$bcongFile);
+		//               self::writeUTF(substr($data,$pos, $pos+self::MAXBLOCKLEN),$bconfFile);
 		//               $pos +=self::MAXBLOCKLEN;
 		//          }
 		//
 		//          // Write the remaining text
 		//          if ( $r > 0 ) {
-		//               self::writeUTF(substr($data,$pos),$bcongFile);
+		//               self::writeUTF(substr($data,$pos),$bconfFile);
 		//          }
-		self::writeUTF($data, $bcongFile);
+		
+		$this->util->writeUTF($withOutNewLine, $bconfFile);
 		fclose($pipeLineFileOpen);
 	}
 	
-	protected function harvestReferencedFile($bcongFile, $id, $refPath)
+	protected function harvestReferencedFile($bconfFile, $id, $refPath)
 	{
-		self::writeInt($id, $bcongFile);
+		$this->util->writeInt($id, $bconfFile);
 		$path = parse_url($refPath, PHP_URL_PATH);
 		
-		self::writeUTF(basename($path), $bcongFile);
+		$this->util->writeUTF(basename($path), $bconfFile);
 		
 		if ($refPath == '') {
-			self::writeLong(0, $bcongFile); // size = 0
+			$this->util->writeLong(0, $bconfFile); // size = 0
 			return false;
 		}
 		//Open the file and read the content
@@ -125,9 +132,9 @@ class editor_Plugins_Okapi_Bconf_BconfExport extends editor_Plugins_Okapi_Bconf_
 		$fileSize = filesize($refPath);
 		$fileContent = fread($file, $fileSize);
 		
-		self::writeLong($fileSize, $bcongFile);
+		$this->util->writeLong($fileSize, $bconfFile);
 		if ($fileSize > 0) {
-			fwrite($bcongFile, $fileContent);
+			fwrite($bconfFile, $fileContent);
 		}
 		fclose($file);
 	}
@@ -136,7 +143,7 @@ class editor_Plugins_Okapi_Bconf_BconfExport extends editor_Plugins_Okapi_Bconf_
 	/**
 	 *
 	 */
-	protected function filterConfiguration($okapiId, $bcongFile)
+	protected function filterConfiguration($okapiId, $bconfFile)
 	{
 		
 		$filterConfiguration = new editor_Plugins_Okapi_Models_BconfFilter();
@@ -148,26 +155,26 @@ class editor_Plugins_Okapi_Bconf_BconfExport extends editor_Plugins_Okapi_Bconf_
 				$count++;
 			}
 		}
-		self::writeInt($count, $bcongFile);
+		$this->util->writeInt($count, $bconfFile);
 		
 		foreach ($data as $filter) {
 			if ($filter['default'] == 1) {
 				//TODO get dir path
 				$configFilePath = self::OKAPI_BCONF_BASE_PATH . $filter['configId'].'.fprm';
+				error_log($configFilePath);
 				$file = fopen($configFilePath, "r") or die("Unable to open file!");
 				$configData = fread($file, filesize($configFilePath));
-				$this->writeUTF($filter['configId'], $bcongFile);
-				$this->writeUTF($configData, $bcongFile);
-				error_log($configFilePath);
+				$this->util->writeUTF($filter['configId'], $bconfFile);
+				$this->util->writeUTF($configData, $bconfFile);
 			}
 		}
 	}
 	
 	/**Section 5: Mapping extensions -> filter configuration id
 	 * @param $bconfId
-	 * @param $bcongFile
+	 * @param $bconfFile
 	 */
-	protected function extensionsMapping($okapiId, $bcongFile)
+	protected function extensionsMapping($okapiId, $bconfFile)
 	{
 		
 		$filterConfiguration = new editor_Plugins_Okapi_Models_BconfFilter();
@@ -197,15 +204,14 @@ class editor_Plugins_Okapi_Bconf_BconfExport extends editor_Plugins_Okapi_Bconf_
 					}
 				}
 			}
-			self::writeInt($count, $bcongFile); // None
+			$this->util->writeInt($count, $bconfFile); // None
 			
 			foreach ($extMap as $item) {
-				error_log(json_encode($item));
-				self::writeUTF($item["ext"], $bcongFile);
-				self::writeUTF($item["id"], $bcongFile);
+				$this->util->writeUTF($item["ext"], $bconfFile);
+				$this->util->writeUTF($item["id"], $bconfFile);
 			}
 		} else {
-			self::writeInt(0, $bcongFile); // None
+			$this->util->writeInt(0, $bconfFile); // None
 		}
 	}
 	
