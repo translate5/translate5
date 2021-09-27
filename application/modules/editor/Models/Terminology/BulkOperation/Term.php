@@ -225,24 +225,30 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
             return;
         }
 
+        // must be done like this since the where/quote functions will not cast int only keys as strings
+        // ex:  for termTbxId 1 and 4 the query will be : WHERE (termTbxId in (1, 4))
+        //      instead of  WHERE (termTbxId in ("1", "4"))
+        $keys = implode('","',array_keys($this->insertedTbxIds));
+
         //TODO: what is the point of this code ? Validation only or ? since the attar is reset right after it is filled up
         //fetch the newly inserted IDs
         $s = $this->model->db->select()
             ->from($this->model->db, ['id', 'termTbxId','guid'])
-            ->where('termTbxId in (?)', array_keys($this->insertedTbxIds))
+            ->where('termTbxId in ("'.$keys.'")')
             ->where('collectionId = ?', $collectionId);
         $ids = $this->model->db->fetchAll($s)->toArray();
+
         foreach($ids as $id) {
             if(empty($this->insertedTbxIds[$id['termTbxId']])) {
                 //this may not happen!
                 throw new editor_Models_Terminology_Import_Exception('E1356', [
                     'msg' => 'No ID to an inserted term found!',
                     'collectionId' => $collectionId,
-                    'termTbxId' => $id['termTbxId'],
+                    'termTbxId' => $id['termTbxId']
                 ]);
             }
-            //set the ID in the term tbx objects for further reuse
-            $this->insertedTbxIds[$id['termTbxId']]->id = $id['id'];
+            //set the ID in the referenced term tbx instance for further reuse via getParent
+            $this->insertedTbxIds[$id['termTbxId']] -> id = $id['id'];
         }
         $this->insertedTbxIds = [];
     }

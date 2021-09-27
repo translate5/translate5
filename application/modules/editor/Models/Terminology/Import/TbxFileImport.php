@@ -183,6 +183,8 @@ class editor_Models_Terminology_Import_TbxFileImport
         $this->mergeTerms = $mergeTerms;
         $this->prepareImportArrays($user);
 
+        error_log("File to import: ".$tbxFilePath);
+
         $xmlReader = (new class() extends XMLReader {
             public function reopen(string $tbxFilePath) {
                 $this->close();
@@ -365,13 +367,13 @@ $memLog('Loaded terms:        ');
         //before we save anything to the database we have to perform the merges
         $this->bulkTerm->mergeTerms($this->bulkTermEntry, $this->mergeTerms);
 
-        //bulkTerm create or update must be called before attributes and transacGrps in order to save the termId there correctly
         $this->bulkTermEntry->createOrUpdateElement();
 
         // Load the attributes and transac for the current term entry. Loading this on each term entry saves memory and it is faster as loading all at once.
         $this->bulkTransacGrp->loadExisting($this->bulkTermEntry->getCurrentEntry()->id);
         $this->bulkAttribute->loadExisting($this->bulkTermEntry->getCurrentEntry()->id);
 
+        //bulkTerm create or update must be called before attributes and transacGrps in order to save the termId there correctly
         $this->bulkTerm->createOrUpdateElement();
         $this->bulkAttribute->createOrUpdateElement();
         $this->bulkTransacGrp->createOrUpdateElement();
@@ -872,11 +874,6 @@ $memLog('Loaded terms:        ');
      * Update and save the counted collection import totals as specific data attribute
      */
     protected function setCollectionImportStatistic(){
-
-        $this->collection->addSpecificData('termEntry',$this->bulkTermEntry->getStatistics()['totalCount']);
-        $this->collection->addSpecificData('term',$this->bulkTerm->getStatistics()['totalCount']);
-        $this->collection->addSpecificData('attribute',$this->bulkAttribute->getStatistics()['totalCount']);
-
-        $this->collection->save();
+        $this->collection->updateStats($this->collection->getId());
     }
 }

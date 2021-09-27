@@ -167,8 +167,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             $languageresource['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
 
-
-            $languageresource['specificData'] = $this->translateSpecificData($languageresource['specificData'],$languageresource['serviceName']);
+            if(isset($languageresource['specificData']) && !empty($languageresource['specificData'])){
+                $languageresource['specificData'] = $this->translateSpecificData($languageresource['specificData'],$languageresource['serviceName']);
+            }
         }
     }
 
@@ -285,7 +286,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->status = $connector->getStatus($this->entity->getResource());
         $this->view->rows->statusInfo = $t->_($connector->getLastStatusInfo());
 
-        $this->view->rows->specificData = $this->translateSpecificData($this->view->rows->specificData,$this->view->rows->serviceName);
+        if(property_exists($this->view->rows,'specificData')){
+            $this->view->rows->specificData = $this->translateSpecificData($this->view->rows->specificData,$this->view->rows->serviceName);
+        }
     }
 
     /**
