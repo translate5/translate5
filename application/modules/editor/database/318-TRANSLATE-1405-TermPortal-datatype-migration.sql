@@ -174,6 +174,7 @@ WHERE bf.best = dt.duplicateRank AND bf.label = dt.label  AND bf.type = dt.type;
 
 -- FIXME in discussion: select here the highest ranked with non empty labeltext, and update the entry with duplicateRank = 9 with that labelText if it should be used
 
+-- we set the toBeUsedDatatypeId to the id of the datatype finally to be used
 UPDATE terms_attributes_datatype dt, (
     SELECT id, label, type
     FROM terms_attributes_datatype
@@ -182,9 +183,14 @@ UPDATE terms_attributes_datatype dt, (
 SET dt.toBeUsedDatatypeId = bf.id
 WHERE bf.label = dt.label  AND bf.type = dt.type AND dt.duplicateRank < 9;
 
+-- the same on the labels to be used itself
+UPDATE terms_attributes_datatype dt
+SET dt.toBeUsedDatatypeId = dt.id
+WHERE dt.duplicateRank = 9;
+
 call translate5Logger('Define which duplicated datatypes should be used.');
 
--- now we update the attributes labels to the new IDs:
+-- now we update the duplicated attributes labels to the new IDs:
 UPDATE terms_attributes a, terms_attributes_datatype dt
 SET a.dataTypeId = dt.toBeUsedDatatypeId
 WHERE a.dataTypeId = dt.id AND dt.duplicateRank > 0;
