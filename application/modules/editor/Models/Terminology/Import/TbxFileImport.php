@@ -874,11 +874,6 @@ $memLog('Loaded terms:        ');
      * Update and save the counted collection import totals as specific data attribute
      */
     protected function setCollectionImportStatistic(){
-
-        $this->collection->addSpecificData('termEntry',$this->bulkTermEntry->getStatistics()['totalCount']);
-        $this->collection->addSpecificData('term',$this->bulkTerm->getStatistics()['totalCount']);
-        $this->collection->addSpecificData('attribute',$this->bulkAttribute->getStatistics()['totalCount']);
-
-        $this->collection->save();
+        $this->collection->updateStats($this->collection->getId());
     }
 }
