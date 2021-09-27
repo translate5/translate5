@@ -286,7 +286,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->status = $connector->getStatus($this->entity->getResource());
         $this->view->rows->statusInfo = $t->_($connector->getLastStatusInfo());
 
-        if(array_key_exists('specificData',$this->view->rows)){
+        if(property_exists($this->view->rows,'specificData')){
             $this->view->rows->specificData = $this->translateSpecificData($this->view->rows->specificData,$this->view->rows->serviceName);
         }
     }
