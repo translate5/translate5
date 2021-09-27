@@ -183,6 +183,8 @@ class editor_Models_Terminology_Import_TbxFileImport
         $this->mergeTerms = $mergeTerms;
         $this->prepareImportArrays($user);
 
+        error_log("File to import: ".$tbxFilePath);
+
         $xmlReader = (new class() extends XMLReader {
             public function reopen(string $tbxFilePath) {
                 $this->close();

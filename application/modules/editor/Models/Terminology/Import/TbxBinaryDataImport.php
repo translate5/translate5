@@ -113,7 +113,7 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
 
         $hexOrXbaseWithoutSpace = str_replace(' ', '', $items['data']);
 
-        if ($image['encoding'] === 'hex') {
+        if (isset($image['encoding']) && $image['encoding'] === 'hex') {
             // convert the hex string to binary
             $image['data'] = hex2bin($hexOrXbaseWithoutSpace);
         } else {
