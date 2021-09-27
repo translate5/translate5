@@ -484,4 +484,57 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
             $recursiveDirCleaner->deleteOldFiles($collectionPath, $olderThan);
         }
     }
+
+    /**
+     * Example usage:
+     *  ->updateStats($collectionId):
+     *      - Update all qties using SELECT COUNT(`id`) FROM corresponsind tables
+     *  ->updateStats($collectionId, ['termEntry' => 1, 'term' => -1]):
+     *      - Update termEntry and term qties using given diff-values. This example may not happen in real life
+     *            it's here just to indicate that qties can be increased or decreased depending on diff > 0 or < 0
+     *      - Update attribute qty using SELECT COUNT(`id`) as no diff given
+     *
+     * @param $collectionId
+     * @param mixed $diff
+     * @param $diff
+     */
+    public function updateStats(int $collectionId, $diff = false) {
+
+        // Foreach type
+        foreach ([
+            'termEntry' => 'terms_term_entry',
+            'term'      => 'terms_term',
+            'attribute' => 'terms_attributes'
+        ] as $type => $table) {
+
+            // If $diff arg is not an array, or is, but having no actual diff specified under $type key
+            if (!is_array($diff) || !isset($diff[$type])) {
+
+                // Get qty
+                $qty = $this->db->getAdapter()->query('
+                    SELECT COUNT(`id`) FROM `' . $table . '` WHERE `collectionId` = ?
+                ', $collectionId)->fetchColumn();
+
+            // Else
+            } else {
+
+                // Set qty as an expression, that increases/decreases the existing value within json
+                $qty = 'IFNULL(JSON_EXTRACT(`specificData`, "$.' . $type . '"), 0) + (' . $diff[$type] . ')';
+            }
+
+            // Build "key, value" pair
+            $stat[$type] = '"$.' . $type . '", ' . $qty;
+        }
+
+        // Update stat
+        $this->db->getAdapter()->query($_ = '
+            UPDATE `LEK_languageresources` 
+            SET `specificData` = JSON_SET(`specificData`, 
+              ' . join(",\n", $stat) . '
+            )
+            WHERE `id` = ?        
+        ', $collectionId);
+
+        //i($_, 'a');
+    }
 }

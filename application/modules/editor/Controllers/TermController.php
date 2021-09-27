@@ -138,6 +138,9 @@ class editor_TermController extends ZfExtended_RestController
             ]
         ], $params);
 
+        // Collection statistics diff
+        $diff = ['termEntry' => 0, 'term' => 0, 'attribute' => 0];
+
         // Trim whitespaces from term
         $params['term'] = trim($params['term']);
 
@@ -150,7 +153,7 @@ class editor_TermController extends ZfExtended_RestController
             $termEntryTbxId = $_['termEntryId']['termEntryTbxId'];
             $termEntryGuid = $_['termEntryId']['entryGuid'];
 
-            // Insert termEntry-data and get termEntryId
+        // Insert termEntry-data and get termEntryId
         } else {
 
             // Instantiate termEntry-model instance
@@ -170,6 +173,9 @@ class editor_TermController extends ZfExtended_RestController
                 'userName' => $this->_session->userName,
                 'userGuid' => $this->_session->userGuid
             ]);
+
+            // Increase termEntry stats diff
+            $diff['termEntry'] ++;
         }
 
         // Instantiate term-model instance
@@ -205,6 +211,10 @@ class editor_TermController extends ZfExtended_RestController
                 'userName' => $this->_session->userName,
                 'userGuid' => $this->_session->userGuid
             ]);
+
+            // Increment term and attribute stats diff
+            $diff['term'] ++;
+            $diff['attribute'] ++; // processStatus-attr was added for source term
         }
 
         // Apply data
@@ -233,6 +243,10 @@ class editor_TermController extends ZfExtended_RestController
             'userGuid' => $this->_session->userGuid,
         ]);
 
+        // Increment term and attribute stats diff
+        $diff['term'] ++;
+        $diff['attribute'] += trim($params['note']) ? 2 : 1; // processStatus and maybe note attr were added for term
+
         // Flush params so that GUI to be redirected to that newly created term
         $this->view->assign([
 
@@ -247,6 +261,11 @@ class editor_TermController extends ZfExtended_RestController
             //
             'termEntryId' => $termEntryId,
         ]);
+
+        // Update
+        ZfExtended_Factory
+            ::get('editor_Models_TermCollection_TermCollection')
+            ->updateStats($params['collectionId'], $diff);
     }
 
     /**
@@ -345,6 +364,9 @@ class editor_TermController extends ZfExtended_RestController
             ? (count($isLast_data) < 2 ? 'entry' : 'language')
             : false;
 
+        // Collection statistics diff
+        $diff = ['termEntry' => 0, 'term' => 0];
+
         // If term we're going to delete is the last term within it's termEntry
         if ($data['isLast'] == 'entry') {
 
@@ -357,7 +379,11 @@ class editor_TermController extends ZfExtended_RestController
             $termEntry->load($_['termId']['termEntryId']);
             $termEntry->delete();
 
-            // Else
+            // Decrement stats for term and termEntry
+            $diff['term'] --;
+            $diff['termEntry'] --;
+
+        // Else
         } else {
 
             // Else this term is the last within it's language
@@ -367,9 +393,10 @@ class editor_TermController extends ZfExtended_RestController
                 editor_Models_Terminology_Models_AttributeModel
                     ::deleteImages($_['termId']['collectionId'], $_['termId']['termEntryId'], $_['termId']['language']);
 
-                // Delete `terms_transacgrp`-records for language-level
+                // Delete `terms_transacgrp`- and `terms_attributes`- records for language-level and term-level
                 $where = []; foreach (['termEntryId', 'language'] as $prop) $where []= '`' . $prop . '` = "' . $_['termId'][$prop] . '"';
                 editor_Utils::db()->query('DELETE FROM `terms_transacgrp` WHERE ' . implode(' AND ', $where));
+                editor_Utils::db()->query('DELETE FROM `terms_attributes` WHERE ' . implode(' AND ', $where));
 
                 // Affect `terms_transacgrp` 'modification'-records for entry- and language-level
                 ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
@@ -394,6 +421,9 @@ class editor_TermController extends ZfExtended_RestController
                     $_['termId']['termEntryId'],
                     $data['isLast'] == 'language' ? null : $_['termId']['language']
                 );
+
+            // Decrement stats for term
+            $diff['term'] --;
         }
 
         // Setup 'modified' prop, so that modification info, specified in
@@ -402,5 +432,10 @@ class editor_TermController extends ZfExtended_RestController
 
         // Flush response data
         $this->view->assign($data);
+
+        // Update
+        ZfExtended_Factory
+            ::get('editor_Models_TermCollection_TermCollection')
+            ->updateStats($_['termId']['collectionId'], $diff);
     }
 }
