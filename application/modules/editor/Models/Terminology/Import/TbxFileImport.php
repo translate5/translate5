@@ -367,13 +367,13 @@ $memLog('Loaded terms:        ');
         //before we save anything to the database we have to perform the merges
         $this->bulkTerm->mergeTerms($this->bulkTermEntry, $this->mergeTerms);
 
-        //bulkTerm create or update must be called before attributes and transacGrps in order to save the termId there correctly
         $this->bulkTermEntry->createOrUpdateElement();
 
         // Load the attributes and transac for the current term entry. Loading this on each term entry saves memory and it is faster as loading all at once.
         $this->bulkTransacGrp->loadExisting($this->bulkTermEntry->getCurrentEntry()->id);
         $this->bulkAttribute->loadExisting($this->bulkTermEntry->getCurrentEntry()->id);
 
+        //bulkTerm create or update must be called before attributes and transacGrps in order to save the termId there correctly
         $this->bulkTerm->createOrUpdateElement();
         $this->bulkAttribute->createOrUpdateElement();
         $this->bulkTransacGrp->createOrUpdateElement();

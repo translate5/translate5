@@ -247,8 +247,8 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
                     'termTbxId' => $id['termTbxId']
                 ]);
             }
-            //set the ID in the term tbx objects for further reuse
-            $this->insertedTbxIds[$id['termTbxId']]->id = $id['id'];
+            //set the ID in the referenced term tbx instance for further reuse via getParent
+            $this->insertedTbxIds[$id['termTbxId']] -> id = $id['id'];
         }
         $this->insertedTbxIds = [];
     }

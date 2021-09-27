@@ -133,10 +133,9 @@ GROUP BY collectionId, termEntryId, languageId;
 call translate5Logger('filled migration langset table');
 
 -- set langSetGuid
-UPDATE terms_term t, terms_migration_langset l
-SET t.langSetGuid = l.langSetGuid,
-    t.updatedAt = t.updatedAt -- prevent autoupdate here!
-WHERE t.collectionId = l.collectionId AND t.termEntryId = l.termEntryId AND t.languageId = l.languageId;
+UPDATE terms_term t
+LEFT JOIN terms_migration_langset l ON t.collectionId = l.collectionId AND t.termEntryId = l.termEntryId AND t.languageId = l.languageId
+SET t.langSetGuid = l.langSetGuid, t.updatedAt = t.updatedAt; -- prevent autoupdate here!
 
 call translate5Logger('set langSetGuid in term table');
 
