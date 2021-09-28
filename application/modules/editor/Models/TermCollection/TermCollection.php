@@ -427,7 +427,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         /* @var $service editor_Services_TermCollection_Service */
         $serviceType = $service->getServiceNamespace();
         $s = $this->db->select()
-        ->where('lr.serviceType = ?',$serviceType);
+        ->where('serviceType = ?',$serviceType);
 
         return $this->db->fetchAll($s)->toArray();
     }
