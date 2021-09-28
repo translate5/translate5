@@ -861,13 +861,24 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Render keyword WHERE string
         $keywordWHERE = '(' . implode(' OR ', $keywordWHERE) . ')';
 
-        //i($params['query']);
         // Keep letters, numbers and underscores only
         $against = trim(preg_replace('/[^\p{L}\p{N}_]+/u', ' ', $params['query'])) . '*';
-        if (preg_match('~ ~', $against)) $against = '+' . preg_replace('~ ~', ' +', $against);
 
-        // Build match-against WHERE string
-        $againstWHERE = 'MATCH(' . implode(', ', $cols) . ') AGAINST(:against IN BOOLEAN MODE)';
+        // Build match-against WHERE
+        $againstWHERE = ['words' => 'MATCH(' . implode(', ', $cols) . ') AGAINST(:against IN BOOLEAN MODE)'];
+
+        // If $against contains spaces
+        if (preg_match('~ ~', $against)) {
+
+            // Prepare whole search phrase
+            $phrase = '"' . trim($against, '*') . '"';
+
+            // Build match-against WHERE clause for the whole phrase
+            $againstWHERE['phrase'] = 'MATCH(' . implode(', ', $cols) . ') AGAINST(:phrase IN BOOLEAN MODE)';
+
+            // Add special search syntax
+            $against = '+' . preg_replace('~ ~', ' +', $against);
+        }
 
         // If it's a non '*'-query (e.g. non 'any'-query)
         if (!preg_match('~^\*+$~', $against)) {
@@ -875,12 +886,16 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             // Prepend $where with $keywordWHERE
             array_unshift($where, $keywordWHERE);
 
-            // Check if wildcard prefix is going to be used in LIKE(:keyword), and if no
-            if (!preg_match('~[%_][^\s]~', $keyword))
+            // Check if wildcard prefix is NOT going to be used in LIKE(:keyword), and if so
+            if (!preg_match('~[%_][^\s]~', $keyword)) {
+
+                // Stringify againstWHERE clause(s)
+                $againstWHERE = '(' . join(' OR ', $againstWHERE) . ')';
 
                 // Prepend $where with $againstWHERE, because
                 // FULLTEXT-search does not support wildcard prefixes
                 array_unshift($where, $againstWHERE);
+            }
         }
 
         // Term query template
@@ -892,7 +907,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         ';
 
         // Prepare params array
-        $bindParam = [':keyword' => $keyword, ':against' => $against];
+        $bindParam = [':keyword' => $keyword, ':against' => $against, ':phrase' => $phrase ?? ''];
 
         // If we have to calculate total
         if ($total === true) {
@@ -1827,7 +1842,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             ->joinLeft(['t2' =>'terms_term'], 't1.termEntryId = t2.termEntryId AND t1.collectionId = t2.collectionId', null)
             ->join(['l' =>'LEK_languages'], 't2.languageId = l.id', 'rtl')
             ->where('t1.collectionId IN(?)', $collectionIds)
-            //->where('t2.collectionId IN(?)', $collectionIds)
             ->where('t1.termTbxId IN(?)', $allIds)
             ->where('t1.languageId IN (?)', $allLanguages)
             ->where('t2.languageId IN (?)', $allLanguages);
@@ -1840,11 +1854,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
             settype($termGroups[$term->termEntryTbxId], 'array');
 
-            $term->used = in_array($term->termId, $allIds);
+            $term->used = in_array($term->termTbxId, $allIds);
             $term->isSource = in_array($term->languageId, $sourceLanguages);
             $term->transFound = false;
             if ($term->used) {
-                $term->transFound = preg_match('/class="[^"]*transFound[^"]*"/', $transFoundSearch[$term->termId]);
+                $term->transFound = preg_match('/class="[^"]*transFound[^"]*"/', $transFoundSearch[$term->termTbxId]);
             }
 
             $termGroups[$term->termEntryTbxId][] = $term;
