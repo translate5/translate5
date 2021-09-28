@@ -1295,10 +1295,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             if(in_array($key,$keysToIgnore)){
                 continue;
             }
-            $return[] = [
+            $toAdd = [
                 "type" => $translate->_($key.'_'.$serviceName),
                 "value" => $value
             ];
+            // fileName should appear always as first element
+            if($key === 'fileName'){
+                array_unshift($return,$toAdd);
+            }else {
+                array_push($return, $toAdd);
+            }
         }
         return Zend_Json::encode($return);
     }
