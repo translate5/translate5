@@ -242,7 +242,7 @@ class editor_Models_Export_Terminology_Tbx {
      * @throws Zend_Db_Statement_Exception
      */
     public function exportCollectionById(int $collectionId, $tbxBasicOnly = false, $exportImages = true,
-                                         $byTermEntryQty = 1000, $byImageQty = 50) {
+                                         $userName, $byTermEntryQty = 1000, $byImageQty = 50) {
 
         // Setup export file absolute path
         $this->file = editor_Models_LanguageResources_LanguageResource::exportFilename($collectionId);
@@ -271,12 +271,38 @@ class editor_Models_Export_Terminology_Tbx {
             $this->tabs[$i] = str_pad('', $i * 4, ' ');
         }
 
-        // Prepare and write tbx header into export.tbx file
+        // Prepare xml header
         $line []= '<?xml version=\'1.0\'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">';
         $line []= '<martif>';
+
+        // Get collection name
+        $collection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        $collection->load($collectionId);
+        $collectionName = $collection->getName();
+
+        // Get list of languages
+        $languages = join(', ', array_column($collection->getLanguagesInTermCollections([$collectionId]), 'rfc5646'));
+
+        // Write <martifHeader> nodes
+        $line []= $this->tabs[1] . '<martifHeader>';
+        $line []=     $this->tabs[2] . '<fileDesc>';
+        $line []=         $this->tabs[3] . '<titleStmt>';
+        $line []=             $this->tabs[4] . '<title>Export of translate5 termCollection ' . $collectionName . '</title>';
+        $line []=             $this->tabs[4] . '<note>Contains the languages: ' . $languages . '</note>';
+        $line []=         $this->tabs[3] . '</titleStmt>';
+        $line []=         $this->tabs[3] . '<sourceDesc>';
+        $line []=             $this->tabs[4] . '<p>File is exported from translate5 instance at https://' . $_SERVER['HTTP_HOST'] . ' by the user ' . $userName . '</p>';
+        $line []=         $this->tabs[3] . '</sourceDesc>';
+        $line []=     $this->tabs[2] . '</fileDesc>';
+        $line []=     $this->tabs[2] . '<encodingDesc>';
+        $line []=         $this->tabs[3] . '<p type="XCSURI">http://www.lisa.org/fileadmin/standards/tbx_basic/TBXBasicXCSV02.xcs</p>';
+        $line []=     $this->tabs[2] . '</encodingDesc>';
+        $line []= $this->tabs[1] . '</martifHeader>';
+
+        // Open <text> and <body> nodes
         $line []= $this->tabs[1] . '<text>';
         $line []= $this->tabs[2] . '<body>';
-        $this->write($line, true);
+        $this->write($line, $collectionName);
 
         // Models shortcuts
         $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
@@ -457,14 +483,32 @@ class editor_Models_Export_Terminology_Tbx {
      */
     public function write(&$lines, $overwrite = false) {
 
-        // If $overwrite arg is true
+        // If $overwrite arg is truly
         if ($overwrite) {
+
+            // If $overwrite arg is integer, assume it's a collectionId
+            if (is_string($collectionName = $overwrite)) {
+            //if (is_int($collectionId = $overwrite)) {
+
+                // Get collection name
+                /*$collection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+                $collection->load($collectionId);
+                $filename = $collection->getName();
+
+                // Convert to filename
+                $filename = rawurlencode($filename);*/
+                $filename = rawurlencode($collectionName);
+                //$filename = rawurlencode(array_reverse(preg_split('~\\/~', $filename))[0]);
+
+                //i($filename, 'a');
+            // Else just use 'export' as filename
+            } else $filename = 'export';
 
             // Set up headers
             header('Cache-Control: no-cache');
             header('X-Accel-Buffering: no');
             header('Content-Type: text/xml');
-            header('Content-Disposition: attachment; filename=export.tbx');
+            header('Content-Disposition: attachment; filename*=UTF-8\'\'' . $filename . '.tbx; filename=' . $filename . '.tbx');
 
             // Set up output buffering implicit flush mode
             ob_implicit_flush(true);
