@@ -236,5 +236,6 @@ UPDATE `terms_attributes_datatype` SET `isTbxBasic` = '1' WHERE `type` = 'proces
 INSERT INTO `terms_collection_attribute_datatype` (collectionId,dataTypeId) (SELECT collectionId,dataTypeId FROM `terms_attributes` group by collectionId,dataTypeId);
 
 call translate5Logger('fix some values and update the datatype collection mapping.');
+call translate5Logger('datatype migration is done - FINISHED OVERALL MIGRATION');
 
 DROP PROCEDURE IF EXISTS translate5Logger;

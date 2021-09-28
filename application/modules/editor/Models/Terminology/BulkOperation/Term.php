@@ -121,7 +121,7 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
             $this->allTerms[$key] = [$value];
         }
         // we need to store the guid to for setting it later for new term attributes in existing terms
-        $this->existing[$element->getCollectionKey()] = $id.'#'.$element->guid.'#'.$element->getDataHash();
+        $this->existing[$element->getCollectionKey()] = $id.'#'.$element->getDataHash().'#'.$element->guid;
 
         // increment the total term count
         $this->processedCount['totalCount']++;
@@ -292,6 +292,7 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
         //1. check if termEntry to be added is already in DB
         $existingId = $bulkEntry->findExisting($bulkEntry->getCurrentEntry(), $payload);
         $entryExistsByTbxId = !is_null($existingId);
+        $foundParentEntryTbxId = null;
 
         /* @var editor_Models_Terminology_TbxObjects_Term $term */
         foreach($this->toBeProcessed as $term) {
@@ -309,7 +310,7 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
                 // setting the guid is required when new attributes are inserted for terms which are merged
                 $existing = $this->existing[$term->getCollectionKey()];
                 $existing = explode('#',$existing);
-                $term->guid = $existing[1];
+                $term->guid = $existing[2];
 
                 // term data is merged automatically via createOrUpdateElement later on
                 continue;
@@ -317,24 +318,30 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
 
             // 2. if we have found a termEntry, the term is tried to be merged inside that termEntry
             // into existing terms of same language and term content, regardless of $mergeTerms setting
-            if($entryExistsByTbxId && !$termExistsByTbxIds) {
+            if(($entryExistsByTbxId && !$termExistsByTbxIds) || $foundParentEntryTbxId !== null) {
                 $foundLocalTerm = $this->findInAllTerms($term, $bulkEntry->getCurrentEntry()->termEntryTbxId);
             }elseif($mergeTerms) {
                 $foundLocalTerm = $this->findInAllTerms($term);
             }
 
             // 3. if there is a matching term in the same termEntry / or in all terms, we reuse its TBX IDs so that it is merged into that term then
-            if(!empty($foundLocalTerm)) {
+            //  a foundLocalTerm can only be used, if it is the first match of a term in termEntry, otherwise the already found termEntry must be reused
+            if(!empty($foundLocalTerm) && ($foundParentEntryTbxId === null || $foundParentEntryTbxId === $foundLocalTerm[1])) {
                 $term->id = $foundLocalTerm[3];
                 $term->guid = $foundLocalTerm[2];
+                $foundParentEntryTbxId = $foundLocalTerm[1];
                 $term->termTbxId = $foundLocalTerm[0];
-                $term->termEntryTbxId = $foundLocalTerm[1];
-                $term->parentEntry->termEntryTbxId = $foundLocalTerm[1];
-                $term->parentLangset->langSetGuid = $this->getExistingLangsetGuid($term->termEntryTbxId, $term->language);
                 // term data is merged automatically via createOrUpdateElement then
             }
 
-            // if no existing term was found, it is just added as new one
+            // reuse the termEntryTbxID found in the above term or in a previous term of the same entry
+            if(!empty($foundParentEntryTbxId)) {
+                $term->termEntryTbxId = $foundParentEntryTbxId;
+                $term->parentEntry->termEntryTbxId = $foundParentEntryTbxId;
+                $term->parentLangset->langSetGuid = $this->getExistingLangsetGuid($term->termEntryTbxId, $term->language);
+            }
+
+            // if no existing term was found, it is just added as new one (either with reused entry TBX ID or new TBX ID)
         }
     }
 }
