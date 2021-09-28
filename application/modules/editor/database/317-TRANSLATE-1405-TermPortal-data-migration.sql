@@ -132,12 +132,18 @@ GROUP BY collectionId, termEntryId, languageId;
 
 call translate5Logger('filled migration langset table');
 
+-- disable the derived merge optimization since this was slowing down the following update on mysql 5.7 machines
+SET SESSION optimizer_switch='derived_merge=off';
+
 -- set langSetGuid
 UPDATE terms_term t
 LEFT JOIN terms_migration_langset l ON t.collectionId = l.collectionId AND t.termEntryId = l.termEntryId AND t.languageId = l.languageId
 SET t.langSetGuid = l.langSetGuid, t.updatedAt = t.updatedAt; -- prevent autoupdate here!
 
 call translate5Logger('set langSetGuid in term table');
+
+-- reenable derived merge, since for other queries it does not seem to be a problem
+SET SESSION optimizer_switch='derived_merge=on';
 
 -- proposals from proposal table
 UPDATE terms_term t, LEK_term_proposal p
@@ -179,6 +185,9 @@ call translate5Logger('fix missing termEntryIds in attribute table');
 UPDATE `LEK_term_attributes` ta
 SET ta.`language` = NULL
 WHERE ta.`language` = '';
+
+-- since there is no index on parentId, we just create one
+ALTER TABLE LEK_term_attributes ADD INDEX (parentId);
 
 -- LEK_term_attributes > terms_transacgrp
 INSERT IGNORE INTO terms_transacgrp
