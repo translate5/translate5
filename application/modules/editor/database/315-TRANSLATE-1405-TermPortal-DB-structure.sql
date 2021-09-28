@@ -29,12 +29,12 @@ DROP TABLE IF EXISTS `terms_attributes_history`;
 DROP TABLE IF EXISTS `terms_attributes_proposal`;
 DROP TABLE IF EXISTS `terms_attributes`;
 DROP TABLE IF EXISTS `terms_collection_attribute_datatype`;
-DROP TABLE IF EXISTS `terms_attributes_datatype`;
 DROP TABLE IF EXISTS `terms_images`;
 DROP TABLE IF EXISTS `terms_ref_object`;
 DROP TABLE IF EXISTS `terms_term_history`;
 DROP TABLE IF EXISTS `terms_transacgrp`;
 DROP TABLE IF EXISTS `terms_term`;
+DROP TABLE IF EXISTS `terms_attributes_datatype`;
 DROP TABLE IF EXISTS `terms_term_entry`;
 DROP TABLE IF EXISTS `terms_migration_langset`;
 

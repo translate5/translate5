@@ -1842,7 +1842,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             ->joinLeft(['t2' =>'terms_term'], 't1.termEntryId = t2.termEntryId AND t1.collectionId = t2.collectionId', null)
             ->join(['l' =>'LEK_languages'], 't2.languageId = l.id', 'rtl')
             ->where('t1.collectionId IN(?)', $collectionIds)
-            //->where('t2.collectionId IN(?)', $collectionIds)
             ->where('t1.termTbxId IN(?)', $allIds)
             ->where('t1.languageId IN (?)', $allLanguages)
             ->where('t2.languageId IN (?)', $allLanguages);
@@ -1855,11 +1854,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
             settype($termGroups[$term->termEntryTbxId], 'array');
 
-            $term->used = in_array($term->termId, $allIds);
+            $term->used = in_array($term->termTbxId, $allIds);
             $term->isSource = in_array($term->languageId, $sourceLanguages);
             $term->transFound = false;
             if ($term->used) {
-                $term->transFound = preg_match('/class="[^"]*transFound[^"]*"/', $transFoundSearch[$term->termId]);
+                $term->transFound = preg_match('/class="[^"]*transFound[^"]*"/', $transFoundSearch[$term->termTbxId]);
             }
 
             $termGroups[$term->termEntryTbxId][] = $term;

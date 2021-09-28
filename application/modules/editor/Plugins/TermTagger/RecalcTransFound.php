@@ -124,7 +124,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
 
             $transFound = $this->groupCounter[$termEntryTbxId] ?? 0;
             foreach ($groupedTerms as $groupedTerm) {
-                $targetTermIdKey = array_search($groupedTerm['termId'], $targetTermIds);
+                $targetTermIdKey = array_search($groupedTerm['termTbxId'], $targetTermIds);
                 if ($targetTermIdKey !== false) {
                     $transFound++;
                     unset($targetTermIds[$targetTermIdKey]);
