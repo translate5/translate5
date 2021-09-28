@@ -865,7 +865,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         $this->entity->addSpecificData('fileName', $filename);
 
-        $this->queueServiceImportWorker($importInfo, true);
+        if(!empty($importInfo)){
+            $this->queueServiceImportWorker($importInfo, true);
+        }
     }
 
     /**
@@ -1299,7 +1301,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 "type" => $translate->_($key.'_'.$serviceName),
                 "value" => $value
             ];
-            // fileName should appear always as first element
+            // fileName should always appear as first element
             if($key === 'fileName'){
                 array_unshift($return,$toAdd);
             }else {
