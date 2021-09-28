@@ -923,8 +923,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor ?? '', $keywordWHERE)
             . 'LIMIT ' . (int) $offset . ',' . (int) $limit;
 
-        i($termQuery, 'a');
-        i($bindParam, 'a');
+        //i($termQuery, 'a');
+        //i($bindParam, 'a');
 
         // Return results
         return editor_Utils::db()->query($termQuery, $bindParam)->fetchAll();
