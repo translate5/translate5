@@ -861,6 +861,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Render keyword WHERE string
         $keywordWHERE = '(' . implode(' OR ', $keywordWHERE) . ')';
 
+        // Prepare params array
+        $bindParam = [':keyword' => $keyword];
+
         // Keep letters, numbers and underscores only
         $against = trim(preg_replace('/[^\p{L}\p{N}_]+/u', ' ', $params['query'])) . '*';
 
@@ -889,6 +892,10 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             // Check if wildcard prefix is NOT going to be used in LIKE(:keyword), and if so
             if (!preg_match('~[%_][^\s]~', $keyword)) {
 
+                // Add bindings
+                $bindParam[':against'] = $against;
+                if (count($againstWHERE) == 2) $bindParam[':phrase'] = $phrase;
+
                 // Stringify againstWHERE clause(s)
                 $againstWHERE = '(' . join(' OR ', $againstWHERE) . ')';
 
@@ -905,9 +912,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             WHERE ' . implode(' AND ', $where) . '
             ORDER BY `t`.`term` ASC
         ';
-
-        // Prepare params array
-        $bindParam = [':keyword' => $keyword, ':against' => $against, ':phrase' => $phrase ?? ''];
 
         // If we have to calculate total
         if ($total === true) {
