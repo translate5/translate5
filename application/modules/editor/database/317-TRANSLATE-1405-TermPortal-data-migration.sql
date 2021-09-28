@@ -186,6 +186,9 @@ UPDATE `LEK_term_attributes` ta
 SET ta.`language` = NULL
 WHERE ta.`language` = '';
 
+-- since there is no index on parentId, we just create one
+ALTER TABLE LEK_term_attributes ADD INDEX (parentId);
+
 -- LEK_term_attributes > terms_transacgrp
 INSERT IGNORE INTO terms_transacgrp
 (elementName, transac, `date`, transacNote, transacType, target, `language`, isDescripGrp, collectionId, termEntryId, termId, termTbxId, termGuid, termEntryGuid, langSetGuid, guid)
