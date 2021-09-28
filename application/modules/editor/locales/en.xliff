@@ -1243,9 +1243,9 @@
   <source>Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)</source>
   <target>Save and open next editable segment (CTRL + ALT + ENTER)</target>
 </trans-unit>
-<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IGltIFdvcmtmbG93IMO2ZmZuZW4gKFNUUkcgKyBFTlRFUik='>
-  <source>Speichern und nächstes bearbeitbares Segment im Workflow öffnen (STRG + ENTER)</source>
-  <target>Save and open next editable segment in workflow (CTRL + ENTER)</target>
+<trans-unit id='U3BlaWNoZXJuLiA8YnIvPk7DpGNoc3RlcyB1bmJlc3TDpHRpZ3RlcywgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW48YnIvPihTVFJHICsgRU5URVIp'>
+  <source>Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)</source>
+  <target>Save.<br/>Open next unconfirmed editable segment<br/>(CTRL + ENTER)</target>
 </trans-unit>
 <trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgU0hJRlQgKyBFTlRFUik='>
   <source>Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)</source>
@@ -1271,13 +1271,13 @@
   <source>Nächste Spalte editieren (STRG + ALT + →)</source>
   <target>Edit next column (CTRL + ALT + →)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IGltIFdvcmtmbG93IMO2ZmZuZW4gKEFMVCArIEJpbGQg4oaTKQ=='>
-  <source>Nicht speichern und nächstes bearbeitbares Segment im Workflow öffnen (ALT + Bild ↓)</source>
-  <target>Don't save and open next editable segment in workflow (ALT + page ↓)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuLjxici8+TsOkY2hzdGVzIHVuYmVzdMOkdGlndGVzLCBiZWFyYmVpdGJhcmVzIFNlZ21lbnQgw7ZmZm5lbjxici8+KEFMVCArIEJpbGQg4oaTKQ=='>
+  <source>Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)</source>
+  <target>Don't save.<br/>Open next unconfirmed editable segment<br/>(ALT + page ↓)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChBTFQgKyBCaWxkIOKGkSk='>
-  <source>Nicht speichern und vorheriges bearbeitbares Segment im Workflow öffnen (ALT + Bild ↑)</source>
-  <target>Don't save and open previous editable segment in workflow (ALT + page ↑)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuLjxici8+Vm9yaGVyaWdlcyB1bmJlc3TDpHRpZ3RlcywgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW48YnIvPihBTFQgKyBCaWxkIOKGkSk='>
+  <source>Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)</source>
+  <target>Don't save.<br/>Open previous unconfirmed editable segment<br/>(ALT + page ↑)</target>
 </trans-unit>
 <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
   <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
