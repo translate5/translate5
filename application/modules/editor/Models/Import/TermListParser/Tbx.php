@@ -75,12 +75,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     ];
 
     /**
-     * collected term states not listed in statusMap
-     * @var array
-     */
-    protected array $unknownStates = [];
-
-    /**
      * Will be set in first <termEntry> of the tbx-file.
      * Detects if ids should be added to the termEntries or not
      * @var boolean
@@ -227,10 +221,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 
             //check if the languages in the task are valid for the term collection
             $this->validateTbxLanguages();
-        }
-
-        if(!empty($this->unknownStates)) {
-            $this->log('TBX contains the following unknown term states: '.join(', ', $this->unknownStates));
         }
     }
 
