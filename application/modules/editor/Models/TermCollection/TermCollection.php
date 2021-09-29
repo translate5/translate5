@@ -89,6 +89,9 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     /***
      * Search from term matches the current term collections with the given query string.
      * All fuzzy languages will be included in the search.('en' as search language will result with search using 'en','en-US','en-GB' etc)
+     * Result will be listed only if there is matching term in the opposite language:
+     * Example if there is a match for term in source(de), and in the same term entry, there is term in the opposite language(en), than this
+     * will be listed as result
      * @param string $queryString
      * @param integer $sourceLang
      * @param integer $targetLang
@@ -113,7 +116,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
             ->from('terms_term')
             ->where('lower(term) like lower(?) COLLATE utf8mb4_bin', $queryString)
             ->where('collectionId = ?', $this->getId())
-            ->where('language IN(?)',$field === 'source' ? $sourceLangs : $targetLangs)
+            ->where('languageId IN(?)',$field === 'source' ? $sourceLangs : $targetLangs)
             ->group('termEntryTbxId');
         $rows = $this->db->fetchAll($s)->toArray();
 
@@ -121,35 +124,36 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
             return [];
         }
 
-		$termEntryTbxId = [];
-		$termEntryTbxIdSearch = [];
-		foreach ($rows as $res) {
-			$termEntryTbxId[] = $res['termEntryTbxId'];
-			//collect the searched terms, so thay are merged with the results
-			if (!isset($termEntryTbxIdSearch[$res['termEntryTbxId']])) {
-			    $termEntryTbxIdSearch[$res['termEntryTbxId']] = [];
-			}
-		    array_push($termEntryTbxIdSearch[$res['termEntryTbxId']], $res['term']);
-		}
+        $termEntryTbxId = [];
+        $termEntryTbxIdSearch = [];
+        foreach ($rows as $res) {
+            $termEntryTbxId[] = $res['termEntryTbxId'];
+            //collect the searched terms, so thy are merged with the results
+            if (!isset($termEntryTbxIdSearch[$res['termEntryTbxId']])) {
+                $termEntryTbxIdSearch[$res['termEntryTbxId']] = [];
+            }
+            array_push($termEntryTbxIdSearch[$res['termEntryTbxId']], $res['term']);
+        }
 
-		$s = $this->db->select()
-    		->setIntegrityCheck(false)
-    		->from(['t' => 'terms_term'])
-    		->joinLeft(['ta' => 'terms_attributes'], 'ta.termId = t.id AND ta.attrType = "processStatus"', ['ta.attrType AS processStatusAttribute', 'ta.value AS processStatusAttributeValue'])
-    		->where('t.termEntryTbxId IN(?)', $termEntryTbxId)
-    		->where('t.language IN(?)',$field === 'source' ? $targetLangs : $sourceLangs)
-    		->where('t.collectionId = ?', $this->getId());
-		$targetResults = $this->db->fetchAll($s)->toArray();
+        // fill all terms in the opposite field of the matched term results
+        $s = $this->db->select()
+            ->setIntegrityCheck(false)
+            ->from(['t' => 'terms_term'])
+            ->joinLeft(['ta' => 'terms_attributes'], 'ta.termId = t.id AND ta.type = "processStatus"', ['ta.type AS processStatusAttribute', 'ta.value AS processStatusAttributeValue'])
+            ->where('t.termEntryTbxId IN(?)', $termEntryTbxId)
+            ->where('t.languageId IN(?)',$field === 'source' ? $targetLangs : $sourceLangs)
+            ->where('t.collectionId = ?', $this->getId());
+        $targetResults = $this->db->fetchAll($s)->toArray();
 
-		//merge the searched terms with the result
-		foreach ($targetResults as &$single){
-		    $single['default'.$field] = '';
-		    if (!empty($termEntryTbxIdSearch[$single['termEntryTbxId']])) {
-		        $single['default'.$field] = $termEntryTbxIdSearch[$single['termEntryTbxId']][0];
-		    }
-		}
+        //merge the searched terms with the result
+        foreach ($targetResults as &$single){
+            $single['default'.$field] = '';
+            if (!empty($termEntryTbxIdSearch[$single['termEntryTbxId']])) {
+                $single['default'.$field] = $termEntryTbxIdSearch[$single['termEntryTbxId']][0];
+            }
+        }
 
-		return $targetResults;
+        return $targetResults;
     }
 
     /***

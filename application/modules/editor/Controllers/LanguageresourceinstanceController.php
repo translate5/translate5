@@ -734,7 +734,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx')->exportCollectionById(
             $params['collectionId'],
             $params['tbxBasicOnly'],
-            $params['exportImages']
+            $params['exportImages'],
+            (new Zend_Session_Namespace('user'))->data->userName
         );
     }
 
