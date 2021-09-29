@@ -533,7 +533,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         }
 
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
-        if ($misc['userName'])
+        if (isset($misc['userName']))
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
 
@@ -799,7 +799,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             list($level, $attributeId) = $info;
 
             // Setup a shortcut
-            $_ = $dataByRefTargetIdA[$refTargetId] ?: [];
+            $_ = $dataByRefTargetIdA[$refTargetId] ?? [];
 
             // Add isValidTbx flag
             $_ += ['isValidTbx' => !!$_];

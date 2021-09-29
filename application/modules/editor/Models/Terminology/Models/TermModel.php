@@ -463,7 +463,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         // If $transacgrpData arg is given - update 'modification'-records of all levels
-        if ($misc['userName'])
+        if (isset($misc['userName']))
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels(
                     $misc['userName'],
@@ -474,7 +474,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 );
 
         // Return
-        return $return;
+        return $return ?? null;
     }
 
     /**
