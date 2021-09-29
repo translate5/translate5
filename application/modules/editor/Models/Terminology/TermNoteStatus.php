@@ -111,11 +111,11 @@ class editor_Models_Terminology_TermNoteStatus
         foreach ($termNotes as $termNote) {
             $type = $termNote['type'];
             //if current termNote is no starttag or type is not allowed to provide a status then we jump out
-            if (in_array($termNote['type'], array_keys(self::$termNoteMap))) {
-                $type = 'custom';
-            }
-            elseif($type != self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS && $type != self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION) {
+            if (!in_array($type, array_keys(self::$termNoteMap))) {
                 continue;
+            }
+            if($type != self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS && $type != self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION) {
+                $type = 'custom';
             }
 
             //if multiple, then we collect only the first one
@@ -127,15 +127,15 @@ class editor_Models_Terminology_TermNoteStatus
             $foundByPrecedenceType[$type] = $this->getStatusFromTermNote($termNote['type'], $termNote['value']);
         }
 
-        // precedence by $termNote->type: custom states before normative before administrative!
-        if(!empty($foundByPrecedenceType['custom'])) {
-            return $foundByPrecedenceType['custom'];
-        }
+        // precedence by $termNote->type: normative before administrative before custom states
         if(!empty($foundByPrecedenceType[self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION])) {
             return $foundByPrecedenceType[self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION];
         }
         if(!empty($foundByPrecedenceType[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS])) {
             return $foundByPrecedenceType[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS];
+        }
+        if(!empty($foundByPrecedenceType['custom'])) {
+            return $foundByPrecedenceType['custom'];
         }
 
         return $this->config->runtimeOptions->tbx->defaultTermStatus;
