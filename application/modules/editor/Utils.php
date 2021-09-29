@@ -457,8 +457,8 @@ class editor_Utils {
                 // Setup $s as a flag indicating whether *_Row (single row) or *_Rowset should be fetched
                 $isSingleRow = $table == $rule['key'];
 
-                // Check
-                list ($table, $column) = explode('.', $table); if (!$column) $column = 'id';
+                // Get key's target table and column
+                $target = explode('.', $table); $table = $target[0]; $column = $target[1] ?? 'id';
 
                 // Setup WHERE clause and method name to be used for fetching
                 $where = $isSingleRow

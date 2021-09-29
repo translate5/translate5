@@ -449,7 +449,7 @@ class editor_Models_Export_Terminology_Tbx {
     public function attributeNodes($level, &$line, $attrA, $termEntryId, $language = '', $termId = '') {
 
         //
-        foreach ($attrA[$termEntryId][$language][$termId] as $attr) {
+        foreach ($attrA[$termEntryId][$language][$termId] ?? [] as $attr) {
 
             //
             $_attr = [];
@@ -469,7 +469,7 @@ class editor_Models_Export_Terminology_Tbx {
     }
 
     public function transacGrpNodes($level, &$line, $trscA, $termEntryId, $language = '', $termId = '') {
-        foreach ($trscA[$termEntryId][$language][$termId] as $trsc) {
+        foreach ($trscA[$termEntryId][$language][$termId] ?? [] as $trsc) {
             $line []= $this->tabs[$level] . '<transacGrp>';
             $line []= $this->tabs[$level + 1] . '<transac type="transactionType">'. $trsc['transac'] . '</transac>';
             $line []= $this->tabs[$level + 1] . '<transacNote type="' . $trsc['transacType'] . '" target="' . $trsc['target'] . '">Jane</transacNote>';
