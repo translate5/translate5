@@ -34,8 +34,6 @@ class editor_Models_Terminology_Import_TbxFileImport
     const TBX_TERM_ENTRY = 'termEntry';
     const TBX_LANGSET = 'langSet';
 
-    const ATTRIBUTE_ALLOWED_TYPES = ['normativeAuthorization', 'administrativeStatus'];
-
     /** @var $logger ZfExtended_Logger */
     protected ZfExtended_Logger $logger;
 
@@ -59,9 +57,6 @@ class editor_Models_Terminology_Import_TbxFileImport
      */
     protected array $tbxMap;
 
-    protected array $importMap;
-    protected array $allowedTypes;
-
     /***
      * @var bool
      */
@@ -81,30 +76,7 @@ class editor_Models_Terminology_Import_TbxFileImport
     protected array $languages;
 
     /**
-     * Collected term states not listed in statusMap
-     * @var array
-     */
-    protected array $unknownStates = [];
-    /**
-     * The array have an assignment of the TBX-enabled Term Static that be used in the editor
-     * @var array
-     */
-    protected array $statusMap = [
-        'preferredTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_PREFERRED,
-        'admittedTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_ADMITTED,
-        'legalTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_LEGAL,
-        'regulatedTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_REGULATED,
-        'standardizedTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_STANDARDIZED,
-        'deprecatedTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_DEPRECATED,
-        'supersededTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_SUPERSEDED,
-
-        //some more states (uncomplete!), see TRANSLATE-714
-        'proposed' => editor_Models_Terminology_TbxObjects_Term::STAT_PREFERRED,
-        'deprecated' => editor_Models_Terminology_TbxObjects_Term::STAT_DEPRECATED,
-        'admitted' => editor_Models_Terminology_TbxObjects_Term::STAT_ADMITTED,
-    ];
-    /**
-     * Collected term states not listed in statusMap
+     * Collected unknown languages
      * @var array
      */
     protected array $unknownLanguages = [];
@@ -139,6 +111,12 @@ class editor_Models_Terminology_Import_TbxFileImport
     protected editor_Models_Terminology_BulkOperation_TermEntry $bulkTermEntry;
 
     /**
+     * contains the whole term note status mapping
+     * @var editor_Models_Terminology_TermNoteStatus
+     */
+    protected editor_Models_Terminology_TermNoteStatus $termNoteStatus;
+
+    /**
      * @var ZfExtended_EventManager
      */
     protected ZfExtended_EventManager $events;
@@ -166,6 +144,8 @@ class editor_Models_Terminology_Import_TbxFileImport
         $this->bulkAttribute = new editor_Models_Terminology_BulkOperation_Attribute();
         $this->bulkTransacGrp = new editor_Models_Terminology_BulkOperation_TransacGrp();
         $this->bulkTerm = new editor_Models_Terminology_BulkOperation_Term();
+
+        $this->termNoteStatus = new editor_Models_Terminology_TermNoteStatus();
     }
 
     /**
@@ -231,6 +211,11 @@ class editor_Models_Terminology_Import_TbxFileImport
         ];
 error_log("Imported TBX data into collection ".$this->collection->getId().' '.print_r($data, 1));
         $this->log('Imported TBX data into collection {collection}', 'E1028', $data);
+
+        $unknownStates = $this->termNoteStatus->getUnknownStates();
+        if(!empty($unknownStates)) {
+            $this->log('TBX Import: The TBX contains terms with unknown administrative / normative states. See details for a list of states.', 'E1360', ['unknown' => $unknownStates], 'warn');
+        }
     }
 
     /**
@@ -258,10 +243,6 @@ $memLog('Start Loading Data:  ');
             $this->languages[strtolower($language['value'])] = $language['id'];
         }
 
-        $this->importMap = $this->config->runtimeOptions->tbx->termImportMap->toArray();
-        //merge system allowed note types with configured ones:
-        $this->allowedTypes = array_merge($this::ATTRIBUTE_ALLOWED_TYPES, array_keys($this->importMap));
-
         // get custom attribute label text and prepare array to check if custom label text exist.
 $memLog('Loaded languages:    ');
         $this->dataType->loadData();
@@ -271,7 +252,6 @@ $memLog('Loaded datatype:     ');
 $memLog('Loaded term entries: ');
         $this->bulkTerm->loadExisting($this->collection->getId());
 $memLog('Loaded terms:        ');
-
     }
 
     /**
@@ -501,7 +481,7 @@ $memLog('Loaded terms:        ');
         $this->addProcessStatusNodeIfNotExists($tig);
         $newTerm->termNote = $this->setAttributeTypes($tig->termNote, $newTerm);
         if ($hasTermNote) {
-            $newTerm->status = $this->getTermNoteStatus($newTerm->termNote);
+            $newTerm->status = $this->termNoteStatus->fromTermNotes($newTerm->termNote);
             $newTerm->processStatus = $this->getProcessStatus($newTerm->termNote);
         } else {
             $newTerm->status = $this->config->runtimeOptions->tbx->defaultTermStatus;
@@ -761,7 +741,7 @@ $memLog('Loaded terms:        ');
             return;
         }
         foreach ($this->unknownLanguages as $key => $language) {
-            $this->log('Unable to import terms in this language set. Invalid Rfc5646 language code. Language code: ' . $key);
+            $this->log('TBX Import: Unable to import terms due invalid Rfc5646 language code "{code}"', 'E1361', ['code' => $key], 'warn');
         }
     }
 
@@ -807,56 +787,14 @@ $memLog('Loaded terms:        ');
     {
         return ZfExtended_Utils::uuid();
     }
-    /**
-     * returns the translate5 internal available term status to the one given in TBX
-     * @param array $termNotes
-     * @return string
-     *
-     *
-     * FIXME wir brauchen eine Funktion die den terms_term status aus den Attributen liefert, verwendbar when one attribute is updated.
-     * statusMap is coming here already from config - regarding client overwriting???
-     */
-    protected function getTermNoteStatus(array $termNotes) : string
-    {
-        /** @var editor_Models_Terminology_TbxObjects_Attribute $attribute */
-        foreach ($termNotes as $attribute) {
-            $tbxStatus = $attribute->value;
-            $tbxType = $attribute->type;
 
-            //if current termNote is no starttag or type is not allowed to provide a status then we jump out
-            if (in_array($tbxType, $this->allowedTypes)) {
-                // termNote type administrativeStatus are similar to normativeAuthorization,
-                // expect that the values have a suffix which must be removed
-                if ($tbxType === 'administrativeStatus') {
-                    $tbxStatus = str_replace('-admn-sts$', '', $attribute->value . '$');
-                }
-
-                //add configured status map
-                $statusMap = $this->statusMap;
-                if (!empty($this->importMap[$tbxType])) {
-                    $statusMap = array_merge($this->statusMap, $this->importMap[$tbxType]);
-                }
-
-                if (!empty($statusMap[$tbxStatus])) {
-                    return $statusMap[$tbxStatus];
-                }
-
-                if (!in_array($tbxStatus, $this->unknownStates)) {
-                    $this->unknownStates[] = $tbxStatus;
-                }
-            }
-        }
-
-        return $this->config->runtimeOptions->tbx->defaultTermStatus;
-    }
-
-    private function log($logMessage, $code = 'E1028', array $extra = [])
+    private function log($logMessage, $code = 'E1028', array $extra = [], $level = 'info')
     {
         $extra['languageResource'] = $this->collection;
         if (!empty($this->task)) {
             $extra['task'] = $this->task;
         }
-        $this->logger->info($code, $logMessage, $extra);
+        $this->logger->$level($code, $logMessage, $extra);
     }
 
     /**

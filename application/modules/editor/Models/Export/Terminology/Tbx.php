@@ -154,10 +154,10 @@ class editor_Models_Export_Terminology_Tbx {
 
             $tig->addAttribute('id', $tigId);
 
-            $term = $tig->addChild('term', $row->term);
+            $term = $tig->addChild('term', htmlspecialchars($row->term, ENT_XML1));
             $term->addAttribute('id', $row->termTbxId);
 
-            $termNote = $tig->addChild('termNote', $row->status); //FIXME Status gemapped???
+            $termNote = $tig->addChild('termNote', $row->status);
             $termNote->addAttribute('type', 'normativeAuthorization');
         }
         //SimpleXML throws an error when giving null, so we need this workaround:
