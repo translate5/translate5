@@ -26,30 +26,6 @@
 -- */
 
  /*
- ** convert multiple termImportMap configs into one config
- */
-INSERT INTO Zf_configuration
-(id, name, confirmed, module, category, value, `default`, `defaults`, `type`, description, `level`, guiName, guiGroup, comment)
-VALUES(null, 'runtimeOptions.tbx.termImportMap', 1, 'editor', 'termtagger', '{}', '{"across_ISO_picklist_Usage": {"do not use": "supersededTerm"}, "across_ISO_picklist_Verwendung": {"Unwort": "supersededTerm"}, "across_userdef_picklist_Verwendung": {"Unwort": "supersededTerm"}}', '', 'map', 'Maps term status values, that is not TBX standard and comes from the import to a standard term status. Current standard term status in translate5 are: preferredTerm (GUI value „preferred“), admittedTerm (GUI value „permitted“), legalTerm (GUI value „permitted“), regulatedTerm (GUI value „permitted“), standardizedTerm (GUI value „permitted“), deprecatedTerm (GUI value „forbidden“), supersededTerm (GUI value „forbidden“). ', 1, 'Term import: Map non-standard term status', 'Language resources', '');
-
-SET @res = JSON_OBJECT();
-
-SELECT @res := JSON_INSERT(@res, CONCAT('$.', type), JSON_OBJECT())
-FROM (
-         SELECT distinct SUBSTRING_INDEX(replace(name, 'runtimeOptions.tbx.termImportMap.', ''),'.',1) type
-         FROM Zf_configuration
-         where name like 'runtimeOptions.tbx.termImportMap.%'
-     ) foo;
-
-SELECT @res := JSON_INSERT(@res, CONCAT('$."', SUBSTRING_INDEX(replace(name, 'runtimeOptions.tbx.termImportMap.', ''),'.',1), '"."', SUBSTRING_INDEX(name,'.',-1), '"'), value) FROM Zf_configuration where name like 'runtimeOptions.tbx.termImportMap.%';
-
-UPDATE Zf_configuration c
-SET c.value = @res
-where c.name = 'runtimeOptions.tbx.termImportMap';
-
-DELETE FROM Zf_configuration WHERE name like 'runtimeOptions.tbx.termImportMap.%';
-
- /*
  ** convert multiple termLabelMap configs into one config
  */
 INSERT INTO Zf_configuration

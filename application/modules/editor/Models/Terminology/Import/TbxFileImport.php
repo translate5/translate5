@@ -184,13 +184,15 @@ class editor_Models_Terminology_Import_TbxFileImport
         $xmlReader->reopen($tbxFilePath); //reset pointer to beginning
         $this->processRefObjects($xmlReader);
 
-
         $this->logUnknownLanguages();
 
         $dataTypeAssoc = ZfExtended_Factory::get('editor_Models_Terminology_Models_CollectionAttributeDataType');
         /* @var $dataTypeAssoc editor_Models_Terminology_Models_CollectionAttributeDataType */
         // insert all attribute data types for current collection in the terms_collection_attribute_datatype table
         $dataTypeAssoc->updateCollectionAttributeAssoc($this->collection->getId());
+
+        //syncronizes the term status picklists to the valid values
+        $this->termNoteStatus->syncStatusToDataTypes();
 
         // remove all empty term entries after the tbx import
         $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
@@ -481,7 +483,7 @@ $memLog('Loaded terms:        ');
         $this->addProcessStatusNodeIfNotExists($tig);
         $newTerm->termNote = $this->setAttributeTypes($tig->termNote, $newTerm);
         if ($hasTermNote) {
-            $newTerm->status = $this->termNoteStatus->fromTermNotes($newTerm->termNote);
+            $newTerm->status = $this->termNoteStatus->fromTermNotesOnImport($newTerm->termNote);
             $newTerm->processStatus = $this->getProcessStatus($newTerm->termNote);
         } else {
             $newTerm->status = $this->config->runtimeOptions->tbx->defaultTermStatus;

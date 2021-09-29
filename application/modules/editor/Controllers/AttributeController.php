@@ -562,6 +562,8 @@ class editor_AttributeController extends ZfExtended_RestController
             'userGuid' => $this->_session->userGuid
         ]);
 
+        //update term status as in putAction
+
         // Prepare inserted data to be flushed into response json
         $inserted = [
             'id' => $a->getId(),
@@ -765,14 +767,16 @@ class editor_AttributeController extends ZfExtended_RestController
         // If attr was not yet changed after importing from tbx - append current value to response
         if (!$_['attrId']['isCreatedLocally']) $data['imported'] = $_['attrId']['value'];
 
+        /* @var $attrM editor_Models_Terminology_Models_AttributeModel */
+        $attrM = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+
+        // Get the term
+        /** @var editor_Models_Terminology_Models_TermModel $t */
+        $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        $t->load($params['termId']);
+
         // If it's a processStatus-attribute
         if ($_['attrId']['type'] == 'processStatus') {
-
-            // Get the term
-            /** @var editor_Models_Terminology_Models_TermModel $t */
-            $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-            $t->load($params['termId']);
-
             // Get current value of processStatus attribute, that should be involved in validation
             $current = $t->getProposal() ? 'unprocessed' : $_['attrId']['value'];
 
@@ -932,10 +936,21 @@ class editor_AttributeController extends ZfExtended_RestController
         } else {
 
             // Update attribute value
-            $attrM = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
             $attrR = $attrM->load($params['attrId']);
             $attrR->setFromArray(['value' => $params['value'], 'updatedBy' => $this->_session->id, 'isCreatedLocally' => 1]);
             $attrM->update();
+        }
+
+        // the term status is updated in in anycase (due implicit normativeAuthorization changes above), not only if a attribute is changed mapped to the term status
+        /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
+        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
+        $termNotes = $attrM->loadByTerm($params['termId'], ['termNote'], $termNoteStatus->getAllTypes());
+        $t->setStatus($termNoteStatus->fromTermNotes($termNotes));
+        //if status is modified save it to the DB
+        if($t->isModified('status')) {
+            $t->setUpdatedBy($this->_session->id);
+            $t->update(['updateProcessStatusAttr' => false]);
+            $data['status'] = $t->getStatus(); //flush new status to the view
         }
 
         // Update `date` and `transacNote` of 'modification'-records

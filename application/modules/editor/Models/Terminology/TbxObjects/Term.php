@@ -53,6 +53,7 @@ class editor_Models_Terminology_TbxObjects_Term extends editor_Models_Terminolog
 
     const TERM_DEFINITION = 'definition';
     const TERM_STANDARD_PROCESS_STATUS= 'finalized';
+
     const STAT_PREFERRED = 'preferredTerm';
     const STAT_ADMITTED = 'admittedTerm';
     const STAT_LEGAL = 'legalTerm';
@@ -60,6 +61,7 @@ class editor_Models_Terminology_TbxObjects_Term extends editor_Models_Terminolog
     const STAT_STANDARDIZED = 'standardizedTerm';
     const STAT_DEPRECATED = 'deprecatedTerm';
     const STAT_SUPERSEDED = 'supersededTerm';
+
     const STAT_NOT_FOUND = 'STAT_NOT_FOUND'; //Dieser Status ist nicht im Konzept definiert, sondern wird nur intern verwendet!
     const TRANSSTAT_FOUND = 'transFound';
     const TRANSSTAT_NOT_FOUND = 'transNotFound';

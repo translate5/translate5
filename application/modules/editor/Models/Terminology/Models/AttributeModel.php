@@ -81,10 +81,22 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
     protected $validatorInstanceClass = 'editor_Models_Validator_Term_Attribute';
 
     /**
-     * editor_Models_Terms_Attribute constructor.
+     * loads attributes of a term, optionally filtered by element and type
+     * @param int $termId
+     * @param array $element
+     * @param array $type
+     * @return array
      */
-    public function __construct() {
-        parent::__construct();
+    public function loadByTerm(int $termId, array $element = [], array $type = []): array {
+        $s = $this->db->select()
+            ->where('termId = ?', $termId);
+        if(!empty($element)) {
+            $s->where('elementName in (?)', $element);
+        }
+        if(!empty($type)) {
+            $s->where('type in (?)', $type);
+        }
+        return $this->db->fetchAll($s)->toArray();
     }
 
     public function getAttributeCollectionByEntryId($collectionId, $termEntryId): array

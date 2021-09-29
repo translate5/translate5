@@ -45,7 +45,7 @@ class editor_Models_Terminology_TermNoteStatus
      *
      * @var array
      */
-    protected array $termNoteMap;
+    static protected array $termNoteMap;
 
     /**
      * Collected term states not listed in statusMap
@@ -57,50 +57,61 @@ class editor_Models_Terminology_TermNoteStatus
     protected Zend_Config $config;
 
     /**
-     * The array have an assignment of the TBX-enabled Term Static that be used in the editor
-     * @var array
-     */
-    protected array $statusMap = [
-        'preferredTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_PREFERRED,
-        'admittedTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_ADMITTED,
-        'legalTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_LEGAL,
-        'regulatedTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_REGULATED,
-        'standardizedTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_STANDARDIZED,
-        'deprecatedTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_DEPRECATED,
-        'supersededTerm' => editor_Models_Terminology_TbxObjects_Term::STAT_SUPERSEDED,
-
-        //some more states (uncomplete!), see TRANSLATE-714
-        'proposed' => editor_Models_Terminology_TbxObjects_Term::STAT_PREFERRED,
-        'deprecated' => editor_Models_Terminology_TbxObjects_Term::STAT_DEPRECATED,
-        'admitted' => editor_Models_Terminology_TbxObjects_Term::STAT_ADMITTED,
-    ];
-
-    /**
      * editor_Models_Import_TermListParser_TbxFileImport constructor.
      * @throws Zend_Exception
      */
     public function __construct() {
         $this->config = Zend_Registry::get('config');
 
-        //load termNoteMap, and convert all children to arrays
-        $this->termNoteMap = array_map(function($item){
-            return (array) $item;
-        }, $this->config->runtimeOptions->tbx->termImportMap->toArray());
+        //load termNoteMap
+        if(empty(self::$termNoteMap)) {
+            self::$termNoteMap = [];
+            /* @var $db editor_Models_Db_Terminology_TermStatusMap */
+            $db = ZfExtended_Factory::get('editor_Models_Db_Terminology_TermStatusMap');
+            $loaded = $db->fetchAll()->toArray();
+            foreach ($loaded as $statusMap) {
+                if(!array_key_exists($statusMap['termNoteType'], self::$termNoteMap)) {
+                    self::$termNoteMap[$statusMap['termNoteType']] = [];
+                }
+                self::$termNoteMap[$statusMap['termNoteType']][$statusMap['termNoteValue']] = $statusMap['mappedStatus'];
+            }
+        }
+    }
+
+    /**
+     * returns all termNote types where the termNotes contain a term status relevant value
+     * @return array
+     */
+    public function getAllTypes(): array {
+        return array_keys(self::$termNoteMap);
+    }
+
+    /**
+     * @param editor_Models_Terminology_TbxObjects_Attribute[] $termNotes
+     */
+    public function fromTermNotesOnImport(array $termNotes): string {
+        $typeAndValueOnly = [];
+        foreach($termNotes as $note) {
+            $typeAndValueOnly[] = [
+                'type' => $note->type,
+                'value' => $note->value
+            ];
+        }
+        return $this->fromTermNotes($typeAndValueOnly);
     }
 
     /**
      * returns the translate5 internal available term status to the one given as termNote in TBX
-     * @param array $termNotes
+     * @param array[] $termNotes
      * @return string
      */
     public function fromTermNotes(array $termNotes) : string
     {
         $foundByPrecedenceType = [];
-        /** @var editor_Models_Terminology_TbxObjects_Attribute $termNote */
         foreach ($termNotes as $termNote) {
-            $type = $termNote->type;
+            $type = $termNote['type'];
             //if current termNote is no starttag or type is not allowed to provide a status then we jump out
-            if (in_array($termNote->type, array_keys($this->termNoteMap))) {
+            if (in_array($termNote['type'], array_keys(self::$termNoteMap))) {
                 $type = 'custom';
             }
             elseif($type != self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS && $type != self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION) {
@@ -113,7 +124,7 @@ class editor_Models_Terminology_TermNoteStatus
             }
 
             //collect all results for the different types
-            $foundByPrecedenceType[$type] = $this->getStatusFromTermNote($termNote->type, $termNote->value);
+            $foundByPrecedenceType[$type] = $this->getStatusFromTermNote($termNote['type'], $termNote['value']);
         }
 
         // precedence by $termNote->type: custom states before normative before administrative!
@@ -137,25 +148,15 @@ class editor_Models_Terminology_TermNoteStatus
      * @return string|null
      */
     public function getStatusFromTermNote($termNoteType, $termNoteValue): ?string {
-        // termNote type administrativeStatus are similar to normativeAuthorization,
-        // expect that the values have a suffix which must be removed
-        if ($termNoteType === self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS) {
-            $termNoteValue = str_replace('-admn-sts$', '', $termNoteValue . '$');
-        }
-
         //return mapped status from specific configuration
-        if (!empty($this->termNoteMap[$termNoteType]) && !empty($this->termNoteMap[$termNoteType][$termNoteValue])) {
-            return $this->termNoteMap[$termNoteType][$termNoteValue];
-        }
-
-        //return mapped status from default status map
-        if (!empty($this->statusMap[$termNoteValue])) {
-            return $this->statusMap[$termNoteValue];
+        if (!empty(self::$termNoteMap[$termNoteType]) && !empty(self::$termNoteMap[$termNoteType][$termNoteValue])) {
+            return self::$termNoteMap[$termNoteType][$termNoteValue];
         }
 
         //collect unknown state
-        if (!in_array($termNoteValue, $this->unknownStates)) {
-            $this->unknownStates[] = $termNoteValue;
+        $logValue = $termNoteType.': '.$termNoteValue;
+        if (!in_array($logValue, $this->unknownStates)) {
+            $this->unknownStates[] = $logValue;
         }
 
         //and return default
@@ -168,5 +169,20 @@ class editor_Models_Terminology_TermNoteStatus
      */
     public function getUnknownStates(): array {
         return $this->unknownStates;
+    }
+
+    /**
+     * Synchronizes the valid term status values into the datatypes picklists
+     */
+    public function syncStatusToDataTypes() {
+        /* @var $db editor_Models_Db_Terminology_TermStatusMap */
+        $db = ZfExtended_Factory::get('editor_Models_Db_Terminology_TermStatusMap');
+        $db->getAdapter()->query("UPDATE terms_attributes_datatype dt, (
+                SELECT termNoteType as type, GROUP_CONCAT(termNoteValue) AS picklistValues
+                FROM terms_term_status_map
+                GROUP BY termNoteType
+            ) as s
+        SET dt.picklistValues = s.picklistValues, dt.dataType = 'picklist'
+        WHERE dt.label = 'termNote' AND dt.level = 'term' AND dt.type = s.type");
     }
 }
