@@ -48,12 +48,6 @@ class editor_Models_Terminology_TermNoteStatus
     protected array $termNoteMap;
 
     /**
-     * Contains the termNote types to be recognized as term status, may be extended from config
-     * @var string[]
-     */
-    protected array $allowedTypes = [self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION, self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS];
-
-    /**
      * Collected term states not listed in statusMap
      * @var array
      */
@@ -92,9 +86,6 @@ class editor_Models_Terminology_TermNoteStatus
         $this->termNoteMap = array_map(function($item){
             return (array) $item;
         }, $this->config->runtimeOptions->tbx->termImportMap->toArray());
-
-        //merge system allowed note types with configured ones:
-        $this->allowedTypes = array_merge($this->allowedTypes, array_keys($this->termNoteMap));
     }
 
     /**
@@ -104,19 +95,36 @@ class editor_Models_Terminology_TermNoteStatus
      */
     public function fromTermNotes(array $termNotes) : string
     {
+        $foundByPrecedenceType = [];
         /** @var editor_Models_Terminology_TbxObjects_Attribute $termNote */
         foreach ($termNotes as $termNote) {
+            $type = $termNote->type;
             //if current termNote is no starttag or type is not allowed to provide a status then we jump out
-            if (!in_array($termNote->type, $this->allowedTypes)) {
+            if (in_array($termNote->type, array_keys($this->termNoteMap))) {
+                $type = 'custom';
+            }
+            elseif($type != self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS && $type != self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION) {
                 continue;
             }
 
-            //FIXME implement precedence by $termNote->type
-            // self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION over
-            // self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS over
-            // all other???
+            //if multiple, then we collect only the first one
+            if(isset($foundByPrecedenceType[$type])) {
+                continue;
+            }
 
-            return $this->getStatusFromTermNote($termNote->type, $termNote->value);
+            //collect all results for the different types
+            $foundByPrecedenceType[$type] = $this->getStatusFromTermNote($termNote->type, $termNote->value);
+        }
+
+        // precedence by $termNote->type: custom states before normative before administrative!
+        if(!empty($foundByPrecedenceType['custom'])) {
+            return $foundByPrecedenceType['custom'];
+        }
+        if(!empty($foundByPrecedenceType[self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION])) {
+            return $foundByPrecedenceType[self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION];
+        }
+        if(!empty($foundByPrecedenceType[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS])) {
+            return $foundByPrecedenceType[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS];
         }
 
         return $this->config->runtimeOptions->tbx->defaultTermStatus;
