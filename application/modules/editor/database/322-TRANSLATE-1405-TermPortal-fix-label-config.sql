@@ -82,3 +82,8 @@ UPDATE terms_attributes_datatype dt, (
     ) as s
 SET dt.picklistValues = s.picklistValues, dt.dataType = 'picklist'
 WHERE dt.label = 'termNote' AND dt.level = 'term' AND dt.type = s.type;
+
+-- fix some corrupted l10nCustom fields
+UPDATE terms_attributes_datatype
+SET l10nCustom = JSON_SET(l10nSystem, '$.en', l10nCustom)
+WHERE !JSON_VALID(l10nCustom);
