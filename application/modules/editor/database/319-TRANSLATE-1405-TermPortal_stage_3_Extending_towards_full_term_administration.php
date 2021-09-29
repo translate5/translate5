@@ -60,3 +60,14 @@ foreach ($all as $single){
     $model->updateStats($single['id']);
 }
 
+$ids = array_column($all,'id');
+
+$term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+/* @var $term editor_Models_Terminology_Models_TermModel */
+$assoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+/* @var $assoc editor_Models_LanguageResources_Languages */
+
+// remove all language resources languages, and re-calculate them
+$assoc->removeByResourceId($ids);
+$term->updateAssocLanguages($ids);
+
