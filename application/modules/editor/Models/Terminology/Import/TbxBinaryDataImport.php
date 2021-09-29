@@ -94,6 +94,7 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
             'collectionId' => $collectionId,
             'name' => null,
             'uniqueName' => null,
+            'encoding' => null,
             'format' => null,
             'contentMd5hash' => null,
         ];
@@ -106,14 +107,16 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
 
         if (isset($items['encoding'])) {
             $image['name'] = $items['name'];
+            $image['encoding'] = $items['encoding'];
         } else {
             $image['name'] = (string)$targetId.'.'.$items['format'];
+            $image['encoding'] = $items['codePage']; //codepage never tested, overtaken from original code
         }
         $image['format'] = $items['format'];
 
         $hexOrXbaseWithoutSpace = str_replace(' ', '', $items['data']);
 
-        if (isset($image['encoding']) && $image['encoding'] === 'hex') {
+        if ($image['encoding'] === 'hex') {
             // convert the hex string to binary
             $image['data'] = hex2bin($hexOrXbaseWithoutSpace);
         } else {
@@ -122,6 +125,9 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
         }
 
         $image['contentMd5hash'] = md5($image['data']);
+
+        // remove the encoding from the images array, it is used only for internal check
+        unset($image['encoding']);
 
         return $image;
     }
