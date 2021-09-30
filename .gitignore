@@ -1,4 +1,4 @@
-client-specific
+/client-specific
 application/config/installation.ini
 data/editorImportedTasks*
 data/editorVisualReviewFonts*
