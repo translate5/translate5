@@ -150,14 +150,16 @@ class editor_Models_Terminology_Import_TbxFileImport
 
     /**
      * Import given TBX file and prepare Import arrays, if file can not be opened throw Zend_Exception.
+     * returns the count of available term entries in the loaded file
      * @param string $tbxFilePath
      * @param editor_Models_TermCollection_TermCollection $collection
      * @param ZfExtended_Models_User $user
      * @param bool $mergeTerms
      * @throws Zend_Exception
      * @throws Exception
+     * @return int
      */
-    public function importXmlFile(string $tbxFilePath, editor_Models_TermCollection_TermCollection $collection, ZfExtended_Models_User $user, bool $mergeTerms)
+    public function importXmlFile(string $tbxFilePath, editor_Models_TermCollection_TermCollection $collection, ZfExtended_Models_User $user, bool $mergeTerms): int
     {
         $this->collection = $collection;
         $this->mergeTerms = $mergeTerms;
@@ -211,13 +213,13 @@ class editor_Models_Terminology_Import_TbxFileImport
             'collection' => $this->collection->getName(),
             'maxMemUsed in MB' => round(memory_get_peak_usage() / 2**20),
         ];
-error_log("Imported TBX data into collection ".$this->collection->getId().' '.print_r($data, 1));
         $this->log('Imported TBX data into collection {collection}', 'E1028', $data);
 
         $unknownStates = $this->termNoteStatus->getUnknownStates();
         if(!empty($unknownStates)) {
             $this->log('TBX Import: The TBX contains terms with unknown administrative / normative states. See details for a list of states.', 'E1360', ['unknown' => $unknownStates], 'warn');
         }
+        return $totalCount;
     }
 
     /**
@@ -228,7 +230,7 @@ error_log("Imported TBX data into collection ".$this->collection->getId().' '.pr
     private function prepareImportArrays(ZfExtended_Models_User $user)
     {
 $memLog = function($msg) {
-    error_log($msg.round(memory_get_usage()/2**20).' MB');
+    //error_log($msg.round(memory_get_usage()/2**20).' MB');
 };
         $this->user = $user;
         $this->dataType->resetData();

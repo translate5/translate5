@@ -112,7 +112,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /***
      * @var $logger ZfExtended_Logger
      */
-    protected $logger;
+    protected ZfExtended_Logger $logger;
 
     /**
      * @var Zend_Config
@@ -155,7 +155,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $this->config = Zend_Registry::get('config');
 
         //init the logger (this will write in the language resources log and in the main log)
-        $this->logger = Zend_Registry::get('logger');
+        $this->logger = Zend_Registry::get('logger')->cloneMe('editor.terminology.import');
         $this->user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $this->termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         $this->termEntryModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
@@ -245,7 +245,16 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 //save the imported tbx to the disc
                 $this->saveFileLocal($tmpName, $fileName);
 
-                $this->tbxFileImport->importXmlFile($tmpName, $this->termCollection, $this->user, $this->mergeTerms);
+                $termEntryCount = $this->tbxFileImport->importXmlFile($tmpName, $this->termCollection, $this->user, $this->mergeTerms);
+                if($termEntryCount <= 0) {
+                    $this->logger->warn(
+                        'E1028',
+                        'The currently imported TBX file "{fileName}" did not contain any term entries!',
+                        $this->getDefaultLogData([
+                            'fileName' => $fileName ?? basename($tmpName)
+                        ])
+                    );
+                }
 
                 $this->updateCollectionLanguage();
             }
