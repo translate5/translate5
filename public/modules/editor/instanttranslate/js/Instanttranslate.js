@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+if (window.parent.location.hash.match(/itranslate|termportal/)) $('#containerHeader').hide();
 var editIdleTimer = null,
     NOT_AVAILABLE_CLS = 'notavailable', // css if a (source-/target-)locale is not available in combination with the other (target-/source-)locale that is set
     uploadedFiles,//Variable to store uploaded files
@@ -992,9 +993,24 @@ $(document).on('click', '.term-proposal' , function() {
         lang = $("#sourceLocale").val(),
         textProposal = $(this).attr('data-term'),
         langProposal = $("#targetLocale").val(),
-        isTermProposalFromInstantTranslate = 'true';
+        isTermProposalFromInstantTranslate = 'true',
+        isMT = $(this).parents('.copyable').find('.translation-result').data('languageresource-type') == 'mt',
         params = "text="+text+"&lang="+lang+"&textProposal="+textProposal+"&langProposal="+langProposal+"&isTermProposalFromInstantTranslate="+isTermProposalFromInstantTranslate;
-    openTermPortal(params);
+
+    var q = top.window.Ext.ComponentQuery.query,
+        vm = q('main').pop().getViewModel(),
+        b = q('[reference=termportalBtn]').pop(),
+        itranslate = { target: {lang: langProposal, term: textProposal, isMT: isMT} };
+
+    // If termId-param is not given, it means that source termEntry is not known,
+    // so we append data for trying to find it
+    if (!location.search.match(/termId/)) itranslate.source = {lang: lang, term: text};
+
+    // Set main viewModel's itranslate-prop
+    vm.set('itranslate', itranslate);
+
+    // Click on TermPortal-button
+    b.el.dom.click();
 });
 
 $('#translations').on('touchstart click','.term-info',function(){

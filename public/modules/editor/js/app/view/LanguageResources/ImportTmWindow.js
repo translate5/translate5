@@ -45,56 +45,56 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
     layout:'fit',
     initConfig : function(instanceConfig) {
         var me = this,
-            config = {},
             defaults = {
                 labelWidth: 160,
                 anchor: '100%'
             },
-        config = {
-            title: me.strings.title,
-            items : [{
-                xtype: 'form',
-                padding: 5,
-                ui: 'default-frame',
-                defaults: defaults,
-                items: [{
-                    ui: 'default-frame',
-                    html: me.strings.importTmx,
-                    padding: 5
-                },{
-                    xtype: 'filefield',
-                    fieldLabel: me.strings.file,
-                    toolTip: me.strings.importTmx, 
-                    regex: /\.tmx$/i,
-                    regexText: me.strings.importTmxType,
-                    labelWidth: 160,
-                    anchor: '100%',
-                    name: 'tmUpload'
-                }]
-            }],
-            dockedItems : [{
-                xtype : 'toolbar',
-                dock : 'bottom',
-                ui: 'footer',
-                layout: {
-                    type: 'hbox',
-                    pack: 'start'
-                },
+            config = {
+                title: me.strings.title,
                 items : [{
-                    xtype: 'tbfill'
-                },{
-                    xtype: 'button',
-                    glyph: 'f00c@FontAwesome5FreeSolid',
-                    itemId: 'save-tm-btn',
-                    text: me.strings.save
-                }, {
-                    xtype : 'button',
-                    glyph: 'f00d@FontAwesome5FreeSolid',
-                    itemId : 'cancel-tm-btn',
-                    text : me.strings.cancel
+                    xtype: 'form',
+                    padding: 5,
+                    ui: 'default-frame',
+                    defaults: defaults,
+                    items: [{
+                        ui: 'default-frame',
+                        html: me.strings.importTmx,
+                        padding: 5
+                    },{
+                        xtype: 'filefield',
+                        fieldLabel: me.strings.file,
+                        toolTip: me.strings.importTmx,
+                        regex: /\.tmx$/i,
+                        regexText: me.strings.importTmxType,
+                        labelWidth: 160,
+                        anchor: '100%',
+                        vtype:'tmFileUploadSize',
+                        name: 'tmUpload'
+                    }]
+                }],
+                dockedItems : [{
+                    xtype : 'toolbar',
+                    dock : 'bottom',
+                    ui: 'footer',
+                    layout: {
+                        type: 'hbox',
+                        pack: 'start'
+                    },
+                    items : [{
+                        xtype: 'tbfill'
+                    },{
+                        xtype: 'button',
+                        glyph: 'f00c@FontAwesome5FreeSolid',
+                        itemId: 'save-tm-btn',
+                        text: me.strings.save
+                    }, {
+                        xtype : 'button',
+                        glyph: 'f00d@FontAwesome5FreeSolid',
+                        itemId : 'cancel-tm-btn',
+                        text : me.strings.cancel
+                    }]
                 }]
-            }]
-        };
+            };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }

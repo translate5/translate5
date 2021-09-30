@@ -37,7 +37,14 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
     
     public function init($taskGuid = NULL, $parameters = array()) {
         $this->behaviour->setConfig(['isMaintenanceScheduled' => true]);
-        return parent::init($taskGuid, $parameters);
+        $init = parent::init($taskGuid, $parameters);
+
+        $workerModel = $this->workerModel;
+        Zend_EventManager_StaticEventManager::getInstance()->attach('editor_Models_Terminology_Import_TbxFileImport', 'afterTermEntrySave', function(Zend_EventManager_Event $event) use($workerModel){
+            $workerModel->updateProgress($event->getParam('progress'));
+        }, 0);
+
+        return $init;
     }
     
     /**
@@ -77,7 +84,10 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
         } else {
             $return = $connector->addAdditionalTm($params['fileinfo'],$params);
         }
-        
+
+        // Must be reloaded because the status or additional info can be changed in addTem/addAdditionalTm
+        $this->languageResource->load($params['languageResourceId']);
+
         $this->updateLanguageResourceStatus($return);
         
         if(isset($params['fileinfo']['tmp_name']) && !empty($params['fileinfo']['tmp_name']) && file_exists($params['fileinfo']['tmp_name'])){

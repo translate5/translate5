@@ -67,8 +67,8 @@ class Application {
         $_SERVER['REQUEST_URI'] = '/database/forceimportall';
         $_SERVER['SERVER_NAME'] = 'localhost';
         $_SERVER['HTTP_HOST'] = 'localhost';
-        define('APPLICATION_PATH', $cwd.DIRECTORY_SEPARATOR.'application');
-        define('APPLICATION_ENV', 'application');
+        defined('APPLICATION_PATH') || define('APPLICATION_PATH', $cwd.DIRECTORY_SEPARATOR.'application');
+        defined('APPLICATION_ENV') || define('APPLICATION_ENV', 'application');
         
         require_once 'Zend/Session.php';
         \Zend_Session::$_unitTestEnabled = ! self::$startSession;

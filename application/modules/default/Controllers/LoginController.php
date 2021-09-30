@@ -96,14 +96,26 @@ class LoginController extends ZfExtended_Controllers_Login {
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
         $roles=$sessionUser->data->roles;
-        
+
+        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
+        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
+
+        // If user was not logged in during the attempt to load termportal, but now is logged and allowed to do that
+        if (($hash = $this->_session->redirecthash)
+            && preg_match('~^#(termportal|itranslate)~', $hash)
+            && $isTermPortalAllowed) {
+
+                // Drop redirecthash prop from session
+                $this->_session->redirecthash = '';
+
+                // Do redirect
+                $this->applicationRedirect(substr($hash, 1), true);
+        }
+
         if($acl->isInAllowedRoles($roles, 'initial_page','editor')) {
             $this->editorRedirect();
         }
-        
-        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
-        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
-        
+
         //the user has termportal and instantranslate roles
         if($isTermPortalAllowed && $isInstantTranslateAllowed){
             //find the last used app, if none use the instantranslate as default
@@ -114,7 +126,7 @@ class LoginController extends ZfExtended_Controllers_Login {
             if($meta->getId()!=null && $meta->getLastUsedApp()!=''){
                 $rdr=$meta->getLastUsedApp();
             }
-            $this->applicationRedirect($rdr);
+            $this->applicationRedirect($rdr, $isTermPortalAllowed);
         }
         
         //is instanttranslate allowed
@@ -135,10 +147,12 @@ class LoginController extends ZfExtended_Controllers_Login {
         exit;
     }
     
-    protected function applicationRedirect(string $applicationName){
+    protected function applicationRedirect(string $applicationName, $isTermPortalAllowed = null){
         header ('HTTP/1.1 302 Moved Temporarily');
         $apiUrl=APPLICATION_RUNDIR.'/editor/'.$applicationName;
-        $url=APPLICATION_RUNDIR.'/editor/apps?name='.$applicationName.'&apiUrl='.$apiUrl;
+        $url = $applicationName == 'termportal' || $isTermPortalAllowed
+            ? APPLICATION_RUNDIR.'/editor/termportal#'.$applicationName
+            : APPLICATION_RUNDIR.'/editor/apps?name='.$applicationName.'&apiUrl='.$apiUrl;
         header ('Location: '.$url);
         exit;
     }

@@ -38,6 +38,7 @@ END LICENSE AND COPYRIGHT
     <link rel="shortcut icon" href="<?php echo $this->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
     <title><?php echo $this->translate->_('translate5'); ?></title>
     <script>
+    if (location.hash.match(/^#(termportal|itranslate)/)) location = '/editor/termportal' + location.hash;
     Editor = {};
     <?php
     echo $this->Php2JsVars();

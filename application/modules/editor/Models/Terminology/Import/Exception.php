@@ -26,14 +26,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TermCollection_TermAttributesLabel extends ZfExtended_Models_Validator_Abstract {
-  
-  /**
-   * Validators for Term Collection
-   */
-  protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible 
-    $this->addValidator('id', 'int');
-    $this->addValidator('label', 'stringLength', array('min' => 0, 'max' => 100));
-  }
+/**
+ */
+class editor_Models_Terminology_Import_Exception extends ZfExtended_ErrorCodeException {
+    /**
+     * @var string
+     */
+    protected $domain = 'editor.terminology.import';
+
+    protected static $localErrorCodes = [
+        'E1353' => 'TBX Import: Folder to save images does not exist or is not writable!',
+        'E1354' => 'TBX Import: Folder to save termcollection images could not be created!',
+        'E1356' => 'TBX Import: Import error - {msg}',
+        'E1357' => 'TBX Import: Could not import due unknown attribute level',
+    ];
 }
