@@ -168,7 +168,7 @@ class editor_Plugins_TermImport_Services_Import {
             if(!file_exists($importDir) && !@mkdir($importDir, 0777, true)){
                 return ["Unable to create the TBX Import dir or the TBX import directory is missing. Path: ".$importDir];
             }
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return ["Unable to create the TBX Import dir or the TBX import directory is missing. Path: ".$importDir];
         }
 
