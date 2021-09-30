@@ -943,16 +943,18 @@ class editor_AttributeController extends ZfExtended_RestController
             $attrM->update();
         }
 
-        // the term status is updated in in anycase (due implicit normativeAuthorization changes above), not only if a attribute is changed mapped to the term status
-        /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
-        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
-        $termNotes = $attrM->loadByTerm($params['termId'], ['termNote'], $termNoteStatus->getAllTypes());
-        $t->setStatus($termNoteStatus->fromTermNotes($termNotes));
-        //if status is modified save it to the DB
-        if($t->isModified('status')) {
-            $t->setUpdatedBy($this->_session->id);
-            $t->update(['updateProcessStatusAttr' => false]);
-            $data['status'] = $t->getStatus(); //flush new status to the view
+        if(isset($params['termId'])) {
+            // the term status is updated in in anycase (due implicit normativeAuthorization changes above), not only if a attribute is changed mapped to the term status
+            /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
+            $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
+            $termNotes = $attrM->loadByTerm($params['termId'], ['termNote'], $termNoteStatus->getAllTypes());
+            $t->setStatus($termNoteStatus->fromTermNotes($termNotes));
+            //if status is modified save it to the DB
+            if($t->isModified('status')) {
+                $t->setUpdatedBy($this->_session->id);
+                $t->update(['updateProcessStatusAttr' => false]);
+                $data['status'] = $t->getStatus(); //flush new status to the view
+            }
         }
 
         // Update `date` and `transacNote` of 'modification'-records
