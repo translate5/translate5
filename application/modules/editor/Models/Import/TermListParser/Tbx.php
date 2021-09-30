@@ -40,11 +40,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     const TBX_ARCHIV_NAME = 'terminology.tbx';
 
     /**
-     * @var XmlReader
-     */
-    protected XMLReader $xml;
-
-    /**
      * @var editor_Models_Task
      */
     protected  editor_Models_Task $task;
@@ -168,7 +163,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     }
 
     /**
-     * Imports the tbx files into the term collection
+     * invocation of the automatic TBX import and term collection creation on the task import with a there provided TBX in the task ZIP.
      * (non-PHPdoc)
      * @see editor_Models_Import_MetaData_IMetaDataImporter::import()
      * @param editor_Models_Task $task
@@ -200,7 +195,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $this->termCollection->addTermCollectionTaskAssoc($this->termCollection->getId(), $task->getTaskGuid());
 
         //reset the taskHash for the task assoc of the current term collection
-        $this->resetTaskTbxHash($this->termCollection->getId());
+        $this->resetTaskTbxHash();
 
         //all tbx files in the same term collection
         foreach($tbxfiles as $file) {
@@ -270,6 +265,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      * @param editor_Models_Task $task
      * @param SplFileInfo $tbxPath
      * @return string
+     * @throws editor_Models_Term_TbxCreationException
      */
     public function assertTbxExists(editor_Models_Task $task, SplFileInfo $tbxPath): string
     {
@@ -332,28 +328,20 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         return $this->statusMap;
     }
 
-
-    /***
-     * Ignore the tag of type figure.
-     * TODO: if more tags need to be ignored, extend this!
-     * @return boolean
+    /**
+     * returns the default logging extra data for logging in this class
+     * @param array $data give additional data to be used here
+     * @return array
      */
-    protected function isIgnoreTag(){
-        if ($this->isStartTag()) {
-            return $this->xml->getAttribute('type') === "figure";
-        }
-        return false;
-    }
-
-    protected function log($logMessage, $code = 'E1028')
+    private function getDefaultLogData(array $data = []): array
     {
-        $data = ['languageResource' => $this->termCollection];
+        $data['languageResource'] = $this->termCollection;
+        $data['userGuid'] = $this->user->getUserGuid();
+        $data['userName'] = $this->user->getUserName();
         if(!empty($this->task)){
             $data['task'] = $this->task;
         }
-        $data['userGuid'] = $this->user->getUserGuid();
-        $data['userName'] = $this->user->getUserName();
-        $this->logger->info($code, $logMessage, $data);
+        return $data;
     }
 
     /***
@@ -372,7 +360,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 
         //disable terminology when no terms for the term collection are available
         if (empty($collLangs)) {
-            $this->log("Terminology is disabled because no terms in the termcollection are found. TermCollectionId: ".$this->termCollection->getId());
+            $this->logger->error('E1028', 'Terminology for task is disabled because no languages are defined in the automatically created and attached term collection', $this->getDefaultLogData());
             $this->task->setTerminologie(0);
             return false;
         }
@@ -391,7 +379,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             return true;
         }
 
-        $this->log('For the following languages no term has been found in the tbx file: '.implode(', ', $notProcessed));
+        $this->logger->error(
+            'E1028',
+            'Terminology for task is disabled because the automatically created and attached term collection does not contain suitable languages for the task.',
+            $this->getDefaultLogData([
+                'notFoundLanguageIds' => $notProcessed
+            ])
+        );
         $this->task->setTerminologie(0);
         return false;
     }
@@ -429,22 +423,35 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 
         //check if the directory exist and it is writable
         if (is_dir($tbxImportDirectoryPath) && !is_writable($tbxImportDirectoryPath)) {
-            $this->log("Unable to save the tbx file to the tbx import path. The file is not writable. Import path: ".$tbxImportDirectoryPath." , termcollectionId: ".$this->termCollection->getId());
+            $this->logger->error(
+                'E1028',
+                'Unable to save the tbx file to the tbx import path. The file is not writable. Import path: {importPath}',
+                $this->getDefaultLogData([
+                    'importPath' => $tbxImportDirectoryPath
+                ])
+            );
             return;
         }
 
         try {
-            if (!file_exists($newFilePath) && !@mkdir($newFilePath, 0777, true)) {
-                $this->log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$this->termCollection->getId());
-                return;
-            }
-        } catch (Exception $e) {
-            $this->log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$this->termCollection->getId());
+            $couldNotCreate = !file_exists($newFilePath) && !@mkdir($newFilePath, 0777, true);
+        } catch (Throwable $e) {
+            $couldNotCreate = false;
+            $this->logger->exception($e);
+        }
+
+        if($couldNotCreate) {
+            $this->logger->error(
+                'E1028',
+                'Unable to create directory for imported tbx files. Directory path: {importPath}',
+                $this->getDefaultLogData([
+                    'importPath' => $newFilePath
+                ])
+            );
             return;
         }
 
         $fi = new FilesystemIterator($newFilePath, FilesystemIterator::SKIP_DOTS);
-        $fileName = null;
         //if the name is set, use it as filename
         if ($name) {
             $fileName = iterator_count($fi).'-'.$name;
