@@ -11,10 +11,6 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
-
-
-
-
 ## [5.5.0] - 2021-09-30
 
 ### Important Notes:
@@ -94,6 +90,19 @@ Changing translate5 theme will no longer logout the user.
 
 **[TRANSLATE-2591](https://jira.translate5.net/browse/TRANSLATE-2591): comments of translate no segments are not exported anymore** <br>
 comments of segments with translate = no were not exported any more, this is fixed now.
+
+
+## [5.2.7] - 2021-08-06
+
+### Important Notes:
+
+
+### Bugfixes
+**[TRANSLATE-2596](https://jira.translate5.net/browse/TRANSLATE-2596): Message bus session synchronization rights** <br>
+Solves the problem where the message bus did not have the rights to synchronize the session.
+
+**[TRANSLATE-2595](https://jira.translate5.net/browse/TRANSLATE-2595): Customers store autoload for not authorized users** <br>
+Solves the problem with loading of the customers for not-authorized users.
 
 
 ## [5.2.6] - 2021-08-04
