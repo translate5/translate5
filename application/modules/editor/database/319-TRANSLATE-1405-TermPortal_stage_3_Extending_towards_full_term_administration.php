@@ -56,6 +56,10 @@ $model = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
 /* @var $model editor_Models_TermCollection_TermCollection */
 $all = $model->loadAll();
 
+if(empty($all)){
+    return;
+}
+
 foreach ($all as $single){
     $model->updateStats($single['id']);
 }
