@@ -1014,10 +1014,19 @@ $(document).on('click', '.term-proposal' , function() {
 });
 
 $('#translations').on('touchstart click','.term-info',function(){
-    var text = $(this).attr('id'),
-        lang = $(this).attr("data-languageRfc"),
-        params="text="+text+"&lang="+lang;
-    openTermPortal(params);
+    var term = $(this).attr('id'),
+        lang = $("#targetLocale").val(),
+        collectionId = $(this).parent().find('[data-languageresource-type=termcollection]').attr('id'),
+        q = top.window.Ext.ComponentQuery.query,
+        vm = q('main').pop().getViewModel(),
+        b = q('[reference=termportalBtn]').pop(),
+        itranslate = { search: {lang: lang, term: term, collectionId: collectionId} };
+
+    // Set main viewModel's itranslate-prop
+    vm.set('itranslate', itranslate);
+
+    // Click on TermPortal-button
+    b.el.dom.click();
 });
 
 $('#termPortalButton').on('touchstart click',function(){

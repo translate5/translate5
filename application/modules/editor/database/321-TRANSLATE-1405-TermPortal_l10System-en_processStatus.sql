@@ -27,3 +27,4 @@
 
 UPDATE `terms_attributes_datatype` SET `l10nSystem` = JSON_SET(`l10nSystem`, "$.en", 'Process status') WHERE `type` = "processStatus" LIMIT 1;
 UPDATE `terms_attributes_datatype` SET `l10nSystem` = JSON_SET(`l10nSystem`, "$.en", 'Normative Authorization') WHERE `type` = "normativeAuthorization" LIMIT 1;
+UPDATE `terms_attributes_datatype` SET `l10nSystem` = JSON_SET(`l10nSystem`, "$.de", 'Normative Berechtigung') WHERE `type` = "normativeAuthorization" LIMIT 1;

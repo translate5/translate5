@@ -37,11 +37,15 @@ insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termProposer','editor_attribute','put');
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM','auto_set_role','termSearch');
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM','auto_set_role','termProposer');
+insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM','auto_set_role','termFinalizer');
+insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM','auto_set_role','termReviewer');
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM','editor_term','delete');
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM','editor_attribute','delete');
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM_allClients','auto_set_role','termPM');
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM_allClients','auto_set_role','termProposer');
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM_allClients','auto_set_role','termSearch');
+insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM_allClients','auto_set_role','termFinalizer');
+insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM_allClients','auto_set_role','termReviewer');
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','pm','setaclrole','termReviewer');
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','pm','setaclrole','termFinalizer');
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','pm','setaclrole','termPM');

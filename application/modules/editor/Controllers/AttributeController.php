@@ -562,8 +562,6 @@ class editor_AttributeController extends ZfExtended_RestController
             'userGuid' => $this->_session->userGuid
         ]);
 
-        //update term status as in putAction
-
         // Prepare inserted data to be flushed into response json
         $inserted = [
             'id' => $a->getId(),
@@ -576,8 +574,22 @@ class editor_AttributeController extends ZfExtended_RestController
             'updated' => $misc['userName'] . ', ' . date('d.m.Y H:i:s', strtotime($a->getUpdatedAt())),
         ];
 
+        // Response data
+        $data = ['inserted' => $inserted, 'updated' => $updated];
+
+        // Get the term (if termId exists only)
+        /** @var editor_Models_Terminology_Models_TermModel $t */
+        if (!empty($params['termId'])) {
+            $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+            $t->load($params['termId']);
+
+            // If term status changed - append new value to json
+            if ($status = $this->_updateTermStatus($t, $a))
+                $data['status'] = $status;
+        }
+
         // Flush response data
-        $this->view->assign(['inserted' => $inserted, 'updated' => $updated]);
+        $this->view->assign($data);
     }
 
 
@@ -943,19 +955,11 @@ class editor_AttributeController extends ZfExtended_RestController
             $attrM->update();
         }
 
-        if(isset($params['termId'])) {
-            // the term status is updated in in anycase (due implicit normativeAuthorization changes above), not only if a attribute is changed mapped to the term status
-            /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
-            $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
-            $termNotes = $attrM->loadByTerm($params['termId'], ['termNote'], $termNoteStatus->getAllTypes());
-            $t->setStatus($termNoteStatus->fromTermNotes($termNotes));
-            //if status is modified save it to the DB
-            if($t->isModified('status')) {
-                $t->setUpdatedBy($this->_session->id);
-                $t->update(['updateProcessStatusAttr' => false]);
-                $data['status'] = $t->getStatus(); //flush new status to the view
-            }
-        }
+        // The term status is updated in in anycase (due implicit normativeAuthorization changes above),
+        // not only if a attribute is changed mapped to the term status
+        if (isset($params['termId']))
+            if ($status = $this->_updateTermStatus($t, $attrM))
+                $data['status'] = $status;
 
         // Update `date` and `transacNote` of 'modification'-records
         // for all levels starting from term-level and up to top
@@ -970,5 +974,36 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Flush response data
         $this->view->assign($data);
+    }
+
+    /**
+     * Update term's status.
+     * This is intended to be called after some term-level attribute was created/updated,
+     * so this method get all term's attributes that may affect term's `status` and recalculate
+     * and return the value for `status`
+     *
+     * @param $termM
+     * @param $attrM
+     * @return mixed
+     */
+    protected function _updateTermStatus($termM, $attrM) {
+
+        /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
+        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
+
+        // Get attributes, that may affect term status
+        $termNotes = $attrM->loadByTerm($termM->getId(), ['termNote'], $termNoteStatus->getAllTypes());
+
+        // Recalculate term status
+        $termM->setStatus($termNoteStatus->fromTermNotes($termNotes));
+
+        // If status is modified save it to the DB
+        if ($termM->isModified('status')) {
+            $termM->setUpdatedBy($this->_session->id);
+            $termM->update(['updateProcessStatusAttr' => false]);
+
+            // Return new status
+            return $termM->getStatus();
+        }
     }
 }

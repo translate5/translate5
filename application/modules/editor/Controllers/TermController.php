@@ -229,7 +229,7 @@ class editor_TermController extends ZfExtended_RestController
             'languageId' => $params['languageId'],
             'language' => $params['language'],
             'term' => trim($params['term']),
-            'status' => 'preferredTerm', // which status should be set initially ?
+            'status' => Zend_Registry::get('config')->runtimeOptions->tbx->defaultTermStatus,
             'processStatus' => $processStatus = 'unprocessed',
             //'definition' => '',
             'updatedBy' => $this->_session->id,
