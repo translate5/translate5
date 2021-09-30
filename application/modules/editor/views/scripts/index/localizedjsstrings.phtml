@@ -687,10 +687,21 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.help.HelpWindow", {
         override: "Editor.view.help.HelpWindow",
         strings:{
-        	cbDoNotShowAgainLabel: '<?php echo $this->translate->_('Dieses Fenster nicht mehr automatisch anzeigen.');?>'
+        	cbDoNotShowAgainLabel: '<?php echo $this->translate->_('Dieses Fenster nicht mehr automatisch anzeigen.');?>',
+            documentationTitle: '<?php echo $this->translate->_('PDF Dokumentation');?>'
         }
     });
-    
+
+    Ext.define("Editor.locale.de.view.help.Documentation", {
+        override: "Editor.view.help.Documentation",
+        strings:{
+            btnOpenInBrowserText: '<?php echo $this->translate->_('In neuem Browser-Tab öffnen');?>'
+        }
+    });
+
+
+    btnOpenInBrowserText:'#UT#im Browser öffnen'
+
     Ext.define("Editor.locale.de.view.admin.task.filter.DateFilter", {
         override: "Editor.view.admin.task.filter.DateFilter",
         strings:{
