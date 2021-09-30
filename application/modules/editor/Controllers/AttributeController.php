@@ -770,10 +770,12 @@ class editor_AttributeController extends ZfExtended_RestController
         /* @var $attrM editor_Models_Terminology_Models_AttributeModel */
         $attrM = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
 
-        // Get the term
+        // Get the term (if termId exists only)
         /** @var editor_Models_Terminology_Models_TermModel $t */
         $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        $t->load($params['termId']);
+        if(!empty($params['termId'])) {
+            $t->load($params['termId']);
+        }
 
         // If it's a processStatus-attribute
         if ($_['attrId']['type'] == 'processStatus') {
