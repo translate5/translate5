@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -46,71 +46,35 @@ Ext.define('Editor.view.HeadPanel', {
     },
     strings: {
         logout: '#UT# Abmelden',
-        readonly: '#UT# - [LESEMODUS]',
-        uiThemeComboLabelText:'#UT#Layout'
+        readonly: '#UT# - [LESEMODUS]'
     },
     
     initConfig: function(instanceConfig) {
         var me = this,
-            translations = [],
-            uiThemesRecord = Editor.app.getUserConfig('extJs.cssFile',true),
-            uiDefaults = [];
-
-        Ext.Object.each(Editor.data.translations, function(i, n) {
-            translations.push([i, n]);
-        });
-
-        Ext.Array.each(uiThemesRecord.get('defaults'), function(i) {
-            uiDefaults.push([i, Ext.String.capitalize(i)]);
-        });
-
-
-        var config = {
-            items: [{
-                xtype: 'container',
-                cls: 'head-panel-brand',
-                html: Editor.data.app.branding,
-                flex: 1
-            },{
-                xtype: 'applicationInfoPanel'
-            },{
-                xtype: 'toolbar',
-                itemId: 'top-menu',
-                cls: 'head-panel-toolbar',
-                ui: 'footer',
+            config = {
                 items: [{
-                    xtype: 'tbfill'
+                    xtype: 'container',
+                    cls: 'head-panel-brand',
+                    html: Editor.data.app.branding,
+                    flex: 1
                 },{
-                    xtype: 'helpButton'
+                    xtype: 'applicationInfoPanel'
                 },{
-                    xtype: 'combo',
-                    itemId: 'uiTheme',
-                    value: uiThemesRecord.get('value'),
-                    store: uiDefaults,
-                    fieldLabel: me.strings.uiThemeComboLabelText,
-                    labelAlign:'right',
-                    labelWidth:50,
-                    width:200,
-                    forceSelection: true,
-                    hidden: !Editor.data.frontend.changeUserThemeVisible,
-                    queryMode: 'local'
-                },{
-                    xtype: 'combo',
-                    itemId: 'languageSwitch',
-                    cls: 'app-language-switch',
-                    width:110,
-                    forceSelection: true,
-                    value: Editor.data.locale,
-                    editable: false,
-                    store: translations,
-                    queryMode: 'local'
-                },{
-                    xtype: 'button',
-                    itemId: 'logoutSingle',
-                    text: me.strings.logout
+                    xtype: 'toolbar',
+                    itemId: 'top-menu',
+                    cls: 'head-panel-toolbar',
+                    ui: 'footer',
+                    items: [{
+                        xtype: 'tbfill'
+                    },{
+                        xtype: 'helpButton'
+                    },{
+                        xtype: 'button',
+                        itemId: 'logoutSingle',
+                        text: me.strings.logout
+                    }]
                 }]
-            }]
-        };
+            };
         
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);

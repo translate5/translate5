@@ -1,26 +1,30 @@
 <?php
 /*
- START LICENSE AND COPYRIGHT
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
  
- This file is part of ZfExtended library
- 
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
- This file may be used under the terms of the GNU LESSER GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file lgpl3-license.txt
- included in the packaging of this file.  Please review the following information
- to ensure the GNU LESSER GENERAL PUBLIC LICENSE version 3.0 requirements will be met:
- https://www.gnu.org/licenses/lgpl-3.0.txt
- 
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
- @license    GNU LESSER GENERAL PUBLIC LICENSE version 3
- https://www.gnu.org/licenses/lgpl-3.0.txt
- 
- END LICENSE AND COPYRIGHT
- */
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
 
 /**
  * Additional Log Writer which just logs all events with an field "task" with a task Entity in its extra data to a separate task log table
@@ -39,6 +43,12 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
         // we clone the event so that we can delete the task afterwards without modifying the real event perhaps used later in another writer
         $event = clone $event;
         $task = $event->extra['task'];
+
+        $id = $task->getId();
+        if(empty($id)) {
+            return;
+        }
+
         /* @var $task editor_Models_Task */
         $taskLog = ZfExtended_Factory::get('editor_Models_Logger_Task');
         /* @var $taskLog editor_Models_Logger_Task */
@@ -64,7 +74,7 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
         try {
             $taskLog->save();
         }
-        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+        catch(Throwable $e) {
             //do nothing here! The error itself was logged in the system log,
             // the task seems to be deleted in the meantime, so no need and way to log it here
             // this can happen for example if error happens in a worker (async from GUI),

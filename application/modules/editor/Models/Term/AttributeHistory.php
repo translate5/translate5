@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -29,37 +29,45 @@ END LICENSE AND COPYRIGHT
 /**
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
+ * @method integer getAttrId() getAttrId()
+ * @method void setAttrId() setAttrId(integer $attrId)
  * @method integer getCollectionId() getCollectionId()
  * @method void setCollectionId() setCollectionId(integer $collectionId)
- * @method integer getAttributeId() getAttributeId()
- * @method void setAttributeId() setAttributeId(integer $termId)
+ * @method integer getTermEntryId() getTermEntryId()
+ * @method void setTermEntryId() setTermEntryId(integer $termEntryId)
+ * @method string getLanguage() getLanguage()
+ * @method void setLanguage() setLanguage(string $language)
+ * @method integer getTermId() getTermId()
+ * @method void setTermId() setTermId(integer $termId)
+ * @method integer getDataTypeId() getDataTypeId()
+ * @method void setDataTypeId() setDataTypeId(integer $dataTypeId)
+ * @method string getType() getType()
+ * @method void setType() setType(string $type)
  * @method string getValue() getValue()
  * @method void setValue() setValue(string $value)
- * @method string getCreated() getCreated()
- * @method void setCreated() setCreated(string $created)
- * @method string getUpdated() getUpdated()
- * @method void setUpdated() setUpdated(string $updated)
- * @method string getUserGuid() getUserGuid()
- * @method void setUserGuid() setUserGuid(string $userGuid)
- * @method string getUserName() getUserName()
- * @method void setUserName() setUserName(string $userName)
- * @method string getHistoryCreated() getHistoryCreated()
- * @method void setHistoryCreated() setHistoryCreated(string $created)
- * @method string getProcessStatus() getProcessStatus()
- * @method void setProcessStatus() setProcessStatus(string $processStatus)
+ * @method string getTarget() getTarget()
+ * @method void setTarget() setTarget(string $target)
+ * @method integer getIsCreatedLocally() getIsCreatedLocally()
+ * @method void setIsCreatedLocally() setIsCreatedLocally(integer $isCreatedLocally)
+ * @method integer getUpdatedBy() getUpdatedBy()
+ * @method void setUpdatedBy() setUpdatedBy(integer $userId)
+ * @method string getUpdatedAt() getUpdatedAt()
+ * @method void setUpdatedAt() setUpdatedAt(string $updatedAt)
+ * @method string getTermEntryGuid() getTermEntryGuid()
+ * @method void setTermEntryGuid() setTermEntryGuid(string $termEntryGuid)
+ * @method string getLangSetGuid() getLangSetGuid()
+ * @method void setLangSetGuid() setLangSetGuid(string $langSetGuid)
+ * @method string getTermGuid() getTermGuid()
+ * @method void setTermGuid() setTermGuid(string $termGuid)
+ * @method string getGuid() getGuid()
+ * @method void setGuid() setGuid(string $guid)
+ * @method string getElementName() getElementName()
+ * @method void setElementName() setElementName(string $elementName)
+ * @method string getAttrLang() getAttrLang()
+ * @method void setAttrLang() setAttrLang(string $attrLang)
+ * @method string getDataType() getDataType()
+ * @method void setDataType() setDataType(string $dataType)
  */
 class editor_Models_Term_AttributeHistory extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Term_AttributeHistory';
-    
-    public function getFieldsToUpdate() {
-        return [
-            'collectionId',
-            'value',
-            'processStatus',
-            'userGuid',
-            'userName',
-            'created',
-            'updated',
-        ];
-    }
 }

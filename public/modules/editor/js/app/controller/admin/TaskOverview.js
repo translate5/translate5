@@ -1,9 +1,10 @@
+
 /*
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -44,7 +45,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         'admin.WorkflowUserRoles',
         'admin.WorkflowState',
         'admin.WorkflowSteps',
-        'admin.Workflow',
+        'admin.Workflow'
     ],
     views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow', 'StatefulWindow'],
     refs: [{
@@ -295,11 +296,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             idx,
             customerId,
             langs = val.match(/-([a-zA-Z_]{2,5})-([a-zA-Z_]{2,5})\.[^.]+$/);
-        if (name && name.getValue() == '') {
+        if (name && name.getValue() === '') {
             name.setValue(val.replace(/\.[^.]+$/, '').replace(/^C:\\fakepath\\/, ''));
         }
         //simple algorithmus to get the language from the filename
-        if (langs && langs.length == 3) {
+        if (langs && langs.length === 3) {
             //try to convert deDE language to de-DE for searching in the store
             var regex = /^([a-z]+)_?([A-Z]+)$/;
             if (regex.test(langs[1])) {

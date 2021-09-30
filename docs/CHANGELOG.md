@@ -12,6 +12,142 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [5.2.6] - 2021-08-04
+
+### Important Notes:
+#### [TRANSLATE-2570](https://jira.translate5.net/browse/TRANSLATE-2570)
+FIX must not be applied when imports are running
+
+#### [TRANSLATE-2564](https://jira.translate5.net/browse/TRANSLATE-2564)
+FIX must not be applied when imports are running
+
+#### [TRANSLATE-2416](https://jira.translate5.net/browse/TRANSLATE-2416)
+In order to use (set to a user) the new role PM-light, the admin or PM has to re-login and reload the application.
+ 
+
+
+### Added
+**[TRANSLATE-2580](https://jira.translate5.net/browse/TRANSLATE-2580): Add segment length check to AutoQA** <br>
+AutoQA now incorporates a check of the(pixel based)  segment-length
+
+**[TRANSLATE-2416](https://jira.translate5.net/browse/TRANSLATE-2416): Create PM-light system role** <br>
+A new role PM-light is created, which may only administrate its own projects and tasks and has no access to user management or language resources management.
+
+
+### Changed
+**[TRANSLATE-2586](https://jira.translate5.net/browse/TRANSLATE-2586): Check the URLs in the reviewHtml.txt file for the visual** <br>
+ENHANCEMENT: Warn and clean visual source URLs that can not be imported because they have a fragment "#"
+ENHANCEMENT: Skip duplicates and clean URLs in the reviewHtml.txt file
+
+**[TRANSLATE-2583](https://jira.translate5.net/browse/TRANSLATE-2583): Save config record instead of model sync** <br>
+Code improvements in the configuration overview grid.
+
+
+### Bugfixes
+**[TRANSLATE-2589](https://jira.translate5.net/browse/TRANSLATE-2589): Exclude meta data of images for word files by default** <br>
+By default translate5 will now not extract any more meta data of images, that are embedded in MS Word files.
+
+**[TRANSLATE-2587](https://jira.translate5.net/browse/TRANSLATE-2587): Improve error logging** <br>
+Improves error messages in instant-translate.
+
+**[TRANSLATE-2585](https://jira.translate5.net/browse/TRANSLATE-2585): Evaluate auto_set_role acl for OpenID authentications** <br>
+All missing mandatory translate roles for users authentication via SSO will be automatically added.
+
+**[TRANSLATE-2584](https://jira.translate5.net/browse/TRANSLATE-2584): Across XLF with translate no may contain invalid segmented content** <br>
+Across XLF may contain invalid segmented content for not translatable (not editable) segments. This is fixed by using the not segment content in that case.
+
+**[TRANSLATE-2570](https://jira.translate5.net/browse/TRANSLATE-2570): AutoQA checks blocked segments / finds unedited fuzzy errors in unedited bilingual segments** <br>
+ENHANCEMENT: blocked segments will no longer be evaluated in the quality-management, only if they have structural internal tag-errors they will appear in a new category for this
+FIX: Missing internal tags may have been detected in untranslated empty segments
+FIX: Added task-name & guid to error-logs regarding structural internal tag errors
+FIX: Quality-Management is now bound to a proper ACL
+FIX: Re-establish proper layout of action icons in Task-Grid
+
+
+
+**[TRANSLATE-2564](https://jira.translate5.net/browse/TRANSLATE-2564): Do not render MQM-Tags parted by overlappings** <br>
+FIX: MQM-Tags now are visualized with overlappings unresolved (not cut into pieves)
+
+
+
+## [5.2.5] - 2021-07-20
+
+### Important Notes:
+#### [TRANSLATE-2388](https://jira.translate5.net/browse/TRANSLATE-2388)
+The task usageMode can now be set via API on task creation (not as mentioned in the issue before via config).
+
+#### [TRANSLATE-1808](https://jira.translate5.net/browse/TRANSLATE-1808)
+Test this feature after making a release! 
+- on our server with create instance 
+- sole installation
+ 
+
+
+### Added
+**[TRANSLATE-2518](https://jira.translate5.net/browse/TRANSLATE-2518): Add project description to project and tasks** <br>
+A project description can be added on project creation.
+
+**[TRANSLATE-2477](https://jira.translate5.net/browse/TRANSLATE-2477): Language resource to task assoc: Set default for pre-translation and internal-fuzzy options in system config** <br>
+Default values for "internal fuzzy", "translate MT" and "translate TM and Term" checkboxes  can be defined as system configuration configuration (overwritable on client level).
+
+**[TRANSLATE-992](https://jira.translate5.net/browse/TRANSLATE-992): New Keyboard shortcuts for process / cancel repetition editor** <br>
+Adding keyboard shortcuts to save (ctrl+s) or cancel (esc) the processing of repetitions in the repetition editor.
+
+
+### Changed
+**[TRANSLATE-2566](https://jira.translate5.net/browse/TRANSLATE-2566): Integrate Theme-Switch in translate5** <br>
+Users are able to change the translate5 theme.
+
+**[TRANSLATE-2381](https://jira.translate5.net/browse/TRANSLATE-2381): Visual: Enhance the reflow mechanism for overlapping elements** <br>
+Visual: Improved Text-Reflow. This signifantly reduces the rate of PDFs that cannot be imported with a functional WYSIWIG preview. There now is a threshhold for detected reflow-rendering errors that can be raised for individual tasks that had to many errors on Import as a last ressort. Although that will rarely be neccessary.
+
+**[TRANSLATE-1808](https://jira.translate5.net/browse/TRANSLATE-1808): Installer should set the timezone** <br>
+The installer always set timezone europe/berlin, know the  user is asked on installation which timezone should be used.
+
+
+### Bugfixes
+**[TRANSLATE-2581](https://jira.translate5.net/browse/TRANSLATE-2581): Task user assoc workflow step drop-down filtering** <br>
+If a user was added twice to a task, and the workflow step of the second user was changed to the same step of the first user, this led to a duplicated key error message.
+
+**[TRANSLATE-2578](https://jira.translate5.net/browse/TRANSLATE-2578): Reload users to task association grid after task import finishes** <br>
+Refresh users to task association grid after the task import is done.
+
+**[TRANSLATE-2576](https://jira.translate5.net/browse/TRANSLATE-2576): Notify associated user button does not work** <br>
+Fixes problem with "Notify users" button not sending emails.
+
+**[TRANSLATE-2575](https://jira.translate5.net/browse/TRANSLATE-2575): System default configuration on instance or client level has no influence on Multiple user setting in import wizard** <br>
+The default value for the "multiple user" setting drop-down was not correctly preset from config.
+
+**[TRANSLATE-2573](https://jira.translate5.net/browse/TRANSLATE-2573): User assignment entry disappears in import wizard, when pre-assigned deadline is changed** <br>
+Edited user association in import wizard was disappearing after switching the workflow.
+
+**[TRANSLATE-2571](https://jira.translate5.net/browse/TRANSLATE-2571): ERROR in core: E9999 - TimeOut on waiting for the following materialized view to be filled** <br>
+There was a problem when editing a default associated user of a task in the task add wizard. This is fixed now.
+
+**[TRANSLATE-2568](https://jira.translate5.net/browse/TRANSLATE-2568): ModelFront plug-in is defect and prevents language resource usage** <br>
+The ModelFront plug-in was defect and stopped match analysis and pre-translation from working.
+
+**[TRANSLATE-2567](https://jira.translate5.net/browse/TRANSLATE-2567): TagProtection can not deal with line breaks in HTML attributes** <br>
+When using TagProtection (protect plain HTML code in XLF as tags) line breaks in HTML attributes were not probably resolved.
+
+**[TRANSLATE-2565](https://jira.translate5.net/browse/TRANSLATE-2565): GroupShare: Wrong tag order using the groupshare language resource** <br>
+Nested internal tags were restored in wrong order if using a segment containing such tags from the groupshare language resource. 
+
+**[TRANSLATE-2546](https://jira.translate5.net/browse/TRANSLATE-2546): New uuid column of match analysis is not filled up for existing analysis** <br>
+The new uuid database column of the match analysis table is not filled up for existing analysis.
+
+**[TRANSLATE-2544](https://jira.translate5.net/browse/TRANSLATE-2544): Focus new project after creating it** <br>
+After task/project creation the created project will be focused in the project overview
+
+**[TRANSLATE-2525](https://jira.translate5.net/browse/TRANSLATE-2525): npsp spaces outside of mrk-tags of mtype "seg" should be allowed** <br>
+Due to invalid XLIFF from Across there is a check in import, that checks, if there is text outside of mrk-tags of mtype "seg" inside of seg-source or target tags. Spaces and tags are allowed, but nbsp characters were not so far. This is changed and all other masked whitespace tags are allowed to be outside of mrk tags too.
+
+**[TRANSLATE-2388](https://jira.translate5.net/browse/TRANSLATE-2388): Ensure config overwrite works for "task usage mode"** <br>
+The task usageMode can now be set via API on task creation.
+
+
 ## [5.2.4] - 2021-07-06
 
 ### Important Notes:

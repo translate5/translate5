@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -123,7 +123,7 @@ class editor_Models_Quality_StatisticsView {
         $this->createMqmTree();
         if(!$this->onlyMqm){
             // we use the filter-panel-views intermediate model to add the other types
-            $panelView = new editor_Models_Quality_FilterPanelView($this->task, NULL, false, NULL, true, $this->field);
+            $panelView = new editor_Models_Quality_FilterPanelView($this->task, false, NULL, true, $this->field);
             foreach($panelView->getRowsByType() as $type => $typeRows){
                 $row = $typeRows[editor_Models_Quality_FilterPanelView::RUBRIC];
                 if($row->qcount > 0){

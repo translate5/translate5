@@ -4,18 +4,18 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -53,30 +53,30 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      * @var array
      */
     protected $frontendEndControllers = [
-        'ServerException' => true,
-        'ViewModes' => true,
-        'Segments' => true,
-        'Preferences' => true,
-        'MetaPanel' => true,
-        'Editor' => true,
-        'Fileorder' => true,
-        'ChangeAlike' => true,
-        'Comments' => true,
-        'SearchReplace' => true,
-        'SnapshotHistory' => true,
-        'Termportal' => true,
-        'JsLogger' => true,
-        'editor.CustomPanel' => true,
-        'admin.TaskOverview' => false,           //disabled by default, controlled by ACL
-        'admin.TaskPreferences' => false,        //disabled by default, controlled by ACL
-        'admin.TaskUserAssoc' => false,          //disabled by default, controlled by ACL
-        'admin.Customer' => false,               //disabled by default, controlled by ACL
-        'LanguageResourcesTaskassoc' => false,   //disabled by default, controlled by ACL
-        'LanguageResources' => false,            //disabled by default, controlled by ACL
-        'TmOverview' => false,                   //disabled by default, controlled by ACL
-        'Localizer' => true,
-        'Quality' => true,
-        'QualityMqm' => true //the check if this controller is active is task specific (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
+        'ServerException'               => true,
+        'ViewModes'                     => true,
+        'Segments'                      => true,
+        'Preferences'                   => true,
+        'MetaPanel'                     => true,
+        'Editor'                        => true,
+        'Fileorder'                     => true,
+        'ChangeAlike'                   => true,
+        'Comments'                      => true,
+        'SearchReplace'                 => true,
+        'SnapshotHistory'               => true,
+        'Termportal'                    => true,
+        'JsLogger'                      => true,
+        'editor.CustomPanel'            => true,
+        'admin.TaskOverview'            => ['taskOverviewFrontendController'], //controlled by ACL, enabling frontend rights given here
+        'admin.TaskPreferences'         => ['taskOverviewFrontendController'], //controlled by ACL, enabling frontend rights given here
+        'admin.TaskUserAssoc'           => ['taskUserAssocFrontendController'], //controlled by ACL, enabling frontend rights given here
+        'admin.Customer'                => ['customerAdministration'], //controlled by ACL, enabling frontend rights given here
+        'LanguageResourcesTaskassoc'    => ['languageResourcesTaskassoc'], //controlled by ACL, enabling frontend rights given here
+        'LanguageResources'             => ['languageResourcesMatchQuery', 'languageResourcesSearchQuery'], //controlled by ACL, enabling frontend rights given here
+        'TmOverview'                    => ['languageResourcesOverview'], //controlled by ACL, enabling frontend rights given here
+        'Localizer'                     => true,
+        'Quality'                       => true,
+        'QualityMqm'                    => true //the check if this controller is active is task specific (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
     ];
 
     public function init()
@@ -142,6 +142,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $this->view->appVersion = $this->getAppVersion();
         $this->setJsVarsInView();
+        $this->setThemeVarsInView($userConfig['runtimeOptions.extJs.cssFile']['defaults']);
         $this->checkForUpdates($this->view->appVersion);
     }
 
@@ -352,9 +353,34 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         /* @var $config editor_Models_Config */
         $this->view->Php2JsVars()->set('frontend.config.configLabelMap', $config->getLabelMap());
 
+        $tmFileUploadSizeText = $this->translate->_("Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.");
+        $uploadMaxFilesize = preg_replace('/\D/', '', ini_get('upload_max_filesize'));
+
+        $tmFileUploadSizeText = str_replace('{upload_max_filesize}',$uploadMaxFilesize,$tmFileUploadSizeText);
+
+
+        //Info: custom vtype text must be translated here and set as frontend var. There is no way of doing this with localizedjsstrings
+        $this->view->Php2JsVars()->set('frontend.override.VTypes.tmFileUploadSizeText', $tmFileUploadSizeText);
+
+        // set the max allowed upload filesize into frontend variable. This is used for upload file size validation in tm import
+        $this->view->Php2JsVars()->set('frontend.php.upload_max_filesize',$uploadMaxFilesize);
+
         $this->setJsAppData();
     }
 
+    /***
+     * Add translated theme names to a frontend variable
+     * @param string $themes
+     * @throws Zend_Exception
+     */
+    protected function setThemeVarsInView(string $themes){
+        $themes = explode(',',$themes);
+        $translated = [];
+        foreach ($themes as $item) {
+            $translated[$item] = $this->translate->_($item);
+        }
+        $this->view->Php2JsVars()->set('frontend.config.themesName', $translated);
+    }
     /***
      * Set language resources frontend vars
      */
@@ -485,36 +511,26 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
 
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'taskOverviewFrontendController')) {
-            $this->frontendEndControllers['admin.TaskOverview'] = true;
-            $this->frontendEndControllers['admin.TaskPreferences'] = true;
-        }
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'adminUserFrontendController')) {
-            $this->frontendEndControllers['admin.TaskUserAssoc'] = true;
-        }
-
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'customerAdministration')) {
-            $this->frontendEndControllers['admin.Customer'] = true;
-        }
-
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesTaskassoc')) {
-            $this->frontendEndControllers['LanguageResourcesTaskassoc'] = true;
-        }
-
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesMatchQuery') || $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesSearchQuery')) {
-            $this->frontendEndControllers['LanguageResources'] = true;
-        }
-
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesOverview')) {
-            $this->frontendEndControllers['TmOverview'] = true;
-        }
-
         //ensure Localizer beeing the last one, so we remove it and add it later to be at the arrays end
         unset($this->frontendEndControllers['Localizer']);
 
-        //get only the active controller names
-        $activeControllers = array_keys(array_filter($this->frontendEndControllers));
+        //store only the enabled controller names
+        $activeControllers = [];
+        foreach($this->frontendEndControllers as $controller => $enabled) {
+            if(is_array($enabled)) {
+                foreach($enabled as $neededRightForController) {
+                    if($acl->isInAllowedRoles($userSession->data->roles, 'frontend', $neededRightForController)) {
+                        $enabled = true;
+                        break; //at least only one right is needed out of the list
+                    }
+                }
+            }
+            if($enabled === true) {
+                $activeControllers[] = $controller;
+            }
+        }
 
+        //add the active controllers from plugins
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
         $pluginFrontendControllers = $pm->getActiveFrontendControllers();
@@ -556,13 +572,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     public function applicationstateAction()
     {
         $this->_helper->layout->disableLayout();
+        $userSession = new Zend_Session_Namespace('user');
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
 
-        $userSession = new Zend_Session_Namespace('user');
-        //since application state contains sensibile information we show that only to API users
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'backend', 'applicationstate')) {
-            $this->view->applicationstate = ZfExtended_Debug::applicationState();
+        $config = Zend_Registry::get('config');
+        $isCronIP = $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR'];
+        $hasAppStateACL = $acl->isInAllowedRoles($userSession->data->roles, 'backend', 'applicationstate');
+        //since application state contains sensible information we show that only to the cron TP, or with more details to the API users
+        if ($isCronIP || $hasAppStateACL) {
+            $this->view->applicationstate = ZfExtended_Debug::applicationState($hasAppStateACL);
         }
     }
 
@@ -630,12 +649,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // get requested file from router
         $requestedType = $this->getParam(1);
         $requestedFile = $this->getParam(2);
-        $js = explode($slash, $requestedFile);
+        $requestedFileParts = explode($slash, $requestedFile);
         $extension = strtolower(pathinfo($requestedFile, PATHINFO_EXTENSION));
 
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase!
-        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js)));
+        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($requestedFileParts)));
 
         // DEBUG
         // error_log("INDEXCONTROLLER: pluginpublicAction: plugin: ".$plugin." / requestedType: ".$requestedType." / requestedFile: ".$requestedFile." / extension: ".$extension);
@@ -654,20 +673,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         }
 
         // check if requested "fileType" is allowed
-        if (!$plugin->isPublicFileType($requestedType)) {
+        if (!$plugin->isPublicSubFolder($requestedType)) {
             throw new ZfExtended_NotFoundException();
         }
 
-        $absolutePath = null;
-        //get public files of the plugin to make a whitelist check of the file string from userland
-        $allowedFiles = $plugin->getPublicFiles($requestedType, $absolutePath);
-        $file = join($slash, $js);
-        if (empty($allowedFiles) || !in_array($file, $allowedFiles)) {
-            throw new ZfExtended_NotFoundException();
-        }
-        //concat the absPath from above with filepath
-        $wholePath = $absolutePath . '/' . $file;
-        if (!file_exists($wholePath)) {
+        $publicFile = $plugin->getPublicFile($requestedType, $requestedFileParts);
+        if (empty($publicFile) || !$publicFile->isFile()) {
             throw new ZfExtended_NotFoundException();
         }
         if (array_key_exists($extension, $types)) {
@@ -678,7 +689,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             header('Content-Type: ');
         }
         //FIXME add version URL suffix to plugin.css inclusion
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $publicFile->getMTime()));
         //with etags we would have to use the values of $_SERVER['HTTP_IF_NONE_MATCH'] too!
         //makes sense to do so!
         //header('ETag: '.md5(of file content));
@@ -696,7 +707,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         */
 
 
-        readfile($wholePath);
+        readfile($publicFile);
         //FIXME: Optimierung bei den Plugin Assets: public Dateien die durch die Plugins geroutet werden, sollten chachebar sein und B keine Plugin Inits triggern. Geht letzteres überhaupt wg. VisualReview welches die Dateien ebenfalls hier durchschiebt?
         exit;
     }

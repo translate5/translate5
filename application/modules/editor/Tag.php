@@ -1,36 +1,30 @@
 <?php
 /*
- START LICENSE AND COPYRIGHT
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
- This file is part of a plug-in for translate5.
- translate5 can be optained via the instructions that are linked at http://www.translate5.net
- For the license of translate5 itself please see http://www.translate5.net/license.txt
- For the license of this plug-in, please see below.
- 
- This file is part of a plug-in for translate5 and may be used under the terms of the
- GNU GENERAL PUBLIC LICENSE version 3 as published by the Free Software Foundation and
- appearing in the file gpl3-license.txt included in the packaging of the translate5 plug-in
- to which this file belongs. Please review the following information to ensure the
- GNU GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/gpl.html
- 
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the
- root folder of translate5.
- 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
- @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
- http://www.gnu.org/licenses/gpl.html
- http://www.translate5.net/plugin-exception.txt
- 
- END LICENSE AND COPYRIGHT
- */
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
 
 use PHPHtmlParser\Dom;
 use PHPHtmlParser\Options;
@@ -453,24 +447,14 @@ class editor_Tag {
         return (count($this->children) > 0);
     }
     /**
-     * 
-     * @return editor_Tag|NULL
-     */
-    public function getFirstChild(){
-        if($this->hasChildren()){
-            return $this->children[0];
-        }
-        return NULL;
-    }
-    /**
      * Retrieves the last child if there are any
      * @return editor_Tag|NULL
      */
-    public function getLastChild(){
+    public function getLastChildsTextLength() : int {
         if($this->hasChildren()){
-            return $this->children[count($this->children) - 1];
+            return $this->children[count($this->children) - 1]->getTextLength();
         }
-        return NULL;
+        return 0;
     }
     /**
      * 
@@ -885,7 +869,7 @@ class editor_Tag {
         return ($this->getName() == '' && count($this->children) == 0);
     }
     /**
-     * Retrieves, if the tag is a sungular tag like <tag /> or a complete tag with opening and closing part
+     * Retrieves, if the tag is a singular tag like <tag /> or a complete tag with opening and closing part
      * @return bool
      */
     public function isSingular() : bool {
@@ -1026,17 +1010,11 @@ class editor_Tag {
      * @param boolean $withDataAttribs
      * @return string
      */
-    protected function renderStart($withDataAttribs=true) : string {
+    protected function renderStart(bool $withDataAttribs=true) : string {
         if($this->getName() == ''){
             return '';
         }
-        $tag = '<'.$this->getName();
-        $tag .= self::classAttr($this->getClasses());
-        foreach($this->attribs as $name => $val){
-            if($withDataAttribs || substr($name, 0, 5) != 'data-'){
-                $tag .= self::createAttribute($name, $val);
-            }
-        }
+        $tag = '<'.$this->getName().$this->renderAttributes($withDataAttribs);
         if($this->isSingular()){
             // QUIRK: The blank before the space is against the HTML-Spec and superflous BUT termtagger does double img-tags if they do not have a blank before the trailing slash ...
             return $tag.' />';
@@ -1052,5 +1030,39 @@ class editor_Tag {
             return '';
         }
         return '</'.$this->getName().'>';
+    }
+    /**
+     * Creates all our attributes as string starting with a blank
+     * @param boolean $withDataAttribs
+     * @return string
+     */
+    protected function renderAttributes(bool $withDataAttribs=true) : string {
+        $attribs = self::classAttr($this->getClasses());
+        foreach($this->attribs as $name => $val){
+            if($withDataAttribs || substr($name, 0, 5) != 'data-'){
+                $attribs .= self::createAttribute($name, $val);
+            }
+        }
+        return $attribs;
+    }
+    /**
+     * Helper to debug nested tags
+     * @param string $indentation
+     */
+    public function debugStructure(string $indentation=''){
+        $text = $indentation.' '.get_class($this).' '.$this->debugProps()."\n";
+        if($this->hasChildren()){
+            foreach($this->getChildren() as $child){
+                $text .= $child->debugStructure('**'.$indentation);
+            }
+        }
+        return $text;
+    }
+    /**
+     * Helper to create debug structure
+     * @return string
+     */
+    public function debugProps() : string {
+        return '';
     }
 }

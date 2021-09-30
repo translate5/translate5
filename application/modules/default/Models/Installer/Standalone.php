@@ -4,24 +4,24 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -488,15 +488,10 @@ class Models_Installer_Standalone {
      */
     protected function acceptLicenses(array $depsToAccept) {
         if(is_array($this->options) && ($this->options['license-ignore'] ?? false)){
-            //FIXME check log after next installation and remove the below md5 based check if not needed anymore!
-            error_log("IGNORE LICENSE BY PARAM");
             return;
         }
-        //FIXME since above options is not usable yet, we just check for the host to ignore the license question
-        //when using console kit we can replace this with an undocumented switch
+        //if install-and-update.sh is called on the server and above options is not usable, there fore this fallback
         if(md5(gethostname()) === '52c30971e2fe1d24879b307b44e0966f') {
-            //FIXME check log after next installation and remove the below md5 based check if not needed anymore!
-            error_log("IGNORE LICENSE BY HOST");
             return;
         }
         $first = true;

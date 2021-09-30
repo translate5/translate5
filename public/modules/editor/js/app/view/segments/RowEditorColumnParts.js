@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -46,15 +46,13 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         segmentNotSavedUserMessage: '#UT#Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
         cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!'
     },
-    listeners: {
-        'afterlayout': 'onAfterLayout'
-    },
     initComponent: function() {
         var me = this;
         me.callParent();
         me.on('render', function(p) {
             p.body.on('dblclick', me.changeColumnByClick, me);
         });
+        me.on('afterlayout', me.onAfterLayout, me);
         
         me.mainEditor = me.add(new Editor.view.segments.HtmlEditor());
     },

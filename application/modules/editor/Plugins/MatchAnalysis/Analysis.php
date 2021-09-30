@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -245,10 +245,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param bool $saveAnalysis
      * @return NULL|stdClass
      */
-    protected function getBestResult(editor_Models_Segment $segment, $saveAnalysis = true)
-    {
-        $bestMatchRateResult = null;
-        $bestMatchRate = null;
+    protected function getBestResult(editor_Models_Segment $segment,$saveAnalysis=true){
+        $bestMatchRateResult=null;
+        $bestMatchRate=null;
 
         //query the segment for each assigned tm
         foreach ($this->connectors as $languageResourceid => $connector) {
@@ -294,22 +293,21 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                     // - if multiple permitted terms: take the first
                     if (!is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
                         $bestMatchMetaData = $bestMatchRateResult->metaData;
-                        $bestMatchIsPreferredTerm = editor_Models_Term::isPreferredTerm($bestMatchMetaData['status']);
+                        $bestMatchIsPreferredTerm = editor_Models_Terminology_Models_TermModel::isPreferredTerm($bestMatchMetaData['status']);
                         if ($bestMatchIsPreferredTerm) {
                             continue;
                         }
                     }
                     // - only allow preferred and permitted terms for best matches
                     $metaData = $match->metaData;
-                    $matchIsPreferredTerm = editor_Models_Term::isPreferredTerm($metaData['status']);
-                    $matchIsPermittedTerm = editor_Models_Term::isPermittedTerm($metaData['status']);
+                    $matchIsPreferredTerm = editor_Models_Terminology_Models_TermModel::isPreferredTerm($metaData['status']);
+                    $matchIsPermittedTerm = editor_Models_Terminology_Models_TermModel::isPermittedTerm($metaData['status']);
                     if (!$matchIsPreferredTerm && !$matchIsPermittedTerm) {
                         continue;
                     }
                 }
 
                 $matchRateInternal = $match;
-
                 //store best match rate results(do not compare agains the mt results)
                 if ($matchRateInternal->matchrate > $bestMatchRate && !$isMtResource) {
                     $bestMatchRateResult = $match;

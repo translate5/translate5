@@ -1,9 +1,10 @@
+
 /*
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -24,6 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+
 /* This css will be applied when this theme is active. */
 @CHARSET "UTF-8";
 body:not(.loading) > #head-panel {
@@ -36,4 +38,20 @@ tr.no-users td div {
 }
 tr.import td div {
     color: #b642e8 !important;
+}
+
+/* fix the color of the text for odd grid cells in treegrid */
+.x-tree-view .x-grid-item:nth-of-type(odd) .x-grid-cell {
+    background-color: #EAF1FB !important;
+    color: black !important;
+}
+
+#segment-grid .x-grid-row-editor .segment-content .x-form-display-field {
+    color: #ffffff !important;
+    cursor: text !important;
+}
+
+#segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
+	color: #ffffff !important;
+	white-space: normal !important;
 }

@@ -15,7 +15,7 @@
                 <source>GeneralMetatagTitleSuffix</source>
                 <target state="needs-review-adaptation">translate5 - Open Source translation system</target>
             </trans-unit>
-            <trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermCustomerSearch</source><target>Terminologie suche</target></trans-unit>
+            <trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermSearch</source><target>Term-Suche</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRrdW5kZQ=='>
 <source>Standardkunde</source>
 <target>Standardkunde</target>

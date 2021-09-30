@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -60,19 +60,20 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         view.getViewModel().set('uploadLabel',view.strings.file);
     },
 
+    labelTooltipInstance:null,
+
     /**
      * Resource combo handler
      */
     onResourceChange:function(field,resource){
         var me=this,
             view=me.getView(),
-            uploadField=view.down('filefield[name="tmUpload"]'),
             serviceName=field.getSelection() && field.getSelection().get('serviceName'),
             resourceType=field.getSelection() && field.getSelection().get('resourceType'),
             helppage = field.getSelection() && field.getSelection().get('helppage'),
             vm=view.getViewModel(),
             sdlEngineCombo=view.down('#sdlEngine');
-        
+
         if (!me.isValidService(serviceName, helppage)) {
             return false;
         }
@@ -80,24 +81,18 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         vm.set('serviceName',serviceName);
         vm.set('resourceType',resourceType);
 
-        var resourcesStore=Ext.StoreManager.get('Editor.store.LanguageResources.Resources'),
-            isSdl=me.isSdlResource(),
-            isTermcollection=me.isTermcollectionResource();
-
-        uploadField.tooltip=isTermcollection ? view.strings.collection : view.strings.file;
-        uploadField.regexText=isTermcollection ? view.strings.importTbxType : view.strings.importTmxType;
-        uploadField.regex=isTermcollection ? view.tbxRegex : view.tmxRegex;
-        vm.set('uploadLabel',isTermcollection ? view.strings.collection : view.strings.file);
+        // upload field has different tooltip and label based on the selected resource
+        me.updateUploadFieldConfig();
 
         //is visible when sdl as resource is selected
         //sdlEngineCombo.setVisible(isSdl);
         //sdlEngineCombo.setDisabled(!isSdl);
-        if(isSdl){
+        if(me.isSdlResource()){
             sdlEngineCombo.getStore().clearFilter();
             return;
         }
         //for non engine type resource load the resource languages
-        var record = resourcesStore.getById(resource),
+        var record = Ext.StoreManager.get('Editor.store.LanguageResources.Resources').getById(resource),
             sourceField=view.down('combo[name="sourceLang"]'),
             targetField=view.down('combo[name="targetLang"]'),
             sourceData = record ? record.get('sourceLanguages') : [],
@@ -270,6 +265,30 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     isTermcollectionResource:function(){
         var vm=this.getView().getViewModel();
         return vm.get('serviceName')==Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
+    },
+
+    /***
+     * Set custom config for the upload field based on the selected resource.
+     */
+    updateUploadFieldConfig:function (){
+        var me=this,
+            view=me.getView(),
+            uploadField=view.down('filefield[name="tmUpload"]'),
+            isTc = me.isTermcollectionResource();
+
+        // create tooltip instance to show fileupload field tooltips.
+        if(me.labelTooltipInstance === null){
+            me.labelTooltipInstance = Ext.create('Ext.tip.ToolTip', {
+                target: uploadField.labelEl
+            });
+        }
+        me.labelTooltipInstance.setHtml(isTc ? view.strings.collectionUploadTooltip : view.strings.file);
+
+        uploadField.regexText = isTc ? view.strings.importTbxType : view.strings.importTmxType;
+        uploadField.regex = isTc ? view.tbxRegex : view.tmxRegex;
+        view.getViewModel().set('uploadLabel',isTc ? view.strings.collection : view.strings.file);
+
+        isTc ? uploadField.labelEl.addCls('lableInfoIcon') : uploadField.labelEl.removeCls('lableInfoIcon');
     }
 
 });

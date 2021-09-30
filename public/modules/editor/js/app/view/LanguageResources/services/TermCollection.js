@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -33,8 +33,8 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.pluginFeasibilityTest.view.EditorPanel
- * @extends Ext.panel.Panel
+ * @class Editor.view.LanguageResources.services.TermCollection
+ * @extends Editor.view.LanguageResources.services.Default
  */
 Ext.define('Editor.view.LanguageResources.services.TermCollection', {
     requires: ['Editor.view.LanguageResources.services.Default'],
@@ -42,8 +42,7 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
     id: 'TermCollection',
 
     addTooltip: '#UT#Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen',
-    exportTooltip:'#UT#Vorschläge exportieren',
-    
+
     /**
      * returns the row css class for the associated service in the tm overview panel
      * @param {Editor.model.LanguageResources.LanguageResource} rec
@@ -64,13 +63,6 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
     		return false;
     	}
         return this.addTooltip;
-    },
-    
-    /***
-     * Get export language resources tooltip
-     */
-    getExportTooltip:function(){
-    	return this.exportTooltip;
     },
     
     /***

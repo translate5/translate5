@@ -4,18 +4,18 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -42,20 +42,20 @@ class editor_Plugins_TermTagger_SegmentProcessor {
     public static function getQualityState(array $cssClasses, bool $isSourceField) : string {
         foreach($cssClasses as $cssClass){
             switch($cssClass){                
-                case editor_Models_Term::TRANSSTAT_NOT_FOUND:
+                case editor_Models_Terminology_Models_TermModel::TRANSSTAT_NOT_FOUND:
                     if($isSourceField){
                         return editor_Plugins_TermTagger_QualityProvider::NOT_FOUND_IN_TARGET;
                     }
                     break;
                     
-                case editor_Models_Term::TRANSSTAT_NOT_DEFINED:
+                case editor_Models_Terminology_Models_TermModel::TRANSSTAT_NOT_DEFINED:
                     if($isSourceField){
                         return editor_Plugins_TermTagger_QualityProvider::NOT_DEFINED_IN_TARGET;
                     }
                     break;
                     
-                case editor_Models_Term::STAT_SUPERSEDED:
-                case editor_Models_Term::STAT_DEPRECATED:
+                case editor_Models_Terminology_Models_TermModel::STAT_SUPERSEDED:
+                case editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED:
                     if($isSourceField){
                         return editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_SOURCE;
                     } else {

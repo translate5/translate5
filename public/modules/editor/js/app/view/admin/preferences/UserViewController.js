@@ -1,10 +1,9 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -15,14 +14,13 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -37,28 +35,55 @@ Ext.define('Editor.view.admin.preferences.UserViewController', {
             },
             '#preferencesUserWindow #cancelBtn': {
                 click: 'handleCancel'
+            },
+            '#languageSwitch': {
+                change: 'changeLocale'
+            },
+            '#uiTheme' : {
+                change: 'onUiThemeChange'
             }
         }
     },
+
     /**
      * Speichert die Einstellungen und schließt das Fenster
      */
-    handleSave: function() {
-        var me = this, 
+    handleSave: function () {
+        var me = this,
             form = me.getView().down('form').getForm(),
             pw = form.getValues().passwd,
             user = Editor.app.authenticatedUser;
-        if(form.isValid()) {
+        if (form.isValid()) {
             user.set('passwd', pw);
             user.save({
-                url: Editor.data.restpath+'user/authenticated',
-                success: function() {
+                url: Editor.data.restpath + 'user/authenticated',
+                success: function () {
                     Editor.MessageBox.addSuccess(me.strings.pwSave);
                 }
             });
         }
     },
-    handleCancel: function() {
+
+    handleCancel: function () {
         this.getView().down('form').reset();
+    },
+
+    /***
+     * Change translate5 language on language dropdown change
+     * @param combo
+     * @param locale
+     */
+    changeLocale: function (combo, locale) {
+        Editor.app.setTranslation(locale);
+    },
+
+    /***
+     * On ui change combo event handler
+     * @param combo
+     * @param newValue
+     */
+    onUiThemeChange:function(combo, newValue){
+        Editor.app.changeUserTheme(newValue);
     }
+
 });

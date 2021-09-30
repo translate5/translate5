@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -27,6 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Models_Db_Term_History extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_term_history';
+    protected $_name    = 'terms_term_history';
     public $_primary = 'id';
 }

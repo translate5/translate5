@@ -1468,7 +1468,7 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id="QW53ZW5kYmFya2VpdCB2b24gR2ViaWV0c3NjaGVtYXRhcw=="><source>Anwendbarkeit von Gebietsschematas</source><target>Locale applicability</target></trans-unit>
 <trans-unit id="SW50ZXJuYXRpb25hbGlzaWVydW5n"><source>Internationalisierung</source><target>Internationalization</target></trans-unit>
 <trans-unit id="U29uc3RpZ2Vz"><source>Sonstiges</source><target>Other</target></trans-unit>
-<trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermCustomerSearch</source><target>Term search</target></trans-unit>
+<trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermSearch</source><target>Term search</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRrdW5kZQ=='><source>Standardkunde</source><target>Default customer</target></trans-unit>
 <trans-unit id='RXJlaWduaXNzZSB6dSBTcHJhY2hyZXNvdXJjZSAiezB9Ig=='><source>Ereignisse zu Sprachresource "{0}"</source><target>Results for Language-Resource "{0}"</target></trans-unit>
 <trans-unit id='TG9n'><source>Log</source><target>Log</target></trans-unit>

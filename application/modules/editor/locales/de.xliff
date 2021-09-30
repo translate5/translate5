@@ -696,14 +696,14 @@
 <trans-unit id='QUNIVFVORzogRWluIHdlaXRlcmVyIEZpbHRlciBpc3QgZ2VzZXR6dC4gRXMgaXN0IGRhaGVyIG3DtmdsaWNoLCBkYXNzIG5pY2h0IGFsbGUgU2VnbWVudGUgZGVyIExlc2V6ZWljaGVubGlzdGUgc2ljaHRiYXIgc2luZA=='><source>ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind</source><target>ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind</target></trans-unit>
 <trans-unit id='TGVzZXplaWNoZW4='><source>Lesezeichen</source><target>Lesezeichen</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW4gKFNUUkcgKyBBTFQgKyBFTlRFUik='><source>Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)</source><target>Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)</target></trans-unit>
-<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IGltIFdvcmtmbG93IMO2ZmZuZW4gKFNUUkcgKyBFTlRFUik='><source>Speichern und nächstes bearbeitbares Segment im Workflow öffnen (STRG + ENTER)</source><target>Speichern und nächstes bearbeitbares Segment im Workflow öffnen (STRG + ENTER)</target></trans-unit>
+<trans-unit id='U3BlaWNoZXJuLiA8YnIvPk7DpGNoc3RlcyB1bmJlc3TDpHRpZ3RlcywgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW48YnIvPihTVFJHICsgRU5URVIp'><source>Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)</source><target>Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)</target></trans-unit>
 <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW4gKFNUUkcgKyBBTFQgKyDihpMp'><source>Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)</source><target>Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)</target></trans-unit>
 <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsg4oaRKQ=='><source>Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)</source><target>Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)</target></trans-unit>
 <trans-unit id='RGVtIGF1c2dld8OkaGx0ZW4gU2VnbWVudCBlaW5lbiBLb21tZW50YXIgaGluenVmw7xnZW4uIChBTFQgKyBDKQ=='><source>Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)</source><target>Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)</target></trans-unit>
 <trans-unit id='Vm9yaGVyaWdlIFNwYWx0ZSBlZGl0aWVyZW4gKFNUUkcgKyBBTFQgKyDihpAp'><source>Vorherige Spalte editieren (STRG + ALT + ←)</source><target>Vorherige Spalte editieren (STRG + ALT + ←)</target></trans-unit>
 <trans-unit id='TsOkY2hzdGUgU3BhbHRlIGVkaXRpZXJlbiAoU1RSRyArIEFMVCArIOKGkik='><source>Nächste Spalte editieren (STRG + ALT + →)</source><target>Nächste Spalte editieren (STRG + ALT + →)</target></trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IGltIFdvcmtmbG93IMO2ZmZuZW4gKEFMVCArIEJpbGQg4oaTKQ=='><source>Nicht speichern und nächstes bearbeitbares Segment im Workflow öffnen (ALT + Bild ↓)</source><target>Nicht speichern und nächstes bearbeitbares Segment im Workflow öffnen (ALT + Bild ↓)</target></trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChBTFQgKyBCaWxkIOKGkSk='><source>Nicht speichern und vorheriges bearbeitbares Segment im Workflow öffnen (ALT + Bild ↑)</source><target>Nicht speichern und vorheriges bearbeitbares Segment im Workflow öffnen (ALT + Bild ↑)</target></trans-unit>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuLjxici8+TsOkY2hzdGVzIHVuYmVzdMOkdGlndGVzLCBiZWFyYmVpdGJhcmVzIFNlZ21lbnQgw7ZmZm5lbjxici8+KEFMVCArIEJpbGQg4oaTKQ=='><source>Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)</source><target>Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)</target></trans-unit>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuLjxici8+Vm9yaGVyaWdlcyB1bmJlc3TDpHRpZ3RlcywgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW48YnIvPihBTFQgKyBCaWxkIOKGkSk='><source>Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)</source><target>Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)</target></trans-unit>
 <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'><source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source><target>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</target></trans-unit>
 <trans-unit id='QWJicmVjaGVuIChFU0Mp'><source>Abbrechen (ESC)</source><target>Abbrechen (ESC)</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIChTVFJHICsgUyk='><source>Speichern (STRG + S)</source><target>Speichern (STRG + S)</target></trans-unit>
@@ -1273,7 +1273,6 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='QUNIVFVORzogUVVFTExTUFJBQ0hMSUNIRVIgSU5IQUxUIElOIFZPUkhFUklHRU0gT0RFUiBOQUNIRk9MR0VOREVNIFNFR01FTlQ='><source>ACHTUNG: QUELLSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</source><target>ACHTUNG: QUELLSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</target></trans-unit>
 <trans-unit id='QUNIVFVORzogWklFTFNQUkFDSExJQ0hFUiBJTkhBTFQgSU4gVk9SSEVSSUdFTSBPREVSIE5BQ0hGT0xHRU5ERU0gU0VHTUVOVA=='><source>ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</source><target>ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</target></trans-unit>
 <trans-unit id='V2llZGVyaG9sdW5nIG51ciBhdXRvbWF0aXNjaCBlcnNldHplbiBiencuIEVyc2V0enVuZyBkZXIgV2llZGVyaG9sdW5nIHZvcnNjaGxhZ2VuLCB3ZW5uIFppZWwgbGVlciBpc3Q='><source>Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist</source><target>Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist</target></trans-unit>
-<trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermCustomerSearch</source><target>TermCustomerSearch</target></trans-unit>
 <trans-unit id='VGVybVBvcnRhbA=='><source>TermPortal</source><target>TermPortal</target></trans-unit>
 <trans-unit id='RGFzIFByb2pla3QgZW50aMOkbHQgYWx0ZXJuYXRpdmUgw5xiZXJzZXR6dW5nZW4uIEJlaSBkZXIgw5xiZXJuYWhtZSB2b24gTWF0Y2hlcyB3aXJkIGRpZSBTZWdtZW50IE1hdGNocmF0ZSBkYWhlciBuaWNodCB2ZXLDpG5kZXJ0Lg=='><source>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</source><target>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</target></trans-unit>
 <trans-unit id='QmVpbSBCZWFyYmVpdGVuIGRlciBRdWVsbHNwYWx0ZSBrw7ZubmVuIE1hdGNoZXMgbmljaHQgw7xiZXJub21tZW4gd2VyZGVuLg=='><source>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</source><target>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</target></trans-unit>
@@ -1531,7 +1530,12 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='VGVybVBvcnRhbCBTcHJhY2hlbg=='><source>TermPortal Sprachen</source><target>TermPortal Sprachen</target></trans-unit>
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>Alle verfügbaren Sprachen</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</target></trans-unit>
-<trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>TermProposer</target></trans-unit>
+<trans-unit id='VGVybVNlYXJjaA=='><source>TermSearch</source><target>Term-Suche</target></trans-unit>
+<trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>Terme vorschlagen</target></trans-unit>
+<trans-unit id='VGVybVJldmlld2Vy'><source>TermReviewer</source><target>Terme prüfen</target></trans-unit>
+<trans-unit id='VGVybUZpbmFsaXplcg=='><source>TermFinalizer</source><target>Terme freigeben</target></trans-unit>
+<trans-unit id='VGVybVBN'><source>TermPM</source><target>Term PM</target></trans-unit>
+<trans-unit id='VGVybVBNX2FsbENsaWVudHM'><source>TermPM_allClients</source><target>Term PM (alle Kunden)</target></trans-unit>
 <trans-unit id='T3BlbklEIElzc3Vlcg=='><source>OpenID Issuer</source><target>OpenID Issuer</target></trans-unit>
 <trans-unit id='SsO8bmdlciBhbHMgb2RlciBnbGVpY2g='><source>Jünger als oder gleich</source><target>Jünger als oder gleich</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Vorschläge löschen, deren letzte Berührung länger her ist als</source><target>Vorschläge löschen, deren letzte Berührung länger her ist als</target></trans-unit>
@@ -1891,6 +1895,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBlbnRmZXJudA=='><source>Whitespace wurde entfernt</source><target>Whitespace wurde entfernt</target></trans-unit>
 <trans-unit id='V2hpdGVzcGFjZSB3dXJkZSBoaW56dWdlZsO8Z3Q='><source>Whitespace wurde hinzugefügt</source><target>Whitespace wurde hinzugefügt</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdzIGhhYmVuIGVpbmUgdW5nw7xsdGlnZSBTdHJ1a3R1cg=='><source>Interne Tags haben eine ungültige Struktur</source><target>Interne Tags haben eine ungültige Struktur</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIG5pY2h0IGVkaXRpZXJiYXJlciBTZWdtZW50ZSBoYWJlbiBlaW5lIHVuZ8O8bHRpZ2UgU3RydWt0dXI='><source>Interne Tags nicht editierbarer Segmente haben eine ungültige Struktur</source><target>Interne Tags nicht editierbarer Segmente haben eine ungültige Struktur</target></trans-unit>
 <trans-unit id='RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGdlcHLDvGZ0'><source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source><target>Diese Kategorie wurde nicht oder nur unvollständig geprüft</target></trans-unit>
 <trans-unit id='Qml0dGUgc3Rvw59lbiBTaWUgdW50ZW4gZWluZSBuZXVlIFByw7xmdW5nIGFuIHVtIGRhcyBQcm9ibGVtIHp1IGJlaGViZW4='><source>Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben</source><target>Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben</target></trans-unit>
 <trans-unit id='UVMgJmFtcDsgRGF0ZWllbg=='><source>QS &amp; Dateien</source><target>QS &amp; Dateien</target></trans-unit>
@@ -1917,6 +1922,11 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='><source>Der False-Positive Status wurde aktualisiert</source><target>Der False-Positive Status wurde aktualisiert</target></trans-unit>
 <trans-unit id='QWNodHVuZw=='><source>Achtung</source><target>Achtung</target></trans-unit>
 <trans-unit id='RXMgZ2lidCBpbiBkaWVzZXIgQXVmZ2FiZSBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIHUuVS4gZWluZW4gZmVobGVyZnJlaWVuIEV4cG9ydCBkZXIgQXVmZ2FiZSB2ZXJoaW5kZXJu'><source>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</source><target>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</target></trans-unit>
+<trans-unit id='TMOkbmdlbiBQcsO8ZnVuZw=='><source>Längen Prüfung</source><target>Längen Prüfung</target></trans-unit>
+<trans-unit id='U2VnbWVudCBpc3QgbMOkbmdlciBhbHMgZXJsYXVidA=='><source>Segment ist länger als erlaubt</source><target>Segment ist länger als erlaubt</target></trans-unit>
+<trans-unit id='U2VnbWVudCBpc3QgcmVsZXZhbnQga8O8cnplciBhbHMgZXJsYXVidCAobWVociBhbHMgezB9JSBvZGVyIG1pbi4gezF9IFBpeGVsIG9kZXIgbWluLiB7Mn0gWmVpY2hlbiB6dSBrdXJ6KQ=='><source>Segment ist relevant kürzer als erlaubt (mehr als {0}% oder min. {1} Pixel oder min. {2} Zeichen zu kurz)</source><target>Segment ist relevant kürzer als erlaubt (mehr als {0}% oder min. {1} Pixel oder min. {2} Zeichen zu kurz)</target></trans-unit>
+<trans-unit id='U2VnbWVudCBpc3Qga8O8cnplciBhbHMgZXJsYXVidA=='><source>Segment ist kürzer als erlaubt</source><target>Segment ist kürzer als erlaubt</target></trans-unit>
+<trans-unit id='WnUgdmllbGUgWmVpbGVudW1icsO8Y2hlIGltIFNlZ21lbnQ='><source>Zu viele Zeilenumbrüche im Segment</source><target>Zu viele Zeilenumbrüche im Segment</target></trans-unit>
 <trans-unit id='TGFkZS4uLg=='><source>Lade...</source><target>Lade...</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>
 <trans-unit id='Q29udGVudA=='><source>Content</source><target>Content</target></trans-unit>
@@ -1994,6 +2004,33 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='UHJvamVrdGJlc2NocmVpYnVuZw=='><source>Projektbeschreibung</source><target>Projektbeschreibung</target></trans-unit>
 <trans-unit id='UHJvamVrdGJlc2Noci4gYW56ZWlnZW4='><source>Projektbeschr. anzeigen</source><target>Projektbeschr. anzeigen</target></trans-unit>
 <trans-unit id='UHJvamVrdGJlc2Noci4gYXVzYmxlbmRlbg=='><source>Projektbeschr. ausblenden</source><target>Projektbeschr. ausblenden</target></trans-unit>
+<trans-unit id='UG1saWdodA=='><source>Pmlight</source><target>PM Light</target></trans-unit>
+<trans-unit id='SWhyZSBEYXRlaSBpc3QgZ3LDtsOfZXIgYWxzIGRhcyB6dWzDpHNzaWdlIE1heGltdW0gdm9uIHt1cGxvYWRfbWF4X2ZpbGVzaXplfSBNQi4gVW0gZ3LDtsOfZXJlIERhdGVpZW4gaG9jaGxhZGVuIHp1IGvDtm5uZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gdHJhbnNsYXRlNS1TdXBwb3J0Lg=='><source>Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.</source><target>Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.</target></trans-unit>
+<trans-unit id='WnVzw6R0emxpY2hlIEluZm9z'><source>Zusätzliche Infos</source><target>Zusätzliche Infos</target></trans-unit>
+<trans-unit id='ZmlsZU5hbWVfT3BlblRNMg=='><source>fileName_OpenTM2</source><target>Datenbankname</target></trans-unit>
+<trans-unit id='ZmlsZU5hbWVfVGVybUNvbGxlY3Rpb24='><source>fileName_TermCollection</source><target>Zuletzt importierte Datei</target></trans-unit>
+<trans-unit id='dGVybV9UZXJtQ29sbGVjdGlvbg=='><source>term_TermCollection</source><target>Benennungen</target></trans-unit>
+<trans-unit id='YXR0cmlidXRlX1Rlcm1Db2xsZWN0aW9u'><source>attribute_TermCollection</source><target>Attribute</target></trans-unit>
+<trans-unit id='dGVybUVudHJ5X1Rlcm1Db2xsZWN0aW9u'><source>termEntry_TermCollection</source><target>Einträge</target></trans-unit>
+<trans-unit id='dG1JZF9Hcm91cFNoYXJl'><source>tmId_GroupShare</source><target>Id</target></trans-unit>
+<trans-unit id='dG1JZF9zb3VyY2VMYW5n'><source>tmId_sourceLang</source><target>Quellsprache</target></trans-unit>
+<trans-unit id='dG1JZF90YXJnZXRMYW5n'><source>tmId_targetLang</source><target>Zielsprache</target></trans-unit>
+<trans-unit id='ZG9tYWluQ29kZV9TRExMYW5ndWFnZUNsb3Vk'><source>domainCode_SDLLanguageCloud</source><target>Domaincode</target></trans-unit>
+<trans-unit id='ZW5naW5lTmFtZV9TRExMYW5ndWFnZUNsb3Vk'><source>engineName_SDLLanguageCloud</source><target>Engine name</target></trans-unit>
+<trans-unit id='RXJsYXVidGUgRGF0ZWlmb3JtYXRlOiBUQlggb2RlciBlaW5lIFppcC1EYXRlaSwgZGllIGVpbmUgb2RlciBtZWhyZXJlIFRCWC1EYXRlaWVuIGVudGjDpGx0Lg=='><source>Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.</source><target>Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.</target></trans-unit>
+<trans-unit id='TnVyIFRCWCBCYXNpYyBTdGFuZGFyZGF0dHJpYnV0ZSArIHByb2Nlc3NTdGF0dXMgZXhwb3J0aWVyZW4='><source>Nur TBX Basic Standardattribute + processStatus exportieren</source><target>Nur TBX Basic Standardattribute + processStatus exportieren</target></trans-unit>
+<trans-unit id='QmlsZGVyIGltIEhleC1Gb3JtYXQgZXhwb3J0aWVyZW4sIGVpbmdlYmV0dGV0IGluIFRCWA=='><source>Bilder im Hex-Format exportieren, eingebettet in TBX</source><target>Bilder im Hex-Format exportieren, eingebettet in TBX</target></trans-unit>
+<trans-unit id='QWxzIFRCWCBleHBvcnRpZXJlbg=='><source>Als TBX exportieren</source><target>Als TBX exportieren</target></trans-unit>
+<trans-unit id='MS4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'><source>1. Lektorat (sprachlich)</source><target>1. Lektorat (sprachlich)</target></trans-unit>
+<trans-unit id='MS4gTGVrdG9yYXQgKHRlY2huaXNjaCk='><source>1. Lektorat (technisch)</source><target>1. Lektorat (technisch)</target></trans-unit>
+<trans-unit id='Mi4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'><source>2. Lektorat (sprachlich)</source><target>2. Lektorat (sprachlich)</target></trans-unit>
+<trans-unit id='Mi4gTGVrdG9yYXQgKHRlY2huaXNjaCk='><source>2. Lektorat (technisch)</source><target>2. Lektorat (technisch)</target></trans-unit>
+<trans-unit id='VGV4dGZyZWlnYWJl'><source>Textfreigabe</source><target>Textfreigabe</target></trans-unit>
+<trans-unit id='RXh0ZXJuZXMgRFRQIChudXIgTGVzZXJlY2h0ZSBpbiB0cmFuc2xhdGU1KQ=='><source>Externes DTP (nur Leserechte in translate5)</source><target>Externes DTP (nur Leserechte in translate5)</target></trans-unit>
+<trans-unit id='RmluYWxlIFRleHRmcmVpZ2FiZQ=='><source>Finale Textfreigabe</source><target>Finale Textfreigabe</target></trans-unit>
+<trans-unit id='U3ByYWNoZSDDpG5kZXJu'><source>Sprache ändern</source><target>Sprache ändern</target></trans-unit>
+<trans-unit id='YXJpYQ=='><source>aria</source><target>Dunkles Layout (Aria)</target></trans-unit>
+<trans-unit id='dHJpdG9u'><source>triton</source><target>Standard Layout (Triton)</target></trans-unit>
   </body>
  </file>
 </xliff>

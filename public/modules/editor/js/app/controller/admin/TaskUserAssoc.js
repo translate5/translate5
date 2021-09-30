@@ -1,9 +1,10 @@
+
 /*
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -20,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -48,9 +49,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
     }, {
         ref: 'userAssocForm',
         selector: 'adminTaskUserAssoc form'
-    }, {
-        ref: 'userAssocSegmentrange',
-        selector: 'adminTaskUserAssoc #segmentrange'
     }, {
         ref: 'editInfo',
         selector: 'adminTaskUserAssoc #editInfoOverlay'
@@ -174,7 +172,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         me.getEditInfo().hide();
         me.getUserAssocForm().show();
         me.getUserAssocForm().setDisabled(false);
-        me.getUserAssocSegmentrange().setDisabled(usageMode !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS);
         me.filterStepsCombo(newRec);
         me.getUserAssoc().loadRecord(newRec);
         me.initState(null, step, '');
@@ -201,8 +198,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         formPanel.setVisible(!emptySel);
 
         formPanel.setDisabled(emptySel || !userEditable);
-
-        me.getUserAssocSegmentrange().setDisabled(task.get('usageMode') !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS);
 
         me.filterStepsCombo(selection[0]);
 

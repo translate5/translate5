@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -36,6 +36,6 @@ class editor_Models_Validator_TermCollection_TermEntry extends ZfExtended_Models
     $this->addValidator('id', 'int');
     $this->addValidator('collectionId', 'int');
     $this->addValidator('groupId', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('isProposal', 'boolean');
+    $this->addValidator('isCreatedLocally', 'boolean');
   }
 }

@@ -1,36 +1,30 @@
 <?php
 /*
- START LICENSE AND COPYRIGHT
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
- This file is part of a plug-in for translate5.
- translate5 can be optained via the instructions that are linked at http://www.translate5.net
- For the license of translate5 itself please see http://www.translate5.net/license.txt
- For the license of this plug-in, please see below.
- 
- This file is part of a plug-in for translate5 and may be used under the terms of the
- GNU GENERAL PUBLIC LICENSE version 3 as published by the Free Software Foundation and
- appearing in the file gpl3-license.txt included in the packaging of the translate5 plug-in
- to which this file belongs. Please review the following information to ensure the
- GNU GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/gpl.html
- 
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the
- root folder of translate5.
- 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
- @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
- http://www.gnu.org/licenses/gpl.html
- http://www.translate5.net/plugin-exception.txt
- 
- END LICENSE AND COPYRIGHT
- */
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
 
 /**
  * Represents an MQM tag
@@ -39,9 +33,12 @@
  * OPENER: <img class="open minor qmflag ownttip qmflag-13" data-t5qid="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />
  * CLOSER: <img class="close minor qmflag ownttip qmflag-13" data-t5qid="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />
  * TEMPLATE: <img class="%1$s qmflag ownttip %2$s qmflag-%3$d" data-t5qid="%4$d" data-comment="%5$s" src="%6$s" />
+ * this tag is represented by two image-tags in the markup which will be paired to a single tag in the unparsing process
+ * In the rendering phase an instance will be cloned and act's as two seperate single image tags again !
  * 
  * @method editor_Segment_Mqm_Tag clone(boolean $withDataAttribs)
  * @method editor_Segment_Mqm_Tag createBaseClone()
+ * @method editor_Segment_Mqm_Tag cloneForRendering()
  */
 final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
 
@@ -149,6 +146,12 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      */
     private $paired = false;
     /**
+     * This flag will be set in the rendering-phase, then we act as a single image tag !
+     * Can be NULL | left | right
+     * @var string
+     */
+    private $rendering = NULL;
+    /**
      * 
      * @var int
      */
@@ -163,6 +166,11 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      * @var string
      */
     private $comment = '';
+    /**
+     * Holds the order of our closer in the phase of serialization
+     * @var int
+     */
+    public $rightOrder = -1;
     /**
      * 
      * @return int
@@ -183,16 +191,26 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      */
     public function getComment() : string {
         return $this->comment;
-    }
+    }    
     /**
-     * 
-     * @return bool
-     */
-    public function isPaired() : bool {
-        return $this->paired;
+     * MQM tags can not be Splitted as they are explicitly allowed to overlap
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::isSplitable()
+     */    
+    public function isSplitable() : bool {
+        return false;
     }
     
     /* Overwritten API */
+    
+    /**
+     * A MQM tag will act as singular tag in the unparsig phase, wil be turned to a real non-singular tag when pairing in the consolidation phase and act as a singular tag again in the rendering phase
+     * {@inheritDoc}
+     * @see editor_Tag::isSingular()
+     */
+    public function isSingular() : bool {
+        return !$this->paired;
+    }
     
     public function getCategory() : string {
         return self::createCategoryVal($this->categoryIndex);
@@ -210,20 +228,66 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
 
     /* Overwritten API to reflect pairing */
     
-    public function clone(bool $withDataAttribs=false, bool $withId=false){
-        $clone = parent::clone($withDataAttribs, $withId);
-        /* @var $clone editor_Segment_Mqm_Tag */
-        $clone->setMqmProps($this->paired, $this->categoryIndex, $this->severity, $this->comment);
-        return $clone;
+    /**
+     * Special API to set the rendering props in the rendering phase
+     * @param string $renderingMode
+     * @param int $order
+     * @param int $parentOrder
+     * @return editor_Segment_Mqm_Tag
+     */
+    private function setRendering(string $renderingMode, int $order, int $parentOrder){
+        $this->rendering = $renderingMode;
+        $this->paired = false; // crucial to avoid nonsense in the rendering model
+        $this->order = $order;
+        $this->parentOrder = $parentOrder;
+        if($this->rendering == 'left'){
+            $this->endIndex = $this->startIndex;
+        } else {
+            $this->startIndex = $this->endIndex;
+        }
+        return $this;
     }
-    
-    protected function renderStart($withDataAttribs=true) : string {
+    /**
+     * Overwritten to add two clones acting as image tags instead of a single Tag.
+     * That's the main "trick" why MQM-tags are handled as mates but as independent tags when rendering leading to overlaps being rendered as such
+     * The nesting of the MQM tags already was corrected in the consolidation phase by manipulating order & right order
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::addRenderingClone()
+     */
+    public function addRenderingClone(array &$renderingQueue){
+        $renderingQueue[] = $this->cloneForRendering()->setRendering('left', $this->order, -1);
+        $renderingQueue[] = $this->cloneForRendering()->setRendering('right', $this->rightOrder, -1);
+    }
+    /**
+     * Overwritten since we act as a single image tag in the rendering phase
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::render()
+     */
+    public function render(array $skippedTypes=NULL) : string {
+        if($this->rendering == NULL){
+            return parent::render($skippedTypes);
+        } 
+        if($this->rendering == 'left'){
+            return $this->renderImageTag(true);
+        }
+        return $this->renderImageTag(false);
+    }
+    /**
+     * Normally not used, but who knows if we are ever rendered outside the rendering phase
+     * {@inheritDoc}
+     * @see editor_Tag::renderStart()
+     */
+    protected function renderStart(bool $withDataAttribs=true) : string {
         if($this->paired){
             return $this->renderImageTag(true);
         }
         return parent::renderStart($withDataAttribs);
     }
-
+    /**
+     * Normally not used, but who knows if we are ever rendered outside the rendering phase
+     * {@inheritDoc}
+     * @see editor_Tag::renderStart()
+     */
     protected function renderEnd() : string {
         if($this->paired){
             return $this->renderImageTag(false);
@@ -244,24 +308,12 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         $tag->prependClass($className);
         return $tag->render();
     }
-    /**
-     * Adds additional clone properties
-     * @param bool $paired
-     * @param int $categoryIndex
-     * @param string $severity
-     * @param string $comment
-     * @return editor_Segment_Mqm_Tag
-     */
-    private function setMqmProps(bool $paired, int $categoryIndex, string $severity, string $comment) : editor_Segment_Mqm_Tag{
-        $this->paired = $paired;
-        $this->singular = !$paired;
-        $this->categoryIndex = $categoryIndex;
-        $this->severity = $severity;
-        $this->comment = $comment;
-        return $this;
-    }
     
     /* Consolidation API */
+    
+    public function isPaired() : bool {
+        return $this->paired;
+    }
     
     public function isPairedOpener() : bool {
         return ($this->hasClass(self::CSS_CLASS_OPEN));
@@ -302,8 +354,8 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
             error_log("\n##### MQM TAG: INVALID INDEXES FOUND [open: (".$this->startIndex."|".$this->endIndex.") close: (".$tag->startIndex."|".$tag->endIndex.")] #####\n");
         }
         $this->paired = true;
-        $this->singular = false;
         $this->endIndex = $tag->startIndex;
+        $this->rightOrder = $tag->order;
         $this->removeClass(self::CSS_CLASS_OPEN)->removeClass(self::CSS_CLASS_OPEN);
         $src = $this->getAttribute('src');
         $matches = array();
@@ -320,17 +372,28 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         $this->severity = editor_Segment_Mqm_Configuration::instance($task)->findMqmSeverity($this->classes, '');
     }
     
+    public function clone(bool $withDataAttribs=false, bool $withId=false){
+        $clone = parent::clone($withDataAttribs, $withId);
+        /* @var $clone editor_Segment_Mqm_Tag */
+        $data = new stdClass();
+        $this->furtherSerialize($data);
+        $clone->furtherUnserialize($data);
+        return $clone;
+    }
+    
     protected function furtherSerialize(stdClass $data){
         $data->paired = $this->paired;
         $data->categoryIndex = $this->categoryIndex;
-        $data->comment = $this->comment;
         $data->severity = $this->severity;
+        $data->comment = $this->comment;
+        $data->rightOrder = $this->rightOrder;
     }
     
     protected function furtherUnserialize(stdClass $data){
         $this->paired = $data->paired;
         $this->categoryIndex = $data->categoryIndex;
-        $this->comment = $data->comment;
         $this->severity = $data->severity;
+        $this->comment = $data->comment;
+        $this->rightOrder = $data->rightOrder;
     }
 }

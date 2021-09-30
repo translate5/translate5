@@ -4,18 +4,18 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -105,7 +105,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         
         
         //[6] search for the term attributes in the term termEntryId
-        $attributes=$this->api()->requestJson('editor/termcollection/searchattribute', 'GET', ['termEntryId' =>$term->termEntryId]);
+        /*$attributes=$this->api()->requestJson('editor/termcollection/searchattribute', 'GET', ['termEntryId' =>$term->termEntryId]);
         //validate the term attributes
         $this->assertTrue(is_array($attributes->termAttributes),"No attributes where found for the test proposal term.");
         $attributes=$attributes->termAttributes;
@@ -119,7 +119,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
                 break;
             }
         }
-        $this->assertTrue(!empty($testAttribute),"No attributes where found for the test proposal term.");
+        $this->assertTrue(!empty($testAttribute),"No attributes where found for the test proposal term.");*/
         
         
         //[7] create attribute proposal

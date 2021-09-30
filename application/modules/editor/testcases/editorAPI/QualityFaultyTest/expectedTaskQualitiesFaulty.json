@@ -1,42 +1,31 @@
 {
-    "text": "{d5e99721-0326-498a-8c68-fa414aa41286}",
+    "text": "{4b154c5d-7bcf-4dd9-b6af-2f0b3fcfbea6}",
     "children": [
         {
             "qid": -1,
             "qtype": "internal",
-            "qcount": 3,
+            "qcount": 2,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "8485",
+                    "qid": "70520",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "internal_tag_structure_faulty",
                     "qcatidx": "-1",
                     "qcountfp": 0,
-                    "text": "Internal tags have incorrect structure",
+                    "text": "Internal tags have an incorrect structure",
                     "leaf": true,
                     "qfaulty": true
                 },
                 {
-                    "qid": "8486",
-                    "qtype": "internal",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "qcategory": "internal_tags_added",
-                    "qcatidx": "0",
-                    "qcountfp": 0,
-                    "text": "Internal tags have been added",
-                    "leaf": true
-                },
-                {
-                    "qid": "8487",
+                    "qid": "70521",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "internal_tags_missing",
-                    "qcatidx": "0",
+                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Internal tags missing",
                     "leaf": true
@@ -45,8 +34,19 @@
             "qcategory": null,
             "qcountfp": 0,
             "text": "Internal tags",
-            "qtotal": 3,
+            "qtotal": 2,
             "expanded": false
+        },
+        {
+            "qid": -1,
+            "qtype": "length",
+            "qcount": 0,
+            "qcomplete": true,
+            "qcategory": null,
+            "qcountfp": 0,
+            "text": "Length check",
+            "qtotal": 0,
+            "leaf": true
         },
         {
             "qid": -1,
@@ -77,18 +77,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "8474",
-                    "qtype": "term",
-                    "qcount": 7,
-                    "qcomplete": true,
-                    "qcategory": "not_defined_in_target",
-                    "qcatidx": "-1",
-                    "qcountfp": 0,
-                    "text": "Not defined in target terminology",
-                    "leaf": true
-                },
-                {
-                    "qid": "8478",
+                    "qid": "70513",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -99,7 +88,18 @@
                     "leaf": true
                 },
                 {
-                    "qid": "8480",
+                    "qid": "70509",
+                    "qtype": "term",
+                    "qcount": 7,
+                    "qcomplete": true,
+                    "qcategory": "not_defined_in_target",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Not defined in target terminology",
+                    "leaf": true
+                },
+                {
+                    "qid": "70515",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
@@ -129,7 +129,7 @@
         }
     ],
     "metaData": {
-        "numSegments": 13,
+        "numSegments": 12,
         "hasFaultyInternalTags": true
     }
 }

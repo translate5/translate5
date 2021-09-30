@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -74,20 +74,22 @@ class editor_Models_Logger_LanguageResources extends ZfExtended_Models_Entity_Ab
     }
     
     /***
-     * Get the events count grouped by language resource id and events count
-     *  for the given language resources
-     * 
+     * Get the count of events per language resource for the last 2 months. This will only count the errors and warnings
+     *
      * @param array $languageResourcesIds
      * @return array
      */
-    public function getEventsCountGrouped(array $languageResourcesIds) {
+    public function getLatesEventsCount(array $languageResourcesIds) {
         if(empty($languageResourcesIds)){
             return [];
         }
         $s = $this->db->select()
         ->from('LEK_languageresources_log',array('count(*) as logCount','languageResourceId'))
         ->where('languageResourceId IN(?)', $languageResourcesIds)
+        ->where('level < ?',ZfExtended_Logger::LEVEL_INFO)
+        ->where('created >= NOW() - INTERVAL 2 month')
         ->group('languageResourceId');
+
         $result=$this->db->fetchAll($s)->toArray();
         return array_combine(array_column($result,'languageResourceId'),array_column($result,'logCount'));
     }

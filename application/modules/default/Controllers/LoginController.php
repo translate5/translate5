@@ -4,18 +4,18 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -96,14 +96,26 @@ class LoginController extends ZfExtended_Controllers_Login {
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
         $roles=$sessionUser->data->roles;
-        
+
+        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
+        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
+
+        // If user was not logged in during the attempt to load termportal, but now is logged and allowed to do that
+        if (($hash = $this->_session->redirecthash)
+            && preg_match('~^#(termportal|itranslate)~', $hash)
+            && $isTermPortalAllowed) {
+
+                // Drop redirecthash prop from session
+                $this->_session->redirecthash = '';
+
+                // Do redirect
+                $this->applicationRedirect(substr($hash, 1), true);
+        }
+
         if($acl->isInAllowedRoles($roles, 'initial_page','editor')) {
             $this->editorRedirect();
         }
-        
-        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
-        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
-        
+
         //the user has termportal and instantranslate roles
         if($isTermPortalAllowed && $isInstantTranslateAllowed){
             //find the last used app, if none use the instantranslate as default
@@ -114,7 +126,7 @@ class LoginController extends ZfExtended_Controllers_Login {
             if($meta->getId()!=null && $meta->getLastUsedApp()!=''){
                 $rdr=$meta->getLastUsedApp();
             }
-            $this->applicationRedirect($rdr);
+            $this->applicationRedirect($rdr, $isTermPortalAllowed);
         }
         
         //is instanttranslate allowed
@@ -135,10 +147,12 @@ class LoginController extends ZfExtended_Controllers_Login {
         exit;
     }
     
-    protected function applicationRedirect(string $applicationName){
+    protected function applicationRedirect(string $applicationName, $isTermPortalAllowed = null){
         header ('HTTP/1.1 302 Moved Temporarily');
         $apiUrl=APPLICATION_RUNDIR.'/editor/'.$applicationName;
-        $url=APPLICATION_RUNDIR.'/editor/apps?name='.$applicationName.'&apiUrl='.$apiUrl;
+        $url = $applicationName == 'termportal' || $isTermPortalAllowed
+            ? APPLICATION_RUNDIR.'/editor/termportal#'.$applicationName
+            : APPLICATION_RUNDIR.'/editor/apps?name='.$applicationName.'&apiUrl='.$apiUrl;
         header ('Location: '.$url);
         exit;
     }

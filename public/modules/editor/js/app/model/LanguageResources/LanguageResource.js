@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -62,6 +62,31 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
     {name: 'serviceType', type: 'string'},
     {name: 'searchable', type: 'boolean'}
   ],
+
+  /***
+   * Is the current record Tm
+   * @returns {boolean}
+   */
+  isTm:function (){
+    return this.get('resourceType') === Editor.util.LanguageResources.resourceType.TM;
+  },
+
+  /***
+   * Is the current record Mt
+   * @returns {boolean}
+   */
+  isMt:function (){
+    return this.get('resourceType') === Editor.util.LanguageResources.resourceType.MT;
+  },
+
+  /***
+   * Is the current record Term collection
+   * @returns {boolean}
+   */
+  isTc:function (){
+    return this.get('resourceType') === Editor.util.LanguageResources.resourceType.TERM_COLLECTION;
+  },
+
   idProperty: 'id',
   proxy : {
     type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 

@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -66,7 +66,8 @@ class editor_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
      * @param int $userGroupId
      * @return integer
      */
-    public function getTotalCount($userGroupId){
+    public function getTotalCount(){
+        $userGroupId = 15;
         $db = $this->db->getAdapter();
         $s = $this->db->select()->where('LEK_change_log.userGroup & '.$db->quote($userGroupId, 'INTEGER').'');
         return $this->computeTotalCount($s);

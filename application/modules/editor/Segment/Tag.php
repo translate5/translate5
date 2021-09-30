@@ -1,36 +1,30 @@
 <?php
 /*
- START LICENSE AND COPYRIGHT
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
- This file is part of a plug-in for translate5.
- translate5 can be optained via the instructions that are linked at http://www.translate5.net
- For the license of translate5 itself please see http://www.translate5.net/license.txt
- For the license of this plug-in, please see below.
- 
- This file is part of a plug-in for translate5 and may be used under the terms of the
- GNU GENERAL PUBLIC LICENSE version 3 as published by the Free Software Foundation and
- appearing in the file gpl3-license.txt included in the packaging of the translate5 plug-in
- to which this file belongs. Please review the following information to ensure the
- GNU GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/gpl.html
- 
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the
- root folder of translate5.
- 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
- @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
- http://www.gnu.org/licenses/gpl.html
- http://www.translate5.net/plugin-exception.txt
- 
- END LICENSE AND COPYRIGHT
- */
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
 
 /**
  * Abstraction for an Internal tag as used in the segment text's
@@ -61,6 +55,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     const TYPE_QM = 'qm';
     /**
+     * A special Type only used for tests and as a default for unknown tags in segment content
      * @var string
      */
     const TYPE_ANY = 'any';
@@ -116,9 +111,18 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @return editor_Segment_Tag
      */
     public static function createNew(int $startIndex=0, int $endIndex=0, string $category='') : editor_Segment_Tag {
-        $tag = new self($startIndex, $endIndex, $category);
+        $tag = new static($startIndex, $endIndex, $category);
         $tag->addClass($tag->getIdentificationClass());
         return $tag;
+    }
+    /**
+     * Strips all segment tags from a string
+     * @param string $markup
+     * @return string
+     */
+    public static function strip(string $markup) : string {
+        $markup = preg_replace(editor_Segment_Internal_Tag::REGEX_REMOVE, '', $markup);
+        return strip_tags($markup);
     }
     /**
      * @deprecated: do not use with segment tags
@@ -199,6 +203,11 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @var string
      */
     public $content = '';
+    /**
+     * Only needed in the rendering process
+     * @var array
+     */
+    public $cuts = [];
     /**
      * The category of tag we have, a further specification of type
      * might not be used by all internal tags
@@ -473,7 +482,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return false;
     }
     /**
-     * Evaluates, if the tag can be splitted (interleaved with other tags). Apart from internal tags this is the case for all other tags
+     * Retrieves, if the tag can be splitted (to solve overlappings with other tags). This means, that identical tags will be joined when consolidating
      * API is used in the consolidation phase only
      * @return bool
      */
@@ -495,6 +504,14 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public function onConsolidationRemoval() {
         
+    }
+    /**
+     * Some Internal Tags are IMG-tags that are paired (parted into an opening and closing tag represented by images)
+     * This API can be used after the consolidation to identify paired tags
+     * @return bool
+     */
+    public function isPaired() : bool {
+        return false;
     }
     /**
      * Some Internal Tags are IMG-tags that are paired (parted into an opening and closing tag represented by images)
@@ -532,8 +549,8 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         if(!$this->isSingular()){
             if($this->startIndex <= $tag->startIndex && $this->endIndex >= $tag->endIndex){
                 // when tag are aligned with our boundries it is unclear if they are inside or outside, so let's decide by the parentship on creation
-                if($tag->endIndex == $this->startIndex || $tag->startIndex == $this->endIndex){
-                    return $tag->parentOrder == $this->order;
+                if(($tag->endIndex == $this->startIndex || $tag->startIndex == $this->endIndex)){
+                    return ($tag->parentOrder == $this->order);
                 }
                 return true;
             }
@@ -542,7 +559,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     }
     /**
      * Finds the next container that can contain the passed tag
-     * API is used in the rendering process only
+     * API is used in the rendering phase only
      * @param editor_Segment_Tag $tag
      * @return editor_Segment_Tag|NULL
      */
@@ -564,6 +581,24 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         $this->parentOrder = $from->parentOrder;
     }
     /**
+     * Clones the tag to create the rendering model
+     * API is used in the rendering phase only
+     * @return editor_Segment_Tag
+     */
+    public function cloneForRendering(){
+        $clone = $this->clone(true);
+        $clone->cloneOrder($this);
+        return $clone;
+    }
+    /**
+     * Adds our rendering clone to the rendering queue
+     * API is used in the rendering phase only
+     * @param array $renderingQueue
+     */
+    public function addRenderingClone(array &$renderingQueue){
+        $renderingQueue[] = $this->cloneForRendering();
+    }
+    /**
      * After the nested structure of tags is set this fills in the text-chunks of the segments text
      * CRUCIAL: at this point only editor_Segment_Tag must be added as children !
      * API is used in the rendering process only
@@ -572,7 +607,9 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     public function addSegmentText(editor_Segment_FieldTags $tags){
         if($this->startIndex < $this->endIndex){
             if($this->hasChildren()){
-                // fil the text-gaps around our children with text-parts of the segments & fill our children with text
+                // crucial: we need to sort our children as tags with the same start-position but length 0 must come first
+                usort($this->children, array('editor_Segment_FieldTags', 'compareChildren'));
+                // fill the text-gaps around our children with text-parts of the segments & fill our children with text
                 $chldrn = [];
                 $last = $this->startIndex;
                 foreach($this->children as $child){
@@ -630,13 +667,16 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * Debug output
      * @return string
      */
-    public function debug($asMarkup=false){
+    public function debug(){
         $debug = '';
-        $processor = ($asMarkup) ? 'htmlspecialchars' : 'trim';
-        $newline = ($asMarkup) ? '<br/>' : "\n";
-        $debug .= 'RENDERED: '.$processor($this->render()).$newline;
+        $newline = "\n";
+        $debug .= 'RENDERED: '.trim($this->render()).$newline;
         $debug .= 'START: '.$this->startIndex.' | END: '.$this->endIndex.' | FULLENGTH: '.($this->isFullLength?'true':'false').$newline;
         $debug .= 'DELETED: '.($this->wasDeleted?'true':'false').' | INSERTED: '.($this->wasInserted?'true':'false').$newline;
         return $debug;
+    }
+
+    public function debugProps() : string {
+        return '['.$this->startIndex.'|'.$this->endIndex.'|'.$this->order.'|'.$this->parentOrder.']';
     }
 }

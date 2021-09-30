@@ -4,18 +4,18 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -154,26 +154,31 @@ class editor_Workflow_Manager {
     public function getWorkflowData() {
         $result = [];
         
-        //updating the config defaults list if needed FIXME move to workflow configurator on workflow creation if implemented in the future
-        $config = ZfExtended_Factory::get('editor_Models_Config');
-        /* @var $model editor_Models_Config */
-        $config->loadByName('runtimeOptions.workflow.initialWorkflow');
         $workflows = array_keys(self::$workflowList);
-        $workflowList = join(',', $workflows);
-        
-        if($config->getDefaults() != $workflowList) {
-            $config->setDefaults($workflowList);
-            $config->save();
+
+        try {
+            //updating the config defaults list if needed FIXME move to workflow configurator on workflow creation if implemented in the future
+            $config = ZfExtended_Factory::get('editor_Models_Config');
+            /* @var $config editor_Models_Config */
+            $config->loadByName('runtimeOptions.workflow.initialWorkflow');
+            $workflowList = join(',', $workflows);
+
+            if($config->getDefaults() != $workflowList) {
+                $config->setDefaults($workflowList);
+                $config->save();
+            }
+        } catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //if the config could not be found, we can not update the defaults,
+            // but that should happen only while updating older installations, so no need to handle it more in detail
         }
-        
+
         foreach($workflows as $name) {
             $wf = $this->get($name);
             /* @var $wf editor_Workflow_Default */
             $data = new stdClass();
             $data->id = $name;
             $data->label = $wf->getLabel();
-            $data->anonymousFieldLabel = false; //FIXME true | false, comes from app.ini not from wf class
-            
+
             $data->roles = $wf->labelize($wf->getRoles());
             
             $data->usableSteps = $wf->labelize($wf->getUsableSteps());

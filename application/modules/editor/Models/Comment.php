@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -125,6 +125,9 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
   /**
    * Loads all comments of a segment by segmentid and taskguid, orders by creation order
    * does not provide isEditable info
+   * @param int $segmentId
+   * @param string $taskGuid
+   * @return array|null
    */
   public function loadBySegmentAndTaskPlain(int $segmentId, string $taskGuid) {
       $s = $this->db->select()

@@ -1,9 +1,10 @@
+
 /*
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -14,18 +15,18 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
+if (window.parent.location.hash.match(/itranslate|termportal/)) $('#containerHeader').hide();
 var editIdleTimer = null,
     NOT_AVAILABLE_CLS = 'notavailable', // css if a (source-/target-)locale is not available in combination with the other (target-/source-)locale that is set
     uploadedFiles,//Variable to store uploaded files
@@ -992,9 +993,24 @@ $(document).on('click', '.term-proposal' , function() {
         lang = $("#sourceLocale").val(),
         textProposal = $(this).attr('data-term'),
         langProposal = $("#targetLocale").val(),
-        isTermProposalFromInstantTranslate = 'true';
+        isTermProposalFromInstantTranslate = 'true',
+        isMT = $(this).parents('.copyable').find('.translation-result').data('languageresource-type') == 'mt',
         params = "text="+text+"&lang="+lang+"&textProposal="+textProposal+"&langProposal="+langProposal+"&isTermProposalFromInstantTranslate="+isTermProposalFromInstantTranslate;
-    openTermPortal(params);
+
+    var q = top.window.Ext.ComponentQuery.query,
+        vm = q('main').pop().getViewModel(),
+        b = q('[reference=termportalBtn]').pop(),
+        itranslate = { target: {lang: langProposal, term: textProposal, isMT: isMT} };
+
+    // If termId-param is not given, it means that source termEntry is not known,
+    // so we append data for trying to find it
+    if (!location.search.match(/termId/)) itranslate.source = {lang: lang, term: text};
+
+    // Set main viewModel's itranslate-prop
+    vm.set('itranslate', itranslate);
+
+    // Click on TermPortal-button
+    b.el.dom.click();
 });
 
 $('#translations').on('touchstart click','.term-info',function(){

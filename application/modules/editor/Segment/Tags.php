@@ -1,39 +1,35 @@
 <?php
 /*
- START LICENSE AND COPYRIGHT
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
- This file is part of a plug-in for translate5.
- translate5 can be optained via the instructions that are linked at http://www.translate5.net
- For the license of translate5 itself please see http://www.translate5.net/license.txt
- For the license of this plug-in, please see below.
- 
- This file is part of a plug-in for translate5 and may be used under the terms of the
- GNU GENERAL PUBLIC LICENSE version 3 as published by the Free Software Foundation and
- appearing in the file gpl3-license.txt included in the packaging of the translate5 plug-in
- to which this file belongs. Please review the following information to ensure the
- GNU GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/gpl.html
- 
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the
- root folder of translate5.
- 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
- @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
- http://www.gnu.org/licenses/gpl.html
- http://www.translate5.net/plugin-exception.txt
- 
- END LICENSE AND COPYRIGHT
- */
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
 
 /**
  * Abstraction to bundle the segment's internal tags per field to have a model to be passed across the quality providers
+ * 
+ * TODO: The FieldTags are created with the additional params $additionalSaveTo and $termTaggerName: This is somehow dirty and should be avoided by enhancing Logic here and in the Termtagger
  */
 class editor_Segment_Tags implements JsonSerializable {
     
@@ -171,6 +167,7 @@ class editor_Segment_Tags implements JsonSerializable {
     }
     /** 
      * Initializes from scratch (used in the initial quality worker), creates the inital data structure
+     * TODO: the ugly ttName-logic should be removed and instead add prop for the originationg field of the field-text should be added !!
      * @param editor_Models_SegmentFieldManager $fieldManager
      */ 
     private function init(){
@@ -184,13 +181,13 @@ class editor_Segment_Tags implements JsonSerializable {
         $hasOriginalSource = ($sourceEditingEnabled) ? (!$this->isImport || $this->segment->get($sourceFieldEditIndex) != $this->segment->get($sourceField)) : false;
         if($hasOriginalSource){
             // original source (what is the source in all other cases)
-            $this->sourceOriginal = new editor_Segment_FieldTags($this->task, $this->segmentId, $sourceField, $this->segment->get($sourceField), $sourceField, 'SourceOriginal');
+            $this->sourceOriginal = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->segment->get($sourceField), $sourceField, $sourceField, NULL, 'SourceOriginal');
             // source here is the editable source
-            $this->source = new editor_Segment_FieldTags($this->task, $this->segmentId, $sourceField, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
+            $this->source = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->segment->get($sourceFieldEditIndex), $sourceField, $sourceFieldEditIndex);
         } else {
             // on import with enabled source editing, we copy the source as editedSource as well
-            $saveTo = ($sourceEditingEnabled) ? [$sourceField, $sourceFieldEditIndex] : $sourceField;
-            $this->source = new editor_Segment_FieldTags($this->task, $this->segmentId, $sourceField, $this->segment->get($sourceField), $saveTo, $sourceField);
+            $additionalSaveTo = ($sourceEditingEnabled) ? $sourceFieldEditIndex : NULL;
+            $this->source = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->segment->get($sourceField), $sourceField, $sourceField, $additionalSaveTo);
         }
         $this->targets = [];
         
@@ -200,7 +197,7 @@ class editor_Segment_Tags implements JsonSerializable {
             // TODO: this is not compliant with the multitarget tasks but can only be changed when the code in the AlikesegmentConroller is multifield capable
             $firstTarget = $fieldManager->getFirstTargetName();
             $editIndex = $fieldManager->getEditIndex($firstTarget);
-            $target = new editor_Segment_FieldTags($this->task, $this->segmentId, $firstTarget, $this->segment->get($editIndex), $editIndex, $editIndex);
+            $target = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->segment->get($editIndex), $firstTarget, $editIndex);
             $this->targets[] = $target;
             $this->targetOriginal = $target;
             $this->targetOriginalIdx = 0;
@@ -213,22 +210,22 @@ class editor_Segment_Tags implements JsonSerializable {
                     $editIndex = $fieldManager->getEditIndex($field->name);
                     // special when we have an import but the fields are different this might is
                     if($this->isImport && $this->segment->get($field->name) != $this->segment->get($editIndex)){
-                        $target = new editor_Segment_FieldTags($this->task, $this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
+                        $target = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->segment->get($field->name), $field->name, $field->name);
                         $this->targets[] = $target;
                         if($this->targetOriginal == null){
                             $this->targetOriginal = $target;
                             $this->targetOriginalIdx = count($this->targets);
                         }
-                        $this->targets[] = new editor_Segment_FieldTags($this->task, $this->segmentId, $field->name, $this->segment->get($editIndex), $editIndex, $editIndex);
+                        $this->targets[] = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->segment->get($editIndex), $field->name, $editIndex);
                     } else {
                         // when importing, the field will be saved as edit field & as normal field
-                        $saveTo = ($this->isImport) ? [$field->name, $editIndex] : $editIndex;
+                        $additionalSaveTo = ($this->isImport) ? $field->name : NULL;
                         // the field name sent to the termtagger differs between import and editing (WHY?)
                         $ttField = ($this->isImport) ? $field->name : $editIndex;
-                        $this->targets[] = new editor_Segment_FieldTags($this->task, $this->segmentId, $field->name, $this->segment->get($editIndex), $saveTo, $ttField);
+                        $this->targets[] = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->segment->get($editIndex), $field->name, $editIndex, $additionalSaveTo, $ttField);
                         // the first target will be the original target as needed for some Quality checks
                         if($this->targetOriginal == null){
-                            $this->targetOriginal = new editor_Segment_FieldTags($this->task, $this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
+                            $this->targetOriginal = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->segment->get($field->name), $field->name, $field->name);
                         }
                     }
                 }
@@ -243,7 +240,7 @@ class editor_Segment_Tags implements JsonSerializable {
 
         if($this->hasOriginalSource()){
              // we do know that the original source just has a single save-to field
-             $this->getSegment()->set($this->sourceOriginal->getFirstSaveToField(), $this->sourceOriginal->render());
+             $this->getSegment()->set($this->sourceOriginal->getDataField(), $this->sourceOriginal->render());
         }
         // save source
         if($this->hasSource()){
@@ -658,19 +655,25 @@ class editor_Segment_Tags implements JsonSerializable {
      * Debug output
      * @return string
      */
-    public function debug($asMarkup=false){
+    public function debug(){
         $debug = '';
-        $processor = ($asMarkup) ? 'htmlspecialchars' : 'trim';
-        $newline = ($asMarkup) ? '<br/>' : "\n";
+        $newline = "\n";
         if($this->source != NULL){
-            $debug .= 'SOURCE '.$this->source->debugProps().': '.$processor($this->source->render()).$newline;
+            $debug .= 'SOURCE '.$this->source->debugProps().': '.trim($this->source->render()).$newline;
         }
         if($this->sourceOriginal != NULL){
-            $debug .= 'SOURCE ORIGINAL '.$this->sourceOriginal->debugProps().': '.$processor($this->sourceOriginal->render()).$newline;
+            $debug .= 'SOURCE ORIGINAL '.$this->sourceOriginal->debugProps().': '.trim($this->sourceOriginal->render()).$newline;
         }
         for($i=0; $i < count($this->targets); $i++){
-            $debug .= 'TARGET '.$i.' '.$this->targets[$i]->debugProps().': '.$processor($this->targets[$i]->render()).$newline;
+            $debug .= 'TARGET '.$i.' '.$this->targets[$i]->debugProps().': '.trim($this->targets[$i]->render()).$newline;
         }
         return $debug;
+    }
+    /**
+     * Debug formatted JSON
+     * @return string
+     */
+    public function debugJson(){
+        return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     }
 }

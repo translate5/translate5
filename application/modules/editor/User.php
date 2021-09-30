@@ -1,39 +1,33 @@
 <?php
 /*
- START LICENSE AND COPYRIGHT
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
- This file is part of a plug-in for translate5.
- translate5 can be optained via the instructions that are linked at http://www.translate5.net
- For the license of translate5 itself please see http://www.translate5.net/license.txt
- For the license of this plug-in, please see below.
- 
- This file is part of a plug-in for translate5 and may be used under the terms of the
- GNU GENERAL PUBLIC LICENSE version 3 as published by the Free Software Foundation and
- appearing in the file gpl3-license.txt included in the packaging of the translate5 plug-in
- to which this file belongs. Please review the following information to ensure the
- GNU GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/gpl.html
- 
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the
- root folder of translate5.
- 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
- @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
- http://www.gnu.org/licenses/gpl.html
- http://www.translate5.net/plugin-exception.txt
- 
- END LICENSE AND COPYRIGHT
- */
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
 
 /**
- * 
+ * FIXME must be moved to ZfExtended since there is the authenticated user used too!!!
  * Represents the session based User and provides a convenience API accessing it
  */
 class editor_User {
@@ -42,7 +36,12 @@ class editor_User {
      * @var editor_User
      */
     private static $_instance = NULL;
-    
+
+    /**
+     * @var ZfExtended_Models_User
+     */
+    private static $modelInstance = NULL;
+
     /**
      * 
      * @return editor_User
@@ -62,6 +61,8 @@ class editor_User {
     private function __construct(){
         $this->session = new Zend_Session_Namespace('user');
         // TODO FIXME: add some validation to catch an inexisting session or an invalid user
+        self::$modelInstance = ZfExtended_Factory::get('ZfExtended_Models_User');
+        self::$modelInstance->load($this->getId());
     }
     /**
      * 
@@ -98,8 +99,13 @@ class editor_User {
     public function getData() {
         return $this->session->data;
     }
+
+    public function getModel(): ZfExtended_Models_User {
+        return self::$modelInstance;
+    }
+
     /**
-     * 
+     * @deprecated should not be used, ACL checks must be used instead
      * @param string $role
      * @return bool
      */
@@ -107,7 +113,7 @@ class editor_User {
         return (!empty($role) && in_array($role, $this->session->data->roles));
     }
     /**
-     * 
+     * @deprecated should not be used, ACL checks must be used instead
      * @param string[] $roles
      * @return bool
      */
@@ -120,7 +126,7 @@ class editor_User {
         return true;
     }
     /**
-     * 
+     * @deprecated should not be used, ACL checks must be used instead
      * @param string|string[] $role
      * @return bool
      */
@@ -131,21 +137,21 @@ class editor_User {
         return $this->hasRole($role);
     }
     /**
-     *
+     * @deprecated should not be used, ACL checks must be used instead
      * @return bool
      */
     public function isProjectManager() : bool {
         return $this->hasRole(ACL_ROLE_PM);
     }
     /**
-     *
+     * @deprecated should not be used, ACL checks must be used instead
      * @return bool
      */
     public function isAdmin() : bool {
         return $this->hasRole(ACL_ROLE_ADMIN);
     }
     /**
-     *
+     * @deprecated should not be used, ACL checks must be used instead
      * @return bool
      */
     public function isPM() : bool {

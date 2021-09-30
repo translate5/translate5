@@ -18,7 +18,7 @@
   "target": "",
   "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
   "targetToSort": "",
-  "targetEdit": "<img class=\"open critical qmflag ownttip qmflag-19\" data-comment=\"\" src=\"/modules/editor/images/imageTags/qmsubsegment-19-left.png\" />Apache 2.x<img class=\"close critical qmflag ownttip qmflag-19\" data-comment=\"\" src=\"/modules/editor/images/imageTags/qmsubsegment-19-right.png\" /><img class=\"open critical qmflag ownttip qmflag-4\" data-comment=\"\" src=\"/modules/editor/images/imageTags/qmsubsegment-4-left.png\" /> auf<img class=\"close critical qmflag ownttip qmflag-4\" data-comment=\"\" src=\"/modules/editor/images/imageTags/qmsubsegment-4-right.png\" /> Unix-Systemen",
+  "targetEdit": "<img class=\"open critical qmflag ownttip qmflag-19\" data-comment=\"\" src=\"/modules/editor/images/imageTags/qmsubsegment-19-left.png\" />Apache 2.x<img class=\"open critical qmflag ownttip qmflag-4\" data-comment=\"\" src=\"/modules/editor/images/imageTags/qmsubsegment-4-left.png\" /><img class=\"close critical qmflag ownttip qmflag-19\" data-comment=\"\" src=\"/modules/editor/images/imageTags/qmsubsegment-19-right.png\" /> auf<img class=\"close critical qmflag ownttip qmflag-4\" data-comment=\"\" src=\"/modules/editor/images/imageTags/qmsubsegment-4-right.png\" /> Unix-Systemen",
   "targetEditToSort": "Apache 2.x auf Unix-Systemen",
   "isWatched": null,
   "segmentUserAssocId": null,

@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -242,19 +242,12 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
 
         Ext.Array.each(uiThemesRecord.get('defaults'), function(i) {
             menuItems.push({
-                text: Ext.String.capitalize(i),
+                text: (Editor.data.frontend.config.themesName[i] !== undefined) ? Editor.data.frontend.config.themesName[i]  :  Ext.String.capitalize(i),
                 value:i,
                 checked: uiThemesRecord.get('value') === i,
                 group: 'uiTheme',
-                checkHandler: function (item){
-                    // on item select, change the user state config, and reload the application
-                    // after reload, the user will get the changed theme
-                    uiThemesRecord.set('value',item.value);
-                    uiThemesRecord.save({
-                        callback:function(){
-                            location.reload();
-                        }
-                    });
+                handler: function (item){
+                    Editor.app.changeUserTheme(item.value);
                 }
             });
         });
