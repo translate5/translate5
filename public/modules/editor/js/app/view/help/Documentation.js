@@ -40,7 +40,7 @@ Ext.define('Editor.view.help.Documentation', {
 
     initConfig: function(instanceConfig) {
         var me = this,
-            url = Ext.String.format(me.getDocumentationUrl(), '?lang='+Editor.data.locale),
+            url = Ext.String.format(me.getDocumentationUrl(), Editor.data.locale),
             isRemote=url.match(/^(http:\/\/|https:\/\/|ftp:\/\/|\/\/)([-a-zA-Z0-9@:%_\+.~#?&//=])+$/)!==null,
             config = {
                 hidden:(url === "" || url === undefined),
