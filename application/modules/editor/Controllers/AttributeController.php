@@ -186,8 +186,8 @@ class editor_AttributeController extends ZfExtended_RestController
             ],
         ], $_['attrId']);
 
-        // If it's a processStatus-attribute - do nothing
-        if ($_['attrId']['type'] == 'processStatus') return;
+        // If it's a processStatus- or administrativeStatus-attribute - do nothing
+        if ($_['attrId']['type'] == 'processStatus' || $_['attrId']['type'] == 'administrativeStatus') return;
 
         // Create `terms_attributes` model instance
         $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
