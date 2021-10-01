@@ -69,7 +69,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             'language'=>$response->id
         ];
         $response=$this->api()->requestJson('editor/termcollection/search', 'GET', $searchParams);
-        $this->assertTrue(is_object($response),"No terms are found in the termcollection");
+        $this->assertTrue(is_object($response),"No terms are found in the termcollection ".self::$collectionId);
         $this->assertNotEmpty($response->term,"No terms are found in the term collection for the search string '*'");
         $term=$response->term[0];
         
