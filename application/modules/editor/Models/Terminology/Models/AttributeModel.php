@@ -685,7 +685,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         // Get data by ref targets
         $dataByRefTargetIdA = editor_Utils::db()->query($_ = '
             SELECT
-              ' . $tbxCol . ',
+              ' . $tbxCol . ' AS `tbx`,
               `termEntryId`,
               `collectionId`,
               JSON_OBJECTAGG(
@@ -694,7 +694,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
               ) AS `json`
             FROM `terms_term`
             WHERE ' . $where . '
-            GROUP BY `termEntryId`            
+            GROUP BY `tbx`            
         ')->fetchAll(PDO::FETCH_UNIQUE);
 
         // Simulate situation when current search-term language is 'en-us', but refData contains term only for 'en-gb'
