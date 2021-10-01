@@ -40,9 +40,9 @@ Ext.define('Editor.view.help.Documentation', {
 
     initConfig: function(instanceConfig) {
         var me = this,
-            url=me.getDocumentationUrl(),
+            url = Ext.String.format(me.getDocumentationUrl(), '?lang='+Editor.data.locale),
+            isRemote=url.match(/^(http:\/\/|https:\/\/|ftp:\/\/|\/\/)([-a-zA-Z0-9@:%_\+.~#?&//=])+$/)!==null,
             config = {
-                html:'<iframe src="'+url+'" width="100%" height="100%" ></iframe>',
                 hidden:(url === "" || url === undefined),
                 tbar:['->',{
                     xtype: 'button',
@@ -53,6 +53,19 @@ Ext.define('Editor.view.help.Documentation', {
                     }
                 }]
             };
+            //if the url is remote url, load the content inside an iframe
+            //also this prevents from iframe in iframe(in the views, also iframe can be defined)
+            if(isRemote){
+                config.html='<iframe src="'+url+'" width="100%" height="100%" ></iframe>';
+            }else{
+                //the url is not remote, set the loader configuration
+                config.loader={
+                    url:url,
+                    renderer: 'html',
+                    autoLoad: true,
+                    scripts: true
+                };
+            }
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }

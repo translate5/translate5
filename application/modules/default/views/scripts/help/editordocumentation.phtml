@@ -25,37 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+$locale=$_REQUEST['lang'] ?? 'en';
+?>
 
-class HelpController extends ZfExtended_Controllers_Action {
-
-    public function indexAction(){
-        $this->_helper->layout->disableLayout();
-    }
-    public function editorAction() {
-        $this->_helper->layout->disableLayout();
-    }
-    public function editordocumentationAction() {
-        $this->_helper->layout->disableLayout();
-    }
-    public function languageresourceAction() {
-        $this->_helper->layout->disableLayout();
-    }
-    public function taskoverviewAction() {
-        $this->_helper->layout->disableLayout();
-    }
-    public function useroverviewAction() {
-        $this->_helper->layout->disableLayout();
-    }
-    public function customeroverviewAction() {
-        $this->_helper->layout->disableLayout();
-    }
-    public function segmentsgridAction() {
-        $this->_helper->layout->disableLayout();
-    }
-    public function projectAction() {
-        $this->_helper->layout->disableLayout();
-    }
-    public function preferencesAction() {
-        $this->_helper->layout->disableLayout();
-    }
-}
+<iframe width="100%" height="100%" src="/documentation/documentation_<?php echo $locale;?>.pdf" </iframe>

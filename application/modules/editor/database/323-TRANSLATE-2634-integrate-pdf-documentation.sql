@@ -26,7 +26,8 @@
 -- */
 
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`) VALUES ('runtimeOptions.frontend.helpWindow.editor.documentationUrl', '1', 'editor', 'system', '', '', '', 'string', 'The content of the defined URL will be loaded in this help page section. If empty and if the URL for the help video is also empty, nothing is loaded and the help button will not be available. If a video URL is also defined there will be a tab navigation in the help window.', '2', 'Help window URL PDF documentation: Editor', 'System setup: Help');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`)
+VALUES ('runtimeOptions.frontend.helpWindow.editor.documentationUrl', '1', 'editor', 'system', '/help/editordocumentation/{0}', '/help/editordocumentation/{0}', '', 'string', 'The content of the defined URL will be loaded in this help page section. If empty and if the URL for the help video is also empty, nothing is loaded and the help button will not be available. If a video URL is also defined there will be a tab navigation in the help window.', '2', 'Help window URL PDF documentation: Editor', 'System setup: Help');
 
 UPDATE `Zf_configuration` SET `description` = 'The content of the defined URL will be loaded in this help page section. If empty and if the URL for the PDF documentation is also empty, nothing is loaded and the help button will not be available. If a PDF documentation URL is also defined there will be a tab navigation in the help window.', `guiName` = 'Help window URL video: Editor' WHERE `name` = 'runtimeOptions.frontend.helpWindow.editor.loaderUrl';
 
