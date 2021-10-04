@@ -484,13 +484,23 @@ $memLog('Loaded terms:        ');
         $hasTermNote = isset($tig->termNote);
         $this->addProcessStatusNodeIfNotExists($tig);
         $newTerm->termNote = $this->setAttributeTypes($tig->termNote, $newTerm);
+
+        $admnStatFound = false;
         if ($hasTermNote) {
-            $newTerm->status = $this->termNoteStatus->fromTermNotesOnImport($newTerm->termNote);
+            $newTerm->status = $this->termNoteStatus->fromTermNotesOnImport($newTerm->termNote, $admnStatFound);
             $newTerm->processStatus = $this->getProcessStatus($newTerm->termNote);
         } else {
             $newTerm->status = $this->config->runtimeOptions->tbx->defaultTermStatus;
             $newTerm->processStatus = $newTerm::TERM_STANDARD_PROCESS_STATUS;
         }
+
+        //if no termNote with administrativeStatus was found, we create one
+        if(!$admnStatFound) {
+            $newStatus = $this->termNoteStatus->getAdmnStatusFromTermStatus($newTerm->status);
+            $newTerm->termNote[] = $this->createAndAddAttribute($newTerm, 'termNote', 'administrativeStatus', '', $newStatus);
+        }
+
+        //check if termNote administrativeStatus is set, if not add it to $newTerm->termNote and bulk with $newTerm->status value
 
         if ($newTerm->processStatus === '') {
             $newTerm->processStatus = $newTerm::TERM_STANDARD_PROCESS_STATUS;
@@ -558,51 +568,68 @@ $memLog('Loaded terms:        ');
         $attributes = [];
         /** @var SimpleXMLElement $value */
         foreach ($element as $key => $value) {
-            /** @var editor_Models_Terminology_TbxObjects_Attribute $attribute */
-            $attribute = $this->bulkAttribute->getNewImportObject();
-            $attribute->setParent($parentNode);
-            $attribute->collectionId = $this->collection->getId();
-            $attribute->termEntryId = $attribute->parentEntry->id;
-            $attribute->language = $attribute->parentLangset->language ?? null;
-            // termId is updated after inserting all the terms!
-            $attribute->termTbxId = $attribute->parentTerm->termTbxId ?? null;
-            $attribute->type = (string)$value->attributes()->{'type'};
-            $attribute->value = (string) $value;
-            $attribute->target = (string)$value->attributes()->{'target'};
-            $attribute->createdBy = $this->user->getId();
-            $attribute->createdAt = NOW_ISO; //is saved only on INSERT / on UPDATE it is not send to server, otherwise the hash would change
-            $attribute->updatedBy = $this->user->getId();
-
-            $attribute->termEntryGuid = $attribute->parentEntry->entryGuid;
-            $attribute->langSetGuid = $attribute->parentLangset->langSetGuid ?? null;
-            $attribute->termGuid = $attribute->parentTerm->guid ?? null;
-
-            $attribute->elementName = $key;
-            $attribute->attrLang = $attribute->parentLangset->language ?? '';
-
-            // check if the dataType exist for the element
-            $labelId = $this->dataType->getForAttribute($attribute);
-            if (empty($labelId)) {
-                // the dataType does not exist -> create it
-                $this->attributeDataTypeModel->loadOrCreate($attribute->elementName, $attribute->type, [$attribute->getLevel()]);
-
-                // reload all dataTypes
-                $this->dataType->loadData(true);
-
-                $labelId = $this->dataType->getForAttribute($attribute);
-            }
-
-            $attribute->dataTypeId = (int)$labelId;
-
-            $attribute->isDescripGrp = (int)$isDescripGrp;
-
-            $attributes[] = $attribute;
-
-            // add the attribute to the global attributes collection
-            $this->bulkAttribute->add($attribute);
+            $attributes[] = $this->createAndAddAttribute($parentNode, $key, (string)$value->attributes()->{'type'}, (string)$value->attributes()->{'target'}, (string) $value, $isDescripGrp);
         }
 
         return $attributes;
+    }
+
+    /**
+     * Creates a attribute TbxObject out of the given values, add its to the bulk list and returns it
+     * @param editor_Models_Terminology_TbxObjects_Abstract $parentNode
+     * @param string $elementName
+     * @param string $type
+     * @param string $target
+     * @param string $value
+     * @param bool $isDescripGrp
+     * @return editor_Models_Terminology_TbxObjects_Attribute
+     * @throws ZfExtended_ErrorCodeException
+     * @throws editor_Models_Terminology_Import_Exception
+     */
+    protected function createAndAddAttribute(editor_Models_Terminology_TbxObjects_Abstract $parentNode, string $elementName, string $type, string $target, string $value, bool $isDescripGrp = false): editor_Models_Terminology_TbxObjects_Attribute {
+        /** @var editor_Models_Terminology_TbxObjects_Attribute $attribute */
+        $attribute = $this->bulkAttribute->getNewImportObject();
+        $attribute->setParent($parentNode);
+        $attribute->collectionId = $this->collection->getId();
+        $attribute->termEntryId = $attribute->parentEntry->id;
+        $attribute->language = $attribute->parentLangset->language ?? null;
+        // termId is updated after inserting all the terms!
+        $attribute->termTbxId = $attribute->parentTerm->termTbxId ?? null;
+        $attribute->type = $type;
+        $attribute->value = $value;
+        $attribute->target = $target;
+        $attribute->createdBy = $this->user->getId();
+        $attribute->createdAt = NOW_ISO; //is saved only on INSERT / on UPDATE it is not send to server, otherwise the hash would change
+        $attribute->updatedBy = $this->user->getId();
+
+        $attribute->termEntryGuid = $attribute->parentEntry->entryGuid;
+        $attribute->langSetGuid = $attribute->parentLangset->langSetGuid ?? null;
+        $attribute->termGuid = $attribute->parentTerm->guid ?? null;
+
+        $attribute->elementName = $elementName;
+        $attribute->attrLang = $attribute->parentLangset->language ?? '';
+
+        // check if the dataType exist for the element
+        $labelId = $this->dataType->getForAttribute($attribute);
+        if (empty($labelId)) {
+            // the dataType does not exist -> create it
+            $this->attributeDataTypeModel->loadOrCreate($attribute->elementName, $attribute->type, [$attribute->getLevel()]);
+
+            // reload all dataTypes
+            $this->dataType->loadData(true);
+
+            $labelId = $this->dataType->getForAttribute($attribute);
+        }
+
+        $attribute->dataTypeId = (int)$labelId;
+
+        $attribute->isDescripGrp = (int)$isDescripGrp;
+
+
+        // add the attribute to the global attributes collection
+        $this->bulkAttribute->add($attribute);
+
+        return $attribute;
     }
 
     /**

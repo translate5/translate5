@@ -89,9 +89,12 @@ class editor_Models_Terminology_TermNoteStatus
     /**
      * @param editor_Models_Terminology_TbxObjects_Attribute[] $termNotes
      */
-    public function fromTermNotesOnImport(array $termNotes): string {
+    public function fromTermNotesOnImport(array $termNotes, bool &$admnStatFound = false): string {
         $typeAndValueOnly = [];
         foreach($termNotes as $note) {
+            if($note->type == 'administrativeStatus') {
+                $admnStatFound = true;
+            }
             $typeAndValueOnly[] = [
                 'type' => $note->type,
                 'value' => $note->value
@@ -184,5 +187,18 @@ class editor_Models_Terminology_TermNoteStatus
             ) as s
         SET dt.picklistValues = s.picklistValues, dt.dataType = 'picklist'
         WHERE dt.label = 'termNote' AND dt.level = 'term' AND dt.type = s.type");
+    }
+
+    /**
+     * returns the attribute administrativeStatus value from a given term status (returns the first matching), returns the first one too as fallback
+     * @param string $termStatus
+     * @return string
+     */
+    public function getAdmnStatusFromTermStatus(string $termStatus): string {
+        $result = array_search($termStatus, self::$termNoteMap['administrativeStatus']);
+        if($result === false) {
+            return reset(self::$termNoteMap['administrativeStatus']);
+        }
+        return $result;
     }
 }
