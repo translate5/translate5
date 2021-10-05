@@ -79,6 +79,27 @@ class editor_Models_Terminology_TermNoteStatus
     }
 
     /**
+     * Reads out the default term status from the configured default administrative status value
+     * @throws ZfExtended_Exception
+     */
+    public function getDefaultTermStatus() {
+        $def = $this->config->runtimeOptions->tbx->defaultAdministrativeStatus;
+        if(empty(self::$termNoteMap[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS][$def])) {
+            //this may not happen, therefore just a anonymous exception
+            throw new ZfExtended_Exception('value of runtimeOptions->tbx->defaultAdministrativeStatus does not map to a valid value in terms_term_status_map');
+        }
+        return self::$termNoteMap[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS][$def];
+    }
+
+    /**
+     * return all available administrativeStatus values (the attribute values, not the mapped ones for the term)
+     * @return array
+     */
+    public function getAdministrativeStatusValues(): array {
+        return array_keys(self::$termNoteMap[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS]);
+    }
+
+    /**
      * returns all termNote types where the termNotes contain a term status relevant value
      * @return array
      */
@@ -97,6 +118,7 @@ class editor_Models_Terminology_TermNoteStatus
 
     /**
      * @param editor_Models_Terminology_TbxObjects_Attribute[] $termNotes
+     * @throws ZfExtended_Exception
      */
     public function fromTermNotesOnImport(array $termNotes, bool &$admnStatFound = false): string {
         $foundByPrecedenceType = [];
@@ -140,7 +162,7 @@ class editor_Models_Terminology_TermNoteStatus
         }
 
         if(empty($noteToBeUsed)) {
-            return $this->config->runtimeOptions->tbx->defaultTermStatus;
+            return $this->getDefaultTermStatus();
         }
 
         $statusToBeUsed = $this->getStatusFromTermNote($noteToBeUsed->type, $noteToBeUsed->value);
@@ -159,13 +181,15 @@ class editor_Models_Terminology_TermNoteStatus
     /**
      * returns the translate5 internal available term status to the one given as termNote in TBX
      * @param array[] $termNotes
+     * @param string $sourceType
      * @param array[] $statusPerAttribute
      * @return string
+     * @throws ZfExtended_Exception
      */
     public function fromTermNotes(array $termNotes, string $sourceType, array &$statusPerAttribute) : string
     {
         //first find the used value to a given type, default as fallback
-        $usedStatus = $this->config->runtimeOptions->tbx->defaultTermStatus;
+        $usedStatus = $this->getDefaultTermStatus();
         foreach ($termNotes as $termNote) {
             $type = $termNote['type'];
             //if current termNote type is not allowed to provide a status then we jump over
@@ -197,6 +221,7 @@ class editor_Models_Terminology_TermNoteStatus
      * @param $termNoteType
      * @param $termNoteValue
      * @return string|null
+     * @throws ZfExtended_Exception
      */
     public function getStatusFromTermNote($termNoteType, $termNoteValue): ?string {
         //return mapped status from specific configuration
@@ -211,7 +236,7 @@ class editor_Models_Terminology_TermNoteStatus
         }
 
         //and return default
-        return $this->config->runtimeOptions->tbx->defaultTermStatus;
+        return $this->getDefaultTermStatus();
     }
 
     /**

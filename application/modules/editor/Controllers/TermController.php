@@ -85,6 +85,7 @@ class editor_TermController extends ZfExtended_RestController
 
     /**
      * Create term (with own termEntry, if need)
+     * @throws ZfExtended_Exception
      */
     public function postAction() {
 
@@ -217,6 +218,9 @@ class editor_TermController extends ZfExtended_RestController
             $diff['attribute'] ++; // processStatus-attr was added for source term
         }
 
+        /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
+        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
+
         // Apply data
         $termR->init([
             'termTbxId' => $termTbxId = 'id' . ZfExtended_Utils::uuid(),
@@ -229,7 +233,7 @@ class editor_TermController extends ZfExtended_RestController
             'languageId' => $params['languageId'],
             'language' => $params['language'],
             'term' => trim($params['term']),
-            'status' => Zend_Registry::get('config')->runtimeOptions->tbx->defaultTermStatus,
+            'status' => $termNoteStatus->getDefaultTermStatus(),
             'processStatus' => $processStatus = 'unprocessed',
             //'definition' => '',
             'updatedBy' => $this->_session->id,
