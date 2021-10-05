@@ -142,11 +142,96 @@ END LICENSE AND COPYRIGHT
 if(!$this->isIpBasedUser){
     echo '<div id="logoutContainer"><a id="logout" href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus">'.$translate->_('Abmelden').'</a></div>';
 }
+
+// SBE: tempDev
+$isTempDev = TRUE;
 ?>
     
 </div>
 
-<div id="containerTranslation" class="container">
+<div id="containerTranslation" class="container container__instanttranslate">
+    <?php if ($isTempDev) : ?>
+        <div id="source">
+            <form id="sourceLanguageAndContent">
+                <select id="sourceLocale" name="sourceLocale">
+                    <?php
+                    $sourceLangSelected = false;
+                    $getParamSource = $this->source;
+                    if (!is_null($getParamSource)) {
+                        $sourceLangSelected = $getParamSource;
+                    } else if (!empty($this->sourceSearchLanguagePreselectionLocale)) {
+                        $sourceLangSelected = $this->sourceSearchLanguagePreselectionLocale;
+                    }
+                    $optionValues=[];
+                    $sourceLangSelected=strtolower($sourceLangSelected);
+                    foreach ($allSourceLanguageLocales as $sourceLangLocale) {
+                        // get the language display name from all languages array. The display name is at index 1
+                        $displayLanguage = $this->allDbLanguages[$sourceLangLocale][1] ?? $sourceLangLocale;
+                        $selected = ($sourceLangSelected != false && $sourceLangSelected == strtolower($sourceLangLocale)) ? ' selected="selected"' : '';
+                        $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$displayLanguage.'</option>';
+                    }
+                    echo implode(' ', $optionValues);
+                    ?>
+                </select>
+                <div id="sourceIsText" class="source-toggle show-if-source-is-text infotext"></div>
+                <div id="sourceIsFile" class="source-toggle show-if-source-is-file infotext"></div>
+                <div id="sourceContent" class="clearable">
+                    <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"><?php echo htmlspecialchars($this->text); ?></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
+                    <span class="clearable-clear show-if-source-is-text" title="<?php echo $this->translations["clearText"];?>">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
+                    <span id="countedCharacters" class="show-if-source-is-text">0</span>
+                    <input id="sourceFile" name="sourceFile" type="file" class="show-if-source-is-file"/>
+                </div>
+                <div id="sourceError" class="instant-translation-error ui-state-error ui-corner-all"></div>
+                <div id="pretranslatedfiles"></div>
+            </form>
+        </div>
+        <div id="target">
+            <form id="targetControls">
+                <select id="targetLocale" name="targetLocale">
+                    <?php
+                    $targetLangSelected = false;
+                    $getParamTarget = $this->target;
+                    if (!is_null($getParamTarget)) {
+                        $targetLangSelected = $getParamTarget;
+                    } else if (!empty($this->targetSearchLanguagePreselectionLocale)) {
+                        $targetLangSelected = $this->targetSearchLanguagePreselectionLocale;
+                    }
+                    $optionValues=[];
+                    $targetLangSelected=strtolower($targetLangSelected);
+                    foreach ($allTargetLanguageLocales as $targetLangLocale) {
+                        // get the language display name from all languages array. The display name is at index 1
+                        $displayLanguage = $this->allDbLanguages[$targetLangLocale][1] ?? $targetLangLocale;
+                        $selected = ($targetLangSelected != false && $targetLangSelected == strtolower($targetLangLocale)) ? ' selected="selected"' : '';
+                        $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$displayLanguage.'</option>';
+                    }
+                    echo implode(' ', $optionValues);
+                    ?>
+                </select>
+                <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="click-starts-translation ui-corner-all ui-button ui-widget"/>
+                <div id="instantTranslationIsOff" class="click-starts-translation instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
+                <div id="instantTranslationIsOn" class="instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
+            </form>
+            <div id="targetError" class="instant-translation-error ui-state-error ui-corner-all"></div>
+            <div class="loadingSpinnerIndicator"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
+            <div id="translations">
+                <!-- inject translations here  -->
+            </div>
+            <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+            <p>SBE-DEV: Test-Ausgabe</p>
+            <div class="box box__result__header box__result__header__green font-size-big">
+                <h2>Result-Header</h2>
+            </div>
+            <div class="box box__result__content">
+                <p class="font-size-medium">
+                    Some kind of subheader here.
+                </p>
+                <p>
+                    Detailed result-content with some text inside.
+                </p>
+            </div>
+        </div>
+    <?php else: ?>
+    <?php // ******************************** BACKUP Original-Code ************************************** ?>
 	<div id="source">
         <form id="sourceLanguageAndContent">
             <select id="sourceLocale" name="sourceLocale">
@@ -215,11 +300,12 @@ if(!$this->isIpBasedUser){
             <!-- inject translations here  -->
         </div>
     </div>
+    <?php // ******************************** ENDE BACKUP Original-Code ************************************** ?>
+    <?php endif; ?>
 </div>
 
 <script type="text/javascript">
     var characterLimit = '<?php echo $characterLimit;?>';
-    
 </script>
 
 <script type="text/javascript">
