@@ -339,7 +339,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if (isset($rop->frontend->helpWindow)) {
             $helpWindowConfig = $rop->frontend->helpWindow->toArray() ?? [];
         }
-        //helpWindow config config values for each section (loaderUrl)
+        //helpWindow config values for each section (loaderUrl,documentationUrl)
         $this->view->Php2JsVars()->set('frontend.helpWindow', $helpWindowConfig);
 
         //show references files popup
