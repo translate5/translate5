@@ -209,6 +209,7 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
                                 glyph: "f093@FontAwesome5FreeSolid",
                                 text: me.strings.uploadBconf,
                                 tooltip: me.strings.uploadBconf,
+                                handler: 'importbconf'
                             },
                             {
                                 xtype: "textfield",

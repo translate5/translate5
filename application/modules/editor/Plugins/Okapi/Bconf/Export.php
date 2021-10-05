@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * Generate new bconf file
  *
  */
-class editor_Plugins_Okapi_Bconf_BconfExport
+class editor_Plugins_Okapi_Bconf_Export
 {
 	const OKAPI_BCONF_BASE_PATH = 'D:/okapi/test/';
 	const MAXBUFFERSIZE = 1024 * 8;

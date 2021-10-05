@@ -58,7 +58,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
       */
      public function postAction()
      {
-          $bconf = new editor_Plugins_Okapi_Bconf_BconfExport();
+          $bconf = new editor_Plugins_Okapi_Bconf_Export();
           $okapiName = $this->getParam('okapiName');
           $okapiId = $this->getParam('okapiId');
           if($okapiId ==null || $okapiId ==""){
@@ -66,5 +66,16 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
           }
           $bconf->ExportBconf($okapiName,$okapiId);
      }
+	
+	/**
+	 * Import bconf
+	 */
+	public function importAction()
+	{
+		error_log("guru");
+		$bconf = new editor_Plugins_Okapi_Bconf_Import();
+		//TODO get the file name from UI
+		$bconf->importBconf("");
+	}
      
 }

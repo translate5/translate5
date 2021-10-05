@@ -105,5 +105,26 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
                return item.get('name').toLowerCase().indexOf(searchFilterValue)>-1 || item.get('extensions').toLowerCase().indexOf(searchFilterValue)>-1  || item.get('description').toLowerCase().indexOf(searchFilterValue)>-1
             })
         }
-    }
+    },
+
+    importbconf: function (grid, rowIndex, colIndex) {
+        // var okapiName = grid.getStore().getAt(rowIndex).get('name');
+        // var okapiId = grid.getStore().getAt(rowIndex).get('id');
+        var form = Ext.create('Ext.form.Panel',{
+            timeout: 60000
+        });
+
+        form.submit({
+            url     : Editor.data.restpath + 'plugins_okapi_bconf/import',
+            method  : 'POST',
+            // params  : {
+            //     okapiName:okapiName,
+            //     okapiId:okapiId
+            // },
+            scope   : this,
+            success : function(responseText){
+            },
+            target: '_blank'
+        });
+    },
 });
