@@ -4309,6 +4309,14 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>triton</source>
     <target>Default theme (Triton)</target>
 </trans-unit>
+<trans-unit id='UERGIERva3VtZW50YXRpb24='>
+    <source>PDF Dokumentation</source>
+    <target>PDF documentation</target>
+</trans-unit>
+<trans-unit id='SW4gbmV1ZW0gQnJvd3Nlci1UYWIgw7ZmZm5lbg=='>
+    <source>In neuem Browser-Tab öffnen</source>
+    <target>Open in new browser tab</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

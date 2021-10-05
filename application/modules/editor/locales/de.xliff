@@ -2031,6 +2031,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U3ByYWNoZSDDpG5kZXJu'><source>Sprache ändern</source><target>Sprache ändern</target></trans-unit>
 <trans-unit id='YXJpYQ=='><source>aria</source><target>Dunkles Layout (Aria)</target></trans-unit>
 <trans-unit id='dHJpdG9u'><source>triton</source><target>Standard Layout (Triton)</target></trans-unit>
+<trans-unit id='UERGIERva3VtZW50YXRpb24='><source>PDF Dokumentation</source><target>PDF Dokumentation</target></trans-unit>
+<trans-unit id='SW4gbmV1ZW0gQnJvd3Nlci1UYWIgw7ZmZm5lbg=='><source>In neuem Browser-Tab öffnen</source><target>In neuem Browser-Tab öffnen</target></trans-unit>
   </body>
  </file>
 </xliff>
