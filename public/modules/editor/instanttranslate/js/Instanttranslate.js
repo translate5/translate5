@@ -349,7 +349,7 @@ function startTimerForInstantTranslation() {
     terminateTranslation();
     editIdleTimer = setTimeout(function() {
         startTranslation(); // TODO: this can start a filetranslation without calling startFileTranslation()
-    }, 200);
+    }, Editor.data.apps.instanttranslate.translateDelay);
 }
 function startTranslation() {
     var textToTranslate,
