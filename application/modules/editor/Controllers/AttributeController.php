@@ -112,6 +112,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ], $_['termEntryId']);
 
         // Call the appropriate method depend on attr's `elementName` or `type` prop
+        settype($params['mode'], 'string');
         if ($params['mode'] == 'xref') $this->xrefcreateAction($_);
         else if ($params['mode'] == 'ref') $this->refcreateAction($_);
         else if ($params['mode'] == 'figure') $this->figurecreateAction($_);
@@ -525,6 +526,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ], $_['termEntryId']);
 
         // Create `terms_attributes` model instance
+        /* @var $a editor_Models_Terminology_Models_AttributeModel */
         $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
 
         // Apply data
@@ -982,20 +984,34 @@ class editor_AttributeController extends ZfExtended_RestController
      * so this method get all term's attributes that may affect term's `status` and recalculate
      * and return the value for `status`
      *
-     * @param $termM
-     * @param $attrM
-     * @return mixed
+     * @param editor_Models_Terminology_Models_TermModel $termM
+     * @param editor_Models_Terminology_Models_AttributeModel $attrM
+     * @return array
      */
-    protected function _updateTermStatus($termM, $attrM) {
+    protected function _updateTermStatus(editor_Models_Terminology_Models_TermModel $termM, editor_Models_Terminology_Models_AttributeModel $attrM): array {
 
         /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
         $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
-
         // Get attributes, that may affect term status
         $termNotes = $attrM->loadByTerm($termM->getId(), ['termNote'], $termNoteStatus->getAllTypes());
 
+        $others = [];
+        if($termNoteStatus->isStatusRelevant($attrM)) {
+            // in this case we sync the changed attribute to the other status relevant attributes
+            $status = $termNoteStatus->fromTermNotes($termNotes, $attrM->getType(), $others);
+        }
+        else {
+            // in this case the administrativeStatus may be changed implictly, so we sync its value to the others
+            $status = $termNoteStatus->fromTermNotes($termNotes, $termNoteStatus::DEFAULT_TYPE_ADMINISTRATIVE_STATUS, $others);
+        }
+
+        //update the other attributes with the new value
+        foreach($others as $id => $other) {
+            $attrM->db->update(['value' => $other['status']], ['id = ?' => $id]);
+        }
+
         // Recalculate term status
-        $termM->setStatus($termNoteStatus->fromTermNotes($termNotes));
+        $termM->setStatus($status);
 
         // If status is modified save it to the DB
         if ($termM->isModified('status')) {
@@ -1003,7 +1019,11 @@ class editor_AttributeController extends ZfExtended_RestController
             $termM->update(['updateProcessStatusAttr' => false]);
 
             // Return new status
-            return $termM->getStatus();
+            return [
+                'status' => $termM->getStatus(),
+                'others' => array_column($others, 'status', 'dataTypeId')
+            ];
         }
+        return [];
     }
 }

@@ -368,7 +368,7 @@ class editor_Utils {
              // settype($rule['dis'], 'string');
 
             // Shortcut to $data[$prop]
-            $value = $data[$prop];
+            $value = $data[$prop] ?? null;
 
             // Get meta
             $meta = isset($data['_meta'][$prop]) ? $data['_meta'][$prop] : [];

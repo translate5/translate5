@@ -46,3 +46,6 @@ JOIN (
     where termNoteType = 'administrativeStatus'
     group by mappedStatus) m ON m.mappedStatus = t.status
 WHERE ta.id is null;
+
+-- migration of the existing other values (across picklists, normativeAuthorization)
+-- is not needed since they was setting the term status on import and term status could not be changed.

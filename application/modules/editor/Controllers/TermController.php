@@ -185,7 +185,7 @@ class editor_TermController extends ZfExtended_RestController
         // If 'sourceLang' and 'sourceTerm' params are given, it means we here because of
         // InstantTranslate usage in a way that assume that we found no existing termEntry by sourceTerm-param
         // so we save both terms (source and target) under same newly created termEntry
-        if ($_['sourceLang']) {
+        if ($_['sourceLang'] ?? false) {
 
             // Apply data
             $termR->init([
