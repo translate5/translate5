@@ -243,19 +243,19 @@ class editor_Models_Terminology_TermNoteStatus
      * @return string
      */
     public function getAdmnStatusFromTermStatus(string $termStatus): string {
-        return $this->getAttributeValueFromTermStatus($termStatus, self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS);
+        return $this->getAttributeValueFromTermStatus($termStatus, self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS) ?? reset(self::$termNoteMap[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS]);
     }
 
     /**
      * returns the attributes value (by type) from a given term status (returns the first matching), returns the first one too as fallback
      * @param string $termStatus
      * @param string $type
-     * @return string
+     * @return string|null
      */
-    protected function getAttributeValueFromTermStatus(string $termStatus, string $type): string {
+    protected function getAttributeValueFromTermStatus(string $termStatus, string $type): ?string {
         $result = array_search($termStatus, self::$termNoteMap[$type]);
         if($result === false) {
-            return reset(self::$termNoteMap[$type]);
+            return null;
         }
         return $result;
     }
