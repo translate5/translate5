@@ -865,3 +865,10 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
     vertical-align: middle;
     text-align: center;
 }
+
+.okapifilterGrid .x-action-col-icon{
+    margin: 5px !important;
+}
+.customFilterGrid .x-action-col-icon{
+    margin: 5px !important;
+}
