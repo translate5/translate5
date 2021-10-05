@@ -722,7 +722,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             // despite 'en-gb' is more preferable, so below we're preventing that
             if (count($prefLangGroupA) == 1)
                 foreach ($prefLangA as $prefLang)
-                    if ($value = $refData['json'][$prefLang]) {
+                    if ($value = $refData['json'][$prefLang] ?? null) {
                         $refData['language'] = $prefLang;
                         list (
                             $refData['termId'],
@@ -740,7 +740,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             foreach ($prefLangA as $prefLang) {
 
                 // If term exists for the preferred language
-                if (count($prefLangGroupA) >= 1 && $value = $refData['json'][$prefLang]) {
+                if (count($prefLangGroupA) >= 1 && $value = $refData['json'][$prefLang] ?? null) {
                     $refData['language'] = $prefLang;
                     list (
                         $refData['termId'],
