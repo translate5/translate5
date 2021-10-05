@@ -1007,7 +1007,12 @@ class editor_AttributeController extends ZfExtended_RestController
 
         //update the other attributes with the new value
         foreach($others as $id => $other) {
-            $attrM->db->update(['value' => $other['status']], ['id = ?' => $id]);
+            if($other['status'] === null) {
+                $attrM->db->delete(['id = ?' => $id]);
+            }
+            else {
+                $attrM->db->update(['value' => $other['status']], ['id = ?' => $id]);
+            }
         }
 
         // Recalculate term status
