@@ -490,7 +490,7 @@ $memLog('Loaded terms:        ');
             $newTerm->status = $this->termNoteStatus->fromTermNotesOnImport($newTerm->termNote, $admnStatFound);
             $newTerm->processStatus = $this->getProcessStatus($newTerm->termNote);
         } else {
-            $newTerm->status = $this->config->runtimeOptions->tbx->defaultTermStatus;
+            $newTerm->status = $this->termNoteStatus->getDefaultTermStatus();
             $newTerm->processStatus = $newTerm::TERM_STANDARD_PROCESS_STATUS;
         }
 
