@@ -169,7 +169,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             // it is single task project, set the taskGuid and the target langauge as record values
             newRecord.set('targetLang',project.get('targetLang'));
             newRecord.set('taskGuid',project.get('taskGuid'));
-        }else{
+        } else {
             // it is multi task project, the target language dropdown should contain only the project-tasks target languages
             var targetLangs = [];
             project.get('projectTasks').forEach(function(t){
@@ -185,6 +185,8 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             targetLangField.resumeEvents(true);
             me.getViewModel().set('formTask',null);
         }
+     
+        me.getView().fireEvent('addnewassoc', newRecord, formPanel);
 
         // reset the current form and load the new record
         me.resetRecord(newRecord);

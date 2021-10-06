@@ -110,7 +110,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
 	/**
 	 * on each segment store load update the firstEditableRow info, needed for match result preloading
 	 */
-    onSegmentStoreLoad: function (store, records) {
+    onSegmentStoreLoad: function(store, records) {
         var me = this,
             er =store.getFirsteditableRow();
         me.setFirsEditableRow(er);
@@ -118,9 +118,9 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     calculateRows: function(controller){
         var me = this,
             maxSegments = Editor.data.LanguageResources.preloadedSegments;
-        me.nextSegment = controller.next.nextEditable;
+        me.nextSegment = controller.next.editableNext;
         if(me.nextSegment){
-            var retval = controller.findNextRows(controller.next.nextEditable.idx,maxSegments);
+            var retval = controller.findNextRows(controller.next.editableNext.idx, maxSegments);
             me.cacheSegmentIndex = me.cacheSegmentIndex.concat(retval);
         }
         me.checkCacheLength();
