@@ -861,4 +861,87 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             WHERE `termEntryId` IN (' . $termEntryIds . ')' . editor_Utils::rif($tbxBasicOnly, ' AND `dataTypeId` IN ($1)')
         )->fetchAll(), 'termEntryId', 'language', 'termId');
     }
+
+    /**
+     * Replicate new value of definition attribute to `terms_term`.`definition` where needed
+     * and return array containing new value and ids of affected `terms_term` records for
+     * being able to apply that on client side
+     */
+    public function replicateDefinition() {
+
+        // Append 'definition' key to the return data array
+        $data = ['value' => $this->getValue(), 'affected' => []];
+
+        // Prepare query bindings
+        $bind = [$this->getTermEntryId()];
+
+        // Bind the language-param to the query
+        // If it's a lanuguage-level definition, $this's language is just used,
+        // otherwise we need to replicate definition to all terms, that have
+        // no definition-attribute on their language-level, or have but it's empty,
+        // so we find the languages matching that criteria within current termEntry
+        $bind []= $this->getLanguage() ?: join(',', $this->db->getAdapter()->query('
+            SELECT 
+              `ta`.`language`, 
+              MAX(IFNULL(`ta`.`TYPE` = "definition", 0)) AS `hasDef`,
+              MAX(`ta`.`type` = "definition" AND `ta`.`value` = "") AS `butEmpty`
+            FROM `terms_attributes` ta 
+            WHERE 1
+              AND `termEntryId` = ? 
+              AND NOT ISNULL(`language`)
+              AND ISNULL(`termId`)
+            GROUP BY `language`
+            HAVING `hasDef` = 0 OR `butEmpty` = 1
+        ', $this->getTermEntryId())->fetchAll(PDO::FETCH_COLUMN));
+
+        // Get ids of terms, that will be affected
+        $termIdA = $this->db->getAdapter()->query('
+            SELECT `id` 
+            FROM `terms_term` 
+            WHERE `termEntryId` = ? AND FIND_IN_SET(`language`, ?)
+        ', $bind)->fetchAll(PDO::FETCH_COLUMN);
+
+        // Get term model
+        $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+
+        // Foreach termId
+        foreach ($termIdA as $termId) {
+
+            // Load term and update definition, involving history-record creation
+            $termM->load($termId);
+            $termM->setDefinition($this->getValue());
+            $termM->update();
+
+            //
+            $data['affected'] []= $termId;
+        }
+
+        // If it's a language-level definition
+        /*if ($this->getLanguage()) {
+
+
+            // Replicate it into `definition` column for all terms within current termEntry having same language
+            editor_Utils::db()->query('
+                UPDATE `terms_term` SET `definition` = ? WHERE `termEntryId` = ? AND `language` = ?
+            ', [
+                $this->getValue(),
+                $this->getTermEntryId(),
+                $this->getLanguage(),
+            ]);
+
+        // Else if it's a termEntry-level definition
+        } else {
+
+            // Replicate it into `definition` column for all terms within current termEntry having emtpy cell there so far
+            editor_Utils::db()->query('
+                UPDATE `terms_term` SET `definition` = ? WHERE `termEntryId` = ? AND `definition` = ""
+            ', [
+                $this->getValue(),
+                $this->getTermEntryId(),
+            ]);
+        }*/
+
+        // Return
+        return $data;
+    }
 }

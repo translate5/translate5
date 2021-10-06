@@ -955,6 +955,15 @@ class editor_AttributeController extends ZfExtended_RestController
             $attrR = $attrM->load($params['attrId']);
             $attrR->setFromArray(['value' => $params['value'], 'updatedBy' => $this->_session->id, 'isCreatedLocally' => 1]);
             $attrM->update();
+
+            // If it's a definition-attribute
+            if ($_['attrId']['type'] == 'definition' && !$_['attrId']['termId']) {
+
+                // Replicate new value of definition-attribute to `terms_term`.`definition` where needed
+                // and return array containing new value and ids of affected `terms_term` records for
+                // being able to apply that on client side
+                $data['definition'] = $attrM->replicateDefinition();
+            }
         }
 
         // The term status is updated in in anycase (due implicit normativeAuthorization changes above),
