@@ -31,6 +31,9 @@
 SELECT @dataTypeId := id FROM terms_attributes_datatype
 WHERE label = 'termNote' and type = 'administrativeStatus';
 
+SET autocommit=0;
+SET unique_checks=0;
+SET foreign_key_checks=0;
 INSERT INTO terms_attributes (collectionId, termEntryId, language, termId, termTbxId, dataTypeId, type,
                                             value, target, isCreatedLocally, createdBy, createdAt, updatedBy, updatedAt,
                                             termEntryGuid, langSetGuid, termGuid, guid, elementName, attrLang,
@@ -46,6 +49,10 @@ JOIN (
     where termNoteType = 'administrativeStatus'
     group by mappedStatus) m ON m.mappedStatus = t.status
 WHERE ta.id is null;
+COMMIT;
+SET unique_checks=1;
+SET foreign_key_checks=1;
+SET autocommit=1;
 
 -- migration of the existing other values (across picklists, normativeAuthorization)
 -- is not needed since they was setting the term status on import and term status could not be changed.
