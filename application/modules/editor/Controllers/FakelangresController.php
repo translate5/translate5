@@ -59,15 +59,34 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
         //for deepl we expect always that requests:
         $this->expectHeader('accept', 'application/json; charset=utf-8');
         $this->expectHeader('accept-charset', 'UTF-8');
-        $this->expectGet('auth_key', Zend_Registry::get('config')->runtimeOptions->plugins->DeepL->authkey);
-        
+        $authKey = Zend_Registry::get('config')->runtimeOptions->plugins->DeepL->authkey;
+        $this->expectGet('auth_key', $authKey);
+
+        $isDemo = $authKey === 'demomode';
+
         /*
          ** to test not authenticated requests:
          */
 //         header('HTTP/1.0 403 Forbidden');
 //         exit;
-        
         header('Content-Type: application/json', true);
+        /*
+         ** to test other deepl errors:
+         */
+//         here we do not know the real HTTP status code, I assume some 5xx
+//        header('HTTP/1.0 503 Service Unavailable');
+//        echo "upstream connect error or disconnect/reset before headers. reset reason: overflow";
+//        exit;
+//          header('HTTP/1.0 502 Bad Gateway');
+//          echo '<html>
+// <head><title>502 Bad Gateway</title></head>
+// <body bgcolor="white">
+// <center><h1>502 Bad Gateway</h1></center>
+// <hr><center>nginx</center>
+// </body>
+// </html>';
+//         exit;
+        
         $calledUrl = $this->getUriApiPart();
         switch ($calledUrl) {
             //Requesting which languages do exist:
@@ -116,7 +135,7 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
         [25-Nov-2020 16:55:32 Europe/Vienna] Raw Body (505c744):{"message":"Value for 'target_lang' not supported."}
         */
         try {
-            $this->expectPost('source_lang', ...['de', 'en', 'es']);
+            $isDemo || $this->expectPost('source_lang', ...['de', 'en', 'es']);
         }catch(Exception $e) {
             http_response_code(400);
             echo '{"message":"Value for \'source_lang\' not supported."}';
@@ -124,7 +143,7 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
         }
         
         try {
-            $this->expectPost('target_lang', ...['de', 'en', 'es']);
+            $isDemo || $this->expectPost('target_lang', ...['de', 'en', 'es']);
         }catch(Exception $e) {
             http_response_code(400);
             echo '{"message":"Value for \'target_lang\' not supported."}';
@@ -169,7 +188,7 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
             //remove a specific tag
             //$text = str_replace('<x id="6"/>', '', $demomt->translateToRot13($_POST['text']));
             //normal content:
-            $translated->text = $demomt->translateToRot13($text);
+            $translated->text = $demomt->translateToRot13($text, $isDemo);
             $result->translations[] = $translated;
         }
         
