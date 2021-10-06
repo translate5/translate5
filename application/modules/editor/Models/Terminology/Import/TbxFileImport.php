@@ -381,7 +381,15 @@ $memLog('Loaded terms:        ');
         $this->bulkTermEntry->add($newEntry);
 
         if (isset($termEntry->descrip)) {
-            $this->setAttributeTypes($termEntry->descrip, $newEntry);
+            //collect and set the descrip attributes, and check if there is a definition
+            $descrips = $this->setAttributeTypes($termEntry->descrip, $newEntry);
+            /* @var editor_Models_Terminology_TbxObjects_Attribute $descrip */
+            foreach($descrips as $descrip) {
+                if($descrip->type == 'definition') {
+                    $newEntry->definition = $descrip->value;
+                    break;
+                }
+            }
         }
 
         $this->setDiscriptGrp($termEntry,$newEntry,'termEntry');
@@ -477,8 +485,12 @@ $memLog('Loaded terms:        ');
         $newTerm->descripTarget = $parsedLangSet->descripTarget;
         $newTerm->descripType = $parsedLangSet->descripType;
 
+        //if there is a definition on languageLevel use that, if not check if there is one on entry level
         if (strtolower($parsedLangSet->descripType) === $newTerm::TERM_DEFINITION) {
             $newTerm->definition = $parsedLangSet->descrip;
+        }
+        elseif(!is_null($newTerm->definition) && !is_null($newTerm->parentEntry->definition)) {
+            $newTerm->definition = $newTerm->parentEntry->definition;
         }
 
         $hasTermNote = isset($tig->termNote);
@@ -693,9 +705,17 @@ $memLog('Loaded terms:        ');
 
             $this->setAttributeTypes($descripGrp->descrip, $tbxObject,true);
 
-            $tbxObject->descrip = (string)$descripGrp->descrip;
-            $tbxObject->descripTarget = (string)$descripGrp->descrip->attributes()->{'target'};
-            $tbxObject->descripType = (string)$descripGrp->descrip->attributes()->{'type'};
+            if($tbxObject instanceof editor_Models_Terminology_TbxObjects_Term || $tbxObject instanceof editor_Models_Terminology_TbxObjects_Langset) {
+                $tbxObject->descrip = (string)$descripGrp->descrip;
+                $tbxObject->descripTarget = (string)$descripGrp->descrip->attributes()->{'target'};
+                $tbxObject->descripType = (string)$descripGrp->descrip->attributes()->{'type'};
+            }
+
+            $setEntryDefinition = $tbxObject instanceof editor_Models_Terminology_TbxObjects_TermEntry && is_null($tbxObject->definition);
+            $isDefinition = (string)$descripGrp->descrip->attributes()->{'type'} === 'definition';
+            if($setEntryDefinition && $isDefinition) {
+                $tbxObject->definition = (string)$descripGrp->descrip;
+            }
 
             $this->setAttributeTypes($descripGrp->admin, $tbxObject,true);
 

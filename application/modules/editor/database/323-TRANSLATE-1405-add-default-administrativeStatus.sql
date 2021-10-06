@@ -39,7 +39,7 @@ INSERT INTO terms_attributes (collectionId, termEntryId, language, termId, termT
                                             termEntryGuid, langSetGuid, termGuid, guid, elementName, attrLang,
                                             isDescripGrp)
 SELECT t.collectionId, t.termEntryid, t.language, t.id as termId, t.termTbxId, @dataTypeId, 'administrativeStatus' as type,
-       m.termNoteValue as value, null as target, 1 as isCreatedLocally, null as createdBy, now() as createdAt, null as updatedBy, now() as updatedAt,
+       m.termNoteValue as value, null as target, 0 as isCreatedLocally, null as createdBy, now() as createdAt, null as updatedBy, now() as updatedAt,
        t.termEntryGuid, t.langSetGuid, t.guid as termGuid, uuid() as guid, 'termNote' as elementName, null as attrLang, 0 as isDescripGrp
 FROM terms_term t
 LEFT JOIN terms_attributes ta ON ta.termId = t.id AND ta.elementName = 'termNote' AND ta.type = 'administrativeStatus'

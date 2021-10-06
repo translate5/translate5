@@ -593,17 +593,23 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * @param array $collectionIds
      * @param string $olderThan
      * @return boolean
+     * @throws Zend_Db_Statement_Exception
      */
     public function removeProposalsOlderThan(array $collectionIds,string $olderThan): bool
     {
         // Get ids of attrs, that were created or updated after tbx-import
-        if (!$attrIdA = editor_Utils::db()->query('
+        $attrIdA = editor_Utils::db()->query('
             SELECT `id` 
             FROM `terms_attributes` 
             WHERE TRUE
               AND `isCreatedLocally` = "1" 
               AND `collectionId` IN (' . implode(',', $collectionIds) . ')
-        ')->fetchAll(PDO::FETCH_COLUMN)) return false;
+        ')->fetchAll(PDO::FETCH_COLUMN);
+
+        if (empty($attrIdA)){
+            return false;
+        }
+
 
         // Get tbx-imported values for `value` and `target` props, that now have changed values in attributes-table
         $tbxA = editor_Utils::db()->query('
@@ -622,10 +628,14 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         $affectedQty = 0;
 
         // Delete created attrs, that are older than $olderThan
-        if ($attrIdA_created) $affectedQty += $this->db->delete([
-            'createdAt < ?' => $olderThan,
-            'id in (?)' => $attrIdA_created,
-        ]);
+        if (!empty($attrIdA_created)) {
+            //this speeds incredibly up the SQL since no cast must be done in SQL then
+            $affectedQty += $this->db->delete([
+                'createdAt < ?' => $olderThan,
+                'collectionId in (?)' => $collectionIds,
+                'id in (?)' => $attrIdA_created,
+            ]);
+        }
 
         // Overwrite $attrIdA_updated array for it to keep only ids of attributes, that were last updated before $olderThan arg
         if ($attrIdA_updated) $attrIdA_updated = editor_Utils::db()->query($sql = '
