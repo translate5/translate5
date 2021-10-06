@@ -192,7 +192,7 @@ class editor_Models_Segment_AutoStates {
     
     /**
      * returns a mapping between user workflow roles, and segment auto states to be used for this role
-     * @return multitype:string
+     * @return string[]
      */
     public function getRoleToStateMap() {
         return array(

@@ -57,7 +57,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
     title:null,
 
     referenceHolder: true,
-
+    
     strings:{
         wizardTitle:'#UT#Standard-Benutzerzuweisungen',
         sourceLang: '#UT#Quellsprache',

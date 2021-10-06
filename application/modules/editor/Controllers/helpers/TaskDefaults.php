@@ -89,7 +89,7 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
         $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
 
         foreach ($defaults as $assoc){
-
+            
             $manager = ZfExtended_Factory::get('editor_Workflow_Manager');
             /* @var $manager editor_Workflow_Manager */
 
@@ -108,16 +108,20 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
             $model->setUserGuid($assoc['userGuid']);
 
             // if there is default deadline date default config, insert it as task specific config.
-            if($assoc['deadlineDate']!== null && $assoc['deadlineDate']>0){
-                $name = ['runtimeOptions','workflow',$model->getWorkflow(),$model->getWorkflowStepName(),'defaultDeadlineDate'];
-                $taskConfig->updateInsertConfig($task->getTaskGuid(),implode('.',$name),$assoc['deadlineDate']);
+            if($assoc['deadlineDate'] !== null && $assoc['deadlineDate'] > 0){
+                $name = ['runtimeOptions','workflow', $model->getWorkflow(), $model->getWorkflowStepName(), 'defaultDeadlineDate'];
+                $taskConfig->updateInsertConfig($task->getTaskGuid(), implode('.', $name), $assoc['deadlineDate']);
             }
 
             // get deadline date config and set it if exist
             $configValue = $task->getConfig(true)->runtimeOptions->workflow->{$model->getWorkflow()}->{$model->getWorkflowStepName()}->defaultDeadlineDate ?? 0;
             if($configValue > 0){
-                $model->setDeadlineDate(editor_Utils::addBusinessDays($task->getOrderdate(),$configValue));
+                $model->setDeadlineDate(editor_Utils::addBusinessDays($task->getOrderdate(), $configValue));
             }
+            // processing some trackchanges properties that can't be parted out to the trackchanges-plugin
+            $model->setTrackchangesShow($assoc['trackchangesShow']);
+            $model->setTrackchangesShowAll($assoc['trackchangesShowAll']);
+            $model->setTrackchangesAcceptReject($assoc['trackchangesAcceptReject']);
 
             $model->save();
         }

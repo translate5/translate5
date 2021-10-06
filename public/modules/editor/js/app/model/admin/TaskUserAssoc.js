@@ -56,7 +56,10 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
         {name: 'editable', type: 'boolean'},
         {name: 'assignmentDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
         {name: 'finishedDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
-        {name: 'deadlineDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT}
+        {name: 'deadlineDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+        {name: 'trackchangesShow', type: 'int'},
+        {name: 'trackchangesShowAll', type: 'int'},
+        {name: 'trackchangesAcceptReject', type: 'int'}
     ],
     validators: {
         taskGuid: 'presence',
