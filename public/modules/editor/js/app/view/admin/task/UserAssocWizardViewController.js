@@ -155,18 +155,13 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
 
     onAddAssocBtnClick : function(){
         var me=this,
-            newRecord,
+            newRecord = me.getView().getDefaultFormRecord(),
             project = me.getView().task,
             formPanel = me.lookup('assocForm'),
             form = formPanel.getForm(),
             targetLangField =  form.findField('targetLang'),
-            workflowCombo = me.getView().down('#workflowCombo'),
             hasProjectTasks = project.hasProjectTasks();
 
-        newRecord = Ext.create('Editor.model.admin.TaskUserAssoc',{
-            sourceLang : project.get('sourceLang'), // source language is always the same for projects or single tasks
-            workflow: workflowCombo.getValue()
-        });
 
         targetLangField.setVisible(hasProjectTasks);
 

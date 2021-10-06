@@ -102,7 +102,6 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                     return true;
                                 }
                             },
-                            disabled:true,
                             items:[{
                                 xtype: 'languagecombo',
                                 name: 'sourceLang',
@@ -220,6 +219,19 @@ Ext.define('Editor.view.admin.user.Assoc', {
      */
     getCustomer: function(){
         return this.customer;
+    },
+
+    /***
+     * Get default assoc form record
+     * @returns {Editor.model.admin.UserAssocDefault}
+     */
+    getDefaultFormRecord:function (){
+        var me=this;
+        return Ext.create('Editor.model.admin.UserAssocDefault',{
+            customerId : me.getCustomer().get('id'),
+            deadlineDate:null,
+            workflow: me.down('#workflowCombo').getValue()
+        });
     },
 
     /***

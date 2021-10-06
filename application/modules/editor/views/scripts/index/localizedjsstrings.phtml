@@ -336,14 +336,14 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_stopWatchingSegment = '<?php echo $this->translate->_('Segment von Lesezeichenliste entfernen (STRG + D)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_scrollToSegment = '<?php echo $this->translate->_('Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNextFiltered = '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment im Workflow öffnen (STRG + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNextFiltered = '<?php echo $this->translate->_('Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren (STRG + ALT + ←)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren (STRG + ALT + →)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_next = '<?php echo $this->translate->_('Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern und nächstes bearbeitbares Segment im Workflow öffnen (ALT + Bild ↓)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment im Workflow öffnen (ALT + Bild ↑)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_whitespaceButtonGroup= '<?php echo $this->translate->_('Sonderzeichen hinzufügen:');?>';
    
    Ext.define("Editor.locale.de.view.segments.MetaPanel", {
@@ -681,10 +681,21 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.help.HelpWindow", {
         override: "Editor.view.help.HelpWindow",
         strings:{
-        	cbDoNotShowAgainLabel: '<?php echo $this->translate->_('Dieses Fenster nicht mehr automatisch anzeigen.');?>'
+        	cbDoNotShowAgainLabel: '<?php echo $this->translate->_('Dieses Fenster nicht mehr automatisch anzeigen.');?>',
+            documentationTitle: '<?php echo $this->translate->_('PDF Dokumentation');?>'
         }
     });
-    
+
+    Ext.define("Editor.locale.de.view.help.Documentation", {
+        override: "Editor.view.help.Documentation",
+        strings:{
+            btnOpenInBrowserText: '<?php echo $this->translate->_('In neuem Browser-Tab öffnen');?>'
+        }
+    });
+
+
+    btnOpenInBrowserText:'#UT#im Browser öffnen'
+
     Ext.define("Editor.locale.de.view.admin.task.filter.DateFilter", {
         override: "Editor.view.admin.task.filter.DateFilter",
         strings:{
@@ -1608,6 +1619,16 @@ Ext.define('Editor.controller.Localizer', {
             title: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
         }
     });
+    Ext.define("Editor.locale.view.LanguageResources.TbxExport", {
+        override: "Editor.view.LanguageResources.TbxExport",
+        strings: {
+            tbxBasicOnlyLabel: '<?php echo $this->translate->_('Nur TBX Basic Standardattribute + processStatus exportieren');?>',
+            exportImagesLabel: '<?php echo $this->translate->_('Bilder im Hex-Format exportieren, eingebettet in TBX');?>',
+            exportButtonText: '<?php echo $this->translate->_('Exportieren');?>',
+            cancelButtonText: '<?php echo $this->translate->_('Abbrechen');?>',
+            title: '<?php echo $this->translate->_('Als TBX exportieren');?>'
+        }
+    });
     Ext.define("Editor.locale.controller.TaskAssoc", {
         override: "Editor.controller.LanguageResourcesTaskassoc",
         strings: {
@@ -1671,7 +1692,8 @@ Ext.define('Editor.controller.Localizer', {
             collection: '<?php echo $this->translate->_('TBX-Datei');?>',
             importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
             useAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert');?>',
-            writeAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden');?>'
+            writeAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden');?>',
+            collectionUploadTooltip: '<?php echo $this->translate->_('Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.');?>'
         }
     });
     
@@ -1741,14 +1763,23 @@ Ext.define('Editor.controller.Localizer', {
         	defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
         	useAsDefault: '<?php echo $this->translate->_('Leserechte standardmäßig');?>',
         	writeAsDefault: '<?php echo $this->translate->_('Schreibrechte standardmäßig');?>',
-            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>'
+            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
+            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
+            specificDataText: '<?php echo $this->translate->_('Zusätzliche Infos');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.view.LanguageResources.TermCollectionExportActionMenu", {
+        override: "Editor.view.LanguageResources.TermCollectionExportActionMenu",
+        strings: {
+            exportProposal: '<?php echo $this->translate->_('Vorschläge exportieren');?>',
+            exportCollection: '<?php echo $this->translate->_('Als TBX exportieren');?>'
         }
     });
 
     Ext.define("Editor.locale.view.LanguageResources.services.TermCollection", {
         override: "Editor.view.LanguageResources.services.TermCollection",
-        addTooltip: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen');?>',
-        exportTooltip: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
+        addTooltip: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen');?>'
     });
 
     Ext.define("Editor.locale.view.LanguageResources.services.Default", {
@@ -1793,7 +1824,8 @@ Ext.define('Editor.controller.Localizer', {
             deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
             helpButtonTooltip:'<?php echo $this->translate->_('Info zum Term-Collection');?>',
             deleteTermProposalsDate:'<?php echo $this->translate->_('Vorschläge löschen, deren letzte Berührung länger her ist als');?>',
-            deleteTermProposalsImport:'<?php echo $this->translate->_('Vorschläge löschen älter als aktueller Import');?>'
+            deleteTermProposalsImport:'<?php echo $this->translate->_('Vorschläge löschen älter als aktueller Import');?>',
+            collectionUploadTooltip: '<?php echo $this->translate->_('Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.');?>'
         }
     });
     

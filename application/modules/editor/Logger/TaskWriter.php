@@ -43,6 +43,12 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
         // we clone the event so that we can delete the task afterwards without modifying the real event perhaps used later in another writer
         $event = clone $event;
         $task = $event->extra['task'];
+
+        $id = $task->getId();
+        if(empty($id)) {
+            return;
+        }
+
         /* @var $task editor_Models_Task */
         $taskLog = ZfExtended_Factory::get('editor_Models_Logger_Task');
         /* @var $taskLog editor_Models_Logger_Task */
@@ -68,7 +74,7 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
         try {
             $taskLog->save();
         }
-        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+        catch(Throwable $e) {
             //do nothing here! The error itself was logged in the system log,
             // the task seems to be deleted in the meantime, so no need and way to log it here
             // this can happen for example if error happens in a worker (async from GUI),

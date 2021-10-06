@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -41,7 +41,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
      * @var editor_Models_Segment
      */
     protected $entity;
-    
+
     /**
      * Number to divide the segment duration
      *
@@ -76,7 +76,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     {
         return editor_Models_SegmentFieldManager::getForTaskGuid($taskGuid);
     }
-    
+
     public function indexAction() {
         
         $taskGuid = $this->session->taskGuid;
@@ -709,11 +709,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
 
         //Erstellung und Setzen der Nutzdaten:
         $session = new Zend_Session_Namespace();
-        $terms = ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $terms editor_Models_Term */
+        $terms = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $terms editor_Models_Terminology_Models_TermModel */
         $this->view->publicModulePath = APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module');
         $this->view->termGroups = $terms->getByTaskGuidAndSegment($session->taskGuid, (int)$this->_getParam('id'));
-        $this->view->termStatMap = editor_Models_Term::getTermStatusMap();
+        $this->view->termStatMap = editor_Models_Terminology_Models_TermModel::getTermStatusMap();
         $this->view->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
 

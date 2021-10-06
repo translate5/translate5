@@ -48,6 +48,7 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.ImportCollectionWindow',
         'Editor.view.LanguageResources.log.LogWindow',
         'Editor.view.LanguageResources.ProposalExport',
+        'Editor.view.LanguageResources.TbxExport',
         'Editor.view.LanguageResources.services.Default'
     ],
     models: ['Editor.model.admin.Task', 'Editor.model.LanguageResources.Resource','Editor.model.LanguageResources.LanguageResource'],
@@ -122,6 +123,9 @@ Ext.define('Editor.controller.TmOverview', {
             },
             'addTmWindow filefield[name="tmUpload"]': {
                 change: 'handleChangeImportFile'
+            },
+            '#termCollectionExportActionMenu': {
+                click: 'onTermCollectionExportActionMenuClick'
             }
         },
         store: {
@@ -138,6 +142,13 @@ Ext.define('Editor.controller.TmOverview', {
      * Task to check the records to be imported
      */
     checkImportingRecordsTask: null,
+
+    /***
+     * Action menu cache component for term collection export
+     */
+    exportTcMenuCache: [],
+
+
     init: function() {
         var me = this;
         //add the taskassocs field to the task model
@@ -394,7 +405,7 @@ Ext.define('Editor.controller.TmOverview', {
                     me.handleDeleteTm(view,cell,col,newRecord);
                     break;
                 case 'export':
-                    me.handleExportProposalClick(view,cell,col,newRecord);
+                    me.showTermCollectionActionMenu(newRecord,ev);
                     break;
                 case 'log':
                     me.handleLogTm(view,cell,col,newRecord);
@@ -582,14 +593,64 @@ Ext.define('Editor.controller.TmOverview', {
         });
         return labels.join(',');
     },
-    
-    /***
-     * Export proposals action button click handler
+
+    /**+
+     * Show termcollection action menu
+     *
+     * @param newRecord
+     * @param event
      */
-    handleExportProposalClick:function(view, cell, cellIdx, rec){
+    showTermCollectionActionMenu: function (newRecord,event) {
+        var me = this,
+            menu = me.exportTcMenuCache.termCollectionExportActionMenu;
+
+        if (!menu) {
+            //create fresh menu instance
+            me.exportTcMenuCache.termCollectionExportActionMenu = menu = Ext.widget('termCollectionExportActionMenu');
+        }
+        menu.record = newRecord;
+        menu.showAt(event.getXY());
+    },
+
+    /***
+     * Collection export action menu event handler
+     * @param com
+     * @param item
+     * @param ev
+     */
+    onTermCollectionExportActionMenuClick:function (com, item, ev) {
+        var me = this,
+            action = item && item.action;
+
+        if (!me[action] || !Ext.isFunction(me[action])) {
+            return;
+        }
+
+        me[action](com.record);
+    },
+
+    /***
+     * Export proposal action menu click handler
+     *
+     * @param rec
+     */
+    exportProposal:function(rec){
     	var proposalWindow=Ext.create('Editor.view.LanguageResources.ProposalExport',{
     		record:rec
     	});
     	proposalWindow.show();
+    },
+
+    /***
+     * Export collection action menu click handler
+     *
+     * @param rec
+     */
+    exportCollection:function (rec){
+        var tbxWindow=Ext.create('Editor.view.LanguageResources.TbxExport',{
+            record:rec
+        });
+        tbxWindow.show();
     }
+
 });

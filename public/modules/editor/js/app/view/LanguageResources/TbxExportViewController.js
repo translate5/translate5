@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,14 +26,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_Term_AttributeProposal extends ZfExtended_Models_Validator_Abstract {
-  /**
-   * Validators for Term Attributes
-   */
-  protected function defineValidators() {
-    $this->addValidator('id', 'int');
-    $this->addValidator('value', 'stringLength', array('min' => 0, 'max' => 65535));
-    $this->addDontValidateField('collectionId');
-    $this->addDontValidateField('attributeId');
-  }
-}
+/**
+ * @class Editor.view.LanguageResources.TbxExportViewController
+ * @extends Ext.app.ViewController
+ */
+Ext.define('Editor.view.LanguageResources.TbxExportViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.tbxexport',
+    
+    /***
+     * Export term and term attribute proposals for the given collection id.
+     * All terms and attributes younger than the export date will be exported.
+     */
+    exportTbx:function(tbxBasicOnly, exportImages, record) {
+    	var params = {},
+	    	url = Editor.data.restpath+'languageresourceinstance/tbxexport?';
+		tbxBasicOnly.up('window').destroy();
+		params['collectionId'] = record.get('id');
+	  	params['tbxBasicOnly'] = tbxBasicOnly.getValue() ? 1 : 0;
+	  	params['exportImages'] = exportImages.getValue() ? 1 : 0;
+	  	window.open(url+Ext.urlEncode(params));
+    }
+});

@@ -37,7 +37,7 @@ export DO_CAPTURE=$DO_CAPTURE
 
 # starting test suite:
 
-if phpunit --atleast-version 8.0.0; then 
+if phpunit --atleast-version 8.0.0; then
     phpunit --colors --verbose --cache-result-file ${APPLICATION_ROOT}application/modules/editor/testcases/.phpunit.result.cache  --include-path $INCLUDES --bootstrap bootstrap.php $TO_RUN
     exit $?
 else

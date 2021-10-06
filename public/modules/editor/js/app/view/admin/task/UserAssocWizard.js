@@ -158,6 +158,18 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
     },
 
     /***
+     * Get default assoc form record
+     * @returns {Editor.model.admin.TaskUserAssoc}
+     */
+    getDefaultFormRecord:function (){
+        var me=this;
+        return Ext.create('Editor.model.admin.TaskUserAssoc',{
+            sourceLang : me.task.get('sourceLang'), // source language is always the same for projects or single tasks
+            workflow: me.down('#workflowCombo').getValue()
+        });
+    },
+
+    /***
      * Load the assoc data based on the current projectId and workflow
      */
     loadAssocData : function (){

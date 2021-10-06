@@ -306,7 +306,7 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
             "editor"=>2,
             //WARNING: just adding and changing (admin / pm) integers is not possible.
             // the values must also respected in the GUI and application
-            //"termCustomerSearch"=>4,
+            //"termSearch"=>4,
             //"termProposer"=>8,
             //"instantTranslate"=>16,
             "pm"=>4, // was 32

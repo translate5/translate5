@@ -46,14 +46,14 @@
 						<admin type="projectSubset" target="3b9a499d-7264-40df-a26e-60a9555efc8f">18-00056_Gravitrax_12x </admin>
 						<admin type="projectSubset" target="aabea2bc-2e34-4a24-81cc-6366b35826f4">Testprojekt_DXF </admin>
 						<transacGrp>
-							<transac>creation </transac>
-							<date>2018-01-12 </date>
-							<transacNote type="responsiblePerson">Aleksandar Mitrev </transacNote>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
 						</transacGrp>
 						<transacGrp>
-							<transac>modification </transac>
-							<date>2018-01-12 </date>
-							<transacNote type="responsiblePerson">Aleksandar Mitrev </transacNote>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
 						</transacGrp>
 					</tig>
 					<tig>

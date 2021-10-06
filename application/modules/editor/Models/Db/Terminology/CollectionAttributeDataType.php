@@ -26,14 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_Term_Proposal extends ZfExtended_Models_Validator_Abstract {
-  /**
-   * Validators for Terms
-   */
-  protected function defineValidators() {
-    $this->addValidator('id', 'int');
-    $this->addValidator('term', 'stringLength', array('min' => 0, 'max' => 16386));
-    $this->addDontValidateField('collectionId');
-    $this->addDontValidateField('termId');
-  }
+class editor_Models_Db_Terminology_CollectionAttributeDataType extends Zend_Db_Table_Abstract {
+    protected $_name    = 'terms_collection_attribute_datatype';
+    public $_primary = 'id';
 }

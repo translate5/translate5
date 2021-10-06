@@ -66,6 +66,11 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
             '#userGuid':{
                 change:'checkDuplicates'
             }
+        },
+        store:{
+            '#admin.UserAssocDefault':{
+                load:'onAdminUserAssocDefaultStoreLoad'
+            }
         }
     },
 
@@ -73,6 +78,7 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
         deleteUserMessage:'#UT#Soll dieser Eintrag wirklich gelöscht werden?',
         deleteUserTitle:'#UT#Eintrag löschen?'
     },
+
     onSaveAssocBtnClick : function(){
         var me = this,
             formPanel = me.lookup('assocForm'),
@@ -138,6 +144,7 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
     onReloadAssocBtnClick : function (){
         var me=this;
         me.getView().down('grid').getStore().load();
+        me.resetRecord();
     },
 
     onAssocGridSelect: function (grid,record) {
@@ -146,6 +153,14 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
         form.getForm().loadRecord(record.clone());
         form.setDisabled(false);
     },
+
+    /***
+     * On default user assoc store load event handler
+     */
+    onAdminUserAssocDefaultStoreLoad:function (){
+        this.resetRecord();
+    },
+
 
     /***
      * On workflow step name change event handler
@@ -232,9 +247,8 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
             formPanel = me.lookup('assocForm'),
             form = formPanel.getForm();
         if(!record){
-            record = Ext.create('Ext.data.Model');
+            record = me.getView().getDefaultFormRecord();
         }
         form.loadRecord(record);
-        formPanel.setDisabled(true);
     }
 });

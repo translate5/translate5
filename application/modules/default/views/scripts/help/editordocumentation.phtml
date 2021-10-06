@@ -25,15 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+$locale=$_REQUEST['lang'] ?? 'en';
+?>
 
-class editor_Models_Validator_TermCollection_TermAttributesLabel extends ZfExtended_Models_Validator_Abstract {
-  
-  /**
-   * Validators for Term Collection
-   */
-  protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible 
-    $this->addValidator('id', 'int');
-    $this->addValidator('label', 'stringLength', array('min' => 0, 'max' => 100));
-  }
-}
+<iframe width="100%" height="100%" src="/documentation/Translate5 Guide <?php echo strtoupper($locale);?>.pdf" </iframe>
