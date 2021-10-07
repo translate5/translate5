@@ -25,5 +25,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-UPDATE `LEK_customer` SET `openIdServerRoles` = REPLACE(`roles`, "termCustomerSearch", "termSearch");
-UPDATE `LEK_customer` SET `openIdDefaultServerRoles` = REPLACE(`roles`, "termCustomerSearch", "termSearch");
+UPDATE `LEK_customer` SET `openIdServerRoles` = REPLACE(`openIdServerRoles`, "termCustomerSearch", "termSearch");
+UPDATE `LEK_customer` SET `openIdDefaultServerRoles` = REPLACE(`openIdDefaultServerRoles`, "termCustomerSearch", "termSearch");
