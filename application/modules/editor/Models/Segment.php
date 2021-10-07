@@ -194,6 +194,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     protected $tagsModel = null;
     
     /**
+     * @var editor_Models_Segment_UtilityBroker
+     */
+    protected editor_Models_Segment_UtilityBroker $utilityBroker;
+    
+    /**
      * static so that only one instance is used, for performance and logging issues
      * @var editor_Models_Segment_PixelLength
      */
@@ -204,6 +209,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     public function __construct()
     {
+        $this->utilityBroker = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        //FIXME replace all helpers with UtilityBroker usage if possible
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
@@ -469,7 +476,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
                 $this->isDataModified = true;
             } else {
                 // when the text-contents are identical we check, if this may is a removal initiated by the accept/reject feature of trackchanges
-                if($data->edited == $this->trackChangesTagHelper->removeTrackChanges($oldValue)){
+                // therefore we compare the available track-changes tags, if they differ somehow the content was not modified
+                if($this->utilityBroker->trackChangeTag->getUsedTagInfo($oldValue) !== $this->utilityBroker->trackChangeTag->getUsedTagInfo($data->edited)){
                     $this->isDataModified = true;
                 }
             }
