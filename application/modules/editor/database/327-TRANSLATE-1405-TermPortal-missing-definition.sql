@@ -30,3 +30,6 @@ UPDATE terms_term t
     JOIN terms_attributes ta on t.termEntryId = ta.termEntryId AND ta.language is null AND ta.elementName = 'descrip' AND ta.type = 'definition'
 SET t.definition = ta.value
 where t.definition = '';
+
+INSERT IGNORE INTO Zf_acl_rules (module, role, resource, `right`)
+VALUES ('editor', 'termSearch', 'editor_index', 'pluginpublic');
