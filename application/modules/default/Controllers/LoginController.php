@@ -106,7 +106,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         //TODO: after itranslate route is changed to itranslate to instanttranslate here
         if (preg_match('~^#(termportal|itranslate)~', $hash) && $isTermPortalAllowed) {
             // Do redirect
-            //$this->applicationRedirect(substr($hash, 1), true);
+            $this->applicationRedirect(substr($hash, 1), true);
         }
 
         if($acl->isInAllowedRoles($roles, 'initial_page','editor')) {
