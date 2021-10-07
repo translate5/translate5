@@ -962,7 +962,7 @@ class editor_AttributeController extends ZfExtended_RestController
                 // Replicate new value of definition-attribute to `terms_term`.`definition` where needed
                 // and return array containing new value and ids of affected `terms_term` records for
                 // being able to apply that on client side
-                $data['definition'] = $attrM->replicateDefinition($params['value']);
+                $data['definition'] = $attrM->replicateDefinition('updated');
             }
         }
 

@@ -575,25 +575,10 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             }
         }
 
-        // If attribute's `type` is 'definition'
-        if ($this->getType() == 'definition') {
-
-            // If it's a language-level definition - get termEntry-level
-            // definition-attribute to be used as a replacement or just use null
-            $value = $this->getLanguage()
-                ? $this->db->getAdapter()->query('
-                    SELECT `value` 
-                    FROM `terms_attributes` 
-                    WHERE 1
-                      AND `termEntryId` = ? 
-                      AND ISNULL(`language`) 
-                      AND `type` = "definition"
-                  ', $this->getTermEntryId())->fetchColumn()
-                : null;
-
-            // Replicate new definition value across terms identified by give ids
-            $return['definition'] = ['value' => $value, 'affected' => $this->_replicateDefinition($value)];
-        }
+        // If attribute's `type` is 'definition' - check whether we should update `terms_term`.`definition`
+        // and if yes, what should be the new value and what terms should be affected
+        if ($this->getType() == 'definition')
+            $return['definition'] = $this->replicateDefinition('deleted');
 
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
         if ($misc['userName'])
@@ -896,21 +881,36 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * Replicate new value of definition attribute to `terms_term`.`definition` where needed
      * and return array containing new value and ids of affected `terms_term` records for
      * being able to apply that on client side
-     */
-    public function replicateDefinition($value) {
-
-        // Replicate new definition value across all needed terms
-        return ['value' => $value, 'affected' => $this->_replicateDefinition($value)];
-    }
-
-    /**
+     *
      * Accepts a definition text as a first arg and spread it across
      * `terms_term`.`definition` where need according to the agreed logic
      *
      * @param $definition
      */
-    protected function _replicateDefinition($value) {
+    public function replicateDefinition($event) {
 
+        // If $event is 'deleted'
+        if ($event == 'deleted') {
+
+            // If it's a language-level definition-attribute is going to be deleted
+            // get termEntry-level definition-attribute to be used as a replacement
+            // or just use null
+            $value = $this->getLanguage() ? $this->_entryLevelDef() : null;
+
+        // Else if $event is 'updated'
+        } else if ($event == 'updated') {
+
+            // If we updated the language-level definition-attribute
+            $value = $this->getLanguage()
+
+                // Use new value if not empty, or termEntry-level one otherwise
+                ? ($this->getValue() ?: $this->_entryLevelDef())
+
+                // Else if we updated termEntry-level one - use the value we have
+                : $this->getValue();
+        }
+
+        i('here3', 'a');
         // Prepare query bindings
         $bind = [$this->getTermEntryId()];
 
@@ -919,8 +919,11 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         // otherwise we need to replicate definition to all terms, that have
         // no definition-attribute on their language-level, or have but it's empty,
         // so we find the languages matching that criteria within current termEntry
-        $bind []= $this->getLanguage() ?: join(',', $this->_getLanguagesWithNoOrEmptyDefinition());
+        $bind []= $this->getLanguage()
+            ? $this->getLanguage()
+            : join(',', $this->_getLanguagesWithNoOrEmptyDefinition());
 
+        i($bind, 'a');
         // Get ids of terms, that will be affected
         $termIdA = $this->db->getAdapter()->query('
             SELECT `id` 
@@ -947,7 +950,24 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         }
 
         // Return
-        return $affected;
+        return ['value' => $value, 'affected' => $affected];
+    }
+
+    /**
+     * Get the value of termEntry-level definition attribute
+     *
+     * @return string
+     * @throws Zend_Db_Statement_Exception
+     */
+    protected function _entryLevelDef() {
+        return $this->db->getAdapter()->query('
+            SELECT `value` 
+            FROM `terms_attributes` 
+            WHERE 1
+              AND `termEntryId` = ? 
+              AND ISNULL(`language`) 
+              AND `type` = "definition"
+        ', $this->getTermEntryId())->fetchColumn();
     }
 
     /**
@@ -961,16 +981,20 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      */
     protected function _getLanguagesWithNoOrEmptyDefinition() {
         return $this->db->getAdapter()->query('
-            SELECT 
-              `ta`.`language`, 
+            SELECT
+              `t`.`language`,
+              COUNT(`ta`.`id`) AS `qty`,
               MAX(IFNULL(`ta`.`TYPE` = "definition", 0)) AS `hasDef`,
-              MAX(`ta`.`type` = "definition" AND `ta`.`value` = "") AS `butEmpty`
-            FROM `terms_attributes` ta 
-            WHERE 1
-              AND `termEntryId` = ? 
-              AND NOT ISNULL(`language`)
-              AND ISNULL(`termId`)
-            GROUP BY `language`
+              MAX(IFNULL(`ta`.`TYPE` = "definition", 0) AND IFNULL(`ta`.`value`, "") = "") AS `butEmpty`
+            FROM 
+              `terms_term` `t`
+              LEFT JOIN `terms_attributes` `ta` ON (
+                    `ta`.`termEntryId` = `t`.`termEntryId` 
+                AND `t`.`language` = `ta`.`language` 
+                AND ISNULL(`ta`.`termId`)
+              )
+            WHERE `t`.`termEntryId` = ?
+            GROUP BY `t`.`language`
             HAVING `hasDef` = 0 OR `butEmpty` = 1
         ', $this->getTermEntryId())->fetchAll(PDO::FETCH_COLUMN);
     }
