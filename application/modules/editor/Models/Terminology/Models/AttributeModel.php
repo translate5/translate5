@@ -575,9 +575,29 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             }
         }
 
+        // If attribute's `type` is 'definition'
+        if ($this->getType() == 'definition') {
+
+            // If it's a language-level definition - get termEntry-level
+            // definition-attribute to be used as a replacement or just use null
+            $value = $this->getLanguage()
+                ? $this->db->getAdapter()->query('
+                    SELECT `value` 
+                    FROM `terms_attributes` 
+                    WHERE 1
+                      AND `termEntryId` = ? 
+                      AND ISNULL(`language`) 
+                      AND `type` = "definition"
+                  ', $this->getTermEntryId())->fetchColumn()
+                : null;
+
+            // Replicate new definition value across terms identified by give ids
+            $return['definition'] = ['value' => $value, 'affected' => $this->_replicateDefinition($value)];
+        }
+
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
         if ($misc['userName'])
-            $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
+            $return['updated'] = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage());
 
         // Call parent
@@ -877,10 +897,19 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * and return array containing new value and ids of affected `terms_term` records for
      * being able to apply that on client side
      */
-    public function replicateDefinition() {
+    public function replicateDefinition($value) {
 
-        // Append 'definition' key to the return data array
-        $data = ['value' => $this->getValue(), 'affected' => []];
+        // Replicate new definition value across all needed terms
+        return ['value' => $value, 'affected' => $this->_replicateDefinition($value)];
+    }
+
+    /**
+     * Accepts a definition text as a first arg and spread it across
+     * `terms_term`.`definition` where need according to the agreed logic
+     *
+     * @param $definition
+     */
+    protected function _replicateDefinition($value) {
 
         // Prepare query bindings
         $bind = [$this->getTermEntryId()];
@@ -890,7 +919,48 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         // otherwise we need to replicate definition to all terms, that have
         // no definition-attribute on their language-level, or have but it's empty,
         // so we find the languages matching that criteria within current termEntry
-        $bind []= $this->getLanguage() ?: join(',', $this->db->getAdapter()->query('
+        $bind []= $this->getLanguage() ?: join(',', $this->_getLanguagesWithNoOrEmptyDefinition());
+
+        // Get ids of terms, that will be affected
+        $termIdA = $this->db->getAdapter()->query('
+            SELECT `id` 
+            FROM `terms_term` 
+            WHERE `termEntryId` = ? AND FIND_IN_SET(`language`, ?)
+        ', $bind)->fetchAll(PDO::FETCH_COLUMN);
+
+        // Affected term ids array
+        $affected = [];
+
+        // Get term model
+        $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+
+        // Foreach termId
+        foreach ($termIdA as $termId) {
+
+            // Load term and update definition, involving history-record creation
+            $termM->load($termId);
+            $termM->setDefinition($value);
+            $termM->update();
+
+            //
+            $affected []= $termId;
+        }
+
+        // Return
+        return $affected;
+    }
+
+    /**
+     * Get array of languages (within current termEntryId) that have no definition-attribute,
+     * or have but it's empty. This is an internal-purpose method, that is used to build the
+     * WHERE clause to identify terms_term-records that termEntry-level definition-attribute
+     * can be replicated across as a value of `definition` column
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    protected function _getLanguagesWithNoOrEmptyDefinition() {
+        return $this->db->getAdapter()->query('
             SELECT 
               `ta`.`language`, 
               MAX(IFNULL(`ta`.`TYPE` = "definition", 0)) AS `hasDef`,
@@ -902,56 +972,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
               AND ISNULL(`termId`)
             GROUP BY `language`
             HAVING `hasDef` = 0 OR `butEmpty` = 1
-        ', $this->getTermEntryId())->fetchAll(PDO::FETCH_COLUMN));
-
-        // Get ids of terms, that will be affected
-        $termIdA = $this->db->getAdapter()->query('
-            SELECT `id` 
-            FROM `terms_term` 
-            WHERE `termEntryId` = ? AND FIND_IN_SET(`language`, ?)
-        ', $bind)->fetchAll(PDO::FETCH_COLUMN);
-
-        // Get term model
-        $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-
-        // Foreach termId
-        foreach ($termIdA as $termId) {
-
-            // Load term and update definition, involving history-record creation
-            $termM->load($termId);
-            $termM->setDefinition($this->getValue());
-            $termM->update();
-
-            //
-            $data['affected'] []= $termId;
-        }
-
-        // If it's a language-level definition
-        /*if ($this->getLanguage()) {
-
-
-            // Replicate it into `definition` column for all terms within current termEntry having same language
-            editor_Utils::db()->query('
-                UPDATE `terms_term` SET `definition` = ? WHERE `termEntryId` = ? AND `language` = ?
-            ', [
-                $this->getValue(),
-                $this->getTermEntryId(),
-                $this->getLanguage(),
-            ]);
-
-        // Else if it's a termEntry-level definition
-        } else {
-
-            // Replicate it into `definition` column for all terms within current termEntry having emtpy cell there so far
-            editor_Utils::db()->query('
-                UPDATE `terms_term` SET `definition` = ? WHERE `termEntryId` = ? AND `definition` = ""
-            ', [
-                $this->getValue(),
-                $this->getTermEntryId(),
-            ]);
-        }*/
-
-        // Return
-        return $data;
+        ', $this->getTermEntryId())->fetchAll(PDO::FETCH_COLUMN);
     }
 }

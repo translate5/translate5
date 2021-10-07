@@ -193,13 +193,13 @@ class editor_AttributeController extends ZfExtended_RestController
         // Create `terms_attributes` model instance
         $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
         $a->load($params['attrId']);
-        $updated = $a->delete($misc = [
+        $data = $a->delete($misc = [
             'userName' => $this->_session->userName,
             'userGuid' => $this->_session->userGuid,
         ]);
 
         // Flush response data
-        $this->view->assign(['updated' => $updated]);
+        $this->view->assign($data);
 
         // Update
         ZfExtended_Factory
@@ -962,7 +962,7 @@ class editor_AttributeController extends ZfExtended_RestController
                 // Replicate new value of definition-attribute to `terms_term`.`definition` where needed
                 // and return array containing new value and ids of affected `terms_term` records for
                 // being able to apply that on client side
-                $data['definition'] = $attrM->replicateDefinition();
+                $data['definition'] = $attrM->replicateDefinition($params['value']);
             }
         }
 
