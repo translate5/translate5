@@ -345,7 +345,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         }
 
         $hash = $this->_session->redirecthash;
-        if(preg_match('~^#name=(termportal|instanttranslate)~', $hash, $matches)){
+        if(preg_match('~^#name=(termportal|instanttranslate|itranslate)~', $hash, $matches)){
             // Drop redirecthash prop from session
             $this->_session->redirecthash = '';
             $hash = $matches[1];
