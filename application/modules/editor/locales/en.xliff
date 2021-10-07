@@ -4205,6 +4205,7 @@ The following task was imported with errors / warnings / notices. Please take ca
   <target>Hide project description</target>
 </trans-unit>
 <trans-unit id='VGVybVNlYXJjaA=='><source>TermSearch</source><target>Term search</target></trans-unit>
+<trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermCustomerSearch</source><target>Term search</target></trans-unit>
 <trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>Propose terms</target></trans-unit>
 <trans-unit id='VGVybVJldmlld2Vy'><source>TermReviewer</source><target>Review terms</target></trans-unit>
 <trans-unit id='VGVybUZpbmFsaXplcg=='><source>TermFinalizer</source><target>Finalize terms</target></trans-unit>
