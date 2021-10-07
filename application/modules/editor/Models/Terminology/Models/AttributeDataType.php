@@ -105,7 +105,7 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
     public function getIdsForTerms(array $labelTypeList): array {
         //we load all datatypes for the given labels / elementNames and filter them then on PHP level
         $s = $this->db->select()
-            ->from($this->db, ['id', 'label', 'level']);
+            ->from($this->db, ['id', 'label', 'type']);
 
         foreach($labelTypeList as $key) {
             $parts = explode('#', $key);
@@ -116,7 +116,7 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
             else {
                 $s->where('type = ?', $parts[1]);
             }
-            $s->where($this->db->getAdapter()->quoteInto('FIND_IN_SET( "term" ,level)>0 )'));
+            $s->where('FIND_IN_SET( "term" ,level)>0 )');
         }
 
         $dbResult = $this->db->fetchAll($s)->toArray();
