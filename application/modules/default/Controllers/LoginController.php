@@ -100,7 +100,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
         $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
 
-        $hash = $this->handleRedirectHash();
+        $hash = $this->handleAppsRedirectHash();
 
         // If user was not logged in during the attempt to load termportal, but now is logged and allowed to do that
         //TODO: after itranslate route is changed to itranslate to instanttranslate here
@@ -338,14 +338,18 @@ class LoginController extends ZfExtended_Controllers_Login {
         $renderer->view->headScript()->appendScript($openIdScript);
     }
 
-    protected function handleRedirectHash(){
+    /**
+     * Parse and adjust the redirect hash when the current request is for terportal/instant-translate
+     * @return mixed|string|null
+     */
+    protected function handleAppsRedirectHash(){
 
         if(!isset($this->_session->redirecthash)){
             return null;
         }
 
         $hash = $this->_session->redirecthash;
-        if(preg_match('~^#name=(termportal|instanttranslate|itranslate)~', $hash, $matches)){
+        if(preg_match('~^#name=(termportal|instanttranslate)~', $hash, $matches)){
             // Drop redirecthash prop from session
             $this->_session->redirecthash = '';
             $hash = $matches[1];
