@@ -54,5 +54,7 @@ SET unique_checks=1;
 SET foreign_key_checks=1;
 SET autocommit=1;
 
+INSERT IGNORE INTO `terms_collection_attribute_datatype` (collectionId,dataTypeId) (SELECT collectionId,dataTypeId FROM `terms_attributes` group by collectionId,dataTypeId);
+
 -- migration of the existing other values (across picklists, normativeAuthorization)
 -- is not needed since they was setting the term status on import and term status could not be changed.

@@ -233,7 +233,7 @@ UPDATE `terms_attributes_datatype` SET `l10nCustom` = '{"de":"","en":""}' WHERE 
 UPDATE `terms_attributes_datatype` SET `isTbxBasic` = '1' WHERE `type` = 'processStatus' LIMIT 1;
 
 # fill the collection to data type assoc table
-INSERT INTO `terms_collection_attribute_datatype` (collectionId,dataTypeId) (SELECT collectionId,dataTypeId FROM `terms_attributes` group by collectionId,dataTypeId);
+INSERT IGNORE INTO `terms_collection_attribute_datatype` (collectionId,dataTypeId) (SELECT collectionId,dataTypeId FROM `terms_attributes` group by collectionId,dataTypeId);
 
 call translate5Logger('fix some values and update the datatype collection mapping.');
 call translate5Logger('datatype migration is done - FINISHED OVERALL MIGRATION');
