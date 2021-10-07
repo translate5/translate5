@@ -100,13 +100,10 @@ class LoginController extends ZfExtended_Controllers_Login {
         $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
         $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
 
-        // If user was not logged in during the attempt to load termportal, but now is logged and allowed to do that
-        if (($hash = $this->_session->redirecthash)
-            && preg_match('~^#(termportal|itranslate)~', $hash)
-            && $isTermPortalAllowed) {
+        $hash = $this->handelRedirectHash();
 
-                // Drop redirecthash prop from session
-                $this->_session->redirecthash = '';
+        // If user was not logged in during the attempt to load termportal, but now is logged and allowed to do that
+        if (preg_match('~^#(termportal|instanttranslate)~', $hash) && $isTermPortalAllowed) {
 
                 // Do redirect
                 $this->applicationRedirect(substr($hash, 1), true);
@@ -146,8 +143,24 @@ class LoginController extends ZfExtended_Controllers_Login {
         throw new ZfExtended_NoAccessException("No initial_page resource is found.");
         exit;
     }
-    
+
+    /***
+     * Redirect to one of the existing applications (termportal or instanttranslate)
+     *
+     * @param string $applicationName application name
+     * @param null $isTermPortalAllowed is the user allowed to see termportal by acl
+     * @throws Zend_Exception
+     */
     protected function applicationRedirect(string $applicationName, $isTermPortalAllowed = null){
+
+        $pluginmanager = Zend_Registry::get('PluginManager');
+        /* @var $pluginmanager ZfExtended_Plugin_Manager */
+        $plugins = $pluginmanager->getAvailable();
+        $termPortalEnabled = in_array('TermPortal',$plugins);
+
+        // is term portal allowed when the user has termportal rights and the termportal plugin is enabled
+        $isTermPortalAllowed = $isTermPortalAllowed && $termPortalEnabled;
+
         header ('HTTP/1.1 302 Moved Temporarily');
         $apiUrl=APPLICATION_RUNDIR.'/editor/'.$applicationName;
         $url = $applicationName == 'termportal' || $isTermPortalAllowed
@@ -322,5 +335,21 @@ class LoginController extends ZfExtended_Controllers_Login {
             'ViewRenderer'
         );
         $renderer->view->headScript()->appendScript($openIdScript);
+    }
+
+    protected function handelRedirectHash(){
+
+        if(!isset($this->_session->redirecthash)){
+            return null;
+        }
+
+        $hash = $this->_session->redirecthash;
+        if(preg_match('~^#name=(termportal|instanttranslate)~', $hash, $matches)){
+            // Drop redirecthash prop from session
+            $this->_session->redirecthash = '';
+            return '#'.$matches[1];
+        }
+
+        return $hash;
     }
 }
