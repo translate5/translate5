@@ -805,7 +805,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             }
 
             // If term for preferred languages is still not found - just use first
-            if (!$refData['language']) {
+            if (!isset($refData['language'])) {
                 $refData['language'] = array_keys($refData['json'])[0];
                 list (
                     $refData['termId'],
