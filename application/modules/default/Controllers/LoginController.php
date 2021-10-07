@@ -103,10 +103,10 @@ class LoginController extends ZfExtended_Controllers_Login {
         $hash = $this->handleRedirectHash();
 
         // If user was not logged in during the attempt to load termportal, but now is logged and allowed to do that
-        if (preg_match('~^#(termportal|instanttranslate)~', $hash) && $isTermPortalAllowed) {
-
-                // Do redirect
-                $this->applicationRedirect(substr($hash, 1), true);
+        //TODO: after itranslate route is changed to itranslate to instanttranslate here
+        if (preg_match('~^#(termportal|itranslate)~', $hash) && $isTermPortalAllowed) {
+            // Do redirect
+            //$this->applicationRedirect(substr($hash, 1), true);
         }
 
         if($acl->isInAllowedRoles($roles, 'initial_page','editor')) {
