@@ -1531,6 +1531,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>Alle verfügbaren Sprachen</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</target></trans-unit>
 <trans-unit id='VGVybVNlYXJjaA=='><source>TermSearch</source><target>Term-Suche</target></trans-unit>
+<trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermCustomerSearch</source><target>Term-Suche</target></trans-unit>
 <trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>Terme vorschlagen</target></trans-unit>
 <trans-unit id='VGVybVJldmlld2Vy'><source>TermReviewer</source><target>Terme prüfen</target></trans-unit>
 <trans-unit id='VGVybUZpbmFsaXplcg=='><source>TermFinalizer</source><target>Terme freigeben</target></trans-unit>

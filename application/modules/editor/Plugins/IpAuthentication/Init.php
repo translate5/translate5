@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /***
  * For certain roles where it makes sense it should be possible to authenticate at translate5 only by the fact,
- * that the user comes from a certain IP address. Currently this makes sense for the roles termSearch and InstantTranslate (the user must have no other roles).
+ * that the user comes from a certain IP address. Currently this makes sense for the roles termCustomerSearch and InstantTranslate (the user must have no other roles).
  */
 class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
     protected static $description = 'Provides the possibility to authenticate InstantTranslate and TermSearch roles only by IP address (must be configured).';

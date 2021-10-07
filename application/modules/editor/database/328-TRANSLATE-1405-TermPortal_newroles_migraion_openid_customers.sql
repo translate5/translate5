@@ -25,5 +25,9 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-UPDATE `LEK_customer` SET `openIdServerRoles` = REPLACE(`openIdServerRoles`, "termCustomerSearch", "termSearch");
-UPDATE `LEK_customer` SET `openIdDefaultServerRoles` = REPLACE(`openIdDefaultServerRoles`, "termCustomerSearch", "termSearch");
+UPDATE `Zf_acl_rules` SET `role` = "termCustomerSearch" WHERE `role` = "termSearch";
+UPDATE `Zf_acl_rules` SET `resource` = "termCustomerSearch" WHERE `resource` = "termSearch";
+UPDATE `Zf_acl_rules` SET `right` = "termCustomerSearch" WHERE `right` = "termSearch";
+UPDATE `Zf_users` SET `roles` = REPLACE(`roles`, "termSearch", "termCustomerSearch");
+UPDATE `LEK_customer` SET `openIdServerRoles` = REPLACE(`openIdServerRoles`, "termSearch", "termCustomerSearch");
+UPDATE `LEK_customer` SET `openIdDefaultServerRoles` = REPLACE(`openIdDefaultServerRoles`, "termSearch", "termCustomerSearch");
