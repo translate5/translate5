@@ -798,7 +798,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Define which old values can be changed to which new values
             $allow = false; $allowByRole = [
-                'termSearch' => false, // no change allowed
+                'termCustomerSearch' => false, // no change allowed
                 'termReviewer' =>  ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
                 'termFinalizer' => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
                 'termProposer' =>  [],
