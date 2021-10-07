@@ -121,29 +121,23 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Save
         $termId = $this->save();
 
-        // Get processStatus-attr dataTypeId
-        $dataTypeId_processStatus = editor_Utils::db()->query('
-            SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = "processStatus" LIMIT 1
-        ')->fetchColumn();
+        // Get some needed dataTypeIds
+        /* @var $datatype editor_Models_Terminology_Models_AttributeDataType */
+        $datatype = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
+        $dataTypeIds = $datatype->getIdsForTerms(['termNote#processStatus', 'termNote#administrativeStatus', 'note#']);
 
         // Append to $attrA
         $attrA['processStatus'] = [
-            'dataTypeId' => $dataTypeId_processStatus,
+            'dataTypeId' => $dataTypeIds['termNote#processStatus'],
             'type' => 'processStatus',
             'value' => $this->getProcessStatus(),
         ];
 
         // If value for note-attr is given
-        if ($misc['note']) {
-
-            // Get note-attr dataTypeId
-            $dataTypeId_note = editor_Utils::db()->query('
-                SELECT `id` FROM `terms_attributes_datatype` WHERE `label` = "note" LIMIT 1
-            ')->fetchColumn();
-
+        if ($misc['note'] ?? false) {
             // Append to attrA
             $attrA['note'] = [
-                'dataTypeId' => $dataTypeId_note,
+                'dataTypeId' => $dataTypeIds['note#'],
                 'type' => 'note',
                 'value' => $misc['note'],
             ];
@@ -151,27 +145,21 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // If new term's processStatus is 'rejected'
         if ($this->getProcessStatus() == 'rejected') {
-
-            // Get normativeAuthorization-attr dataTypeId
-            $dataTypeId_normativeAuthorization = editor_Utils::db()->query('
-                SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = "normativeAuthorization" LIMIT 1
-            ')->fetchColumn();
-
             // Append to attrA
-            $attrA['normativeAuthorization'] = [
-                'dataTypeId' => $dataTypeId_normativeAuthorization,
-                'type' => 'normativeAuthorization',
-                'value' => 'deprecatedTerm',
+            $attrA['administrativeStatus'] = [
+                'dataTypeId' => $dataTypeIds['termNote#administrativeStatus'],
+                'type' => 'administrativeStatus',
+                'value' => 'deprecatedTerm-admn-sts',
             ];
         }
 
         // If attributes should be copied from other term
-        if ($misc['copyAttrsFromTermId']) {
+        if ($misc['copyAttrsFromTermId'] ?? false) {
 
             // Array of dataTypeIds to be ignored while copying attributes from other term
-            $except = [$dataTypeId_processStatus];
-            if ($misc['note']) $except []= $dataTypeId_note;
-            if ($this->getProcessStatus() == 'rejected') $except []= $dataTypeId_normativeAuthorization;
+            $except = [$dataTypeIds['termNote#processStatus']];
+            if ($misc['note']) $except []= $dataTypeIds['note#'];
+            if ($this->getProcessStatus() == 'rejected') $except []= $dataTypeIds['termNote#administrativeStatus'];
 
             // Fetch attributes of existing term, except at least 'processStatus' attribute
             $attrA += editor_Utils::db()->query('

@@ -93,4 +93,37 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
             SELECT `id` FROM `terms_attributes_datatype` WHERE `isTbxBasic` = 1
         ')->fetchAll(PDO::FETCH_COLUMN));
     }
+
+    /**
+     * provides a list of term level label and type tupels (as one string separated with #) and returns their datatype IDs
+     * example "termNote#footype", "note#" returns for example the IDs for label termNote with type footype on level term and the id for label note with type null on level term
+     * Only type may be empty (null)!
+     *
+     * @param array $labelTypeList
+     * @return array
+     */
+    public function getIdsForTerms(array $labelTypeList): array {
+        //we load all datatypes for the given labels / elementNames and filter them then on PHP level
+        $s = $this->db->select()
+            ->from($this->db, ['id', 'label', 'level']);
+
+        foreach($labelTypeList as $key) {
+            $parts = explode('#', $key);
+            $s->orWhere('(label = ?', $parts[0]);
+            if(empty($parts[1])) {
+                $s->where('type is null');
+            }
+            else {
+                $s->where('type = ?', $parts[1]);
+            }
+            $s->where($this->db->getAdapter()->quoteInto('FIND_IN_SET( "term" ,level)>0 )'));
+        }
+
+        $dbResult = $this->db->fetchAll($s)->toArray();
+        $result = [];
+        foreach($dbResult as $row) {
+            $result[$row['label'].'#'.$row['type']] = $row['id'];
+        }
+        return $result;
+    }
 }

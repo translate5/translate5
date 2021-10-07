@@ -52,6 +52,10 @@ insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','pm','setaclrole','termPM_allClients');
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','admin','auto_set_role','termPM');
 insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','admin','auto_set_role','termPM_allClients');
+insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','admin','auto_set_role','termProposer');
+insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','admin','auto_set_role','termSearch');
+insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','admin','auto_set_role','termFinalizer');
+insert ignore into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','admin','auto_set_role','termReviewer');
 
 UPDATE `Zf_acl_rules` SET `resource` = "editor_attribute" WHERE `role` = "termProposer" AND `resource` = "editor_termattribute" AND `right` = "post";
 

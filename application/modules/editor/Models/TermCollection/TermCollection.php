@@ -402,13 +402,14 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      *
      * @param bool $dict if true return ids mapped to name, if false array of IDs only
      * @param array $clientIds if given, intersect the loaded collection IDs with the ones given as parameter
+     * @param bool $termportal Is passed to getUserCustomersFromSession($termportal) call
      * @return array
      */
-    public function getCollectionForAuthenticatedUser(bool $dict = false, array $clientIds = []): array
+    public function getCollectionForAuthenticatedUser(bool $dict = false, array $clientIds = [], $termportal = false): array
     {
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
-        $customers = $userModel->getUserCustomersFromSession();
+        $customers = $userModel->getUserCustomersFromSession($termportal);
 
         if (!empty($clientIds)) {
             $customers = array_intersect($customers, $clientIds);
