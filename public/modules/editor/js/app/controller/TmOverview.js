@@ -70,7 +70,10 @@ Ext.define('Editor.controller.TmOverview', {
         taskassocgridcell:'#UT#Zugewiesene Sprachressourcen',
         exportTm: '#UT#als TM Datei exportieren',
         exportTmx: '#UT#als TMX Datei exportieren',
-        exportZippedTmx: '#UT#als gezippte TMX Datei exportieren'
+        exportZippedTmx: '#UT#als gezippte TMX Datei exportieren',
+        mergeTermsWarnTitle: '#UT#Nicht empfohlen!',
+        mergeTermsWarnMessage: '#UT#Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.'
+
     },
     refs:[{
         ref: 'tmOverviewPanel',
@@ -126,6 +129,9 @@ Ext.define('Editor.controller.TmOverview', {
             },
             '#termCollectionExportActionMenu': {
                 click: 'onTermCollectionExportActionMenuClick'
+            },
+            '#addTmWindow #mergeTerms,#importCollectionWindow #mergeTerms': {
+                change: 'onMergeTermsChange'
             }
         },
         store: {
@@ -627,6 +633,21 @@ Ext.define('Editor.controller.TmOverview', {
         }
 
         me[action](com.record);
+    },
+
+    /***
+     * Merge terms checkbox change event handler
+     * @param checkbox
+     * @param newValue
+     */
+    onMergeTermsChange:function (checkbox,newValue){
+        if(newValue === true){
+            Ext.Msg.show({
+                title: this.strings.mergeTermsWarnTitle,
+                message: this.strings.mergeTermsWarnMessage,
+                icon: Ext.Msg.WARNING
+            });
+        }
     },
 
     /***

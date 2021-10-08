@@ -1669,6 +1669,8 @@ Ext.define('Editor.controller.Localizer', {
             exportTm: '<?php echo $this->translate->_('als TM Datei exportieren');?>',
             exportTmx: '<?php echo $this->translate->_('als TMX Datei exportieren');?>',
             exportZippedTmx: '<?php echo $this->translate->_('als gezippte TMX Datei exportieren');?>',
+            mergeTermsWarnTitle: '<?php echo $this->translate->_('Nicht empfohlen!');?>',
+            mergeTermsWarnMessage: '<?php echo $this->translate->_('Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.');?>'
         }
     });
     
@@ -1693,8 +1695,7 @@ Ext.define('Editor.controller.Localizer', {
             importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
             useAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert');?>',
             writeAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden');?>',
-            collectionUploadTooltip: '<?php echo $this->translate->_('Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.');?>',
-            mergeTermsLabelTooltip: '<?php echo $this->translate->_('Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn \'Terme zusammenführen\' angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.');?>'
+            collectionUploadTooltip: '<?php echo $this->translate->_('Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.');?>'
         }
     });
     

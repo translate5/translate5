@@ -65,7 +65,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         useAsDefaultTooltip: '#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert',
         writeAsDefaultTooltip: '#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden',
         collectionUploadTooltip: '#UT#Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.',
-        mergeTermsLabelTooltip: '#UT#Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn "Terme zusammenführen" angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.'
+        mergeTermsLabelTooltip: '#UT#Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.'
     },
     height: 500,
     width: 500,
@@ -146,11 +146,6 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                         bind: {
                             hidden: '{!isTermCollectionResource}',
                             disabled: '{!isTermCollectionResource}'
-                        },
-                        labelClsExtra: 'lableInfoIcon',
-                        autoEl: {
-                            tag: 'div',
-                            'data-qtip': me.strings.mergeTermsLabelTooltip
                         },
                         fieldLabel: me.strings.mergeTerms,
                         itemId: 'mergeTerms',
