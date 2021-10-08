@@ -50,7 +50,7 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
                 anchor: '100%'
             },
             config = {
-                title: me.strings.title,
+                title:me.strings.title,
                 items : [{
                     xtype: 'form',
                     padding: 5,
@@ -105,6 +105,8 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
      * @param record
      */
     loadRecord: function(record) {
-        this.languageResourceRecord = record;
+        var me=this;
+        me.setTitle(me.strings.title+': '+record.get('name'));
+        me.languageResourceRecord = record;
     }
 });

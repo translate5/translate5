@@ -196,7 +196,7 @@
 <trans-unit id='QXVmZ2FiZSB3aXJkIGFiZ2VzY2hsb3NzZW4uLi4='><source>Aufgabe wird abgeschlossen...</source><target>Aufgabe wird abgeschlossen...</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB3aXJkIHdpZWRlciBlcsO2ZmZuZXQuLi4='><source>Aufgabe wird wieder eröffnet...</source><target>Aufgabe wird wieder eröffnet...</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB3aXJkIGJlZW5kZXQuLi4='><source>Aufgabe wird beendet...</source><target>Aufgabe wird beendet...</target></trans-unit>
-<trans-unit id='QXVmZ2FiZSB3aXJkIGdlbMO2c2NodC4uLg=='><source>Aufgabe wird gelöscht...</source><target>Aufgabe wird gelöscht...</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSAiezB9IiB3aXJkIGdlbMO2c2NodC4uLg=='><source>Aufgabe "{0}" wird gelöscht...</source><target>Aufgabe "{0}" wird gelöscht...</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB3aXJkIG5vY2ggdmVyd2VuZGV0IHVuZCBrYW5uIGRhaGVyIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4h'><source>Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!</source><target>Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB3aXJkIGR1cmNoIEJlbnV0emVyICJ7MH0iIGJlYXJiZWl0ZXQgdW5kIGlzdCBkYWhlciBzY2hyZWliZ2VzY2jDvHR6dCE='><source>Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!</source><target>Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!</target></trans-unit>
 <trans-unit id='QXVmZ2FiZW4='><source>Aufgaben</source><target>Aufgaben</target></trans-unit>
@@ -212,7 +212,7 @@
 <trans-unit id='V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBmw7xyIGFsbGUgQmVudXR6ZXIgZW5kZ8O8bHRpZyBiZWVuZGVuPw=='><source>Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?</source><target>Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?</target></trans-unit>
 <trans-unit id='QmVlbmRldGUgQXVmZ2FiZSB3aWVkZXIgw7ZmZm5lbj8='><source>Beendete Aufgabe wieder öffnen?</source><target>Beendete Aufgabe wieder öffnen?</target></trans-unit>
 <trans-unit id='V29sbGVuIFNpZSBkaWUgYmVlbmRldGUgQXVmZ2FiZSB3aXJrbGljaCB3aWVkZXIgw7ZmZm5lbj8='><source>Wollen Sie die beendete Aufgabe wirklich wieder öffnen?</source><target>Wollen Sie die beendete Aufgabe wirklich wieder öffnen?</target></trans-unit>
-<trans-unit id='QXVmZ2FiZSBrb21wbGV0dCBsw7ZzY2hlbj8='><source>Aufgabe komplett löschen?</source><target>Aufgabe komplett löschen?</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSAiezB9IiBrb21wbGV0dCBsw7ZzY2hlbj8='><source>Aufgabe "{0}" komplett löschen?</source><target>Aufgabe "{0}" komplett löschen?</target></trans-unit>
 <trans-unit id='V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBrb21wbGV0dCB1bmQgdW53aWRlcnJ1ZmxpY2ggbMO2c2NoZW4/'><source>Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?</source><target>Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?</target></trans-unit>
 <trans-unit id='S2VpbmUgQmVudXR6ZXIgenVnZW9yZG5ldCE='><source>Keine Benutzer zugeordnet!</source><target>Keine Benutzer zugeordnet!</target></trans-unit>
 <trans-unit id='QmVhcmJlaXRldCB1bmQgR2VzcGVycnQgZHVyY2ggezB9'><source>Bearbeitet und Gesperrt durch {0}</source><target>Bearbeitet und Gesperrt durch {0}</target></trans-unit>
@@ -1737,10 +1737,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RGllc2VzIEZlbnN0ZXIgbmljaHQgbWVociBhdXRvbWF0aXNjaCBhbnplaWdlbi4='><source>Dieses Fenster nicht mehr automatisch anzeigen.</source><target>Dieses Fenster nicht mehr automatisch anzeigen.</target></trans-unit>
 <trans-unit id='RGFzIG7DpGNoc3RlIC8gdm9yaGVyaWdlIFNlZ21lbnQgd2lyZCBub2NoIGdlc3BlaWNoZXJ0LCBiaXR0ZSB3YXJ0ZW4uLi4='><source>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</source><target>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</target></trans-unit>
 <trans-unit id='UHJvamVrdCBrb21wbGV0dCBsw7ZzY2hlbg=='><source>Projekt komplett löschen</source><target>Projekt komplett löschen</target></trans-unit>
-<trans-unit id='UHJvamVrdCBrb21wbGV0dCBsw7ZzY2hlbj8='><source>Projekt komplett löschen?</source><target>Projekt komplett löschen?</target></trans-unit>
+<trans-unit id='UHJvamVrdCAiezB9IiBrb21wbGV0dCBsw7ZzY2hlbj8='><source>Projekt "{0}" komplett löschen?</source><target>Projekt "{0}" komplett löschen?</target></trans-unit>
 <trans-unit id='U29sbHRlbiBkYXMgUHJvamVrdCB1bmQgYWxsZSBpbSBQcm9qZWt0IGVudGhhbHRlbmVuIEF1ZmdhYmVuIGdlbMO2c2NodCB3ZXJkZW4/'><source>Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?</source><target>Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?</target></trans-unit>
 <trans-unit id='UHJvamVrdCBsw7ZzY2hlbg=='><source>Projekt löschen</source><target>Projekt löschen</target></trans-unit>
-<trans-unit id='RGFzIFByb2pla3Qgd3VyZGUgZXJmb2xncmVpY2ggZW50ZmVybnQh'><source>Das Projekt wurde erfolgreich entfernt!</source><target>Das Projekt wurde erfolgreich entfernt!</target></trans-unit>
+<trans-unit id='RGFzIFByb2pla3QgInswfSIgd3VyZGUgZXJmb2xncmVpY2ggZW50ZmVybnQh'><source>Das Projekt "{0}" wurde erfolgreich entfernt!</source><target>Das Projekt "{0}" wurde erfolgreich entfernt!</target></trans-unit>
 <trans-unit id='QXVmZ2FiZW5uYW1lLVByb2pla3Q='><source>Aufgabenname-Projekt</source><target>Aufgabenname</target></trans-unit>
 <trans-unit id='RGllc2UgUXVlbGxzcHJhY2hlIHdpcmQgdm9uIGRlciBSZXNzb3VyY2UgbmljaHQgdW50ZXJzdMO8dHp0IQ=='><source>Diese Quellsprache wird von der Ressource nicht unterstützt!</source><target>Diese Quellsprache wird von der Ressource nicht unterstützt!</target></trans-unit>
 <trans-unit id='RGllc2UgWmllbHNwcmFjaGUgd2lyZCB2b24gZGVyIFJlc3NvdXJjZSBuaWNodCB1bnRlcnN0w7x0enQh'><source>Diese Zielsprache wird von der Ressource nicht unterstützt!</source><target>Diese Zielsprache wird von der Ressource nicht unterstützt!</target></trans-unit>
@@ -2034,6 +2034,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='dHJpdG9u'><source>triton</source><target>Standard Layout (Triton)</target></trans-unit>
 <trans-unit id='UERGIERva3VtZW50YXRpb24='><source>PDF Dokumentation</source><target>PDF Dokumentation</target></trans-unit>
 <trans-unit id='SW4gbmV1ZW0gQnJvd3Nlci1UYWIgw7ZmZm5lbg=='><source>In neuem Browser-Tab öffnen</source><target>In neuem Browser-Tab öffnen</target></trans-unit>
+<trans-unit id='U3ByYWNocmVzc291cmNlICJ7MH0iIGdlbMO2c2NodC4='><source>Sprachressource "{0}" gelöscht.</source><target>Sprachressource "{0}" gelöscht.</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSAiezB9IiBnZWzDtnNjaHQ='><source>Aufgabe "{0}" gelöscht</source><target>Aufgabe "{0}" gelöscht</target></trans-unit>
   </body>
  </file>
 </xliff>

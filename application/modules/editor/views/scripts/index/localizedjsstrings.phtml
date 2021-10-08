@@ -514,7 +514,7 @@ Ext.define('Editor.controller.Localizer', {
             taskUnFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
             taskReopen: '<?php echo $this->translate->_('Aufgabe wird wieder eröffnet...');?>',
             taskEnding: '<?php echo $this->translate->_('Aufgabe wird beendet...');?>',
-            taskDestroy: '<?php echo $this->translate->_('Aufgabe wird gelöscht...');?>',
+            taskDestroy: '<?php echo $this->translate->_('Aufgabe "{0}" wird gelöscht...');?>',
             taskNotDestroyed: '<?php echo $this->translate->_('Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!');?>',
             loadingWindowMessage: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>',
             loading: '<?php echo $this->translate->_('Laden');?>',
@@ -527,6 +527,7 @@ Ext.define('Editor.controller.Localizer', {
             excelExportUsageLabel: '<?php echo $this->translate->_('Excel-Export Nutzung');?>',
             averageProcessingTimeTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Übersetzer');?>',
             averageProcessingTimeSecondTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit zweiter Lektor');?>',
+            taskDeleted: '<?php echo $this->translate->_('Aufgabe "{0}" gelöscht');?>'
         },
         confirmStrings: {
             "editorFinishTask":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -535,7 +536,7 @@ Ext.define('Editor.controller.Localizer', {
             "editorUnfinishAllTask":  {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?');?>"},
             "editorEndTask":          {title: "<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>"},
             "editorReopenTask":       {title: "<?php echo $this->translate->_('Beendete Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die beendete Aufgabe wirklich wieder öffnen?');?>"},
-            "editorDeleteTask":       {title: "<?php echo $this->translate->_('Aufgabe komplett löschen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
+            "editorDeleteTask":       {title: "<?php echo $this->translate->_('Aufgabe "{0}" komplett löschen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
         }
     });
     
@@ -833,11 +834,11 @@ Ext.define('Editor.controller.Localizer', {
      Ext.define("Editor.locale.de.view.project.ProjectGridViewController", {
         override: "Editor.view.project.ProjectGridViewController",
         strings: {
-            deleteProjectDialogTitle: '<?php echo $this->translate->_('Projekt komplett löschen?');?>',
+            deleteProjectDialogTitle: '<?php echo $this->translate->_('Projekt "{0}" komplett löschen?');?>',
             deleteProjectDialogMessage: '<?php echo $this->translate->_('Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?');?>',
             projectDeleteButtonText: '<?php echo $this->translate->_('Projekt löschen');?>',
             projectCanceltButtonText: '<?php echo $this->translate->_('Nein');?>',
-            projectRemovedMessage: '<?php echo $this->translate->_('Das Projekt wurde erfolgreich entfernt!');?>'
+            projectRemovedMessage: '<?php echo $this->translate->_('Das Projekt "{0}" wurde erfolgreich entfernt!');?>'
         }
     });
     
@@ -1661,7 +1662,7 @@ Ext.define('Editor.controller.Localizer', {
             deleteConfirmText: '<?php echo $this->translate->_('Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?');?>',
             deleteConfirmLocal: '<?php echo $this->translate->_('Sprachressource löschen?');?>',
             deleteConfirmLocalText: '<?php echo $this->translate->_('Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.');?>',
-            deleted: '<?php echo $this->translate->_('Sprachressource gelöscht.');?>',
+            deleted: '<?php echo $this->translate->_('Sprachressource "{0}" gelöscht.');?>',
             edited: '<?php echo $this->translate->_('Die Sprachressource "{0}" wurde erfolgreich geändert.');?>',
             created: '<?php echo $this->translate->_('Die Sprachressource "{0}" wurde erfolgreich erstellt.');?>',
             noResourcesAssigned: '<?php echo $this->translate->_('Keine Sprachressourcen zugewiesen.');?>',
