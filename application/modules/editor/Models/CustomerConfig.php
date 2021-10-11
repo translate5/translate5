@@ -120,14 +120,13 @@ class editor_Models_CustomerConfig extends ZfExtended_Models_Entity_Abstract {
         $default = Zend_Registry::get('config')->runtimeOptions->termportal->liveSearchMinChars;
 
         // Get maximum among clients custom values of this config param
-        if ($customerIds)
-            $customMax = $this->db->getAdapter()->query('
-                SELECT MAX(`value`) 
-                FROM `LEK_customer_config` 
-                WHERE TRUE
-                  AND `name` = "runtimeOptions.termportal.liveSearchMinChars" 
-                  AND `customerId` IN (' . $customerIds . ') 
-            ')->fetchColumn();
+        $customMax = $customerIds ? $this->db->getAdapter()->query('
+            SELECT MAX(`value`) 
+            FROM `LEK_customer_config` 
+            WHERE TRUE
+              AND `name` = "runtimeOptions.termportal.liveSearchMinChars" 
+              AND `customerId` IN (' . $customerIds . ') 
+        ')->fetchColumn() : false;
 
         // Get max and return
         return $customMax ? max($default, $customMax) : $default;

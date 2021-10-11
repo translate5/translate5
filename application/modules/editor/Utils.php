@@ -557,8 +557,8 @@ class editor_Utils {
                 : (is_array($msg2) ? $msg2 : ['msg' => $msg2]);
 
         // Merge the additional data to the $flush array
-        if ($mrg1) $flush = array_merge($flush, $mrg1);
-        if ($mrg2) $flush = array_merge($flush, $mrg2);
+        if (isset($mrg1)) $flush = array_merge($flush, $mrg1);
+        if (isset($mrg2)) $flush = array_merge($flush, $mrg2);
 
         // Send headers
         if (!headers_sent()) {
