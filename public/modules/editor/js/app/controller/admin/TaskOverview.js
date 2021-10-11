@@ -153,8 +153,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             msg: "#UT#Wollen Sie die beendete Aufgabe wirklich wieder öffnen?"
         },
         "editorDeleteTask": {
-            title: "#UT#Aufgabe komplett löschen?",
-            msg: "#UT#Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?"
+            title: '#UT#Aufgabe "{0}" komplett löschen?',
+            msg: '#UT#Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?'
         }
     },
     strings: {
@@ -164,7 +164,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         taskUnFinishing: '#UT#Aufgabe wird abgeschlossen...',
         taskReopen: '#UT#Aufgabe wird wieder eröffnet...',
         taskEnding: '#UT#Aufgabe wird beendet...',
-        taskDestroy: '#UT#Aufgabe wird gelöscht...',
+        taskDestroy: '#UT#Aufgabe "{0}" wird gelöscht...',
+        taskDeleted: '#UT#Aufgabe "{0}" gelöscht',
         taskNotDestroyed: '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
         loadingWindowMessage: "#UT#Dateien werden hochgeladen",
         loading: '#UT#Laden',
@@ -740,7 +741,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         }
 
         var confirm = me.confirmStrings[action];
-        Ext.Msg.confirm(confirm.title, confirm.msg, function (btn) {
+        Ext.Msg.confirm(Ext.String.format(confirm.title, task.get('taskName')), confirm.msg, function (btn) {
             if (btn === 'yes') {
                 me[action](task, ev);
             }
@@ -903,11 +904,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      * INFO: beforeTaskDelete is a chained event
      * @param {Editor.model.admin.Task} task
      */
-    editorDeleteTask: function (task) {
+    editorDeleteTask: function(task) {
         var me = this,
             app = Editor.app;
 
-        app.mask(me.strings.taskDestroy, task.get('taskName'));
+        app.mask(Ext.String.format(me.strings.taskDestroy, task.get('taskName')), task.get('taskName'));
 
         //the beforeTaskDelete is chained event. If one of the chained listeners does not return true,
         //the task delete will be omitted.
@@ -922,6 +923,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             preventDefaultHandler: true,
             success: function () {
                 app.unmask();
+                Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskDeleted, task.get('taskName')),2);
                 me.fireEvent('afterTaskDelete', task);
             },
             failure: function (batch, operation) {

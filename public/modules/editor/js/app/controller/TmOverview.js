@@ -33,7 +33,6 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Die Einstellungen werden in einem Cookie gespeichert
  * @class Editor.controller.TmOverview
  * @extends Ext.app.Controller
  */
@@ -63,7 +62,7 @@ Ext.define('Editor.controller.TmOverview', {
         deleteConfirmText: '#UT#Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?',
         deleteConfirmLocal: '#UT#Sprachressource löschen?',
         deleteConfirmLocalText: '#UT#Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.',
-        deleted: '#UT#Sprachressource gelöscht.',
+        deleted: '#UT#Sprachressource "{0}" gelöscht.',
         edited: '#UT#Die Sprachressource "{0}" wurde erfolgreich geändert.',
         created: '#UT#Die Sprachressource "{0}" wurde erfolgreich erstellt.',
         noResourcesAssigned: '#UT#Keine Sprachressourcen zugewiesen.',
@@ -488,7 +487,7 @@ Ext.define('Editor.controller.TmOverview', {
                 success: function(record, operation) {
                     store && store.load();
                     store.remove(rec);
-                    Editor.MessageBox.addSuccess(msg.deleted);
+                    Editor.MessageBox.addSuccess(Ext.String.format(msg.deleted, rec.get('name')));
                     Editor.MessageBox.addByOperation(operation);
                 }
             });
