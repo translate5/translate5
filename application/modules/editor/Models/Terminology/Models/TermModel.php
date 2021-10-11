@@ -721,7 +721,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         foreach ($params['attrs'] as $aDataTypeId => $aValue) {
 
             // Fuzzy search for text-attrs
-            if ($textA[$aDataTypeId]) $aValue = '*' . trim($aValue, '*?') . '*';
+            if (isset($textA[$aDataTypeId])) $aValue = '*' . trim($aValue, '*?') . '*';
 
             // If wildcards are used, convert them to the mysql syntax
             $expr = str_replace(['*', '?'], ['%', '_'], $aValue);
