@@ -43,7 +43,8 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         deleteTermEitriesImport:'#UT#Termeinträge löschen älter als aktueller Import',
         helpButtonTooltip:'#UT#Info zum Term-Collection',
         deleteTermProposals:'#UT#Vorschläge löschen, deren letzte Berührung länger her ist als',
-        deleteTermProposalsImport:'#UT#Vorschläge löschen älter als aktueller Import'
+        deleteTermProposalsImport:'#UT#Vorschläge löschen älter als aktueller Import',
+        collectionUploadTooltip:'#UT#Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.'
     },
     tools:[{
         type:'help',
@@ -74,7 +75,7 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
             fieldLabel: me.strings.mergeTerms,
             itemId:'mergeTerms',
             name:'mergeTerms',
-            value:true
+            value:false
         },{
             xtype:'datefield',
             fieldLabel: me.strings.deleteTermEntriesDate,
@@ -121,14 +122,19 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
             	}
             }
         });
-        me.down('filefield[name="tmUpload"]').regex=/\.tbx$/i;
+        var uploadField = me.down('filefield[name="tmUpload"]');
+        uploadField.regex=/\.(tbx|zip)$/i;
+        uploadField.labelClsExtra = 'lableInfoIcon';
+        uploadField.autoEl = { tag: 'div', 'data-qtip': me.strings.collectionUploadTooltip};
     },
     /**
      * loads the record into the form
      * @param record
      */
     loadRecord: function(record) {
-        this.languageResourceRecord = record;
+        var me=this;
+        me.setTitle(me.strings.title+': '+record.get('name'));
+        me.languageResourceRecord = record;
     },
     
     /***

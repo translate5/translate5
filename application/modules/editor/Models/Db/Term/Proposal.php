@@ -27,6 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Models_Db_Term_Proposal extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_term_proposal';
+    protected $_name    = 'terms_proposal';
     public $_primary = 'id';
 }

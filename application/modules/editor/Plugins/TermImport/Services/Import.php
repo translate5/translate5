@@ -29,77 +29,77 @@ END LICENSE AND COPYRIGHT
 /**
  */
 class editor_Plugins_TermImport_Services_Import {
-    
+
     /***
      * Import from file system config file
      * @var string
      */
     const FILESYSTEM_CONFIG_NAME="filesystem.config";
-    
+
     /***
      * Import from across api config name
      * @var string
      */
     const CROSSAPI_CONFIG_NAME="crossapi.config";
-    
+
     /***
      * Import dir key from the filesystem config file
      * @var string
      */
     const IMPORT_DIR_ARRAY_KEY="importDir";
-    
-    
+
+
     /***
      * Key from the crossapi config file for the across api url
      * @var string
      */
     const IMPORT_ACOSS_API_URL="crossAPIurl";
-    
+
 
     /***
      * Key for the merge terms flag used by the tbx import parser
      * @var string
      */
     const IMPORT_MERGE_TERMS_KEY="mergeTerms";
-    
+
     /***
      *  Key from the crossapi config file for the across api user
      * @var string
      */
     const IMPORT_ACOSS_API_USER="apiUsername";
-    
+
     /***
      *  Key from the crossapi config file for the across api password
      * @var string
      */
     const IMPORT_ACOSS_API_PWD="apiPassword";
-    
+
     /***
      * Key from the crossapi config file for the across export files directory
      * @var string
      */
     const CROSS_EXPORT_FILES_DIR="crossExportFilesDir";
-    
+
     /***
      * File mapping group name in the filesystem config
      *
      * @var string
      */
     const FILE_MAPPING_GROUP="FileMapping";
-    
+
     /***
      * Collection mapping group name in the filesystem config
      *
      * @var string
      */
     const COLLECTION_MAPPING_GROUP="CollectionMapping";
-    
-    
+
+
     /***
      * Tmp file name for the file from the across api
      */
     const CROSS_API_TMP_FILENAME="Apiresponsetmpfilename.tbx";
-    
+
     /***
      * Deletes all terms in all listed termCollections, that have a modification date older than the listed one.
      * Since every term that exists in a TBX gets a new updated date on TBX-import, even if it is not changed: Simply set this date to yesterday to delete all terms, that are not part of the current import
@@ -107,53 +107,53 @@ class editor_Plugins_TermImport_Services_Import {
      * @var string
      */
     const DELETE_ENTRIES_KEY="deleteTermsLastTouchedOlderThan";
-    
-    
+
+
     /***
      * Config key for deleting terms older than current import date.
      * @var string
      */
     CONST DELETE_TERMS_OLDER_THAN_IMPORT_KEY="deleteTermsOlderThanCurrentImport";
-    
-    
+
+
     /***
      * Config key for deletes all proposals older then deleteProposalsLastTouchedOlderThan date.
      *
      * @var string
      */
     CONST DELETE_PROPOSALS_OLDER_THAN_KEY="deleteProposalsLastTouchedOlderThan";
-    
-    
+
+
     /***
      * Config key form delete all proposals older than the NOW_ISO
      *
      * @var string
      */
     CONST DELETE_PROPOSALS_OLDER_THAN_IMPORT_KEY="deleteProposalsOlderThanCurrentImport";
-    
-    
+
+
     /***
      * Data from the filesystem or cross api config file
      * @var array
      */
     public $configMap=array();
-    
+
     /**
      * @var float contains the start time of the last profiling call
      */
     protected $profilingStart = null;
-    
+
     /**
      * messages return to caller
      * @var array
      */
     protected $returnMessage = [];
-    
+
     public function __construct() {
         //init profiling
         $this->logProfiling();
     }
-    
+
     /***
      * File system import handler.
      */
@@ -163,52 +163,52 @@ class editor_Plugins_TermImport_Services_Import {
         }
         //tbx files import folder
         $importDir = $this->configMap[self::IMPORT_DIR_ARRAY_KEY];
-        
+
         try {
             if(!file_exists($importDir) && !@mkdir($importDir, 0777, true)){
                 return ["Unable to create the TBX Import dir or the TBX import directory is missing. Path: ".$importDir];
             }
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return ["Unable to create the TBX Import dir or the TBX import directory is missing. Path: ".$importDir];
         }
-        
+
         if($this->isFolderEmpty($importDir)){
             return ["The configured import dir is empty"];
         }
-        
+
         $this->returnMessage=[];
-        
+
         $this->logProfiling('Init FileSystemImport');
         //get all files from the import direcotry
         $it = new FilesystemIterator($importDir, FilesystemIterator::SKIP_DOTS);
         $affectedCollections = [];
         foreach ($it as $fileinfo) {
             $file=$fileinfo->getFilename();
-            
+
             $params=$this->handleCollectionForFile($file);
-            
+
             if(!$params){
                 continue;
             }
-            
+
             if(is_string($params)){
                 $this->returnMessage[]=$params;
                 continue;
             }
             $affectedCollections[] = $params['collectionId'];
             $this->logProfiling('Prepared collection '.$params['collectionName'].'('.$params['collectionId'].')');
-            
+
             //define the import source, used for storing the file in the disk in the needed location
             $params['importSource']="filesystem";
-            
+
             $this->importTbx($file, $importDir.$file, $params);
-            
+
             //remove old term entries and terms
             $this->removeTermsOlderThenImport($params['collectionId']);
-            
+
             //remove term proposals
             $this->removeProposalsOlderThan($params['collectionId']);
-            
+
         }
         if(empty($this->returnMessage)){
             $this->returnMessage[]="No files where imported";
@@ -217,19 +217,19 @@ class editor_Plugins_TermImport_Services_Import {
         if(empty($affectedCollections)){
             return $this->returnMessage;
         }
-        
+
         //remove old terms
         $this->removeOldTerms($affectedCollections);
-        
+
         //remove proposals older than current import
         $this->removeProposalsOlderThenImport($affectedCollections);
-        
+
         //clean the empty term entries
         $this->removeEmptyTermEntries($affectedCollections);
-        
+
         return $this->returnMessage;
     }
-    
+
     /***
      * Import the tbx files into the term collection from the across via the across api.
      * The files will be imported in the configured collection in the crossapi config file
@@ -240,27 +240,27 @@ class editor_Plugins_TermImport_Services_Import {
         if(empty($this->configMap)){
             $this->loadConfig(self::CROSSAPI_CONFIG_NAME);
         }
-        
+
         $this->returnMessage=[];
-        
+
         //tbx files import folder
         $apiUrl=$this->configMap[self::IMPORT_ACOSS_API_URL];
         $apiUser=$this->configMap[self::IMPORT_ACOSS_API_USER];
         $apiPwd=$this->configMap[self::IMPORT_ACOSS_API_PWD];
-        
+
         if(empty($apiUrl)){
             $this->returnMessage[]="Across api url is not defined in the config file";
             return $this->returnMessage;
         }
-        
+
         if(empty($apiUser) || empty($apiPwd)){
             $this->returnMessage[]="Authentication parameters are missing";
             return $this->returnMessage;
         }
-        
+
         //tbx files import folder
         $exportFilesDir=$this->configMap[self::CROSS_EXPORT_FILES_DIR];
-        
+
         try {
             if(!file_exists($exportFilesDir) && !@mkdir($exportFilesDir, 0777, true)){
                 return ["Unable to create the TBX Import dir or the TBX import directory is missing. Path: ".$exportFilesDir];
@@ -268,12 +268,12 @@ class editor_Plugins_TermImport_Services_Import {
         } catch (Exception $e) {
             return ["Unable to create the TBX Import dir or the TBX import directory is missing. Path: ".$exportFilesDir];
         }
-        
+
         if($this->isFolderEmpty($exportFilesDir)){
             $this->returnMessage[]="Across api export files are not defined";
             return $this->returnMessage;
         }
-        
+
         //FIXME: split the php file into classes ?
         require_once('AcrossTbxExport.php');
 
@@ -283,12 +283,12 @@ class editor_Plugins_TermImport_Services_Import {
         $this->logProfiling('Init FileAcrossApiImport');
         foreach ($it as $fileinfo) {
             $file=$fileinfo->getFilename();
-            
+
             $connector=new TbxAcrossSoapConnector($apiUrl,$apiUser,$apiPwd);
             /* @var $connector TbxAcrossSoapConnector */
-            
+
             $params=$this->handleCollectionForFile($file);
-            
+
             if(!$params){
                 continue;
             }
@@ -297,40 +297,40 @@ class editor_Plugins_TermImport_Services_Import {
                 $this->returnMessage[]=$params;
                 continue;
             }
-            
+
             if(!$params || !isset($params['collectionId'])){
                 continue;
             }
-            
+
             //absolute file path
             $file=$exportFilesDir.$file;
-            
-            
+
+
             $affectedCollections[] = $params['collectionId'];
-            
+
             $respTbxl=$connector->getTbx($file);
-            
+
             if(empty($respTbxl)){
                 $this->returnMessage[]="Empty tbx file for across config file:".$file;
                 continue;
             }
-            
+
             $tmpFile=$exportFilesDir.self::CROSS_API_TMP_FILENAME;
-            
+
             //save the tmp file to the disc
             file_put_contents($tmpFile, $respTbxl);
-            
+
             //define the import source, used for storing the file in the disk in the needed location
             $params['importSource']="crossapi";
-            
+
             $this->importTbx($file, $tmpFile, $params);
-            
+
             //remove old term entries and terms
             $this->removeTermsOlderThenImport($params['collectionId']);
-            
+
             //remove term proposals
             $this->removeProposalsOlderThan($params['collectionId']);
-            
+
             //remove the tmp file
             if (file_exists($tmpFile)) {
                 unlink($tmpFile);
@@ -339,23 +339,23 @@ class editor_Plugins_TermImport_Services_Import {
         if(empty($this->returnMessage)){
             $this->returnMessage[]="No files where imported";
         }
-        
+
         if(empty($affectedCollections)){
             return $this->returnMessage;
         }
-        
+
         //remove old terms
         $this->removeOldTerms($affectedCollections);
-        
+
         //remove proposals older than current import
         $this->removeProposalsOlderThenImport($affectedCollections);
-        
+
         //clean the empty term entries
         $this->removeEmptyTermEntries($affectedCollections);
-        
+
         return $this->returnMessage;
     }
-    
+
     protected function importTbx($file, $absFile, $params) {
         $this->logProfiling();
         $model = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
@@ -363,7 +363,7 @@ class editor_Plugins_TermImport_Services_Import {
         if(isset($this->configMap[self::IMPORT_MERGE_TERMS_KEY])){
             $params['mergeTerms']=$this->configMap[self::IMPORT_MERGE_TERMS_KEY] ==="true" || $this->configMap[self::IMPORT_MERGE_TERMS_KEY] ==="1";
         }
-        
+
         if($model->importTbx([$absFile], $params)){
             $msg="File: ".$file.' was imported in the collection: '.$params['collectionName'];
             $this->returnMessage[]=$msg;
@@ -375,7 +375,7 @@ class editor_Plugins_TermImport_Services_Import {
         }
         $this->logProfiling('Imported TBX');
     }
-    
+
     /***
      * Check if for the current file there is config for the termcollection to tbx file association
      * and termcollection to customer number association
@@ -386,32 +386,32 @@ class editor_Plugins_TermImport_Services_Import {
         if(!isset($this->configMap[self::FILE_MAPPING_GROUP]) || !isset($this->configMap[self::FILE_MAPPING_GROUP][$file])){
             return null;
         }
-        
+
         $collectionName=$this->configMap[self::FILE_MAPPING_GROUP][$file];
-        
+
         if(!isset($this->configMap[self::COLLECTION_MAPPING_GROUP][$collectionName])){
             return "No customer is assigned to the collection:".$collectionName;
         }
-            
+
         $customerNumber=$this->configMap[self::COLLECTION_MAPPING_GROUP][$collectionName];
-        
+
         $customer = ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $customer editor_Models_Customer */
         $customer->loadByNumber($customerNumber);
         $customerId = $customer->getId();
-        
+
         $model=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $model editor_Models_TermCollection_TermCollection */
-        
+
         $tc=$model->loadByName($collectionName);
-        
+
         //if the term collection exist, return the config import array array
         if(!empty($tc)){
             $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
             /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
             $customers=$customerAssoc->loadByLanguageResourceId($tc['id']);
             $customers=array_column($customers, 'customerId');
-            
+
             //check if the customer exist in the assoc table
             if(!in_array($customerId, $customers)){
                 $customers[]=$customerId;
@@ -420,18 +420,18 @@ class editor_Plugins_TermImport_Services_Import {
             }
             return ['collectionId'=>$tc['id'],'customerIds'=>$customers,'mergeTerms'=>true,'collectionName'=>$tc['name']];
         }
-        
+
         //create new term collection/language resource
         $collection=$model->create($collectionName, [$customerId]);
-        
+
         return ['collectionId'=>$collection->getId(),'customerIds'=>[$customerId],'mergeTerms'=>true,'collectionName'=>$collectionName];
     }
-    
+
     private function loadConfig($configName){
         $path=$this->getPluginConfigFolderPath();
         $this->initConfigFile($path.$configName);
     }
-    
+
     /***
      * Init the config array
      *
@@ -447,13 +447,13 @@ class editor_Plugins_TermImport_Services_Import {
         if(empty($file)){
             throw new ZfExtended_ValidateException("The configuration file:".$filePath.' is empty.');
         }
-        
+
         $this->configMap = parse_ini_file($filePath,true);
         if(empty($this->configMap)){
             throw new ZfExtended_ValidateException("Wrong file structure in :".$filePath);
         }
     }
-    
+
     /***
      * Remove terms older than the configured date in the config file.
      * @param array $collectionIds
@@ -465,15 +465,15 @@ class editor_Plugins_TermImport_Services_Import {
             return;
         }
         $olderThan=$this->configMap[self::DELETE_ENTRIES_KEY];
-        
-        $termModel=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $termModel editor_Models_Term */
+
+        $termModel=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $termModel editor_Models_Terminology_Models_TermModel */
         $termModel->removeOldTerms($collectionIds, $olderThan);
         //clean the old tbx files from the disc
         $this->removeCollectionTbxFromDisc($collectionIds, strtotime($olderThan));
         $this->logProfiling('removeOldTerms for collections '.join(',', $collectionIds));
     }
-    
+
     /***
      * Remove terms older than current date: NOW_ISO
      *
@@ -484,15 +484,15 @@ class editor_Plugins_TermImport_Services_Import {
         if(empty($this->configMap[self::DELETE_TERMS_OLDER_THAN_IMPORT_KEY])){
             return;
         }
-        
-        $termModel=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $termModel editor_Models_Term */
+
+        $termModel=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $termModel editor_Models_Terminology_Models_TermModel */
         $termModel->removeOldTerms([$collectionId], NOW_ISO);
         //clean the old tbx files from the disc
         $this->removeCollectionTbxFromDisc([$collectionId], strtotime(NOW_ISO));
         $this->logProfiling('removeTermsOlderThenImport for collection '.$collectionId);
     }
-    
+
     /***
      * Delete all proposals older than deleteProposalsLastTouchedOlderThan date.
      *
@@ -507,7 +507,7 @@ class editor_Plugins_TermImport_Services_Import {
         $this->removeOldProposals([$collectionId], $olderThan);
         $this->logProfiling('removeProposalsOlderThan for collection '.$collectionId);
     }
-    
+
     /***
      * Remove proposals older than curent import
      * @param array $collectionIds
@@ -520,21 +520,22 @@ class editor_Plugins_TermImport_Services_Import {
         $this->removeOldProposals($collectionIds, NOW_ISO);
         $this->logProfiling('removeProposalsOlderThenImport for collection '.print_r($collectionIds,1));
     }
-    
+
     /***
      * Remove empty term entries (term entries without any term in it).
      * Only the empty term entries from the same term collection will be removed.
      *
      * @param array $collectionIds
      */
-    protected function removeEmptyTermEntries(array $collectionIds) {
+    protected function removeEmptyTermEntries(array $collectionIds)
+    {
         //remove all empty term entries from the same term collection
-        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
-        /* @var $termEntry editor_Models_TermCollection_TermEntry */
+        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
         $termEntry->removeEmptyFromCollection($collectionIds);
         $this->logProfiling('removeEmptyTermEntries for collections '.join(',', $collectionIds));
     }
-    
+
     /***
      * Remove proposals for given collection and where the last change for the proposal is older than $olderThan date
      *
@@ -542,17 +543,19 @@ class editor_Plugins_TermImport_Services_Import {
      * @param string $olderThan
      */
     protected function removeOldProposals(array $collectionIds,string $olderThan){
-        $proposals=ZfExtended_Factory::get('editor_Models_Term_Proposal');
-        /* @var $proposals editor_Models_Term_Proposal */
-        $proposals->removeOlderThan($collectionIds,$olderThan);
-        
-        $attributeProposals=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
-        /* @var $attributeProposals editor_Models_Term_AttributeProposal */
-        //remove the attirubte proposals
-        $attributeProposals->removeOlderThan($collectionIds,$olderThan);
+
+        // Remove term proposals
+        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $term editor_Models_Terminology_Models_TermModel */
+        $term->removeProposalsOlderThan($collectionIds,$olderThan);
+
+        // Remove attribute proposals
+        $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+        /* @var $attribute editor_Models_Terminology_Models_AttributeModel */
+        $attribute->removeProposalsOlderThan($collectionIds,$olderThan);
     }
-    
-    
+
+
     /****
      * Remove term collection tbx files from the tbx-import directory older than the given timestamp
      * @param array $collections
@@ -566,7 +569,7 @@ class editor_Plugins_TermImport_Services_Import {
         }
         $this->logProfiling('removeCollectionTbxFromDisc for collections '.join(',', $collections));
     }
-    
+
     /***
      * Get the plugin config folder absolute path
      * @return string
@@ -574,8 +577,8 @@ class editor_Plugins_TermImport_Services_Import {
     private function getPluginConfigFolderPath(){
         return APPLICATION_PATH.'/modules/editor/Plugins/TermImport/config/';
     }
-    
-    
+
+
     /**
      * Check if the folder contains file
      * @param string $dir
@@ -584,7 +587,7 @@ class editor_Plugins_TermImport_Services_Import {
     private function isFolderEmpty($dir) {
         return (($files = @scandir($dir)) && count($files) <= 2);
     }
-    
+
     /**
      * logs a message to the error log and prints the duration needed
      * @param string $msg if empty just reset start timer and log nothing

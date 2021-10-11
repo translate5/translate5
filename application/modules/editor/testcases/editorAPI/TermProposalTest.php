@@ -69,7 +69,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             'language'=>$response->id
         ];
         $response=$this->api()->requestJson('editor/termcollection/search', 'GET', $searchParams);
-        $this->assertTrue(is_object($response),"No terms are found in the termcollection");
+        $this->assertTrue(is_object($response),"No terms are found in the termcollection ".self::$collectionId);
         $this->assertNotEmpty($response->term,"No terms are found in the term collection for the search string '*'");
         $term=$response->term[0];
         
@@ -105,7 +105,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         
         
         //[6] search for the term attributes in the term termEntryId
-        $attributes=$this->api()->requestJson('editor/termcollection/searchattribute', 'GET', ['termEntryId' =>$term->termEntryId]);
+        /*$attributes=$this->api()->requestJson('editor/termcollection/searchattribute', 'GET', ['termEntryId' =>$term->termEntryId]);
         //validate the term attributes
         $this->assertTrue(is_array($attributes->termAttributes),"No attributes where found for the test proposal term.");
         $attributes=$attributes->termAttributes;
@@ -119,7 +119,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
                 break;
             }
         }
-        $this->assertTrue(!empty($testAttribute),"No attributes where found for the test proposal term.");
+        $this->assertTrue(!empty($testAttribute),"No attributes where found for the test proposal term.");*/
         
         
         //[7] create attribute proposal

@@ -74,7 +74,7 @@ Ext.define('Editor.controller.Termportal', {
         if(this.isTermportalAllowed()){
             var apiUrl=Editor.data.restpath+'termportal',
                 appName='termportal',
-                url=Editor.data.restpath+'apps?name='+appName+'&apiUrl='+apiUrl;
+                url=Editor.data.restpath+appName+'#termportal';
             
             //reset the window name, since the user can use this window to open the translate5
             //this can happen after the user logout from termportal and login again in translate5

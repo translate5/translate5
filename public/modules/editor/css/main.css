@@ -732,7 +732,7 @@ a.x-btn span.task-confirmation {
 .language-ressource-import .ico-tm-import {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}
 .language-ressource-export .ico-tm-download {background-image: url(../images/book_go.png);background-repeat:no-repeat;background-position:center;}
 .ico-tm-magnifier {background-image: url(../images/magnifier.png) !important;background-repeat:no-repeat;background-position:center;}
-.ico-tm-log {background-image: url(../images/error.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-log {background-image: url(../images/information.png);background-repeat:no-repeat;background-position:center;}
 /*
 .matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 */
@@ -844,6 +844,7 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 	background-color: #f9e788;
 } 
 
+.customerPanelGrid .x-action-col-icon.x-action-col-0 { margin-right:5px; }
 .customerPanelGrid .ico-customer-mt-export {background-image: url("../images/database_go.png");display:inline-block;}
 .tools-help-icon .x-tool-home{
 	background-image:url(../images/help.png) !important;

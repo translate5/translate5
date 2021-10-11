@@ -103,4 +103,32 @@ class editor_Models_CustomerConfig extends ZfExtended_Models_Entity_Abstract {
         }
         return $row['value'];
     }
+
+    /**
+     * Get 'liveSearchMinChars' termportal config option
+     * It's getting maximum value among values defined in Zf_configuration
+     * and custom values defined for the customers, identified by $customerIds
+     *
+     * @param string $customerIds Comma-separated
+     * @return int
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     */
+    public function getLiveSearchMinChars($customerIds) {
+
+        // Get default
+        $default = Zend_Registry::get('config')->runtimeOptions->termportal->liveSearchMinChars;
+
+        // Get maximum among clients custom values of this config param
+        $customMax = $customerIds ? $this->db->getAdapter()->query('
+            SELECT MAX(`value`) 
+            FROM `LEK_customer_config` 
+            WHERE TRUE
+              AND `name` = "runtimeOptions.termportal.liveSearchMinChars" 
+              AND `customerId` IN (' . $customerIds . ') 
+        ')->fetchColumn() : false;
+
+        // Get max and return
+        return $customMax ? max($default, $customMax) : $default;
+    }
 }

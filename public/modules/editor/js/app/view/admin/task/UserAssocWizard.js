@@ -57,7 +57,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
     title:null,
 
     referenceHolder: true,
-
+    
     strings:{
         wizardTitle:'#UT#Standard-Benutzerzuweisungen',
         sourceLang: '#UT#Quellsprache',
@@ -154,6 +154,18 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
             queryMode: 'local',
             displayField: 'name',
             valueField: 'id'
+        });
+    },
+
+    /***
+     * Get default assoc form record
+     * @returns {Editor.model.admin.TaskUserAssoc}
+     */
+    getDefaultFormRecord:function (){
+        var me=this;
+        return Ext.create('Editor.model.admin.TaskUserAssoc',{
+            sourceLang : me.task.get('sourceLang'), // source language is always the same for projects or single tasks
+            workflow: me.down('#workflowCombo').getValue()
         });
     },
 

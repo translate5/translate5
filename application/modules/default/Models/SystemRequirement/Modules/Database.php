@@ -55,6 +55,7 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         $this->checkDbSettings($db);
         $this->checkTableCharsets($db);
         $this->checkDbTriggerCreation($db);
+        $this->checkFulltextIndexSettings($db);
         return $this->result;
     }
     
@@ -120,6 +121,27 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         }
     }
     
+    protected function checkFulltextIndexSettings(Zend_Db_Adapter_Abstract $db) {
+        $result = $db->query("SELECT @@innodb_ft_min_token_size length, @@innodb_ft_enable_stopword stopword;");
+
+        $res = $result->fetchObject();
+        if(empty($res)) {
+            return; //should not be
+        }
+        $error = false;
+        if($res->length > 1) {
+            $this->result->warning[] = 'For proper TermPortal usage: The minimum word length of the fulltext search is '.$res->length.' but must be 1. Set innodb_ft_min_token_size = 1 in DB configuration and restart database.';
+            $error = true;
+        }
+        if($res->stopword > 0) {
+            $this->result->warning[] = 'For proper TermPortal usage: The stopword list of the fulltext search must be disabled, but it is enabled. Set innodb_ft_enable_stopword = 0 in DB configuration and restart database.';
+            $error = true;
+        }
+        if($error) {
+            $this->result->warning[] = 'After changing the fulltext relevant configuration the fulltext index must be rebuild, see the below linked documentation for further information.';
+        }
+    }
+
     protected function checkDbSettings(Zend_Db_Adapter_Abstract $db) {
         // WARNING: if the tested variables are empty in DB, the test is positive!
         $notAllowedSqlModes = array(

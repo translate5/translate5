@@ -34,6 +34,9 @@ class HelpController extends ZfExtended_Controllers_Action {
     public function editorAction() {
         $this->_helper->layout->disableLayout();
     }
+    public function editordocumentationAction() {
+        $this->_helper->layout->disableLayout();
+    }
     public function languageresourceAction() {
         $this->_helper->layout->disableLayout();
     }

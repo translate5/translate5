@@ -96,14 +96,23 @@ class LoginController extends ZfExtended_Controllers_Login {
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
         $roles=$sessionUser->data->roles;
-        
+
+        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
+        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
+
+        $hash = $this->handleAppsRedirectHash();
+
+        // If user was not logged in during the attempt to load termportal, but now is logged and allowed to do that
+        //TODO: after itranslate route is changed to itranslate to instanttranslate here
+        if (preg_match('~^#(termportal|itranslate)~', $hash) && $isTermPortalAllowed) {
+            // Do redirect
+            $this->applicationRedirect(substr($hash, 1), true);
+        }
+
         if($acl->isInAllowedRoles($roles, 'initial_page','editor')) {
             $this->editorRedirect();
         }
-        
-        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
-        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
-        
+
         //the user has termportal and instantranslate roles
         if($isTermPortalAllowed && $isInstantTranslateAllowed){
             //find the last used app, if none use the instantranslate as default
@@ -114,7 +123,7 @@ class LoginController extends ZfExtended_Controllers_Login {
             if($meta->getId()!=null && $meta->getLastUsedApp()!=''){
                 $rdr=$meta->getLastUsedApp();
             }
-            $this->applicationRedirect($rdr);
+            $this->applicationRedirect($rdr, $isTermPortalAllowed);
         }
         
         //is instanttranslate allowed
@@ -134,11 +143,30 @@ class LoginController extends ZfExtended_Controllers_Login {
         throw new ZfExtended_NoAccessException("No initial_page resource is found.");
         exit;
     }
-    
-    protected function applicationRedirect(string $applicationName){
+
+    /***
+     * Redirect to one of the existing applications (termportal or instanttranslate)
+     *
+     * @param string $applicationName application name
+     * @param null $isTermPortalAllowed is the user allowed to see termportal by acl
+     * @throws Zend_Exception
+     */
+    protected function applicationRedirect(string $applicationName, $isTermPortalAllowed = null){
+
+        $pluginmanager = Zend_Registry::get('PluginManager');
+        /* @var $pluginmanager ZfExtended_Plugin_Manager */
+        $plugins = array_keys($pluginmanager->getAvailable());
+        $termPortalEnabled = in_array('TermPortal',$plugins);
+
+
+        // is term portal allowed when the user has termportal rights and the termportal plugin is enabled
+        $isTermPortalAllowed = $isTermPortalAllowed && $termPortalEnabled;
+
         header ('HTTP/1.1 302 Moved Temporarily');
         $apiUrl=APPLICATION_RUNDIR.'/editor/'.$applicationName;
-        $url=APPLICATION_RUNDIR.'/editor/apps?name='.$applicationName.'&apiUrl='.$apiUrl;
+        $url = $applicationName == 'termportal' || $isTermPortalAllowed
+            ? APPLICATION_RUNDIR.'/editor/termportal#'.$applicationName
+            : APPLICATION_RUNDIR.'/editor/apps?name='.$applicationName.'&apiUrl='.$apiUrl;
         header ('Location: '.$url);
         exit;
     }
@@ -308,5 +336,30 @@ class LoginController extends ZfExtended_Controllers_Login {
             'ViewRenderer'
         );
         $renderer->view->headScript()->appendScript($openIdScript);
+    }
+
+    /**
+     * Parse and adjust the redirect hash when the current request is for terportal/instant-translate
+     * @return mixed|string|null
+     */
+    protected function handleAppsRedirectHash(){
+
+        if(!isset($this->_session->redirecthash)){
+            return null;
+        }
+
+        $hash = $this->_session->redirecthash;
+        if(preg_match('~^#name=(termportal|instanttranslate)~', $hash, $matches)){
+            // Drop redirecthash prop from session
+            $this->_session->redirecthash = '';
+            $hash = $matches[1];
+            //TODO: after itranslate route is changed to instanttranslate this should be removed
+            if($hash === 'instanttranslate'){
+                $hash = 'itranslate';
+            }
+            return '#'.$hash;
+        }
+
+        return $hash;
     }
 }

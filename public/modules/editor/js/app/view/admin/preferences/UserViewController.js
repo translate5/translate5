@@ -83,13 +83,7 @@ Ext.define('Editor.view.admin.preferences.UserViewController', {
      * @param newValue
      */
     onUiThemeChange:function(combo, newValue){
-        var uiThemesRecord = Editor.app.getUserConfig('extJs.cssFile',true);
-        uiThemesRecord.set('value',newValue);
-        uiThemesRecord.save({
-            callback:function(){
-                location.reload();
-            }
-        });
+        Editor.app.changeUserTheme(newValue);
     }
 
 });
