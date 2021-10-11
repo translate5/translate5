@@ -72,7 +72,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         me.preimportOperation({
             usageMode: usageMode.getValue(),
             workflow:workflowCombo.getValue(),
-            notifyAssociatedUsers:notify.checked ? 1 : 0
+            notifyAssociatedUsers:notify ? 1 : 0
         },function (){
             view.fireEvent('wizardCardFinished', skipCards);
         });
@@ -121,6 +121,9 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         if(usersStore.getCount() === 0){
             usersStore.load();
         }
+
+        // set the checkbox default value from config
+        me.setNotifyAllUsersTaskConfig();
     },
 
     /***
@@ -336,10 +339,24 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
      * @param oldValue
      */
     updatePreImportOnChange: function (newValue, oldValue){
-        // ignore when the new value is null. This is the case when the default values are set for the components
-        if(oldValue === null){
-            return;
-        }
         this.getView().getViewModel().set('sendPreImportOperation',newValue !== oldValue);
+    },
+
+    /***
+     * This will set the notify associated users checkbox value from runtimeOptions.workflow.notifyAllUsersAboutTask config.
+     * This config is overridable on customer level!
+     */
+    setNotifyAllUsersTaskConfig:function(){
+        var me=this,
+            view = me.getView(),
+            notifyAssociatedUsersCheckBox = view.down('#notifyAssociatedUsersCheckBox'),
+            store = Ext.create('Editor.store.admin.CustomerConfig');
+
+        view.mask();
+
+        store.loadByCustomerId(view.task.get('customerId'),function (){
+            notifyAssociatedUsersCheckBox.setValue(store.getConfig('workflow.notifyAllUsersAboutTask'));
+            view.unmask();
+        });
     }
 });
