@@ -59,12 +59,17 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'Imports all new database files or a single file if a filename / hash was given.');
 
+        /**
+         * TODO Open Ideas:
+         */
 //        $this->addOption(
 //            'select',
 //            's',
 //            InputOption::VALUE_NONE,
 //            'Provides an interactive menu to select the files to be imported.');
 
+            //add a recall parameter, so that specific database files can be called again.
+        
         $this->addOption(
             'assume-imported',
             null,
@@ -86,15 +91,23 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         
         $dbupdater = \ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
         /* @var $dbupdater \ZfExtended_Models_Installer_DbUpdater */
-        
-        //$this->getModifiedFiles();
-        $dbupdater->calculateChanges();
-        
+
+        //print on develop machines the configured sqlPaths and in the Browser GUI
+        $usedPaths = $dbupdater->calculateChanges();
+        $usedPaths = array_filter($usedPaths, function($item) {
+            return strpos($item, 'library/ZfExtended/database/') === false && strpos($item, 'modules/default/database/') === false && strpos($item, 'modules/editor/database/') === false;
+        });
+        if(!empty($usedPaths)) {
+            array_unshift($usedPaths, 'Additional configured DB search path(s): ');
+            $this->io->warning($usedPaths);
+        }
+
         $result = $this->processOnlyOneFile($dbupdater);
         if($result >= 0) {
             return $result;
         }
-        
+
+
         $newFiles = $dbupdater->getNewFiles();
         $toProcess = [];
         if(!empty($newFiles)) {
