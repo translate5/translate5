@@ -110,18 +110,8 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
 
     onAddAssocBtnClick : function(){
         var me=this,
-            formPanel = me.lookup('assocForm'),
-            workflowCombo = me.getView().down('#workflowCombo');
-            newRecord = Ext.create('Editor.model.admin.UserAssocDefault',{
-                customerId : me.getView().getCustomer().get('id'),
-                deadlineDate: null,
-                workflow: workflowCombo.getValue()
-            });
-            
-        me.getView().fireEvent('addnewassoc', newRecord, formPanel);
-
-        me.resetRecord(newRecord);
-
+            formPanel = me.lookup('assocForm');
+        me.resetRecord();
         formPanel.setDisabled(false);
     },
 
@@ -240,7 +230,7 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
     },
 
     /***
-     * Resets the current form record and clears the grid selection
+     * Resets the current form record and load new record into the form
      */
     resetRecord:function (record){
         var me=this,
@@ -249,6 +239,7 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
         if(!record){
             record = me.getView().getDefaultFormRecord();
         }
+        me.getView().fireEvent('addnewassoc', record, formPanel);
         form.loadRecord(record);
     }
 });
