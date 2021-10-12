@@ -865,6 +865,10 @@
         <source>Soll dieser Eintrag wirklich gelöscht werden?</source>
         <target>Do you really want to delete this entry?</target>
       </trans-unit>
+      <trans-unit id='QmVudXR6ZXJ6dXdlaXN1bmcgZ2VzcGVpY2hlcnQ='>
+      	<source>Benutzerzuweisung gespeichert</source>
+      	<target>User association saved</target>
+      </trans-unit>
       <trans-unit id='V29ya2Zsb3cgU2Nocml0dA=='>
         <source>Workflow Schritt</source>
         <target>Workflow step</target>

@@ -75,8 +75,9 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
     },
 
     strings:{
-        deleteUserMessage:'#UT#Soll dieser Eintrag wirklich gelöscht werden?',
-        deleteUserTitle:'#UT#Eintrag löschen?'
+        deleteUserMessage: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
+        deleteUserTitle: '#UT#Eintrag löschen?',
+        assocSaved: '#UT#Benutzerzuweisung gespeichert'
     },
 
     onSaveAssocBtnClick : function(){
@@ -97,7 +98,7 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
             },
             success: function() {
                 me.getView().down('grid').getStore().load();
-                Editor.MessageBox.addSuccess('Assoc saved');
+                Editor.MessageBox.addSuccess(me.strings.assocSaved);
                 me.resetRecord();
             }
         });
