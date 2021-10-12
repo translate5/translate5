@@ -871,6 +871,14 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Prepare params array
         $bindParam = [];
 
+        //
+        foreach (['termEntryTbxId', 'termTbxId'] as $prop)
+            if (isset($params[$prop]) && $params[$prop]) {
+                $token = ':' . $prop;
+                $where []= '`t`.`' . $prop . '` = ' . $token;
+                $bindParam[$token] = $params[$prop];
+            }
+
         // If it's a non '*'-query (e.g. non 'any'-query)
         if (!preg_match('~^\*+$~', $against)) {
 
