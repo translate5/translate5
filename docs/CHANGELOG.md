@@ -12,6 +12,29 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.5.2] - 2021-10-11
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-2637](https://jira.translate5.net/browse/TRANSLATE-2637): Warn regarding merging terms** <br>
+Warning message will be shown when using merge terms functionality in term collection import/re-import
+
+**[TRANSLATE-2630](https://jira.translate5.net/browse/TRANSLATE-2630): Add language resource name to language resource pop-up - same for projects** <br>
+Improves info messages and windows titles in language resources, project and task overview.
+
+
+### Bugfixes
+**[TRANSLATE-2597](https://jira.translate5.net/browse/TRANSLATE-2597): Set resource usage log lifetime by default to 30 days** <br>
+This will set the default lifetime days for resources usage log configuration to 30 days when there is no value set.
+
+**[TRANSLATE-2528](https://jira.translate5.net/browse/TRANSLATE-2528): Instant-translate and Term-portal route after login** <br>
+Fixed problems accessing TermPortal / InstantTranslate with external URLs.
+
+
 ## [5.5.1] - 2021-10-07
 
 ### Important Notes:

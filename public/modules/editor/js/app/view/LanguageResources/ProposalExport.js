@@ -50,7 +50,7 @@ Ext.define('Editor.view.LanguageResources.ProposalExport', {
 	initConfig: function(instanceConfig) {
         var me = this,
         config = {
-    		title:me.strings.title,
+			title:me.strings.title+': '+instanceConfig.record.get('name'),
             items:[{
         		xtype: 'datefield',
         		flex:1,

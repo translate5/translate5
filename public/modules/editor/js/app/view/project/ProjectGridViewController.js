@@ -30,11 +30,11 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.projectGrid',
     strings: {
-    	deleteProjectDialogTitle:'#UT#Projekt komplett löschen?',
+    	deleteProjectDialogTitle:'#UT#Projekt "{0}" komplett löschen?',
     	deleteProjectDialogMessage:'#UT#Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?',
     	projectDeleteButtonText:'#UT#Projekt löschen',
     	projectCanceltButtonText:'#UT#Nein',
-    	projectRemovedMessage:'#UT#Das Projekt wurde erfolgreich entfernt!'
+    	projectRemovedMessage:'#UT#Das Projekt "{0}" wurde erfolgreich entfernt!'
     },
     listen: {
         messagebus: {
@@ -74,7 +74,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     handleProjectDelete:function(project,event){
     	var me=this;
         Ext.Msg.show({
-            title:me.strings.deleteProjectDialogTitle,
+            title:Ext.String.format(me.strings.deleteProjectDialogTitle, project.get('taskName')),
             message: me.strings.deleteProjectDialogMessage,
             buttons: Ext.Msg.YESNO,
             icon: Ext.Msg.QUESTION,
@@ -94,7 +94,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     /**
      * Find the action icon click handler
      */
-    projectActionDispatcher: function(view, cell, row, col, ev, evObj) {
+    projectActionDispatcher: function(view, cell, row, col, ev) {
         var me = this,
             t = ev.getTarget(),
             f = t.className.match(/ico-project-([^ ]+)/),
@@ -103,7 +103,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
                 return a.charAt(1).toUpperCase();
             },
             actionIdx = ((f && f[1]) ? f[1] : "not-existing"),
-            //build camelized action out of icon css class:
+            //build camelize action out of icon css class:
             action = ('handleProject-'+actionIdx).replace(camelRe, camelFn),
             right = action.replace(/^handleProject/, 'editor')+'Project',
             project = view.getStore().getAt(row);
@@ -134,7 +134,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
             success: function() {
             	me.reloadProjects();
             	Ext.StoreManager.get('admin.Tasks').reload();
-            	Editor.MessageBox.addSuccess(me.strings.projectRemovedMessage,2);
+            	Editor.MessageBox.addSuccess(Ext.String.format(me.strings.projectRemovedMessage, project.get('taskName')),2);
             },
             failure: function(records, op){
             	Editor.app.getController('ServerException').handleException(op.error.response);
