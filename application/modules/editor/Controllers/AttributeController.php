@@ -793,6 +793,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // If it's a processStatus-attribute
         if ($_['attrId']['type'] == 'processStatus') {
+
             // Get current value of processStatus attribute, that should be involved in validation
             $current = $t->getProposal() ? 'unprocessed' : $_['attrId']['value'];
 

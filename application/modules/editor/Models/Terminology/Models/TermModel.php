@@ -63,6 +63,14 @@ END LICENSE AND COPYRIGHT
  * @method string setLangSetGuid() setLangSetGuid(string $langSetGuid)
  * @method string getGuid() getGuid()
  * @method string setGuid() setGuid(string $guid)
+ * @method integer getTbxCreatedBy() getTbxCreatedBy()
+ * @method integer setTbxCreatedBy() setTbxCreatedBy(integer $personId)
+ * @method integer getTbxCreatedAt() getTbxCreatedAt()
+ * @method integer setTbxCreatedAt() setTbxCreatedAt(string $timestamp)
+ * @method integer getTbxUpdatedBy() getTbxUpdatedBy()
+ * @method integer setTbxUpdatedBy() setTbxUpdatedBy(integer $personId)
+ * @method integer getTbxUpdatedAt() getTbxUpdatedAt()
+ * @method integer setTbxUpdatedAt() setTbxUpdatedAt(string $timestamp)
  */
 class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminology_Models_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Term';
@@ -117,6 +125,23 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      *
      */
     public function insert($misc = []) {
+
+        // If $misc['userName'] is given
+        if (isset($misc['userName'])) {
+
+            // Load or create person
+            $person = ZfExtended_Factory
+                ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
+                ->loadOrCreateByName($misc['userName']);
+
+            // Use person id as tbxCreatedBy and tbxUpdatedBy
+            $this->setTbxCreatedBy($by = $person->getId());
+            $this->setTbxUpdatedBy($by);
+        }
+
+        // Set tbx(Created|Updated)At
+        $this->setTbxCreatedAt($at = date('Y-m-d H:i:s'));
+        $this->setTbxUpdatedAt($at);
 
         // Save
         $termId = $this->save();
@@ -871,13 +896,18 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Prepare params array
         $bindParam = [];
 
-        //
+        // Mind termEntryTbxId and termTbxId params
         foreach (['termEntryTbxId', 'termTbxId'] as $prop)
             if (isset($params[$prop]) && $params[$prop]) {
                 $token = ':' . $prop;
                 $where []= '`t`.`' . $prop . '` = ' . $token;
                 $bindParam[$token] = $params[$prop];
             }
+
+        // Mind tbxCreatedBy and tbxUpdatedBy params
+        foreach (['tbxCreatedBy', 'tbxUpdatedBy'] as $prop)
+            if (isset($params[$prop]) && $params[$prop])
+                $where []= '`t`.`' . $prop . '` IN (' . $params[$prop] . ')';
 
         // If it's a non '*'-query (e.g. non 'any'-query)
         if (!preg_match('~^\*+$~', $against)) {
