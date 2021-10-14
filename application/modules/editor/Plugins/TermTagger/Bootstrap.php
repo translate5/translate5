@@ -64,8 +64,48 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         
         //checks if the term taggers are available.
         $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', array($this, 'handleTermTaggerCheck'));
+
+        $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
     }
-    
+
+    /**
+     * update defaultAdministrativeStatus defaults
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterConfigIndexAction(Zend_EventManager_Event $event) {
+        $rows = $event->getParam('view')->rows ?? [];
+        if(empty($rows)){
+            return;
+        }
+
+        //find the defaultAdministrativeStatus config
+        $toUpdate = array_search('runtimeOptions.tbx.defaultAdministrativeStatus', array_column($rows, 'name'));
+
+        if(empty($toUpdate)){
+            return;
+        }
+        $config = $rows[$toUpdate];
+
+        /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
+        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
+
+
+        $defaults = implode(',',$termNoteStatus->getAdministrativeStatusValues());
+        //the config has the same values as defaults
+        if($config['defaults'] == $defaults){
+            return;
+        }
+
+        $model = ZfExtended_Factory::get('editor_Models_Config');
+        /* @var $model editor_Models_Config */
+        $model->loadByName($config['name']);
+        $model->setDefaults($defaults);
+        $model->save();
+
+        //update the view rows
+        $event->getParam('view')->rows[$toUpdate]['defaults'] = $defaults;
+    }
+
     /**
      * By default read only segments are not tagged, can be disabled via config
      * @param Zend_EventManager_Event $event

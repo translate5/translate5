@@ -218,7 +218,6 @@ class editor_TaskController extends ZfExtended_RestController {
 
         ->initContext();
     }
-
     /**
      * init the internal used workflow
      * @param string $wfId workflow ID. optional, if omitted use the workflow of $this->entity

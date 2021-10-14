@@ -291,8 +291,6 @@ $isTempDev = TRUE;
                 ?>
             </select>
             <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="click-starts-translation ui-corner-all ui-button ui-widget"/>
-            <div id="instantTranslationIsOff" class="click-starts-translation instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
-            <div id="instantTranslationIsOn" class="instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
         </form>
         <div id="targetError" class="instant-translation-error ui-state-error ui-corner-all"></div>
         <div class="loadingSpinnerIndicator"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>

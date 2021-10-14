@@ -114,7 +114,7 @@ class editor_Models_Segment_TermTag
      * @param bool $preserveInternal if true, internal tags are masked before removing term tags.
      * @return string
      */
-    public function remove(string $segment, $preserveInternal = false): string
+    public function remove(string $segment, bool $preserveInternal = false): string
     {
         if ($preserveInternal) {
             $this->initInternalTagHelper();

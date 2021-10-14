@@ -575,9 +575,14 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             }
         }
 
+        // If attribute's `type` is 'definition' - check whether we should update `terms_term`.`definition`
+        // and if yes, what should be the new value and what terms should be affected
+        if ($this->getType() == 'definition')
+            $return['definition'] = $this->replicateDefinition('deleted');
+
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
         if ($misc['userName'])
-            $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
+            $return['updated'] = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage());
 
         // Call parent
@@ -593,17 +598,23 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * @param array $collectionIds
      * @param string $olderThan
      * @return boolean
+     * @throws Zend_Db_Statement_Exception
      */
     public function removeProposalsOlderThan(array $collectionIds,string $olderThan): bool
     {
         // Get ids of attrs, that were created or updated after tbx-import
-        if (!$attrIdA = editor_Utils::db()->query('
+        $attrIdA = editor_Utils::db()->query('
             SELECT `id` 
             FROM `terms_attributes` 
             WHERE TRUE
               AND `isCreatedLocally` = "1" 
               AND `collectionId` IN (' . implode(',', $collectionIds) . ')
-        ')->fetchAll(PDO::FETCH_COLUMN)) return false;
+        ')->fetchAll(PDO::FETCH_COLUMN);
+
+        if (empty($attrIdA)){
+            return false;
+        }
+
 
         // Get tbx-imported values for `value` and `target` props, that now have changed values in attributes-table
         $tbxA = editor_Utils::db()->query('
@@ -622,10 +633,14 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         $affectedQty = 0;
 
         // Delete created attrs, that are older than $olderThan
-        if ($attrIdA_created) $affectedQty += $this->db->delete([
-            'createdAt < ?' => $olderThan,
-            'id in (?)' => $attrIdA_created,
-        ]);
+        if (!empty($attrIdA_created)) {
+            //this speeds incredibly up the SQL since no cast must be done in SQL then
+            $affectedQty += $this->db->delete([
+                'createdAt < ?' => $olderThan,
+                'collectionId in (?)' => $collectionIds,
+                'id in (?)' => $attrIdA_created,
+            ]);
+        }
 
         // Overwrite $attrIdA_updated array for it to keep only ids of attributes, that were last updated before $olderThan arg
         if ($attrIdA_updated) $attrIdA_updated = editor_Utils::db()->query($sql = '
@@ -685,7 +700,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         // Get data by ref targets
         $dataByRefTargetIdA = editor_Utils::db()->query($_ = '
             SELECT
-              ' . $tbxCol . ',
+              ' . $tbxCol . ' AS `tbx`,
               `termEntryId`,
               `collectionId`,
               JSON_OBJECTAGG(
@@ -694,7 +709,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
               ) AS `json`
             FROM `terms_term`
             WHERE ' . $where . '
-            GROUP BY `termEntryId`            
+            GROUP BY `tbx`            
         ')->fetchAll(PDO::FETCH_UNIQUE);
 
         // Simulate situation when current search-term language is 'en-us', but refData contains term only for 'en-gb'
@@ -722,7 +737,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             // despite 'en-gb' is more preferable, so below we're preventing that
             if (count($prefLangGroupA) == 1)
                 foreach ($prefLangA as $prefLang)
-                    if ($value = $refData['json'][$prefLang]) {
+                    if ($value = $refData['json'][$prefLang] ?? null) {
                         $refData['language'] = $prefLang;
                         list (
                             $refData['termId'],
@@ -740,7 +755,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             foreach ($prefLangA as $prefLang) {
 
                 // If term exists for the preferred language
-                if (count($prefLangGroupA) >= 1 && $value = $refData['json'][$prefLang]) {
+                if (count($prefLangGroupA) >= 1 && $value = $refData['json'][$prefLang] ?? null) {
                     $refData['language'] = $prefLang;
                     list (
                         $refData['termId'],
@@ -775,7 +790,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             }
 
             // If term for preferred languages is still not found - just use first
-            if (!$refData['language']) {
+            if (!isset($refData['language'])) {
                 $refData['language'] = array_keys($refData['json'])[0];
                 list (
                     $refData['termId'],
@@ -860,5 +875,127 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             FROM `terms_attributes`
             WHERE `termEntryId` IN (' . $termEntryIds . ')' . editor_Utils::rif($tbxBasicOnly, ' AND `dataTypeId` IN ($1)')
         )->fetchAll(), 'termEntryId', 'language', 'termId');
+    }
+
+    /**
+     * Replicate new value of definition attribute to `terms_term`.`definition` where needed
+     * and return array containing new value and ids of affected `terms_term` records for
+     * being able to apply that on client side
+     *
+     * Accepts a definition text as a first arg and spread it across
+     * `terms_term`.`definition` where need according to the agreed logic
+     *
+     * @param $definition
+     */
+    public function replicateDefinition($event) {
+
+        // If $event is 'deleted'
+        if ($event == 'deleted') {
+
+            // If it's a language-level definition-attribute is going to be deleted
+            // get termEntry-level definition-attribute to be used as a replacement
+            // or just use null
+            $value = $this->getLanguage() ? $this->_entryLevelDef() : null;
+
+        // Else if $event is 'updated'
+        } else if ($event == 'updated') {
+
+            // If we updated the language-level definition-attribute
+            $value = $this->getLanguage()
+
+                // Use new value if not empty, or termEntry-level one otherwise
+                ? ($this->getValue() ?: $this->_entryLevelDef())
+
+                // Else if we updated termEntry-level one - use the value we have
+                : $this->getValue();
+        }
+
+        i('here3', 'a');
+        // Prepare query bindings
+        $bind = [$this->getTermEntryId()];
+
+        // Bind the language-param to the query
+        // If it's a lanuguage-level definition, $this's language is just used,
+        // otherwise we need to replicate definition to all terms, that have
+        // no definition-attribute on their language-level, or have but it's empty,
+        // so we find the languages matching that criteria within current termEntry
+        $bind []= $this->getLanguage()
+            ? $this->getLanguage()
+            : join(',', $this->_getLanguagesWithNoOrEmptyDefinition());
+
+        i($bind, 'a');
+        // Get ids of terms, that will be affected
+        $termIdA = $this->db->getAdapter()->query('
+            SELECT `id` 
+            FROM `terms_term` 
+            WHERE `termEntryId` = ? AND FIND_IN_SET(`language`, ?)
+        ', $bind)->fetchAll(PDO::FETCH_COLUMN);
+
+        // Affected term ids array
+        $affected = [];
+
+        // Get term model
+        $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+
+        // Foreach termId
+        foreach ($termIdA as $termId) {
+
+            // Load term and update definition, involving history-record creation
+            $termM->load($termId);
+            $termM->setDefinition($value);
+            $termM->update();
+
+            //
+            $affected []= $termId;
+        }
+
+        // Return
+        return ['value' => $value, 'affected' => $affected];
+    }
+
+    /**
+     * Get the value of termEntry-level definition attribute
+     *
+     * @return string
+     * @throws Zend_Db_Statement_Exception
+     */
+    protected function _entryLevelDef() {
+        return $this->db->getAdapter()->query('
+            SELECT `value` 
+            FROM `terms_attributes` 
+            WHERE 1
+              AND `termEntryId` = ? 
+              AND ISNULL(`language`) 
+              AND `type` = "definition"
+        ', $this->getTermEntryId())->fetchColumn();
+    }
+
+    /**
+     * Get array of languages (within current termEntryId) that have no definition-attribute,
+     * or have but it's empty. This is an internal-purpose method, that is used to build the
+     * WHERE clause to identify terms_term-records that termEntry-level definition-attribute
+     * can be replicated across as a value of `definition` column
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    protected function _getLanguagesWithNoOrEmptyDefinition() {
+        return $this->db->getAdapter()->query('
+            SELECT
+              `t`.`language`,
+              COUNT(`ta`.`id`) AS `qty`,
+              MAX(IFNULL(`ta`.`TYPE` = "definition", 0)) AS `hasDef`,
+              MAX(IFNULL(`ta`.`TYPE` = "definition", 0) AND IFNULL(`ta`.`value`, "") = "") AS `butEmpty`
+            FROM 
+              `terms_term` `t`
+              LEFT JOIN `terms_attributes` `ta` ON (
+                    `ta`.`termEntryId` = `t`.`termEntryId` 
+                AND `t`.`language` = `ta`.`language` 
+                AND ISNULL(`ta`.`termId`)
+              )
+            WHERE `t`.`termEntryId` = ?
+            GROUP BY `t`.`language`
+            HAVING `hasDef` = 0 OR `butEmpty` = 1
+        ', $this->getTermEntryId())->fetchAll(PDO::FETCH_COLUMN);
     }
 }

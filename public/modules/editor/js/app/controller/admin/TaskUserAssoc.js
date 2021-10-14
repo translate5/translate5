@@ -147,6 +147,8 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
             step = task.get('workflowStepName'),
             state = Ext.Object.getKeys(meta.states)[0],
             isTranslationTask = task.get('emptyTargets'),
+            userAssoc = me.getUserAssoc(),
+            userAssocForm = me.getUserAssocForm(),
             newRec;
 
         if (!meta.usableSteps[step]) {
@@ -168,12 +170,15 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
             workflowStepName: step,
             state: state
         });
+ 
+        userAssoc.fireEvent('addnewassoc', newRec, userAssocForm);
+        
         me.getAssocDelBtn().disable();
         me.getEditInfo().hide();
-        me.getUserAssocForm().show();
-        me.getUserAssocForm().setDisabled(false);
+        userAssocForm.show();
+        userAssocForm.setDisabled(false);
         me.filterStepsCombo(newRec);
-        me.getUserAssoc().loadRecord(newRec);
+        userAssoc.loadRecord(newRec);
         me.initState(null, step, '');
     },
 

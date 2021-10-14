@@ -132,7 +132,9 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
      * @param record
      */
     loadRecord: function(record) {
-        this.languageResourceRecord = record;
+        var me=this;
+        me.setTitle(me.strings.title+': '+record.get('name'));
+        me.languageResourceRecord = record;
     },
     
     /***

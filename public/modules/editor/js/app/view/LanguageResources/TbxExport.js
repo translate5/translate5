@@ -39,7 +39,7 @@ Ext.define('Editor.view.LanguageResources.TbxExport', {
     	exportImagesLabel: '#UT#Bilder im Hex-Format exportieren, eingebettet in TBX',
     	exportButtonText:'#UT#Exportieren',
     	cancelButtonText:'#UT#Abbrechen',
-    	title:'#UT#Als TBX exportieren',
+    	title:'#UT#Als TBX exportieren'
     },
     modal:true,
 	width:500,
@@ -51,7 +51,7 @@ Ext.define('Editor.view.LanguageResources.TbxExport', {
 	initConfig: function(instanceConfig) {
         var me = this,
         config = {
-    		title:me.strings.title,
+    		title:me.strings.title+': '+instanceConfig.record.get('name'),
 			defaults: {
 				margin: '0 0 0 15'
 			},

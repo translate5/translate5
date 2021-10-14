@@ -80,7 +80,7 @@ class editor_Utils {
           \A (?&json) \Z
           /six',
         'xmlid' => '~(?(DEFINE)
-            (?<first>   (:|[A-Z]|_|[a-z]|[\x{C0}-\x{D6}]|[\x{D8}-\x{F6}]|[\x{F8}-\x{2FF}]|[\x{370}-\x{37D}]|[\x{37F}-\x{1FFF}]|[\x{200C}-\x{200D}]|[\x{2070}-\x{218F}]|[\x{2C00}-\x{2FEF}]|[\x{3001}-\x{D7FF}]|[\x{F900}-\x{FDCF}]|[\x{FDF0}-\x{FFFD}]|[\x{10000}-\x{EFFFF}]) )
+            (?<first>   (:|[0-9]|[A-Z]|_|[a-z]|[\x{C0}-\x{D6}]|[\x{D8}-\x{F6}]|[\x{F8}-\x{2FF}]|[\x{370}-\x{37D}]|[\x{37F}-\x{1FFF}]|[\x{200C}-\x{200D}]|[\x{2070}-\x{218F}]|[\x{2C00}-\x{2FEF}]|[\x{3001}-\x{D7FF}]|[\x{F900}-\x{FDCF}]|[\x{FDF0}-\x{FFFD}]|[\x{10000}-\x{EFFFF}]) )
             (?<other>   (-|\.|[0-9]|\x{B7}|[\x{0300}-\x{036F}]|[\x{203F}-\x{2040}]) )
             (?<second>  (?&first) | (?&other)  )
             (?<xmlid>   (?&first)   (?&second)* )
@@ -134,25 +134,6 @@ class editor_Utils {
         '\u200D', // ‍
         '\u200E', // ‎
         '\u200F' // ‏
-    ];
-    /**
-     * List of problematic characters (Characters that presumably have no meaning for the text) in Hex-notation
-     * This are the following characters: , , , , , , , , , , , 
-     * @var array
-     */
-    private static $problematicChars = [
-        '\uE003',
-        '\ue005',
-        '\uE009',
-        '\uE015',
-        '\uE016',
-        '\uE01B',
-        '\uE01C',
-        '\uE01D',
-        '\uE01E',
-        '\uE01F',
-        '\uE043',
-        '\uE062'
     ];
     /**
      * List of Ligatures with their Ascii replacements in Hex-notation
@@ -287,20 +268,6 @@ class editor_Utils {
         return $text;
     }
     /**
-     * Removes/Replace some chars which have no meaning for textual content and presumably are only "non printable characters"
-     * While these are multibyte chars, a segmentation may be written inside these bytes an then the charcters are damaged
-     * FIXME Stephan: Please add some DOC here how these chars affected the segmentation and how you found that out
-     * @param string $text
-     * @param string $replacement
-     * @return string
-     */
-    public static function replaceProblematicChars($text, $replacement='') {
-        foreach(self::$problematicChars as $char){
-            $text = str_replace(json_decode('"'.$char.'"'), $replacement, $text);
-        }
-        return $text;
-    }
-    /**
      * splits the text up into HTML tags / entities on one side and plain text on the other side
      * The order in the array is important for the following wordBreakUp, since there are HTML tags and entities ignored.
      * Caution: The ignoring is done by the array index calculation there!
@@ -368,7 +335,7 @@ class editor_Utils {
              // settype($rule['dis'], 'string');
 
             // Shortcut to $data[$prop]
-            $value = $data[$prop];
+            $value = $data[$prop] ?? null;
 
             // Get meta
             $meta = isset($data['_meta'][$prop]) ? $data['_meta'][$prop] : [];
@@ -557,8 +524,8 @@ class editor_Utils {
                 : (is_array($msg2) ? $msg2 : ['msg' => $msg2]);
 
         // Merge the additional data to the $flush array
-        if ($mrg1) $flush = array_merge($flush, $mrg1);
-        if ($mrg2) $flush = array_merge($flush, $mrg2);
+        if (isset($mrg1)) $flush = array_merge($flush, $mrg1);
+        if (isset($mrg2)) $flush = array_merge($flush, $mrg2);
 
         // Send headers
         if (!headers_sent()) {

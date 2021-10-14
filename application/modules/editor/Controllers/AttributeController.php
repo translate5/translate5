@@ -112,6 +112,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ], $_['termEntryId']);
 
         // Call the appropriate method depend on attr's `elementName` or `type` prop
+        settype($params['mode'], 'string');
         if ($params['mode'] == 'xref') $this->xrefcreateAction($_);
         else if ($params['mode'] == 'ref') $this->refcreateAction($_);
         else if ($params['mode'] == 'figure') $this->figurecreateAction($_);
@@ -186,19 +187,19 @@ class editor_AttributeController extends ZfExtended_RestController
             ],
         ], $_['attrId']);
 
-        // If it's a processStatus-attribute - do nothing
-        if ($_['attrId']['type'] == 'processStatus') return;
+        // If it's a processStatus- or administrativeStatus-attribute - do nothing
+        if ($_['attrId']['type'] == 'processStatus' || $_['attrId']['type'] == 'administrativeStatus') return;
 
         // Create `terms_attributes` model instance
         $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
         $a->load($params['attrId']);
-        $updated = $a->delete($misc = [
+        $data = $a->delete($misc = [
             'userName' => $this->_session->userName,
             'userGuid' => $this->_session->userGuid,
         ]);
 
         // Flush response data
-        $this->view->assign(['updated' => $updated]);
+        $this->view->assign($data);
 
         // Update
         ZfExtended_Factory
@@ -525,6 +526,7 @@ class editor_AttributeController extends ZfExtended_RestController
         ], $_['termEntryId']);
 
         // Create `terms_attributes` model instance
+        /* @var $a editor_Models_Terminology_Models_AttributeModel */
         $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
 
         // Apply data
@@ -796,7 +798,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Define which old values can be changed to which new values
             $allow = false; $allowByRole = [
-                'termSearch' => false, // no change allowed
+                'termCustomerSearch' => false, // no change allowed
                 'termReviewer' =>  ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
                 'termFinalizer' => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
                 'termProposer' =>  [],
@@ -953,6 +955,15 @@ class editor_AttributeController extends ZfExtended_RestController
             $attrR = $attrM->load($params['attrId']);
             $attrR->setFromArray(['value' => $params['value'], 'updatedBy' => $this->_session->id, 'isCreatedLocally' => 1]);
             $attrM->update();
+
+            // If it's a definition-attribute
+            if ($_['attrId']['type'] == 'definition' && !$_['attrId']['termId']) {
+
+                // Replicate new value of definition-attribute to `terms_term`.`definition` where needed
+                // and return array containing new value and ids of affected `terms_term` records for
+                // being able to apply that on client side
+                $data['definition'] = $attrM->replicateDefinition('updated');
+            }
         }
 
         // The term status is updated in in anycase (due implicit normativeAuthorization changes above),
@@ -982,20 +993,39 @@ class editor_AttributeController extends ZfExtended_RestController
      * so this method get all term's attributes that may affect term's `status` and recalculate
      * and return the value for `status`
      *
-     * @param $termM
-     * @param $attrM
-     * @return mixed
+     * @param editor_Models_Terminology_Models_TermModel $termM
+     * @param editor_Models_Terminology_Models_AttributeModel $attrM
+     * @return array
      */
-    protected function _updateTermStatus($termM, $attrM) {
+    protected function _updateTermStatus(editor_Models_Terminology_Models_TermModel $termM, editor_Models_Terminology_Models_AttributeModel $attrM): array {
 
         /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
         $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
-
         // Get attributes, that may affect term status
         $termNotes = $attrM->loadByTerm($termM->getId(), ['termNote'], $termNoteStatus->getAllTypes());
 
+        $others = [];
+        if($termNoteStatus->isStatusRelevant($attrM)) {
+            // in this case we sync the changed attribute to the other status relevant attributes
+            $status = $termNoteStatus->fromTermNotes($termNotes, $attrM->getType(), $others);
+        }
+        else {
+            // in this case the administrativeStatus may be changed implictly, so we sync its value to the others
+            $status = $termNoteStatus->fromTermNotes($termNotes, $termNoteStatus::DEFAULT_TYPE_ADMINISTRATIVE_STATUS, $others);
+        }
+
+        //update the other attributes with the new value
+        foreach($others as $id => $other) {
+            if($other['status'] === null) {
+                $attrM->db->delete(['id = ?' => $id]);
+            }
+            else {
+                $attrM->db->update(['value' => $other['status']], ['id = ?' => $id]);
+            }
+        }
+
         // Recalculate term status
-        $termM->setStatus($termNoteStatus->fromTermNotes($termNotes));
+        $termM->setStatus($status);
 
         // If status is modified save it to the DB
         if ($termM->isModified('status')) {
@@ -1003,7 +1033,11 @@ class editor_AttributeController extends ZfExtended_RestController
             $termM->update(['updateProcessStatusAttr' => false]);
 
             // Return new status
-            return $termM->getStatus();
+            return [
+                'status' => $termM->getStatus(),
+                'others' => array_column($others, 'status', 'dataTypeId')
+            ];
         }
+        return [];
     }
 }

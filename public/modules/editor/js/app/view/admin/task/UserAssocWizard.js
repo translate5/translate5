@@ -57,7 +57,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
     title:null,
 
     referenceHolder: true,
-
+    
     strings:{
         wizardTitle:'#UT#Standard-Benutzerzuweisungen',
         sourceLang: '#UT#Quellsprache',
@@ -124,17 +124,11 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
 
         // define the form fields bindings
         form.findField('userGuid').setBind({
-            store: '{users}', // the store binding must be redefined because this will overwrite the main bind definition
-            disabled:'{!targetLangUserAssoc.value}'
+            store: '{users}' // the store binding must be redefined because this will overwrite the main bind definition
         });
 
         form.findField('workflowStepName').setBind({
-            store:'{workflowSteps}',// the store binding must be redefined because this will overwrite the main bind definition
-            disabled:'{!targetLangUserAssoc.value}'
-        });
-
-        form.findField('deadlineDate').setBind({
-            disabled:'{!targetLangUserAssoc.value}'
+            store:'{workflowSteps}'// the store binding must be redefined because this will overwrite the main bind definition
         });
 
         grid.down('#assocGridTopToolbar').insert(4,{
@@ -154,6 +148,18 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
             queryMode: 'local',
             displayField: 'name',
             valueField: 'id'
+        });
+    },
+
+    /***
+     * Get default assoc form record
+     * @returns {Editor.model.admin.TaskUserAssoc}
+     */
+    getDefaultFormRecord:function (){
+        var me=this;
+        return Ext.create('Editor.model.admin.TaskUserAssoc',{
+            sourceLang : me.task.get('sourceLang'), // source language is always the same for projects or single tasks
+            workflow: me.down('#workflowCombo').getValue()
         });
     },
 

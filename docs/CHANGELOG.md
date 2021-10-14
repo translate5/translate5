@@ -11,6 +11,76 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [5.5.2] - 2021-10-11
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-2637](https://jira.translate5.net/browse/TRANSLATE-2637): Warn regarding merging terms** <br>
+Warning message will be shown when using merge terms functionality in term collection import/re-import
+
+**[TRANSLATE-2630](https://jira.translate5.net/browse/TRANSLATE-2630): Add language resource name to language resource pop-up - same for projects** <br>
+Improves info messages and windows titles in language resources, project and task overview.
+
+
+### Bugfixes
+**[TRANSLATE-2597](https://jira.translate5.net/browse/TRANSLATE-2597): Set resource usage log lifetime by default to 30 days** <br>
+This will set the default lifetime days for resources usage log configuration to 30 days when there is no value set.
+
+**[TRANSLATE-2528](https://jira.translate5.net/browse/TRANSLATE-2528): Instant-translate and Term-portal route after login** <br>
+Fixed problems accessing TermPortal / InstantTranslate with external URLs.
+
+
+## [5.5.1] - 2021-10-07
+
+### Important Notes:
+#### [TRANSLATE-2645](https://jira.translate5.net/browse/TRANSLATE-2645)
+Please set innodb_ft_min_token_size in your mysql installation to 1 and  	innodb_ft_enable_stopword to 0.
+This is necessary for TermPortal to find words shorter than 3 characters. If you did already install translate5 5.5.0 on your server OR if you did install translate 5.5.1 BEFORE you did change that settings in your mysql installation, then you would need to update the fulltext indexes of your DB term-tables manually. 
+If this is the case, please call "./translate5.sh termportal:reindex" or contact us, how to do this.
+Please run "./translate5.sh system:check" to check afterwards if everything is properly configured.
+
+#### [TRANSLATE-2634](https://jira.translate5.net/browse/TRANSLATE-2634)
+By default the new PDF documentation for translate5s editor is integrated in the help window of the editor. If you do not want to show this to your users, please deactivate it after the upgrade in the system configuration (GUI). For detailed info how this can be configured please check this link: https://confluence.translate5.net/display/CON/Database+based+configuration
+If you happen to have defined custom help content in the editor, and the help content is in written text/pdf/html , it make sense this content to be loaded with editordocumentation.phtml
+ 
+
+
+### Added
+**[TRANSLATE-2640](https://jira.translate5.net/browse/TRANSLATE-2640): Remove InstantTranslate on/off button from InstantTranslate and move functionality to configuration** <br>
+The auto-translate feature in instant translate can be configured if active for each client.
+
+
+### Changed
+**[TRANSLATE-2645](https://jira.translate5.net/browse/TRANSLATE-2645): TermPortal: set mysql fulltext search minimum word length to 1 and disable stop words** <br>
+Please set innodb_ft_min_token_size in your mysql installation to 1 and  	innodb_ft_enable_stopword to 0.
+This is necessary for TermPortal to find words shorter than 3 characters. If you did already install translate5 5.5.0 on your server OR if you did install translate 5.5.1 BEFORE you did change that settings in your mysql installation, then you would need to update the fulltext indexes of your DB term-tables manually. 
+If this is the case, please call "./translate5.sh termportal:reindex" or contact us, how to do this.
+Please run "./translate5.sh system:check" to check afterwards if everything is properly configured.
+
+**[TRANSLATE-2641](https://jira.translate5.net/browse/TRANSLATE-2641): AdministrativeStatus default attribute and value** <br>
+The "Usage Status (administrativeStatus)" attribute is now the leading one regarding the term status. Its value is synchronized to all other similar attributes (normativeAuthorization and other custom ones).
+
+**[TRANSLATE-2634](https://jira.translate5.net/browse/TRANSLATE-2634): Integrate PDF documentation in translate5 help window** <br>
+Pdf documentation in the editor help window is available now.
+To change PDF location or disable see config runtimeOptions.frontend.helpWindow.editor.documentationUrl
+
+**[TRANSLATE-2607](https://jira.translate5.net/browse/TRANSLATE-2607): Make type timeout in InstantTranslate configurable** <br>
+The translation delay in instant translate can be configured now.
+
+
+### Bugfixes
+**[TRANSLATE-2644](https://jira.translate5.net/browse/TRANSLATE-2644): Task related notification emails should link directly to the task** <br>
+Currently task related notification E-Mails do not point to the task but to the portal only. This is changed.
+
+**[TRANSLATE-2643](https://jira.translate5.net/browse/TRANSLATE-2643): Usability improvements: default user assignment** <br>
+Usability improvements in default user association overview.
+
+
 ## [5.5.0] - 2021-09-30
 
 ### Important Notes:

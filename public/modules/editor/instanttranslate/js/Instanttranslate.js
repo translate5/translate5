@@ -33,7 +33,7 @@ var editIdleTimer = null,
     translateTextResponse = '',
     latestTranslationInProgressID = false,
     latestTextToTranslate = '',
-    instantTranslationIsActive = true,
+    instantTranslationIsActive = Editor.data.apps.instanttranslate.instantTranslationIsActive,
     chosenSourceIsText = true,
     fileTypesAllowed = [],
     fileUploadLanguageCombinationsAvailable = [],
@@ -349,7 +349,7 @@ function startTimerForInstantTranslation() {
     terminateTranslation();
     editIdleTimer = setTimeout(function() {
         startTranslation(); // TODO: this can start a filetranslation without calling startFileTranslation()
-    }, 200);
+    }, Editor.data.apps.instanttranslate.translateDelay);
 }
 function startTranslation() {
     var textToTranslate,
@@ -855,13 +855,6 @@ $(document).on('click', '.getdownloads' , function(e) {
     e.stopPropagation();
     getDownloads();
     return false;
-});
-
-/* --------------- toggle instant translation ------------------------------- */
-$('.instant-translation-toggle').click(function(){
-    $('.instant-translation-toggle').toggle();
-    instantTranslationIsActive = !instantTranslationIsActive;
-    clearAllErrorMessages();
 });
 
 /* --------------- clear source --------------------------------------------- */

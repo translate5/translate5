@@ -844,6 +844,7 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 	background-color: #f9e788;
 } 
 
+.customerPanelGrid .x-action-col-icon.x-action-col-0 { margin-right:5px; }
 .customerPanelGrid .ico-customer-mt-export {background-image: url("../images/database_go.png");display:inline-block;}
 .tools-help-icon .x-tool-home{
 	background-image:url(../images/help.png) !important;

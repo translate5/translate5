@@ -180,10 +180,10 @@
         <source>Aufgabe wurde erfolgreich beendet.</source>
         <target>task ended successfully.</target>
       </trans-unit>
-      <trans-unit id="QXVmZ2FiZSBrb21wbGV0dCBsw7ZzY2hlbj8=">
-        <source>Aufgabe komplett l&#xF6;schen?</source>
-        <target>Delete task completely?</target>
-      </trans-unit>
+      <trans-unit id='QXVmZ2FiZSAiezB9IiBrb21wbGV0dCBsw7ZzY2hlbj8='>
+        <source>Aufgabe "{0}" komplett löschen?</source>
+        <target>Delete "{0}" task completely?</target>
+    </trans-unit>
       <trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBrb21wbGV0dCB1bmQgdW53aWRlcnJ1ZmxpY2ggbMO2c2NoZW4/">
         <source>Wollen Sie die Aufgabe wirklich komplett und unwiderruflich l&#xF6;schen?</source>
         <target>Do you really want to delete the the task irrevocably?</target>
@@ -865,6 +865,10 @@
         <source>Soll dieser Eintrag wirklich gelöscht werden?</source>
         <target>Do you really want to delete this entry?</target>
       </trans-unit>
+      <trans-unit id='QmVudXR6ZXJ6dXdlaXN1bmcgZ2VzcGVpY2hlcnQ='>
+      	<source>Benutzerzuweisung gespeichert</source>
+      	<target>User association saved</target>
+      </trans-unit>
       <trans-unit id='V29ya2Zsb3cgU2Nocml0dA=='>
         <source>Workflow Schritt</source>
         <target>Workflow step</target>
@@ -1077,9 +1081,9 @@
 	<source>Aufgabe wird beendet...</source>
 	<target>Ending task...</target>
       </trans-unit>
-      <trans-unit id='QXVmZ2FiZSB3aXJkIGdlbMO2c2NodC4uLg=='>
-	<source>Aufgabe wird gelöscht...</source>
-	<target>Deleting task...</target>
+      <trans-unit id='QXVmZ2FiZSAiezB9IiB3aXJkIGdlbMO2c2NodC4uLg=='>
+	<source>Aufgabe "{0}" wird gelöscht...</source>
+	<target>Deleting "{0}" task...</target>
       </trans-unit>
       <trans-unit id='QXVmZ2FiZSB3aXJkIG5vY2ggdmVyd2VuZGV0IHVuZCBrYW5uIGRhaGVyIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4h'>
 	<source>Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!</source>
@@ -3769,10 +3773,10 @@ The following task was imported with errors / warnings / notices. Please take ca
   <target>The previous / next segment is still saving, please wait...</target>
 </trans-unit>
 <trans-unit id='UHJvamVrdCBrb21wbGV0dCBsw7ZzY2hlbg=='><source>Projekt komplett löschen</source><target>Delete project completely</target></trans-unit>
-<trans-unit id='UHJvamVrdCBrb21wbGV0dCBsw7ZzY2hlbj8='><source>Projekt komplett löschen?</source><target>Delete project completely?</target></trans-unit>
+<trans-unit id='UHJvamVrdCAiezB9IiBrb21wbGV0dCBsw7ZzY2hlbj8='><source>Projekt "{0}" komplett löschen?</source><target>Delete "{0}" project completely?</target></trans-unit>
 <trans-unit id='U29sbHRlbiBkYXMgUHJvamVrdCB1bmQgYWxsZSBpbSBQcm9qZWt0IGVudGhhbHRlbmVuIEF1ZmdhYmVuIGdlbMO2c2NodCB3ZXJkZW4/'><source>Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?</source><target>Should the project and all tasks included in the project be deleted?</target></trans-unit>
 <trans-unit id='UHJvamVrdCBsw7ZzY2hlbg=='><source>Projekt löschen</source><target>Delete project</target></trans-unit>
-<trans-unit id='RGFzIFByb2pla3Qgd3VyZGUgZXJmb2xncmVpY2ggZW50ZmVybnQh'><source>Das Projekt wurde erfolgreich entfernt!</source><target>The project was successfully removed!</target></trans-unit>
+<trans-unit id='RGFzIFByb2pla3QgInswfSIgd3VyZGUgZXJmb2xncmVpY2ggZW50ZmVybnQh'><source>Das Projekt "{0}" wurde erfolgreich entfernt!</source><target>The project "{0}" was successfully removed!</target></trans-unit>
 <trans-unit id='QXVmZ2FiZW5uYW1lLVByb2pla3Q='><source>Aufgabenname-Projekt</source><target>Task-name</target></trans-unit>
 <trans-unit id='UHJvamVrdGU='><source>Projekte</source><target>Projects</target></trans-unit>
 <trans-unit id='enVtIFByb2pla3Qgc3ByaW5nZW4='><source>zum Projekt springen</source><target>jump to project</target></trans-unit>
@@ -4205,6 +4209,7 @@ The following task was imported with errors / warnings / notices. Please take ca
   <target>Hide project description</target>
 </trans-unit>
 <trans-unit id='VGVybVNlYXJjaA=='><source>TermSearch</source><target>Term search</target></trans-unit>
+<trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermCustomerSearch</source><target>Term search</target></trans-unit>
 <trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>Propose terms</target></trans-unit>
 <trans-unit id='VGVybVJldmlld2Vy'><source>TermReviewer</source><target>Review terms</target></trans-unit>
 <trans-unit id='VGVybUZpbmFsaXplcg=='><source>TermFinalizer</source><target>Finalize terms</target></trans-unit>
@@ -4308,6 +4313,30 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='dHJpdG9u'>
     <source>triton</source>
     <target>Default theme (Triton)</target>
+</trans-unit>
+<trans-unit id='UERGIERva3VtZW50YXRpb24='>
+    <source>PDF Dokumentation</source>
+    <target>PDF documentation</target>
+</trans-unit>
+<trans-unit id='SW4gbmV1ZW0gQnJvd3Nlci1UYWIgw7ZmZm5lbg=='>
+    <source>In neuem Browser-Tab öffnen</source>
+    <target>Open in new browser tab</target>
+</trans-unit>
+<trans-unit id='U3ByYWNocmVzc291cmNlICJ7MH0iIGdlbMO2c2NodC4='>
+    <source>Sprachressource "{0}" gelöscht.</source>
+    <target>Language resource "{0}" deleted.</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSAiezB9IiBnZWzDtnNjaHQ='>
+    <source>Aufgabe "{0}" gelöscht</source>
+    <target>Task "{0}" deleted</target>
+</trans-unit>
+<trans-unit id='QmVncmlmZmUgaW4gZGVyIFRCWCB3ZXJkZW4gaW1tZXIgenVlcnN0IG5hY2ggSUQgbWl0IGJlc3RlaGVuZGVuIEVpbnRyw6RnZW4gaW4gZGVyIFRlcm1Db2xsZWN0aW9uIHp1c2FtbWVuZ2Vmw7xocnQuIFdlbm4gVGVybWUgenVzYW1tZW5mw7xocmVuIGFuZ2VrcmV1enQgaXN0IHVuZCBkaWUgSUQgaW4gZGVyIFRCWCBuaWNodCBpbiBkZXIgVGVybUNvbGxlY3Rpb24gZ2VmdW5kZW4gd2lyZCwgd2lyZCBnZXN1Y2h0LCBvYiBkZXJzZWxiZSBCZWdyaWZmIGJlcmVpdHMgaW4gZGVyc2VsYmVuIFNwcmFjaGUgZXhpc3RpZXJ0LiBXZW5uIGphLCB3ZXJkZW4gZGllIGdlc2FtdGVuIFRlcm1laW50csOkZ2UgenVzYW1tZW5nZWbDvGhydC4gSW5zYmVzb25kZXJlIGJlaSBlaW5lciBUZXJtQ29sbGVjdGlvbiBtaXQgdmllbGVuIFNwcmFjaGVuIGthbm4gZGllcyB6dSB1bmVyd8O8bnNjaHRlbiBFcmdlYm5pc3NlbiBmw7xocmVuLg=='>
+    <source>Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.</source>
+    <target>Terms in the TBX will always be merged first by ID with existing entries in the TermCollection. If Merge terms is checked and the ID in the TBX is not found in the TermCollection, it will be search, if the same term exists already in the same language. If yes, the entire term entries will be merged. Especially with a TermCollection with many languages this may lead to unwanted results.</target>
+</trans-unit>
+<trans-unit id='TmljaHQgZW1wZm9obGVuIQ=='>
+    <source>Nicht empfohlen!</source>
+    <target>Not recommended!</target>
 </trans-unit>
 </body>
   </file>

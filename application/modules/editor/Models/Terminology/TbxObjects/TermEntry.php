@@ -47,6 +47,12 @@ class editor_Models_Terminology_TbxObjects_TermEntry extends editor_Models_Termi
     public array $ref = [];
 
     /**
+     * This definition is not saved into the term_entry table!
+     * @var string|null
+     */
+    public ?string $definition = null;
+
+    /**
      * @return string
      */
     public function getCollectionKey(): string

@@ -339,7 +339,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if (isset($rop->frontend->helpWindow)) {
             $helpWindowConfig = $rop->frontend->helpWindow->toArray() ?? [];
         }
-        //helpWindow config config values for each section (loaderUrl)
+        //helpWindow config values for each section (loaderUrl,documentationUrl)
         $this->view->Php2JsVars()->set('frontend.helpWindow', $helpWindowConfig);
 
         //show references files popup
@@ -452,7 +452,17 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $php2js->set('app.branding', (string)$this->translate->_($ed->branding));
         $php2js->set('app.company', $this->config->runtimeOptions->companyName);
         $php2js->set('app.name', $this->config->runtimeOptions->appName);
-        $php2js->set('app.user', $userSession->data);
+        $userData = (array) $userSession->data;
+
+        // Trim TermPortal-roles if TermPortal plugin is disabled
+        if (!in_array('editor_Plugins_TermPortal_Init', Zend_Registry::get('PluginManager')->getActive()))
+            foreach($userData['roles'] as $idx => $role)
+                if (preg_match('~^term~', $role))
+                    unset($userData['roles'][$idx]);
+
+        $userData['roles'] = array_values($userData['roles']);
+
+        $php2js->set('app.user', $userData);
         $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));
         $php2js->set('app.sessionKey', session_name());
 

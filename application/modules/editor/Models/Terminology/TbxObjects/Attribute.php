@@ -62,8 +62,8 @@ class editor_Models_Terminology_TbxObjects_Attribute extends editor_Models_Termi
     public ?int $termId = null;
     public ?string $termTbxId = '';
     public int $dataTypeId = 0;
-    public string $type = '';
-    public string $value = '';
+    public ?string $type = '';
+    public ?string $value = '';
     public ?string $target = '';
     //public int $isCreatedLocally = 0;
     public int $createdBy = 0;

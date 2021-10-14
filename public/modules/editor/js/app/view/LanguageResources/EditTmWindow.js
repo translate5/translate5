@@ -94,7 +94,9 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                 anchor: '100%'
             },
             config = {
-                title: me.strings.edit,
+                bind:{
+                    title:me.strings.edit+': {name}'
+                },
                 items : [{
                     xtype: 'form',
                     padding: 5,
@@ -250,5 +252,6 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         me.down('form').loadRecord(record);
         vm.set('serviceName',record.get('serviceName'));
         vm.set('resourceType',record.get('resourceType'));
+        vm.set('name',record.get('name'));
     }
 });
