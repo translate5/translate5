@@ -41,8 +41,49 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstract {
     
     const DATA_DIR = 'editorOkapiBconf';
+    const OKAPI_BCONF_BASE_PATH = 'okapiBconf';
     
     protected $dbInstanceClass = 'editor_Plugins_Okapi_Models_Db_Bconf';
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_Bconf';
     
+    protected $exportBconf ;
+    
+    public function __construct(){
+        $this->exportBconf = new editor_Plugins_Okapi_Bconf_Export();
+    }
+    
+    /**
+     * Export the Bconf
+     */
+    public function exportBconf($okapiName,$okapiId){
+       
+        $bconfFilesPath= $this->getDataDirectory($okapiId);
+        $this->exportBconf->ExportBconf($okapiName,$okapiId,$bconfFilesPath);
+        error_log($bconfFilesPath);
+    }
+    
+    /**
+     *
+     * @throws editor_Plugins_Okapi_Exception
+     * @return SplFileInfo
+     */
+    private function getDataDirectory($okapiId){
+        $okapiBconfDir = '../data/'.self::OKAPI_BCONF_BASE_PATH.'/'.$okapiId.'/';
+        if(!is_dir($okapiBconfDir)){
+            if(!mkdir($okapiBconfDir, 0777, true)){
+                // TODO OKAPI: define proper Event Code
+                throw new editor_Plugins_Okapi_Exception('E9999', ['reason' => 'Could not create Okapi Bconf directory: "'.$okapiBconfDir.'".']);
+            }
+        }
+        $okapiBconfDir = new SplFileInfo($okapiBconfDir);
+        if(!$okapiBconfDir->isDir()) {
+            // TODO OKAPI: define proper Event Code
+            throw new editor_Plugins_Okapi_Exception('E9999', ['reason' => 'Okapi Bconf directory does not exist: "'.$okapiBconfDir->getPathname().'".']);
+        }
+        if(!$okapiBconfDir->isWritable()) {
+            // TODO OKAPI: define proper Event Code
+            throw new editor_Plugins_Okapi_Exception('E9999', ['reason' => 'Okapi Bconf directory is not writeable: "'.$okapiBconfDir->getPathname().'".']);
+        }
+        return $okapiBconfDir;
+    }
 }

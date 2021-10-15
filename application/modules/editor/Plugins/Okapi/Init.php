@@ -230,6 +230,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         ));
         $r->addRoute('plugins_okapibconf_restdefault', $restRoute);
         
+        $importAction = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_visualreview_visualreview/segmentmap',
+            array(
+                'module' => 'editor',
+                'controller' => 'editor_Plugins_Okapi_BconfController',
+                'action' => 'segmentmap'
+            ));
+        $r->addRoute('editor_Plugins_Okapi_Bconf', $importAction);
+        
         // route for bconf filter
         $restRoute = new Zend_Rest_Route($f, array(), array(
             'editor' => array('plugins_okapi_bconffilter'),

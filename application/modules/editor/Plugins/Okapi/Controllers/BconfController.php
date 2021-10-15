@@ -58,7 +58,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
       */
      public function postAction()
      {
-          $bconf = new editor_Plugins_Okapi_Bconf_Export();
+          $bconf = new editor_Plugins_Okapi_Models_Bconf();
           $okapiName = $this->getParam('okapiName');
           $okapiId = $this->getParam('okapiId');
           if($okapiId ==null || $okapiId ==""){

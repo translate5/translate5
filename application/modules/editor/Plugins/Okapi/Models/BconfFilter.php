@@ -52,10 +52,9 @@ class editor_Plugins_Okapi_Models_BconfFilter extends ZfExtended_Models_Entity_A
           // find all fonts for a task
           $select = $this->db->select()
                ->where('okapiId = ?', $okapiId);
-          $row = $this->db->fetchAll($select);
-          if($row != null){
-               $this->row = $row;
-               return $this;
+          $rows = $this->loadFilterdCustom($select);
+          if($rows != null){
+              return $rows;
           }
           return null;
      }
