@@ -33,14 +33,12 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_Okapi_Bconf_Export
 {
-    const OKAPI_BCONF_BASE_PATH = 'D:/okapi/test/';
+    
     const MAXBUFFERSIZE = 1024 * 8;
     const MAXBLOCKLEN = 45000;
     const SIGNATURE = "batchConf";
     const VERSION = 2;
-    const  NUMPLUGINS = 0;
-    const PIPELINEFILE = "D:/okapi/pipeline.pln";
-    const EXTFILESDIR = "G:/projects/Marc/projects/translate5/application/modules/editor/Plugins/Okapi/data/okapi-import-bconf-generation/testfiles";
+    const NUMPLUGINS = 0;
     
     protected $util;
     public function __construct(){
@@ -49,26 +47,34 @@ class editor_Plugins_Okapi_Bconf_Export
     /**
      * Export bconf
      */
-    public function ExportBconf($okapiName, $okapiId, $bconfFilesPath)
+    public function ExportBconf($okapiName, $okapiId, $bconfBasePath)
     {
         
-        $bconfFile = fopen($bconfFilesPath.'/'.$okapiName.'.bconf', "w") or die("Unable to open file!");
-        error_log($bconfFilesPath.$okapiName.'.bconf');
+        $bconfFile = fopen($bconfBasePath.$okapiName.'.bconf', "w") or die("Unable to open file!");
+        
         $this->util->writeUTF(self::SIGNATURE, $bconfFile);
         $this->util->writeInt(self::VERSION, $bconfFile);
         //TODO check the Plugins currentlly not in use
         $this->util->writeInt(self::NUMPLUGINS, $bconfFile);
         
         //Read the pipeline and extract steps
-        $this->processPipeline(self::PIPELINEFILE, $bconfFile);
-        $this->filterConfiguration($okapiId, $bconfFile);
+        $this->processPipeline($bconfFile,$bconfBasePath);
+        $this->filterConfiguration($okapiId, $bconfFile,$bconfBasePath);
         $this->extensionsMapping($okapiId, $bconfFile);
         fclose($bconfFile);
+        
+        if(file_exists($bconfBasePath.$okapiName.'.bconf')){
+            
+            return $bconfBasePath.$okapiName.'.bconf';
+        }
+        else{
+            return null;
+        }
     }
     
-    protected function processPipeline($pipeLine, $bconfFile)
+    protected function processPipeline($bconfFile, $bconfBasePath)
     {
-        $pipeLineFileOpen = fopen($pipeLine, 'r') or die("Unable to open file!");
+        $pipeLineFileOpen = fopen($bconfBasePath.'pipeline.pln', 'r') or die("Unable to open file!");
         
         $data = fread($pipeLineFileOpen, self::MAXBUFFERSIZE);
         //force to add new line
@@ -140,7 +146,7 @@ class editor_Plugins_Okapi_Bconf_Export
     /**
      *
      */
-    protected function filterConfiguration($okapiId, $bconfFile)
+    protected function filterConfiguration($okapiId, $bconfFile, $bconfBasePath)
     {
         
         $filterConfiguration = new editor_Plugins_Okapi_Models_BconfFilter();
@@ -156,8 +162,7 @@ class editor_Plugins_Okapi_Bconf_Export
         foreach ($data as $filter) {
             if ($filter['default'] == 1) {
                 //TODO get dir path
-                $configFilePath = self::OKAPI_BCONF_BASE_PATH . $filter['configId'].'.fprm';
-                error_log($configFilePath);
+                $configFilePath = $bconfBasePath.$filter['configId'].'.fprm';
                 $file = fopen($configFilePath, "r") or die("Unable to open file!");
                 $configData = fread($file, filesize($configFilePath));
                 $this->util->writeUTF($filter['configId'], $bconfFile);

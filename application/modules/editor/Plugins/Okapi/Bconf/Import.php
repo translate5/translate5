@@ -33,14 +33,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_Okapi_Bconf_Import
 {
-	const OKAPI_BCONF_BASE_PATH = 'D:/okapi/import';
-	const MAXBUFFERSIZE = 1024 * 8;
-	const MAXBLOCKLEN = 45000;
-	const SIGNATURE = "batchConf";
-	const VERSION = 2;
-	const  NUMPLUGINS = 0;
-	const BCONFFILE= 'D:/okapi/today.bconf';
-
 	protected $util;
 	public function __construct(){
 		$this->util = new editor_Plugins_Okapi_Bconf_Util();
@@ -48,24 +40,31 @@ class editor_Plugins_Okapi_Bconf_Import
 	/**
 	 * Export bconf
 	 */
-	public function importBconf($okapiName)
+	public function importBconf($bconfFile)
 	{
-		
-		$fileExist = file_exists(self::BCONFFILE);
-		if ($fileExist) {
-			return false;
-		}
-		
-		$filename = self::BCONFFILE;
-		$handle = fopen($filename, "rb");
-		$fsize = filesize($filename);
-		$contents = fread($handle, $fsize);
-		$byteArray = unpack("N*",$contents);
-		for($n = 0; $n < 16; $n++)
-		{
-			error_log($byteArray);
-			error_log([$n]);
-		}
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        file_get_contents($bconfFile['name']);
+//        foreach($bconfFile as $formname => $fileForUpload) {
+//            //$response = $http->setFileUpload($fileForUpload['name'], $formname, file_get_contents($fileForUpload['tmp_name']), $fileForUpload['type']);
+//            error_log($fileForUpload);
+//        }
+       // $this->processResponse($http->request($method));
+        //error_log(json_encode($response));
+//		$fileExist = file_exists(self::BCONFFILE);
+//		if ($fileExist) {
+//			return false;
+//		}
+//
+//		$filename = self::BCONFFILE;
+//		$handle = fopen($filename, "rb");
+//		$fsize = filesize($filename);
+//		$contents = fread($handle, $fsize);
+//		$byteArray = unpack("N*",$contents);
+//		for($n = 0; $n < 16; $n++)
+//		{
+//			error_log($byteArray);
+//			error_log([$n]);
+//		}
 	}
 	
 }

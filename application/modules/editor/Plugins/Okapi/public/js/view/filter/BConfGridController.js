@@ -79,10 +79,10 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
         var form = Ext.create('Ext.form.Panel',{
             timeout: 60000
         });
-
         form.submit({
-            url     : Editor.data.restpath + 'plugins_okapi_bconf',
-            method  : 'POST',
+            url     : Editor.data.restpath + 'plugins_okapi_bconf/exportbconf',
+            method  : 'GET',
+            standardSubmit: true,
             params  : {
                 okapiName:okapiName,
                 okapiId:okapiId
@@ -96,6 +96,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
     getActionStatus:function (view, rowIndex, colIndex, item, record) {
         return record.get('default')=="1";
     },
+
     filterByText: function (text){
         var me = this, view = me.getView(), store = view.getStore();
         var searchFilterValue =text.getValue().trim().toLowerCase();
@@ -107,24 +108,16 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
         }
     },
 
-    importbconf: function (grid, rowIndex, colIndex) {
-        // var okapiName = grid.getStore().getAt(rowIndex).get('name');
-        // var okapiId = grid.getStore().getAt(rowIndex).get('id');
-        var form = Ext.create('Ext.form.Panel',{
-            timeout: 60000
-        });
+    uploadBconf: function (btn) {
+        var form=btn.up('form');
 
         form.submit({
-            url     : Editor.data.restpath + 'plugins_okapi_bconf/import',
+            url     : Editor.data.restpath + 'plugins_okapi_bconf/importbconf',
             method  : 'POST',
-            // params  : {
-            //     okapiName:okapiName,
-            //     okapiId:okapiId
-            // },
             scope   : this,
             success : function(responseText){
-            },
-            target: '_blank'
+            }
         });
-    },
+    }
+
 });

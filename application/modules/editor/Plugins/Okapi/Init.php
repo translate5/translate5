@@ -229,15 +229,25 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             'editor' => array('plugins_okapi_bconf'),
         ));
         $r->addRoute('plugins_okapibconf_restdefault', $restRoute);
-        
-        $importAction = new ZfExtended_Controller_RestLikeRoute(
-            'editor/plugins_visualreview_visualreview/segmentmap',
+        // New get rought for export the bconf file.
+        $exportbconf = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/exportbconf',
             array(
                 'module' => 'editor',
-                'controller' => 'editor_Plugins_Okapi_BconfController',
-                'action' => 'segmentmap'
+                'controller' => 'plugins_okapi_bconf',
+                'action' => 'exportBconf'
             ));
-        $r->addRoute('editor_Plugins_Okapi_Bconf', $importAction);
+        $r->addRoute('plugins_okapi_bconf_exportbconf', $exportbconf);
+        
+        // New post rought for import the bconf file.
+        $importbconf = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/importbconf',
+            array(
+                'module' => 'editor',
+                'controller' => 'plugins_okapi_bconf',
+                'action' => 'importbconf'
+            ));
+        $r->addRoute('plugins_okapi_bconf_importbconf', $importbconf);
         
         // route for bconf filter
         $restRoute = new Zend_Rest_Route($f, array(), array(

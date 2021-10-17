@@ -46,20 +46,22 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     protected $dbInstanceClass = 'editor_Plugins_Okapi_Models_Db_Bconf';
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_Bconf';
     
-    protected $exportBconf ;
-    
-    public function __construct(){
-        $this->exportBconf = new editor_Plugins_Okapi_Bconf_Export();
-    }
-    
-    /**
+     /**
      * Export the Bconf
      */
     public function exportBconf($okapiName,$okapiId){
-       
+        $exportBconf = new editor_Plugins_Okapi_Bconf_Export();
         $bconfFilesPath= $this->getDataDirectory($okapiId);
-        $this->exportBconf->ExportBconf($okapiName,$okapiId,$bconfFilesPath);
-        error_log($bconfFilesPath);
+        return $exportBconf->ExportBconf($okapiName,$okapiId,$bconfFilesPath.'/');
+    }
+    
+    /** Unpack the bconf file.
+     * @param $bconfFile
+     */
+    public function importBconf($bconfFile){
+    
+        $importBconf = new editor_Plugins_Okapi_Bconf_Import();
+        $importBconf->importBconf($bconfFile);
     }
     
     /**
