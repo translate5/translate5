@@ -909,6 +909,20 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             if (isset($params[$prop]) && $params[$prop])
                 $where []= '`t`.`' . $prop . '` IN (' . $params[$prop] . ')';
 
+        // Respect tbx(Created|Updated)(At|Gt|Lt) params
+        foreach (['tbxCreated', 'tbxUpdated'] as $prop) {
+            $since = $params[$prop . 'Gt'] ?? false;
+            $until = $params[$prop . 'Lt'] ?? false;
+            $at    = $params[$prop . 'At'] ?? false;
+            if ($at || $since || $until) {
+                if ($at) $cond = " = '$at'";
+                else if ($since && $until) $cond = "BETWEEN '$since' AND '$until'";
+                else if ($since) $cond = ">= '$since'";
+                else $cond = "<= '$until'";
+                $where []= 'DATE(`t`.`' . $prop . "At`) $cond";
+            }
+        }
+
         // If it's a non '*'-query (e.g. non 'any'-query)
         if (!preg_match('~^\*+$~', $against)) {
 
