@@ -49,6 +49,10 @@ class editor_Models_Terminology_TbxObjects_Term extends editor_Models_Terminolog
         'termEntryGuid' => false,
         'langSetGuid' => false,
         'guid' => false,
+        'tbxCreatedBy' => true,
+        'tbxCreatedAt' => true,
+        'tbxUpdatedBy' => true,
+        'tbxUpdatedAt' => true,
     ];
 
     const TERM_DEFINITION = 'definition';
@@ -85,6 +89,11 @@ class editor_Models_Terminology_TbxObjects_Term extends editor_Models_Terminolog
     public ?string $termEntryGuid = null;
     public ?string $langSetGuid = null;
     public ?string $guid = null;
+
+    public ?int $tbxCreatedBy = null;
+    public string $tbxCreatedAt = '';
+    public ?int $tbxUpdatedBy = null;
+    public string $tbxUpdatedAt = '';
 
     public string $descrip = '';
     public string $descripType = '';

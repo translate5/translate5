@@ -122,6 +122,14 @@ class editor_Models_Terminology_Import_TbxFileImport
     protected ZfExtended_EventManager $events;
 
     /**
+     * Array of transacgrp responsible person names => ids.
+     * If it's null, it means it was not yet lazy-loaded
+     *
+     * @var null|array
+     */
+    protected $transacgrpPersons = null;
+
+    /**
      * editor_Models_Import_TermListParser_TbxFileImport constructor.
      * @throws Zend_Exception
      */
@@ -670,16 +678,35 @@ $memLog('Loaded terms:        ');
         // for term entry transac group there is no language
         $transacGrpObject->language = $transacGrpObject->parentLangset->language ?? null;
 
+        // Define $replicateOnTerm flag, indicating whether or not
+        // current transacGrp-data should be replicated to a term-level
+        $replicateToTerm = false;
+
         if (isset($transacGrp->transac)) {
             $transacGrpObject->transac = (string)$transacGrp->transac;
+
+            // If $elementName is 'tig'
+            if ($elementName == 'tig')
+                if (in_array($transacGrpObject->transac, ['creation', 'modification']))
+                    $replicateToTerm = $transacGrpObject->transac;
         }
         if (isset($transacGrp->date)) {
             $transacGrpObject->date = ZfExtended_Utils::toMysqlDateTime((string)$transacGrp->date);
+
+            // Replicate creation/modification date into term tbx(Created|Updated)At prop
+            if ($replicateToTerm)
+                $parentNode->{$replicateToTerm == 'modification' ? 'tbxUpdatedAt' : 'tbxCreatedAt'}
+                    = $transacGrpObject->date;
         }
         if (isset($transacGrp->transacNote)) {
             $transacGrpObject->transacType = (string)$transacGrp->transacNote->attributes()->{'type'};
             $transacGrpObject->target = (string)$transacGrp->transacNote->attributes()->{'target'};
             $transacGrpObject->transacNote = (string)$transacGrp->transacNote;
+
+            // Replicate creation/modification responsible person into term tbx(Created|Updated)By prop
+            if ($replicateToTerm && in_array($transacGrpObject->transacType, ['responsiblePerson', 'responsibility']))
+                $parentNode->{$replicateToTerm == 'modification' ? 'tbxUpdatedBy' : 'tbxCreatedBy'}
+                    = $this->getTransacPersonIdByName($transacGrpObject->transacNote);
         }
 
         $transacGrpObject->isDescripGrp = (int)$isDescripGrp;
@@ -864,5 +891,36 @@ $memLog('Loaded terms:        ');
      */
     protected function setCollectionImportStatistic(){
         $this->collection->updateStats($this->collection->getId());
+    }
+
+    /**
+     * Get id of terms_transacgrp_person-record by $name from a lazy-loaded dictionary,
+     * If no such record - it will be created in db, added into dictionary, and it's id returned
+     *
+     * @param $name
+     * @return int
+     */
+    protected function getTransacPersonIdByName($name) {
+
+        // If person dictionary was not loaded so far
+        // or there is no person with given $name in a dictionary yet
+        // - load persons model
+        if ($this->transacgrpPersons === null || !isset($this->transacgrpPersons[$name]))
+            $m = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpPersonModel');
+
+        // If person dictionary was not loaded so far - do load
+        if ($this->transacgrpPersons === null)
+            foreach ($m->loadAll() as $person)
+                $this->transacgrpPersons[$person['name']] = $person['id'];
+
+        // If there is no person with given $name in a dictionary yet - add it
+        if (!isset($this->transacgrpPersons[$name])) {
+            $m->init(['name' => $name]);
+            $m->save();
+            $this->transacgrpPersons[$name] = $m->getId();
+        }
+
+        // Return person id
+        return $this->transacgrpPersons[$name];
     }
 }
