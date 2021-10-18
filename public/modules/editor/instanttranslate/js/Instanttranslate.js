@@ -26,7 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-if (window.parent.location.hash.match(/itranslate|termportal/)) $('#containerHeader').hide();
+if (window.parent.location.hash.match(/itranslate|termportal/)) {
+    $('#containerHeader').hide();
+}
 var editIdleTimer = null,
     NOT_AVAILABLE_CLS = 'notavailable', // css if a (source-/target-)locale is not available in combination with the other (target-/source-)locale that is set
     uploadedFiles,//Variable to store uploaded files
@@ -36,8 +38,7 @@ var editIdleTimer = null,
     instantTranslationIsActive = Editor.data.apps.instanttranslate.instantTranslationIsActive,
     chosenSourceIsText = true,
     fileTypesAllowed = [],
-    fileUploadLanguageCombinationsAvailable = [],
-    additionalTranslationsHtmlContainer='';
+    fileUploadLanguageCombinationsAvailable = [];
 
 /**
  * Returns all available combinations of source- and target-language for the given languageResource.
@@ -49,9 +50,9 @@ var editIdleTimer = null,
  */
 function getLanguageCombinations(languageResource) {
     var allLanguageCombinations = [];
-    $.each(languageResource.source, function(index, sourceLang) {
-        $.each(languageResource.target, function(index, targetLang) {
-            if (sourceLang != targetLang) {
+    $.each(languageResource.source, function(indexSource, sourceLang) {
+        $.each(languageResource.target, function(indexTarget, targetLang) {
+            if (sourceLang !== targetLang) {
                 allLanguageCombinations.push(sourceLang+","+targetLang);
             }
         });
@@ -195,7 +196,7 @@ function checkInstantTranslation() {
     // Check if any engines are available for that language-combination.
     if (!hasEnginesForLanguageCombination()) {
         hideTranslations();
-        showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
+        showTargetError(Editor.data.languageresource.translatedStrings.noLanguageResource);
         return;
     }
     if(getInputTextValueTrim().length > 0 && getInputTextValueTrim() === latestTextToTranslate) {
@@ -304,7 +305,7 @@ $('#sourceFile').on('change', grabUploadedFiles);
 
 //start translation manually via button
 $('.click-starts-translation').click(function(event){
-    if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
+    if ($('#sourceText').is(":hidden") && $('#sourceFile').is(":visible")) {
         startFileTranslation();
     } else {
         startTranslation();
@@ -321,12 +322,12 @@ function grabUploadedFiles(event){
     }
 }
 
-function startFileTranslation(){
+function startFileTranslation() {
     var fileName,
         fileType,
         fileTypesErrorList = [];
-    if ($('#sourceFile').val() == "") {
-        showSourceError(Editor.data.languageresource.translatedStrings['uploadFileNotFound']);
+    if ($('#sourceFile').val() === '') {
+        showSourceError(Editor.data.languageresource.translatedStrings.uploadFileNotFound);
         return;
     }
     clearAllErrorMessages();
@@ -338,7 +339,7 @@ function startFileTranslation(){
         }
     });
     if (fileTypesErrorList.length > 0) {
-        showSourceError(Editor.data.languageresource.translatedStrings['notAllowed'] + ': ' + fileTypesErrorList.join());
+        showSourceError(Editor.data.languageresource.translatedStrings.notAllowed + ': ' + fileTypesErrorList.join());
         return;
     }
     startTranslation();
@@ -357,19 +358,19 @@ function startTranslation() {
     // Check if any engines are available for that language-combination.
     if (!hasEnginesForLanguageCombination()) {
         hideTranslations();
-        showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
+        showTargetError(Editor.data.languageresource.translatedStrings.noLanguageResource);
         return;
     }
     // translate a file?
-    if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
-        // TODO: we can get here via startTimerForInstantTranslation 
+    if ($('#sourceText').is(":hidden") && $('#sourceFile').is(":visible")) {
+        // TODO: we can get here via startTimerForInstantTranslation
         // (= without calling startFileTranslation() first),
         // so we have to run the same validation. Bad!
-        if ($('#sourceFile').val() == "") {
-            showSourceError(Editor.data.languageresource.translatedStrings['uploadFileNotFound']);
+        if ($('#sourceFile').val() === '') {
+            showSourceError(Editor.data.languageresource.translatedStrings.uploadFileNotFound);
             return;
         }
-        if (uploadedFiles != undefined) {
+        if (uploadedFiles !== undefined) {
             startLoadingState();
             requestFileTranslate();
         }
@@ -449,10 +450,7 @@ function translateText(textToTranslate,translationInProgressID){
 function fillTranslation() {
     var translationHtml = '';
     
-    //reset the additional translations
-    additionalTranslationsHtmlContainer='';
-    
-    // 
+    //
     if (translateTextResponse.hasOwnProperty('translationForSegmentedText')) {
         translationHtml = renderSingleMatchAndResources(translateTextResponse);
     } else {
@@ -461,10 +459,6 @@ function fillTranslation() {
     
     if (translationHtml == '') {
         showTargetError(Editor.data.languageresource.translatedStrings['noResultsFound']);
-    }
-    //when there is aditional translations, display them at the end
-    if(additionalTranslationsHtmlContainer!=''){
-    	translationHtml+=additionalTranslationsHtmlContainer;
     }
     $('#translations').html(translationHtml);
     showTranslations();
@@ -579,15 +573,6 @@ function renderMatchesByResource (translateTextResponse) {
 function renderTranslationContainer(resultData) {
     var translationsContainer = '';
     
-    translationsContainer += '<h4>';
-    //if this tooltip is set, there is onyl one result -> result with best matchrate 
-    if(resultData.singleResultBestMatchrateTooltip){
-        translationsContainer += '<span class="singleResultBestMatchrateInfoIcon" title="'+resultData.singleResultBestMatchrateTooltip+'"></span>';
-    }
-    translationsContainer += resultData.languageResourceHeadline;
-    translationsContainer += '<span class="loadingSpinnerIndicator"><img src="'+Editor.data.publicModulePath+'images/loading-spinner.gif"/></span>';
-    translationsContainer += '</h4>';
-    
     if (resultData.fuzzyMatch.sourceDiff != undefined) {
         var fuzzyMatchTranslatedString = Editor.data.languageresource.translatedStrings['attentionFuzzyMatch'].replace("{0}", resultData.fuzzyMatch.matchRate);
         translationsContainer += '<div class="translation-sourcediff" title="'+Editor.data.languageresource.translatedStrings['differenceIsHighlighted']+'">'+fuzzyMatchTranslatedString+': ';
@@ -595,71 +580,118 @@ function renderTranslationContainer(resultData) {
         translationsContainer += '</div>';
     }
     
-    translationsContainer += '<div class="copyable">';
-    translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'" data-languageresource-type="'+resultData.languageResourceType+'">'+sanitizeTranslatedText(resultData.translationText)+'</div>';
-    translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
-    
-    if(resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
-        translationsContainer += '<span class="process-status-attribute"><img src="' + Editor.data.publicModulePath + 'images/tick.png" alt="finalized" title="finalized"></span>';
-    }
-    
-    if (resultData.term != '' && Editor.data.isUserTermportalAllowed) {
-    	//check if for the current term the rfc language value is set, if yes set data property so the language is used in the term portal
-    	var languageRfc=resultData.languageRfc ? ('data-languageRfc="'+resultData.languageRfc+'"') : '';
-        translationsContainer += '<span class="term-info" id="'+resultData.term+'" '+languageRfc+' title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><span class="ui-icon ui-icon-info"></span></span>';
-    }
-    
-    if (resultData.termStatus != '') {
-        translationsContainer += '<span class="term-status">'+renderTermStatusIcon(resultData.termStatus)+'</span>';
-    }
-    
-    if (resultData.alternativeTranslations != undefined) {
-    	var at=resultData.alternativeTranslations,
-    		highestConfidenceTranslation='',
-    		atHtmlTableResultPosTag = '',
-    		atHtmlTableStart = '',
-    		atHtmlTableEnd = '',
-    		atHtmlTable='',
-    		atHtmlBt=[];
-    	if (at.length > 0) {
-    		atHtmlTableStart = '<table class="translationsForLabel">';
-    		atHtmlTableEnd = '</table>';
-    	}
-    	$.each(at, function(key, result){
-    		if (atHtmlTableResultPosTag == '') {
-    			// This assumes that result['posTag'] is the same for all results!
-    			atHtmlTableResultPosTag = '<tr><td colspan="3"><b>'+result['posTag']+'</b></td></tr>';
-    		}
-    		atHtmlTable += '<tr>';
-    		atHtmlTable += '<td><progress value="'+result['confidence']+'" max="1"></progress></td>';
-    		atHtmlTable += '<td><b>'+result['displayTarget']+':</b></td>';
-    		atHtmlBt=[];
-        	$.each(result.backTranslations, function(keyBt, resultBt){
-        		if(highestConfidenceTranslation==''){
-        			highestConfidenceTranslation='<h5 class="translationsForLabel">'+Editor.data.languageresource.translatedStrings['translationsForLabel']+'<span class="displayTarget"> '+result['displayTarget']+'</span></h5>';
-        		}
-        		atHtmlBt.push(resultBt.displayText);
-        	});
-        	atHtmlTable += '<td>'+atHtmlBt.join(', ')+'</td>';
-        	atHtmlTable += '</tr>';
-    	});
-    }
-    
-    translationsContainer += '</div>';
-    
-    //collect the additional translations, thay are rendered at the end of the result list
-    additionalTranslationsHtmlContainer +=highestConfidenceTranslation;
-    additionalTranslationsHtmlContainer +=atHtmlTableStart;
-    additionalTranslationsHtmlContainer +=atHtmlTableResultPosTag;
-    additionalTranslationsHtmlContainer +=atHtmlTable;
-    additionalTranslationsHtmlContainer +=atHtmlTableEnd;
-	
-    if (resultData.infoText != '') {
-        translationsContainer += '<div class="translation-infotext">'+resultData.infoText+'</div>';
-    }
-    
-    translationsContainer += '<div id="translationError'+resultData.languageResourceId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
+    translationsContainer += '<div class="copyable marginTop">';
+
+    translationsContainer += '<div class="box box__result__header box__result__header__green font-size-big">';
+        translationsContainer += '<h2>';
+            translationsContainer += '<div class="floatRight">'+renderTranslationContainerResultIcons(resultData)+'</div>';
+            translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'" data-languageresource-type="'+resultData.languageResourceType+'">'+sanitizeTranslatedText(resultData.translationText)+'</div>';
+        translationsContainer += '</h2>';
+    translationsContainer += '</div>'; // end of <div className="box box__result__header ...
+
+    translationsContainer += '<div class="box box__result__content">';
+        translationsContainer += '<p class="font-size-medium">';
+            //if this tooltip is set, there is only one result -> result with best matchrate
+            if(resultData.singleResultBestMatchrateTooltip){
+                translationsContainer += '<span class="singleResultBestMatchrateInfoIcon" title="'+resultData.singleResultBestMatchrateTooltip+'"></span>';
+            }
+            translationsContainer += resultData.languageResourceHeadline;
+            translationsContainer += '<span class="loadingSpinnerIndicator"><img src="'+Editor.data.publicModulePath+'images/loading-spinner.gif"/></span>';
+        translationsContainer += '</p>';
+        if (resultData.infoText != '') {
+            translationsContainer += '<div class="translation-infotext marginTop">'+resultData.infoText+'</div>';
+        }
+        translationsContainer += renderTranslationContainerResultAlternativeTranslations(resultData);
+        translationsContainer += '</div>'; // end of <div className="box box__result__content">
+
+    translationsContainer += '</div>'; // end of <div class="copyable">
+
+    //renderTranslationContainerResultAlternativeTranslations(resultData);
+
+    // SBE: as far as I can see, this container is never used:
+    // translationsContainer += '<div id="translationError'+resultData.languageResourceId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
     return translationsContainer;
+}
+
+/**
+ * render all icons like "copy" etc. for the tranlsations result text
+ * @param resultData
+ * @returns {string}
+ */
+function renderTranslationContainerResultIcons (resultData) {
+    var tempHtml = '';
+
+    // render status-icon
+    if (resultData.termStatus != '') {
+        tempHtml += renderTermStatusIcon(resultData.termStatus);
+    }
+
+    // render
+    if(resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
+        tempHtml += '<span class="process-status-attribute"><img src="' + Editor.data.publicModulePath + 'images/tick.png" alt="finalized" title="finalized"></span>';
+    }
+
+    // render info-icon
+    if (resultData.term != '' && Editor.data.isUserTermportalAllowed) {
+        //check if for the current term the rfc language value is set, if yes set data property so the language is used in the term portal
+        var languageRfc=resultData.languageRfc ? ('data-languageRfc="'+resultData.languageRfc+'"') : '';
+        tempHtml += '<span class="term-info" id="'+resultData.term+'" '+languageRfc+' title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><svg class="icon icon-t5_info" /></span>';
+    }
+
+    // render "copy to clipboard"
+    tempHtml += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><svg class="icon icon-t5_copy" /></span>';
+
+
+    return tempHtml;
+}
+
+/**
+ * render the additional results of alternative translations
+ * which are submitted by Microsoft TM
+ * @param resultData
+ * @returns {string}
+ */
+function renderTranslationContainerResultAlternativeTranslations (resultData) {
+    if (resultData.alternativeTranslations != undefined) {
+        var at=resultData.alternativeTranslations,
+            highestConfidenceTranslation='',
+            atHtmlTableResultPosTag = '',
+            atHtmlTableStart = '',
+            atHtmlTableEnd = '',
+            atHtmlTable='',
+            atHtmlBt=[];
+        if (at.length > 0) {
+            atHtmlTableStart = '<table class="translationsForLabel marginTop">';
+            atHtmlTableEnd = '</table>';
+        }
+        $.each(at, function(key, result){
+            if (atHtmlTableResultPosTag == '') {
+                // This assumes that result['posTag'] is the same for all results!
+                atHtmlTableResultPosTag = '<tr><td colspan="3"><b>'+result['posTag']+'</b></td></tr>';
+            }
+            atHtmlTable += '<tr>';
+            atHtmlTable += '<td><progress value="'+result['confidence']+'" max="1"></progress></td>';
+            atHtmlTable += '<td><b>'+result['displayTarget']+':</b></td>';
+            atHtmlBt=[];
+            $.each(result.backTranslations, function(keyBt, resultBt){
+                if(highestConfidenceTranslation==''){
+                    highestConfidenceTranslation='<h5 class="translationsForLabel">'+Editor.data.languageresource.translatedStrings['translationsForLabel']+'<span class="displayTarget"> '+result['displayTarget']+'</span></h5>';
+                }
+                atHtmlBt.push(resultBt.displayText);
+            });
+            atHtmlTable += '<td>'+atHtmlBt.join(', ')+'</td>';
+            atHtmlTable += '</tr>';
+        });
+    }
+
+    $return = '';
+    $return += highestConfidenceTranslation;
+    $return += atHtmlTableStart;
+    $return += atHtmlTableResultPosTag;
+    $return += atHtmlTable;
+    $return += atHtmlTableEnd;
+
+    return $return;
 }
 
 /***
@@ -676,7 +708,8 @@ function renderTermStatusIcon(termStatus){
     if(map[termStatus]) {
         status = map[termStatus];
         label = labels[status]+' ('+termStatus+')';
-        termStatusHtml += '<img src="' + Editor.data.publicModulePath + 'images/termStatus/'+status+'.png" alt="'+label+'" title="'+label+'"> ';
+        //termStatusHtml = '<img src="' + Editor.data.publicModulePath + 'images/termStatus/'+status+'.png" alt="'+label+'" title="'+label+'"> ';
+        termStatusHtml = '<span class="term-status" title="'+label+'"><svg class="icon icon-t5_termstate-'+status+'" /></span>';
     }
     return termStatusHtml;
 }

@@ -55,6 +55,9 @@ END LICENSE AND COPYRIGHT
 
 /* --------------- defining some variables --------------- */
 :root {
+    --padding-normal: 15px;
+    --padding-big: 25px;
+
     --color-grey_01: #FDFDFD;
     --color-grey_02: #FAF9F9;
     --color-grey_03: #F3F2F2;
@@ -76,6 +79,8 @@ END LICENSE AND COPYRIGHT
     --color-green_01: #00C444;
 
 
+    --font-size-giant: 32px;
+    --font-size-verybig: 24px;
     --font-size-big: 16px;
     --font-size-medium: 15px;
     --font-size-normal: 14px;
@@ -84,21 +89,30 @@ END LICENSE AND COPYRIGHT
 
 /* --------------- global resets --------------- */
 
-.container__instanttranslate h1,
-.container__instanttranslate h2,
-.container__instanttranslate h3,
-.container__instanttranslate h4,
-.container__instanttranslate h5,
-.container__instanttranslate h6,
+.instantTranslate h1,
+.instantTranslate h2,
+.instantTranslate h3,
+.instantTranslate h4,
+.instantTranslate h5,
+.instantTranslate h6,
 
-.container__instanttranslate p
+.instantTranslate p
 {
     padding: 0;
     margin: 0;
     font-size: 100%;
 }
-.container__instanttranslate  *:focus {
+.instantTranslate  *:focus {
     outline: none;
+}
+
+.instantTranslate .ui-tooltip {
+    font-size: var(--font-size-normal);
+    border-radius: 0;
+    box-shadow: none;
+    border-color: var(--color-grey_04);
+    background-color: var(--color-grey_02);
+    color: var(--color-grey_07);
 }
 
 /* --------------- global sets --------------- */
@@ -108,11 +122,32 @@ END LICENSE AND COPYRIGHT
 .font-size-normal {font-size: var(--font-size-normal);}
 .font-size-small {font-size: var(--font-size-small);}
 
+.bg-grey_01 {background-color: var(--color-grey_01);}
+.bg-grey_02 {background-color: var(--color-grey_02);}
+.bg-grey_03 {background-color: var(--color-grey_03);}
+.bg-grey_04 {background-color: var(--color-grey_04);}
+.bg-grey_05 {background-color: var(--color-grey_05);}
+.bg-grey_06 {background-color: var(--color-grey_06);}
+.bg-grey_07 {background-color: var(--color-grey_07);}
+.bg-grey_08 {background-color: var(--color-grey_08);}
+.bg-grey_09 {background-color: var(--color-grey_09);}
+.bg-grey_10 {background-color: var(--color-grey_10);}
+
 .bg-blue_01 {background-color: var(--color-blue_01);}
 .bg-blue_02 {background-color: var(--color-blue_02);}
 .bg-blue_03 {background-color: var(--color-blue_03);}
 .bg-blue_04 {background-color: var(--color-blue_04);}
+.bg-blue_05 {background-color: var(--color-blue_05);}
 
+.marginTop {margin-top: var(--font-size-big);}
+
+.floatRight {float: right;}
+
+.hide {
+    position: absolute;
+    margin-left: -666666px;
+    clip: rect(0,0,0,0);
+}
 
 /* --------------- container --------------- */
 
@@ -139,6 +174,7 @@ END LICENSE AND COPYRIGHT
     flex: 1 300px;
     min-width: 0;
     margin: 10px;
+    position: relative;
 }
 
 .error {
@@ -150,7 +186,7 @@ END LICENSE AND COPYRIGHT
 .box {
     width: 100%;
     border: 1px solid var(--color-grey_04);
-    padding: 15px;
+    padding: var(--padding-normal);
 }
 
 .result {
@@ -177,16 +213,16 @@ END LICENSE AND COPYRIGHT
 
 .ui-menu .ui-state-focus, .ui-menu .ui-state-active {margin: 0;}
 
-.container__instanttranslate .ui-selectmenu-button.ui-button {
+.instantTranslate .ui-selectmenu-button.ui-button {
     width: 100%;
     border-radius: 0;
     border-color: var(--color-blue_03);
-    padding: 18px 10px 18px 25px;
+    padding: 20px var(--padding-big) 16px var(--padding-big);
     background-color: var(--color-blue_01);
     color: var(--color-grey_09);
     font-size: var(--font-size-big);
 }
-.container__instanttranslate .ui-selectmenu-button.ui-selectmenu-button-open {
+.instantTranslate .ui-selectmenu-button.ui-selectmenu-button-open {
     background-color: transparent;
     border-bottom-width: 0;
 }
@@ -204,14 +240,149 @@ END LICENSE AND COPYRIGHT
 }
 .localesSelectList li.notavailable .ui-menu-item-wrapper {
     color: var(--color-grey_09);
-    padding: 9px 0 9px 25px;
+    padding: 9px 0 9px var(--padding-big);
 }
 .localesSelectList li.notavailable .ui-state-active {
     color: var(--color-blue_05);
 }
 
-/* --------------- general --------------- */
+.switchSourceTarget {
+    display: inline-block;
+    width: auto;
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    top: 8px;
+    right: -30px;
+    z-index: 10;
+    padding: 10px;
+    cursor: pointer;
+}
 
+@media (max-width: 640px) {
+    .switchSourceTarget {right: 0px;}
+    #sourceLocale-button {width: calc(100% - 60px);}
+}
+
+
+/* --------------- text input and source-file select --------------- */
+
+.textinput, .dropSourceFile {
+    border: 1px solid var(--color-grey_03);
+    background-color: var(--color-grey_02);
+    width: 100%;
+    height: calc(100VH - 300px);
+    position: relative;
+}
+
+.textinput textarea {
+    width: 100%;
+    height: calc(100% - 30px);
+    resize: none;
+    border-color: transparent;
+    background-color: transparent;
+    font-size: var(--font-size-big);
+    line-height: 1.4;
+}
+
+.countedCharacters {
+    position: absolute;
+    user-select: none;
+    bottom: var(--padding-normal);
+    right: var(--padding-normal);
+}
+
+.clearTextinput {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+.dropSourceFile {
+    border-style: dashed;
+    border-width: 2px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;  /* <--- I added this */
+    align-items: center;   /* <--- Change here */
+    cursor: pointer;
+}
+
+.dropSourceFile.dragover {
+    border-color: var(--color-grey_07);
+}
+
+.ui-button {
+    border-color: var(--color-blue_04);
+    background-color: var(--color-blue_04);
+    color: #FFFFFF;
+}
+.ui-button:hover, .ui-button:focus, .ui-button:active {
+    border-color: var(--color-blue_04);
+    background-color: var(--color-grey_01);
+    color: var(--color-blue_04);
+}
+
+.translationSubmit {
+    width: 100%;
+    padding: var(--font-size-normal);
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* --------------- icons --------------- */
+
+.icon {
+    display: inline-block;
+    width: var(--font-size-big);
+    height: var(--font-size-big);
+    overflow: hidden;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.iconsize-normal {
+    width: var(--font-size-normal);
+    height: var(--font-size-normal);
+}
+
+.iconsize-giant {
+    width: var(--font-size-giant);
+    height: var(--font-size-giant);
+}
+
+.icon-t5_termstate-unknown,
+.icon-t5_termstate-permitted,
+.icon-t5_termstate-forbidden,
+.icon-t5_termstate-information-small-white,
+
+.icon-t5_attention {background-image: url("/modules/editor/instanttranslate/images/icons/t5_attention.svg");}
+.icon-t5_check_cyan {background-image: url("/modules/editor/instanttranslate/images/icons/t5_check_cyan.svg");}
+.icon-t5_termstate-preferred,
+.icon-t5_check_green {background-image: url("/modules/editor/instanttranslate/images/icons/t5_check_green.svg");}
+.icon-t5_check_grey {background-image: url("/modules/editor/instanttranslate/images/icons/t5_check_grey.svg");}
+.icon-t5_chevron_grey {background-image: url("/modules/editor/instanttranslate/images/icons/t5_chevron_grey.svg");}
+.icon-t5_chevron {background-image: url("/modules/editor/instanttranslate/images/icons/t5_chevron.svg");}
+.icon-t5_close {background-image: url("/modules/editor/instanttranslate/images/icons/t5_close.svg");}
+.icon-t5_copy {background-image: url("/modules/editor/instanttranslate/images/icons/t5_copy.svg");}
+.icon-t5_document_black {background-image: url("/modules/editor/instanttranslate/images/icons/t5_document_black.svg");}
+.icon-t5_document_grey {background-image: url("/modules/editor/instanttranslate/images/icons/t5_document_grey.svg");}
+.icon-t5_download {background-image: url("/modules/editor/instanttranslate/images/icons/t5_download.svg");}
+.icon-t5_info {background-image: url("/modules/editor/instanttranslate/images/icons/t5_info.svg");}
+.icon-t5_switcher {background-image: url("/modules/editor/instanttranslate/images/icons/t5_switcher.svg");}
+.icon-t5_translate_file_cyan {background-image: url("/modules/editor/instanttranslate/images/icons/t5_translate_file_cyan.svg");}
+.icon-t5_translate_file {background-image: url("/modules/editor/instanttranslate/images/icons/t5_translate_file.svg");}
+.icon-t5_translate_text_cyan {background-image: url("/modules/editor/instanttranslate/images/icons/t5_translate_text_cyan.svg");}
+.icon-t5_translate_text {background-image: url("/modules/editor/instanttranslate/images/icons/t5_translate_text.svg");}
+.icon-t5_upload {background-image: url("/modules/editor/instanttranslate/images/icons/t5_upload.svg");}
+
+
+#translations .icon {margin: 0 10px;}
+
+/* --------------- general --------------- */
 /*
 h4, p {
     padding: 0px 3px;
@@ -290,7 +461,7 @@ h4, p {
     flex: 0 0 180px;
     order: 1;
     height: 110px;
-    background: url(/images/translate5.png?v=1) no-repeat left top;
+    background: url("/images/translate5.png?v=1") no-repeat left top;
     background-size: auto auto;
     background-size: 150px;
 }
@@ -324,7 +495,7 @@ h4, p {
     #logo {
         flex: 0 1 100%;
         text-align:left;
-        margin-right: 0px;
+        margin-right: 0;
     }
     #languageSelector {text-align: left; margin-top: 5px;}
     #logoutContainer {margin-top: 5px;}
@@ -350,9 +521,9 @@ h4, p {
     background-color: #999;
     z-index: 800;
     position: absolute;
-    left: 0px;
-    top: 0px;
-    margin: 0px;
+    left: 0;
+    top: 0;
+    margin: 0;
     text-align: center;
 }
 .loadingSpinnerLayer img {
@@ -363,7 +534,7 @@ h4, p {
     z-index: 900;
 }
 .loadingSpinnerIndicator {
-    margin: 2px 0px;
+    margin: 2px 0;
 }
 #translations .loadingSpinnerIndicator img {
     width: 20px;
@@ -411,12 +582,28 @@ h4, p {
     }
 }
 */
-/* --------------- target --------------- */
 
+/* --------------- target --------------- */
+progress::-webkit-progress-bar,
+progress::-moz-progress-bar,
+progress {
+    background-color: #0a8cff;
+    color: #f4ff81;
+}
+progress[value] {
+    width: 50px;
+    height: 7px;
+/*
+    background-color: var(--color-grey_01);
+    color: var(--color-grey_06);
+    color: #FF0000;
+*/
+}
+
+/*
 #target {
     z-index: 10;
 }
-/*
 #target h2 {
     font-size: 0.9EM;
 }
@@ -482,7 +669,7 @@ h4, p {
 }
 */
 
- */
+
 /* -- alternativeTranslations -- */
 /*
 h5.translationsForLabel {
@@ -578,11 +765,10 @@ left: 45px;
     right: 14px;
 }
 */
- */
 
 /* --------------- ui-tooltip --------------- */
 /*
-  .ui-tooltip {
+.ui-tooltip {
     background: black;
     padding: 10px;
     color: white;

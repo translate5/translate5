@@ -42,7 +42,6 @@ $config = Zend_Registry::get('config');
 /* @var $config Zend_Config */
 
 $version = '?v='.$this->appVersion;
-echo $this->doctype();
 
 $this->headLink()->prependStylesheet(APPLICATION_RUNDIR.'/modules/editor/instanttranslate/css/instanttranslate.css'.$version);
 
@@ -52,6 +51,7 @@ $this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css'.$version);
 //$jqueryIconFontPath = APPLICATION_RUNDIR.'/js/jquery-ui/jquery-ui-iconfont-2.3.2';
 //$this->headLink()->prependStylesheet($jqueryIconFontPath.'/jquery-ui-1.12.icon-font.min.css'.$version);
 ?>
+<!DOCTYPE HTML>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <?php echo $this->headTitle() ?>
@@ -63,7 +63,7 @@ $this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css'.$version);
         <script src="<?php echo $jqueryPath; ?>/external/jquery/jquery.js<?php echo $version; ?>"></script>
         <script src="<?php echo $jqueryPath; ?>/jquery-ui.min.js<?php echo $version; ?>"></script>
     </head>
-    <body>
+    <body class="instantTranslate">
         <?php
             echo $this->layout()->content;
         ?>
