@@ -56,7 +56,7 @@ Ext.define('Editor.view.admin.preferences.User', {
 
     initConfig: function (instanceConfig) {
         var me = this,
-            uiThemesRecord = Editor.app.getUserConfig('extJs.cssFile',true),
+            uiThemesRecord = Editor.app.getUserConfig('extJs.theme',true),
             themes = [],
             translations = [];
 

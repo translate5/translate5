@@ -112,7 +112,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $userConfig = ZfExtended_Factory::get('editor_Models_Config');
         /* @var $userConfig editor_Models_Config */
         $userConfig = $userConfig->mergeUserValues(editor_User::instance()->getGuid());
-        $userTheme = $userConfig['runtimeOptions.extJs.cssFile']['value'];
+        $userTheme = $userConfig['runtimeOptions.extJs.theme']['value'];
+        $defaultTheme = $this->config->runtimeOptions->extJs->defaultTheme;
+        $userTheme = $userTheme == 'default' ? $defaultTheme : $userTheme;
 
         $this->view->userTheme = $userTheme;
 
@@ -142,7 +144,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $this->view->appVersion = $this->getAppVersion();
         $this->setJsVarsInView();
-        $this->setThemeVarsInView($userConfig['runtimeOptions.extJs.cssFile']['defaults']);
+        $this->setThemeVarsInView($userConfig['runtimeOptions.extJs.theme']['defaults']);
         $this->checkForUpdates($this->view->appVersion);
     }
 
