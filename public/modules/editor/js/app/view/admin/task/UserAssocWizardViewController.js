@@ -186,8 +186,6 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             me.getViewModel().set('formTask',null);
         }
      
-        me.getView().fireEvent('addnewassoc', newRecord, formPanel);
-
         // reset the current form and load the new record
         me.resetRecord(newRecord);
 

@@ -102,12 +102,11 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
     }
     
     /***
-     * Delete the given user(temporarary user) with all associations
+     * Delete the given user(temporary user) with all associations
      *
      *   1. load all tasks where the given user is pm
-     *   2. remove all user associations from those tasks
-     *   3. remove all of those tasks
-     *   4. remove the given user
+     *   2. remove all of those tasks and with this all user task associations
+     *   3. remove the given user
      * @param ZfExtended_Models_User $user
      */
     protected function deleteTemporaryUser(ZfExtended_Models_User $user){
@@ -117,16 +116,17 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
         
         if(!empty($tasks)){
             $taskGuids = array_column($tasks,'taskGuid');
-            $userAssocDb = ZfExtended_Factory::get('editor_Models_Db_TaskUserAssoc');
-            /* @var $userAssocDb editor_Models_Db_TaskUserAssoc */
-            //remove all associated users to those tasks
-            $userAssocDb->delete([
-                'taskGuid IN (?)'=>$taskGuids
-            ]);
-            //remove all tasks where the current user is pm
-            $taskModel->db->delete([
-                'taskGuid IN (?)'=>$taskGuids
-            ]);
+
+            //remove all tasks and all files with the task, where the current user is pm
+            foreach ($taskGuids as $taskGuid) {
+                /* @var $task editor_Models_Task */
+                $task = ZfExtended_Factory::get('editor_Models_Task');
+                $task->loadByTaskGuid($taskGuid);
+
+                $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', [$task]);
+                /* @var $remover editor_Models_Task_Remover */
+                $remover->remove(true);
+            }
         }
         $user->delete();
     }

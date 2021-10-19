@@ -124,17 +124,11 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
 
         // define the form fields bindings
         form.findField('userGuid').setBind({
-            store: '{users}', // the store binding must be redefined because this will overwrite the main bind definition
-            disabled:'{!targetLangUserAssoc.value}'
+            store: '{users}' // the store binding must be redefined because this will overwrite the main bind definition
         });
 
         form.findField('workflowStepName').setBind({
-            store:'{workflowSteps}',// the store binding must be redefined because this will overwrite the main bind definition
-            disabled:'{!targetLangUserAssoc.value}'
-        });
-
-        form.findField('deadlineDate').setBind({
-            disabled:'{!targetLangUserAssoc.value}'
+            store:'{workflowSteps}'// the store binding must be redefined because this will overwrite the main bind definition
         });
 
         grid.down('#assocGridTopToolbar').insert(4,{
