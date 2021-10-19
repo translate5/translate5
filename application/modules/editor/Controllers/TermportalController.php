@@ -45,6 +45,10 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action
         $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
 
         $this->view->cssFiles = [
+                'itranslate' => $this->_helper->ClientSpecific->getCss('instanttranslate') ?? false,
+                'termportal' => $this->_helper->ClientSpecific->getCss('termportal') ?? false,
+        ];
+
         // If it is turned On
         if ($this->view->enableJsLogger) {
 
