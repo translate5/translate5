@@ -224,8 +224,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // No props actually, but this allows us to cycle through $levelA
         if ($isTermForNewLanguage) $levelA['language'] = ['elementName' => 'langSet'];
 
-        // Create 'creation' and 'modification' `terms_transacgroup`-entries for term-level (and language-level, if need)
-        foreach ($levelA as $byLevel) foreach (['creation', 'modification'] as $type) {
+        // Create 'origination' and 'modification' `terms_transacgroup`-entries for term-level (and language-level, if need)
+        foreach ($levelA as $byLevel) foreach (['origination', 'modification'] as $type) {
 
             // Create `terms_transacgrp` model instance
             $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
@@ -237,7 +237,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 'date' => date('Y-m-d H:i:s'),
                 'transacNote' => $misc['userName'],
                 'target' => $misc['userGuid'],
-                'transacType' => 'responsiblePerson',
+                'transacType' => 'responsibility',
                 'language' => $this->getLanguage(),
                 // 'attrLang' => $this->getLanguage(), // ?
                 'collectionId' => $this->getCollectionId(),

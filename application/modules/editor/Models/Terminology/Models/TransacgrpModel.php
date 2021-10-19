@@ -221,7 +221,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                 else if ($mlevel == 'entry')    $byLevel += ['elementName' => 'termEntry'];
 
                 // Create `terms_transacgrp`-records
-                foreach (['creation', 'modification'] as $type) {
+                foreach (['origination', 'modification'] as $type) {
 
                     // Create `terms_transacgrp` model instance
                     $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
@@ -232,15 +232,15 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                         'date' => date('Y-m-d H:i:s'),
                         'transacNote' => $userName,
                         'target' => $userGuid,
-                        'transacType' => 'responsiblePerson',
+                        'transacType' => 'responsibility',
                         'guid' => ZfExtended_Utils::uuid(),
                     ]);
 
                     // Save `terms_transacgrp` entry
                     $t->save();
 
-                    // If level is 'term' but creation-transacgrp-record it's missing
-                    if ($level == 'term' && $mlevel == 'term' && $type == 'creation')
+                    // If level is 'term' but origination-transacgrp-record is missing
+                    if ($level == 'term' && $mlevel == 'term' && $type == 'origination')
 
                         // Append tbxCreatedBy and tbxCreatedAt to the data for term to be updated with
                         $termUpdate += ['tbxCreatedBy' => $person->getId(), 'tbxCreatedAt' => $termUpdate['tbxUpdatedAt']];
@@ -326,7 +326,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
         return $result;
     }
     /***
-     * Create transac group attributes with its values. The type can be creation or modification
+     * Create transac group attributes with its values. The type can be origination or modification
      * Depending on what kind of entity is passed, the appropriate attribute will be created(term attribute or term entry attribute)
      *
      * @param editor_Models_Terminology_Models_TermModel|editor_Models_Terminology_Models_TermEntryModel $entity
