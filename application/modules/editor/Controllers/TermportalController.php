@@ -44,6 +44,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action
         // Get enableJsLogger param
         $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
 
+        $this->view->cssFiles = [
         // If it is turned On
         if ($this->view->enableJsLogger) {
 
