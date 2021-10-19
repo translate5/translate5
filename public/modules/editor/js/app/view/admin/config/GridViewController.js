@@ -182,8 +182,13 @@ Ext.define('Editor.view.admin.config.GridViewController', {
      */
     handleReadonlyConfig:function(showReadonlyConfig){
         var me = this,
-            store = me.getView().getStore();
-    
+            view = me.getView(),
+            store = view && view.getStore();
+
+        if(!store){
+            return;
+        }
+
         if(showReadonlyConfig){
             store.removeFilter('isReadOnly');
         }else{

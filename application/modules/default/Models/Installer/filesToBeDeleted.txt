@@ -173,3 +173,5 @@
 /public/modules/editor/js/app/view/ui/segments/column/IsWatched.js
 /public/modules/editor/js/app/view/DateTimeField/DateTimeField.js
 /public/modules/editor/js/app/view/DateTimeField/DateTimePicker.js
+/client-specific/views/editor/scripts/termportal/layoutConfig.php
+/client-specific/views/editor/scripts/instanttranslate/layoutConfig.php

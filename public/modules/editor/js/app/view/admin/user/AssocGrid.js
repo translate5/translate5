@@ -158,7 +158,6 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     }, {
                         xtype: 'checkbox',
                         hidden:true,
-                        value:1,
                         itemId: 'notifyAssociatedUsersCheckBox',
                         glyph: 'f674@FontAwesome5FreeSolid',
                         fieldLabel: me.strings.notifyButtonText,
