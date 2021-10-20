@@ -917,6 +917,9 @@ $memLog('Loaded terms:        ');
      */
     protected function getTransacPersonIdByName($name) {
 
+        // Get current collectionId
+        $collectionId = $this->collection->getId();
+
         // If person dictionary was not loaded so far
         // or there is no person with given $name in a dictionary yet
         // - load persons model
@@ -925,12 +928,12 @@ $memLog('Loaded terms:        ');
 
         // If person dictionary was not loaded so far - do load
         if ($this->transacgrpPersons === null)
-            foreach ($m->loadAll() as $person)
+            foreach ($m->loadByCollectionIds([$collectionId]) as $person)
                 $this->transacgrpPersons[$person['name']] = $person['id'];
 
         // If there is no person with given $name in a dictionary yet - add it
         if (!isset($this->transacgrpPersons[$name])) {
-            $m->init(['name' => $name]);
+            $m->init(['collectionId' => $collectionId, 'name' => $name]);
             $m->save();
             $this->transacgrpPersons[$name] = $m->getId();
         }

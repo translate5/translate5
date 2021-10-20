@@ -121,10 +121,13 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
         // If $level is 'term'
         if ($level == 'term') {
 
+            // Get source
+            $source = editor_Utils::db()->query('SELECT * FROM `terms_term` WHERE `id` = ?', $termId)->fetch();
+
             // Load or create person
             $person = ZfExtended_Factory
                 ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
-                ->loadOrCreateByName($userName);
+                ->loadOrCreateByName($userName, $source['collectionId']);
 
             // Prepare data for term to be updated with
             $termUpdate = ['tbxUpdatedBy' => $person->getId(), 'tbxUpdatedAt' => $bind[':date']];
@@ -179,7 +182,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
 
             // If $level is 'term' - fetch terms_term-record by $termId arg
             if ($level == 'term') {
-                $source = editor_Utils::db()->query('SELECT * FROM `terms_term` WHERE `id` = ?', $termId)->fetch();
+                // $source = editor_Utils::db()->query('SELECT * FROM `terms_term` WHERE `id` = ?', $termId)->fetch();
                 $info['termEntryGuid'] = $source['termEntryGuid'];
                 $info['termTbxId'] = $source['termTbxId'];
                 $info['termGuid'] = $source['guid'];
