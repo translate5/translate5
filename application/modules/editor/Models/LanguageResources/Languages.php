@@ -140,8 +140,8 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
     /***
      * @return array[]
      */
-    public function loadResourceIdsGrouped() {
-        $langs=$this->loadByLanguageResourceId();
+    public function loadResourceIdsGrouped($languageResourceId = null) {
+        $langs=$this->loadByLanguageResourceId($languageResourceId);
         $retval=[];
         foreach ($langs as $lang){
             if(!isset($retval[$lang['languageResourceId']])){
