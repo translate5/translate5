@@ -154,9 +154,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     protected $taskDataPath;
     /**
      * A Cache for the faulty segments the task holds
-     * @var int[]
+     * @var int[][]
      */
-    protected $faultySegmentIds = NULL;
+    protected $faultySegmentsCache = [];
 
     
     /**
@@ -1311,9 +1311,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return int[]
      */
     public function getFaultySegmentIds() : array {
-        if($this->faultySegmentIds === NULL){
-            $this->faultySegmentIds = editor_Models_Db_SegmentQuality::getFaultySegmentIds($this->getTaskGuid());
+        if(!array_key_exists($this->getId(), $this->faultySegmentsCache)){
+            $this->faultySegmentsCache[$this->getId()] = editor_Models_Db_SegmentQuality::getFaultySegmentIds($this->getTaskGuid());
         }
-        return $this->faultySegmentIds;
+        return $this->faultySegmentsCache[$this->getId()];
     }
 }
