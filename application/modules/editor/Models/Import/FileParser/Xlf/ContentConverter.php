@@ -30,6 +30,9 @@ END LICENSE AND COPYRIGHT
  * Converts XLF segment content chunks into translate5 internal segment content string
  */
 class editor_Models_Import_FileParser_Xlf_ContentConverter {
+
+    const TAGS_WITH_CONTENT = ['it', 'ph', 'bpt', 'ept'];
+
     /**
      * @var editor_Models_Import_FileParser_XmlParser
      */
@@ -122,6 +125,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $originalContent = $this->xmlparser->getRange($opener['openerKey'], $key, true);
             if($this->useTagContentOnly($tag, $key, $opener)) {
                 $text = $this->xmlparser->join($this->innerTag);
+                if(strlen($text) === 0) {
+                    $text = null; //a empty text makes no sense here, so we set to null so that a usable text is generated later
+                }
             }
             else {
                 $text = null;
@@ -194,7 +200,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $tagObj = new editor_Models_Import_FileParser_Tag($tagType);
         $tagObj->tag = $tag;
         $tagObj->text = $text;
-        $tagObj->id = $this->getId($openerMeta, $originalContent);
+        $tagObj->id = $this->getId($openerMeta, $originalContent, in_array($tag, self::TAGS_WITH_CONTENT));
         $tagObj->rid = $this->getRid($openerMeta);;
         $tagObj->originalContent = $originalContent;
 
@@ -220,16 +226,23 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param string $originalContent
      * @return string
      */
-    protected function getId(array $openerMeta, string $originalContent): string {
+    protected function getId(array $openerMeta, string $originalContent, bool $tagWithContent): string {
         $id = $this->xmlparser->getAttribute($openerMeta['attributes'], 'id');
         if($id !== false) {
             return $id;
         }
 
-        //we use the content as id, so we can match tag numbers in source and target by that id then
-        // if there is sub content, it must be removed since the sub content in different languages produces different md5 hashes
-        // since sub tags can contained nested content wthe greedy approach is ok to remove from first <sub> to last </sub>
-        return md5(preg_replace('#<sub>.*</sub>#','<sub/>', $originalContent));
+        if($tagWithContent) {
+            //we use the content as id, so we can match tag numbers in source and target by that id then
+            // if there is sub content, it must be removed since the sub content in different languages produces different md5 hashes
+            // since sub tags can contained nested content wthe greedy approach is ok to remove from first <sub> to last </sub>
+            return md5(preg_replace('#<sub>.*</sub>#','<sub/>', $originalContent));
+        }
+
+        if(empty($openerMeta['fakedRid'])){
+            $openerMeta['fakedRid'] = $openerMeta['tag'].'-'.$openerMeta['openerKey'];
+        }
+        return $openerMeta['fakedRid'];
     }
 
     /**

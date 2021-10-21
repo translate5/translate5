@@ -213,7 +213,8 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTags {
                 $sourceChunk = array_pop($source);
                 $targetChunk = array_pop($target);
             }
-            if($sourceChunk !== $targetChunk) {
+            //make a string cast here, so that the rendered tag content is used of tags (tags are objects here)
+            if((string)$sourceChunk !== (string)$targetChunk) {
                 return -1;
             }
             //inc internal start shift count
