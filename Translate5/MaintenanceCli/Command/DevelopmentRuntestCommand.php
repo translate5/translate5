@@ -63,6 +63,12 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             'Use this option to re-capture the test data of a test. Probably not all tests are adopted yet to support this switch.');
 
         $this->addOption(
+            'legacy-segment',
+            'l',
+            InputOption::VALUE_NONE,
+            'Use this option when re-capturing segment test data to use the old order of the segment data. Comparing the changes then with git diff is easier. Then commit and re-run the test without this option, then finally commit the result. Only usable with -c');
+
+        $this->addOption(
             'xdebug',
             'x',
             InputOption::VALUE_NONE,
@@ -120,6 +126,9 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
                 'Sloppy checking or "just comitting the changes" may make the test useless!',
             ]);
             $this->io->confirm('Yes, I will check the modified data files thoroughly!');
+            if($this->input->getOption('legacy-segment')){
+                putenv('LEGACY_DATA=1');
+            }
         }
         else {
             putenv('DO_CAPTURE=0');

@@ -71,6 +71,7 @@ ZfExtended_Test_ApiHelper::setup([
     'CAPTURE_MODE' => (getenv('DO_CAPTURE') === "1"),
     'XDEBUG_ENABLE' => (getenv('XDEBUG_ENABLE') === "1"),
     'KEEP_DATA' => (getenv('KEEP_DATA') === "1"),
+    'LEGACY_DATA' => (getenv('LEGACY_DATA') === "1"),
 ]);
 
 //forcing cwd to testcases dir
