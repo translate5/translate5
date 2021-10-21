@@ -315,12 +315,12 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             $tagText = htmlspecialchars($tagText, ENT_QUOTES | ENT_XML1);
         }
 
-        $tag = new editor_Models_Import_FileParser_Tag();
-        $tag->originalContent = $tag;
-        $tag->tagNr = $shortTagIdent;;
-        $tag->id = $tagName;
-        $tag->text = $tagText;
-        return $tag->renderTag();
+        $tagObj = new editor_Models_Import_FileParser_Tag();
+        $tagObj->originalContent = $tag;
+        $tagObj->tagNr = $shortTagIdent;;
+        $tagObj->id = $tagName;
+        $tagObj->text = $tagText;
+        return $tagObj->renderTag();
     }
     /**
      * new tags should also be added to containsOnlyTagsOrEmpty

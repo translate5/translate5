@@ -467,12 +467,12 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             if(strpos($tag, $this->placeholderCSV)!==false){
                 return $tag;
             }
-            $tag = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_SINGLE, false);
-            $tag->originalContent = $tag;
-            $tag->tagNr = $this->shortTagIdent++;;
-            $tag->id = editor_Models_Segment_InternalTag::TYPE_REGEX;
-            $tag->text = $this->encodeTagsForDisplay($tag);
-            return $tag->renderTag();
+            $tagObj = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_SINGLE, false);
+            $tagObj->originalContent = $tag;
+            $tagObj->tagNr = $this->shortTagIdent++;;
+            $tagObj->id = editor_Models_Segment_InternalTag::TYPE_REGEX;
+            $tagObj->text = $this->encodeTagsForDisplay($tag);
+            return $tagObj->renderTag();
         };
         foreach ($regexToUse as $regEx) {
             $text = preg_replace_callback($regEx, $mask, $text);

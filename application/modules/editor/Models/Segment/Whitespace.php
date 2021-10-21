@@ -328,13 +328,13 @@ class editor_Models_Segment_Whitespace {
                     }
             }
 
-            $tag = new editor_Models_Import_FileParser_Tag();
-            $tag->originalContent = $tag;
-            $tag->tagNr = $shortTagNumber;
-            $tag->id = $tagName;
-            $tag->text = $text;
+            $tagObj = new editor_Models_Import_FileParser_Tag();
+            $tagObj->originalContent = $tag;
+            $tagObj->tagNr = $shortTagNumber;
+            $tagObj->id = $tagName;
+            $tagObj->text = $text;
             //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
-            return $tag->renderTag($length, $title, $cls);
+            return $tagObj->renderTag($length, $title, $cls);
         }, $segment);
     }
 }

@@ -467,10 +467,10 @@ The German and the English Comment tag of the string must be imported as comment
             $length = 0;
         }
 
-        $tag = new editor_Models_Import_FileParser_Tag();
-        $tag->originalContent = $chunk;
-        $tag->tagNr = $this->shortTagIdent++;;
-        $tag->id = $insetType;
-        return $tag->renderTag($length);
+        $tagObj = new editor_Models_Import_FileParser_Tag();
+        $tagObj->originalContent = $chunk;
+        $tagObj->tagNr = $this->shortTagIdent++;;
+        $tagObj->id = $insetType;
+        return $tagObj->renderTag($length);
     }
 }
