@@ -156,8 +156,6 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             ->where('type = ?', editor_Segment_Tag::TYPE_INTERNAL)
             ->where('category = ?', editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY);
         $segmentIds = [];
-        // DEBUG
-        // error_log('FETCH SEGMENT-IDS FOR QUALITY FILTER: '.$select->__toString());
         foreach($adapter->fetchAll($select, [], Zend_Db::FETCH_ASSOC) as $row){
             $segmentIds[] = $row['segmentId'];
         }
