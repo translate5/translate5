@@ -118,6 +118,18 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
             'entry'    => 1
         ];
 
+        // If $level is 'term'
+        if ($level == 'term') {
+
+            // Load or create person
+            $person = ZfExtended_Factory
+                ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
+                ->loadOrCreateByName($userName);
+
+            // Prepare data for term to be updated with
+            $termUpdate = ['tbxUpdatedBy' => $person->getId(), 'tbxUpdatedAt' => $bind[':date']];
+        }
+
         // If number of affected rows is less than it should be
         // it mean that terms_transacgrp-records for at least one level are missing
         if ($missing = $affectedFact < $affectedPlan[$level]) {
@@ -152,9 +164,8 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                   AND `transac` = "modification"
                   AND ' . $where[$level];
 
-            // Get levels, that terms_transacgrp-records are exist
-            $levelA['exist'] = editor_Utils::db()->query($sql,
-            $bind)->fetchAll(PDO::FETCH_COLUMN);
+            // Get levels, that terms_transacgrp-records are exist for
+            $levelA['exist'] = editor_Utils::db()->query($sql, $bind)->fetchAll(PDO::FETCH_COLUMN);
 
             // Define which level should exist
             $levelA['should'] = [
@@ -183,7 +194,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
             $info['collectionId'] = $source['collectionId'];
 
             // Create missing terms_transacgrp-records
-            foreach ($levelA['missing'] as $level) {
+            foreach ($levelA['missing'] as $mlevel) {
 
                 // Props applicable for all levels
                 $byLevel = [
@@ -193,21 +204,21 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                 ];
 
                 // Props applicable for term- and language-levels
-                if ($level == 'term' || $level == 'language') $byLevel += [
+                if ($mlevel == 'term' || $mlevel == 'language') $byLevel += [
                     'language' => $language
                 ];
 
                 // Props, applicable for term-level only
-                if ($level == 'term') $byLevel += [
+                if ($mlevel == 'term') $byLevel += [
                     'termId' => $termId,
                     'termTbxId' => $info['termTbxId'],
                     'termGuid' => $info['termGuid'],
                 ];
 
                 // Setup 'elementName'
-                if ($level == 'term')          $byLevel += ['elementName' => 'tig'];
-                else if ($level == 'language') $byLevel += ['elementName' => 'langSet'];
-                else if ($level == 'entry')    $byLevel += ['elementName' => 'termEntry'];
+                if ($mlevel == 'term')          $byLevel += ['elementName' => 'tig'];
+                else if ($mlevel == 'language') $byLevel += ['elementName' => 'langSet'];
+                else if ($mlevel == 'entry')    $byLevel += ['elementName' => 'termEntry'];
 
                 // Create `terms_transacgrp`-records
                 foreach (['creation', 'modification'] as $type) {
@@ -227,8 +238,26 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
 
                     // Save `terms_transacgrp` entry
                     $t->save();
+
+                    // If level is 'term' but creation-transacgrp-record it's missing
+                    if ($level == 'term' && $mlevel == 'term' && $type == 'creation')
+
+                        // Append tbxCreatedBy and tbxCreatedAt to the data for term to be updated with
+                        $termUpdate += ['tbxCreatedBy' => $person->getId(), 'tbxCreatedAt' => $termUpdate['tbxUpdatedAt']];
                 }
             }
+        }
+
+        // If $level is 'term'
+        if ($level == 'term') {
+
+            // Prepare col => value pairs as sql
+            $cols = [];
+            foreach ($termUpdate as $prop => $value)
+                $cols []= '`' . $prop . '` = "' . $value . '"';
+
+            // Update terms_term-record
+            $this->db->getAdapter()->query('UPDATE `terms_term` SET ' . join(', ', $cols) . ' WHERE `id` = ?', $termId);
         }
 
         // Return affection info, appending a whitespace at the ending to indicate that

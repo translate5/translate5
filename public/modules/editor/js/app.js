@@ -465,7 +465,7 @@ Ext.application({
             Ext.raise('The provided theme is not valid!');
             return;
         }
-        var record = Editor.app.getUserConfig('extJs.cssFile',true);
+        var record = Editor.app.getUserConfig('extJs.theme',true);
         record.set('value',newTheme);
         record.save({
             callback:function(){
