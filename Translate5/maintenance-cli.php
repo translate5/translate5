@@ -38,6 +38,7 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     DevelopmentGithookCommand,
     DevelopmentNewModelCommand,
     DevelopmentNewdbchangeCommand,
+    DevelopmentRuntestCommand,
     LogCommand,
     MaintenanceAnnounceCommand,
     MaintenanceCommand,
@@ -89,6 +90,7 @@ if(file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();
+    $commands[] = new DevelopmentRuntestCommand();
     $commands[] = new ReleaseNotesCommand();
     $commands[] = new DevelopmentNewModelCommand();
 }
