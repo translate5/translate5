@@ -317,9 +317,15 @@ abstract class editor_Models_Export_FileParser {
     protected function getSegmentContent($segmentId, $field) {
         $this->_segmentEntity = $segment = $this->getSegment($segmentId);
         $segmentMeta = $segment->meta();
-        
-        $edited = (string) $segment->getFieldEdited($field);
-        
+
+        if($field == editor_Models_SegmentField::TYPE_SOURCE && !$this->segmentFieldManager->isEditable($field)) {
+            //for non editable sources the edited field is empty, so we have to fetch the original
+            $edited = (string) $segment->getFieldOriginal($field);
+        }
+        else {
+            $edited = (string) $segment->getFieldEdited($field);
+        }
+
         $trackChange=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
         /* @var $trackChange editor_Models_Segment_TrackChangeTag */
         
