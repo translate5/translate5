@@ -213,7 +213,7 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTags {
                 $sourceChunk = array_pop($source);
                 $targetChunk = array_pop($target);
             }
-            if($sourceChunk != $targetChunk) {
+            if($sourceChunk !== $targetChunk) {
                 return -1;
             }
             //inc internal start shift count
