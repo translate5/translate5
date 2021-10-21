@@ -44,8 +44,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileParser{
     use editor_Plugins_Transit_TraitParse;
-    use editor_Models_Import_FileParser_TagTrait;
-    
+
     /**
      *
      * @var string
@@ -117,7 +116,6 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      */
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task){
         parent::__construct($path, $fileName, $fileId, $task);
-        $this->initImageTags();
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         /* @var $meta editor_Models_Segment_Meta */
         $meta->addMeta('transitLockedForRefMat', editor_Models_Segment_Meta::META_TYPE_BOOLEAN, 0, 'defines, if segment is marked in transitFile as locked for translation memory use');
@@ -253,7 +251,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         
         $segment = $this->parseTags($segment);
         
-        $segment = $this->replacePlaceholderTags($segment);
+        $segment = $this->utilities->whitespace->replacePlaceholderTags($segment, $this->shortTagIdent);
         $this->checkForUndefinedTags($segment);
 
         return $segment;
@@ -291,7 +289,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
                 $tagName = 'SubSeg';
                 $shortTagIdent = $this->shortTagIdent++;
                 $tagText = 'SubSeg';
-                $tagType = '_leftTag';
+                $tagType = editor_Models_Import_FileParser_Tag::TYPE_OPEN;
                 $tag = $this->createTag($unprotect($tag), $shortTagIdent, $tagName, $tagType, $tagText);
             }
             elseif (strpos($tag, '~')!==false){
@@ -301,7 +299,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
                 $shortTagIdentOld = $shortTagIdent;
                 $tagName = 'SubSeg';
                 $tagText = 'SubSeg';
-                $tagType = '_rightTag';
+                $tagType = editor_Models_Import_FileParser_Tag::TYPE_CLOSE;
                 $tag = $this->createTag($unprotect($tag), $shortTagIdent, $tagName, $tagType, $tagText);
             }
             else{
@@ -316,9 +314,13 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         if(strpos($tagText, '<') !== false ||strpos($tagText, '"') !== false){
             $tagText = htmlspecialchars($tagText, ENT_QUOTES | ENT_XML1);
         }
-        $p = $this->getTagParams($tag, $shortTagIdent, $tagName, $tagText);
-        $tag = $this->$tagType->getHtmlTag($p);
-        return $tag;
+
+        $tag = new editor_Models_Import_FileParser_Tag();
+        $tag->originalContent = $tag;
+        $tag->tagNr = $shortTagIdent;;
+        $tag->id = $tagName;
+        $tag->text = $tagText;
+        return $tag->renderTag();
     }
     /**
      * new tags should also be added to containsOnlyTagsOrEmpty
@@ -357,7 +359,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     protected function createSingleTag(DOMElement $tag,string $tagName) {
         $tagString = $tag->ownerDocument->saveXML($tag);
         $tagText = $this->getTagText($tagString, $tagName);
-        $tagType = '_singleTag';
+        $tagType = editor_Models_Import_FileParser_Tag::TYPE_SINGLE;
         $tagString = $this->createTag($tagString, $this->shortTagIdent++, $tagName, $tagType, $tagText);
         $this->replaceDOMElementWithXML($tagString, $tag);
     }
@@ -443,9 +445,9 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * @param string $tagName
      */
     protected function parseEndTags(string $tagName, string $tag,$transitTagNr){
-        $tagType = '_rightTag';
+        $tagType = editor_Models_Import_FileParser_Tag::TYPE_CLOSE;
         if(!$transitTagNr){
-            $tagType = '_singleTag';
+            $tagType = editor_Models_Import_FileParser_Tag::TYPE_SINGLE;
         }
         $shortTagIdent = $this->getShortTagIdent($transitTagNr);
         $tagText = $this->getTagText($tag, $tagName);
@@ -467,9 +469,9 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     }
     
     protected function parseBeginTags(string $tagName, string $tag,$transitTagNr) {
-        $tagType = '_leftTag';
+        $tagType = editor_Models_Import_FileParser_Tag::TYPE_OPEN;
         if(!$transitTagNr){
-            $tagType = '_singleTag';
+            $tagType = editor_Models_Import_FileParser_Tag::TYPE_SINGLE;
         }
         $shortTagIdent = $this->getShortTagIdent($transitTagNr);
         $tagText = $this->getTagText($tag, $tagName);

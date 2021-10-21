@@ -39,8 +39,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParser {
-    use editor_Models_Import_FileParser_TagTrait;
-    
+
     /**
      * string "source" as defined in application.ini column definition
      * @var string
@@ -52,7 +51,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @var string
      */
     const CONFIG_COLUMN_MID = 'mid';
-    
+
     /**
      * @var array order of the columns - which column is mid, source and target
      */
@@ -114,8 +113,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
         parent::__construct($path, $fileName, $fileId, $task);
-        $this->initImageTags();
-        
+
         $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
         $this->regexInternalTags = editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS;
@@ -391,7 +389,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $segment = $this->utilities->tagProtection->protectTags($segment, false);
             
             //now we have to protect thw so protected tags with the internal char based replacers
-            $segment = $this->replacePlaceholderTags($segment);
+            $segment = $this->utilities->whitespace->replacePlaceholderTags($segment, $this->shortTagIdent);
             $segment = $this->parseSegmentInsertPlaceholders($segment, $this->regexInternalTags);
         }
         
@@ -402,7 +400,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $segment = $this->utilities->whitespace->protectWhitespace($segment, $this->utilities->whitespace::ENTITY_MODE_KEEP);
         
         // if there are now internal tags added by the whitespace protection we have to protect them locally too
-        $segment = $this->replacePlaceholderTags($segment);
+        $segment = $this->utilities->whitespace->replacePlaceholderTags($segment, $this->shortTagIdent);
         $segment = $this->parseSegmentInsertPlaceholders($segment,$this->regexInternalTags);
         
         return $this->parseSegmentReplacePlaceholders($segment);
@@ -469,9 +467,12 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             if(strpos($tag, $this->placeholderCSV)!==false){
                 return $tag;
             }
-            $tagId = $this->shortTagIdent++;
-            $p = $this->getTagParams($tag, $tagId, editor_Models_Segment_InternalTag::TYPE_REGEX, $this->encodeTagsForDisplay($tag), false);
-            return $this->_singleTag->getHtmlTag($p);
+            $tag = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_SINGLE, false);
+            $tag->originalContent = $tag;
+            $tag->tagNr = $this->shortTagIdent++;;
+            $tag->id = editor_Models_Segment_InternalTag::TYPE_REGEX;
+            $tag->text = $this->encodeTagsForDisplay($tag);
+            return $tag->renderTag();
         };
         foreach ($regexToUse as $regEx) {
             $text = preg_replace_callback($regEx, $mask, $text);

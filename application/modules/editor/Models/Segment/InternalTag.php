@@ -63,7 +63,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * Used as tag id for regex based internal tags
      */
     const TYPE_REGEX = 'regex';
-    
+
     public function __construct($replacerTemplate = null){
         $this->replacerRegex = self::REGEX_INTERNAL_TAGS;
         $this->placeholderTemplate = $replacerTemplate ?? self::PLACEHOLDER_TEMPLATE;

@@ -63,6 +63,7 @@ class Models_SystemRequirement_Modules_PhpExtensions extends ZfExtended_Models_S
             'mbstring',
             'pdo_mysql',
             'zip',
+            'sockets',
             'curl'
         ];
         $missing = array_diff($needed, $loaded);

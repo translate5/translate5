@@ -49,7 +49,20 @@ class editor_Models_Segment_Whitespace {
     const ENTITY_MODE_OFF = 'off';
     
     const WHITESPACE_TAGS = ['hardReturn', 'softReturn', 'macReturn', 'space', 'tab', 'char'];
-    
+
+    /**
+     *
+     * @var array
+     */
+    const WHITESPACE_TAG_LIST = [
+        '#<(hardReturn)/>#',
+        '#<(softReturn)/>#',
+        '#<(macReturn)/>#',
+        '#<(char) ts="([^"]*)"( length="([0-9]+)")?/>#',
+        '#<(tab) ts="([^"]*)"( length="([0-9]+)")?/>#',
+        '#<(space) ts="([^"]*)"( length="([0-9]+)")?/>#',
+    ];
+
     /**
      * Return search and replace map
      * @var array
@@ -183,5 +196,145 @@ class editor_Models_Segment_Whitespace {
      */
     protected function maskSpecialContent($type, $toBeProtected, $length) {
         return '<'.$type.' ts="' . implode(',', unpack('H*', $toBeProtected)) . '" length="'.(int)$length.'"/>';
+    }
+
+    /**
+     * replaces protected tag placeholder tags with internal tags
+     * @param string $segment
+     * @return string
+     */
+    protected function protectedTagReplacer(string $segment, int &$shortTagIdent): string {
+        if(strpos($segment, '<protectedTag ') === false) {
+            return $segment;
+        }
+        $shortTagNrMap = [];
+        return preg_replace_callback('#<protectedTag data-type="([^"]*)" data-id="([0-9]+)" data-content="([^"]*)"/>#', function($match) use (&$shortTagNrMap, & $shortTagIdent) {
+            $type = $match[1];
+            $id = $match[2];
+            $content = pack('H*', $match[3]);
+
+
+            //generate the html tag for the editor
+            switch ($type) {
+                case 'open':
+                    $type = editor_Models_Import_FileParser_Tag::TYPE_OPEN;
+                    $shortTag = $shortTagIdent++;
+                    $shortTagNrMap[$id] = $shortTag;
+                    break;
+                case 'close':
+                    //on tag protection it is ensured that tag pairs are wellformed, so on close we can rely that open nr exists:
+                    $type = editor_Models_Import_FileParser_Tag::TYPE_CLOSE;
+                    $shortTag = $shortTagNrMap[$id];
+                    break;
+                case 'single':
+                default:
+                    $type = editor_Models_Import_FileParser_Tag::TYPE_SINGLE;
+                    $shortTag = $shortTagIdent++;
+                    break;
+            }
+            $tag = new editor_Models_Import_FileParser_Tag($type);
+            $tag->originalContent = $content;
+            $tag->tagNr = $shortTag;
+            $tag->id = $id;
+            $tag->rid = $id;
+            $tag->text = htmlspecialchars($content);
+            return $tag->renderTag();
+        }, $segment);
+    }
+
+    /**
+     * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <space> etc) with an internal tag
+     * @param string $segment
+     * @param array $tagShortcutNumberMap shorttag numbers can be provided from outside (needed for language resource usage)
+     * @return string
+     */
+    public function replacePlaceholderTags($segment, int &$shortTagIdent, array $tagShortcutNumberMap = []) {
+        return $this->whitespaceTagReplacer($this->protectedTagReplacer($segment, $shortTagIdent), $shortTagIdent, $tagShortcutNumberMap);
+    }
+
+    /**
+     * replaces whitespace placeholder tags with internal tags
+     * @param string $segment
+     * @param array $tagShortcutNumberMap
+     * @return string
+     */
+    public function whitespaceTagReplacer($segment, int & $shortTagIdent, array $tagShortcutNumberMap = []) {
+        //$tagShortcutNumberMap must be given explicitly here as non referenced variable from outside,
+        // so that each call of the whitespaceTagReplacer function has its fresh list of tag numbers
+        return preg_replace_callback(self::WHITESPACE_TAG_LIST, function($match) use (&$tagShortcutNumberMap, $segment, & $shortTagIdent) {
+            $tag = $match[0];
+            $tagName = $match[1];
+            $cls = ' '.$tagName;
+
+            //either we get a reusable shortcut number in the map, or we have to increment one
+            if(empty($tagShortcutNumberMap) || empty($tagShortcutNumberMap[$tag])) {
+                $shortTagNumber = $shortTagIdent++;
+            }
+            else {
+                $shortTagNumber = array_shift($tagShortcutNumberMap[$tag]);
+            }
+            $title = '&lt;'.$shortTagNumber.'/&gt;: ';
+
+
+            //if there is no length attribute, use length = 1
+            if(empty($match[3])) {
+                $length = 1;
+            }
+            else {
+                $length = $match[4]; //else use the stored length value
+            }
+
+            //generate the html tag for the editor
+            switch ($match[1]) {
+                // ↵    U+21B5      e2 86 b5    &crarr;     &#8629;     DOWNWARDS ARROW WITH CORNER LEFTWARDS
+                //'hardReturn' => ['text' => '&lt;↵ hardReturn/&gt;'], //in title irgendwas mit <hardReturn/>
+                //'softReturn' => ['text' => '&lt;↵ softReturn/&gt;'], //in title irgendwas mit <softReturn/>
+                //'macReturn' => ['text' => '&lt;↵ macReturn/&gt;'],  //in title irgendwas mit <macReturn/>
+                case 'hardReturn':
+                case 'softReturn':
+                case 'macReturn':
+                    $cls = ' newline';
+                    $text = '↵';
+                    $title .= 'Newline';
+                    break;
+                case 'space':
+                    // ·    U+00B7      c2 b7       &middot;    &#183;      MIDDLE DOT
+                    //'space' => ['text' => '&lt;·/&gt;'],
+                    $text = str_repeat('·',$length);
+                    $title .= $length.' whitespace character'.($length>1?'s':'');
+                    break;
+                case 'tab':
+                    // →    U+2192      e2 86 92    &rarr;      &#8594;     RIGHTWARDS ARROW
+                    //'tab' => ['text' => '&lt;→/&gt;'],
+                    $text = str_repeat('→',$length);
+                    $title .= $length.' tab character'.($length>1?'s':'');
+                    break;
+                case 'char':
+                default:
+                    //'char' => ['text' => 'protected Special character'],
+                    if($tag == '<char ts="c2a0" length="1"/>'){
+                        //new type non breaking space: U+00A0
+                        //symbolyzed in word as:
+                        //U+00B0	°	c2 b0	&deg;	° 	&#176;	° 	DEGREE SIGN
+                        //in unix tools:
+                        //U+23B5	⎵	e2 8e b5		&#9141;	⎵ 	BOTTOM SQUARE BRACKET
+                        $text = '⎵';
+                        $cls = ' nbsp';
+                        $title .= 'Non breaking space';
+                    }
+                    else {
+                        $text = 'protected Special-Character';
+                        $title .= 'protected Special-Character';
+                    }
+            }
+
+            $tag = new editor_Models_Import_FileParser_Tag();
+            $tag->originalContent = $tag;
+            $tag->tagNr = $shortTagNumber;
+            $tag->id = $tagName;
+            $tag->text = $text;
+            //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
+            return $tag->renderTag($length, $title, $cls);
+        }, $segment);
     }
 }
