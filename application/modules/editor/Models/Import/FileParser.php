@@ -124,7 +124,13 @@ abstract class editor_Models_Import_FileParser {
      * @var editor_Models_Segment_UtilityBroker
      */
     protected $utilities;
-    
+
+    /**
+     * counter for internal tags
+     * @var integer
+     */
+    protected int $shortTagIdent = 1;
+
     /**
      * returns the file extensions (in lower case) parsable by this fileparser
      * @return array;
