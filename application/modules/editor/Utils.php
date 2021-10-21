@@ -791,7 +791,7 @@ class editor_Utils {
             );
             $context = stream_context_create($opts);
             $headers = get_headers($url, 0, $context);
-            $code == -1;
+            $code = -1;
             $matches = [];
             if ($headers != false && count($headers) > 0) {
                 foreach($headers as $header){
