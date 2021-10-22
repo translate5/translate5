@@ -87,7 +87,7 @@ class editor_Models_UserConfig extends ZfExtended_Models_Entity_Abstract {
             return;
         }
         $this->db->delete([
-            'name = ?' => 'runtimeOptions.extJs.cssFile'
+            'name = ?' => 'runtimeOptions.extJs.theme'
         ]);
     }
 }

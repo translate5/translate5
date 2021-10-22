@@ -286,6 +286,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->status = $connector->getStatus($this->entity->getResource());
         $this->view->rows->statusInfo = $t->_($connector->getLastStatusInfo());
 
+        $languages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $languages editor_Models_LanguageResources_Languages */
+        $languages=$languages->loadResourceIdsGrouped($this->entity->getId());
+
+        $this->view->rows->sourceLang = $this->getLanguage($languages, 'sourceLang', $this->entity->getId());
+        $this->view->rows->targetLang = $this->getLanguage($languages, 'targetLang', $this->entity->getId());
+
         if(property_exists($this->view->rows,'specificData') && strlen($this->view->rows->specificData) > 0){
             $this->view->rows->specificData = $this->translateSpecificData($this->view->rows->specificData,$this->view->rows->serviceName);
         }
@@ -866,9 +873,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         $this->entity->addSpecificData('fileName', $filename);
 
-        if(!empty($importInfo)){
-            $this->queueServiceImportWorker($importInfo, true);
-        }
+        $this->queueServiceImportWorker($importInfo ?? [], true);
     }
 
     /**
@@ -894,9 +899,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     /**
      * handles the fileupload
-     * @return array|boolean meta data about the upload or false when there was no file
+     * @param editor_Services_Connector $connector
+     * @return array|null meta data about the upload or null when there was no file
+     * @throws Zend_File_Transfer_Exception
+     * @throws Zend_Validate_Exception
      */
-    protected function handleFileUpload(editor_Services_Connector $connector) {
+    protected function handleFileUpload(editor_Services_Connector $connector): ?array {
         $upload = new Zend_File_Transfer_Adapter_Http();
 
         //check if connector / resource can deal with the uploaded file type
@@ -955,14 +963,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         } catch (Zend_File_Transfer_Exception $e) {
             //no tmUpload field was given, this can happen only from the api
             //allow empty filebased language resource without file upload
-            return false;
+            return null;
         }
 
         //checking general upload errors
         $errorNr = $importInfo[self::FILE_UPLOAD_NAME]['error'];
 
         if($errorNr === UPLOAD_ERR_NO_FILE) {
-            return false;
+            return null;
         }
 
         if($errorNr !== UPLOAD_ERR_OK) {
@@ -990,12 +998,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $worker=ZfExtended_Factory::get('editor_Services_ImportWorker');
         /* @var $worker editor_Services_ImportWorker */
 
-        $params=$this->getAllParams();
+        $params = $this->getAllParams();
+        $params['languageResourceId'] = $this->entity->getId();
 
-        $this->handleUploadLanguageResourcesFile($importInfo[self::FILE_UPLOAD_NAME]);
+        if(!empty($importInfo) && !empty($importInfo[self::FILE_UPLOAD_NAME])) {
+            $this->handleUploadLanguageResourcesFile($importInfo[self::FILE_UPLOAD_NAME]);
+            $params['fileinfo'] = $importInfo[self::FILE_UPLOAD_NAME];
+        }
+        else {
+            $params['fileinfo'] = [];
+        }
 
-        $params['languageResourceId']=$this->entity->getId();
-        $params['fileinfo']=!empty($importInfo[self::FILE_UPLOAD_NAME])? $importInfo[self::FILE_UPLOAD_NAME]:[];
         $params['addnew']=$addNew;
         $params['userGuid']=editor_User::instance()->getGuid();
 
@@ -1017,10 +1030,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @param array $fileinfo
      */
     protected function handleUploadLanguageResourcesFile(array &$fileinfo){
-        if(!$fileinfo){
-            return;
-        }
-
         //create unique temp file name
         $newFileLocation=tempnam(sys_get_temp_dir(), 'LanguageResources'.$fileinfo['name']);
         if (!is_dir(dirname($newFileLocation))) {

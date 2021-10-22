@@ -237,7 +237,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     getThemeMenuConfig:function(){
         var me=this,
             config,
-            uiThemesRecord = Editor.app.getUserConfig('extJs.cssFile',true),
+            uiThemesRecord = Editor.app.getUserConfig('extJs.theme',true),
             menuItems = [];
 
         Ext.Array.each(uiThemesRecord.get('defaults'), function(i) {

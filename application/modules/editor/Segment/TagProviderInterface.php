@@ -47,6 +47,12 @@ interface editor_Segment_TagProviderInterface {
      */
     public function isSegmentTag(string $type, string $nodeName, array $classNames, array $attributes) : bool;
     /**
+     * Evaluates, if the Dom-Tag will show up in the exported content#
+     * This means, these tags may be further processed (like internal tags) so the name may better be 'isPreExportedTag'
+     * @return bool
+     */
+    public function isExportedTag() : bool;
+    /**
      * Creates a segment tag. Will only be called, when ::isSegmentTag evaluates "true"
      * @param int $startIndex
      * @param int $endIndex

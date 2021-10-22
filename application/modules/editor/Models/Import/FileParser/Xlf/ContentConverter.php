@@ -30,12 +30,9 @@ END LICENSE AND COPYRIGHT
  * Converts XLF segment content chunks into translate5 internal segment content string
  */
 class editor_Models_Import_FileParser_Xlf_ContentConverter {
-    use editor_Models_Import_FileParser_TagTrait;
-    
-    const RID_TYPE_RID = 'rid';
-    const RID_TYPE_ID = 'id';
-    const RID_TYPE_FAKE = 'fake';
-    
+
+    const TAGS_WITH_CONTENT = ['it', 'ph', 'bpt', 'ept'];
+
     /**
      * @var editor_Models_Import_FileParser_XmlParser
      */
@@ -70,22 +67,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     protected $task;
     
     /**
-     * map of content tag to tagNr, to get the correct tagNr for tag pairs and between source and target column
-     * @var array
-     */
-    protected $shortTagNumbers = [];
-    
-    /**
      * @var boolean
      */
     protected $useTagContentOnlyNamespace;
     
-    /**
-     * @var boolean
-     */
-    protected $source = true;
-    
-    protected $preserveWhitespace = false;
+    protected bool $preserveWhitespace = false;
     
     /**
      * Flag to switch normal mode and remove tags mode
@@ -96,8 +82,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     /**
      * @var editor_Models_Segment_UtilityBroker
      */
-    protected $utilities;
-    
+    protected editor_Models_Segment_UtilityBroker $utilities;
+
+    /**
+     * @var editor_Models_Import_FileParser_Xlf_ShortTagNumbers
+     */
+    protected editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers;
+
     /**
      * @param array $namespaces
      * @param editor_Models_Task $task for debugging reasons only
@@ -107,10 +98,10 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->namespaces = $namespaces;
         $this->task = $task;
         $this->filename = $filename;
-        $this->initImageTags();
-        
+
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
-        
+        $this->shortTagNumbers = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ShortTagNumbers');
+
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
         
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
@@ -134,6 +125,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $originalContent = $this->xmlparser->getRange($opener['openerKey'], $key, true);
             if($this->useTagContentOnly($tag, $key, $opener)) {
                 $text = $this->xmlparser->join($this->innerTag);
+                if(strlen($text) === 0) {
+                    $text = null; //a empty text makes no sense here, so we set to null so that a usable text is generated later
+                }
             }
             else {
                 $text = null;
@@ -152,115 +146,105 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->xmlparser->registerElement('*', [$this, 'handleUnknown']); // → all other tags
         $this->xmlparser->registerOther([$this, 'handleText']);
     }
-    
+
     /**
      * creates an internal tag out of the given data
-     * @param string $openerMeta openerMeta array to get the ID to identify tag pairs (for tagNr calculation)
+     * @param array $openerMeta openerMeta array to get the ID to identify tag pairs (for tagNr calculation)
      * @param string $tag
      * @param string $originalContent this is value which is restored on export
-     * @param string $text optional, this is the tag value which should be shown in the frontend
-     * @return string
+     * @param string|null $text optional, this is the tag value which should be shown in the frontend
+     * @return editor_Models_Import_FileParser_Tag|null
      */
-    protected function createTag($openerMeta, $tag, $originalContent, $text = null): ?editor_Models_Import_FileParser_Tag {
+    protected function createTag(array $openerMeta, string $tag, string $originalContent, string $text = null): ?editor_Models_Import_FileParser_Tag {
         if($this->removeTags){
             return null;
         }
-        $ridType = null;
-        $rid = $this->getRid($openerMeta, $ridType);
+
         switch ($tag) {
+            // ID mandatory, no content, SINGLE TAG
             case 'x':
+            // ID mandatory, content, SINGLE TAG
             case 'ph':
+            // ID mandatory, pos mandatory, content, SINGLE TAG containing one partner of a pair
             case 'it':
-            case 'bx':
-            case 'ex':
                 $tagType = editor_Models_Import_FileParser_Tag::TYPE_SINGLE;
-                $type = '_singleTag';
-                
-                //we use the content as rid, so we can match tag numbers in source and target
-                // if there is sub content, it must be removed since the sub content in different languages produces different md5 hashes
-                // since sub tags can contained nested content wthe greedy approach is ok to remove from first <sub> to last </sub>
-                $rid = md5(preg_replace('#<sub>.*</sub>#','<sub/>',$originalContent));
                 break;
+
+            // bx / ex: ID mandatory, RID for referencing the bx/ex partner (optional), no content, PAIRED TAG
+            // Since it is unclear from the spec if a bx/ex pair must be in the same trans-unit or not
+            // and since tag numbering should be consistent in our segments and since one trans-unit can contain multiple segments (mrk type seg)
+            // we define the type after parsing the whole segment, so we know if the partner is inside the same segment or not
+            case 'bx':
             case 'bpt':
+                // bpt/ept ID mandatory, RID optional, content
                 //the tagNr depends here on the existence of an entry with the same RID
                 // if yes, take this value
                 // if no, increase and set the new value as new tagNr to that RID
                 // for g tags: RID = 'g-'.$openerKey;
+                // regarding the type, see bx / ex
             case 'g':
                 $tagType = editor_Models_Import_FileParser_Tag::TYPE_OPEN;
-                $type = '_leftTag';
                 break;
             case 'g-close':
                 //g-close tag is just a hack to distinguish between open and close
                 $tag = 'g';
-            case 'ept':
+            case 'ex':
+            case 'ept': // ID mandatory, RID optional, content
                 $tagType = editor_Models_Import_FileParser_Tag::TYPE_CLOSE;
-                $type = '_rightTag';
                 break;
             default:
-                return '<b>Programming Error! invalid tag type used!</b>';
+                // 'E1363' => 'Unknown XLF tag found: {tag} - can not import that.',
+                throw new editor_Models_Import_FileParser_Xlf_Exception('E1363');
         }
-        if(strlen($text) === 0) {
-            $text = htmlentities($originalContent);
-        }
+
         $tagObj = new editor_Models_Import_FileParser_Tag($tagType);
         $tagObj->tag = $tag;
-        $tagObj->tagNr = $this->getShortTagNumber($ridType, $rid);
         $tagObj->text = $text;
-        $tagObj->rid = $rid;
+        $tagObj->id = $this->getId($openerMeta, $originalContent, in_array($tag, self::TAGS_WITH_CONTENT));
+        $tagObj->rid = $this->getRid($openerMeta);;
         $tagObj->originalContent = $originalContent;
-        $tagObj->renderedTag = $this->{$type}->getHtmlTag($this->getTagParams($originalContent, $tagObj->tagNr, $rid, $text));
+
+        $this->shortTagNumbers->addTag($tagObj);
         return $tagObj;
     }
-    
+
     /**
      * Calculates an identifier of a tag, to match opener and closer tag (for tag numbering).
      * @param array $openerMeta
-     * @param array $ridType will receive the rid type
+     * @return string|null
      */
-    protected function getRid($openerMeta, & $ridType) {
+    protected function getRid(array $openerMeta): ?string {
         $rid = $this->xmlparser->getAttribute($openerMeta['attributes'], 'rid');
         if($rid !== false) {
-            $ridType = self::RID_TYPE_RID;
             return $rid;
         }
+        return null;
+    }
+
+    /**
+     * @param array $openerMeta
+     * @param string $originalContent
+     * @return string
+     */
+    protected function getId(array $openerMeta, string $originalContent, bool $tagWithContent): string {
         $id = $this->xmlparser->getAttribute($openerMeta['attributes'], 'id');
         if($id !== false) {
-            $ridType = self::RID_TYPE_ID;
             return $id;
         }
-        //according to the spec all tags must have an ID, so if we get here,
-        // this is invalid and we have to fake an identifier.
-        // tagnumbering may then not be correct!
+
+        if($tagWithContent) {
+            //we use the content as id, so we can match tag numbers in source and target by that id then
+            // if there is sub content, it must be removed since the sub content in different languages produces different md5 hashes
+            // since sub tags can contained nested content wthe greedy approach is ok to remove from first <sub> to last </sub>
+            return md5(preg_replace('#<sub>.*</sub>#','<sub/>', $originalContent));
+        }
+
         if(empty($openerMeta['fakedRid'])){
             $openerMeta['fakedRid'] = $openerMeta['tag'].'-'.$openerMeta['openerKey'];
         }
-        $ridType = self::RID_TYPE_FAKE;
         return $openerMeta['fakedRid'];
     }
-    
-    /**
-     * returns the short tag number to the given rid or creates one
-     * rid can be given as tag attribute, if nothing found the ID is used as fallback.
-     * A rid should always be given, since it is also needed to map the tags in source to target,
-     *  so that same tagNr are used for same tags there
-     * @param string $ridType
-     * @param string $rid
-     * @return number
-     */
-    protected function getShortTagNumber($ridType, $rid) {
-        if(empty($rid)) {
-            return $this->shortTagIdent++;
-        }
-        //pairedTags have a rid, we have to look it up or to create it
-        // we need the ridType here too, since a trans-unit may mix tags using ids only and tags using rid (which can be the same as the id in other, not related tags)
-        $rid = $ridType.'-'.$rid;
-        if(empty($this->shortTagNumbers[$rid])) {
-            $this->shortTagNumbers[$rid] = $this->shortTagIdent++;
-        }
-        return $this->shortTagNumbers[$rid];
-    }
-    
+
     /**
      * returns true if the tag content should only be used as text for the internal tags.
      * On false the surrounding tags (ph, ept, bpt, it) are also displayed.
@@ -301,16 +285,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     public function convert($chunks, $source, $preserveWhitespace = false) {
         $this->result = [];
         $this->removeTags = false;
-        //this assumes that source tags come always before target tags
-        if($source) {
-            $this->shortTagIdent = 1;
-            $this->shortTagNumbers = [];
-        }
-        else {
-            //if we parse the target, we have to reuse the tagNrs found in source
-            $this->shortTagIdent = empty($this->shortTagNumbers) ? 1 : (max($this->shortTagNumbers) + 1);
-        }
-        $this->source = $source;
+        $this->shortTagNumbers->init($source);
+
         //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content
         $this->preserveWhitespace = $preserveWhitespace;
         if(is_array($chunks)) {
@@ -325,6 +301,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $this->result[0] = ltrim($this->result[0]);
             $this->result[$lastIdx] = rtrim($this->result[$lastIdx]);
         }
+
+        $this->shortTagNumbers->calculatePartnerAndType();
+
         return $this->result;
     }
     
@@ -336,7 +315,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     public function removeXlfTagsAndProtectedWhitespace($content) {
         $this->result = [];
         //by setting removeTags to false, currently all side effects related to $this->shortTag* fields are prevented.
-        // Keep in mind if changing getShortTagNumber code or usage,
+        // Keep in mind if changing updateShortTagNumber code or usage,
         // since this is the only place manipulating the fields - and which deacticated with remove tags implicitly.
         $this->removeTags = true;
         $this->preserveWhitespace = false;
@@ -344,10 +323,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         //all XLF tags are removed, internal tags produced by the parser (protected whitespace) is also removed.
         return $this->utilities->internalTag->replace($this->xmlparser->join($this->result),'');
     }
-    
+
     /**
      * default text handler
      * @param string $text
+     * @throws editor_Models_ConfigException
+     * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
     public function handleText($text) {
         if(!$this->preserveWhitespace) {
@@ -383,7 +364,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $text = $wh->protectWhitespace($text);
         }
         
-        $text = $this->replacePlaceholderTags($text);
+        $text = $wh->replacePlaceholderTags($text, $this->shortTagNumbers->shortTagIdent);
         $this->result[] = $text;
     }
     

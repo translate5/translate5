@@ -1,0 +1,95 @@
+{
+	"config" : {
+		"platform" : {
+			"php" : "8"
+		}
+	},
+	"autoload" : {
+		"psr-4" : {
+			"Translate5\\" : "Translate5"
+		}
+	},
+	"repositories" : [{
+			"type" : "package",
+			"package" : {
+				"name" : "gportela85/datetimefield",
+				"license" : "MIT",
+				"version" : "1.9",
+				"description" : "A DateTime Form Field UX for Sencha, ExtJS 5.x and ExtJS 6.x.",
+				"type" : "extjs-ux",
+				"source" : {
+					"url" : "https://github.com/gportela85/DateTimeField.git",
+					"type" : "git",
+					"reference" : "1.9"
+				}
+			}
+		}, {
+			"type" : "vcs",
+			"url" : "https://github.com/dream-group/horde-text-diff/"
+		}, {
+			"_README" : "If the pull request https://github.com/technosophos/querypath/pull/208 will go into upstream master we will not need the separate version and URL anymore. version was ~3.0",
+			"type" : "vcs",
+			"url" : "https://github.com/thomaslauria/querypath"
+		}
+	],
+	"require" : {
+		"ext-simplexml": "*",
+		"ext-libxml": "*",
+		"ext-pdo": "*",
+		"ext-mysqli": "*",
+		"ext-xmlreader": "*",
+		"ext-sockets" : "*",
+		"phpunit/phpunit": "^9",
+		"shardj/zf1-future" : "dev-master",
+		"symfony/console" : "^5.0",
+		"wikimedia/composer-merge-plugin" : "~2.0",
+		"comcast/php-legal-licenses" : "~1.1",
+		"gportela85/datetimefield" : "^1.9",
+		"fortawesome/font-awesome" : "^5.13",
+		"phpoffice/phpspreadsheet" : "~1.12",
+		"querypath/querypath" : "dev-master",
+		"google/cloud-translate" : "~1.7",
+		"dream-group/horde-text-diff" : "dev-master",
+		"lesstif/php-jira-rest-client" : "~2.4",
+		"paquettg/php-html-parser": "^3.1"
+	},
+	"extra" : {
+		"merge-plugin" : {
+			"include" : [
+				"application/modules/editor/Plugins/*/composer.local.json",
+				"library/*/composer-php8.local.json"
+			],
+			"recurse" : true
+		},
+		"hooks" : {
+			"pre-commit" : [
+				"echo committing as $(git config user.name)",
+				"bash .git/hooks/pre-commit.sample",
+				"./translate5.sh dev:githook pre-commit"
+			],
+			"commit-msg" : "./translate5.sh dev:githook commit-msg $1"
+		}
+	},
+	"scripts" : {
+		"post-install-cmd" : "cghooks add --ignore-lock; cghooks update",
+		"post-update-cmd" : "cghooks update"
+	},
+	"name" : "mittagqi/translate5",
+	"description" : "Open Source Translation System\nCloud translation, review, post-editing and terminology platform",
+	"homepage" : "https://www.translate5.net",
+	"support" : {
+		"email" : "support@translate5.net",
+		"issues" : "https://jira.translate5.net/",
+		"wiki" : "https://confluence.translate5.net/",
+		"forum" : "https://confluence.translate5.net/questions"
+	},
+	"keywords" : [
+		"translation",
+		"review",
+		"post-editing"
+	],
+	"license" : "AGPL-3.0-only",
+	"require-dev" : {
+		"brainmaestro/composer-git-hooks" : "^2.8"
+	}
+}

@@ -30,16 +30,19 @@ class editor_Services_Microsoft_HttpApi extends editor_Services_Connector_HttpAp
     public function __construct(editor_Services_Microsoft_Resource $resource) {
         $this->resource = $resource;
     }
-    
+
     /**
      * Search the api for given source/target language by domainCode
      *
      * @param string $text
      * @param string $sourceLang
      * @param string $targetLang
+     * @param bool $useDictionary
      * @return boolean
+     * @throws Zend_Http_Client_Exception
+     * @throws editor_Services_Exceptions_InvalidResponse
      */
-    public function search($text, $sourceLang, $targetLang, $useDictionary = false) {
+    public function search($text, $sourceLang, $targetLang, &$useDictionary = false) {
 
         $useDictionary = $useDictionary && $this->isValidDictionaryLookup($sourceLang, $targetLang);
         
@@ -115,7 +118,7 @@ class editor_Services_Microsoft_HttpApi extends editor_Services_Connector_HttpAp
     }
 
     /***
-     * Gets from API the set of languages currently supported for translation, return bool if the request was successfull
+     * Gets from API the set of languages currently supported for translation
      * @return array|null
      */
     public function getLanguages(): ?array {

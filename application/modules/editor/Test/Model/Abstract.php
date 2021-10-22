@@ -180,6 +180,40 @@ abstract class editor_Test_Model_Abstract {
                 $result->children[] = $this->copy($child, false);
             }
         }
+
+        //reorder the wanted data, so that it matches to the old order for easier comparsion with diff
+        if(ZfExtended_Test_ApiHelper::isLegacyData() && $this instanceof editor_Test_Model_Segment) {
+            $foo = [
+                'segmentNrInTask' => null,
+                'mid' => null,
+                'userGuid' => null,
+                'userName' => null,
+                'editable' => null,
+                'pretrans' => null,
+                'matchRate' => null,
+                'matchRateType' => null,
+                'stateId' => null,
+                'autoStateId' => null,
+                'fileOrder' => null,
+                'comments' => null,
+                'workflowStepNr' => null,
+                'workflowStep' => null,
+                'source' => null,
+                'sourceMd5' => null,
+                'sourceToSort' => null,
+                'target' => null,
+                'targetMd5' => null,
+                'targetToSort' => null,
+                'targetEdit' => null,
+                'targetEditToSort' => null,
+                'metaCache' => null,
+                'isWatched' => null,
+                'isRepeated' => null,
+            ];
+            //fix the order of the associated array vs object then.
+            $result = (array) $result;
+            $result = (object) array_replace(array_intersect_key($foo, $result), $result);
+        }
         return $result;
     }
     /**
@@ -191,7 +225,8 @@ abstract class editor_Test_Model_Abstract {
         if(!empty($message)){
             return $message;
         }
-        $message = 'Comparing '.array_pop(explode('_', __CLASS__));
+        $parts = explode('_', __CLASS__);
+        $message = 'Comparing '.array_pop($parts);
         $message .= ($this->_identification == NULL) ? ' failed!' : ' "'.$this->_identification.'" failed!';
         return $message;
     }

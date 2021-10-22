@@ -136,25 +136,6 @@ class editor_Utils {
         '\u200F' // ‏
     ];
     /**
-     * List of problematic characters (Characters that presumably have no meaning for the text) in Hex-notation
-     * This are the following characters: , , , , , , , , , , , 
-     * @var array
-     */
-    private static $problematicChars = [
-        '\uE003',
-        '\ue005',
-        '\uE009',
-        '\uE015',
-        '\uE016',
-        '\uE01B',
-        '\uE01C',
-        '\uE01D',
-        '\uE01E',
-        '\uE01F',
-        '\uE043',
-        '\uE062'
-    ];
-    /**
      * List of Ligatures with their Ascii replacements in Hex-notation
      * See: https://en.wikipedia.org/wiki/Typographic_ligature#Ligatures_in_Unicode_.28Latin_alphabets.29
      * @var array
@@ -283,20 +264,6 @@ class editor_Utils {
     public static function replaceDigraphs($text){
         foreach(self::$digraphs as $digraph => $replacement){
             $text = str_replace(json_decode('"'.$digraph.'"'), $replacement, $text);
-        }
-        return $text;
-    }
-    /**
-     * Removes/Replace some chars which have no meaning for textual content and presumably are only "non printable characters"
-     * While these are multibyte chars, a segmentation may be written inside these bytes an then the charcters are damaged
-     * FIXME Stephan: Please add some DOC here how these chars affected the segmentation and how you found that out
-     * @param string $text
-     * @param string $replacement
-     * @return string
-     */
-    public static function replaceProblematicChars($text, $replacement='') {
-        foreach(self::$problematicChars as $char){
-            $text = str_replace(json_decode('"'.$char.'"'), $replacement, $text);
         }
         return $text;
     }
@@ -824,7 +791,7 @@ class editor_Utils {
             );
             $context = stream_context_create($opts);
             $headers = get_headers($url, 0, $context);
-            $code == -1;
+            $code = -1;
             $matches = [];
             if ($headers != false && count($headers) > 0) {
                 foreach($headers as $header){
