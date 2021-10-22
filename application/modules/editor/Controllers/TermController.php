@@ -139,6 +139,8 @@ class editor_TermController extends ZfExtended_RestController
             ]
         ], $params);
 
+        /// Creating termEntry-record if need
+
         // Collection statistics diff
         $diff = ['termEntry' => 0, 'term' => 0, 'attribute' => 0];
 
@@ -183,6 +185,8 @@ class editor_TermController extends ZfExtended_RestController
         /** @var editor_Models_Terminology_Models_TermModel $termR */
         $termR = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
 
+        /// Creating term-record for sourceTerm if we came from InstantTranslate
+
         // If 'sourceLang' and 'sourceTerm' params are given, it means we here because of
         // InstantTranslate usage in a way that assume that we found no existing termEntry by sourceTerm-param
         // so we save both terms (source and target) under same newly created termEntry
@@ -218,6 +222,8 @@ class editor_TermController extends ZfExtended_RestController
             $diff['attribute'] ++; // processStatus-attr was added for source term
         }
 
+        /// Creating main term-record
+
         /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
         $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
 
@@ -247,9 +253,15 @@ class editor_TermController extends ZfExtended_RestController
             'userGuid' => $this->_session->userGuid,
         ]);
 
+        /// Updating collection stats
         // Increment term and attribute stats diff
         $diff['term'] ++;
         $diff['attribute'] += trim($params['note']) ? 2 : 1; // processStatus and maybe note attr were added for term
+
+        // Update
+        ZfExtended_Factory
+            ::get('editor_Models_TermCollection_TermCollection')
+            ->updateStats($params['collectionId'], $diff);
 
         // Flush params so that GUI to be redirected to that newly created term
         $this->view->assign([
@@ -265,11 +277,6 @@ class editor_TermController extends ZfExtended_RestController
             //
             'termEntryId' => $termEntryId,
         ]);
-
-        // Update
-        ZfExtended_Factory
-            ::get('editor_Models_TermCollection_TermCollection')
-            ->updateStats($params['collectionId'], $diff);
     }
 
     /**
@@ -342,7 +349,7 @@ class editor_TermController extends ZfExtended_RestController
             'termId' => [
                 'req' => true,
                 'rex' => 'int11',
-                'key' => 'terms_term'
+                'key' => 'editor_Models_Terminology_Models_TermModel'
             ]
         ], $params);
 
@@ -351,22 +358,15 @@ class editor_TermController extends ZfExtended_RestController
             'collectionId' => [
                 'fis' => $this->collectionIds ?: 'invalid'
             ],
-        ], $_['termId']);
-
-        // Get data, that will help to detect whether this term is the last in it's termEntry or language
-        $isLast_data = editor_Utils::db()->query('
-            SELECT `language`, COUNT(`id`) AS `termQty` 
-            FROM `terms_term` 
-            WHERE `termEntryId` = ? 
-            GROUP BY `language` 
-            ORDER BY `language` = ? DESC 
-            LIMIT 2        
-        ', [$_['termId']['termEntryId'], $_['termId']['language']])->fetchAll(PDO::FETCH_KEY_PAIR);
+        ], $_['termId']->toArray());
 
         // Setup 'isLast' response flag
-        $data['isLast'] = $isLast_data[$_['termId']['language']] < 2
-            ? (count($isLast_data) < 2 ? 'entry' : 'language')
-            : false;
+        $data['isLast'] = $_['termId']->isLast();
+
+        // Backup props
+        $collectionId = $_['termId']->getCollectionId();
+        $termEntryId  = $_['termId']->getTermEntryId();
+        $language     = $_['termId']->getLanguage();
 
         // Collection statistics diff
         $diff = ['termEntry' => 0, 'term' => 0];
@@ -374,72 +374,38 @@ class editor_TermController extends ZfExtended_RestController
         // If term we're going to delete is the last term within it's termEntry
         if ($data['isLast'] == 'entry') {
 
-            // Delete `terms_images`-records and image-files found by those records
-            editor_Models_Terminology_Models_AttributeModel
-                ::deleteImages($_['termId']['collectionId'], $_['termId']['termEntryId']);
+            // Delete:
+            // 1. all images of termEntry (including language-level images)
+            // 2. terms_term_entry-record itself
+            $_['termId']->preDeleteIfLast4Entry();
 
-            /** @var editor_Models_Terminology_Models_TermEntryModel $termEntry */
-            $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
-            $termEntry->load($_['termId']['termEntryId']);
-            $termEntry->delete();
-
-            // Get term's tbx(Created|Updated)By props
-            $personIds = [];
-            if ($by = $_['termId']['tbxCreatedBy']) $personIds[$by] = true;
-            if ($by = $_['termId']['tbxUpdatedBy']) $personIds[$by] = true;
-            $personIds = array_keys($personIds);
-
-            // Drop terms_transacgrp_person-records if not used anymore
-            ZfExtended_Factory
-                ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
-                ->dropIfNotUsedAnymore($personIds);
-
-            // Decrement stats for term and termEntry
-            $diff['term'] --;
+            // Decrement stats for termEntry
             $diff['termEntry'] --;
 
         // Else
         } else {
 
             // Else this term is the last within it's language
-            if ($data['isLast'] == 'language') {
-
-                // Delete `terms_images`-records and image-files found by those records
-                editor_Models_Terminology_Models_AttributeModel
-                    ::deleteImages($_['termId']['collectionId'], $_['termId']['termEntryId'], $_['termId']['language']);
-
-                // Delete `terms_transacgrp`- and `terms_attributes`- records for language-level and term-level
-                $where = []; foreach (['termEntryId', 'language'] as $prop) $where []= '`' . $prop . '` = "' . $_['termId'][$prop] . '"';
-                editor_Utils::db()->query('DELETE FROM `terms_transacgrp` WHERE ' . implode(' AND ', $where));
-                editor_Utils::db()->query('DELETE FROM `terms_attributes` WHERE ' . implode(' AND ', $where));
-
-                // Affect `terms_transacgrp` 'modification'-records for entry- and language-level
-                ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
-                    ->affectLevels(
-                        $this->_session->userName,
-                        $this->_session->userGuid,
-                        $_['termId']['termEntryId'],
-                        $_['termId']['language']
-                    );
-            }
-
-            /** @var editor_Models_Terminology_Models_TermModel $term */
-            $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-            $term->load($_['termId']['id']);
-            $term->delete();
+            if ($data['isLast'] == 'language') $_['termId']->preDeleteIfLast4Language();
 
             // Affect `terms_transacgrp` 'modification'-records for entry- and (maybe) language-level
             ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels(
                     $this->_session->userName,
                     $this->_session->userGuid,
-                    $_['termId']['termEntryId'],
-                    $data['isLast'] == 'language' ? null : $_['termId']['language']
+                    $termEntryId,
+                    $data['isLast'] == 'language' ? null : $language
                 );
-
-            // Decrement stats for term
-            $diff['term'] --;
         }
+
+        // Delete the term
+        $_['termId']->delete();
+
+        // Decrement stats for term
+        $diff['term'] --;
+
+        // Update collection stats
+        ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection')->updateStats($collectionId, $diff);
 
         // Setup 'modified' prop, so that modification info, specified in
         // entry- and (maybe) language-level panels can be updated
@@ -447,10 +413,5 @@ class editor_TermController extends ZfExtended_RestController
 
         // Flush response data
         $this->view->assign($data);
-
-        // Update
-        ZfExtended_Factory
-            ::get('editor_Models_TermCollection_TermCollection')
-            ->updateStats($_['termId']['collectionId'], $diff);
     }
 }

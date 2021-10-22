@@ -2384,4 +2384,66 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             WHERE `termEntryId` IN (' . $termEntryIds . ')
         ')->fetchAll(), 'termEntryId', 'language');
     }
+
+    /**
+     * Check whether current term is the last one having it's termEntryId or / and languageId
+     *
+     * @return bool|string
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function isLast() {
+
+        // Get data, that will help to detect whether this term is the last in it's termEntry or language
+        $isLast_data = $this->db->getAdapter()->query('
+            SELECT `language`, COUNT(`id`) AS `termQty` 
+            FROM `terms_term` 
+            WHERE `termEntryId` = ? 
+            GROUP BY `language` 
+            ORDER BY `language` = ? DESC 
+            LIMIT 2        
+        ', [$this->getTermEntryId(), $this->getLanguage()])->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // Return false, if not last, or 'language' or 'entry' if is last within language or entry
+        return $isLast_data[$this->getLanguage()] < 2
+            ? (count($isLast_data) < 2 ? 'entry' : 'language')
+            : false;
+    }
+
+    /**
+     * Delete language-level things:
+     * 1. `terms_images`-records
+     * 2. image-files
+     * 3.`terms_transacgrp`-records
+     * 4.`terms_attributes`-records
+     */
+    public function preDeleteIfLast4Language() {
+
+        // Delete `terms_images`-records and image-files found by those records
+        editor_Models_Terminology_Models_AttributeModel
+            ::deleteImages($this->getCollectionId(), $this->getTermEntryId(), $this->getLanguage());
+
+        // Delete `terms_transacgrp`- and `terms_attributes`- records for language-level and term-level
+        $where = '`termEntryId` = ? AND `language` = ? AND `termId` IS NULL';
+        $bind = [$this->getTermEntryId(), $this->getLanguage()];
+        $this->db->getAdapter()->query('DELETE FROM `terms_transacgrp` WHERE ' . $where, $bind);
+        $this->db->getAdapter()->query('DELETE FROM `terms_attributes` WHERE ' . $where, $bind);
+    }
+
+    /**
+     * Delete termEntry- levels things:
+     * 1.`terms_images`-records (both on termEntry- and language- levels)
+     * 2.`terms_term_entry`-record. Note: current terms_term-record will be deleted by ON DELETE CASCADE
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function preDeleteIfLast4Entry() {
+
+        // Delete `terms_images`-records and image-files found by those records
+        editor_Models_Terminology_Models_AttributeModel
+            ::deleteImages($this->getCollectionId(), $this->getTermEntryId());
+
+        /** @var editor_Models_Terminology_Models_TermEntryModel $termEntry */
+        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        $termEntry->load($this->getTermEntryId());
+        $termEntry->delete();
+    }
 }

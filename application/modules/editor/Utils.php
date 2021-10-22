@@ -318,6 +318,10 @@ class editor_Utils {
         // Declare $rowA array
         $rowA = [];
 
+        //
+        if (is_object($data) && is_subclass_of($data, 'ZfExtended_Models_Entity_Abstract'))
+            $data = $data->toArray();
+
         // Foreach prop having mismatch rules
         foreach ($ruleA as $props => $rule) foreach (self::ar($props) as $prop) {
 
@@ -424,24 +428,36 @@ class editor_Utils {
                 // Setup $s as a flag indicating whether *_Row (single row) or *_Rowset should be fetched
                 $isSingleRow = $table == $rule['key'];
 
-                // Get key's target table and column
-                $target = explode('.', $table); $table = $target[0]; $column = $target[1] ?? 'id';
+                // If $rule['key'] arg is a class name of model, that is a subclass of ZfExtended_Models_Entity_Abstract
+                if ($isSingleRow && is_subclass_of($rule['key'], 'ZfExtended_Models_Entity_Abstract')) {
 
-                // Setup WHERE clause and method name to be used for fetching
-                $where = $isSingleRow
-                    ? self::db()->quoteInto('`' . $column . '` = ?', $value)
-                    : self::db()->quoteInto('`' . $column . '` IN (?)', self::ar($value));
+                    // Setup model and load record
+                    $m = is_string($rule['key']) ? ZfExtended_Factory::get($rule['key']) : $rule['key'];
+                    $m->load($value);
+                    $rowA[$prop] = $m->getId() ? $m : false;
 
-                // Prepare statement
-                $stmt = self::db()->query('
-                    SELECT * 
-                    FROM `' . $table . '` 
-                    WHERE ' . $where . self::rif($isSingleRow, '
-                    LIMIT 1'
-                ));
+                // Else
+                } else {
 
-                // Fetch
-                $rowA[$prop] = $isSingleRow ? $stmt->fetch() : $stmt->fetchAll();
+                    // Get key's target table and column
+                    $target = explode('.', $table); $table = $target[0]; $column = $target[1] ?? 'id';
+
+                    // Setup WHERE clause and method name to be used for fetching
+                    $where = $isSingleRow
+                        ? self::db()->quoteInto('`' . $column . '` = ?', $value)
+                        : self::db()->quoteInto('`' . $column . '` IN (?)', self::ar($value));
+
+                    // Prepare statement
+                    $stmt = self::db()->query('
+                        SELECT * 
+                        FROM `' . $table . '` 
+                        WHERE ' . $where . self::rif($isSingleRow, '
+                        LIMIT 1'
+                    ));
+
+                    // Fetch
+                    $rowA[$prop] = $isSingleRow ? $stmt->fetch() : $stmt->fetchAll();
+                }
 
                 // If no *_Row was fetched, or empty *_Rowset was fetched - flush error
                 if (!$rowA[$prop])
