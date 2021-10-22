@@ -31,7 +31,6 @@ END LICENSE AND COPYRIGHT
  */
 
 $APPLICATION_ROOT = rtrim(getenv('APPLICATION_ROOT'), '/');
-$DO_CAPTURE = (getenv('DO_CAPTURE') === "1");
 
 $zendLib = $APPLICATION_ROOT.'/vendor/shardj/zf1-future/library/';
 
@@ -64,12 +63,16 @@ $index->addModuleOptions('default');
 
 // runtimeOptions.dir.taskData
 $config = Zend_Registry::get('config');
-$API_URL = $config->runtimeOptions->server->protocol.$config->runtimeOptions->server->name;
-$DATA_DIR = $config->runtimeOptions->dir->taskData;
-$LOGOUT_PATH = $config->runtimeOptions->loginUrl;
-
 // crucial: setup the test-API with the neccessary pathes & url's
-ZfExtended_Test_ApiHelper::setup($API_URL, $DATA_DIR, $LOGOUT_PATH, $DO_CAPTURE);
+ZfExtended_Test_ApiHelper::setup([
+    'API_URL' => $config->runtimeOptions->server->protocol.$config->runtimeOptions->server->name,
+    'DATA_DIR' => $config->runtimeOptions->dir->taskData,
+    'LOGOUT_PATH' => $config->runtimeOptions->loginUrl,
+    'CAPTURE_MODE' => (getenv('DO_CAPTURE') === "1"),
+    'XDEBUG_ENABLE' => (getenv('XDEBUG_ENABLE') === "1"),
+    'KEEP_DATA' => (getenv('KEEP_DATA') === "1"),
+    'LEGACY_DATA' => (getenv('LEGACY_DATA') === "1"),
+]);
 
 //forcing cwd to testcases dir
 chdir(dirname(__FILE__));

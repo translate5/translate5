@@ -28,12 +28,13 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Testcase for TRANSLATE-2282 Mixing XLF id and rid values led to wrong tag numbering
+ * also tests now TRANSLATE-2658 Wrong tag numbering between source and target in imported MemoQ XLF files
  * For details see the issue.
  */
 class Translate2282Test extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+
         $task = array(
             'sourceLang' => 'de',
             'targetLang' => 'es',
@@ -84,6 +85,6 @@ class Translate2282Test extends editor_Test_JsonTest {
         self::$api->login('testlector');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }

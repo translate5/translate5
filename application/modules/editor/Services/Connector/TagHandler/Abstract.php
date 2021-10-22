@@ -37,9 +37,6 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Services_Connector_TagHandler_Abstract {
     
-    //FIXME original comment: this is just a temporary solution until TagTrait is refactored into smaller reusable classes, see TRANSLATE-1509
-    use editor_Models_Import_FileParser_TagTrait;
-    
     /**
      * This parser is used to restore whitespace tags
      * @var editor_Models_Import_FileParser_XmlParser
@@ -70,7 +67,13 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
      * @var editor_Models_Segment_UtilityBroker
      */
     protected $utilities;
-    
+
+    /**
+     * counter for internal tags
+     * @var integer
+     */
+    protected $shortTagIdent = 1;
+
     /**
      * @var ZfExtended_Logger_Queued
      */
@@ -81,8 +84,6 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
         $this->trackChange = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         
-        $this->initImageTags();
-        
         $this->logger = ZfExtended_Factory::get('ZfExtended_Logger_Queued');
         
         //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
@@ -91,7 +92,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
             
             //set shortTagIdent of the tagTrait to the next usable number if there are new tags
             $this->shortTagIdent = $this->highestTagShortCutNumber + 1;
-            $textNode = $this->whitespaceTagReplacer($textNode, $this->tagShortCutSpecialCharMap);
+            $textNode = $this->utilities->whitespace->whitespaceTagReplacer($textNode, $this->shortTagIdent, $this->tagShortCutSpecialCharMap);
             $this->xmlparser->replaceChunk($key, $textNode);
         });
     }
@@ -125,7 +126,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
     protected function importWhitespaceFromTagLessQuery(string $text): string {
         $wh = $this->utilities->whitespace;
         $text = $wh->protectWhitespace($text, $wh::ENTITY_MODE_KEEP);
-        return $this->whitespaceTagReplacer($text, $this->tagShortCutSpecialCharMap);
+        return $wh->whitespaceTagReplacer($text, $this->shortTagIdent, $this->tagShortCutSpecialCharMap);
     }
 
     protected function restoreWhitespaceForQuery (string $queryString): string {

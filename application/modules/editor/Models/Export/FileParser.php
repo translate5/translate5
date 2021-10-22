@@ -317,8 +317,11 @@ abstract class editor_Models_Export_FileParser {
     protected function getSegmentContent($segmentId, $field) {
         $this->_segmentEntity = $segment = $this->getSegment($segmentId);
         $segmentMeta = $segment->meta();
-        $segmentExport = $segment->getFieldExport($field, $this->_task, true);
         
+        // for non editable sources the edited field is empty, so we have to fetch the original
+        $useEdited = !($field == editor_Models_SegmentField::TYPE_SOURCE && !$this->segmentFieldManager->isEditable($field));
+        $segmentExport = $segment->getFieldExport($field, $this->_task, $useEdited);
+
         // This removes all segment tags but the ones needed for export
         $edited = ($segmentExport == NULL) ? '' : $segmentExport->process();
         
