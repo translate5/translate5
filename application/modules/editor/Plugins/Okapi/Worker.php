@@ -216,6 +216,12 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             $result = true;
         } catch (Exception $e){
             $this->handleException($e, $workFile, $fileId, false);
+            if(file_exists($workFile)) {
+                //we add the XLF file suffix, since the workfile is now still a XLF file.
+                rename($workFile, $workFile.$api::OUTPUT_FILE_EXTENSION);
+            }
+            //add a export-error file, pointing into the right direction
+            file_put_contents(dirname($workFile).'/export-error.txt', basename($workFile).': could not be exported due errors in Okapi. See task event log for more details.'."\n", FILE_APPEND);
         } finally {
             $api->removeProject();
         }

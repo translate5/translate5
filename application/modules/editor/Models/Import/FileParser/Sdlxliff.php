@@ -61,10 +61,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     const TARGET = 'target';
     const USERGUID = 'sdlxliff-imported';
 
-    use editor_Models_Import_FileParser_TagTrait {
-        getTagParams as protected traitGetTagParams;
-    }
-
     /**
      * @var array mappt alle Tag-Referenzen im Header der sdlxliff-Datei innerhalb von
      *      <tag-defs><tag></tag></tag-defs> auf die Tags in Segmenten des sdlxliff
@@ -134,7 +130,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
 //         if(!empty($this->html5Tags)){
 //             $this->_tagDefMapping = array_merge($this->_tagDefMapping,array_combine($this->html5Tags, $this->html5Tags));
 //         }
-        $this->initImageTags();
         $this->checkForSdlChangeMarker();
         $this->prepareTagMapping();
         $this->readCxtMetaDefinitions();
@@ -804,8 +799,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $data->openTags[$data->openCounter]['nr'] = $data->j;
 
         //ersetzte gegen Tag für die Anzeige
-        $p = $this->getTagParams($tag, $shortTagIdent, $tagId, $this->_tagMapping[$tagId]['text']);
-        $tag = $this->_leftTag->getHtmlTag($p);
+        $tagObj = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_OPEN);
+        $tagObj->originalContent = $tag;
+        $tagObj->tagNr = $shortTagIdent;;
+        $tagObj->id = $tagId;
+        $tagObj->text = $this->encodeTagsForDisplay($this->_tagMapping[$tagId]['text']);
+        $tag = $tagObj->renderTag();
 
         $data->j++;
         return $data;
@@ -831,8 +830,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $mappedTag = $this->_tagMapping[$openTag['tagId']];
 
         //generate the html tag for the editor
-        $p = $this->getTagParams($data->segment[$data->i], $openTag['nr'], $openTag['tagId'], $mappedTag['eptText']);
-        $data->segment[$data->i] = $this->_rightTag->getHtmlTag($p);
+        $tagObj = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_CLOSE);
+        $tagObj->originalContent = $data->segment[$data->i];
+        $tagObj->tagNr = $openTag['nr'];;
+        $tagObj->id = $openTag['tagId'];
+        $tagObj->text = $this->encodeTagsForDisplay($mappedTag['eptText']);
+        $data->segment[$data->i] = $tagObj->renderTag();
 
         $data->openCounter--;
         return $data;
@@ -852,7 +855,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if (in_array($tagName, $whitespaceTags)) {
             //tagtrait is working with shortTagIdent internally, so we have to feed it here
             $this->shortTagIdent = $data->j++;
-            $tag = $this->replacePlaceholderTags($tag);
+            $tag = $this->utilities->whitespace->replacePlaceholderTags($tag, $this->shortTagIdent);
             return $data;
         }
         $this->verifyTagName($tagName, $data);
@@ -864,20 +867,14 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         }
 
         //generate the html tag for the editor
-        $p = $this->getTagParams($tag, $shortTagIdent, $tagId, $this->_tagMapping[$tagId]['text']);
-        $tag = $this->_singleTag->getHtmlTag($p);
+        $tagObj = new editor_Models_Import_FileParser_Tag();
+        $tagObj->originalContent = $tag;
+        $tagObj->tagNr = $shortTagIdent;;
+        $tagObj->id = $tagId;
+        $tagObj->text = $this->encodeTagsForDisplay($this->_tagMapping[$tagId]['text']);
+        $tag = $tagObj->renderTag();
 
         $data->j++;
-        return $data;
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see editor_Models_Import_FileParser::getTagParams()
-     */
-    protected function getTagParams($tag, $shortTag, $tagId, $text) {
-        $data = $this->traitGetTagParams($tag, $shortTag, $tagId, $text);
-        $data['text'] = $this->encodeTagsForDisplay($data['text']);
         return $data;
     }
 

@@ -286,6 +286,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->status = $connector->getStatus($this->entity->getResource());
         $this->view->rows->statusInfo = $t->_($connector->getLastStatusInfo());
 
+        $languages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $languages editor_Models_LanguageResources_Languages */
+        $languages=$languages->loadResourceIdsGrouped($this->entity->getId());
+
+        $this->view->rows->sourceLang = $this->getLanguage($languages, 'sourceLang', $this->entity->getId());
+        $this->view->rows->targetLang = $this->getLanguage($languages, 'targetLang', $this->entity->getId());
+
         if(property_exists($this->view->rows,'specificData') && strlen($this->view->rows->specificData) > 0){
             $this->view->rows->specificData = $this->translateSpecificData($this->view->rows->specificData,$this->view->rows->serviceName);
         }

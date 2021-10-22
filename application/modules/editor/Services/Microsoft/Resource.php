@@ -86,8 +86,8 @@ class editor_Services_Microsoft_Resource extends editor_Models_LanguageResources
         if(is_null($this->validLanguages)) {
             $api = ZfExtended_Factory::get('editor_Services_Microsoft_HttpApi',[$this]);
             /* @var $api editor_Services_Microsoft_HttpApi */
-            $this->validLanguages = $api->getLanguages() ?? [];
+            $this->validLanguages = array_map('strtolower', $api->getLanguages() ?? []);
         }
-        return in_array($rfc5646, $this->validLanguages);
+        return in_array(strtolower($rfc5646), $this->validLanguages);
     }
 }

@@ -46,5 +46,6 @@ class editor_Models_Import_FileParser_Xlf_Exception extends editor_Models_Import
         'E1195' => 'A trans-unit of file "{file}" contains MRK tags other than type=seg, which are currently not supported! Stop Import.',
         'E1196' => 'Whitespace in text content of file "{file}" can not be cleaned by preg_replace. Error Message: "{pregMsg}". Stop Import.',
         'E1232' => 'XLF Parser supports only XLIFF Version 1.1 and 1.2, but the imported xliff tag does not match that criteria: {tag}',
+        'E1363' => 'Unknown XLF tag found: {tag} - can not import that.',
     ];
 }
