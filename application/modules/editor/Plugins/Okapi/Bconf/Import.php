@@ -40,7 +40,7 @@ class editor_Plugins_Okapi_Bconf_Import
 	/**
 	 * Export bconf
 	 */
-	public function importBconf($bconfFile)
+	public function importBconf( $bconfFile, $okapiBconfDir): void
 	{
 //        $http = ZfExtended_Factory::get('Zend_Http_Client');
 //        file_get_contents($bconfFile['name']);
@@ -54,21 +54,29 @@ class editor_Plugins_Okapi_Bconf_Import
 //		if ($fileExist) {
 //			return false;
 //		}
-        error_log(json_encode($bconfFile));
-        $bconfFileContent = file_get_contents($bconfFile['tmp_name']);
-        error_log($bconfFile['tmp_name']);
-        error_log(json_encode($bconfFileContent));
-//		$filename = self::BCONFFILE;
-//		$handle = fopen($filename, "rb");
-//		$fsize = filesize($filename);
-//		$contents = fread($handle, $fsize);
-//		$byteArray = unpack("N*",$contents);
-//		for($n = 0; $n < 16; $n++)
-//		{
-//			error_log($byteArray);
-//			error_log([$n]);
-//		}
   
+		$filename ='D:/okapi/okapi.bconf';
+        $file = fopen($filename, "r") or die("Unable to open file!");
+        
+        $fileSize = filesize($filename);
+        $fileContent = fread($file, $fileSize);
+  
+		//$byteArray = unpack("N*",$contents);
+        error_log( $fileContent);
+        error_log( $filename);
+        
+		for($n = 0; $n < 16; $n++)
+		{
+//			error_log($contents[$n]);
+//			error_log([$n]);
+		}
+ 
+ 
 	}
+    
+    protected function initBconfFile($filename){
+        $bconfModel = new editor_Plugins_Okapi_Models_Bconf();
+        $bconfModel->save();
+    }
 	
 }

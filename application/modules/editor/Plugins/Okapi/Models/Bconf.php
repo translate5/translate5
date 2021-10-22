@@ -59,9 +59,18 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @param $bconfFile
      */
     public function importBconf($bconfFile){
+        
+        //save in database and get the new bconf id to create new directory.
+        $nameWithExt = explode('.',$bconfFile['name']);
+        $name = $nameWithExt[0];
     
+        $this->setName($name);
+        $id = $this->save();
+    
+        $okapiBconfDir = $this->getDataDirectory($id);
+        
         $importBconf = new editor_Plugins_Okapi_Bconf_Import();
-        $importBconf->importBconf($bconfFile);
+        $importBconf->importBconf($bconfFile,$okapiBconfDir);
     }
     
     /**

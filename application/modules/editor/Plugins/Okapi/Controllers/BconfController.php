@@ -33,7 +33,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
 {
-    
     const FILE_UPLOAD_NAME='bconffile';
      /**
       *
@@ -101,7 +100,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
         }else{
             $file = $files[self::FILE_UPLOAD_NAME];
         }
-        $bconf = new editor_Plugins_Okapi_Bconf_Import();
+        
+        $bconf = new editor_Plugins_Okapi_Models_Bconf();
 		//TODO get the file name from UI
   
 		$bconf->importBconf($file);
