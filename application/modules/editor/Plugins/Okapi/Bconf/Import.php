@@ -42,19 +42,22 @@ class editor_Plugins_Okapi_Bconf_Import
 	 */
 	public function importBconf($bconfFile)
 	{
-        $http = ZfExtended_Factory::get('Zend_Http_Client');
-        file_get_contents($bconfFile['name']);
+//        $http = ZfExtended_Factory::get('Zend_Http_Client');
+//        file_get_contents($bconfFile['name']);
 //        foreach($bconfFile as $formname => $fileForUpload) {
 //            //$response = $http->setFileUpload($fileForUpload['name'], $formname, file_get_contents($fileForUpload['tmp_name']), $fileForUpload['type']);
 //            error_log($fileForUpload);
 //        }
-       // $this->processResponse($http->request($method));
-        //error_log(json_encode($response));
+//       // $this->processResponse($http->request($method));
+//        //error_log(json_encode($response));
 //		$fileExist = file_exists(self::BCONFFILE);
 //		if ($fileExist) {
 //			return false;
 //		}
-//
+        error_log(json_encode($bconfFile));
+        $bconfFileContent = file_get_contents($bconfFile['tmp_name']);
+        error_log($bconfFile['tmp_name']);
+        error_log(json_encode($bconfFileContent));
 //		$filename = self::BCONFFILE;
 //		$handle = fopen($filename, "rb");
 //		$fsize = filesize($filename);
@@ -65,6 +68,7 @@ class editor_Plugins_Okapi_Bconf_Import
 //			error_log($byteArray);
 //			error_log([$n]);
 //		}
+  
 	}
 	
 }
