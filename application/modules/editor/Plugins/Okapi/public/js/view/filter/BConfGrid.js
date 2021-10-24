@@ -214,7 +214,7 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
                                     xtype: 'filefield',
                                     name: 'bconffile',
                                     msgTarget: 'side',
-                                    allowBlank: false,
+                                    //allowBlank: false,
                                     anchor: '100%',
                                     width:300,
                                     buttonText: me.strings.browse
@@ -225,7 +225,7 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
                                     tooltip: me.strings.addBconf,
                                     text: me.strings.upload,
                                     handler: "uploadBconf",
-                                    formBind: true,
+                                    //formBind: true,
                                 }]
                             },
                             {

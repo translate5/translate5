@@ -41,7 +41,7 @@ class editor_Plugins_Okapi_Bconf_Import
 	 * Export bconf
 	 */
 	public function importBconf( $bconfFile, $okapiBconfDir): void
-	{
+    {
 //        $http = ZfExtended_Factory::get('Zend_Http_Client');
 //        file_get_contents($bconfFile['name']);
 //        foreach($bconfFile as $formname => $fileForUpload) {
@@ -54,26 +54,20 @@ class editor_Plugins_Okapi_Bconf_Import
 //		if ($fileExist) {
 //			return false;
 //		}
-  
-		$filename ='D:/okapi/okapi.bconf';
-        $file = fopen($filename, "r") or die("Unable to open file!");
         
+        $filename = 'D:/okapi/okapi.bconf';
+        $file = fopen($filename, "rb");
+
         $fileSize = filesize($filename);
-        $fileContent = fread($file, $fileSize);
-  
-		//$byteArray = unpack("N*",$contents);
-        error_log( $fileContent);
-        error_log( $filename);
-        
-		for($n = 0; $n < 16; $n++)
-		{
-//			error_log($contents[$n]);
-//			error_log([$n]);
-		}
- 
- 
-	}
-    
+        $fileContent = fread($file,$fileSize);
+        fseek($file, 0);
+        $data = fgets($file, 45);
+        error_log($data);
+//       $finalval = "";
+//        foreach ($byteArray as $x => $val) {
+//           error_log($val);
+//        }
+    }
     protected function initBconfFile($filename){
         $bconfModel = new editor_Plugins_Okapi_Models_Bconf();
         $bconfModel->save();
