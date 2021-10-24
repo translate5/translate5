@@ -480,4 +480,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function isTc() {
         return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
     }
+
+    /**
+     * Get termcollection export filename, that tbx-contents will be written to
+     */
+    static function exportFilename($collectionId) {
+        return editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir() . 'tc_' . $collectionId . '/export.tbx';
+    }
 }

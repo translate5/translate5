@@ -57,7 +57,11 @@ Ext.define('Editor.controller.Editor', {
         takeTagTooltip: '#UT#STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.',
         saveAnyway: '#UT# Trotzdem speichern',
         doubleclickToTakeMatch: '#UT# Doppelklick auf die Zeile übernimmt diesen Match in das geöffnete Segment.',
-        noVisibleContentColumn:'#UT#Ausgeblendete bearbeitbare Spalten wurden sichtbar geschaltet, da die Aufgabe zum Editieren geöffnet wurde, aber keine editierbare Spalte sichtbar war.'
+        noVisibleContentColumn:'#UT#Ausgeblendete bearbeitbare Spalten wurden sichtbar geschaltet, da die Aufgabe zum Editieren geöffnet wurde, aber keine editierbare Spalte sichtbar war.',
+        gridEndReached: '#UT#Kein weiteres Segment bearbeitbar!',
+        gridStartReached: '#UT#Kein vorheriges Segment bearbeitbar!',
+        gridEndReachedFiltered: '#UT#Kein weiteres Segment im Workflow bearbeitbar!',
+        gridStartReachedFiltered: '#UT#Kein vorheriges Segment im Workflow bearbeitbar!'
     },
     DEC_DIGITS: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
     refs : [{
@@ -393,7 +397,7 @@ Ext.define('Editor.controller.Editor', {
     handleStartEdit: function(plugin, context) {
         var me = this;
         me.isEditing = true;
-        me.prevNextSegment.calculateRows(context);//context.record, context.rowIdx
+        me.prevNextSegment.calculateRows(context); //context.record, context.rowIdx TODO
         me.getSourceTags(context);
     },
     getSourceTags: function(context) {
@@ -792,7 +796,7 @@ Ext.define('Editor.controller.Editor', {
      */
     goToLowerNoSave: function() {
         var me = this;
-        me.prevNextSegment.calcNext();
+        me.calcNext();
         me.moveToAdjacentRow();
     },
     /**
@@ -801,7 +805,7 @@ Ext.define('Editor.controller.Editor', {
      */
     goToUpperNoSave: function() {
         var me = this;
-        me.prevNextSegment.calcPrev();
+        me.calcPrev();
         me.moveToAdjacentRow();
     },
     /**
@@ -812,7 +816,7 @@ Ext.define('Editor.controller.Editor', {
         var me = this;
         e.preventDefault();
         e.stopEvent();
-        me.prevNextSegment.calcNext(true);
+        me.calcNext(true);
         me.moveToAdjacentRow();
     },
     /**
@@ -823,7 +827,7 @@ Ext.define('Editor.controller.Editor', {
         var me = this;
         e.preventDefault();
         e.stopEvent();
-        me.prevNextSegment.calcPrev(true);
+        me.calcPrev(true);
         me.moveToAdjacentRow();
     },
     /**
@@ -842,11 +846,27 @@ Ext.define('Editor.controller.Editor', {
         me.openNextRow();
     },
     /**
+     * triggers the calculation of the prev segment with the appropriate configs/msg
+     */
+    calcPrev: function(inWorkflow){
+        var type = (inWorkflow) ? 'workflow' : 'editable',
+            msg = (inWorkflow) ? this.messages.gridStartReachedFiltered : this.messages.gridStartReached;
+        this.prevNextSegment.calcPrev(type, msg);
+    },
+    /**
+     * triggers the calculation of the next segment with the appropriate configs/msg
+     */
+    calcNext: function(inWorkflow){
+        var type = (inWorkflow) ? 'workflow' : 'editable',
+            msg = (inWorkflow) ? this.messages.gridEndReachedFiltered : this.messages.gridEndReached;
+        this.prevNextSegment.calcNext(type, msg);
+    },
+    /**
      * Handler for saveNext Button
      * @return {Boolean} true if there is a next segment, false otherwise
      */
     saveNext: function() {
-        this.prevNextSegment.calcNext();
+        this.calcNext();
         this.saveOtherRow();
     },
     /**
@@ -854,7 +874,7 @@ Ext.define('Editor.controller.Editor', {
      * @return {Boolean} true if there is a next segment, false otherwise
      */
     savePrevious: function() {
-        this.prevNextSegment.calcPrev();
+        this.calcPrev();
         this.saveOtherRow();
     },
     /**
@@ -862,7 +882,7 @@ Ext.define('Editor.controller.Editor', {
      * @return {Boolean} true if there is a next segment, false otherwise
      */
     saveNextByWorkflow: function() {
-        this.prevNextSegment.calcNext(true);
+        this.calcNext(true);
         this.saveOtherRow();
     },
     /**
@@ -870,8 +890,20 @@ Ext.define('Editor.controller.Editor', {
      * @return {Boolean} true if there is a next segment, false otherwise
      */
     savePreviousByWorkflow: function() {
-        this.prevNextSegment.calcPrev(true);
+        this.calcPrev(true);
         this.saveOtherRow();
+    },
+    /**
+     * API for plugins to save the current and open the next segment followed by the passed callback
+     * @param {String} type
+     * @param {String} msg
+     * @param {function} callback
+     */
+    saveCurrentAndOpenNext: function(type, msg, callback){
+        this.nextOpenedCallback = callback;
+        this.prevNextSegment.calcNext(type, msg);
+        this.saveOtherRow();
+        
     },
     /**
      * save and go to other row
@@ -903,11 +935,11 @@ Ext.define('Editor.controller.Editor', {
             rowMeta = me.prevNextSegment.getCalculated(),
             callback,
             sel,
-            scrollMode=ed.self.STARTEDIT_MOVEEDITOR;
+            scrollMode = ed.self.STARTEDIT_MOVEEDITOR;
         
         //if the editor should be scrolled or moved
         if(!rowMeta.isMoveEditor){
-        	scrollMode=ed.self.STARTEDIT_SCROLLUNDER;
+        	scrollMode = ed.self.STARTEDIT_SCROLLUNDER;
         }
         
         //if we have a nextSegment and it is rendered, bring into the view and open it
@@ -915,6 +947,7 @@ Ext.define('Editor.controller.Editor', {
             selModel.select(rowMeta.rec);
             //REMIND here was startEdit defered with 300 millis, is this still needed?
             ed.startEdit(rowMeta.rec, rowMeta.lastColumn,scrollMode);
+            me.nextRowOpened();
             return;
         }
 
@@ -924,6 +957,7 @@ Ext.define('Editor.controller.Editor', {
                 grid.selectOrFocus(rowMeta.idx);
                 sel = selModel.getSelection();
                 ed.startEdit(sel[0], rowMeta.lastColumn,scrollMode);
+                me.nextRowOpened();
             };
             grid.scrollTo(rowMeta.idx, {
                 callback: callback,
@@ -943,6 +977,15 @@ Ext.define('Editor.controller.Editor', {
         else {
             Editor.MessageBox.addInfo(me.messages.segmentsChanged);
         }
+    },
+    /**
+     * Applies any callbacks after opening a row (can currently only be one)
+     */
+    nextRowOpened: function(){
+        if(this.nextOpenedCallback){
+            this.nextOpenedCallback();
+        }
+        this.nextOpenedCallback = null;
     },
     /**
      * @param {Editor.view.segments.HtmlEditor} editor
@@ -1376,8 +1419,8 @@ Ext.define('Editor.controller.Editor', {
         
         me.copiedSelectionWithTagHandling = copy;
 
-        console.log(me.copiedSelectionWithTagHandling);
-        //if we are in a regular copy / cut event we set the clipboard content to our needs
+        // console.log(me.copiedSelectionWithTagHandling);
+        // if we are in a regular copy / cut event we set the clipboard content to our needs
         if(e && e.browserEvent) {
             e.browserEvent.clipboardData.setData('text/plain', copy.selDataText);
             e.browserEvent.clipboardData.setData('text/html', copy.selDataHtml);
@@ -1421,15 +1464,11 @@ Ext.define('Editor.controller.Editor', {
             me.copiedSelectionWithTagHandling = null;
             return;
         }
-        
-/*
-
-*/
-
+        /*
         console.log("text", clipboardText);
         console.log("html", clipboardHtml);
         console.log("data", internalClip);
-
+        */
         //to insert tags, the copy/cut from segment must be the same as the paste to segment, so that tags are not moved between segments
         if(segmentId === internalClip.selSegmentId) {
             toInsert = internalClip.selDataHtml;
@@ -1716,7 +1755,7 @@ Ext.define('Editor.controller.Editor', {
     /***
      * Edit task and focus segment route
      */
-    onTaskSegmentEditRoute:function(taskId,segmentNrInTask){
+    onTaskSegmentEditRoute: function(taskId,segmentNrInTask){
         var me=this,
             store = Ext.StoreManager.get('Segments'),
             isLoaded=store.getCount()>0 && store.isLoaded;
@@ -1733,7 +1772,7 @@ Ext.define('Editor.controller.Editor', {
     /***
      * Open taks for editing for given taskid
      */
-    openTask:function(taskId){
+    openTask: function(taskId){
         //if the task is loaded, do nothing
         if(Editor.data.task){
             return;
@@ -1751,7 +1790,7 @@ Ext.define('Editor.controller.Editor', {
     /***
      * Focus segment in the segments grid.
      */
-    focusSegment:function(segmentNrInTask){
+    focusSegment: function(segmentNrInTask){
         var grid=this.getSegmentGrid();
         //focus only when the segments grid is visible
         if(!segmentNrInTask || !grid || !grid.isVisible(true)){
@@ -1794,7 +1833,7 @@ Ext.define('Editor.controller.Editor', {
     /***
      * Segments store load event handler
      */
-    onSegmentsStoreLoad:function(store){
+    onSegmentsStoreLoad: function(store){
         var me=this,
             segmentIdFromHash = Editor.app.parseSegmentIdFromTaskEditHash(true);
 
@@ -1823,7 +1862,7 @@ Ext.define('Editor.controller.Editor', {
      * @param {String} newSize 
      * @param {String} oldSize 
      */
-    onSegmentGridSegmentsSizeChanged:function(grid, newSize, oldSize){
+    onSegmentGridSegmentsSizeChanged: function(grid, newSize, oldSize){
         var me=this,
             htmlEditor = me.getSegmentsHtmleditor();
         if(!htmlEditor){
@@ -1835,7 +1874,7 @@ Ext.define('Editor.controller.Editor', {
     /***
      * Make sure that there is an editable content column when user try to edit segment when the task is in edit mode
      */
-    handleNotEditableContentColumn:function(){
+    handleNotEditableContentColumn: function(){
         var me=this,
             isReadOnly = me.getSegmentGrid().lookupViewModel().get('taskIsReadonly');
         
@@ -1852,6 +1891,14 @@ Ext.define('Editor.controller.Editor', {
             for(var i=0;i<hiddenEditable.length;i++){
                 hiddenEditable[i].setVisible(true);
             }
+        }
+    },
+    /**
+     * Adds types to the prev-next controller
+     */
+    addPrevNextSegmentType: function(type, parser, additionalParams){
+        if(this.prevNextSegment){
+            this.prevNextSegment.addType(type, parser, additionalParams);
         }
     }
 });

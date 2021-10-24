@@ -55,6 +55,12 @@ class ChangelogCommand extends Translate5AbstractCommand
             'i',
             InputOption::VALUE_NONE,
             'Show the important release notes only.');
+
+        $this->addOption(
+            'summary',
+            's',
+            InputOption::VALUE_NONE,
+            'Show only a summary');
     }
 
     /**
@@ -66,8 +72,11 @@ class ChangelogCommand extends Translate5AbstractCommand
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
+
         $content = file_get_contents(APPLICATION_ROOT.'/docs/CHANGELOG.md');
-        
+
+
+        $summary = $input->getOption('summary');
 
         if($input->getOption('important')) {
             $this->writeTitle('Translate5 important release Notes:');
@@ -87,6 +96,9 @@ class ChangelogCommand extends Translate5AbstractCommand
         $isImportant = false;
         while(!is_null($chunk)) {
             $chunk = array_shift($chunks);
+            if(is_null($chunk)) {
+                return 0;
+            }
             switch ($chunk) {
                 case '##':
                     $isImportant = false;
@@ -109,10 +121,21 @@ class ChangelogCommand extends Translate5AbstractCommand
                 break;
             }
             $chunk = trim($chunk);
-            if(empty($chunk)) {
-                continue;
+            if(strlen($chunk) > 0) {
+                $matches = null;
+                if($summary && preg_match_all('#\*\*\[([^]]+)\]\(([^)]+)\):(.+)\*\* <br>#', $chunk, $matches)) {
+                    foreach($matches[1] as $idx => $key) {
+                        $url = $matches[2][$idx];
+                        $subject = $matches[3][$idx];
+                        $this->io->text('<info>'.$key.'</info> <options=bold>'.$subject.'</>');
+                    }
+                }
+                else {
+                    $chunk = preg_replace('#\*\*\[([^]]+)\]\(([^)]+)\):(.+)\*\* <br>#', "<info>$1</info> <options=bold>$3</> \n <fg=gray>$2</>" , $chunk);
+                    $this->io->text($chunk);
+                }
+                //<fg=yellow;options=bold>not optimal</>
             }
-            $this->io->text($chunk);
         }
         return 0;
     }

@@ -26,13 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+if (window.parent.location.hash.match(/itranslate|termportal/)) $('#containerHeader').hide();
 var editIdleTimer = null,
     NOT_AVAILABLE_CLS = 'notavailable', // css if a (source-/target-)locale is not available in combination with the other (target-/source-)locale that is set
     uploadedFiles,//Variable to store uploaded files
     translateTextResponse = '',
     latestTranslationInProgressID = false,
     latestTextToTranslate = '',
-    instantTranslationIsActive = true,
+    instantTranslationIsActive = Editor.data.apps.instanttranslate.instantTranslationIsActive,
     chosenSourceIsText = true,
     fileTypesAllowed = [],
     fileUploadLanguageCombinationsAvailable = [],
@@ -348,7 +349,7 @@ function startTimerForInstantTranslation() {
     terminateTranslation();
     editIdleTimer = setTimeout(function() {
         startTranslation(); // TODO: this can start a filetranslation without calling startFileTranslation()
-    }, 200);
+    }, Editor.data.apps.instanttranslate.translateDelay);
 }
 function startTranslation() {
     var textToTranslate,
@@ -856,13 +857,6 @@ $(document).on('click', '.getdownloads' , function(e) {
     return false;
 });
 
-/* --------------- toggle instant translation ------------------------------- */
-$('.instant-translation-toggle').click(function(){
-    $('.instant-translation-toggle').toggle();
-    instantTranslationIsActive = !instantTranslationIsActive;
-    clearAllErrorMessages();
-});
-
 /* --------------- clear source --------------------------------------------- */
 $(".clearable").each(function() {
     // idea from https://stackoverflow.com/a/6258628
@@ -992,16 +986,40 @@ $(document).on('click', '.term-proposal' , function() {
         lang = $("#sourceLocale").val(),
         textProposal = $(this).attr('data-term'),
         langProposal = $("#targetLocale").val(),
-        isTermProposalFromInstantTranslate = 'true';
+        isTermProposalFromInstantTranslate = 'true',
+        isMT = $(this).parents('.copyable').find('.translation-result').data('languageresource-type') == 'mt',
         params = "text="+text+"&lang="+lang+"&textProposal="+textProposal+"&langProposal="+langProposal+"&isTermProposalFromInstantTranslate="+isTermProposalFromInstantTranslate;
-    openTermPortal(params);
+
+    var q = top.window.Ext.ComponentQuery.query,
+        vm = q('main').pop().getViewModel(),
+        b = q('[reference=termportalBtn]').pop(),
+        itranslate = { target: {lang: langProposal, term: textProposal, isMT: isMT} };
+
+    // If termId-param is not given, it means that source termEntry is not known,
+    // so we append data for trying to find it
+    if (!location.search.match(/termId/)) itranslate.source = {lang: lang, term: text};
+
+    // Set main viewModel's itranslate-prop
+    vm.set('itranslate', itranslate);
+
+    // Click on TermPortal-button
+    b.el.dom.click();
 });
 
 $('#translations').on('touchstart click','.term-info',function(){
-    var text = $(this).attr('id'),
-        lang = $(this).attr("data-languageRfc"),
-        params="text="+text+"&lang="+lang;
-    openTermPortal(params);
+    var term = $(this).attr('id'),
+        lang = $("#targetLocale").val(),
+        collectionId = $(this).parent().find('[data-languageresource-type=termcollection]').attr('id'),
+        q = top.window.Ext.ComponentQuery.query,
+        vm = q('main').pop().getViewModel(),
+        b = q('[reference=termportalBtn]').pop(),
+        itranslate = { search: {lang: lang, term: term, collectionId: collectionId} };
+
+    // Set main viewModel's itranslate-prop
+    vm.set('itranslate', itranslate);
+
+    // Click on TermPortal-button
+    b.el.dom.click();
 });
 
 $('#termPortalButton').on('touchstart click',function(){

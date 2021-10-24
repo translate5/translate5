@@ -36,6 +36,6 @@ class editor_Models_Validator_TermCollection_TermEntry extends ZfExtended_Models
     $this->addValidator('id', 'int');
     $this->addValidator('collectionId', 'int');
     $this->addValidator('groupId', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('isProposal', 'boolean');
+    $this->addValidator('isCreatedLocally', 'boolean');
   }
 }

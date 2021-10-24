@@ -103,4 +103,8 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
     public function isFullyChecked(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
         return ($qualityConfig->enableInternalTagCheck == 1);
     }
+    
+    public function isExportedTag() : bool {
+        return true;
+    }
 }

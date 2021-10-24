@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -36,28 +35,55 @@ Ext.define('Editor.view.admin.preferences.UserViewController', {
             },
             '#preferencesUserWindow #cancelBtn': {
                 click: 'handleCancel'
+            },
+            '#languageSwitch': {
+                change: 'changeLocale'
+            },
+            '#uiTheme' : {
+                change: 'onUiThemeChange'
             }
         }
     },
+
     /**
      * Speichert die Einstellungen und schließt das Fenster
      */
-    handleSave: function() {
-        var me = this, 
+    handleSave: function () {
+        var me = this,
             form = me.getView().down('form').getForm(),
             pw = form.getValues().passwd,
             user = Editor.app.authenticatedUser;
-        if(form.isValid()) {
+        if (form.isValid()) {
             user.set('passwd', pw);
             user.save({
-                url: Editor.data.restpath+'user/authenticated',
-                success: function() {
+                url: Editor.data.restpath + 'user/authenticated',
+                success: function () {
                     Editor.MessageBox.addSuccess(me.strings.pwSave);
                 }
             });
         }
     },
-    handleCancel: function() {
+
+    handleCancel: function () {
         this.getView().down('form').reset();
+    },
+
+    /***
+     * Change translate5 language on language dropdown change
+     * @param combo
+     * @param locale
+     */
+    changeLocale: function (combo, locale) {
+        Editor.app.setTranslation(locale);
+    },
+
+    /***
+     * On ui change combo event handler
+     * @param combo
+     * @param newValue
+     */
+    onUiThemeChange:function(combo, newValue){
+        Editor.app.changeUserTheme(newValue);
     }
+
 });

@@ -28,6 +28,7 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
@@ -74,6 +75,25 @@ abstract class Translate5AbstractCommand extends Command
         $this->translate5 = new Application();
         $this->translate5->init();
     }
+
+    protected function getLogo() {
+        $logo = <<<EOF
+        <fg=bright-yellow;options=reverse>            </>
+    <fg=bright-yellow;options=reverse>                    </>
+  <fg=bright-yellow;options=reverse>                        </>
+ <fg=bright-yellow;options=reverse>   _                      </> _       _       <fg=cyan;options=bold>_____</> 
+<fg=bright-yellow;options=reverse>   | |                     |</> |     | |     <fg=cyan;options=bold>| ____|</>
+<fg=bright-yellow;options=reverse>   | |_ _ __ __ _ _ __  ___|</> | __ _| |_ ___<fg=cyan;options=bold>| |__  </>
+<fg=bright-yellow;options=reverse>   | __| "__/ _` | '_ \/ __|</> |/ _` | __/ _ <fg=cyan;options=bold>\___ \ </>
+<fg=bright-yellow;options=reverse>   | |_| | | (_| | | | \__ \ </>| (_| | ||  __<fg=cyan;options=bold>/___) |</>
+ <fg=bright-yellow;options=reverse>   \__|_|  \__,_|_| |_|___/</>_|\__,_|\__\___<fg=cyan;options=bold>|____/ </>
+  <fg=bright-yellow;options=reverse>                         </>
+    <fg=bright-yellow;options=reverse>                    </>
+        <fg=bright-yellow;options=reverse>            </>
+EOF;
+
+        return $logo;
+    }
     
     /**
      * Shows a title and instance information. Should be used in each translate5 command.
@@ -88,6 +108,16 @@ abstract class Translate5AbstractCommand extends Command
             '   <info>Version:</> '.$this->translate5->getVersion(),
             '',
         ]);
+    }
+
+    protected function writeAssoc(array $data) {
+        $keys = array_keys($data);
+        $maxlen = max(array_map('strlen', $keys)) + 1;
+        foreach($data as $key => $value) {
+            $key = str_pad($key, $maxlen, ' ', STR_PAD_LEFT);
+            $key = '<info>'.$key.'</info> ';
+            $this->output->writeln($key.OutputFormatter::escape((string) $value));
+        }
     }
     
     /***

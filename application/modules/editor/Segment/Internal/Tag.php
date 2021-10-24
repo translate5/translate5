@@ -99,6 +99,11 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      */
     private $fullTag = NULL;
     /**
+     * Prop is needed for the tag-comparision and tag-repair and represents the counterpart 
+     * @var editor_Segment_Internal_Tag
+     */
+    public $counterpart = NULL;
+    /**
      * API needed for cloning
      * @param editor_Segment_Internal_ContentTag $tag
      */
@@ -117,35 +122,51 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * Evaluates if we wrap/represent a single HTML Tag of the segments content
      * @return boolean
      */
-    public function isSingle(){
+    public function isSingle() : bool {
         return $this->hasClass(self::CSS_CLASS_SINGLE);
     }
     /**
      * Evaluates if we wrap/represent a opening HTML Tag of the segments content
      * @return boolean
      */
-    public function isOpening(){
+    public function isOpening() : bool {
         return $this->hasClass(self::CSS_CLASS_OPEN);
     }
     /**
      * Evaluates if we wrap/represent a closing HTML Tag of the segments content
      * @return boolean
      */
-    public function isClosing(){
+    public function isClosing() : bool {
         return $this->hasClass(self::CSS_CLASS_CLOSE);
+    }
+    /**
+     * retrieves the marker class representing the tag-type
+     * @return string
+     */
+    public function getTagTypeClass() : string {
+        if($this->isSingle()){
+            return self::CSS_CLASS_SINGLE;
+        }
+        if($this->isOpening()){
+            return self::CSS_CLASS_OPEN;
+        }
+        if($this->isClosing()){
+            return self::CSS_CLASS_CLOSE;
+        }
+        return '';
     }
     /**
      * Evaluates, if the internal tag represents a whitespace tag
      * @return boolean
      */
-    public function isWhitespace(){
+    public function isWhitespace() : bool {
         return ($this->isSingle() && ($this->hasClass(self::CSS_CLASS_NEWLINE) || $this->hasClass(self::CSS_CLASS_NBSP) || $this->hasClass(self::CSS_CLASS_SPACE) || $this->hasClass(self::CSS_CLASS_TAB)));
     }
     /**
      * Evaluates, if the internal tag represents a newline
      * @return boolean
      */
-    public function isNewline(){
+    public function isNewline() : bool {
         return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_NEWLINE));
     }
     /**

@@ -37,8 +37,6 @@ END LICENSE AND COPYRIGHT
  * Fileparsing for import of customer specific XML
  */
 class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Import_FileParser {
-    use editor_Models_Import_FileParser_TagTrait;
-    
     /**
      * @var editor_Models_Import_FileParser_XmlParser
      */
@@ -116,7 +114,6 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
         parent::__construct($path, $fileName, $fileId, $task);
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
-        $this->initImageTags();
     }
     
     /**
@@ -375,7 +372,7 @@ The German and the English Comment tag of the string must be imported as comment
         
         //since there are no other tags we can just take the string and protect whitespace there (no tag protection needed!)
         $segment = $this->utilities->whitespace->protectWhitespace($segment);
-        $segment = $this->replacePlaceholderTags($segment);
+        $segment = $this->utilities->whitespace->replacePlaceholderTags($segment, $this->shortTagIdent);
         
         $segment = $this->utilities->internalTag->unprotect($segment);
         
@@ -462,13 +459,18 @@ The German and the English Comment tag of the string must be imported as comment
      */
     protected function createTag(string $tag, string $chunk, array $attributes): string {
         $insetType = $this->xmlparser->getAttribute($attributes, 'insettype');
-        $p = $this->getTagParams($chunk, $this->shortTagIdent++, $insetType, htmlentities($chunk));
+
         //we get the width from the Insets list
         if(array_key_exists($insetType, $this->insetWidths)) {
-            $p['length'] = $this->insetWidths[$insetType];
+            $length = $this->insetWidths[$insetType];
         } else {
-            $p['length'] = 0;
+            $length = 0;
         }
-        return $this->_singleTag->getHtmlTag($p);
+
+        $tagObj = new editor_Models_Import_FileParser_Tag();
+        $tagObj->originalContent = $chunk;
+        $tagObj->tagNr = $this->shortTagIdent++;;
+        $tagObj->id = $insetType;
+        return $tagObj->renderTag($length);
     }
 }

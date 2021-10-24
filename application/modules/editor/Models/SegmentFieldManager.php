@@ -199,6 +199,15 @@ class editor_Models_SegmentFieldManager {
         return $this->segmentfields[$name];
     }
 
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function isEditable(string $name): bool {
+        $field = $this->getByName($name);
+        return $field && $field->editable == '1';
+    }
+
     /***
      * Set segment field by name and value
      * @param string $name

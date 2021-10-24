@@ -218,7 +218,6 @@ class editor_TaskController extends ZfExtended_RestController {
 
         ->initContext();
     }
-
     /**
      * init the internal used workflow
      * @param string $wfId workflow ID. optional, if omitted use the workflow of $this->entity
@@ -760,6 +759,9 @@ class editor_TaskController extends ZfExtended_RestController {
                 $saveModel = true;
                 $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
                 /* @var $taskConfig editor_Models_TaskConfig */
+                // INFO: runtimeOptions.workflow.notifyAllUsersAboutTask can be overwritten only on customer level but from the frontend we are able to
+                // change this value via checkbox in the import wizard. This to take effect on all tasks, we insert the config value in the task config table, which
+                // value will be evaluated later (after task import in the notification class)
                 $taskConfig->updateInsertConfig($model->getTaskGuid(),'runtimeOptions.workflow.notifyAllUsersAboutTask',$notifyAssociatedUsers);
             }
 

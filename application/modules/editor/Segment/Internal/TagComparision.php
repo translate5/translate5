@@ -27,9 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Compares two field-tags if they have the same amount of internal tags in the same order
+ * Compares two field-tags if they have the same amount and type of internal tags and if these tags have a valid structure (no overlapy, proper nesting)
  */
-class editor_Segment_Internal_TagComparision {
+class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_TagCheckBase {
     
     /**
      * Evaluates if the given quality type & cateogory represents a fault
@@ -74,16 +74,6 @@ class editor_Segment_Internal_TagComparision {
      */
     private $stati = [];
     /**
-     * 
-     * @var editor_Segment_Internal_Tag[]
-     */    
-    private $checkTags = [];
-    /**
-     * 
-     * @var int
-     */
-    private $numCheckTags = 0;
-    /**
      *
      * @var editor_Segment_Internal_Tag[]
      */ 
@@ -93,16 +83,10 @@ class editor_Segment_Internal_TagComparision {
      * @var int
      */
     private $numAgainstTags = 0;
-    /**
-     * 
-     * @param editor_Segment_FieldTags $toCheck
-     * @param editor_Segment_FieldTags $against
-     */
-    public function __construct(editor_Segment_FieldTags $toCheck, ?editor_Segment_FieldTags $against){
+
+    public function __construct(editor_Segment_FieldTags $toCheck, editor_Segment_FieldTags $against=NULL){
+        parent::__construct($toCheck, $against);
         $this->status = array();
-        $toCheck->sort();
-        $this->checkTags = $toCheck->getByType(editor_Segment_Tag::TYPE_INTERNAL);
-        $this->numCheckTags = count($this->checkTags);
         // the structural check can be done without against tags
         $this->checkStructure();
         // there is a against and it is not empty and toCheck also is not empty
@@ -173,56 +157,16 @@ class editor_Segment_Internal_TagComparision {
         if($this->numCheckTags == 0){
             return;
         }
-        $numOpeners = 0;
         // check every opener if it has a corresponding closer with no overlaps inbetween
+        // The idea of this algorithm is, if every existing tag-pair is checked, so that is has no overlapping tags in between (which are not checked for overlaps between them), the whole structure must be valid
+        // closing tags can be skipped in this test, only orphan closers are obvious faults
         for($i=0; $i < $this->numCheckTags; $i++){
-            if($this->checkTags[$i]->isOpening()){
-                $numOpeners++;
-                if(!$this->nextClosingMatches($this->checkTags[$i]->getTagIndex(), $i + 1)){
-                    $this->stati[] = self::TAG_STRUCTURE_FAULTY;
-                    return;
-                }
+            // check the tags in a loop, where closing tags with counterparts can be excluded to avoid duplicate checks, they are checked with their opening counterpart
+            if((!$this->checkTags[$i]->isSingle() && $this->checkTags[$i]->counterpart == NULL) || ($this->checkTags[$i]->isOpening() && !$this->isStructurallyValid($this->checkTags[$i]))){
+                $this->stati[] = self::TAG_STRUCTURE_FAULTY;
+                return;
             }
         }
-        // if we come that close we just check if we have the same amount of openers/closers t make sure there is no orphan closer ...
-        $numClosers = 0;
-        for($i=0; $i < $this->numCheckTags; $i++){
-            if($this->checkTags[$i]->isClosing()){
-                $numClosers++;
-            }
-        }
-        if($numOpeners != $numClosers){
-            $this->stati[] = self::TAG_STRUCTURE_FAULTY;
-        }
-    }
-    /**
-     * Finds for an opener the corresponding closer, accepts openers/closers inbetween as long as they the number of openers & closers equals
-     * @param int $tagIndex
-     * @param int $start
-     * @return bool
-     */
-    private function nextClosingMatches(int $tagIndex, int $start) : bool {
-        if($start >= $this->numCheckTags){
-            return false;
-        }
-        $numOpen = 0;
-        for($i=$start; $i < $this->numCheckTags; $i++){            
-            if($this->checkTags[$i]->isClosing() && $this->checkTags[$i]->getTagIndex() == $tagIndex){
-                // we only are the "correct" closer if no other tags are open or closed (the value will be negative then)
-                // Note that we do not check the opened/closed tags for validity, this will be handled by the checks for those openers ...
-                return ($numOpen === 0);
-            } else if($this->checkTags[$i]->isOpening()) {
-                $numOpen++;
-            } else if($this->checkTags[$i]->isClosing()){
-                $numOpen--;
-                if($numOpen < 0){
-                    // as soon as we have an closing tag (no the one we are searching for) and no opening tag before this is a structural fault
-                    return false;
-                }
-            }
-        }
-        // closer not found
-        return false;
     }
     /**
      * 

@@ -38,7 +38,7 @@
             <mq:comment id="74d5b955-c68b-4ad3-8678-4d0af352eacb" creatoruser="Table RTF" time="2020-01-28T09:22:33Z" deleted="false" category="0" appliesto="Row" origin="SourceFile">und <b>nochmal</b> einer.</mq:comment>
             <mq:comment id="2cf2933e-f7d6-4c33-82fd-3cc5811a0227" creatoruser="JF" time="2020-03-10T11:06:08Z" deleted="true" category="0" appliesto="Target" origin="User">Hallo Marc,</mq:comment>
             <mq:comment id="4129e22f-406d-4ffd-bf0a-c2dc7e93ad6d" creatoruser="JF" time="2020-03-10T11:06:20Z" deleted="false" category="0" appliesto="Target" origin="User">"Hallo" „Marc“!</mq:comment>
-        <mq:comment id="NOT-TESTABLE" creatoruser="lector test" time="NOT-TESTABLE" deleted="false" category="0" appliesto="Target" origin="User">A test comment for segment 4</mq:comment></mq:comments>
+        <mq:comment id="f6ae7642-a63f-44ff-bda5-fa3dd458d943" creatoruser="lector test" time="2021-10-21T14:41:05Z" deleted="false" category="0" appliesto="Target" origin="User">A test comment for segment 4</mq:comment></mq:comments>
       </trans-unit>
       <trans-unit id="2" translate="no" mq:locked="locked" mq:status="PartiallyEdited" mq:segmentguid="72c3a015-62da-4b13-a076-dc6c07055b35" mq:lastchangedtimestamp="2020-03-30T14:07:45Z" mq:lastchanginguser="TRA_02" mq:maxlengthchars="-1" mq:nosplitjoin="false" mq:firstlabel="1" mq:lastlabel="1" mq:autosplitjoinstate="0" mq:lastmodifrole="4" mq:multipleexactmatch="false">
         <source xml:space="preserve" mq:segpart="1" mq:hasfollowingobject="hasfollowingobject">vom <bpt id="1" ctype="bold">{}</bpt><bpt id="2" rid="1">&lt;uf ufcatid="1"&gt;</bpt>Nikolaus<ept id="1">{}</ept><ept id="3" rid="1">&lt;/uf&gt;</ept></source>
@@ -57,7 +57,7 @@
             <mq:comment id="74d5b955-c68b-4ad3-8678-4d0af352eacb" creatoruser="Table RTF" time="2020-01-28T09:22:33Z" deleted="false" category="0" appliesto="Row" origin="SourceFile">und nochmal einer.</mq:comment>
             <mq:comment id="2cf2933e-f7d6-4c33-82fd-3cc5811a0227" creatoruser="JF" time="2020-03-10T11:06:08Z" deleted="true" category="0" appliesto="Target" origin="User">Hallo Marc,</mq:comment>
             <mq:comment id="4129e22f-406d-4ffd-bf0a-c2dc7e93ad6d" creatoruser="JF" time="2020-03-10T11:06:20Z" deleted="false" category="0" appliesto="Target" origin="User">Hallo Marc!</mq:comment>
-        <mq:comment id="NOT-TESTABLE" creatoruser="lector test" time="NOT-TESTABLE" deleted="false" category="0" appliesto="Target" origin="User">A test comment for segment 5</mq:comment></mq:comments>
+        <mq:comment id="33fa85b2-3f22-4c84-be07-787f2b3b9bef" creatoruser="lector test" time="2021-10-21T14:41:05Z" deleted="false" category="0" appliesto="Target" origin="User">A test comment for segment 5</mq:comment></mq:comments>
       </trans-unit>
       <trans-unit id="3" mq:status="ManuallyConfirmed" mq:percent="100" mq:segmentguid="447f7528-9fa9-4b3b-90ec-77bcec6b988d" mq:translatorcommitmatchrate="100" mq:translatorcommitusername="TRA_01" mq:translatorcommittimestamp="2020-03-31T09:38:37Z" mq:lastchangedtimestamp="2020-03-31T09:38:37Z" mq:lastchanginguser="TRA_01" mq:maxlengthchars="-1" mq:nosplitjoin="false" mq:firstlabel="1" mq:lastlabel="1" mq:autosplitjoinstate="0" mq:lastmodifrole="1000" mq:multipleexactmatch="false">
         <source xml:space="preserve" mq:segpart="1" mq:hasfollowingobject="hasfollowingobject">Neuer Kommentarblock</source>
@@ -73,7 +73,7 @@
         <mq:nosplitjoins/>
         <mq:originalsource edited="false"/>
         <mq:insertedmatch matchtype="0" source="bla blub" matchrate="100" originalmatchrate="0" ambiguousexact="false" hitfororiginalsegementversion="false"/>
-      <mq:comments><mq:comment id="NOT-TESTABLE" creatoruser="lector test" time="NOT-TESTABLE" deleted="false" category="0" appliesto="Target" origin="User">A test comment for segment 6</mq:comment></mq:comments></trans-unit>
+      <mq:comments><mq:comment id="9f4e1842-ffc9-48dd-ad9b-eae850947d9d" creatoruser="lector test" time="2021-10-21T14:41:06Z" deleted="false" category="0" appliesto="Target" origin="User">A test comment for segment 6</mq:comment></mq:comments></trans-unit>
     </body>
   </file>
 </xliff>
