@@ -20,7 +20,7 @@
 --  @copyright  Marc Mittag, MittagQI - Quality Informatics
 --  @author     MittagQI - Quality Informatics
 --  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
--- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+--              http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 --
 -- END LICENSE AND COPYRIGHT
 -- */
@@ -30,7 +30,7 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('edit
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_okapi_bconffilter', 'all');
 
 CREATE TABLE `LEK_okapi_bconf` (
-	`id` INT (11) NOT NULL AUTO_INCREMENT,
+    `id` INT (11) NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(50),
     `customer_id` VARCHAR(50),
     `default` BOOLEAN,
@@ -40,27 +40,27 @@ CREATE TABLE `LEK_okapi_bconf` (
 );
 
 CREATE TABLE `LEK_okapi_bconf_filter` (
-	`id` int(11) NOT NULL AUTO_INCREMENT,
-	`okapiId` int(11) NOT NULL,
-	`configId` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-	`okapiName` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-	`mime` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-	`default` bit(1) DEFAULT NULL,
-	`name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-	`notes` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-	`extensions` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-	`configuration` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-	`codeId` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-	PRIMARY KEY (`id`),
-	CONSTRAINT `fk_LEK_okapi_bconf_filter` FOREIGN KEY (`okapiId`) REFERENCES `LEK_okapi_bconf` (`id`) ON DELETE CASCADE
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `okapiId` int(11) NOT NULL,
+    `configId` varchar(50) NOT NULL,
+    `okapiName` varchar(50) DEFAULT NULL,
+    `mime` varchar(20) DEFAULT NULL,
+    `default` bit(1) DEFAULT NULL,
+    `name` varchar(50) DEFAULT NULL,
+    `notes` varchar(200) DEFAULT NULL,
+    `extensions` varchar(200) DEFAULT NULL,
+    `configuration` text DEFAULT NULL,
+    `codeId` varchar(50) DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_LEK_okapi_bconf_filter` FOREIGN KEY (`okapiId`) REFERENCES `LEK_okapi_bconf` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `LEK_okapi_bconf_default_filter` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `configId` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `mimeType` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `extensions` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    PRIMARY KEY (`id`)
-)
+  `configId` varchar(50) NOT NULL,
+  `mimeType` varchar(50) DEFAULT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `extensions` varchar(200) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+   PRIMARY KEY (`id`)
+);
