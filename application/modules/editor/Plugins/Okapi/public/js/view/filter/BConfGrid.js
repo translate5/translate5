@@ -64,7 +64,8 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
         searchText: "#UT#Search",
         searchEmptyText: "#UT#Search Bconf",
         export: "#UT#Export",
-        browse:'#UT#Browse'
+        browse:'#UT#Browse',
+        bconfRequired:'#UT#Bconf required'
     },
     store: {
         type: "bconfStore",
@@ -214,7 +215,9 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
                                     xtype: 'filefield',
                                     name: 'bconffile',
                                     msgTarget: 'side',
-                                    //allowBlank: false,
+                                    regex: new RegExp('\.bconf$', 'i'),
+                                    regexText: this.strings.bconfRequired,
+                                    allowBlank: false,
                                     anchor: '100%',
                                     width:300,
                                     buttonText: me.strings.browse

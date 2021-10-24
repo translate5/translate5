@@ -109,11 +109,12 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
     },
 
     uploadBconf: function (btn) {
-        var form=btn.up('form');
-
+        var form = btn.up('form');
         form.submit({
             url     : Editor.data.restpath + 'plugins_okapi_bconf/importbconf',
-            method  : 'POST',
+            params: {
+                format: 'jsontext',
+            },
             scope   : this,
             success : function(responseText){
             }
