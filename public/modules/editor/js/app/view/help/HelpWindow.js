@@ -28,6 +28,10 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.help.HelpWindow', {
     extend: 'Editor.view.StatefulWindow',
+    requires:[
+        'Editor.view.help.Video',
+        'Editor.view.help.Documentation'
+    ],
     alias: 'widget.helpWindow',
     itemId: 'helpWindow',
     stateId:'helpWindow',
@@ -41,7 +45,8 @@ Ext.define('Editor.view.help.HelpWindow', {
         doNotShowAgain:'{cbDoNotShowAgain.checked}'
     },
     strings:{
-        cbDoNotShowAgainLabel:'#UT#Dieses Fenster nicht mehr automatisch anzeigen.'
+        cbDoNotShowAgainLabel:'#UT#Dieses Fenster nicht mehr automatisch anzeigen.',
+        documentationTitle: '#UT#PDF Dokumentation'
     },
     statics:{
         //get the current window state id without creating the window
@@ -55,16 +60,15 @@ Ext.define('Editor.view.help.HelpWindow', {
             original=me.callParent();
         return original+'.'+Editor.data.helpSection;
     },
-    
+
     initConfig: function(instanceConfig) {
         var me = this,
-            url=Ext.String.format(me.getLoaderUrl(), Editor.data.helpSection, Editor.data.locale),
-            isRemote=url.match(/^(http:\/\/|https:\/\/|ftp:\/\/|\/\/)([-a-zA-Z0-9@:%_\+.~#?&//=])+$/)!==null,
             config = {
-                //max height 750, if viewport is smaller use max 95% of the viewport. 
-                height: Math.min(750, parseInt(Editor.app.viewport.getHeight() * 0.95)), 
-                //max width 1024, if viewport is smaller use max 95% of the viewport. 
-                width: Math.min(1024, parseInt(Editor.app.viewport.getWidth() * 0.95)), 
+                //max height 750, if viewport is smaller use max 95% of the viewport.
+                height: Math.min(750, parseInt(Editor.app.viewport.getHeight() * 0.95)),
+                //max width 1024, if viewport is smaller use max 95% of the viewport.
+                width: Math.min(1024, parseInt(Editor.app.viewport.getWidth() * 0.95)),
+                items:me.getHelpWindowItems(),
                 dockedItems: [{
                     xtype: 'toolbar',
                     dock: 'bottom',
@@ -82,26 +86,52 @@ Ext.define('Editor.view.help.HelpWindow', {
                     }]
                 }]
             };
-        //if the url is remote url, load the content inside an iframe
-        //also this prevents from iframe in iframe(in the views, also iframe can be defined)
-        if(isRemote){
-            config.html='<iframe src="'+url+'" width="100%" height="100%" ></iframe>';
-        }else{
-            //the url is not remote, set the loader configuration
-            config.loader={
-                url:url,
-                renderer: 'html',
-                autoLoad: true,
-                scripts: true
-            }
-        }
-        
+
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
     },
-    
+
+    /***
+     * Get help window items configuration. When there are more than one item to be show in the help section (video and docu),
+     * the items will be added in tabpanel
+     */
+    getHelpWindowItems:function (){
+        var me=this,
+            helpsection = Editor.data.frontend.helpWindow[Editor.data.helpSection],
+            items = [];
+
+        if(helpsection.loaderUrl !== undefined && helpsection.loaderUrl !== ""){
+            items.push({
+                xtype:'helpVideo',
+                title:'Video'
+            });
+        }
+        if(helpsection.documentationUrl !== undefined && helpsection.documentationUrl !== ""){
+            items.push({
+                xtype:'helpDocumentation',
+                title:me.strings.documentationTitle
+            });
+        }
+
+        if(items.length === 0){
+            return [];
+        }
+
+        // for single item, title is not needed
+        if(items.length === 1){
+            items[0].title = null;
+            return items;
+        }
+
+        // pack them in tab panel
+        return [{
+            xtype:'tabpanel',
+            items:items
+        }];
+    },
+
     /***
      * Get the window state record from the state provider(this state is not the actual state of the window, it is the state record in the
      * state provider store)
@@ -114,15 +144,6 @@ Ext.define('Editor.view.help.HelpWindow', {
      */
     isComponentHidden:function(){
         var state=this.getProviderState();
-        return state===undefined || state===""
-    },
-    
-    /***
-     * Get the loader url from the configuration
-     */
-    getLoaderUrl:function(){
-        var sectionConfig=Editor.data.frontend.helpWindow[Editor.data.helpSection];
-        return sectionConfig.loaderUrl;
+        return state===undefined || state==="";
     }
-    
 });

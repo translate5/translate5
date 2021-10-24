@@ -27,7 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * the task user assoc grid used when imporing a task or configuring the client defaults!
+ * This is used for defining default user-task associations. This component exist in the customer overview (where the default assignments are defined)
+ * and in the task import wizard, where the matching defaults are listed/assigned and can be edited.
  */
 Ext.define('Editor.view.admin.user.AssocGrid', {
     extend: 'Ext.grid.Panel',
@@ -157,7 +158,6 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     }, {
                         xtype: 'checkbox',
                         hidden:true,
-                        value:1,
                         itemId: 'notifyAssociatedUsersCheckBox',
                         glyph: 'f674@FontAwesome5FreeSolid',
                         fieldLabel: me.strings.notifyButtonText,

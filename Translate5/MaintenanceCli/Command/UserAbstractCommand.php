@@ -97,7 +97,29 @@ abstract class UserAbstractCommand extends Translate5AbstractCommand
         }
         return 0;
     }
-    
+
+    /**
+     * prints the login log from latest to oldes, amount limited to the limit parameter
+     * @param string $userGuid
+     * @param int $limit
+     */
+    protected function printLoginLog(string $userGuid, int $limit = 5) {
+        $loginLog = \ZfExtended_Factory::get('ZfExtended_Models_LoginLog');
+        /* @var $loginLog \ZfExtended_Models_LoginLog */
+        $logs = $loginLog->loadByUserGuid($userGuid, $limit);
+
+        if(empty($logs)) {
+            $this->io->info('Not logged in yet.');
+        }
+        else {
+            $this->io->section('Last 5 logins (timestamp, status, way):');
+        }
+
+        foreach($logs as $log) {
+            $this->io->text($log['created'].' '.$log['status'].' '.$log['way']);
+        }
+    }
+
     protected function printOneUser(\stdClass $data) {
         $out = [
             '       <info>ID:</info> '.$data->id,
@@ -121,7 +143,7 @@ abstract class UserAbstractCommand extends Translate5AbstractCommand
             $out[] = '<info>Open ID Issuer:</info> '.OutputFormatter::escape((string) $data->openIdIssuer);
         }
         $out[] = '';
-        
+
         $this->io->text($out);
         if(!$data->editable) {
             $this->io->warning('User is not editable!');

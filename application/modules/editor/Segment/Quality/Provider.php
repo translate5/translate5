@@ -178,6 +178,10 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     public function isSegmentTag(string $type, string $nodeName, array $classNames, array $attributes) : bool {
         return false;
     }
+    
+    public function isExportedTag() : bool {
+        return false;
+    }
 
     public function createSegmentTag(int $startIndex, int $endIndex, string $nodeName, array $classNames) : editor_Segment_Tag {
         $className = static::$segmentTagClass;

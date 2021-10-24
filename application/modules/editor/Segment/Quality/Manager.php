@@ -88,6 +88,11 @@ final class editor_Segment_Quality_Manager {
      */
     private $locked = false;
     /**
+     * Just a cache for the export types which are defined statically via the TagProviderInterface
+     * @var array
+     */
+    private $exportTypes = NULL;
+    /**
      * The constructor instantiates all providers and locks the registry
      * @throws ZfExtended_Exception
      */
@@ -367,6 +372,22 @@ final class editor_Segment_Quality_Manager {
             }
         }
         return $data;
+    }
+    /**
+     * Retrieves all types that will be exported (with further processing)
+     * @return array
+     */
+    public function getAllExportedTypes(){
+        if($this->exportTypes === NULL){
+            $this->exportTypes = [];
+            foreach($this->registry as $type => $provider){
+                /* @var $provider editor_Segment_Quality_Provider */
+                if($provider->isExportedTag()){
+                    $this->exportTypes[] = $provider->getType();
+                }
+            }
+        }
+        return $this->exportTypes;
     }
     /**
      * 

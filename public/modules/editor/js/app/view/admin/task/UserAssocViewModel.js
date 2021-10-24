@@ -82,6 +82,12 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
             },
             bind:{bindTo:'{currentTask}',deep:true}
         },
+        disableRanges:{
+            get: function (task) {
+                return task && task.get('usageMode') !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS;
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
         editInfoHtml:{
             get: function (task) {
                 var me= this,

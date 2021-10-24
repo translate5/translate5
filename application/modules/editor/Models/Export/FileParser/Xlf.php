@@ -124,7 +124,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
                 $xmlparser->replaceChunk($opener['openerKey'], $this->makeTag($tag, true, $opener['attributes']));
             }
         });
-        
+
         $xmlparser->registerElement('trans-unit', function(){
             $this->transUnitLength = 0;
         }, function($tag, $key, $opener) use ($xmlparser){
@@ -185,9 +185,13 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
                     $this->logSegment($originalAttributes, 'segment to long');
                 }
             }
-            
         });
-        
+
+        //the unit segment id container must be removed on export, they are mainly needed for namespace related features, which are executed before
+        $xmlparser->registerElement('t5:unitSegIds', null, function($tag, $key) use ($xmlparser){
+            $xmlparser->replaceChunk($key, '');
+        });
+
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
         $this->_exportFile = $xmlparser->parse($this->_skeletonFile, $preserveWhitespaceDefault);
         

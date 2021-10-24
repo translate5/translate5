@@ -1432,3 +1432,29 @@ Ext.override(Ext.grid.feature.Grouping, {
         }
     }
 });
+
+/***
+ * Add custom upload filesize validation which can be used for fileupload fields.
+ * The file size is loaded from the php.ini upload_max_filesize value
+ * Example usage:
+ *   {
+ *       xtype: 'filefield',
+ *       name: 'tmUpload',
+ *       vtype:'fileUploadSize',
+ *   }
+ *
+ */
+Ext.define('Translate5.override.form.field.VTypes', {
+    override: 'Ext.form.field.VTypes',
+
+    tmFileUploadSize: function(val, field) {
+        var files = field.fileInputEl.dom.files;
+
+        if(!files || files.length === 0){
+            return true;
+        }
+        return Editor.data.frontend.php.upload_max_filesize > (files[0].size/(1024*1024));
+    },
+    tmFileUploadSizeText:Editor.data.frontend.override.VTypes.tmFileUploadSizeText
+
+});

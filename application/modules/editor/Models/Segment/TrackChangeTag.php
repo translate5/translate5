@@ -179,4 +179,28 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         $segment= preg_replace('/<'.self::PLACEHOLDER_TAG_DEL.'[^>]+>/', '', $segment);
         return $segment;
     }
+
+    /**
+     * This function returns a list of used track change tags inside text in a canonical comparable format, since comparing bare tags is due different structure not possible
+     * @param string $segment
+     * @return array
+     */
+    public function getUsedTagInfo(string $segment): array {
+        $matches= null;
+        if(!preg_match_all('/<(ins|del) ([^>]+)>/', $segment, $matches)) {
+            return [];
+        }
+        $result = [];
+        foreach($matches[1] as $index => $tag) {
+            $dataAttributes = [];
+            //find data-attributes
+            if(preg_match_all('/data-([^\s]+)="([^"]*)"/', $matches[2][$index], $dataAttributes)){
+                //ensure that all attribute keys are lowercase, original notation can be found in the orignal chunk
+                $dataAttributes[1] = array_map('strtolower', $dataAttributes[1]);
+                $tag .= '#'.join('#', array_combine($dataAttributes[1], $dataAttributes[2]));
+            }
+            $result[] = $tag;
+        }
+        return $result;
+    }
 }

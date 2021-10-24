@@ -94,6 +94,8 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                     hidden: true,
                     bodyPadding: 10,
                     region: 'east',
+                    reference: 'assocForm',
+                    itemId: 'userAssocForm',
                     defaults: {
                         labelAlign: 'top'
                     },
@@ -159,6 +161,9 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                         fieldLabel: me.strings.fieldSegmentrange,
                         labelCls: 'labelInfoIcon',
                         cls: 'userAssocLabelIconField',
+                        bind:{
+                            disabled: '{disableRanges}'
+                        },
                         autoEl: {
                             tag: 'span',
                             'data-qtip': me.strings.fieldSegmentrangeInfo
@@ -187,13 +192,11 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                 }]
             }]
         };
-
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
     },
-
     /**
      * loads all or all available users into the dropdown, the store is reused to get the username to userguids
      * @param {Boolean} edit true if edit an assoc, false if add a new one

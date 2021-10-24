@@ -636,7 +636,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   /**
    * Insert whitespace; we use the ("internal-tag"-)divs here, because insertMarkup() 
    * will render ("internal-tag"-)divs to the ("tag-image"-)images we finally need.
-   * For titles etc, see also whitespaceTagReplacer() in TagTrait.php
+   * For titles etc, see also whitespaceTagReplacer() in editor_Models_Segment_Whitespace
    * @param string whitespaceType ('nbsp'|'newline'|'tab')
    * @param number tagNr
    */

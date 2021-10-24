@@ -105,7 +105,7 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf::extractSegment()
      */
-    protected function extractSegment($transUnit) {
+    protected function extractSegment($transUnit): array {
         foreach($this->currentTarget as $mid => $target) {
             $this->protectHtml($target);
         }

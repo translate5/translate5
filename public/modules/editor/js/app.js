@@ -454,6 +454,28 @@ Ext.application({
         Editor.data.logoutOnWindowClose = false;
         form.submit();
     },
+
+    /***
+     * This will change the transalte5 theme with setting the user specific theme config
+     * @param newTheme
+     */
+    changeUserTheme:function (newTheme){
+        // check if the given theme is available
+        if(Editor.data.frontend.config.themesName[newTheme] === undefined){
+            Ext.raise('The provided theme is not valid!');
+            return;
+        }
+        var record = Editor.app.getUserConfig('extJs.theme',true);
+        record.set('value',newTheme);
+        record.save({
+            callback:function(){
+                // disable logout on windows close when the theme is changed
+                Editor.data.logoutOnWindowClose = false;
+                location.reload();
+            }
+        });
+    },
+
     browserAdvice: function () {
         var me = this,
             supportedBrowser = false;

@@ -44,7 +44,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
       exportExcel: '#UT#Externe Bearbeitung als Excel',
       downloadImportArchive: '#UT#Importarchiv herunterladen',
       faultyQualityAlertTitle: '#UT#Warnung',
-      faultyQualityAlertText: '#UT#Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern',
+      faultyQualityAlertText: '#UT#Es gibt in dieser Aufgabe interne Tag Fehler, die für einen fehlerfreien Export automatisch korrigiert wurden',
   },
   
   makePath: function(path, field) {

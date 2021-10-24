@@ -13,6 +13,167 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+## [5.5.2] - 2021-10-11
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-2637](https://jira.translate5.net/browse/TRANSLATE-2637): Warn regarding merging terms** <br>
+Warning message will be shown when using merge terms functionality in term collection import/re-import
+
+**[TRANSLATE-2630](https://jira.translate5.net/browse/TRANSLATE-2630): Add language resource name to language resource pop-up - same for projects** <br>
+Improves info messages and windows titles in language resources, project and task overview.
+
+
+### Bugfixes
+**[TRANSLATE-2597](https://jira.translate5.net/browse/TRANSLATE-2597): Set resource usage log lifetime by default to 30 days** <br>
+This will set the default lifetime days for resources usage log configuration to 30 days when there is no value set.
+
+**[TRANSLATE-2528](https://jira.translate5.net/browse/TRANSLATE-2528): Instant-translate and Term-portal route after login** <br>
+Fixed problems accessing TermPortal / InstantTranslate with external URLs.
+
+
+## [5.5.1] - 2021-10-07
+
+### Important Notes:
+#### [TRANSLATE-2645](https://jira.translate5.net/browse/TRANSLATE-2645)
+Please set innodb_ft_min_token_size in your mysql installation to 1 and  	innodb_ft_enable_stopword to 0.
+This is necessary for TermPortal to find words shorter than 3 characters. If you did already install translate5 5.5.0 on your server OR if you did install translate 5.5.1 BEFORE you did change that settings in your mysql installation, then you would need to update the fulltext indexes of your DB term-tables manually. 
+If this is the case, please call "./translate5.sh termportal:reindex" or contact us, how to do this.
+Please run "./translate5.sh system:check" to check afterwards if everything is properly configured.
+
+#### [TRANSLATE-2634](https://jira.translate5.net/browse/TRANSLATE-2634)
+By default the new PDF documentation for translate5s editor is integrated in the help window of the editor. If you do not want to show this to your users, please deactivate it after the upgrade in the system configuration (GUI). For detailed info how this can be configured please check this link: https://confluence.translate5.net/display/CON/Database+based+configuration
+If you happen to have defined custom help content in the editor, and the help content is in written text/pdf/html , it make sense this content to be loaded with editordocumentation.phtml
+ 
+
+
+### Added
+**[TRANSLATE-2640](https://jira.translate5.net/browse/TRANSLATE-2640): Remove InstantTranslate on/off button from InstantTranslate and move functionality to configuration** <br>
+The auto-translate feature in instant translate can be configured if active for each client.
+
+
+### Changed
+**[TRANSLATE-2645](https://jira.translate5.net/browse/TRANSLATE-2645): TermPortal: set mysql fulltext search minimum word length to 1 and disable stop words** <br>
+Please set innodb_ft_min_token_size in your mysql installation to 1 and  	innodb_ft_enable_stopword to 0.
+This is necessary for TermPortal to find words shorter than 3 characters. If you did already install translate5 5.5.0 on your server OR if you did install translate 5.5.1 BEFORE you did change that settings in your mysql installation, then you would need to update the fulltext indexes of your DB term-tables manually. 
+If this is the case, please call "./translate5.sh termportal:reindex" or contact us, how to do this.
+Please run "./translate5.sh system:check" to check afterwards if everything is properly configured.
+
+**[TRANSLATE-2641](https://jira.translate5.net/browse/TRANSLATE-2641): AdministrativeStatus default attribute and value** <br>
+The "Usage Status (administrativeStatus)" attribute is now the leading one regarding the term status. Its value is synchronized to all other similar attributes (normativeAuthorization and other custom ones).
+
+**[TRANSLATE-2634](https://jira.translate5.net/browse/TRANSLATE-2634): Integrate PDF documentation in translate5 help window** <br>
+Pdf documentation in the editor help window is available now.
+To change PDF location or disable see config runtimeOptions.frontend.helpWindow.editor.documentationUrl
+
+**[TRANSLATE-2607](https://jira.translate5.net/browse/TRANSLATE-2607): Make type timeout in InstantTranslate configurable** <br>
+The translation delay in instant translate can be configured now.
+
+
+### Bugfixes
+**[TRANSLATE-2644](https://jira.translate5.net/browse/TRANSLATE-2644): Task related notification emails should link directly to the task** <br>
+Currently task related notification E-Mails do not point to the task but to the portal only. This is changed.
+
+**[TRANSLATE-2643](https://jira.translate5.net/browse/TRANSLATE-2643): Usability improvements: default user assignment** <br>
+Usability improvements in default user association overview.
+
+
+## [5.5.0] - 2021-09-30
+
+### Important Notes:
+#### [TRANSLATE-2623](https://jira.translate5.net/browse/TRANSLATE-2623)
+All user-set themes different from "thriton" or "arria" are set to the translate5 default theme: thriton. From now on, there are only 2 available themes in the dropdown: Dark theme (Aria) and Default theme (Triton)
+
+#### [TRANSLATE-1405](https://jira.translate5.net/browse/TRANSLATE-1405)
+Due the new TermPortal all terminology data is migrated to a new database structure, this may run a long time depending on the size of the term databases. The progress can be watched in the transalte5 system log.
+
+The config values runtimeOptions.tbx.termLabelMap.* are merged into one config runtimeOptions.tbx.termLabelMap
+
+The config values runtimeOptions.tbx.termImportMap.* (which maps custom to valid TBX term status value) are moved into a own configuration table. 
+If the previoulsy confiuration was completly in DB all is fine, conversion is done automatically. If such config was still/again in installation.ini, then migratation must be done by hand. Unknown status values are logged on TBX import.
+ 
+
+
+### Added
+**[TRANSLATE-2302](https://jira.translate5.net/browse/TRANSLATE-2302): Accept and reject TrackChanges** <br>
+Plugin TrackChanges
+* added capabilities for the editor, to accept/reject changes from preceiding workflow-steps
+* reduced tracking of changes in the translation step, only pretranslated segments are tracked
+* by default, TrackChanges is invisible in the translation step
+* the visibility of changes is normally reduced to the changes of the preceiding workflow steps
+* the visibility and capability to accept/reject for the editor can be set via the user assocciations on the task and customer level
+
+**[TRANSLATE-1405](https://jira.translate5.net/browse/TRANSLATE-1405): TermPortal as terminology management solution** <br>
+Introduced the brand new TermPortal, now completely usable as terminology management solution.
+
+
+### Changed
+**[TRANSLATE-2629](https://jira.translate5.net/browse/TRANSLATE-2629): Integrate beo-proposals for German names of standard tbx attributes** <br>
+Term-portal improvement UI names of standard TBX attributes
+
+**[TRANSLATE-2625](https://jira.translate5.net/browse/TRANSLATE-2625): Solve tag errors automatically on export** <br>
+Internal Tag Errors (faulty structure) will be fixed automatically when exporting a task: Orphan opening/closing tags will be removed, structurally broken tag pairs will be corrected. The errors in the task itself will remain.
+
+**[TRANSLATE-2623](https://jira.translate5.net/browse/TRANSLATE-2623): Move theme switch button and language switch button in settings panel** <br>
+The drop-down for switching the translate5 language and translate5 theme is moved under "Preferences" ->"My settings" tab.
+
+**[TRANSLATE-2622](https://jira.translate5.net/browse/TRANSLATE-2622): CLI video in settings help window** <br>
+Integrate CLI video in preferences help page.
+
+**[TRANSLATE-2611](https://jira.translate5.net/browse/TRANSLATE-2611): Check Visual Review URLs before downloading them if they are accessible** <br>
+Added additional check for Visual Review URLs if the URL is accessible before downloading it to improve the logged error
+
+
+### Bugfixes
+**[TRANSLATE-2621](https://jira.translate5.net/browse/TRANSLATE-2621): Logging task specific stuff before task is saved leads to errors** <br>
+In seldom cases it may happen that task specific errors should be logged in the time before the task was first saved to DB, this was producing a system error on processing the initial error and the information about the initial error was lost.
+
+**[TRANSLATE-2618](https://jira.translate5.net/browse/TRANSLATE-2618): Rename tooltips for next segment in translate5** <br>
+Improves tooltip text in editor meta panel segment navigation.
+
+**[TRANSLATE-2614](https://jira.translate5.net/browse/TRANSLATE-2614): Correct translate5 workflow names of complex workflow** <br>
+Improve the step names and translations of the complex workflow
+
+**[TRANSLATE-2612](https://jira.translate5.net/browse/TRANSLATE-2612): Job status changes from open to waiting on deadline change** <br>
+If the deadline of a job in a task is changed, the status of the job changes from "open" to "waiting". This is fixed.
+
+**[TRANSLATE-2609](https://jira.translate5.net/browse/TRANSLATE-2609): Import of MemoQ comments fails** <br>
+HOTFIX: MemoQ comment parsing produces corrupt comments with single comment nodes. Add Exception to the base parsing API to prevent usage of negative length's
+
+**[TRANSLATE-2603](https://jira.translate5.net/browse/TRANSLATE-2603): Browser does not refresh cache for maintenance page** <br>
+It could happen that users were hanging in the maintenance page - depending on their proxy / cache settings. This is solved now.
+
+**[TRANSLATE-2602](https://jira.translate5.net/browse/TRANSLATE-2602): msg is not defined** <br>
+Fixed a ordinary programming error in the frontend message bus.
+
+**[TRANSLATE-2601](https://jira.translate5.net/browse/TRANSLATE-2601): role column is not listed in workflow mail** <br>
+The role was not shown any more in the notification e-mails if a task was assigned to users.
+
+**[TRANSLATE-2599](https://jira.translate5.net/browse/TRANSLATE-2599): reviewer can not open associated task in read-only mode** <br>
+If a user with segment ranges tries to open a task read-only due workflow state waiting or finished this was resulting in an error.
+
+**[TRANSLATE-2598](https://jira.translate5.net/browse/TRANSLATE-2598): Layout Change Logout** <br>
+Changing translate5 theme will no longer logout the user.
+
+**[TRANSLATE-2591](https://jira.translate5.net/browse/TRANSLATE-2591): comments of translate no segments are not exported anymore** <br>
+comments of segments with translate = no were not exported any more, this is fixed now.
+
+
+## [5.2.7] - 2021-08-06
+
+### Important Notes:
+
+
+### Bugfixes
+**[TRANSLATE-2596](https://jira.translate5.net/browse/TRANSLATE-2596): Message bus session synchronization rights** <br>
+Solves the problem where the message bus did not have the rights to synchronize the session.
+
+**[TRANSLATE-2595](https://jira.translate5.net/browse/TRANSLATE-2595): Customers store autoload for not authorized users** <br>
+Solves the problem with loading of the customers for not-authorized users.
+
 
 ## [5.2.6] - 2021-08-04
 

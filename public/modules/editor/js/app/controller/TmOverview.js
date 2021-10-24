@@ -33,7 +33,6 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Die Einstellungen werden in einem Cookie gespeichert
  * @class Editor.controller.TmOverview
  * @extends Ext.app.Controller
  */
@@ -48,6 +47,7 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.ImportCollectionWindow',
         'Editor.view.LanguageResources.log.LogWindow',
         'Editor.view.LanguageResources.ProposalExport',
+        'Editor.view.LanguageResources.TbxExport',
         'Editor.view.LanguageResources.services.Default'
     ],
     models: ['Editor.model.admin.Task', 'Editor.model.LanguageResources.Resource','Editor.model.LanguageResources.LanguageResource'],
@@ -62,14 +62,17 @@ Ext.define('Editor.controller.TmOverview', {
         deleteConfirmText: '#UT#Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?',
         deleteConfirmLocal: '#UT#Sprachressource löschen?',
         deleteConfirmLocalText: '#UT#Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.',
-        deleted: '#UT#Sprachressource gelöscht.',
+        deleted: '#UT#Sprachressource "{0}" gelöscht.',
         edited: '#UT#Die Sprachressource "{0}" wurde erfolgreich geändert.',
         created: '#UT#Die Sprachressource "{0}" wurde erfolgreich erstellt.',
         noResourcesAssigned: '#UT#Keine Sprachressourcen zugewiesen.',
         taskassocgridcell:'#UT#Zugewiesene Sprachressourcen',
         exportTm: '#UT#als TM Datei exportieren',
         exportTmx: '#UT#als TMX Datei exportieren',
-        exportZippedTmx: '#UT#als gezippte TMX Datei exportieren'
+        exportZippedTmx: '#UT#als gezippte TMX Datei exportieren',
+        mergeTermsWarnTitle: '#UT#Nicht empfohlen!',
+        mergeTermsWarnMessage: '#UT#Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.'
+
     },
     refs:[{
         ref: 'tmOverviewPanel',
@@ -122,6 +125,12 @@ Ext.define('Editor.controller.TmOverview', {
             },
             'addTmWindow filefield[name="tmUpload"]': {
                 change: 'handleChangeImportFile'
+            },
+            '#termCollectionExportActionMenu': {
+                click: 'onTermCollectionExportActionMenuClick'
+            },
+            '#addTmWindow #mergeTerms,#importCollectionWindow #mergeTerms': {
+                change: 'onMergeTermsChange'
             }
         },
         store: {
@@ -138,6 +147,13 @@ Ext.define('Editor.controller.TmOverview', {
      * Task to check the records to be imported
      */
     checkImportingRecordsTask: null,
+
+    /***
+     * Action menu cache component for term collection export
+     */
+    exportTcMenuCache: [],
+
+
     init: function() {
         var me = this;
         //add the taskassocs field to the task model
@@ -394,7 +410,7 @@ Ext.define('Editor.controller.TmOverview', {
                     me.handleDeleteTm(view,cell,col,newRecord);
                     break;
                 case 'export':
-                    me.handleExportProposalClick(view,cell,col,newRecord);
+                    me.showTermCollectionActionMenu(newRecord,ev);
                     break;
                 case 'log':
                     me.handleLogTm(view,cell,col,newRecord);
@@ -471,7 +487,7 @@ Ext.define('Editor.controller.TmOverview', {
                 success: function(record, operation) {
                     store && store.load();
                     store.remove(rec);
-                    Editor.MessageBox.addSuccess(msg.deleted);
+                    Editor.MessageBox.addSuccess(Ext.String.format(msg.deleted, rec.get('name')));
                     Editor.MessageBox.addByOperation(operation);
                 }
             });
@@ -582,14 +598,79 @@ Ext.define('Editor.controller.TmOverview', {
         });
         return labels.join(',');
     },
-    
-    /***
-     * Export proposals action button click handler
+
+    /**+
+     * Show termcollection action menu
+     *
+     * @param newRecord
+     * @param event
      */
-    handleExportProposalClick:function(view, cell, cellIdx, rec){
+    showTermCollectionActionMenu: function (newRecord,event) {
+        var me = this,
+            menu = me.exportTcMenuCache.termCollectionExportActionMenu;
+
+        if (!menu) {
+            //create fresh menu instance
+            me.exportTcMenuCache.termCollectionExportActionMenu = menu = Ext.widget('termCollectionExportActionMenu');
+        }
+        menu.record = newRecord;
+        menu.showAt(event.getXY());
+    },
+
+    /***
+     * Collection export action menu event handler
+     * @param com
+     * @param item
+     * @param ev
+     */
+    onTermCollectionExportActionMenuClick:function (com, item, ev) {
+        var me = this,
+            action = item && item.action;
+
+        if (!me[action] || !Ext.isFunction(me[action])) {
+            return;
+        }
+
+        me[action](com.record);
+    },
+
+    /***
+     * Merge terms checkbox change event handler
+     * @param checkbox
+     * @param newValue
+     */
+    onMergeTermsChange:function (checkbox,newValue){
+        if(newValue === true){
+            Ext.Msg.show({
+                title: this.strings.mergeTermsWarnTitle,
+                message: this.strings.mergeTermsWarnMessage,
+                icon: Ext.Msg.WARNING
+            });
+        }
+    },
+
+    /***
+     * Export proposal action menu click handler
+     *
+     * @param rec
+     */
+    exportProposal:function(rec){
     	var proposalWindow=Ext.create('Editor.view.LanguageResources.ProposalExport',{
     		record:rec
     	});
     	proposalWindow.show();
+    },
+
+    /***
+     * Export collection action menu click handler
+     *
+     * @param rec
+     */
+    exportCollection:function (rec){
+        var tbxWindow=Ext.create('Editor.view.LanguageResources.TbxExport',{
+            record:rec
+        });
+        tbxWindow.show();
     }
+
 });

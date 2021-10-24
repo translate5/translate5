@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.controller.Editor
+ * @class Editor.controller.LanguageResources
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.controller.LanguageResources', {

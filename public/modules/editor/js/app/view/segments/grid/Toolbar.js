@@ -237,24 +237,17 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     getThemeMenuConfig:function(){
         var me=this,
             config,
-            uiThemesRecord = Editor.app.getUserConfig('extJs.cssFile',true),
+            uiThemesRecord = Editor.app.getUserConfig('extJs.theme',true),
             menuItems = [];
 
         Ext.Array.each(uiThemesRecord.get('defaults'), function(i) {
             menuItems.push({
-                text: Ext.String.capitalize(i),
+                text: (Editor.data.frontend.config.themesName[i] !== undefined) ? Editor.data.frontend.config.themesName[i]  :  Ext.String.capitalize(i),
                 value:i,
                 checked: uiThemesRecord.get('value') === i,
                 group: 'uiTheme',
-                checkHandler: function (item){
-                    // on item select, change the user state config, and reload the application
-                    // after reload, the user will get the changed theme
-                    uiThemesRecord.set('value',item.value);
-                    uiThemesRecord.save({
-                        callback:function(){
-                            location.reload();
-                        }
-                    });
+                handler: function (item){
+                    Editor.app.changeUserTheme(item.value);
                 }
             });
         });
