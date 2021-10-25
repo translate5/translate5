@@ -1,3 +1,0 @@
-SET NAMES utf8;
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `type`, `description`) 
-VALUES ('runtimeOptions.billPdfFooter', '1', 'erp', 'base', 'BW Bank Stuttgart • BIC: SOLADEST600 • IBAN: DE13 6005 0101 0004 5117 77 \nSitz der Gesellschaft: Stuttgart • Amtsgericht Stuttgart HRB 724850 \nGeschäftsführer: Andrea Kunze, Katrin Gast \nUSt-IdNr.: DE258470299', 'BW Bank Stuttgart • BIC: SOLADEST600 • IBAN: DE13 6005 0101 0004 5117 77 \nSitz der Gesellschaft: Stuttgart • Amtsgericht Stuttgart HRB 724850 \nGeschäftsführer: Andrea Kunze, Katrin Gast \nUSt-IdNr.: DE258470299', 'string', 'Footer text shown in pdf export');

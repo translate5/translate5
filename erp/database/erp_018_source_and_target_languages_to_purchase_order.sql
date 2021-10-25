@@ -1,3 +1,0 @@
-ALTER TABLE `ERP_purchaseOrder` 
-ADD COLUMN `sourceLang` VARCHAR(255) NULL DEFAULT NULL AFTER `number`,
-ADD COLUMN `targetLang` VARCHAR(255) NULL DEFAULT NULL AFTER `sourceLang`;

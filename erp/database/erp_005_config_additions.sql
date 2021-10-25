@@ -1,2 +1,0 @@
-INSERT INTO `Zf_configuration` 
-VALUES (null,'runtimeOptions.viewfilters',1,'erp','base','{"offer": ["offered"],"project": ["ordered","cancelled"],"bill": ["billed","paid"]}','{"offer": ["offered"],"project": ["ordered","cancelled"],"bill": ["billed","paid"]}','','map','mapping of order states (offered, ordered, cancelled, billed, paid, declined, proforma]) to the main filters: offer,project,bill');

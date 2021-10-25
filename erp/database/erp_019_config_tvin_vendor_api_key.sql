@@ -1,2 +1,0 @@
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.vendor.apiKey', '1', 'erp', 'system', '01C4286F-A133-4F31-8352-87F23BDC27B8', '01C4286F-A133-4F31-8352-87F23BDC27B8', '', 'string', 'api key needed for tvin server communication');

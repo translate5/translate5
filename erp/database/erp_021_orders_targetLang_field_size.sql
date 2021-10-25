@@ -1,2 +1,0 @@
-ALTER TABLE `ERP_order` 
-CHANGE COLUMN `targetLang` `targetLang` TEXT NULL DEFAULT NULL ;

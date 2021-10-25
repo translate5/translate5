@@ -1,1 +1,0 @@
-UPDATE `Zf_configuration` SET `value` = '{"offer": ["offered"],"project": ["ordered"],"bill": ["billed","paid"]}' WHERE `Zf_configuration`.`name` = 'runtimeOptions.viewfilters';
