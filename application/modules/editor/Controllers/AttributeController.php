@@ -143,7 +143,7 @@ class editor_AttributeController extends ZfExtended_RestController
             'attrId' => [
                 'req' => true,
                 'rex' => 'int11',
-                'key' => 'terms_attributes'
+                'key' => 'editor_Models_Terminology_Models_AttributeModel'
             ],
         ], $params);
 
@@ -155,9 +155,9 @@ class editor_AttributeController extends ZfExtended_RestController
         ], $_['attrId']);
 
         // Call the appropriate method depend on attr's `elementName` or `type` prop
-        if ($_['attrId']['elementName'] == 'xref') $this->xrefupdateAction($_);
-        else if ($_['attrId']['elementName'] == 'ref') $this->refupdateAction($_);
-        else if ($_['attrId']['type'] == 'figure') $this->figureupdateAction($_);
+        if ($_['attrId']->getElementName() == 'xref') $this->xrefupdateAction($_);
+        else if ($_['attrId']->getElementName() == 'ref') $this->refupdateAction($_);
+        else if ($_['attrId']->getType() == 'figure') $this->figureupdateAction($_);
         else $this->attrupdateAction($_);
     }
 
@@ -176,7 +176,7 @@ class editor_AttributeController extends ZfExtended_RestController
             'attrId' => [
                 'req' => true,
                 'rex' => 'int11',
-                'key' => 'terms_attributes'
+                'key' => 'editor_Models_Terminology_Models_AttributeModel'
             ]
         ], $params);
 
@@ -187,28 +187,30 @@ class editor_AttributeController extends ZfExtended_RestController
             ],
         ], $_['attrId']);
 
-        // If it's a processStatus- or administrativeStatus-attribute - do nothing
-        if ($_['attrId']['type'] == 'processStatus' || $_['attrId']['type'] == 'administrativeStatus') return;
+        // Prevent deletion of processStatus and administrativeStatus attributes
+        editor_Utils::jcheck([
+            'type' => [
+                'dis' => 'processStatus,administrativeStatus'
+            ]
+        ], $_['attrId']);
 
-        // Create `terms_attributes` model instance
-        $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        $a->load($params['attrId']);
-        $data = $a->delete($misc = [
+        // Update collection stats
+        ZfExtended_Factory
+            ::get('editor_Models_TermCollection_TermCollection')
+            ->updateStats($_['attrId']->getCollectionId(), [
+                'termEntry' => 0,
+                'term' => 0,
+                'attribute' => -1
+            ]);
+
+        // Delete attribute
+        $data = $_['attrId']->delete([
             'userName' => $this->_session->userName,
             'userGuid' => $this->_session->userGuid,
         ]);
 
         // Flush response data
         $this->view->assign($data);
-
-        // Update
-        ZfExtended_Factory
-            ::get('editor_Models_TermCollection_TermCollection')
-            ->updateStats($_['attrId']['collectionId'], [
-                'termEntry' => 0,
-                'term' => 0,
-                'attribute' => -1
-            ]);
     }
 
     /**
@@ -221,7 +223,7 @@ class editor_AttributeController extends ZfExtended_RestController
         $params = $this->getRequest()->getParams();
 
         // Validate params
-        editor_Utils::jcheck([
+        $_ += editor_Utils::jcheck([
             'language' => [
                 'req' => $params['level'] == 'language',
                 'rex' => 'rfc5646'
@@ -232,7 +234,8 @@ class editor_AttributeController extends ZfExtended_RestController
             ],
             'type' => [
                 'req' => true,
-                'fis' => 'xGraphic,externalCrossReference'
+                'fis' => 'xGraphic,externalCrossReference',
+                'key' => 'terms_attributes_datatype.type'
             ],
         ], $params);
 
@@ -249,9 +252,7 @@ class editor_AttributeController extends ZfExtended_RestController
             // No need for xrefs
             //'termId' => ,
 
-            'dataTypeId' => editor_Utils::db()->query(
-                'SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = ?', $params['type']
-            )->fetchColumn(),
+            'dataTypeId' => $_['type']['id'],
             'type' => $params['type'],
 
             // Below 2 will be set by xrefupdateAction()
@@ -299,7 +300,7 @@ class editor_AttributeController extends ZfExtended_RestController
     public function refcreateAction($_) {
 
         // Get request params
-        $params = $this->getRequest()->getParams();
+        $params = ['type' => 'crossReference'] + $this->getRequest()->getParams();
 
         // Validate params
         $_ += editor_Utils::jcheck([
@@ -312,6 +313,9 @@ class editor_AttributeController extends ZfExtended_RestController
                 'rex' => 'int11',
                 'key' => 'terms_term'
             ],
+            'type' => [
+                'key' => 'terms_attributes_datatype.type'
+            ]
         ], $params);
 
         // Create `terms_attributes` model instance
@@ -325,9 +329,7 @@ class editor_AttributeController extends ZfExtended_RestController
             'termId' => $params['level'] == 'term' ? $_['termId']['id'] : null,
             'termTbxId' => $params['level'] == 'term' ? $_['termId']['termTbxId'] : null,
 
-            'dataTypeId' => editor_Utils::db()->query(
-                'SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = "crossReference"'
-            )->fetchColumn(),
+            'dataTypeId' => $_['type']['id'],
             'type' => 'crossReference',
 
             // Below 2 will be set by refupdateAction()
@@ -375,10 +377,10 @@ class editor_AttributeController extends ZfExtended_RestController
     public function figurecreateAction($_) {
 
         // Get request params
-        $params = $this->getRequest()->getParams();
+        $params = ['type' => 'figure'] + $this->getRequest()->getParams();
 
         // Validate params
-        editor_Utils::jcheck([
+        $_ += editor_Utils::jcheck([
             'language' => [
                 'req' => $params['level'] == 'language',
                 'rex' => 'rfc5646'
@@ -387,6 +389,9 @@ class editor_AttributeController extends ZfExtended_RestController
                 'req' => true,
                 'fis' => 'entry,language'
             ],
+            'type' => [
+                'key' => 'terms_attributes_datatype.type'
+            ]
         ], $params);
 
         // Create `terms_attributes` model instance
@@ -398,9 +403,7 @@ class editor_AttributeController extends ZfExtended_RestController
             'termEntryId' => $params['termEntryId'],
             'language' => $params['level'] == 'language' ? $params['language'] : null,
             // 'termId' => ,
-            'dataTypeId' => $dataTypeId = editor_Utils::db()->query(
-                'SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = "figure"'
-            )->fetchColumn(),
+            'dataTypeId' => $_['type']['id'],
             'type' => 'figure',
             'value' => 'Image',
             'target' => ZfExtended_Utils::uuid(),
@@ -456,7 +459,7 @@ class editor_AttributeController extends ZfExtended_RestController
             'dataTypeId' => [
                 'req' => true,
                 'rex' => 'int11',
-                'key' => 'terms_attributes_datatype'
+                'key' => 'editor_Models_Terminology_Models_AttributeDataType'
             ],
         ], $params);
 
@@ -468,7 +471,7 @@ class editor_AttributeController extends ZfExtended_RestController
             ],
             'level' => [
                 'req' => true,
-                'fis' => $_['dataTypeId']['level']
+                'fis' => $_['dataTypeId']->getLevel()
             ],
             'termId' => [
                 'req' => $params['level'] == 'term',
@@ -484,46 +487,26 @@ class editor_AttributeController extends ZfExtended_RestController
             'type' => [
                 'dis' => 'figure,externalCrossReference,crossReference,xGraphic'
             ],
-            'label' => [
-                'dis' => 'date,langSet,term'
-            ],
         ], $_['dataTypeId']);
-
-        // Setup WHERE clauses for entry-, language- and term-level attributes
-        $levelWHERE = [
-            'entry'    => '`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`)',
-            'language' => '`termEntryId` = :termEntryId AND `language` = :language AND ISNULL(`termId`)',
-            'term'     => '`termId` = :termId'
-        ];
-
-        // Params for binding to the existing attribute-fetching query
-        $bind = [
-            'entry'    => [':termEntryId' => $params['termEntryId']],
-            'language' => [':termEntryId' => $params['termEntryId'], ':language' => $params['language']],
-            'term'     => [':termId' => $params['termId']]
-        ];
 
         // Prevent creating attribute with a dataTypeId, that one of already existing attributes has
         editor_Utils::jcheck([
             'dataTypeId' => [
-                'dis' => editor_Utils::db()->query('
-                    SELECT `dataTypeId` 
-                    FROM `terms_attributes`
-                    WHERE ' . $levelWHERE[$params['level']]
-                    , $bind[$params['level']])->fetchAll(PDO::FETCH_COLUMN)
+                'dis' => $_['dataTypeId']->getAlreadyExistingFor(
+                    $params['termEntryId'],
+                    $params['language'] ?? null,
+                    $params['termId'] ?? null
+                )
             ]
         ], $params);
 
         // If attribute we're going to add is not a part of TBX basic standard
-        if (!$_['dataTypeId']['isTbxBasic']) editor_Utils::jcheck([
-            'collectionId' => [
-                'fis' => editor_Utils::db()->query('
-                    SELECT `collectionId` 
-                    FROM `terms_collection_attribute_datatype` 
-                    WHERE `dataTypeId` = ?'
-                    , $params['dataTypeId'])->fetchAll(PDO::FETCH_COLUMN)
-            ]
-        ], $_['termEntryId']);
+        if (!$_['dataTypeId']->getIsTbxBasic())
+            editor_Utils::jcheck([
+                'collectionId' => [
+                    'fis' => $_['dataTypeId']->getAllowedCollectionIds()
+                ]
+            ], $_['termEntryId']);
 
         // Create `terms_attributes` model instance
         /* @var $a editor_Models_Terminology_Models_AttributeModel */
@@ -538,8 +521,8 @@ class editor_AttributeController extends ZfExtended_RestController
             'termTbxId' => $params['level'] == 'term' ? $_['termId']['termTbxId'] : null,
 
             'dataTypeId' => $params['dataTypeId'],
-            'type' => $_['dataTypeId']['type'],
-            'value' => $_['dataTypeId']['dataType'] == 'picklist' ? explode(',', $_['dataTypeId']['picklistValues'])[0] : null,
+            'type' => $_['dataTypeId']->getType(),
+            'value' => $_['dataTypeId']->getDataType() == 'picklist' ? explode(',', $_['dataTypeId']->getPicklistValues())[0] : null,
 
             // This wont be set for ordinary attributes
             //'target' => ,
@@ -553,7 +536,7 @@ class editor_AttributeController extends ZfExtended_RestController
             //'langSetGuid' => null,
             'termGuid' => $params['level'] == 'term' ? $_['termId']['guid'] : null,
             'guid' => ZfExtended_Utils::uuid(),
-            'elementName' => $_['dataTypeId']['label'],
+            'elementName' => $_['dataTypeId']->getLabel(),
             'attrLang' => $params['level'] != 'entry' ? $params['language'] : null,
             //'dataType' => null
         ]);
@@ -614,18 +597,17 @@ class editor_AttributeController extends ZfExtended_RestController
             ]
         ], $params);
 
-        // Create `terms_attributes` model instance
-        /** @var editor_Models_Terminology_Models_AttributeModel $a */
-        $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        $a->load($params['attrId']);
-        $a->{'set' . ucfirst($params['dataIndex'])}($params['value']);
-        $updated = $a->update($misc = [
+        // Set attribute's dataIndex-defined prop
+        $_['attrId']->{'set' . ucfirst($params['dataIndex'])}($params['value']);
+
+        // Update attribute
+        $updated = $_['attrId']->update($misc = [
             'userName' => $this->_session->userName,
             'userGuid' => $this->_session->userGuid,
         ]);
 
         // Setup $isValidUrl flag indicating whether `target`-prop contains a valid url
-        $isValidUrl = preg_match('~ href="([^"]+)"~', editor_Utils::url2a($a->getTarget()));
+        $isValidUrl = preg_match('~ href="([^"]+)"~', editor_Utils::url2a($_['attrId']->getTarget()));
 
         // Flush response data
         $this->view->assign(['updated' => $updated, 'isValidUrl' => $isValidUrl]);
@@ -650,12 +632,11 @@ class editor_AttributeController extends ZfExtended_RestController
             ]
         ], $params);
 
-        // Create `terms_attributes` model instance
-        /** @var editor_Models_Terminology_Models_AttributeModel $a */
-        $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        $a->load($params['attrId']);
-        $a->setTarget($params['target']);
-        $data['updated'] = $a->update($misc = [
+        // Set attribute's target-prop
+        $_['attrId']->setTarget($params['target']);
+
+        // Update attribute
+        $data['updated'] = $_['attrId']->update($misc = [
             'userName' => $this->_session->userName,
             'userGuid' => $this->_session->userGuid,
         ]);
@@ -664,10 +645,10 @@ class editor_AttributeController extends ZfExtended_RestController
         if ($params['target']) {
 
             // Detect level
-            $level = $_['attrId']['termId'] ? 'term' : 'entry';
+            $level = $_['attrId']->getTermId() ? 'term' : 'entry';
 
             // Prepare first 2 arguments to be used for $this->_refTarget(&$refA, $refTargetIdA, $prefLangA) call
-            $refA[$level][$params['attrId']] = $_['attrId'];
+            $refA[$level][$params['attrId']] = $_['attrId']->toArray();
             $refTargetIdA[$params['target']] = [$level, $params['attrId']];
             $prefLangA = array_unique([$params['termLang'], $params['mainLang']]);
 
@@ -708,16 +689,16 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Apply data
         $i->init([
-            'targetId' => $_['attrId']['target'],
+            'targetId' => $_['attrId']->getTarget(),
             'name' => $_['figure']['name'],
             'uniqueName' => ZfExtended_Utils::uuid() . $_['figure']['.ext'],
             'encoding' => 'hex',
             'format' => $_['figure']['type'],
-            'collectionId' => $_['attrId']['collectionId']
+            'collectionId' => $_['attrId']->getCollectionId()
         ]);
 
         // If uploaded file is successfully moved into proper location
-        if ($i->moveImage($_['figure']['tmp_name'], $_['attrId']['collectionId'])) {
+        if ($i->moveImage($_['figure']['tmp_name'], $_['attrId']->getCollectionId())) {
 
             // Save `terms_images` record
             $i->save();
@@ -728,8 +709,8 @@ class editor_AttributeController extends ZfExtended_RestController
                 ->affectLevels(
                     $this->_session->userName,
                     $this->_session->userGuid,
-                    $_['attrId']['termEntryId'],
-                    $_['attrId']['language']
+                    $_['attrId']->getTermEntryId(),
+                    $_['attrId']->getLanguage()
                 );
 
             // Flush response data
@@ -777,6 +758,9 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Default response data to be flushed in case of attribute change
         $data = ['success' => true, 'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s')];
+
+        //
+        $_['attrId'] = $_['attrId']->toArray();
 
         // If attr was not yet changed after importing from tbx - append current value to response
         if (!$_['attrId']['isCreatedLocally']) $data['imported'] = $_['attrId']['value'];

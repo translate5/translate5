@@ -126,4 +126,71 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
         }
         return $result;
     }
+
+    /**
+     * Get dataTypeId by $type
+     *
+     * @param string $type
+     * @return string
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getIdByType(string $type) {
+        return $this->db->getAdapter()->query(
+            'SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = ?', $type
+        )->fetchColumn();
+    }
+
+
+    /**
+     * Get array of terms_attributes.dataTypeId for a level, identified by $termEntryId, $language and $termId args
+     * Currently this is used to prevent creating more than 1 attributes having same dataTypeId
+     *
+     * @param int $termEntryId
+     * @param string|null $language
+     * @param int|null $termId
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getAlreadyExistingFor(int $termEntryId, string $language = null, int $termId = null) {
+
+        // Detect level
+        if ($termEntryId && $language && $termId) $level = 'term';
+        else if ($termEntryId && $language) $level = 'language';
+        else $level = 'entry';
+
+        // Setup WHERE clauses for entry-, language- and term-level attributes
+        $levelWHERE = [
+            'entry'    => '`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`)',
+            'language' => '`termEntryId` = :termEntryId AND `language` = :language AND ISNULL(`termId`)',
+            'term'     => '`termId` = :termId'
+        ];
+
+        // Params for binding to the existing attribute-fetching query
+        $bind = [
+            'entry'    => [':termEntryId' => $termEntryId],
+            'language' => [':termEntryId' => $termEntryId, ':language' => $language],
+            'term'     => [':termId' => $termId]
+        ];
+
+        // Return existing attributes datatype ids
+        return $this->db->getAdapter()->query('
+            SELECT `dataTypeId` 
+            FROM `terms_attributes`
+            WHERE ' . $levelWHERE[$level]
+        , $bind[$level])->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Get array of collection ids that are allowed to create attribute with current data type in
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getAllowedCollectionIds() {
+        return $this->db->getAdapter()->query('
+            SELECT `collectionId` 
+            FROM `terms_collection_attribute_datatype` 
+            WHERE `dataTypeId` = ?'
+        , $this->getId())->fetchAll(PDO::FETCH_COLUMN);
+    }
 }

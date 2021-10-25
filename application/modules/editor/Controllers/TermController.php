@@ -358,7 +358,7 @@ class editor_TermController extends ZfExtended_RestController
             'collectionId' => [
                 'fis' => $this->collectionIds ?: 'invalid'
             ],
-        ], $_['termId']->toArray());
+        ], $_['termId']);
 
         // Setup 'isLast' response flag
         $data['isLast'] = $_['termId']->isLast();
