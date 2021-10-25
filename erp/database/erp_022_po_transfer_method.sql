@@ -1,0 +1,1 @@
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.po.transferMethod', '1', 'erp', 'base', '[\"transfer method 1\",\"transfer method 2\",\"transfer method 3\"]', '[\"transfer method 1\",\"transfer method 2\",\"transfer method 3\"]', '', 'list', 'Transmission path');

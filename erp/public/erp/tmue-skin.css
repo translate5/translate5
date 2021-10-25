@@ -1,0 +1,7 @@
+.head-panel .head-panel-brand {
+    background:url("../../client-specific/images/transmission_logo_web.gif") no-repeat 10px 5px;
+    border-bottom: 1px solid #666666;
+    border-top: 3px solid #9f1923;
+    color: #666666;
+    font-weight: normal;
+}

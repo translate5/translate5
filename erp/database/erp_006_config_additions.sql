@@ -1,0 +1,2 @@
+INSERT INTO `Zf_configuration` (`id`,`name`,`confirmed`,`module`,`category`,`value`,`default`,`defaults`,`type`,`description`)
+VALUES (null,'runtimeOptions.taxsets',1,'erp','base','[{"id": 0, "text": "0%"},{"id": 19, "text": "19%"}]','[{"id": 0, "text": "0%"},{"id": 19, "text": "19%"}]','','map','The defined tax rates for customer configuration. id is the percentage as integer, text is the percentage as text.');

@@ -1,0 +1,261 @@
+.sumpanel .offer {margin-right:50px;}
+
+/* icons */
+.icon-add {
+    background-image:url(resources/add.png);
+}
+.icon-refresh {
+    background-image:url(resources/arrow_refresh.png);
+}
+.icon-close {
+    background-image:url(resources/close.png);
+}
+.icon-excel {
+    background-image:url(resources/page_excel.png);
+}
+.icon-order-add {
+    background-image:url(resources/page_add.png);
+}
+.icon-po-add {
+    background-image:url(resources/table_row_insert.png);
+}
+/* Head Panel */
+.head-panel {height: 150px;position:relative;}/* possible to overwrite bg => whole container */
+.head-panel .head-panel-brand {} /* box for html branding */
+.head-panel .head-panel-info-panel {position:absolute;}
+.head-panel .head-panel-info-panel .info-box {position:absolute;right:20px;top:20px;}
+.head-panel .head-panel-toolbar {
+	position:absolute;
+	padding-top:35px;
+	width:440px;
+	background-color: transparent !important;
+}
+
+.head-panel-info-panel span.user-label,
+.head-panel-info-panel span.login-label,
+.head-panel-info-panel span.task-label {font-style: italic; font-weight: bold;}
+.head-panel-info-panel span.task-readonly {font-style: italic;}
+
+/*comments column*/
+#segment-grid .x-grid-row .comments-field .x-grid-cell-inner {
+  white-space: normal;
+  width: 200px;
+}
+#segment-grid .x-grid-row-editor img.add,
+#segment-grid .x-grid-row-editor img.edit {
+    display:none;
+}
+#segment-grid .x-grid-row-editor .x-btn {float:right;}
+#segment-grid .x-grid-row-selected .comments-field .x-grid-cell-inner img.add,
+#segment-grid .x-grid-row-selected .comments-field .x-grid-cell-inner img.edit {
+    background: url("resources/comment_edit.png") no-repeat center;
+    cursor: pointer;
+    float:right;
+    height:20px !important;
+    width:20px !important;
+    padding:0;
+}
+#segment-grid .x-grid-row-selected .comments-field .x-grid-cell-inner img.add {
+    background-image: url("resources/comment_add.png");
+}
+#segment-grid .x-grid-row-selected.editing-disabled .comments-field .x-grid-cell-inner img.add {
+    display:none;
+}
+.comments-grid .x-action-col-cell img {height:16px;width:16px;cursor: pointer;margin-right:5px;}
+.ico-comment-add {background-image: url("resources/comment_add.png");}
+.ico-comment-edit {background-image: url("resources/comment_edit.png");}
+.ico-comment-delete {background-image: url("resources/comment_delete.png");}
+.comments-grid .comment-readonly .x-action-col-cell img {display:none;}
+
+.comment {margin-bottom:5px;}
+#segment-grid .comment {margin-bottom:0px;}
+#segment-grid .comment .ellipsis {font-size:7pt;line-hight:3pt;display:block;line-height:10pt;}
+.comment .content,
+.comments-grid .comment .modified,
+.comments-grid .comment .content {white-space: normal;display:block;}
+.comment .author, .comment .created, .comment .modified {font-size: 7pt; font-style: italic;line-height:10pt;}
+.negativeNumber{
+	color:#ff0000;
+}
+.negativeValueNumberfield .x-form-text-wrap >input{
+	color:#ff0000;
+}
+.numberfieldcustom .x-form-text-field-body > div{
+    float:left !important;
+    width:130px;
+}
+.numberfieldcustom .x-form-trigger-spinner,.x-form-trigger-spinner >div,.numberfieldcustomgroup .x-form-trigger-spinner,.x-form-trigger-spinner >div{
+	display:none;
+}
+.numberfieldcustomgroup .x-form-text-field-body > div{
+    float:left !important;
+    width:120px;
+}
+.displayfieldcustom  .x-form-display-field-body > div{
+	float:left !important;
+	width:125px;
+	text-align:right;
+}
+.displayfieldcustomgroup  .x-form-display-field-body > div{
+	float:left !important;
+	width:115px;
+	text-align:right;
+}
+.numberfieldcustomtextalign .x-form-text-wrap >input{
+    text-align:end !important;
+}
+table.fixedsumtable { table-layout:fixed; }
+table.fixedsumtable td { white-space: nowrap; }
+
+/*
+	START MESSAGEBOX STYLES
+	These styles are copied from classic theme ,they are missing in Triton theme.
+	(they are needed for styling the messagebox info message)
+*/
+/* including package ext-theme-classic */
+/* line 2, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tl {
+  background: transparent no-repeat 0 0; }
+
+/* line 6, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tc {
+  height: 8px;
+  background: transparent repeat-x 0 0;
+  overflow: hidden; }
+
+/* line 12, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tr {
+  background: transparent no-repeat right -8px; }
+
+/* line 16, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-ml {
+  background: transparent repeat-y 0;
+  padding-left: 4px;
+  overflow: hidden; }
+
+/* line 22, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-mc {
+  background: repeat-x 0 -16px;
+  padding: 4px 10px; }
+
+/* line 27, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-mc h3 {
+  margin: 0 0 4px 0; }
+
+/* line 31, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-mr {
+  background: transparent repeat-y right;
+  padding-right: 4px;
+  overflow: hidden; }
+
+/* line 37, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-bl {
+  background: transparent no-repeat 0 -16px; }
+
+/* line 41, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-bc {
+  background: transparent repeat-x 0 -8px;
+  height: 8px;
+  overflow: hidden; }
+
+/* line 47, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-br {
+  background: transparent no-repeat right -24px; }
+
+/* line 51, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tl, .x-box-bl {
+  padding-left: 8px;
+  overflow: hidden; }
+
+/* line 56, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tr, .x-box-br {
+  padding-right: 8px;
+  overflow: hidden; }
+
+/* line 61, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tl {
+  background-image: url(resources/corners.gif); }
+
+/* line 65, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tc {
+  background-image: url(resources/tb.gif); }
+
+/* line 69, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tr {
+  background-image: url(resources/corners.gif); }
+
+/* line 73, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-ml {
+  background-image: url(resources/l.gif); }
+
+/* line 77, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-mc {
+  background-color: #eee;
+  background-image: url(resources/tb.gif);
+  font-family: "Myriad Pro","Myriad Web","Tahoma","Helvetica","Arial",sans-serif;
+  color: #393939;
+  font-size: 15px; }
+
+/* line 85, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-mc h3 {
+  font-size: 18px;
+  font-weight: bold; }
+
+/* line 90, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-mr {
+  background-image: url(resources/r.gif); }
+
+/* line 94, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-bl {
+  background-image: url(resources/corners.gif); }
+
+/* line 98, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-bc {
+  background-image: url(resources/tb.gif); }
+
+/* line 102, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-br {
+  background-image: url(resources/corners.gif); }
+
+/* line 106, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-blue .x-box-bl, .x-box-blue .x-box-br, .x-box-blue .x-box-tl, .x-box-blue .x-box-tr {
+  background-image: url(resources/corners-blue.gif); }
+
+/* line 110, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-blue .x-box-bc, .x-box-blue .x-box-mc, .x-box-blue .x-box-tc {
+  background-image: url(resources/tb-blue.gif); }
+
+/* line 114, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-blue .x-box-mc {
+  background-color: #c3daf9; }
+
+/* line 118, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-blue .x-box-mc h3 {
+  color: #17385b; }
+
+/* line 122, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-blue .x-box-ml {
+  background-image: url(resources/l-blue.gif); }
+
+/* line 126, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-blue .x-box-mr {
+  background-image: url(resources/r-blue.gif); }
+/*
+	END MESSAGEBOX STYLES
+*/
+.x-grid-item-selected{
+  color: #000000;
+}
+.x-grid-item {
+  color: #000000;
+}
+.tooltipNumberTableCell{
+  text-align: right;
+  white-space: nowrap;
+}
+.changed-field-value input,.changed-field-value textarea{
+    background-image:url(resources/megaphone--pencil.png);
+    background-repeat: no-repeat;
+    background-position: left 8px center;
+    padding-left: 30px;
+}

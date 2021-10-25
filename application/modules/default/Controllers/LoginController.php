@@ -55,7 +55,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         $lock = ZfExtended_Factory::get('ZfExtended_Models_Db_SessionUserLock');
         /* @var $lock ZfExtended_Models_Db_SessionUserLock */
         $this->view->lockedUsers = $lock->getLocked();
-       
+
         //set the redirecthash value in the session if it is provided by the login form submit
         //Info: bacause of the multiple redirects (sso authentication), we save the hash in the session, and reaply it when
         //we redirect to the editor module
@@ -83,6 +83,7 @@ class LoginController extends ZfExtended_Controllers_Login {
     }
     
     protected function initDataAndRedirect() {
+
         //@todo do this with events
         if(class_exists('editor_Models_Segment_MaterializedView')) {
             $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
@@ -92,16 +93,17 @@ class LoginController extends ZfExtended_Controllers_Login {
         
         $this->localeSetup();
         
-        $sessionUser = new Zend_Session_Namespace('user');
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
-        $roles=$sessionUser->data->roles;
+        $roles=editor_User::instance()->getRoles();
 
         $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
         $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
 
+
         $hash = $this->handleAppsRedirectHash();
 
+        // Case 1: redirect to instant-translate/term-portal using hash route
         // If user was not logged in during the attempt to load termportal, but now is logged and allowed to do that
         //TODO: after itranslate route is changed to itranslate to instanttranslate here
         if (preg_match('~^#(termportal|itranslate)~', $hash) && $isTermPortalAllowed) {
@@ -109,39 +111,40 @@ class LoginController extends ZfExtended_Controllers_Login {
             $this->applicationRedirect(substr($hash, 1), true);
         }
 
-        if($acl->isInAllowedRoles($roles, 'initial_page','editor')) {
-            $this->editorRedirect();
+        // Case 2: redirect base on allowed modules
+        if(!empty($redirectModule = $this->getModuleRedirect())){
+            $this->moduleRedirect($redirectModule);
         }
 
-        //the user has termportal and instantranslate roles
+        // Case 3: redirect to instant-translate/term-portal when the user has both roles. Where the user will be redirected
+        // will be decided based on the last used application
         if($isTermPortalAllowed && $isInstantTranslateAllowed){
             //find the last used app, if none use the instantranslate as default
             $meta=ZfExtended_Factory::get('editor_Models_UserMeta');
             /* @var $meta editor_Models_UserMeta */
-            $meta->loadOrSet($sessionUser->data->id);
+            $meta->loadOrSet(editor_User::instance()->getId());
             $rdr='instanttranslate';
             if($meta->getId()!=null && $meta->getLastUsedApp()!=''){
                 $rdr=$meta->getLastUsedApp();
             }
-            $this->applicationRedirect($rdr, $isTermPortalAllowed);
+            $this->applicationRedirect($rdr, true);
         }
         
-        //is instanttranslate allowed
+        //Case 4: the user is only instant-translate allowed, redirect directly to instant-translate
         if($isInstantTranslateAllowed){
             $this->applicationRedirect('instanttranslate');
         }
-        
-        //is termportal allowed
+
+        //Case 5: the user is only term-portal allowed, redirect directly to term-portal
         if($isTermPortalAllowed){
             $this->applicationRedirect('termportal');
         }
         
-        if($sessionUser->data->login == Zfextended_Models_User::SYSTEM_LOGIN) {
+        if(editor_User::instance()->getLogin() == Zfextended_Models_User::SYSTEM_LOGIN) {
             $this->logoutAction();
         }
         
         throw new ZfExtended_NoAccessException("No initial_page resource is found.");
-        exit;
     }
 
     /***
@@ -155,9 +158,8 @@ class LoginController extends ZfExtended_Controllers_Login {
 
         $pluginmanager = Zend_Registry::get('PluginManager');
         /* @var $pluginmanager ZfExtended_Plugin_Manager */
-        $plugins = array_keys($pluginmanager->getAvailable());
-        $termPortalEnabled = in_array('TermPortal',$plugins);
-
+        $plugins = $pluginmanager->getActive();
+        $termPortalEnabled = in_array('editor_Plugins_TermPortal_Init',$plugins);
 
         // is term portal allowed when the user has termportal rights and the termportal plugin is enabled
         $isTermPortalAllowed = $isTermPortalAllowed && $termPortalEnabled;
@@ -172,11 +174,12 @@ class LoginController extends ZfExtended_Controllers_Login {
     }
 
     /***
-     * Redirect to the editor module (append the hash if exist).
+     * Redirect to the provided module and append the hash(if exist in the session) to the redirect url
+     * @param string $redirectModule
      */
-    protected function editorRedirect(){
-        $redirecthash = isset($this->_session->redirecthash) ? $this->_session->redirecthash : null;
-        $redirectHeader = 'Location: '.APPLICATION_RUNDIR.'/editor';
+    protected function moduleRedirect(string $redirectModule){
+        $redirecthash = $this->_session->redirecthash ?? null;
+        $redirectHeader = 'Location: '.APPLICATION_RUNDIR.'/'.$redirectModule;
         if(!empty($redirecthash)){
             //remove the redirect hash from the session. The rout handling is done by extjs
             unset($this->_session->redirecthash);
@@ -361,5 +364,38 @@ class LoginController extends ZfExtended_Controllers_Login {
         }
 
         return $hash;
+    }
+
+    /***
+     * Get the redirect module based on the initial_page resource for the current user.
+     * The order of the modules is decided by runtimeOptions->modulesOrder config in application ini
+     * @return string
+     * @throws Zend_Db_Table_Exception
+     * @throws Zend_Exception
+     */
+    protected function getModuleRedirect(): string
+    {
+
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+
+        // get all initial_page acl records for all available user roles
+        $initialPages = $acl->getResourceByRoles('initial_page',editor_User::instance()->getRoles());
+
+        $aclModules = array_column($initialPages,'module');
+        // get only the modules from the user allowed initial page acl
+        $aclModules = array_unique($aclModules);
+
+        $config = Zend_Registry::get('config');
+        $modulesOrder = explode(',',$config->runtimeOptions->modulesOrder);
+
+        // find the module redirect based on the modulesOrder config
+        foreach ($modulesOrder as $module){
+            if(in_array($module,$aclModules)){
+                return $module;
+            }
+        }
+        // no redirect module was found
+        return '';
     }
 }

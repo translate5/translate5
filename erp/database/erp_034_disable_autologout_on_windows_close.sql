@@ -1,0 +1,1 @@
+UPDATE `Zf_configuration` SET `value`='0' WHERE `name`='runtimeOptions.logoutOnWindowClose';

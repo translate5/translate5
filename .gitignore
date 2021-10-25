@@ -5,6 +5,7 @@ data/editorVisualReviewFonts*
 data/tbx-import/*
 !data/tbx-import/term-images-public
 data/dummyTm_*
+data/purchaseOrderPdfs*
 /nbproject/
 .buildpath
 .project
