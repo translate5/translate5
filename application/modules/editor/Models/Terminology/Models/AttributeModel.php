@@ -539,7 +539,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             : '`termTbxId` IN (' . $in . ') OR `termEntryTbxId` IN (' . $in . ')';
 
         // Get data by ref targets
-        $dataByRefTargetIdA = $this->db->getAdapter()->query($_ = '
+        $dataByRefTargetIdA = editor_Utils::db()->query($_ = '
             SELECT
               ' . $tbxCol . ' AS `tbx`,
               `termEntryId`,
@@ -684,7 +684,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         $where = []; foreach ($bind as $key => $value) $where []= '`' . ltrim($key, ':') . '` = ' . $key;
 
         // Get image-attribute targets
-        $targetIdA = $this->db->getAdapter()->query('
+        $targetIdA = editor_Utils::db()->query('
             SELECT `target`, `id` FROM `terms_attributes` WHERE ' . implode(' AND ', $where) . ' AND `type` = "figure" 
         ', $bind)->fetchAll(PDO::FETCH_KEY_PAIR);
 
@@ -751,7 +751,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
                 : $this->getValue();
         }
 
-        i('here3', 'a');
         // Prepare query bindings
         $bind = [$this->getTermEntryId()];
 
