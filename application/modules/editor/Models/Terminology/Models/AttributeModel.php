@@ -550,7 +550,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         $return = parent::save();
 
         // Affect transacgrp-records
-        if ($misc['userName'])
+        if ($misc['userName'] ?? 0)
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
 

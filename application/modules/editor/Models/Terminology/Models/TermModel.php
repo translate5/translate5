@@ -179,11 +179,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         // If attributes should be copied from other term
-        if ($misc['copyAttrsFromTermId'] ?? false) {
+        if ($misc['copyAttrsFromTermId'] ?? 0) {
 
             // Array of dataTypeIds to be ignored while copying attributes from other term
             $except = [$dataTypeIds['termNote#processStatus']];
-            if ($misc['note']) $except []= $dataTypeIds['note#'];
+            if ($misc['note'] ?? 0) $except []= $dataTypeIds['note#'];
             if ($this->getProcessStatus() == 'rejected') $except []= $dataTypeIds['termNote#administrativeStatus'];
 
             // Fetch attributes of existing term, except at least 'processStatus' attribute
