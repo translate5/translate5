@@ -32,6 +32,11 @@ END LICENSE AND COPYRIGHT
 class editor_TermController extends ZfExtended_RestController
 {
     /**
+     * Use termportal trait
+     */
+    use editor_Controllers_Traits_TermportalTrait;
+
+    /**
      * @var string
      */
     protected $entityClass = 'editor_Models_Terminology_Models_TermModel';
