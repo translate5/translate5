@@ -99,7 +99,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
         if ($level == 'term') $bind[':termId'] = $termId;
 
         // Run query
-        $affectedFact = editor_Utils::db()->query('
+        $affectedFact = $this->db->getAdapter()->query('
             UPDATE `terms_transacgrp` 
             SET 
               `date` = :date, 
@@ -122,7 +122,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
         if ($level == 'term') {
 
             // Get source
-            $source = editor_Utils::db()->query('SELECT * FROM `terms_term` WHERE `id` = ?', $termId)->fetch();
+            $source = $this->db->getAdapter()->query('SELECT * FROM `terms_term` WHERE `id` = ?', $termId)->fetch();
 
             // Load or create person
             $person = ZfExtended_Factory
@@ -168,7 +168,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                   AND ' . $where[$level];
 
             // Get levels, that terms_transacgrp-records are exist for
-            $levelA['exist'] = editor_Utils::db()->query($sql, $bind)->fetchAll(PDO::FETCH_COLUMN);
+            $levelA['exist'] = $this->db->getAdapter()->query($sql, $bind)->fetchAll(PDO::FETCH_COLUMN);
 
             // Define which level should exist
             $levelA['should'] = [
@@ -182,14 +182,14 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
 
             // If $level is 'term' - fetch terms_term-record by $termId arg
             if ($level == 'term') {
-                // $source = editor_Utils::db()->query('SELECT * FROM `terms_term` WHERE `id` = ?', $termId)->fetch();
+                // $source = $this->db->getAdapter()->query('SELECT * FROM `terms_term` WHERE `id` = ?', $termId)->fetch();
                 $info['termEntryGuid'] = $source['termEntryGuid'];
                 $info['termTbxId'] = $source['termTbxId'];
                 $info['termGuid'] = $source['guid'];
 
             // Else fetch terms_term_entry-record by $termEntryId arg
             } else {
-                $source = editor_Utils::db()->query('SELECT * FROM `terms_term_entry` WHERE `id` = ?', $termEntryId)->fetch();
+                $source = $this->db->getAdapter()->query('SELECT * FROM `terms_term_entry` WHERE `id` = ?', $termEntryId)->fetch();
                 $info['termEntryGuid'] = $source['entryGuid'];
             }
 

@@ -187,7 +187,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             if ($this->getProcessStatus() == 'rejected') $except []= $dataTypeIds['termNote#administrativeStatus'];
 
             // Fetch attributes of existing term, except at least 'processStatus' attribute
-            $attrA += editor_Utils::db()->query('
+            $attrA += $this->db->getAdapter()->query('
                 SELECT `dataTypeId`, `type`, `value`, `target`, `elementName`, `attrLang`  
                 FROM `terms_attributes` 
                 WHERE `termId` = ? AND `dataTypeId` NOT IN (' . implode(',', $except) . ') 
@@ -198,7 +198,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         foreach ($attrA as $attrI) $this->initAttr($attrI)->save();
 
         // Check whether there were no terms for this language previously within same termEntryId
-        $isTermForNewLanguage = !editor_Utils::db()->query('
+        $isTermForNewLanguage = !$this->db->getAdapter()->query('
             SELECT `id` 
             FROM `terms_term` 
             WHERE TRUE 
@@ -258,7 +258,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         if (!$isTermForNewLanguage) $language = '(' . $language . ' OR `language` = "' . $this->getLanguage() . '")';
 
         // Update 'modification'-record of termEntry-level (and language-level, if need)
-        editor_Utils::db()->query('
+        $this->db->getAdapter()->query('
             UPDATE `terms_transacgrp` 
             SET 
               `date` = :date, 
@@ -444,7 +444,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             // If we should update processStatus-attribute, but we don't know it's `id` yet - detect it
             // else just pick that id from $misc['updateProcessStatusAttr']
             $attrId = $misc['updateProcessStatusAttr'] === true
-                ? editor_Utils::db()->query('
+                ? $this->db->getAdapter()->query('
                         SELECT `id` FROM `terms_attributes` WHERE `termId` = ? AND `type` = "processStatus"
                     ', $this->getId())->fetchColumn()
                 : $misc['updateProcessStatusAttr'];
@@ -569,12 +569,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     public function setAttr($type, $value) {
 
         // Get dataTypeId todo: throw exception if not found
-        if (!$dataTypeId = editor_Utils::db()->query('
+        if (!$dataTypeId = $this->db->getAdapter()->query('
             SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = ? LIMIT 1
         ', $type)->fetchColumn()) return;
 
         // Try to find id of existing attribute having such $dataTypeId
-        $attrId = editor_Utils::db()->query(
+        $attrId = $this->db->getAdapter()->query(
             'SELECT `id` FROM `terms_attributes` WHERE `termId` = ? AND `dataTypeId` = ? LIMIT 1',
         [$this->getId(), $dataTypeId])->fetchColumn();
 
@@ -705,7 +705,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 $codeA []= $codeByLangIdA[$langId];
 
             // Get text-attributes datatype ids
-            $textA = editor_Utils::db()
+            $textA = $this->db->getAdapter()
                 ->query('SELECT `id`, 1 FROM `terms_attributes_datatype` WHERE `dataType` != "picklist"')
                 ->fetchAll(PDO::FETCH_KEY_PAIR);
         }
@@ -748,7 +748,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             }
 
             // Get termEntryIds of matched attributes
-            $termEntryIds = implode(',', editor_Utils::db()->query('
+            $termEntryIds = implode(',', $this->db->getAdapter()->query('
                 SELECT DISTINCT `termEntryId` 
                 FROM `terms_attributes` 
                 WHERE ' . implode(' AND ', $attrWHERE),
@@ -932,7 +932,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             $totalQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor ?? '', $keywordWHERE);
 
             // Setup &$total variable by reference
-            $total = (int) editor_Utils::db()->query($totalQuery, $bindParam)->fetchColumn();
+            $total = (int) $this->db->getAdapter()->query($totalQuery, $bindParam)->fetchColumn();
         }
 
         // Render query for getting actual results from terms table
@@ -943,7 +943,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         //i($bindParam, 'a');
 
         // Return results
-        return editor_Utils::db()->query($termQuery, $bindParam)->fetchAll();
+        return $this->db->getAdapter()->query($termQuery, $bindParam)->fetchAll();
     }
 
     /**

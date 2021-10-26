@@ -444,7 +444,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
     public function removeProposalsOlderThan(array $collectionIds,string $olderThan): bool
     {
         // Get ids of attrs, that were created or updated after tbx-import
-        $attrIdA = editor_Utils::db()->query('
+        $attrIdA = $this->db->getAdapter()->query('
             SELECT `id` 
             FROM `terms_attributes` 
             WHERE TRUE
@@ -458,7 +458,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
 
         // Get tbx-imported values for `value` and `target` props, that now have changed values in attributes-table
-        $tbxA = editor_Utils::db()->query('
+        $tbxA = $this->db->getAdapter()->query('
             SELECT `attrId`, `value`, `target` 
             FROM `terms_attributes_history`
             WHERE TRUE
@@ -484,7 +484,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         }
 
         // Overwrite $attrIdA_updated array for it to keep only ids of attributes, that were last updated before $olderThan arg
-        if ($attrIdA_updated) $attrIdA_updated = editor_Utils::db()->query($sql = '
+        if ($attrIdA_updated) $attrIdA_updated = $this->db->getAdapter()->query($sql = '
             SELECT `id` 
             FROM `terms_attributes` 
             WHERE TRUE
@@ -539,7 +539,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             : '`termTbxId` IN (' . $in . ') OR `termEntryTbxId` IN (' . $in . ')';
 
         // Get data by ref targets
-        $dataByRefTargetIdA = editor_Utils::db()->query($_ = '
+        $dataByRefTargetIdA = $this->db->getAdapter()->query($_ = '
             SELECT
               ' . $tbxCol . ' AS `tbx`,
               `termEntryId`,
@@ -684,7 +684,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         $where = []; foreach ($bind as $key => $value) $where []= '`' . ltrim($key, ':') . '` = ' . $key;
 
         // Get image-attribute targets
-        $targetIdA = editor_Utils::db()->query('
+        $targetIdA = $this->db->getAdapter()->query('
             SELECT `target`, `id` FROM `terms_attributes` WHERE ' . implode(' AND ', $where) . ' AND `type` = "figure" 
         ', $bind)->fetchAll(PDO::FETCH_KEY_PAIR);
 
