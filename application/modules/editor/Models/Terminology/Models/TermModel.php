@@ -404,14 +404,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 ', $info[0]['id'])->fetchAll(PDO::FETCH_KEY_PAIR);
             }
         }
-
-        // Remove old language assocs
-        /*ZfExtended_Factory
-            ::get('editor_Models_LanguageResources_Languages')
-            ->removeByResourceId([$this->getCollectionId()]);
-
-        // Add the new language assocs
-        $this->updateAssocLanguages([$this->getCollectionId()]);*/
     }
 
     /**
@@ -620,25 +612,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     }
 
     /**
-     * creates a new, unsaved term history entity
-     * @return editor_Models_Term_History
-     */
-    /*public function getNewHistoryEntity(): editor_Models_Term_History
-    {
-        $history = ZfExtended_Factory::get('editor_Models_Term_History');
-        /* @var $history editor_Models_Term_History * /
-        $history->setTermId($this->getId());
-        $history->setHistoryCreated(NOW_ISO);
-
-        $fields = $history->getFieldsToUpdate();
-        foreach ($fields as $field) {
-            $history->__call('set' . ucfirst($field), array($this->get($field)));
-        }
-
-        return $history;
-    }*/
-
-    /**
      * returns a map CONSTNAME => value of all term status
      * @return array
      */
@@ -675,21 +648,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         self::$termEntryTbxIdCache[$termId] = $res;
 
         return $res->toArray();
-    }
-
-    /***
-     * check if the term with the same termEntry,collection but different termId exist
-     *
-     * @return Zend_Db_Table_Rowset_Abstract
-     */
-    public function getRestTermsOfTermEntry($termEntryTbxId, $termId, $collectionId)
-    {
-        $s = $this->db->select()
-            ->where('termEntryTbxId = ?', $termEntryTbxId)
-            ->where('termTbxId != ?', $termId)
-            ->where('collectionId = ?',$collectionId);
-
-        return $this->db->fetchAll($s);
     }
 
     /***
@@ -1140,28 +1098,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     }
 
     /***
-     * Get loaded data as object with term attributes included
-     * @return stdClass
-     */
-    /*public function getDataObjectWithAttributes(): stdClass
-    {
-        $result = $this->getDataObject();
-        //load all attributes for the term
-        $rows = $this->groupTermsAndAttributes($this->findTermAndAttributes($result->id));
-        $result->attributes = [];
-        if (!empty($rows) && !empty($rows[0]['attributes'])) {
-            $result->attributes = $rows[0]['attributes'];
-        }
-
-        return $result;
-    }*/
-
-    public function groupTerms(array $data): ?array
-    {
-
-    }
-
-    /***
      * Group term and term attributes data by term. Each row will represent one term and its attributes in attributes array.
      * The term attributes itself will be grouped in parent-child structure
      * @param array $data
@@ -1330,38 +1266,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         return $map;
-    }*/
-
-    /**
-     * Find term in collection by given language and term value
-     * @param string $termText
-     * @param int|null $languageId optional, if omitted use internal value
-     * @param int|null $termCollection optional, if omitted use internal value
-     * @return Zend_Db_Table_Rowset_Abstract
-     */
-    public function findTermInCollection(string $termText, int $languageId = null, int $termCollection = null): Zend_Db_Table_Rowset_Abstract
-    {
-        $s = $this->db->select()
-            ->where('term = ?', $termText)
-            ->where('languageId = ?', $languageId ?? $this->getLanguage())
-            ->where('collectionId = ?',$termCollection ?? $this->getCollectionId());
-
-        return $this->db->fetchAll($s);
-    }
-
-    /***
-     * Find the term and the term attributes by given term id
-     * @param int $termId
-     * @return array
-     */
-    /*public function findTermAndAttributes(int $termId): array
-    {
-        $s = $this->getSearchTermSelect();
-        $s->where('terms_term.termTbxId=?', $termId);
-            $s->order('LEK_languages.rfc5646')
-            ->order('terms_term.term');
-
-        return $this->db->fetchAll($s)->toArray();
     }*/
 
     /***
