@@ -68,6 +68,7 @@ CALL PROCEDURE_DROP_FOREIGN_KEY_IF_EXIST('LEK_workflow_userpref', 'LEK_workflow_
 
 CALL PROCEDURE_DROP_INDEX_IF_EXIST('LEK_workflow_userpref', 'taskGuid');
 
+CALL PROCEDURE_DROP_FOREIGN_KEY_IF_EXIST('LEK_taskUserAssoc', 'LEK_taskUserAssoc_ibfk_1');
 CALL PROCEDURE_DROP_FOREIGN_KEY_IF_EXIST('LEK_taskUserAssoc', 'LEK_taskUserAssoc_ibfk_3');
 CALL PROCEDURE_DROP_FOREIGN_KEY_IF_EXIST('LEK_taskUserAssoc', 'LEK_taskUserAssoc_ibfk_2');
 

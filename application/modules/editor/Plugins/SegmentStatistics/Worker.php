@@ -267,9 +267,10 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
      * @param editor_Models_SegmentFieldManager $sfm
      * @param editor_Models_Segment $segment
      * @param Zend_Db_Table_Row $field
-     * @return stdClass
+     * @return string
      */
-    protected function getSegmentContent(editor_Models_SegmentFieldManager $sfm, editor_Models_Segment $segment, Zend_Db_Table_Row $field): stdClass
+
+    protected function getSegmentContent(editor_Models_SegmentFieldManager $sfm, editor_Models_Segment $segment, Zend_Db_Table_Row $field): string
     {
         //on export respect edited field:
         $useEditable = $field->editable && $this->type == self::TYPE_EXPORT;

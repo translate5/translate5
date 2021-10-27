@@ -201,7 +201,7 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
      * @return array
      */
     public function getConfiguredIps(): array{
-        return $this->config->runtimeOptions->authentication->ipbased->IpAddresses->toArray() ?? [];
+        return $this->config->runtimeOptions?->authentication?->ipbased?->IpAddresses?->toArray() ?? [];
     }
 
 

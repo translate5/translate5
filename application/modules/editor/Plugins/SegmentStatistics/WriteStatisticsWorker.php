@@ -34,7 +34,7 @@ class editor_Plugins_SegmentStatistics_WriteStatisticsWorker extends editor_Plug
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()
      */
-    public function work() {
+    public function work() :bool{
         $this->setType();
         $config = Zend_Registry::get('config');
         if(!$config->runtimeOptions->plugins->SegmentStatistics->createFilteredOnly){
