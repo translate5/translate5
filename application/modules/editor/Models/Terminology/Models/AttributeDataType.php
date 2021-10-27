@@ -193,4 +193,49 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
             WHERE `dataTypeId` = ?'
         , $this->getId())->fetchAll(PDO::FETCH_COLUMN);
     }
+
+    /**
+     * Get array of attribute datatypes in a format, compatible with TermPortal client app
+     *
+     * @param string $locale
+     * @param array $collectionIds
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getLocalized(string $locale, array $collectionIds): array {
+
+        // Fetch from database
+        $attributes = $this->db->getAdapter()->query('
+            SELECT 
+              `a`.`id`,
+              IF (
+                  JSON_UNQUOTE(JSON_EXTRACT(`l10nCustom`, :lang)) != "",
+                  JSON_UNQUOTE(JSON_EXTRACT(`l10nCustom`, :lang)), 
+                  IF (
+                    JSON_UNQUOTE(JSON_EXTRACT(`l10nSystem`, :lang)) != "", 
+                    JSON_UNQUOTE(JSON_EXTRACT(`l10nSystem`, :lang)), 
+                    `type`
+                  )
+              ) AS `title`,
+              CONCAT("attr-", `a`.`id`) AS `alias`,
+              IF(`a`.`label` = "note", `a`.`label`, `a`.`dataType`) AS `dataType`,
+              `a`.`picklistValues`,
+              `a`.`level`,
+              `a`.`isTbxBasic`,
+              `a`.`type`,
+              GROUP_CONCAT(`ac`.`collectionId`) AS `collections`
+            FROM 
+              `terms_attributes_datatype` `a` 
+              LEFT JOIN `terms_collection_attribute_datatype` `ac` ON (`ac`.`dataTypeId` = `a`.`id`)
+            WHERE `ac`.`collectionId` IN (' . join(',',$collectionIds) . ') OR ISNULL(`ac`.`collectionId`)
+            GROUP BY `a`.`id`
+            ORDER BY `title`
+        ', [':lang' => '$.' . $locale])->fetchAll();
+
+        // Make sure isTbxBasic to be integer in javascript
+        array_walk($attributes, fn(&$a) => $a['isTbxBasic'] += 0);
+
+        // Return attributes
+        return $attributes;
+    }
 }
