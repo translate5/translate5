@@ -712,225 +712,44 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
+     * @throws ZfExtended_Exception
      * @throws ZfExtended_Mismatch
      */
     public function attrupdateAction() {
 
-        // Validate params
-        $_ = $this->jcheck([
-            'level' => [
-                'req' => true,
-                'fis' => 'entry,language,term' // FIND_IN_SET
-            ],
-            'termId' => [
-                'rex' => 'int11',
-                'key' => 'terms_term'
-            ]
-        ]);
-
-        // Get attribute meta
-        $_ += $this->jcheck([
-            'dataTypeId' => [
-                'key' => 'terms_attributes_datatype'
-            ]
-        ], $this->entity);
-
-        // If attribute is a picklist - make sure given value is in the list of allowed values
-        if ($_['dataTypeId']['dataType'] == 'picklist')
-            $this->jcheck([
-                'value' => [
-                    'req' => true,
-                    'fis' => $_['dataTypeId']['picklistValues'] // FIND_IN_SET
-                ]
-            ]);
+        // Check request params and return an array, containing records
+        // fetched from database by dataTypeId-param (and termId-param, if given)
+        $_ = $this->_attrupdateCheck();
 
         // Default response data to be flushed in case of attribute change
         $data = ['success' => true, 'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s')];
 
-        //
-        $_['attrId'] = $this->entity->toArray();
-
-        // Get request params
-        $params = $this->getRequest()->getParams();
-
         // If attr was not yet changed after importing from tbx - append current value to response
         if (!$this->entity->getIsCreatedLocally()) $data['imported'] = $this->entity->getValue();
-
-        /* @var $attrM editor_Models_Terminology_Models_AttributeModel */
-        $attrM = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-
-        // Get the term (if termId exists only)
-        /** @var editor_Models_Terminology_Models_TermModel $t */
-        $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        if(!empty($params['termId'])) {
-            $t->load($params['termId']);
-        }
 
         // If it's a processStatus-attribute
         if ($this->entity->getType() == 'processStatus') {
 
-            // Get current value of processStatus attribute, that should be involved in validation
-            $current = $t->getProposal() ? 'unprocessed' : $this->entity->getValue();
+            // Check whether current user is allowed to change processStatus from it's current value to given value
+            $this->_attrupdateCheckProcessStatusChangeIsAllowed($_);
 
-            // Define which old values can be changed to which new values
-            $allow = false; $allowByRole = [
-                'termCustomerSearch' => false, // no change allowed
-                'termReviewer' =>  ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
-                'termFinalizer' => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
-                'termProposer' =>  [],
-                'termPM' => true, // any change allowed
-                'termPM_allClients' => true,
-            ];
-
-            // Setup roles
-            $role = array_flip($this->_session->roles); array_walk($role, fn(&$a) => $a = true);
-
-            // Merge allowed
-            foreach ($allowByRole as $i => $info)
-                if ($role[$i])
-                    $allow = is_bool($info) || is_bool($allow)
-                        ? $info
-                        : $info + $allow;
-
-            // Prepare list of allowed values
-            $allowed = []; foreach(explode(',', $_['dataTypeId']['picklistValues']) as $possible)
-                if ($allow === true || (is_array($allow[$current]) && $allow[$current][$possible]))
-                    $allowed []= $possible;
-
-            // Make sure only allowed values can be set as new value of processStatus attribute
-            $this->jcheck([
-                'value' => [
-                    'fis' => implode(',', $allowed ?: ['wontpass']) // FIND_IN_SET
-                ]
-            ]);
-
-            // If term, that we're going to change processStatus for - has a proposal
-            if ($t->getProposal()) {
-
-                // If new processStatus is rejected, provisionallyProcessed or finalized
-                if ($params['value'] != 'unprocessed') {
-
-                    // Move existing term's proposal to the new term, with attributes replicated
-                    $p = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-                    $init = $t->toArray(); unset($init['id'], $init['proposal']);
-                    $init['processStatus'] = $params['value'];
-                    $init['term'] = $t->getProposal();
-                    $init['guid'] = ZfExtended_Utils::uuid();
-                    $init['termTbxId'] = 'id' . ZfExtended_Utils::uuid();
-                    $init['updatedBy'] = $this->_session->id;
-                    $p->init($init);
-                    $p->insert([
-                        'userName' => $this->_session->userName,
-                        'userGuid' => $this->_session->userGuid,
-                        'copyAttrsFromTermId' => $t->getId()
-                    ]);
-
-                    // Make sure newly created term's data to be flushed within json response,
-                    // so it'll be possible to add record into siblings-panel grid's store
-                    $data['inserted'] = [
-                        'id' => $p->getId(),
-                        'tbx' => $p->getTermTbxId(),
-                        'languageId' => $p->getLanguageId(),
-                        'language' => $p->getLanguage(),
-                        'term' => $p->getTerm(),
-                        'proposal' => $p->getProposal(),
-                        'status' => $p->getStatus(),
-                        'processStatus' => $p->getProcessStatus(),
-                        'termEntryTbxId' => $p->getTermEntryTbxId(),
-
-                        // For store's new record, images array will be copied from source record
-                        'images' => [],
-                    ];
-
-                    // If processStatus is 'rejected', it means that proposal for existing term was rejected,
-                    // so that we spoof $params['value'] with processStatus of existing term,
-                    // as it will be flushed within json response
-                    if ($params['value'] == 'rejected') $params['value'] = $t->getProcessStatus();
-
-                    // Else if existing term's proposal is accepted, e.g. is 'provisionallyProcessed'
-                    // or 'finalized' - then, for existing term, setup `processStatus` = 'rejected'
-                    // Also, spoof $params['value'] for it to be 'rejected', as it will be flushed within json response
-                    else $t->setProcessStatus($params['value'] = 'rejected');
-
-                    // Remove proposal from existing term
-                    $t->setProposal('');
-                    $t->setUpdatedBy($this->_session->id);
-                    $__ = $t->update(['updateProcessStatusAttr' => $params['attrId']]);
-
-                    // If value returned by the above call is an array containing 'normativeAuthorization' key
-                    // it means that term processStatus was changed to 'rejected', so 'normativeAuthorization'
-                    // attribute was set to 'deprecatedTerm', and in case if there was no such attribute previously
-                    // we need to pass attr info to client side for attr-field to be added into the attr-panel
-                    if ($naa = $__['normativeAuthorization'])
-                        $data['normativeAuthorization'] = [
-                            'id' => $naa['id'],
-                            'value' => $naa['value'],
-                            'type' => $naa['type'],
-                            'dataTypeId' => $naa['dataTypeId'],
-                            'created' => $this->_session->userName . ', ' . date('d.m.Y H:i:s', strtotime($naa['createdAt'])),
-                            'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s', strtotime($naa['updatedAt'])),
-                        ];
-
-                    // Update
-                    ZfExtended_Factory
-                        ::get('editor_Models_TermCollection_TermCollection')
-                        ->updateStats($_['termId']['collectionId'], ['termEntry' => 0, 'term' => 1]);
-
-                // Else do nothing
-                } else {
-
-                }
-
-            // Else
-            } else {
-
-                // Update `processStatus` on `terms_term`-record
-                $t->setProcessStatus($params['value']);
-                $t->setUpdatedBy($this->_session->id);
-                $__ = $t->update(['updateProcessStatusAttr' => $params['attrId']]);
-
-                // If value returned by the above call is an array containing 'normativeAuthorization' key
-                // it means that term processStatus was changed to 'rejected', so 'normativeAuthorization'
-                // attribute was set to 'deprecatedTerm', and in case if there was no such attribute previously
-                // we need to pass attr info to client side for attr-field to be added into the attr-panel
-                if ($naa = $__['normativeAuthorization'] ?? 0) {
-                    $data['normativeAuthorization'] = [
-                        'id' => $naa['id'],
-                        'value' => $naa['value'],
-                        'type' => $naa['type'],
-                        'dataTypeId' => $naa['dataTypeId'],
-                        'created' => $this->_session->userName . ', ' . date('d.m.Y H:i:s', strtotime($naa['createdAt'])),
-                        'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s', strtotime($naa['updatedAt'])),
-                    ];
-
-                    // Increment collection stats 'attribute'-prop only
-                    ZfExtended_Factory
-                        ::get('editor_Models_TermCollection_TermCollection')
-                        ->updateStats($_['termId']['collectionId'], [
-                            'termEntry' => 0,
-                            'term' => 0,
-                            'attribute' => 1
-                        ]);
-                }
-            }
-
-            // Append processStatus to response data
-            $data['processStatus'] = [
-                'id' => $this->entity->getId(),
-                'value' => $params['value'],
-                'type' => 'processStatus',
-                'dataTypeId' => $this->entity->getDataTypeId(),
-                'created' => $this->_session->userName . ', ' . date('d.m.Y H:i:s', strtotime($this->entity->getCreatedAt())),
-                'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s'),
-            ];
+            // Do process status change, incl. detaching proposal if need, etc
+            $data += $_['termId']->doProcessStatusChange(
+                $this->getParam('value'),
+                $this->_session->id,
+                $this->_session->userName,
+                $this->_session->userGuid,
+                $this->entity
+            );
 
         // Else
         } else {
 
             // Update attribute value
-            $attrR = $attrM->load($params['attrId']);
-            $attrR->setFromArray(['value' => $params['value'], 'updatedBy' => $this->_session->id, 'isCreatedLocally' => 1]);
-            $attrM->update();
+            $this->entity->setValue($this->getParam('value'));
+            $this->entity->setUpdatedBy($this->_session->id);
+            $this->entity->setIsCreatedLocally(1);
+            $this->entity->update();
 
             // If it's a definition-attribute
             if ($this->entity->getType() == 'definition' && !$this->entity->getTermId()) {
@@ -938,14 +757,14 @@ class editor_AttributeController extends ZfExtended_RestController
                 // Replicate new value of definition-attribute to `terms_term`.`definition` where needed
                 // and return array containing new value and ids of affected `terms_term` records for
                 // being able to apply that on client side
-                $data['definition'] = $attrM->replicateDefinition('updated');
+                $data['definition'] = $this->entity->replicateDefinition('updated');
             }
         }
 
         // The term status is updated in in anycase (due implicit normativeAuthorization changes above),
         // not only if a attribute is changed mapped to the term status
-        if (isset($params['termId']))
-            if ($status = $this->_updateTermStatus($t, $attrM))
+        if (isset($_['termId']))
+            if ($status = $this->_updateTermStatus($_['termId'], $this->entity))
                 $data['status'] = $status;
 
         // Update `date` and `transacNote` of 'modification'-records
@@ -972,6 +791,7 @@ class editor_AttributeController extends ZfExtended_RestController
      * @param editor_Models_Terminology_Models_TermModel $termM
      * @param editor_Models_Terminology_Models_AttributeModel $attrM
      * @return array
+     * @throws ZfExtended_Exception
      */
     protected function _updateTermStatus(editor_Models_Terminology_Models_TermModel $termM, editor_Models_Terminology_Models_AttributeModel $attrM): array {
 
@@ -1015,5 +835,92 @@ class editor_AttributeController extends ZfExtended_RestController
             ];
         }
         return [];
+    }
+
+    /**
+     * Check request params and return an array, containing records
+     * fetched from database by dataTypeId-param (and termId-param, if given)
+     *
+     * @return array
+     * @throws ZfExtended_Mismatch
+     */
+    protected function _attrupdateCheck() {
+
+        // Get attribute meta
+        $_ = $this->jcheck([
+            'dataTypeId' => [
+                'key' => 'terms_attributes_datatype'
+            ]
+        ], $this->entity);
+
+        // Validate params and load term model instance, if termId param is given
+        $_ += $this->jcheck([
+            'level' => [
+                'req' => true,
+                'fis' => 'entry,language,term' // FIND_IN_SET
+            ],
+            'termId' => [
+                'req' => $this->getParam('level') == 'term',
+                'rex' => 'int11',
+                'key' => 'editor_Models_Terminology_Models_TermModel'
+            ]
+        ]);
+
+        // If attribute is a picklist - make sure given value is in the list of allowed values
+        if ($_['dataTypeId']['dataType'] == 'picklist')
+            $this->jcheck([
+                'value' => [
+                    'req' => true,
+                    'fis' => $_['dataTypeId']['picklistValues'] // FIND_IN_SET
+                ]
+            ]);
+
+        // Return records, fetched by dataTypeId-param (and termId-param, if given)
+        return $_;
+    }
+
+    /**
+     * Check if current user is allowed to change the processStatus.
+     * If is not allowed - exception will be thrown
+     *
+     * @param array $_ data, picked by previous $this->jcheck() call
+     * @throws ZfExtended_Mismatch
+     */
+    protected function _attrupdateCheckProcessStatusChangeIsAllowed($_) {
+
+        // Get current value of processStatus attribute, that should be involved in validation
+        $current = $_['termId']->getProposal() ? 'unprocessed' : $this->entity->getValue();
+
+        // Define which old values can be changed to which new values
+        $allow = false; $allowByRole = [
+            'termCustomerSearch' => false, // no change allowed
+            'termReviewer' =>  ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
+            'termFinalizer' => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
+            'termProposer' =>  [],
+            'termPM' => true, // any change allowed
+            'termPM_allClients' => true,
+        ];
+
+        // Setup roles
+        $role = array_flip($this->_session->roles); array_walk($role, fn(&$a) => $a = true);
+
+        // Merge allowed
+        foreach ($allowByRole as $i => $info)
+            if ($role[$i])
+                $allow = is_bool($info) || is_bool($allow)
+                    ? $info
+                    : $info + $allow;
+
+        // Prepare list of allowed values
+        $allowed = []; foreach(explode(',', $_['dataTypeId']['picklistValues']) as $possible)
+            if ($allow === true || (is_array($allow[$current]) && $allow[$current][$possible]))
+                $allowed []= $possible;
+
+        // Make sure only allowed values can be set as new value of processStatus attribute
+        $this->jcheck([
+            'value' => [
+                'fis' => implode(',', $allowed ?: ['wontpass']) // FIND_IN_SET
+            ]
+        ]);
     }
 }

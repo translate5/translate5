@@ -462,7 +462,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
                 // Set 'normativeAuthorization' attribute to 'deprecatedTerm'
                 // If no such attribute yet exists - it will be created
-                $return['normativeAuthorization'] = $this
+                $this->normativeAuthorization = $this
                     ->setAttr('normativeAuthorization', 'deprecatedTerm')
                     ->toArray();
         }
@@ -2349,5 +2349,175 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
         $termEntry->load($this->getTermEntryId());
         $termEntry->delete();
+    }
+
+    /**
+     * Detach current term proposal into new term, with attributes replication,
+     * and return newly created term data in a format, compatible with TermPortal siblings-panel
+     *
+     * @param string $processStatus
+     * @param int $userId
+     * @param string $userName
+     * @param string $userGuid
+     * @param int|null $processStatusAttrId
+     * @return array
+     */
+    public function detachProposal(string &$processStatus, int $userId, string $userName, string $userGuid, int $processStatusAttrId = null): array {
+
+        // Prepare the data to be used for init a new term based on current term's proposal
+        $init = $this->toArray(); unset($init['id'], $init['proposal']);
+        $init['processStatus'] = $processStatus;
+        $init['term'] = $this->getProposal();
+        $init['guid'] = ZfExtended_Utils::uuid();
+        $init['termTbxId'] = 'id' . ZfExtended_Utils::uuid();
+        $init['updatedBy'] = $userId;
+
+        // Move existing term's proposal to the new term, with attributes replicated
+        $p = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        $p->init($init);
+        $p->insert([
+            'userName' => $userName,
+            'userGuid' => $userGuid,
+            'copyAttrsFromTermId' => $this->getId()
+        ]);
+
+        // If processStatus is 'rejected', it means that proposal for existing term was rejected,
+        // so that we spoof $params['value'] with processStatus of existing term,
+        // as it will be flushed within json response
+        if ($processStatus == 'rejected') $processStatus = $this->getProcessStatus();
+
+        // Else if existing term's proposal is accepted, e.g. is 'provisionallyProcessed'
+        // or 'finalized' - then, for existing term, setup `processStatus` = 'rejected'
+        // Also, spoof $params['value'] for it to be 'rejected', as it will be flushed within json response
+        else $this->setProcessStatus($processStatus = 'rejected');
+
+        // Remove proposal from existing term
+        $this->setProposal('');
+        $this->setUpdatedBy($userId);
+        $this->update(['updateProcessStatusAttr' => $processStatusAttrId ?? true]);
+
+        // Return new term data in format, compatible with TermPortal's siblings-panel store
+        return [
+            'id' => $p->getId(),
+            'tbx' => $p->getTermTbxId(),
+            'languageId' => $p->getLanguageId(),
+            'language' => $p->getLanguage(),
+            'term' => $p->getTerm(),
+            'proposal' => $p->getProposal(),
+            'status' => $p->getStatus(),
+            'processStatus' => $p->getProcessStatus(),
+            'termEntryTbxId' => $p->getTermEntryTbxId(),
+
+            // For store's new record, images array will be copied from source record
+            'images' => [],
+        ];
+    }
+
+    /**
+     * Do process status change, with (if need)
+     *  - detaching the proposal
+     *  - creating/updating normativeAuthorization-attr
+     *  - updating collections stats
+     *
+     * @param string $processStatus
+     * @param string $userId
+     * @param string $userName
+     * @param string $userGuid
+     * @param editor_Models_Terminology_Models_AttributeModel|null $processStatusAttr
+     * @return array
+     */
+    public function doProcessStatusChange(string $processStatus, string $userId, string $userName, string $userGuid,
+                                          editor_Models_Terminology_Models_AttributeModel $processStatusAttr = null) {
+        // Return value
+        $data = [];
+
+        // If term, that we're going to change processStatus for - has a proposal
+        if ($this->getProposal()) {
+
+            // If new processStatus is 'rejected', 'provisionallyProcessed' or 'finalized'
+            // - cut proposal from existing into separate term
+            if ($processStatus != 'unprocessed') {
+
+                // Make sure newly created term's data to be flushed within json response,
+                // so it'll be possible to add record into siblings-panel grid's store
+                $data['inserted'] = $this->detachProposal(
+                    $processStatus,
+                    $userId,
+                    $userName,
+                    $userGuid,
+                    $processStatusAttr->getId()
+                );
+
+                // If $this->normativeAuthorization was set by the above $this->detachProposal() -> $this->update() call
+                // it means that term processStatus was changed to 'rejected', so 'normativeAuthorization'
+                // attribute was set to 'deprecatedTerm', and in case if there was no such attribute previously
+                // we need to pass attr info to client side for new attr-field to be added into the attr-panel
+                if ($this->normativeAuthorization ?? 0)
+                    $data['normativeAuthorization'] = $this->_normativeAuthorization($userName);
+
+                // Update collection stats
+                ZfExtended_Factory
+                    ::get('editor_Models_TermCollection_TermCollection')
+                    ->updateStats($this->getCollectionId(), ['termEntry' => 0, 'term' => 1]);
+            }
+
+        // Else
+        } else {
+
+            // Update `processStatus` on `terms_term`-record
+            $this->setProcessStatus($processStatus);
+            $this->setUpdatedBy($userId);
+            $this->update(['updateProcessStatusAttr' => $processStatusAttr->getId()]);
+
+            // If $this->normativeAuthorization was set by the above $this->update() call
+            // it means that term processStatus was changed to 'rejected', so 'normativeAuthorization'
+            // attribute was set to 'deprecatedTerm', and in case if there was no such attribute previously
+            // we need to pass attr info to client side for attr-field to be added into the attr-panel
+            if ($this->normativeAuthorization ?? 0) {
+                $data['normativeAuthorization'] = $this->_normativeAuthorization($userName);
+
+                // Increment collection stats 'attribute'-prop only
+                ZfExtended_Factory
+                    ::get('editor_Models_TermCollection_TermCollection')
+                    ->updateStats($this->getCollectionId(), [
+                        'termEntry' => 0,
+                        'term' => 0,
+                        'attribute' => 1
+                    ]);
+            }
+        }
+
+        // Append processStatus-attr info into return value
+        $data['processStatus'] = [
+            'id' => $processStatusAttr->getId(),
+            'value' => $processStatus,
+            'type' => 'processStatus',
+            'dataTypeId' => $processStatusAttr->getDataTypeId(),
+            'created' => $userName . ', ' . date('d.m.Y H:i:s', strtotime($processStatusAttr->getCreatedAt())),
+            'updated' => $userName . ', ' . date('d.m.Y H:i:s'),
+        ];
+
+        // Return data
+        return $data;
+    }
+
+    /**
+     * @param $userName
+     * @return array|void
+     */
+    protected function _normativeAuthorization($userName) {
+
+        // If no 'normativeAuthorization' prop is set - return
+        if (!$na = $this->normativeAuthorization ?? 0) return;
+
+        // Else return attribute-info compatible with TermPortal {xtype: 'attrpanel'}
+        return [
+            'id' => $na['id'],
+            'value' => $na['value'],
+            'type' => $na['type'],
+            'dataTypeId' => $na['dataTypeId'],
+            'created' => $userName . ', ' . date('d.m.Y H:i:s', strtotime($na['createdAt'])),
+            'updated' => $userName . ', ' . date('d.m.Y H:i:s', strtotime($na['updatedAt'])),
+        ];
     }
 }
