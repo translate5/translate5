@@ -37,7 +37,8 @@ Ext.define('Editor.model.Config', {
     {name: 'isReadOnly', type: 'bool',defaultValue: false},//TODO: readonly validator
     {name: 'name', type: 'string'},
     {name: 'guiName', type: 'string'},
-    {
+    {name: 'typeClass', type: 'string', persist: false},
+      {
       name: 'value',
       critical: true,
       convert: function(value, record) {

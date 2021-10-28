@@ -104,6 +104,11 @@ Ext.define('Editor.view.admin.config.Grid', {
      */
     taskGuid: null,
     extraParams : [],
+    /**
+     * Container for the custom type instances
+     * @var Object
+     */
+    customTypes: {},
     publishes: {
         //publish this field so it is bindable
         extraParams: true
@@ -343,6 +348,11 @@ Ext.define('Editor.view.admin.config.Grid', {
               };
             break;
         }
+
+        if(!Ext.isEmpty(record.get('typeClass'))) {
+            return this.up('grid').getCustomType(record.get('typeClass')).getConfigEditor(record);
+        }
+
         return Ext.create('Ext.grid.CellEditor', {
             field:Ext.create(config),
             completeOnEnter: false
@@ -356,14 +366,15 @@ Ext.define('Editor.view.admin.config.Grid', {
         var me=this,
             isValueChanged = record.get('default') !== value,
             returnValue = value;
+           
         switch (record.get('type')) {
             case 'boolean': // bool
                 var defaultVal = !/^(?:f(?:alse)?|no?|0+)$/i.test(record.get('default')) && !!record.get('default');
                 isValueChanged = defaultVal !== value;
-                if(value == true){
+                if(value === true){
                     returnValue = me.strings.configActiveColumn;
                 }
-                if(value == false){
+                if(value === false){
                     returnValue = me.strings.configDeactiveColumn;
                 }
             break;
@@ -373,13 +384,30 @@ Ext.define('Editor.view.admin.config.Grid', {
                 }
             break;
         }
+
+        if(!Ext.isEmpty(record.get('typeClass'))) {
+             returnValue = this.getCustomType(record.get('typeClass')).renderer(value, metaData, record);
+        }
+
         //mark the value with bold if the value is different as the default value
         if(isValueChanged && returnValue){
             returnValue = '<b>'+returnValue+'</b>';
         }
         return returnValue;
     },
-    
+
+    /**
+     * returns the instance to the custom type
+     * @param [String} type
+     * @returns {*}
+     */
+    getCustomType: function(type) {
+        if(!this.customTypes[type]) {
+            this.customTypes[type] = Ext.create(type);
+        }
+        return this.customTypes[type];
+    },
+
     /***
      * Cell renderer for the guiName cell.
      * TODO: use template
