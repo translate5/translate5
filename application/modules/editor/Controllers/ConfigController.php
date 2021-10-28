@@ -84,7 +84,7 @@ class editor_ConfigController extends ZfExtended_RestController {
         $error = null;
         $valueToCheck = $this->data->value;
         if(!$type->validateValue($this->entity->getType(), $valueToCheck, $error)) {
-            throw new ZfExtended_UnprocessableEntity('E4567', ['errorMsg' => $error]);
+            throw new ZfExtended_UnprocessableEntity('E1363', ['errorMsg' => $error]);
         }
         $value = (string) $this->data->value;
 
