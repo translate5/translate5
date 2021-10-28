@@ -34,7 +34,7 @@ Ext.define('Editor.view.admin.config.Grid', {
     ],
     controller: 'adminConfigGrid',
     viewModel:{
-        type:'adminConfigGrid',
+        type:'adminConfigGrid'
     },
     alias: 'widget.adminConfigGrid',
     itemId: 'adminConfigGrid',
@@ -403,7 +403,7 @@ Ext.define('Editor.view.admin.config.Grid', {
      */
     getCustomType: function(type) {
         if(!this.customTypes[type]) {
-            this.customTypes[type] = Ext.create(type);
+            this.customTypes[type] = Ext.ClassManager.get(type);
         }
         return this.customTypes[type];
     },
