@@ -35,7 +35,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     requires: [
         'Editor.plugins.MatchAnalysis.view.AnalysisPanel',
-        'Editor.plugins.MatchAnalysis.view.LanguageResources'
+        'Editor.plugins.MatchAnalysis.view.LanguageResources',
+        'Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig'
     ],
     
     models: ['Editor.plugins.MatchAnalysis.model.MatchAnalysis'],

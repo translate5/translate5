@@ -79,8 +79,8 @@ Ext.define('Editor.store.Segments', {
       var proxy = this.getProxy(), params = {};
       params[proxy.getFilterParam()] = proxy.encodeFilters(this.getFilters().items);
       params[proxy.getSortParam()] = proxy.encodeSorters(this.getSorters().items);
-      if(proxy.extraParams['qualities'] && proxy.extraParams['qualities'] !== ''){
-          params['qualities'] = proxy.extraParams['qualities'];
+      if(proxy.extraParams.qualities && proxy.extraParams.qualities !== ''){
+          params.qualities = proxy.extraParam.qualities;
       }
       return params;
   },
@@ -97,8 +97,8 @@ Ext.define('Editor.store.Segments', {
    */
   getQualityFilter: function(){
       var proxy = this.getProxy();
-      if(proxy.extraParams['qualities'] && proxy.extraParams['qualities'] !== ''){
-          return params['qualities'];
+      if(proxy.extraParams.qualities && proxy.extraParams.qualities !== ''){
+          return proxy.extraParams.qualities;
       }
       return '';
   },
@@ -106,9 +106,9 @@ Ext.define('Editor.store.Segments', {
    * Sets the qualityFilter, returns, if the filter changed
    */
   setQualityFilter: function(filter){
-      var proxy = this.getProxy(), changed = (proxy.extraParams['qualities']) ? (proxy.extraParams['qualities'] !== filter) : (filter !== '');
+      var proxy = this.getProxy(), changed = (proxy.extraParams.qualities) ? (proxy.extraParams.qualities !== filter) : (filter !== '');
       if(filter === ''){
-          delete proxy.extraParams['qualities'];
+          delete proxy.extraParams.qualities;
       } else {
           proxy.setExtraParam('qualities', filter);
       }
