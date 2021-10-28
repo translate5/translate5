@@ -349,8 +349,8 @@ Ext.define('Editor.view.admin.config.Grid', {
             break;
         }
 
-        if(!Ext.isEmpty(record.get('typeClass'))) {
-            return this.up('grid').getCustomType(record.get('typeClass')).getConfigEditor(record);
+        if(!Ext.isEmpty(record.get('typeClassGui'))) {
+            return this.up('grid').getCustomType(record.get('typeClassGui')).getConfigEditor(record);
         }
 
         return Ext.create('Ext.grid.CellEditor', {
@@ -385,8 +385,8 @@ Ext.define('Editor.view.admin.config.Grid', {
             break;
         }
 
-        if(!Ext.isEmpty(record.get('typeClass'))) {
-             returnValue = this.getCustomType(record.get('typeClass')).renderer(value, metaData, record);
+        if(!Ext.isEmpty(record.get('typeClassGui'))) {
+             returnValue = this.getCustomType(record.get('typeClassGui')).renderer(value, metaData, record);
         }
 
         //mark the value with bold if the value is different as the default value

@@ -198,7 +198,7 @@ class editor_ConfigController extends ZfExtended_RestController {
 
         //get a fresh copy of data
         $configRow = $this->entity->toArray();
-        $configRow['typeClass'] = $type->getGuiViewCls(); //we can overwrite the typeClass here, since php class value is not usable in GUI
+        $configRow['typeClassGui'] = $type->getGuiViewCls(); //we can overwrite the typeClass here, since php class value is not usable in GUI
 
         //merge the current entity with the custom config data ($row)
         $this->view->rows = array_merge($row, $configRow);
