@@ -26,19 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
  * Translations: since all the configurations are not translated, we just keep the text here also just in english
  * @class Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig
  * @extends Ext.grid.Panel
+ *
  */
 Ext.define('Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig', {
+    extend: 'Ext.window.Window',
+    requires: [
+        'Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfigController'
+    ],
+    controller: 'pluginMatchAnalysisBoundaryConfig',
+
     record: null,
+
     strings: {
         title: 'Edit the match analysis boundaries',
         start: 'Start',
@@ -51,94 +53,39 @@ Ext.define('Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig', {
         endLesserBegin: 'End value must be bigger or equal to start value!'
     },
     /**
-     * on save button click
-     * @param {Ext.btn.Button} btn
+     * This statics must be implemented in classes used as custom config editors
      */
-    onSave: function(btn) {
-        var win = btn.up('window'),
-            grid = win.down('grid'),
-            newValue = {},
-            confRec = this.record;
+    statics: {
+        getConfigEditor: function(record) {
+            var win = new this({record: record});
+            win.show();
 
-        grid.store.each(function(rec) {
-            newValue[rec.get('begin')] = rec.get('end');
-        });
-        confRec.set('value', newValue);
-        win.setLoading('saving...');
-        confRec.save({
-            success: function() {
-                win.setLoading(false);
-                win.close();
-            },
-            failure: function() {
-                win.setLoading(false);
-            }
-        });
-    },
-    /**
-     * on cancel click button
-     * @param {Ext.btn.Button} btn
-     */
-    onCancel: function(btn) {
-        this.record.reject();
-        btn.up('window').close();
-    },
-    /**
-     * on remove click button
-     * @param {Ext.btn.Button} btn
-     */
-    onRemove: function(btn) {
-        var win = btn.up('window'),
-            grid = win.down('grid'),
-            selMod = grid.getSelectionModel();
-
-        grid.findPlugin('rowediting').cancelEdit();
-
-        grid.store.remove(selMod.getSelection());
-
-        if (grid.store.getCount() > 0) {
-            selMod.select(0);
+            //prevent cell editing:
+            return null;
+        },
+        renderer: function(value) {
+            var res = [];
+            Ext.Object.each(value, function(key, item){
+                item = item.toString();
+                if(key === item) {
+                    res.push(item);
+                }
+                else {
+                    res.push(key+'-'+item);
+                }
+            });
+            return res.join('; ');
         }
     },
-    onAdd: function(btn) {
-        var win = btn.up('window'),
-            grid = win.down('grid'),
-            newVal = Math.min(Math.max(...grid.store.collect('end')) + 1, 104),
-            rec;
-        
-        rec = grid.store.insert(0, {
-            begin: 0,
-            end: 0
-        })[0];
-        //we set the values after creation, so that the record looks dirty
-        rec.set('begin', newVal);
-        rec.set('end', newVal);
-    },
-
-    renderer: function(value) {
-        var res = [];
-        Ext.Object.each(value, function(key, item){
-            item = item.toString();
-            if(key === item) {
-                res.push(item);
-            }
-            else {
-                res.push(key+'-'+item);
-            }
-        });
-        return res.join('; ');
-    },
-
-    getConfigEditor : function(record) {
+    initConfig: function(instanceConfig) {
         var me = this,
-            data = [],
+            data = [], config,
             percent = function(v){return v+'%';};
-        this.record = record;
-        Ext.Object.each(record.get('value'), function(key, value) {
+
+        Ext.Object.each(instanceConfig.record.get('value'), function(key, value) {
             data.push([parseInt(key), parseInt(value)]);
         });
-
-        Ext.create('Ext.window.Window', {
+        config = {
             title: me.strings.title,
             height: 600,
             modal: true,
@@ -147,13 +94,11 @@ Ext.define('Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig', {
             bbar: ['->', {
                 text: me.strings.save,
                 glyph: 'f00c@FontAwesome5FreeSolid',
-                scope: this,
-                handler: this.onSave
+                handler: 'onSave'
             },{
                 text: me.strings.cancel,
                 glyph: 'f00d@FontAwesome5FreeSolid',
-                scope: this,
-                handler: this.onCancel
+                handler: 'onCancel'
             }],
             items: {
                 xtype: 'grid',
@@ -167,14 +112,12 @@ Ext.define('Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig', {
                     type: 'button',
                     text: me.strings.add,
                     glyph: 'f067@FontAwesome5FreeSolid',
-                    scope: this,
-                    handler: this.onAdd
+                    handler: 'onAdd'
                 },{
                     type: 'button',
                     text: me.strings.remove,
                     glyph: 'f2ed@FontAwesome5FreeSolid',
-                    scope: this,
-                    handler: this.onRemove
+                    handler: 'onRemove'
                 }],
                 columns: [{
                     header: me.strings.start,
@@ -223,9 +166,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig', {
                     ]
                 })
             }
-        }).show();
-
-        //prevent cell editing
-        return null;
+        };
+        if (instanceConfig) {
+            config=me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     }
 });
