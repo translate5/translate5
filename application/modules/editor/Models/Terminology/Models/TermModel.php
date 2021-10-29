@@ -2520,4 +2520,211 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             'updated' => $userName . ', ' . date('d.m.Y H:i:s', strtotime($na['updatedAt'])),
         ];
     }
+
+    /**
+     * Fetch attributes and transacgrps data for TermPortal right panels,
+     * and image/figure-attributes for center panel
+     *
+     * @return array
+     */
+    public function terminfo(): array {
+
+        // Setup different `language`-column clauses to be used
+        // for fetching attributes-data and fetching transacgrp-data
+        // because we need to fetch image-attributes not only for right-panels
+        // but also for center panel
+        $cond = [
+            'transacgrp' => '`language` = :language',
+            'attribute'  => '(`language` = :language OR (`type` = "figure" AND NOT ISNULL(`language`)))'
+        ];
+
+        // Setup definition for level-column
+        $levelColumnToBeGroupedBy = '
+          IF ((`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`)), "entry", 
+            IF ((`termEntryId` = :termEntryId AND %s AND ISNULL(`termId`)), "language", 
+              IF (`termId` = :termId, "term", "other"))) AS `level`';
+
+        // Setup WHERE clauses for entry-, language- and term-level attributes/transacgrp
+        $levelWHERE = implode(' AND ', [
+            '`termEntryId` = :termEntryId',
+            '(ISNULL(`language`) OR %s)',
+            '(ISNULL(`termId`)   OR `termId` = :termId)'
+        ]);
+
+        // Params for binding to the attribute/transacgrp-fetching query
+        $bind = [
+            ':termEntryId' => $this->getTermEntryId(),
+            ':language' => $this->getLanguage(),
+            ':termId' => $this->getId()
+        ];
+
+        // Get attributes grouped by level
+        $attributeA = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_AttributeModel')
+            ->loadGroupedByLevel(
+                sprintf($levelColumnToBeGroupedBy, $cond['attribute']),
+                sprintf($levelWHERE, $cond['attribute']),
+                $bind
+            );
+
+        // Get `transacgrp` data grouped by level
+        $transacgrpA = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_AttributeModel')
+            ->loadGroupedByLevel(
+                sprintf($levelColumnToBeGroupedBy, $cond['transacgrp']),
+                sprintf($levelWHERE, $cond['transacgrp']),
+                $bind
+            );
+
+        // Convert transacgrp-data
+        foreach (['entry', 'language', 'term'] as $level)
+            $transacgrpA[$level]
+                = array_column($transacgrpA[$level] ?? [], 'whowhen', 'transac');
+
+        // Return attributes and transacgrps
+        return [$attributeA, $transacgrpA];
+    }
+
+    /**
+     * Fetch attributes and transacgrps data for TermPortal right panels
+     *
+     * @return array
+     */
+    public function siblinginfo(): array {
+
+        // Setup different entry-level clauses to be used
+        // for fetching attributes-data and fetching transacgrp-data
+        // because we need to fetch ref-attributes not only for
+        // language- and term- levels, but for entry-level as well
+        $cond = [
+            'attribute'  => '`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`) AND `elementName` = "ref"',
+            'transacgrp' => 'FALSE',
+        ];
+
+        // Setup definition for level-column
+        $levelColumnToBeGroupedBy = '
+          IF ((`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`)), "entry", 
+            IF ((`termEntryId` = :termEntryId AND `language` = :language AND ISNULL(`termId`)), "language", 
+              IF (`termId` = :termId, "term", "other"))) AS `level`';
+
+        // Setup WHERE clauses for entry-, language- and term-level attributes
+        $levelWHERE = '`termEntryId` = :termEntryId AND ((' . implode(') OR (', [
+            'entry'    => '%s',
+            'language' => '`termEntryId` = :termEntryId AND `language` = :language AND ISNULL(`termId`)',
+            'term'     => '`termId` = :termId'
+        ]) . '))';
+
+        // Params for binding to the attribute/transacgrp-fetching query
+        $bind = [
+            ':termEntryId' => $this->getTermEntryId(),
+            ':language' => $this->getLanguage(),
+            ':termId' => $this->getId()
+        ];
+
+        // Get attributes grouped by level
+        $attributeA = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_AttributeModel')
+            ->loadGroupedByLevel(
+                $levelColumnToBeGroupedBy,
+                sprintf($levelWHERE, $cond['attribute']),
+                $bind
+            );
+
+        // Get transacgrps grouped by level
+        $transacgrpA = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_AttributeModel')
+            ->loadGroupedByLevel(
+                $levelColumnToBeGroupedBy,
+                sprintf($levelWHERE, $cond['transacgrp']),
+                $bind
+            );
+
+        // Convert transacgrp-data
+        foreach (['entry', 'language', 'term'] as $level)
+            $transacgrpA[$level]
+                = array_column($transacgrpA[$level] ?? [], 'whowhen', 'transac');
+
+        // Return attributes and transacgrps
+        return [$attributeA, $transacgrpA];
+    }
+
+    /**
+     * Get client name
+     *
+     * @return string
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getClientName() {
+
+        // Get `clientId` of a term collection
+        $clientId = $this->db->getAdapter()->query(
+            'SELECT `customerId` FROM `LEK_languageresources_customerassoc` WHERE `languageResourceId` = ?',
+            $this->getCollectionId()
+        )->fetchColumn();
+
+        // Use that `clientId` to get the client name
+        return $this->db->getAdapter()->query('SELECT `name` FROM `LEK_customer` WHERE `id` = ?', $clientId)->fetchColumn();
+    }
+
+    /**
+     * Get all terms having same termEntryId as current term has, orderded:
+     *   by current search language(s), and then
+     *   by termportal languages
+     *
+     * @param string $searchLangIds
+     * @param string $termPortalLangRfcs
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getSiblingsOrderedBy(string $searchLangIds = '', string $termPortalLangRfcs = ''): array {
+
+        // Bind params
+        $bind = [
+            ':termEntryId' => $this->getTermEntryId(),
+        ];
+
+        // If we have current search term languages ids given
+        if ($searchLangIds) {
+
+            // Make sure this languages terms will be at the top
+            $order []= 'FIND_IN_SET(`languageId`, :searchLangIds) DESC';
+
+            // Append binding
+            $bind[':searchLangIds'] = join(',', array_reverse(explode(',', $searchLangIds)));
+        }
+
+        // If we have termportal languages given
+        if ($termPortalLangRfcs) {
+
+            // Setup secondary order clause
+            $order []= 'FIND_IN_SET(`language`, :termPortalLangRfcs)';
+
+            // Append binding
+            $bind[':termPortalLangRfcs'] = $termPortalLangRfcs;
+        }
+
+        // Join ORDER clauses
+        $order = join(', ', $order) ?: '`id`';
+
+        // Get raw siblings
+        return $this->db->getAdapter()->query($sql = '
+            SELECT 
+              `id`, 
+              `id`, 
+              `termTbxId` AS `tbx`, 
+              `languageId`, 
+              `language`, 
+              `term`,
+              `proposal`,
+              `collectionId`,
+              `status`,
+              `processStatus`,
+              `termEntryId`,
+              `termEntryTbxId`
+            FROM `terms_term` 
+            WHERE `termEntryId` = :termEntryId
+            ORDER BY ' . $order,
+            $bind
+        )->fetchAll(PDO::FETCH_UNIQUE);
+    }
 }

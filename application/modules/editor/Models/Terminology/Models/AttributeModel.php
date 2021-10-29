@@ -838,4 +838,34 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             HAVING `hasDef` = 0 OR `butEmpty` = 1
         ', $this->getTermEntryId())->fetchAll(PDO::FETCH_COLUMN);
     }
+
+    /**
+     * This method retrieves attributes grouped by level.
+     * It is used internally by TermModel->terminfo() and ->siblinginfo()
+     * and should not be called directly
+     *
+     * @param $levelColumnToBeGroupedBy
+     * @param $where
+     * @param $bind
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function loadGroupedByLevel($levelColumnToBeGroupedBy, $where, $bind) {
+        return $this->db->getAdapter()->query('
+            SELECT 
+              ' . $levelColumnToBeGroupedBy . ', 
+              `id`, 
+              `elementName`,
+              `value`,
+              `type`,
+              `dataTypeId`,
+              `language`,
+              `target`,
+              IFNULL(`createdBy`, 0) AS `createdBy`, DATE_FORMAT(`createdAt`, "%d.%m.%Y %H:%i:%s") AS `createdAt`,
+              IFNULL(`updatedBy`, 0) AS `updatedBy`, DATE_FORMAT(`updatedAt`, "%d.%m.%Y %H:%i:%s") AS `updatedAt`
+            FROM `terms_attributes` 
+            WHERE ' . $where . '
+            ORDER BY `type` = "processStatus" DESC, `id` DESC', $bind
+        )->fetchAll(PDO::FETCH_GROUP);
+    }
 }

@@ -140,6 +140,19 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
         )->fetchColumn();
     }
 
+    /**
+     * Get dataTypeId by for note-attribute
+     *
+     * @param string $type
+     * @return string
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getNoteId() {
+        return $this->db->getAdapter()->query(
+            'SELECT `id` FROM `terms_attributes_datatype` WHERE `label` = "note" AND `type` IS NULL'
+        )->fetchColumn();
+    }
+
 
     /**
      * Get array of terms_attributes.dataTypeId for a level, identified by $termEntryId, $language and $termId args

@@ -284,4 +284,28 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
             WHERE `termEntryId` IN (' . $termEntryIds . ')
         ')->fetchAll(), 'termEntryId', 'language', 'termId');
     }
+
+    /**
+     * This method retrieves attributes grouped by level.
+     * It is used internally by TermModel->terminfo() and ->siblinginfo()
+     * and should not be called directly
+     *
+     * @param $levelColumnToBeGroupedBy
+     * @param $where
+     * @param $bind
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function loadGroupedByLevel($levelColumnToBeGroupedBy, $where, $bind) {
+        $transacgrpA = $this->db->getAdapter()->query('
+            SELECT 
+              ' . $levelColumnToBeGroupedBy . ',                   
+              `transac`,
+              CONCAT(`transacNote`, ", ", DATE_FORMAT(`date`, "%d.%m.%Y %H:%i:%s")) AS `whowhen`
+            FROM `terms_transacgrp`
+            WHERE TRUE # TRUE here is just to beautify WHERE clause
+              AND ' . $where . ' 
+              AND `transacType` = "responsibility" 
+              AND `transac` IN ("modification", "origination")', $bind
+        )->fetchAll(PDO::FETCH_GROUP);
+    }
 }
