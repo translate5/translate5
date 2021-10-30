@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 if (window.parent.location.hash.match(/itranslate|termportal/)) {
+    $('body').addClass('noheader');
     $('#containerHeader').hide();
 }
 var editIdleTimer = null,
@@ -38,7 +39,14 @@ var editIdleTimer = null,
     instantTranslationIsActive = Editor.data.apps.instanttranslate.instantTranslationIsActive,
     chosenSourceIsText = true,
     fileTypesAllowed = [],
-    fileUploadLanguageCombinationsAvailable = [];
+    fileUploadLanguageCombinationsAvailable = [],
+    langugaeInformationData = [];
+
+
+// hide translate-button if instantTranslationIsActive is active
+if (instantTranslationIsActive) {
+    $('#translationSubmit').hide();
+}
 
 /**
  * Returns all available combinations of source- and target-language for the given languageResource.
@@ -105,10 +113,8 @@ function setfileUploadLanguageCombinationsAvailable() {
                     languageResourceToCheckAllTargets = languageResourceToCheck.target;
                     $.each(languageResourceToCheckAllTargets, function(indexT) {
                         langComb = languageResourceToCheckAllSources[indexS] + '|' + languageResourceToCheckAllTargets[indexT];
-                        if ( languageResourceToCheckAllSources[indexS] !== languageResourceToCheckAllTargets[indexT]
-                            && $.inArray(langComb, fileUploadLanguageCombinationsAvailable) === -1) {
+                        if ( languageResourceToCheckAllSources[indexS] !== languageResourceToCheckAllTargets[indexT] && $.inArray(langComb, fileUploadLanguageCombinationsAvailable) === -1) {
                             fileUploadLanguageCombinationsAvailable.push(langComb); 
-                                
                         }
                     });
                 });
@@ -128,21 +134,22 @@ function isFileUploadAvailable() {
  * If files are allowed for the current language-combination, show text accordingly.
  */
 function setTextForSource() {
-    var textForSourceIsText = Editor.data.languageresource.translatedStrings['enterText'],
+    var textForSourceIsText = Editor.data.languageresource.translatedStrings.enterText,
         textForSourceIsFile = '';
     if (!isFileUploadAvailable()) {
         // No file-upload is possible
         chosenSourceIsText = true;
         showSource();
+        toggleSourceTextFile('text', true);
     } else {
         // When source is chosen to text
         textForSourceIsText += ' <span class="change-source-type">';
-        textForSourceIsText += Editor.data.languageresource.translatedStrings['orTranslateFile'];
+        textForSourceIsText += Editor.data.languageresource.translatedStrings.orTranslateFile;
         textForSourceIsText += '</span>';
         // When source is chosen to file
-        textForSourceIsFile = Editor.data.languageresource.translatedStrings['uploadFile'];
+        textForSourceIsFile = Editor.data.languageresource.translatedStrings.uploadFile;
         textForSourceIsFile += ' <span class="change-source-type">';
-        textForSourceIsFile += Editor.data.languageresource.translatedStrings['orTranslateText'];
+        textForSourceIsFile += Editor.data.languageresource.translatedStrings.orTranslateText;
         textForSourceIsFile += '</span>';
     }
     $("#sourceIsText").html(textForSourceIsText);
@@ -316,7 +323,7 @@ $('.click-starts-translation').click(function(event){
 /* --------------- prepare file-translations  ------------------------------- */
 
 function grabUploadedFiles(event){
-    uploadedFiles = event.target.files; 
+    uploadedFiles = event.target.files;
     if (instantTranslationIsActive) {
         startFileTranslation();
     }
@@ -356,6 +363,7 @@ function startTranslation() {
     var textToTranslate,
         translationInProgressID;
     // Check if any engines are available for that language-combination.
+
     if (!hasEnginesForLanguageCombination()) {
         hideTranslations();
         showTargetError(Editor.data.languageresource.translatedStrings.noLanguageResource);
@@ -370,7 +378,7 @@ function startTranslation() {
             showSourceError(Editor.data.languageresource.translatedStrings.uploadFileNotFound);
             return;
         }
-        if (uploadedFiles !== undefined) {
+        if (uploadedFiles != undefined) {
             startLoadingState();
             requestFileTranslate();
         }
@@ -428,7 +436,7 @@ function translateText(textToTranslate,translationInProgressID){
             if (translationInProgressID != latestTranslationInProgressID) {
                 return;
             }
-            if (result.errors !== undefined && result.errors != '') {
+            if (result.errors != undefined && result.errors != '') {
                 showTargetError(result.errors);
             } else {
                 clearAllErrorMessages();
@@ -502,87 +510,138 @@ function renderMatchesByResource (translateTextResponse) {
         resultData,
         languageRfc,
         alternativeTranslations;
-    $.each(translateTextResponse, function(serviceName, resource){
-        resultHtml = '';
-        $.each(resource, function(resourceName, allResults){
-            $.each(allResults, function(key, result){
-                if (result['target'] != '') {
-                    fuzzyMatch = {};
-                    if (result['sourceDiff'] != undefined) {
-                        fuzzyMatch = {'matchRate': result['matchrate'], 
-                                      'sourceDiff': result['sourceDiff']}
-                    }
-                    infoText = [];
-                    term = '';
-                    languageRfc=null;
-                    termStatus = '';
-                    processStatusAttribute = '';
-                    processStatusAttributeValue = '';
-                    alternativeTranslations=[];
-                    if (result['metaData'] != undefined) {
-                        metaData = result['metaData'];
-                        if(metaData['definitions'] != undefined && metaData['definitions'].length>0) {
-                        	//add all available definitions as separate row
-                        	for(var i=0;i<metaData['definitions'].length;i++){
-                        		infoText.push(metaData['definitions'][i]);
-                        	}
-                        }
-                        if(metaData['term'] != undefined) {
-                            term = metaData['term'];
-                        }
-                        if(metaData['languageRfc'] != undefined) {
-                        	languageRfc = metaData['languageRfc'];
-                        }
-                        if(metaData['status'] != undefined) {
-                            termStatus = metaData['status'];
-                        }
-                        if(metaData['processStatusAttribute'] != undefined) {
-                        	processStatusAttribute = metaData['processStatusAttribute'];
-                        }
-                        if(metaData['processStatusAttributeValue'] != undefined) {
-                        	processStatusAttributeValue = metaData['processStatusAttributeValue'];
-                        }
-                        if(metaData['alternativeTranslations'] != undefined) {
-                        	alternativeTranslations = metaData['alternativeTranslations'];
-                        }
-                    }
-                    resultData = {'languageResourceHeadline' : resourceName + ' (' + serviceName + ')',
-                                  'languageResourceId': result['languageResourceid'],
-                                  'languageResourceType': result['languageResourceType'],
-                                  'fuzzyMatch': fuzzyMatch,
-                                  'infoText': infoText.join('<br/>'),
-                                  'term': term,
-                                  'termStatus': termStatus,
-                                  'translationText': result['target'],
-                                  'processStatusAttribute':processStatusAttribute,
-                                  'processStatusAttributeValue':processStatusAttributeValue,
-                                  'languageRfc':languageRfc,
-                                  'alternativeTranslations':alternativeTranslations
-                                  };
-                    resultHtml += renderTranslationContainer(resultData);
+
+    // first: order the response-result, that fuzzyMatches are at the end
+    // separate the fuzzyMatches from the results
+    var $orderedResults = [];
+    var $fuzzyResults = [];
+    $.each(translateTextResponse, function(serviceName, resource) {
+        $.each(resource, function(resourceName, allResults) {
+            $.each(allResults, function(key, result) {
+                result.serviceName = serviceName;
+                result.resourceName = resourceName;
+                // check if result is a fuzzyMatch
+                if (result.sourceDiff != undefined) {
+                    $fuzzyResults.push(result);
+                }
+                else {
+                    $orderedResults.push(result);
                 }
             });
         });
-        if (resultHtml != '') {
-            translationHtml += resultHtml;
+    });
+    // and then add the fuzzyMatches at the end of he other results
+    $orderedResults = $orderedResults.concat($fuzzyResults);
+
+    resultHtml = '';
+    $.each($orderedResults, function(key, result){
+        if (result.target !== '') {
+            fuzzyMatch = {};
+            if (result.sourceDiff != undefined) {
+                fuzzyMatch = {'matchRate': result.matchrate,
+                              'sourceDiff': result.sourceDiff};
+            }
+            infoText = [];
+            term = '';
+            languageRfc=null;
+            termStatus = '';
+            processStatusAttribute = '';
+            processStatusAttributeValue = '';
+            alternativeTranslations=[];
+            if (result['metaData'] != undefined) {
+                metaData = result['metaData'];
+                if(metaData['definitions'] != undefined && metaData['definitions'].length>0) {
+                    //add all available definitions as separate row
+                    for(var i=0;i<metaData['definitions'].length;i++){
+                        infoText.push(metaData['definitions'][i]);
+                    }
+                }
+                if(metaData.term != undefined) {
+                    term = metaData.term;
+                }
+                if(metaData.languageRfc != undefined) {
+                    languageRfc = metaData.languageRfc;
+                }
+                if(metaData.status != undefined) {
+                    termStatus = metaData.status;
+                }
+                if(metaData.processStatusAttribute != undefined) {
+                    processStatusAttribute = metaData.processStatusAttribute;
+                }
+                if(metaData.processStatusAttributeValue != undefined) {
+                    processStatusAttributeValue = metaData.processStatusAttributeValue;
+                }
+                if(metaData.alternativeTranslations != undefined) {
+                    alternativeTranslations = metaData.alternativeTranslations;
+                }
+            }
+            resultData = {'languageResourceHeadline' : result.resourceName + ' [' + getLanguageresourceName(result.serviceName) + '] ',
+                          'languageResourceId': result.languageResourceid,
+                          'languageResourceType': result.languageResourceType,
+                          'fuzzyMatch': fuzzyMatch,
+                          'infoText': infoText.join('<br/>'),
+                          'term': term,
+                          'termStatus': termStatus,
+                          'translationText': result.target,
+                          'processStatusAttribute':processStatusAttribute,
+                          'processStatusAttributeValue':processStatusAttributeValue,
+                          'languageRfc':languageRfc,
+                          'alternativeTranslations':alternativeTranslations
+                          };
+            resultHtml += renderTranslationContainer(resultData);
         }
     });
-    return translationHtml;
+
+    if (resultHtml !== '') {
+        return resultHtml;
+    }
+
+    return '';
+}
+
+/**
+ * get the translate name of the languageservice.
+ * if no translation is defined, the requested $service will be returned
+ * Sample:
+ * 'TermCollection' => 'Terminologiedatenbank (translate5)'
+ * '<unknown>' => '<unknown'
+ *
+ * @param $service
+ * @returns {string|*}
+ */
+function getLanguageresourceName($service) {
+    if (Editor.data.languageresource.translatedStrings.languageresourceNames[$service] !== undefined) {
+        return Editor.data.languageresource.translatedStrings.languageresourceNames[$service];
+    }
+    return $service;
 }
 
 function renderTranslationContainer(resultData) {
     var translationsContainer = '';
-    
-    if (resultData.fuzzyMatch.sourceDiff != undefined) {
-        var fuzzyMatchTranslatedString = Editor.data.languageresource.translatedStrings['attentionFuzzyMatch'].replace("{0}", resultData.fuzzyMatch.matchRate);
-        translationsContainer += '<div class="translation-sourcediff" title="'+Editor.data.languageresource.translatedStrings['differenceIsHighlighted']+'">'+fuzzyMatchTranslatedString+': ';
-        translationsContainer += '<span class="translation-sourcediff-content">' + resultData.fuzzyMatch.sourceDiff + '</span>';
-        translationsContainer += '</div>';
+    var $additionalHeaderClass = 'b';
+    var $isFuzzyMatch = false;
+    var $fuzzyContainer = '';
+    var $alternativeTranslations = false;
+
+    // TermCollection
+    // detect color of the header-bottom-border
+    if (resultData.languageResourceType === 'termcollection') {
+        $additionalHeaderClass = 'box__result__header__green';
     }
     
+    if (resultData.fuzzyMatch.sourceDiff !== undefined) {
+        $isFuzzyMatch = true;
+        $additionalHeaderClass = 'box__result__header__red';
+        var fuzzyMatchTranslatedString = Editor.data.languageresource.translatedStrings['attentionFuzzyMatch'].replace("{0}", resultData.fuzzyMatch.matchRate);
+        $fuzzyContainer += '<div class="translation-sourcediff" title="'+Editor.data.languageresource.translatedStrings['differenceIsHighlighted']+'">';
+        $fuzzyContainer += '<svg class="icon icon-t5_attention" /><span class="error">'+fuzzyMatchTranslatedString+'</span><br>';
+        $fuzzyContainer += '    <span class="translation-sourcediff-content">' + resultData.fuzzyMatch.sourceDiff + '</span>';
+        $fuzzyContainer += '</div>';
+    }
+
     translationsContainer += '<div class="copyable marginTop">';
 
-    translationsContainer += '<div class="box box__result__header box__result__header__green font-size-big">';
+    translationsContainer += '<div class="box box__result__header '+$additionalHeaderClass+' font-size-big">';
         translationsContainer += '<h2>';
             translationsContainer += '<div class="floatRight">'+renderTranslationContainerResultIcons(resultData)+'</div>';
             translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'" data-languageresource-type="'+resultData.languageResourceType+'">'+sanitizeTranslatedText(resultData.translationText)+'</div>';
@@ -595,14 +654,19 @@ function renderTranslationContainer(resultData) {
             if(resultData.singleResultBestMatchrateTooltip){
                 translationsContainer += '<span class="singleResultBestMatchrateInfoIcon" title="'+resultData.singleResultBestMatchrateTooltip+'"></span>';
             }
-            translationsContainer += resultData.languageResourceHeadline;
+            translationsContainer += '<div class="overflowEllipses">'+resultData.languageResourceHeadline+'</div>';
             translationsContainer += '<span class="loadingSpinnerIndicator"><img src="'+Editor.data.publicModulePath+'images/loading-spinner.gif"/></span>';
         translationsContainer += '</p>';
-        if (resultData.infoText != '') {
+        if (resultData.infoText !== '') {
             translationsContainer += '<div class="translation-infotext marginTop">'+resultData.infoText+'</div>';
         }
-        translationsContainer += renderTranslationContainerResultAlternativeTranslations(resultData);
-        translationsContainer += '</div>'; // end of <div className="box box__result__content">
+        translationsContainer += $fuzzyContainer;
+
+    translationsContainer += '</div>'; // end of <div className="box box__result__content">
+
+    if (($alternativeTranslations = renderTranslationContainerResultAlternativeTranslations(resultData))) {
+        translationsContainer += '<div class="box box__result__content bg-grey_01">'+$alternativeTranslations+'</div>';
+    }
 
     translationsContainer += '</div>'; // end of <div class="copyable">
 
@@ -621,14 +685,15 @@ function renderTranslationContainer(resultData) {
 function renderTranslationContainerResultIcons (resultData) {
     var tempHtml = '';
 
-    // render status-icon
-    if (resultData.termStatus != '') {
-        tempHtml += renderTermStatusIcon(resultData.termStatus);
+    // render process-status icon
+    if(resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
+        //tempHtml += '<span class="process-status-attribute"><img src="' + Editor.data.publicModulePath + 'images/tick.png" alt="finalized" title="finalized"></span>';
+        tempHtml += '<span class="process-status-attribute" title="finalized"><svg class="icon icon-t5_check_green" /></span>';
     }
 
-    // render
-    if(resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
-        tempHtml += '<span class="process-status-attribute"><img src="' + Editor.data.publicModulePath + 'images/tick.png" alt="finalized" title="finalized"></span>';
+    // render usage-status icon
+    if (resultData.termStatus != '') {
+        tempHtml += renderTermUsageStatusIcon(resultData.termStatus);
     }
 
     // render info-icon
@@ -660,26 +725,31 @@ function renderTranslationContainerResultAlternativeTranslations (resultData) {
             atHtmlTableEnd = '',
             atHtmlTable='',
             atHtmlBt=[];
-        if (at.length > 0) {
-            atHtmlTableStart = '<table class="translationsForLabel marginTop">';
-            atHtmlTableEnd = '</table>';
+
+        if (at.length < 1) {
+            return false;
         }
+        atHtmlTableStart = '<table class="translationsForLabel bg-grey_01 marginTop">';
+        atHtmlTableEnd = '</table>';
+
         $.each(at, function(key, result){
             if (atHtmlTableResultPosTag == '') {
                 // This assumes that result['posTag'] is the same for all results!
-                atHtmlTableResultPosTag = '<tr><td colspan="3"><b>'+result['posTag']+'</b></td></tr>';
+                atHtmlTableResultPosTag = '<tr><td colspan="2"><strong>'+result['posTag']+'</strong></td></tr>';
             }
             atHtmlTable += '<tr>';
-            atHtmlTable += '<td><progress value="'+result['confidence']+'" max="1"></progress></td>';
-            atHtmlTable += '<td><b>'+result['displayTarget']+':</b></td>';
+            //atHtmlTable += '<td><progress value="'+result['confidence']+'" max="1"></progress></td>';
+            // we need th &nbsp; to get the correct vertical position of the progress bar
+            atHtmlTable += '<td><div class="progress bg-grey_02" style="width: 50px;"><div class="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: '+100*result['confidence']+'%"></div></div>&nbsp;&nbsp;&nbsp;</td>';
+            atHtmlTable += '<td><b>'+result['displayTarget']+':</b><br>';
             atHtmlBt=[];
             $.each(result.backTranslations, function(keyBt, resultBt){
                 if(highestConfidenceTranslation==''){
-                    highestConfidenceTranslation='<h5 class="translationsForLabel">'+Editor.data.languageresource.translatedStrings['translationsForLabel']+'<span class="displayTarget"> '+result['displayTarget']+'</span></h5>';
+                    highestConfidenceTranslation = Editor.data.languageresource.translatedStrings['translationsForLabel']+'<strong class="displayTarget"> '+result['displayTarget']+'</strong>';
                 }
                 atHtmlBt.push(resultBt.displayText);
             });
-            atHtmlTable += '<td>'+atHtmlBt.join(', ')+'</td>';
+            atHtmlTable += atHtmlBt.join(', ')+'</td>';
             atHtmlTable += '</tr>';
         });
     }
@@ -699,7 +769,7 @@ function renderTranslationContainerResultAlternativeTranslations (resultData) {
  * @param string termStatus
  * @returns string
  */
-function renderTermStatusIcon(termStatus){
+function renderTermUsageStatusIcon(termStatus){
     var termStatusHtml = '', 
         status = 'unknown', 
         map = Editor.data.termStatusMap,
@@ -802,43 +872,56 @@ function getDownloads(){
 function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = array(taskName, downloadUrl, removeDate)
     var pretranslatedFiles = [],
         html = '',
-        htmlFile,
         importProgressUpdate = false;
     $.each(allPretranslatedFiles, function(taskId, taskData) {
-        htmlFile = '<li>';
-        htmlFile += taskData['taskName'];
-        htmlFile += ' ' + taskData['sourceLang'] +' &rarr; ' + taskData['targetLang'];
-        htmlFile += ' (' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] +')<br>';
+        var $htmlFile = '';
+        var $headerContent = '<h2>'+taskData['taskName']+'</h2>';
+        var $headerClassAddition = '';
+        var $progressBar = '';
+        var $innerContent = getLanguageName(taskData.sourceLang)+' &ndash; '+getLanguageName(taskData.targetLang)+'<br>';
+
         switch(taskData['downloadUrl']) {
             case 'isImporting':
+                $headerClassAddition = '';
+                $headerContent = '<h2 class="color-grey_06">'+taskData.taskName+'<span id="importProgressLabel_'+taskId+'" class="floatRight"></span></h2>';
                 importProgressUpdate = true;
-                htmlFile += '<p style="font-size:80%;">' + Editor.data.languageresource.translatedStrings['noDownloadWhileImport'] + '</p>';
-                //add import progres html. For each task separate progress component and progress label.
+                $innerContent += Editor.data.languageresource.translatedStrings['noDownloadWhileImport'];
+                //add import progress html. For each task separate progress component and progress label.
                 if(taskData['importProgress']){
-                    htmlFile += '<div id="importProgress'+taskId+'" style="width: 150px; position: relative">';
-                    htmlFile += '<div id="importProgressLabel'+taskId+'" style="position: absolute;left: 50%;top: 4px;font-weight: bold;text-shadow: 1px 1px 0 #fff;"></div>';
-                    htmlFile += '</div>';
+                    $progressBar += '<div className="progress" style="margin-top: -3px;">';
+                    $progressBar += '    <div id="progressBar_'+taskId+'" class="progressBar progressBarThin" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>';
+                    $progressBar += '</div>';
                 }
                 break;
-            case 'isErroneous': 
-                htmlFile += '<p style="font-size:80%;" class="error">' + Editor.data.languageresource.translatedStrings['noDownloadAfterError'] + '</p>';
+            case 'isErroneous':
+                $headerClassAddition = 'color-grey_06 box__result__header__red';
+                $innerContent += '<span class="error">'+Editor.data.languageresource.translatedStrings.noDownloadAfterError+'</span>';
                 break;
             case 'isNotPretranslated':
-                htmlFile += '<p style="font-size:80%;" class="error">' + Editor.data.languageresource.translatedStrings['noDownloadNotTranslated'] + '</p>';
+                $headerClassAddition = 'color-grey_06 box__result__header__red';
+                $innerContent += '<span class="error">'+Editor.data.languageresource.translatedStrings.noDownloadNotTranslated+'</span>';
                 break;
             default:
-                htmlFile += '<a href="' + taskData['downloadUrl'] + '" class="ui-button ui-widget ui-corner-all" target="_blank">Download</a>';
+                $headerClassAddition = 'box__result__header__green';
+                $headerContent = '<a href="' + taskData.downloadUrl + '" class="color-grey_09" target="_blank" title="Download">'
+                    +'<h2>'+taskData.taskName+' <small class="color-grey_06">('+taskData.orderDate+')</small><svg class="icon icon-t5_download floatRight" /></h2>'
+                    +'</a>';
+                $innerContent += '(' + Editor.data.languageresource.translatedStrings.availableUntil+' '+taskData.removeDate+')';
+                break;
         }
-        htmlFile += '<br/>';
-        
-        pretranslatedFiles.push(htmlFile);
+        $htmlFile += '<div class="box box__result__header '+$headerClassAddition+' font-size-big marginTop">';
+            $htmlFile += $headerContent;
+        $htmlFile += '</div>';
+        $htmlFile += $progressBar;
+        $htmlFile += '<div class="box box__result__content">';
+            $htmlFile += '<p>'+$innerContent+'</p>';
+        $htmlFile += '</div>';
+
+        pretranslatedFiles.push($htmlFile);
     });
+
     if (pretranslatedFiles.length > 0) {
-        html += '<h2>' + Editor.data.languageresource.translatedStrings['pretranslatedFiles'] + '</h2>';
-        html += '<p style="font-size:small;">(' + Editor.data.languageresource.translatedStrings['asOf'] + ' ' + dateAsOf + '):</p>';
-        html += '<ul>';
         html += pretranslatedFiles.join(' ');
-        html += '</ul>';
     }
     
     $('#pretranslatedfiles').html(html);
@@ -855,6 +938,14 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
     }
 }
 
+function getLanguageName($shortCode) {
+    if (Editor.data.allDbLanguages[$shortCode]) {
+        return Editor.data.allDbLanguages[$shortCode][1];
+    };
+    // fallback: return original posted short language Code
+    return $shortCode;
+}
+
 /***
  * Update the progress bar for all importing tasks
  * @param taskData
@@ -864,25 +955,26 @@ function updateImportProgressBar(taskData){
     if(!taskData || taskData.length < 1) {
         return;
     }
-    
+
     $.each(taskData, function(taskId, taskData) {
-        var taskProgresData = taskData['importProgress'];
+        var taskProgressData = taskData['importProgress'];
         
-        if(!taskProgresData || taskProgresData.length < 1){
+        if(!taskProgressData || taskProgressData.length < 1){
             return true;
         }
         
-        //console.log(taskProgresData);
-        
-        var progressbar =$("#importProgress"+taskId),
-            label = $("#importProgressLabel"+taskId);
-        
-        progressbar.progressbar({
-            value:taskProgresData['progress']
-        });
-        label.text(progressbar.progressbar( "value" ) + "%" );
+        //console.log(taskProgressData);
+        setProgressBar('progressBar_'+taskId, taskProgressData['progress']);
+        var label = $('#importProgressLabel_'+taskId);
+        label.text(Math.round(taskProgressData['progress']) + "%" );
     });
 }
+
+function setProgressBar($id, $value) {
+    $('#'+$id)
+        .css("width", $value + "%")
+        .attr("aria-valuenow", $value);
+};
 
 $(document).on('click', '.getdownloads' , function(e) {
     e.stopPropagation();
@@ -1064,7 +1156,7 @@ $('#termPortalButton').on('touchstart click',function(){
  * @param {String} params
  */
 function openTermPortal (params) {
-    console.log('openTermPortal ' + params);
+    //console.log('openTermPortal ' + params);
     var url = Editor.data.restpath+"termportal";
     if (params) {
         window.parent.loadIframe('termportal',url,params);
