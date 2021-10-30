@@ -13,6 +13,61 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.5.3] - 2021-10-28
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-2613](https://jira.translate5.net/browse/TRANSLATE-2613): Add Locaria Logo to Website and App** <br>
+Added Locaria logo to the app
+
+**[TRANSLATE-2076](https://jira.translate5.net/browse/TRANSLATE-2076): Define analysis fuzzy match ranges** <br>
+The ranges of the match rates for the analysis can now be defined in the configuration: runtimeOptions.plugins.MatchAnalysis.fuzzyBoundaries
+
+
+### Changed
+**[TRANSLATE-2652](https://jira.translate5.net/browse/TRANSLATE-2652): Add keyboard short-cuts for Accept/Reject TrackChanges** <br>
+ENHANCEMENT: Keyboard Shortcuts for TrackChanges accept/reject feature
+
+**[TRANSLATE-2625](https://jira.translate5.net/browse/TRANSLATE-2625): Solve tag errors automatically on export** <br>
+Internal Tag Errors (faulty structure) will be fixed automatically when exporting a task: Orphan opening/closing tags will be removed, structurally broken tag pairs will be corrected. The errors in the task itself will remain.
+
+
+### Bugfixes
+**[TRANSLATE-2681](https://jira.translate5.net/browse/TRANSLATE-2681): Language naming mismatch regarding the chinese languages** <br>
+The languages zh-Hans and zh-Hant were missing. Currently zh-CN was named "Chinese simplified", this is changed now to Chinese (China).
+
+**[TRANSLATE-2680](https://jira.translate5.net/browse/TRANSLATE-2680): Okapi empty target fix was working only for tasks with editable source** <br>
+The Okapi export fix TRANSLATE-2384 was working only for tasks with editable source. Now it works in general. Also in case of an export error, the XLF in the export zip was named as original file (so file.docx was containing XLF). This is changed, so that the XLF is named now file.docx.xlf). Additionally a export-error.txt is created which explains the problem.
+
+
+**[TRANSLATE-2679](https://jira.translate5.net/browse/TRANSLATE-2679): Microsoft translator connection language code mapping is not case insensitive** <br>
+Microsoft translator returns zh-Hans for simplified Chinese, we have configured zh-hans in our language table. Therefore the language can not be used. This is fixed now.
+
+**[TRANSLATE-2672](https://jira.translate5.net/browse/TRANSLATE-2672): UI theme selection may be wrong if system default is not triton theme** <br>
+The users selected theme may be resetted to triton theme instead to the system default theme.
+
+**[TRANSLATE-2664](https://jira.translate5.net/browse/TRANSLATE-2664): Fix TermPortal client-specific favicon and CSS usage** <br>
+The technical possibilities to customize the TermPortal layout were not fully migrated from the old termportal.
+
+**[TRANSLATE-2658](https://jira.translate5.net/browse/TRANSLATE-2658): Wrong tag numbering between source and target in imported MemoQ XLF files** <br>
+For MemoQ XLF files it may happen that tag numbering between source and target was wrong. This is corrected now.
+
+**[TRANSLATE-2657](https://jira.translate5.net/browse/TRANSLATE-2657): Missing term roles for legacy admin users** <br>
+Activate the term portal roles for admin users not having them.
+
+**[TRANSLATE-2656](https://jira.translate5.net/browse/TRANSLATE-2656): Notify associated users checkbox is not effective** <br>
+The bug is fixed where the "notify associated users checkbox" in the import wizard does not take effect when disabled.
+
+**[TRANSLATE-2592](https://jira.translate5.net/browse/TRANSLATE-2592): Reduce and by default hide use of TrackChanges in the translation step** <br>
+Regarding translation and track changes: changes are only recorded for pre-translated segments and changes are hidden by default for translators (and can be activated by the user in the view modes drop-down of the editor)
+
+
+
+
 ## [5.5.2] - 2021-10-11
 
 ### Important Notes:

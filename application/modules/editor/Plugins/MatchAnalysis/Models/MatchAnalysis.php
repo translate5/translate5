@@ -73,12 +73,10 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_MatchAnalysis';
     protected $validatorInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Validator_MatchAnalysis';
 
-    /***
+    /**
      * Match analysis groups and calculation borders
-     *
-     * 104%, 103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
      */
-    protected $groupBorder = ['103' => '104', '102' => '103', '101' => '102', '100' => '101', '99' => '100', '89' => '99', '79' => '89', '69' => '79', '59' => '69', '50' => '59', 'noMatch' => 'noMatch'];
+    protected array $fuzzyRanges = [];
 
     /***
      * Load the result by best match rate. The results will be grouped in the followed groups:
@@ -103,6 +101,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
+        $this->loadFuzzyBoundaries($task);
 
         $sqlV3 = 'SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.wordCount) wordCount, SUM(bestRates.segCount) segCount
                   FROM (
@@ -128,6 +127,13 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         return $this->addLanguageResourceInfos($resultArray);
     }
 
+    protected function loadFuzzyBoundaries(editor_Models_Task $task) {
+        $ranges = $task->getConfig()->runtimeOptions->plugins->MatchAnalysis->fuzzyBoundaries->toArray();
+        ksort($ranges);
+        $this->fuzzyRanges = array_reverse($ranges, true);
+        $this->fuzzyRanges['noMatch'] = 'noMatch';
+    }
+    
     /***
      * Load the last analysis by the taskGuid.
      * The return result are not grouped
@@ -168,7 +174,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             $resultFound = false;
 
             //check on which border group this result belongs to
-            foreach ($this->groupBorder as $border => $value) {
+            foreach ($this->fuzzyRanges as $begin => $end) {
 
                 //check if the language resource is not initialized by group initializer
                 if (!isset($groupedResults[$rowKey]) && $res['languageResourceid'] > 0) {
@@ -178,8 +184,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 }
 
                 //set the group key in the array
-                if (!isset($groupedResults[$rowKey][$value])) {
-                    $groupedResults[$rowKey][$value] = 0;
+                if (!isset($groupedResults[$rowKey][$begin])) {
+                    $groupedResults[$rowKey][$begin] = 0;
                 }
 
                 //if result is found, create only empty column
@@ -188,14 +194,16 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 }
 
                 //check matchrate border
-                if ($res['matchRate'] > $border) {
-                    $groupedResults[$rowKey][$value] += $res['wordCount'];
+                if ($begin <= $res['matchRate'] && $res['matchRate'] <= $end) {
+                    $groupedResults[$rowKey][$begin] += $res['wordCount'];
+                    $groupedResults[$rowKey]['wordCountTotal'] += $res['wordCount'];
                     $resultFound = true;
                 }
             }
             //if no results match group is found, the result is in noMatch group
             if (!$resultFound) {
                 $groupedResults[$rowKey]['noMatch'] += $res['wordCount'];
+                $groupedResults[$rowKey]['wordCountTotal'] += $res['wordCount'];
             }
         }
         return array_values($groupedResults);
@@ -204,14 +212,15 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     /***
      * Init match analysis result array. For each assoc language resource one row will be created.
      * @param array $analysisData
-     * @return array|number
+     * @return array
+     * @throws Zend_Exception
      */
     //protected function initResultArray($taskGuid,$internalFuzzy){
-    protected function initResultArray(array $analysisData)
+    protected function initResultArray(array $analysisData): array
     {
         $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
         /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
-        $result = $taskAssoc->loadByTaskGuids([$analysisData['taskGuid']]);
+        $langResTaskAssocs = $taskAssoc->loadByTaskGuids([$analysisData['taskGuid']]);
 
         $isInternalFuzzy = $analysisData['internalFuzzy'] == '1';
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
@@ -231,12 +240,13 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
             $row[$key]['created'] = $analysisData['created'];
             $row[$key]['internalFuzzy'] = $fuzzyString;
+            $row[$key]['wordCountTotal'] = 0;
 
 
-            //init the result borders
-            foreach ($this->groupBorder as $border => $value) {
-                if (!isset($row[$key][$value])) {
-                    $row[$key][$value] = 0;
+            //init the fuzzy range groups with 0
+            foreach (array_keys($this->fuzzyRanges) as $begin) {
+                if (!isset($row[$key][$begin])) {
+                    $row[$key][$begin] = 0;
                 }
             }
             return $row;
@@ -248,7 +258,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($analysisData['taskGuid']);
 
-        foreach ($result as $res) {
+        foreach ($langResTaskAssocs as $res) {
             $lr = $this->getLanguageResourceCached($res['languageResourceId']);
             
             //if the languageresource was deleted, we can not add additional data here
@@ -314,5 +324,13 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             self::$languageResourceCache[$id] = $lr;
         }
         return self::$languageResourceCache[$id];
+    }
+
+    /**
+     * returns the defined match rate ranges, from highest to lowest
+     * @return array
+     */
+    public function getFuzzyRanges(): array {
+        return $this->fuzzyRanges;
     }
 }

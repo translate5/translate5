@@ -32,106 +32,57 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_MatchAnalysis_Export_ExportExcel {
 
-    public static function generateExcelAndProvideDownload($rows, $filename){
+    /**
+     * @var editor_Models_Task
+     */
+    protected editor_Models_Task $task;
 
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $createdDate=null;
-        $internalFuzzy=null;
-        //add to all groups 'Group' sufix, php excel does not handle integer keys
-        foreach ($rows as $rowKey=>$row){
-            $newRows=[];
-            $wordCountTotal=0;
-            foreach ($row as $key=>$value){
-                $newKey=$key;
-                if($key=="created"){
-                    $createdDate=$value;
-                    continue;
-                }
-                if($key=="internalFuzzy"){
-                    $internalFuzzy=$value;
-                    continue;
-                }
-                if($key=="pretranslateMatchrate"){
-                    continue;
-                }
-                //do not use resourceColor in export
-                if($key=="resourceColor"){
-                    continue;
-                }
-                if($key=="resourceType"){
-                    continue;
-                }
+    /**
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    protected ZfExtended_Zendoverwrites_Translate $translate;
 
-                if($key=="resourceName" && $value==""){
-                    $value=$translate->_("Repetitions");
-                }
+    private array $fuzzyRanges;
 
-                //change the key to $key+Group, since the excel export does not accepts numerical keys
-                if(is_numeric($key)){
-                    $newKey=$key.'Group';
-                }
+    public function __construct()
+    {
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+    }
 
-                //update the totals when collectable group is found
-                if(is_numeric($key) || $key=="noMatch"){
-                    $wordCountTotal+=$value;
-                }
-                $newRows[$newKey]=$value;
-            }
-            $newRows['wordCountTotal']=$wordCountTotal;
-            $newRows['internalFuzzy']=$internalFuzzy;
-            $newRows['created']=$createdDate;
+    public function generateExcelAndProvideDownload(editor_Models_Task $task, $rows, $filename){
+        $this->task = $task;
+        $this->fuzzyRanges = $task->getConfig()->runtimeOptions->plugins->MatchAnalysis->fuzzyBoundaries->toArray();
+        $this->fuzzyRanges = array_reverse($this->fuzzyRanges, true);
+        $this->fuzzyRanges['noMatch'] = 'noMatch'; //here we need noMatch as group too
 
-            unset($rows[$rowKey]);
-            $rows[$rowKey]=$newRows;
-        }
+        $data = $this->prepareDataArray($rows);
+
         $spreadsheet = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
-        /* @var $excel ZfExtended_Models_Entity_ExcelExport */
+        /* @var $spreadsheet ZfExtended_Models_Entity_ExcelExport */
 
         $spreadsheet->setPreCalculateFormulas(true);
 
         // set property for export-filename
         $spreadsheet->setProperty('filename', $filename);
 
-        //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
-        //[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59'];
-        $spreadsheet->setLabel('resourceName', $translate->_("Name"));
-        $spreadsheet->setLabel('104Group', $translate->_("TermCollection Treffer (104%)"));
-        $spreadsheet->setLabel('103Group', $translate->_("Kontext Treffer (103%)"));
-        $spreadsheet->setLabel('102Group', $translate->_("Wiederholung (102%)"));
-        $spreadsheet->setLabel('101Group', $translate->_("Exact-exact Treffer (101%)"));
-        $spreadsheet->setLabel('100Group', '100%');
-        $spreadsheet->setLabel('99Group', '99%-90%');
-        $spreadsheet->setLabel('89Group', '89%-80%');
-        $spreadsheet->setLabel('79Group', '79%-70%');
-        $spreadsheet->setLabel('69Group', '69%-60%');
-        $spreadsheet->setLabel('59Group', '59%-51%');
-        $spreadsheet->setLabel('noMatch', '50%-0%');
-        $spreadsheet->setLabel('wordCountTotal', $translate->_("Summe Wörter"));
-        $spreadsheet->setLabel('created', $translate->_("Erstellungsdatum"));
-        $spreadsheet->setLabel('internalFuzzy', $translate->_("Interner Fuzzy aktiv"));
+        $this->setLabels($spreadsheet);
 
-        $rowsCount=count($rows);
-        $rowIndex=$rowsCount+2;
-
+        $sumRowIndex = count($data)+2;
 
         $sheet=$spreadsheet->getSpreadsheet()->getActiveSheet();
 
-        $sheet->setCellValue("A".$rowIndex,$translate->_("Summe"));
-        $sheet->setCellValue("B".$rowIndex, "=SUM(B2:B".($rowIndex-1).")");
-        $sheet->setCellValue("C".$rowIndex, "=SUM(C2:C".($rowIndex-1).")");
-        $sheet->setCellValue("D".$rowIndex, "=SUM(D2:D".($rowIndex-1).")");
-        $sheet->setCellValue("E".$rowIndex, "=SUM(E2:E".($rowIndex-1).")");
-        $sheet->setCellValue("F".$rowIndex, "=SUM(F2:F".($rowIndex-1).")");
-        $sheet->setCellValue("G".$rowIndex, "=SUM(G2:G".($rowIndex-1).")");
-        $sheet->setCellValue("H".$rowIndex, "=SUM(H2:H".($rowIndex-1).")");
-        $sheet->setCellValue("I".$rowIndex, "=SUM(I2:I".($rowIndex-1).")");
-        $sheet->setCellValue("J".$rowIndex, "=SUM(J2:J".($rowIndex-1).")");
-        $sheet->setCellValue("K".$rowIndex, "=SUM(K2:K".($rowIndex-1).")");
-        $sheet->setCellValue("L".$rowIndex, "=SUM(L2:L".($rowIndex-1).")");
-        $sheet->setCellValue("M".$rowIndex, "=SUM(M2:M".($rowIndex-1).")");
+        $sheet->setCellValue("A".$sumRowIndex,$this->translate->_("Summe"));
+
+        //loop over all columns containing a summable value
+        $col = "B";
+        $rangeCount = count($this->fuzzyRanges) + 1; //we have to add one for the sum of sum columns
+        for ($i = 0; $i < $rangeCount; $i++) {
+            $sheet->setCellValue($col.$sumRowIndex, '=SUM('.$col.'2:'.$col.($sumRowIndex-1).")");
+            $col++; //increment the column characters
+        }
 
         //set the cell autosize
-        $spreadsheet->simpleArrayToExcel($rows,function($phpSpreadsheet){
+        $spreadsheet->simpleArrayToExcel($data,function($phpSpreadsheet){
             foreach ($phpSpreadsheet->getWorksheetIterator() as $worksheet) {
 
                 $phpSpreadsheet->setActiveSheetIndex($phpSpreadsheet->getIndex($worksheet));
@@ -145,6 +96,89 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
                 }
             }
         });
+    }
+
+    /**
+     * @param $rows
+     * @throws Zend_Exception
+     */
+    protected function prepareDataArray($rows)
+    {
+        //add to all groups 'Group' sufix, php excel does not handle integer keys
+        $result = [];
+        foreach ($rows as $row){
+            $wordCountTotal = 0;
+
+            //the order in the newRows array defines the result order in the spreadsheet
+            $newRow = [
+                'resourceName' => empty($row['resourceName']) ? $this->translate->_("Repetitions") : $row['resourceName']
+            ];
+
+            //loop over the fuzzy ranges and get the corresponding content
+            foreach($this->fuzzyRanges as $begin => $end) {
+                if(array_key_exists($begin, $row)) {
+                    //change the key to $key+Group, since the Excel export does not accept numerical keys
+                    $key = is_numeric($begin) ? $begin.'Group' : $begin;
+                    $newRow[$key] = $row[$begin];
+                    $wordCountTotal += $row[$begin];
+                }
+            }
+
+            $newRow['wordCountTotal'] = $wordCountTotal;
+            $newRow['internalFuzzy'] = $row['internalFuzzy'];
+            $newRow['created'] = $row['created'];
+
+            $result[] = $newRow;
+        }
+        return $result;
+    }
+
+    protected function setLabels(ZfExtended_Models_Entity_ExcelExport $spreadsheet)
+    {
+        $spreadsheet->setLabel('resourceName', $this->translate->_("Name"));
+
+        $beginners = array_keys($this->fuzzyRanges);
+        //remove the nomatch element itself to get the last and smallest begin value
+        array_pop($beginners);
+        $noMatchEnd = (int) end($beginners) - 1;
+
+        foreach($this->fuzzyRanges as $begin => $end) {
+            if($begin == 'noMatch') {
+                //just keep $begin as it is
+                $label = $noMatchEnd.'%-0%';
+            }
+            elseif($begin === $end) { //must come after noMatch if, since on noMatch is begin == end too
+                //if the range is a single element range, some of the special texts may be used:
+                $label = $this->getSingleElementRangeLabel($begin);
+                $begin .= 'Group';
+            }
+
+            else{
+                //since matchrate groups are DESC from left to right, we use the labels also in that direction
+                $label = sprintf('%d%%-%d%%', $end, $begin);
+                $begin .= 'Group';
+            }
+            $spreadsheet->setLabel($begin, $label);
+        }
+
+        $spreadsheet->setLabel('wordCountTotal', $this->translate->_("Summe Wörter"));
+        $spreadsheet->setLabel('created', $this->translate->_("Erstellungsdatum"));
+        $spreadsheet->setLabel('internalFuzzy', $this->translate->_("Interner Fuzzy aktiv"));
+    }
+
+    private function getSingleElementRangeLabel(int $match): string {
+        switch ($match) {
+            case 104:
+                return $this->translate->_("TermCollection Treffer (104%)");
+            case 103:
+                return $this->translate->_("Kontext Treffer (103%)");
+            case 102:
+                return $this->translate->_("Wiederholung (102%)");
+            case 101:
+                return $this->translate->_("Exact-exact Treffer (101%)");
+            default :
+                return sprintf('%d%%', $match);
+        }
     }
 }
 

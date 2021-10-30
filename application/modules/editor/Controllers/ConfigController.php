@@ -60,12 +60,14 @@ class editor_ConfigController extends ZfExtended_RestController {
      * CRUD is currently not implemented, so BadMethod here
      */
     public function putAction() {
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1025' => 'Field "value" must be provided.',
+            'E1363' => 'Configuration value invalid: {errorMsg}',
+        ]);
+
         $this->decodePutData();
-        
+
         if(!property_exists($this->data, 'value')) {
-            ZfExtended_UnprocessableEntity::addCodes([
-                'E1025' => 'Field "value" must be provided.'
-            ]);
             throw new ZfExtended_UnprocessableEntity('E1025');
         }
         
@@ -73,6 +75,17 @@ class editor_ConfigController extends ZfExtended_RestController {
 
         
         $level = null;
+
+        $typeManager = Zend_Registry::get('configTypeManager');
+        /* @var $typeManager ZfExtended_DbConfig_Type_Manager */
+
+        $type = $typeManager->getType($this->entity->getTypeClass());
+
+        $error = null;
+        $valueToCheck = $this->data->value;
+        if(!$type->validateValue($this->entity->getType(), $valueToCheck, $error)) {
+            throw new ZfExtended_UnprocessableEntity('E1363', ['errorMsg' => $error]);
+        }
         $value = (string) $this->data->value;
 
         $userGuid = $this->data->userGuid ?? null;
@@ -182,9 +195,13 @@ class editor_ConfigController extends ZfExtended_RestController {
                     'oldValue' => $oldValue ?? $this->entity->getOldValue('value')
                 ],$logData));
         }
-        
+
+        //get a fresh copy of data
+        $configRow = $this->entity->toArray();
+        $configRow['typeClassGui'] = $type->getGuiViewCls(); //we can overwrite the typeClass here, since php class value is not usable in GUI
+
         //merge the current entity with the custom config data ($row)
-        $this->view->rows = array_merge($row, $this->entity->toArray());
+        $this->view->rows = array_merge($row, $configRow);
     }
     
     /**

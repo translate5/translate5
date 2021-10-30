@@ -152,6 +152,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var string
      */
     protected $taskDataPath;
+    /**
+     * A Cache for the faulty segments the task holds
+     * @var int[][]
+     */
+    protected $faultySegmentsCache = [];
 
     
     /**
@@ -1299,5 +1304,16 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $db = $this->db->getAdapter();
         $sql = $db->quoteInto($sql, $taskGuid ?? $this->getTaskGuid(), 'string', 2);
         $db->query($sql);
+    }
+    /**
+     * Retrieves the ids of all faulty segments of this task (=segments with internal tag errors)
+     * The result is cached so don't use this API in the context of e.g. an import
+     * @return int[]
+     */
+    public function getFaultySegmentIds() : array {
+        if(!array_key_exists($this->getId(), $this->faultySegmentsCache)){
+            $this->faultySegmentsCache[$this->getId()] = editor_Models_Db_SegmentQuality::getFaultySegmentIds($this->getTaskGuid());
+        }
+        return $this->faultySegmentsCache[$this->getId()];
     }
 }
