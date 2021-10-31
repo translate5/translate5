@@ -296,7 +296,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
      * @throws Zend_Db_Statement_Exception
      */
     public function loadGroupedByLevel($levelColumnToBeGroupedBy, $where, $bind) {
-        $transacgrpA = $this->db->getAdapter()->query('
+        return $this->db->getAdapter()->query('
             SELECT 
               ' . $levelColumnToBeGroupedBy . ',                   
               `transac`,

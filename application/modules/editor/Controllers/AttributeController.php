@@ -492,8 +492,8 @@ class editor_AttributeController extends ZfExtended_RestController
             'dataTypeId' => [
                 'dis' => $_['dataTypeId']->getAlreadyExistingFor(
                     $params['termEntryId'],
-                    $params['language'] ?? null,
-                    $params['termId'] ?? null
+                    $params['level'] != 'entry' && $params['language'] ?? null,
+                    $params['level'] == 'term' && $params['termId'] ?? null
                 )
             ]
         ]);

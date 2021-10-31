@@ -2569,7 +2569,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Get `transacgrp` data grouped by level
         $transacgrpA = ZfExtended_Factory
-            ::get('editor_Models_Terminology_Models_AttributeModel')
+            ::get('editor_Models_Terminology_Models_TransacgrpModel')
             ->loadGroupedByLevel(
                 sprintf($levelColumnToBeGroupedBy, $cond['transacgrp']),
                 sprintf($levelWHERE, $cond['transacgrp']),
@@ -2632,7 +2632,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Get transacgrps grouped by level
         $transacgrpA = ZfExtended_Factory
-            ::get('editor_Models_Terminology_Models_AttributeModel')
+            ::get('editor_Models_Terminology_Models_TransacgrpModel')
             ->loadGroupedByLevel(
                 $levelColumnToBeGroupedBy,
                 sprintf($levelWHERE, $cond['transacgrp']),
