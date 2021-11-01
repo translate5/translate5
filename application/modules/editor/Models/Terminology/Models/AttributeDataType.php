@@ -221,6 +221,7 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
         $attributes = $this->db->getAdapter()->query('
             SELECT 
               `a`.`id`,
+              `a`.`id`,
               IF (
                   JSON_UNQUOTE(JSON_EXTRACT(`l10nCustom`, :lang)) != "",
                   JSON_UNQUOTE(JSON_EXTRACT(`l10nCustom`, :lang)), 
@@ -230,6 +231,7 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
                     `type`
                   )
               ) AS `title`,
+              JSON_UNQUOTE(JSON_EXTRACT(`l10nSystem`, :lang)) AS `system`,     
               CONCAT("attr-", `a`.`id`) AS `alias`,
               IF(`a`.`label` = "note", `a`.`label`, `a`.`dataType`) AS `dataType`,
               `a`.`picklistValues`,
@@ -243,7 +245,7 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
             WHERE `ac`.`collectionId` IN (' . join(',',$collectionIds) . ') OR ISNULL(`ac`.`collectionId`)
             GROUP BY `a`.`id`
             ORDER BY `title`
-        ', [':lang' => '$.' . $locale])->fetchAll();
+        ', [':lang' => '$.' . $locale])->fetchAll(PDO::FETCH_UNIQUE);
 
         // Make sure isTbxBasic to be integer in javascript
         array_walk($attributes, fn(&$a) => $a['isTbxBasic'] += 0);
