@@ -248,7 +248,7 @@ END LICENSE AND COPYRIGHT
     flex: 0 0 180px;
     order: 1;
     height: 75px;
-    background: url("/images/translate5.png?v=1") no-repeat left center;
+    background: url("../../../../images/translate5.png?v=1") no-repeat left center;
     background-size: auto auto;
     background-size: 75px;
     margin-right: auto;
@@ -318,8 +318,8 @@ END LICENSE AND COPYRIGHT
     color: var(--color-blue_05);
     border-bottom-color: var(--color-blue_05);
 }
-.sourceIsText .sourceSelector .icon-t5_translate_text {background-image: url('/modules/editor/instanttranslate/images/icons/t5_translate_text_cyan.svg');}
-.sourceIsFile .sourceSelector .icon-t5_translate_file {background-image: url('/modules/editor/instanttranslate/images/icons/t5_translate_file_cyan.svg');}
+.sourceIsText .sourceSelector .icon-t5_translate_text {background-image: url('../images/icons/t5_translate_text_cyan.svg');}
+.sourceIsFile .sourceSelector .icon-t5_translate_file {background-image: url('../images/icons/t5_translate_file_cyan.svg');}
 
 
 /* --------------- language selectors --------------- */
@@ -472,31 +472,31 @@ END LICENSE AND COPYRIGHT
     height: var(--font-size-giant);
 }
 
-.icon-t5_termstate-preferred {background-image: url("/modules/editor/instanttranslate/images/icons/t5_circle_check_green.svg");}
-.icon-t5_termstate-forbidden {background-image: url("/modules/editor/instanttranslate/images/icons/t5_attention.svg");}
-.icon-t5_termstate-permitted {background-image: url("/modules/editor/instanttranslate/images/icons/t5_circle_blue_02.svg");}
-.icon-t5_termstate-unknown {background-image: url("/modules/editor/instanttranslate/images/icons/t5_circle_grey_06.svg");}
+.icon-t5_termstate-preferred {background-image: url("../images/icons/t5_circle_check_green.svg");}
+.icon-t5_termstate-forbidden {background-image: url("../images/icons/t5_attention.svg");}
+.icon-t5_termstate-permitted {background-image: url("../images/icons/t5_circle_blue_02.svg");}
+.icon-t5_termstate-unknown {background-image: url("../images/icons/t5_circle_grey_06.svg");}
 
 .icon-t5_termstate-information-small-white,
 
-.icon-t5_attention {background-image: url("/modules/editor/instanttranslate/images/icons/t5_attention.svg");}
-.icon-t5_check_cyan {background-image: url("/modules/editor/instanttranslate/images/icons/t5_check_cyan.svg");}
-.icon-t5_check_green {background-image: url("/modules/editor/instanttranslate/images/icons/t5_check_green.svg");}
-.icon-t5_check_grey {background-image: url("/modules/editor/instanttranslate/images/icons/t5_check_grey.svg");}
-.icon-t5_chevron_grey {background-image: url("/modules/editor/instanttranslate/images/icons/t5_chevron_grey.svg");}
-.icon-t5_chevron {background-image: url("/modules/editor/instanttranslate/images/icons/t5_chevron.svg");}
-.icon-t5_close {background-image: url("/modules/editor/instanttranslate/images/icons/t5_close.svg");}
-.icon-t5_copy {background-image: url("/modules/editor/instanttranslate/images/icons/t5_copy.svg");}
-.icon-t5_document_black {background-image: url("/modules/editor/instanttranslate/images/icons/t5_document_black.svg");}
-.icon-t5_document_grey {background-image: url("/modules/editor/instanttranslate/images/icons/t5_document_grey.svg");}
-.icon-t5_download {background-image: url("/modules/editor/instanttranslate/images/icons/t5_download.svg");}
-.icon-t5_info {background-image: url("/modules/editor/instanttranslate/images/icons/t5_info.svg");}
-.icon-t5_switcher {background-image: url("/modules/editor/instanttranslate/images/icons/t5_switcher.svg");}
-.icon-t5_translate_file_cyan {background-image: url("/modules/editor/instanttranslate/images/icons/t5_translate_file_cyan.svg");}
-.icon-t5_translate_file {background-image: url("/modules/editor/instanttranslate/images/icons/t5_translate_file.svg");}
-.icon-t5_translate_text_cyan {background-image: url("/modules/editor/instanttranslate/images/icons/t5_translate_text_cyan.svg");}
-.icon-t5_translate_text {background-image: url("/modules/editor/instanttranslate/images/icons/t5_translate_text.svg");}
-.icon-t5_upload {background-image: url("/modules/editor/instanttranslate/images/icons/t5_upload.svg");}
+.icon-t5_attention {background-image: url("../images/icons/t5_attention.svg");}
+.icon-t5_check_cyan {background-image: url("../images/icons/t5_check_cyan.svg");}
+.icon-t5_check_green {background-image: url("../images/icons/t5_check_green.svg");}
+.icon-t5_check_grey {background-image: url("../images/icons/t5_check_grey.svg");}
+.icon-t5_chevron_grey {background-image: url("../images/icons/t5_chevron_grey.svg");}
+.icon-t5_chevron {background-image: url("../images/icons/t5_chevron.svg");}
+.icon-t5_close {background-image: url("../images/icons/t5_close.svg");}
+.icon-t5_copy {background-image: url("../images/icons/t5_copy.svg");}
+.icon-t5_document_black {background-image: url("../images/icons/t5_document_black.svg");}
+.icon-t5_document_grey {background-image: url("../images/icons/t5_document_grey.svg");}
+.icon-t5_download {background-image: url("../images/icons/t5_download.svg");}
+.icon-t5_info {background-image: url("../images/icons/t5_info.svg");}
+.icon-t5_switcher {background-image: url("../images/icons/t5_switcher.svg");}
+.icon-t5_translate_file_cyan {background-image: url("../images/icons/t5_translate_file_cyan.svg");}
+.icon-t5_translate_file {background-image: url("../images/icons/t5_translate_file.svg");}
+.icon-t5_translate_text_cyan {background-image: url("../images/icons/t5_translate_text_cyan.svg");}
+.icon-t5_translate_text {background-image: url("../images/icons/t5_translate_text.svg");}
+.icon-t5_upload {background-image: url("../images/icons/t5_upload.svg");}
 
 
 #translations .icon {margin: 0 10px;}
