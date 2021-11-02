@@ -77,7 +77,7 @@ class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Term
     }
 
     /**
-     *
+     * Delete termEntry and refresh collection's languages
      */
     public function delete() {
 
@@ -139,54 +139,6 @@ class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Term
             'id IN (?)' => $toRemove,
             'collectionId IN (?)' => explode(',', $collectionIds),
         ]) > 0;
-    }
-
-    /***
-     * Remove empty term entry from the database. Empty term entry is term entry without terms in it.
-     * @param int $termEntryId
-     */
-    public function deleteEmptyTermEntry(int $termEntryId)
-    {
-        $s = $this->db->select()
-            ->setIntegrityCheck(false)
-            ->from(['te'=>'terms_term_entry'])
-            ->join(['t'=>'terms_term'],'t.termEntryId = te.id')
-            ->where('te.id = ?',$termEntryId);
-        $result=$this->db->fetchAll($s)->toArray();
-
-        if (!empty($result)) {
-            return;
-        }
-        $this->db->delete([
-            'id IN (?)' => $termEntryId
-        ]);
-    }
-
-    /**
-     * Remove term entry older than $olderThan date from a specific term collection
-     * The date format should be equivalent to mysql date format 'YYYY-MM-DD HH:MM:SS'
-     *
-     * @param int $collectionId
-     * @param string $olderThan
-     * @param boolean $removeProposal
-     * @return boolean : true if rows are removed
-     */
-    public function removeOlderThan($collectionId, $olderThan, $removeProposal = false)
-    {
-        //find all modefied entries older than $olderThan date
-        //the query will find the lates modefied term entry attribute, if the term entry attribute update date is older than $olderThan, remove the termEntry
-        $collectionId = (int) $collectionId;
-        $entryType=[0];
-        if ($removeProposal) {
-            $entryType[] = 1;
-        }
-        //FIXME testen ob die methode das macht was sie soll
-        return $this->db->delete([' isCreatedLocally IN('.implode(',', $entryType).') AND id IN (SELECT t.termEntryId
-            	FROM terms_attributes t
-            	INNER JOIN (SELECT termEntryId, MAX(updatedAt) as MaxDate FROM terms_attributes WHERE termId is null AND collectionId = '.$collectionId.' GROUP BY termEntryId)
-            	tm ON t.termEntryId = tm.termEntryId AND t.updatedAt = tm.MaxDate
-            	WHERE t.termId is null AND t.collectionId = '.$collectionId.' AND t.updatedAt < ?
-            	GROUP BY t.termEntryId)'=>$olderThan])>0;
     }
 
     /**

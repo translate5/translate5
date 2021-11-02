@@ -99,20 +99,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         return $this->db->fetchAll($s)->toArray();
     }
 
-    public function getAttributeCollectionByEntryId($collectionId, $termEntryId): array
-    {
-        $attributeByKey = [];
-
-        $query = "SELECT * FROM terms_attributes WHERE collectionId = :collectionId AND termEntryId = :termEntryId";
-        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId, 'termEntryId' => $termEntryId]);
-
-        foreach ($queryResults as $key => $attribute) {
-            $attributeByKey[$attribute['elementName'].'-'.$attribute['type'].'-'.$attribute['termEntryId'].'-'.$attribute['language'].'-'.$attribute['termTbxId']] = $attribute;
-        }
-
-        return $attributeByKey;
-    }
-
     /***
      * Is the user allowed for attribute proposal
      * @return boolean
@@ -358,151 +344,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         return $rows;
     }
 
-    /***
-     * Check if for the current term there is a processStatus attribute. When there is no one, create it.
-     * @param int $termId
-     */
-    /*public function checkOrCreateProcessStatus(int $termId)
-    {
-        $s=$this->db->select()
-            ->where('termId=?',$termId)
-            ->where('elementName="termNote"')
-            ->where('type="processStatus"');
-
-        $result=$this->db->fetchAll($s)->toArray();
-
-        if (count($result) > 0) {
-            return;
-        }
-
-        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $term editor_Models_Terminology_Models_TermModel * /
-        $term->load($termId);
-
-        $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language editor_Models_Languages * /
-
-        $language->loadById($term->getLanguage());
-
-        $this->setCollectionId($term->getCollectionId());
-        $this->setTermId($term->getTermId());
-        $this->setGuid(ZfExtended_Utils::guid());
-        $this->setTermEntryId($term->getTermEntryId());
-        $this->setLangSetGuid($term->getLangSetGuid());
-        $this->setLanguage($language->getRfc5646());
-        $this->setElementName('termNote');
-        $this->setType('processStatus');
-
-        $label = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
-        /* @var $label editor_Models_Terminology_Models_AttributeDataType * /
-        $label->loadOrCreate('termNote', 'processStatus',editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_LEVEL_TERM);
-        $this->setDataTypeId($label->getId());
-
-//        $this->setAttrLang($language->getRfc5646());
-
-        $this->setUserGuid($term->getUserGuid());
-        $this->setUserName($term->getUserName());
-        $this->setProcessStatus($term->getProcessStatus());
-        $this->setValue($term->getProcessStatus());
-
-        $this->save();
-    }*/
-
-    /**
-     * Loads an attribute for the given term
-     * @param editor_Models_Terminology_Models_TermModel $term
-     * @param string $name
-     * @param string $level
-     */
-    public function loadByTermAndName(editor_Models_Terminology_Models_TermModel $term, string $name, string $level = self::ATTR_LEVEL_TERM) {
-        $s = $this->db->select()->where('collectionId = ?', $term->getCollectionId());
-        $s->where('termEntryId = ?', $term->getTermEntryId());
-        if ($level == self::ATTR_LEVEL_LANGSET || $level == self::ATTR_LEVEL_TERM) {
-            $lang = ZfExtended_Factory::get('editor_Models_Languages');
-            /* @var $lang editor_Models_Languages */
-            $lang->loadById($term->getLanguageId());
-            $s->where('language = ?', strtolower($lang->getRfc5646()));
-        } else {
-            $s->where('language is null OR language = "none"');
-        }
-
-        if ($level === self::ATTR_LEVEL_TERM) {
-            $s->where('termId = ?', $term->getTermId());
-        } else {
-            $s->where('termId is null OR termId = ""');
-        }
-        $s->where('elementName = ?', $name);
-
-        $row = $this->db->fetchRow($s);
-        if (!$row) {
-            $this->notFound(__CLASS__ . '#termAndName', $term->getId().'; '.$name);
-        }
-        //load implies loading one Row, so use only the first row
-        $this->row = $row;
-    }
-    /***
-     * Add comment attribute for given term
-     * @param int $termId
-     * @param string $termText
-     * @return editor_Models_Terminology_Models_AttributeModel
-     */
-    /*public function addTermComment(int $termId,string $termText): self
-    {
-        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $term editor_Models_Terminology_Models_TermModel * /
-        $term->load($termId);
-
-        $lang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $lang editor_Models_Languages * /
-        $lang->loadById($term->getLanguageId());
-
-        $label = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
-        /* @var $label editor_Models_Terminology_Models_AttributeDataType * /
-        $label->loadOrCreate('note');
-
-        $this->init([
-            'elementName' => 'note',
-            'created' => NOW_ISO,
-          //'internalCount' => 1,
-            'collectionId' => $term->getCollectionId(),
-            'termId' => $term->getTermId(),
-            'termEntryId' => $term->getTermEntryId(),
-            'termEntryGuid' => $term->getTermEntryGuid(),
-            'langSetGuid' => $term->getLangSetGuid(),
-            'guid' => ZfExtended_Utils::guid(),
-            'language' => strtolower($lang->getRfc5646()),
-            'dataTypeId' => $label->getId(),
-            'isCreatedLocally' => 1
-        ]);
-        $this->setValue(trim($termText));
-        $sessionUser = new Zend_Session_Namespace('user');
-        $this->setUserGuid($sessionUser->data->userGuid);
-        $this->setUserName($sessionUser->data->userName);
-        $this->hasField('updatedAt') && $this->setUpdatedAt(NOW_ISO);
-        $this->save();
-
-        return $this;
-    }*/
-
-    /**
-     * creates a new, unsaved term attribute history entity
-     * @return editor_Models_Term_AttributeHistory
-     */
-    /*public function getNewHistoryEntity(): editor_Models_Term_AttributeHistory
-    {
-        $history = ZfExtended_Factory::get('editor_Models_Term_AttributeHistory');
-        /* @var $history editor_Models_Term_AttributeHistory * /
-        $history->setAttributeId($this->getId());
-        $history->setHistoryCreated(NOW_ISO);
-
-        $fields = $history->getFieldsToUpdate();
-        foreach ($fields as $field) {
-            $history->__call('set' . ucfirst($field), array($this->get($field)));
-        }
-
-        return $history;
-    }*/
-
     /**
      * @return mixed
      */
@@ -550,7 +391,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         $return = parent::save();
 
         // Affect transacgrp-records
-        if ($misc['userName'])
+        if ($misc['userName'] ?? 0)
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
 
@@ -603,7 +444,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
     public function removeProposalsOlderThan(array $collectionIds,string $olderThan): bool
     {
         // Get ids of attrs, that were created or updated after tbx-import
-        $attrIdA = editor_Utils::db()->query('
+        $attrIdA = $this->db->getAdapter()->query('
             SELECT `id` 
             FROM `terms_attributes` 
             WHERE TRUE
@@ -617,7 +458,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
 
         // Get tbx-imported values for `value` and `target` props, that now have changed values in attributes-table
-        $tbxA = editor_Utils::db()->query('
+        $tbxA = $this->db->getAdapter()->query('
             SELECT `attrId`, `value`, `target` 
             FROM `terms_attributes_history`
             WHERE TRUE
@@ -643,7 +484,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         }
 
         // Overwrite $attrIdA_updated array for it to keep only ids of attributes, that were last updated before $olderThan arg
-        if ($attrIdA_updated) $attrIdA_updated = editor_Utils::db()->query($sql = '
+        if ($attrIdA_updated) $attrIdA_updated = $this->db->getAdapter()->query($sql = '
             SELECT `id` 
             FROM `terms_attributes` 
             WHERE TRUE
@@ -910,7 +751,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
                 : $this->getValue();
         }
 
-        i('here3', 'a');
         // Prepare query bindings
         $bind = [$this->getTermEntryId()];
 
@@ -997,5 +837,35 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             GROUP BY `t`.`language`
             HAVING `hasDef` = 0 OR `butEmpty` = 1
         ', $this->getTermEntryId())->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * This method retrieves attributes grouped by level.
+     * It is used internally by TermModel->terminfo() and ->siblinginfo()
+     * and should not be called directly
+     *
+     * @param $levelColumnToBeGroupedBy
+     * @param $where
+     * @param $bind
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function loadGroupedByLevel($levelColumnToBeGroupedBy, $where, $bind) {
+        return $this->db->getAdapter()->query('
+            SELECT 
+              ' . $levelColumnToBeGroupedBy . ', 
+              `id`, 
+              `elementName`,
+              `value`,
+              `type`,
+              `dataTypeId`,
+              `language`,
+              `target`,
+              IFNULL(`createdBy`, 0) AS `createdBy`, DATE_FORMAT(`createdAt`, "%d.%m.%Y %H:%i:%s") AS `createdAt`,
+              IFNULL(`updatedBy`, 0) AS `updatedBy`, DATE_FORMAT(`updatedAt`, "%d.%m.%Y %H:%i:%s") AS `updatedAt`
+            FROM `terms_attributes` 
+            WHERE ' . $where . '
+            ORDER BY `type` = "processStatus" DESC, `id` DESC', $bind
+        )->fetchAll(PDO::FETCH_GROUP);
     }
 }
