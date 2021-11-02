@@ -90,6 +90,15 @@ Ext.define('Editor.util.TaskActions', {
         openTask: function(task, readonly) {
             (new this()).openTask(task, readonly);
             return;
+        },
+        /**
+         * Returns true if the currently opened task is exportable
+         * (currently checks only if a segment save is still in progress)
+         * @return {Boolean}
+         */
+        isTaskExportable: function() {
+            var ctrl = Editor.app.getController('Segments');
+            return !ctrl.saveChainMutex && !ctrl.saveIsRunning;
         }
     },
     /**
