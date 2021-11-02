@@ -70,7 +70,12 @@ Ext.define('Editor.view.admin.config.Grid', {
         expandAll:'#UT#Alles aufklappen',
         toolbarFilter:'#UT#Suche',
         overwriteLevelList:'#UT#Überschreibbar auf Ebene:',
-        readOnlyFilter:'#UT#Schreibgeschützte Konfigurationen sichtbar:'
+        readOnlyFilter:'#UT#Schreibgeschützte Konfigurationen sichtbar:',
+        configLocales:{
+            default:'#UT#Default',
+            aria:'#UT#Dunkles Layout (Aria)',
+            triton:'#UT#Standard Layout (Triton)'
+        }
     },
     
     listeners:{
@@ -279,7 +284,9 @@ Ext.define('Editor.view.admin.config.Grid', {
      */
     getEditorConfig:function(record){
         var me=this,
+            grid = me.up('grid'),
             hasDefaults = record.get('defaults').length>0,
+            defaultsStore = [],
             config={
                 xtype: 'textfield',
                 name: 'value',
@@ -287,6 +294,24 @@ Ext.define('Editor.view.admin.config.Grid', {
             };
         if(record.get('isReadOnly') && record.get('isReadOnly')==true){
             return false; 
+        }
+
+        if(hasDefaults){
+
+            var defaultsData = [];
+
+            // check if there is translation for the default values
+            Ext.Array.each(record.get('defaults'), function(name) {
+                defaultsData.push({
+                    "id" : name,
+                    "value" : grid.strings.configLocales[name] !== undefined ? grid.strings.configLocales[name] : name
+                });
+            });
+
+            defaultsStore = Ext.create('Ext.data.Store', {
+                fields: ['id', 'value'],
+                data : defaultsData
+            });
         }
         switch(record.get('type')){
             case 'float':
@@ -303,7 +328,9 @@ Ext.define('Editor.view.admin.config.Grid', {
                     config={
                         xtype: 'combo',
                         name: 'value',
-                        store:record.get('defaults'),
+                        store:defaultsStore,
+                        displayField: 'value',
+                        valueField: 'id',
                         value:record.get('value'),
                         queryMode: 'local',
                         typeAhead: false
@@ -322,7 +349,7 @@ Ext.define('Editor.view.admin.config.Grid', {
                         fields: ['id', 'value'],
                         data : [
                             {"id":"false", "value":me.up('grid').strings.configDeactiveColumn},
-                            {"id":"true", "value":me.up('grid').strings.configActiveColumn},
+                            {"id":"true", "value":me.up('grid').strings.configActiveColumn}
                         ]
                     }),
                     value:record.get('value'),
@@ -335,7 +362,7 @@ Ext.define('Editor.view.admin.config.Grid', {
                 config={
                   xtype: 'tagfield',
                   name: 'value',
-                  store:hasDefaults ? record.get('defaults') : [],
+                  store:defaultsStore,
                   value:record.get('value'),
                   typeAhead: true,
                   queryMode: 'local',
@@ -350,7 +377,7 @@ Ext.define('Editor.view.admin.config.Grid', {
         }
 
         if(!Ext.isEmpty(record.get('typeClassGui'))) {
-            return this.up('grid').getCustomType(record.get('typeClassGui')).getConfigEditor(record);
+            return grid.getCustomType(record.get('typeClassGui')).getConfigEditor(record);
         }
 
         return Ext.create('Ext.grid.CellEditor', {
@@ -389,10 +416,16 @@ Ext.define('Editor.view.admin.config.Grid', {
              returnValue = this.getCustomType(record.get('typeClassGui')).renderer(value, metaData, record);
         }
 
+        // if the value of the config is defined as translatable locale, use the translation for display
+        if(me.strings.configLocales[returnValue] !== undefined){
+            returnValue = me.strings.configLocales[returnValue];
+        }
+
         //mark the value with bold if the value is different as the default value
         if(isValueChanged && returnValue){
             returnValue = '<b>'+returnValue+'</b>';
         }
+
         return returnValue;
     },
 
