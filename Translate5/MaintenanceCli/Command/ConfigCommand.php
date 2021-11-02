@@ -167,7 +167,7 @@ Modified values are shown bold in the simple listing.');
             $msg = 'The value was set empty!';
         }
         else {
-            $exactConfig['value'] = $newValue;
+            $exactConfig['value'] = (string) $newValue;
             $msg = 'The value was updated!';
         }
 
@@ -177,8 +177,7 @@ Modified values are shown bold in the simple listing.');
         $type = $typeManager->getType($config->getTypeClass());
 
         $error = null;
-        $valueToCheck = $exactConfig['value'];
-        if(!$type->validateValue($config->getType(), $valueToCheck, $error)) {
+        if(!$type->validateValue($config->getType(), $exactConfig['value'], $error)) {
             $this->io->error(sprintf('The given value "%s" is not valid, the error is: %s', $exactConfig['value'], $error));
             return 1;
         }

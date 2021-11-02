@@ -43,8 +43,9 @@ class editor_Plugins_MatchAnalysis_DbConfig_FuzzyBoundaryType extends ZfExtended
             return false;
         }
 
-        $value = (array) $value;
-        ksort($value, ); //sort by the keys, from the lowest to the biggest
+        $err = '';
+        $confVal = (array) $this->jsonDecode($value, $err); //from parent validate we still get a string
+        ksort($confVal, ); //sort by the keys, from the lowest to the biggest
 
         //the following values are mandatory and must be listed in the configuration
         // the values are set to true, if handled in the config
@@ -58,7 +59,7 @@ class editor_Plugins_MatchAnalysis_DbConfig_FuzzyBoundaryType extends ZfExtended
 
         //loop over the values and check for gaps, overlapping, mandatories and so on
         $lastEnd = 0;
-        foreach($value as $begin => $end) {
+        foreach($confVal as $begin => $end) {
             settype($begin, 'integer');
             settype($end, 'integer');
             if($begin > $end) {
