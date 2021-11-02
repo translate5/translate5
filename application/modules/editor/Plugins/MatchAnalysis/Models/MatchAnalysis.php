@@ -173,6 +173,10 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             //results found in group
             $resultFound = false;
 
+            if (!isset($groupedResults[$rowKey]['wordCountTotal'])) {
+                $groupedResults[$rowKey]['wordCountTotal'] = 0;
+            }
+
             //check on which border group this result belongs to
             foreach ($this->fuzzyRanges as $begin => $end) {
 
