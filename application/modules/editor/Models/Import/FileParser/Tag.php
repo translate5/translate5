@@ -74,9 +74,9 @@ class editor_Models_Import_FileParser_Tag {
 
     /**
      * The short tag number used in the GUI
-     * @var int
+     * @var mixed
      */
-    public ?int $tagNr = null;
+    public $tagNr = null;
 
     /**
      * The original raw (un-encoded) content contained in the tag
