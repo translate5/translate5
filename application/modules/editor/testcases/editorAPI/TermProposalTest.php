@@ -56,8 +56,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         self::$collectionId =$termCollection->id;
         $this->api()->addFile('Term.tbx', $this->api()->getFile('Term.tbx'), "application/xml");
         $this->api()->requestJson('editor/termcollection/import', 'POST', ['collectionId' =>self::$collectionId, 'customerIds' => $this->api()->getCustomer()->id,'mergeTerms'=>true]);
-        
-        
+
         //[2] find the term inside the term collection
         $response=$this->api()->requestJson('editor/language?page=1&start=0&limit=20&filter='.urlencode('[{"operator":"eq","value":"de-DE","property":"rfc5646"}]'), 'GET');
         $this->assertNotEmpty($response,"Unable to load the language needed for the term search.");
@@ -157,7 +156,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
     
     public static function tearDownAfterClass(): void {
         self::$api->login('testtermproposer');
-        self::$api->requestJson('editor/termcollection/'.self::$collectionId,'DELETE');
+        self::$api->cleanup && self::$api->requestJson('editor/termcollection/'.self::$collectionId,'DELETE');
     }
     
 }

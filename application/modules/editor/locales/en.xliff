@@ -2655,9 +2655,9 @@ A task was associated to you in the task-portal {portalLink}.<br />
   <target>101% is a 100% match, that originates from a file with the same name.</target>
 </trans-unit>
 
-<trans-unit id='V2llZGVyaG9sdW5nLiBFaW5lIFdpZWRlcmhvbHVuZyBpc3QgZWluIFRyZWZmZXIsIGRlciBpZGVudGlzY2ggaW4gZGVyIGFrdHVlbGxlbiBBdWZnYWJlIG5vY2htYWxzIHZvcmtvbW10Lg=='>
-<source>Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.</source>
-<target>Repetition. A repetition is a match that occurs identically in the current task again.</target>
+<trans-unit id='MTAyJSBpc3QgZWluZSBXaWVkZXJob2x1bmcuIEVpbmUgV2llZGVyaG9sdW5nIGlzdCBlaW4gVHJlZmZlciwgZGVyIGlkZW50aXNjaCBpbiBkZXIgYWt0dWVsbGVuIEF1ZmdhYmUgbm9jaG1hbHMgdm9ya29tbXQu'>
+<source>102% ist eine Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.</source>
+<target>102% is a repetition. A repetition is a match that occurs identically in the current task again.</target>
 </trans-unit>
 
 <trans-unit id='MTAzJSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIHVyc3Byw7xuZ2xpY2ggYXVzIGVpbmVyIERhdGVpIG1pdCBkZW0gc2VsYmVuIE5hbWVuIHN0YW1tdCAod2llIGVpbiAxMDElIFRyZWZmZXIpLiBadXPDpHR6bGljaCB6dW0gMTAxJSBUcmVmZmVyIGlzdCBkaWUgU2VnbWVudC1JRCBub2NoIGlkZW50aXNjaCBvZGVyIGdsZWljaCBtaXQgZGVyIFNlZ21lbnQtSUQgaW4gZGVyIGFrdHVlbGxlbiBEYXRlaS4='>

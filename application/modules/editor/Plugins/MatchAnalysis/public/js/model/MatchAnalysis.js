@@ -38,49 +38,14 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.MatchAnalysis.model.MatchAnalysis', {
   extend: 'Ext.data.Model',
-  
   fields: [
     {name: 'id', type: 'int'},
     {name: 'created'},
-    {name: '103'},
-    {name: '102'},
-    {name: '101'},
-    {name: '100'},
-    {name: '99'},//99-90
-    {name: '89'},//89-80
-    {name: '79'},//79-70
-    {name: '69'},//69-60
-    {name: '59'},//59-51
-    {name: 'noMatch'},//50-0
-    {name: 'wordCountTotal',
-    	convert: function(val,row) {
-    		//sum all in row columns
-    		var ignoreSumColumns=[
-    			  "created",
-    			  "id",
-    			  "resourceType",
-    			  "resourceName",
-    			  "resourceColor",
-    			  "pretranslateMatchrate",
-    			  "internalFuzzy"
-    		  ],ts=0;
-    		
-    		for (var key in row.data) {
-    		    // skip loop if the property is from prototype
-    		    if (!row.data.hasOwnProperty(key)){
-    		    	continue;	
-    		    }
-
-    		    //some culumns shuld not be included in the sum
-    		    if(Ext.Array.contains(ignoreSumColumns,key)){
-    		    	continue
-		    	}
-	        	ts+=row.data[key];
-    		}
-    		delete ignoreSumColumns;
-    		return ts;
-    	}    
-    }
+      // WARNING the fields for the numbered data fields are missing here
+      // they are set automatically via metaData from the request,
+      // since the setup is fluent and depends on the underlying configuration!
+    {name: 'noMatch'},
+    {name: 'wordCountTotal', type: 'int'}
   ],
   idProperty: 'id',
   proxy : {

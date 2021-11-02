@@ -211,7 +211,7 @@ CREATE TABLE Statements
 
 Template Config:
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`)
-VALUES ('runtimeOptions.xxx.yyy', '1', 'app', 'system', 'VALUE', 'DEFAULT', '', 'string', 'DESC.', 2, 'place me in the GUI', 'place me in the GUI');
+VALUES ('runtimeOptions.xxx.yyy', '1', 'app', 'system', 'VALUE', 'DEFAULT', '', 'string', 'DESC.', 2, 'place me in the GUI', 'place me in the GUI', '');
 // Choose the guiGroup wisely!
 // CONFIG_LEVEL_SYSTEM      = 1;
 // CONFIG_LEVEL_INSTANCE    = 2;

@@ -167,16 +167,21 @@ Modified values are shown bold in the simple listing.');
             $msg = 'The value was set empty!';
         }
         else {
-            $exactConfig['value'] = $newValue;
+            $exactConfig['value'] = (string) $newValue;
             $msg = 'The value was updated!';
         }
-        if($config->getType() == \ZfExtended_Resource_DbConfig::TYPE_MAP || $config->getType() == \ZfExtended_Resource_DbConfig::TYPE_LIST) {
-            json_decode($exactConfig['value']);
-            if(json_last_error() != JSON_ERROR_NONE) {
-                $this->io->error(sprintf('The given value "%s" is not valid, the error is: %s', $exactConfig['value'], json_last_error_msg()));
-                return 1;
-            }
+
+        $typeManager = \Zend_Registry::get('configTypeManager');
+        /* @var $typeManager \ZfExtended_DbConfig_Type_Manager */
+
+        $type = $typeManager->getType($config->getTypeClass());
+
+        $error = null;
+        if(!$type->validateValue($config->getType(), $exactConfig['value'], $error)) {
+            $this->io->error(sprintf('The given value "%s" is not valid, the error is: %s', $exactConfig['value'], $error));
+            return 1;
         }
+
         if(!$config->isValidInDefaults($exactConfig['value'])) {
             $this->io->error(sprintf('The given value "%s" is not valid, only the following values are allowed: %s', $exactConfig['value'], $config->getDefaults()));
             return 1;
