@@ -57,6 +57,21 @@ class editor_Models_Terminology_Import_TbxFileImport
      */
     protected array $tbxMap;
 
+    /**
+     * Array to map any known values of transac and transacType to tbx-standard values,
+     * for converting non-standard values into standard prior saving into database
+     *
+     * @var array
+     */
+    protected array $transacMap = [
+        'origination' => 'origination',
+        'modification' => 'modification',
+        'creation' => 'origination',                // Not part of tbx-standart
+
+        'responsibility' => 'responsibility',
+        'responsiblePerson' => 'responsibility',    // Not part of tbx-standart
+    ];
+
     /***
      * @var bool
      */
@@ -683,28 +698,28 @@ $memLog('Loaded terms:        ');
         $replicateToTerm = false;
 
         if (isset($transacGrp->transac)) {
-            $transacGrpObject->transac = (string)$transacGrp->transac;
+            $transacGrpObject->transac = $this->getTransacMappingIfExists((string) $transacGrp->transac);
 
             // If $elementName is 'tig'
             if ($elementName == 'tig')
-                if (in_array($transacGrpObject->transac, ['creation', 'modification']))
+                if (in_array($transacGrpObject->transac, ['origination', 'modification']))
                     $replicateToTerm = $transacGrpObject->transac;
         }
         if (isset($transacGrp->date)) {
             $transacGrpObject->date = ZfExtended_Utils::toMysqlDateTime((string)$transacGrp->date);
 
-            // Replicate creation/modification date into term tbx(Created|Updated)At prop
+            // Replicate origination/modification date into term tbx(Created|Updated)At prop
             if ($replicateToTerm)
                 $parentNode->{$replicateToTerm == 'modification' ? 'tbxUpdatedAt' : 'tbxCreatedAt'}
                     = $transacGrpObject->date;
         }
         if (isset($transacGrp->transacNote)) {
-            $transacGrpObject->transacType = (string)$transacGrp->transacNote->attributes()->{'type'};
+            $transacGrpObject->transacType = $this->getTransacMappingIfExists((string)$transacGrp->transacNote->attributes()->{'type'});
             $transacGrpObject->target = (string)$transacGrp->transacNote->attributes()->{'target'};
-            $transacGrpObject->transacNote = (string)$transacGrp->transacNote;
+            $transacGrpObject->transacNote = trim((string)$transacGrp->transacNote);
 
-            // Replicate creation/modification responsible person into term tbx(Created|Updated)By prop
-            if ($replicateToTerm && in_array($transacGrpObject->transacType, ['responsiblePerson', 'responsibility']))
+            // Replicate origination/modification responsible person into term tbx(Created|Updated)By prop
+            if ($replicateToTerm && $transacGrpObject->transacType == 'responsibility')
                 $parentNode->{$replicateToTerm == 'modification' ? 'tbxUpdatedBy' : 'tbxCreatedBy'}
                     = $this->getTransacPersonIdByName($transacGrpObject->transacNote);
         }
@@ -902,6 +917,9 @@ $memLog('Loaded terms:        ');
      */
     protected function getTransacPersonIdByName($name) {
 
+        // Get current collectionId
+        $collectionId = $this->collection->getId();
+
         // If person dictionary was not loaded so far
         // or there is no person with given $name in a dictionary yet
         // - load persons model
@@ -910,17 +928,28 @@ $memLog('Loaded terms:        ');
 
         // If person dictionary was not loaded so far - do load
         if ($this->transacgrpPersons === null)
-            foreach ($m->loadAll() as $person)
+            foreach ($m->loadByCollectionIds([$collectionId]) as $person)
                 $this->transacgrpPersons[$person['name']] = $person['id'];
 
         // If there is no person with given $name in a dictionary yet - add it
         if (!isset($this->transacgrpPersons[$name])) {
-            $m->init(['name' => $name]);
+            $m->init(['collectionId' => $collectionId, 'name' => $name]);
             $m->save();
             $this->transacgrpPersons[$name] = $m->getId();
         }
 
         // Return person id
         return $this->transacgrpPersons[$name];
+    }
+
+    /**
+     * Get mapping for a $value, according to tbx-standard.
+     * If no mapping exists - $value is returned
+     *
+     * @param $value
+     * @return string
+     */
+    protected function getTransacMappingIfExists($value) {
+        return $this->transacMap[$value] ?? $value;
     }
 }
