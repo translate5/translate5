@@ -37,10 +37,11 @@ END LICENSE AND COPYRIGHT
 ?>
     <script src="https://app.therootcause.io/rootcause-full-extjs.js" crossorigin="anonymous"></script>
     <script>
+        var RcConfig = RcConfig || {}, RCFinalConfig;
         (function() {
             // We use the jslogger on the global scope,
             // for usage see Editor.controller.JsLogger.
-            jslogger = window.RC && new RC.Logger({
+            jslogger = window.RC && new RC.Logger(RCFinalConfig = Object.assign({
                 applicationId : "1b60154d0a976fff59848a5e5607ac015df89161",
                 captureScreenshot : true,
                 recordUserActions : true,
@@ -67,6 +68,6 @@ END LICENSE AND COPYRIGHT
                 maxNbrOfReportedErrors : 1,
                 version : "<?php echo $this->appVersion; ?>",
                 frameworkVersion : "ExtJS <?php echo $this->extJsVersion; ?>"
-            });
+            }, RcConfig));
         })();
     </script>
