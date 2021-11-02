@@ -132,7 +132,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             // Load or create person
             $person = ZfExtended_Factory
                 ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
-                ->loadOrCreateByName($misc['userName']);
+                ->loadOrCreateByName($misc['userName'], $this->getCollectionId());
 
             // Use person id as tbxCreatedBy and tbxUpdatedBy
             $this->setTbxCreatedBy($by = $person->getId());
@@ -224,8 +224,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // No props actually, but this allows us to cycle through $levelA
         if ($isTermForNewLanguage) $levelA['language'] = ['elementName' => 'langSet'];
 
-        // Create 'creation' and 'modification' `terms_transacgroup`-entries for term-level (and language-level, if need)
-        foreach ($levelA as $byLevel) foreach (['creation', 'modification'] as $type) {
+        // Create 'origination' and 'modification' `terms_transacgroup`-entries for term-level (and language-level, if need)
+        foreach ($levelA as $byLevel) foreach (['origination', 'modification'] as $type) {
 
             // Create `terms_transacgrp` model instance
             $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
@@ -237,7 +237,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 'date' => date('Y-m-d H:i:s'),
                 'transacNote' => $misc['userName'],
                 'target' => $misc['userGuid'],
-                'transacType' => 'responsiblePerson',
+                'transacType' => 'responsibility',
                 'language' => $this->getLanguage(),
                 // 'attrLang' => $this->getLanguage(), // ?
                 'collectionId' => $this->getCollectionId(),
@@ -499,8 +499,19 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $collectionId = $this->getCollectionId();
         $languageId = $this->getLanguageId();
 
+        // Backup tbx(Created|Updated)By props
+        $personIds = [];
+        if ($this->getTbxCreatedBy()) $personIds[$this->getTbxCreatedBy()] = true;
+        if ($this->getTbxUpdatedBy()) $personIds[$this->getTbxUpdatedBy()] = true;
+        $personIds = array_keys($personIds);
+
         // Call parent
         parent::delete();
+
+        // Drop terms_transacgrp_person-records if not used anymore
+        ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
+            ->dropIfNotUsedAnymore($personIds);
 
         // Restore collectionId and languageId
         $this->setCollectionId($collectionId);
@@ -820,7 +831,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Shared WHERE clause, that will be used for querying both terms and proposals tables
         $where = [
             '`t`.`languageId` IN (' . $params['language'] . ')',
-            '`t`.`collectionId` IN (' . $params['collectionIds'] . ')',
+            '`t`.`collectionId` IN (' . ($params['collectionIds'] ?: 0) . ')',
         ];
 
         // Append clause for prosessStatus

@@ -25,12 +25,16 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 CREATE TABLE `terms_transacgrp_person` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=INNODB;
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `collectionId` int(11) DEFAULT NULL,
+   `name` varchar(255) DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `ttp_collectionId` (`collectionId`),
+   CONSTRAINT `ttp_collectionId` FOREIGN KEY (`collectionId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
-INSERT INTO `terms_transacgrp_person` (`name`) SELECT DISTINCT `transacNote` FROM `terms_transacgrp`;
+INSERT INTO `terms_transacgrp_person` (`collectionId`, `name`)
+SELECT DISTINCT `collectionId`, `transacNote` FROM `terms_transacgrp` WHERE `termId` IS NOT NULL;
 
 ALTER TABLE `terms_term`   
   CHANGE `updatedBy` `updatedBy` INT(11) NULL COMMENT 'Local instance user (e.g. from Zf_users)',
@@ -50,6 +54,7 @@ SET
   `tt`.`tbxCreatedAt` = `tr`.`date`
 WHERE 1
   AND `tt`.`id` = `tr`.`termId`
+  AND `tt`.`collectionId` = `trp`.`collectionId`
   AND `tr`.`transacType` = 'responsiblePerson'
   AND `tr`.`transac` = 'creation'
   AND `trp`.`name` = `tr`.`transacNote`;
@@ -63,6 +68,7 @@ SET
   `tt`.`tbxUpdatedAt` = `tr`.`date`
 WHERE 1
   AND `tt`.`id` = `tr`.`termId`
+  AND `tt`.`collectionId` = `trp`.`collectionId`
   AND `tr`.`transacType` = 'responsiblePerson'
   AND `tr`.`transac` = 'modification'
   AND `trp`.`name` = `tr`.`transacNote`;

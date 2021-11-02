@@ -49,8 +49,8 @@ class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Term
         // Save and get insert id
         $termEntryId = $this->save();
 
-        // Create 'creation' and 'modification' `terms_transacgroup`-entries
-        foreach (['creation', 'modification'] as $type) {
+        // Create 'origination' and 'modification' `terms_transacgroup`-entries
+        foreach (['origination', 'modification'] as $type) {
 
             // Create `terms_transacgrp` model instance
             $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
@@ -61,7 +61,7 @@ class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Term
                 'transac' => $type,
                 'date' => date('Y-m-d H:i:s'),
                 'transacNote' => $misc['userName'],
-                'transacType' => 'responsiblePerson',
+                'transacType' => 'responsibility',
                 'collectionId' => $this->getCollectionId(),
                 'termEntryId' => $termEntryId,
                 'termEntryGuid' => $this->getEntryGuid(),

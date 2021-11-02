@@ -276,7 +276,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         return !($name == 'date'
             || $name=='termNote' && $type=='processStatus'
             || $name=='transacNote' && ($this->isResponsablePersonAttribute($type))
-            || $name=='transac' && ($type=='creation' || $type=='origination')
+            || $name=='transac' && ($type=='origination' || $type=='origination')
             || $name=='transac' && $type=='modification');
     }
     /***

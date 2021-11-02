@@ -383,6 +383,17 @@ class editor_TermController extends ZfExtended_RestController
             $termEntry->load($_['termId']['termEntryId']);
             $termEntry->delete();
 
+            // Get term's tbx(Created|Updated)By props
+            $personIds = [];
+            if ($by = $_['termId']['tbxCreatedBy']) $personIds[$by] = true;
+            if ($by = $_['termId']['tbxUpdatedBy']) $personIds[$by] = true;
+            $personIds = array_keys($personIds);
+
+            // Drop terms_transacgrp_person-records if not used anymore
+            ZfExtended_Factory
+                ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
+                ->dropIfNotUsedAnymore($personIds);
+
             // Decrement stats for term and termEntry
             $diff['term'] --;
             $diff['termEntry'] --;
