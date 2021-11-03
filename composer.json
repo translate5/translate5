@@ -24,6 +24,9 @@
 				}
 			}
 		}, {
+			"type" : "vcs",
+			"url" : "https://github.com/dream-group/horde-text-diff/"
+		}, {
 			"_README" : "If our pull request will go into upstream shardj/zf1-future as project we will not need the separate version and URL anymore.",
 			"type" : "vcs",
 			"url" : "https://github.com/MittagQI/zf1-php7.3"
