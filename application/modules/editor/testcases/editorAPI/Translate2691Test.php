@@ -46,7 +46,8 @@ class Translate2691Test extends ZfExtended_Test_ApiTestcase {
             'result' => 'Xyxyx abcdexyz d\'foobar par un <mrk mtype="x-sdl-added" sdl:revid="XXX">Rézyxvewe</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">partenaire</mrk> <mrk mtype="x-sdl-added" sdl:revid="XXX">Xyzéé</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">de service après-vente</mrk> du fooxxx ou un autre <mrk mtype="x-sdl-added" sdl:revid="XXX">Rézyxvewe</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">partenaire</mrk> <mrk mtype="x-sdl-added" sdl:revid="XXX">Xyzéé</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">de service après-vente</mrk> qualifié ou par un blabla <mrk mtype="x-sdl-added" sdl:revid="XXX">spécialisé</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">qualifié</mrk> et en faire',
         ]);
 
-        $worker->setBlocking(true, 10); //we have to wait for the underlying worker to provide the download
+        //if the diff algorithm is defect we will timeout here
+        $worker->setBlocking(true, 5);
         try {
             $worker->queue();
         }
