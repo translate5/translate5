@@ -869,7 +869,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         foreach (['termEntryTbxId', 'termTbxId'] as $prop)
             if (isset($params[$prop]) && $params[$prop]) {
                 $token = ':' . $prop;
-                $where []= '`t`.`' . $prop . '` = ' . $token;
+                $where []= '`t`.`' . $prop . '` LIKE CONCAT("%%", ' . $token . ', "%%")';
                 $bindParam[$token] = $params[$prop];
             }
 
