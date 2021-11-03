@@ -124,6 +124,8 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
 
         // set the checkbox default value from config
         me.setNotifyAllUsersTaskConfig();
+
+        me.onAddAssocBtnClick();
     },
 
     /***
