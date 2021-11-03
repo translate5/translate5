@@ -24,9 +24,6 @@
 				}
 			}
 		}, {
-			"type" : "pear",
-			"url" : "https://pear.horde.org"
-		}, {
 			"_README" : "If our pull request will go into upstream shardj/zf1-future as project we will not need the separate version and URL anymore.",
 			"type" : "vcs",
 			"url" : "https://github.com/MittagQI/zf1-php7.3"
@@ -47,7 +44,7 @@
 		"phpoffice/phpspreadsheet" : "~1.12",
 		"querypath/querypath" : "~3.0",
 		"google/cloud-translate" : "~1.7",
-		"pear-pear.horde.org/horde_text_diff" : "^2.2",
+		"dream-group/horde-text-diff" : "dev-master",
 		"lesstif/php-jira-rest-client" : "~2.4",
 		"paquettg/php-html-parser": "^3.1"
 	},
