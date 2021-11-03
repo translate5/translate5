@@ -231,7 +231,9 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
                     `type`
                   )
               ) AS `title`,
-              JSON_UNQUOTE(JSON_EXTRACT(`l10nSystem`, :lang)) AS `system`,     
+              IF (JSON_UNQUOTE(JSON_EXTRACT(`l10nSystem`, :lang)) != "",
+                  JSON_UNQUOTE(JSON_EXTRACT(`l10nSystem`, :lang)),
+                  `type`) AS `system`,     
               CONCAT("attr-", `a`.`id`) AS `alias`,
               IF(`a`.`label` = "note", `a`.`label`, `a`.`dataType`) AS `dataType`,
               `a`.`picklistValues`,
