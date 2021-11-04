@@ -869,7 +869,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         //generate the html tag for the editor
         $tagObj = new editor_Models_Import_FileParser_Tag();
         $tagObj->originalContent = $tag;
-        $tagObj->tagNr = $shortTagIdent;;
+        $tagObj->tagNr = $shortTagIdent;
         $tagObj->id = $tagId;
         $tagObj->text = $this->encodeTagsForDisplay($this->_tagMapping[$tagId]['text']);
         $tag = $tagObj->renderTag();

@@ -99,7 +99,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
         if ($level == 'term') $bind[':termId'] = $termId;
 
         // Run query
-        $affectedFact = editor_Utils::db()->query('
+        $affectedFact = $this->db->getAdapter()->query('
             UPDATE `terms_transacgrp` 
             SET 
               `date` = :date, 
@@ -121,10 +121,13 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
         // If $level is 'term'
         if ($level == 'term') {
 
+            // Get source
+            $source = $this->db->getAdapter()->query('SELECT * FROM `terms_term` WHERE `id` = ?', $termId)->fetch();
+
             // Load or create person
             $person = ZfExtended_Factory
                 ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
-                ->loadOrCreateByName($userName);
+                ->loadOrCreateByName($userName, $source['collectionId']);
 
             // Prepare data for term to be updated with
             $termUpdate = ['tbxUpdatedBy' => $person->getId(), 'tbxUpdatedAt' => $bind[':date']];
@@ -165,7 +168,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                   AND ' . $where[$level];
 
             // Get levels, that terms_transacgrp-records are exist for
-            $levelA['exist'] = editor_Utils::db()->query($sql, $bind)->fetchAll(PDO::FETCH_COLUMN);
+            $levelA['exist'] = $this->db->getAdapter()->query($sql, $bind)->fetchAll(PDO::FETCH_COLUMN);
 
             // Define which level should exist
             $levelA['should'] = [
@@ -179,14 +182,14 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
 
             // If $level is 'term' - fetch terms_term-record by $termId arg
             if ($level == 'term') {
-                $source = editor_Utils::db()->query('SELECT * FROM `terms_term` WHERE `id` = ?', $termId)->fetch();
+                // $source = $this->db->getAdapter()->query('SELECT * FROM `terms_term` WHERE `id` = ?', $termId)->fetch();
                 $info['termEntryGuid'] = $source['termEntryGuid'];
                 $info['termTbxId'] = $source['termTbxId'];
                 $info['termGuid'] = $source['guid'];
 
             // Else fetch terms_term_entry-record by $termEntryId arg
             } else {
-                $source = editor_Utils::db()->query('SELECT * FROM `terms_term_entry` WHERE `id` = ?', $termEntryId)->fetch();
+                $source = $this->db->getAdapter()->query('SELECT * FROM `terms_term_entry` WHERE `id` = ?', $termEntryId)->fetch();
                 $info['termEntryGuid'] = $source['entryGuid'];
             }
 
@@ -221,7 +224,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                 else if ($mlevel == 'entry')    $byLevel += ['elementName' => 'termEntry'];
 
                 // Create `terms_transacgrp`-records
-                foreach (['creation', 'modification'] as $type) {
+                foreach (['origination', 'modification'] as $type) {
 
                     // Create `terms_transacgrp` model instance
                     $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
@@ -232,15 +235,15 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                         'date' => date('Y-m-d H:i:s'),
                         'transacNote' => $userName,
                         'target' => $userGuid,
-                        'transacType' => 'responsiblePerson',
+                        'transacType' => 'responsibility',
                         'guid' => ZfExtended_Utils::uuid(),
                     ]);
 
                     // Save `terms_transacgrp` entry
                     $t->save();
 
-                    // If level is 'term' but creation-transacgrp-record it's missing
-                    if ($level == 'term' && $mlevel == 'term' && $type == 'creation')
+                    // If level is 'term' but origination-transacgrp-record is missing
+                    if ($level == 'term' && $mlevel == 'term' && $type == 'origination')
 
                         // Append tbxCreatedBy and tbxCreatedAt to the data for term to be updated with
                         $termUpdate += ['tbxCreatedBy' => $person->getId(), 'tbxCreatedAt' => $termUpdate['tbxUpdatedAt']];
@@ -267,78 +270,6 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
         return $userName . ', ' . date('d.m.Y H:i:s', $time) . editor_Utils::rif($missing, ' ');
     }
 
-    public function getTransacGrpCollectionByEntryId($collectionId, $termEntryId): array
-    {
-        $transacGrpByKey = [];
-
-        $query = "SELECT * FROM terms_transacgrp WHERE collectionId = :collectionId AND termEntryId = :termEntryId";
-        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId, 'termEntryId' => $termEntryId]);
-
-        foreach ($queryResults as $key => $transacGrp) {
-            $transacGrpByKey[$transacGrp['elementName'].'-'.$transacGrp['transac'].'-'.$transacGrp['isDescripGrp'].'-'.$transacGrp['termId']] = $transacGrp;
-        }
-
-        return $transacGrpByKey;
-    }
-
-    /***
-     * Handle transac attributes group. If no transac group attributes exist for the entity, new one will be created.
-     *
-     * @param editor_Models_Terminology_Models_TermModel|editor_Models_Terminology_Models_TermEntryModel $entity
-     * @return bool
-     */
-    public function handleTransacGroup($entity): bool
-    {
-        if ($entity->getId() === null) {
-            return false;
-        }
-        $ret = $this->getTransacGroup($entity);
-        //if the transac group exist, do nothing
-        if (!empty($ret)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /***
-     * Get transac attribute for the entity and type
-     *
-     * @param editor_Models_Terminology_Models_TermModel|editor_Models_Terminology_Models_TermEntryModel $entity
-     * @param array $types
-     * @return array
-     */
-    public function getTransacGroup($entity): array
-    {
-        $s = $this->db->select();
-        if ($entity instanceof editor_Models_Terminology_Models_TermModel){
-            $s->where('termId=?', $entity->getTermId());
-        }
-
-        if ($entity instanceof editor_Models_Terminology_Models_TermEntryModel){
-            $s->where('id=?', $entity->getId());
-        }
-
-        $s->where('collectionId=?', $entity->getTermId());
-
-        $result = $this->db->fetchAll($s)->toArray();
-
-        return $result;
-    }
-    /***
-     * Create transac group attributes with its values. The type can be creation or modification
-     * Depending on what kind of entity is passed, the appropriate attribute will be created(term attribute or term entry attribute)
-     *
-     * @param editor_Models_Terminology_Models_TermModel|editor_Models_Terminology_Models_TermEntryModel $entity
-     * @param string $type
-     * @return bool
-     */
-    public function createTransacGroup($entity, string $type): bool
-    {
-
-        return true;
-    }
-
     /**
      * Get data for tbx-export
      *
@@ -352,5 +283,29 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
             FROM `terms_transacgrp`
             WHERE `termEntryId` IN (' . $termEntryIds . ')
         ')->fetchAll(), 'termEntryId', 'language', 'termId');
+    }
+
+    /**
+     * This method retrieves attributes grouped by level.
+     * It is used internally by TermModel->terminfo() and ->siblinginfo()
+     * and should not be called directly
+     *
+     * @param $levelColumnToBeGroupedBy
+     * @param $where
+     * @param $bind
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function loadGroupedByLevel($levelColumnToBeGroupedBy, $where, $bind) {
+        return $this->db->getAdapter()->query('
+            SELECT 
+              ' . $levelColumnToBeGroupedBy . ',                   
+              `transac`,
+              CONCAT(`transacNote`, ", ", DATE_FORMAT(`date`, "%d.%m.%Y %H:%i:%s")) AS `whowhen`
+            FROM `terms_transacgrp`
+            WHERE TRUE # TRUE here is just to beautify WHERE clause
+              AND ' . $where . ' 
+              AND `transacType` = "responsibility" 
+              AND `transac` IN ("modification", "origination")', $bind
+        )->fetchAll(PDO::FETCH_GROUP);
     }
 }

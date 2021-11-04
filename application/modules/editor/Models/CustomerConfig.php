@@ -109,7 +109,7 @@ class editor_Models_CustomerConfig extends ZfExtended_Models_Entity_Abstract {
      * It's getting maximum value among values defined in Zf_configuration
      * and custom values defined for the customers, identified by $customerIds
      *
-     * @param string $customerIds Comma-separated
+     * @param array $customerIds
      * @return int
      * @throws Zend_Db_Statement_Exception
      * @throws Zend_Exception
@@ -125,7 +125,7 @@ class editor_Models_CustomerConfig extends ZfExtended_Models_Entity_Abstract {
             FROM `LEK_customer_config` 
             WHERE TRUE
               AND `name` = "runtimeOptions.termportal.liveSearchMinChars" 
-              AND `customerId` IN (' . $customerIds . ') 
+              AND `customerId` IN (' . (join(',', $customerIds) ?: 0) . ') 
         ')->fetchColumn() : false;
 
         // Get max and return

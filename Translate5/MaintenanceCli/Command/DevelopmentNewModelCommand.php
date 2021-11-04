@@ -140,11 +140,9 @@ class DevelopmentNewModelCommand extends Translate5AbstractCommand
         
         return 0;
     }
-    
+
     protected function loadTable(string $tableName){
-        $this->table = \ZfExtended_Factory::get('Zend_Db_Table',[
-            'name' => $tableName
-        ]);
+        $this->table = \ZfExtended_Factory::get('Zend_Db_Table',[$tableName]);
     }
     
     /**
