@@ -66,11 +66,22 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
     }
 
     /**
-     *
+     * Get list of attibute datatypes
      */
     public function indexAction()
     {
-        throw new BadMethodCallException();
+        // Get ids of collections accessible to current user
+        $collectionIds = ZfExtended_Factory
+            ::get('editor_Models_TermCollection_TermCollection')
+            ->getCollectionForAuthenticatedUser();
+
+        // Get possible attribs as dataTypeId => info pairs
+        $attribs = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_AttributeDataType')
+            ->getLocalized($this->_session->locale, $collectionIds);
+
+        // Flush into response
+        $this->view->assign($attribs);
     }
 
     /**

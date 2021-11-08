@@ -372,7 +372,7 @@ class editor_Utils {
      *
      * Todo: Add support for 'min' and 'max' rules, that would work for strings, numbers and file sizes
      * @param $ruleA
-     * @param $data
+     * @param array|stdClass|ZfExtended_Models_Entity_Abstract $data Data to checked
      * @return array
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
@@ -382,9 +382,15 @@ class editor_Utils {
         // Declare $rowA array
         $rowA = [];
 
-        // If $data arg is a model instance, or model name convert it to array
-        if (is_object($data) && is_subclass_of($data, 'ZfExtended_Models_Entity_Abstract'))
-            $data = $data->toArray();
+        // If $data is an object
+        if (is_object($data)) {
+
+            // If $data arg is a model instance - convert it to array
+            if (is_subclass_of($data, 'ZfExtended_Models_Entity_Abstract')) $data = $data->toArray();
+
+            // Else if $data arg is an instance of stdClass - convert it to array as well
+            else if ($data instanceof stdClass) $data = (array) $data;
+        }
 
         // Foreach prop having mismatch rules
         foreach ($ruleA as $props => $rule) foreach (self::ar($props) as $prop) {

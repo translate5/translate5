@@ -61,6 +61,9 @@ class editor_AttributeController extends ZfExtended_RestController
         // Call parent
         parent::init();
 
+        // If request contains json-encoded 'data'-param, decode it and append to request params
+        $this->handleData();
+
         // Pick session
         $this->_session = (new Zend_Session_Namespace('user'))->data;
 
@@ -478,7 +481,7 @@ class editor_AttributeController extends ZfExtended_RestController
                 'rex' => 'int11',
                 'key' => 'terms_term'
             ],
-        ], $params);
+        ]);
 
         // Prevent creating attribute that is having type, handled by dedicated *createAction()
         $this->jcheck([
@@ -846,25 +849,16 @@ class editor_AttributeController extends ZfExtended_RestController
      */
     protected function _attrupdateCheck() {
 
-        // Get attribute meta
+        // Get attribute meta load term model instance, if current attr has non-empty termId
         $_ = $this->jcheck([
             'dataTypeId' => [
                 'key' => 'terms_attributes_datatype'
-            ]
-        ], $this->entity);
-
-        // Validate params and load term model instance, if termId param is given
-        $_ += $this->jcheck([
-            'level' => [
-                'req' => true,
-                'fis' => 'entry,language,term' // FIND_IN_SET
             ],
             'termId' => [
-                'req' => $this->getParam('level') == 'term',
                 'rex' => 'int11',
                 'key' => 'editor_Models_Terminology_Models_TermModel'
             ]
-        ]);
+        ], $this->entity);
 
         // If attribute is a picklist - make sure given value is in the list of allowed values
         if ($_['dataTypeId']['dataType'] == 'picklist')
