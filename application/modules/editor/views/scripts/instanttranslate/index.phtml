@@ -45,19 +45,20 @@ END LICENSE AND COPYRIGHT
             //are the sublanguages used as dropdown selections
             $useLanguage=strpos($sourceLocale, '-') === false || $this->showSublanguages;
             if (!in_array($sourceLocale, $allSourceLanguageLocales) && $useLanguage) {
-                $allSourceLanguageLocales[] = $sourceLocale;
+                $allSourceLanguageLocales[$sourceLocale] = ($this->allDbLanguages[$sourceLocale][1] ?? $sourceLocale);
             }
         }
         foreach ($languageResource['target']as $key => $targetLocale) {
             //are the sublanguages used as dropdown selections
             $useLanguage=strpos($targetLocale, '-') === false || $this->showSublanguages;
             if (!in_array($targetLocale, $allTargetLanguageLocales) && $useLanguage) {
-                $allTargetLanguageLocales[] = $targetLocale;
+                $allTargetLanguageLocales[$targetLocale] = ($this->allDbLanguages[$targetLocale][1] ?? $targetLocale);
             }
         }
     }
-    sort($allSourceLanguageLocales);
-    sort($allTargetLanguageLocales);
+    // sort the languages by their speaking names
+    asort($allSourceLanguageLocales);
+    asort($allTargetLanguageLocales);
     
     // the lowest number of characters that any of the LanguageResources can handle
     // is our limit for what the user is allowed to enter:
@@ -172,7 +173,7 @@ $isTempDevTemplatesShow = FALSE;
             <svg class="icon icon-t5_switcher" />
         </div>
         <form id="sourceLanguageAndContent">
-            <select id="sourceLocale" name="sourceLocale">
+            <select id="sourceLocale" class="selectSourceTarget" name="sourceLocale">
                 <?php
                 $sourceLangSelected = false;
                 $getParamSource = $this->source;
@@ -183,9 +184,7 @@ $isTempDevTemplatesShow = FALSE;
                 }
                 $optionValues=[];
                 $sourceLangSelected=strtolower($sourceLangSelected);
-                foreach ($allSourceLanguageLocales as $sourceLangLocale) {
-                    // get the language display name from all languages array. The display name is at index 1
-                    $displayLanguage = $this->allDbLanguages[$sourceLangLocale][1] ?? $sourceLangLocale;
+                foreach ($allSourceLanguageLocales as $sourceLangLocale => $displayLanguage) {
                     $selected = ($sourceLangSelected != false && $sourceLangSelected == strtolower($sourceLangLocale)) ? ' selected="selected"' : '';
                     $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$displayLanguage.'</option>';
                 }
@@ -194,9 +193,9 @@ $isTempDevTemplatesShow = FALSE;
             </select>
             
             <div id="sourceContent" class="textinput clearable box marginTop show-if-source-is-text">
-                <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text__" placeholder="<?= $translate->_("Geben Sie Text ein"); ?>"><?php echo htmlspecialchars($this->text); ?></textarea>
-                <svg class="icon icon-t5_close clearTextinput clearable-clear show-if-source-is-text__" title="<?php echo $this->translations["clearText"];?>" />
-                <span id="countedCharacters" class="countedCharacters show-if-source-is-text__">0</span>
+                <textarea id="sourceText" name="sourceText" wrap="SOFT" class="" placeholder="<?= $translate->_("Geben Sie Text ein"); ?>"><?php echo htmlspecialchars($this->text); ?></textarea>
+                <svg class="icon icon-t5_close clearTextinput clearable-clear" title="<?php echo $this->translations["clearText"];?>" />
+                <span id="countedCharacters" class="countedCharacters_">0</span>
             </div>
             <div class="dropSourceFile box marginTop show-if-source-is-file font-size-big">
                 <svg class="icon icon-t5_upload iconsize-giant" /><br>
@@ -212,7 +211,7 @@ $isTempDevTemplatesShow = FALSE;
     </div>
     <div id="target">
         <form id="targetControls">
-            <select id="targetLocale" name="targetLocale">
+            <select id="targetLocale" class="selectSourceTarget" name="targetLocale">
                 <?php
                 $targetLangSelected = false;
                 $getParamTarget = $this->target;
@@ -223,9 +222,7 @@ $isTempDevTemplatesShow = FALSE;
                 }
                 $optionValues=[];
                 $targetLangSelected=strtolower($targetLangSelected);
-                foreach ($allTargetLanguageLocales as $targetLangLocale) {
-                    // get the language display name from all languages array. The display name is at index 1
-                    $displayLanguage = $this->allDbLanguages[$targetLangLocale][1] ?? $targetLangLocale;
+                foreach ($allTargetLanguageLocales as $targetLangLocale => $displayLanguage) {
                     $selected = ($targetLangSelected != false && $targetLangSelected == strtolower($targetLangLocale)) ? ' selected="selected"' : '';
                     $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$displayLanguage.'</option>';
                 }
@@ -256,7 +253,7 @@ $isTempDevTemplatesShow = FALSE;
             </div>
             <p class="box marginTop">
                 Liste aller Icons:<br>
-                <svg class="icon icon-t5_attention" /> icon-t5_attention
+                <svg class="icon icon-t5_attention" title="Hallo Welt! Dies ist ein Icon mit title." /> icon-t5_attention
                 <svg class="icon icon-t5_check_cyan" /> icon-t5_check_cyan
                 <svg class="icon icon-t5_check_green" /> icon-t5_check_green
                 <svg class="icon icon-t5_check_grey" /> icon-t5_check_grey
@@ -324,40 +321,51 @@ $( function() {
             $("#languageSelector").attr("action", "?locale=" + action);
             $("#languageSelector").submit();
         }
-      });
+    });
+    
     $('#sourceLocale').selectmenu({
+        appendTo: "#source",
         open: function() {
             updateLocalesSelectLists($(this));
         },
         change: function() {
             checkInstantTranslation();
         }
-      }).selectmenu("menuWidget").addClass("overflow localesSelectList");
+    }).selectmenu("menuWidget").addClass("overflow localesSelectList");
     $('#targetLocale').selectmenu({
+        appendTo: "#target",
         open: function() {
             updateLocalesSelectLists($(this));
         },
         change: function() {
             checkInstantTranslation();
         }
-      }).selectmenu("menuWidget").addClass("overflow localesSelectList");
+    }).selectmenu("menuWidget").addClass("overflow localesSelectList");
+    // cause the select-menuWidget will not re-size and re-postition itself on windows resize, we just close it.
+    $(window).resize(function() {
+        $('.selectSourceTarget').selectmenu('close');
+    });
+    
     $('#sourceFile').button();
     $('#translationSubmit').button();
-    $('#sourceContent').tooltip({
-        position: { my: "left+15 center", at: "bottom", of: ".clearable-clear" }
+    
+    // activate jQuery-UI tooltip to show title in styled box
+    $( document ).tooltip({
+        position: {
+            my: "center top",
+            at: "center bottom+14",
+            using: function( position, feedback ) {
+                $( this ).css( position );
+                $( "<div>" )
+                    .addClass( "arrow" )
+                    .addClass( "top" )
+                    .addClass( feedback.vertical )
+                    .addClass( feedback.horizontal )
+                    .appendTo( this );
+            }
+        }
     });
-    $('#translations .translation-sourcediff').tooltip({
-        position: { my: "left+15 center", at: "bottom", of: ".translation-sourcediff" }
-    });
-    $('#translations .copyable-copy').tooltip({
-        position: { my: "left+15 center", at: "bottom", of: ".copyable-copy" }
-    });
-    $('#translations .term-info').tooltip({
-        position: { my: "left+15 center", at: "bottom", of: ".term-info" }
-    });
-    $('#translations .term-status').tooltip({
-        position: { my: "left+15 center", at: "bottom", of: ".term-info" }
-    });
+    
     //check if the source and the target are the same
     if($('#sourceLocale').val()==$('#targetLocale').val()){
     	setTargetFirstAvailable($('#sourceLocale').val());
