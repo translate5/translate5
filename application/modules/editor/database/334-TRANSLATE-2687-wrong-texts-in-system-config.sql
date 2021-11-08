@@ -25,7 +25,9 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-UPDATE `Zf_configuration` SET `description` = 'The \"default\" theme equals to the ExtJs \"Triton\" theme, the dark theme equals the ExtJs \"Aria\" theme. More themes can be used if configured on db level. Please contact translate5 support, if you need this.', `guiName` = 'Extjs theme to be used for translate5', `guiGroup` = 'System setup: General' 
+UPDATE `Zf_configuration` SET
+`description` = 'The "default" equals to the theme configured in runtimeOptions.extJs.defaultTheme config. If this config is empty ExtJs "Triton" theme will be used. The dark theme equals the ExtJs "Aria" theme. More themes can be used if configured on db level. Please contact translate5 support, if you need this.',
+`guiName` = 'Extjs theme to be used for translate5', `guiGroup` = 'System setup: General'
 WHERE `name` = 'runtimeOptions.extJs.theme';
 
 UPDATE `Zf_configuration` SET `guiGroup` = 'InstantTranslate' 
