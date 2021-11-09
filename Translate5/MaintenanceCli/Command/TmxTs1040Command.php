@@ -34,7 +34,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 
-
+/**
+ * converts and cleans given TMX files as defined in TS-1040
+ */
 class TmxTs1040Command extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
