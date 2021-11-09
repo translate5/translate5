@@ -47,8 +47,6 @@ class SystemMailtestCommand extends Translate5AbstractCommand
         // the "--help" option
         ->setHelp('Sends a test e-mail to the given address as argument.');
 
-        $this->initTranslate5();
-
         $this->addArgument('email', InputArgument::REQUIRED, 'Receiver of the test e-mail.');
     }
 
@@ -60,6 +58,7 @@ class SystemMailtestCommand extends Translate5AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
+        $this->initTranslate5();
         $this->writeTitle('Check e-mail setup');
         $email = $this->input->getArgument('email');
 

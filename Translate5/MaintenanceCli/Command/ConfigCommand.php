@@ -52,6 +52,9 @@ class ConfigCommand extends Translate5AbstractCommand
 Modified values are shown bold in the simple listing.');
         
         $this->addArgument('name', InputArgument::OPTIONAL, 'The part of a configuration value name. If more than one config value is found, all are listed.');
+        
+        //FIXME wenn es eine array config ist, sollte es einen Schalter --add geben um den Wert hinzuzufügen anstatt das komplette Array zu überschreiben.
+        
         $this->addArgument('value', InputArgument::OPTIONAL, 'Value to be set for the configuration, only usable if name is concrete enough to find only one configuration entry.');
         $this->addOption(
             'detail',
@@ -153,9 +156,20 @@ Modified values are shown bold in the simple listing.');
             }
             return 0;
         }
+
+        $exactNameConfig = array_filter($foundConfigs, function($config) use ($name) {
+            return $config['name'] === $name;
+        });
+
         if(!$isExact) {
-            $this->io->error('Setting a value is only allowed if name is not ambiguous!');
-            return 1;
+            if(empty($exactNameConfig)) {
+                $this->io->error('Setting a value is only allowed if name is not ambiguous!');
+                return 1;
+            }
+            else {
+                $this->io->warning('Given name is ambiguous, but exact one setting is found matching the whole name, this value is going to be changed now:');
+                $exactConfig = reset($exactNameConfig);
+            }
         }
         
         $config->init($exactConfig);
