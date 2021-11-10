@@ -360,6 +360,16 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     menuDisabled: !Editor.app.authenticatedUser.isAllowed('editorTaskOverviewColumnMenu')
                 },
                 items: [{
+                    xtype: 'gridcolumn',
+                    width: 60,
+                    dataIndex: 'id',
+                    stateId: 'id',
+                    filter: {
+                        type: 'numeric'
+                    },
+                    text: 'id',
+                    text: me.text_cols.id
+                },{
                     text: me.text_cols.taskActions,
                     menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
                     stateId: 'taskGridActionColumn',
@@ -768,16 +778,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
         if (Editor.data.debug && Editor.data.debug.showTaskGuid) {
             config.columns.items.unshift({
-                xtype: 'gridcolumn',
-                width: 60,
-                dataIndex: 'id',
-                stateId: 'id',
-                filter: {
-                    type: 'numeric'
-                },
-                text: 'id',
-                text: me.text_cols.id
-            }, {
                 xtype: 'gridcolumn',
                 width: 140,
                 dataIndex: 'taskGuid',

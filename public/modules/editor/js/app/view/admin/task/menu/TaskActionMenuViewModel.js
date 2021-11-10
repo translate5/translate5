@@ -41,6 +41,12 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
             },
             bind:{bindTo:'{task}',deep:true}
         },
+        isCancelable:{
+            get: function(record) {
+                return record && this.isMenuAllowed('editorCancelImport', record);
+            },
+            bind:{bindTo:'{task}',deep:true}
+        },
         isNotImportPendingCustom:{
             get: function(record) {
                 return record && record.isNotImportPendingCustom();

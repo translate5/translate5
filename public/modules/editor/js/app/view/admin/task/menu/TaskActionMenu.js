@@ -45,6 +45,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
       actionEnd: '#UT#Aufgabe komplett Beenden',
       actionReOpen: '#UT#beendete Aufgabe wieder öffnen',
       actionDelete: '#UT#Aufgabe komplett löschen',
+      actionCancel: '#UT#Import abbrechen',
       actionLog: '#UT#Ereignis-Protokoll',
       taskPrefs: '#UT#Aufgabenspezifische Einstellungen',
       exp: '#UT#Export',
@@ -59,6 +60,15 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
 	    config = {
 	        //Info: all items should be hidden by default, with this we reduce the "blinking" component behaviour
 	        items:[{
+	        	text: '#UT#Cancel import',
+				action: 'editorCancelImport',
+				hidden: true,
+		        bind:{
+		        	hidden:'{!isCancelable}'
+		        },
+		        glyph: 'f00d@FontAwesome5FreeSolid',
+		        sortIndex: 0
+			},{
 		        // - read only öffnen
 		        text: me.messages.actionEdit,
 		        action: 'editorEditTask',
