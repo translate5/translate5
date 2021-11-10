@@ -2350,7 +2350,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
               `id`, 
               `termTbxId` AS `tbx`, 
               `languageId`, 
-              `language`, 
+              LOWER(`language`) AS `language`, 
               `term`,
               `proposal`,
               `collectionId`,
