@@ -137,6 +137,9 @@ Ext.define('Editor.model.admin.User', {
       }
       var notOpenable = ! task.isOpenable();
       switch(right) {
+          case 'editorCancelImport':
+              //cancel import is only allowed on import and if either admin or pm of the task
+              return task.isImporting() && (isAllowed || task.get('pmGuid') === Editor.data.app.user.userGuid);
           case 'editorReopenTask':
               if(!task.isEnded()) {
                   return false;
