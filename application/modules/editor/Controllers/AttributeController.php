@@ -455,39 +455,50 @@ class editor_AttributeController extends ZfExtended_RestController
                 'rex' => 'xmlid',
             ],
             'termLang,mainLang' => [
-                'req' => true,
                 'rex' => 'rfc5646'
             ]
         ]);
+
+        // Get param shortcuts
+        $target = $this->getParam('target');
+        $attrId = $this->getParam('attrId');
+        $termLang = $this->getParam('termLang');
+        $mainLang = $this->getParam('mainLang');
 
         // Get request params
         $params = $this->getRequest()->getParams();
 
         // Set attribute's target-prop
-        $this->entity->setTarget($params['target']);
+        $this->entity->setTarget($target);
 
         // Update attribute
-        $data['updated'] = $this->entity->update($misc = [
+        $data['updated'] = $this->entity->update([
             'userName' => $this->_session->userName,
             'userGuid' => $this->_session->userGuid,
         ]);
 
         // If given target is not empty
-        if ($params['target']) {
+        if ($target) {
 
             // Detect level
             $level = $this->entity->getTermId() ? 'term' : 'entry';
 
+            // Setup preferred languages array
+            $prefLangA = [];
+            if ($termLang) $prefLangA[] = $termLang;
+            if ($mainLang) $prefLangA[] = $mainLang;
+            if ($level == 'term' && !$prefLangA) $prefLangA []= $this->entity->getLanguage();
+            $preLangA = array_unique($prefLangA);
+
             // Prepare first 2 arguments to be used for $this->_refTarget(&$refA, $refTargetIdA, $prefLangA) call
-            $refA[$level][$params['attrId']] = $this->entity->toArray();
-            $refTargetIdA[$params['target']] = [$level, $params['attrId']];
-            $prefLangA = array_unique([$params['termLang'], $params['mainLang']]);
+            $refA[$level][$attrId] = $this->entity->toArray();
+            $refTargetIdA[$target] = [$level, $attrId];
 
             // Call $this->_refTarget() with that args
             editor_Models_Terminology_Models_AttributeModel::refTarget($refA, $refTargetIdA, $prefLangA, $level);
 
             // Append refTarget data to the response
-            $data += $refA[$level][$params['attrId']];
+            $data += $refA[$level][$attrId];
         }
 
         // Flush response data

@@ -174,6 +174,10 @@ class editor_TermController extends ZfExtended_RestController
             // Params to simulate click on certain found result
             'termId' => $this->entity->getId(),
             'termEntryId' => $this->entity->getTermEntryId(),
+
+            // Tbx ids
+            'termTbxId' => $this->entity->getTermTbxId(),
+            'termEntryTbxId' => $this->entity->getTermEntryTbxId(),
         ]);
     }
 
