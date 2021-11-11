@@ -35,7 +35,21 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
      * @var integer
      */
     protected static $collectionId;
-    
+
+    /**
+     * Current term-search language
+     *
+     * @var
+     */
+    protected static $language;
+
+    /**
+     * Termportal setup data (dictionaries, etc)
+     *
+     * @var
+     */
+    protected static $setup;
+
     public static function setUpBeforeClass(): void {
         self::$api=new ZfExtended_Test_ApiHelper(__CLASS__);
         self::assertNeededUsers(); //last authed user is testmanager
@@ -51,13 +65,13 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
 
         /*class_exists('editor_Utils');
         $last = editor_Utils::db()->query('SELECT `id` FROM `LEK_languageresources` ORDER BY `id` DESC LIMIT 1')->fetchColumn();
-        self::$api->requestJson('editor/termcollection/' . $last,'DELETE');*/
+        self::$api->requestJson('editor/termcollection/' . $last, 'DELETE');*/
 
         // [1] create empty term collection
         $termCollection = $this->api()->requestJson('editor/termcollection', 'POST', [
             'name' => 'Test api collection',
-            'customerIds' => $this->api()->getCustomer()->id]
-        );
+            'customerIds' => $this->api()->getCustomer()->id
+        ]);
         $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $this->assertEquals('Test api collection', $termCollection->name);
 
@@ -80,6 +94,9 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             'limit' => 20,
         ]);
         $this->assertNotEmpty($language, 'Unable to load the language needed for the term search.');
+
+        // Remember term-search language
+        self::$language = $language[0]->id;
 
         // [4] find imported term by *-query and de-DE language id
         $termsearch = $this->api()->requestJson('editor/plugins_termportal_data/search', 'GET', [
@@ -232,14 +249,14 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         );
 
         // [20] get termportal setup data (dictionaries, etc)
-        $setup = $this->api()->requestJson('editor/plugins_termportal_data');
-        $this->assertIsObject($setup, 'Termportal setup data is not an array');
+        self::$setup = $this->api()->requestJson('editor/plugins_termportal_data');
+        $this->assertIsObject(self::$setup, 'Termportal setup data is not an array');
 
         // Check props presence
         foreach ([
              'locale', 'role', 'permission', 'activeItem', 'l10n', 'filterWindow', 'filterPanel', 'lang',
              'langInclSubs', 'flag', 'newTermLang', 'language', 'cfg', 'itranslateQuery', 'time'] as $prop)
-            $this->assertObjectHasAttribute($prop, $setup, 'Termportal setup data has no ' . $prop . '-property');
+            $this->assertObjectHasAttribute($prop, self::$setup, 'Termportal setup data has no ' . $prop . '-property');
 
         // [21] call siblinginfo to get attributes for Term1
         $siblinginfo = $this->api()->requestJson('editor/plugins_termportal_data/siblinginfo', 'POST', ['termId' => $Term1->termId]);
@@ -268,6 +285,9 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertIsArray($exportFact, 'Unable to export the term proposals');
         $exportPlan = $this->api()->getFileContent('Export.json');
         $this->assertEquals(count((array) $exportFact), count($exportPlan), "The proposal export result does not match the expected result");
+
+        // Assert that termportal filters are working
+        $this->assertFilters($dataTypeA);
 
         // [23] delete image-attr, check image full path not exists anymore
         $figuredelete = $this->api()->requestJson('editor/attribute', 'DELETE', ['attrId' => $figurecreate->inserted->id]);
@@ -298,6 +318,25 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertIsObject($Term1_delete, 'Unable to delete Term2 (having language=en) [isLast=language]');
         $this->assertObjectHasAttribute('isLast', $Term1_delete, 'Term2 deletion response does not have isLast prop');
         $this->assertEquals($Term1_delete->isLast, 'entry', 'Deleted term should be the last among its termEntry');
+
+        // [28] Rename the note-attr label
+        $currentLabel = $dataTypeA->$dataTypeId_note->title;
+        $labeledit = $this->api()->requestJson('editor/attributedatatype', 'PUT', [
+            'dataTypeId' => $dataTypeId_note,
+            'locale' => 'en',
+            'label' => $currentLabel . '-amended'
+        ]);
+        $this->assertIsObject($labeledit, 'Unable to edit note-attr label');
+        $this->assertObjectHasAttribute('label', $labeledit, 'Note-attr editing response has no label-prop');
+
+        // Restore old label back
+        $labeledit = $this->api()->requestJson('editor/attributedatatype', 'PUT', [
+            'dataTypeId' => $dataTypeId_note,
+            'locale' => 'en',
+            'label' => $currentLabel
+        ]);
+        $this->assertIsObject($labeledit, 'Unable to revert note-attr label back');
+        $this->assertObjectHasAttribute('label', $labeledit, 'Note-attr reverting back response has no label-prop');
     }
 
     public static function tearDownAfterClass(): void {
@@ -305,4 +344,111 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         self::$api->cleanup && self::$api->requestJson('editor/termcollection/'.self::$collectionId,'DELETE');
     }
 
+    /**
+     * Run search and check that results quantity is as expected
+     *
+     * @param $qty Expected quantity of results
+     * @param array $customParams
+     */
+    public function assertSearchResultQty($qty, $customParams = []) {
+
+        // Common search params
+        $commonParams = [
+            'query' => '*',
+            'collectionIds' => self::$collectionId,
+            'language' => self::$language,
+            'start' => 0,
+            'limit' => 10
+        ];
+
+        // Append common data to custom data
+        $finalParams = $commonParams + $customParams;
+
+        // Get response
+        $resp = $this->api()->requestJson('editor/plugins_termportal_data/search', 'GET', $finalParams);
+
+        // Print params and get output
+        $query = var_export($finalParams, true);
+
+        // Do checks
+        $this->assertIsObject($resp, 'Invalid response. ' . $query);
+        $this->assertObjectHasAttribute('data', $resp, 'Response has no data-prop. ' . $query);
+        $this->assertIsArray($resp->data, '$resp->data is not an array. ' . $query);
+        $this->assertEquals($qty, count($resp->data), 'Results qty should be ' . $qty . ', but ' . count($resp->data) . ' got instead. ' . $query);
+    }
+
+    /**
+     * Assert that termportal filters are working
+     *
+     * @param $dataTypeA
+     */
+    public function assertFilters($dataTypeA) {
+
+        // Currently there should be 3 terms total in term collection
+        $this->assertSearchResultQty(3);
+
+        // One of them is rejected
+        $this->assertSearchResultQty(1, ['processStatus' => 'rejected']);
+
+        // Two are rejected or unprocessed
+        $this->assertSearchResultQty(2, ['processStatus' => 'rejected,unprocessed']);
+
+        // Get en-language id
+        $english = $this->api()->requestJson('editor/language', 'GET', ['filter' => '[{"operator":"eq","value":"en","property":"rfc5646"}]']);
+        $this->assertNotEmpty($english, 'Unable to load english-language needed for use in noTermDefinedFor filter');
+
+        // Only one 'de-de'-term which is rejected or unprocessed and having no siblings for 'en'-language
+        $this->assertSearchResultQty(1, [
+            'processStatus' => 'rejected,unprocessed',
+            'noTermDefinedFor' => $english[0]->id
+        ]);
+
+        // Get en-language id
+        $italian = $this->api()->requestJson('editor/language', 'GET', ['filter' => '[{"operator":"eq","value":"it","property":"rfc5646"}]']);
+        $this->assertNotEmpty($italian, 'Unable to load italian-language needed for use in noTermDefinedFor-filter');
+
+        // Two 'de-de'-terms which are rejected or unprocessed and having no siblings for 'it'-language
+        $this->assertSearchResultQty(2, [
+            'processStatus' => 'rejected,unprocessed',
+            'noTermDefinedFor' => $italian[0]->id
+        ]);
+
+        // Get customerSubset attrbiute datatype id
+        $dataTypeId_customerSubset = array_column((array) $dataTypeA, 'id', 'type')['customerSubset'];
+
+        // No terms having this attribute defined with value 'Testkunde1' and having no siblings for 'it'-language
+        $this->assertSearchResultQty(0, [
+            'processStatus' => 'rejected,unprocessed',
+            'noTermDefinedFor' => $italian[0]->id,
+            'attr-' . $dataTypeId_customerSubset => 'Testkunde1'
+        ]);
+
+        // One term having this attribute defined with value 'Testkunde' and having no siblings for 'it'-language
+        $this->assertSearchResultQty(1, [
+            'processStatus' => 'rejected,unprocessed',
+            'noTermDefinedFor' => $italian[0]->id,
+            'attr-' . $dataTypeId_customerSubset => 'Testkunde'
+        ]);
+
+        // Two terms having termEntryTbxId LIKE '%1111-2222-3333%'
+        $this->assertSearchResultQty(2, ['termEntryTbxId' => '1111-2222-3333']);
+
+        // One term having termTbxId = 37705a81-e0df-4209-9a12-eaddc93674e0
+        $this->assertSearchResultQty(1, ['termTbxId' => '37705a81-e0df-4209-9a12-eaddc93674e0']);
+
+        // Get 'termproposer test'-person id
+        $tbxPersonId = array_column(self::$setup->filterWindow->tbxCreatedBy, 'id', 'name')['termproposer test'];
+
+        // Two terms created by that person
+        $this->assertSearchResultQty(2, ['tbxCreatedBy' => $tbxPersonId]);
+
+        // One term created at 2019-07-15
+        $this->assertSearchResultQty(1, ['tbxCreatedAt' => '2019-07-15']);
+
+        // Three terms created since 2019-07-15
+        $this->assertSearchResultQty(3, ['tbxCreatedGt' => '2019-07-15']);
+
+        // One term created until 2019-07-15
+        $this->assertSearchResultQty(1, ['tbxCreatedLt' => '2019-07-15']);
+    }
 }

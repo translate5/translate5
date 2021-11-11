@@ -61,6 +61,9 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
         // Call parent
         parent::init();
 
+        // If request contains json-encoded 'data'-param, decode it and append to request params
+        $this->handleData();
+
         // Pick session
         $this->_session = (new Zend_Session_Namespace('user'))->data;
     }
