@@ -65,9 +65,9 @@
 		    <target>Zähle interne Fuzzy</target>
 		</trans-unit>
 
-		<trans-unit id='Vm9yw7xiZXJzZXR6dW5ncyBNYXRjaC1SYXRl'>
-		    <source>Vorübersetzungs Match-Rate</source>
-		    <target>Vorübersetzungs Match-Rate</target>
+		<trans-unit id='VE0gVm9yw7xiZXJzZXR6dW5ncyBNYXRjaC1SYXRl'>
+		    <source>TM Vorübersetzungs Match-Rate</source>
+		    <target>TM Vorübersetzungs Match-Rate</target>
 		</trans-unit>
 
 		<trans-unit id='Vm9yw7xiZXJzZXR6dW5nIG1pdCBUTS1NYXRjaCwgZGllIGdyw7bDn2VyIG9kZXIgZ2xlaWNoIGRlbSBhdXNnZXfDpGhsdGVuIFdlcnQgaXN0'>
@@ -139,6 +139,10 @@
         <trans-unit id='RXhwb3J0IFRyYWRvcy1saWtlIFhNTA=='>
             <source>Export Trados-like XML</source>
             <target>Export Trados-like XML</target>
+        </trans-unit>
+        <trans-unit id='VGVybWlub2xvZ2llIFByw7xmdW5nIHN0YXJ0ZW4='>
+            <source>Terminologie Prüfung starten</source>
+            <target>Terminologie Prüfung starten</target>
         </trans-unit>
     </body>
   </file>
