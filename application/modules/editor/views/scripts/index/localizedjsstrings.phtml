@@ -871,6 +871,7 @@ Ext.define('Editor.controller.Localizer', {
             actionUnFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer wieder öffnen');?>',
             actionEnd: '<?php echo $this->translate->_('Aufgabe komplett beenden');?>',
             actionDelete: '<?php echo $this->translate->_('Aufgabe komplett löschen');?>',
+            actionCancel: '<?php echo $this->translate->_('Import abbrechen');?>',
             actionLog: '<?php echo $this->translate->_('Ereignis-Protokoll');?>',
             assocUser: '<?php echo $this->translate->_('Benutzer der Aufgabe zuweisen');?>', //FIXME remove me!
             taskPrefs: '<?php echo $this->translate->_('Aufgabenspezifische Einstellungen');?>',
@@ -935,6 +936,11 @@ Ext.define('Editor.controller.Localizer', {
             toolbarFilter: '<?php echo $this->translate->_('Suche');?>',
             overwriteLevelList: '<?php echo $this->translate->_('Überschreibbar auf Ebene:');?>',
             readOnlyFilter: '<?php echo $this->translate->_('Schreibgeschützte Konfigurationen sichtbar:');?>',
+            configLocales:{
+                default: '<?php echo $this->translate->_('Default');?>',
+                aria: '<?php echo $this->translate->_('Dunkles Layout (Aria)');?>',
+                triton: '<?php echo $this->translate->_('Standard Layout (Triton)');?>',
+            }
         }
     });
     
@@ -1163,6 +1169,7 @@ Ext.define('Editor.controller.Localizer', {
             taskConfirmed: '<?php echo $this->translate->_('Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.');?>',
             taskFinished: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich abgeschlossen.');?>',
             taskClosing: '<?php echo $this->translate->_('Aufgabe wird verlassen...');?>',
+            taskCancelImport: '<?php echo $this->translate->_('Import wird abgebrochen...');?>',
             taskConfirming: '<?php echo $this->translate->_('Aufgabe wird bestätigt...');?>',
             taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen und verlassen...');?>',
             saveSegmentFirst: '<?php echo $this->translate->_('Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.');?>'

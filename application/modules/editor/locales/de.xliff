@@ -265,6 +265,8 @@
 <trans-unit id='QXVmZ2FiZSBmw7xyIGFsbGUgQmVudXR6ZXIgd2llZGVyIMO2ZmZuZW4='><source>Aufgabe für alle Benutzer wieder öffnen</source><target>Aufgabe für alle Benutzer wieder öffnen</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSBrb21wbGV0dCBiZWVuZGVu'><source>Aufgabe komplett beenden</source><target>Aufgabe komplett beenden</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSBrb21wbGV0dCBsw7ZzY2hlbg=='><source>Aufgabe komplett löschen</source><target>Aufgabe komplett löschen</target></trans-unit>
+<trans-unit id='SW1wb3J0IGFiYnJlY2hlbg=='><source>Import abbrechen</source><target>Import abbrechen</target></trans-unit>
+<trans-unit id='SW1wb3J0IHdpcmQgYWJnZWJyb2NoZW4uLi4='><source>Import wird abgebrochen...</source><target>Import wird abgebrochen...</target></trans-unit>
 <trans-unit id='QmVudXR6ZXIgZGVyIEF1ZmdhYmUgenV3ZWlzZW4='><source>Benutzer der Aufgabe zuweisen</source><target>Benutzer der Aufgabe zuweisen</target></trans-unit>
 <trans-unit id='YmVlbmRldGUgQXVmZ2FiZSB3aWVkZXIgw7ZmZm5lbg=='><source>beendete Aufgabe wieder öffnen</source><target>beendete Aufgabe wieder öffnen</target></trans-unit>
 <trans-unit id='RXhwb3J0b3B0aW9uZW4='><source>Exportoptionen</source><target>Exportoptionen</target></trans-unit>

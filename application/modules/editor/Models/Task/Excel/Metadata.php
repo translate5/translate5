@@ -183,9 +183,14 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                     $value = $customer->getName();
                     break;
                 case 'orderdate':
-                    $format = Zend_Locale_Format::getDateFormat();
-                    $date = new Zend_Date($task[$colName], Zend_Date::ISO_8601);
-                    $value = $date->toString($format);
+                    $value = \PhpOffice\PhpSpreadsheet\Shared\Date::stringToExcel($task[$colName]);
+
+                    $sheet->getStyle($sheetCols[$key].$this->taskRow)
+                        ->getNumberFormat()
+                        ->setFormatCode(
+                            \PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_DATE_YYYYMMDD
+                        );
+
                     break;
                 case 'relaisLang':
                 case 'sourceLang':

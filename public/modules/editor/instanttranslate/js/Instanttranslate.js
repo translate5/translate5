@@ -623,12 +623,16 @@ function renderTranslationContainer(resultData) {
     var $fuzzyContainer = '';
     var $alternativeTranslations = false;
 
-    // TermCollection
     // detect color of the header-bottom-border
+    // results of TermCollection are green
     if (resultData.languageResourceType === 'termcollection') {
         $additionalHeaderClass = 'box__result__header__green';
     }
-    
+    // and 100% matches of TranslationMemory are green
+    if (resultData.languageResourceType === 'tm' && resultData.fuzzyMatch.sourceDiff === undefined) {
+        $additionalHeaderClass = 'box__result__header__green';
+    }
+
     if (resultData.fuzzyMatch.sourceDiff !== undefined) {
         $isFuzzyMatch = true;
         $additionalHeaderClass = 'box__result__header__red';

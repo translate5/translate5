@@ -45,11 +45,8 @@ $version = '?v='.$this->appVersion;
 
 $this->headLink()->prependStylesheet(APPLICATION_RUNDIR.'/modules/editor/instanttranslate/css/instanttranslate.css'.$version);
 
-$jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui/jquery-ui-1.12.1';
+$jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui/jquery-ui-1.13.0';
 $this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css'.$version);
-
-//$jqueryIconFontPath = APPLICATION_RUNDIR.'/js/jquery-ui/jquery-ui-iconfont-2.3.2';
-//$this->headLink()->prependStylesheet($jqueryIconFontPath.'/jquery-ui-1.12.icon-font.min.css'.$version);
 ?>
 <!DOCTYPE HTML>
 <html xmlns="http://www.w3.org/1999/xhtml">
