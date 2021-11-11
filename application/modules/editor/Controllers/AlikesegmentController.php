@@ -206,14 +206,16 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.repetition');
                 /* @var $logger ZfExtended_Logger */
                 $data = [
-                    'level' => $logger::LEVEL_DEBUG,
-                    'loadedSegmentMaster' => $this->entity->getDataObject(),
+                    'level' => $logger::LEVEL_WARN,
+                    'extra' => [
+                        'loadedSegmentMaster' => $this->entity->getDataObject(),
+                    ]
                 ];
                 if(!empty($entity)) {
-                    $data['preparedRepetition'] = $entity->getDataObject();
+                    $data['extra']['preparedRepetition'] = $entity->getDataObject();
                 }
                 if(!empty($entity)) {
-                    $data['preparedRepetitionHistory'] = $history->getDataObject();
+                    $data['extra']['preparedRepetitionHistory'] = $history->getDataObject();
                 }
                 $logger->exception($e, $data);
                 continue;

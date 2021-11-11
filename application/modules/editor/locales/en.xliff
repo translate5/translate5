@@ -240,6 +240,14 @@
         <source>Aufgabe komplett l&#xF6;schen</source>
         <target>Delete task completely</target>
       </trans-unit>
+      <trans-unit id='SW1wb3J0IGFiYnJlY2hlbg=='>
+        <source>Import abbrechen</source>
+        <target>abort import</target>
+      </trans-unit>
+      <trans-unit id='SW1wb3J0IHdpcmQgYWJnZWJyb2NoZW4uLi4='>
+        <source>Import wird abgebrochen...</source>
+        <target>aborting import...</target>
+      </trans-unit>
       <trans-unit id="Vm9ybmFtZQ==">
         <source>Vorname</source>
         <target>Forename</target>

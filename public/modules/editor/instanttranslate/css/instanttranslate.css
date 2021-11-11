@@ -26,6 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/*
+the following font "Roboto" is under Apache 2.0 Licence
+http://www.apache.org/licenses/LICENSE-2.0.html
+
+For Details see https://fonts.google.com/attribution
+*/
+
 /* roboto-regular - latin */
 @font-face {
     font-family: 'Roboto';
@@ -68,6 +75,7 @@ END LICENSE AND COPYRIGHT
     --color-grey_08: #6D6E6E;
     --color-grey_09: #5A5B5B;
     --color-grey_10: #3C3B3B;
+    --color-grey_11: #1C1B1B;
 
     --color-blue_01: #E1F5FD;
     --color-blue_02: #A5D9F9;
@@ -109,11 +117,45 @@ END LICENSE AND COPYRIGHT
 
 .instantTranslate .ui-tooltip {
     font-size: var(--font-size-normal);
-    border-radius: 0;
+    border-radius: 2px;
     box-shadow: none;
-    border-color: var(--color-grey_04);
-    background-color: var(--color-grey_02);
-    color: var(--color-grey_07);
+    border-color: var(--color-grey_11);
+    background-color: var(--color-grey_11);
+    color: #FFFFFF;
+}
+
+.arrow {
+    width: 70px;
+    height: 16px;
+    overflow: hidden;
+    position: absolute;
+    left: 50%;
+    margin-left: -35px;
+    bottom: -16px;
+}
+.arrow.top {
+    top: -16px;
+    bottom: auto;
+}
+.arrow.left {
+    left: 20%;
+}
+.arrow:after {
+    background-color: var(--color-grey_11);
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: -20px;
+    width: 25px;
+    height: 25px;
+    box-shadow: 6px 5px 9px -9px black;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+.arrow.top:after {
+    bottom: -20px;
+    top: auto;
 }
 
 /* --------------- global sets --------------- */
@@ -133,6 +175,7 @@ END LICENSE AND COPYRIGHT
 .color-grey_08 {color: var(--color-grey_08) !important;}
 .color-grey_09 {color: var(--color-grey_09) !important;}
 .color-grey_10 {color: var(--color-grey_10) !important;}
+.color-grey_11 {color: var(--color-grey_11) !important;}
 
 .bg-grey_01 {background-color: var(--color-grey_01) !important;}
 .bg-grey_02 {background-color: var(--color-grey_02) !important;}
@@ -144,6 +187,7 @@ END LICENSE AND COPYRIGHT
 .bg-grey_08 {background-color: var(--color-grey_08) !important;}
 .bg-grey_09 {background-color: var(--color-grey_09) !important;}
 .bg-grey_10 {background-color: var(--color-grey_10) !important;}
+.bg-grey_11 {background-color: var(--color-grey_11) !important;}
 
 .bg-blue_01 {background-color: var(--color-blue_01) !important;}
 .bg-blue_02 {background-color: var(--color-blue_02) !important;}
@@ -344,18 +388,24 @@ END LICENSE AND COPYRIGHT
     border-top-width: 0;
     border-color: var(--color-blue_03);
 }
-.ui-selectmenu-menu .ui-menu {padding: 1VW;}
-.localesSelectList li.notavailable {width: 50%; float: left;}
+.ui-selectmenu-menu {max-width: 100%;}
+.ui-selectmenu-menu .ui-menu {padding: 1VW; max-width: 100%;}
+.localesSelectList {column-count: 2;}
 
 .localesSelectList .ui-menu-item-wrapper {
     background-color: transparent;
     border: none;
+    padding: 0;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.localesSelectList li.notavailable .ui-menu-item-wrapper {
+.localesSelectList li.ui-menu-item {
     color: var(--color-grey_09);
     padding: 9px 0 9px var(--padding-big);
 }
-.localesSelectList li.notavailable .ui-state-active {
+.localesSelectList li.ui-menu-item .ui-state-active {
     color: var(--color-blue_05);
 }
 
@@ -555,28 +605,3 @@ END LICENSE AND COPYRIGHT
 }
 
 
-/* --------------- ui-tooltip --------------- */
-/*
-.ui-tooltip {
-    background: black;
-    padding: 10px;
-    color: white;
-    font-size: 9px;
-  }
-  
- #switchSourceTarget{
-	height:40px;
-	width:60px;
-	margin: 10px;
- }
-
-.switchSourceTargetDisabled{
-	color: #999;
-}
-.singleResultBestMatchrateInfoIcon {
-    background: url(../../images/information.png) no-repeat left center;
-    color: #666;
-    font-size: 12px;
-    padding: 3px 5px 3px 20px;
-}
-*/

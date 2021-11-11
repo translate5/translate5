@@ -855,6 +855,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         this.openTaskRequest(task);
     },
 
+    editorCancelImport: function(task) {
+        if (!this.isAllowed('editorCancelImport', task)) {
+            return;
+        }
+        Editor.util.TaskActions.cancelImport(task);
+    },
+
     /**
      * Finish the task for the logged in user
      * @param {Editor.model.admin.Task} task

@@ -45,7 +45,12 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addDontValidateField('lockedInternalSessionUniqId');
     $this->addValidator('locked', 'date', array('Y-m-d H:i:s'));
     $this->addValidator('lockingUser', 'guid');
-    $this->addValidator('state', 'inArray', array(array(editor_Models_Task::STATE_OPEN, editor_Models_Task::STATE_END, editor_Models_Task::STATE_UNCONFIRMED)));
+    $this->addValidator('state', 'inArray', [[
+        editor_Models_Task::STATE_OPEN,
+        editor_Models_Task::STATE_END,
+        editor_Models_Task::STATE_UNCONFIRMED,
+        editor_Models_Task::STATE_ERROR, //to cancel import only, validated on usage
+    ]]);
     $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
     /* @var $wfm editor_Workflow_Manager */
     $this->addValidator('workflow', 'inArray', [$wfm->getWorkflows()]);
