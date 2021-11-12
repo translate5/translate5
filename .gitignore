@@ -22,3 +22,5 @@ cghooks.lock
 _mails
 /.idea
 .idea
+.history
+.DS_Store

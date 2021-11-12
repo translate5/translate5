@@ -280,6 +280,11 @@ Ext.define('Editor.controller.Localizer', {
 		startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
         newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
 	};
+
+  	Editor.view.comments.Navigation.prototype.title = Editor.view.segments.column.Comments.prototype.text;
+  	Editor.view.comments.Navigation.prototype.strings = {
+	};
+
   	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('Manuelle QS (im Segment)');?>';
   	Editor.view.quality.mqm.Fieldset.prototype.strings = {
 		severityLabel: '<?php echo $this->translate->_('Gewichtung');?>',

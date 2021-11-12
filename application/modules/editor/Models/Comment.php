@@ -102,6 +102,26 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
   }
   
   /**
+   * loads all comments
+   * sorts from newest to oldest 
+   * @param string $taskGuid
+   * @return array
+   */
+  public function loadAllComments(string $taskGuid) {
+      $sessionUser = new Zend_Session_Namespace('user');
+      $userGuid = $sessionUser->data->userGuid ?? null;
+      $comments = $this->loadByTaskPlain($taskGuid);
+      $editable = true;
+      //comment is editable until an other user has edited it. 
+      //the following algorithm depends on correct sort (id DESC => from newest to oldest comment)
+      foreach($comments as &$comment) {
+          $comment['isEditable'] = ($editable && $userGuid && $comment['userGuid'] == $userGuid);
+          $editable = $editable && $comment['isEditable'];
+      }
+      return $comments;
+  }
+
+  /**
    * loads all comments to the given segmentId, filter also only the session loaded taskguid
    * sorts from newest to oldest comment, does compute the isEditable flag
    * @param int $segmentId
@@ -122,6 +142,20 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
       return $comments;
   }
   
+  /**
+   * Loads all comments of a segment by segmentid and taskguid, orders by creation order
+   * does not provide isEditable info
+   * @param int $segmentId
+   * @param string $taskGuid
+   * @return array|null
+   */
+  public function loadByTaskPlain(string $taskGuid) {
+      $s = $this->db->select()
+      ->where('taskGuid = ?', $taskGuid)
+      ->order('id DESC');
+      return $this->db->getAdapter()->fetchAll($s);
+  }
+
   /**
    * Loads all comments of a segment by segmentid and taskguid, orders by creation order
    * does not provide isEditable info

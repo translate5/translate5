@@ -866,3 +866,7 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
     vertical-align: middle;
     text-align: center;
 }
+
+.fs16 {
+  font-size: 16px;
+}

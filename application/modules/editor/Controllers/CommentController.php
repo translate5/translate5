@@ -56,7 +56,11 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
     
     public function indexAction() {
         $segmentId = (int)$this->_getParam('segmentId');
-        $this->view->rows = $this->entity->loadBySegmentId($segmentId, $this->session->taskGuid);
+        if($segmentId){
+            $this->view->rows = $this->entity->loadBySegmentId($segmentId, $this->session->taskGuid);
+        } else {
+            $this->view->rows = $this->entity->loadAll($this->session->taskGuid);
+        }
         foreach($this->view->rows as &$row) {
             $row['comment'] = htmlspecialchars($row['comment']);
         }

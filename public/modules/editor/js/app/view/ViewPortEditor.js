@@ -47,7 +47,8 @@ Ext.define('Editor.view.ViewPortEditor', {
         'Editor.view.segments.Grid',
         'Editor.view.segments.MetaPanelNavi',
         'Editor.view.segments.MetaPanel',
-        'Editor.view.quality.FilterPanel'
+        'Editor.view.quality.FilterPanel',
+        'Editor.view.comments.Navigation'
     ],
 
     viewModel: {
@@ -77,7 +78,7 @@ Ext.define('Editor.view.ViewPortEditor', {
               title: me.items_west_title,
               width: 250,
               collapsible: true,
-              layout: {type:'accordion'},
+              layout: {type:'accordion'}, // accordian layout requires panels, calls e.g. addBodyCls
               animCollapse: true,
               itemId: 'filepanel',
               items: [{
@@ -85,6 +86,11 @@ Ext.define('Editor.view.ViewPortEditor', {
                   stateId: 'editor.westPanelQualityFilter',
                   stateEvents: ['collapse', 'expand'],
                   stateful: true
+              },{
+                xtype: 'commentNavigation',
+                stateId: 'editor.westPanelCommentNavigation',
+                stateEvents: ['collapse', 'expand'],
+                stateful: true
               },{
                   xtype: 'fileorder.tree',
                   stateId: 'editor.westPanelFileorderTree',
