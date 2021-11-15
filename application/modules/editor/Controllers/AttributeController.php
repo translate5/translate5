@@ -61,6 +61,9 @@ class editor_AttributeController extends ZfExtended_RestController
         // Call parent
         parent::init();
 
+        // If request contains json-encoded 'data'-param, decode it and append to request params
+        $this->handleData();
+
         // Pick session
         $this->_session = (new Zend_Session_Namespace('user'))->data;
 
@@ -94,45 +97,65 @@ class editor_AttributeController extends ZfExtended_RestController
      */
     public function postAction() {
 
+        // Shortcut
+        $dataType = $this->getParam('dataType');
+
         // Validate params
         $_ = $this->jcheck([
-            'termEntryId' => [
+            'dataType' => [
                 'req' => true,
+                'rex' => is_numeric($dataType) ? 'int11' : '~^[a-zA-Z_]+$~',
+                'key' => 'editor_Models_Terminology_Models_AttributeDataType.' . (is_numeric($dataType) ? 'id' : 'type')
+            ],
+            'termEntryId' => [
+                'req' => !$this->getParam('termId'),
                 'rex' => 'int11',
                 'key' => 'terms_term_entry'
             ],
-            'mode' => [
-                // 'req' => false
-                'fis' => 'xref,ref,figure' // FIND_IN_SET
+            'language' => [
+                'rex' => 'rfc5646',
+                'key' => 'LEK_languages.rfc5646'
+            ],
+            'termId' => [
+                'req' => !$this->getParam('termEntryId'),
+                'rex' => 'int11',
+                'key' => 'editor_Models_Terminology_Models_TermModel'
             ],
         ]);
+
+        // Set 'level' prop inside $_ to be passed further
+        $_['level'] = $this->getParam('termId') ? 'term' : ($this->getParam('language') ? 'language' : 'entry');
+
+        // Check that the level we're going to create attr at is allowed for that attr datatype
+        $this->jcheck([
+            'level' => [
+                'fis' => $_['dataType']->getLevel() // FIND_IN_SET
+            ]
+        ], $_);
+
+        // Set 'termOrEntry' prop (to have a place where collectionId is accessible)
+        $_['termOrEntry'] = $_['level'] == 'term' ? $_['termId']->toArray() : $_['termEntryId'];
 
         // If no or only certain collections are accessible - validate collection accessibility
         if ($this->collectionIds !== true) $this->jcheck([
             'collectionId' => [
                 'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
             ],
-        ], $_['termEntryId']);
+        ], $_['termOrEntry']);
 
-        // Get request params
-        $params = $this->getRequest()->getParams();
-
-        // Call the appropriate method depend on attr's `elementName` or `type` prop
-        settype($params['mode'], 'string');
-        if ($params['mode'] == 'xref') {
-            $this->xrefcreateAction($_);
-        } else if ($params['mode'] == 'ref') {
-            $this->refcreateAction($_);
-        } else if ($params['mode'] == 'figure') {
-            $this->figurecreateAction($_);
-        } else {
-            $this->attrcreateAction($_);
+        // Call the appropriate method depend on mode-param
+        switch ($_['dataType']->getType()) {
+            case 'xGraphic':
+            case 'externalCrossReference': $this->xrefcreateAction($_);   break;
+            case 'crossReference':         $this->refcreateAction($_);    break;
+            case 'figure':                 $this->figurecreateAction($_); break;
+            default:                       $this->attrcreateAction($_);   break;
         }
 
         // Update
         ZfExtended_Factory
             ::get('editor_Models_TermCollection_TermCollection')
-            ->updateStats($_['termEntryId']['collectionId'], [
+            ->updateStats($_['termOrEntry']['collectionId'], [
                 'termEntry' => 0,
                 'term' => 0,
                 'attribute' => 1
@@ -224,59 +247,16 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
+     *
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
     public function xrefcreateAction($_) {
 
-        // Get request params
-        $params = $this->getRequest()->getParams();
-
-        // Validate params and load terms_attributes_datatype-row by type-param
-        $_ += $this->jcheck([
-            'language' => [
-                'req' => $params['level'] == 'language',
-                'rex' => 'rfc5646'
-            ],
-            'level' => [
-                'req' => true,
-                'fis' => 'entry,language,term' // FIND_IN_SET
-            ],
-            'type' => [
-                'req' => true,
-                'fis' => 'xGraphic,externalCrossReference', // FIND_IN_SET
-                'key' => 'terms_attributes_datatype.type'
-            ],
-        ]);
-
         // Init attribute model with data
-        $this->entity->init([
-            'collectionId' => $_['termEntryId']['collectionId'],
-            'termEntryId' => $params['termEntryId'],
-            'language' => $params['level'] == 'language' ? $params['language'] : null,
-
-            // No need for xrefs
-            //'termId' => ,
-
-            'dataTypeId' => $_['type']['id'],
-            'type' => $params['type'],
-
-            // Below 2 will be set by xrefupdateAction()
-            //'value' => ,
-            //'target' => ,
-
-            'isCreatedLocally' => 1,
-            'createdBy' => $this->_session->id,
-            'createdAt' => date('Y-m-d H:i:s'),
-            'updatedBy' => $this->_session->id,
-            'updatedAt' => date('Y-m-d H:i:s'),
-            'termEntryGuid' => $_['termEntryId']['entryGuid'],
-            //'langSetGuid' => null,
-            //'termGuid' => null,
-            'guid' => ZfExtended_Utils::uuid(),
-            'elementName' => 'xref',
-            'attrLang' => $params['language'],
-            //'dataType' => null
+        $this->_attrInit($_, [
+            'value' => null,
+            'target' => null,
         ]);
 
         // Save attr and affect transacgrp-records
@@ -305,52 +285,10 @@ class editor_AttributeController extends ZfExtended_RestController
      */
     public function refcreateAction($_) {
 
-        // Get request params
-        $params = ['type' => 'crossReference'] + $this->getRequest()->getParams();
-
-        // Validate params
-        $_ += $this->jcheck([
-            'level' => [
-                'req' => true,
-                'fis' => 'entry,term' // FIND_IN_SET
-            ],
-            'termId' => [
-                'req' => $params['level'] == 'term',
-                'rex' => 'int11',
-                'key' => 'terms_term'
-            ],
-            'type' => [
-                'key' => 'terms_attributes_datatype.type'
-            ]
-        ], $params);
-
         // Init attribute model with data
-        $this->entity->init([
-            'collectionId' => $_['termEntryId']['collectionId'],
-            'termEntryId' => $params['termEntryId'],
-            'language' => $params['level'] == 'term' ? $_['termId']['language'] : null,
-            'termId' => $params['level'] == 'term' ? $_['termId']['id'] : null,
-            'termTbxId' => $params['level'] == 'term' ? $_['termId']['termTbxId'] : null,
-
-            'dataTypeId' => $_['type']['id'],
-            'type' => 'crossReference',
-
-            // Below 2 will be set by refupdateAction()
-            //'value' => ,
-            //'target' => ,
-
-            'isCreatedLocally' => 1,
-            'createdBy' => $this->_session->id,
-            'createdAt' => date('Y-m-d H:i:s'),
-            'updatedBy' => $this->_session->id,
-            'updatedAt' => date('Y-m-d H:i:s'),
-            'termEntryGuid' => $_['termEntryId']['entryGuid'],
-            //'langSetGuid' => null,
-            'termGuid' => $params['level'] == 'term' ? $_['termId']['guid'] : null,
-            'guid' => ZfExtended_Utils::uuid(),
-            'elementName' => 'ref',
-            'attrLang' => $params['level'] == 'term' ? $_['termId']['language']: null,
-            //'dataType' => null
+        $this->_attrInit($_, [
+            'value' => null,
+            'target' => null,
         ]);
 
         // Save attr and affect transacgrp-records
@@ -362,8 +300,8 @@ class editor_AttributeController extends ZfExtended_RestController
         // Prepare inserted data to be flushed into response json
         $inserted = [
             'id' => $this->entity->getId(),
-            'target' => '',
             'value' => '',
+            'target' => '',
             'language' => '',
             'created' => $misc['userName'] . ', ' . date('d.m.Y H:i:s', strtotime($this->entity->getCreatedAt())),
             'updated' => $misc['userName'] . ', ' . date('d.m.Y H:i:s', strtotime($this->entity->getUpdatedAt())),
@@ -379,46 +317,10 @@ class editor_AttributeController extends ZfExtended_RestController
      */
     public function figurecreateAction($_) {
 
-        // Get request params
-        $params = ['type' => 'figure'] + $this->getRequest()->getParams();
-
-        // Validate params
-        $_ += $this->jcheck([
-            'language' => [
-                'req' => $params['level'] == 'language',
-                'rex' => 'rfc5646'
-            ],
-            'level' => [
-                'req' => true,
-                'fis' => 'entry,language' // FIND_IN_SET
-            ],
-            'type' => [
-                'key' => 'terms_attributes_datatype.type'
-            ]
-        ], $params);
-
         // Init attribute model with data
-        $this->entity->init([
-            'collectionId' => $_['termEntryId']['collectionId'],
-            'termEntryId' => $params['termEntryId'],
-            'language' => $params['level'] == 'language' ? $params['language'] : null,
-            // 'termId' => ,
-            'dataTypeId' => $_['type']['id'],
-            'type' => 'figure',
+        $this->_attrInit($_, [
             'value' => 'Image',
             'target' => ZfExtended_Utils::uuid(),
-            'isCreatedLocally' => 1,
-            'createdBy' => $this->_session->id,
-            'createdAt' => date('Y-m-d H:i:s'),
-            'updatedBy' => $this->_session->id,
-            'updatedAt' => date('Y-m-d H:i:s'),
-            'termEntryGuid' => $_['termEntryId']['entryGuid'],
-            //'langSetGuid' => null,
-            //'termGuid' => $params['level'] == 'term' ? $_['termId']['guid'] : null,
-            'guid' => ZfExtended_Utils::uuid(),
-            'elementName' => 'descrip',
-            'attrLang' => $params['level'] == 'language' ? $params['language'] : null,
-            //'dataType' => null
         ]);
 
         // Save attr and affect transacgrp-records
@@ -451,88 +353,29 @@ class editor_AttributeController extends ZfExtended_RestController
      */
     public function attrcreateAction($_) {
 
-        // Check dataTypeId-param and load corresponding instance into dataType-model
-        $_ += $this->jcheck([
-            'dataTypeId' => [
-                'req' => true,
-                'rex' => 'int11',
-                'key' => 'editor_Models_Terminology_Models_AttributeDataType'
-            ],
-        ]);
-
-        // Get request params
-        $params = $this->getRequest()->getParams();
-
-        // Validate others params
-        $_ += $this->jcheck([
-            'language' => [
-                'req' => $params['level'] != 'entry',
-                'rex' => 'rfc5646'
-            ],
-            'level' => [
-                'req' => true,
-                'fis' => $_['dataTypeId']->getLevel() // FIND_IN_SET
-            ],
-            'termId' => [
-                'req' => $params['level'] == 'term',
-                'rex' => 'int11',
-                'key' => 'terms_term'
-            ],
-        ], $params);
-
-        // Prevent creating attribute that is having type, handled by dedicated *createAction()
-        $this->jcheck([
-            'type' => [
-                'dis' => 'figure,externalCrossReference,crossReference,xGraphic'
-            ],
-        ], $_['dataTypeId']);
-
         // Prevent creating attribute with a dataTypeId, that one of already existing attributes has
         $this->jcheck([
-            'dataTypeId' => [
-                'dis' => $_['dataTypeId']->getAlreadyExistingFor(
-                    $params['termEntryId'],
-                    $params['level'] != 'entry' && $params['language'] ?? null,
-                    $params['level'] == 'term' && $params['termId'] ?? null
+            'id' => [
+                'dis' => $_['dataType']->getAlreadyExistingFor(
+                    $_['level'] == 'term' ? $_['termId']->getTermEntryId() : $_['termEntryId']['id'],
+                    $_['level'] == 'term' ? $_['termId']->getLanguage() : $this->getParam('language'),
+                    $_['level'] == 'term' ? $_['termId']->getId() : null
                 )
             ]
-        ]);
+        ], $_['dataType']);
 
         // If attribute we're going to add is not a part of TBX basic standard
-        if (!$_['dataTypeId']->getIsTbxBasic())
+        if (!$_['dataType']->getIsTbxBasic())
             $this->jcheck([
                 'collectionId' => [
-                    'fis' => $_['dataTypeId']->getAllowedCollectionIds() // FIND_IN_SET
+                    'fis' => $_['dataType']->getAllowedCollectionIds() // FIND_IN_SET
                 ]
-            ], $_['termEntryId']);
+            ], $_['termOrEntry']);
 
         // Init attribute model with data
-        $this->entity->init([
-            'collectionId' => $_['termEntryId']['collectionId'],
-            'termEntryId' => $params['termEntryId'],
-            'language' => $params['level'] != 'entry' ? $params['language'] : null,
-            'termId' => $params['level'] == 'term' ? $_['termId']['id'] : null,
-            'termTbxId' => $params['level'] == 'term' ? $_['termId']['termTbxId'] : null,
-
-            'dataTypeId' => $params['dataTypeId'],
-            'type' => $_['dataTypeId']->getType(),
-            'value' => $_['dataTypeId']->getDataType() == 'picklist' ? explode(',', $_['dataTypeId']->getPicklistValues())[0] : null,
-
-            // This wont be set for ordinary attributes
-            //'target' => ,
-
-            'isCreatedLocally' => 1,
-            'createdBy' => $this->_session->id,
-            'createdAt' => date('Y-m-d H:i:s'),
-            'updatedBy' => $this->_session->id,
-            'updatedAt' => date('Y-m-d H:i:s'),
-            'termEntryGuid' => $_['termEntryId']['entryGuid'],
-            //'langSetGuid' => null,
-            'termGuid' => $params['level'] == 'term' ? $_['termId']['guid'] : null,
-            'guid' => ZfExtended_Utils::uuid(),
-            'elementName' => $_['dataTypeId']->getLabel(),
-            'attrLang' => $params['level'] != 'entry' ? $params['language'] : null,
-            //'dataType' => null
+        $this->_attrInit($_, [
+            'value' => $_['dataType']->getDataType() == 'picklist' ? explode(',', $_['dataType']->getPicklistValues())[0] : null,
+            'target' => null,
         ]);
 
         // Save attr and affect transacgrp-records
@@ -556,16 +399,10 @@ class editor_AttributeController extends ZfExtended_RestController
         // Response data
         $data = ['inserted' => $inserted, 'updated' => $updated];
 
-        // Get the term (if termId exists only)
-        /** @var editor_Models_Terminology_Models_TermModel $t */
-        if (!empty($params['termId'])) {
-            $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-            $t->load($params['termId']);
-
-            // If term status changed - append new value to json
-            if ($status = $this->_updateTermStatus($t, $this->entity))
+        // If term status changed - append new value to json
+        if ($_['level'] == 'term')
+            if ($status = $this->_updateTermStatus($_['termId'], $this->entity))
                 $data['status'] = $status;
-        }
 
         // Flush response data
         $this->view->assign($data);
@@ -618,39 +455,50 @@ class editor_AttributeController extends ZfExtended_RestController
                 'rex' => 'xmlid',
             ],
             'termLang,mainLang' => [
-                'req' => true,
                 'rex' => 'rfc5646'
             ]
         ]);
+
+        // Get param shortcuts
+        $target = $this->getParam('target');
+        $attrId = $this->getParam('attrId');
+        $termLang = $this->getParam('termLang');
+        $mainLang = $this->getParam('mainLang');
 
         // Get request params
         $params = $this->getRequest()->getParams();
 
         // Set attribute's target-prop
-        $this->entity->setTarget($params['target']);
+        $this->entity->setTarget($target);
 
         // Update attribute
-        $data['updated'] = $this->entity->update($misc = [
+        $data['updated'] = $this->entity->update([
             'userName' => $this->_session->userName,
             'userGuid' => $this->_session->userGuid,
         ]);
 
         // If given target is not empty
-        if ($params['target']) {
+        if ($target) {
 
             // Detect level
             $level = $this->entity->getTermId() ? 'term' : 'entry';
 
+            // Setup preferred languages array
+            $prefLangA = [];
+            if ($termLang) $prefLangA[] = $termLang;
+            if ($mainLang) $prefLangA[] = $mainLang;
+            if ($level == 'term' && !$prefLangA) $prefLangA []= $this->entity->getLanguage();
+            $preLangA = array_unique($prefLangA);
+
             // Prepare first 2 arguments to be used for $this->_refTarget(&$refA, $refTargetIdA, $prefLangA) call
-            $refA[$level][$params['attrId']] = $this->entity->toArray();
-            $refTargetIdA[$params['target']] = [$level, $params['attrId']];
-            $prefLangA = array_unique([$params['termLang'], $params['mainLang']]);
+            $refA[$level][$attrId] = $this->entity->toArray();
+            $refTargetIdA[$target] = [$level, $attrId];
 
             // Call $this->_refTarget() with that args
             editor_Models_Terminology_Models_AttributeModel::refTarget($refA, $refTargetIdA, $prefLangA, $level);
 
             // Append refTarget data to the response
-            $data += $refA[$level][$params['attrId']];
+            $data += $refA[$level][$attrId];
         }
 
         // Flush response data
@@ -664,10 +512,6 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Validate params and pick figure image file
         $_ = $this->jcheck([
-            'level' => [
-                'req' => true,
-                'fis' => 'entry,language' // FIND_IN_SET
-            ],
             'figure' => [
                 'req' => true,
                 'ext' => '~^(gif|png|jpe?g)$~'
@@ -846,25 +690,16 @@ class editor_AttributeController extends ZfExtended_RestController
      */
     protected function _attrupdateCheck() {
 
-        // Get attribute meta
+        // Get attribute meta load term model instance, if current attr has non-empty termId
         $_ = $this->jcheck([
             'dataTypeId' => [
                 'key' => 'terms_attributes_datatype'
-            ]
-        ], $this->entity);
-
-        // Validate params and load term model instance, if termId param is given
-        $_ += $this->jcheck([
-            'level' => [
-                'req' => true,
-                'fis' => 'entry,language,term' // FIND_IN_SET
             ],
             'termId' => [
-                'req' => $this->getParam('level') == 'term',
                 'rex' => 'int11',
                 'key' => 'editor_Models_Terminology_Models_TermModel'
             ]
-        ]);
+        ], $this->entity);
 
         // If attribute is a picklist - make sure given value is in the list of allowed values
         if ($_['dataTypeId']['dataType'] == 'picklist')
@@ -906,14 +741,14 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Merge allowed
         foreach ($allowByRole as $i => $info)
-            if ($role[$i])
+            if ($role[$i] ?? 0)
                 $allow = is_bool($info) || is_bool($allow)
                     ? $info
                     : $info + $allow;
 
         // Prepare list of allowed values
         $allowed = []; foreach(explode(',', $_['dataTypeId']['picklistValues']) as $possible)
-            if ($allow === true || (is_array($allow[$current]) && $allow[$current][$possible]))
+            if ($allow === true || (is_array($allow[$current] ?? 0) && ($allow[$current][$possible] ?? 0)))
                 $allowed []= $possible;
 
         // Make sure only allowed values can be set as new value of processStatus attribute
@@ -921,6 +756,40 @@ class editor_AttributeController extends ZfExtended_RestController
             'value' => [
                 'fis' => implode(',', $allowed ?: ['wontpass']) // FIND_IN_SET
             ]
+        ]);
+    }
+
+    /**
+     * Init attribute with common data, picked from jcheck() return value ($_-arg)
+     * and custom data, given by $data arg
+     *
+     * @param array $_ Common data holder
+     * @param array $data
+     */
+    protected function _attrInit(array $_, array $data = []) {
+
+        // Init
+        $this->entity->init($data + [
+            'dataTypeId'  => $_['dataType']->getId(),
+            'type'        => $_['dataType']->getType(),
+            'elementName' => $_['dataType']->getLabel(),
+
+            'collectionId' => $_['termOrEntry']['collectionId'],
+            'termEntryId'  =>      $this->getParam('termId') ? $_['termId']->getTermEntryId()  : $_['termEntryId']['id'],
+            'language'     => $l = $this->getParam('termId') ? $_['termId']->getLanguage() : $this->getParam('language'),
+            'termId'       => $this->getParam('termId'),
+            'termTbxId'    => $this->getParam('termId') ? $_['termId']->getTermTbxId() : null,
+            'isCreatedLocally' => 1,
+            'createdBy' => $this->_session->id,
+            'createdAt' => date('Y-m-d H:i:s'),
+            'updatedBy' => $this->_session->id,
+            'updatedAt' => date('Y-m-d H:i:s'),
+            'termEntryGuid' => $this->getParam('termId') ? $_['termId']->getTermEntryGuid() : $_['termEntryId']['entryGuid'],
+            //'langSetGuid' => null,
+            'termGuid' => $this->getParam('termId') ? $_['termId']->getGuid() : null,
+            'guid' => ZfExtended_Utils::uuid(),
+            'attrLang' => $l,
+            //'dataType' => null
         ]);
     }
 }

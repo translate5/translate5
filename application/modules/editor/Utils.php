@@ -335,14 +335,15 @@ class editor_Utils {
      *  'eql' - Equal. Prop value should be equal to given rule value. Equality check is done using non-strict comparison, e.g '!='
      *  'key' - Key(s) pointing to existing record(s). Possible rule values:
      *
-     *          - 'tableName'                  - Single row mode. Here columnName is not given, so 'id' assumed
-     *          - 'tableName.columnName'       - Single row mode. Here columnName is explicitly given
+     *          - 'tableName'                             - Single row mode. Here columnName is not given, so 'id' assumed
+     *          - 'tableName.columnName'                  - Single row mode. Here columnName is explicitly given
      *
-     *          - 'tableName*'                 - Multiple rows mode. Prop value should be comma-separated list or array
-     *          - 'tableName.columnName*'        of values, that can be, for example, ids, slugs or others kind of data
+     *          - 'tableName*'                            - Multiple rows mode. Prop value should be comma-separated list or array
+     *          - 'tableName.columnName*'                   of values, that can be, for example, ids, slugs or others kind of data
      *
-     *          - 'editor_Models_MyModelName'  - Single row mode. Model class name can be used
-     *          - $this->entity                - Single row mode. Model class instance can be used
+     *          - 'editor_Models_MyModelName'             - Single row mode. Model class name can be used
+     *          - 'editor_Models_MyModelName.columnName'  - Single row mode. Model class name can be used
+     *          - $this->entity                           - Single row mode. Model class instance can be used
      *
      *          Found data is accessible within return value using the same mapping: $_['propNameX'],
      *          and is represented as:
@@ -372,7 +373,7 @@ class editor_Utils {
      *
      * Todo: Add support for 'min' and 'max' rules, that would work for strings, numbers and file sizes
      * @param $ruleA
-     * @param $data
+     * @param array|stdClass|ZfExtended_Models_Entity_Abstract $data Data to checked
      * @return array
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
@@ -382,9 +383,15 @@ class editor_Utils {
         // Declare $rowA array
         $rowA = [];
 
-        // If $data arg is a model instance, or model name convert it to array
-        if (is_object($data) && is_subclass_of($data, 'ZfExtended_Models_Entity_Abstract'))
-            $data = $data->toArray();
+        // If $data is an object
+        if (is_object($data)) {
+
+            // If $data arg is a model instance - convert it to array
+            if (is_subclass_of($data, 'ZfExtended_Models_Entity_Abstract')) $data = $data->toArray();
+
+            // Else if $data arg is an instance of stdClass - convert it to array as well
+            else if ($data instanceof stdClass) $data = (array) $data;
+        }
 
         // Foreach prop having mismatch rules
         foreach ($ruleA as $props => $rule) foreach (self::ar($props) as $prop) {
@@ -469,28 +476,74 @@ class editor_Utils {
             if ($rule['dis'] && in_array($value, self::ar($rule['dis'])))
                 throw new ZfExtended_Mismatch('E2005', [$value, $label]);
 
-            // If prop's value should be an identifier of an existing object, but such object not found - flush error
+            // If prop's value should be an identifier of an existing database record
             if ($rule['key'] && strlen($value) && $value != '0') {
 
-                // Get table name
-                $table = preg_replace('/\*$/', '', $rule['key']);
+                // If the rule value is a string
+                if (is_string($rule['key'])) {
 
-                // Setup $s as a flag indicating whether *_Row (single row) or *_Rowset should be fetched
-                $isSingleRow = $table == $rule['key'];
+                    // Get table name
+                    $table = preg_replace('/\*$/', '', $rule['key']);
 
-                // If $rule['key'] arg is a class name of model, that is a subclass of ZfExtended_Models_Entity_Abstract
-                if ($isSingleRow && is_subclass_of($rule['key'], 'ZfExtended_Models_Entity_Abstract')) {
+                    // Setup $isSingleRow as a flag indicating whether *_Row (single row) or *_Rowset should be fetched
+                    $isSingleRow = $table == $rule['key'];
 
-                    // Setup model and load record
-                    $m = is_string($rule['key']) ? ZfExtended_Factory::get($rule['key']) : $rule['key'];
-                    $m->load($value);
+                    // Get key's target table and column
+                    $target = explode('.', $table); $table = $target[0]; $column = $target[1] ?? 'id';
+
+                // Else if
+                } else {
+
+                    //
+                    $isSingleRow = true;
+
+                    //
+                    $table = $rule['key'];
+                }
+
+                // If $rule['key'] arg is a class name (or an instance) of model, that is a subclass of ZfExtended_Models_Entity_Abstract
+                if (is_subclass_of($table, 'ZfExtended_Models_Entity_Abstract')) {
+
+                    // If rule value is string
+                    if (is_string($rule['key'])) {
+
+                        // Get model
+                        $m = ZfExtended_Factory::get($table);
+
+                        // If single row mode
+                        if ($isSingleRow) {
+
+                            // Load row
+                            $m->loadRow("$column = ?", $value);
+
+                        // Else
+                        } else {
+                             // Not yet supported
+                        }
+
+                    // Else if rule value is a model instance
+                    } else {
+
+                        // Get model
+                        $m = $rule['key'];
+
+                        // If single row mode
+                        if ($isSingleRow) {
+
+                            // Load row
+                            $m->load($value);
+
+                        // Else
+                        } else {
+                            // Not yet supported
+                        }
+                    }
+
+                    // Assign model into return value
                     $rowA[$prop] = $m->getId() ? $m : false;
 
                 // Else
                 } else {
-
-                    // Get key's target table and column
-                    $target = explode('.', $table); $table = $target[0]; $column = $target[1] ?? 'id';
 
                     // Setup WHERE clause and method name to be used for fetching
                     $where = $isSingleRow
@@ -511,7 +564,7 @@ class editor_Utils {
 
                 // If no *_Row was fetched, or empty *_Rowset was fetched - flush error
                 if (!$rowA[$prop])
-                    throw new ZfExtended_Mismatch('E2002', [$rule['key'], $value]);
+                    throw new ZfExtended_Mismatch('E2002', [is_string($rule['key']) ? $rule['key'] : get_class($rule['key']), $value]);
             }
 
             // If prop's value should be unique within the whole database table, but it's not - flush error

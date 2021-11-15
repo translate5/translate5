@@ -244,7 +244,7 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
             FROM 
               `terms_attributes_datatype` `a` 
               LEFT JOIN `terms_collection_attribute_datatype` `ac` ON (`ac`.`dataTypeId` = `a`.`id`)
-            WHERE `ac`.`collectionId` IN (' . join(',',$collectionIds) . ') OR ISNULL(`ac`.`collectionId`)
+            WHERE `ac`.`collectionId` IN (' . join(',',$collectionIds) . ') OR ISNULL(`ac`.`collectionId`) OR `a`.`isTbxBasic`
             GROUP BY `a`.`id`
             ORDER BY `title`
         ', [':lang' => '$.' . $locale])->fetchAll(PDO::FETCH_UNIQUE);
