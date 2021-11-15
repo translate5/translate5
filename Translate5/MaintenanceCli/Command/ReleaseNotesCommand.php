@@ -142,6 +142,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
                 passthru('git add '.$md);
                 passthru('git add '.$sql);
                 passthru('git commit -m "change log release '.$this->releaseVersion->name.'" '.$sql.' '.$md);
+                passthru('git push');
             }
         }
         if(!$this->releaseVersion->released) {
