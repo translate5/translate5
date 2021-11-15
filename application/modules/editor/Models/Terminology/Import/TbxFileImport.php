@@ -188,8 +188,6 @@ class editor_Models_Terminology_Import_TbxFileImport
         $this->mergeTerms = $mergeTerms;
         $this->prepareImportArrays($user);
 
-        error_log("File to import: ".$tbxFilePath);
-
         $xmlReader = (new class() extends XMLReader {
             public function reopen(string $tbxFilePath) {
                 $this->close();
@@ -332,7 +330,7 @@ $memLog('Loaded terms:        ');
             $newProgress = min(100, round(($importCount/$totalCount)*100));
             if($newProgress > $progress) {
                 $progress = $newProgress;
-                $this->events->trigger('afterTermEntrySave', $this, ['progress' => $progress]);
+                $this->events->trigger('afterTermEntrySave', $this, ['progress' => $progress / 100]); //we store the value as value between 0 and 1
             }
 
             // Uncomment this to print the progress
