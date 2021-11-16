@@ -30,6 +30,8 @@ END LICENSE AND COPYRIGHT
  * Initial Class of Plugin "TermTagger"
  */
 class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
+    const TASK_STATE = 'termtagging';
+
     protected static $description = 'Provides term-tagging';
     
     /**
@@ -66,6 +68,8 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', array($this, 'handleTermTaggerCheck'));
 
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
+
+        $this->eventManager->attach('editor_TaskController', 'tagtermsOperation', [$this, 'handleTagtermsOperation']);
     }
 
     /**
@@ -275,5 +279,30 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $sourceOrig = $alikeSegment->getSource();
         $targetEdit = $alikeSegment->getTargetEdit();
         $alikeSegment->setSource($this->markTransFound->recalc($sourceOrig, $targetEdit));
+    }
+
+    /**
+     * Operation action handler. Run termtagging specific for a task
+     *
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleTagtermsOperation(Zend_EventManager_Event $event){
+        $task = $event->getParam('entity');
+        /* @var $task editor_Models_Task */
+
+        $initialTaskState = $task->getState();
+        $task->checkStateAllowsActions();
+        if(!$task->lock(NOW_ISO, self::TASK_STATE)) {
+            return;
+        }
+
+        $task->setState(self::TASK_STATE);
+        $task->save();
+
+        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_SetTaskToOpen');
+        /* @var $worker editor_Plugins_TermTagger_Worker_SetTaskToOpen */
+        $worker->init($task->getTaskGuid(),['initialTaskState' => $initialTaskState]);
+        $parentId = $worker->queue(0, null, false);
+        editor_Segment_Quality_Manager::instance()->prepareAnalysis($task, $parentId);
     }
 }

@@ -14,6 +14,75 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.5.4] - 2021-11-15
+
+### Important Notes:
+#### [TRANSLATE-2638](https://jira.translate5.net/browse/TRANSLATE-2638)
+Implement new layout for InstantTranslate as discussed with the consortium members.
+
+#### [TRANSLATE-2404](https://jira.translate5.net/browse/TRANSLATE-2404)
+The layout of the start analysis panel has been changed. The checkboxes were reordered, so that they need less space. And a separate button was introduced to run the terminology check. That means running a terminology check after the import is now completely independent of running analyses.
+ 
+
+
+### Added
+**[TRANSLATE-2638](https://jira.translate5.net/browse/TRANSLATE-2638): Implement new layout for InstantTranslate** <br>
+Implement new layout for InstantTranslate as discussed with the consortium members.
+
+
+### Changed
+**[TRANSLATE-2683](https://jira.translate5.net/browse/TRANSLATE-2683): Editor Embedded: export may be started while last edited segment still is saving** <br>
+For translate5 embedded usage: the JS API function Editor.util.TaskActions.isTaskExportable() returns true or false if the currently opened task can be exported regarding the last segment save call.
+
+**[TRANSLATE-2649](https://jira.translate5.net/browse/TRANSLATE-2649): Small fixes for TermPortal** <br>
+A number of fixes/improvements implemented
+
+**[TRANSLATE-2632](https://jira.translate5.net/browse/TRANSLATE-2632): TermPortal code refactoring** <br>
+Termportal code and related tests are now refactored for better maintainability.
+
+**[TRANSLATE-2489](https://jira.translate5.net/browse/TRANSLATE-2489): Change of attribute label in GUI** <br>
+Added ability to edit attribute labels
+
+
+### Bugfixes
+**[TRANSLATE-2701](https://jira.translate5.net/browse/TRANSLATE-2701): Source term from InstantTranslate not saved along with target term** <br>
+TermPortal: In case the source term, that had been translated in InstantTranslate was not contained in the TermCollection, only the target term was added, the new source term not. This is fixed.
+
+**[TRANSLATE-2699](https://jira.translate5.net/browse/TRANSLATE-2699): Add missing ID column to task overview and fix date type in meta data excel** <br>
+Add missing ID column to task overview and fix date type in meta data excel export.
+
+**[TRANSLATE-2696](https://jira.translate5.net/browse/TRANSLATE-2696): Malicious segments may lead to endless loop while term tagging** <br>
+Segments with specific / malicious content may lead to endless loops while term tagging so that the task import is running forever.
+
+**[TRANSLATE-2695](https://jira.translate5.net/browse/TRANSLATE-2695): JS error task is null** <br>
+Due unknown conditions there might be an error task is null in the GUI. Since the reason could not be determined, we just fixed the symptoms. As a result a user might click twice on the menu action item to get all items.
+
+**[TRANSLATE-2694](https://jira.translate5.net/browse/TRANSLATE-2694): Improve GUI logging for false positive "Not all repeated segments could be saved" messages** <br>
+Improve GUI logging for message like: Not all repeated segments could be saved. With the advanced logging should it be possible to detect the reason behind.
+
+**[TRANSLATE-2691](https://jira.translate5.net/browse/TRANSLATE-2691): SDLXLIFF diff export is failing with an endless loop** <br>
+The SDLXLIFF export with diff fails by hanging in an endless loop if the segment content has a specific form. This is fixed by updating the underlying diff library.
+
+**[TRANSLATE-2690](https://jira.translate5.net/browse/TRANSLATE-2690): task is null: User association in import wizard** <br>
+Fix for "task is null" error in import user-assoc wizard
+
+**[TRANSLATE-2689](https://jira.translate5.net/browse/TRANSLATE-2689): TBX import fails because of some ID error** <br>
+Terminology containing string based IDs could not be imported if the same ID was used one time lower case and one time uppercase.
+
+**[TRANSLATE-2688](https://jira.translate5.net/browse/TRANSLATE-2688): For many languages the lcid is missing in LEK_languages** <br>
+Added some missing LCID values in the language table.
+
+**[TRANSLATE-2687](https://jira.translate5.net/browse/TRANSLATE-2687): Wrong texts in system config options** <br>
+Improve description and GUI-text for system configurations.
+
+**[TRANSLATE-2686](https://jira.translate5.net/browse/TRANSLATE-2686): TermTagging does not work after import** <br>
+If term tagging is started along with analysis on an already imported task, nothing gets tagged.
+
+**[TRANSLATE-2404](https://jira.translate5.net/browse/TRANSLATE-2404): There is no way to run only the terminology check only after import** <br>
+There is no way to start the terminology check only from the language resource association panel, a analysis is always started as well. This is changed now.
+
+
 ## [5.5.3] - 2021-10-28
 
 ### Important Notes:
