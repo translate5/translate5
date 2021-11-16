@@ -186,6 +186,9 @@ $dep->dependencies = [[
         "target" => "public/modules/editor/js/ux",
         //"licenses" => licenses are confirmed with third-party-dependencies package, since UX packages are maintained there, but pulled in separatly to public directory here
     ],[
+    //FIXME move rangy also too composer, what prevents from doing so: it is unclear where the 1.3.1-dev version is coming from.
+    // is it from the web? Is it a local modified copy of 1.3.0? Fork the 1.3.0 apply a diff to the local files.
+    // or finally take the current zip and configure is at as package in composer, then it can be removed here too
         "name" => "rangy",
         "label" => "Rangy",
         "version" => "1.3.1-dev",
@@ -196,53 +199,6 @@ $dep->dependencies = [[
             "license" => "MIT",
             "relpath" => "docs/third-party-licenses/rangy-license.txt"
         ]]
-    ],[
-        "name" => "jquery-ui",
-        "label" => "JQuery UI",
-        "version" => "1.12.1",
-        "url" => "RELEASE:jquery-ui.zip",
-        "target" => "public/js/jquery-ui",
-        "licenses" => [[
-            "uses" => "JQuery",
-            "license" => "MIT",
-            "relpath" => "docs/third-party-licenses/jquery-license.txt"
-        ],[
-            "uses" => "JQuery UI",
-            "license" => "JQuery UI",
-            "relpath" => "docs/third-party-licenses/jquery-ui-license.txt"
-        ],[
-            "uses" => "Future Imperfect by HTML5 UP",
-            "license" => "CCA 3.0",
-            "relpath" => "docs/third-party-licenses/jquery-ui-license.txt"
-        ],[
-            "uses" => "Skel",
-            "license" => "MIT",
-            "relpath" => "docs/third-party-licenses/skel-license.txt"
-        ]]
-    ],[
-        "name" => "tag-it",
-        "label" => "Tag-it: a jQuery UI plugin",
-        "version" => "master-2019-08-01",
-        "url" => "RELEASE:tag-it.zip",
-        "target" => "public/js/jquery-ui",
-        "preventTargetCleaning" => true,
-        "licenses" => [[
-            "uses" => "Tag-it",
-            "license" => "MIT",
-            "relpath" => "docs/third-party-licenses/tag-it-license.txt"
-        ]]
-    ],[
-        "name" => "jquery-ui-iconfont",
-        "label" => "Icons for jQuery-UI",
-        "version" => "2.3.2",
-        "url" => "RELEASE:jquery-ui-iconfont.zip",
-        "target" => "public/js/jquery-ui",
-        "preventTargetCleaning" => true,
-        "licenses" => [[
-            "uses" => "Icons for jQuery-UI",
-            "license" => "CC BY-SA 3.0",
-            "relpath" => "docs/third-party-licenses/jquery-ui-iconfont-README.md"
-        ]]
     ]
 ];
 
@@ -250,7 +206,9 @@ $dep->post_install_copy = [
     "vendor/fortawesome/font-awesome/css" => "public/modules/editor/fontawesome/css",
     "vendor/fortawesome/font-awesome/js" => "public/modules/editor/fontawesome/js",
     "vendor/fortawesome/font-awesome/webfonts" => "public/modules/editor/fontawesome/webfonts",
-    "vendor/fortawesome/font-awesome/LICENSE.txt" => "public/modules/editor/fontawesome/LICENSE.txt"
+    "vendor/fortawesome/font-awesome/LICENSE.txt" => "public/modules/editor/fontawesome/LICENSE.txt",
+    "vendor/jquery/jquery-ui" => "public/js/jquery-ui",
+    "vendor/translate5/instanttranslate-roboto-font/" => "public/modules/editor/instanttranslate/fonts/roboto",
 ];
 
 $dep = json_encode($dep, JSON_PRETTY_PRINT);

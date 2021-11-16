@@ -26,29 +26,39 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-$config = Zend_Registry::get('config');
-/* @var $config Zend_Config */
+/**
+ * This Worker reopens the task after lonely termtagging
+ */
+class editor_Plugins_TermTagger_Worker_SetTaskToOpen extends editor_Models_Task_AbstractWorker {
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::validateParameters()
+     */
+    protected function validateParameters($parameters = array()) {
+        if(empty($parameters['initialTaskState'])) {
+            throw new ZfExtended_Exception('no initialTaskState given');
+        }
+        return true;
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::work()
+     */
+    public function work() {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->taskGuid);
+        
+        if ($task->getState() != editor_Plugins_TermTagger_Bootstrap::TASK_STATE) {
+            return false;
+        }
 
-echo $this->doctype();
-$version = '?v='.$this->appVersion;
-$this->headLink()->prependStylesheet(APPLICATION_RUNDIR.'/modules/editor/apps/css/apps.css'.$version);
-$jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui';
-$this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css'.$version);
-?>
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <?php echo $this->headTitle() ?>
-        <?php echo $this->headMeta() ?>
-        <?php echo $this->headLink() ?>
-        <?php echo $this->headStyle() ?>
-        <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR . $config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
-<?php echo $this->headScript() ?>
-        <script src="<?php echo $jqueryPath; ?>/external/jquery/jquery.js<?php echo $version; ?>"></script>
-        <script src="<?php echo $jqueryPath; ?>/jquery-ui.min.js<?php echo $version; ?>"></script>
-    </head>
-    <body>
-        <?php
-            echo $this->layout()->content;
-        ?>
-    </body>
-</html>
+        $params = $this->workerModel->getParameters();
+        $task->setState($params['initialTaskState']);
+        $task->save();
+        $task->unlock();
+        
+        return true;
+    }
+}

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a674fbfe2de1ca95826fc023932085f8",
+    "content-hash": "fcd27f90ef2b2ba7751d847a39886e26",
     "packages": [
         {
             "name": "apix/log",
@@ -1374,6 +1374,24 @@
                 "source": "https://github.com/infostars/headless-chromium-php/tree/master"
             },
             "time": "2018-12-07T14:25:03+00:00"
+        },
+        {
+            "name": "jquery/jquery-ui",
+            "version": "1.13.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jquery/jquery-ui.git",
+                "reference": "1.13.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://jqueryui.com/resources/download/jquery-ui-1.13.0.zip"
+            },
+            "type": "library",
+            "license": [
+                "MIT"
+            ],
+            "description": "A curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library."
         },
         {
             "name": "jumbojett/openid-connect-php",
@@ -7045,6 +7063,19 @@
                 }
             ],
             "time": "2021-07-28T10:34:58+00:00"
+        },
+        {
+            "name": "translate5/instanttranslate-roboto-font",
+            "version": "26",
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.translate5.net/instanttranslate-font-roboto.zip"
+            },
+            "type": "library",
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "package introducing roboto font from google for instanttranslation"
         },
         {
             "name": "vlucas/phpdotenv",

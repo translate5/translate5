@@ -61,6 +61,9 @@ class editor_TermController extends ZfExtended_RestController
         // Call parent
         parent::init();
 
+        // If request contains json-encoded 'data'-param, decode it and append to request params
+        $this->handleData();
+
         // Pick session
         $this->_session = (new Zend_Session_Namespace('user'))->data;
 
@@ -141,19 +144,19 @@ class editor_TermController extends ZfExtended_RestController
 
         // Apply data
         $this->_postTermInit([
-            'languageId' => $params['languageId'],
+            'languageId' => $_['language']['id'],
             'language' => $params['language'],
             'term' => $params['term'],
             'status' => $termNoteStatus->getDefaultTermStatus(),
         ], $te)->insert([
-            'note' => trim($params['note']),
+            'note' => trim($params['note'] ?? ''),
             'userName' => $this->_session->userName,
             'userGuid' => $this->_session->userGuid,
         ]);
 
         // Increment term and attribute stats diff
         $diff['term'] ++;
-        $diff['attribute'] += trim($params['note']) ? 2 : 1; // processStatus and maybe note attr were added for term
+        $diff['attribute'] += trim($params['note'] ?? '') ? 2 : 1; // processStatus and maybe note attr were added for term
 
         // Update
         ZfExtended_Factory
@@ -171,6 +174,10 @@ class editor_TermController extends ZfExtended_RestController
             // Params to simulate click on certain found result
             'termId' => $this->entity->getId(),
             'termEntryId' => $this->entity->getTermEntryId(),
+
+            // Tbx ids
+            'termTbxId' => $this->entity->getTermTbxId(),
+            'termEntryTbxId' => $this->entity->getTermEntryTbxId(),
         ]);
     }
 
@@ -195,33 +202,29 @@ class editor_TermController extends ZfExtended_RestController
 
         // Validate params
         return $this->jcheck([
-            'collectionId,languageId' => [
-                'req' => true,                                                      // required
-                'rex' => 'int11'                                                    // regular expression preset key or raw expression
-            ],
             'collectionId' => [
+                'req' => true,                                                      // required
+                'rex' => 'int11',                                                   // regular expression preset key or raw expression
                 'key' => 'LEK_languageresources',                                   // points to existing record in a given db table
-            ],                                                                      // $_['collectionId'] will contain that record
-            'languageId' => [
-                'key' => 'LEK_languages',                                           // points to existing record in a given db table
-            ],                                                                      // $_['languageId'] will contain that record
+            ],
+            'language' => [
+                'req' => true,                                                      // required
+                'rex' => 'rfc5646',                                                 // regular expression preset key or raw expression
+                'key' => 'LEK_languages.rfc5646',                                   // points to existing record in a given db table
+            ],
+            'term' => [
+                'req' => true,                                                      // required
+                'rex' => '~[^\s]~',                                                 // regular expression preset key or raw expression
+            ],
+            'note' => [
+                'req' => Zend_Registry::get('config')                               // required
+                   ->runtimeOptions->termportal->commentAttributeMandatory,
+                'rex' => 'varchar255s'                                              // regular expression preset key or raw expression
+            ],
             'termEntryId' => [
                 'rex' => 'int11',
                 'key' => 'terms_term_entry',                                        // points to existing record in a given db table
             ],                                                                      // $_['termEntryId'] will contain that record
-            'term' => [
-                'req' => true,                                                      // required
-                'rex' => '~[^\s]~'                                                  // regular expression preset key or raw expression
-            ],
-            'language' => [
-                'req' => true,                                                      // required
-                'rex' => 'rfc5646'                                                  // regular expression preset key or raw expression
-            ],
-            'note' => [
-                'req' => Zend_Registry::get('config')                               // required
-                    ->runtimeOptions->termportal->commentAttributeMandatory,
-                'rex' => 'varchar255s'                                              // regular expression preset key or raw expression
-            ],
             'sourceTerm' => [
                 'req' => isset($params['sourceLang']),
                 'rex' => '~[^\s]~'
@@ -250,7 +253,7 @@ class editor_TermController extends ZfExtended_RestController
         $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
 
         // If termEntryId is given in params
-        if ($params['termEntryId']) {
+        if ($params['termEntryId'] ?? 0) {
 
             // Load instance
             $termEntry->load($params['termEntryId']);
