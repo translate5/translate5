@@ -189,7 +189,7 @@ class editor_Plugins_Okapi_Bconf_Export
         
         $extMap = [];
         $count = 0;
-        if ($data != null) {
+        if ($data != null && count($data) > 0) {
             foreach ($data as $filter) {
                 $extList = explode(",", $filter["extensions"]);
                 foreach ($extList as $extension) {
@@ -199,6 +199,8 @@ class editor_Plugins_Okapi_Bconf_Export
                     }
                 }
             }
+        }
+        if ($defaultFiltersData != null && count($defaultFiltersData) > 0) {
             foreach ($defaultFiltersData as $filter) {
                 $extList = explode(",", $filter["extensions"]);
                 foreach ($extList as $extension) {
@@ -207,9 +209,10 @@ class editor_Plugins_Okapi_Bconf_Export
                         $count++;
                     }
                 }
-            }
+            }            
+        }
+        if(count($extMap) > 0){
             $this->util->writeInt($count, $bconfFile); // None
-            
             foreach ($extMap as $item) {
                 $this->util->writeUTF($item["ext"], $bconfFile);
                 $this->util->writeUTF($item["id"], $bconfFile);
