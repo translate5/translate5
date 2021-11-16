@@ -190,7 +190,17 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             if($exception instanceof editor_Plugins_TermTagger_Exception_Down) {
                 $this->config->disableResourceSlot($slot);
             }
-            $this->setTermtagState($this->loadedSegmentIds, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED);
+            //if we run in a timeout then set status retag, so that the affected segments are tagged lonely not as batch
+            if($exception instanceof editor_Plugins_TermTagger_Exception_TimeOut) {
+                // if we are in the retag loop the timeout should be handled as malfunction
+                $state = $this->malfunctionState; //this is either retag or defect (later if we are already processing retags)
+            }
+            else {
+                $state = editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED;
+            }
+
+            $this->setTermtagState($this->loadedSegmentIds, $state);
+
             $exception->addExtraData([
                 'task' => $this->task
             ]);

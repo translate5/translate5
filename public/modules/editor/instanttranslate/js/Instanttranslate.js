@@ -1093,8 +1093,8 @@ function checkTermPortalIntegration() {
  * @params {Object}
  */
 function drawTermPortalIntegration(termToPropose) {
-    var html = '<span class="term-proposal" title="'+Editor.data.languageresource.translatedStrings['termProposalIconTooltip']+'" data-id="'+termToPropose.id+'" data-term="'+termToPropose.text+'"><span class="ui-icon ui-icon-circle-plus"></span></span>';
-    $('#'+termToPropose.id+'.translation-result').next('.copyable-copy').append(html);
+    var html = '<span class="term-proposal" title="'+Editor.data.languageresource.translatedStrings['termProposalIconTooltip']+'" data-id="'+termToPropose.id+'" data-term="'+termToPropose.text+'"><svg class="icon icon-t5_circle_plus_grey" /></span>';
+    $('#'+termToPropose.id+'.translation-result').prev('.floatRight').children('.copyable-copy').prepend(html);
 }
 
 /***

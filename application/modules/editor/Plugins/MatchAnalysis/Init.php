@@ -231,12 +231,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             return false;
         }
         
-        $analysisWorkerId = $worker->queue($parentWorkerId, null, false);
-
-        //if we are not in import we have to schedule the quality workers in analysis context
-        if(!$task->isImporting()) {
-            editor_Segment_Quality_Manager::instance()->prepareAnalysis($task, $analysisWorkerId);
-        }
+        $worker->queue($parentWorkerId, null, false);
 
         return true;
     }

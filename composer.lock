@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "8c98ff5869723cb23459f5365e134a19",
+    "content-hash": "a62835babc65ba9f359a5f6130d810d3",
     "packages": [
         {
             "name": "apix/log",
@@ -712,11 +712,7 @@
                 "url": "https://github.com/gportela85/DateTimeField.git",
                 "reference": "1.9"
             },
-            "type": "extjs-ux",
-            "license": [
-                "MIT"
-            ],
-            "description": "A DateTime Form Field UX for Sencha, ExtJS 5.x and ExtJS 6.x."
+            "type": "extjs-ux"
         },
         {
             "name": "graham-campbell/result-type",
@@ -1065,6 +1061,26 @@
                 "screenshot"
             ],
             "time": "2018-12-07T14:25:03+00:00"
+        },
+        {
+            "name": "jquery/jquery-ui",
+            "version": "1.13.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jquery/jquery-ui.git",
+                "reference": "1.13.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://jqueryui.com/resources/download/jquery-ui-1.13.0.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library",
+            "license": [
+                "MIT"
+            ],
+            "description": "A curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library."
         },
         {
             "name": "jumbojett/openid-connect-php",
@@ -3210,12 +3226,12 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Shardj/zf1-future.git",
+                "url": "https://github.com/MittagQI/zf1-php7.3.git",
                 "reference": "f7b607d74841dcfbf4b1e576cbc083f22b982886"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/f7b607d74841dcfbf4b1e576cbc083f22b982886",
+                "url": "https://api.github.com/repos/MittagQI/zf1-php7.3/zipball/f7b607d74841dcfbf4b1e576cbc083f22b982886",
                 "reference": "f7b607d74841dcfbf4b1e576cbc083f22b982886",
                 "shasum": ""
             },
