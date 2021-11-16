@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "a62835babc65ba9f359a5f6130d810d3",
+    "content-hash": "c6f03544703283996eb8dc46be160dbc",
     "packages": [
         {
             "name": "apix/log",
@@ -4163,6 +4163,21 @@
                 "utf8"
             ],
             "time": "2020-06-11T12:16:36+00:00"
+        },
+        {
+            "name": "translate5/instanttranslate-roboto-font",
+            "version": "26",
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.translate5.net/instanttranslate-font-roboto.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library",
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "package introducing roboto font from google for instanttranslation"
         },
         {
             "name": "vlucas/phpdotenv",
