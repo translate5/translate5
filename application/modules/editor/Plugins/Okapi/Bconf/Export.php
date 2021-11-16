@@ -85,7 +85,12 @@ class editor_Plugins_Okapi_Bconf_Export
             $methods = explode("\n", $key);
             foreach ($methods as $method) {
                 if (str_contains($method, 'Path')) {
-                    self::harvestReferencedFile($bconfFile, ++$id, explode("=", $method)[1]);
+                    
+                    $path = explode("=", $method)[1];
+                    $path = str_replace('\\\\', '/', $path);
+                    $path = str_replace('\\', '/', $path);
+                    
+                    $this->harvestReferencedFile($bconfFile, ++$id, basename($path), $bconfBasePath);
                 }
             }
         }
@@ -118,23 +123,21 @@ class editor_Plugins_Okapi_Bconf_Export
         fclose($pipeLineFileOpen);
     }
     
-    protected function harvestReferencedFile($bconfFile, $id, $refPath)
+    protected function harvestReferencedFile($bconfFile, $id, $fileName, $bconfBasePath)
     {
         $this->util->writeInt($id, $bconfFile);
-        $path = parse_url($refPath, PHP_URL_PATH);
+        $this->util->writeUTF($fileName, $bconfFile);
         
-        $this->util->writeUTF(basename($path), $bconfFile);
-        
-        if ($refPath == '') {
+        if ($fileName == '') {
             $this->util->writeLong(0, $bconfFile); // size = 0
             return false;
         }
         //Open the file and read the content
-        $file = fopen($refPath, "r") or die("Unable to open file!");
+        $file = fopen($bconfBasePath.$fileName, "r") or die("Unable to open file!");
         
-        $fileSize = filesize($refPath);
+        $fileSize = filesize($bconfBasePath.$fileName);
         $fileContent = fread($file, $fileSize);
-        
+       
         $this->util->writeLong($fileSize, $bconfFile);
         if ($fileSize > 0) {
             fwrite($bconfFile, $fileContent);
