@@ -27,33 +27,28 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @class Editor.view.comments.Overview
+ * @class Editor.view.comments.Navigation
  */
 Ext.define('Editor.view.comments.Navigation', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.commentNavigation',
-    controller: 'CommentNavigation',
-
-    requires: [
-        'Editor.view.comments.NavigationViewController' 
-    ],
 
     collapsible: true,
     items: [{
         xtype: 'dataview',
         itemId: 'commentList',
         store: 'AllComments',
+        scrollable: true,
         tpl: [
             '<tpl for=".">',
-            '<div class="{[this.getIcon()]} x-grid-item x-grid-cell-inner fs16">  {comment}</div>',
+            '<div class="{[this.getIcon(values.type)]} x-grid-item x-grid-cell-inner fs16"> {comment}</div>',
             '</tpl>',
             {
                 getIcon: function (type) {
-                    if (!type) type = ['segment', 'visual', 'video'][Ext.Number.randomInt(0, 2)];
                     return {
-                        'segment': 'x-fa fa-comment-o',
-                        'visual': 'x-fa fa-eye',
-                        'video': 'x-fa fa-video-camera',
+                        'segmentComment': 'x-fa fa-comment-o',
+                        'visualAnnotation': 'x-fa fa-eye',
+                        'videoAnnotation': 'x-fa fa-video-camera',
                     }[type];
                 }
             }
@@ -61,38 +56,12 @@ Ext.define('Editor.view.comments.Navigation', {
         itemSelector: 'div.x-grid-item',
     }],
 
-    title: '#UT#Task-Kommentare',
+    title: '#UT#Kommentare',
     itemId: 'commentNavigation',
     layout: 'fit',
 
-    listeners: {
-        expand: 'onCommentPanelExpand'
+    initConfig: function (config) {
+        config.title= this.title; //see EXT6UPD-9
+        return this.callParent(arguments);
     },
-
-    initConfig: function (instanceConfig) {
-        var me = this
-        config = {
-            title: me.title, //see EXT6UPD-9
-        };
-
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
-        }
-        return me.callParent([config]);
-    },
-
-    handleCollapse: function () {
-        if (!this.collapsible) {
-            return;
-        }
-        this.collapse();
-    },
-
-    handleExpand: function () {
-        var me = this;
-        if (me.collapsible && me.collapsed) {
-            //FIXME everything with the expangin inside the comments controoler
-            me.expand();
-        }
-    }
 });

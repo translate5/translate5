@@ -26,18 +26,39 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Store für Editor.model.Comment
- * @class Editor.store.AllComments
- * @extends Ext.data.Store
+/**#@++
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
- Ext.define('Editor.store.comments.AllComments', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.Remark',
-  storeId: 'AllComments',
-  remoteFilter: true,
-  autoLoad: false,
-  autoSync: false,
-  pageSize: 0,
-  buffered: false,
-});
+/**
+ * @class Editor.model.Comment
+ * @extends Ext.data.Model
+ */
+ Ext.define('Editor.model.Remark', {
+    extend: 'Ext.data.Model',
+    fields: [
+      {name: 'id', type: 'int'},
+      {name: 'segmentId', type: 'int'},
+      {name: 'userName', type: 'string'},
+      {name: 'comment', type: 'string'},
+      {name: 'modified', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+      {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+      {name: 'type', type: 'string'},
+    ],
+    idProperty: 'id',
+    proxy : {
+      type : 'rest',
+      url: Editor.data.restpath+'commentnav',
+      reader : {
+        rootProperty: 'rows',
+        type : 'json'
+      },
+      writer: {
+        encode: true,
+        rootProperty: 'data',
+        writeAllFields: false
+      }
+    }
+  });

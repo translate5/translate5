@@ -281,9 +281,12 @@ Ext.define('Editor.controller.Localizer', {
         newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
 	};
 
-  	Editor.view.comments.Navigation.prototype.title = Editor.view.segments.column.Comments.prototype.text;
-  	Editor.view.comments.Navigation.prototype.strings = {
-	};
+    Ext.define("Editor.locale.de.view.comments.Navigation", {
+        override: "Editor.view.comments.Navigation",
+        title: Editor.view.segments.column.Comments.prototype.text,
+        strings: {
+        }
+    });
 
   	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('Manuelle QS (im Segment)');?>';
   	Editor.view.quality.mqm.Fieldset.prototype.strings = {

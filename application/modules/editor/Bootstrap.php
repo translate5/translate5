@@ -111,7 +111,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     {
         
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
-            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'comment', 'attributedatatype',
+            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'comment', 'commentnav', 'attributedatatype',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                                 'config', 'segmentuserassoc', 'session', 'language','termcollection','languageresourceresource','languageresourcetaskassoc',
                                 'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category', 'quality','userassocdefault'
@@ -227,7 +227,12 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'project'
         )));
 
-
+        $this->front->getRouter()->addRoute('editorTaskCommentNav', new ZfExtended_Controller_RestLikeRoute(
+            'editor/commentnav',[
+                'module' => 'editor',
+                'controller' => 'commentnav',
+                'action' => 'index'
+            ]));
 
         //FIXME convert me to RestLikeRoute (see filemap)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
