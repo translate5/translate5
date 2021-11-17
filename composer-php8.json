@@ -24,6 +24,18 @@
 				}
 			}
 		}, {
+			"type" : "package",
+			"package" : {
+				"name" : "translate5/instanttranslate-roboto-font",
+				"license" : "Apache-2.0",
+				"version" : "26",
+				"description" : "package introducing roboto font from google for instanttranslation",
+				"dist" : {
+					"url" : "https://downloads.translate5.net/instanttranslate-font-roboto.zip",
+					"type" : "zip"
+				}
+			}
+		}, {
 			"type" : "vcs",
 			"url" : "https://github.com/dream-group/horde-text-diff/"
 		}, {
@@ -69,7 +81,8 @@
 		"dream-group/horde-text-diff" : "dev-master",
 		"lesstif/php-jira-rest-client" : "~2.4",
 		"paquettg/php-html-parser": "^3.1",
-		"jquery/jquery-ui": "1.13.0"
+		"jquery/jquery-ui": "1.13.0",
+		"translate5/instanttranslate-roboto-font": "26"
 	},
 	"extra" : {
 		"merge-plugin" : {

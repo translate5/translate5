@@ -207,7 +207,8 @@ $dep->post_install_copy = [
     "vendor/fortawesome/font-awesome/js" => "public/modules/editor/fontawesome/js",
     "vendor/fortawesome/font-awesome/webfonts" => "public/modules/editor/fontawesome/webfonts",
     "vendor/fortawesome/font-awesome/LICENSE.txt" => "public/modules/editor/fontawesome/LICENSE.txt",
-    "vendor/jquery/jquery-ui" => "public/js/jquery-ui"
+    "vendor/jquery/jquery-ui" => "public/js/jquery-ui",
+    "vendor/translate5/instanttranslate-roboto-font/" => "public/modules/editor/instanttranslate/fonts/roboto",
 ];
 
 $dep = json_encode($dep, JSON_PRETTY_PRINT);

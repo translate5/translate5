@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3876d13fd2e0392c0a52c2e79e40fa1f",
+    "content-hash": "fcd27f90ef2b2ba7751d847a39886e26",
     "packages": [
         {
             "name": "apix/log",
@@ -7118,6 +7118,19 @@
                 }
             ],
             "time": "2021-07-28T10:34:58+00:00"
+        },
+        {
+            "name": "translate5/instanttranslate-roboto-font",
+            "version": "26",
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.translate5.net/instanttranslate-font-roboto.zip"
+            },
+            "type": "library",
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "package introducing roboto font from google for instanttranslation"
         },
         {
             "name": "vlucas/phpdotenv",
