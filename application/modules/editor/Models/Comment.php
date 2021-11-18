@@ -131,9 +131,7 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    */
   public function loadByTaskPlain(string $taskGuid) {
       $s = $this->db->select()
-      ->where('taskGuid = ?', $taskGuid)
-      ->order('segmentId ASC')
-      ->order('id ASC');
+      ->where('taskGuid = ?', $taskGuid); // sort in frontend, see there
       return $this->db->getAdapter()->fetchAll($s);
   }
 

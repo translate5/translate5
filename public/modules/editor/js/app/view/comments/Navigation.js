@@ -37,7 +37,13 @@ Ext.define('Editor.view.comments.Navigation', {
     items: [{
         xtype: 'dataview',
         itemId: 'commentList',
-        store: 'AllComments',
+        store: {
+            type:'AllComments',
+            sorters: [ // must sort here in frontend for new comments' correct position
+                { property: 'segmentId', direction: 'ASC' },
+                { property: 'id', direction: 'ASC' },
+            ]
+        },
         scrollable: true,
         tpl: [
             '<tpl for=".">',

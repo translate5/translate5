@@ -51,7 +51,38 @@ Ext.define('Editor.controller.CommentNavigation', {
       '#commentList': {
         itemclick: 'jumpThere'
       }
-    }
+    },
+        messagebus: {
+            '#translate5 task': {
+                commentChanged: function carryChangeToStore({comment, connectionId}){
+                    console.log(arguments)
+                    cl = this.getCommentList();
+                    store = cl.store;
+                    var updated = new store.model(comment);
+                    var existing = store.getById(comment.id);
+                    if(existing){
+                        //store.update({records:[new store.model(comment)]}) //trigers request
+                        var changed = [];
+                        for(prop in existing.data){
+                            if(existing.get(prop) !== updated.get(prop)){
+                                existing.set(prop, updated.get(prop), {silent:true, commit:false});
+                                changed.push(prop);
+                            }
+                            if(changed.length){
+                                existing.commit(false, changed);
+                            }
+                        }
+                        updated = existing;
+                        //store.data.replace(existing, );
+                        //store.data.removeAt(store.data.indexOf(existing))
+                        //cl.refresh();
+                    } else {
+                        store.add(updated)
+                    }
+                    cl.scrollable.doHighlight(cl.getNodeByRecord(updated));
+                }
+            }
+        }
   },
 
   loadStore: function () {
@@ -64,10 +95,12 @@ Ext.define('Editor.controller.CommentNavigation', {
       case 'segment':
         var
           grid = Ext.getCmp('segment-grid'),
+          view = grid.view,
           rec = grid.store.getById(record.data.segmentId);
         //grid.scrollTo(recIdx); // does not animate upwards direction
+        var rowTableEl = view.el.getById(view.getRowId(rec)); //table has bgColor set for end of animation
         grid.setSelection(rec);
-        grid.view.scrollRowIntoView(rec, true);
+        grid.getScrollable().scrollIntoView(rowTableEl, false, true, true);
 
 
       case 'floating': //TODO: scroll to annotation in Visual Review
@@ -76,6 +109,7 @@ Ext.define('Editor.controller.CommentNavigation', {
     }
 
   }
+
 
 }
 )

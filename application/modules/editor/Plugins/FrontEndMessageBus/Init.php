@@ -372,22 +372,23 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     }
 
     public function handleNormalComment(Zend_EventManager_Event $event) {
-        $comment = $event->getParam('entity');
-        /* @var $comment editor_Models_Comment */
-
-        $this->triggerCommentNavUpdate([
-            'message'  => $comment->getComment(),
-            'date'     => $comment->getModified(),
-            'author'   => $comment->getUserName(),
-            'taskGuid' => $comment->getTaskGuid(),
-            'type'     => 'comment',
-        ]);
+        $a_comment = $event->getParam('entity')->toArray();
+        $taskGuid = $a_comment['taskGuid'];
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        $task->loadByTaskGuid($taskGuid);
+        if($task->anonymizeUsers()){
+            $wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            $a_comment = $wfAnonymize->anonymizeUserdata($taskGuid, $a_comment['userGuid'], $a_comment);
+        }
+        $a_comment['type'] = 'segmentComment';
+        $this->triggerCommentNavUpdate($a_comment);
     }
 
-    public function triggerCommentNavUpdate(array $commenData) {
+    public function triggerCommentNavUpdate(array $commentData) {
         $this->bus->notify(self::CHANNEL_TASK, 'commentChanged', [
             'connectionId' => $this->getHeaderConnId(),
-            'comment'      => $commenData,
+            'comment'      => $commentData,
             'sessionId'    => Zend_Session::getId(),
         ]);
     }

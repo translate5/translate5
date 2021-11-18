@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  */
  Ext.define('Editor.store.comments.AllComments', {
   extend : 'Ext.data.Store',
+  alias: 'store.AllComments',
   model: 'Editor.model.Remark',
   storeId: 'AllComments',
   remoteFilter: true,
