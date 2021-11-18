@@ -68,6 +68,13 @@ class editor_AttributeController extends ZfExtended_RestController
     public $responseA = [];
 
     /**
+     * Return values of $this->jcheck() calls for each termEntryId-language-termId params combination
+     *
+     * @var array
+     */
+    public $jchecked = [];
+
+    /**
      * @throws Zend_Session_Exception
      */
     public function init() {
@@ -134,13 +141,20 @@ class editor_AttributeController extends ZfExtended_RestController
         ], $_);
 
         // Detect whether we're in batch mode
-        $this->batch = false;
+        $this->batch = $this->getParam('batch');
         foreach (['termEntryId', 'language', 'termId'] as $param)
             if ($value = $this->getParam($param))
                 if ($value == 'batch'
                     || ($param != 'language' && editor_Utils::rexm('int11list',   $value) && !editor_Utils::rexm('int11'  , $value))
                     || ($param == 'language' && editor_Utils::rexm('rfc5646list', $value) && !editor_Utils::rexm('rfc5646', $value)))
                     $this->batch = true;
+
+        // Prevent creation of processStatus and administrativeStatus attributes
+        if ($this->batch) $this->jcheck([
+            'type' => [
+                'dis' => 'processStatus,administrativeStatus'
+            ]
+        ], $_['dataType']);
 
         // If batch-mode was detected
         if ($this->batch) {
@@ -157,8 +171,8 @@ class editor_AttributeController extends ZfExtended_RestController
                     // Use it to spoof 'termEntryId' request-param
                     $this->setParam('termEntryId', $termEntryId);
 
-                    // Call _postSingle to create an attribute as if we would not be in batch-mode
-                    $this->_postSingle($_);
+                    // Validate request params (and pull records if need) as if we would not be in batch-mode
+                    $this->_postCheck($_);
                 }
 
             // Else if we're going to create an attribute across language-levels of
@@ -199,8 +213,8 @@ class editor_AttributeController extends ZfExtended_RestController
                         // Use it to spoof 'termEntryId' request-param
                         $this->setParam('language', $language);
 
-                        // Call _postSingle to create an attribute as if we would not be in batch-mode
-                        $this->_postSingle($_);
+                        // Validate request params (and pull records if need) as if we would not be in batch-mode
+                        $this->_postCheck($_);
                     }
                 }
 
@@ -226,8 +240,8 @@ class editor_AttributeController extends ZfExtended_RestController
                         // Use it to spoof 'termEntryId' request-param
                         $this->setParam('termId', $termId);
 
-                        // Call _postSingle to create an attribute as if we would not be in batch-mode
-                        $this->_postSingle($_);
+                        // Validate request params (and pull records if need) as if we would not be in batch-mode
+                        $this->_postCheck($_);
                     }
 
                 // Else if termId-param is 'batch'
@@ -249,16 +263,33 @@ class editor_AttributeController extends ZfExtended_RestController
                             // Use it to spoof 'termEntryId' request-param
                             $this->setParam('termId', $termId);
 
-                            // Call _postSingle to create an attribute as if we would not be in batch-mode
-                            $this->_postSingle($_);
+                            // Call _postCheck to create an attribute as if we would not be in batch-mode
+                            $this->_postCheck($_);
                         }
                     }
                 }
             }
 
-        // Else
-        } else {
-            $this->_postSingle($_);
+        // Validate request params (and pull records if need)
+        } else $this->_postCheck($_);
+
+        // Foreach jchecked params combination
+        foreach ($this->jchecked as $key => $jchecked) {
+
+            // Get params
+            list ($params['termEntryId'], $params['language'], $params['termId']) = explode(':', $key);
+
+            // Spoof params
+            foreach ($params as $name => $value) $this->setParam($name, $value ?: null);
+
+            // Call the appropriate method depend on mode-param
+            switch ($_['dataType']->getType()) {
+                case 'xGraphic':
+                case 'externalCrossReference': $this->xrefcreateAction  ($jchecked); break;
+                case 'crossReference':         $this->refcreateAction   ($jchecked); break;
+                case 'figure':                 $this->figurecreateAction($jchecked); break;
+                default:                       $this->attrcreateAction  ($jchecked); break;
+            }
         }
 
         // Get first response, but make that inserted.id to contain comma-separated of all responses rather that first one only
@@ -271,13 +302,13 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
-     * Single attribute creation
+     * Validate request params responsible for single attribute creation
      *
      * @param $_
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
-    protected function _postSingle($_) {
+    protected function _postCheck($_) {
 
         // Validate other params
         $_ += $this->jcheck([
@@ -315,14 +346,11 @@ class editor_AttributeController extends ZfExtended_RestController
                 ]
             ], $_['termOrEntry']);
 
-        // Call the appropriate method depend on mode-param
-        switch ($_['dataType']->getType()) {
-            case 'xGraphic':
-            case 'externalCrossReference': $this->xrefcreateAction($_);   break;
-            case 'crossReference':         $this->refcreateAction($_);    break;
-            case 'figure':                 $this->figurecreateAction($_); break;
-            default:                       $this->attrcreateAction($_);   break;
-        }
+        // Build params key
+        $key = $this->getParam('termEntryId') . ':' . $this->getParam('language') . ':' . $this->getParam('termId');
+
+        // Save jcheck return data
+        $this->jchecked[$key] = $_;
     }
 
     /**
