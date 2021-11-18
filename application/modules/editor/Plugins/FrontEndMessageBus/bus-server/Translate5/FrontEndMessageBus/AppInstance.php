@@ -402,6 +402,19 @@ class AppInstance {
         }
         $this->logger->info('Pinged from Backend');
     }
+
+    /**
+     * sends the message to all conneted users
+     */
+    protected function notifyUser(string $message) {
+        $msg = FrontendMsg::create(self::CHANNEL_INSTANCE, 'notifyUser',[
+            'message' => $message,
+        ]);
+        $msg->logSend();
+        foreach($this->getConnections() as $conn) {
+            $conn->send((string) $msg);
+        }
+    }
     
     public function debug(): array {
         $data = [
