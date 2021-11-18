@@ -462,7 +462,14 @@ class Task extends Channel {
         $answer = $this->createSegmentAnswerFromBackend($connectionId, $segment, $sessionId, 'segmentSave');
         $this->sendToTaskUsers($segment['taskGuid'], $sessionId, $answer, $saverConn);
     }
-    
+
+    public function commentChanged(string $connectionId, array $comment, string $sessionId) {
+        $this->sendToTaskUsers($comment['taskGuid'], $sessionId, FrontendMsg::create(self::CHANNEL_NAME, 'commentChanged', [
+            'comment' => $comment,
+            'connectionId' => $connectionId,
+        ]));
+    }
+
     /**
      * Unlocks all alike segments to a given master segment.
      * @param string $connectionId

@@ -75,12 +75,16 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('ZfExtended_Models_Worker', 'updateProgress',array($this, 'handleUpdateProgress'));
-        
+
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
-        
+
         //inject JS strings
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
+
+        //updating comments in the comment nav
+        $this->eventManager->attach('Editor_CommentController', 'afterPostAction', array($this, 'handleNormalComment'));
+        $this->eventManager->attach('Editor_CommentController', 'afterPutAction', array($this, 'handleNormalComment'));
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {
@@ -365,5 +369,26 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $f = Zend_Registry::get('frontController');
         /* @var $f Zend_Controller_Front */
         return $f->getRequest()->getHeader('X-Translate5-MessageBus-ConnId');
+    }
+
+    public function handleNormalComment(Zend_EventManager_Event $event) {
+        $comment = $event->getParam('entity');
+        /* @var $comment editor_Models_Comment */
+
+        $this->triggerCommentNavUpdate([
+            'message'  => $comment->getComment(),
+            'date'     => $comment->getModified(),
+            'author'   => $comment->getUserName(),
+            'taskGuid' => $comment->getTaskGuid(),
+            'type'     => 'comment',
+        ]);
+    }
+
+    public function triggerCommentNavUpdate(array $commenData) {
+        $this->bus->notify(self::CHANNEL_TASK, 'commentChanged', [
+            'connectionId' => $this->getHeaderConnId(),
+            'comment'      => $commenData,
+            'sessionId'    => Zend_Session::getId(),
+        ]);
     }
 }
