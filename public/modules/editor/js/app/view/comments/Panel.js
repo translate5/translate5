@@ -39,6 +39,8 @@ Ext.define('Editor.view.comments.Panel', {
     alias: 'widget.commentPanel',
     controller: 'commentPanel',
 
+    cls:'commentPanel',
+
     requires: [
         'Editor.view.comments.Grid',
         'Editor.view.comments.PanelViewController'
@@ -135,8 +137,8 @@ Ext.define('Editor.view.comments.Panel', {
                             items: [{
                                 type: 'button',
                                 glyph:'e876@Material Icons',
+                                iconCls:'customMaterialIconStyle',
                                 itemId:'saveBtn',
-                                iconCls:'glyphIconColor',
                                 style:{
                                     background:'transparent',
                                     borderColor:'transparent'
@@ -150,12 +152,11 @@ Ext.define('Editor.view.comments.Panel', {
                             },{
                                 type: 'button',
                                 glyph:'e14c@Material Icons',
+                                iconCls:'customMaterialIconStyle',
                                 itemId:'closeBtn',
-                                iconCls:'glyphIconColor',
                                 style:{
                                     background:'transparent',
-                                    borderColor:'transparent',
-                                    color:'black'
+                                    borderColor:'transparent'
                                 },
                                 tooltip: {
                                     text: me.item_closeBtn
