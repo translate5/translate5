@@ -210,6 +210,7 @@ $dep->post_install_copy = [
     "vendor/jquery/jquery-ui" => "public/js/jquery-ui",
     "vendor/translate5/instanttranslate-roboto-font/" => "public/modules/editor/instanttranslate/fonts/roboto",
     "vendor/google/material-design-icons" => "public/modules/editor/material-design-icons/material-design-icons",
+    "vendor/google/material-design-icons/LICENSE" => "public/modules/editor/material-design-icons/LICENSE",
 ];
 
 $dep = json_encode($dep, JSON_PRETTY_PRINT);
