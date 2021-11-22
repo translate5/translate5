@@ -225,7 +225,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             $return['definition'] = $this->replicateDefinition('deleted');
 
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
-        if ($misc['userName'])
+        if ($misc['userName'] ?? 0)
             $return['updated'] = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
 
@@ -233,7 +233,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         parent::delete();
 
         // Return
-        return $return;
+        return $return ?? null;
     }
 
     /***
@@ -566,7 +566,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             ? $this->getLanguage()
             : join(',', $this->_getLanguagesWithNoOrEmptyDefinition());
 
-        i($bind, 'a');
         // Get ids of terms, that will be affected
         $termIdA = $this->db->getAdapter()->query('
             SELECT `id` 

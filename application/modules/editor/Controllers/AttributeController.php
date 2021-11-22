@@ -297,6 +297,15 @@ class editor_AttributeController extends ZfExtended_RestController
         $response = $this->responseA[0];
         $response['inserted']['id'] = join(',', array_column(array_column($this->responseA, 'inserted'), 'id'));
 
+        // Merge insertedId => existingId pairs among all responses
+        $existing = [];
+        foreach ($this->responseA as $responseI)
+            if ($responseI['existing'] ?? 0)
+                $existing += $responseI['existing'];
+
+        // If not empty - append merged to respone
+        if ($existing) $response['existing'] = $existing;
+
         // Flush response
         $this->view->assign($response);
     }
@@ -366,16 +375,41 @@ class editor_AttributeController extends ZfExtended_RestController
                 'req' => true,
                 'rex' => 'int11list'
             ],
+            'dropId' => [
+                'rex' => 'int11list'
+            ],
         ]);
 
-        // Model instances and dataTypeIds
-        $entityA = []; $dataTypeIdA = [];
+        // Get attr ids array
+        $attrIdA = editor_Utils::ar($this->getParam('attrId'));
+
+        // If dropId-param is given
+        if ($dropId = $this->getParam('dropId')) {
+
+            // Split by comma
+            $dropIdA = editor_Utils::ar($dropId);
+
+            // Make sure that qties of $attrIdA and $dropIdA are equal
+            $this->jcheck(['qty' => ['eql' => count($attrIdA)]], ['qty' => count($dropIdA)]);
+        }
+
+        // Attribute model instances whose value/target we're going to update
+        $attrA = [];
+
+        // Attribute model instances that we're going to delete, but, with preliminary
+        // usage of their values to apply to attribute model instances from above ($attrA) array
+        // Note: this is used only in batch-mode
+        $dropA = [];
+
+        // Array of dataTypeIds to check that attributes we're going to update all are of same dataTypeId
+        // Note: this is not used in batch-mode
+        $dataTypeIdA = [];
 
         // Foreach comma-separated value inside attrId-param
-        foreach (editor_Utils::ar($this->getParam('attrId')) as $attrId) {
+        foreach ($attrIdA as $idx => $attrId) {
 
-            // Load entity, make a clone and append it to $entityA
-            $this->entity->load($attrId); $entityA[$attrId] = clone $this->entity;
+            // Load attribute model instance, make a clone and append it to $attrA
+            $this->entity->load($attrId); $attrA[$attrId] = clone $this->entity;
 
             // If no or only certain collections are accessible - validate collection accessibility
             if ($this->collectionIds !== true) $this->jcheck([
@@ -384,15 +418,40 @@ class editor_AttributeController extends ZfExtended_RestController
                 ],
             ], $this->entity);
 
+            // Setup an $unique flag inidcating whether this attribute should be unique having it's dataTypeId within it's level
+            $unique = !in_array($this->entity->getType(), ['xGraphic', 'externalCrossReference', 'crossReference', 'figure']);
+
+            // If attr should be unique and dropId-param is given
+            if ($unique && $dropId ?? 0) {
+
+                // Load entity, make a clone and append it to $dropA under $attrId key
+                $this->entity->load($dropIdA[$idx]); $dropA[$attrId] = clone $this->entity;
+
+                // If no or only certain collections are accessible - validate collection accessibility
+                if ($this->collectionIds !== true) $this->jcheck([
+                    'collectionId' => [
+                        'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
+                    ],
+                ], $this->entity);
+
+                // Make sure that both instances in [attr => drop] pair has equal dataTypeId, termEntryId, language and termId props
+                $this->jcheck([
+                    'dataTypeId'  => ['eql' => $attrA[$attrId]->getDataTypeId()],
+                    'termEntryId' => ['eql' => $attrA[$attrId]->getTermEntryId()],
+                    'language'    => ['eql' => $attrA[$attrId]->getLanguage()],
+                    'termId'      => ['eql' => $attrA[$attrId]->getTermId()],
+                ], $this->entity);
+            }
+
             // Collect distinct dataTypeIds
-            $dataTypeIdA[$this->entity->getDataTypeId()] = true;
+            if (!isset($dropId)) $dataTypeIdA[$this->entity->getDataTypeId()] = true;
         }
 
         // Check that all attributes belong to the same dataTypeId
-        $this->jcheck(['qty' => ['eql' => 1]], ['qty' => count($dataTypeIdA)]);
+        if (!isset($dropId)) $this->jcheck(['qty' => ['eql' => 1]], ['qty' => count($dataTypeIdA)]);
 
         // Foreach attribute model instance
-        foreach ($entityA as $attrId => $entity) {
+        foreach ($attrA as $attrId => $entity) {
 
             // Spoof $this->entity
             $this->entity = $entity;
@@ -403,7 +462,7 @@ class editor_AttributeController extends ZfExtended_RestController
                 case 'externalCrossReference': $this->xrefupdateAction();   break;
                 case 'crossReference':         $this->refupdateAction();    break;
                 case 'figure':     $tmp_name = $this->figureupdateAction(); break;
-                default:                       $this->attrupdateAction();   break;
+                default:                       $this->attrupdateAction($dropA[$attrId] ?? null);   break;
             }
         }
 
@@ -455,9 +514,6 @@ class editor_AttributeController extends ZfExtended_RestController
             // Collect distinct dataTypeIds
             $dataTypeIdA[$this->entity->getDataTypeId()] = true;
         }
-
-        // Check that all attributes belongs to the same dataTypeId
-        $this->jcheck(['qty' => ['eql' => 1]], ['qty' => count($dataTypeIdA)]);
 
         // Foreach attribute - do checks
         foreach ($entityA as $attrId => $entity) {
@@ -620,7 +676,7 @@ class editor_AttributeController extends ZfExtended_RestController
         // we're in batch mode, and we're going to create an attribute with a dataTypeId
         // that one of already existing attributes has, so instead of creating new one
         // we just load the existing one, so the existing one will be used further
-        if ($attrId) {
+        /*if ($attrId) {
 
             // Load existing
             $this->entity->load($attrId);
@@ -636,7 +692,7 @@ class editor_AttributeController extends ZfExtended_RestController
             ]);
 
         // Else
-        } else {
+        } else {*/
 
             // Init attribute model with data
             $this->_attrInit($_, [
@@ -649,7 +705,7 @@ class editor_AttributeController extends ZfExtended_RestController
                 'userName' => $this->_session->userName,
                 'userGuid' => $this->_session->userGuid
             ]);
-        }
+        //}
 
         // Prepare inserted data to be flushed into response json
         $inserted = [
@@ -670,6 +726,9 @@ class editor_AttributeController extends ZfExtended_RestController
         if ($_['level'] == 'term')
             if ($status = $this->_updateTermStatus($_['termId'], $this->entity))
                 $data['status'] = $status;
+
+        // Pass existing attrId into response as well, if detected
+        if ($attrId) $data['existing'][$inserted['id']] = (int) $attrId;
 
         // Append response data
         $this->responseA []= $data;
@@ -820,10 +879,11 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
+     * @param editor_Models_Terminology_Models_AttributeModel|null $drop
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Mismatch
      */
-    public function attrupdateAction() {
+    public function attrupdateAction(editor_Models_Terminology_Models_AttributeModel $drop = null) {
 
         // Check request params and return an array, containing records
         // fetched from database by dataTypeId-param (and termId-param, if given)
@@ -835,6 +895,25 @@ class editor_AttributeController extends ZfExtended_RestController
         // If attr was not yet changed after importing from tbx - append current value to response
         if (!$this->entity->getIsCreatedLocally()) $data['imported'] = $this->entity->getValue();
 
+        // If $drop arg is given - use it's value
+        $value = $drop ? $drop->getValue() : $this->getParam('value');
+
+        // If $drop arg is given
+        if ($drop) {
+
+            // Update collection stats
+            ZfExtended_Factory
+                ::get('editor_Models_TermCollection_TermCollection')
+                ->updateStats($drop->getCollectionId(), [
+                    'termEntry' => 0,
+                    'term' => 0,
+                    'attribute' => -1
+                ]);
+
+            // Delete
+            $drop->delete();
+        }
+
         // If it's a processStatus-attribute
         if ($this->entity->getType() == 'processStatus') {
 
@@ -843,7 +922,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Do process status change, incl. detaching proposal if need, etc
             $data += $_['termId']->doProcessStatusChange(
-                $this->getParam('value'),
+                $value,
                 $this->_session->id,
                 $this->_session->userName,
                 $this->_session->userGuid,
@@ -854,7 +933,7 @@ class editor_AttributeController extends ZfExtended_RestController
         } else {
 
             // Update attribute value
-            $this->entity->setValue($this->getParam('value'));
+            $this->entity->setValue($value);
             $this->entity->setUpdatedBy($this->_session->id);
             $this->entity->setIsCreatedLocally(1);
             $this->entity->update();
