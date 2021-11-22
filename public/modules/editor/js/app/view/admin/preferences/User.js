@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -47,47 +46,61 @@ Ext.define('Editor.view.admin.preferences.User', {
         password_check: '#UT#Passwort Kontrolle',
         passwordMisMatch: '#UT#Die Passwörter stimmern nicht überein!',
         saveBtn: '#UT#speichern',
-        cancelBtn: '#UT#Abbrechen'
+        cancelBtn: '#UT#Abbrechen',
+        uiThemeComboLabelText:'#UT#Layout',
+        changeUiLangaugeLabelText:'#UT#Sprache ändern'
     },
     //layout: 'fit',
 
-    initConfig: function(instanceConfig) {
+    bodyPadding: 10,
+
+    initConfig: function (instanceConfig) {
         var me = this,
-            config = {
-                title: me.title, //see EXT6UPD-9
+            uiThemesRecord = Editor.app.getUserConfig('extJs.theme',true),
+            themes = [],
+            translations = [];
+
+        Ext.Object.each(Editor.data.translations, function(i, n) {
+            translations.push([i, n]);
+        });
+
+        Ext.Object.each(Editor.data.frontend.config.themesName, function(i, n) {
+            themes.push([i, n]);
+        });
+
+        var config = {
+            title: me.title, //see EXT6UPD-9
+            items: [{
+                xtype: 'form',
+                width: 400,
+                border:false,
                 items: [{
-                    xtype: 'form',
-                    //frame: true,
-                    width: 400,
-                    //ui: 'default-framed',
-                    bodyPadding: 10,
-                    items:[{
-                        xtype: 'fieldset',
-                        title: me.strings.editPassword,
-                        defaultType: 'textfield',
-                        defaults: {
-                            labelWidth: 160,
-                            inputType: 'password',
-                            minLength: 8,
-                            allowBlank: false,
-                            //anchor: '100%'
+                    xtype: 'fieldset',
+                    title: me.strings.editPassword,
+                    defaultType: 'textfield',
+                    defaults: {
+                        labelWidth: 160,
+                        width:"100%",
+                        inputType: 'password',
+                        minLength: 8,
+                        allowBlank: false
+                    },
+                    items: [{
+                        name: 'passwd',
+                        fieldLabel: me.strings.password
+                    }, {
+                        name: 'passwd_check',
+                        validator: function (value) {
+                            var pwd = this.previousSibling('[name=passwd]');
+                            return (value === pwd.getValue()) ? true : me.strings.passwordMisMatch;
                         },
-                        items: [{
-                            name: 'passwd',
-                            fieldLabel: me.strings.password
-                        },{
-                            name: 'passwd_check',
-                            validator: function(value) {
-                                var pwd = this.previousSibling('[name=passwd]');
-                                return (value === pwd.getValue()) ? true : me.strings.passwordMisMatch;
-                            },
-                            fieldLabel: me.strings.password_check
-                        }]
-                    }],
-                    dockedItems: [{
+                        fieldLabel: me.strings.password_check
+                    },{
                         xtype: 'toolbar',
                         ui: 'footer',
-                        dock: 'bottom',
+                        style: {
+                            background: 'transparent'
+                        },
                         layout: {
                             pack: 'end',
                             type: 'hbox'
@@ -105,7 +118,37 @@ Ext.define('Editor.view.admin.preferences.User', {
                         }]
                     }]
                 }]
-            };
+            },{
+                xtype: 'fieldset',
+                title: me.strings.uiThemeComboLabelText,
+                width: 400,
+                items:[{
+                    xtype: 'combo',
+                    width: 200,
+                    itemId: 'uiTheme',
+                    value: uiThemesRecord.get('value'),
+                    store: themes,
+                    forceSelection: true,
+                    hidden: !Editor.data.frontend.changeUserThemeVisible,
+                    queryMode: 'local'
+                }]
+            },{
+                xtype: 'fieldset',
+                title: me.strings.changeUiLangaugeLabelText,
+                width: 400,
+                items:[{
+                    xtype: 'combo',
+                    width: 200,
+                    itemId: 'languageSwitch',
+                    cls: 'app-language-switch',
+                    forceSelection: true,
+                    value: Editor.data.locale,
+                    editable: false,
+                    store: translations,
+                    queryMode: 'local'
+                }]
+            }]
+        };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }

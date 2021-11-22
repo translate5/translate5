@@ -112,7 +112,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $userConfig = ZfExtended_Factory::get('editor_Models_Config');
         /* @var $userConfig editor_Models_Config */
         $userConfig = $userConfig->mergeUserValues(editor_User::instance()->getGuid());
-        $userTheme = $userConfig['runtimeOptions.extJs.cssFile']['value'];
+        $userTheme = $userConfig['runtimeOptions.extJs.theme']['value'];
+        $defaultTheme = $this->config->runtimeOptions->extJs->defaultTheme;
+        $userTheme = $userTheme == 'default' ? $defaultTheme : $userTheme;
 
         $this->view->userTheme = $userTheme;
 
@@ -142,6 +144,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $this->view->appVersion = $this->getAppVersion();
         $this->setJsVarsInView();
+        $this->setThemeVarsInView($userConfig['runtimeOptions.extJs.theme']['defaults']);
         $this->checkForUpdates($this->view->appVersion);
     }
 
@@ -338,7 +341,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if (isset($rop->frontend->helpWindow)) {
             $helpWindowConfig = $rop->frontend->helpWindow->toArray() ?? [];
         }
-        //helpWindow config config values for each section (loaderUrl)
+        //helpWindow config values for each section (loaderUrl,documentationUrl)
         $this->view->Php2JsVars()->set('frontend.helpWindow', $helpWindowConfig);
 
         //show references files popup
@@ -352,9 +355,37 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         /* @var $config editor_Models_Config */
         $this->view->Php2JsVars()->set('frontend.config.configLabelMap', $config->getLabelMap());
 
+        $tmFileUploadSizeText = $this->translate->_("Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.");
+        $uploadMaxFilesize = preg_replace('/\D/', '', ini_get('upload_max_filesize'));
+
+        $tmFileUploadSizeText = str_replace('{upload_max_filesize}',$uploadMaxFilesize,$tmFileUploadSizeText);
+
+
+        //Info: custom vtype text must be translated here and set as frontend var. There is no way of doing this with localizedjsstrings
+        $this->view->Php2JsVars()->set('frontend.override.VTypes.tmFileUploadSizeText', $tmFileUploadSizeText);
+
+        // set the max allowed upload filesize into frontend variable. This is used for upload file size validation in tm import
+        $this->view->Php2JsVars()->set('frontend.php.upload_max_filesize',$uploadMaxFilesize);
+        
+        // show Consortium Logos on application load for xyz seconds [default 3]
+        $this->view->Php2JsVars()->set('startup.showConsortiumLogos', $rop->startup->showConsortiumLogos);
+        
         $this->setJsAppData();
     }
 
+    /***
+     * Add translated theme names to a frontend variable
+     * @param string $themes
+     * @throws Zend_Exception
+     */
+    protected function setThemeVarsInView(string $themes){
+        $themes = explode(',',$themes);
+        $translated = [];
+        foreach ($themes as $item) {
+            $translated[$item] = $this->translate->_($item);
+        }
+        $this->view->Php2JsVars()->set('frontend.config.themesName', $translated);
+    }
     /***
      * Set language resources frontend vars
      */
@@ -426,7 +457,17 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $php2js->set('app.branding', (string)$this->translate->_($ed->branding));
         $php2js->set('app.company', $this->config->runtimeOptions->companyName);
         $php2js->set('app.name', $this->config->runtimeOptions->appName);
-        $php2js->set('app.user', $userSession->data);
+        $userData = (array) $userSession->data;
+
+        // Trim TermPortal-roles if TermPortal plugin is disabled
+        if (!in_array('editor_Plugins_TermPortal_Init', Zend_Registry::get('PluginManager')->getActive()))
+            foreach($userData['roles'] as $idx => $role)
+                if (preg_match('~^term~', $role))
+                    unset($userData['roles'][$idx]);
+
+        $userData['roles'] = array_values($userData['roles']);
+
+        $php2js->set('app.user', $userData);
         $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));
         $php2js->set('app.sessionKey', session_name());
 
@@ -546,13 +587,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     public function applicationstateAction()
     {
         $this->_helper->layout->disableLayout();
+        $userSession = new Zend_Session_Namespace('user');
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
 
-        $userSession = new Zend_Session_Namespace('user');
-        //since application state contains sensibile information we show that only to API users
-        if ($acl->isInAllowedRoles($userSession->data->roles, 'backend', 'applicationstate')) {
-            $this->view->applicationstate = ZfExtended_Debug::applicationState();
+        $config = Zend_Registry::get('config');
+        $isCronIP = $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR'];
+        $hasAppStateACL = $acl->isInAllowedRoles($userSession->data->roles, 'backend', 'applicationstate');
+        //since application state contains sensible information we show that only to the cron TP, or with more details to the API users
+        if ($isCronIP || $hasAppStateACL) {
+            $this->view->applicationstate = ZfExtended_Debug::applicationState($hasAppStateACL);
         }
     }
 
@@ -620,12 +664,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // get requested file from router
         $requestedType = $this->getParam(1);
         $requestedFile = $this->getParam(2);
-        $js = explode($slash, $requestedFile);
+        $requestedFileParts = explode($slash, $requestedFile);
         $extension = strtolower(pathinfo($requestedFile, PATHINFO_EXTENSION));
 
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase!
-        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js)));
+        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($requestedFileParts)));
 
         // DEBUG
         // error_log("INDEXCONTROLLER: pluginpublicAction: plugin: ".$plugin." / requestedType: ".$requestedType." / requestedFile: ".$requestedFile." / extension: ".$extension);
@@ -644,20 +688,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         }
 
         // check if requested "fileType" is allowed
-        if (!$plugin->isPublicFileType($requestedType)) {
+        if (!$plugin->isPublicSubFolder($requestedType)) {
             throw new ZfExtended_NotFoundException();
         }
 
-        $absolutePath = null;
-        //get public files of the plugin to make a whitelist check of the file string from userland
-        $allowedFiles = $plugin->getPublicFiles($requestedType, $absolutePath);
-        $file = join($slash, $js);
-        if (empty($allowedFiles) || !in_array($file, $allowedFiles)) {
-            throw new ZfExtended_NotFoundException();
-        }
-        //concat the absPath from above with filepath
-        $wholePath = $absolutePath . '/' . $file;
-        if (!file_exists($wholePath)) {
+        $publicFile = $plugin->getPublicFile($requestedType, $requestedFileParts);
+        if (empty($publicFile) || !$publicFile->isFile()) {
             throw new ZfExtended_NotFoundException();
         }
         if (array_key_exists($extension, $types)) {
@@ -668,7 +704,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             header('Content-Type: ');
         }
         //FIXME add version URL suffix to plugin.css inclusion
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $publicFile->getMTime()));
         //with etags we would have to use the values of $_SERVER['HTTP_IF_NONE_MATCH'] too!
         //makes sense to do so!
         //header('ETag: '.md5(of file content));
@@ -686,7 +722,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         */
 
 
-        readfile($wholePath);
+        readfile($publicFile);
         //FIXME: Optimierung bei den Plugin Assets: public Dateien die durch die Plugins geroutet werden, sollten chachebar sein und B keine Plugin Inits triggern. Geht letzteres überhaupt wg. VisualReview welches die Dateien ebenfalls hier durchschiebt?
         exit;
     }

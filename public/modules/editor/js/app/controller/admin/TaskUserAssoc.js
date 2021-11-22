@@ -50,9 +50,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         ref: 'userAssocForm',
         selector: 'adminTaskUserAssoc form'
     }, {
-        ref: 'userAssocSegmentrange',
-        selector: 'adminTaskUserAssoc #segmentrange'
-    }, {
         ref: 'editInfo',
         selector: 'adminTaskUserAssoc #editInfoOverlay'
     }, {
@@ -150,6 +147,8 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
             step = task.get('workflowStepName'),
             state = Ext.Object.getKeys(meta.states)[0],
             isTranslationTask = task.get('emptyTargets'),
+            userAssoc = me.getUserAssoc(),
+            userAssocForm = me.getUserAssocForm(),
             newRec;
 
         if (!meta.usableSteps[step]) {
@@ -171,13 +170,15 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
             workflowStepName: step,
             state: state
         });
+ 
+        userAssoc.fireEvent('addnewassoc', newRec, userAssocForm);
+        
         me.getAssocDelBtn().disable();
         me.getEditInfo().hide();
-        me.getUserAssocForm().show();
-        me.getUserAssocForm().setDisabled(false);
-        me.getUserAssocSegmentrange().setDisabled(usageMode !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS);
+        userAssocForm.show();
+        userAssocForm.setDisabled(false);
         me.filterStepsCombo(newRec);
-        me.getUserAssoc().loadRecord(newRec);
+        userAssoc.loadRecord(newRec);
         me.initState(null, step, '');
     },
 
@@ -202,8 +203,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         formPanel.setVisible(!emptySel);
 
         formPanel.setDisabled(emptySel || !userEditable);
-
-        me.getUserAssocSegmentrange().setDisabled(task.get('usageMode') !== Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS);
 
         me.filterStepsCombo(selection[0]);
 

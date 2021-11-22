@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -190,7 +190,17 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             if($exception instanceof editor_Plugins_TermTagger_Exception_Down) {
                 $this->config->disableResourceSlot($slot);
             }
-            $this->setTermtagState($this->loadedSegmentIds, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED);
+            //if we run in a timeout then set status retag, so that the affected segments are tagged lonely not as batch
+            if($exception instanceof editor_Plugins_TermTagger_Exception_TimeOut) {
+                // if we are in the retag loop the timeout should be handled as malfunction
+                $state = $this->malfunctionState; //this is either retag or defect (later if we are already processing retags)
+            }
+            else {
+                $state = editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED;
+            }
+
+            $this->setTermtagState($this->loadedSegmentIds, $state);
+
             $exception->addExtraData([
                 'task' => $this->task
             ]);
@@ -239,7 +249,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
         
         return $segmentIds;
     }
-    
+
     /**
      * returns a list with the next segmentId where terms are marked as to be "retagged"
      * returns only one segment since this segments has to be single tagged
@@ -311,7 +321,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             'untaggableSegments' => $segmentsToLog,
         ]);
     }
-    
+
     /*************************** SINGLE SEGMENT PROCESSING ***************************/
     
     protected function processSegmentTags(editor_Segment_Tags $tags, string $slot) : bool {

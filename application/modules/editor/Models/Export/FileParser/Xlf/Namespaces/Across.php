@@ -77,7 +77,7 @@ class editor_Models_Export_FileParser_Xlf_Namespaces_Across extends editor_Model
         });
 
         //must use another selector as in the Xlf Export itself. On using the same selector, the later one overwrites the first one
-        $xmlparser->registerElement('trans-unit lekTargetSeg', null, function($tag, $key, $opener) use ($xmlparser, $task){
+        $xmlparser->registerElement('trans-unit t5:unitSegIds', null, function($tag, $key, $opener) use ($xmlparser, $task){
             $this->loadComments($opener['attributes'], $xmlparser, $task);
         });
 

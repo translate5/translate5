@@ -180,10 +180,10 @@
         <source>Aufgabe wurde erfolgreich beendet.</source>
         <target>task ended successfully.</target>
       </trans-unit>
-      <trans-unit id="QXVmZ2FiZSBrb21wbGV0dCBsw7ZzY2hlbj8=">
-        <source>Aufgabe komplett l&#xF6;schen?</source>
-        <target>Delete task completely?</target>
-      </trans-unit>
+      <trans-unit id='QXVmZ2FiZSAiezB9IiBrb21wbGV0dCBsw7ZzY2hlbj8='>
+        <source>Aufgabe "{0}" komplett löschen?</source>
+        <target>Delete "{0}" task completely?</target>
+    </trans-unit>
       <trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBrb21wbGV0dCB1bmQgdW53aWRlcnJ1ZmxpY2ggbMO2c2NoZW4/">
         <source>Wollen Sie die Aufgabe wirklich komplett und unwiderruflich l&#xF6;schen?</source>
         <target>Do you really want to delete the the task irrevocably?</target>
@@ -239,6 +239,14 @@
       <trans-unit id="QXVmZ2FiZSBrb21wbGV0dCBsw7ZzY2hlbg==">
         <source>Aufgabe komplett l&#xF6;schen</source>
         <target>Delete task completely</target>
+      </trans-unit>
+      <trans-unit id='SW1wb3J0IGFiYnJlY2hlbg=='>
+        <source>Import abbrechen</source>
+        <target>abort import</target>
+      </trans-unit>
+      <trans-unit id='SW1wb3J0IHdpcmQgYWJnZWJyb2NoZW4uLi4='>
+        <source>Import wird abgebrochen...</source>
+        <target>aborting import...</target>
       </trans-unit>
       <trans-unit id="Vm9ybmFtZQ==">
         <source>Vorname</source>
@@ -398,7 +406,7 @@
       </trans-unit>
       <trans-unit id="UGFzc3dvcnQgw6RuZGVybg==">
         <source>Passwort &#xE4;ndern</source>
-        <target>change password</target>
+        <target>Change password</target>
       </trans-unit>
       <trans-unit id="UGFzc3dvcnQgS29udHJvbGxl">
         <source>Passwort Kontrolle</source>
@@ -865,6 +873,10 @@
         <source>Soll dieser Eintrag wirklich gelöscht werden?</source>
         <target>Do you really want to delete this entry?</target>
       </trans-unit>
+      <trans-unit id='QmVudXR6ZXJ6dXdlaXN1bmcgZ2VzcGVpY2hlcnQ='>
+      	<source>Benutzerzuweisung gespeichert</source>
+      	<target>User association saved</target>
+      </trans-unit>
       <trans-unit id='V29ya2Zsb3cgU2Nocml0dA=='>
         <source>Workflow Schritt</source>
         <target>Workflow step</target>
@@ -1077,9 +1089,9 @@
 	<source>Aufgabe wird beendet...</source>
 	<target>Ending task...</target>
       </trans-unit>
-      <trans-unit id='QXVmZ2FiZSB3aXJkIGdlbMO2c2NodC4uLg=='>
-	<source>Aufgabe wird gelöscht...</source>
-	<target>Deleting task...</target>
+      <trans-unit id='QXVmZ2FiZSAiezB9IiB3aXJkIGdlbMO2c2NodC4uLg=='>
+	<source>Aufgabe "{0}" wird gelöscht...</source>
+	<target>Deleting "{0}" task...</target>
       </trans-unit>
       <trans-unit id='QXVmZ2FiZSB3aXJkIG5vY2ggdmVyd2VuZGV0IHVuZCBrYW5uIGRhaGVyIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4h'>
 	<source>Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!</source>
@@ -1243,9 +1255,9 @@
   <source>Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)</source>
   <target>Save and open next editable segment (CTRL + ALT + ENTER)</target>
 </trans-unit>
-<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IGltIFdvcmtmbG93IMO2ZmZuZW4gKFNUUkcgKyBFTlRFUik='>
-  <source>Speichern und nächstes bearbeitbares Segment im Workflow öffnen (STRG + ENTER)</source>
-  <target>Save and open next editable segment in workflow (CTRL + ENTER)</target>
+<trans-unit id='U3BlaWNoZXJuLiA8YnIvPk7DpGNoc3RlcyB1bmJlc3TDpHRpZ3RlcywgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW48YnIvPihTVFJHICsgRU5URVIp'>
+  <source>Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)</source>
+  <target>Save.<br/>Open next unconfirmed editable segment<br/>(CTRL + ENTER)</target>
 </trans-unit>
 <trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgU0hJRlQgKyBFTlRFUik='>
   <source>Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)</source>
@@ -1271,13 +1283,13 @@
   <source>Nächste Spalte editieren (STRG + ALT + →)</source>
   <target>Edit next column (CTRL + ALT + →)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IGltIFdvcmtmbG93IMO2ZmZuZW4gKEFMVCArIEJpbGQg4oaTKQ=='>
-  <source>Nicht speichern und nächstes bearbeitbares Segment im Workflow öffnen (ALT + Bild ↓)</source>
-  <target>Don't save and open next editable segment in workflow (ALT + page ↓)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuLjxici8+TsOkY2hzdGVzIHVuYmVzdMOkdGlndGVzLCBiZWFyYmVpdGJhcmVzIFNlZ21lbnQgw7ZmZm5lbjxici8+KEFMVCArIEJpbGQg4oaTKQ=='>
+  <source>Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)</source>
+  <target>Don't save.<br/>Open next unconfirmed editable segment<br/>(ALT + page ↓)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChBTFQgKyBCaWxkIOKGkSk='>
-  <source>Nicht speichern und vorheriges bearbeitbares Segment im Workflow öffnen (ALT + Bild ↑)</source>
-  <target>Don't save and open previous editable segment in workflow (ALT + page ↑)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuLjxici8+Vm9yaGVyaWdlcyB1bmJlc3TDpHRpZ3RlcywgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW48YnIvPihBTFQgKyBCaWxkIOKGkSk='>
+  <source>Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)</source>
+  <target>Don't save.<br/>Open previous unconfirmed editable segment<br/>(ALT + page ↑)</target>
 </trans-unit>
 <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
   <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
@@ -1472,7 +1484,7 @@
 </trans-unit>
 <trans-unit id='RGFzIHZlcndlbmRldGUgw5xiZXJzZXR6dW5nc3dlcmt6ZXVnIGhhdCBrZWluZSBJbmZvcm1hdGlvbiB6dXIgSGVya3VuZnQgZGVzIE1hdGNoZXMgenVyIFZlcmbDvGd1bmcgZ2VzdGVsbHQu'>
     <source>Das verwendete Übersetzungswerkzeug hat keine Information zur Herkunft des Matches zur Verfügung gestellt.</source>
-    <target>The translation tool used did not provided information on the origin of the match.</target>
+    <target>The translation tool used did not provide information on the origin of the match.</target>
 </trans-unit>
 <trans-unit id='RGllc2VyIFRhc2sgd3VyZGUgaW1wb3J0aWVydCwgYmV2b3IgZGFzIE1hdGNoIFJhdGUgVHlwLUZlYXR1cmUgaW1wbGVtZW50aWVydCB3dXJkZS4='>
     <source>Dieser Task wurde importiert, bevor das Match Rate Typ-Feature implementiert wurde.</source>
@@ -2651,9 +2663,9 @@ A task was associated to you in the task-portal {portalLink}.<br />
   <target>101% is a 100% match, that originates from a file with the same name.</target>
 </trans-unit>
 
-<trans-unit id='V2llZGVyaG9sdW5nLiBFaW5lIFdpZWRlcmhvbHVuZyBpc3QgZWluIFRyZWZmZXIsIGRlciBpZGVudGlzY2ggaW4gZGVyIGFrdHVlbGxlbiBBdWZnYWJlIG5vY2htYWxzIHZvcmtvbW10Lg=='>
-<source>Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.</source>
-<target>Repetition. A repetition is a match that occurs identically in the current task again.</target>
+<trans-unit id='MTAyJSBpc3QgZWluZSBXaWVkZXJob2x1bmcuIEVpbmUgV2llZGVyaG9sdW5nIGlzdCBlaW4gVHJlZmZlciwgZGVyIGlkZW50aXNjaCBpbiBkZXIgYWt0dWVsbGVuIEF1ZmdhYmUgbm9jaG1hbHMgdm9ya29tbXQu'>
+<source>102% ist eine Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.</source>
+<target>102% is a repetition. A repetition is a match that occurs identically in the current task again.</target>
 </trans-unit>
 
 <trans-unit id='MTAzJSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIHVyc3Byw7xuZ2xpY2ggYXVzIGVpbmVyIERhdGVpIG1pdCBkZW0gc2VsYmVuIE5hbWVuIHN0YW1tdCAod2llIGVpbiAxMDElIFRyZWZmZXIpLiBadXPDpHR6bGljaCB6dW0gMTAxJSBUcmVmZmVyIGlzdCBkaWUgU2VnbWVudC1JRCBub2NoIGlkZW50aXNjaCBvZGVyIGdsZWljaCBtaXQgZGVyIFNlZ21lbnQtSUQgaW4gZGVyIGFrdHVlbGxlbiBEYXRlaS4='>
@@ -3413,7 +3425,7 @@ A task was associated to you in the task-portal {portalLink}.<br />
 <trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIEF0dHJpYnV0cy1XZXJ0'><source>Änderung zu bestehendem Attributs-Wert</source><target>Change to existing attribute</target></trans-unit>
 <trans-unit id='RWludHJhZw=='><source>Eintrag</source><target>Entry</target></trans-unit>
 <trans-unit id='TGV0enRlciBCZWFyYmVpdGVy'><source>Letzter Bearbeiter</source><target>Last editor</target></trans-unit>
-<trans-unit id='QmVhcmJlaXR1bmdzZGF0dW0='><source>Bearbeitungsdatum</source><target>Edit date</target></trans-unit>
+<trans-unit id='QmVhcmJlaXR1bmdzZGF0dW0='><source>Bearbeitungsdatum</source><target>Last modified date</target></trans-unit>
 <trans-unit id='RXhjZWwgUmUtSW1wb3J0aWVyZW4='>
     <source>Excel Re-Importieren</source>
     <target>Excel Re-Import</target>
@@ -3769,10 +3781,10 @@ The following task was imported with errors / warnings / notices. Please take ca
   <target>The previous / next segment is still saving, please wait...</target>
 </trans-unit>
 <trans-unit id='UHJvamVrdCBrb21wbGV0dCBsw7ZzY2hlbg=='><source>Projekt komplett löschen</source><target>Delete project completely</target></trans-unit>
-<trans-unit id='UHJvamVrdCBrb21wbGV0dCBsw7ZzY2hlbj8='><source>Projekt komplett löschen?</source><target>Delete project completely?</target></trans-unit>
+<trans-unit id='UHJvamVrdCAiezB9IiBrb21wbGV0dCBsw7ZzY2hlbj8='><source>Projekt "{0}" komplett löschen?</source><target>Delete "{0}" project completely?</target></trans-unit>
 <trans-unit id='U29sbHRlbiBkYXMgUHJvamVrdCB1bmQgYWxsZSBpbSBQcm9qZWt0IGVudGhhbHRlbmVuIEF1ZmdhYmVuIGdlbMO2c2NodCB3ZXJkZW4/'><source>Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?</source><target>Should the project and all tasks included in the project be deleted?</target></trans-unit>
 <trans-unit id='UHJvamVrdCBsw7ZzY2hlbg=='><source>Projekt löschen</source><target>Delete project</target></trans-unit>
-<trans-unit id='RGFzIFByb2pla3Qgd3VyZGUgZXJmb2xncmVpY2ggZW50ZmVybnQh'><source>Das Projekt wurde erfolgreich entfernt!</source><target>The project was successfully removed!</target></trans-unit>
+<trans-unit id='RGFzIFByb2pla3QgInswfSIgd3VyZGUgZXJmb2xncmVpY2ggZW50ZmVybnQh'><source>Das Projekt "{0}" wurde erfolgreich entfernt!</source><target>The project "{0}" was successfully removed!</target></trans-unit>
 <trans-unit id='QXVmZ2FiZW5uYW1lLVByb2pla3Q='><source>Aufgabenname-Projekt</source><target>Task-name</target></trans-unit>
 <trans-unit id='UHJvamVrdGU='><source>Projekte</source><target>Projects</target></trans-unit>
 <trans-unit id='enVtIFByb2pla3Qgc3ByaW5nZW4='><source>zum Projekt springen</source><target>jump to project</target></trans-unit>
@@ -4044,7 +4056,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBlbnRmZXJudA=='><source>Die Qualität wurde entfernt</source><target>The quality has been removed</target></trans-unit>
 <trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='><source>Der False-Positive Status wurde aktualisiert</source><target>The false-positive state has been updated</target></trans-unit>
 <trans-unit id='QWNodHVuZw=='><source>Achtung</source><target>Warning</target></trans-unit>
-<trans-unit id='RXMgZ2lidCBpbiBkaWVzZXIgQXVmZ2FiZSBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIHUuVS4gZWluZW4gZmVobGVyZnJlaWVuIEV4cG9ydCBkZXIgQXVmZ2FiZSB2ZXJoaW5kZXJu'><source>Es gibt in dieser Aufgabe Interne Tag Fehler die u.U. einen fehlerfreien Export der Aufgabe verhindern</source><target>There are problems with internal tags in this task that may prevent exporting this task properly</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBpbiBkaWVzZXIgQXVmZ2FiZSBpbnRlcm5lIFRhZyBGZWhsZXIsIGRpZSBmw7xyIGVpbmVuIGZlaGxlcmZyZWllbiBFeHBvcnQgYXV0b21hdGlzY2gga29ycmlnaWVydCB3dXJkZW4='>
+	<source>Es gibt in dieser Aufgabe interne Tag Fehler, die für einen fehlerfreien Export automatisch korrigiert wurden</source>
+	<target>There are problems with internal tags in this task that have been automatically resolved for a proper export</target>
+</trans-unit>
 <trans-unit id='TMOkbmdlbiBQcsO8ZnVuZw=='><source>Längen Prüfung</source><target>Length check</target></trans-unit>
 <trans-unit id='U2VnbWVudCBpc3QgbMOkbmdlciBhbHMgZXJsYXVidA=='><source>Segment ist länger als erlaubt</source><target>Segment longer than allowed</target></trans-unit>
 <trans-unit id='U2VnbWVudCBpc3QgcmVsZXZhbnQga8O8cnplciBhbHMgZXJsYXVidCAobWVociBhbHMgezB9JSB6dSBrdXJ6IG9kZXIgbWluLiB7MX0gUGl4ZWwgenUga3Vyeik='><source>Segment ist relevant kürzer als erlaubt (mehr als {0}% zu kurz oder min. {1} Pixel zu kurz)</source><target>Segment relevantly shorter than allowed (more than {0}% shorter than allowed or at least {1} Pixel shorter than allowed)</target></trans-unit>
@@ -4204,9 +4219,135 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Projektbeschr. ausblenden</source>
   <target>Hide project description</target>
 </trans-unit>
+<trans-unit id='VGVybVNlYXJjaA=='><source>TermSearch</source><target>Term search</target></trans-unit>
+<trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermCustomerSearch</source><target>Term search</target></trans-unit>
+<trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>Propose terms</target></trans-unit>
+<trans-unit id='VGVybVJldmlld2Vy'><source>TermReviewer</source><target>Review terms</target></trans-unit>
+<trans-unit id='VGVybUZpbmFsaXplcg=='><source>TermFinalizer</source><target>Finalize terms</target></trans-unit>
+<trans-unit id='VGVybVBN'><source>TermPM</source><target>Term PM</target></trans-unit>
+<trans-unit id='VGVybVBNX2FsbENsaWVudHM'><source>TermPM_allClients</source><target>Term PM (all clients)</target></trans-unit>
 <trans-unit id='UG1saWdodA=='>
     <source>Pmlight</source>
     <target>PM Light</target>
+</trans-unit>
+<trans-unit id='SWhyZSBEYXRlaSBpc3QgZ3LDtsOfZXIgYWxzIGRhcyB6dWzDpHNzaWdlIE1heGltdW0gdm9uIHt1cGxvYWRfbWF4X2ZpbGVzaXplfSBNQi4gVW0gZ3LDtsOfZXJlIERhdGVpZW4gaG9jaGxhZGVuIHp1IGvDtm5uZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gdHJhbnNsYXRlNS1TdXBwb3J0Lg=='>
+    <source>Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.</source>
+    <target>Your file is larger than the allowed limit of {upload_max_filesize} MB. To be able to upload larger files, please contact the translate5 support.</target>
+</trans-unit>
+<trans-unit id='WnVzw6R0emxpY2hlIEluZm9z'>
+    <source>Zusätzliche Infos</source>
+    <target>Additional info</target>
+</trans-unit>
+<trans-unit id='ZmlsZU5hbWVfT3BlblRNMg=='>
+    <source>fileName_OpenTM2</source>
+    <target>Database name</target>
+</trans-unit>
+<trans-unit id='ZmlsZU5hbWVfVGVybUNvbGxlY3Rpb24='>
+    <source>fileName_TermCollection</source>
+    <target>Last imported file</target>
+</trans-unit>
+<trans-unit id='dGVybV9UZXJtQ29sbGVjdGlvbg=='>
+    <source>term_TermCollection</source>
+    <target>Terms</target>
+</trans-unit>
+<trans-unit id='dGVybUVudHJ5X1Rlcm1Db2xsZWN0aW9u'>
+    <source>termEntry_TermCollection</source>
+    <target>Entries</target>
+</trans-unit>
+<trans-unit id='YXR0cmlidXRlX1Rlcm1Db2xsZWN0aW9u'>
+    <source>attribute_TermCollection</source>
+    <target>Attributes</target>
+</trans-unit>
+<trans-unit id='dG1JZF9Hcm91cFNoYXJl'>
+    <source>tmId_GroupShare</source>
+    <target>Id</target>
+</trans-unit>
+<trans-unit id='dG1JZF9zb3VyY2VMYW5n'>
+    <source>tmId_sourceLang</source>
+    <target>Source language</target>
+</trans-unit>
+<trans-unit id='dG1JZF90YXJnZXRMYW5n'>
+    <source>tmId_targetLang</source>
+    <target>Target language</target>
+</trans-unit>
+<trans-unit id='ZG9tYWluQ29kZV9TRExMYW5ndWFnZUNsb3Vk'>
+    <source>domainCode_SDLLanguageCloud</source>
+    <target>Domain code</target>
+</trans-unit>
+<trans-unit id='ZW5naW5lTmFtZV9TRExMYW5ndWFnZUNsb3Vk'>
+    <source>engineName_SDLLanguageCloud</source>
+    <target>Enginename</target>
+</trans-unit>
+<trans-unit id='RXJsYXVidGUgRGF0ZWlmb3JtYXRlOiBUQlggb2RlciBlaW5lIFppcC1EYXRlaSwgZGllIGVpbmUgb2RlciBtZWhyZXJlIFRCWC1EYXRlaWVuIGVudGjDpGx0Lg=='>
+    <source>Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.</source>
+    <target>Allowed file formats: TBX or a zip file containing one or multiple TBX files.</target>
+</trans-unit>
+<trans-unit id='TnVyIFRCWCBCYXNpYyBTdGFuZGFyZGF0dHJpYnV0ZSArIHByb2Nlc3NTdGF0dXMgZXhwb3J0aWVyZW4='><source>Nur TBX Basic Standardattribute + processStatus exportieren</source><target>Export only TBX Basic standard attributes + processStatus</target></trans-unit>
+<trans-unit id='QmlsZGVyIGltIEhleC1Gb3JtYXQgZXhwb3J0aWVyZW4sIGVpbmdlYmV0dGV0IGluIFRCWA=='><source>Bilder im Hex-Format exportieren, eingebettet in TBX</source><target>Export images in hex format, embedded in TBX</target></trans-unit>
+<trans-unit id='QWxzIFRCWCBleHBvcnRpZXJlbg=='><source>Als TBX exportieren</source><target>Export as TBX</target></trans-unit>
+<trans-unit id='MS4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'>
+  <source>1. Lektorat (sprachlich)</source>
+  <target>1st revision - language</target>
+</trans-unit>
+<trans-unit id='MS4gTGVrdG9yYXQgKHRlY2huaXNjaCk='>
+  <source>1. Lektorat (technisch)</source>
+  <target>1st revision - technical</target>
+</trans-unit>
+<trans-unit id='Mi4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'>
+  <source>2. Lektorat (sprachlich)</source>
+  <target>2nd revision - language</target>
+</trans-unit>
+<trans-unit id='Mi4gTGVrdG9yYXQgKHRlY2huaXNjaCk='>
+  <source>2. Lektorat (technisch)</source>
+  <target>2nd revision - technical</target>
+</trans-unit>
+<trans-unit id='VGV4dGZyZWlnYWJl'>
+  <source>Textfreigabe</source>
+  <target>Text approval</target>
+</trans-unit>
+<trans-unit id='RXh0ZXJuZXMgRFRQIChudXIgTGVzZXJlY2h0ZSBpbiB0cmFuc2xhdGU1KQ=='>
+  <source>Externes DTP (nur Leserechte in translate5)</source>
+  <target>External DTP (read-only inside translate5)</target>
+</trans-unit>
+<trans-unit id='RmluYWxlIFRleHRmcmVpZ2FiZQ=='>
+  <source>Finale Textfreigabe</source>
+  <target>Final text approval</target>
+</trans-unit>
+<trans-unit id='U3ByYWNoZSDDpG5kZXJu'>
+    <source>Sprache ändern</source>
+    <target>Change language</target>
+</trans-unit>
+<trans-unit id='YXJpYQ=='>
+    <source>aria</source>
+    <target>Dark theme (Aria)</target>
+</trans-unit>
+<trans-unit id='dHJpdG9u'>
+    <source>triton</source>
+    <target>Default theme (Triton)</target>
+</trans-unit>
+<trans-unit id='UERGIERva3VtZW50YXRpb24='>
+    <source>PDF Dokumentation</source>
+    <target>PDF documentation</target>
+</trans-unit>
+<trans-unit id='SW4gbmV1ZW0gQnJvd3Nlci1UYWIgw7ZmZm5lbg=='>
+    <source>In neuem Browser-Tab öffnen</source>
+    <target>Open in new browser tab</target>
+</trans-unit>
+<trans-unit id='U3ByYWNocmVzc291cmNlICJ7MH0iIGdlbMO2c2NodC4='>
+    <source>Sprachressource "{0}" gelöscht.</source>
+    <target>Language resource "{0}" deleted.</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSAiezB9IiBnZWzDtnNjaHQ='>
+    <source>Aufgabe "{0}" gelöscht</source>
+    <target>Task "{0}" deleted</target>
+</trans-unit>
+<trans-unit id='QmVncmlmZmUgaW4gZGVyIFRCWCB3ZXJkZW4gaW1tZXIgenVlcnN0IG5hY2ggSUQgbWl0IGJlc3RlaGVuZGVuIEVpbnRyw6RnZW4gaW4gZGVyIFRlcm1Db2xsZWN0aW9uIHp1c2FtbWVuZ2Vmw7xocnQuIFdlbm4gVGVybWUgenVzYW1tZW5mw7xocmVuIGFuZ2VrcmV1enQgaXN0IHVuZCBkaWUgSUQgaW4gZGVyIFRCWCBuaWNodCBpbiBkZXIgVGVybUNvbGxlY3Rpb24gZ2VmdW5kZW4gd2lyZCwgd2lyZCBnZXN1Y2h0LCBvYiBkZXJzZWxiZSBCZWdyaWZmIGJlcmVpdHMgaW4gZGVyc2VsYmVuIFNwcmFjaGUgZXhpc3RpZXJ0LiBXZW5uIGphLCB3ZXJkZW4gZGllIGdlc2FtdGVuIFRlcm1laW50csOkZ2UgenVzYW1tZW5nZWbDvGhydC4gSW5zYmVzb25kZXJlIGJlaSBlaW5lciBUZXJtQ29sbGVjdGlvbiBtaXQgdmllbGVuIFNwcmFjaGVuIGthbm4gZGllcyB6dSB1bmVyd8O8bnNjaHRlbiBFcmdlYm5pc3NlbiBmw7xocmVuLg=='>
+    <source>Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.</source>
+    <target>Terms in the TBX will always be merged first by ID with existing entries in the TermCollection. If Merge terms is checked and the ID in the TBX is not found in the TermCollection, it will be search, if the same term exists already in the same language. If yes, the entire term entries will be merged. Especially with a TermCollection with many languages this may lead to unwanted results.</target>
+</trans-unit>
+<trans-unit id='TmljaHQgZW1wZm9obGVuIQ=='>
+    <source>Nicht empfohlen!</source>
+    <target>Not recommended!</target>
 </trans-unit>
 </body>
   </file>

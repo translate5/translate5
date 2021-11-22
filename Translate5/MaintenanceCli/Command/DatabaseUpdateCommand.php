@@ -58,6 +58,17 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             'i',
             InputOption::VALUE_NONE,
             'Imports all new database files or a single file if a filename / hash was given.');
+
+        /**
+         * TODO Open Ideas:
+         */
+//        $this->addOption(
+//            'select',
+//            's',
+//            InputOption::VALUE_NONE,
+//            'Provides an interactive menu to select the files to be imported.');
+
+            //add a recall parameter, so that specific database files can be called again.
         
         $this->addOption(
             'assume-imported',
@@ -80,15 +91,23 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         
         $dbupdater = \ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
         /* @var $dbupdater \ZfExtended_Models_Installer_DbUpdater */
-        
-        //$this->getModifiedFiles();
-        $dbupdater->calculateChanges();
-        
+
+        //print on develop machines the configured sqlPaths and in the Browser GUI
+        $usedPaths = $dbupdater->calculateChanges();
+        $usedPaths = array_filter($usedPaths, function($item) {
+            return strpos($item, 'library/ZfExtended/database/') === false && strpos($item, 'modules/default/database/') === false && strpos($item, 'modules/editor/database/') === false;
+        });
+        if(!empty($usedPaths)) {
+            array_unshift($usedPaths, 'Additional configured DB search path(s): ');
+            $this->io->warning($usedPaths);
+        }
+
         $result = $this->processOnlyOneFile($dbupdater);
         if($result >= 0) {
             return $result;
         }
-        
+
+
         $newFiles = $dbupdater->getNewFiles();
         $toProcess = [];
         if(!empty($newFiles)) {
@@ -117,7 +136,21 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             $this->io->warning('--assume-imported can only be used on one single file! Nothing is assumed as imported.');
             return 1;
         }
-        if($this->input->getOption('import')) {
+        $import = $this->input->getOption('import');
+
+//        //print_r($modified);
+//        //print_r($newFiles);
+//        if($this->input->getOption('select')) {
+//            $selected = $this->io->choice("Select file to be imported", $toProcess);
+//            print_r($selected);
+//        }
+//        return 0;
+
+        if(!$import) {
+            $import = $this->io->confirm('Import listed files?', false);
+        }
+
+        if($import) {
             $importedCount = $dbupdater->applyNew($toProcess);
             $dbupdater->updateModified($toProcess);
             $errors = $dbupdater->getErrors();

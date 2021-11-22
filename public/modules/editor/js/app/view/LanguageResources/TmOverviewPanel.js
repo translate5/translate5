@@ -40,7 +40,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     extend : 'Ext.grid.Panel',
     requires: [
         'Editor.view.admin.customer.CustomerFilter',
-        'Editor.view.LanguageResources.TmOverviewViewController'
+        'Editor.view.LanguageResources.TmOverviewViewController',
+        'Editor.view.LanguageResources.TermCollectionExportActionMenu'
     ],
     alias: 'widget.tmOverviewPanel',
     controller: 'tmOverviewPanel',
@@ -76,13 +77,17 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         useAsDefault:'#UT#Leserechte standardmäßig',
         writeAsDefault:'#UT#Schreibrechte standardmäßig',
         taskassocgridcell:'#UT#Zugewiesene Aufgaben',
-        groupHeader: '#UT#Ressource: {name}'
+        groupHeader: '#UT#Ressource: {name}',
+        specificDataText:'#UT#Zusätzliche Infos'
     },
     cls:'tmOverviewPanel',
     height: '100%',
     layout: {
         type: 'fit'
     },
+
+    tooltip:null,
+
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
@@ -257,6 +262,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     text: me.strings.color
                 },{
                     xtype: 'gridcolumn',
+                    text:me.strings.specificDataText,
+                    width: 160,
+                    tdCls:'specificData',
+                    renderer:me.specificDataRenderer,
+                    dataIndex: 'specificData'
+                },{
+                    xtype: 'gridcolumn',
                     width: 160,
                     text: me.strings.languageResourceStatusColumn,
                     dataIndex: 'status',
@@ -335,6 +347,69 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
       }
       return me.callParent([config]);
     },
+
+    initComponent: function () {
+        var me = this;
+        me.statisticTpl = new Ext.XTemplate(
+            '<table>',
+            '<tpl for=".">',
+            '<tr><td>{type}: </td><td>{value}</td></tr>',
+            '</tpl>',
+            '</table>');
+        me.callParent(arguments);
+        me.view.on('afterrender', function () {
+            me.tooltip = me.createToolTip();
+            me.tooltip.on({
+                beforeshow:{
+                    scope:me,
+                    fn:me.onSpecificDataTooltipBeforeShow
+                }
+            });
+        });
+
+    },
+
+    onDestroy: function () {
+        if (this.tooltip) {
+            this.tooltip.destroy();
+        }
+        this.callParent(arguments);
+    },
+
+
+    /***
+     * Tooltip for specificData column. This will fill the template with data based on the user mouse:hover column
+     * @returns {Ext.tip.ToolTip}
+     */
+    createToolTip: function () {
+        var me = this;
+        return Ext.create('Ext.tip.ToolTip', {
+            target: me.view.el,
+            delegate: 'td.specificData',
+            dismissDelay: 0,
+            showDelay: 200,
+            maxWidth: 1000,
+            renderTo: Ext.getBody()
+        });
+    },
+
+    /***
+     * On specificData column before tooltip show event handler
+     * @param tip
+     * @returns {boolean}
+     */
+    onSpecificDataTooltipBeforeShow: function updateTipBody(tip) {
+        var me=this,
+            tr = Ext.fly(tip.triggerElement).up('tr'),
+            record = me.view.getRecord(tr),
+            value = record.get('specificData');
+
+        if(Ext.isEmpty(value)){
+            return false;
+        }
+        tip.update(me.statisticTpl.apply(Ext.JSON.decode(value)));
+    },
+
     langRenderer : function(val, md) {
         if(!val || val.length<1){
             return '';
@@ -430,7 +505,21 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 callbackCheck(loadedRecord);
             }
         });
+    },
+
+    /***
+     * Custom specific data renderer
+     * @param value
+     * @param meta
+     * @param record
+     * @returns {string}
+     */
+    specificDataRenderer: function(value, meta) {
+        if(!Ext.isEmpty(value)){
+            meta.tdCls = 'gridColumnInfoIconTooltipCenter';
+        }
+        return '';
     }
-    
-    
+
+
 });

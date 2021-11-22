@@ -58,6 +58,7 @@
 /application/modules/default/Controllers/ControllerMixIns.php
 /application/modules/default/Controllers/LicenseController.php
 /application/modules/default/configs/aclConfig.ini
+/application/modules/editor/Models/Import/FileParser/TagTrait.php
 /application/modules/default/views/helpers/LanguageSelector.php
 /application/modules/default/views/scripts/help/matchresource.phtml
 /application/modules/default/views/scripts/index/cms.phtml
@@ -173,3 +174,5 @@
 /public/modules/editor/js/app/view/ui/segments/column/IsWatched.js
 /public/modules/editor/js/app/view/DateTimeField/DateTimeField.js
 /public/modules/editor/js/app/view/DateTimeField/DateTimePicker.js
+/client-specific/views/editor/scripts/termportal/layoutConfig.php
+/client-specific/views/editor/scripts/instanttranslate/layoutConfig.php

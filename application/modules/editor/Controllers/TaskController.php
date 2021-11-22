@@ -218,7 +218,6 @@ class editor_TaskController extends ZfExtended_RestController {
 
         ->initContext();
     }
-
     /**
      * init the internal used workflow
      * @param string $wfId workflow ID. optional, if omitted use the workflow of $this->entity
@@ -764,6 +763,9 @@ error_log(print_r($this->_getParam('data'),1));
                 $saveModel = true;
                 $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
                 /* @var $taskConfig editor_Models_TaskConfig */
+                // INFO: runtimeOptions.workflow.notifyAllUsersAboutTask can be overwritten only on customer level but from the frontend we are able to
+                // change this value via checkbox in the import wizard. This to take effect on all tasks, we insert the config value in the task config table, which
+                // value will be evaluated later (after task import in the notification class)
                 $taskConfig->updateInsertConfig($model->getTaskGuid(),'runtimeOptions.workflow.notifyAllUsersAboutTask',$notifyAssociatedUsers);
             }
 
@@ -1084,6 +1086,9 @@ error_log(print_r($this->_getParam('data'),1));
         
         // check if the user is allowed to open the task based on the session. The user is not able to open 2 different task in same time.
         $this->checkUserSessionAllowsOpen($this->entity->getTaskGuid());
+        $this->decodePutData();
+
+        $this->handleCancelImport();
 
         //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
         $this->entity->checkStateAllowsActions([editor_Models_Excel_AbstractExImport::TASK_STATE_ISEXCELEXPORTED]);
@@ -1092,7 +1097,6 @@ error_log(print_r($this->_getParam('data'),1));
         $this->log->request();
 
         $oldTask = clone $this->entity;
-        $this->decodePutData();
 
         //warn the api user for the targetDeliveryDate ussage
         $this->targetDeliveryDateWarning();
@@ -2103,5 +2107,38 @@ error_log(print_r($this->_getParam('data'),1));
                 $this->checkStateDelete($model,$forced);
             }
         }
+    }
+
+    protected function handleCancelImport() {
+        $isAllowedToCancel = $this->isAllowed('frontend', 'editorCancelImport') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
+
+        //if no state is set or user is not allowed to cancel, do nothing
+        if(empty($this->data->state)) {
+            return;
+        }
+
+        //if task is importing and state is tried to be set to something other as error, unset state and do nothing here
+        if($this->entity->isImporting() && ($this->data->state != $this->entity::STATE_ERROR || !$isAllowedToCancel)){
+            unset($this->data->state);
+            return;
+        }
+
+        //override the entity version check
+        if(isset($this->data->entityVersion)) {
+            unset($this->data->entityVersion);
+        }
+
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $worker ZfExtended_Models_Worker */
+        try {
+            $worker->loadFirstOf('editor_Models_Import_Worker', $this->entity->getTaskGuid());
+            $worker->setState($worker::STATE_DEFUNCT);
+            $worker->save();
+            $worker->defuncRemainingOfGroup();
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            //if no import worker found, nothing can be stopped
+        }
+        $this->entity->unlock();
+        $this->log->info('E1011', 'Task import cancelled', ['task' => $this->entity]);
     }
 }

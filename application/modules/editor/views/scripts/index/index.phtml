@@ -28,6 +28,10 @@ END LICENSE AND COPYRIGHT
 
 //FIXME add manifest here if we implement better caching
 //FIXME set lang to the lang of the users GUI
+
+$config = Zend_Registry::get('config');
+/* @var $config Zend_Config */
+
 ?><!DOCTYPE HTML>
 <html lang="en-US">
 <head>
@@ -38,6 +42,7 @@ END LICENSE AND COPYRIGHT
     <link rel="shortcut icon" href="<?php echo $this->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
     <title><?php echo $this->translate->_('translate5'); ?></title>
     <script>
+    if (location.hash.match(/^#(termportal|itranslate)/)) location = '/editor/termportal' + location.hash;
     Editor = {};
     <?php
     echo $this->Php2JsVars();
@@ -57,6 +62,19 @@ END LICENSE AND COPYRIGHT
         <?php echo $this->translate->_('translate5 wird geladen:');?>
         <div id="loading-indicator-text"></div>
     	<div id="head-panel"></div>
+        <?php if($this->getScriptPath('fragments/header-consortium-logos.phtml') && $config->runtimeOptions->startup->showConsortiumLogos > 0) : ?>
+            <div class="containerConsortium">
+                <a href="https://www.translate5.net" target="_blank">
+                    <?= $this->render('fragments/header-consortium-logos.phtml') ?>
+                </a>
+                <style>
+                    .containerConsortium a {text-decoration: none;}
+                    .float-container {border: none; padding: 20px 0 0 0; margin-left: -35px;}
+                    .powered-text-container {margin-bottom: 0;}
+                    .float-child {width: 100%;}
+                </style>
+            </div>
+        <?php endif; ?>
     </div>
 </body>
 </html>

@@ -1,12 +1,26 @@
+<?php
+/**
+ * !!! this template-fragment is also used in the initial translate5-loading screen.
+ * look at /application/modules/editor/views/scripts/index/index.phtml
+ * via an "alias-file" under
+ * application/modules/editor/views/scripts/fragments/header-consortium-logos.phtml
+ * so if you made any changes here, be sure that the loading screen is still displayed correct.
+ * to show consortium-logos on startup runtimeOptions.startup.showConsortiumLogos must be > 0
+ */
+?>
 <style>
     .float-container {
         border: 3px solid #fff;
         padding: 20px;
     }
-
     .float-child {
-        width: 50%;
+        width: 48.5%;
+    }
+    .float-child-left {
         float: left;
+    }
+    .float-child-right {
+        float: right;
     }
     .right-consortium img{
         width: 100%;
@@ -25,10 +39,26 @@
 
     @media screen and (max-width: 800px) {
         .float-child {
-            width:auto;
+            width: auto;
         }
+
         #wrapper {
             padding-top: 10em;
+        }
+
+        .post > header {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .post > header .title {
+            padding-bottom: 0px;
+            margin-bottom: 0px;
+        }
+    }
+    @media screen and (max-width: 550px) {
+        #wrapper {
+            padding-top: 6em;
         }
         .post > header {
             padding-top: 10px;
@@ -38,41 +68,23 @@
             padding-bottom: 0px;
             margin-bottom: 0px;
         }
-
-        @media screen and (max-width: 550px) {
-            .float-child {
-                width:auto;
-            }
-            #wrapper {
-                padding-top: 6em;
-            }
-            .post > header {
-                padding-top: 10px;
-                padding-bottom: 10px;
-            }
-            .post > header .title{
-                padding-bottom: 0px;
-                margin-bottom: 0px;
-            }
-        }
+    }
 </style>
 <div class="float-container">
-    <div class="powered-text">
-        <label class="powered-text">Powered by translate5 Consortium:</label>
-    </div>
-    <div class="float-child">
-        <div class="left-consortium">
-            <img src="https://www.translate5.net/wp-content/uploads/header-konsortium-links-hr.jpg"
-                 alt="translate5 consortium"
-            >
+    <a href="<?php echo $this->translate->_('{LinkConsortium}');?>" target="_blank">
+        <div class="powered-text-container">
+            <label class="powered-text">Powered by translate5 Consortium:</label>
         </div>
-    </div>
-
-    <div class="float-child">
-        <div class="right-consortium">
-            <img src="https://www.translate5.net/wp-content/uploads/header-konsortium-rechts-hr.jpg"
-                 alt="translate5 consortium"
-            >
+        <div class="float-child float-child-left">
+            <div class="left-consortium">
+                <img src="https://www.translate5.net/t5-additions/images/consortium-01.jpg" alt="translate5 consortium">
+            </div>
         </div>
-    </div>
+    
+        <div class="float-child float-child-right">
+            <div class="right-consortium">
+                <img src="https://www.translate5.net/t5-additions/images/consortium-02.jpg" alt="translate5 consortium">
+            </div>
+        </div>
+    </a>
 </div>

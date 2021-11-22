@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -41,13 +41,18 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
      * @var editor_Models_Segment
      */
     protected $entity;
-    
+
     /**
      * Number to divide the segment duration
      *
      * @var integer
      */
     protected $durationsDivisor = 1;
+    /**
+     * 
+     * @var string[]
+     */
+    protected $cachedAutostates = NULL;
     
     public function preDispatch(){
         parent::preDispatch();
@@ -71,7 +76,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     {
         return editor_Models_SegmentFieldManager::getForTaskGuid($taskGuid);
     }
-    
+
     public function indexAction() {
         
         $taskGuid = $this->session->taskGuid;
@@ -141,7 +146,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
 
         $this->view->Php2JsVars()->set($type, $result);
     }
-
+    /**
+     * 
+     */
     public function nextsegmentsAction() {
         $segmentId = (int) $this->_getParam('segmentId');
         if ($this->_getParam('nextFiltered', false) || $this->_getParam('prevFiltered', false)) {
@@ -149,22 +156,30 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         }
         $this->entity->load($segmentId);
         $this->checkTaskGuidAndEditable();
-        $result = array();
+        
+        $context = new stdClass(); // this needs to be an object to make sure it is passed by reference through the events API
+        $context->result = [];
+        $context->types = explode(',', $this->_getParam('parsertypes', 'editable,workflow'));
+        $context->field = $this->_getParam('editedField', null);
+        
+        foreach($context->types as $type){
+            if($type == 'editable' || $type == 'workflow'){
+                $param = 'next_'.$type;
+                if ($this->_getParam($param, false)) {
+                    $autoStates = ($type == 'workflow') ? $this->getUsersAutoStateIds() : NULL;
+                    $context->result[$param] = $this->entity->findSurroundingEditables(true, $autoStates);
+                }
+                $param = 'prev_'.$type;
+                if ($this->_getParam($param, false)) {
+                    $autoStates = ($type == 'workflow') ? $this->getUsersAutoStateIds() : NULL;
+                    $context->result[$param] = $this->entity->findSurroundingEditables(false, $autoStates);
+                }
+            }
+        }
+        // this gives plugins (which may add types in the frontend) the chance to add the corresponding data
+        $this->events->trigger('nextsegmentsAction', $this, array('context' => $context, 'segment' => $this->entity));
 
-        //load only the requested editable segment
-        if ($this->_getParam('next', false)) {
-            $result['next'] = $this->entity->findSurroundingEditables(true);
-        }
-        if ($this->_getParam('prev', false)) {
-            $result['prev'] = $this->entity->findSurroundingEditables(false);
-        }
-        if ($this->_getParam('nextFiltered', false)) {
-            $result['nextFiltered'] = $this->entity->findSurroundingEditables(true, $autoStates);
-        }
-        if ($this->_getParam('prevFiltered', false)) {
-            $result['prevFiltered'] = $this->entity->findSurroundingEditables(false, $autoStates);
-        }
-        echo Zend_Json::encode((object)$result, Zend_Json::TYPE_OBJECT);
+        echo Zend_Json::encode((object) $context->result, Zend_Json::TYPE_OBJECT);
     }
 
     /**
@@ -194,27 +209,25 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
      * returns a list of autoStateIds, belonging to the users role in the currently loaded task
      * is neede for the autostate filter in the frontend
      */
-    protected function getUsersAutoStateIds()
-    {
-        $sessionUser = new Zend_Session_Namespace('user');
-
-        $taskUserAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskGuid($sessionUser->data->userGuid, $this->session->taskGuid);
-
-        if ($taskUserAssoc->getIsPmOverride()) {
-            $userRole = 'pm';
-        } else {
-            $userRole = $taskUserAssoc->getRole();
+    protected function getUsersAutoStateIds(){
+        if($this->cachedAutostates == NULL){
+            $sessionUser = new Zend_Session_Namespace('user');
+            $taskUserAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskGuid($sessionUser->data->userGuid, $this->session->taskGuid);
+            if ($taskUserAssoc->getIsPmOverride()) {
+                $userRole = 'pm';
+            } else {
+                $userRole = $taskUserAssoc->getRole();
+            }
+            $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+            /* @var $states editor_Models_Segment_AutoStates */
+            $autoStateMap = $states->getRoleToStateMap();
+            if (empty($userRole) || empty($autoStateMap[$userRole])) {
+                return null;
+            }
+            $this->cachedAutostates = $autoStateMap[$userRole];
         }
-
-        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        /* @var $states editor_Models_Segment_AutoStates */
-        $autoStateMap = $states->getRoleToStateMap();
-        if (empty($userRole) || empty($autoStateMap[$userRole])) {
-            return null;
-        }
-        return $autoStateMap[$userRole];
+        return $this->cachedAutostates;
     }
-
     /**
      * adds the optional is first of file info to the affected segments
      * @param string $taskGuid
@@ -696,11 +709,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
 
         //Erstellung und Setzen der Nutzdaten:
         $session = new Zend_Session_Namespace();
-        $terms = ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $terms editor_Models_Term */
+        $terms = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $terms editor_Models_Terminology_Models_TermModel */
         $this->view->publicModulePath = APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module');
         $this->view->termGroups = $terms->getByTaskGuidAndSegment($session->taskGuid, (int)$this->_getParam('id'));
-        $this->view->termStatMap = editor_Models_Term::getTermStatusMap();
+        $this->view->termStatMap = editor_Models_Terminology_Models_TermModel::getTermStatusMap();
         $this->view->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
 
@@ -813,7 +826,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         }
         $sessionUser = new Zend_Session_Namespace('user');
         $sessionUserGuid = $sessionUser->data->userGuid;
-        $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($sessionUserGuid, $task);
+        $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUserGuid, $task);
         /* @var $tua editor_Models_TaskUserAssoc */
         $step = $tua->getWorkflowStepName();
         $handleSegmentranges = $tua->isSegmentrangedTaskForStep($task, $step);

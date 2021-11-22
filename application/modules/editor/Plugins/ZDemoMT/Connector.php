@@ -90,23 +90,43 @@ class editor_Plugins_ZDemoMT_Connector extends editor_Services_Connector_Abstrac
         }
         return $this->resultList;
     }
-    
+
     /**
      * translates the given string to rot13.
      * @param string $searchString
+     * @param bool $isDemo
      * @return string
      */
-    public function translateToRot13(string $searchString): string {
+    public function translateToRot13(string $searchString, bool $isDemo = false): string {
         $tokens = preg_split('/(<[^>]+>)/i', $searchString, null, PREG_SPLIT_DELIM_CAPTURE);
         foreach($tokens as &$token) {
             if(strpos($token, '<') === 0) {
                 continue;
             }
-            $token = htmlentities(str_rot13(html_entity_decode($token)), ENT_XML1);
+            if($isDemo) {
+                $chars = mb_str_split(html_entity_decode($token));
+                $i = 0;
+                $demo = [0 => 'd', 1 => 'e', 2 => 'm', 3 => 'o'];
+                foreach($chars as &$char) {
+                    if(ctype_space($char) || ctype_punct($char)) {
+                        continue;
+                    }
+                    if(ctype_upper($char)) {
+                        $char = strtoupper($demo[$i++ % 4]);
+                    }
+                    else {
+                        $char = $demo[$i++ % 4];
+                    }
+                }
+                $token = htmlentities(join('', $chars));
+            }
+            else {
+                $token = htmlentities(str_rot13(html_entity_decode($token)), ENT_XML1);
+            }
         }
         return join('', $tokens);
     }
-    
+
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()

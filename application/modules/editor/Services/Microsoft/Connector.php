@@ -111,7 +111,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @param boolean $useDictionary
      * @return boolean
      */
-    protected function queryApi($searchString, $useDictionary = false): bool{
+    protected function queryApi($searchString, &$useDictionary = false): bool{
         return $this->api->search($searchString, $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode(), $useDictionary);
     }
     
@@ -129,6 +129,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         $useDictionary = mb_strlen($searchString) <= self::DICTONARY_SEARCH_CHARACTERS_BORDER;
         
         //query either with dictionary or without as fallback
+        // $useDictionary may be set to false by the search itself, if the languages do not support a dictionary lookup
         if ($this->queryApi($searchString, $useDictionary)) {
             $results = $this->api->getResult();
             $hasNoDictResults = $useDictionary && (empty($results) || empty($results[0]) || empty($results[0]->translations));

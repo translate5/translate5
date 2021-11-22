@@ -33,3 +33,6 @@ END LICENSE AND COPYRIGHT
 .icon-match-resources {background-image: url("images/share.png");}
 .adminTaskGrid tr.editorAnalysisTask .ico-task-analysis {background-image: url("images/chart_pie.png");display:inline-block;}
 .matchAnalysisGrid .x-grid-header-ct .info-icon > div {background:url("images/information.png") no-repeat 45px 9px;}
+
+.matchAnalysisInfoBox div > span{display:inline-block; margin-right:30px;}
+.matchAnalysisInfoBox div span.label{font-style: italic;}

@@ -55,10 +55,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     strings: {
         noMatch: '#UT#Keine Treffer',
         matchCount: '#UT#Gesamtzahl der Wörter',
-        tabTitle: "#UT#Analyse",
+        tabTitle: "#UT#Datum der Analyse",
         exportAnalysis: '#UT#Export als Excel',
         exportAnalysisXML: '#UT#Export Trados-like XML',
-        noAnalysis: '#UT#Start der Analyse im Tab “Sprachressourcen zuweisen“',
+        noAnalysis: '#UT#Es wurde bisher keine Analyse erstellt. Starten Sie eine Analyse im Tab “Sprachressourcen zuweisen“',
         languageResources: '#UT#Sprachressourcen',
         analysisDate: '#UT#Datum',
         languageResourceName: '#UT#Name',
@@ -80,13 +80,6 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
 
     initConfig: function (instanceConfig) {
         var me = this,
-            columnRenderer = function (val, meta, record) {
-                if (val) {
-                    return val;
-                }
-                return 0;
-            },
-
             config = {
                 title: me.strings.tabTitle,
                 scrollable: true,
@@ -103,207 +96,130 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                     features: [{
                         ftype: 'summary'
                     }],
-                    columns: [{
-                        xtype: 'gridcolumn',
-                        text: me.strings.languageResourceName,
-                        renderer: function (value, metaData, record) {
-                            if (!value) {
-                                return me.strings.repetitions;
-                            }
-                            return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #' + record.get('resourceColor') + ';"></div>' + value;
-                        },
-                        summaryRenderer: function (value, summaryData, dataIndex) {
-                            return me.strings.totalSum;
-                        },
-                        dataIndex: 'resourceName',
-                        flex: 5,
-                        sortable: true
-                    }, {
-                        xtype: 'gridcolumn',
-                        cls: 'info-icon',
-                        flex: 2,
-                        dataIndex: '104',
-                        cellWrap: true,
-                        text: "104%",
-                        tooltip: Editor.util.LanguageResources.getMatchrateTooltip(104),
-                        summaryType: 'sum',
-                        renderer: columnRenderer,
-                    }, {
-                        xtype: 'gridcolumn',
-                        cls: 'info-icon',
-                        flex: 2,
-                        dataIndex: '103',
-                        cellWrap: true,
-                        text: "103%",
-                        tooltip: Editor.util.LanguageResources.getMatchrateTooltip(103),
-                        summaryType: 'sum',
-                        renderer: columnRenderer,
-                    }, {
-                        xtype: 'gridcolumn',
-                        cls: 'info-icon',
-                        flex: 2,
-                        dataIndex: '102',
-                        cellWrap: true,
-                        text: "102%",
-                        tooltip: Editor.util.LanguageResources.getMatchrateTooltip(102),
-                        summaryType: 'sum',
-                        renderer: columnRenderer
-                    }, {
-                        xtype: 'gridcolumn',
-                        cls: 'info-icon',
-                        flex: 2,
-                        dataIndex: '101',
-                        cellWrap: true,
-                        text: "101%",
-                        tooltip: Editor.util.LanguageResources.getMatchrateTooltip(101),
-                        summaryType: 'sum',
-                        renderer: columnRenderer
-                    }, {
-                        xtype: 'gridcolumn',
-                        flex: 2,
-                        dataIndex: '100',
-                        cellWrap: true,
-                        text: "100%",
-                        summaryType: 'sum',
-                        renderer: columnRenderer
-                    }, {
-                        xtype: 'gridcolumn',
-                        flex: 2,
-                        dataIndex: '99',
-                        cellWrap: true,
-                        text: "99%-90%",
-                        summaryType: 'sum',
-                        renderer: columnRenderer
-                    }, {
-                        xtype: 'gridcolumn',
-                        flex: 2,
-                        dataIndex: '89',
-                        cellWrap: true,
-                        text: "89%-80%",
-                        summaryType: 'sum',
-                        renderer: columnRenderer
-                    }, {
-                        xtype: 'gridcolumn',
-                        flex: 2,
-                        dataIndex: '79',
-                        cellWrap: true,
-                        text: "79%-70%",
-                        summaryType: 'sum',
-                        renderer: columnRenderer
-                    }, {
-                        xtype: 'gridcolumn',
-                        flex: 2,
-                        dataIndex: '69',
-                        cellWrap: true,
-                        text: "69%-60%",
-                        summaryType: 'sum',
-                        renderer: columnRenderer
-                    }, {
-                        xtype: 'gridcolumn',
-                        flex: 2,
-                        dataIndex: '59',
-                        cellWrap: true,
-                        text: "59%-51%",
-                        summaryType: 'sum',
-                        renderer: columnRenderer
-                    }, {
-                        xtype: 'gridcolumn',
-                        flex: 3,
-                        dataIndex: 'noMatch',
-                        cellWrap: true,
-                        text: me.strings.noMatch,
-                        summaryType: 'sum',
-                        renderer: columnRenderer
-                    }, {
-                        xtype: 'gridcolumn',
-                        flex: 4,
-                        dataIndex: 'wordCountTotal',
-                        cellWrap: true,
-                        summaryType: 'sum',
-                        summaryRenderer: function (value, summaryData, dataIndex) {
-                            return value;
-                        },
-                        text: me.strings.matchCount
-                    }],
+                    columns: me.getColumnConfig(),
                     dockedItems: [{
+                        dock: 'top',
+                        xtype: 'panel',
+                        bodyPadding: 10,
+                        itemId: 'infoPanel',
+                        cls: 'matchAnalysisInfoBox',
+                        tpl: [
+                            '<tpl if="hasAnalysisData">',
+                                '<span class="date"><span class="label">{strings.analysisDate}:</span> {created}</span>',
+                                '<span class="fuzzy"><span class="label">{strings.internalFuzzy}:</span> {internalFuzzy}</span>',
+                                '<tpl if="!editFullMatch">',
+                                    '<span class="editFullMatch">{strings.edit100PercentMatchDisabledMessage}</span>',
+                                '</tpl>',
+                            '<tpl else>',
+                                '{strings.noAnalysis}',
+                            '</tpl>'
+                        ]
+                    },{
+                        xtype: 'container',
+                        dock: 'bottom',
+                        html: '<ul><li>'+[
+                            Editor.util.LanguageResources.getMatchrateTooltip(101),
+                            Editor.util.LanguageResources.getMatchrateTooltip(102),
+                            Editor.util.LanguageResources.getMatchrateTooltip(103),
+                            Editor.util.LanguageResources.getMatchrateTooltip(104)
+                        ].join('</li><li>')+'</li></ul>'
+                    },{
                         xtype: 'toolbar',
                         dock: 'bottom',
-
+                        ui: 'footer',
                         items: [{
-                            xtype: 'container',
-                            layout: 'hbox',
-                            padding: '5',
-                            html: "¹ " + me.strings.noAnalysis,
-                            dock: 'bottom',
-
-                            items: [{
-                                xtype: 'button',
-                                flex: 2,
-                                glyph: 'f1c3@FontAwesome5FreeSolid',
-                                itemId: 'exportExcel',
-                                text: me.strings.exportAnalysis,
-                                margin: '50 0 0 0',
-
-                                listeners: {
-                                    click: {fn: 'exportAction', extraArg: 'excel'}
-                                },
+                            xtype: 'button',
+                            glyph: 'f1c3@FontAwesome5FreeSolid',
+                            itemId: 'exportExcel',
+                            text: me.strings.exportAnalysis,
+                            bind: {
+                                disabled: '{!hasAnalysisData}'
                             },
-                                {
-                                    xtype: 'button',
-                                    glyph: 'f1c9@FontAwesome5FreeSolid',
-                                    itemId: 'exportXml',
-                                    text: me.strings.exportAnalysisXML,
-                                    margin: '50 0 0 10',
-
-                                    listeners: {
-                                        click: {fn: 'exportAction', extraArg: 'xml'}
-                                    },
-
-                                }
-                            ]
-                        }
-                        ]
-                    },
-                        {
-                            xtype: 'toolbar',
-                            dock
-    :
-        'top',
-            layout
-    :
-        {
-            type: 'vbox',
-                align
-        :
-            'left'
-        }
-    ,
-        items: [{
-            xtype: 'displayfield',
-            fieldLabel: me.strings.analysisDate,
-            itemId: 'analysisDatum'
-        }, {
-            xtype: 'displayfield',
-            fieldLabel: me.strings.internalFuzzy,
-            itemId: 'internalFuzzy'
-        }, {
-            xtype: 'displayfield',
-            bind: {
-                value: '{getEdit100PercentMatchLableText}',
-            },
-            itemId: 'edit100PercentMatchLableText'
-        }]
-
-    }
-    ]
-
-    }]
-    }
-        ;
+                            listeners: {
+                                click: {fn: 'exportAction', extraArg: 'excel'}
+                            }
+                        }, {
+                            xtype: 'button',
+                            glyph: 'f1c9@FontAwesome5FreeSolid',
+                            itemId: 'exportXml',
+                            text: me.strings.exportAnalysisXML,
+                            bind: {
+                                disabled: '{!hasAnalysisData}'
+                            },
+                            listeners: {
+                                click: {fn: 'exportAction', extraArg: 'xml'}
+                            }
+                        }]
+                    }]
+                }]
+            };
 
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+    getColumnConfig: function(customRanges) {
+        var me = this,
+            columnRenderer = function (val) {
+                return val ? val : 0;
+            },
+            columns;
+
+        customRanges = customRanges || [];
+
+        columns = [{
+            xtype: 'gridcolumn',
+            text: me.strings.languageResourceName,
+            renderer: function (value, metaData, record) {
+                if (!value) {
+                    return me.strings.repetitions;
+                }
+                return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #' + record.get('resourceColor') + ';"></div>' + value;
+            },
+            summaryRenderer: function () {
+                return me.strings.totalSum;
+            },
+            dataIndex: 'resourceName',
+            flex: 5,
+            sortable: true
+        }];
+
+        Ext.Array.each(customRanges, function(item){
+            var label,
+                isNoMatch = (item.begin === 'noMatch');
+            if(!item.begin && !item.end) {
+                return;
+            }
+            if(item.end === item.begin) {
+                label = item.end+'%';
+            }
+            else {
+                label = item.end+'%-'+item.begin+'%';
+            }
+            columns.push({
+                xtype: 'gridcolumn',
+                flex: isNoMatch ? 3 : 2,
+                dataIndex: item.begin,
+                cellWrap: true,
+                text: isNoMatch ? me.strings.noMatch : label,
+                summaryType: 'sum',
+                renderer: columnRenderer
+            });
+        });
+
+        columns.push({
+            xtype: 'gridcolumn',
+            flex: 4,
+            dataIndex: 'wordCountTotal',
+            cellWrap: true,
+            summaryType: 'sum',
+            summaryRenderer: function (value) {
+                return value;
+            },
+            text: me.strings.matchCount
+        });
+
+        return columns;
     }
 });

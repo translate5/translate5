@@ -72,7 +72,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         me.preimportOperation({
             usageMode: usageMode.getValue(),
             workflow:workflowCombo.getValue(),
-            notifyAssociatedUsers:notify.checked ? 1 : 0
+            notifyAssociatedUsers:notify ? 1 : 0
         },function (){
             view.fireEvent('wizardCardFinished', skipCards);
         });
@@ -121,6 +121,11 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         if(usersStore.getCount() === 0){
             usersStore.load();
         }
+
+        // set the checkbox default value from config
+        me.setNotifyAllUsersTaskConfig();
+
+        me.onAddAssocBtnClick();
     },
 
     /***
@@ -147,7 +152,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             success: function() {
                 me.getView().down('grid').getStore().load();
                 Editor.MessageBox.addSuccess('Assoc saved');
-                me.resetRecord();
+                me.onAddAssocBtnClick();
                 taskStore.load();
             }
         });
@@ -155,18 +160,13 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
 
     onAddAssocBtnClick : function(){
         var me=this,
-            newRecord,
+            newRecord = me.getView().getDefaultFormRecord(),
             project = me.getView().task,
             formPanel = me.lookup('assocForm'),
             form = formPanel.getForm(),
             targetLangField =  form.findField('targetLang'),
-            workflowCombo = me.getView().down('#workflowCombo'),
             hasProjectTasks = project.hasProjectTasks();
 
-        newRecord = Ext.create('Editor.model.admin.TaskUserAssoc',{
-            sourceLang : project.get('sourceLang'), // source language is always the same for projects or single tasks
-            workflow: workflowCombo.getValue()
-        });
 
         targetLangField.setVisible(hasProjectTasks);
 
@@ -174,7 +174,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             // it is single task project, set the taskGuid and the target langauge as record values
             newRecord.set('targetLang',project.get('targetLang'));
             newRecord.set('taskGuid',project.get('taskGuid'));
-        }else{
+        } else {
             // it is multi task project, the target language dropdown should contain only the project-tasks target languages
             var targetLangs = [];
             project.get('projectTasks').forEach(function(t){
@@ -190,7 +190,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             targetLangField.resumeEvents(true);
             me.getViewModel().set('formTask',null);
         }
-
+     
         // reset the current form and load the new record
         me.resetRecord(newRecord);
 
@@ -339,10 +339,24 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
      * @param oldValue
      */
     updatePreImportOnChange: function (newValue, oldValue){
-        // ignore when the new value is null. This is the case when the default values are set for the components
-        if(oldValue === null){
-            return;
-        }
         this.getView().getViewModel().set('sendPreImportOperation',newValue !== oldValue);
+    },
+
+    /***
+     * This will set the notify associated users checkbox value from runtimeOptions.workflow.notifyAllUsersAboutTask config.
+     * This config is overridable on customer level!
+     */
+    setNotifyAllUsersTaskConfig:function(){
+        var me=this,
+            view = me.getView(),
+            notifyAssociatedUsersCheckBox = view.down('#notifyAssociatedUsersCheckBox'),
+            store = Ext.create('Editor.store.admin.CustomerConfig');
+
+        view.mask();
+
+        store.loadByCustomerId(view.task.get('customerId'),function (){
+            notifyAssociatedUsersCheckBox.setValue(store.getConfig('workflow.notifyAllUsersAboutTask'));
+            view.unmask();
+        });
     }
 });

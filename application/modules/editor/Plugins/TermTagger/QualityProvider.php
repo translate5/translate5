@@ -76,14 +76,16 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         if (!$task->getTerminologie()) {
             return;
         }
+
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
         // Create segments_meta-field 'termtagState' if not exists
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         /* @var $meta editor_Models_Segment_Meta */
         $meta->addMeta('termtagState', $meta::META_TYPE_STRING, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
-        
-        $this->lockOversizedSegments($task, $meta);
+
+        //lock oversized segments and reset already tagged segments to untagged
+        $this->prepareSegments($task, $meta);
         
         // init worker and queue it
         $params = ['resourcePool' => 'import', 'processingMode' => $processingMode];
@@ -174,12 +176,11 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         return (($type == static::$type || in_array(static::$type, $classNames)) && editor_Plugins_TermTagger_Tag::hasNodeName($nodeName));
     }
     /**
-     * Find oversized segments and mark them as oversized
-     *
+     * Find oversized segments and mark them as oversized and sets tagged segments to untagged
      * @param editor_Models_Task $task
      * @param editor_Models_Segment_Meta $meta
      */
-    private function lockOversizedSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta) {
+    private function prepareSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta) {
         $config = Zend_Registry::get('config');
         $maxWordCount = $config->runtimeOptions->termTagger->maxSegmentWordCount ?? 150;
         $meta->db->update([
@@ -187,6 +188,12 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         ],[
             'taskGuid = ?' => $task->getTaskGuid(),
             'sourceWordCount >= ?' => $maxWordCount,
+        ]);
+        $meta->db->update([
+            'termtagState' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED
+        ],[
+            'taskGuid = ?' => $task->getTaskGuid(),
+            'termtagState = ?' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_TAGGED,
         ]);
     }
 }

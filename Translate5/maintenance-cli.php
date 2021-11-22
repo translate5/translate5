@@ -30,8 +30,7 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{
-    CachePurgeCommand,
+use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     ChangelogCommand,
     ConfigCommand,
     DatabaseUpdateCommand,
@@ -39,6 +38,7 @@ use Translate5\MaintenanceCli\Command\{
     DevelopmentGithookCommand,
     DevelopmentNewModelCommand,
     DevelopmentNewdbchangeCommand,
+    DevelopmentRuntestCommand,
     LogCommand,
     MaintenanceAnnounceCommand,
     MaintenanceCommand,
@@ -53,11 +53,11 @@ use Translate5\MaintenanceCli\Command\{
     SystemCheckCommand,
     SystemMailtestCommand,
     TaskCleanCommand,
+    TermportalReindexCommand,
     UserCreateCommand,
     UserInfoCommand,
     WorkerListCommand,
-    WorkerQueueCommand
-};
+    WorkerQueueCommand};
 use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
@@ -80,6 +80,7 @@ $commands = [
     new SystemCheckCommand(),
     new SystemMailtestCommand(),
     new TaskCleanCommand(),
+    new TermportalReindexCommand(),
     new UserCreateCommand(),
     new UserInfoCommand(),
     new WorkerListCommand(),
@@ -89,8 +90,10 @@ if(file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();
+    $commands[] = new DevelopmentRuntestCommand();
     $commands[] = new ReleaseNotesCommand();
     $commands[] = new DevelopmentNewModelCommand();
+    $commands[] = new \Translate5\MaintenanceCli\Command\TmxTs1040Command();
 }
 $app->addCommands($commands);
 $app->run();

@@ -74,34 +74,44 @@ class editor_Plugins_MatchAnalysis_Export_Xml
      * defined fuzzy ranges
      * @var array
      */
-    const FUZZY_RANGES = [
-        '50' => '59',
-        '60' => '69',
-        '70' => '79',
-        '80' => '89',
-        '90' => '99'
-    ];
-    
+    protected array $fuzzyRanges = [];
+
     /**
      * Collection of analyse nodes to be rendered
      * @var array
      */
-    protected $analyseNodes = [];
+    protected array $analyseNodes = [];
     
     /**
      * @var SimpleXMLElement
      */
-    protected $rootNode = null;
-    
+    protected SimpleXMLElement $rootNode;
+
+    /**
+     * @throws editor_Models_ConfigException
+     */
+    public function __construct(editor_Models_Task $task) {
+
+        //for XML export we may
+        $configuredFuzzies = $task->getConfig()->runtimeOptions->plugins->MatchAnalysis->fuzzyBoundaries;
+        $this->fuzzyRanges = [];
+        foreach($configuredFuzzies->toArray() as $begin => $end) {
+            if((int) $begin >= 100) {
+                continue;
+            }
+            $this->fuzzyRanges[(string) $begin] = (string) min((int)$end, 99);
+        }
+    }
+
     /**
      * adds empty fuzzy nodes
      */
     protected function addEmptyFuzzyNodes() {
-        foreach(self::FUZZY_RANGES as $min => $max) {
+        foreach($this->fuzzyRanges as $min => $max) {
             $this->add('fuzzy', ['min' => $min, 'max' => $max]);
         }
         //we use separate loops to sort all internal fuzzies below the fuzzies
-        foreach(self::FUZZY_RANGES as $min => $max) {
+        foreach($this->fuzzyRanges as $min => $max) {
             $this->add('internalFuzzy', ['min' => $min, 'max' => $max]);
         }
     }
@@ -129,10 +139,9 @@ class editor_Plugins_MatchAnalysis_Export_Xml
 
     /**
      * @param $rows
+     * @param $taskGuid
      * @return SimpleXMLElement
-     * @throws Exception
      */
-
     public function generateXML($rows, $taskGuid): SimpleXMLElement
     {
         $usedLanguageResources = [];
@@ -200,7 +209,7 @@ class editor_Plugins_MatchAnalysis_Export_Xml
      * @return boolean
      */
     protected function isFuzzyRange(array &$row): bool {
-        foreach(self::FUZZY_RANGES as $min => $max) {
+        foreach($this->fuzzyRanges as $min => $max) {
             if($min <= $row['matchRate'] && $row['matchRate'] <= $max) {
                 $row['min'] = $min;
                 $row['max'] = $max;
@@ -283,10 +292,10 @@ class editor_Plugins_MatchAnalysis_Export_Xml
             }
         }
     }
-    
+
     /**
      * creates and returns the XML taskInfo Node
-     * @param editor_Models_Task $task
+     * @param string $taskGuid
      * @return SimpleXMLElement
      */
     protected function createTaskInfo(string $taskGuid): SimpleXMLElement {
@@ -334,8 +343,7 @@ class editor_Plugins_MatchAnalysis_Export_Xml
         $settings->addAttribute('reportInternalFuzzyLeverage', $hasInternalFuzzy ? 'yes' : 'no');
         $settings->addAttribute('reportLockedSegmentsSeparately', 'no');
         $settings->addAttribute('reportCrossFileRepetitions', 'yes');
-        // TODO Currently the value of minimum score is hardcoded, but will be changed in the future to dynamic (with TRANSLATE-2076)
-        $settings->addAttribute('minimumMatchScore', '50');
+        $settings->addAttribute('minimumMatchScore', (string) min(array_keys($this->fuzzyRanges)));
         $settings->addAttribute('searchMode', 'bestWins');
         $settings->addAttribute('missingFormattingPenalty', 'n/a');
         $settings->addAttribute('differentFormattingPenalty', 'n/a');
@@ -350,7 +358,6 @@ class editor_Plugins_MatchAnalysis_Export_Xml
     
     /**
      * creates the XML root node
-     * @return SimpleXMLElement
      */
     protected function createRootNode() {
         $this->rootNode = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><task name="analyse"></task><!--

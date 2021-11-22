@@ -287,6 +287,23 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
 </target></trans-unit>
 <trans-unit id='VGhlIHR3byBnaXZlbiB0b2tlbnMgZG8gbm90IG1hdGNo'><source>The two given tokens do not match</source><target>The two given tokens do not match</target></trans-unit>
 <trans-unit id='UG1saWdodA=='><source>Pmlight</source><target>PM Light</target></trans-unit>
+<trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{CliYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/oUhUakQFmVw</target></trans-unit>
+<trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{CliYoutubeVideoGuideDescriptionContent}</source>
+<target><br/>
+<figure>
+    <figcaption><b>Übersicht:</b></figcaption>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=28&amp;autoplay=1" dir="auto">0:28</a> Befehlsübersicht<br/>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=34&amp;autoplay=1" dir="auto">0:34</a> Hilfe zu einem Befehl<br/>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=41&amp;autoplay=1" dir="auto">0:41</a> Einstellungsmöglichkeiten<br/>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=82&amp;autoplay=1" dir="auto">1:22</a> Pluginübersicht<br/>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=106&amp;autoplay=1" dir="auto">1:46</a> System log<br/>
+      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=141&amp;autoplay=1" dir="auto">2:21</a> Kontaktinformation<br/>
+</figure>
+</target>
+</trans-unit>
+<trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='><source>{LinkConsortium}</source><target>https://www.translate5.net/2021/03/19/das-translate5-konsortium-ein-vollumfaengliches-open-source-cloud-uebersetzungssystem</target></trans-unit>
+
   </body>
  </file>
 </xliff>

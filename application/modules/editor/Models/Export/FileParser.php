@@ -318,22 +318,26 @@ abstract class editor_Models_Export_FileParser {
         $this->_segmentEntity = $segment = $this->getSegment($segmentId);
         $segmentMeta = $segment->meta();
         
-        $edited = (string) $segment->getFieldEdited($field);
+        // for non editable sources the edited field is empty, so we have to fetch the original
+        $useEdited = !($field == editor_Models_SegmentField::TYPE_SOURCE && !$this->segmentFieldManager->isEditable($field));
+        $segmentExport = $segment->getFieldExport($field, $this->_task, $useEdited);
+
+        // This removes all segment tags but the ones needed for export
+        $edited = ($segmentExport == NULL) ? '' : $segmentExport->process();
         
-        $trackChange=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-        /* @var $trackChange editor_Models_Segment_TrackChangeTag */
-        
-        $edited= $trackChange->removeTrackChanges($edited);
-        
-        $edited = $this->utilities->internalTag->protect($edited);
-        $edited = $this->removeTermTags($edited);
-        $edited = $this->utilities->internalTag->unprotect($edited);
+        if($segmentExport != NULL && $segmentExport->tagErrorsHaveBeenFixed()){
+            // TODO INSTANTTRANSLATE: If we need a remark in the instant translate frontend, that there were errors automatically fixed, 
+            // this has to be initiated here
+            error_log('Task '.$this->_task->getTaskGuid().' Export: Internal Tag Faults have been fixed automatically');
+        }
+       
+        // TODO: rework, solve with segment-tags code (-> editor_Segment_Internal_TagComparision)
         $this->compareTags($segment, $edited, $field);
         
         //count length after removing removeTrackChanges and removeTermTags
         // so that the same remove must not be done again inside of textLength
         //also add additionalMrkLength to the segment length for final length calculation
-        $this->lastSegmentLength = $segment->textLengthByMeta($edited,$segmentMeta,$segment->getFileId()) + $segmentMeta->getAdditionalMrkLength();
+        $this->lastSegmentLength = $segment->textLengthByMeta($edited, $segmentMeta, $segment->getFileId()) + $segmentMeta->getAdditionalMrkLength();
         
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);
@@ -341,11 +345,10 @@ abstract class editor_Models_Export_FileParser {
         if(!$this->options['diff']){
             return $this->unprotectContent($edited);
         }
-        
-        $original = (string) $segment->getFieldOriginal($field);
-        $original = $this->utilities->internalTag->protect($original);
-        $original = $this->removeTermTags($original);
-        $original = $this->utilities->internalTag->unprotect($original);
+        $segmentOriginal = $segment->getFieldExport($field, $this->_task, false, false);
+        // This removes all segment tags but the ones needed for export
+        $original = ($segmentOriginal == NULL) ? '' : $segmentOriginal->process();
+
         $original = $this->parseSegment($original);
         try {
             $diffed = $this->_diffTagger->diffSegment($original, $edited, $segment->getTimestamp(), $segment->getUserName());

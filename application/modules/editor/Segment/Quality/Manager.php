@@ -88,6 +88,11 @@ final class editor_Segment_Quality_Manager {
      */
     private $locked = false;
     /**
+     * Just a cache for the export types which are defined statically via the TagProviderInterface
+     * @var array
+     */
+    private $exportTypes = NULL;
+    /**
      * The constructor instantiates all providers and locks the registry
      * @throws ZfExtended_Exception
      */
@@ -138,20 +143,39 @@ final class editor_Segment_Quality_Manager {
         }
         return NULL;
     }
+
     /**
      * Prepares the import: adds all Import Workers that exist for Quality tags
      * @param editor_Models_Task $task
      * @param int $parentWorkerId
      */
-    public function prepareImport(editor_Models_Task $task, int $parentWorkerId){
-        
+    public function prepareImport(editor_Models_Task $task, int $parentWorkerId) {
+        $this->prepareByContext($task, $parentWorkerId, editor_Segment_Processing::IMPORT);
+    }
+    /**
+     * Prepares the import: adds all Import Workers that exist for Quality tags
+     * @param editor_Models_Task $task
+     * @param int $parentWorkerId
+     */
+    public function prepareAnalysis(editor_Models_Task $task, int $parentWorkerId) {
+        $this->prepareByContext($task, $parentWorkerId, editor_Segment_Processing::ANALYSIS);
+    }
+
+    /**
+     * Prepares the quality workers depending on the context
+     * @param editor_Models_Task $task
+     * @param int $parentWorkerId
+     * @param string $context
+     */
+    private function prepareByContext(editor_Models_Task $task, int $parentWorkerId, string $context){
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
             if($provider->hasImportWorker()){
-                $provider->addWorker($task, $parentWorkerId, editor_Segment_Processing::IMPORT);
+                $provider->addWorker($task, $parentWorkerId, $context);
             }
         }
     }
+
     /**
      * Finishes the import: processes all non-worker providers & saves the processed tags-model back to the segments
      * @param editor_Models_Task $task
@@ -367,6 +391,22 @@ final class editor_Segment_Quality_Manager {
             }
         }
         return $data;
+    }
+    /**
+     * Retrieves all types that will be exported (with further processing)
+     * @return array
+     */
+    public function getAllExportedTypes(){
+        if($this->exportTypes === NULL){
+            $this->exportTypes = [];
+            foreach($this->registry as $type => $provider){
+                /* @var $provider editor_Segment_Quality_Provider */
+                if($provider->isExportedTag()){
+                    $this->exportTypes[] = $provider->getType();
+                }
+            }
+        }
+        return $this->exportTypes;
     }
     /**
      * 

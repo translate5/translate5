@@ -111,10 +111,10 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     {
         
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
-            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'comment',
+            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'comment', 'attributedatatype',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                                 'config', 'segmentuserassoc', 'session', 'language','termcollection','languageresourceresource','languageresourcetaskassoc',
-                                'languageresourceinstance','taskusertracking', 'term', 'termattribute', 'category', 'quality','userassocdefault'
+                                'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category', 'quality','userassocdefault'
             ],
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -375,25 +375,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                         'action' => 'testgetattributes'
                 ));
         $this->front->getRouter()->addRoute('testgetattributes', $getCollectionAttributes);
-        
-        $searchTermCollection= new ZfExtended_Controller_RestLikeRoute(
-                'editor/termcollection/search/*',
-                array(
-                        'module' => 'editor',
-                        'controller' => 'termcollection',
-                        'action' => 'search'
-                ));
-        $this->front->getRouter()->addRoute('searchtermcollection', $searchTermCollection);
-        
-        $searchAttributeTermCollection= new ZfExtended_Controller_RestLikeRoute(
-                'editor/termcollection/searchattribute/*',
-                array(
-                        'module' => 'editor',
-                        'controller' => 'termcollection',
-                        'action' => 'searchattribute'
-                ));
-        $this->front->getRouter()->addRoute('searchattributetermcollection', $searchAttributeTermCollection);
-        
+
         $searchTermExists = new ZfExtended_Controller_RestLikeRoute(
             'editor/termcollection/searchtermexists/*',
             array(
@@ -479,7 +461,16 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'export'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_export', $queryRoute);
-        
+
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_tbxexport', new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/tbxexport',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'tbxexport'
+            )
+        ));
+
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/testexport',
             array(

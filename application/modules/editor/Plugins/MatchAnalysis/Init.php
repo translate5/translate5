@@ -232,6 +232,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         }
         
         $worker->queue($parentWorkerId, null, false);
+
         return true;
     }
     

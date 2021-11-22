@@ -13,6 +13,9 @@
         "login": "testtranslator",
         "surName": "test",
         "firstName": "translator",
-        "parentIds": null
+        "parentIds": null,
+        "trackchangesShow": "1",
+        "trackchangesShowAll": "1",
+        "trackchangesAcceptReject": "1"
     }
 ]

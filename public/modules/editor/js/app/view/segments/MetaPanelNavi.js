@@ -61,14 +61,14 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     item_reset: '#UT#Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)',
     item_save: '#UT#Speichern (STRG + S)',
     item_saveAndNext: '#UT#Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)',
-    item_saveAndNextFiltered: '#UT#Speichern und nächstes bearbeitbares Segment im Workflow öffnen (STRG + ENTER)',
+    item_saveAndNextFiltered: '#UT#Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)',
     item_saveAndPrevious: '#UT#Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)',    
     item_alternateLeft: '#UT#Vorherige Spalte editieren (STRG + ALT + ←)',
     item_alternateRight: '#UT#Nächste Spalte editieren (STRG + ALT + →)',
     item_next: '#UT#Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)',
-    item_nextFiltered: '#UT#Nicht speichern und nächstes bearbeitbares Segment im Workflow öffnen (ALT + Bild ↓)',
+    item_nextFiltered: '#UT#Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)',
     item_prev: '#UT#Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)',
-    item_prevFiltered: '#UT#Nicht speichern und vorheriges bearbeitbares Segment im Workflow öffnen (ALT + Bild ↑)',
+    item_prevFiltered: '#UT#Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)',
     item_whitespaceButtonGroup: '#UT#Sonderzeichen hinzufügen:',
     initComponent: function() {
       var me = this,
@@ -215,11 +215,13 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
       if (userCanModifyWhitespaceTags && userCanInsertWhitespaceTags) {
     	  items.push({
   	 		 	xtype: 'buttongroup',
-  	 		 	width:'97%',
+  	 		 	width:'96%',
   	 		 	height:45,
+  	 		 	columns: 7,
   	 			items:[{
   	 				xtype: 'displayfield',
-  	 	            value: me.item_whitespaceButtonGroup
+  	 	            value: me.item_whitespaceButtonGroup,
+  	 	            width: 182
   	 			},{
   	 				xtype: 'button',
   	 				border: 1,

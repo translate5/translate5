@@ -29,486 +29,409 @@ END LICENSE AND COPYRIGHT
 /**
  *
  */
-class editor_TermController extends ZfExtended_RestController {
-
-    protected $entityClass = 'editor_Models_Term';
+class editor_TermController extends ZfExtended_RestController
+{
+    /**
+     * Use termportal trait
+     */
+    use editor_Controllers_Traits_TermportalTrait;
 
     /**
-     * @var editor_Models_Term
+     * @var string
+     */
+    protected $entityClass = 'editor_Models_Terminology_Models_TermModel';
+
+    /**
+     * @var editor_Models_Terminology_Models_TermModel
      */
     protected $entity;
 
     /**
-     * @var editor_Models_Term_Proposal
+     * Collections, allowed for current user
+     *
+     * @var
      */
-    protected $proposal;
+    protected $collectionIds = false;
 
     /**
-     * Extend the term with the proposal - if there is any
-     * {@inheritDoc}
-     * @see ZfExtended_RestController::getAction()
+     * @throws Zend_Session_Exception
+     */
+    public function init() {
+
+        // Call parent
+        parent::init();
+
+        // If request contains json-encoded 'data'-param, decode it and append to request params
+        $this->handleData();
+
+        // Pick session
+        $this->_session = (new Zend_Session_Namespace('user'))->data;
+
+        // If current user has 'termPM_allClients' role, it means all collections are accessible
+        // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
+        $this->collectionIds =
+            in_array('termPM_allClients', $this->_session->roles)
+                ?: ZfExtended_Factory::get('ZfExtended_Models_User')->getAccessibleCollectionIds();
+    }
+
+    /**
+     *
+     */
+    public function indexAction()
+    {
+        // Term attributes are currently not listable via REST API
+        throw new BadMethodCallException();
+    }
+
+    /**
+     *
      */
     public function getAction() {
-        parent::getAction();
-        $this->proposal = ZfExtended_Factory::get('editor_Models_Term_Proposal');
-        /* @var $proposal editor_Models_Term_Proposal */
-        try {
-            $this->proposal->loadByTermId($this->entity->getId());
-            $this->view->rows->proposal = $this->proposal->getDataObject();
-        }
-        catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            $this->proposal->init();
-            $this->view->rows->proposal = null;
-            //do nothing if no proposal found
-        }
+        throw new BadMethodCallException();
     }
 
-    public function postAction(){
-        parent::postAction();
-
-        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $attribute editor_Models_Term_Attribute */
-
-        settype($this->data->isTermProposalFromInstantTranslate, 'boolean');
-
-        //handle additional source term
-        $this->handleSourceTerm();
-
-        //handle the term transac group attributes (modification/creation)
-        /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->handleTransacGroup($this->entity);
-
-        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->checkOrCreateProcessStatus($this->entity->getId());
-
-        $this->view->rows = $this->entity->getDataObjectWithAttributes();
-        //load the term entry attributes
-        $this->view->rows->termEntryAttributes=$attribute->getAttributesForTermEntry($this->entity->getTermEntryId(),[$this->entity->getCollectionId()]);
-
-        if(!empty($this->view->rows->attributes) && !empty($this->view->rows->language)){
-            $language = ZfExtended_Factory::get('editor_Models_Languages');
-            /* @var $language editor_Models_Languages */
-            $language->load($this->view->rows->language);
-            $this->view->rows->languageRfc5646 = $language->getRfc5646();
-        }
-    }
-    /**
-     * {@inheritDoc}
-     * @see ZfExtended_RestController::decodePutData()
-     */
-    protected function decodePutData() {
-        parent::decodePutData();
-
-        if(isset($this->data->term)){
-            //remove whitespace from the beggining and the end of the string
-            $this->data->term=trim($this->data->term);
-        }
-
-        if(isset($this->data->comment)){
-            //remove whitespace from the beggining and the end of the string
-            $this->data->comment=trim($this->data->comment);
-        }
-
-        $this->convertToLanguageId();
-        if($this->_request->isPut()) {
-            //the following fields may not be changed via PUT:
-            unset($this->data->language);
-            unset($this->data->termEntryId);
-            unset($this->data->mid);
-            unset($this->data->groupId);
-        }
-
-        //ignore all non post request
-        if(!$this->_request->isPost()){
-            return;
-        }
-
-        if(!empty($this->data->groupId)) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1154', ['groupId' => 'Die GroupId kann nicht direkt gesetzt werden, nur indirekt über eine gegebene TermEntryId.']);
-        }
-
-        if(!empty($this->data->termEntryId)){
-            //when the term entry is provided, load the term entry and set the term groupId
-            //this is the case when new term is proposed in the allready exisitn termEntry
-            $entry = ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
-            /* @var $entry editor_Models_TermCollection_TermEntry */
-            $entry->load($this->data->termEntryId);
-            $this->entity->setGroupId($entry->getGroupId());
-            $this->entity->setTermEntryId($entry->getId());
-            return;
-        }
-
-        if(empty($this->data->termEntryId) && $this->entity->getTermEntryId()==null) {
-            $entry = ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
-            /* @var $entry editor_Models_TermCollection_TermEntry */
-            $entry->setCollectionId($this->data->collectionId);
-            $entry->setGroupId(ZfExtended_Utils::uuid());
-            $entry->setIsProposal(true);
-            $entry->save();
-
-            //update or create the term entry creation/modification attributes
-            $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-            /* @var $attribute editor_Models_Term_Attribute */
-            $attribute->createTransacGroup($entry,'creation');
-            $attribute->createTransacGroup($entry,'modification');
-
-            $this->entity->setTermEntryId($entry->getId());
-            $this->entity->setGroupId($entry->getGroupId());
-            $this->data->termEntryId=$entry->getId();
-            $this->data->groupId=$entry->getGroupId();
-        }
-    }
 
     /**
-     * {@inheritDoc}
-     * @see ZfExtended_RestController::additionalValidations()
+     * Create term (with own termEntry, if need)
+     * @throws ZfExtended_Exception
+     * @throws Zend_Exception
      */
-    protected function additionalValidations() {
-        //for POST and PUT update always the usage after entity validation
-        $this->updateUsageData($this->entity);
+    public function postAction() {
 
-        if($this->_request->isPost()) {
-            $this->initTermOnPost();
-        }
-    }
+        // Check params
+        $_ = $this->_postCheckParams();
 
-    /**
-     * converts a given language value as lcid or Rfc5646 value to the needed ID
-     */
-    protected function convertToLanguageId() {
-        //ignoring if already integer like value or empty
-        if(empty($this->data->language)) {
-            return;
-        }
+        // Get request params
+        $params = $this->getRequest()->getParams();
 
-        $languages=explode(',',$this->data->language);
+        // Collection statistics diff
+        $diff = ['termEntry' => 0, 'term' => 0, 'attribute' => 0];
 
-        if(empty($languages)){
-           return;
+        // Trim whitespaces from term
+        $params['term'] = trim($params['term']);
+
+        // Load termEntry model instance if termEntryId param is given or create and return a new one
+        $te = $this->_postLoadOrCreateTermEntry();
+
+        // Increase termEntry stats diff
+        if (!isset($params['termEntryId'])) {
+            $diff['termEntry'] ++;
         }
 
-        $language=$languages[0];
-        $this->data->language=$language;
+        // If 'sourceLang' and 'sourceTerm' params are given, it means we here because of
+        // InstantTranslate usage in a way that assume that we found no existing termEntry by sourceTerm-param
+        // so we save both terms (source and target) under same newly created termEntry
+        if ($_['sourceLang'] ?? 0) {
 
-        if((int)$this->data->language > 0) {
-            return;
+            // Init current entity with data and insert into database
+            $this->_postTermInit([
+                'languageId' => $_['sourceLang']['id'],
+                'language' => $_['sourceLang']['rfc5646'],
+                'term' => trim($params['sourceTerm']),
+                'status' => 'preferredTerm', // which status should be set initially ?
+            ], $te)->insert([
+                'userName' => $this->_session->userName,
+                'userGuid' => $this->_session->userGuid
+            ]);
+
+            // Increment term and attribute stats diff
+            $diff['term'] ++;
+            $diff['attribute'] ++; // processStatus-attr was added for source term
         }
 
-        $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language editor_Models_Languages */
-        try {
-            $matches = null;
-            if(preg_match('/^lcid-([0-9]+)$/i', $this->data->language, $matches)) {
-                $language->loadByLcid($matches[1]);
-            }else {
-                $language->loadByRfc5646($this->data->language);
-            }
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            $this->data->language = 0;
-            return;
-        }
-        $this->data->language = $language->getId();
-    }
+        /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
+        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
 
-    /**
-     * Creates a term entry if a term is tried to be created without any termEntryId and groupId given
-     */
-    protected function initTermOnPost() {
-        $this->entity->setCreated(NOW_ISO);
-        ZfExtended_UnprocessableEntity::addCodes([
-            'E1152' => 'Missing mandatory collectionId for term creation',
-            'E1153' => 'Missing mandatory language (ID) for term creation',
-            'E1154' => 'GroupId was set explicitly, this is not allowed. Must be set implicit via a given termEntryId',
+        // Apply data
+        $this->_postTermInit([
+            'languageId' => $_['language']['id'],
+            'language' => $params['language'],
+            'term' => $params['term'],
+            'status' => $termNoteStatus->getDefaultTermStatus(),
+        ], $te)->insert([
+            'note' => trim($params['note'] ?? ''),
+            'userName' => $this->_session->userName,
+            'userGuid' => $this->_session->userGuid,
         ]);
-        if(empty($this->data->collectionId)) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1152', ['collectionId' => 'Bitte wählen Sie eine TermCollection aus, welcher dieser Term hinzugefügt werden soll.']);
-        }
-        if(empty($this->data->language)) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1153', ['language' => 'Bitte wählen Sie die Sprache des Terms aus.']);
-        }
-        if(empty($this->data->processStatus)) {
-            //TODO: this initial value will depend on the ACL with Phase 3 implementation of termportal
-            $this->entity->setProcessStatus(editor_Models_Term::PROCESS_STATUS_UNPROCESSED);
-        }
-        if(empty($this->data->status)) {
-            $this->entity->setStatus(editor_Models_Term::STAT_ADMITTED);
-        }
-        if(empty($this->data->mid)) {
-            $this->entity->setMid(ZfExtended_Utils::uuid());
-        }
-        $entry = ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
-        /* @var $entry editor_Models_TermCollection_TermEntry */
-        if(empty($this->data->termEntryId)) {
 
-            $entry->setCollectionId($this->data->collectionId);
-            $entry->setGroupId(ZfExtended_Utils::uuid());
-            $entry->setIsProposal(true);
-            $entry->setId($entry->save());
+        // Increment term and attribute stats diff
+        $diff['term'] ++;
+        $diff['attribute'] += trim($params['note'] ?? '') ? 2 : 1; // processStatus and maybe note attr were added for term
 
-            $this->entity->setTermEntryId($entry->getId());
-            $this->entity->setGroupId($entry->getGroupId());
-        }else{
-            //when the term entry is provided, load the term entry and set the term groupId
-            //this is the case when new term is proposed in the allready exisitn termEntry
-            $entry->load($this->data->termEntryId);
-            $this->entity->setGroupId($entry->getGroupId());
-        }
+        // Update
+        ZfExtended_Factory
+            ::get('editor_Models_TermCollection_TermCollection')
+            ->updateStats($this->entity->getCollectionId(), $diff);
 
-        //update or create the term entry creation/modification attributes
-        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->handleTransacGroup($entry);
+        // Flush params so that GUI to be redirected to that newly created term
+        $this->view->assign([
+
+            // Params, that will be used to build search hash-string
+            'query' => $this->entity->getTerm(),
+            'language' => $this->entity->getLanguageId(),
+            'collectionIds' => $this->entity->getCollectionId(),
+
+            // Params to simulate click on certain found result
+            'termId' => $this->entity->getId(),
+            'termEntryId' => $this->entity->getTermEntryId(),
+
+            // Tbx ids
+            'termTbxId' => $this->entity->getTermTbxId(),
+            'termEntryTbxId' => $this->entity->getTermEntryTbxId(),
+        ]);
     }
 
     /**
-     * propose a new term, this function has the same signature as the putAction, expect that it creates a new propose instead of editing the term directly
+     * Request params validation prior term creation
+     *
+     * @return array
+     * @throws Zend_Exception
+     * @throws ZfExtended_Mismatch
      */
-    public function proposeOperation() {
-        $sessionUser = new Zend_Session_Namespace('user');
+    protected function _postCheckParams() {
 
-        $this->decodePutData();
-        $term = trim($this->data->term);
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) $this->jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
+            ],
+        ]);
 
-        //check if the term text exist in the term collection within the language
-        $tmpTermValue = $this->entity->findTermInCollection($term);
+        // Get request params
+        $params = $this->getRequest()->getParams();
 
-        if($tmpTermValue && $tmpTermValue->count()>0){
-            ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1111' => 'The made term proposal does already exist as different term in the same language in the current term collection.'
-            ], 'editor.term');
-            throw new ZfExtended_Models_Entity_Conflict('E1111');
-        }
-
-        $this->proposal->setTermId($this->entity->getId());
-        $this->proposal->setCollectionId($this->entity->getCollectionId());
-        $this->proposal->setTerm($term);
-        $this->proposal->validate();
-
-        //set system fields after validation, so we don't have to provide a validator for them
-        $this->proposal->setUserGuid($sessionUser->data->userGuid);
-        $this->proposal->setUserName($sessionUser->data->userName);
-
-        //we don't save the term, but we save it to a proposal:
-        $this->proposal->save();
-
-        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $attribute editor_Models_Term_Attribute */
-
-        $attribute->handleTransacGroup($this->entity);
-
-        $this->view->rows = $this->entity->getDataObjectWithAttributes();
-        //update the view
-        $this->view->rows->proposal = $this->proposal->getDataObject();
+        // Validate params
+        return $this->jcheck([
+            'collectionId' => [
+                'req' => true,                                                      // required
+                'rex' => 'int11',                                                   // regular expression preset key or raw expression
+                'key' => 'LEK_languageresources',                                   // points to existing record in a given db table
+            ],
+            'language' => [
+                'req' => true,                                                      // required
+                'rex' => 'rfc5646',                                                 // regular expression preset key or raw expression
+                'key' => 'LEK_languages.rfc5646',                                   // points to existing record in a given db table
+            ],
+            'term' => [
+                'req' => true,                                                      // required
+                'rex' => '~[^\s]~',                                                 // regular expression preset key or raw expression
+            ],
+            'note' => [
+                'req' => Zend_Registry::get('config')                               // required
+                   ->runtimeOptions->termportal->commentAttributeMandatory,
+                'rex' => 'varchar255s'                                              // regular expression preset key or raw expression
+            ],
+            'termEntryId' => [
+                'rex' => 'int11',
+                'key' => 'terms_term_entry',                                        // points to existing record in a given db table
+            ],                                                                      // $_['termEntryId'] will contain that record
+            'sourceTerm' => [
+                'req' => isset($params['sourceLang']),
+                'rex' => '~[^\s]~'
+            ],
+            'sourceLang' => [
+                'req' => isset($params['sourceTerm']),
+                'rex' => 'rfc5646',
+                'key' => 'LEK_languages.rfc5646'
+            ]
+        ]);
     }
 
     /**
-     * Tries to update or insert a value "comment" into langSet>descripGrp>note of the term
+     * Check whether termEntryId request param is given,
+     * and if yes - load model instance, else created it otherwise
+     *
+     * @return editor_Models_Terminology_Models_TermEntryModel
      */
-    public function commentOperation() {
-        $this->decodePutData();
-        $commentAttribute = ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $commentAttribute editor_Models_Term_Attribute */
-        try {
-            $commentAttribute->loadByTermAndName($this->entity, 'note', $commentAttribute::ATTR_LEVEL_TERM);
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            $commentAttribute=$commentAttribute->addTermComment($this->entity->getId(), trim($this->data->comment));
-            $this->view->rows = $commentAttribute->getDataObject();
-            //set the groupid, it is used by the attribute proposal component
-            $this->view->rows->groupId=$this->entity->getGroupId();
-            return;
-        }
+    protected function _postLoadOrCreateTermEntry() {
 
-        //the comment is proposed
-        $sessionUser = new Zend_Session_Namespace('user');
+        // Get params
+        $params = $this->getRequest()->getParams();
 
-        $this->decodePutData();
+        // Get termEntry-model
+        /** @var editor_Models_Terminology_Models_TermEntryModel $termEntry */
+        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
 
-        $proposal=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
-        /* @var $proposal editor_Models_Term_AttributeProposal */
+        // If termEntryId is given in params
+        if ($params['termEntryId'] ?? 0) {
 
-        $proposal->setAttributeId($commentAttribute->getId());
-        $proposal->setCollectionId($commentAttribute->getCollectionId());
-        $proposal->setValue(trim($this->data->comment));
-        $proposal->validate();
+            // Load instance
+            $termEntry->load($params['termEntryId']);
 
-        //set system fields after validation, so we don't have to provide a validator for them
-        $proposal->setUserGuid($sessionUser->data->userGuid);
-        $proposal->setUserName($sessionUser->data->userName);
-        $proposal->setCreated(NOW_ISO);
+        // Else init new one with data and insert into database
+        } else {
 
-        $proposal->save();
+            // Apply data
+            $termEntry->init([
+                'collectionId' => $params['collectionId'],
+                'termEntryTbxId' => 'id' . ZfExtended_Utils::uuid(),
+                'entryGuid' => ZfExtended_Utils::uuid(),
+                'isCreatedLocally' => 1, // Just a flag, indicating that termEntry was created manually, e.g. not via tbx import
+            ]);
 
-        //in the term attributes the termEntryId is not set
-        $entryId=$commentAttribute->getTermEntryId();
-        if($entryId==null){
-            $term=ZfExtended_Factory::get('editor_Models_Term');
-            /* @var $term editor_Models_Term */
-            $term->load($commentAttribute->getTermId());
-            $entryId=$term->getTermEntryId();
+            // Insert
+            $termEntry->insert([
+                'userName' => $this->_session->userName,
+                'userGuid' => $this->_session->userGuid
+            ]);
         }
 
-        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
-        /* @var $termEntry editor_Models_TermCollection_TermEntry */
-        $termEntry->load($entryId);
-
-        //update the term entry create/modefy dates
-        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->handleTransacGroup($termEntry);
-
-        //update the view
-        $this->view->rows = $commentAttribute->getDataObject();
-        $this->view->rows->proposal = $proposal->getDataObject();
-        //set the groupid, it is used by the attribute proposal component
-        $this->view->rows->groupId=$termEntry->getGroupId();
+        // Return termEntry model instance
+        return $termEntry;
     }
 
     /**
-     * TODO: Tests, later on the development
-     * confirm the proposal and saves the proposed data into the term
-     * @throws ZfExtended_UnprocessableEntity
+     * Concat custom data given by $data arg with shared/common data,
+     * and use that data to init termModel-model instance
+     *
+     * @param array $data
+     * @param editor_Models_Terminology_Models_TermEntryModel $te
+     * @return editor_Models_Terminology_Models_TermModel
      */
-    public function confirmproposalOperation() {
-        if(empty($this->view->rows->proposal)) {
-            ZfExtended_UnprocessableEntity::addCodes([
-                'E1105' => 'There is no proposal which can be confirmed.'
-            ], 'editor.term');
-            throw new ZfExtended_UnprocessableEntity('E1105');
-        }
-        $history = $this->entity->getNewHistoryEntity();
-        //take over new data from proposal:
-        $this->entity->setTerm($this->proposal->getTerm());
-        $this->entity->setProcessStatus($this->entity::PROCESS_STATUS_PROV_PROCESSED);
-        $this->updateUsageData($this->entity, $this->proposal->getUserName(), $this->proposal->getUserGuid());
-        $this->entity->save();
-        $this->proposal->delete();
-        $history->save();
-        $this->view->rows = $this->entity->getDataObjectWithAttributes();
-        $this->view->rows->proposal = null;
+    protected function _postTermInit(array $data, editor_Models_Terminology_Models_TermEntryModel $te) {
+
+        // Do init
+        $this->entity->init($data + [
+            'termTbxId' => 'id' . ZfExtended_Utils::uuid(),
+            'collectionId' => $te->getCollectionId(),
+            'termEntryId' => $te->getId(),
+            'termEntryTbxId' => $te->getTermEntryTbxId(),
+            'termEntryGuid' => $te->getEntryGuid(),
+            //'langSetGuid' => $langSetGuid = '???',
+            'guid' => ZfExtended_Utils::uuid(),
+            'processStatus' => 'unprocessed',
+            //'definition' => '',
+            'updatedBy' => $this->_session->id,
+            'updatedAt' => date('Y-m-d H:i:s')
+        ]);
+
+        // Return $this->entity itself
+        return $this->entity;
     }
 
     /**
-     * removes a proposal
-     * @throws ZfExtended_UnprocessableEntity
+     * Update term (update `terms_term`.`proposal`)
+     *
+     * @throws ZfExtended_Mismatch
      */
-    public function removeproposalOperation() {
-        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
-        /* @var $termEntry editor_Models_TermCollection_TermEntry */
-        $termEntryId=$this->entity->getTermEntryId();
-        //the removed request is for term with process status unprocessed
-        if($this->view->rows->processStatus==$this->entity::PROCESS_STATUS_UNPROCESSED){
-            $this->entity->delete();
-            $this->view->rows = [];
-            $termEntry->deleteEmptyTermEntry($termEntryId);
-            return;
-        }
+    public function putAction() {
 
-        if(empty($this->view->rows->proposal)) {
-            ZfExtended_UnprocessableEntity::addCodes([
-                'E1109' => 'There is no proposal which can be deleted.'
-            ], 'editor.term.attribute');
-            throw new ZfExtended_UnprocessableEntity('E1109');
-        }
-        $this->proposal->delete();
-        $termEntry->deleteEmptyTermEntry($termEntryId);
+        // Validate params and load entity
+        $this->jcheck([
+            'termId' => [
+                'req' => true,
+                'rex' => 'int11',
+                'key' => $this->entity,
+            ],
+            'proposal' => [
+                //'req' => true,
+                'rex' => '~[^\s]~'
+            ]
+        ]);
 
-        //remove all term attribute proposals to
-        //https://jira.translate5.net/browse/TS-174
-        $attributeProposal=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
-        /* @var $attributeProposal editor_Models_Term_AttributeProposal */
-        $attributeProposal->removeAllTermAttributeProposals($this->entity->getId());
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) $this->jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
+            ],
+        ], $this->entity);
 
-        $this->view->rows = $this->entity->getDataObjectWithAttributes();
-        $this->view->rows->proposal = null;
+        // Get request params
+        $params = $this->getRequest()->getParams();
 
-        //load all attributes for the term
-        $rows=$this->entity->findTermAndAttributes($this->entity->getId());
-        $rows=$this->entity->groupTermsAndAttributes($rows);
-        if(!empty($rows) && !empty($rows[0]['attributes'])){
-            $this->view->rows->attributes =$rows[0]['attributes'];
-        }
-    }
+        // Update proposal
+        $this->entity->setProposal(trim($params['proposal']));
+        $this->entity->setUpdatedBy($this->_session->id);
 
-    /***
-     * Handle the additional term if exist
-     */
-    protected function handleSourceTerm(){
-        if($this->entity->getId()<1){
-            return;
-        }
+        // Save, and pass params required to update `terms_transacgrp`-records of type 'modification' for all 3 levels
+        $updated = $this->entity->update([
+            'userName' => $this->_session->userName,
+            'userGuid' => $this->_session->userGuid
+        ]);
 
-        if(!isset($this->data->termSource) || !isset($this->data->termSourceLanguage)){
-            return;
-        }
-
-        if(empty($this->data->termSource) || empty($this->data->termSourceLanguage)){
-            return;
-        }
-
-        $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language editor_Models_Languages */
-        try {
-            $matches = null;
-            if(preg_match('/^lcid-([0-9]+)$/i', $this->data->termSourceLanguage, $matches)) {
-                $language->loadByLcid($matches[1]);
-            }else {
-                $language->loadByRfc5646($this->data->termSourceLanguage);
-            }
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            $this->data->termSourceLanguage = 0;
-            return;
-        }
-        $this->data->termSourceLanguage = $language->getId();
-
-        //remove whitespace from the beggining and the end of the string
-        $this->data->termSource=trim($this->data->termSource);
-
-        $term=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $term editor_Models_Term */
-
-        $term->setTerm($this->data->termSource);
-        $term->setLanguage($this->data->termSourceLanguage);
-        $term->setMid($this->entity->getMid());
-        $term->setStatus($this->entity->getStatus());
-        $term->setProcessStatus($this->entity->getProcessStatus());
-        $term->setDefinition($this->entity->getDefinition());
-        $term->setGroupId($this->entity->getGroupId());
-        $term->setCollectionId($this->entity->getCollectionId());
-        $term->setTermEntryId($this->entity->getTermEntryId());
-        $term->setUserGuid($this->entity->getUserGuid());
-        $term->setUserName($this->entity->getUserName());
-        $term->setCreated(null);
-        $term->setUpdated(null);
-        $term->setId($term->save());
-
-        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $attribute editor_Models_Term_Attribute */
-        //check or create the term processStatus attribute
-        $attribute->checkOrCreateProcessStatus($term->getId());
-
-        //if the term is added from the instant transalte MT engine, set the default comment
-        if($this->data->isTermProposalFromInstantTranslate){
-            $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-            $attribute->addTermComment($term->getId(), $translate->_("Aus MT übernommen"));
-        }
-        //create or update or create the term transac group attributes
-        $attribute->handleTransacGroup($term);
+        // Flush response data
+        $this->view->assign([
+            'updated' => $updated,
+            'proposal' => $this->entity->getProposal(),
+            'processStatus' => $this->entity->getProposal() ? 'unprocessed' : $this->entity->getProcessStatus(),
+        ]);
     }
 
     /**
-     * Helper function to update the userGuid, userName and updated field of the given entity
-     * @param ZfExtended_Models_Entity_Abstract $entity
-     * @param string $userName optional, defaults to userName of authenticated user in session
-     * @param string $userGuid optional, defaults to userGuid of authenticated user in session
+     * Delete term
+     *
+     * @throws ZfExtended_Mismatch
      */
-    protected function updateUsageData(ZfExtended_Models_Entity_Abstract $entity, string $userName = null, string $userGuid = null) {
-        $sessionUser = new Zend_Session_Namespace('user');
-        $entity->setUserGuid($userGuid ?? $sessionUser->data->userGuid);
-        $entity->setUserName($userName ?? $sessionUser->data->userName);
-        $entity->hasField('updated') && $entity->setUpdated(NOW_ISO);
+    public function deleteAction() {
+
+        // Validate params and load entity
+        $this->jcheck([
+            'termId' => [
+                'req' => true,
+                'rex' => 'int11',
+                'key' => $this->entity
+            ]
+        ]);
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) $this->jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
+            ],
+        ], $this->entity);
+
+        // Setup 'isLast' response flag
+        $data['isLast'] = $this->entity->isLast();
+
+        // Backup props
+        $collectionId = $this->entity->getCollectionId();
+        $termEntryId  = $this->entity->getTermEntryId();
+        $language     = $this->entity->getLanguage();
+
+        // Collection statistics diff
+        $diff = ['termEntry' => 0, 'term' => 0];
+
+        // If term we're going to delete is the last term within it's termEntry
+        if ($data['isLast'] == 'entry') {
+
+            // Delete:
+            // 1. all images of termEntry (including language-level images)
+            // 2. terms_term_entry-record itself
+            $this->entity->preDeleteIfLast4Entry();
+
+            // Decrement stats for termEntry
+            $diff['termEntry'] --;
+
+        // Else
+        } else {
+
+            // Else this term is the last within it's language
+            if ($data['isLast'] == 'language') $this->entity->preDeleteIfLast4Language();
+
+            // Affect `terms_transacgrp` 'modification'-records for entry- and (maybe) language-level
+            ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
+                ->affectLevels(
+                    $this->_session->userName,
+                    $this->_session->userGuid,
+                    $termEntryId,
+                    $data['isLast'] == 'language' ? null : $language
+                );
+        }
+
+        // Delete the term
+        $this->entity->delete();
+
+        // Decrement stats for term
+        $diff['term'] --;
+
+        // Update collection stats
+        ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection')->updateStats($collectionId, $diff);
+
+        // Setup 'modified' prop, so that modification info, specified in
+        // entry- and (maybe) language-level panels can be updated
+        $data['modified'] = $this->_session->userName . ', ' . date('d.m.Y H:i:s');
+
+        // Flush response data
+        $this->view->assign($data);
     }
 }

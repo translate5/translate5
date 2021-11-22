@@ -140,8 +140,8 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
     /***
      * @return array[]
      */
-    public function loadResourceIdsGrouped() {
-        $langs=$this->loadByLanguageResourceId();
+    public function loadResourceIdsGrouped($languageResourceId = null) {
+        $langs=$this->loadByLanguageResourceId($languageResourceId);
         $retval=[];
         foreach ($langs as $lang){
             if(!isset($retval[$lang['languageResourceId']])){
@@ -258,7 +258,7 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
         
         //load all available mt resources for the customers of a user
         $allLanguageResources= $engineModel->getAllMergedByAssoc(true,editor_Models_Segment_MatchRateType::TYPE_MT);
-        
+        $showSubLanguages = Zend_Registry::get('config')->runtimeOptions->InstantTranslate->showSubLanguages ?? true;
         foreach($allLanguageResources as $languageResourceToCheck) {
             
             //foreach sources, find the available targets
@@ -267,7 +267,8 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
                     $localesAvailable[$source]=[];
                 }
                 foreach($languageResourceToCheck['target'] as $target){
-                    if(!in_array($target,$localesAvailable[$source]) && $target!=$source){
+                    $useLanguage=strpos($target, '-') === false || $showSubLanguages;
+                    if(!in_array($target,$localesAvailable[$source]) && $target!=$source && $useLanguage){
                         $localesAvailable[$source][]=$target;
                     }
                 }

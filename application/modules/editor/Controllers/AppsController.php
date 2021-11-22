@@ -34,11 +34,12 @@ class Editor_AppsController extends ZfExtended_Controllers_Action {
         Zend_Layout::getMvcInstance()->setLayout('apps');
         Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
         $config = Zend_Registry::get('config');
-        $this->view->render('apps/layoutConfig.php');
-        $this->view->appVersion = ZfExtended_Utils::getAppVersion();
-        
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        
+
+        $this->view->headTitle($translate->_('translate5-termportal'));
+        $this->view->appVersion = ZfExtended_Utils::getAppVersion();
+
+
         $this->view->Php2JsVars()->set('restpath',APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
         $this->view->Php2JsVars()->set('apps.appName',$this->getRequest()->getParam('name'));
         $this->view->Php2JsVars()->set('apps.apiUrl',$this->getRequest()->getParam('apiUrl'));

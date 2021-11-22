@@ -194,6 +194,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     protected $tagsModel = null;
     
     /**
+     * @var editor_Models_Segment_UtilityBroker
+     */
+    protected editor_Models_Segment_UtilityBroker $utilityBroker;
+    
+    /**
      * static so that only one instance is used, for performance and logging issues
      * @var editor_Models_Segment_PixelLength
      */
@@ -204,6 +209,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     public function __construct()
     {
+        $this->utilityBroker = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        //FIXME replace all helpers with UtilityBroker usage if possible
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
@@ -451,8 +458,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     /**
      * Checks if segment data is changed in this entity, compared against last loaded content
      */
-    public function isDataModified($typeFilter = null)
-    {
+    public function isDataModified($typeFilter = null) {
         if (!is_null($this->isDataModified)) {
             return $this->isDataModified;
         }
@@ -465,8 +471,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             if (!$isEditable || !$edited || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
-            if ($this->stripTermTagsAndTrackChanges($data->edited) !== $this->stripTermTagsAndTrackChanges($this->getOldValue($fieldName))) {
+            $oldValue = $this->getOldValue($fieldName);
+            if($this->stripTermTagsAndTrackChanges($data->edited) !== $this->stripTermTagsAndTrackChanges($oldValue)) {
                 $this->isDataModified = true;
+            } else {
+                // when the text-contents are identical we check, if this may is a removal initiated by the accept/reject feature of trackchanges
+                // therefore we compare the available track-changes tags, if they differ somehow the content was not modified
+                if($this->utilityBroker->trackChangeTag->getUsedTagInfo($oldValue) !== $this->utilityBroker->trackChangeTag->getUsedTagInfo($data->edited)){
+                    $this->isDataModified = true;
+                }
             }
         }
         return $this->isDataModified;
@@ -1026,6 +1039,24 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         }
         return $this->segmentdata[$field]->edited;
     }
+    /**
+     * Returns the edited content of a field preprocessed for export
+     * @param string $field
+     * @param editor_Models_Task $task
+     * @param bool $edited: If set (default) the edited content is used, otherwise the original
+     * @param bool $fixKnownFaultyTags: If set (default) Tag-faults are repaired automatically (usually these tags are removed)
+     * @return editor_Segment_Export
+     */
+    public function getFieldExport(string $field, editor_Models_Task $task, bool $edited=true, bool $fixKnownFaultyTags=true) : editor_Segment_Export {
+        //since fields can be merged from different files, data for a field can be empty
+        if (empty($this->segmentdata[$field])) {
+            return NULL;
+        }
+        $fieldTags = ($edited) ?
+            new editor_Segment_FieldTags($task, $this->getId(), $this->segmentdata[$field]->edited, $field, $this->segmentFieldManager->getEditIndex($field)) :
+            new editor_Segment_FieldTags($task, $this->getId(), $this->segmentdata[$field]->original, $field, $field);
+            return editor_Segment_Export::create($fieldTags, $fixKnownFaultyTags);
+    }
 
     /**
      * returns a list with editable dataindex
@@ -1093,19 +1124,24 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $s->order($this->tableName . '.segmentNrInTask ASC');
         return parent::loadFilterdCustom($s);
     }
-
+    /**
+     * Prepares the entity for using it in an editable finder
+     * @return editor_Models_Segment
+     */
+    public function reInitForEditablesFinder(){
+        $this->reInitDb($this->getTaskGuid());
+        $this->initDefaultSort();
+        return $this;
+    }
     /**
      * inits and returns the editor_Models_Segment_EditablesFinder
      * @return editor_Models_Segment_EditablesFinder
      */
-    protected function initSegmentFinder()
-    {
-        $this->reInitDb($this->getTaskGuid());
-        $this->initDefaultSort();
-
-        return ZfExtended_Factory::get('editor_Models_Segment_EditablesFinder', array($this));
+    protected function initSegmentFinder(){
+        return ZfExtended_Factory::get(
+            'editor_Models_Segment_EditablesFinder',
+            array($this->reInitForEditablesFinder()));
     }
-
     /**
      * returns the first and the last EDITABLE segment of the actual filtered request
      * @param array $autoStateIds a list of autoStates where the prev/next page segments are additionaly compared to

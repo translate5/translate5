@@ -47,16 +47,19 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
                 return Editor.model.admin.User.getLongUserName(rec);
             }
         },
-        {name: 'state', type: 'string'},
+        {name: 'state', type: 'string', critical: true},
         {name: 'role', type: 'string'},
-        {name: 'workflow', type: 'string',critical: true},
-        {name: 'workflowStepName', type: 'string'},
+        {name: 'workflow', type: 'string', critical: true},
+        {name: 'workflowStepName', type: 'string', critical: true},
         {name: 'segmentrange', type: 'string'},
         {name: 'deletable', type: 'boolean'},
         {name: 'editable', type: 'boolean'},
         {name: 'assignmentDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
         {name: 'finishedDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
-        {name: 'deadlineDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT}
+        {name: 'deadlineDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+        {name: 'trackchangesShow', type: 'int'},
+        {name: 'trackchangesShowAll', type: 'int'},
+        {name: 'trackchangesAcceptReject', type: 'int'}
     ],
     validators: {
         taskGuid: 'presence',

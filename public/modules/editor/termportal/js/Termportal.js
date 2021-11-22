@@ -3,19 +3,19 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -48,7 +48,7 @@ function clearResults () {
  * On dropdown select function handler
  */
 var selectItem = function (event, ui) {
-    
+
     // if an item from the autocomplete.list has been selected and clicked via mouse, "update" search results first using THIS item
     var origEvent = event;
     while (origEvent.originalEvent !== undefined){
@@ -63,7 +63,7 @@ var selectItem = function (event, ui) {
     }
 
     console.log('selectItem: ' + ui.item.termEntryId);
-    
+
     //empty term options component
     $('#searchTermsSelect').empty();
 
@@ -72,7 +72,7 @@ var selectItem = function (event, ui) {
         $('#searchTermsSelect').show();
         showFinalResultContent();
     }
-    
+
     console.log('selectItem: ' + ui.item.termEntryId);
 
     Term.fillSearchTermSelect(ui.item.label);
@@ -82,7 +82,7 @@ var selectItem = function (event, ui) {
     //$('#search').val(ui.item.value);
     return false;
 };
- 
+
 $('#search').autocomplete({
     source: function(request, response) {
         Term.searchTerm(request.term,function(data){
@@ -128,7 +128,7 @@ function getLanguageFlag(rfcLanguage) {
     	flagRfc=flagRfc.toLowerCase();
         return '<img src="' + moduleFolder + 'images/flags/' + Editor.data.apps.termportal.rfcFlags[flagRfc] + '.png" alt="' + flagRfc + '" title="' + flagRfc + '">';
     }
-    
+
     return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
 }
 
@@ -155,7 +155,7 @@ $('#search').keyup(function (e) {
 
     Attribute.languageDefinitionContent=[];
     Term.termGroupsCache=[];
-    
+
     $('#error-no-results').hide();
     $('#searchTermsHelper').find('.proposal-txt').text(proposalTranslations['addTermEntryProposal']);
     $('#searchTermsHelper').find('.proposal-btn').prop('title', proposalTranslations['addTermEntryProposal']);
@@ -204,10 +204,10 @@ function checkSubLanguage(locale) {
  * @param {String} languageRfc5646
  */
 function addLanguageToSelect(languageId,languageRfc5646) {
-    var $langSel = $('#language'), 
+    var $langSel = $('#language'),
         selected, opts_list,
         langExist=false;
-    
+
     //check if the given language exist as option in the sellect
     $('#language option').each(function() {
     	var allVals=$(this).val().split(',');
@@ -216,12 +216,12 @@ function addLanguageToSelect(languageId,languageRfc5646) {
     	}
     	langExist=$.inArray(languageId,allVals)!== -1;
     });
-    
+
     //do not add the language as option if the language exist as sellect
     if (langExist) {
         return;
     }
-    
+
     $langSel.append('<option value="'+languageId+'">'+languageRfc5646+'</option>');
     // https://stackoverflow.com/a/26232541
     selected = $langSel.val();
@@ -268,7 +268,7 @@ function renderTagLabel(text) {
 }
 
 /**
- * When a user has selected something from the dropdown, we 
+ * When a user has selected something from the dropdown, we
  * - reset the dropdown (they only serve for choosing, not as chosen selection)
  * - add the tag-field
  * - add the hidden field

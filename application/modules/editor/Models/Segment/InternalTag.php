@@ -63,7 +63,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * Used as tag id for regex based internal tags
      */
     const TYPE_REGEX = 'regex';
-    
+
     public function __construct($replacerTemplate = null){
         $this->replacerRegex = self::REGEX_INTERNAL_TAGS;
         $this->placeholderTemplate = $replacerTemplate ?? self::PLACEHOLDER_TEMPLATE;
@@ -369,7 +369,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @param number $newid
      * @return string|mixed
      */
-    public function toXliff2(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1) {
+    protected function toXliff2(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1) {
         //if not external map given, we init it internally, although we don't need it
         if(is_null($replaceMap)) {
             $replaceMap = [];
@@ -383,12 +383,15 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         $origTags = [];
         $openTagIds = [];
         $closeTags = [];
+
         //loop over the found internal tags, replace them with the XLIFF2 tags
         foreach($this->originalTags as $key => $tag) {
             //use replace on the single tag to replace the internal tag with the xliff2 tag
             $this->originalTags[$key] = $this->replace($tag, function($match) use ($key, &$newid, &$origTags, &$openTagIds, &$closeTags){
                 
-                //if newid is null, calculation is disabled and we have to use the original ID
+                //if newid is null, calculation is disabled and we have to use the original ID as id
+                // for calculating the startRef value we have to consider the short tag numbers to get the paired tags
+                // since the original ID may not be used therefore (for example if in import format the rid was used therefore)
                 $useOriginalId = is_null($newid);
                     
                 $originalId = $match[3];
@@ -403,11 +406,11 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
                 elseif($type == 'open') {
                     $result = sprintf('<sc id="%s"/>', $newid);
                     //store the open tag id to the original id (latter one is used to map start and close tag)
-                    $openTagIds[$originalId] = $newid++;
+                    $openTagIds[$this->getTagNumber($match[0])] = $newid++;
                 }
                 else {
-                    $result = sprintf('<ec id="%1$s" startRef="%1$s" />', $newid++);
-                    $closeTags[$key] = $originalId;
+                    $result = sprintf('<ec id="%1$s" startRef="XXX" />', $newid++);
+                    $closeTags[$key] = $this->getTagNumber($match[0]);
                 }
                 
                 if($useOriginalId) {
@@ -419,15 +422,15 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
                 return $result;
             });
         }
-        
+
         //loop over the close tags and inject the id of the start tag as startRef attribute
-        foreach($closeTags as $key => $originalId) {
-            if(empty($openTagIds[$originalId])) {
+        foreach($closeTags as $key => $shortTagNr) {
+            if(empty($openTagIds[$shortTagNr])) {
                 //remove optional startRef attribute if no start tag exists
                 $this->originalTags[$key] = str_replace(' startRef="XXX" ', '', $this->originalTags[$key]);
             }
             else {
-                $this->originalTags[$key] = str_replace('startRef="XXX"', 'startRef="'.$openTagIds[$originalId].'"', $this->originalTags[$key]);
+                $this->originalTags[$key] = str_replace('startRef="XXX"', 'startRef="'.$openTagIds[$shortTagNr].'"', $this->originalTags[$key]);
             }
         }
         

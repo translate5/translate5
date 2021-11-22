@@ -109,6 +109,7 @@ class WorkerListCommand extends Translate5AbstractCommand
             'endtime'   => 'Endtime:',
             'taskGuid'  => 'TaskGuid:',
             'worker'    => 'Worker:',
+            'progress'  => 'Progress:',
         ];
         
         $resultNotListed = [];
@@ -128,7 +129,11 @@ class WorkerListCommand extends Translate5AbstractCommand
             }
             $row = [];
             foreach($headlines as $key => $title) {
-                $row[] = $worker[$key];
+                if($key == 'progress') {
+                    $row[] = round($worker[$key] * 100).'%';
+                }else {
+                    $row[] = $worker[$key];
+                }
             }
             $rows[] = $row;
         }

@@ -133,9 +133,17 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         if(!$this->io->confirm('Does the important release notes contain all API / GUI relevant changes?', false)) {
             return 0;
         }
-        if($this->io->confirm('Create the SQL and Update the change log (or modify them in JIRA again)?', false)) {
-            $this->createSql();
-            $this->updateChangeLog();
+        if($this->io->confirm('Create the SQL and Update the change log (or modify them in JIRA again)?', true)) {
+            $sql = $this->createSql();
+            $md = $this->updateChangeLog();
+            if($this->io->confirm('git: stage above files and commit them?', true)) {
+                $sql = str_replace(getcwd().'/', '', $sql);
+                $md = str_replace(getcwd().'/', '', $md);
+                passthru('git add '.$md);
+                passthru('git add '.$sql);
+                passthru('git commit -m "change log release '.$this->releaseVersion->name.'" '.$sql.' '.$md);
+                passthru('git push');
+            }
         }
         if(!$this->releaseVersion->released) {
             $this->io->note('Please release the version on URL https://jira.translate5.net/projects/TRANSLATE/versions/'.$this->releaseVersion->id);
@@ -264,8 +272,12 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             }
         }
     }
-    
-    protected function createSql() {
+
+    /**
+     * creates the SQL changelog and returns the path to it
+     * @return string
+     */
+    protected function createSql(): string {
         $sql = '
 -- /*
 -- START LICENSE AND COPYRIGHT
@@ -335,12 +347,14 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
         $filename = APPLICATION_ROOT.'/application/modules/editor/database/sql-changelog-'.$version.'.sql';
         $this->io->success('Created SQL changelog file '.$filename);
         file_put_contents($filename, $sql);
+        return $filename;
     }
     
     /**
      * Injects the MarkDown changelog into the CHANGELOG.md file
+     * @return string returns the filename of the changelog.md file
      */
-    protected function updateChangeLog() {
+    protected function updateChangeLog(): string {
         $date = date('Y-m-d', time());
         
         //headlines
@@ -387,6 +401,7 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
         $lastPos = mb_strpos($content, "\n## [");
         $this->io->success('Updated changelog file '.$filename);
         file_put_contents($filename, substr_replace($content, $md, $lastPos, 0));
+        return $filename;
     }
     
     protected function makeSqlRow($row, $type, $date, $groups) {

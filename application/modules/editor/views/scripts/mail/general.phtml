@@ -99,6 +99,8 @@ if(!empty($this->task)) {
     $taskData = $this->workflowNotifyMail()->getTaskLanguages($this->task);
     $taskData['task'] = $this->task->getDataObject();
 
+    $urlPart = '/editor#task/'.$this->task->getId().'/1/edit';
+
     $taskData['deadlineDate'] = $this->taskUserAssoc['deadlineDate'] ?? '-';
     $taskData['wordCount'] = $this->task->getWordCount() > 0 ? $this->task->getWordCount() : '-';
     
@@ -106,9 +108,12 @@ if(!empty($this->task)) {
     /* @var $customer editor_Models_Customer */
     $customer->load($this->task->getCustomerId());
     //if the customer domain is set, use this domain as portal url and link
-    if(!empty($customer->getDomain())){
+    if(empty($customer->getDomain())){
+        $data['portalLink']='<a href="'.$portal.$urlPart.'">'.$portal.'</a>';
+    }
+    else {
         $data['portalUrl']=$customer->getDomain();
-        $data['portalLink']='<a href="'.$customer->getDomain().'">'.$customer->getDomain().'</a>';
+        $data['portalLink']='<a href="'.$customer->getDomain().$urlPart.'">'.$customer->getDomain().'</a>';
     }
     
     //we have to pre-apply the relaisLang Fragment to inject the language itself

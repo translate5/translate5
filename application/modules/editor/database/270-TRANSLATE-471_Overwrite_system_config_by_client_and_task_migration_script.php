@@ -65,7 +65,7 @@ foreach ($file as $key=>$value){
     }
     try {
         $config->loadByName($key);
-        if($config->getType() == ZfExtended_Resource_DbConfig::TYPE_LIST){
+        if($config->getType() == ZfExtended_DbConfig_Type_CoreTypes::TYPE_LIST){
             $value = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
         $config->setValue($value);

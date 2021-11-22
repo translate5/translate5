@@ -664,4 +664,16 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
     protected  function tagBreakUp($segment){
         return editor_Utils::tagBreakUp($segment,'/(<[^>]*>|&[^;]+;)/');
     }
+
+    /**
+     * wrapper function to be called by the testsuite in a worker to test an endless loop in the diff algorithm
+     * @param string|null $taskGuid
+     * @param array $params
+     */
+    public function diffTestCall(?string $taskGuid, array $params) {
+        $result = $this->diffSegment($params['target'], $params['edited'], $params['date'], $params['name']);
+        if(preg_replace('/sdl:revid="[^"]+"/', 'sdl:revid="XXX"', $result) !== $params['result']) {
+            throw new Exception('The result is not as expected.');
+        }
+    }
 }
