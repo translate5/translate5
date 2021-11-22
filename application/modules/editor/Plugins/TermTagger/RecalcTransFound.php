@@ -114,7 +114,13 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         $this->groupCounter = [];
 
         foreach ($sourceTermIds as $sourceTermId) {
-            $this->termModel->loadByMid($sourceTermId, $collectionIds);
+            try {
+                $this->termModel->loadByMid($sourceTermId, $collectionIds);
+            }
+            catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                $toMarkMemory[$sourceTermId] = null; //so the source terms are marked as notfound in the repetitions
+                continue;
+            }
             $termEntryTbxId = $this->termModel->getTermEntryTbxId();
 
             $groupedTerms = $this->termModel->getAllTermsOfGroup($collectionIds, $termEntryTbxId, $this->targetFuzzyLanguages);
