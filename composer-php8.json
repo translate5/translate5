@@ -59,7 +59,22 @@
                                         "reference" : "1.13.0"
                                 }
                         }
+		},
+		{
+			"type" : "package",
+			"package" : {
+				"name" : "google/material-design-icons",
+				"license" : "Apache-2.0 License",
+				"version" : "4.0.0",
+				"description" : "Material Design icons by Google",
+				"source" : {
+					"url" : "https://github.com/google/material-design-icons.git",
+					"type" : "git",
+					"reference" : "4.0.0"
+				}
+			}
 		}
+		
 	],
 	"require" : {
 		"ext-simplexml": "*",
@@ -82,7 +97,8 @@
 		"lesstif/php-jira-rest-client" : "~2.4",
 		"paquettg/php-html-parser": "^3.1",
 		"jquery/jquery-ui": "1.13.0",
-		"translate5/instanttranslate-roboto-font": "26"
+		"translate5/instanttranslate-roboto-font": "26",
+		"google/material-design-icons": "4.0.0"
 	},
 	"extra" : {
 		"merge-plugin" : {

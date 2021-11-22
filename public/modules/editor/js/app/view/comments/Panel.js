@@ -124,29 +124,45 @@ Ext.define('Editor.view.comments.Panel', {
                             enterIsSpecial: true,
                             fieldLabel: me.item_commentNew,
                             anchor: '100%'
-                        }, {
+                        }],
+                        dockedItems: [{
                             xtype: 'toolbar',
+                            dock: 'bottom',
                             ui: 'footer',
-                            flex: 1,
-                            //dock : 'bottom',
-                            layout: {
-                                pack: 'end',
-                                type: 'hbox'
+                            style:{
+                                background:'transparent'
                             },
                             items: [{
-                                xtype: 'button',
-                                itemId: 'closeBtn',
-                                listeners: {
-                                    click: 'onCloseBtnClick'
+                                type: 'button',
+                                glyph:'e876@Material Icons',
+                                itemId:'saveBtn',
+                                iconCls:'glyphIconColor',
+                                style:{
+                                    background:'transparent',
+                                    borderColor:'transparent'
                                 },
-                                text: me.item_closeBtn
-                            }, {
-                                xtype: 'button',
-                                itemId: 'saveBtn',
-                                listeners: {
-                                    click: 'saveComment'
+                                tooltip: {
+                                    text: me.item_saveBtn
                                 },
-                                text: me.item_saveBtn
+                                listeners:{
+                                    'click':'saveComment'
+                                }
+                            },{
+                                type: 'button',
+                                glyph:'e14c@Material Icons',
+                                itemId:'closeBtn',
+                                iconCls:'glyphIconColor',
+                                style:{
+                                    background:'transparent',
+                                    borderColor:'transparent',
+                                    color:'black'
+                                },
+                                tooltip: {
+                                    text: me.item_closeBtn
+                                },
+                                listeners:{
+                                    'click':'onCloseBtnClick'
+                                }
                             }]
                         }]
                     }, {
