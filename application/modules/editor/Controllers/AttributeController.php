@@ -369,15 +369,19 @@ class editor_AttributeController extends ZfExtended_RestController
      */
     public function putAction() {
 
-        // Validate params and load entity
+        // Validate params
         $this->jcheck([
             'attrId' => [
-                'req' => true,
+                'req' => !$this->getParam('draft0'),
                 'rex' => 'int11list'
             ],
             'dropId' => [
                 'rex' => 'int11list'
             ],
+            'draft0' => [
+                'req' => !$this->getParam('attrId') && !$this->getParam('value'),
+                'rex' => 'int11list'
+            ]
         ]);
 
         // Get attr ids array
@@ -471,6 +475,9 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Flush response
         $this->view->assign($this->responseA[0]);
+
+        // If draft0-param is given - setup isDraft=0 on attributes identified by that param
+        if ($draft0 = $this->getParam('draft0')) $this->entity->undraftByIds($draft0);
     }
 
     /**
@@ -1133,6 +1140,7 @@ class editor_AttributeController extends ZfExtended_RestController
             'guid' => ZfExtended_Utils::uuid(),
             'attrLang' => $l,
             //'dataType' => null
+            'isDraft' => $this->batch ? 1 : 0
         ]);
     }
 }

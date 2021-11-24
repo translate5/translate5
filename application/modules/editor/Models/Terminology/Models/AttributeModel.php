@@ -670,4 +670,39 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             ORDER BY `type` = "processStatus" DESC, `id` DESC', $bind
         )->fetchAll(PDO::FETCH_GROUP);
     }
+
+    /**
+     * Set up `isDraft` = 0 for records identified by comma-separated ids given by $ids arg
+     *
+     * @param $ids
+     */
+    public function undraftByIds($ids) {
+        $this->db->getAdapter()->query('
+            UPDATE `terms_attributes` SET `isDraft` = "0" WHERE `id` IN (' . $ids . ')
+        ');
+    }
+
+    /**
+     * Delete attributes having isDraft=1
+     * This is currently used by cron
+     *
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function deleteDrafts() {
+
+        // Get ids array of draft attributes
+        $attrIdA_isDraft = $this->db->getAdapter()->query('
+            SELECT `id` FROM `terms_attributes` WHERE `isDraft` = "1"
+        ')->fetchAll(PDO::FETCH_COLUMN);
+
+        // Foreach id
+        foreach ($attrIdA_isDraft as $attrId) {
+
+            // Load model instance
+            $this->load($attrId);
+
+            // Call delete method
+            $this->delete();
+        }
+    }
 }
