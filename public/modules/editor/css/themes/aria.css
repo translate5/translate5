@@ -55,3 +55,12 @@ tr.import td div {
 	color: #ffffff !important;
 	white-space: normal !important;
 }
+
+.customMaterialIconStyle{
+    color: #34383f;
+    opacity:1 !important;
+}
+
+.commentPanel .customMaterialIconStyle{
+    color: #b0b0b0;
+}
