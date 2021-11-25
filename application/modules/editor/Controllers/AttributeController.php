@@ -141,13 +141,13 @@ class editor_AttributeController extends ZfExtended_RestController
         ], $_);
 
         // Detect whether we're in batch mode
-        $this->batch = $this->getParam('batch');
-        foreach (['termEntryId', 'language', 'termId'] as $param)
-            if ($value = $this->getParam($param))
-                if ($value == 'batch'
-                    || ($param != 'language' && editor_Utils::rexm('int11list',   $value) && !editor_Utils::rexm('int11'  , $value))
-                    || ($param == 'language' && editor_Utils::rexm('rfc5646list', $value) && !editor_Utils::rexm('rfc5646', $value)))
-                    $this->batch = true;
+        if (!$this->batch = $this->getParam('batch'))
+            foreach (['termEntryId', 'language', 'termId'] as $param)
+                if ($value = $this->getParam($param))
+                    if ($value == 'batch'
+                        || ($param != 'language' && editor_Utils::rexm('int11list',   $value) && !editor_Utils::rexm('int11'  , $value))
+                        || ($param == 'language' && editor_Utils::rexm('rfc5646list', $value) && !editor_Utils::rexm('rfc5646', $value)))
+                        $this->batch = true;
 
         // Prevent creation of processStatus and administrativeStatus attributes
         if ($this->batch) $this->jcheck([
@@ -163,7 +163,7 @@ class editor_AttributeController extends ZfExtended_RestController
             if ($_['level'] == 'entry') {
 
                 // Get array of termEntryIds
-                $termEntryIdA = editor_Utils::ar($this->getParam('termEntryId'));
+                $termEntryIdA = array_unique(editor_Utils::ar($this->getParam('termEntryId')));
 
                 // Foreach termEntryId
                 foreach ($termEntryIdA as $termEntryId) {
@@ -180,7 +180,7 @@ class editor_AttributeController extends ZfExtended_RestController
             } else if ($_['level'] == 'language') {
 
                 // Get array of termEntryIds
-                $termEntryIdA = editor_Utils::ar($this->getParam('termEntryId'));
+                $termEntryIdA = array_unique(editor_Utils::ar($this->getParam('termEntryId')));
 
                 // If language-param is not 'batch' - make sure it's a
                 // comma-separated list of rfc-codes before usage it in sql query
@@ -223,7 +223,7 @@ class editor_AttributeController extends ZfExtended_RestController
             } else if ($_['level'] == 'term') {
 
                 // Get array of termEntryIds
-                $termEntryIdA = editor_Utils::ar($this->getParam('termEntryId'));
+                $termEntryIdA = array_unique(editor_Utils::ar($this->getParam('termEntryId')));
 
                 // Drop termEntryId and language params, as we don't need them
                 $this->setParam('termEntryId', '');
@@ -231,7 +231,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
                 // If termId-param is given as comma-separated list of integers
                 if ($termIdA = editor_Utils::rexm('int11list', $this->getParam('termId'))
-                    ? editor_Utils::ar($this->getParam('termId'))
+                    ? array_unique(editor_Utils::ar($this->getParam('termId')))
                     : []) {
 
                     // Foreach term within current termEntryId

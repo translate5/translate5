@@ -289,6 +289,25 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         // Assert that termportal filters are working
         $this->assertFilters($dataTypeA);
 
+        //
+        $termEntryId = join(',', [$importedTerm->termEntryId, $Term1->termEntryId]);
+
+        // Batch create note-attr for termEntry-level
+        $this->assertBatchEdit(2, [
+            'termEntryId' => $termEntryId,
+            'dataType' => 20,
+            'batch' => 'true'
+        ]);
+
+        // Batch create note-attr for term-level
+        $this->assertBatchEdit(4, [
+            'termEntryId' => $termEntryId,
+            'dataType' => 20,
+            'languageId' => 'batch',
+            'termId' => 'batch',
+        ], 1, true);
+
+
         // [23] delete image-attr, check image full path not exists anymore
         $figuredelete = $this->api()->requestJson('editor/attribute', 'DELETE', ['attrId' => $figurecreate->inserted->id]);
         $this->assertIsObject($figuredelete, 'Unable to delete the image-attr');
@@ -450,5 +469,86 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
 
         // One term created until 2019-07-15
         $this->assertSearchResultQty(1, ['tbxCreatedLt' => '2019-07-15']);
+    }
+
+    /**
+     * @param $planQty
+     * @param $params
+     * @param int $existingPlanQty
+     * @param bool $save
+     */
+    public function assertBatchEdit($planQty, $params, $existingPlanQty = 0, $save = false) {
+
+        // Get response
+        $resp = $this->api()->requestJson('editor/attribute', 'POST', $params);
+
+        // Print params and get output
+        $query = var_export($params, true);
+
+        // Do checks
+        $this->assertIsObject($resp, 'Invalid response. ' . $query);
+        $this->assertObjectHasAttribute('inserted', $resp, 'Response has no inserted-prop. ' . $query);
+        $this->assertIsObject($resp->inserted, '$resp->inserted is not an object. ' . $query);
+        $this->assertObjectHasAttribute('id', $resp->inserted, '$resp->inserted has no id-prop. ' . $query);
+        $factQty = $resp->inserted->id ? count(explode(',', $resp->inserted->id)) : 0;
+        $this->assertEquals($planQty, $factQty, 'Inserted attrs qty should be ' . $planQty . ', but ' . $factQty . ' got instead. ' . $query);
+
+        //
+        $existingFact = [];
+
+        // If $existingPlanQty arg is given and is > 0
+        if ($existingPlanQty) {
+            $this->assertObjectHasAttribute('existing', $resp, 'Response has no existing-prop. ' . $query);
+            $this->assertIsObject($resp->existing, 'Response has no existing-prop. ' . $query);
+            $existingFact = (array) $resp->existing;
+            $existingFactQty = count($existingFact);
+            $this->assertEquals($existingPlanQty, $existingFactQty, '$resp->existing contains '
+                . $existingFactQty . ' instead of ' . $existingPlanQty . '.' . $query);
+
+        // Else assert that there is no existing-prop in $resp
+        } else $this->assertObjectNotHasAttribute('existing', $resp, 'Response should have no existing-prop. ' . $query);
+
+        // Build query string from params to use it as a key
+        $key = http_build_query($params);
+
+        // Remember ids of inserted attrs
+        $insertedIds = $resp->inserted->id;
+
+        // Request params for PUT-request
+        $params = [
+            'attrId' => $insertedIds,
+            'value' => 'batch value for note-attr'
+        ];
+
+        // Batch update note-attr for termEntry-level
+        $resp = $this->api()->requestJson('editor/attribute', 'PUT', $params);
+
+        // Print params and get output
+        $query = var_export($params, true);
+
+        // Do checks
+        $this->assertIsObject($resp, 'Invalid response. ' . $query);
+        $this->assertObjectHasAttribute('success', $resp, 'Response has no success-prop. ' . $query);
+        $this->assertIsBool($resp->success, '$resp->success is not bool. ' . $query);
+        $this->assertEquals(true, $resp->success, '$resp->success is not true. ' . $query);
+
+        // If $save arg is true
+        if ($save) {
+
+            // Pick values from inserted attrs and apply them to the existing attrs
+            // Drop inserted attrs having existing attrs
+            // Undraft inserted attrs having no existing attrs
+            $resp = $this->api()->requestJson('editor/attribute', 'PUT', [
+                'attrId' => join(',', array_values($existingFact)),
+                'dropId' => join(',', $dropIdA = array_keys($existingFact)),
+                'draft0' => join(',', array_diff(explode(',', $insertedIds), $dropIdA))
+            ]);
+
+        // Else batch delete note-attr
+        } else {
+            $resp = $this->api()->requestJson('editor/attribute', 'DELETE', ['attrId' => $insertedIds]);
+            $this->assertIsObject($resp, 'Unable to batch-delete the note-attrs for termEntry-level');
+            $this->assertObjectHasAttribute('updated', $resp, 'Note-attr deletion response does not contain "updated" prop');
+        }
     }
 }
