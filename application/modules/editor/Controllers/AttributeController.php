@@ -473,11 +473,11 @@ class editor_AttributeController extends ZfExtended_RestController
         // Delete uploaded temporary file
         if ($tmp_name ?? 0) unlink($tmp_name);
 
-        // Flush response
-        $this->view->assign($this->responseA[0]);
-
         // If draft0-param is given - setup isDraft=0 on attributes identified by that param
         if ($draft0 = $this->getParam('draft0')) $this->entity->undraftByIds($draft0);
+
+        // Flush response. Actually, $this->responseA is contain responses only if attrId-param is not empty
+        if ($attrIdA) $this->view->assign($this->responseA[0]); else if ($draft0) $this->view->assign(['success' => true]);
     }
 
     /**

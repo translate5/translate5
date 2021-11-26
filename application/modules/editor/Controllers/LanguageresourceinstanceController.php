@@ -774,7 +774,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $proposals editor_Models_Terminology_Models_TermModel */
         $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        $this->view->rows = $proposals->loadProposalExportData($termCollection->getCollectionForAuthenticatedUser(), date('Y-m-d'));
+        $collectionIdA = $termCollection->getCollectionForAuthenticatedUser();
+        if ($required = $this->getParam('collectionId')) {
+            $required = is_array($required) ? $required : explode(',', $required);
+            $collectionIdA = array_intersect($collectionIdA, $required);
+        }
+        $this->view->rows = $proposals->loadProposalExportData($collectionIdA, date('Y-m-d'));
     }
 
 
