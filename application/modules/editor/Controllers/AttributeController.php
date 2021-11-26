@@ -186,13 +186,17 @@ class editor_AttributeController extends ZfExtended_RestController
                 // comma-separated list of rfc-codes before usage it in sql query
                 if ($this->getParam('language') != 'batch') $this->jcheck(['language' => ['rex' => 'rfc5646list']]);
 
-                // Build language-col cond. Here we respect comma-separated rfc-codes given by language-param only
+                // Get term model
+                /** @var editor_Models_Terminology_Models_TermModel $termM */
+                $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+
+                // Setup $certain variable to be used language-col cond. Here we respect comma-separated rfc-codes given by language-param only
                 // in case if termEntryId-param contains single(!) integer value. If termEntryId-param
                 // contains multiple (e.g comma-separated) values, then ALL distinct languages of each
                 // termEntryId will be affected
-                $languageCond = $this->getParam('language') != 'batch' && count($termEntryIdA) == 1
-                    ? 'FIND_IN_SET(`language`, "' . $this->getParam('language') . '")'
-                    : 'TRUE';
+                $certain = $this->getParam('language') != 'batch' && count($termEntryIdA) == 1
+                    ? $this->getParam('language')
+                    : false;
 
                 // Foreach termEntryId
                 foreach ($termEntryIdA as $termEntryId) {
@@ -201,11 +205,7 @@ class editor_AttributeController extends ZfExtended_RestController
                     $this->setParam('termEntryId', $termEntryId);
 
                     // Get distinct languages inside that termEntry
-                    $languageA = editor_Utils::db()->query('
-                        SELECT DISTINCT `language` 
-                        FROM `terms_term`
-                        WHERE `termEntryId` = ? AND ' . $languageCond . '
-                    ', $termEntryId)->fetchAll(PDO::FETCH_COLUMN);
+                    $languageA = $termM->getLanguagesByTermEntryId($termEntryId, $certain);
 
                     // Foreach language within current termEntryId
                     foreach ($languageA as $language) {
@@ -247,15 +247,15 @@ class editor_AttributeController extends ZfExtended_RestController
                 // Else if termId-param is 'batch'
                 } else {
 
+                    // Get term model
+                    /** @var editor_Models_Terminology_Models_TermModel $termM */
+                    $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+
                     // Foreach termEntryId
                     foreach ($termEntryIdA as $termEntryId) {
 
                         // Get termIds inside that termEntry
-                        $termIdA = editor_Utils::db()->query('
-                            SELECT `id` 
-                            FROM `terms_term`
-                            WHERE `termEntryId` = ?
-                        ', $termEntryId)->fetchAll(PDO::FETCH_COLUMN);
+                        $termIdA = $termM->getIdsByTermEntryId($termEntryId);
 
                         // Foreach term within current termEntryId
                         foreach ($termIdA as $termId) {

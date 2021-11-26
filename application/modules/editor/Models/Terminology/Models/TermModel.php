@@ -2364,4 +2364,50 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             $bind
         )->fetchAll(PDO::FETCH_UNIQUE);
     }
+
+    /**
+     * Get ids of all terms having given $termEntryId
+     *
+     * @param $termEntryId
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getIdsByTermEntryId($termEntryId) {
+        return $this->db->getAdapter()->query('
+            SELECT `id` 
+            FROM `terms_term`
+            WHERE `termEntryId` = ?
+        ', $termEntryId)->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Get distinct languages of all terms having given $termEntryId
+     *
+     * @param $termEntryId
+     * @param $certain
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getLanguagesByTermEntryId($termEntryId, $certain = false) {
+
+        // Query param binding
+        $bind = [':termEntryId' => $termEntryId];
+
+        // If $certain arg is given
+        if ($certain) {
+
+            // Append binding
+            $bind[':certain'] = $certain;
+
+            // Append WHERE clause
+            $certain = ' AND FIND_IN_SET(`language`, :certain)';
+        }
+
+        // Return distinc languages
+        return $this->db->getAdapter()->query('
+            SELECT DISTINCT `language` 
+            FROM `terms_term`
+            WHERE `termEntryId` = :termEntryId' . $certain
+        , $bind)->fetchAll(PDO::FETCH_COLUMN);
+    }
 }
