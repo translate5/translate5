@@ -639,6 +639,19 @@ class editor_Segment_FieldTags implements JsonSerializable {
                 error_log($tag->toJson());
                 error_log("\n========================================\n");
             }
+            // TS-1337: This error happend "in the wild". It can only happen with malformed Markup. We need more data for a proper investigation
+            if($nearest == null){
+                $errorData = new stdClass();
+                $errorData->holder = $holder->jsonSerialize();
+                $errorData->container = $container->jsonSerialize();
+                $errorData->tag = $tag->jsonSerialize();
+                $errorData->segmentId = $this->segmentId;
+                $errorData->taskId = $this->task->getId();
+                $errorData->taskGuid = $this->task->getTaskGuid();
+                $errorData->taskName = $this->task->getTaskName();
+                
+                throw new ZfExtended_Exception('editor_Segment_FieldTags::render: Rendering failed presumably due to invalid tag structure.'."\n".json_encode($errorData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            }
             $nearest->addChild($tag);
             $container = $tag;
             $processed[] = $tag;
