@@ -174,6 +174,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         importType:'import',
                         scrollable:'y',
                         listeners: {
+                            //TODO: is this Thomas stuff ?
                             XXXdrop: {
                                 element: 'el',
                                 fn: 'onMainCardDrop'
@@ -309,18 +310,20 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     allowBlank: true,
                                     toolTip: me.strings.relaisLangTip,
                                     fieldLabel: me.strings.relaisLangLabel
-                                },{
-                                    //TRANSLATE-2080 FIXME remove me but adopt regex (file type) checks to the workfiles
-                                    xtype: 'filefield',
-                                    name: 'importUpload',
-                                    hidden:true,
-                                    regex: new RegExp('\.('+Editor.data.import.validExtensions.join('|')+')$', 'i'),
-                                    regexText: me.strings.importUploadType,
-                                    allowBlank: false,
-                                    emptyText: 'FIXME REMOVE ME!',
-                                    toolTip: me.strings.importUploadTip,
-                                    fieldLabel: me.strings.importUploadLabel
-                                }]
+                                }
+                                // ,{
+                                //     //TRANSLATE-2080 FIXME remove me but adopt regex (file type) checks to the workfiles
+                                //     xtype: 'filefield',
+                                //     name: 'importUpload',
+                                //     hidden:true,
+                                //     regex: new RegExp('\.('+Editor.data.import.validExtensions.join('|')+')$', 'i'),
+                                //     regexText: me.strings.importUploadType,
+                                //     allowBlank: false,
+                                //     emptyText: 'FIXME REMOVE ME!',
+                                //     toolTip: me.strings.importUploadTip,
+                                //     fieldLabel: me.strings.importUploadLabel
+                                // }
+                                ]
                             }]
                         
                         },{

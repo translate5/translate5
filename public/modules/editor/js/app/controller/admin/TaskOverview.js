@@ -1097,28 +1097,36 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     saveTask: function (successCallback) {
         var me = this,
             win = me.getTaskAddWindow(),
+            grid = me.getWizardUploadGrid(),
+            formData = new FormData(),
             form = me.getTaskAddForm();
 
-        me.setUploadedFiles(form);
-
-        if (!me.getTaskAddForm().isValid()) {
+        if (!form.isValid()) {
             return;
         }
 
         win.setLoading(me.strings.loadingWindowMessage);
 
-        form.submit({
-            //Accept Header of submitted file uploads could not be changed:
-            //http://stackoverflow.com/questions/13344082/fileupload-accept-header
-            //so use format parameter jsontext here, for jsontext see REST_Controller_Action_Helper_ContextSwitch
+        grid.getStore().each(function(record) {
+            // Add file to AJAX request
+            //FIXME append only files where the type is a processable one(workfile/pivotfile) at the moment.
+            formData.append('importUpload[]', record.get('file'), record.get('name'));
+        });
 
-            params: {
-                format: 'jsontext',
-                autoStartImport: 0
-            },
+        var val = null;
+        form.getForm().getFields().each(function (field){
+            // for date fields the value submitted to the server is in different format
+            val = !field.getSubmitValue ? field.getValue() : field.getSubmitValue();
+            formData.append(field.getName(), val);
+        });
+
+        formData.append('autoStartImport', 0);
+
+        Ext.Ajax.request({
+            rawData: formData,
+            headers: {'Content-Type':null}, //to use content type of FormData
             timeout: 3600,
-            url: Editor.data.restpath + 'task?format=json', //to fix POST_MAX_SIZE problems, see TRANSLATE-1034
-            scope: this,
+            url: Editor.data.restpath + 'task',
             success: function (form, submit) {
                 var task = me.getModel('admin.Task').create(submit.result.rows);
                 me.fireEvent('taskCreated', task);
@@ -1277,18 +1285,5 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         task.store = me.getAdminTasksStore();
 
         me.setCardsTask(task);
-    },
-
-    setUploadedFiles:function (form){
-        var me = this,
-            grid = me.getWizardUploadGrid(),
-            field = form.getForm().findField('importUpload'),
-            gridData = [];
-
-        grid.getStore().each(function(r) {
-            gridData.push(r.getData());
-        });
-
-        field.setValue(gridData);
     }
 });
