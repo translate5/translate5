@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.wizardUploadGrid',
+
     onManualAdd: function(btn) {
         this.addFilesToStore(btn.fileInputEl.dom.files, 'workfile');
     },
@@ -49,7 +50,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         });
     },
     addFilesToStore: function(files, type) {
-        var store = this.getView().store;
+        var me = this,
+            store = me.getView().store;
         Ext.Array.forEach(Ext.Array.from(files), function(file) {
             var rec, source, target;
 
@@ -57,7 +59,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                 file: file,
                 name: file.name,
                 size: file.size,
-                type: type
+                type: type,
+                error: null
             });
             store.addSorted(rec);
 
@@ -76,10 +79,37 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                 if(target) {
                     rec.set('targetLang', target[1]);
                 }
+                me.validateLanguages(rec);
                 rec.commit();
             };
         });
     },
+
+    validateLanguages:function (rec){
+        var me = this,
+            view = me.getView(),
+            window = view.up('#adminTaskAddWindow'),
+            sourceField = window.down('languagecombo[name="sourceLang"]'),
+            targetField = window.down('tagfield[name="targetLang[]"]');
+
+
+        if(rec.get('sourceLang') === null){
+            rec.set('error',rec.get('error')+['Source not valid']);
+            return false;
+        }
+        if(rec.get('sourceLang') === null){
+            rec.set('error',rec.get('error')+['Target not valid']);
+            return false;
+        }
+        if(!sourceField.readOnly && Ext.isEmpty(sourceField.getValue())){
+            // convert the rfc value of the record to id
+            sourceField.setValue(rec.get('sourceLang'));
+            sourceField.setReadOnly(true);
+        }
+
+        targetField.addValue(rec.get('targetLang'));
+    },
+
     testNewUpload: function() {
         console.log(this.getView().getStore());
         var store = this.getView().getStore(),
@@ -110,19 +140,3 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         xhr.send(formData);
     }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

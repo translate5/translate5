@@ -60,6 +60,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
             config = {
                 height: 300,
                 allowDeselect : true,
+                sortableColumns:false,
                 tbar: [{
                     xtype: 'wizardFileButton',
                     text: 'Add work file(s)',
@@ -97,6 +98,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'gridcolumn',
                     width: 140,
                     dataIndex: 'targetLang',
+                    //renderer:me.langRenderer,
                     text: 'Target Language'
                 },{
                     xtype: 'gridcolumn',
@@ -121,5 +123,24 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([ config ]);
+    },
+
+    /**
+     * renders the value of the language columns
+     * @param {String} val
+     * @returns {String}
+     */
+    langRenderer: function (val, md) {
+        var lang = Ext.StoreMgr.get('admin.Languages').getById(val),
+            label;
+        if (lang) {
+            label = lang.get('label');
+            md.tdAttr = 'data-qtip="' + label + '"';
+            return label;
+        }
+        if (!val || val === "0") {
+            return '';
+        }
+        return '-';
     }
 });

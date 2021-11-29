@@ -139,7 +139,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             record=store.getById(parseInt(id));
         }
         if(!record){
-            record=store.getAt(0);
+            record = store.getAt(0);
         }
         me.selectProjectTaskRecord(record);
         me.lookup('projectGrid').setLoading(false);
@@ -192,6 +192,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     * On project store load
     */
     onProjectStoreLoad:function(store){
+        return;
         //if the project panel is not active, ignore the redirect,
         //when we redirect, the component focus is changed
         if(!this.getView().isVisible(true)){
@@ -212,13 +213,31 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         if(record){
             task = store.getById(record.get('id'));
         }
-        //no selected record is found, use the first in the store
-        if(!task){
-            task = store.getAt(0);
+
+        if(task){
+            me.redirectFocus(task,false);
+            return;
         }
-        me.redirectFocus(task,false);
+
+        //no selected record is found, use the first in the store
+        //TODO: before getting the first record, check first the hash.
+        var hash = window.location.hash.substring(1),
+            includeTask = false;
+        if(hash === ''){
+            record = store.getAt(0);
+        }else {
+            hash = hash.split('/');
+
+            record = {};
+            record.projectId = hash[1];
+            includeTask = hash.length === 4;
+            if(includeTask){
+                record.id = hash[2];
+            }
+        }
+        me.redirectFocus(record,includeTask);
     },
-    
+
     onReloadProjectBtnClick:function(){
         var me=this;
         me.reloadProject();

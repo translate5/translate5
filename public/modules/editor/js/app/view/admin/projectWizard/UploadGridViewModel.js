@@ -40,7 +40,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewModel', {
                 direction: 'ASC'
             },{
                 property: 'type',
-                // direction DESC is sufficient to sort pivot files under the same named workfiles, with additional types we may use a sorterFn here
+                // direction DESC is sufficient to sort pivot files under the same named workflows, with additional types we may use a sorterFn here
                 direction: 'DESC'
             }],
             fields: [{
@@ -52,13 +52,19 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewModel', {
             },{
                 name: 'type'
             },{
-                //FIXME should be int then!
-                // type: 'int',
-                name: 'sourceLang'
+                type: 'int',
+                name: 'sourceLang',
+                convert:function (val){
+                    return Ext.StoreManager.get('admin.Languages').getIdByRfc(val);
+                }
             },{
-                //FIXME should be int then!
-                // type: 'int',
-                name: 'targetLang'
+                type: 'int',
+                name: 'targetLang',
+                convert:function (val){
+                    return Ext.StoreManager.get('admin.Languages').getIdByRfc(val);
+                }
+            },{
+                name: 'error'
             }]
         }
     }

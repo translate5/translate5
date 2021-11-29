@@ -99,6 +99,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },{
         ref:'userAssocGrid',
         selector: '#adminTaskUserAssocGrid'
+    },{
+        ref:'wizardUploadGrid',
+        selector:'#adminTaskAddWindow wizardUploadGrid'
     }],
     alias: 'controller.taskOverviewController',
 
@@ -337,12 +340,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     handleImportDefaults: function () {
         var me = this;
-        if (me.getTaskAddForm().isValid()) {
-            me.saveTask(function (task) {
-                me.fireEvent('wizardCardImportDefaults',task);
-                me.startImport(task);
-            });
-        }
+
+        me.saveTask(function (task) {
+            me.fireEvent('wizardCardImportDefaults',task);
+            me.startImport(task);
+        });
     },
 
     /**
@@ -1095,7 +1097,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     saveTask: function (successCallback) {
         var me = this,
             win = me.getTaskAddWindow(),
-            form = this.getTaskAddForm();
+            form = me.getTaskAddForm();
+
+        me.setUploadedFiles(form);
+
+        if (!me.getTaskAddForm().isValid()) {
+            return;
+        }
 
         win.setLoading(me.strings.loadingWindowMessage);
 
@@ -1269,5 +1277,18 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         task.store = me.getAdminTasksStore();
 
         me.setCardsTask(task);
+    },
+
+    setUploadedFiles:function (form){
+        var me = this,
+            grid = me.getWizardUploadGrid(),
+            field = form.getForm().findField('importUpload'),
+            gridData = [];
+
+        grid.getStore().each(function(r) {
+            gridData.push(r.getData());
+        });
+
+        field.setValue(gridData);
     }
 });

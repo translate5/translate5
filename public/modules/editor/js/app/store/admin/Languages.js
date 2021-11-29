@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -31,7 +30,17 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Store
  */
 Ext.define('Editor.store.admin.Languages', {
-  extend : 'Ext.data.ArrayStore',
-  fields: ['id', 'label', {name: 'rtl', type: 'boolean'},'rfc5646'],
-  data: Editor.data.languages
+    extend: 'Ext.data.ArrayStore',
+    fields: ['id', 'label', {name: 'rtl', type: 'boolean'}, 'rfc5646'],
+    data: Editor.data.languages,
+
+    /***
+    * Find language id in store by given rfc value
+    * @param rfc
+    * @returns {*}
+    */
+    getIdByRfc: function (rfc) {
+        var rec = this.findRecord('rfc5646', rfc, 0, false, true, true);
+        return rec !== null ? rec.get('id') : null;
+    }
 });

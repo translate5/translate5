@@ -313,6 +313,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     //TRANSLATE-2080 FIXME remove me but adopt regex (file type) checks to the workfiles
                                     xtype: 'filefield',
                                     name: 'importUpload',
+                                    hidden:true,
                                     regex: new RegExp('\.('+Editor.data.import.validExtensions.join('|')+')$', 'i'),
                                     regexText: me.strings.importUploadType,
                                     allowBlank: false,
