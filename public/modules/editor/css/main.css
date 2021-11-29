@@ -26,6 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+
+/* --------------- Variables for user color in track changes and multi user editing --------------- */
+:root {
+    --color-usernr1: #f9e788;/* yellow pale */
+    --color-usernr2: #f9b372;/* orange pale */
+    --color-usernr3: #cbe0f9;/* blue pale */
+    --color-usernr4: #f3d5ed;/* lilac pale */
+    --color-usernr5: #e4fb81;/* yellowish green pale */
+    --color-usernr6: #FFD8D4;/* pink pale */
+    --color-usernr7: #9af2db;/* turquoise pale */
+    --color-usernr8: #b5f3bf;/* lime green pale */
+}
+
 /* T5DEV-161: visual review requres this to be set to 'initial' and not to 'relative' else the review file will not be displayed! */
 div.x-container.x-container-default {position: initial;}
 
