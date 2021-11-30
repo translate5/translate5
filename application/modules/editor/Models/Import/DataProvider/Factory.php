@@ -66,7 +66,9 @@ class editor_Models_Import_DataProvider_Factory {
     public function createFromUpload(editor_Models_Import_UploadProcessor $upload): editor_Models_Import_DataProvider_Abstract {
         $mainUpload = $upload->getMainUpload();
 
-        if($mainUpload->getFileExtension() === $upload::TYPE_ZIP) {
+        $files = $mainUpload->getFiles();
+        $isZip = count($files) === 1 && $mainUpload->getFileExtension((array_values($files[0])[0])) === $upload::TYPE_ZIP;
+        if($isZip) {
             $dp = 'editor_Models_Import_DataProvider_Zip';
             $tmpfiles = array_keys($mainUpload->getFiles());
             $args = [reset($tmpfiles)]; //first uploaded review file is used as ZIP file

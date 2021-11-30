@@ -86,7 +86,7 @@ class editor_Models_Import_UploadProcessor_GenericUpload {
      * @return false if the basic validation failed
      */
     public function initAndValidate(Zend_File_Transfer_Adapter_Http $upload, Callable $addErrorCallback): bool {
-        //due the isUploaded check this file is not mandatory
+        //due to the isUploaded check this file is not mandatory
         if($this->optional && !$upload->isUploaded($this->fieldName)) {
             return false; //stops processing, but since that is no error, no msg is stored
         }
@@ -95,34 +95,41 @@ class editor_Models_Import_UploadProcessor_GenericUpload {
             $addErrorCallback($upload->getMessages());
             return false;
         }
-        
-        $this->fileInfo = $upload->getFileInfo($this->fieldName)[$this->fieldName];
-        
-        if(empty($this->fileInfo['size'])) {
-            $addErrorCallback([editor_Models_Import_UploadProcessor::ERROR_EMPTY_FILE]);
-            return false;
+
+        $this->fileInfo = $upload->getFileInfo($this->fieldName);
+
+        foreach ($this->fileInfo as $fileInfo){
+            if(empty($fileInfo['size'])) {
+                $addErrorCallback([editor_Models_Import_UploadProcessor::ERROR_EMPTY_FILE]);
+                return false;
+            }
         }
-        
+
         return true;
     }
 
     /**
-     * returns an array with tempnam => filename for all uploaded files of that field (currently only one is possible, multiple must be implemented)
+     * returns an array with tempnam => filename for all uploaded files of that field
      * @return array
      */
     public function getFiles(): array {
         if(empty($this->fileInfo)) {
             return [];
         }
-        return [$this->fileInfo['tmp_name'] => $this->fileInfo['name']];
+        $files = [];
+        foreach ($this->fileInfo as $fileInfo){
+            $files[$fileInfo['tmp_name']] = $fileInfo['name'];
+        }
+        return $files;
     }
     
-    /**
-     * returns the file extension of the uploaded file
+    /**+
+     * Get the file extension of the given uploaded file name
+     * @param string $fileName
      * @return string
      */
-    public function getFileExtension(): string {
-        $importName = pathinfo($this->fileInfo['name']);
+    public function getFileExtension(string $fileName): string {
+        $importName = pathinfo($fileName);
         settype($importName['extension'], 'string');
         return strtolower($importName['extension']);
     }
