@@ -223,10 +223,6 @@ For Details see https://fonts.google.com/attribution
     color: var(--color-grey_07);
 }
 
-.ui-selectmenu-menu ul {
-    max-height: 19em;
-}
-
 .wrap {
     margin-bottom: 1em;
 }

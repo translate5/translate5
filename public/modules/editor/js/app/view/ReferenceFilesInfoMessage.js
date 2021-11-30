@@ -60,6 +60,6 @@ Ext.define('Editor.view.ReferenceFilesInfoMessage', {
         //    itemId:'showReferenceFilesButton',
         //    text: me.strings.buttonText,
         //}];
-        return me.callParent([config]);
+        me.callParent(arguments);
     }
 });

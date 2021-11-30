@@ -32,7 +32,7 @@ $config = Zend_Registry::get('config');
 echo $this->doctype();
 $version = '?v='.$this->appVersion;
 $this->headLink()->prependStylesheet(APPLICATION_RUNDIR.'/modules/editor/apps/css/apps.css'.$version);
-$jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui/jquery-ui-1.12.1';
+$jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui';
 $this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css'.$version);
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
