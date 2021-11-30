@@ -309,28 +309,30 @@ $memLog('Loaded terms:        ');
         while ($xmlReader->read() && $xmlReader->name !== $this->tbxMap[$this::TBX_TERM_ENTRY]);
         //process termentry
         while ($xmlReader->name === $this->tbxMap[$this::TBX_TERM_ENTRY]) {
-            $termEntryNode = new SimpleXMLElement($xmlReader->readOuterXML());
-            $parentEntry = $this->handleTermEntry($termEntryNode);
+            if (strlen($_xml = $xmlReader->readOuterXML())) {
+                $termEntryNode = new SimpleXMLElement($_xml);
+                $parentEntry = $this->handleTermEntry($termEntryNode);
 
-            foreach ($termEntryNode->{$this->tbxMap[$this::TBX_LANGSET]} as $languageGroup) {
+                foreach ($termEntryNode->{$this->tbxMap[$this::TBX_LANGSET]} as $languageGroup) {
 
-                $parentLangSet = $this->handleLanguageGroup($languageGroup, $parentEntry);
-                if (is_null($parentLangSet)) {
-                    continue;
+                    $parentLangSet = $this->handleLanguageGroup($languageGroup, $parentEntry);
+                    if (is_null($parentLangSet)) {
+                        continue;
+                    }
+                    foreach ($languageGroup->{$this->tbxMap[$this::TBX_TIG]} as $termGroup) {
+                        $this->handleTermGroup($termGroup, $parentLangSet);
+                    }
                 }
-                foreach ($languageGroup->{$this->tbxMap[$this::TBX_TIG]} as $termGroup) {
-                    $this->handleTermGroup($termGroup, $parentLangSet);
-                }
-            }
-            $this->saveParsedTermEntryNode();
-            $importCount++;
+                $this->saveParsedTermEntryNode();
+                $importCount++;
 
-            //since we do not want to kill the worker table by updating the progress too often,
-            // we do that only 100 times per import, in other words once per percent
-            $newProgress = min(100, round(($importCount/$totalCount)*100));
-            if($newProgress > $progress) {
-                $progress = $newProgress;
-                $this->events->trigger('afterTermEntrySave', $this, ['progress' => $progress / 100]); //we store the value as value between 0 and 1
+                //since we do not want to kill the worker table by updating the progress too often,
+                // we do that only 100 times per import, in other words once per percent
+                $newProgress = min(100, round(($importCount/$totalCount)*100));
+                if($newProgress > $progress) {
+                    $progress = $newProgress;
+                    $this->events->trigger('afterTermEntrySave', $this, ['progress' => $progress / 100]); //we store the value as value between 0 and 1
+                }
             }
 
             // Uncomment this to print the progress
