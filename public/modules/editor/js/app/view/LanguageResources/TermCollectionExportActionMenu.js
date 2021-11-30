@@ -32,7 +32,8 @@ Ext.define('Editor.view.LanguageResources.TermCollectionExportActionMenu', {
 
 	strings:{
 		exportProposal:'#UT#Vorschläge exportieren',
-		exportCollection:'#UT#Als TBX exportieren'
+		exportCollection:'#UT#Als TBX exportieren',
+		exportSpreadsheet:'#UT#Als XSLS exportieren',
 	},
 
 	record : null, // current language resources record
@@ -46,6 +47,9 @@ Ext.define('Editor.view.LanguageResources.TermCollectionExportActionMenu', {
 				}, {
 					text: me.strings.exportCollection,
 					action: 'exportCollection'
+				}, {
+					text: me.strings.exportSpreadsheet,
+					action: 'exportSpreadsheet'
 				}]
 			};
 		if (instanceConfig) {

@@ -765,6 +765,32 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $proposals->exportProposals($rows);
     }
 
+    public function xlsxexportAction() {
+
+        // Load utils
+        class_exists('editor_Utils');
+
+        // Get params
+        $params = $this->getRequest()->getParams();
+
+        // Check params
+        editor_Utils::jcheck([
+            'collectionId' => [
+                'req' => true,
+                'rex' => 'int11',
+                'key' => 'LEK_languageresources'
+            ]
+        ], $params);
+
+        // Turn off limitations
+        ignore_user_abort(1); set_time_limit(0);
+
+        // Export collection
+        ZfExtended_Factory
+            ::get('editor_Models_Export_Terminology_Xlsx')
+            ->exportCollectionById($params['collectionId']);
+    }
+
     /***
      * This is used for the tests. It will return the proposals for the current date and for the
      * assigned collections of the customers of the authenticated user

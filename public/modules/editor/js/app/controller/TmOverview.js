@@ -671,6 +671,16 @@ Ext.define('Editor.controller.TmOverview', {
             record:rec
         });
         tbxWindow.show();
-    }
+    },
 
+    /***
+     * Export collection as xlsx action menu click handler
+     *
+     * @param rec
+     */
+    exportSpreadsheet:function (rec){
+        var params = {}, url = Editor.data.restpath+'languageresourceinstance/xlsxexport?';
+        params['collectionId'] = rec.get('id');
+        window.open(url+Ext.urlEncode(params));
+    }
 });
