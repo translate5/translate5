@@ -76,10 +76,10 @@ class editor_Models_Segment_RepetitionUpdater {
      * @param editor_Models_Segment $repetition the segment to write to
      * @return boolean true if the repetition could be processed, false otherwise
      */
-    public function updateRepetition(editor_Models_Segment $master, editor_Models_Segment $repetition): bool {
+    public function updateTargetOfRepetition(editor_Models_Segment $master, editor_Models_Segment $repetition): bool {
         $this->originalSegment = $master;
         $this->setRepetition($repetition);
-        return $this->updateSegmentContent('target');
+        return $this->updateTarget();
     }
     
     /**
@@ -91,22 +91,14 @@ class editor_Models_Segment_RepetitionUpdater {
     }
     
     /**
-     * call back for the fieldloop over all editable segments, 
+     * call back for the fieldloop over all editable segments,
      *   replaces the tags in the given content with the tags which were before in the segemnt
      * @param string $field: can be 'target' or 'source', no other operations suported for repetitions! Source is expected to be an editable source
      * @return bool
      */
-    public function updateSegmentContent(string $field) : bool {
-        
-        if($field != 'target' && $field != 'source'){
-            throw new ZfExtended_BadMethodCallException('editor_Models_Segment_RepetitionUpdater: Param "field" can only be "target" or "source"');
-        }
-
+    protected function updateSegmentContent(string $originalContent, string $segmentContent, Callable $updateField) : bool {
         // TODO: we could make much more use of the segment-tags code if only it would be more clear what this code does ...
-        
-        $originalContent = ($field == 'target') ? $this->repeatedSegment->getTarget() : $this->repeatedSegment->getSource();
-        $segmentContent = ($field == 'target') ? $this->originalSegment->getTargetEdit() : $this->originalSegment->getSourceEdit();
-        
+
         //replace the repeatedSegment tags with the original repetition ones
         $useSourceTags = empty($originalContent);
         if($useSourceTags) {
@@ -151,16 +143,39 @@ class editor_Models_Segment_RepetitionUpdater {
         if(count($tagsForRepetition) !== $i) {
             return false;
         }
-        if($field == 'target'){
+        $updateField($originalContent, $segmentContent);
+        return true;
+    }
+
+    public function updateTarget() {
+        $originalContent = $this->repeatedSegment->getTarget();
+        $segmentContent = $this->originalSegment->getTargetEdit();
+        return $this->updateSegmentContent($originalContent, $segmentContent, function($originalContent, $segmentContent){
             $this->repeatedSegment->setTargetEdit($segmentContent);
             // when copying targets originating from a language-resource, we copy the original target as well ...
             if($this->originalSegment->isFromLanguageResource()){
                 $this->repeatedSegment->setTarget($originalContent);
             }
-        } else {
+            $this->repeatedSegment->updateToSort('target'.editor_Models_SegmentFieldManager::_EDIT_PREFIX);
+        });
+    }
+
+    public function updateSource() {
+        $originalContent = $segmentContent = $this->originalSegment->getSource();
+
+        return $this->updateSegmentContent($originalContent, $segmentContent, function($originalContent, $segmentContent){
+            $this->repeatedSegment->setSource($segmentContent);
+            $this->repeatedSegment->updateToSort('source');
+        });
+    }
+
+    public function updateSourceEditable() {
+        $originalContent = $this->repeatedSegment->getSource();
+        $segmentContent = $this->originalSegment->getSourceEdit();
+
+        return $this->updateSegmentContent($originalContent, $segmentContent, function($originalContent, $segmentContent){
             $this->repeatedSegment->setSourceEdit($segmentContent);
-        }
-        $this->repeatedSegment->updateToSort($field.editor_Models_SegmentFieldManager::_EDIT_PREFIX);
-        return true;
+            $this->repeatedSegment->updateToSort('source'.editor_Models_SegmentFieldManager::_EDIT_PREFIX);
+        });
     }
 }

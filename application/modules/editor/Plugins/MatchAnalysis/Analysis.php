@@ -209,7 +209,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             return $this->repetitionByHash[$segmentHash] = $bestResult;
         }
         $masterHasResult = !empty($this->repetitionByHash[$segmentHash]);
-        if ($masterHasResult && !$this->repetitionUpdater->updateRepetition($this->repetitionMasterSegments[$segmentHash], $segment)) {
+        if ($masterHasResult && !$this->repetitionUpdater->updateTargetOfRepetition($this->repetitionMasterSegments[$segmentHash], $segment)) {
             //if repetition could not be updated, handle segment as it is a segment without repetitions,
             // we may not update the repetitionHash, this would interfer with the other repetitions
             return $this->getBestResult($segment, true);
