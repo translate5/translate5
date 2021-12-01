@@ -335,7 +335,7 @@ class editor_Models_Export_Terminology_Tbx {
                     $this->transacGrpNodes(5, $line, $trscA, $termEntry['id'], $lang);
                     foreach ($terms as $term) {
                         $line []= $this->tabs[5] . '<tig>';
-                        $line []= $this->tabs[6] . '<term id="' . $term['termTbxId'] . '">' . $term['term'] . '</term>';
+                        $line []= $this->tabs[6] . '<term id="' . $term['termTbxId'] . '">' . htmlentities($term['term'], ENT_XML1) . '</term>';
                         $this->attributeNodes(6, $line, $attrA, $termEntry['id'], $lang, $term['id']);
                         $this->transacGrpNodes(6, $line, $trscA, $termEntry['id'], $lang, $term['id']);
                         $line []= $this->tabs[5] . '</tig>';
@@ -426,13 +426,13 @@ class editor_Models_Export_Terminology_Tbx {
         $descripGrp = ['attr' => [], 'trsc' => []];
 
         // Cut attrs, having isDescripGrp flag
-        foreach ($attrA[$termEntryId][$language][$termId] as $idx => $attr)
+        foreach ($attrA[$termEntryId][$language][$termId] ?? [] as $idx => $attr)
             if ($attr['isDescripGrp'])
                 if ($descripGrp['attr'][$termEntryId][$language][$termId] []= $attr)
                     unset($attrA[$termEntryId][$language][$termId][$idx]);
 
         // Cut trscs, having isDescripGrp flag
-        foreach ($trscA[$termEntryId][$language][$termId] as $idx => $trsc)
+        foreach ($trscA[$termEntryId][$language][$termId] ?? [] as $idx => $trsc)
             if ($trsc['isDescripGrp'])
                 if ($descripGrp['trsc'][$termEntryId][$language][$termId] []= $trsc)
                     unset($trscA[$termEntryId][$language][$termId][$idx]);
@@ -448,10 +448,10 @@ class editor_Models_Export_Terminology_Tbx {
 
     public function attributeNodes($level, &$line, $attrA, $termEntryId, $language = '', $termId = '') {
 
-        //
+        // Foreach level-attr
         foreach ($attrA[$termEntryId][$language][$termId] ?? [] as $attr) {
 
-            //
+            // Node attributes
             $_attr = [];
 
             // Append 'type' node-attr
@@ -459,11 +459,11 @@ class editor_Models_Export_Terminology_Tbx {
 
             // Append 'target' node-attr
             if ($attr['elementName'] == 'xref' || $attr['elementName'] == 'ref' || $attr['target'])
-                $_attr []= 'target="' . $attr['target'] . '"';
+                $_attr []= 'target="' . htmlentities($attr['target'], ENT_XML1) . '"';
 
             // Build and append node
             $line []= $this->tabs[$level] . '<' . $attr['elementName'] . ' ' . join(' ', $_attr) . '>'
-                . $attr['value']
+                . htmlentities($attr['value'], ENT_XML1)
                 . '</' . $attr['elementName'] . '>';
         }
     }
@@ -472,7 +472,7 @@ class editor_Models_Export_Terminology_Tbx {
         foreach ($trscA[$termEntryId][$language][$termId] ?? [] as $trsc) {
             $line []= $this->tabs[$level] . '<transacGrp>';
             $line []= $this->tabs[$level + 1] . '<transac type="transactionType">'. $trsc['transac'] . '</transac>';
-            $line []= $this->tabs[$level + 1] . '<transacNote type="' . $trsc['transacType'] . '" target="' . $trsc['target'] . '">Jane</transacNote>';
+            $line []= $this->tabs[$level + 1] . '<transacNote type="' . $trsc['transacType'] . '" target="' . $trsc['target'] . '">' . $trsc['transacNote'] . '</transacNote>';
             $line []= $this->tabs[$level + 1] . '<date>' . explode(' ', $trsc['date'])[0] . '</date>';
             $line []= $this->tabs[$level] . '</transacGrp>';
         }
