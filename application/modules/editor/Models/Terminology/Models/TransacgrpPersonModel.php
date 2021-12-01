@@ -109,8 +109,7 @@ class editor_Models_Terminology_Models_TransacgrpPersonModel extends editor_Mode
     }
 
     /**
-     * Get array, containing distinct lists of persons,
-     * mentioned within `terms_term`.`tbx(Created|Updated)By` columns
+     * Get array, containing lists of transacgrp-persons
      *
      * @param array $collectionIds
      * @return array
@@ -118,22 +117,19 @@ class editor_Models_Terminology_Models_TransacgrpPersonModel extends editor_Mode
      */
     public function getDistinctStores(array $collectionIds): array {
 
+        // Build WHERE clause for collectionId column
+        $where = $this->db->getAdapter()->quoteInto('`collectionId` IN (?)', $collectionIds);
+
         // Get transacgrp person dictionary
         $tbxPersonA = $this->db->getAdapter()->query('
-            SELECT `id`, `id`, `name` FROM `terms_transacgrp_person`
-        ')->fetchAll(PDO::FETCH_UNIQUE);
+            SELECT `id`, `name` FROM `terms_transacgrp_person` WHERE ' . $where
+        )->fetchAll();
 
         // Setup combobox-recognizable data for tbxCreatedBy and tbxUpdatedBy filterWindow filters
         foreach (['tbxCreatedBy', 'tbxUpdatedBy'] as $prop)
-            foreach ($this->db->getAdapter()->query('
-                SELECT DISTINCT `' . $prop.'` 
-                FROM `terms_term`
-                WHERE `collectionId` IN (' . join(',', $collectionIds) . ')
-            ')->fetchAll(PDO::FETCH_COLUMN) as $by)
-                if ($person = $tbxPersonA[$by] ?? 0)
-                    $data[$prop] []= $person;
+            $data[$prop] = $tbxPersonA;
 
         // Return data
-        return $data ?? [];
+        return $data;
     }
 }

@@ -84,7 +84,11 @@ class editor_Utils {
             (?<other>   (-|\.|[0-9]|\x{B7}|[\x{0300}-\x{036F}]|[\x{203F}-\x{2040}]) )
             (?<second>  (?&first) | (?&other)  )
             (?<xmlid>   (?&first)   (?&second)* )
-        )^(?&xmlid)$~ixu'
+        )^(?&xmlid)$~ixu',
+        'rfc5646list' => '~(?(DEFINE)
+            (?<rfc5646>       ([a-z]{2,3}(-[a-zA-Z0-9]{2,4}|)(-[a-zA-Z]{2}|)) )
+            (?<rfc5646list>   (?&rfc5646)  (?: , (?&rfc5646)  )* )
+        )^(?&rfc5646list)$~xu',
     ];
 
     /**

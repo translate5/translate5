@@ -155,8 +155,8 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
 
 
     /**
-     * Get array of terms_attributes.dataTypeId for a level, identified by $termEntryId, $language and $termId args
-     * Currently this is used to prevent creating more than 1 attributes having same dataTypeId
+     * Get array of terms_attributes.dataTypeId => terms_attributes.id pairs for a level, identified by $termEntryId,
+     * $language and $termId args. Currently this is used to prevent creating more than 1 attributes having same dataTypeId
      *
      * @param int $termEntryId
      * @param string|null $language
@@ -187,10 +187,10 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
 
         // Return existing attributes datatype ids
         return $this->db->getAdapter()->query('
-            SELECT `dataTypeId` 
+            SELECT `dataTypeId`, `id` 
             FROM `terms_attributes`
             WHERE ' . $levelWHERE[$level]
-        , $bind[$level])->fetchAll(PDO::FETCH_COLUMN);
+        , $bind[$level])->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 
     /**
