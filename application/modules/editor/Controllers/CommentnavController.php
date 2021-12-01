@@ -25,57 +25,80 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-class Editor_CommentnavController extends ZfExtended_Controllers_Action {
+class Editor_CommentnavController extends ZfExtended_RestController {
 
     /**
      * @var Zend_Session_Namespace
      */
     protected $session;
     /**
+     * @var editor_Models_Task
+     */
+    protected $task;
+    /**
      * @var ZfExtended_Zendoverwrites_Translate
      */
     protected $translate;
+    protected $wfAnonymize;
 
     public function init() {
-        parent::init();
-        //$restContexts = Zend_Controller_Action_HelperBroker::getExistingHelper('restContexts');
-
-        $contextSwitch = Zend_Controller_Action_HelperBroker::getExistingHelper('contextSwitch');
-        $contextSwitch->setAutoSerialization(true);
-        $contextSwitch->initContext('json');
-        $contextSwitch->addActionContext('index', true);
-
-       //foreach ($restContexts->getControllerActions($controller) as $action) {
-            //$contextSwitch->addActionContext($action, true);
-        //}
+        $this->initRestControllerSpecific();
     }
 
+/**
+ * Loads segment comments in JSON format
+ * You can attach listeners to afterIndexAction to add more types.
+ * Example:
+ * $eventManager->attach('Editor_CommentnavController', 'afterIndexAction, $callback)
+ */
     public function indexAction() {
         $this->session = new Zend_Session_Namespace();
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        $task->loadByTaskGuid($this->session->taskGuid);
+        $pluginmanager = Zend_Registry::get('PluginManager');
+        $availablePlugins = $pluginmanager->getAvailable();
+        $this->task = ZfExtended_Factory::get('editor_Models_Task');
+        $this->task->loadByTaskGuid($this->session->taskGuid);
+        $this->wfAnonymize = false;
+        if($this->task->anonymizeUsers()){
+            $this->wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+        }
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
 
-        $comment_entity = ZfExtended_Factory::get('editor_Models_Comment');
-        //$annotation_entity = ZfExtended_Factory::get('editor_Models_Comment');
-
-        $this->view->rows = $comment_entity->loadByTaskPlain($this->session->taskGuid);
-        $wfAnonymize = false;
-        if($task->anonymizeUsers()){
-            $wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+        $entities = $this->loadSegmentCommentArray();
+        if(array_key_exists('VisualReview',$availablePlugins)){
+            $annotations = $this->loadAnnotationsArray();
+            $entities = array_merge($entities,$annotations);
         }
-        foreach ($this->view->rows as &$row) {
+        $this->view->rows = $entities;
+        $this->view->total = count($this->view->rows);
+    }
+
+    public function loadSegmentCommentArray(){
+        $comment_entity = ZfExtended_Factory::get('editor_Models_Comment');
+        $comments = $comment_entity->loadByTaskPlain($this->session->taskGuid);
+        foreach ($comments as &$row) {
             $row['comment'] = htmlspecialchars($row['comment']);
             $row['type'] = 'segmentComment';
             unset($row['userGuid']);
-            if($wfAnonymize) {
+            if($this->wfAnonymize) {
                 $row = $wfAnonymize->anonymizeUserdata($this->session->taskGuid, $row['userGuid'], $row);
             }
-
         }
-        $this->view->total = count($this->view->rows);
+        return $comments;
+    }
+
+    public function loadAnnotationsArray(){
+        $annotation_entity = ZfExtended_Factory::get('editor_Plugins_VisualReview_Annotation_Entity');
+        $annotations = $annotation_entity->loadAllByTask($this->session->taskGuid);
+        foreach ($annotations as &$row) {
+            $row['comment'] = htmlspecialchars($row['text']);
+            $row['type'] = 'visualAnnotation';
+            unset($row['userGuid']);
+            if($this->wfAnonymize) {
+                $row = $wfAnonymize->anonymizeUserdata($this->session->taskGuid, $row['userGuid'], $row);
+            }
+        }
+        return $annotations;
     }
 
 }

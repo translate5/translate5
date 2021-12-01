@@ -41,19 +41,21 @@ Ext.define('Editor.view.comments.Navigation', {
             type:'AllComments',
             sorters: [ // must sort here in frontend for new comments' correct position
                 { property: 'segmentId', direction: 'ASC' },
+                { property: 'y', direction: 'ASC' },
+                { property: 'page', direction: 'ASC' },
                 { property: 'id', direction: 'ASC' },
             ]
         },
         scrollable: true,
         tpl: [
             '<tpl for=".">',
-            '<div class="{[this.getIcon(values.type)]} x-grid-item x-grid-cell-inner fs16"> {comment}</div>',
+            '<div class="x-grid-item x-grid-cell-inner {[this.getIcon(values.type)]} fs16" tabindex="-1"> {comment}</div>',
             '</tpl>',
             {
                 getIcon: function (type) {
                     return {
                         'segmentComment': 'x-fa fa-comment-o',
-                        'visualAnnotation': 'x-fa fa-eye',
+                        'visualAnnotation': 'x-fa fa-map-marker',
                         'videoAnnotation': 'x-fa fa-video-camera',
                     }[type];
                 }

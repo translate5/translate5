@@ -90,9 +90,8 @@ Ext.define('Editor.controller.CommentNavigation', {
     cl.store.load();
   },
   jumpThere: function (origin, record, item, index, e) {
-    record.data.type = 'segment';
     switch (record.data.type) {
-      case 'segment':
+      case 'segmentComment':
         var
           grid = Ext.getCmp('segment-grid'),
           view = grid.view,
@@ -101,11 +100,16 @@ Ext.define('Editor.controller.CommentNavigation', {
         var rowTableEl = view.el.getById(view.getRowId(rec)); //table has bgColor set for end of animation
         grid.setSelection(rec);
         grid.getScrollable().scrollIntoView(rowTableEl, false, true, true);
-
-
-      case 'floating': //TODO: scroll to annotation in Visual Review
         break;
-      case 'video': //TODO: scroll to annotation in Video
+
+      case 'visualAnnotation':
+        var
+            vr = Ext.first('visualReviewPanel'),
+            vc = vr && vr.getController();
+        if(vc){
+            vc.scrollToAnnotation(record);
+        }
+        break;
     }
 
   }
