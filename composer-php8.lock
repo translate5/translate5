@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b6dce066115a9946b027d65779d70dd",
+    "content-hash": "3b452912919e14ffed44d5afc9fff4f0",
     "packages": [
         {
             "name": "apix/log",
@@ -61,6 +61,28 @@
                 "source": "https://github.com/apix/log/tree/1.2.1"
             },
             "time": "2016-09-22T10:51:22+00:00"
+        },
+        {
+            "name": "axelbecher/material-design-icons",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/axelbecher/material-design-icons.git",
+                "reference": "00d2e63c3489ade2c0e0eb2858de10d25b83c601"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/axelbecher/material-design-icons/zipball/00d2e63c3489ade2c0e0eb2858de10d25b83c601",
+                "reference": "00d2e63c3489ade2c0e0eb2858de10d25b83c601",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "A clone of Google's material design icons with only the web font files",
+            "support": {
+                "source": "https://github.com/axelbecher/material-design-icons/tree/v1.0.0"
+            },
+            "time": "2021-11-30T20:40:27+00:00"
         },
         {
             "name": "cboden/ratchet",
@@ -698,6 +720,61 @@
             "time": "2021-10-20T17:52:15+00:00"
         },
         {
+            "name": "google/cloud-vision",
+            "version": "v1.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/googleapis/google-cloud-php-vision.git",
+                "reference": "a50bba3769e2ab95f6241118f66e85ac051bf12d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-vision/zipball/a50bba3769e2ab95f6241118f66e85ac051bf12d",
+                "reference": "a50bba3769e2ab95f6241118f66e85ac051bf12d",
+                "shasum": ""
+            },
+            "require": {
+                "google/cloud-core": "^1.43",
+                "google/gax": "^1.1"
+            },
+            "require-dev": {
+                "erusev/parsedown": "^1.6",
+                "google/cloud-storage": "^1.12",
+                "phpdocumentor/reflection": "^3.0",
+                "phpunit/phpunit": "^4.8|^5.0",
+                "squizlabs/php_codesniffer": "2.*"
+            },
+            "suggest": {
+                "ext-grpc": "The gRPC extension enables use of the performant gRPC transport",
+                "ext-protobuf": "Provides a significant increase in throughput over the pure PHP protobuf implementation. See https://cloud.google.com/php/grpc for installation instructions.",
+                "google/cloud-storage": "Annotate images stored in Google Cloud Storage"
+            },
+            "type": "library",
+            "extra": {
+                "component": {
+                    "id": "cloud-vision",
+                    "target": "googleapis/google-cloud-php-vision.git",
+                    "path": "Vision",
+                    "entry": "src/VisionClient.php"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Google\\Cloud\\Vision\\": "src",
+                    "GPBMetadata\\Google\\Cloud\\Vision\\": "metadata"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "Cloud Vision Client for PHP",
+            "support": {
+                "source": "https://github.com/googleapis/google-cloud-php-vision/tree/v1.5.1"
+            },
+            "time": "2021-10-20T17:52:15+00:00"
+        },
+        {
             "name": "google/common-protos",
             "version": "1.3.1",
             "source": {
@@ -837,20 +914,6 @@
                 "source": "https://github.com/GoogleCloudPlatform/grpc-gcp-php/tree/v0.2.0"
             },
             "time": "2021-09-27T22:57:18+00:00"
-        },
-        {
-            "name": "google/material-design-icons",
-            "version": "4.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/google/material-design-icons.git",
-                "reference": "4.0.0"
-            },
-            "type": "library",
-            "license": [
-                "Apache-2.0 License"
-            ],
-            "description": "Material Design icons by Google"
         },
         {
             "name": "google/protobuf",

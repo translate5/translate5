@@ -422,6 +422,9 @@ $memLog('Loaded terms:        ');
                 $newEntry->transacGrp = $this->setTransacAttributes($transacGrp, false, 'termEntry', $newEntry);
             }
         }
+        if (isset($termEntry->note)) {
+            $this->setAttributeTypes($termEntry->note, $newEntry);
+        }
         if (isset($termEntry->xref)) {
             $this->setAttributeTypes($termEntry->xref, $newEntry);
         }
