@@ -37,11 +37,25 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
     protected static $collectionId;
 
     /**
-     * Current term-search language
+     * German language
      *
-     * @var
+     * @var stdClass
      */
-    protected static $language;
+    protected static $german;
+
+    /**
+     * English language
+     *
+     * @var stdClass
+     */
+    protected static $english;
+
+    /**
+     * Italian language
+     *
+     * @var stdClass
+     */
+    protected static $italian;
 
     /**
      * Termportal setup data (dictionaries, etc)
@@ -86,23 +100,26 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             'mergeTerms' => true
         ]);
 
-        // [3] get languages list, limited to de-DE language
-        $language = $this->api()->requestJson('editor/language', 'GET', [
-            'filter' => '[{"operator":"eq","value":"de-DE","property":"rfc5646"}]',
-            'page' => 1,
-            'start' => 0,
-            'limit' => 20,
-        ]);
-        $this->assertNotEmpty($language, 'Unable to load the language needed for the term search.');
+        // [3] get languages: german
+        $german = $this->api()->requestJson('editor/language', 'GET', ['filter' => '[{"operator":"eq","value":"de-DE","property":"rfc5646"}]']);
+        $this->assertNotEmpty($german, 'Unable to load the german-language needed for the term search.');
+        self::$german = $german[0];
 
-        // Remember term-search language
-        self::$language = $language[0]->id;
+        // english
+        $english = $this->api()->requestJson('editor/language', 'GET', ['filter' => '[{"operator":"eq","value":"en","property":"rfc5646"}]']);
+        $this->assertNotEmpty($english, 'Unable to load english-language needed for use in noTermDefinedFor filter');
+        self::$english = $english[0];
+
+        // italian
+        $italian = $this->api()->requestJson('editor/language', 'GET', ['filter' => '[{"operator":"eq","value":"it","property":"rfc5646"}]']);
+        $this->assertNotEmpty($italian, 'Unable to load italian-language needed for use in noTermDefinedFor-filter');
+        self::$italian = $italian[0];
 
         // [4] find imported term by *-query and de-DE language id
         $termsearch = $this->api()->requestJson('editor/plugins_termportal_data/search', 'GET', [
             'query' => '*',
             'collectionIds' => self::$collectionId,
-            'language' => $language[0]->id,
+            'language' => self::$german->id,
             'start' => 0,
             'limit' => 1
         ]);
@@ -135,7 +152,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         // [7] create new term entry with term = "Term1" (de-DE) and note-attr = "Note for Term1"
         $Term1 = $this->api()->requestJson('editor/term', 'POST', $Term1_data = [
             'collectionId' => self::$collectionId,
-            'language' => $language[0]->rfc5646,
+            'language' => self::$german->rfc5646,
             'term' => 'Term1',
             'note' => 'Note for Term1'
         ]);
@@ -280,14 +297,43 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertArrayHasKey($dataTypeId_note, $attrA, 'Note-attr not found among Term1 attributes');
         $this->assertEquals($attrA[$dataTypeId_note], $Term1_data['note'], 'Note-attr found but not equals to the one used in api call');
 
-        // [22] Get the export data and compare the values with the expected export file data
-        $exportFact = $this->api()->requestJson('editor/languageresourceinstance/testexport', 'GET');
-        $this->assertIsArray($exportFact, 'Unable to export the term proposals');
-        $exportPlan = $this->api()->getFileContent('Export.json');
-        $this->assertEquals(count((array) $exportFact), count($exportPlan), "The proposal export result does not match the expected result");
-
         // Assert that termportal filters are working
         $this->assertFilters($dataTypeA);
+
+        // Batch create note-attr for termEntry-level
+        $this->assertBatchEdit(2, 'batch-value for note-attr for termEntry-level', [
+            'termEntryId' => $termEntryId_batch = join(',', [$importedTerm->termEntryId, $Term1->termEntryId]),
+            'dataType' => 20,
+            'batch' => 'true'
+        ], 0, false);
+
+        // Batch create image-attr for language-level
+        $this->assertBatchEdit($planQtyImage = 2, $this->api()->getFile('Image.jpg'), [
+            'termEntryId' => $Term1->termEntryId,
+            'dataType' => 'figure',
+            'language' => self::$german->rfc5646 . ',' . self::$english->rfc5646,
+            'batch' => 'true',
+        ], 0, true);
+
+        // Batch create note-attr for term-level
+        $this->assertBatchEdit($planQtyNote = 4, 'batch-value for note-attr for term-level', [
+            'termEntryId' => $termEntryId_batch,
+            'dataType' => 20,
+            'languageId' => 'batch',
+            'termId' => 'batch',
+        ], $existingPlanQtyNote = 1, true);
+
+        // [22] Get the export data and compare the values with the expected export file data
+        $exportFact = $this->api()->requestJson('editor/languageresourceinstance/testexport', 'GET', [
+            'collectionId' => self::$collectionId,
+        ]);
+        $this->assertIsArray($exportFact, 'Unable to export the term proposals');
+        $exportPlan = $this->api()->getFileContent('Export.json');
+        $this->assertEquals(
+            count($exportPlan) + $planQtyImage + $planQtyNote - $existingPlanQtyNote,
+            count((array) $exportFact),
+            "The proposal export result does not match the expected result"
+        );
 
         // [23] delete image-attr, check image full path not exists anymore
         $figuredelete = $this->api()->requestJson('editor/attribute', 'DELETE', ['attrId' => $figurecreate->inserted->id]);
@@ -356,7 +402,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         $commonParams = [
             'query' => '*',
             'collectionIds' => self::$collectionId,
-            'language' => self::$language,
+            'language' => self::$german->id,
             'start' => 0,
             'limit' => 10
         ];
@@ -393,24 +439,16 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         // Two are rejected or unprocessed
         $this->assertSearchResultQty(2, ['processStatus' => 'rejected,unprocessed']);
 
-        // Get en-language id
-        $english = $this->api()->requestJson('editor/language', 'GET', ['filter' => '[{"operator":"eq","value":"en","property":"rfc5646"}]']);
-        $this->assertNotEmpty($english, 'Unable to load english-language needed for use in noTermDefinedFor filter');
-
         // Only one 'de-de'-term which is rejected or unprocessed and having no siblings for 'en'-language
         $this->assertSearchResultQty(1, [
             'processStatus' => 'rejected,unprocessed',
-            'noTermDefinedFor' => $english[0]->id
+            'noTermDefinedFor' => self::$english->id
         ]);
-
-        // Get en-language id
-        $italian = $this->api()->requestJson('editor/language', 'GET', ['filter' => '[{"operator":"eq","value":"it","property":"rfc5646"}]']);
-        $this->assertNotEmpty($italian, 'Unable to load italian-language needed for use in noTermDefinedFor-filter');
 
         // Two 'de-de'-terms which are rejected or unprocessed and having no siblings for 'it'-language
         $this->assertSearchResultQty(2, [
             'processStatus' => 'rejected,unprocessed',
-            'noTermDefinedFor' => $italian[0]->id
+            'noTermDefinedFor' => self::$italian->id
         ]);
 
         // Get customerSubset attrbiute datatype id
@@ -419,14 +457,14 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         // No terms having this attribute defined with value 'Testkunde1' and having no siblings for 'it'-language
         $this->assertSearchResultQty(0, [
             'processStatus' => 'rejected,unprocessed',
-            'noTermDefinedFor' => $italian[0]->id,
+            'noTermDefinedFor' => self::$italian->id,
             'attr-' . $dataTypeId_customerSubset => 'Testkunde1'
         ]);
 
         // One term having this attribute defined with value 'Testkunde' and having no siblings for 'it'-language
         $this->assertSearchResultQty(1, [
             'processStatus' => 'rejected,unprocessed',
-            'noTermDefinedFor' => $italian[0]->id,
+            'noTermDefinedFor' => self::$italian->id,
             'attr-' . $dataTypeId_customerSubset => 'Testkunde'
         ]);
 
@@ -450,5 +488,96 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
 
         // One term created until 2019-07-15
         $this->assertSearchResultQty(1, ['tbxCreatedLt' => '2019-07-15']);
+    }
+
+    /**
+     * @param $planQty
+     * @param $params
+     * @param int $existingPlanQty
+     * @param bool $save
+     */
+    public function assertBatchEdit($planQty, $value, $postParams, $existingPlanQty = 0, $save = false) {
+
+        // Get response
+        $resp = $this->api()->requestJson('editor/attribute', 'POST', $postParams);
+
+        // Print params and get output
+        $query = var_export($postParams, true);
+
+        // Do checks
+        $this->assertIsObject($resp, 'Invalid response. ' . $query);
+        $this->assertObjectHasAttribute('inserted', $resp, 'Response has no inserted-prop. ' . $query);
+        $this->assertIsObject($resp->inserted, '$resp->inserted is not an object. ' . $query);
+        $this->assertObjectHasAttribute('id', $resp->inserted, '$resp->inserted has no id-prop. ' . $query);
+        $factQty = $resp->inserted->id ? count(explode(',', $resp->inserted->id)) : 0;
+        $this->assertEquals($planQty, $factQty, 'Inserted attrs qty should be ' . $planQty . ', but ' . $factQty . ' got instead. ' . $query);
+
+        //
+        $existingFact = [];
+
+        // If $existingPlanQty arg is given and is > 0
+        if ($existingPlanQty) {
+            $this->assertObjectHasAttribute('existing', $resp, 'Response has no existing-prop. ' . $query);
+            $this->assertIsObject($resp->existing, 'Response has no existing-prop. ' . $query);
+            $existingFact = (array) $resp->existing;
+            $existingFactQty = count($existingFact);
+            $this->assertEquals($existingPlanQty, $existingFactQty, '$resp->existing contains '
+                . $existingFactQty . ' instead of ' . $existingPlanQty . '.' . $query);
+
+        // Else assert that there is no existing-prop in $resp
+        } else $this->assertObjectNotHasAttribute('existing', $resp, 'Response should have no existing-prop. ' . $query);
+
+        // Remember ids of inserted attrs
+        $insertedIds = $resp->inserted->id;
+
+        // Request params for PUT-request
+        if ($postParams['dataType'] == 'figure') {
+            $this->api()->addFile('figure', $value, "image/jpg");
+            $putParams = ['attrId' => $insertedIds];
+        } else {
+            $putParams = ['attrId' => $insertedIds, 'value' => $value];
+        }
+
+        // Batch update note-attr for termEntry-level
+        $resp = $this->api()->requestJson('editor/attribute', 'PUT', $putParams);
+
+        // Print params and get output
+        $query = var_export($putParams, true);
+
+        // Do checks
+        $this->assertIsObject($resp, 'Invalid response. ' . $query);
+        if ($postParams['dataType'] == 'figure') {
+            $this->assertObjectHasAttribute('src', $resp, 'Response has no src-prop. ' . $query);
+            $this->assertIsString($resp->src, '$resp->src is not string. ' . $query);
+            $this->assertNotEmpty($resp->src, '$resp->src is empty. ' . $query);
+        } else {
+            $this->assertObjectHasAttribute('success', $resp, 'Response has no success-prop. ' . $query);
+            $this->assertIsBool($resp->success, '$resp->success is not bool. ' . $query);
+            $this->assertEquals(true, $resp->success, '$resp->success is not true. ' . $query);
+        }
+
+        // If $save arg is true
+        if ($save) {
+
+            // Pick values from inserted attrs and apply them to the existing attrs
+            // Drop inserted attrs having existing attrs
+            // Undraft inserted attrs having no existing attrs
+            $resp = $this->api()->requestJson('editor/attribute', 'PUT', $params = [
+                'attrId' => join(',', array_values($existingFact)),
+                'dropId' => join(',', $dropIdA = array_keys($existingFact)),
+                'draft0' => join(',', array_diff(explode(',', $insertedIds), $dropIdA))
+            ]);
+
+            // Check $resp
+            $this->assertObjectHasAttribute('success', $resp, 'Attr batch-save: response has no success-prop. ' . $query);
+            $this->assertIsBool($resp->success, 'Attr batch-save: $resp->success is not bool. ' . $query);
+            $this->assertEquals(true, $resp->success, 'Attr batch-save: $resp->success is not true. ' . $query);
+
+        // Else batch delete note-attr
+        } else {
+            $resp = $this->api()->requestJson('editor/attribute', 'DELETE', ['attrId' => $insertedIds]);
+            $this->assertIsObject($resp, 'Attrs batch-deletion response is not an object');
+            $this->assertObjectHasAttribute('updated', $resp, 'Note-attr deletion response does not contain "updated" prop');
+        }
     }
 }
