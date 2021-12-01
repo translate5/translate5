@@ -264,6 +264,19 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
      */
     public function getUsageForLevelsByCollectionId($collectionId, string $locale = 'en') {
 
+        // Get localized attrs
+        $localized = $this->getLocalized($locale, [$collectionId]);
+
+        // Get dataTypeIds of attrs, that require 2 cols for being exported
+        $double = [];
+        foreach (['xGraphic', 'externalCrossReference', 'crossReference'] as $type)
+            foreach ($localized as $dataTypeId => $dataType)
+                if ($dataType['type'] == $type)
+                    $double []= $dataTypeId;
+
+        //
+        $fis = join(',', $double);
+
         // Get entry-level dataTypeIds usages
         $entry = $this->db->getAdapter()->query('
             SELECT DISTINCT `dataTypeId`
@@ -273,7 +286,8 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
               AND `termEntryId` IS NOT NULL 
               AND `language` IS NULL
               AND `termId` IS NULL
-        ', $collectionId)->fetchAll(PDO::FETCH_COLUMN);
+            ORDER BY NOT FIND_IN_SET(`dataTypeId`, ?) DESC, FIND_IN_SET(`dataTypeId`, ?) ASC 
+        ', [$collectionId, $fis, $fis])->fetchAll(PDO::FETCH_COLUMN);
 
         // Get language-level dataTypeIds usages
         $language = $this->db->getAdapter()->query('
@@ -297,9 +311,6 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
               AND `termId` IS NOT NULL
         ', $collectionId)->fetchAll(PDO::FETCH_COLUMN);
 
-        // Get localized attrs
-        $localized = $this->getLocalized($locale, [$collectionId]);
-
         // Collect usage info, so that for each level we have arrays of [dataTypeId => title] pairs
         foreach (compact('term', 'language', 'entry') as $level => $dataTypeIdA) {
             $usage[$level] = [];
@@ -308,6 +319,6 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
         }
 
         // Return usage
-        return $usage;
+        return compact('usage', 'double');
     }
 }

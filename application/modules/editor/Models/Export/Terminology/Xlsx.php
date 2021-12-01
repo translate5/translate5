@@ -64,6 +64,21 @@ class editor_Models_Export_Terminology_Xlsx {
     public $colMapA = [];
 
     /**
+     * @var array
+     */
+    public $emailA = [];
+
+    /**
+     * @var array
+     */
+    public $usage = [];
+
+    /**
+     * @var array
+     */
+    public $double = [];
+
+    /**
      * Column index from string.
      *
      * @param string $pString eg 'A'
@@ -100,20 +115,46 @@ class editor_Models_Export_Terminology_Xlsx {
         $attrM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
         $trscM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
 
+        // Get user emails from `Zf_users` table
+        $this->emailA = $trscM->db->getAdapter()->query('
+            SELECT `userGuid`, `email` FROM `Zf_users`
+        ')->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // Append emails from `terms_ref_object` table
+        $this->emailA += $trscM->db->getAdapter()->query('
+            SELECT `key`, JSON_UNQUOTE(json_extract(`data`, "$.email")) FROM `terms_ref_object` WHERE `collectionId` = ?
+        ', $collectionId)->fetchAll(PDO::FETCH_KEY_PAIR);
+
         // Get total qty of entries to be processed
         $termEntryQty = $termEntryM->getQtyByCollectionId($collectionId);
 
         // Get attribute datatypes usage info
         $usage = $dataTypeM->getUsageForLevelsByCollectionId($collectionId);
+        $this->usage = $usage['usage']; $this->double = $usage['double'];
 
         //
-        foreach ($usage as $level => $dataTypeA) {
+        foreach ($this->usage as $level => $dataTypeA) {
             $mapKey = $level . '.attribs';
             $attrIdx_first = $this->colIdxA[$mapKey];
             $attrIdx_last = $attrIdx_first + 2;
             $attrCol_last = Coordinate::stringFromColumnIndex($attrIdx_last);
             $shift = count($dataTypeA) - 3 + (count($dataTypeA) ? 0 : 1);
-            $this->sheet->insertNewColumnBefore($attrCol_last, $shift);
+
+            //
+            foreach (array_keys($dataTypeA) as $dataTypeId)
+                if (in_array($dataTypeId, $this->double))
+                    $shift ++;
+
+            //
+            if ($shift) $this->sheet->insertNewColumnBefore($attrCol_last, $shift);
+
+            // Set up columns header titles
+            $idxA = [$attrIdx_first]; $double = -1;
+            foreach (array_values($dataTypeA) as $dataTypeIdx => $title) {
+                if (in_array(array_keys($dataTypeA)[$dataTypeIdx], $this->double)) $double ++;
+                $col = Coordinate::stringFromColumnIndex($attrIdx_first + $dataTypeIdx + ($double > 0 ? $double : 0));
+                $this->sheet->setCellValue($col . '2', $title);
+            }
 
             // Shift further columns coords
             $mapKeyA = array_keys($this->colIdxA);
@@ -128,7 +169,7 @@ class editor_Models_Export_Terminology_Xlsx {
             $this->colGrpA[$key] = Coordinate::stringFromColumnIndex($_idx);
 
         //
-        for ($i = 1; $i <= $this->colIdxA['term.attribs'] + count($usage['term']); $i++)
+        for ($i = 1; $i <= $this->colIdxA['term.attribs'] + count($this->usage['term']); $i++)
             $this->colMapA[$i] = Coordinate::stringFromColumnIndex($i);
 
         // Indexes
@@ -156,15 +197,9 @@ class editor_Models_Export_Terminology_Xlsx {
 
             // Foreach termEntry
             foreach ($termEntryA as $entryIdx => $termEntry) {
-                //$line []= $this->tabs[3] . '<termEntry id="' . $termEntry['termEntryTbxId'] . '">';
-                //$this->descripGrpNodes(4, $line, $attrA, $trscA, $termEntry['id']);
-                //$this->attributeNodes(4, $line, $attrA, $termEntry['id']);
                 foreach ($termA[$termEntry['id']] as $lang => $terms) {
-                    //$line []= $this->tabs[4] . '<langSet xml:lang="' . $lang . '">';
-                    //$this->attributeNodes(5, $line, $attrA, $termEntry['id'], $lang);
-                    //$this->transacGrpNodes(5, $line, $trscA, $termEntry['id'], $lang);
                     foreach ($terms as $termIdx => $term) {
-                        $idx['row'] = $idx['start'] + $idx['page'] + $idx['term'];
+                        $idx['row'] = $idx['start'] + $idx['page'] + ($idx['term']++);
                         $this->sheet->setCellValue('A' . $idx['row'], $termEntry['id']);
                         $this->sheet->setCellValue('B' . $idx['row'], $lang);
                         $this->sheet->setCellValue('C' . $idx['row'], $term['id']);
@@ -175,21 +210,35 @@ class editor_Models_Export_Terminology_Xlsx {
                         $this->transacGrpCells('language', $idx['row'], $trscA, $termEntry['id'], $lang);
                         $this->transacGrpCells('term',     $idx['row'], $trscA, $termEntry['id'], $lang, $term['id']);
 
-                        //$line []= $this->tabs[5] . '<tig>';
-                        //$line []= $this->tabs[6] . '<term id="' . $term['termTbxId'] . '">' . $term['term'] . '</term>';
-                        //$this->attributeNodes(6, $line, $attrA, $termEntry['id'], $lang, $term['id']);
-                        //$this->transacGrpNodes(6, $line, $trscA, $termEntry['id'], $lang, $term['id']);
-                        //$line []= $this->tabs[5] . '</tig>';
-                        $idx['term'] ++;
+                        $this->attributeCells('entry',    $idx['row'], $attrA, $termEntry['id']);
+                        $this->attributeCells('language', $idx['row'], $attrA, $termEntry['id'], $lang);
+                        $this->attributeCells('term',     $idx['row'], $attrA, $termEntry['id'], $lang, $term['id']);
                     }
-                    //$line []= $this->tabs[4] . '</langSet>';
                 }
-                //$line []= $this->tabs[3] . '</termEntry>';
             }
-
-            // Append into tbx file
-            //$this->write($line);
         }
+
+        $style = $this->sheet->getStyle('AH3')->exportArray();
+        $style = [
+            //'borders' => [
+                //'outline' => [
+                    //'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                    //'color' => ['argb' => 'FFFF0000'],
+                //],
+            //],
+            'fill' => [
+                'fillType' => 'solid',
+                'startColor' => [
+                    'argb' => 'FFADD58A'
+                ],
+                'endColor' => [
+                    'argb' => 'FFC2E0AE'
+                ]
+            ]
+        ];
+        $this->sheet->getStyle('AI:AJ')->applyFromArray($style);
+        //$this->sheet->getStyle('AI2:AJ' . $idx['row'])->applyFromArray($style);
+        //$this->sheet->getStyle('AI2:AJ2000000')->applyFromArray($style);
 
         // Save
         $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($xlsx);
@@ -198,68 +247,28 @@ class editor_Models_Export_Terminology_Xlsx {
         die('xxxx');
     }
 
-    public function descripGrpNodes($level, &$line, &$attrA, &$trscA, $termEntryId, $language = '', $termId = '') {
-
-        //
-        $descripGrp = ['attr' => [], 'trsc' => []];
-
-        // Cut attrs, having isDescripGrp flag
-        foreach ($attrA[$termEntryId][$language][$termId] as $idx => $attr)
-            if ($attr['isDescripGrp'])
-                if ($descripGrp['attr'][$termEntryId][$language][$termId] []= $attr)
-                    unset($attrA[$termEntryId][$language][$termId][$idx]);
-
-        // Cut trscs, having isDescripGrp flag
-        foreach ($trscA[$termEntryId][$language][$termId] as $idx => $trsc)
-            if ($trsc['isDescripGrp'])
-                if ($descripGrp['trsc'][$termEntryId][$language][$termId] []= $trsc)
-                    unset($trscA[$termEntryId][$language][$termId][$idx]);
-
-        //
-        if ($descripGrp['attr'] || $descripGrp['trsc']) {
-            $line []= $this->tabs[$level] . '<descripGrp>';
-            $this->attributeNodes($level + 1, $line, $descripGrp['attr'], $termEntryId, $language, $termId);
-            $this->transacGrpNodes($level + 1, $line, $descripGrp['trsc'], $termEntryId, $language, $termId);
-            $line []= $this->tabs[$level] . '</descripGrp>';
-        }
-    }
-
-    public function attributeNodes($level, &$line, $attrA, $termEntryId, $language = '', $termId = '') {
-
-        //
-        foreach ($attrA[$termEntryId][$language][$termId] ?? [] as $attr) {
-
-            //
-            $_attr = [];
-
-            // Append 'type' node-attr
-            if ($attr['type']) $_attr []= 'type="' . $attr['type'] . '"';
-
-            // Append 'target' node-attr
-            if ($attr['elementName'] == 'xref' || $attr['elementName'] == 'ref' || $attr['target'])
-                $_attr []= 'target="' . $attr['target'] . '"';
-
-            // Build and append node
-            $line []= $this->tabs[$level] . '<' . $attr['elementName'] . ' ' . join(' ', $_attr) . '>'
-                . $attr['value']
-                . '</' . $attr['elementName'] . '>';
+    public function attributeCells($level, $rowIdx, $attrA, $termEntryId, $language = '', $termId = '') {
+        $colIdx = $this->colIdxA[$level . '.attribs'];
+        foreach (array_keys($this->usage[$level]) as $attrIdx => $dataTypeId) {
+            foreach ($attrA[$termEntryId][$language][$termId] ?? [] as $attr) {
+                if ($dataTypeId == $attr['dataTypeId']) {
+                    $this->sheet->setCellValue($this->colMapA[$colIdx + $attrIdx] . $rowIdx, $attr['value']);
+                }
+            }
         }
     }
 
     public function transacGrpCells($level, $rowIdx, $trscA, $termEntryId, $language = '', $termId = '') {
-
         foreach ($trscA[$termEntryId][$language][$termId] ?? [] as $trsc) {
             $colIdx = $this->colIdxA[$level . '.' . $trsc['transac']];
-            if ($trsc['transac'] == 'origination') {
+            if ($trsc['transac'] == 'origination' || $trsc['transac'] == 'modification') {
                 $this->sheet->setCellValue($this->colMapA[$colIdx    ] . $rowIdx, $trsc['transacNote']);
-                $this->sheet->setCellValue($this->colMapA[$colIdx + 3] . $rowIdx, explode(' ', $trsc['date'])[0]);
-            } else if ($trsc['transac'] == 'modification') {
-                $this->sheet->setCellValue($this->colMapA[$colIdx    ] . $rowIdx, $trsc['transacNote']);
+                $this->sheet->setCellValue($this->colMapA[$colIdx + 1] . $rowIdx, $trsc['target']);
+                if ($email = $this->emailA[$trsc['target']] ?? '') {
+                    $this->sheet->setCellValue($this->colMapA[$colIdx + 2] . $rowIdx, $email);
+                }
                 $this->sheet->setCellValue($this->colMapA[$colIdx + 3] . $rowIdx, explode(' ', $trsc['date'])[0]);
             }
-            /*$line []= '<transac type="transactionType">'. $trsc['transac'] . '</transac>';
-            $line []= '<transacNote type="' . $trsc['transacType'] . '" target="' . $trsc['target'] . '">Jane</transacNote>';
-            $line []= '<date>' . explode(' ', $trsc['date'])[0] . '</date>';*/
         }
     }
 }
