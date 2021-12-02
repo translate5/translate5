@@ -232,7 +232,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             ->where('termtagState IS NULL OR termtagState IN (?)', [editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED])
             ->order('id')
             ->limit(editor_Plugins_TermTagger_Configuration::IMPORT_SEGMENTS_PER_CALL)
-            ->forUpdate(true);
+            ->forUpdate(Zend_Db_Select::FU_MODE_SKIP);
         $segmentIds = $db->fetchAll($sql)->toArray();
         $segmentIds = array_column($segmentIds, 'segmentId');
         
