@@ -712,7 +712,11 @@
                 "url": "https://github.com/gportela85/DateTimeField.git",
                 "reference": "1.9"
             },
-            "type": "extjs-ux"
+            "type": "extjs-ux",
+            "license": [
+                "MIT"
+            ],
+            "description": "A DateTime Form Field UX for Sencha, ExtJS 5.x and ExtJS 6.x."
         },
         {
             "name": "graham-campbell/result-type",
@@ -3227,12 +3231,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/MittagQI/zf1-php7.3.git",
-                "reference": "f7b607d74841dcfbf4b1e576cbc083f22b982886"
+                "reference": "a81f384f6d31a7930ba1fb1221d3488c3a60c2d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/MittagQI/zf1-php7.3/zipball/f7b607d74841dcfbf4b1e576cbc083f22b982886",
-                "reference": "f7b607d74841dcfbf4b1e576cbc083f22b982886",
+                "url": "https://api.github.com/repos/MittagQI/zf1-php7.3/zipball/a81f384f6d31a7930ba1fb1221d3488c3a60c2d6",
+                "reference": "a81f384f6d31a7930ba1fb1221d3488c3a60c2d6",
                 "shasum": ""
             },
             "archive": {
@@ -3249,8 +3253,9 @@
                 "zendframework/zendframework1": ">=1.12.20"
             },
             "require-dev": {
+                "php-parallel-lint/php-parallel-lint": "1.0.0",
                 "phpunit/dbunit": "1.3.*",
-                "phpunit/phpunit": "3.7.*"
+                "zf1s/phpunit": "3.7.39"
             },
             "type": "library",
             "extra": {
@@ -3266,6 +3271,14 @@
             "include-path": [
                 "library/"
             ],
+            "scripts": {
+                "lint": [
+                    "parallel-lint --exclude vendor --exclude tests/Zend/Loader/_files/ParseError.php ."
+                ],
+                "test": [
+                    "phpunit"
+                ]
+            },
             "license": [
                 "BSD-3-Clause"
             ],
@@ -3278,7 +3291,7 @@
             "support": {
                 "source": "https://github.com/MittagQI/zf1-php7.3/tree/master"
             },
-            "time": "2020-08-25T09:01:10+00:00"
+            "time": "2021-12-02T10:29:01+00:00"
         },
         {
             "name": "symfony/console",
