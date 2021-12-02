@@ -1651,6 +1651,12 @@ class editor_TaskController extends ZfExtended_RestController {
                 break;
         }
 
+        if($this->isMaintenanceLoginLock(30)) {
+            //since file is fetched for download we simply print out that text without decoration.
+            echo 'Maintenance is scheduled, exports are not possible at the moment.';
+            exit;
+        }
+
         //FIXME multiple problems here with the export worker
         // it is possible that we get the following in DB (implicit ordererd by ID here):
         //      Export_Worker for ExportReq1
