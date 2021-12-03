@@ -25,43 +25,104 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use Box\Spout\Common\Entity\Style\Color;
+use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
+use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
 /**
  * exports term data stored in translate5 to valid XLSX files
  */
 class editor_Models_Export_Terminology_Xlsx {
 
-    /**
-     * @var Worksheet
-     */
-    public Worksheet $sheet;
-
-    public $colIdxA = [
-        'entry.origination' => 6,
-        'entry.modification' => 10,
-        'entry.attribs' => 14,
-
-        'language.origination' => 17,
-        'language.modification' => 21,
-        'language.attribs' => 25,
-
-        'term.origination' => 28,
-        'term.modification' => 32,
-        'term.attribs' => 36,
+    public $cols = [
+        'main' => [
+            'cols' => [
+                'termEntryId' => 'Term Entry ID',
+                'language' => 'Language',
+                'termId' => 'Term ID',
+                'term' => 'Term',
+                'processStatus' => 'processStatus',
+            ],
+        ],
+        'entry.origination' => [
+            'text' => 'TermEntry creator/creation properties',
+            'color' => 'fffbcc',
+            'cols' => [
+                'name' => 'name',
+                'guid' => 'guid',
+                'email' => 'e-mail',
+                'date' => 'date'
+            ]
+        ],
+        'entry.modification' => [
+            'text' => 'TermEntry last modifier/modification properties',
+            'color' => 'fff9ae',
+            'cols' => [
+                'name' => 'name',
+                'guid' => 'guid',
+                'email' => 'e-mail',
+                'date' => 'date'
+            ]
+        ],
+        'entry.attribs' => [
+            'text' => 'TermEntry level attributes',
+            'color' => 'fff685',
+            'cols' => [
+            ]
+        ],
+        'language.origination' => [
+            'text' => 'Language level creator/creation properties',
+            'color' => 'dfcce4',
+            'cols' => [
+                'name' => 'name',
+                'guid' => 'guid',
+                'email' => 'e-mail',
+                'date' => 'date'
+            ]
+        ],
+        'language.modification' => [
+            'text' => 'Language level last modifier/modification properties',
+            'color' => 'c7a0cb',
+            'cols' => [
+                'name' => 'name',
+                'guid' => 'guid',
+                'email' => 'e-mail',
+                'date' => 'date'
+            ]
+        ],
+        'language.attribs' => [
+            'text' => 'Language level attributes',
+            'color' => 'bd7cb5',
+            'cols' => [
+            ]
+        ],
+        'term.origination' => [
+            'text' => 'Term level creator/creation properties',
+            'color' => 'e0efd4',
+            'cols' => [
+                'name' => 'name',
+                'guid' => 'guid',
+                'email' => 'e-mail',
+                'date' => 'date'
+            ]
+        ],
+        'term.modification' => [
+            'text' => 'Term level last modifier/modification properties',
+            'color' => 'c2e0ae',
+            'cols' => [
+                'name' => 'name',
+                'guid' => 'guid',
+                'email' => 'e-mail',
+                'date' => 'date'
+            ]
+        ],
+        'term.attribs' => [
+            'text' => 'Term level attributes',
+            'color' => 'add58a',
+            'cols' => [
+            ]
+        ]
     ];
-
-    /**
-     * @var array
-     */
-    public $colGrpA = [];
-
-    /**
-     * @var array
-     */
-    public $colMapA = [];
 
     /**
      * @var array
@@ -74,22 +135,6 @@ class editor_Models_Export_Terminology_Xlsx {
     public $usage = [];
 
     /**
-     * @var array
-     */
-    public $double = [];
-
-    /**
-     * Column index from string.
-     *
-     * @param string $pString eg 'A'
-     *
-     * @return int Column index (A = 1)
-     */
-    public function columnIndexFromString($pString) {
-        return Coordinate::columnIndexFromString($pString);
-    }
-
-    /**
      * @param int $collectionId
      * @param bool $tbxBasicOnly
      * @param bool $exportImages
@@ -100,20 +145,34 @@ class editor_Models_Export_Terminology_Xlsx {
                                          $byTermEntryQty = 1000, $byImageQty = 50) {
         class_exists('editor_Utils');
 
-        // Load xlsx file
-        $xlsx = (new PhpOffice\PhpSpreadsheet\Reader\Xlsx())->load(
-            join(DIRECTORY_SEPARATOR, [APPLICATION_ROOT, 'data', 'TermCollectionExportTpl.xlsx'])
-        );
-
-        // Make active sheet to be accessible from other methods
-        $this->sheet = $xlsx->getActiveSheet();
-
         // Models shortcuts
         $dataTypeM  = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
         $termEntryM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
         $termM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         $attrM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
         $trscM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+
+        // ... and a writer to create the new file
+        $this->writer = WriterEntityFactory::createXLSXWriter();
+        $this->writer->openToFile(join(DIRECTORY_SEPARATOR, [APPLICATION_ROOT, 'data', 'out.xlsx']));
+
+        // Get attribute datatypes usage info
+        $this->usage = $dataTypeM->getUsageForLevelsByCollectionId($collectionId);
+
+        // Setup attrib-cols
+        foreach ($this->usage->usage as $level => $dataTypeIdA) {
+            foreach ($dataTypeIdA as $dataTypeId => $title) {
+                if ($this->usage->double[$dataTypeId] ?? 0) {
+                    $this->cols[$level . '.attribs']['cols'][$dataTypeId . '-value'] = $title;
+                    $this->cols[$level . '.attribs']['cols'][$dataTypeId . '-target'] = '';
+                } else {
+                    $this->cols[$level . '.attribs']['cols'][$dataTypeId] = $title;
+                }
+            }
+        }
+
+        // White 2 header rows
+        $this->writeFirstHeaderRow()->writeSecondHeaderRow();
 
         // Get user emails from `Zf_users` table
         $this->emailA = $trscM->db->getAdapter()->query('
@@ -128,64 +187,14 @@ class editor_Models_Export_Terminology_Xlsx {
         // Get total qty of entries to be processed
         $termEntryQty = $termEntryM->getQtyByCollectionId($collectionId);
 
-        // Get attribute datatypes usage info
-        $usage = $dataTypeM->getUsageForLevelsByCollectionId($collectionId);
-        $this->usage = $usage['usage']; $this->double = $usage['double'];
-
-        //
-        foreach ($this->usage as $level => $dataTypeA) {
-            $mapKey = $level . '.attribs';
-            $attrIdx_first = $this->colIdxA[$mapKey];
-            $attrIdx_last = $attrIdx_first + 2;
-            $attrCol_last = Coordinate::stringFromColumnIndex($attrIdx_last);
-            $shift = count($dataTypeA) - 3 + (count($dataTypeA) ? 0 : 1);
-
-            //
-            foreach (array_keys($dataTypeA) as $dataTypeId)
-                if (in_array($dataTypeId, $this->double))
-                    $shift ++;
-
-            //
-            if ($shift) $this->sheet->insertNewColumnBefore($attrCol_last, $shift);
-
-            // Set up columns header titles
-            $idxA = [$attrIdx_first]; $double = -1;
-            foreach (array_values($dataTypeA) as $dataTypeIdx => $title) {
-                if (in_array(array_keys($dataTypeA)[$dataTypeIdx], $this->double)) $double ++;
-                $col = Coordinate::stringFromColumnIndex($attrIdx_first + $dataTypeIdx + ($double > 0 ? $double : 0));
-                $this->sheet->setCellValue($col . '2', $title);
-            }
-
-            // Shift further columns coords
-            $mapKeyA = array_keys($this->colIdxA);
-            $mapKeyIdx = array_flip($mapKeyA)[$mapKey];
-            foreach ($mapKeyA as $keyIdx => $keyValue)
-                if ($keyIdx > $mapKeyIdx)
-                    $this->colIdxA[$keyValue] += $shift;
-        }
-
-        //
-        foreach ($this->colIdxA as $key => $_idx)
-            $this->colGrpA[$key] = Coordinate::stringFromColumnIndex($_idx);
-
-        //
-        for ($i = 1; $i <= $this->colIdxA['term.attribs'] + count($this->usage['term']); $i++)
-            $this->colMapA[$i] = Coordinate::stringFromColumnIndex($i);
-
-        // Indexes
-        $idx['start'] = 3; $idx['term'] = 0;
-
         // Build WHERE clause
         $where = 'collectionId = ' . $collectionId;
 
         // Fetch usages by $byTermEntryQty at a time
         for ($p = 1; $p <= ceil($termEntryQty / $byTermEntryQty); $p++) {
 
-            // Page start index
-            $idx['page'] = ($p - 1) * $byTermEntryQty;
-
             // Get termEntries
-            $termEntryA = $termEntryM->db->fetchAll($where, null, $byTermEntryQty, $idx['page'])->toArray();
+            $termEntryA = $termEntryM->db->fetchAll($where, null, $byTermEntryQty, ($p - 1) * $byTermEntryQty)->toArray();
 
             // Get termEntryIds
             $termEntryIds = join(',', array_column($termEntryA, 'id') ?: [0]);
@@ -199,76 +208,199 @@ class editor_Models_Export_Terminology_Xlsx {
             foreach ($termEntryA as $entryIdx => $termEntry) {
                 foreach ($termA[$termEntry['id']] as $lang => $terms) {
                     foreach ($terms as $termIdx => $term) {
-                        $idx['row'] = $idx['start'] + $idx['page'] + ($idx['term']++);
-                        $this->sheet->setCellValue('A' . $idx['row'], $termEntry['id']);
-                        $this->sheet->setCellValue('B' . $idx['row'], $lang);
-                        $this->sheet->setCellValue('C' . $idx['row'], $term['id']);
-                        $this->sheet->setCellValue('D' . $idx['row'], $term['term']);
-                        $this->sheet->setCellValue('E' . $idx['row'], $term['processStatus']);
 
-                        $this->transacGrpCells('entry',    $idx['row'], $trscA, $termEntry['id']);
-                        $this->transacGrpCells('language', $idx['row'], $trscA, $termEntry['id'], $lang);
-                        $this->transacGrpCells('term',     $idx['row'], $trscA, $termEntry['id'], $lang, $term['id']);
+                        //
+                        $shift = 0;
 
-                        $this->attributeCells('entry',    $idx['row'], $attrA, $termEntry['id']);
-                        $this->attributeCells('language', $idx['row'], $attrA, $termEntry['id'], $lang);
-                        $this->attributeCells('term',     $idx['row'], $attrA, $termEntry['id'], $lang, $term['id']);
+                        // Init new row
+                        $row = WriterEntityFactory::createRow([]);
+
+                        // Foreach column groups
+                        foreach ($this->cols as $group => &$info) {
+
+                            // If group style is not yet prepared - prepare it
+                            if (!array_key_exists('style', $info))
+                                $info['style'] = ($info['color'] ?? 0)
+                                    ? (new StyleBuilder())->setBackgroundColor($info['color'])->build()
+                                    : null;
+
+                            //
+                            if ($group == 'main') {
+
+                                // Prepare data
+                                $data = [
+                                    'termEntryId' => $termEntry['id'],
+                                    'language' => $lang,
+                                    'termId' => $term['id'],
+                                    'term' => $term['term'],
+                                    'processStatus' => $term['processStatus'],
+                                ];
+
+                                // Foreach column in group
+                                foreach (array_keys($info['cols']) as $idx => $key) {
+
+                                    // Create cell
+                                    $cell = WriterEntityFactory::createCell($data[$key], $info['style']);
+
+                                    // Add cell to a row
+                                    $row->setCellAtIndex($cell, $shift + $idx);
+                                }
+
+                            //
+                            } else if (preg_match('~(entry|language|term)\.(origination|modification)~', $group, $m)) {
+
+                                // Prepare level-path
+                                $path = [$termEntry['id']];
+                                if ($m[1] != 'entry') $path []= $lang;
+                                if ($m[1] == 'term') $path []= $term['id'];
+                                $path = join(':', $path);
+
+                                // Prepare data
+                                $data = $this->transacGrpCells($m[1], $m[2], $trscA, $path);
+
+                                // Foreach column in group
+                                foreach (array_keys($info['cols']) as $idx => $key) {
+
+                                    // Create cell
+                                    $cell = WriterEntityFactory::createCell($data[$key], $info['style']);
+
+                                    // Add cell to a row
+                                    $row->setCellAtIndex($cell, $shift + $idx);
+                                }
+
+                            //
+                            } else if (preg_match('~(entry|language|term)\.attribs~', $group, $m)) {
+
+                                // Prepare level-path
+                                $path = [$termEntry['id']];
+                                if ($m[1] != 'entry') $path []= $lang;
+                                if ($m[1] == 'term') $path []= $term['id'];
+                                $path = join(':', $path);
+
+                                // Prepare data
+                                $data = $this->attributeCells($m[1], $attrA, $path);
+
+                                // Foreach column in group
+                                foreach (array_keys($info['cols']) as $idx => $key) {
+
+                                    // Create cell
+                                    $cell = WriterEntityFactory::createCell($data[$key] ?? '-', $info['style']);
+
+                                    // Add cell to a row
+                                    $row->setCellAtIndex($cell, $shift + $idx);
+                                }
+                            }
+
+                            // Increase cell index shift
+                            $shift += count($info['cols']);
+                        }
+
+                        // Write row
+                        $this->writer->addRow($row);
                     }
                 }
             }
         }
 
-        $style = $this->sheet->getStyle('AH3')->exportArray();
-        $style = [
-            //'borders' => [
-                //'outline' => [
-                    //'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
-                    //'color' => ['argb' => 'FFFF0000'],
-                //],
-            //],
-            'fill' => [
-                'fillType' => 'solid',
-                'startColor' => [
-                    'argb' => 'FFADD58A'
-                ],
-                'endColor' => [
-                    'argb' => 'FFC2E0AE'
-                ]
-            ]
-        ];
-        $this->sheet->getStyle('AI:AJ')->applyFromArray($style);
-        //$this->sheet->getStyle('AI2:AJ' . $idx['row'])->applyFromArray($style);
-        //$this->sheet->getStyle('AI2:AJ2000000')->applyFromArray($style);
 
         // Save
-        $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($xlsx);
-        $out = join(DIRECTORY_SEPARATOR, [APPLICATION_ROOT, 'data', 'out.xlsx']);
-        $writer->save($out);
+        $this->writer->close();
         die('xxxx');
     }
 
-    public function attributeCells($level, $rowIdx, $attrA, $termEntryId, $language = '', $termId = '') {
-        $colIdx = $this->colIdxA[$level . '.attribs'];
-        foreach (array_keys($this->usage[$level]) as $attrIdx => $dataTypeId) {
-            foreach ($attrA[$termEntryId][$language][$termId] ?? [] as $attr) {
-                if ($dataTypeId == $attr['dataTypeId']) {
-                    $this->sheet->setCellValue($this->colMapA[$colIdx + $attrIdx] . $rowIdx, $attr['value']);
+    public function attributeCells($level, $attrA, $path) {
+
+        //
+        $_ = explode(':', $path);
+        $termEntryId = $_[0];
+        $language = $_[1] ?? '';
+        $termId = $_[2] ?? '';
+
+        //
+        $data = [];
+
+        //
+        foreach ($attrA[$termEntryId][$language][$termId] ?? [] as $attr) {
+            if ($type = $this->usage->multi[$attr['dataTypeId']] ?? 0) {
+                if ($this->usage->double[$attr['dataTypeId']] ?? 0) {
+                    $data[$attr['dataTypeId'] . '-value']  []= $attr['value'];
+                    $data[$attr['dataTypeId'] . '-target'] []= $attr['target'];
+                } else {
+                    $data[$attr['dataTypeId']] []= $attr[$type == 'crossReference' ? 'target' : 'value'];
                 }
+            } else {
+                $data[$attr['dataTypeId']] []= $attr['value'];
             }
         }
+        d($termEntryId);
+        foreach ($data as &$value) $value = join("\n", $value);
+        d($data);
+        d($this->cols['entry.attribs']);
+
+        return $data;
     }
 
-    public function transacGrpCells($level, $rowIdx, $trscA, $termEntryId, $language = '', $termId = '') {
+    public function transacGrpCells($level, $transac, $trscA, $path) {
+
+        //
+        $_ = explode(':', $path);
+        $termEntryId = $_[0];
+        $language = $_[1] ?? '';
+        $termId = $_[2] ?? '';
+
+        //
         foreach ($trscA[$termEntryId][$language][$termId] ?? [] as $trsc) {
-            $colIdx = $this->colIdxA[$level . '.' . $trsc['transac']];
-            if ($trsc['transac'] == 'origination' || $trsc['transac'] == 'modification') {
-                $this->sheet->setCellValue($this->colMapA[$colIdx    ] . $rowIdx, $trsc['transacNote']);
-                $this->sheet->setCellValue($this->colMapA[$colIdx + 1] . $rowIdx, $trsc['target']);
-                if ($email = $this->emailA[$trsc['target']] ?? '') {
-                    $this->sheet->setCellValue($this->colMapA[$colIdx + 2] . $rowIdx, $email);
-                }
-                $this->sheet->setCellValue($this->colMapA[$colIdx + 3] . $rowIdx, explode(' ', $trsc['date'])[0]);
+            if ($trsc['transac'] == $transac) {
+                return [
+                    'name' => $trsc['transacNote'],
+                    'guid' => $trsc['target'],
+                    'email' => $this->emailA[$trsc['target']] ?? '',
+                    'date' => explode(' ', $trsc['date'])[0]
+                ];
             }
         }
+
+        return [
+            'name' => '',
+            'guid' => '',
+            'email' => '',
+            'date' => ''
+        ];
+    }
+
+    public function writeFirstHeaderRow() {
+        $shift = 0;
+        $row = WriterEntityFactory::createRow([]);
+        foreach ($this->cols as $group => $info) {
+            $style = ($info['color'] ?? 0) ? (new StyleBuilder())->setBackgroundColor($info['color'])->build() : null;
+            foreach (array_values($info['cols']) as $idx => $text) {
+                $cell = WriterEntityFactory::createCell($idx ? '': ($info['text'] ?? ''), $style);
+                $row->setCellAtIndex($cell, $shift + $idx);
+            }
+            $shift += count($info['cols']);
+        }
+        $this->writer->addRow($row);
+
+        return $this;
+    }
+
+    public function writeSecondHeaderRow() {
+        $shift = 0;
+        $row = WriterEntityFactory::createRow([]);
+        foreach ($this->cols as $group => $info) {
+
+            $styleBuilder = new StyleBuilder();
+            if ($info['color'] ?? 0) $styleBuilder->setBackgroundColor($info['color']);
+            $style = $styleBuilder->setFontBold()->build();
+
+            foreach (array_values($info['cols']) as $idx => $text) {
+                $cell = WriterEntityFactory::createCell($text, $style);
+                $row->setCellAtIndex($cell, $shift + $idx);
+            }
+            $shift += count($info['cols']);
+        }
+        $this->writer->addRow($row);
+
+        return $this;
     }
 }

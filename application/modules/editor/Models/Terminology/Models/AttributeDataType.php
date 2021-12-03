@@ -267,15 +267,22 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
         // Get localized attrs
         $localized = $this->getLocalized($locale, [$collectionId]);
 
-        // Get dataTypeIds of attrs, that require 2 cols for being exported
-        $double = [];
-        foreach (['xGraphic', 'externalCrossReference', 'crossReference'] as $type)
-            foreach ($localized as $dataTypeId => $dataType)
-                if ($dataType['type'] == $type)
-                    $double []= $dataTypeId;
+        // Get dataTypeIds of attrs, that:
+        // 1.can appear multiple times at the same level
+        // 2.require double-column for being excel-exported
+        $double = $multi = [];
+        foreach (['crossReference', 'figure', 'xGraphic', 'externalCrossReference'] as $type) {
+            foreach ($localized as $dataTypeId => $dataType) {
+                if ($dataType['type'] == $type) {
+                    $multi[$dataTypeId] = $dataType['type'];
+                    if (preg_match('~^(xGraphic|externalCrossReference)$~', $dataType['type']))
+                        $double[$dataTypeId] = $dataType['type'];
+                }
+            }
+        }
 
-        //
-        $fis = join(',', $double);
+        // Get comma separated list of dataTypeIds in the proper order
+        $list = join(',', array_keys($multi));
 
         // Get entry-level dataTypeIds usages
         $entry = $this->db->getAdapter()->query('
@@ -286,8 +293,8 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
               AND `termEntryId` IS NOT NULL 
               AND `language` IS NULL
               AND `termId` IS NULL
-            ORDER BY NOT FIND_IN_SET(`dataTypeId`, ?) DESC, FIND_IN_SET(`dataTypeId`, ?) ASC 
-        ', [$collectionId, $fis, $fis])->fetchAll(PDO::FETCH_COLUMN);
+            ORDER BY FIND_IN_SET(`dataTypeId`, ?) ASC 
+        ', [$collectionId, $list])->fetchAll(PDO::FETCH_COLUMN);
 
         // Get language-level dataTypeIds usages
         $language = $this->db->getAdapter()->query('
@@ -298,7 +305,8 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
               AND `termEntryId` IS NOT NULL 
               AND `language` IS NOT NULL
               AND `termId` IS NULL
-        ', $collectionId)->fetchAll(PDO::FETCH_COLUMN);
+            ORDER BY FIND_IN_SET(`dataTypeId`, ?) ASC 
+        ', [$collectionId, $list])->fetchAll(PDO::FETCH_COLUMN);
 
         // Get term-level dataTypeIds usages
         $term = $this->db->getAdapter()->query('
@@ -309,16 +317,17 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
               AND `termEntryId` IS NOT NULL 
               AND `language` IS NOT NULL
               AND `termId` IS NOT NULL
-        ', $collectionId)->fetchAll(PDO::FETCH_COLUMN);
+            ORDER BY FIND_IN_SET(`dataTypeId`, ?) ASC 
+        ', [$collectionId, $list])->fetchAll(PDO::FETCH_COLUMN);
 
         // Collect usage info, so that for each level we have arrays of [dataTypeId => title] pairs
-        foreach (compact('term', 'language', 'entry') as $level => $dataTypeIdA) {
+        foreach (compact('entry', 'language', 'term') as $level => $dataTypeIdA) {
             $usage[$level] = [];
             foreach ($dataTypeIdA as $dataTypeId)
                 $usage[$level][$dataTypeId] = $localized[$dataTypeId]['title'];
         }
 
         // Return usage
-        return compact('usage', 'double');
+        return (object) compact('usage', 'double', 'multi');
     }
 }
