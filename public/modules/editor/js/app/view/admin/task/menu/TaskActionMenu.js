@@ -51,7 +51,10 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
         actionExcelReimport: '#UT#Excel Re-Importieren',
         projectOverview: '#UT#zum Projekt springen',
         taskOverview: '#UT#zur Aufgabe springen',
-        actionDeleteProject: '#UT#Projekt komplett löschen',
+        actionDeleteProject: '#UT#Projekt komplett löschen'
+    },
+
+    strings:{
         cancelImportText: '#UT#Import abbrechen'
     },
 
