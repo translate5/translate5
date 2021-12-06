@@ -74,7 +74,25 @@ $termDivParams = function($class, $rtl) {
                 $class[] = 'transfound';
             }
             $definition = htmlspecialchars($term->definition);
-            $itemStr .= sprintf('<span class="%3$s" title="%2$s">%1$s</span>', $term->term, $definition, join(' ', $class));
+
+            if($this->linkPortal) {
+                //TODO would be better in the termportal plugin somehow, but currently there is no way to invoke here in the PHTML via plugin
+                //for the syntax of the search array see TermPortal.view.termportal.TermportalController::encode64
+                $search = [
+                    $term->term,
+                    $term->languageId,
+                    '', //empty client-id filter
+                    $term->collectionId,
+                ];
+                $url = APPLICATION_RUNDIR.'/editor/termportal#termportal/search/'.base64_encode(json_encode($search));
+                $termText = '<a href="'.$url.'" target="termportalandinstanttranslate">'.$term->term.'</a>';
+            }
+            else {
+                $termText = $term->term;
+            }
+
+            $itemStr .= sprintf('<span class="%3$s" title="%2$s">%1$s</span>', $termText, $definition, join(' ', $class));
+
             if(!empty($term->definition)){
                 $src = $this->publicModulePath.'/images/termStatus/information-small-white.png';
                 $itemStr .= sprintf(' <img src="%1$s" alt="%2$s" title="%2$s"/>', $src, $definition);

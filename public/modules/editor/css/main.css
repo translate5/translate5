@@ -231,11 +231,13 @@ div.single + div {
 .head-panel-info-panel span.task-readonly {font-style: italic;}
 /* END - Headpanel */
 
-/*Terminologie:*/
+/*Terminology:*/
 .metaTermPanel .term-group {padding:2px 0px; text-align:left;vertical-align: top;}
 .metaTermPanel .term-group > div {padding: 2px 1px;}
 .metaTermPanel .term-group > div.target-terms {padding-left: 14px;}
 .metaTermPanel .target-terms {border-top:1px dotted #BFC2C2;}
+.metaTermPanel .term-box span.term a {color:inherit;text-decoration:none;}
+.metaTermPanel .term-box span.term a:hover {text-decoration:underline;}
 
 .x-form-cb-label-after {white-space: normal;}
 

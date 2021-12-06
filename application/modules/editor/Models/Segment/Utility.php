@@ -45,7 +45,6 @@ class editor_Models_Segment_Utility {
         // It is important that we have no entities in our DB but their UTF8 characters instead,
         // since a XLF export of our segments would not be valid XML with the entities.
         // And the browsers are converting the entities anyway to UTF8 characters.
-        // Refactor to a better place with TRANSLATE-296
         if($xmlBased) {
             // in a XML based format only the defined entities may exist
             // - for our major XML formats these are: &amp; &lt; &gt; only

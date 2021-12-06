@@ -32,5 +32,6 @@ END LICENSE AND COPYRIGHT
  * @version 0.7
  *
  */
-header('Location: '.APPLICATION_RUNDIR.'/editor');
+
+Zend_Controller_Front::getInstance()->getResponse()->setRedirect(APPLICATION_RUNDIR.'/editor')
 ?>
