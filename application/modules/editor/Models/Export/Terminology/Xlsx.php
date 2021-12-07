@@ -25,9 +25,11 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-use Box\Spout\Common\Entity\Style\Color;
-use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
+use WilsonGlasser\Spout\Writer\Common\Creator\Style\StyleBuilder;
+use WilsonGlasser\Spout\Writer\Common\Creator\WriterEntityFactory;
+use WilsonGlasser\Spout\Writer\Common\Helper\CellHelper;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Common\Entity\ColumnDimension;
 
 /**
  * exports term data stored in translate5 to valid XLSX files
@@ -144,6 +146,8 @@ class editor_Models_Export_Terminology_Xlsx {
     public function exportCollectionById(int $collectionId, $tbxBasicOnly = false, $exportImages = true,
                                          $byTermEntryQty = 1000, $byImageQty = 50) {
         class_exists('editor_Utils');
+        mt();
+        set_time_limit(0);
 
         // Models shortcuts
         $dataTypeM  = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
@@ -153,7 +157,7 @@ class editor_Models_Export_Terminology_Xlsx {
         $trscM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
 
         // ... and a writer to create the new file
-        $this->writer = WriterEntityFactory::createXLSXWriter();
+        $this->writer = WriterEntityFactory::createWriter('xlsx');
         $this->writer->openToFile(join(DIRECTORY_SEPARATOR, [APPLICATION_ROOT, 'data', 'out.xlsx']));
 
         // Get attribute datatypes usage info
@@ -212,8 +216,14 @@ class editor_Models_Export_Terminology_Xlsx {
                         //
                         $shift = 0;
 
+                        /** Create a style with the StyleBuilder */
+                        $style = (new StyleBuilder())
+                            ->setShouldWrapText(false)
+                            //->setCellAlignment(CellAlignment::RIGHT)
+                            ->build();
+
                         // Init new row
-                        $row = WriterEntityFactory::createRow([]);
+                        $row = WriterEntityFactory::createRow([], $style);
 
                         // Foreach column groups
                         foreach ($this->cols as $group => &$info) {
@@ -221,7 +231,7 @@ class editor_Models_Export_Terminology_Xlsx {
                             // If group style is not yet prepared - prepare it
                             if (!array_key_exists('style', $info))
                                 $info['style'] = ($info['color'] ?? 0)
-                                    ? (new StyleBuilder())->setBackgroundColor($info['color'])->build()
+                                    ? (new StyleBuilder())->setBackgroundColor($info['color'])->setShouldWrapText(false)->build()
                                     : null;
 
                             //
@@ -271,14 +281,10 @@ class editor_Models_Export_Terminology_Xlsx {
                             //
                             } else if (preg_match('~(entry|language|term)\.attribs~', $group, $m)) {
 
-                                // Prepare level-path
-                                $path = [$termEntry['id']];
-                                if ($m[1] != 'entry') $path []= $lang;
-                                if ($m[1] == 'term') $path []= $term['id'];
-                                $path = join(':', $path);
-
                                 // Prepare data
-                                $data = $this->attributeCells($m[1], $attrA, $path);
+                                     if ($m[1] == 'entry')    $data = $this->attributeCells($attrA, $termEntry['id']);
+                                else if ($m[1] == 'language') $data = $this->attributeCells($attrA, $termEntry['id'], $lang);
+                                else if ($m[1] == 'term')     $data = $this->attributeCells($attrA, $termEntry['id'], $lang, $term['id']);
 
                                 // Foreach column in group
                                 foreach (array_keys($info['cols']) as $idx => $key) {
@@ -302,29 +308,25 @@ class editor_Models_Export_Terminology_Xlsx {
             }
         }
 
-
         // Save
         $this->writer->close();
         die('xxxx');
     }
 
-    public function attributeCells($level, $attrA, $path) {
+    public function attributeCells($attrA, $termEntryId, $language = '', $termId = '') {
 
         //
-        $_ = explode(':', $path);
-        $termEntryId = $_[0];
-        $language = $_[1] ?? '';
-        $termId = $_[2] ?? '';
-
-        //
-        $data = [];
+        $data = []; $figure = []; $dataTypeId_figure = 0;
 
         //
         foreach ($attrA[$termEntryId][$language][$termId] ?? [] as $attr) {
+            //$attr['value'] = preg_replace("~\n~", '', $attr['value']);
             if ($type = $this->usage->multi[$attr['dataTypeId']] ?? 0) {
                 if ($this->usage->double[$attr['dataTypeId']] ?? 0) {
                     $data[$attr['dataTypeId'] . '-value']  []= $attr['value'];
                     $data[$attr['dataTypeId'] . '-target'] []= $attr['target'];
+                } else if ($type == 'figure') {
+                    $data[$dataTypeId_figure = $attr['dataTypeId']][$attr['target']] = $attr['target'];
                 } else {
                     $data[$attr['dataTypeId']] []= $attr[$type == 'crossReference' ? 'target' : 'value'];
                 }
@@ -332,10 +334,11 @@ class editor_Models_Export_Terminology_Xlsx {
                 $data[$attr['dataTypeId']] []= $attr['value'];
             }
         }
-        d($termEntryId);
-        foreach ($data as &$value) $value = join("\n", $value);
-        d($data);
-        d($this->cols['entry.attribs']);
+
+        //foreach ($data[$dataTypeId_figure]
+
+        //foreach ($data as &$value) $value = preg_replace("~\n~", '', join("; ", $value));
+        foreach ($data as &$value) $value = join(" \n", $value);
 
         return $data;
     }
@@ -369,18 +372,27 @@ class editor_Models_Export_Terminology_Xlsx {
     }
 
     public function writeFirstHeaderRow() {
+        $sheet = $this->writer->getCurrentSheet();
         $shift = 0;
         $row = WriterEntityFactory::createRow([]);
         foreach ($this->cols as $group => $info) {
-            $style = ($info['color'] ?? 0) ? (new StyleBuilder())->setBackgroundColor($info['color'])->build() : null;
+
+            // Prepare style
+            $styleBuilder = new StyleBuilder();
+            if ($info['color'] ?? 0) $styleBuilder->setBackgroundColor($info['color']);
+            $styleBuilder->setHorizontalAlign(Style::ALIGN_MIDDLE);
+            $style = $styleBuilder->build();
+
             foreach (array_values($info['cols']) as $idx => $text) {
                 $cell = WriterEntityFactory::createCell($idx ? '': ($info['text'] ?? ''), $style);
                 $row->setCellAtIndex($cell, $shift + $idx);
             }
+            $merge = CellHelper::getCellIndexFromColumnIndex($shift) . '1';
             $shift += count($info['cols']);
+            $merge .= ':' . CellHelper::getCellIndexFromColumnIndex($shift - 1) . '1';
+            $sheet->mergeCells($merge);
         }
         $this->writer->addRow($row);
-
         return $this;
     }
 
@@ -396,10 +408,14 @@ class editor_Models_Export_Terminology_Xlsx {
             foreach (array_values($info['cols']) as $idx => $text) {
                 $cell = WriterEntityFactory::createCell($text, $style);
                 $row->setCellAtIndex($cell, $shift + $idx);
+                $this->writer->getCurrentSheet()->addColumnDimension(new ColumnDimension(
+                    CellHelper::getCellIndexFromColumnIndex($shift + $idx), max(mb_strlen($text), 10)
+                ));
             }
             $shift += count($info['cols']);
         }
         $this->writer->addRow($row);
+        $this->writer->getCurrentSheet()->setAutoFilter('A2:' . CellHelper::getCellIndexFromColumnIndex($shift - 1) . '2');
 
         return $this;
     }

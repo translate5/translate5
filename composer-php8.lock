@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3b452912919e14ffed44d5afc9fff4f0",
+    "content-hash": "a280383e5e55c7512d1c6712f1b1073b",
     "packages": [
         {
             "name": "apix/log",
@@ -7279,6 +7279,82 @@
                 "source": "https://github.com/wikimedia/composer-merge-plugin/tree/v2.0.1"
             },
             "time": "2021-02-24T05:28:06+00:00"
+        },
+        {
+            "name": "wilsonglasser/spout",
+            "version": "v3.0.14",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wilsonglasser/spout.git",
+                "reference": "3f5935842c6f366aa6f96a4f0ecc1545d820c6fa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wilsonglasser/spout/zipball/3f5935842c6f366aa6f96a4f0ecc1545d820c6fa",
+                "reference": "3f5935842c6f366aa6f96a4f0ecc1545d820c6fa",
+                "shasum": ""
+            },
+            "require": {
+                "ext-xmlreader": "*",
+                "ext-zip": "*",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2",
+                "phpunit/phpunit": "^7"
+            },
+            "suggest": {
+                "ext-iconv": "To handle non UTF-8 CSV files (if \"php-intl\" is not already installed or is too limited)",
+                "ext-intl": "To handle non UTF-8 CSV files (if \"iconv\" is not already installed)"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "WilsonGlasser\\Spout\\": "src/Spout"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Wilson Glasser",
+                    "email": "wilsonglasser@gmail.com"
+                },
+                {
+                    "name": "Adrien Loison",
+                    "email": "adrien@box.com"
+                }
+            ],
+            "description": "PHP Library to read and write spreadsheet files (CSV, XLSX and ODS), in a fast and scalable way",
+            "homepage": "https://www.github.com/box/spout",
+            "keywords": [
+                "OOXML",
+                "csv",
+                "excel",
+                "memory",
+                "odf",
+                "ods",
+                "office",
+                "open",
+                "php",
+                "read",
+                "scale",
+                "spreadsheet",
+                "stream",
+                "write",
+                "xlsx"
+            ],
+            "support": {
+                "source": "https://github.com/wilsonglasser/spout/tree/v3.0.14"
+            },
+            "time": "2021-11-17T19:45:07+00:00"
         },
         {
             "name": "wrench/wrench",
