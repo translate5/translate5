@@ -59,22 +59,7 @@
                                         "reference" : "1.13.0"
                                 }
                         }
-		},
-		{
-			"type" : "package",
-			"package" : {
-				"name" : "google/material-design-icons",
-				"license" : "Apache-2.0 License",
-				"version" : "4.0.0",
-				"description" : "Material Design icons by Google",
-				"source" : {
-					"url" : "https://github.com/google/material-design-icons.git",
-					"type" : "git",
-					"reference" : "4.0.0"
-				}
-			}
-		}
-		
+		}		
 	],
 	"require" : {
 		"ext-simplexml": "*",
