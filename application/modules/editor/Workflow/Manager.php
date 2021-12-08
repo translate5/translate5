@@ -172,12 +172,14 @@ class editor_Workflow_Manager {
             // but that should happen only while updating older installations, so no need to handle it more in detail
         }
 
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+
         foreach($workflows as $name) {
             $wf = $this->get($name);
             /* @var $wf editor_Workflow_Default */
             $data = new stdClass();
             $data->id = $name;
-            $data->label = $wf->getLabel();
+            $data->label = $translate->_($wf->getLabel());
 
             $data->roles = $wf->labelize($wf->getRoles());
             
