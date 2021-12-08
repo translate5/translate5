@@ -73,7 +73,7 @@ class Editor_CommentnavController extends ZfExtended_RestController {
         $this->view->total = count($this->view->rows);
     }
 
-    public function loadSegmentCommentArray(){
+    protected function loadSegmentCommentArray(){
         $comment_entity = ZfExtended_Factory::get('editor_Models_Comment');
         $comments = $comment_entity->loadByTaskPlainWithPage($this->session->taskGuid);
         foreach ($comments as &$row) {
@@ -86,7 +86,7 @@ class Editor_CommentnavController extends ZfExtended_RestController {
         return $comments;
     }
 
-    public function loadAnnotationsArray(){
+    protected function loadAnnotationsArray(){
         $annotation_entity = ZfExtended_Factory::get('editor_Plugins_VisualReview_Annotation_Entity');
         $annotations = $annotation_entity->loadAllByTask($this->session->taskGuid);
         foreach ($annotations as &$row) {
@@ -97,6 +97,22 @@ class Editor_CommentnavController extends ZfExtended_RestController {
             }
         }
         return $annotations;
+    }
+
+    public function getAction() {
+        throw new BadMethodCallException('commentnav supports only GET Action');
+    }
+
+    public function postAction() {
+        throw new BadMethodCallException('commentnav supports only GET Action');
+    }
+    
+    public function putAction() {
+        throw new BadMethodCallException('commentnav supports only GET Action');
+    }
+    
+    public function deleteAction() {
+        throw new BadMethodCallException('commentnav supports only GET Action');
     }
 
 }

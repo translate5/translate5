@@ -373,9 +373,8 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
 
     public function handleNormalComment(Zend_EventManager_Event $event) {
         $comment = $event->getParam('entity');
-        $a_comment = $comment->toArray();
-        $taskGuid = $a_comment['taskGuid'];
-        $a_comment  = $comment->loadByTaskPlainWithPage($taskGuid, $a_comment['id']);
+        $taskGuid = $comment->get('taskGuid');
+        $a_comment  = $comment->loadByTaskPlainWithPage($taskGuid, $comment->getId());
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         $task->loadByTaskGuid($taskGuid);

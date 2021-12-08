@@ -127,18 +127,18 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    * does not provide isEditable info
    * @param string $taskGuid
    * @param string $cid (optional) - commentId if only one comment
-   * @return array|null
+   * @return editor_Models_Comment[]|editor_Models_Comment|null
    */
   public function loadByTaskPlainWithPage(string $taskGuid, string $cid='') {
         $s = $this->db->select()
         ->distinct()
         ->setIntegrityCheck(false)
-        ->from(array('comments' => $this->db->info($this->db::NAME)))
+        ->from(['comments' => $this->db->info($this->db::NAME)])
         ->where('comments.taskGuid = ?', $taskGuid) // sort in frontend, see there
         ->joinLeft(
-            array('sm' => 'LEK_visualreview_segmentmapping'),
+            ['sm' => 'LEK_visualreview_segmentmapping'],
             'comments.segmentId = sm.segmentId',
-            array('page' => 'segmentPage', 'reviewFileId')
+            ['page' => 'segmentPage', 'reviewFileId']
         );
         if ($cid) {
             $s->where('comments.id = ?', $cid);
@@ -152,7 +152,7 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    * does not provide isEditable info
    * @param int $segmentId
    * @param string $taskGuid
-   * @return array|null
+   * @return editor_Models_Comment[]|null
    */
   public function loadBySegmentAndTaskPlain(int $segmentId, string $taskGuid) {
       $s = $this->db->select()
@@ -160,7 +160,7 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
       ->where('segmentId = ?', $segmentId)
       ->order('id DESC');
       return $this->db->getAdapter()->fetchAll($s);
-  } 
+  }
   
   /**
    * calculates the isEditable state of the current comment
