@@ -1,7 +1,7 @@
 {
 	"config" : {
 		"platform" : {
-			"php" : "7.3"
+			"php" : "8"
 		}
 	},
 	"autoload" : {
@@ -39,6 +39,10 @@
 			"type" : "vcs",
 			"url" : "https://github.com/dream-group/horde-text-diff/"
 		}, {
+			"_README" : "If the pull request https://github.com/technosophos/querypath/pull/208 will go into upstream master we will not need the separate version and URL anymore. version was ~3.0",
+			"type" : "vcs",
+			"url" : "https://github.com/thomaslauria/querypath"
+		}, {
 			"_README" : "If our pull request will go into upstream shardj/zf1-future as project we will not need the separate version and URL anymore.",
 			"type" : "vcs",
 			"url" : "https://github.com/MittagQI/zf1-php7.3"
@@ -59,7 +63,7 @@
                                         "reference" : "1.13.0"
                                 }
                         }
-		}
+		}		
 	],
 	"require" : {
 		"ext-simplexml": "*",
@@ -67,26 +71,29 @@
 		"ext-pdo": "*",
 		"ext-mysqli": "*",
 		"ext-xmlreader": "*",
+		"ext-sockets" : "*",
+		"phpunit/phpunit": "^9",
 		"shardj/zf1-future" : "dev-master",
 		"symfony/console" : "^5.0",
-		"wikimedia/composer-merge-plugin" : "~1.4",
+		"wikimedia/composer-merge-plugin" : "~2.0",
 		"comcast/php-legal-licenses" : "~1.1",
 		"gportela85/datetimefield" : "^1.9",
 		"fortawesome/font-awesome" : "^5.13",
 		"phpoffice/phpspreadsheet" : "~1.12",
-		"querypath/querypath" : "~3.0",
+		"querypath/querypath" : "dev-master",
 		"google/cloud-translate" : "~1.7",
 		"dream-group/horde-text-diff" : "dev-master",
 		"lesstif/php-jira-rest-client" : "~2.4",
 		"paquettg/php-html-parser": "^3.1",
 		"jquery/jquery-ui": "1.13.0",
-		"translate5/instanttranslate-roboto-font": "26"
+		"translate5/instanttranslate-roboto-font": "26",
+		"axelbecher/material-design-icons": "^1.0"
 	},
 	"extra" : {
 		"merge-plugin" : {
 			"include" : [
 				"application/modules/editor/Plugins/*/composer.local.json",
-				"library/*/composer.local.json"
+				"library/*/composer-php8.local.json"
 			],
 			"recurse" : true
 		},
@@ -99,9 +106,10 @@
 			"commit-msg" : "./translate5.sh dev:githook commit-msg $1"
 		}
 	},
-	"scripts": {
-        	"post-install-cmd": "cghooks add --ignore-lock; cghooks update",
-        	"post-update-cmd": "cghooks update"
+	"scripts" : {
+		"post-install-cmd" : "cghooks add --ignore-lock; cghooks update",
+		"post-update-cmd" : "cghooks update",
+		"pre-install-cmd" : "Translate5\\Installer\\HookIn::postPackageInstall"
 	},
 	"name" : "mittagqi/translate5",
 	"description" : "Open Source Translation System\nCloud translation, review, post-editing and terminology platform",
