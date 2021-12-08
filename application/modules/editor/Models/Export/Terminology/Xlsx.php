@@ -165,6 +165,57 @@ class editor_Models_Export_Terminology_Xlsx {
     public $usage = [];
 
     /**
+     * Images model
+     *
+     * @var editor_Models_Terminology_Models_ImagesModel
+     */
+    public $imagesModel;
+
+    /**
+     * Collection id
+     *
+     * @var int
+     */
+    private $collectionId;
+
+    /**
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    private $l10n;
+
+    /**
+     * Get exported file path
+     *
+     * @param int $collectionId
+     * @return string
+     */
+    public function file(int $collectionId) {
+        return join(DIRECTORY_SEPARATOR, [APPLICATION_ROOT, 'data', 'tmp', 'tc_' . $collectionId . '.xlsx']);
+    }
+
+    /**
+     * Print status msg
+     *
+     * @param $msg
+     * @param null $arg If given, will be used as 2nd arg for sprintf() call
+     * @throws Zend_Exception
+     */
+    public function status($msg, $arg = null) {
+
+        // Get translate instance if not yet got
+        if (!$this->l10n) $this->l10n = ZfExtended_Zendoverwrites_Translate::getInstance();
+
+        // Localize $msg arg
+        $msg = $this->l10n->_($msg);
+
+        // If $arg arg is given - use as template
+        if ($arg !== null) $msg = sprintf($msg, $arg);
+
+        // Print
+        d($msg);
+    }
+
+    /**
      * Do export
      *
      * @param int $collectionId
@@ -172,39 +223,6 @@ class editor_Models_Export_Terminology_Xlsx {
      * @param int $byTermEntryQty
      */
     public function exportCollectionById(int $collectionId, $tbxBasicOnly = false, $byTermEntryQty = 1000) {
-
-        // Build file path
-        $file = join(DIRECTORY_SEPARATOR, [APPLICATION_ROOT, 'data', 'tmp', 'tc_' . $collectionId . '.xlsx']);
-
-        // If session's 'download' flag is set
-        if ($_SESSION['download'] ?? false) {
-
-            // Unset session's download flag
-            unset($_SESSION['download']);
-
-            // Get collection name
-            $collection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            $collection->load($collectionId);
-            $collectionName = $collection->getName();
-
-            // If $overwrite arg is a string, assume it's a collection name, else just use 'export' as filename
-            $filename = is_string($collectionName) ? rawurlencode($collectionName) : 'export';
-
-            // Set up headers
-            header('Cache-Control: no-cache');
-            header('X-Accel-Buffering: no');
-            header('Content-Type: text/xml');
-            header('Content-Disposition: attachment; filename*=UTF-8\'\'' . $filename . '.xlsx; filename=' . $filename . '.xlsx');
-
-            // Flush the entire file
-            readfile($file);
-
-            // Delete the file
-            unlink($file);
-
-            // Exit
-            exit;
-        }
 
         // Load utils
         class_exists('editor_Utils'); mt();
@@ -215,12 +233,19 @@ class editor_Models_Export_Terminology_Xlsx {
         // Set no time limit
         set_time_limit(0);
 
+        // Assign collectionId as a class property
+        $this->collectionId = $collectionId;
+
         // Models shortcuts
         $dataTypeM  = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
         $termEntryM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
         $termM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         $attrM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
         $trscM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+        $this->imagesModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
+
+        // Build file path
+        $file = $this->file($collectionId);
 
         // Create writer and open file for writing
         $this->writer = WriterEntityFactory::createWriter('xlsx');
@@ -246,8 +271,8 @@ class editor_Models_Export_Terminology_Xlsx {
         $termEntryQty = $termEntryM->getQtyByCollectionId($collectionId);
 
         // Flush info on how may termEntries to be exported
-        d('Total termEntry-qty: ' . $termEntryQty);
-        d('Starting export...');
+        $this->status('Gesamtzahl der Termeinträge: %s', $termEntryQty);
+        $this->status('Beginn des Exports...');
 
         // Build WHERE clause
         $where = 'collectionId = ' . $collectionId;
@@ -346,17 +371,20 @@ class editor_Models_Export_Terminology_Xlsx {
             $progress = ($offset + count($termEntryA)) / $termEntryQty * 100;
 
             // Print progress percentage
-            d('Progress: ' . floor($progress)  . '%');
+            $this->status('Fortschritt: %s', floor($progress)  . '%');
+
+            //
+            //if ($p == 2) break;
         }
 
         // Flush preparing
-        d('Preparing the download...');
+        $this->status('Vorbereiten des Downloads...');
 
         // Finish creating xlsx file
         $this->writer->close();
 
         // Flush done
-        d('<strong>Done in ' . round(mt(), 3) . ' sec</strong>');
+        $this->status('Erledigt in %s Sek.', round(mt(), 3));
 
         // Setup session's 'download'-flag, so that on reload we could catch that and initiate download
         $_SESSION['download'] = true;
@@ -395,7 +423,7 @@ class editor_Models_Export_Terminology_Xlsx {
 
                 // Else if it's figure-attr
                 } else if ($type == 'figure') {
-                    $data[$dataTypeId_figure = $attr['dataTypeId']][$attr['target']] = $attr['target'];
+                    $data[$dataTypeId_figure = $attr['dataTypeId']] [$attr['target']]= $attr['target'];
 
                 // Else if it's crossReference-attr
                 } else {
@@ -404,6 +432,18 @@ class editor_Models_Export_Terminology_Xlsx {
 
             // Else
             } else $data[$attr['dataTypeId']] []= $attr['value'];
+        }
+
+        // Get images URLs
+        if ($data[$dataTypeId_figure] ?? 0) {
+
+            // Get image paths by target ids
+            $paths = $this->imagesModel->getImagePathsByTargetIds($this->collectionId, $data[$dataTypeId_figure]);
+
+            // Foreach path
+            foreach ($paths as $target => $src)
+                $data[$dataTypeId_figure][$target]
+                    = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $src;
         }
 
         // Join multi-values by newlines
@@ -455,6 +495,9 @@ class editor_Models_Export_Terminology_Xlsx {
 
         // Foreach column group
         foreach ($this->cols as $group => $info) {
+
+            // If no cols - skip
+            if (!$info['cols']) continue;
 
             // Prepare style
             $styleBuilder = new StyleBuilder();

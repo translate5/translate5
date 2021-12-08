@@ -2025,6 +2025,11 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QmlsZGVyIGltIEhleC1Gb3JtYXQgZXhwb3J0aWVyZW4sIGVpbmdlYmV0dGV0IGluIFRCWA=='><source>Bilder im Hex-Format exportieren, eingebettet in TBX</source><target>Bilder im Hex-Format exportieren, eingebettet in TBX</target></trans-unit>
 <trans-unit id='QWxzIFRCWCBleHBvcnRpZXJlbg=='><source>Als TBX exportieren</source><target>Als TBX exportieren</target></trans-unit>
 <trans-unit id='QWxzIFhMU1ggZXhwb3J0aWVyZW4='><source>Als XLSX exportieren</source><target>Als XLSX exportieren</target></trans-unit>
+<trans-unit id='R2VzYW10emFobCBkZXIgVGVybWVpbnRyw6RnZTogJXM='><source>Gesamtzahl der Termeinträge: %s</source><target>Gesamtzahl der Termeinträge: %s</target></trans-unit>
+<trans-unit id='QmVnaW5uIGRlcyBFeHBvcnRzLi4u'><source>Beginn des Exports...</source><target>Beginn des Exports...</target></trans-unit>
+<trans-unit id='Rm9ydHNjaHJpdHQ6ICVz'><source>Fortschritt: %s</source><target>Fortschritt: %s</target></trans-unit>
+<trans-unit id='Vm9yYmVyZWl0ZW4gZGVzIERvd25sb2Fkcy4uLg=='><source>Vorbereiten des Downloads...</source><target>Vorbereiten des Downloads...</target></trans-unit>
+<trans-unit id='RXJsZWRpZ3QgaW4gJXMgU2VrLg=='><source>Erledigt in %s Sek.</source><target>Erledigt in %s Sek.</target></trans-unit>
 <trans-unit id='MS4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'><source>1. Lektorat (sprachlich)</source><target>1. Lektorat (sprachlich)</target></trans-unit>
 <trans-unit id='MS4gTGVrdG9yYXQgKHRlY2huaXNjaCk='><source>1. Lektorat (technisch)</source><target>1. Lektorat (technisch)</target></trans-unit>
 <trans-unit id='Mi4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'><source>2. Lektorat (sprachlich)</source><target>2. Lektorat (sprachlich)</target></trans-unit>

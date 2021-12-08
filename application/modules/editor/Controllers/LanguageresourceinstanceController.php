@@ -774,7 +774,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $params = $this->getRequest()->getParams();
 
         // Check params
-        editor_Utils::jcheck([
+        $_ = editor_Utils::jcheck([
             'collectionId' => [
                 'req' => true,
                 'rex' => 'int11',
@@ -782,13 +782,42 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             ]
         ], $params);
 
-        // Turn off limitations
-        ignore_user_abort(1); set_time_limit(0);
+        // Turn off time limit
+        set_time_limit(0);
 
         // Export collection
-        ZfExtended_Factory
-            ::get('editor_Models_Export_Terminology_Xlsx')
-            ->exportCollectionById($params['collectionId']);
+        $xlsx = ZfExtended_Factory::get('editor_Models_Export_Terminology_Xlsx');
+
+        // If session's 'download' flag is set
+        if ($_SESSION['download'] ?? false) {
+
+            // Build file path
+            $file = $xlsx->file($_['collectionId']['id']);
+
+            // Unset session's download flag
+            unset($_SESSION['download']);
+
+            // Convert collection name to filename
+            $filename = rawurlencode($_['collectionId']['name']);
+
+            // Set up headers
+            header('Cache-Control: no-cache');
+            header('X-Accel-Buffering: no');
+            header('Content-Type: text/xml');
+            header('Content-Disposition: attachment; filename*=UTF-8\'\'' . $filename . '.xlsx; filename=' . $filename . '.xlsx');
+
+            // Flush the entire file
+            readfile($file);
+
+            // Delete the file
+            unlink($file);
+
+            // Exit
+            exit;
+        }
+
+        // Do export
+        $xlsx->exportCollectionById($params['collectionId']);
     }
 
     /***
