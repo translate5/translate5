@@ -127,7 +127,7 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    * does not provide isEditable info
    * @param string $taskGuid
    * @param string $cid (optional) - commentId if only one comment
-   * @return editor_Models_Comment[]|editor_Models_Comment|null
+   * @return array|null
    */
   public function loadByTaskPlainWithPage(string $taskGuid, string $cid='') {
         $s = $this->db->select()
@@ -152,7 +152,7 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    * does not provide isEditable info
    * @param int $segmentId
    * @param string $taskGuid
-   * @return editor_Models_Comment[]|null
+   * @return array|null
    */
   public function loadBySegmentAndTaskPlain(int $segmentId, string $taskGuid) {
       $s = $this->db->select()

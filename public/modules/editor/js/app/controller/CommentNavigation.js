@@ -55,9 +55,8 @@ Ext.define('Editor.controller.CommentNavigation', {
         messagebus: {
             '#translate5 task': {
                 commentChanged: function carryChangeToStore({comment,connectionId}){
-                    console.log(arguments)
-                    cl = this.getCommentList();
-                    store = cl.store;
+                    var cl = this.getCommentList();
+                    var store = cl.store;
                     var updated = new store.model(comment);
                     var existing = store.getById(comment.id);
                     /** Update exsiting record - Why this way?
