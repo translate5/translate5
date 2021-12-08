@@ -2043,6 +2043,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U3RhbmRhcmQgV29ya2Zsb3c='><source>Standard Workflow</source><target>Standard Workflow</target></trans-unit>
 <trans-unit id='Q29tcGxleCBXb3JrZmxvdw=='><source>Complex Workflow</source><target>Complex Workflow</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQgV29ya2Zsb3cgKMOcYmVyc2V0enVuZywgTGVrdG9yYXQsIFp3ZWl0ZXMgTGVrdG9yYXQp'><source>Standard Workflow (Übersetzung, Lektorat, Zweites Lektorat)</source><target>Standard Workflow</target></trans-unit>
+<trans-unit id='SW1wb3J0IGFiYnJlY2hlbg=='><source>Import abbrechen</source><target>Import abbrechen</target></trans-unit>
   </body>
  </file>
 </xliff>

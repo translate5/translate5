@@ -93,6 +93,7 @@ Ext.define('Editor.controller.Termportal', {
      */
     isTermportalAllowed:function(){
         var userRoles=Editor.data.app.user.roles.split(",");
+        //FIXME must check the rights, not the roles! a new frontend right must be added and distributed over the roles
         return (Ext.Array.indexOf(userRoles, "termCustomerSearch") >= 0) || (Ext.Array.indexOf(userRoles, "termProposer") >= 0) ;
     }
 });

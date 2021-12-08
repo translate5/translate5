@@ -4357,6 +4357,10 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Standard Workflow (Übersetzung, Lektorat, Zweites Lektorat)</source>
     <target>Standard Workflow</target>
 </trans-unit>
+<trans-unit id='SW1wb3J0IGFiYnJlY2hlbg=='>
+    <source>Import abbrechen</source>
+    <target>Cancel import</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
