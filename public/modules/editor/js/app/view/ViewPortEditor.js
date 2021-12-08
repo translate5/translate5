@@ -104,8 +104,8 @@ Ext.define('Editor.view.ViewPortEditor', {
               }
             ]
           },{
-              region: 'center',
-              flex:Editor.app.getController('LanguageResources').isLanguageResourcesDisabled() ? 0.3 : 0.5,
+              region: 'center', // implicit flex:1
+              height: 236, // 236 is high enough to show all action buttons on the right
               xtype: 'segments.grid',
               itemId: 'segmentgrid',
               stateful: {
