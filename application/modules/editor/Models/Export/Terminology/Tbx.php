@@ -486,23 +486,8 @@ class editor_Models_Export_Terminology_Tbx {
         // If $overwrite arg is truly
         if ($overwrite) {
 
-            // If $overwrite arg is integer, assume it's a collectionId
-            if (is_string($collectionName = $overwrite)) {
-            //if (is_int($collectionId = $overwrite)) {
-
-                // Get collection name
-                /*$collection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-                $collection->load($collectionId);
-                $filename = $collection->getName();
-
-                // Convert to filename
-                $filename = rawurlencode($filename);*/
-                $filename = rawurlencode($collectionName);
-                //$filename = rawurlencode(array_reverse(preg_split('~\\/~', $filename))[0]);
-
-                //i($filename, 'a');
-            // Else just use 'export' as filename
-            } else $filename = 'export';
+            // If $overwrite arg is a string, assume it's a collection name, else just use 'export' as filename
+            $filename = is_string($overwrite) ? rawurlencode($overwrite) : 'export';
 
             // Set up headers
             header('Cache-Control: no-cache');
