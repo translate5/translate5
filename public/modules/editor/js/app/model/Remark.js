@@ -41,11 +41,22 @@ END LICENSE AND COPYRIGHT
     fields: [
       {name: 'id', type: 'int'},
       {name: 'segmentId', type: 'int'},
-      {name: 'userName', type: 'string'},
+      {name: 'userName', type: 'string', mapping: function(data){
+          if(data.userName) return data.userName;
+          var ret = '';
+          if(data.firstName) ret += data.firstName;
+          if(data.surName) ret += (ret && ' ') + data.surName;
+          if(!ret) ret = 'Anonymous';
+          return ret;
+        }
+      },
       {name: 'comment', type: 'string'},
-      {name: 'modified', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+      {name: 'modified', type: 'string', dateFormat: Editor.DATE_ISO_FORMAT, mapping:'updated'},
       {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
-      {name: 'page', type: 'integer',  default: -1},
+      {name: 'page', type: 'integer',  default: -1, convert: function(v, rec){
+        if(v==0) v=rec.get('reviewFileId');
+        return v;
+      }},
       {name: 'x', type: 'number', default: -1},
       {name: 'y', type: 'number', default: -1},
       {name: 'type', type: 'string'},

@@ -123,18 +123,30 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
   }
   
   /**
-   * Loads all comments of a segment by segmentid and taskguid, orders by creation order
+   * Loads all comments of a task by taskguid with corresponding page, optionally only the one specified by id
    * does not provide isEditable info
-   * @param int $segmentId
    * @param string $taskGuid
+   * @param string $cid (optional) - commentId if only one comment
    * @return array|null
    */
-  public function loadByTaskPlain(string $taskGuid) {
-      $s = $this->db->select()
-      ->where('taskGuid = ?', $taskGuid); // sort in frontend, see there
-      return $this->db->getAdapter()->fetchAll($s);
-  }
-
+  public function loadByTaskPlainWithPage(string $taskGuid, string $cid='') {
+        $s = $this->db->select()
+        ->distinct()
+        ->setIntegrityCheck(false)
+        ->from(array('comments' => $this->db->info($this->db::NAME)))
+        ->where('comments.taskGuid = ?', $taskGuid) // sort in frontend, see there
+        ->joinLeft(
+            array('sm' => 'LEK_visualreview_segmentmapping'),
+            'comments.segmentId = sm.segmentId',
+            array('page' => 'segmentPage', 'reviewFileId')
+        );
+        if ($cid) {
+            $s->where('comments.id = ?', $cid);
+            return $this->db->getAdapter()->fetchRow($s); // returns array
+        } else {
+            return $this->db->getAdapter()->fetchAll($s);
+        }
+    }
   /**
    * Loads all comments of a segment by segmentid and taskguid, orders by creation order
    * does not provide isEditable info

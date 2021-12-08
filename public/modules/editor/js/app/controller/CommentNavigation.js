@@ -32,40 +32,45 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.controller.CommentNavigation', {
-  extend: 'Ext.app.Controller',
-  models: ['Comment'],
-  stores: ['comments.AllComments'],
-  views: ['comments.Navigation'],
+    extend: 'Ext.app.Controller',
+    models: ['Comment'],
+    stores: ['comments.AllComments'],
+    views: ['comments.Navigation'],
 
-  refs: [{
-    ref: 'commentList',
-    selector: '#commentList'
-  }],
-  control: {
-    commentNavigation: {
-      'expand': 'loadStore'
-    }
-  },
-  listen: {
-    component: {
-      '#commentList': {
-        itemclick: 'jumpThere'
-      }
+    refs: [{
+        selector: '#commentList',
+        ref: 'commentList',
+    }],
+    control: {
+        commentNavigation: {
+            'expand': 'loadStore'
+        }
     },
+    listen: {
+        component: {
+            '#commentList': {
+                itemclick: 'jumpThere'
+            }
+        },
         messagebus: {
             '#translate5 task': {
-                commentChanged: function carryChangeToStore({comment, connectionId}){
+                commentChanged: function carryChangeToStore({comment,connectionId}){
                     console.log(arguments)
                     cl = this.getCommentList();
                     store = cl.store;
                     var updated = new store.model(comment);
                     var existing = store.getById(comment.id);
-                    if(existing){
+                    /** Update exsiting record - Why this way?
+                    * store.update(...) triggers a request
+                    * store.data.replace() does not replace (at least in ExtJS-6.2.0)
+                    * Modifying existing saves sort operations
+                    */
+                    if(existing) {
                         //store.update({records:[new store.model(comment)]}) //trigers request
                         var changed = [];
                         for(prop in existing.data){
                             if(existing.get(prop) !== updated.get(prop)){
-                                existing.set(prop, updated.get(prop), {silent:true, commit:false});
+                                existing.set(prop,updated.get(prop),{silent:true, commit:false});
                                 changed.push(prop);
                             }
                             if(changed.length){
@@ -73,47 +78,41 @@ Ext.define('Editor.controller.CommentNavigation', {
                             }
                         }
                         updated = existing;
-                        //store.data.replace(existing, );
-                        //store.data.removeAt(store.data.indexOf(existing))
-                        //cl.refresh();
                     } else {
-                        store.add(updated)
+                        store.addSorted(updated)
                     }
                     cl.scrollable.doHighlight(cl.getNodeByRecord(updated));
                 }
             }
         }
-  },
+    },
 
-  loadStore: function () {
-    var cl = this.getCommentList();
-    cl.store.load();
-  },
-  jumpThere: function (origin, record, item, index, e) {
-    switch (record.data.type) {
-      case 'segmentComment':
-        var
-          grid = Ext.getCmp('segment-grid'),
-          view = grid.view,
-          rec = grid.store.getById(record.data.segmentId);
-        //grid.scrollTo(recIdx); // does not animate upwards direction
-        var rowTableEl = view.el.getById(view.getRowId(rec)); //table has bgColor set for end of animation
-        grid.setSelection(rec);
-        grid.getScrollable().scrollIntoView(rowTableEl, false, true, true);
-        break;
+    loadStore: function() {
+        var cl = this.getCommentList();
+        cl.store.load();
+    },
+    jumpThere: function(origin, record, item, index, e) {
+        switch(record.data.type) {
+            case 'segmentComment':
+                var
+                    grid = Ext.getCmp('segment-grid'),
+                    view = grid.view,
+                    rec = grid.store.getById(record.data.segmentId);
+                //grid.scrollTo(recIdx); // does not animate upwards direction
+                var rowTableEl = view.el.getById(view.getRowId(rec)); //table has bgColor set for end of animation
+                grid.setSelection(rec);
+                grid.getScrollable().scrollIntoView(rowTableEl, false, true, true);
+                break;
 
-      case 'visualAnnotation':
-        var
-            vr = Ext.first('visualReviewPanel'),
-            vc = vr && vr.getController();
-        if(vc){
-            vc.scrollToAnnotation(record);
+            case 'visualAnnotation':
+                var
+                    vr = Ext.first('visualReviewPanel'),
+                    vc = vr && vr.getController();
+                if(vc){
+                    vc.scrollToAnnotation(record);
+                }
+                break;
         }
-        break;
+
     }
-
-  }
-
-
-}
-)
+})

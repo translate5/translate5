@@ -75,13 +75,12 @@ class Editor_CommentnavController extends ZfExtended_RestController {
 
     public function loadSegmentCommentArray(){
         $comment_entity = ZfExtended_Factory::get('editor_Models_Comment');
-        $comments = $comment_entity->loadByTaskPlain($this->session->taskGuid);
+        $comments = $comment_entity->loadByTaskPlainWithPage($this->session->taskGuid);
         foreach ($comments as &$row) {
             $row['comment'] = htmlspecialchars($row['comment']);
             $row['type'] = 'segmentComment';
-            unset($row['userGuid']);
             if($this->wfAnonymize) {
-                $row = $wfAnonymize->anonymizeUserdata($this->session->taskGuid, $row['userGuid'], $row);
+                $row = $this->wfAnonymize->anonymizeUserdata($this->session->taskGuid, $row['userGuid'], $row);
             }
         }
         return $comments;
@@ -93,9 +92,8 @@ class Editor_CommentnavController extends ZfExtended_RestController {
         foreach ($annotations as &$row) {
             $row['comment'] = htmlspecialchars($row['text']);
             $row['type'] = 'visualAnnotation';
-            unset($row['userGuid']);
             if($this->wfAnonymize) {
-                $row = $wfAnonymize->anonymizeUserdata($this->session->taskGuid, $row['userGuid'], $row);
+                $row = $this->wfAnonymize->anonymizeUserdata($this->session->taskGuid, $row['userGuid'], $row);
             }
         }
         return $annotations;

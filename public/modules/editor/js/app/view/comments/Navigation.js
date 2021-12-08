@@ -37,39 +37,84 @@ Ext.define('Editor.view.comments.Navigation', {
     items: [{
         xtype: 'dataview',
         itemId: 'commentList',
+        id:'commentNavList',
         store: {
             type:'AllComments',
+            autoLoad:true,
             sorters: [ // must sort here in frontend for new comments' correct position
+                { property: 'page', direction: 'ASC' },
+                { property: 'type', direction: 'DESC' },
                 { property: 'segmentId', direction: 'ASC' },
                 { property: 'y', direction: 'ASC' },
-                { property: 'page', direction: 'ASC' },
                 { property: 'id', direction: 'ASC' },
             ]
         },
         scrollable: true,
+        itemSelector: 'div.x-grid-item',
         tpl: [
-            '<tpl for=".">',
-            '<div class="x-grid-item x-grid-cell-inner {[this.getIcon(values.type)]} fs16" tabindex="-1"> {comment}</div>',
-            '</tpl>',
+            `<tpl for=".">
+                <div class="x-grid-item x-grid-cell-inner {[this.iconClass[values.type]]} {[this.getUserColor(values.userGuid)]} " tabindex="-1"> {comment}</div>
+            </tpl>`,
             {
-                getIcon: function (type) {
-                    return {
-                        'segmentComment': 'x-fa fa-comment-o',
-                        'visualAnnotation': 'x-fa fa-map-marker',
-                        'videoAnnotation': 'x-fa fa-video-camera',
-                    }[type];
+                iconClass: {
+                    'segmentComment': 'x-fa fa-comment-o',
+                    'visualAnnotation': 'x-fa fa-map-marker',
+                    'videoAnnotation': 'x-fa fa-video-camera',
+                },
+                // internal user tracking number cache used for assigning unique css annotation class(when anonymized users is active we need to augo generate one).
+                trackingUserNumberCache: [],
+                getUserColor:function(userGuid){
+                    var me = this;
+                    if(me.trackingUserNumberCache[userGuid] === undefined){
+                        var trackedUser = me.tracking.findRecord('userGuid',userGuid);
+                        me.trackingUserNumberCache[userGuid] = trackedUser === null ? 'X' : trackedUser.get('taskOpenerNumber');
+                    }
+                    return 'usernr'+me.trackingUserNumberCache[userGuid];
                 }
             }
         ],
-        itemSelector: 'div.x-grid-item',
     }],
+    tipTpl: new Ext.XTemplate([
+        `<div style="padding:10px;font-size:16px;font-weight:normal;line-height:1.5">{comment}</div>
+         <hr>
+         <small><i>{userName} {modified}</i></small>
+         `,
+        {
+            // type: -> see localizedjsstrings.phtml
+        }
+    ]),
 
-    title: '#UT#Kommentare',
+    //title: 'Kommentare', // see EXT6UPD-9 + localizedjsstrings.phtml
     itemId: 'commentNavigation',
     layout: 'fit',
-
-    initConfig: function (config) {
-        config.title= this.title; //see EXT6UPD-9
-        return this.callParent(arguments);
+    initComponent:function(){
+        this.callParent(arguments);
+        var dataview = this.down('dataview');
+        dataview.store.addListener('beforeload',function(){
+            dataview.tpl.tracking = Editor.data.task.userTracking();
+        }, dataview.store, {single:true});
     },
+
+    afterRender: function(){
+        var me = this;
+        me.callParent(arguments);
+        var view = me.down('dataview');
+        view.tip = Ext.create('Ext.tip.ToolTip', {
+            target: view.el,
+            delegate: view.itemSelector,
+            trackMouse: true,
+            mouseOffset: [30, 1],
+            listeners: {
+                beforeshow: function updateTipBody(tip) {
+                    var rec = view.getRecord(tip.triggerElement);
+                    if(tip.pointerEvent.clientX <= 25){ // left side: show type of annotation as tooltip
+                         tip.update(me.tipTpl.type[rec.data.type])
+                    } else { // show regular tooltip
+                        tip.update(me.tipTpl.apply(rec.data));
+                    }
+                }
+            }
+        });
+    }
+
 });

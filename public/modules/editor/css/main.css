@@ -37,6 +37,7 @@ END LICENSE AND COPYRIGHT
     --color-usernr6: #FFD8D4;/* pink pale */
     --color-usernr7: #9af2db;/* turquoise pale */
     --color-usernr8: #b5f3bf;/* lime green pale */
+    --color-usernrX: lightgray;/* lightgray */
 }
 
 /* T5DEV-161: visual review requres this to be set to 'initial' and not to 'relative' else the review file will not be displayed! */
@@ -882,6 +883,30 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
     text-align: center;
 }
 
-.fs16 {
-  font-size: 16px;
+#commentNavList>div {
+    font-size: 16px;
 }
+
+#commentNavList>div:hover {
+    background-color: #99BCE8;
+}
+
+#commentNavList>div::before{
+    display: inline-block;
+    width: 1.28571em;
+    width: 25px;
+    text-align: center;
+    border-radius: 3px;
+    margin: -3px 0 -6px -5px;
+    line-height: 25px;
+}
+
+#commentNavList>div.usernr1::before {background-color: var(--color-usernr1);}
+#commentNavList>div.usernr2::before {background-color: var(--color-usernr2);}
+#commentNavList>div.usernr3::before {background-color: var(--color-usernr3);}
+#commentNavList>div.usernr4::before {background-color: var(--color-usernr4);}
+#commentNavList>div.usernr5::before {background-color: var(--color-usernr5);}
+#commentNavList>div.usernr6::before {background-color: var(--color-usernr6);}
+#commentNavList>div.usernr7::before {background-color: var(--color-usernr7);}
+#commentNavList>div.usernr8::before {background-color: var(--color-usernr8);}
+#commentNavList>div.usernrX::before {background-color: var(--color-usernrX);}

@@ -48,7 +48,8 @@ Ext.define('Editor.view.ViewPortEditor', {
         'Editor.view.segments.MetaPanelNavi',
         'Editor.view.segments.MetaPanel',
         'Editor.view.quality.FilterPanel',
-        'Editor.view.comments.Navigation'
+        'Editor.view.comments.Navigation',
+        'Editor.view.Filepanel'
     ],
 
     viewModel: {
@@ -78,8 +79,10 @@ Ext.define('Editor.view.ViewPortEditor', {
               title: me.items_west_title,
               width: 250,
               collapsible: true,
-              layout: {type:'accordion'}, // accordian layout requires panels, calls e.g. addBodyCls
+              layout: {type:'accordion'}, // accordian layout requires panels as children, calls e.g. addBodyCls
               animCollapse: true,
+              bodyPadding: 0,
+              defaults: {margin:0},
               itemId: 'filepanel',
               items: [{
                   xtype: 'qualityFilterPanel',
@@ -88,20 +91,18 @@ Ext.define('Editor.view.ViewPortEditor', {
                   stateful: true
               },{
                 xtype: 'commentNavigation',
-                stateId: 'editor.westPanelCommentNavigation',
+                stateId: 'editor.commentNav',
                 stateEvents: ['collapse', 'expand'],
                 stateful: true
-              },{
-                  xtype: 'fileorder.tree',
-                  stateId: 'editor.westPanelFileorderTree',
-                  stateEvents: ['collapse', 'expand'],
-                  stateful: true
-              },{
-                  xtype: 'referenceFileTree',
-                  stateId: 'editor.westPanelReferenceFileTree',
-                  stateEvents: ['collapse', 'expand'],
-                  stateful: true
-              }]
+              },
+              {
+                xtype:'taskfiles',
+                stateId: 'editor.taskFiles',
+                stateEvents: ['collapse', 'expand'],
+                stateful: {collapsed:true},
+                itemId: 'filesection'
+              }
+            ]
           },{
               region: 'center',
               flex:Editor.app.getController('LanguageResources').isLanguageResourcesDisabled() ? 0.3 : 0.5,
