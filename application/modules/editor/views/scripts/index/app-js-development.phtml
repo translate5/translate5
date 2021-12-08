@@ -43,6 +43,12 @@ $version = '?v='.$this->appVersion;
 <link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/css/main.css<?php echo $version;?>" />
 <link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/css/themes/<?php echo $this->userTheme;?>.css<?php echo $version;?>" />
 <link rel="stylesheet" type="text/css" href="<?php echo $this->extJsBasepath;?>/build/packages/ux/classic/classic/resources/ux-all.css"/>
+<?php if($this->userTheme !== 'triton'){ echo <<<FONTAWESOME_CLASSES_FROM_EXTJS
+<link rel="stylesheet" type="text/css" href="$this->extJsBasepath/build/packages/font-awesome/resources/font-awesome-all.css"/>
+FONTAWESOME_CLASSES_FROM_EXTJS;
+}
+?>
+
 <link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath;?>/fontawesome/extjs.css"/>
 <link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath;?>/material-design-icons/material-design-icons.css"/>
 

@@ -26,45 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* This css will be applied when this theme is active. */
-@CHARSET "UTF-8";
-body:not(.loading) > #head-panel {
-  background: url(/images/translate5-transparent.png?v=1) no-repeat 19px 19px #3f4757 !important; 
-    background-size: 150px !important;
-}
-
-tr.no-users td div {
-    color: #009d7b !important;
-}
-tr.import td div {
-    color: #b642e8 !important;
-}
-
-/* fix the color of the text for odd grid cells in treegrid */
-.x-tree-view .x-grid-item:nth-of-type(odd) .x-grid-cell {
-    background-color: #EAF1FB !important;
-    color: black !important;
-}
-
-#segment-grid .x-grid-row-editor .segment-content .x-form-display-field {
-    color: #ffffff !important;
-    cursor: text !important;
-}
-
-#segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
-	color: #ffffff !important;
-	white-space: normal !important;
-}
-
-.customMaterialIconStyle{
-    color: #34383f;
-    opacity:1 !important;
-}
-
-.commentPanel .customMaterialIconStyle{
-    color: #b0b0b0;
-}
-
-.x-menu-item-icon.x-fa {
-    color: #ffffff;
-}
+/**
+ * Store für Editor.model.Comment
+ * @class Editor.store.AllComments
+ * @extends Ext.data.Store
+ */
+ Ext.define('Editor.store.comments.AllComments', {
+  extend : 'Ext.data.Store',
+  alias: 'store.AllComments',
+  model: 'Editor.model.Remark',
+  storeId: 'AllComments',
+  remoteFilter: true,
+  autoLoad: false,
+  autoSync: false,
+  pageSize: 0,
+  buffered: false,
+});

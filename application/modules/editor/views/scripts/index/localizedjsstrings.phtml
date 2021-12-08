@@ -265,6 +265,7 @@ Ext.define('Editor.controller.Localizer', {
         messageIsViewModeDueHiddenTags: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die "Tags" ausgeblendet wurden. Klicken Sie auf "Ansicht" und blenden Sie die Tags wieder ein.');?>'
     });
 
+    Editor.view.Filepanel.prototype.title = '<?php echo $this->translate->_('Dateien');?>';
   	Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
   	Editor.view.fileorder.ReferenceTree.prototype.title = '<?php echo $this->translate->_('Referenz-Dateien');?>';
 
@@ -280,6 +281,17 @@ Ext.define('Editor.controller.Localizer', {
 		startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
         newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
 	};
+
+    Ext.define("Editor.locale.view.comments.Navigation", {
+        override: "Editor.view.comments.Navigation",
+        title: Editor.view.segments.column.Comments.prototype.text,
+    });
+    Editor.view.comments.Navigation.prototype.tipTpl.type = {
+        'segmentComment': '<?php echo $this->translate->_('Segment-Kommentar');?>',
+        'visualAnnotation': '<?php echo $this->translate->_('Freie Anmerkung');?>',
+        'videoAnnotation': '<?php echo $this->translate->_('Video-Anmerkung');?>',
+    }
+
   	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('Manuelle QS (im Segment)');?>';
   	Editor.view.quality.mqm.Fieldset.prototype.strings = {
 		severityLabel: '<?php echo $this->translate->_('Gewichtung');?>',

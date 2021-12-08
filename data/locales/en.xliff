@@ -1474,6 +1474,9 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id='TG9n'><source>Log</source><target>Log</target></trans-unit>
 <trans-unit id='T2JlcmZsw6RjaGU='><source>Oberfläche</source><target>interface</target></trans-unit>
 <trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='><source>{LinkConsortium}</source><target>https://www.translate5.net/en/consortium</target></trans-unit>
+<trans-unit id='U2VnbWVudC1Lb21tZW50YXI='><source>Segment-Kommentar</source><target></target>segment comment</trans-unit>
+<trans-unit id='RnJlaWUgQW5tZXJrdW5n'><source>Freie Anmerkung</source><target>free annotation</target></trans-unit>
+<trans-unit id='VmlkZW8tQW5tZXJrdW5n'><source>Video-Anmerkung</source><target>video annotation</target></trans-unit>
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>

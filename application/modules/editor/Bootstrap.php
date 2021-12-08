@@ -227,7 +227,12 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'project'
         )));
 
-
+        $this->front->getRouter()->addRoute('editorTaskCommentNav', new ZfExtended_Controller_RestLikeRoute(
+            'editor/commentnav',[
+                'module' => 'editor',
+                'controller' => 'commentnav',
+                'action' => 'index'
+            ]));
 
         //FIXME convert me to RestLikeRoute (see filemap)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
