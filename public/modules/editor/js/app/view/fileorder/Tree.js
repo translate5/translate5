@@ -58,8 +58,8 @@ Ext.define('Editor.view.fileorder.Tree', {
     selModel:{
       singleSelect: true,
     },
-    plugins: [
-      Ext.create('Ext.tree.plugin.TreeViewDragDrop')
-    ]
+    plugins: [{
+        ptype: 'treeviewdragdrop',
+    }]
   }
 });
