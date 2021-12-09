@@ -140,7 +140,7 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             '--colors',
             '--verbose',
             '--cache-result-file',
-            'application/modules/editor/testcases/.phpunit.result.cache',
+            '.phpunit.result.cache',
             '--bootstrap',
             self::RELATIVE_TEST_ROOT.'bootstrap.php',
             $testGiven ?? self::RELATIVE_TEST_DIR
