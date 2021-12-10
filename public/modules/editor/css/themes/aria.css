@@ -64,3 +64,7 @@ tr.import td div {
 .commentPanel .customMaterialIconStyle{
     color: #b0b0b0;
 }
+
+.x-menu-item-icon.x-fa {
+    color: #ffffff;
+}

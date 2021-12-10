@@ -38,8 +38,8 @@ class editor_Models_Import_Worker_Behaviour extends ZfExtended_Worker_Behaviour_
     protected $task;
 
     public function __construct() {
-        //in import worker behaviour isMaintenanceScheduled is by default on
-        $this->config['isMaintenanceScheduled'] = true;
+        //in import worker behaviour isMaintenanceScheduled is by default on and does not start anymore 60 minutes before maintenance
+        $this->config['isMaintenanceScheduled'] = 60;
     }
     
     /**

@@ -44,7 +44,6 @@ END LICENSE AND COPYRIGHT
  * @method string getTimestamp() getTimestamp()
  * @method void setTimestamp() setTimestamp(string $timestamp)
  * @method string getCustomers() getCustomers()
- * @method void setCustomers() setCustomers(string $customerId)
  * @method bool getRepetition() getRepetition()
  * @method void setRepetition() setRepetition(bool $repetition)
  * @method string getUserGuid() getUserGuid()
@@ -107,16 +106,16 @@ class editor_Models_LanguageResources_UsageLogger extends ZfExtended_Models_Enti
     
     /***
      * Delete log entries for the given customerId. 
-     * For log entires with multiple customers, only the given customer will be removed.
+     * For log entries with multiple customers, only the given customer will be removed.
      * @param int $customerId
      */
     public function deleteByCustomer(int $customerId) {
-        $sql = "UPDATE `LEK_languageresources_usage_log` SET `customers` = replace(customers, ',?,', ',')";
-        $this->db->getAdapter()->query($sql,$customerId);
+        $bindParam = ','.$customerId.',';
+        $sql = "UPDATE `LEK_languageresources_usage_log` SET `customers` = replace(`customers`,?, ',')";
+        $this->db->getAdapter()->query($sql,$bindParam);
         $this->db->delete([
             'customers = ? OR customers="," OR customers=",," ' => $customerId // Check for empty rows. The above query can leave single , as value
         ]);
-        
     }
     
     /**

@@ -1,0 +1,120 @@
+
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/**
+ * @class Editor.view.comments.Navigation
+ */
+Ext.define('Editor.view.comments.Navigation', {
+    extend: 'Ext.panel.Panel',
+    alias: 'widget.commentNavigation',
+
+    collapsible: true,
+    items: [{
+        xtype: 'dataview',
+        itemId: 'commentList',
+        id:'commentNavList',
+        store: {
+            type:'AllComments',
+            autoLoad:true,
+            sorters: [ // must sort here in frontend for new comments' correct position
+                { property: 'page', direction: 'ASC' },
+                { property: 'type', direction: 'DESC' },
+                { property: 'segmentId', direction: 'ASC' },
+                { property: 'y', direction: 'ASC' },
+                { property: 'id', direction: 'ASC' },
+            ]
+        },
+        scrollable: true,
+        itemSelector: 'div.x-grid-item',
+        tpl: [
+            `<tpl for=".">
+                <div class="x-grid-item x-grid-cell-inner {[this.iconClass[values.type]]} {[this.getUserColor(values.userGuid)]} " tabindex="-1"> {comment}</div>
+            </tpl>`,
+            {
+                iconClass: {
+                    'segmentComment': 'x-fa fa-comment-o',
+                    'visualAnnotation': 'x-fa fa-map-marker',
+                    'videoAnnotation': 'x-fa fa-video-camera',
+                },
+                // internal user tracking number cache used for assigning unique css annotation class(when anonymized users is active we need to augo generate one).
+                trackingUserNumberCache: [],
+                getUserColor:function(userGuid){
+                    var me = this;
+                    if(me.trackingUserNumberCache[userGuid] === undefined){
+                        var trackedUser = me.tracking.findRecord('userGuid',userGuid);
+                        me.trackingUserNumberCache[userGuid] = trackedUser === null ? 'X' : trackedUser.get('taskOpenerNumber');
+                    }
+                    return 'usernr'+me.trackingUserNumberCache[userGuid];
+                }
+            }
+        ],
+    }],
+    tipTpl: new Ext.XTemplate([
+        `<div style="padding:10px;font-size:16px;font-weight:normal;line-height:1.5">{comment}</div>
+         <hr>
+         <small><i>{userName} {modified}</i></small>
+         `,
+        {
+            // type: -> see localizedjsstrings.phtml
+        }
+    ]),
+
+    //title: 'Kommentare', // see EXT6UPD-9 + localizedjsstrings.phtml
+    itemId: 'commentNavigation',
+    layout: 'fit',
+    initComponent:function(){
+        this.callParent(arguments);
+        var dataview = this.down('dataview');
+        dataview.store.addListener('beforeload',function(){
+            dataview.tpl.tracking = Editor.data.task.userTracking();
+        }, dataview.store, {single:true});
+    },
+
+    afterRender: function(){
+        var me = this;
+        me.callParent(arguments);
+        var view = me.down('dataview');
+        view.tip = Ext.create('Ext.tip.ToolTip', {
+            target: view.el,
+            delegate: view.itemSelector,
+            trackMouse: true,
+            mouseOffset: [30, 1],
+            listeners: {
+                beforeshow: function updateTipBody(tip) {
+                    var rec = view.getRecord(tip.triggerElement);
+                    if(tip.pointerEvent.clientX <= 25){ // left side: show type of annotation as tooltip
+                         tip.update(me.tipTpl.type[rec.data.type])
+                    } else { // show regular tooltip
+                        tip.update(me.tipTpl.apply(rec.data));
+                    }
+                }
+            }
+        });
+    }
+
+});

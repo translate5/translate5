@@ -15,6 +15,128 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.5.5] - 2021-12-08
+
+### Important Notes:
+#### [TRANSLATE-2740](https://jira.translate5.net/browse/TRANSLATE-2740)
+WARNING: PHP 8 is now required on server side!
+
+#### [TRANSLATE-2666](https://jira.translate5.net/browse/TRANSLATE-2666)
+To use this Feature the following prequesites must be fullfilled:
+* Google Vision API Key stored in  configuration
+* PHP Imagick Extension installed & working
+
+#### [TRANSLATE-2387](https://jira.translate5.net/browse/TRANSLATE-2387)
+Google material icons are integrated per composer.
+
+#### [TRANSLATE-2303](https://jira.translate5.net/browse/TRANSLATE-2303)
+A new Comment section has been added to the left-hand side of the Segment editor. It lists all the segment comments and visual annotations ordered by page.
+ 
+
+
+### Added
+**[TRANSLATE-2728](https://jira.translate5.net/browse/TRANSLATE-2728): Link terms in segment meta panel to the termportal** <br>
+In the segments meta panel all terms of the currently edited segment are shown. This terms are now clickable linked to the termportal - if the termportal is available.
+
+**[TRANSLATE-2713](https://jira.translate5.net/browse/TRANSLATE-2713): Use HTML linking in Visual based on xml/xsl, if workfiles are xliff** <br>
+Added option to add a XML/XSL combination as visual source direct in the /visual folder of the import zip: If there is an XML in the /visual folder with a linked XSL stylesheet that is present in the /visual folder as well, the visual HTML is generated from these files using the normal, text-based segmentation (and not aligning the XML against the imported bilingual workfiles)
+
+**[TRANSLATE-2666](https://jira.translate5.net/browse/TRANSLATE-2666): WYSIWYG for Images with Text** <br>
+This new feature enables using a single Image as a source for a Visual. 
+This Image is then analyzed (OCR) and the found text can be edited in the right WYSIWIG-frame. 
+* The Image must be imported in the subfolder /visual/image of the import-zip
+* A single WebFont-file (*.woff) can be added alongside the Image and then will be used as Font for the whole text on the Image
+* If no font is provided, Arial is the general fallback
+* Any text not present in the bilingual file in /workfiles will be removed from the OCR's output. This means, the bilingual file should contain exactly the text, that is expected to be on the image and to be translated
+
+**[TRANSLATE-2387](https://jira.translate5.net/browse/TRANSLATE-2387): Annotate visual** <br>
+The users are able to add text annotations(markers) where ever he likes in the visual area.  Also the users are able to create segment annotations when clicking on a segment in the layout.
+
+**[TRANSLATE-2303](https://jira.translate5.net/browse/TRANSLATE-2303): Overview of comments** <br>
+A new Comment section has been added to the left-hand side of the Segment editor.
+It lists all the segment comments and visual annotations ordered by page. The type is indicated by a small symbol to the left. Its background color indicates the authoring user.
+When an element of that list is clicked, translate5 jumps to the corresponding remark, either in the VisualReview or in the segment grid.
+On hover the full remark is shown in a tooltip, together with the authoring user and the last change date.
+New comments are added in realtime to the list.
+
+
+### Changed
+**[TRANSLATE-2740](https://jira.translate5.net/browse/TRANSLATE-2740): PHP 8 is now required - support for older PHP versions is dropped** <br>
+Translate5 and all dependencies use now PHP 8.
+
+**[TRANSLATE-2733](https://jira.translate5.net/browse/TRANSLATE-2733): Embed translate5 task video in help window** <br>
+Embed the translate5 task videos as iframe in the help window. The videos are either in german or english, they are chosen automatically depending on the GUI interface. A list of links to jump to specific parts of the videos are provided.
+
+**[TRANSLATE-2726](https://jira.translate5.net/browse/TRANSLATE-2726): Invert tooltipt font color in term-column in left panel** <br>
+Term tooltip font color set to black for proposals to be readable
+
+**[TRANSLATE-2693](https://jira.translate5.net/browse/TRANSLATE-2693): Write tests for new TermPortal** <br>
+Created tests for all termportal api endpoints
+
+**[TRANSLATE-2670](https://jira.translate5.net/browse/TRANSLATE-2670): WYSIWIG for Images: Frontend - General Review-type, new (mostly dummy) ImageScroller, extensions IframeController** <br>
+see Translate-2666
+
+**[TRANSLATE-2669](https://jira.translate5.net/browse/TRANSLATE-2669): WYSIWIG for Images: Extend Font-Management** <br>
+see TRANSLATE-2666
+
+**[TRANSLATE-2668](https://jira.translate5.net/browse/TRANSLATE-2668): WYSIWIG for Images: Add new Review-type, add worker & file managment, creation of HTML file representing the review** <br>
+see TRANSLATE-2666
+
+**[TRANSLATE-2667](https://jira.translate5.net/browse/TRANSLATE-2667): WYSIWIG for Images: Implement Text Recognition** <br>
+see TRANSLATE-2666
+
+**[TRANSLATE-2487](https://jira.translate5.net/browse/TRANSLATE-2487): Edit an attribute for multiple occurrences at once** <br>
+Added ability for attributes batch editing
+
+
+### Bugfixes
+**[TRANSLATE-2741](https://jira.translate5.net/browse/TRANSLATE-2741): Segment processing status is wrong on unchanged segments with tags** <br>
+On reviewing the processing state of a segment was set wrong if the segment contains tags and was saved unchanged.
+
+**[TRANSLATE-2739](https://jira.translate5.net/browse/TRANSLATE-2739): Segment length validation does also check original target on TM usage** <br>
+On tasks using segment length restrictions some segments could not be saved if content was overtaken manually from a language resource and edited afterwards to fit in the length restriction.
+
+**[TRANSLATE-2737](https://jira.translate5.net/browse/TRANSLATE-2737): VisualReview height not saved in session** <br>
+Persist VisualReview height between reloads.
+
+**[TRANSLATE-2736](https://jira.translate5.net/browse/TRANSLATE-2736): State of show/hide split iframe is not saved correctly** <br>
+Fix issues with the saved state of the show/hide split frame button in the visual
+
+**[TRANSLATE-2732](https://jira.translate5.net/browse/TRANSLATE-2732): Advanced filter users list anonymized users query** <br>
+Solves advanced filter error for users with no "read-anonymized" users right.
+
+**[TRANSLATE-2731](https://jira.translate5.net/browse/TRANSLATE-2731): No redirect to login page if maintenance is scheduled** <br>
+The initial page of the translate5 instance does not redirect to the login page if a maintenance is scheduled.
+
+**[TRANSLATE-2730](https://jira.translate5.net/browse/TRANSLATE-2730): Improve maintenance handling regarding workers** <br>
+If maintenance is scheduled the export was hanging in a endless loop, also import related workers won't start anymore one hour before maintenance. 
+
+**[TRANSLATE-2729](https://jira.translate5.net/browse/TRANSLATE-2729): PDO type casting error in bind parameters** <br>
+The user will no longer receive an error when the customer was deleted.
+
+**[TRANSLATE-2724](https://jira.translate5.net/browse/TRANSLATE-2724): Translation error in the Layout** <br>
+Workflow name is localized now.
+
+**[TRANSLATE-2720](https://jira.translate5.net/browse/TRANSLATE-2720): Termportal initial loading takes dozens of seconds** <br>
+Solved termportal long initial loading problem
+
+**[TRANSLATE-2715](https://jira.translate5.net/browse/TRANSLATE-2715): String could not be parsed as XML - on tbx import** <br>
+The exported TBX was no valid XML therefore was an error on re-importing that TBX.
+
+**[TRANSLATE-2708](https://jira.translate5.net/browse/TRANSLATE-2708): Visual review: iframe scaling problem** <br>
+Enables zoom in in all directions in visual.
+
+**[TRANSLATE-2707](https://jira.translate5.net/browse/TRANSLATE-2707): correct display language-selection in Instant-Translate** <br>
+Fixed the language listing in InstantTranslate, which was broken for a lot of languages.
+
+**[TRANSLATE-2706](https://jira.translate5.net/browse/TRANSLATE-2706): Not all repetitions are saved after exchanging the term-collection** <br>
+Not all repeated segments were changed if saving repetitions with terminology and the term-collection was changed in the task.
+
+**[TRANSLATE-2700](https://jira.translate5.net/browse/TRANSLATE-2700): Improve termtagging performance due table locks** <br>
+The queuing of the segments prepared for term tagging is improved, so that multiple term taggers really should work in parallel. 
+
+
 ## [5.5.4] - 2021-11-15
 
 ### Important Notes:

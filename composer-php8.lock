@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a280383e5e55c7512d1c6712f1b1073b",
+    "content-hash": "db0c9fe432b460ea7bb13a96296889a8",
     "packages": [
         {
             "name": "apix/log",
@@ -5875,13 +5875,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Shardj/zf1-future.git",
-                "reference": "9b4211733e8c29b183e2d308116a47b7886d51cd"
+                "url": "https://github.com/MittagQI/zf1-php7.3.git",
+                "reference": "a81f384f6d31a7930ba1fb1221d3488c3a60c2d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/9b4211733e8c29b183e2d308116a47b7886d51cd",
-                "reference": "9b4211733e8c29b183e2d308116a47b7886d51cd",
+                "url": "https://api.github.com/repos/MittagQI/zf1-php7.3/zipball/a81f384f6d31a7930ba1fb1221d3488c3a60c2d6",
+                "reference": "a81f384f6d31a7930ba1fb1221d3488c3a60c2d6",
                 "shasum": ""
             },
             "require": {
@@ -5907,24 +5907,37 @@
                     "Zend_": "library/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "include-path": [
                 "library/"
             ],
+            "archive": {
+                "exclude": [
+                    "/demos",
+                    "/documentation",
+                    "/tests"
+                ]
+            },
+            "scripts": {
+                "lint": [
+                    "parallel-lint --exclude vendor --exclude tests/Zend/Loader/_files/ParseError.php ."
+                ],
+                "test": [
+                    "phpunit"
+                ]
+            },
             "license": [
                 "BSD-3-Clause"
             ],
             "description": "Zend Framework 1. The aim is to keep ZF1 working with the latest PHP versions",
             "homepage": "http://framework.zend.com/",
             "keywords": [
-                "ZF1",
-                "framework"
+                "framework",
+                "zf1"
             ],
             "support": {
-                "issues": "https://github.com/Shardj/zf1-future/issues",
-                "source": "https://github.com/Shardj/zf1-future/tree/release-1.20.0"
+                "source": "https://github.com/MittagQI/zf1-php7.3/tree/master"
             },
-            "time": "2021-11-11T16:54:26+00:00"
+            "time": "2021-12-02T10:29:01+00:00"
         },
         {
             "name": "symfony/console",

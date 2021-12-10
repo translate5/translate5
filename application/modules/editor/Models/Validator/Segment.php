@@ -117,6 +117,14 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
    * @return boolean
    */
   protected function validateLength($value, $field){
+      //we may only check the length of the "Edit" fields, the original fields may receive the full length content
+      $loc = $this->segmentFieldManager->getDataLocationByKey($field);
+
+      //for setting the original no length check is needed!
+      if(($loc['column'] ?? '') == 'original') {
+          return true;
+      }
+
       $data = $this->entity->getDataObject();
       if(!property_exists($data, 'metaCache') || empty($data->metaCache)) {
           return true;

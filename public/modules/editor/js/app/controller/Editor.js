@@ -1738,9 +1738,9 @@ Ext.define('Editor.controller.Editor', {
      * "Reference files info message" window button handler
      */
     onShowReferenceFilesButtonClick:function(){
-        var filePanel =this.getFilepanel(); 
-        filePanel.expand();
-        filePanel.down('referenceFileTree').expand();
+        var filePanel =this.getFilepanel().expand();
+        var taskFiles = filePanel.down('taskfiles').expand();
+        taskFiles.scrollable.scrollIntoView(taskFiles.down('referenceFileTree').view.el);
     },
 
     /**

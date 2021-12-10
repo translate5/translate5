@@ -100,7 +100,7 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
           $segment->save();
       }
   }
-  
+
   /**
    * loads all comments to the given segmentId, filter also only the session loaded taskguid
    * sorts from newest to oldest comment, does compute the isEditable flag
@@ -122,6 +122,31 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
       return $comments;
   }
   
+  /**
+   * Loads all comments of a task by taskguid with corresponding page, optionally only the one specified by id
+   * does not provide isEditable info
+   * @param string $taskGuid
+   * @param string $cid (optional) - commentId if only one comment
+   * @return array|null
+   */
+  public function loadByTaskPlainWithPage(string $taskGuid, string $cid='') {
+        $s = $this->db->select()
+        ->distinct()
+        ->setIntegrityCheck(false)
+        ->from(['comments' => $this->db->info($this->db::NAME)])
+        ->where('comments.taskGuid = ?', $taskGuid) // sort in frontend, see there
+        ->joinLeft(
+            ['sm' => 'LEK_visualreview_segmentmapping'],
+            'comments.segmentId = sm.segmentId',
+            ['page' => 'segmentPage', 'reviewFileId']
+        );
+        if ($cid) {
+            $s->where('comments.id = ?', $cid);
+            return $this->db->getAdapter()->fetchRow($s); // returns array
+        } else {
+            return $this->db->getAdapter()->fetchAll($s);
+        }
+    }
   /**
    * Loads all comments of a segment by segmentid and taskguid, orders by creation order
    * does not provide isEditable info

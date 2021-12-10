@@ -4355,6 +4355,18 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Nicht empfohlen!</source>
     <target>Not recommended!</target>
 </trans-unit>
+<trans-unit id='Q29tcGxleCBXb3JrZmxvdw=='>
+  <source>Complex Workflow</source>
+  <target>Complex Workflow</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmQgV29ya2Zsb3cgKMOcYmVyc2V0enVuZywgTGVrdG9yYXQsIFp3ZWl0ZXMgTGVrdG9yYXQp'>
+    <source>Standard Workflow (Übersetzung, Lektorat, Zweites Lektorat)</source>
+    <target>Standard Workflow</target>
+</trans-unit>
+<trans-unit id='SW1wb3J0IGFiYnJlY2hlbg=='>
+    <source>Import abbrechen</source>
+    <target>Cancel import</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

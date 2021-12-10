@@ -26,40 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * @class Editor.view.fileorder.Tree
- * @extends Editor.view.ui.fileorder.Tree
- * @initalGenerated
+ * Store für Editor.model.Comment
+ * @class Editor.store.AllComments
+ * @extends Ext.data.Store
  */
-Ext.define('Editor.view.fileorder.Tree', {
-  extend: 'Ext.tree.Panel',
-  alias: 'widget.fileorder.tree',
-  itemId: 'fileorderTree',
-  //title: 'Arbeits-Dateien',
-  cls: 'fileTree',
-  store: 'Files',
-  rootVisible: false,
-  collapsible: false,
-  bodyPadding: 0,
-  header: {
-    hidden:false,
-    height:32,
-    padding:'7 10 6',
-    style:'background-color:rgb(212 212 217)' 
-  },
-  bodyPadding: 0,
-  viewConfig: {
-    selModel:{
-      singleSelect: true,
-    },
-    plugins: [{
-        ptype: 'treeviewdragdrop',
-    }]
-  }
+ Ext.define('Editor.store.comments.AllComments', {
+  extend : 'Ext.data.Store',
+  alias: 'store.AllComments',
+  model: 'Editor.model.Remark',
+  storeId: 'AllComments',
+  remoteFilter: true,
+  autoLoad: false,
+  autoSync: false,
+  pageSize: 0,
+  buffered: false,
 });

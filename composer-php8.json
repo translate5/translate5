@@ -43,6 +43,10 @@
 			"type" : "vcs",
 			"url" : "https://github.com/thomaslauria/querypath"
 		}, {
+			"_README" : "If our pull request will go into upstream shardj/zf1-future as project we will not need the separate version and URL anymore.",
+			"type" : "vcs",
+			"url" : "https://github.com/MittagQI/zf1-php7.3"
+		}, {
 			"type" : "package",
                         "package" : {
                                 "name" : "jquery/jquery-ui",
@@ -59,22 +63,7 @@
                                         "reference" : "1.13.0"
                                 }
                         }
-		},
-		{
-			"type" : "package",
-			"package" : {
-				"name" : "google/material-design-icons",
-				"license" : "Apache-2.0 License",
-				"version" : "4.0.0",
-				"description" : "Material Design icons by Google",
-				"source" : {
-					"url" : "https://github.com/google/material-design-icons.git",
-					"type" : "git",
-					"reference" : "4.0.0"
-				}
-			}
-		}
-		
+		}		
 	],
 	"require" : {
 		"ext-simplexml": "*",
