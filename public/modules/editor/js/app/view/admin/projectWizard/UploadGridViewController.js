@@ -52,22 +52,27 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     addFilesToStore: function(files, type) {
         var me = this,
             store = me.getView().store;
+
         Ext.Array.forEach(Ext.Array.from(files), function(file) {
-            var rec, source, target;
+            var rec,
+                extension = file.name ? file.name.split('.').pop() : '',
+                isSupportedFile = Ext.Array.contains(Editor.data.import.validExtensions,extension),
+                source,
+                target,
+                reader = new FileReader();
 
             rec = store.createModel({
                 file: file,
                 name: file.name,
                 size: file.size,
-                type: type,
-                error: null
+                type: !isSupportedFile ? 'error' : type,
+                error: !isSupportedFile ? 'Type not supported.' : null
             });
             store.addSorted(rec);
 
             //FIXME read file only if xlf or sdlxliff, or other xlf based formats at the end.
             //from https://stackoverflow.com/questions/14446447/how-to-read-a-local-text-file
             // seems to be the only way not getting CORS problems
-            var reader = new FileReader();
             reader.readAsText(file);
             reader.onload = function (reader) {
                 var file = reader.target.result;
@@ -80,63 +85,42 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                     rec.set('targetLang', target[1]);
                 }
                 me.validateLanguages(rec);
-                rec.commit();
+                rec.commit(true);
             };
         });
     },
 
     validateLanguages:function (rec){
         var me = this,
+            sl = rec.get('sourceLang'),
+            tl = rec.get('targetLang'),
             view = me.getView(),
             window = view.up('#adminTaskAddWindow'),
             sourceField = window.down('languagecombo[name="sourceLang"]'),
             targetField = window.down('tagfield[name="targetLang[]"]');
 
 
-        if(rec.get('sourceLang') === null){
-            rec.set('error',rec.get('error')+['Source not valid']);
+        if(Ext.isEmpty(sl) && Ext.isEmpty(tl)){
+            // no language was detected but the uploaded extension is supported -> do not mark this record as error
+            return;
+        }
+
+        if(Ext.isEmpty(sl)){
+            rec.set('error','Source not valid');
+            rec.set('type','error');
             return false;
         }
-        if(rec.get('sourceLang') === null){
-            rec.set('error',rec.get('error')+['Target not valid']);
+        if(Ext.isEmpty(tl)){
+            rec.set('error','Target not valid');
+            rec.set('type','error');
             return false;
         }
         if(!sourceField.readOnly && Ext.isEmpty(sourceField.getValue())){
             // convert the rfc value of the record to id
-            sourceField.setValue(rec.get('sourceLang'));
+            sourceField.setValue(sl);
             sourceField.setReadOnly(true);
         }
 
-        targetField.addValue(rec.get('targetLang'));
-    },
-
-    testNewUpload: function() {
-        console.log(this.getView().getStore());
-        var store = this.getView().getStore(),
-            formData = new FormData();
-
-        store.each(function(record) {
-            // Add file to AJAX request
-            //FIXME append only files where the type is a processable one(workfile/pivotfile) at the moment.
-            formData.append('testField[]', record.get('file'), record.get('name'));
-        });
-
-        // Set up the request (encapsulate in ExtJS request?)
-        var xhr = new XMLHttpRequest();
-
-        // FIXME get URL from task model!
-        xhr.open('POST', '/editor/task/', true);
-
-        // Set up a handler for when the task for the request is complete
-        xhr.onload = function () {
-            if (xhr.status == 200) {
-                alert("Upload done");
-            } else {
-                alert("Upload error");
-            }
-        };
-
-        // Send the data.
-        xhr.send(formData);
+        targetField.addValue(tl);
     }
 });

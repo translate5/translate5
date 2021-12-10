@@ -202,6 +202,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                 align : 'stretch'
                             },
                             anchor: '100%',
+                            markInvalid:me.handleInvalidSubmitField,
                             items: [{
                                 xtype: 'container',
                                 itemId: 'taskMainCardContainer',
@@ -459,5 +460,22 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         if(!this.loadMask || !this.loadMask.isVisible()) {
             this.callParent([]);
         }
+    },
+
+    /***
+     * Find and mark the field as invalid from the given field = > error array
+     * @param errors
+     */
+    handleInvalidSubmitField:function (errors){
+        var me = this,
+            form = me.getForm(),
+            field = null;
+        Ext.Object.each(errors, function(key, value) {
+            field = form.findField(key) ?form.findField(key) :  me.down('#'+key);
+            if(field && field.markInvalid){
+                field.markInvalid(value);
+            }
+        });
     }
+
 });

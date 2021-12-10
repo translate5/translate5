@@ -1108,27 +1108,29 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         win.setLoading(me.strings.loadingWindowMessage);
 
         grid.getStore().each(function(record) {
-            // Add file to AJAX request
-            //FIXME append only files where the type is a processable one(workfile/pivotfile) at the moment.
-            formData.append('importUpload[]', record.get('file'), record.get('name'));
+            if(record.get('type') !== 'error'){
+                // Add file to AJAX request
+                //FIXME append only files where the type is a processable one(workfile/pivotfile) at the moment.
+                formData.append('importUpload[]', record.get('file'), record.get('name'));
+                formData.append('importUpload_language[]', record.get('targetLang'));
+                formData.append('importUpload_type[]', record.get('type'));
+            }
         });
 
-        var val = null;
-        form.getForm().getFields().each(function (field){
-            // for date fields the value submitted to the server is in different format
-            val = !field.getSubmitValue ? field.getValue() : field.getSubmitValue();
-            formData.append(field.getName(), val);
-        });
-
-        formData.append('autoStartImport', 0);
+        //INFO: this will convert array to coma separated values requires additional handling on backend. We do not want that
+        // Ext.Object.each(form.getForm().getValues(), function(property, value){
+        //     formData.append(property, value);
+        // });
 
         Ext.Ajax.request({
+            params:form.getForm().getValues(),// send all other form fields as json params to skip the formdata parameter conversions
             rawData: formData,
             headers: {'Content-Type':null}, //to use content type of FormData
-            timeout: 3600,
             url: Editor.data.restpath + 'task',
-            success: function (form, submit) {
-                var task = me.getModel('admin.Task').create(submit.result.rows);
+            success: function (response, opts) {
+                var resp = Ext.decode(response.responseText),
+                    task = me.getModel('admin.Task').create(resp.rows);
+
                 me.fireEvent('taskCreated', task);
                 win.setLoading(false);
 
@@ -1137,21 +1139,23 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                     successCallback(task);
                 }
             },
-            failure: function (form, submit) {
-                var card, errorHandler = Editor.app.getController('ServerException');
+            failure: function (response) {
+                var card,
+                    errorHandler = Editor.app.getController('ServerException'),
+                    resp = (response.responseText && response.responseText !== "") ? Ext.decode(response.responseText) : {};
+
                 win.setLoading(false);
-                if (submit.failureType === 'server' && submit.result && !submit.result.success) {
-                    if (submit.result.httpStatus === "422") {
-                        win.getLayout().setActiveItem('taskMainCard');
-                        win.getViewModel().set('activeItem', win.down('#taskMainCard'));
-                        form.markInvalid(submit.result.errorsTranslated);
-                    } else {
-                        card = win.down('#taskUploadCard');
-                        if (card.isVisible()) {
-                            card.update(errorHandler.renderHtmlMessage(me.strings.taskError, submit.result));
-                        }
-                        errorHandler.handleException(submit.response);
+
+                if (response.status === 422) {
+                    win.getLayout().setActiveItem('taskMainCard');
+                    win.getViewModel().set('activeItem', win.down('#taskMainCard'));
+                    form.markInvalid(resp.errorsTranslated);
+                } else {
+                    card = win.down('#taskUploadCard');
+                    if (card.isVisible()) {
+                        card.update(errorHandler.renderHtmlMessage(me.strings.taskError, response.statusText));
                     }
+                    errorHandler.handleException(response);
                 }
             }
         });

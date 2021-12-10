@@ -43,6 +43,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         type: 'wizardUploadGrid'
     },
     reference: 'uploadgrid',
+    itemId:'importUpload',
     bind: {
         store: '{files}'
     },
@@ -108,6 +109,13 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                 },{
                     xtype: 'gridcolumn',
                     width: 90,
+                    renderer:function (val,meta,record) {
+                        if(val === 'error'){
+                            meta.tdCls = 'redTextColumn';
+                            return record.get('error');
+                        }
+                        return val;
+                    },
                     dataIndex: 'type',
                     text: 'Type'
                 },{
@@ -123,6 +131,19 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([ config ]);
+    },
+
+    markInvalid: function (error){
+        if(Ext.isEmpty(error)){
+            return;
+        }
+        var me = this,
+            gridview  = me.getView();
+
+        me.getStore().removeAll();
+
+        gridview.emptyText = '<div class="x-grid-empty redTextColumn">'+error+'</div>';
+        gridview.refresh();
     },
 
     /**

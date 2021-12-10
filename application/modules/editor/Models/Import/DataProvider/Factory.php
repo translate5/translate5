@@ -51,8 +51,14 @@ class editor_Models_Import_DataProvider_Factory {
                 'path' =>$oldTaskPath,
             ]);
         }
+
+        $files = $this->filterFiles($task);
         $copy = tempnam(sys_get_temp_dir(), 'taskclone');
-        copy($oldTaskPath, $copy);
+
+        foreach ($files as $from => $to) {
+            $tmpTo = $copy.DIRECTORY_SEPARATOR.editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT.DIRECTORY_SEPARATOR.'workfiles'.DIRECTORY_SEPARATOR.$to;
+            copy($from, $tmpTo);
+        }
         $copy = new SplFileInfo($copy);
         ZfExtended_Utils::cleanZipPaths($copy, editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT);
         return ZfExtended_Factory::get('editor_Models_Import_DataProvider_Zip', [$copy->getPathname()]);
@@ -67,7 +73,7 @@ class editor_Models_Import_DataProvider_Factory {
         $mainUpload = $upload->getMainUpload();
 
         $files = $mainUpload->getFiles();
-        $isZip = count($files) === 1 && $mainUpload->getFileExtension((array_values($files[0])[0])) === $upload::TYPE_ZIP;
+        $isZip = count($files) === 1 && $mainUpload->getFileExtension((array_values($files)[0])) === $upload::TYPE_ZIP;
         if($isZip) {
             $dp = 'editor_Models_Import_DataProvider_Zip';
             $tmpfiles = array_keys($mainUpload->getFiles());
@@ -80,5 +86,40 @@ class editor_Models_Import_DataProvider_Factory {
             ];
         }
         return ZfExtended_Factory::get($dp, $args);
+    }
+
+    public function filterFiles(editor_Models_Task $task){
+        $path = $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT;
+        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
+        $files = array();
+        foreach ($rii as $file) {
+            //TODO: filter out not supported filetypes. How do we handle reference files ?
+            if ($file->isDir()){
+                continue;
+            }
+            if(!$this->isBilingual($file->getFilename())){
+
+                continue;
+            }
+            if($this->isBilingualMatch($file->getFilename(),$task->getTa())){
+                $from = $file->getPathname();
+                $to = $task->getTargetLang();
+                $files[$from] = $to;
+            }
+        }
+        return $files;
+    }
+
+    /***
+     * Same check as in the frontend to detect bilingual data. Also the files filter should
+     * @param string $file
+     * @return bool
+     */
+    public function isBilingual(string $file){
+        return true;
+    }
+
+    public function isBilingualMatch(string $file, string $sourceLanguage){
+        return strpos($file,$sourceLanguage)!==false;
     }
 }

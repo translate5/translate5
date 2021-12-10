@@ -55,12 +55,18 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewModel', {
                 type: 'int',
                 name: 'sourceLang',
                 convert:function (val){
+                    if(!val){
+                        return '';
+                    }
                     return Ext.StoreManager.get('admin.Languages').getIdByRfc(val);
                 }
             },{
                 type: 'int',
                 name: 'targetLang',
                 convert:function (val){
+                    if(!val){
+                        return '';
+                    }
                     return Ext.StoreManager.get('admin.Languages').getIdByRfc(val);
                 }
             },{

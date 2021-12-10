@@ -65,7 +65,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     abstract public function archiveImportedData($filename = null);
 
     /**
-     * returns the the absolute import path, mainly used by the import class
+     * returns the absolute import path, mainly used by the import class
      * @return string
      */
     public function getAbsImportPath(){
@@ -108,7 +108,10 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * @throws editor_Models_Import_DataProvider_Exception
      */
     protected function mkdir(string $path) {
-        if(!@mkdir($path)) {
+        if(is_dir($path)){
+            return;
+        }
+        if(!@mkdir($path,0777,true)) {
             //DataProvider: Could not create folder "{path}"
             throw new editor_Models_Import_DataProvider_Exception('E1245', [
                 'task' => $this->task,

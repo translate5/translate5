@@ -31,6 +31,9 @@ END LICENSE AND COPYRIGHT
  */
 class editor_TaskController extends ZfExtended_RestController {
 
+    const IMPORT_UPLOAD_LANGUAGES_NAME = 'importUpload_language';
+    const IMPORT_UPLOAD_TYPE_NAME = 'importUpload_type';
+
     protected $entityClass = 'editor_Models_Task';
 
     /**
@@ -486,10 +489,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::postAction()
      */
     public function postAction() {
-//FIXME remove debug here!
-error_log(print_r($_REQUEST,1));
-error_log(print_r($_FILES,1));
-error_log(print_r($this->_getParam('data'),1));
         $this->entity->init();
         //$this->decodePutData(); → not needed, data was set directly out of params because of file upload
         $this->data = $this->getAllParams();
@@ -530,7 +529,7 @@ error_log(print_r($this->_getParam('data'),1));
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
 
-        //if the visual review mapping type is set, se the task meta data overridable
+        //if the visual review mapping type is set, se the task metadata overridable
         if(isset($this->data['mappingType'])){
             $meta = $this->entity->meta();
             $meta->setMappingType($this->data['mappingType']);
@@ -551,98 +550,41 @@ error_log(print_r($this->_getParam('data'),1));
         //init workflow id for the task, based on customer or general config as fallback
         $this->entity->setWorkflow($c->runtimeOptions->workflow->initialWorkflow);
 
-        if($this->validate()) {
-            $this->initWorkflow();
-            //gets and validates the uploaded zip file
-            $upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
-            /* @var $upload editor_Models_Import_UploadProcessor */
-            $dpFactory = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Factory');
-            /* @var $dpFactory editor_Models_Import_DataProvider_Factory */
-            $upload->initAndValidate();
-            $dp = $dpFactory->createFromUpload($upload);
 
-            $projectTasks = [];
-            //PROJECT with multiple target languages
-            if($this->entity->isProject()) {
-                $entityId=$this->entity->save();
-                $this->entity->initTaskDataDirectory();
-                // check/prepare/unzip our import
-                $dp->checkAndPrepare($this->entity);
-                // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
-                $this->events->trigger("afterUploadPreparation", $this, array('task' => $this->entity, 'dataProvider' => $dp));
-                //for projects this have to be done once before the single tasks are imported
-                $dp->archiveImportedData();
-
-                $this->entity->setProjectId($entityId);
-                
-                $languages=ZfExtended_Factory::get('editor_Models_Languages');
-                /* @var $languages editor_Models_Languages */
-                $languages=$languages->loadAllKeyValueCustom('id','rfc5646');
-                
-                foreach($this->data['targetLang'] as $target) {
-                    $task = clone $this->entity;
-                    $task->setProjectId($entityId);
-                    $task->setTaskType($task::INITIAL_TASKTYPE_PROJECT_TASK);
-                    $task->setTargetLang($target);
-                    $task->setTaskName($this->entity->getTaskName().' - '.$languages[$task->getSourceLang()].' / '.$languages[$task->getTargetLang()]);
-                    $this->processUploadedFile($task, $dpFactory->createFromTask($this->entity));
-
-                    // add task defaults (user associations and language resources)
-                    $this->setTaskDefaults($task);
-                    
-                    //update the task usage log for the this project-task
-                    $this->insertTaskUsageLog($task);
-
-                    $projectTasks[] = $task->getDataObject();
-                }
-                
-                $this->entity->setState($this->entity::INITIAL_TASKTYPE_PROJECT);
-                $this->entity->save();
-            } else {
-                //DEFAULT (SINGLE) TASK:
-
-                //was set as array in setDataInEntity
-                $this->entity->setTargetLang(reset($this->data['targetLang']));
-                //$this->entity->save(); => is done by the import call!
-                //handling project tasks is also done in processUploadedFile
-                $this->processUploadedFile($this->entity, $dp);
-
-                // add task defaults (user associations and language resources)
-                $this->setTaskDefaults($this->entity);
-
-                //if the current task type is for instant translate pretransaltion, the usage log requires different handling
-                if($this->entity->isHiddenTask() == false){
-                    //update the task usage log for the current task
-                    $this->insertTaskUsageLog($this->entity);
-                }
-            }
-
-            //warn the api user for the targetDeliveryDate ussage
-            $this->targetDeliveryDateWarning();
-
-            //update the entity projectId
-            $this->entity->setProjectId($this->entity->getId());
-            $this->entity->save();
-            
-            //reload because entityVersion could be changed somewhere
-            $this->entity->load($this->entity->getId());
-
-            if($this->data['autoStartImport']) {
-                $this->startImportWorkers();
-            }
-
-            $this->view->success = true;
-            $this->view->rows = $this->entity->getDataObject();
-
-            settype($this->view->rows->projectTasks,'array');
-            $this->view->rows->projectTasks = $projectTasks;
-        }
-        else {
+        if(!$this->validate()){
             //we have to prevent attached events, since when we get here the task is not created, which would lead to task not found errors,
             // but we want to result the validation error
             $event = Zend_EventManager_StaticEventManager::getInstance();
             $event->clearListeners(get_class($this), "afterPostAction");
+            return;
         }
+
+        $this->initWorkflow();
+
+        if($this->isProjectUpload()){
+            $tasks = $this->handleProjectUpload();
+        }else{
+            $tasks = $this->handleTaskImport();
+        }
+
+        //warn the api user for the targetDeliveryDate ussage
+        $this->targetDeliveryDateWarning();
+
+        //update the entity projectId
+        $this->entity->setProjectId($this->entity->getId());
+        $this->entity->save();
+
+        //reload because entityVersion could be changed somewhere
+        $this->entity->load($this->entity->getId());
+
+        if($this->data['autoStartImport']) {
+            $this->startImportWorkers();
+        }
+
+        $this->view->success = true;
+        $this->view->rows = $this->entity->getDataObject();
+        settype($this->view->rows->projectTasks,'array');
+        $this->view->rows->projectTasks = $tasks;
     }
 
     /**
@@ -2140,5 +2082,95 @@ error_log(print_r($this->_getParam('data'),1));
         }
         $this->entity->unlock();
         $this->log->info('E1011', 'Task import cancelled', ['task' => $this->entity]);
+    }
+
+
+    public function isProjectUpload(){
+        return is_array($this->data['targetLang']) && count($this->data['targetLang']) > 1 && !empty($this->data[self::IMPORT_UPLOAD_LANGUAGES_NAME]);
+    }
+
+
+    public function handleTaskImport(){
+        //gets and validates the uploaded zip file
+        $upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
+        /* @var $upload editor_Models_Import_UploadProcessor */
+        $dpFactory = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Factory');
+        /* @var $dpFactory editor_Models_Import_DataProvider_Factory */
+        $upload->initAndValidate();
+        $dp = $dpFactory->createFromUpload($upload);
+
+        //DEFAULT (SINGLE) TASK:
+
+        //was set as array in setDataInEntity
+        $this->entity->setTargetLang(reset($this->data['targetLang']));
+        //$this->entity->save(); => is done by the import call!
+        //handling project tasks is also done in processUploadedFile
+        $this->processUploadedFile($this->entity, $dp);
+
+        // add task defaults (user associations and language resources)
+        $this->setTaskDefaults($this->entity);
+
+        //if the current task type is for instant translate pretransaltion, the usage log requires different handling
+        if($this->entity->isHiddenTask() == false){
+            //update the task usage log for the current task
+            $this->insertTaskUsageLog($this->entity);
+        }
+    }
+
+    public function handleProjectUpload(){
+        //gets and validates the uploaded zip file
+        $upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
+        /* @var $upload editor_Models_Import_UploadProcessor */
+
+        $upload->initAndValidate();
+
+        $dp = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Project',[$this->entity]);
+        /* @var $dp editor_Models_Import_DataProvider_Project  */
+
+
+        $entityId=$this->entity->save();
+        $this->entity->initTaskDataDirectory();
+
+        // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
+        $this->events->trigger("afterUploadPreparation", $this, array('task' => $this->entity, 'dataProvider' => $dp));
+        //for projects this have to be done once before the single tasks are imported
+        $dp->archiveImportedData();
+
+        $this->entity->setProjectId($entityId);
+
+        $languages=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languages editor_Models_Languages */
+        $languages=$languages->loadAllKeyValueCustom('id','rfc5646');
+
+        $projectTasks = [];
+
+        foreach($this->data['targetLang'] as $target) {
+            $task = clone $this->entity;
+
+            $dp = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Project',[$task]);
+            /* @var $dp editor_Models_Import_DataProvider_Project  */
+
+            $task->setProjectId($entityId);
+            $task->setTaskType($task::INITIAL_TASKTYPE_PROJECT_TASK);
+            $task->setTargetLang($target);
+            $task->setTaskName($this->entity->getTaskName().' - '.$languages[$task->getSourceLang()].' / '.$languages[$task->getTargetLang()]);
+
+            $dp->handleUploads($upload->getFiles(),$this->data[self::IMPORT_UPLOAD_LANGUAGES_NAME]);
+
+            $this->processUploadedFile($task, $dp);
+
+            // add task defaults (user associations and language resources)
+            $this->setTaskDefaults($task);
+
+            //update the task usage log for this project-task
+            $this->insertTaskUsageLog($task);
+
+            $projectTasks[] = $task->getDataObject();
+        }
+
+        $this->entity->setState($this->entity::INITIAL_TASKTYPE_PROJECT);
+        $this->entity->save();
+
+        return $projectTasks;
     }
 }
