@@ -1168,12 +1168,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             return;
         }
         $states = $this->getTaskRoleAutoStates();
+        // include blocked autostate in total segments finish count
+        $states[] = editor_Models_Segment_AutoStates::BLOCKED;
+
         $isWorkflowEnded = $workflow->isEnded($this);
 
         $adapted = $this->db->getAdapter();
         
         if(!$isWorkflowEnded && !$states) {
-            //if workflow is not ended and we do not have any states to the current steps role, we do not update anything
+            //if workflow is not ended, and we do not have any states to the current steps' role, we do not update anything
             return;
         }
         
