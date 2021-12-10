@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "db0c9fe432b460ea7bb13a96296889a8",
+    "content-hash": "121c3a3a122f48b7fb0875de52f3c691",
     "packages": [
         {
             "name": "apix/log",
@@ -7527,7 +7527,9 @@
         "ext-pdo": "*",
         "ext-mysqli": "*",
         "ext-xmlreader": "*",
-        "ext-sockets": "*"
+        "ext-sockets": "*",
+        "lib-imagick-imagemagick": "*",
+        "ext-imagick": "*"
     },
     "platform-dev": [],
     "platform-overrides": {
