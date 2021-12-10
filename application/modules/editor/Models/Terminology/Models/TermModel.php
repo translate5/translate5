@@ -793,8 +793,14 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         ];
 
         // Append clause for prosessStatus
-        if ($params['processStatus']) $where []= '`t`.`processStatus` IN ("' . str_replace(',', '","', $params['processStatus']) . '")';
-        else if (!$isProposer)        $where []= '`t`.`processStatus` != "' . self::PROCESS_STATUS_UNPROCESSED . '"';
+        if ($params['processStatus']) {
+            $where []= '`t`.`processStatus` IN ("' . str_replace(',', '","', $params['processStatus']) . '")';
+            if (preg_match('~unprocessed~', $params['processStatus'])) {
+                $where []= '(' . array_pop($where) . ' OR `t`.`proposal` != "")';
+            }
+        } else if (!$isProposer) {
+            $where []= '`t`.`processStatus` != "' . self::PROCESS_STATUS_UNPROCESSED . '"';
+        }
 
         // Mind attr-filters in WHERE clause
         if (isset($termEntryIds)) array_unshift($where, '`t`.`termEntryId` IN (' . $termEntryIds . ')');
