@@ -879,3 +879,9 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
     vertical-align: middle;
     text-align: center;
 }
+
+.dropZone{
+    border: 2px dashed #bbb;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}

@@ -44,7 +44,14 @@ class editor_Models_Import_Configuration {
      * @var string
      */
     const WORK_FILES_DIRECTORY = 'workfiles';
-    
+
+
+    /***
+     * Constant for the relais folder name in the import directory
+     * @var string
+     */
+    CONST RELAIS_FILES_DIRECTORY = 'relais';
+
     /**
      * @var editor_Models_Languages language entity instance
      */

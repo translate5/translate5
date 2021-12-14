@@ -40,9 +40,14 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     onManualAddPivot: function(btn) {
         this.addFilesToStore(btn.fileInputEl.dom.files, 'pivot');
     },
-    onDrop: function(e) {        
+    onDrop: function(e) {
         e.stopEvent();
-        this.addFilesToStore(e.browserEvent.dataTransfer.files, 'workfile');
+        var me = this;
+        me.handleDropZoneCss(false);
+        me.addFilesToStore(e.browserEvent.dataTransfer.files, me.getTypByTarget(e.getTarget()));
+    },
+    onDragEnter:function (e){
+        this.handleDropZoneCss(true);
     },
     removeFiles: function() {
         Ext.Array.forEach(Ext.Array.from(this.getView().getSelection()), function(file){
@@ -54,38 +59,44 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             store = me.getView().store;
 
         Ext.Array.forEach(Ext.Array.from(files), function(file) {
-            var rec,
-                extension = file.name ? file.name.split('.').pop() : '',
+            var extension = file.name ? file.name.split('.').pop() : '',
                 isSupportedFile = Ext.Array.contains(Editor.data.import.validExtensions,extension),
                 source,
                 target,
-                reader = new FileReader();
-
-            rec = store.createModel({
-                file: file,
-                name: file.name,
-                size: file.size,
-                type: !isSupportedFile ? 'error' : type,
-                error: !isSupportedFile ? 'Type not supported.' : null
-            });
-            store.addSorted(rec);
+                readFile,
+                reader = new FileReader(),
+                rec = Ext.create('Editor.model.admin.projectWizard.File',{
+                    file: file,
+                    name: file.name,
+                    size: file.size,
+                    type: !isSupportedFile ? 'error' : type,
+                    error: !isSupportedFile ? 'Type not supported.' : null
+                });
 
             //FIXME read file only if xlf or sdlxliff, or other xlf based formats at the end.
             //from https://stackoverflow.com/questions/14446447/how-to-read-a-local-text-file
             // seems to be the only way not getting CORS problems
             reader.readAsText(file);
+
             reader.onload = function (reader) {
-                var file = reader.target.result;
-                source = file.match(/<file[^>]+source-language=["']([^"']+)["']/i);
+                readFile = reader.target.result;
+                source = readFile.match(/<file[^>]+source-language=["']([^"']+)["']/i);
                 if(source) {
                     rec.set('sourceLang', source[1]);
                 }
-                target = file.match(/<file[^>]+target-language=["']([^"']+)["']/i);
+                target = readFile.match(/<file[^>]+target-language=["']([^"']+)["']/i);
                 if(target) {
                     rec.set('targetLang', target[1]);
                 }
+
                 me.validateLanguages(rec);
-                rec.commit(true);
+
+                me.validateFileName(rec);
+
+                // commit the changes before the record is added to the store
+                rec.commit();
+
+                store.addSorted(rec);
             };
         });
     },
@@ -122,5 +133,72 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         }
 
         targetField.addValue(tl);
+    },
+
+    validateFileName:function (rec){
+        rec.set('name',this.checkFileName(rec.get('name'),rec.get('type'),rec.get('targetLang')));
+    },
+
+     /***
+     * Check if the given name is duplicate for the new task. Is duplicated when the record
+     * has same name, type and target language
+     * @param fileName
+     * @param type
+     * @param targetLang
+     * @param index
+     * @returns {*|string}
+     */
+    checkFileName:function (fileName,type,target,index = 0){
+        var me = this,
+            store = me.getView().store,
+            checkName = fileName,
+            ext = '',
+            tokens,
+            nameExists = false;
+        if(index){
+            if(checkName.indexOf('.') > -1){
+                tokens = checkName.split('.'); ext = '.' + tokens.pop();
+                checkName = tokens.join('.');
+            }
+            checkName = `${checkName}(${index})${ext}`;
+        }
+
+        // check for matching name in the store
+        store.each(function(record) {
+            if(record.get('name') === checkName && record.get('type') === type && (record.get('targetLang') === target || Ext.isEmpty(target))){
+                nameExists = true;
+            }
+        });
+        return nameExists ? me.checkFileName(fileName, type, target,index + 1) : checkName;
+    },
+
+    /***
+     * Get the file type by given dropzone element.
+     * @param element
+     * @returns {string}
+     */
+    getTypByTarget:function (element){
+        var cmp = Ext.get(element.id) ? Ext.get(element.id).component : null,
+            name = cmp ? cmp.name : '';
+
+        switch (name){
+            case 'workFilesFilesButton':
+                return 'workfiles';
+            case 'pivotFilesFilesButton':
+                return 'pivot';
+            default:
+                return 'workfiles';
+        }
+    },
+
+    handleDropZoneCss: function (add){
+        var me = this,
+            fn = add ? 'addCls' : 'removeCls',
+            view = me.getView(),
+            dropZones = view.query('wizardFileButton');
+        view.getView()[fn]('dropZone');
+        dropZones.forEach(function (cmp){
+            cmp[fn]('dropZone');
+        });
     }
 });

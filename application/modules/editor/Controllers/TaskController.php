@@ -2155,7 +2155,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $task->setTargetLang($target);
             $task->setTaskName($this->entity->getTaskName().' - '.$languages[$task->getSourceLang()].' / '.$languages[$task->getTargetLang()]);
 
-            $dp->handleUploads($upload->getFiles(),$this->data[self::IMPORT_UPLOAD_LANGUAGES_NAME]);
+            $dp->handleUploads($upload->getFiles(),$this->data[self::IMPORT_UPLOAD_LANGUAGES_NAME],$this->data[self::IMPORT_UPLOAD_TYPE_NAME]);
 
             $this->processUploadedFile($task, $dp);
 

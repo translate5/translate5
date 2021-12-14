@@ -26,24 +26,39 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.projectWizard.UploadGridViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.wizardUploadGrid',
-    stores: {
-        files: {
-            model:'Editor.model.admin.projectWizard.File',
-            sorters: [{
-                // use the transform or sorterFn function to return the rfc value for the language to the here stored ID
-                property: 'targetLang',
-                direction: 'ASC'
-            },{
-                property: 'file',
-                direction: 'ASC'
-            },{
-                property: 'type',
-                // direction DESC is sufficient to sort pivot files under the same named workflows, with additional types we may use a sorterFn here
-                direction: 'DESC'
-            }]
+/**
+ * @class Editor.model.admin.projectWizard.File
+ * @extends Ext.data.Model
+ */
+Ext.define('Editor.model.admin.projectWizard.File', {
+    extend: 'Ext.data.Model',
+    fields: [{
+        name: 'file'
+    },{
+        name: 'name'
+    },{
+        name: 'size'
+    },{
+        name: 'type'
+    },{
+        type: 'int',
+        name: 'sourceLang',
+        convert:function (val){
+            if(!val){
+                return '';
+            }
+            return Ext.StoreManager.get('admin.Languages').getIdByRfc(val);
         }
-    }
+    },{
+        type: 'int',
+        name: 'targetLang',
+        convert:function (val){
+            if(!val){
+                return '';
+            }
+            return Ext.StoreManager.get('admin.Languages').getIdByRfc(val);
+        }
+    },{
+        name: 'error'
+    }]
 });

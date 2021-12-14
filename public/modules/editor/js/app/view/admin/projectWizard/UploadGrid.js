@@ -36,7 +36,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
     requires:[
         'Editor.view.admin.projectWizard.UploadGridViewController',
         'Editor.view.admin.projectWizard.UploadGridViewModel',
-        'Editor.view.admin.projectWizard.FileButton'
+        'Editor.view.admin.projectWizard.FileButton',
+        'Editor.model.admin.projectWizard.File'
     ],
     controller:'wizardUploadGrid',
     viewModel: {
@@ -53,6 +54,10 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
             element: 'el',
             fn: 'onDrop'
         },
+        dragenter: {
+            element: 'el',
+            fn: 'onDragEnter'
+        },
         scope: 'controller'
     },
     // CLICK / PROOF OF CONCEPT DUMMY FOR CONCEPTION, CLEAN UP, FIX TRANSLATIONS!
@@ -65,12 +70,14 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                 tbar: [{
                     xtype: 'wizardFileButton',
                     text: 'Add work file(s)',
+                    name:'workFilesFilesButton',
                     listeners: {
                         change: 'onManualAdd'
                     }
                 },{
                     xtype: 'wizardFileButton',
                     text: 'Add pivot file(s)',
+                    name:'pivotFilesFilesButton',
                     listeners: {
                         change: 'onManualAddPivot'
                     }
@@ -99,7 +106,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'gridcolumn',
                     width: 140,
                     dataIndex: 'targetLang',
-                    //renderer:me.langRenderer,
+                    renderer:me.langRenderer,
                     text: 'Target Language'
                 },{
                     xtype: 'gridcolumn',

@@ -51,21 +51,22 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         }
     }
 
-    public function handleUploads(array $files, array $languages) {
+    public function handleUploads(array $files, array $languages,array $filetypes) {
 
-        $target = $this->getTaskWorkfilesDir();
-
-        $this->mkdir($target);
+        $this->createTaskTempDir();
 
         $importFilesValues = array_values($files['importUpload']);
         $importFilesKeys = array_keys($files['importUpload']);
 
         $matchingFiles = [];
+        $matchingFilesTypes = [];
 
         for($i=0;$i<count($languages);$i++){
             // if the file language matches the task index or the file language at the index is empty (non-bilingual file)
             if($languages[$i] === $this->task->getTargetLang() || empty($languages[$i])){
                 $matchingFiles[$importFilesKeys[$i]] = $importFilesValues[$i];
+                // collect the matching type for the file
+                $matchingFilesTypes[$importFilesKeys[$i]] = $filetypes[$i];
             }
         }
         if(empty($matchingFiles)){
@@ -73,48 +74,89 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         }
 
         foreach($matchingFiles as $tmpFile => $fileName) {
-            $name = $this->getFilepathByName($fileName);
+            $name = $this->getFilepathByName($fileName,$matchingFilesTypes[$tmpFile]);
             if(!copy($tmpFile, $name)) {
                 //DataProvider SingleUpload: Uploaded file "{file}" cannot be moved to "{target}',
                 throw new editor_Models_Import_DataProvider_Exception('E1244', [
                     'task' => $this->task,
                     'file' => $fileName,
-                    'target' => $target,
+                    'target' => $name,
                 ]);
             }
         }
     }
 
+    /***
+     * Archive the import package
+     *
+     * @param $filename
+     * @return void
+     * @throws editor_Models_Import_DataProvider_Exception
+     */
     public function archiveImportedData($filename = null)
     {
-        // TODO: Implement archiveImportedData() method.
+        $filter = new Zend_Filter_Compress(array(
+            'adapter' => 'Zip',
+            'options' => array(
+                'archive' => $this->getZipArchivePath($filename)
+            ),
+        ));
+        if(!$filter->filter($this->importFolder)){
+            //DataProvider Directory: Could not create archive-zip
+            throw new editor_Models_Import_DataProvider_Exception('E1247', [
+                'task' => $this->task,
+            ]);
+        }
     }
 
     /***
-     * Get the task import workfiles directory
+     * Create the temporary import folder for the current task
+     * @return void
+     * @throws editor_Models_Import_DataProvider_Exception
+     */
+    protected function createTaskTempDir(){
+        $this->mkdir($this->getTaskTempDir());
+    }
+
+    /***
+     * Get task temporary directory path
      * @return string
      */
-    protected function getTaskWorkfilesDir(){
-        return $this->importFolder.DIRECTORY_SEPARATOR.editor_Models_Import_Configuration::WORK_FILES_DIRECTORY.DIRECTORY_SEPARATOR;
+    protected function getTaskTempDir(): string
+    {
+        return $this->importFolder.DIRECTORY_SEPARATOR;
     }
 
     /***
-     * Get the file path of a given file in the task workfiles directory.
-     * If the file already exist, the new file will be put in sub folder
+     * Return target directory for the given file type.
+     * It can be: workfiles, relais and visualReview
+     *
+     * @param string $type
+     * @return string
+     */
+    protected function getTargetDir(string $type): string
+    {
+        return match ($type) {
+            'workfile' => editor_Models_Import_Configuration::WORK_FILES_DIRECTORY,
+            'pivot' => editor_Models_Import_Configuration::RELAIS_FILES_DIRECTORY,
+            default => $type,
+        };
+    }
+
+    /***
+     * Get the file path of the given file and file type.
+     * If the file with the same name exist, incremental filename will be generated
      * @param string $fileName
+     * @param string $fileType
      * @return string
      * @throws editor_Models_Import_DataProvider_Exception
      */
-    protected function getFilepathByName(string $fileName){
-        $target = $this->getTaskWorkfilesDir();
+    protected function getFilepathByName(string $fileName,string $fileType): string
+    {
+        $target = $this->getTaskTempDir().$this->getTargetDir($fileType).DIRECTORY_SEPARATOR;
+        $this->mkdir($target);
 
-        $name = $target.$fileName;
-        // if there is same named file, put it into a folder
-        if(is_file($name)){
-            $name = $target.pathinfo($fileName, PATHINFO_FILENAME);
-            $this->mkdir($name);
-            $name = $name.DIRECTORY_SEPARATOR.$fileName;
-        }
-        return $name;
+        $name = ZfExtended_Utils::addNumberIfExist($fileName,$target);
+        return $target.$name;
     }
 }
