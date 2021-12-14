@@ -101,20 +101,20 @@ class editor_Models_Segment_RepetitionUpdater {
 
         //replace the repeatedSegment tags with the original repetition ones
         $useSourceTags = empty($originalContent);
-        if($useSourceTags) {
-            //if the original had no content (mostly translation context), we have to load the source tags.
-            $originalContent = $this->repeatedSegment->getSource();
-        }
-        //get only the real tags, we do not consider whitespace tags in repetitions, 
+
+        //get only the real tags, we do not consider whitespace tags in repetitions,
         // this is because whitespace belongs to the content and not to the segment (tags instead belong to the segment)
-        $tagsForRepetition = $this->tagHelper->getRealTags($originalContent);
+        // if the original had no content (mostly translation context), we have to load the source tags.
+        $tagsForRepetition = $this->tagHelper->getRealTags($useSourceTags ? $this->repeatedSegment->getSource() : $originalContent);
         $shortTagNumbers = $this->tagHelper->getTagNumbers($tagsForRepetition);
+
         if(empty($shortTagNumbers)) {
             $newShortTagNumber = 1;
         }
         else {
             $newShortTagNumber = max($shortTagNumbers) + 1;
         }
+
         if(empty($tagsForRepetition)) {
             //if there are no original tags we have to init $i with the realTagCount in the targetEdit for below check
             $stat = $this->tagHelper->statistic($this->trackChangesTagHelper->protect($segmentContent));
@@ -154,7 +154,10 @@ class editor_Models_Segment_RepetitionUpdater {
             $this->repeatedSegment->setTargetEdit($segmentContent);
             // when copying targets originating from a language-resource, we copy the original target as well ...
             if($this->originalSegment->isFromLanguageResource()){
-                $this->repeatedSegment->setTarget($originalContent);
+                $this->updateSegmentContent($originalContent, $this->originalSegment->getTarget(), function($originalContent, $segmentContent){
+                    $this->repeatedSegment->setTarget($segmentContent);
+                    $this->repeatedSegment->updateToSort('target');
+                });
             }
             $this->repeatedSegment->updateToSort('target'.editor_Models_SegmentFieldManager::_EDIT_PREFIX);
         });

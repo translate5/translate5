@@ -96,15 +96,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         parent::__construct($analysisId);
     }
 
-    /***
+    /**
      * Query the language resource service for each segment, calculate the best match rate, and save the match analysis model
      *
-     * @param Closure $progressCallback : call to update the workerModel progress. It expects progress as argument (progress = 100 / task segment count)
+     * @param Closure|null $progressCallback : call to update the workerModel progress. It expects progress as argument (progress = 100 / task segment count)
      * @return boolean
      */
-    public function calculateMatchrate(Closure $progressCallback = null)
+    public function analyseAndPretranslate(Closure $progressCallback = null): bool
     {
-
         // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$this->task->getTaskGuid()]);
         /* @var $segments editor_Models_Segment_Iterator */
@@ -127,7 +126,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $progress = $segmentCounter / $this->task->getSegmentCount();
 
             //get the best match rate, respecting repetitions
-            $bestMatchRateResult = $this->handleRepetition($segment);
+            $bestMatchRateResult = $this->calculateMatchrate($segment);
 
             if (!$this->pretranslate) {
                 //report progress update
@@ -178,11 +177,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     }
 
     /**
-     * Checks for segment repetititons and handles them if needed
+     * calculates the segments matchrate, respecting repetitions and fuzzy matched and handles them if needed
      * @param editor_Models_Segment $segment
-     * @return stdClass
+     * @return stdClass|null
+     * @throws editor_Models_ConfigException
      */
-    protected function handleRepetition(editor_Models_Segment $segment)
+    protected function calculateMatchrate(editor_Models_Segment $segment): ?stdClass
     {
         //calculate and set segment hash
         $segmentHash = $segment->getSourceMd5();
@@ -214,18 +214,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             // we may not update the repetitionHash, this would interfer with the other repetitions
             return $this->getBestResult($segment, true);
         }
-        $repetitionRate = editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE;
+        $repetitionRate = max(($bestResult->matchrate ?? 0), editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE);
         //get the best match rate for the repetition segment,
         // it can be context match (103%) which is better as the 102% repetition one
         // or the one stored for the repetition could be from a MT. So recalc here always.
         $bestResult = $this->getBestResult($segment, false);
         //save the repetition analysis with either 102% or 103% matchrate
-        $this->saveAnalysis($segment, max($repetitionRate, $bestResult->matchrate ?? 0), 0);
+        $this->saveAnalysis($segment, $repetitionRate, 0);
 
         //if there is no match we can not update the target below
-        if (!$masterHasResult) {
+        if (!$masterHasResult || $this->isInternalFuzzy($this->repetitionByHash[$segmentHash]->target ?? '')) {
             //this means returning null:
-            return $this->repetitionByHash[$segmentHash];
+            return null; //if the master of the repetition had no result, the repetition has no content either
         }
 
         //the returning result must be the one from the first of the repetition group.
@@ -234,6 +234,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $bestRepeatedResult->target = $segment->getTargetEdit();
         // the current result is from repetition segment. This is needed for the resources usage log.
         $bestRepeatedResult->isRepetition = true;
+        $bestRepeatedResult->matchrate = $repetitionRate;
         return $bestRepeatedResult;
     }
 
@@ -245,9 +246,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param bool $saveAnalysis
      * @return NULL|stdClass
      */
-    protected function getBestResult(editor_Models_Segment $segment,$saveAnalysis=true){
-        $bestMatchRateResult=null;
-        $bestMatchRate=null;
+    protected function getBestResult(editor_Models_Segment $segment, bool $saveAnalysis = true): ?stdClass
+    {
+        $bestMatchRateResult = null;
+        $bestMatchRate = null;
 
         //query the segment for each assigned tm
         foreach ($this->connectors as $languageResourceid => $connector) {
@@ -431,7 +433,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected function saveAnalysis($segment, $matchRateResult, $languageResourceid)
     {
-
         $matchAnalysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
         /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
         $matchAnalysis->setSegmentId($segment->getId());
