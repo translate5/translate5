@@ -508,9 +508,9 @@ class Task extends Channel {
      * @param string $connectionId
      * @param array $masterSegment
      * @param string $sessionId
-     * @param array $alikes
+     * @param array $alikeIds
      */
-    public function segmentAlikesLoaded(string $connectionId, array $masterSegment, string $sessionId, array $alikes) {
+    public function segmentAlikesLoaded(string $connectionId, array $masterSegment, string $sessionId, array $alikeIds) {
         //get current connection
         if(empty($this->editedSegments[$masterSegment['id']])) {
             $this->instance->getLogger()->warn('segmentAlikesLoaded: requested master segment is not edited anymore: '.$masterSegment['id']);
@@ -525,9 +525,9 @@ class Task extends Channel {
         $userGuid = $this->instance->getSession($sessionId, 'userGuid');
         $trackingId = $this->getUserTrackingId($currentConnection->openedTask, $userGuid);
         
-        //try to lock all $alikes for this connection
+        //try to lock all $alikeIds for this connection
         $locked = [];
-        foreach($alikes as &$alikeId) {
+        foreach($alikeIds as &$alikeId) {
             $alikeId = (int) $alikeId;
             if(empty($this->editedSegments[$alikeId])) {
                 $locked[] = $alikeId;
@@ -560,14 +560,14 @@ class Task extends Channel {
         }
         
         //storing the alikeIds to the current masterSegment
-        $this->alikeSegments[$masterSegment['id']] = $alikes;
+        $this->alikeSegments[$masterSegment['id']] = $alikeIds;
         
         //ensure that master segment ID is in the lock list for the result too
-        $alikes[] = (int) $masterSegment['id'];
+        $alikeIds[] = (int) $masterSegment['id'];
         
         //send all other users that the segments should be locked
         $this->sendToTaskUsers($masterSegment['taskGuid'], $sessionId, FrontendMsg::create(self::CHANNEL_NAME, 'segmentLocked', [
-            'segmentId' => $alikes, //maybe integer or array of int!
+            'segmentId' => $alikeIds, //maybe integer or array of int!
             'trackingId' => $trackingId,
             'connectionId' => $connectionId,
         ]), $currentConnection);

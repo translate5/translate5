@@ -48,12 +48,12 @@ trait FrontendMsgValidator {
             }
             $param = $params[0];
             /* @var $param \ReflectionParameter */
-            $cls = $param->getClass();
+            $cls = $param->getType()?->getName() ?? null;
             if(empty($cls)) {
                 continue;
             }
-            $isMsg = $cls->getName() === $msgCls || $cls->isSubclassOf($msgCls);
-            $isBackendMsg = $cls->getName() === $backMsgCls || $cls->isSubclassOf($backMsgCls);
+            $isMsg = $cls === $msgCls || is_subclass_of($cls, $msgCls);
+            $isBackendMsg = $cls === $backMsgCls || is_subclass_of($cls, $backMsgCls);
             if($isMsg && !$isBackendMsg) {
                 self::$_validFrontendMethods[] = $method->getName();
             }
