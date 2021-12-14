@@ -463,10 +463,11 @@ class Task extends Channel {
         $this->sendToTaskUsers($segment['taskGuid'], $sessionId, $answer, $saverConn);
     }
 
-    public function commentChanged(string $connectionId, array $comment, string $sessionId) {
+    public function commentChanged(string $connectionId, string $typeOfChange, array $comment, string $sessionId) {
         $this->sendToTaskUsers($comment['taskGuid'], $sessionId, FrontendMsg::create(self::CHANNEL_NAME, 'commentChanged', [
             'comment' => $comment,
             'connectionId' => $connectionId,
+            'typeOfChange' => $typeOfChange,
         ]));
     }
 

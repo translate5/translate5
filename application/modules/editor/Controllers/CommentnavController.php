@@ -25,21 +25,28 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+
+/**
+ * Loads segment comments.
+ * Exposes fields for adding further entities via afterIndexAction event.
+ * See e.g. editor_Plugins_VisualReview_Init
+ */
 class Editor_CommentnavController extends ZfExtended_RestController {
 
     /**
      * @var Zend_Session_Namespace
      */
-    protected $session;
+    public $session;
+    /**
+     * @var editor_Workflow_Anonymize
+     */
+    public $wfAnonymize;
     /**
      * @var editor_Models_Task
      */
-    protected $task;
-    /**
-     * @var ZfExtended_Zendoverwrites_Translate
-     */
-    protected $translate;
-    protected $wfAnonymize;
+    public $task;
+
+    const RESTRICTION = "commentnav supports only GET Action";
 
     public function init() {
         $this->initRestControllerSpecific();
@@ -53,8 +60,6 @@ class Editor_CommentnavController extends ZfExtended_RestController {
  */
     public function indexAction() {
         $this->session = new Zend_Session_Namespace();
-        $pluginmanager = Zend_Registry::get('PluginManager');
-        $availablePlugins = $pluginmanager->getAvailable();
         $this->task = ZfExtended_Factory::get('editor_Models_Task');
         $this->task->loadByTaskGuid($this->session->taskGuid);
         $this->wfAnonymize = false;
@@ -64,12 +69,7 @@ class Editor_CommentnavController extends ZfExtended_RestController {
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
 
-        $entities = $this->loadSegmentCommentArray();
-        if(array_key_exists('VisualReview',$availablePlugins)){
-            $annotations = $this->loadAnnotationsArray();
-            $entities = array_merge($entities,$annotations);
-        }
-        $this->view->rows = $entities;
+        $this->view->rows = $this->loadSegmentCommentArray();
         $this->view->total = count($this->view->rows);
     }
 
@@ -86,33 +86,20 @@ class Editor_CommentnavController extends ZfExtended_RestController {
         return $comments;
     }
 
-    protected function loadAnnotationsArray(){
-        $annotation_entity = ZfExtended_Factory::get('editor_Plugins_VisualReview_Annotation_Entity');
-        $annotations = $annotation_entity->loadAllByTask($this->session->taskGuid);
-        foreach ($annotations as &$row) {
-            $row['comment'] = htmlspecialchars($row['text']);
-            $row['type'] = 'visualAnnotation';
-            if($this->wfAnonymize) {
-                $row = $this->wfAnonymize->anonymizeUserdata($this->session->taskGuid, $row['userGuid'], $row);
-            }
-        }
-        return $annotations;
-    }
-
     public function getAction() {
-        throw new BadMethodCallException('commentnav supports only GET Action');
+        throw new BadMethodCallException(self::RESTRICTION);
     }
 
     public function postAction() {
-        throw new BadMethodCallException('commentnav supports only GET Action');
+        throw new BadMethodCallException(self::RESTRICTION);
     }
     
     public function putAction() {
-        throw new BadMethodCallException('commentnav supports only GET Action');
+        throw new BadMethodCallException(self::RESTRICTION);
     }
     
     public function deleteAction() {
-        throw new BadMethodCallException('commentnav supports only GET Action');
+        throw new BadMethodCallException();
     }
 
 }
