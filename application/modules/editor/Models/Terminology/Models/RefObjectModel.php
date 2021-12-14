@@ -84,4 +84,27 @@ class editor_Models_Terminology_Models_RefObjectModel extends editor_Models_Term
         // Return ref object lists
         return $refObjectListA;
     }
+
+    /**
+     * Get emails for excel export by collectionId
+     *
+     * @param $collectionId
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getEmailsByCollectionId($collectionId) {
+
+        // Fetch emails from `terms_ref_object` table
+        $emails = $this->db->getAdapter()->query('
+            SELECT `key`, JSON_UNQUOTE(JSON_EXTRACT(`data`, "$.email")) FROM `terms_ref_object` WHERE `collectionId` = ?
+        ', $collectionId)->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // Append [userGuid => email] pairs from Zf_users
+        $emails += $this->db->getAdapter()->query('
+            SELECT `userGuid`, `email` FROM `Zf_users`
+        ')->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // Return emails
+        return $emails;
+    }
 }

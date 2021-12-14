@@ -203,13 +203,17 @@ class editor_Models_Export_Terminology_Xlsx {
     public function status($msg, $arg = null) {
 
         // Get translate instance if not yet got
-        if (!$this->l10n) $this->l10n = ZfExtended_Zendoverwrites_Translate::getInstance();
+        if (!$this->l10n) {
+            $this->l10n = ZfExtended_Zendoverwrites_Translate::getInstance();
+        }
 
         // Localize $msg arg
         $msg = $this->l10n->_($msg);
 
         // If $arg arg is given - use as template
-        if ($arg !== null) $msg = sprintf($msg, $arg);
+        if ($arg !== null) {
+            $msg = sprintf($msg, $arg);
+        }
 
         // Print
         d($msg);
@@ -219,10 +223,12 @@ class editor_Models_Export_Terminology_Xlsx {
      * Do export
      *
      * @param int $collectionId
-     * @param bool $tbxBasicOnly
      * @param int $byTermEntryQty
+     * @throws Zend_Exception
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException
+     * @throws \WilsonGlasser\Spout\Common\Exception\UnsupportedTypeException
      */
-    public function exportCollectionById(int $collectionId, $tbxBasicOnly = false, $byTermEntryQty = 1000) {
+    public function exportCollectionById(int $collectionId, $byTermEntryQty = 1000) {
 
         // Load utils
         class_exists('editor_Utils'); mt();
@@ -237,45 +243,25 @@ class editor_Models_Export_Terminology_Xlsx {
         $this->collectionId = $collectionId;
 
         // Models shortcuts
-        $dataTypeM  = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
-        $termEntryM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
-        $termM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        $attrM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        $trscM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
-        $this->imagesModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
+        $termEntryM           = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        $termM                = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        $attrM                = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+        $trscM                = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+        $refObjectModelM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_RefObjectModel');
+        $this->imagesModel    = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
-        // Build file path
-        $file = $this->file($collectionId);
-
-        // Create writer and open file for writing
-        $this->writer = WriterEntityFactory::createWriter('xlsx');
-        $this->writer->openToFile($file);
-
-        // Get attribute datatypes usage info
-        $this->usage = $dataTypeM->getUsageForLevelsByCollectionId($collectionId);
-
-        // Setup <level>.attribs-columns and white 2 header rows
-        $this->setLevelAttribsCols()->writeFirstHeaderRow()->writeSecondHeaderRow();
-
-        // Get user emails from `Zf_users` table
-        $this->emailA = $trscM->db->getAdapter()->query('
-            SELECT `userGuid`, `email` FROM `Zf_users`
-        ')->fetchAll(PDO::FETCH_KEY_PAIR);
-
-        // Append emails from `terms_ref_object` table
-        $this->emailA += $trscM->db->getAdapter()->query('
-            SELECT `key`, JSON_UNQUOTE(JSON_EXTRACT(`data`, "$.email")) FROM `terms_ref_object` WHERE `collectionId` = ?
-        ', $collectionId)->fetchAll(PDO::FETCH_KEY_PAIR);
+        // Setup <level>.attribs-columns and write 2 header rows
+        $this->openXlsxFile()->calcLevelAttribsCols()->writeFirstHeaderRow()->writeSecondHeaderRow();
 
         // Get total qty of entries to be processed
         $termEntryQty = $termEntryM->getQtyByCollectionId($collectionId);
 
-        // Flush info on how may termEntries to be exported
+        // Fetch emails of persons/users mentioned in transacgrp-data
+        $this->emailA = $refObjectModelM->getEmailsByCollectionId($collectionId);
+
+        // Flush info on how many termEntries are going to be exported
         $this->status('Gesamtzahl der Termeinträge: %s', $termEntryQty);
         $this->status('Beginn des Exports...');
-
-        // Build WHERE clause
-        $where = 'collectionId = ' . $collectionId;
 
         // Fetch usages by $byTermEntryQty at a time
         for ($p = 1; $p <= ceil($termEntryQty / $byTermEntryQty); $p++) {
@@ -284,85 +270,21 @@ class editor_Models_Export_Terminology_Xlsx {
             $offset = ($p - 1) * $byTermEntryQty;
 
             // Fetch termEntries
-            $termEntryA = $termEntryM->db->fetchAll($where, null, $byTermEntryQty, $offset)->toArray();
+            $termEntryA = $termEntryM->db->fetchAll('collectionId = ' . $collectionId, null, $byTermEntryQty, $offset)->toArray();
 
             // Get termEntryIds
             $termEntryIds = join(',', array_column($termEntryA, 'id') ?: [0]);
 
             // Get inner data for given termEntries
             $termA = $termM->getExportData($termEntryIds);
-            $attrA = $attrM->getExportData($termEntryIds, $tbxBasicOnly);
+            $attrA = $attrM->getExportData($termEntryIds);
             $trscA = $trscM->getExportData($termEntryIds, true);
 
-            // Foreach termEntry
+            // Write rows
             foreach ($termEntryA as $entryIdx => $termEntry) {
-
-                // Foreach language
                 foreach ($termA[$termEntry['id']] as $lang => $terms) {
-
-                    // Foreach term
                     foreach ($terms as $termIdx => $term) {
-
-                        // Excel column index shift
-                        $shift = 0;
-
-                        // Init new row
-                        $row = WriterEntityFactory::createRow();
-
-                        // Foreach column groups
-                        foreach ($this->cols as $group => &$info) {
-
-                            // If group style is not yet prepared - prepare it
-                            if (!array_key_exists('style', $info))
-                                $info['style'] = ($info['color'] ?? 0)
-                                    ? (new StyleBuilder())->setBackgroundColor($info['color'])->setShouldWrapText(false)->build()
-                                    : null;
-
-                            // If it's main group
-                            if ($group == 'main') {
-
-                                // Prepare data
-                                $data = [
-                                    'termEntryId' => $termEntry['id'],
-                                    'language' => $lang,
-                                    'termId' => $term['id'],
-                                    'term' => $term['term'],
-                                    'processStatus' => $term['processStatus'],
-                                ];
-
-                            // Else if it's transacgrp-group
-                            } else if (preg_match('~(entry|language|term)\.(origination|modification)~', $group, $m)) {
-
-                                // Prepare data
-                                     if ($m[1] == 'entry')    $data = $this->transacGrpCells($trscA, $m[2], $termEntry['id']);
-                                else if ($m[1] == 'language') $data = $this->transacGrpCells($trscA, $m[2], $termEntry['id'], $lang);
-                                else if ($m[1] == 'term')     $data = $this->transacGrpCells($trscA, $m[2], $termEntry['id'], $lang, $term['id']);
-
-                            // Else if it's attribs-group
-                            } else if (preg_match('~(entry|language|term)\.attribs~', $group, $m)) {
-
-                                // Prepare data
-                                     if ($m[1] == 'entry')    $data = $this->attributeCells($attrA, $termEntry['id']);
-                                else if ($m[1] == 'language') $data = $this->attributeCells($attrA, $termEntry['id'], $lang);
-                                else if ($m[1] == 'term')     $data = $this->attributeCells($attrA, $termEntry['id'], $lang, $term['id']);
-                            }
-
-                            // Foreach column in group
-                            foreach (array_keys($info['cols']) as $idx => $key) {
-
-                                // Create cell
-                                $cell = WriterEntityFactory::createCell($data[$key] ?? '', $info['style']);
-
-                                // Add cell to a row
-                                $row->setCellAtIndex($cell, $shift + $idx);
-                            }
-
-                            // Increase cell index shift
-                            $shift += count($info['cols']);
-                        }
-
-                        // Write row
-                        $this->writer->addRow($row);
+                        $this->writeRow($termEntry, $lang, $term, $attrA, $trscA);
                     }
                 }
             }
@@ -397,6 +319,74 @@ class editor_Models_Export_Terminology_Xlsx {
     }
 
     /**
+     * Write row to an excel-export spreadsheet
+     *
+     * @param $termEntry
+     * @param $lang
+     * @param $term
+     * @param $attrA
+     * @param $trscA
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function writeRow($termEntry, $lang, $term, $attrA, $trscA) {
+
+        // Excel column index shift
+        $shift = 0;
+
+        // Init new row
+        $row = WriterEntityFactory::createRow();
+
+        // Foreach column groups
+        foreach ($this->cols as $group => $info) {
+
+            // If it's main group
+            if ($group == 'main') {
+
+                // Prepare data
+                $data = [
+                    'termEntryId' => $termEntry['id'],
+                    'language' => $lang,
+                    'termId' => $term['id'],
+                    'term' => $term['term'],
+                    'processStatus' => $term['processStatus'],
+                ];
+
+            // Else if it's transacgrp-group
+            } else if (preg_match('~(entry|language|term)\.(origination|modification)~', $group, $m)) {
+
+                // Prepare data
+                     if ($m[1] == 'entry')    $data = $this->transacGrpCells($trscA, $m[2], $termEntry['id']);
+                else if ($m[1] == 'language') $data = $this->transacGrpCells($trscA, $m[2], $termEntry['id'], $lang);
+                else if ($m[1] == 'term')     $data = $this->transacGrpCells($trscA, $m[2], $termEntry['id'], $lang, $term['id']);
+
+            // Else if it's attribs-group
+            } else if (preg_match('~(entry|language|term)\.attribs~', $group, $m)) {
+
+                // Prepare data
+                     if ($m[1] == 'entry')    $data = $this->attributeCells($attrA, $termEntry['id']);
+                else if ($m[1] == 'language') $data = $this->attributeCells($attrA, $termEntry['id'], $lang);
+                else if ($m[1] == 'term')     $data = $this->attributeCells($attrA, $termEntry['id'], $lang, $term['id']);
+            }
+
+            // Foreach column in group
+            foreach (array_keys($info['cols']) as $idx => $key) {
+
+                // Create cell
+                $cell = WriterEntityFactory::createCell($data[$key] ?? '', $info['style']);
+
+                // Add cell to a row
+                $row->setCellAtIndex($cell, $shift + $idx);
+            }
+
+            // Increase cell index shift
+            $shift += count($info['cols']);
+        }
+
+        // Write row
+        $this->writer->addRow($row);
+    }
+
+    /**
      * Prepare data for attributes cells
      *
      * @param $attrA
@@ -404,11 +394,12 @@ class editor_Models_Export_Terminology_Xlsx {
      * @param string $language
      * @param string $termId
      * @return array
+     * @throws Zend_Db_Statement_Exception
      */
     public function attributeCells($attrA, $termEntryId, $language = '', $termId = '') {
 
         // Aux variables
-        $data = []; $figure = []; $dataTypeId_figure = 0;
+        $data = []; $dataTypeId_figure = 0;
 
         // Foreach attribute
         foreach ($attrA[$termEntryId][$language][$termId] ?? [] as $attr) {
@@ -431,7 +422,9 @@ class editor_Models_Export_Terminology_Xlsx {
                 }
 
             // Else
-            } else $data[$attr['dataTypeId']] []= $attr['value'];
+            } else {
+                $data[$attr['dataTypeId']] []= $attr['value'];
+            }
         }
 
         // Get images URLs
@@ -441,13 +434,15 @@ class editor_Models_Export_Terminology_Xlsx {
             $paths = $this->imagesModel->getImagePathsByTargetIds($this->collectionId, $data[$dataTypeId_figure]);
 
             // Foreach path
-            foreach ($paths as $target => $src)
-                $data[$dataTypeId_figure][$target]
-                    = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $src;
+            foreach ($paths as $target => $src) {
+                $data[$dataTypeId_figure][$target] = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $src;
+            }
         }
 
         // Join multi-values by newlines
-        foreach ($data as &$value) $value = join(" \n", $value);
+        foreach ($data as &$value) {
+            $value = join(" \n", $value);
+        }
 
         // Return data
         return $data;
@@ -549,12 +544,17 @@ class editor_Models_Export_Terminology_Xlsx {
         $row = WriterEntityFactory::createRow();
 
         // Foreach columns groups
-        foreach ($this->cols as $group => $info) {
+        foreach ($this->cols as $group => &$info) {
 
-            // Prepare style
+            // Prepare style for column header cells
             $styleBuilder = new StyleBuilder();
             if ($info['color'] ?? 0) $styleBuilder->setBackgroundColor($info['color']);
             $style = $styleBuilder->setFontBold()->build();
+
+            // Prepare style for data-cells
+            $info['style'] = ($info['color'] ?? 0)
+                ? (new StyleBuilder())->setBackgroundColor($info['color'])->setShouldWrapText(false)->build()
+                : null;
 
             // Foreach column in current group
             foreach (array_values($info['cols']) as $idx => $text) {
@@ -589,7 +589,12 @@ class editor_Models_Export_Terminology_Xlsx {
      * Setup $this->cols[<level>.attribs]['cols'] columns definitions
      * based on attributes dataTypes usage
      */
-    public function setLevelAttribsCols() {
+    public function calcLevelAttribsCols() {
+
+        // Get attribute datatypes usage info
+        $this->usage = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_AttributeDataType')
+            ->getUsageForLevelsByCollectionId($this->collectionId);
 
         // Foreach $level => $dataTypeIdA pair
         foreach ($this->usage->usage as $level => $dataTypeIdA) {
@@ -610,6 +615,26 @@ class editor_Models_Export_Terminology_Xlsx {
                 }
             }
         }
+
+        // Return $this
+        return $this;
+    }
+
+    /**
+     * Instantiate xlsx-writer and open the destination xlsx-file
+     *
+     * @return $this
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException
+     * @throws \WilsonGlasser\Spout\Common\Exception\UnsupportedTypeException
+     */
+    public function openXlsxFile() {
+
+        // Build file path
+        $file = $this->file($this->collectionId);
+
+        // Create writer and open file for writing
+        $this->writer = WriterEntityFactory::createWriter('xlsx');
+        $this->writer->openToFile($file);
 
         // Return $this
         return $this;
