@@ -143,47 +143,76 @@ final class editor_Segment_Quality_Manager {
         }
         return NULL;
     }
-
     /**
-     * Prepares the import: adds all Import Workers that exist for Quality tags
-     * @param editor_Models_Task $task
-     * @param int $parentWorkerId
+     * Adds the neccessary import workers
+     * @param string $taskGuid
+     * @param int $parentId
      */
-    public function prepareImport(editor_Models_Task $task, int $parentWorkerId) {
-        $this->prepareByContext($task, $parentWorkerId, editor_Segment_Processing::IMPORT);
-    }
-    /**
-     * Prepares the import: adds all Import Workers that exist for Quality tags
-     * @param editor_Models_Task $task
-     * @param int $parentWorkerId
-     */
-    public function prepareAnalysis(editor_Models_Task $task, int $parentWorkerId) {
-        $this->prepareByContext($task, $parentWorkerId, editor_Segment_Processing::ANALYSIS);
-    }
-
-    /**
-     * Prepares the quality workers depending on the context
-     * @param editor_Models_Task $task
-     * @param int $parentWorkerId
-     * @param string $context
-     */
-    private function prepareByContext(editor_Models_Task $task, int $parentWorkerId, string $context){
-        foreach($this->registry as $type => $provider){
-            /* @var $provider editor_Segment_Quality_Provider */
-            if($provider->hasImportWorker()){
-                $provider->addWorker($task, $parentWorkerId, $context);
+    public function queueImport(editor_Models_Task $task, int $parentId=0){
+        // add starting worker
+        $worker = ZfExtended_Factory::get('editor_Segment_Quality_ImportWorker');
+        /* @var $worker editor_Segment_Quality_ImportWorker */
+        if($worker->init($task->getTaskGuid())) {
+            $qualityParentId = $worker->queue($parentId, null, false);
+            // add finishing worker
+            $worker = ZfExtended_Factory::get('editor_Segment_Quality_ImportFinishingWorker');
+            /* @var $worker editor_Segment_Quality_ImportFinishingWorker */
+            if($worker->init($task->getTaskGuid())) {
+                $worker->queue($qualityParentId, null, false);
             }
         }
     }
-
     /**
-     * Finishes the import: processes all non-worker providers & saves the processed tags-model back to the segments
+     * Adds the neccessary workers for an operation
+     * @param string $processingMode: as defined in editor_Segment_Processing
+     * @param editor_Models_Task $task
+     * @param int $parentId
+     */
+    public function queueOperation(string $processingMode, editor_Models_Task $task, int $parentId=0, array $workerParams=[]){
+        // add starting worker
+        $workerParams['processingMode'] = $processingMode;
+        $worker = ZfExtended_Factory::get('editor_Segment_Quality_OperationWorker');
+        /* @var $worker editor_Segment_Quality_OperationWorker */
+        if($worker->init($task->getTaskGuid(), $workerParams)) {
+            $qualityParentId = $worker->queue($parentId, null, false);
+            // add finishing worker
+            $worker = ZfExtended_Factory::get('editor_Segment_Quality_OperationFinishingWorker');
+            /* @var $worker editor_Segment_Quality_ImportFinishingWorker */
+            if($worker->init($task->getTaskGuid(), $workerParams)) {
+                $worker->queue($qualityParentId, null, false);
+            }
+        }
+    }
+    /**
+     * Prepares Term tagging only
+     * @param editor_Models_Task $task
+     * @param int $parentWorkerId
+     */
+    public function prepareTagTerms(editor_Models_Task $task, int $parentWorkerId) {
+        $this->prepareOperation(editor_Segment_Processing::TAGTERMS, $task, $parentWorkerId);
+    }
+    /**
+     * Prepares the quality workers depending on the context/processing type
+     * @param string $processingMode
+     * @param editor_Models_Task $task
+     * @param int $parentWorkerId
+     * @param array $workerParams
+     */
+    public function prepareOperation(string $processingMode, editor_Models_Task $task, int $parentWorkerId, array $workerParams=[]){
+        foreach($this->registry as $type => $provider){
+            /* @var $provider editor_Segment_Quality_Provider */
+            if($provider->hasOperationWorker($processingMode)){
+                $provider->addWorker($task, $parentWorkerId, $processingMode, $workerParams);
+            }
+        }
+    }
+    /**
+     * Finishes an operation: processes all non-worker providers & saves the processed tags-model back to the segments
      * @param editor_Models_Task $task
      */
-    public function finishImport(editor_Models_Task $task){
+    public function finishOperation(string $processingMode, editor_Models_Task $task){
         
         $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
-        $processingMode = editor_Segment_Processing::IMPORT;
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $db editor_Models_Db_Segments */
         $db->getAdapter()->beginTransaction();
@@ -203,7 +232,7 @@ final class editor_Segment_Quality_Manager {
             // process all quality providers that do not have an import worker
             foreach($this->registry as $type => $provider){
                 /* @var $provider editor_Segment_Quality_Provider */
-                if(!$provider->hasImportWorker()){
+                if(!$provider->hasOperationWorker($processingMode)){
                     $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
                 }
             }
@@ -214,9 +243,7 @@ final class editor_Segment_Quality_Manager {
         }
         // save qualities
         editor_Models_Db_SegmentQuality::saveRows($qualities);
-        // remove segment tags model
-        editor_Models_Db_SegmentTags::removeByTaskGuid($task->getTaskGuid());
-        
+
         $db->getAdapter()->commit();
     }
     /**

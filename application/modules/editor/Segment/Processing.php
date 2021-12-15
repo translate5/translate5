@@ -56,5 +56,20 @@ class editor_Segment_Processing {
      * @var string
      */
     const ANALYSIS = 'analysis';
-
+    /**
+     * Used to indicate a TermTagging Only Operation
+     * @var string
+     */
+    const TAGTERMS = 'tagterms';
+    
+    /**
+     * Evaluates if we have a operational processing mode
+     * operational means, that we have workers, who save their results to LEK_segment_tags instead of back to the segments directly
+     * this requires a finising worker calling editor_Segment_Processing::finishOperation 
+     * @param string $type
+     * @return bool
+     */
+    public static function isOperation(string $type) : bool {
+        return ($type == self::IMPORT || $type == self::ANALYSIS || $type == self::RETAG);
+    }
 }

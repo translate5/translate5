@@ -65,15 +65,27 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         return ($taskConfig->runtimeOptions->termTagger->enableAutoQA == 1);
     }
     
-    public function hasImportWorker() : bool {
+    public function hasOperationWorker(string $processingMode) : bool {
+        // we will run with any processing mode
         return true;
     }
     
-    public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode) {
+    public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode, array $workerParams=[]) {
         
-        // if no terminology is present we return as well
+        // Crucial: add processing-mode to worker params
+        $workerParams['processingMode'] = $processingMode;
+        
+        // if no terminology is present we usually to not queue a worker, only a re-tag or analysis must cover the case we actually have to remove the terms !
         /* @var $task editor_Models_Task */
         if (!$task->getTerminologie()) {
+            if($processingMode == editor_Segment_Processing::ANALYSIS || $processingMode == editor_Segment_Processing::RETAG){
+                $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_Remove');
+                if(!$worker->init($task->getTaskGuid(), $workerParams)) {
+                    $this->log->error('E1128', 'TermTagger Remove Worker can not be initialized!', [ 'parameters' => $workerParams ]);
+                    return;
+                }
+                $worker->queue($parentWorkerId);
+            }
             return;
         }
 
@@ -88,11 +100,10 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         $this->prepareSegments($task, $meta);
         
         // init worker and queue it
-        $params = ['resourcePool' => 'import', 'processingMode' => $processingMode];
-        if (!$worker->init($task->getTaskGuid(), $params)) {
-            $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [
-                'parameters' => $params,
-            ]);
+        // QUIRK / FIXME: the "import" resourcePool is used for all Operations (import, analysis, retag)
+        $workerParams['resourcePool'] = 'import';
+        if (!$worker->init($task->getTaskGuid(), $workerParams)) {
+            $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [ 'parameters' => $workerParams ]);
             return;
         }
         $worker->queue($parentWorkerId);
