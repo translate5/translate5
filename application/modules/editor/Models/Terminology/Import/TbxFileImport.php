@@ -464,6 +464,17 @@ $memLog('Loaded terms:        ');
         $newLangSet->entryId = $parentEntry->id;
         $newLangSet->termEntryGuid = $parentEntry->entryGuid;
 
+        // Collect and set the descrip attributes, and check if there is a definition
+        if (isset($languageGroup->descrip)) {
+            $descrips = $this->setAttributeTypes($languageGroup->descrip, $newLangSet);
+            /* @var editor_Models_Terminology_TbxObjects_Attribute $descrip */
+            foreach ($descrips as $descrip) {
+                if ($descrip->type == 'definition') {
+                    $newLangSet->definition = $descrip->value;
+                    break;
+                }
+            }
+        }
 
         $this->setDiscriptGrp($languageGroup,$newLangSet,'langSet');
 
