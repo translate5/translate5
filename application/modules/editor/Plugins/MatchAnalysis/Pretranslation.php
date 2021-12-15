@@ -177,9 +177,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         if($segment->getAutoStateId() != editor_Models_Segment_AutoStates::NOT_TRANSLATED){
             return;
         }
-        //if($result->matchrate==editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE){
-            //return;
-        //}
+
         //the internalLanguageResourceid is set when the segment bestmatchrate is found(see analysis getbestmatchrate function)
         $languageResourceid=$result->internalLanguageResourceid;
         

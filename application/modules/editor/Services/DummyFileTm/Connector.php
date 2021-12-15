@@ -102,14 +102,31 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @see editor_Services_Connector_FilebasedAbstract::getTm()
      */
     public function getTm($mime) {
-        return false; //TODO generate TMX back from DB
+        $target = strtolower($this->languageResource->getTargetLangCode());
+        $source = strtolower($this->languageResource->getSourceLangCode());
+        $result = ['<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE "tmx14.dtd">
+<tmx version="1.4">
+<header adminlang="'.$target.'" creationid="kk" srclang="'.$source.'"></header><body>'];
+
+        $rowSet = $this->db->fetchAll($this->db->select()->where('languageResourceId = ?', $this->languageResource->getId()));
+        foreach($rowSet as $row) {
+            //simulate match query
+            $result[] = '<tu tuid="'.$row['mid'].'"><tuv xml:lang="'.$source.'"><seg>'.htmlentities($row['source'], ENT_XML1).'</seg></tuv>';
+            $result[] = '<tuv xml:lang="'.$target.'"><seg>'.htmlentities($row['target'], ENT_XML1).'</seg></tuv></tu>';
+        }
+        $result[] = '</body></tmx>';
+        return join("\n", $result);
     }
 
     public function update(editor_Models_Segment $segment) {
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
-        
+
         $s = $this->db->select()->where('source = ?', $source);
+        if($this->isInternalFuzzy()) {
+            $s->where('internalFuzzy = 1');
+        }
         $row = $this->db->fetchRow($s);
         if($row) {
             $row->target = $target;
@@ -118,6 +135,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
             $row = $this->db->createRow([
                 'languageResourceId' => $this->languageResource->getId(),
                 'mid' => $segment->getMid(),
+                'internalFuzzy' => (int) $this->isInternalFuzzy(),
                 'source' => $source,
                 'target' => $target,
             ]);
@@ -156,7 +174,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
             sleep(rand(5, 15));
         }
         
-        $rowSet = $this->db->fetchAll($this->db->select());
+        $rowSet = $this->db->fetchAll($this->db->select()->where('languageResourceId = ?', $this->languageResource->getId()));
         foreach($rowSet as $row) {
             //simulate match query
             if(empty($field)) {
@@ -230,7 +248,14 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @see editor_Services_Connector_FilebasedAbstract::delete()
      */
     public function delete() {
-        $this->db->delete(['languageResourceId = ?' => $this->languageResource->getId()]);
+        $where = [
+            'languageResourceId = ?' => $this->languageResource->getId()
+        ];
+        if($this->isInternalFuzzy()) {
+            $where['target like ?'] = 'translate5-unique-id[%';
+            $where['internalFuzzy = ?'] = 1;
+        }
+        $this->db->delete($where);
     }
     
     /**
@@ -249,7 +274,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      */
     public function getValidExportTypes() {
         return [
-            'CSV' => 'application/csv',
+            'TMX' => 'text/xml',
         ];
     }
 
@@ -259,6 +284,33 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
 
     public function translate(string $searchString){
         return $this->search($searchString);
+    }
+
+    /***
+     * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be returned.
+     * @param int $analysisId
+     * @throws ZfExtended_NotFoundException
+     * @return editor_Services_Connector_Abstract
+     */
+    public function initForFuzzyAnalysis($analysisId) {
+        $this->isInternalFuzzy = true;
+
+        $fuzzyLanguageResource = clone $this->languageResource;
+        /* @var $fuzzyLanguageResource editor_Models_LanguageResources_LanguageResource  */
+
+        //visualized name:
+        $fuzzyLanguageResourceName = $this->renderFuzzyLanguageResourceName($this->languageResource->getName(), $analysisId);
+        $fuzzyLanguageResource->setName($fuzzyLanguageResourceName);
+
+        $connector = ZfExtended_Factory::get(get_class($this));
+        /* @var $connector editor_Services_Connector */
+        $connector->connectTo($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());
+        // copy the current config (for task specific config)
+        $connector->setConfig($this->getConfig());
+        // copy the worker user guid
+        $connector->setWorkerUserGuid($this->getWorkerUserGuid());
+        $connector->isInternalFuzzy = true;
+        return $connector;
     }
 
 }

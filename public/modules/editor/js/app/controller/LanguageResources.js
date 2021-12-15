@@ -104,6 +104,7 @@ Ext.define('Editor.controller.LanguageResources', {
       //add the specific service instances, if needed
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.TermCollection'));
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.OpenTM2'));
+      Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.DummyFileTm'));
   },
   assocStore: null,
   SERVER_STATUS: null,//initialized after center panel is rendered

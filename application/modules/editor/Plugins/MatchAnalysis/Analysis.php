@@ -159,9 +159,29 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $bestMatchRateResult = null;
             }
 
+            /*
+            ** TODO on refactoring:
+            ** - currently all information is packed into the $bestMatchRateResult, but not in an additive way, but in an overwritten way
+             *   that means for example for repetitions: it contains the original match data, but the matchrate is overwritten by 102%
+             * - above the information is calculated: Should the segment updated yes or no, and this info is stored by  having a bestMatchRate or not
+             *   better would it be to always have a result object, containing all needed information, including the calculated info update me yes or no
+             * - Fix the class structure here and break code in smaller pieces
+            */
+
+
             //if best matchrate results are found
             if (!empty($bestMatchRateResult)) {
-                $this->updateSegment($segment, $bestMatchRateResult);
+                //DIRTY but this is the only place where we know if a master of a repetition should be finally updated or not
+                // if yes, then the repetitions should also be updated, if the master is not updated (due what ever) then the repetitions should also not be updated
+                $master = $this->repetitionMasterSegments[$segment->getSourceMd5()] ?? null;
+                $rep = $this->repetitionByHash[$segment->getSourceMd5()] ?? null;
+                if($rep && $master && $master->getId() === $segment->getId()) {
+                    $rep->updateMe = true;
+                }
+                //update the segment only if, it was no repetition, or the master of the repetition was updated too
+                if(empty($rep) || ($rep->updateMe ?? false)) {
+                    $this->updateSegment($segment, $bestMatchRateResult);
+                }
             }
             //report progress update
             $progressCallback && $progressCallback($progress);
@@ -222,9 +242,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         //save the repetition analysis with either 102% or 103% matchrate
         $this->saveAnalysis($segment, $repetitionRate, 0);
 
-        //if there is no match we can not update the target below
+        //if there is no match we can not update the target below, this means returning null
         if (!$masterHasResult || $this->isInternalFuzzy($this->repetitionByHash[$segmentHash]->target ?? '')) {
-            //this means returning null:
             return null; //if the master of the repetition had no result, the repetition has no content either
         }
 
