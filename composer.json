@@ -87,7 +87,8 @@
 		"paquettg/php-html-parser": "^3.1",
 		"jquery/jquery-ui": "1.13.0",
 		"translate5/instanttranslate-roboto-font": "26",
-		"axelbecher/material-design-icons": "^1.0"
+		"axelbecher/material-design-icons": "^1.0",
+		"wilsonglasser/spout": "^3.0"
 	},
 	"extra" : {
 		"merge-plugin" : {
