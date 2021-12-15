@@ -125,7 +125,9 @@ Ext.define('Editor.controller.CommentNavigation', {
             store.addSorted(remark);
             if(remark.data.type === 'visualAnnotation') {
                 Ext.getStore('visualReviewAnnotations').add(remark)
-                var page = vr.iframeController.getPageByIndex(remark.get('page')-1);
+                var page = vr.iframeController.type === 'htmlscroller'
+                ? vr.getAnnotationController().getDomPages()[0]
+                : vr.iframeController.getPageByIndex(remark.get('page')-1);
                 vr.getAnnotationController().renderAnnotations(page);
             }
         }
