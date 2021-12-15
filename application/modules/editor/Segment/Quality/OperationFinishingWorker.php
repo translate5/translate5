@@ -28,17 +28,30 @@ END LICENSE AND COPYRIGHT
 
 /**
  * 
- * Finishes the Import regarding the Quality processing
+ * Finishes Operations regarding the Quality processing
  *
  */
-class editor_Segment_Quality_ImportFinishingWorker extends editor_Models_Task_AbstractWorker {
+class editor_Segment_Quality_OperationFinishingWorker extends editor_Models_Task_AbstractWorker {
     
-    protected function validateParameters($parameters=[]){
-        return true;
+    /**
+     * This defines the processing mode for the segments we process
+     * This worker is used in various situations
+     * @var string
+     */
+    protected $processingMode;
+    
+    protected function validateParameters($parameters = array()) {
+        // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
+        if(array_key_exists('processingMode', $parameters)){
+            $this->processingMode = $parameters['processingMode'];
+            return true;
+        }
+        return false;
     }
     
     protected function work(){
-        editor_Segment_Quality_Manager::instance()->finishOperation(editor_Segment_Processing::IMPORT, $this->task);        
+        // add the dependant workers
+        editor_Segment_Quality_Manager::instance()->finishOperation($this->processingMode, $this->task); 
         return true;
     }
 }

@@ -356,6 +356,18 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         return $this->delete($where);
     }
     /**
+     *
+     * @param string $taskGuid
+     * @param string $type
+     * @return int
+     */
+    public function removeByTaskGuidAndType(string $taskGuid, string $type) : int {
+        $where = array();
+        $where[] = $this->getAdapter()->quoteInto('taskGuid = ?', $taskGuid);
+        $where[] = $this->getAdapter()->quoteInto('type = ?', $type);
+        return $this->delete($where);
+    }
+    /**
      * 
      * @return string
      */

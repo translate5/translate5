@@ -202,8 +202,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         if($task->isImporting()) {
             //on import we use the import worker as parentId
             $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
-        }
-        else {
+        } else {
+            // crucial: add a different behaviour for the import worker
             $workerParameters['workerBehaviour'] = 'ZfExtended_Worker_Behaviour_Default';
         }
         
@@ -216,7 +216,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $workerParameters['userGuid'] = $user->data->userGuid;
         $workerParameters['userName'] = $user->data->userName;
 
-        //enable bath query via config
+        //enable batch query via config
         $workerParameters['batchQuery'] = (boolean) $this->config->enableBatchQuery;
         if(!empty($this->batchAssocs) && $workerParameters['batchQuery']){
             $this->queueBatchWorkers($task, $workerParameters, $parentWorkerId);
@@ -232,7 +232,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         }
         
         $worker->queue($parentWorkerId, null, false);
-
+        
+        // if we are not importing we need to add the quality workers (which also include the termtagger)
+        if(!$task->isImporting()){
+            editor_Segment_Quality_Manager::instance()->queueOperation(editor_Segment_Processing::ANALYSIS, $task, $parentWorkerId);
+        }
+        
         return true;
     }
     

@@ -303,6 +303,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         /* @var $worker editor_Plugins_TermTagger_Worker_SetTaskToOpen */
         $worker->init($task->getTaskGuid(),['initialTaskState' => $initialTaskState]);
         $parentId = $worker->queue(0, null, false);
-        editor_Segment_Quality_Manager::instance()->prepareAnalysis($task, $parentId);
+        editor_Segment_Quality_Manager::instance()->prepareTagTerms($task, $parentId);
     }
 }

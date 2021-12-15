@@ -63,11 +63,11 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
         return static::$type;
     }
     /**
-     * Retrieves if the provider has an own import worker
-     * If this API returns false the import is processed via ::processSegment
+     * Retrieves if the provider has an own worker for the given processing type
+     * @param string $processingMode
      * @return boolean
      */
-    public function hasImportWorker() : bool {
+    public function hasOperationWorker(string $processingMode) : bool {
         return false;
     }
     /**
@@ -75,8 +75,9 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @param editor_Models_Task $task
      * @param int $parentWorkerId
      * @param string $processingMode
+     * @param array $workerParams
      */
-    public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode) {
+    public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode, array $workerParams=[]) {
   
     }
     /**
