@@ -476,6 +476,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             )
         ));
 
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_xlsxexport', new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/xlsxexport',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'xlsxexport'
+            )
+        ));
+
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/testexport',
             array(

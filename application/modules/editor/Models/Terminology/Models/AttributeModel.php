@@ -515,7 +515,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      */
     public function getExportData($termEntryIds, $tbxBasicOnly = false) {
         return array_group_by($this->db->getAdapter()->query('
-            SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`, `isDescripGrp` 
+            SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`, `isDescripGrp`, `dataTypeId` 
             FROM `terms_attributes`
             WHERE `termEntryId` IN (' . $termEntryIds . ')' . editor_Utils::rif($tbxBasicOnly, ' AND `dataTypeId` IN ($1)')
         )->fetchAll(), 'termEntryId', 'language', 'termId');
