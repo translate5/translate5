@@ -1,0 +1,67 @@
+<?xml version='1.0'?>
+<!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">
+<martif>
+	<text>
+		<body>
+			<termEntry id="c1">
+				<descrip type="subjectField">&lt;manufacturing</descrip>
+				<descripGrp>
+					<descrip type="definition">&lt;This is a sample definition at the entry level.</descrip>
+					<admin type="source">&lt;Terminology SIG</admin>
+					<transacGrp>
+						<transac type="transactionType">origination</transac>
+						<transacNote type="responsibility" target="US5001">&lt;Jane Doe</transacNote>
+						<date>2007-07-22</date>
+					</transacGrp>
+				</descripGrp>
+				<transacGrp>
+					<transac type="transactionType">origination</transac>
+					<transacNote type="responsibility" target="US5001">&lt;Jane Doe</transacNote>
+					<date>2007-07-22</date>
+				</transacGrp>
+				<transacGrp>
+					<transac type="transactionType">modification</transac>
+					<transacNote type="responsibility" target="US5002">&lt;John Smith</transacNote>
+					<date>2007-07-23</date>
+				</transacGrp>
+				<note>&lt;This is a sample entry with some data categories at the entry level. </note>
+				<ref type="crossReference" target="c2">&lt;unscheduled operation</ref>
+				<xref type="externalCrossReference" target="wikipedia.org">&lt;Wikipedia web site</xref>
+				<xref type="xGraphic" target="http://upload.wikimedia.org/wikipedia/commons/8/80/Wikipedia-logo-v2.svg">&lt;Wikipedia logo</xref>
+				<langSet xml:lang="en">
+					<descrip type="definition">&lt;This is a sample definition at the language level.
+						This one has no source information required therefore it is not embedded in
+						a descripGrp.</descrip>
+					<tig>
+						<term>&lt;scheduled operation</term>
+						<termNote type="geographicalUsage">&lt;Canada</termNote>
+						<descripGrp>
+  						    <descrip type="context">&lt;One hour is required between scheduled operations.</descrip>
+						    <admin type="source">&lt;Tivoli Storage Manager Administrator's Guide</admin>
+						</descripGrp>
+						<transacGrp>
+							<transac type="transactionType">creation</transac>
+							<transacNote type="responsiblePerson" target="US5001">&lt;Jane Doe</transacNote>
+							<date>2007-07-22</date>
+						</transacGrp>
+					</tig>
+				</langSet>
+			</termEntry>
+		</body>
+		<back>
+			<refObjectList type="respPerson">
+				<refObject id="US5001">
+					<item type="fn">&lt;Jane Doe</item>
+					<item type="email">jane_doe@mymail.com</item>
+					<item type="role">approver</item>
+				</refObject>
+				<refObject id="US5002">
+					<item type="fn">&lt;John Smith</item>
+					<item type="email">john_smith@mymail.com</item>
+					<item type="role">inputter</item>
+				</refObject>
+			</refObjectList>
+
+		</back>
+	</text>
+</martif>

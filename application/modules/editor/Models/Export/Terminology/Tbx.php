@@ -327,16 +327,18 @@ class editor_Models_Export_Terminology_Tbx {
             foreach ($termEntryA as $termEntry) {
                 $line []= $this->tabs[3] . '<termEntry id="' . $termEntry['termEntryTbxId'] . '">';
                 $this->descripGrpNodes(4, $line, $attrA, $trscA, $termEntry['id']);
-                $this->attributeNodes(4, $line, $attrA, $termEntry['id']);
+                $this->attributeNodes (4, $line, $attrA, $termEntry['id']);
                 $this->transacGrpNodes(4, $line, $trscA, $termEntry['id']);
                 foreach ($termA[$termEntry['id']] as $lang => $terms) {
                     $line []= $this->tabs[4] . '<langSet xml:lang="' . $lang . '">';
-                    $this->attributeNodes(5, $line, $attrA, $termEntry['id'], $lang);
+                    $this->descripGrpNodes(5, $line, $attrA, $trscA, $termEntry['id'], $lang);
+                    $this->attributeNodes (5, $line, $attrA, $termEntry['id'], $lang);
                     $this->transacGrpNodes(5, $line, $trscA, $termEntry['id'], $lang);
                     foreach ($terms as $term) {
                         $line []= $this->tabs[5] . '<tig>';
                         $line []= $this->tabs[6] . '<term id="' . $term['termTbxId'] . '">' . htmlentities($term['term'], ENT_XML1) . '</term>';
-                        $this->attributeNodes(6, $line, $attrA, $termEntry['id'], $lang, $term['id']);
+                        $this->descripGrpNodes(6, $line, $attrA, $trscA, $termEntry['id'], $lang, $term['id']);
+                        $this->attributeNodes (6, $line, $attrA, $termEntry['id'], $lang, $term['id']);
                         $this->transacGrpNodes(6, $line, $trscA, $termEntry['id'], $lang, $term['id']);
                         $line []= $this->tabs[5] . '</tig>';
                     }
@@ -365,7 +367,7 @@ class editor_Models_Export_Terminology_Tbx {
             foreach ($refObjectListI as $refObject) {
                 $line []= $this->tabs[4] . '<refObject id="' . $refObject['key'] . '">';
                 foreach (json_decode($refObject['data']) as $type => $value) {
-                    $line []= $this->tabs[5] . '<item type="' . $type . '">' . $value . '</item>';
+                    $line []= $this->tabs[5] . '<item type="' . $type . '">' . htmlentities($value, ENT_XML1) . '</item>';
                 }
                 $line []= $this->tabs[4] . '</refObject>';
             }
@@ -472,7 +474,7 @@ class editor_Models_Export_Terminology_Tbx {
         foreach ($trscA[$termEntryId][$language][$termId] ?? [] as $trsc) {
             $line []= $this->tabs[$level] . '<transacGrp>';
             $line []= $this->tabs[$level + 1] . '<transac type="transactionType">'. $trsc['transac'] . '</transac>';
-            $line []= $this->tabs[$level + 1] . '<transacNote type="' . $trsc['transacType'] . '" target="' . $trsc['target'] . '">' . $trsc['transacNote'] . '</transacNote>';
+            $line []= $this->tabs[$level + 1] . '<transacNote type="' . $trsc['transacType'] . '" target="' . $trsc['target'] . '">' . htmlentities($trsc['transacNote'], ENT_XML1) . '</transacNote>';
             $line []= $this->tabs[$level + 1] . '<date>' . explode(' ', $trsc['date'])[0] . '</date>';
             $line []= $this->tabs[$level] . '</transacGrp>';
         }
