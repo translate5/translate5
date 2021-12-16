@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file original="word/document.xml" source-language="de" target-language="en" datatype="x-undefined">
+<body>
+<trans-unit id="NFDBB2FA9-tu1" xml:space="preserve">
+<source xml:lang="de">   =&gt; Translate5 service kontaktieren</source>
+<seg-source><mrk mid="0" mtype="seg">   =&gt; Translate5 service kontaktieren</mrk></seg-source>
+<target xml:lang="en"></target>
+</trans-unit>
+<trans-unit id="NFDBB2FA9-tu1a" xml:space="preserve">
+<source xml:lang="de"> =&gt; Translate5 Service kontaktieren</source>
+<seg-source><mrk mid="0" mtype="seg"> =&gt; Translate5 Service kontaktieren</mrk></seg-source>
+<!-- this should trigger a internal fuzzy since no repetition of above but similar -->
+<target xml:lang="en"></target>
+</trans-unit>
+<trans-unit id="NFDBB2FA9-tu2" xml:space="preserve">
+<source xml:lang="de">Translate5 service kontaktieren</source>
+<seg-source><mrk mid="0" mtype="seg">Translate5 service kontaktieren</mrk></seg-source>
+<target xml:lang="en"></target>
+</trans-unit>
+<trans-unit id="NFDBB2FA9-tu3" xml:space="preserve">
+<source xml:lang="de">Translate5 service kontaktieren</source>
+<seg-source><mrk mid="0" mtype="seg">Translate5 service kontaktieren</mrk></seg-source>
+<target xml:lang="en"></target>
+</trans-unit>
+<trans-unit id="NFDBB2FA9-tu3a" xml:space="preserve">
+<source xml:lang="de">Translate5 Service kontaktieren</source>
+<seg-source><mrk mid="0" mtype="seg">Translate5 Service kontaktieren</mrk></seg-source>
+<target xml:lang="en"></target>
+</trans-unit>
+<trans-unit id="NFDBB2FA9-tu4" xml:space="preserve">
+<source xml:lang="de">=&gt; Translate5 service kontaktieren</source>
+<seg-source><mrk mid="0" mtype="seg">=&gt; Translate5 service kontaktieren</mrk></seg-source>
+<target xml:lang="en"></target>
+</trans-unit>
+<trans-unit id="NFDBB2FA9-tu5" xml:space="preserve">
+<source xml:lang="de">=&gt; Translate5 service kontaktieren</source>
+<seg-source><mrk mid="0" mtype="seg">=&gt; Translate5 service kontaktieren</mrk></seg-source>
+<target xml:lang="en"></target>
+</trans-unit>
+</body>
+</file>
+</xliff>

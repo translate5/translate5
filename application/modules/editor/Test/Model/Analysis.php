@@ -27,43 +27,16 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * defines the compared & sanitized data for a segment
+ * defines the compared & sanitized data for a match analysis
  */
-class editor_Test_Model_Segment extends editor_Test_Model_Abstract {
-
+class editor_Test_Model_Analysis extends editor_Test_Model_Abstract {
     //FIXME make a black list instead a whitelist here!!!
     protected $compared = [
         'segmentNrInTask',
-        'mid',
-        'userGuid',
-        'userName',
-        'editable',
-        'pretrans',
+        'internalFuzzy',
         'matchRate',
-        'stateId',
-        'autoStateId',
-        'fileOrder',
-        'workflowStepNr',
-        'workflowStep',
-        'isRepeated',
-        'sourceMd5',
-        'sourceToSort',
-        'targetMd5',
-        'targetToSort',
-        'targetEditToSort',
-        'isWatched',
-        'segmentUserAssocId',
-        'matchRateType',
-        'isFirstofFile',
-    ];
-
-    protected $sanitized = [
-        'source' => 'fieldtext',
-        'sourceEdit' => 'fieldtext',
-        'target' => 'fieldtext',
-        'targetEdit' => 'fieldtext',
-        'comments' => 'comment',
-        'metaCache' => 'metacache'
+        'wordCount',
+        'type',
     ];
 
     protected $messageField = 'segmentNrInTask';

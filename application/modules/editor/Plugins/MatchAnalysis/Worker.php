@@ -151,7 +151,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
 
         $updateCounter = 0;
         $lastProgress = 0;
-        $return = $this->analysis->calculateMatchrate(function ($progress) use (&$updateCounter, &$lastProgress) {
+        $return = $this->analysis->analyseAndPretranslate(function ($progress) use (&$updateCounter, &$lastProgress) {
             $updateCounter++;
             $lastProgress = $progress;
             //update the progress on each 10 segments (to prevent from possible deadlocks in worker table).

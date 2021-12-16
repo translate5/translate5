@@ -30,7 +30,8 @@ END LICENSE AND COPYRIGHT
  * defines the compared & sanitized data for a segment's comment
  */
 class editor_Test_Model_Comment extends editor_Test_Model_Abstract {
-    
+
+    //FIXME make a black list instead a whitelist here!!!
     protected $compared = [ 'userName', 'comment', 'created', 'modified', 'isEditable' ];
     
     protected $messageField = 'segmentId';

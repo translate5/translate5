@@ -75,8 +75,8 @@ class editor_Services_DummyFileTm_ImportTmx {
                 $importCallback([
                     'languageResourceId' => $langRes->getId(),
                     'mid' => $z->getAttribute('tuid'),
-                    'source' => $this->xmlParser->join($this->source),
-                    'target' => $this->xmlParser->join($this->target),
+                    'source' => html_entity_decode($this->xmlParser->join($this->source),ENT_XML1),
+                    'target' => html_entity_decode($this->xmlParser->join($this->target),ENT_XML1),
                 ]);
             }
             $z->next('tu');

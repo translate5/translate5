@@ -47,6 +47,7 @@ abstract class editor_Test_Model_Abstract {
         return new $className($data);
     }
     /**
+     * FIXME make a black list instead a whitelist here!!!
      * Defines the fields that are compared, all others are ignored
      * If the field does not exist in the passed data, it will be generated with NULL as value
      * @var string[]

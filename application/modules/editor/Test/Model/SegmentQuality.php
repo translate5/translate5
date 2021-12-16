@@ -27,7 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Test_Model_SegmentQuality extends editor_Test_Model_Abstract {
-    
+
+    //FIXME make a black list instead a whitelist here!!!
     protected $compared = [ 'field', 'type', 'typeTitle', 'category', 'categoryIndex', 'title', 'falsePositive', 'filterable', 'falsifiable', 'hasTag', 'tagName', 'cssClass' ];
 
     protected $messageField = 'id';

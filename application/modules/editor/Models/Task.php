@@ -785,7 +785,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * marks the task erroneous and unlocks its
      * @return boolean false if task had not been updated or does not exist,
-     * @throws Zend_Exception if something went wrong
      */
     public function setErroneous() {
         $data = [

@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,44 +27,28 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * defines the compared & sanitized data for a segment
+ * @class Editor.view.LanguageResources.services.DummyFileTm
+ * @extends Editor.view.LanguageResources.services.Default
  */
-class editor_Test_Model_Segment extends editor_Test_Model_Abstract {
+Ext.define('Editor.view.LanguageResources.services.DummyFileTm', {
+    requires: ['Editor.view.LanguageResources.services.Default'],
+    extend: 'Editor.view.LanguageResources.services.Default',
+    id: 'DummyFile TM',
 
-    //FIXME make a black list instead a whitelist here!!!
-    protected $compared = [
-        'segmentNrInTask',
-        'mid',
-        'userGuid',
-        'userName',
-        'editable',
-        'pretrans',
-        'matchRate',
-        'stateId',
-        'autoStateId',
-        'fileOrder',
-        'workflowStepNr',
-        'workflowStep',
-        'isRepeated',
-        'sourceMd5',
-        'sourceToSort',
-        'targetMd5',
-        'targetToSort',
-        'targetEditToSort',
-        'isWatched',
-        'segmentUserAssocId',
-        'matchRateType',
-        'isFirstofFile',
-    ];
+    addTooltip: '#UT#Weitere Daten in Form einer TMX Datei importieren und dem Dummy TM hinzufügen',
 
-    protected $sanitized = [
-        'source' => 'fieldtext',
-        'sourceEdit' => 'fieldtext',
-        'target' => 'fieldtext',
-        'targetEdit' => 'fieldtext',
-        'comments' => 'comment',
-        'metaCache' => 'metacache'
-    ];
+    /**
+     * Get download language reources action icon class
+     */
+    getDownloadIconClass: function(){
+        return 'ico-tm-download';
+    },
 
-    protected $messageField = 'segmentNrInTask';
-}
+    /**
+     * Get valid file-types for download.
+     * @return array
+     */
+    getValidFiletypes:function(){
+        return ['tmx'];
+    }
+});
