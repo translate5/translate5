@@ -36,8 +36,11 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     itemId:'segmentMinMaxLength',
     cls: 'segment-min-max',
     tpl: '<div class="{cls}" data-qtip="{tip}">{text}</div>',
-    hidden:true,
+    hidden: true,
     mixins: ['Editor.util.Range'],
+    requires: [
+        'Editor.util.HtmlCleanup'
+    ],
     strings: {
         segmentToShort:'#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
         segmentToLong:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.',
@@ -142,22 +145,29 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * @var {Integer}
      */
     segmentFileId: null,
-    
+
     /**
      * {Editor.view.segments.HtmlEditor}
      */
     editor: null,
-    
+
     /**
      * @var {Object} bookmarkForCaret
      */
     bookmarkForCaret: null,
-    
+
+    /**
+     * @var {Editor.util.HtmlCleanup}
+     */
+    cleanUpHelper: null,
+
     /**
      * 
      */
     initComponent : function() {
-        
+
+        this.cleanUpHelper = new Editor.util.HtmlCleanup();
+
         // 3 Zeilen * 200px; Aktuell: 4 Zeilen, insgesamt 599px
         // 3 lines * 200px; Current: 4 lines, together 599px
         
@@ -616,7 +626,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             lineWidth,
             range = rangy.createRange();
         
-        rangeWrapper = Ext.dom.Helper.createDom('<div>'+htmlToCheck+'</div>');
+        rangeWrapper = Ext.dom.Helper.createDom('<div>'+this.cleanUpHelper.cleanDeleteTags(htmlToCheck)+'</div>');
         range.selectNodeContents(rangeWrapper);
         linebreakNodes = range.getNodes([1], function(node) {
             return /newline/.test(node.className);
