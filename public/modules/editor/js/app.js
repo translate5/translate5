@@ -416,7 +416,7 @@ Ext.application({
         var me = this,
             ctrl = activatedPanel.getController(),
             conf = ctrl && ctrl.defaultConfig,
-            mainRoute = me.checkMatchingHash(conf && conf.routes);
+            mainRoute = conf && conf.routes && Object.keys(conf.routes)[0];
         me.fireEvent('adminSectionChanged', activatedPanel);
 
         if (!mainRoute) {
@@ -424,30 +424,6 @@ Ext.application({
         }
         me.redirectTo(mainRoute);
     },
-
-    checkMatchingHash:function (routes){
-        if(!routes){
-            return null;
-        }
-        var allRoutes = Object.keys(routes),
-            hash = window.location.hash.substring(1);
-        if(hash === ''){
-            return allRoutes[0];
-        }
-        hash = hash.split('/');
-        var cnt = hash[0],
-            action = hash[hash.length-1],
-            tmp = null;
-
-        for (var i=0;i<allRoutes.length;i++){
-            tmp = allRoutes[i].split('/');
-            if(tmp.length === hash.length && tmp[0] === cnt && tmp[tmp.length-1] === action){
-                return window.location.hash;
-            }
-        }
-        return allRoutes[0];
-    },
-
     mask: function (msg, title) {
         if (!this.appMask) {
             this.appMask = Ext.widget('messagebox');

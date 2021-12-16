@@ -51,14 +51,8 @@ class editor_Models_Import_DataProvider_Factory {
                 'path' =>$oldTaskPath,
             ]);
         }
-
-        $files = $this->filterFiles($task);
         $copy = tempnam(sys_get_temp_dir(), 'taskclone');
-
-        foreach ($files as $from => $to) {
-            $tmpTo = $copy.DIRECTORY_SEPARATOR.editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT.DIRECTORY_SEPARATOR.'workfiles'.DIRECTORY_SEPARATOR.$to;
-            copy($from, $tmpTo);
-        }
+        copy($oldTaskPath, $copy);
         $copy = new SplFileInfo($copy);
         ZfExtended_Utils::cleanZipPaths($copy, editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT);
         return ZfExtended_Factory::get('editor_Models_Import_DataProvider_Zip', [$copy->getPathname()]);
@@ -69,15 +63,23 @@ class editor_Models_Import_DataProvider_Factory {
      * @param editor_Models_Import_UploadProcessor $upload
      * @return editor_Models_Import_DataProvider_Abstract
      */
-    public function createFromUpload(editor_Models_Import_UploadProcessor $upload): editor_Models_Import_DataProvider_Abstract {
+    public function createFromUpload(editor_Models_Import_UploadProcessor $upload, array $data = []): editor_Models_Import_DataProvider_Abstract {
         $mainUpload = $upload->getMainUpload();
 
         $files = $mainUpload->getFiles();
-        $isZip = count($files) === 1 && $mainUpload->getFileExtension((array_values($files)[0])) === $upload::TYPE_ZIP;
-        if($isZip) {
+
+        if($this->isZipUpload($upload)) {
             $dp = 'editor_Models_Import_DataProvider_Zip';
-            $tmpfiles = array_keys($mainUpload->getFiles());
+            $tmpfiles = array_keys($files);
             $args = [reset($tmpfiles)]; //first uploaded review file is used as ZIP file
+            $dp =  ZfExtended_Factory::get($dp, $args);
+        }else if($this->isProjectUpload($data)){
+            $dp = 'editor_Models_Import_DataProvider_Project';
+            $args = [
+                $upload->getFiles(),
+                $data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME],
+                $data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_TYPE_NAME]
+            ];
         } else {
             $dp = 'editor_Models_Import_DataProvider_SingleUploads';
             $args = [
@@ -88,38 +90,25 @@ class editor_Models_Import_DataProvider_Factory {
         return ZfExtended_Factory::get($dp, $args);
     }
 
-    public function filterFiles(editor_Models_Task $task){
-        $path = $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT;
-        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
-        $files = array();
-        foreach ($rii as $file) {
-            //TODO: filter out not supported filetypes. How do we handle reference files ?
-            if ($file->isDir()){
-                continue;
-            }
-            if(!$this->isBilingual($file->getFilename())){
-
-                continue;
-            }
-            if($this->isBilingualMatch($file->getFilename(),$task->getTa())){
-                $from = $file->getPathname();
-                $to = $task->getTargetLang();
-                $files[$from] = $to;
-            }
-        }
-        return $files;
+    /***
+     * Is the current upload zip package
+     * @param editor_Models_Import_UploadProcessor $upload
+     * @return bool
+     */
+    protected function isZipUpload(editor_Models_Import_UploadProcessor $upload): bool {
+        $mainUpload = $upload->getMainUpload();
+        $files = $mainUpload->getFiles();
+        return count($files) === 1 && $mainUpload->getFileExtension((array_values($files)[0])) === $upload::TYPE_ZIP;
     }
 
     /***
-     * Same check as in the frontend to detect bilingual data. Also the files filter should
-     * @param string $file
+     * Is the current upload project upload
+     *
+     * @param array $data
      * @return bool
      */
-    public function isBilingual(string $file){
-        return true;
-    }
-
-    public function isBilingualMatch(string $file, string $sourceLanguage){
-        return strpos($file,$sourceLanguage)!==false;
+    protected function isProjectUpload(array $data): bool
+    {
+        return isset($data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_TYPE_NAME]);
     }
 }

@@ -500,7 +500,7 @@ div.loading div#loading-indicator-text {
 
 /* additional icons about the task state */
 .adminTaskGrid .locked td.state div {padding-left:20px;background:url(../images/information.png) no-repeat left center;}
-.adminTaskGrid .error td.state div {padding-left:20px;background:url(../images/exclamation.png) no-repeat left center;}
+.adminTaskGrid .error td.state div,.importUpload .error td.type div {padding-left:20px;background:url(../images/exclamation.png) no-repeat left center;}
 .adminTaskGrid .unconfirmed td.state div {padding-left:20px;background:url(../images/stamp-exclamation.png) no-repeat left center;}
 .adminTaskGrid .locked.import td.state div {padding-left:6px; background:none;}
 

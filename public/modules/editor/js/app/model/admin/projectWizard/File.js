@@ -32,6 +32,13 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.model.admin.projectWizard.File', {
     extend: 'Ext.data.Model',
+
+    statics: {
+        TYPE_ERROR: 'error',
+        TYPE_PIVOT: 'pivot',
+        TYPE_WORKFILES: 'workfiles',
+    },
+
     fields: [{
         name: 'file'
     },{

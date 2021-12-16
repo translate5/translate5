@@ -31,9 +31,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_TaskController extends ZfExtended_RestController {
 
-    const IMPORT_UPLOAD_LANGUAGES_NAME = 'importUpload_language';
-    const IMPORT_UPLOAD_TYPE_NAME = 'importUpload_type';
-
     protected $entityClass = 'editor_Models_Task';
 
     /**
@@ -2086,7 +2083,7 @@ class editor_TaskController extends ZfExtended_RestController {
 
 
     public function isProjectUpload(){
-        return is_array($this->data['targetLang']) && count($this->data['targetLang']) > 1 && !empty($this->data[self::IMPORT_UPLOAD_LANGUAGES_NAME]);
+        return is_array($this->data['targetLang']) && count($this->data['targetLang']) > 1 && !empty($this->data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME]);
     }
 
 
@@ -2097,7 +2094,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $dpFactory = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Factory');
         /* @var $dpFactory editor_Models_Import_DataProvider_Factory */
         $upload->initAndValidate();
-        $dp = $dpFactory->createFromUpload($upload);
+        $dp = $dpFactory->createFromUpload($upload,$this->data);
 
         //DEFAULT (SINGLE) TASK:
 
@@ -2124,7 +2121,11 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $upload->initAndValidate();
 
-        $dp = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Project',[$this->entity]);
+        $dp = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Project',[
+            $upload->getFiles(),
+            $this->data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME],
+            $this->data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_TYPE_NAME]
+        ]);
         /* @var $dp editor_Models_Import_DataProvider_Project  */
 
 
@@ -2133,6 +2134,9 @@ class editor_TaskController extends ZfExtended_RestController {
 
         // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
         $this->events->trigger("afterUploadPreparation", $this, array('task' => $this->entity, 'dataProvider' => $dp));
+
+        $dp->checkAndPrepare($this->entity);
+
         //for projects this have to be done once before the single tasks are imported
         $dp->archiveImportedData();
 
@@ -2147,15 +2151,17 @@ class editor_TaskController extends ZfExtended_RestController {
         foreach($this->data['targetLang'] as $target) {
             $task = clone $this->entity;
 
-            $dp = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Project',[$task]);
+            $dp = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Project',[
+                $upload->getFiles(),
+                $this->data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME],
+                $this->data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_TYPE_NAME]
+            ]);
             /* @var $dp editor_Models_Import_DataProvider_Project  */
 
             $task->setProjectId($entityId);
             $task->setTaskType($task::INITIAL_TASKTYPE_PROJECT_TASK);
             $task->setTargetLang($target);
             $task->setTaskName($this->entity->getTaskName().' - '.$languages[$task->getSourceLang()].' / '.$languages[$task->getTargetLang()]);
-
-            $dp->handleUploads($upload->getFiles(),$this->data[self::IMPORT_UPLOAD_LANGUAGES_NAME],$this->data[self::IMPORT_UPLOAD_TYPE_NAME]);
 
             $this->processUploadedFile($task, $dp);
 

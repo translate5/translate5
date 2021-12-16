@@ -31,9 +31,27 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_DataProvider_Abstract {
 
-    public function __construct(editor_Models_Task $task){
-        $this->setTask($task);
-        $this->checkAndMakeTempImportFolder();
+    /***
+     * The uploaded files
+     * @var array
+     */
+    protected array $files = [];
+    /***
+     * Languages of the uploaded files.
+     * @var array
+     */
+    protected array $fileLanguages = [];
+
+    /***
+     * Uploaded file types
+     * @var array
+     */
+    protected array $fileTypes = [];
+
+    public function __construct(array $files, array $langauges, array $types){
+        $this->files = $files;
+        $this->fileLanguages = $langauges;
+        $this->fileTypes = $types;
     }
 
     /**
@@ -42,6 +60,8 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      */
     public function checkAndPrepare(editor_Models_Task $task) {
         $this->setTask($task);
+        $this->checkAndMakeTempImportFolder();
+        $this->handleUploads();
         if(!is_dir($this->importFolder)){
             //DataProvider Directory: The importRootFolder "{importRoot}" does not exist!
             throw new editor_Models_Import_DataProvider_Exception('E1248', [
@@ -51,27 +71,55 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         }
     }
 
-    public function handleUploads(array $files, array $languages,array $filetypes) {
+    /**
+     * @throws ZfExtended_ErrorCodeException
+     * @throws editor_Models_Import_DataProvider_Exception
+     */
+    public function handleUploads() {
 
         $this->createTaskTempDir();
 
-        $importFilesValues = array_values($files['importUpload']);
-        $importFilesKeys = array_keys($files['importUpload']);
+        $importFilesValues = array_values($this->files['importUpload']);
+        $importFilesKeys = array_keys($this->files['importUpload']);
 
         $matchingFiles = [];
         $matchingFilesTypes = [];
 
-        for($i=0;$i<count($languages);$i++){
-            // if the file language matches the task index or the file language at the index is empty (non-bilingual file)
-            if($languages[$i] === $this->task->getTargetLang() || empty($languages[$i])){
+
+        // find all matching non pivot files
+        for($i=0;$i<count($this->fileLanguages);$i++){
+            if($this->isWorkfileFileMatch($i)){
                 $matchingFiles[$importFilesKeys[$i]] = $importFilesValues[$i];
                 // collect the matching type for the file
-                $matchingFilesTypes[$importFilesKeys[$i]] = $filetypes[$i];
+                $matchingFilesTypes[$importFilesKeys[$i]] = $this->fileTypes[$i];
             }
         }
+
+        $pivotFiles = [];
+        // find all matching pivot files
+        for($i=0;$i<count($importFilesValues);$i++){
+            if($this->isPivotFileMatch($i)){
+                foreach($matchingFiles as $fileName) {
+                    similar_text($fileName,$importFilesValues[$i],$sim);
+
+                    if($sim > 80){
+                    // check if the pivot file name matches one of the matching work-file name
+                    //if(pathinfo($fileName,PATHINFO_FILENAME) === pathinfo($importFilesValues[$i],PATHINFO_FILENAME) ){
+                        $pivotFiles[$importFilesKeys[$i]] = $importFilesValues[$i];
+                        // collect the matching type for the file
+                        $matchingFilesTypes[$importFilesKeys[$i]] = $this->fileTypes[$i];
+                    }
+                }
+            }
+        }
+        // merge the other files with the pivot files
+        $matchingFiles = array_merge($matchingFiles,$pivotFiles);
+
         if(empty($matchingFiles)){
+            //TODO: Error code
             throw new ZfExtended_ErrorCodeException();
         }
+
 
         foreach($matchingFiles as $tmpFile => $fileName) {
             $name = $this->getFilepathByName($fileName,$matchingFilesTypes[$tmpFile]);
@@ -84,6 +132,12 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
                 ]);
             }
         }
+
+        // if the current task does not have relais files, set the relais language of this task to 0
+        if(!in_array('pivot',$matchingFilesTypes)){
+            $this->task->setRelaisLang(0);
+        }
+
     }
 
     /***
@@ -158,5 +212,45 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
 
         $name = ZfExtended_Utils::addNumberIfExist($fileName,$target);
         return $target.$name;
+    }
+
+    /***
+     * Is the file-type workfile at given index
+     * @param int $arrayIndex
+     * @return bool
+     */
+    protected function isWorkFile(int $arrayIndex): bool
+    {
+        return $this->fileTypes[$arrayIndex] === 'workfiles';
+    }
+
+    /***
+     * Is the file-type pivot at given index
+     * @param int $arrayIdex
+     * @return bool
+     */
+    protected function isPivotFile(int $arrayIdex): bool
+    {
+        return $this->fileTypes[$arrayIdex] === 'pivot';
+    }
+
+    /***
+     * Check if the language at the task index matches the current task target language.
+     * The match is true also when the language is empty at that index (non-bilingual file)
+     * @param int $arrayIndex
+     * @return bool
+     */
+    protected function isWorkfileFileMatch(int $arrayIndex): bool
+    {
+        return $this->isWorkFile($arrayIndex) && $this->fileLanguages[$arrayIndex] === $this->task->getTargetLang() || empty($this->fileLanguages[$arrayIndex]);
+    }
+
+    /***
+     * @param int $arrayIndex
+     * @return bool
+     */
+    protected function isPivotFileMatch(int $arrayIndex): bool
+    {
+        return $this->isPivotFile($arrayIndex) && $this->fileLanguages[$arrayIndex] === $this->task->getRelaisLang();
     }
 }

@@ -300,31 +300,9 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     valueField: 'id',
                                     allowBlank: false
                                 },{
-                                    //TRANSLATE-2080 FIXME make me a hidden fieled since set by choosing bilingual files
-                                    xtype: 'languagecombo',
-                                    name: 'relaisLang',
-                                    emptyText: 'FIXME MAKE ME a HIDDEN FIELD!',
-                                    hidden:!Editor.data.frontend.importTask.pivotDropdownVisible, // the default value is system default
-                                    getSubmitValue: function() {
-                                        return this.getValue();
-                                    },
-                                    allowBlank: true,
-                                    toolTip: me.strings.relaisLangTip,
-                                    fieldLabel: me.strings.relaisLangLabel
-                                }
-                                // ,{
-                                //     //TRANSLATE-2080 FIXME remove me but adopt regex (file type) checks to the workfiles
-                                //     xtype: 'filefield',
-                                //     name: 'importUpload',
-                                //     hidden:true,
-                                //     regex: new RegExp('\.('+Editor.data.import.validExtensions.join('|')+')$', 'i'),
-                                //     regexText: me.strings.importUploadType,
-                                //     allowBlank: false,
-                                //     emptyText: 'FIXME REMOVE ME!',
-                                //     toolTip: me.strings.importUploadTip,
-                                //     fieldLabel: me.strings.importUploadLabel
-                                // }
-                                ]
+                                    xtype: 'hiddenfield',
+                                    name: 'relaisLang'
+                                }]
                             }]
                         
                         },{

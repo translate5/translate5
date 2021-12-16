@@ -45,6 +45,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
     },
     reference: 'uploadgrid',
     itemId:'importUpload',
+    cls:'importUpload',
     bind: {
         store: '{files}'
     },
@@ -82,8 +83,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                         change: 'onManualAddPivot'
                     }
                 },{
-                    xtype: 'button', text: 'Upload Test', handler: 'testNewUpload'
-                },{
                     xtype: 'tbseparator'
                 },{
                     xtype: 'button',
@@ -95,7 +94,14 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     }
                 }],
                 viewConfig: {
-                    emptyText: 'Drag and drop files here to add them as work files, or to one of the above buttons to add them with a different type. (BUTTON DD TO BE DONE!)'
+                    emptyText: 'Drag and drop files here to add them as work files, or to one of the above buttons to add them with a different type. (BUTTON DD TO BE DONE!)',
+                    getRowClass: function (record) {
+                        var res = [];
+                        if(record.get('type') === Editor.model.admin.projectWizard.File.TYPE_ERROR){
+                            res.push('error');
+                        }
+                        return res.join(' ');
+                    }
                 },
                 //FIXME disable manual sort in general!
 
@@ -117,13 +123,14 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'gridcolumn',
                     width: 90,
                     renderer:function (val,meta,record) {
-                        if(val === 'error'){
-                            meta.tdCls = 'redTextColumn';
-                            return record.get('error');
+                        if(record.get('type') === Editor.model.admin.projectWizard.File.TYPE_ERROR){
+                            meta.tdAttr= 'data-qtip="'+record.get('error')+'"';
+                            return 'error';
                         }
                         return val;
                     },
                     dataIndex: 'type',
+                    tdCls: 'type',
                     text: 'Type'
                 },{
                     xtype: 'gridcolumn',

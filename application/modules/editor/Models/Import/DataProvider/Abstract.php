@@ -36,6 +36,15 @@ END LICENSE AND COPYRIGHT
  * Provides the import data as an abstract interface to the import process
  */
 abstract class editor_Models_Import_DataProvider_Abstract {
+    /***
+     * Task languages field name in the request when the project upload is used
+     */
+    const IMPORT_UPLOAD_LANGUAGES_NAME = 'importUpload_language';
+    /***
+     * Task type field name in the request when the project upload is used
+     */
+    const IMPORT_UPLOAD_TYPE_NAME = 'importUpload_type';
+
     const TASK_ARCHIV_ZIP_NAME = 'ImportArchiv.zip';
     const TASK_TEMP_IMPORT = '_tempImport';
 
@@ -48,15 +57,6 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * @param editor_Models_Task $task
      */
     abstract public function checkAndPrepare(editor_Models_Task $task);
-
-    /**
-     * sets the internal used task object
-     * @param editor_Models_Task $task
-     */
-    protected function setTask(editor_Models_Task $task){
-        $this->taskPath = $task->getAbsoluteTaskDataPath();
-        $this->task = $task;
-    }
 
     /**
      * DataProvider specific method to create the import archive
@@ -130,6 +130,15 @@ abstract class editor_Models_Import_DataProvider_Abstract {
             return $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_ARCHIV_ZIP_NAME;
         }
         return $this->taskPath.DIRECTORY_SEPARATOR.$filename;
+    }
+
+    /**
+     * sets the internal used task object
+     * @param editor_Models_Task $task
+     */
+    protected function setTask(editor_Models_Task $task){
+        $this->taskPath = $task->getAbsoluteTaskDataPath();
+        $this->task = $task;
     }
 
     /**

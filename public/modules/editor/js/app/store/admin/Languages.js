@@ -42,5 +42,15 @@ Ext.define('Editor.store.admin.Languages', {
     getIdByRfc: function (rfc) {
         var rec = this.findRecord('rfc5646', rfc, 0, false, true, true);
         return rec !== null ? rec.get('id') : null;
+    },
+
+    /***
+     * Return rfc value of a language by given langauge id
+     * @param id
+     * @returns {string|null}
+     */
+    getRfcById: function (id){
+        var rec = this.getById(id);
+        return rec !== null ? rec.get('rfc5646') : '-';
     }
 });

@@ -35,10 +35,10 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     alias: 'controller.wizardUploadGrid',
 
     onManualAdd: function(btn) {
-        this.addFilesToStore(btn.fileInputEl.dom.files, 'workfile');
+        this.addFilesToStore(btn.fileInputEl.dom.files, Editor.model.admin.projectWizard.File.TYPE_WORKFILES);
     },
     onManualAddPivot: function(btn) {
-        this.addFilesToStore(btn.fileInputEl.dom.files, 'pivot');
+        this.addFilesToStore(btn.fileInputEl.dom.files, Editor.model.admin.projectWizard.File.TYPE_PIVOT);
     },
     onDrop: function(e) {
         e.stopEvent();
@@ -73,6 +73,11 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                     error: !isSupportedFile ? 'Type not supported.' : null
                 });
 
+            if(!isSupportedFile){
+                Editor.MessageBox.getInstance().showDirectError(Ext.String.format('Files {0} with extension {1} are not supported', file.name, extension));
+                return true;
+            }
+
             //FIXME read file only if xlf or sdlxliff, or other xlf based formats at the end.
             //from https://stackoverflow.com/questions/14446447/how-to-read-a-local-text-file
             // seems to be the only way not getting CORS problems
@@ -103,15 +108,25 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
     validateLanguages:function (rec){
         var me = this,
+            languages = Ext.StoreMgr.get('admin.Languages'),
+            isPivotType = rec.get('type') === Editor.model.admin.projectWizard.File.TYPE_PIVOT,
             sl = rec.get('sourceLang'),
             tl = rec.get('targetLang'),
             view = me.getView(),
             window = view.up('#adminTaskAddWindow'),
             sourceField = window.down('languagecombo[name="sourceLang"]'),
-            targetField = window.down('tagfield[name="targetLang[]"]');
+            targetField = window.down('tagfield[name="targetLang[]"]'),
+            relaisLang = window.down('hiddenfield[name="relaisLang"]');
 
 
         if(Ext.isEmpty(sl) && Ext.isEmpty(tl)){
+
+            // if source and target are empty - no languages where detected after file-read
+            if(isPivotType) {
+                // for pivot language only bilingual files can be used
+                rec.set('error','Pivot file is not bilingual.');
+                rec.set('type','error');
+            }
             // no language was detected but the uploaded extension is supported -> do not mark this record as error
             return;
         }
@@ -119,20 +134,38 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         if(Ext.isEmpty(sl)){
             rec.set('error','Source not valid');
             rec.set('type','error');
-            return false;
+            return;
         }
         if(Ext.isEmpty(tl)){
             rec.set('error','Target not valid');
             rec.set('type','error');
-            return false;
+            return;
         }
         if(!sourceField.readOnly && Ext.isEmpty(sourceField.getValue())){
             // convert the rfc value of the record to id
             sourceField.setValue(sl);
             sourceField.setReadOnly(true);
+        }else if(isPivotType && sl !== sourceField.getValue()){
+            // if there is already source lang set, and the pivot file source lang is different, this is not allowed
+            // All uploaded pivot files must have same source language
+            rec.set('error',Ext.String.format('The source language in the pivot file {0} is not the same as the current source language of the project {1}.',languages.getRfcById(sl),languages.getRfcById(sourceField.getValue())));
+            rec.set('type','error');
+            return;
         }
 
+        if(!Ext.isEmpty(relaisLang.getValue()) && tl !== relaisLang.getValue()){
+            // the relais language is set and the relais file target language is different
+            rec.set('error',Ext.String.format('The file {0} has different target language {1} as the expected {2}.', rec.get('name'),languages.getRfcById(tl),languages.getRfcById(relaisLang.getValue())));
+            rec.set('type','error');
+            return;
+        }
+
+        if(isPivotType){
+            relaisLang.setValue(tl);
+            return;
+        }
         targetField.addValue(tl);
+
     },
 
     validateFileName:function (rec){
@@ -183,14 +216,18 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
         switch (name){
             case 'workFilesFilesButton':
-                return 'workfiles';
+                return Editor.model.admin.projectWizard.File.TYPE_WORKFILES;
             case 'pivotFilesFilesButton':
-                return 'pivot';
+                return Editor.model.admin.projectWizard.File.TYPE_PIVOT;
             default:
-                return 'workfiles';
+                return Editor.model.admin.projectWizard.File.TYPE_WORKFILES;
         }
     },
 
+    /***
+     * Add or remove dropzone css from droppable components
+     * @param add
+     */
     handleDropZoneCss: function (add){
         var me = this,
             fn = add ? 'addCls' : 'removeCls',
