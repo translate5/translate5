@@ -72,6 +72,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         taskGridIconTooltip:'#UT#Match-Analyse',
         finishTask:'#UT#Beenden',
         analysis:'#UT#Analyse Starten',
+        analysisHint:'#UT#Umfasst eine QS und Terminologie Prüfung',
         startTermCheck:'#UT#Terminologie Prüfung starten',
         preTranslation:'#UT#Analyse &amp; Vorübersetzungen starten',
         preTranslationTooltip:'#UT#Die Vorübersetzung löst auch eine neue Analyse aus',
@@ -244,18 +245,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },{
                 xtype: 'tbseparator'
             },{
-                xtype:'button',
-                text: me.strings.startTermCheck,
-                glyph: 'f891@FontAwesome5FreeSolid',
-                bind:{
-                    disabled:'{!enableDockedToolbar || !hasTermcollection}',
+                xtype: 'container',
+                html: me.strings.analysisHint,
+                bind: {
                     hidden:'{isAnalysisButtonHidden}'
-                },
-                listeners:{
-                    click:{
-                        fn:me.startTermTaggerOnly,
-                        scope:me
-                    }
                 }
             }]
         },{
@@ -406,7 +399,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     startAnalysis:function(taskId,operation,importDefaults){
         //'editor/:entity/:id/operation/:operation',
         var me = this,
-            removeDefaults = importDefaults===undefined ? false : importDefaults,
+            removeDefaults = importDefaults === undefined ? false : importDefaults,
             params = {
                 internalFuzzy: me.isCheckboxChecked('cbInternalFuzzy'),
                 pretranslateTmAndTerm: me.isCheckboxChecked('pretranslateTmAndTerm'),
@@ -430,24 +423,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             method: "PUT",
             params:params,
             scope: this,
-            failure: function(response){
-                Editor.app.getController('ServerException').handleException(response);
-            }
-        });
-    },
-
-    startTermTaggerOnly: function() {
-        var me = this,
-            win = me.getAdminTaskPreferencesWindow(),
-            task = win.getCurrentTask();
-
-        Ext.Ajax.request({
-            url: Editor.data.restpath+'task/'+task.get('id')+'/tagterms/operation',
-            method: "PUT",
-            scope: this,
-            success: function() {
-                task.load();
-            },
             failure: function(response){
                 Editor.app.getController('ServerException').handleException(response);
             }

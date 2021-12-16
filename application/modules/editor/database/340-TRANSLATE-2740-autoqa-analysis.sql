@@ -33,3 +33,7 @@ INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) VALUES
     ('runtimeOptions.worker.editor_Segment_Quality_OperationFinishingWorker.maxParallelWorkers', 1, 'editor', 'worker', '1', '1', '', 'integer', 'Max parallel running workers of the global quality check operation finishing worker', 1),
     ('runtimeOptions.worker.editor_Segment_Quality_OperationWorker.maxParallelWorkers', 1, 'editor', 'worker', '1', '1', '', 'integer', 'Max parallel running workers of the global quality check operation worker.', 1);
+    
+INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 
+	('editor', 'pm', 'editor_task', 'autoqaOperation'),
+	('editor', 'pmlight', 'editor_task', 'autoqaOperation');
