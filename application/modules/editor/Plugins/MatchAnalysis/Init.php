@@ -182,11 +182,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * Queue the match analysis worker
      *
      * @param string $taskGuid
-     * @param bool $pretranlsate
-     * @param array $eventParams
-     * @return void|boolean
+     * @param array $workerParameters
+     * @return boolean
      */
-    protected function queueAnalysis($taskGuid, $workerParameters = []) {
+    protected function queueAnalysis(string $taskGuid, array $workerParameters) : bool {
         if(!$this->hasAssoc($taskGuid)){
             //you can not run analysis without resources to be associated to the task
             return false;
@@ -197,8 +196,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-
         $parentWorkerId = 0;
+        // this is needed by the analysis-worker and the QA finishing worker to set the temporary analysis state back to the initial state
+        $taskInitialState = $task->getState();
+
         if($task->isImporting()) {
             //on import we use the import worker as parentId
             $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
@@ -208,7 +209,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         }
         
         if(empty($valid)){
-            $this->addWarn($task,'MatchAnalysis Plug-In: No valid analysable language resources found.',['invalid'=>print_r($this->assocs,1)]);
+            $this->addWarn($task,'MatchAnalysis Plug-In: No valid analysable language resources found.', ['invalid' => print_r($this->assocs, 1)]);
             return false;
         }
         
@@ -226,16 +227,22 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         /* @var $worker editor_Plugins_MatchAnalysis_Worker */
 
         // init worker and queue it
+        // we have to add the needed states to handle the state management
+        $workerParameters['taskInitialState'] = $taskInitialState;
+        // only an analysis operation needs to set the state to 'autoqa' to trigger frontend stuff, an import can stay an import ...
+        $workerParameters['taskNextState'] = ($task->isImporting()) ? $taskInitialState : editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS;
         if (!$worker->init($taskGuid, $workerParameters)) {
             $this->addWarn($task,'MatchAnalysis-Error on worker init(). Worker could not be initialized');
             return false;
         }
         
-        $worker->queue($parentWorkerId, null, false);
+        $parentWorkerId = $worker->queue($parentWorkerId, null, false);
         
         // if we are not importing we need to add the quality workers (which also include the termtagger)
         if(!$task->isImporting()){
-            editor_Segment_Quality_Manager::instance()->queueOperation(editor_Segment_Processing::ANALYSIS, $task, $parentWorkerId);
+            // we want the autoqa to work as matchanalysis
+            $qaWorkerParameters = [ 'taskInitialState' => $taskInitialState, 'taskWorkingState' => editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS ];
+            editor_Segment_Quality_Manager::instance()->queueOperation(editor_Segment_Processing::ANALYSIS, $task, $parentWorkerId, $qaWorkerParameters);
         }
         
         return true;

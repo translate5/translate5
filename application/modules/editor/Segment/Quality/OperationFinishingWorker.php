@@ -38,20 +38,35 @@ class editor_Segment_Quality_OperationFinishingWorker extends editor_Models_Task
      * This worker is used in various situations
      * @var string
      */
-    protected $processingMode;
+    private $processingMode;
+    /**
+     * Defines the initial state of the task before the operation was started
+     * @var string
+     */
+    private $taskInitialState;
     
     protected function validateParameters($parameters = array()) {
         // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
-        if(array_key_exists('processingMode', $parameters)){
+        if(array_key_exists('processingMode', $parameters) && array_key_exists('taskInitialState', $parameters)){
             $this->processingMode = $parameters['processingMode'];
+            $this->taskInitialState = $parameters['taskInitialState'];
             return true;
         }
         return false;
     }
     
-    protected function work(){
-        // add the dependant workers
-        editor_Segment_Quality_Manager::instance()->finishOperation($this->processingMode, $this->task); 
+    protected function work(){        
+        // write the segments back to the segments model
+        editor_Segment_Quality_Manager::instance()->finishOperation($this->processingMode, $this->task);
+        // unlock the task if locked
+        if($this->task->isLocked($this->task->getTaskGuid())){
+            $this->task->unlock();
+        }
+        // reset the quality operation state if not set
+        if($this->task->getState() != $this->taskInitialState){
+            $this->task->setState($this->taskInitialState);
+            $this->task->save();
+        }
         return true;
     }
 }

@@ -34,7 +34,12 @@ END LICENSE AND COPYRIGHT
  *
  */
 final class editor_Segment_Quality_Manager {
-   
+    
+    /**
+     * This state is used to identify a running autoqa on the task (when performing operations lige matchanalysis or retagging)
+     * @var string
+     */
+    const TASK_STATE_QUALITY_OPERATION = 'autoqa';
     /**
      * @var editor_Segment_Quality_Manager
      */
@@ -170,7 +175,15 @@ final class editor_Segment_Quality_Manager {
      */
     public function queueOperation(string $processingMode, editor_Models_Task $task, int $parentId=0, array $workerParams=[]){
         // add starting worker
-        $workerParams['processingMode'] = $processingMode;
+        $workerParams['processingMode'] = $processingMode; // mandatory for any processing
+        if(!array_key_exists('taskInitialState', $workerParams)){
+            // if not inherited, the workers need to know the task's initial state
+            $workerParams['taskInitialState'] = $task->getState();
+        }
+        if(!array_key_exists('taskWorkingState', $workerParams)){
+            // if not inherited, the workers need to know the task's initial state
+            $workerParams['taskWorkingState'] = self::TASK_STATE_QUALITY_OPERATION;
+        }
         $worker = ZfExtended_Factory::get('editor_Segment_Quality_OperationWorker');
         /* @var $worker editor_Segment_Quality_OperationWorker */
         if($worker->init($task->getTaskGuid(), $workerParams)) {
@@ -228,7 +241,7 @@ final class editor_Segment_Quality_Manager {
         /* @var $segment editor_Models_Segment */
         foreach($segmentIds as $segmentId){
             $segment->load($segmentId);
-            $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, true);
+            $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, editor_Segment_Processing::isOperation($processingMode));
             // process all quality providers that do not have an import worker
             foreach($this->registry as $type => $provider){
                 /* @var $provider editor_Segment_Quality_Provider */

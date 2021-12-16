@@ -35,6 +35,11 @@
 		    <target>Analyse Starten</target>
 		</trans-unit>
 		
+		<trans-unit id='VW1mYXNzdCBlaW5lIFFTIHVuZCBUZXJtaW5vbG9naWUgUHLDvGZ1bmc='>
+		    <source>Umfasst eine QS und Terminologie Prüfung</source>
+		    <target>Umfasst eine QS und Terminologie Prüfung</target>
+		</trans-unit>
+		
         <trans-unit id='RXhwb3J0IGFscyBFeGNlbA=='>
             <source>Export als Excel</source>
             <target>Export als Excel</target>
@@ -132,18 +137,17 @@
 		    <source>Analyse läuft</source>
 		    <target>Analyse läuft</target>
 		</trans-unit>
+		
         <trans-unit id='R2VzcGVycnRlIDEwMCUtTWF0Y2hlcyBzaW5kIG5pY2h0IFRlaWwgZGVyIEFuYWx5c2Uu'>
             <source>Gesperrte 100%-Matches sind nicht Teil der Analyse.</source>
             <target>Gesperrte 100%-Matches sind nicht Teil der Analyse.</target>
         </trans-unit>
+        
         <trans-unit id='RXhwb3J0IFRyYWRvcy1saWtlIFhNTA=='>
             <source>Export Trados-like XML</source>
             <target>Export Trados-like XML</target>
         </trans-unit>
-        <trans-unit id='VGVybWlub2xvZ2llIFByw7xmdW5nIHN0YXJ0ZW4='>
-            <source>Terminologie Prüfung starten</source>
-            <target>Terminologie Prüfung starten</target>
-        </trans-unit>
+
     </body>
   </file>
 </xliff>

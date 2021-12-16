@@ -64,7 +64,7 @@ class editor_Plugins_TermTagger_Worker_Remove extends editor_Models_Task_Abstrac
         /* @var $segment editor_Models_Segment */
         foreach($segmentIds as $segmentId){
             $segment->load($segmentId);
-            $tags = editor_Segment_Tags::fromSegment($this->task, $this->processingMode, $segment, true);
+            $tags = editor_Segment_Tags::fromSegment($this->task, $this->processingMode, $segment, editor_Segment_Processing::isOperation($this->processingMode));
             // we only need to remove term-tags if there are any
             if(count($tags->getTagsByType(editor_Plugins_TermTagger_Tag::TYPE)) > 0){
                 $tags->removeTagsByType(editor_Plugins_TermTagger_Tag::TYPE);
@@ -73,7 +73,7 @@ class editor_Plugins_TermTagger_Worker_Remove extends editor_Models_Task_Abstrac
         }
         $db->getAdapter()->commit();
         
-        // remove all qualities
+        // remove all qualities (usually this was already done by removing all qualities in an analysis/autoqa operation, but this worker should be able to work universally
         $table = new editor_Models_Db_SegmentQuality();
         $table->removeByTaskGuidAndType($this->taskGuid, editor_Plugins_TermTagger_Tag::TYPE);
         

@@ -35,10 +35,15 @@
 		    <target>Start analysis</target>
 		</trans-unit>
 		
-<trans-unit id='RXhwb3J0IGFscyBFeGNlbA=='>
-  <source>Export als Excel</source>
-  <target>Export as Excel</target>
-</trans-unit>
+		<trans-unit id='VW1mYXNzdCBlaW5lIFFTIHVuZCBUZXJtaW5vbG9naWUgUHLDvGZ1bmc='>
+		    <source>Umfasst eine QS und Terminologie Prüfung</source>
+		    <target>Covers a QA and terminology check</target>
+		</trans-unit>
+		
+		<trans-unit id='RXhwb3J0IGFscyBFeGNlbA=='>
+			<source>Export als Excel</source>
+			<target>Export as Excel</target>
+		</trans-unit>
 		
         <trans-unit id='RXMgd3VyZGUgYmlzaGVyIGtlaW5lIEFuYWx5c2UgZXJzdGVsbHQuIFN0YXJ0ZW4gU2llIGVpbmUgQW5hbHlzZSBpbSBUYWIg4oCcU3ByYWNocmVzc291cmNlbiB6dXdlaXNlbuKAnA=='>
             <source>Es wurde bisher keine Analyse erstellt. Starten Sie eine Analyse im Tab “Sprachressourcen zuweisen“</source>
@@ -129,17 +134,15 @@
 		    <source>Analyse läuft</source>
 		    <target>Analysis in progress</target>
 		</trans-unit>
+		
         <trans-unit id='R2VzcGVycnRlIDEwMCUtTWF0Y2hlcyBzaW5kIG5pY2h0IFRlaWwgZGVyIEFuYWx5c2Uu'>
             <source>Gesperrte 100%-Matches sind nicht Teil der Analyse.</source>
             <target>Locked 100% matches are not part of the analysis.</target>
         </trans-unit>
+        
         <trans-unit id='RXhwb3J0IFRyYWRvcy1saWtlIFhNTA=='>
           <source>Export Trados-like XML</source>
           <target>Export Trados-like XML</target>
-        </trans-unit>
-        <trans-unit id='VGVybWlub2xvZ2llIFByw7xmdW5nIHN0YXJ0ZW4='>
-          <source>Terminologie Prüfung starten</source>
-          <target>Start terminology check</target>
         </trans-unit>
     </body>
   </file>

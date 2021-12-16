@@ -33,12 +33,18 @@ class editor_Segment_Quality_OperationWorker extends editor_Models_Task_Abstract
      * This worker is used in various situations
      * @var string
      */
-    protected $processingMode;
+    private $processingMode;
+    /**
+     * Defines the initial state of the task before the operation was started
+     * @var string
+     */
+    private $taskWorkingState;
     
     protected function validateParameters($parameters = array()) {
         // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
-        if(array_key_exists('processingMode', $parameters)){
+        if(array_key_exists('processingMode', $parameters) && array_key_exists('taskWorkingState', $parameters)){
             $this->processingMode = $parameters['processingMode'];
+            $this->taskWorkingState = $parameters['taskWorkingState'];
             return true;
         }
         return false;
@@ -48,12 +54,24 @@ class editor_Segment_Quality_OperationWorker extends editor_Models_Task_Abstract
         
         $workerId = $this->workerModel->getId();
         
+        if ($this->task->lock(NOW_ISO, editor_Segment_Quality_Manager::TASK_STATE_QUALITY_OPERATION)) {
+            // lock the task while QA is running
+            $this->task->setState($this->taskWorkingState);
+            $this->task->save();
+        } else {
+            return false;
+        }
+        
         // Crucial: remove any existing segment tag models
         editor_Models_Db_SegmentTags::removeByTaskGuid($this->taskGuid);
+        
+        // Also, we have to remove all existing qualities
+        $table = new editor_Models_Db_SegmentQuality();
+        $table->removeByTaskGuid($this->taskGuid);
         
         // add the dependant workers
         editor_Segment_Quality_Manager::instance()->prepareOperation($this->processingMode, $this->task, $workerId);
         
-        return $workerId;
+        return true;
     }
 }

@@ -39,6 +39,7 @@ Ext.define('Editor.store.quality.Task', {
     folderSort: false,
     defaultRootId: 'task',
     taskGuid: null,
+    taskId: null,
     root: {
         expanded: false,
         text: 'ROOT',
