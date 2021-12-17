@@ -113,7 +113,7 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()
      */
-    public function work(): bool
+    public function work()
     {
         $this->task->createMaterializedView();
         $data = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$this->taskGuid]);
@@ -267,9 +267,9 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
      * @param editor_Models_SegmentFieldManager $sfm
      * @param editor_Models_Segment $segment
      * @param Zend_Db_Table_Row $field
-     * @return stdClass
+     * @return string
      */
-    protected function getSegmentContent(editor_Models_SegmentFieldManager $sfm, editor_Models_Segment $segment, Zend_Db_Table_Row $field): stdClass
+    protected function getSegmentContent(editor_Models_SegmentFieldManager $sfm, editor_Models_Segment $segment, Zend_Db_Table_Row $field): string
     {
         //on export respect edited field:
         $useEditable = $field->editable && $this->type == self::TYPE_EXPORT;
