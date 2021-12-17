@@ -36,7 +36,7 @@ class Editor_CommentnavController extends ZfExtended_RestController {
     /**
      * @var editor_Workflow_Anonymize
      */
-    public $wfAnonymize;
+    protected $wfAnonymize;
 
     const RESTRICTION = "commentnav supports only GET Action";
 
