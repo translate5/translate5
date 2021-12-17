@@ -113,13 +113,6 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     protected $mtConnectors=array();
     
     /**
-     * contains the real state of the task. $this->task->state will contain matchanalysis
-     * @var string
-     */
-    protected $taskState;
-    
-    
-    /**
      * @var ZfExtended_EventManager
      */
     protected $events = false;

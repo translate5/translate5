@@ -28,34 +28,42 @@ END LICENSE AND COPYRIGHT
 
 /**
  * 
- * Finishes Operations regarding the Quality processing
+ * An Operation is wrapped by two workers, this is the finishing one
+ * Mainly this resets the state of the task & triggers an operation event
  *
  */
-class editor_Segment_Quality_OperationFinishingWorker extends editor_Models_Task_AbstractWorker {
+class editor_Task_Operation_FinishingWorker extends editor_Models_Task_AbstractWorker {
     
     /**
-     * This defines the processing mode for the segments we process
-     * This worker is used in various situations
+     * This defines the ongoing operation
      * @var string
      */
-    private $processingMode;
+    private $operationType;
+    /**
+     * Defines the initial state of the task before the operation was started
+     * @var string
+     */
+    private $taskInitialState;
     
     protected function validateParameters($parameters = array()) {
         // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
-        if(array_key_exists('processingMode', $parameters)){
-            $this->processingMode = $parameters['processingMode'];
+        if(array_key_exists('operationType', $parameters) && array_key_exists('taskInitialState', $parameters)){
+            $this->operationType = $parameters['operationType'];
+            $this->taskInitialState = $parameters['taskInitialState'];
             return true;
         }
         return false;
     }
     
     protected function work(){        
-        // write the segments back to the segments model
-        editor_Segment_Quality_Manager::instance()->finishOperation($this->processingMode, $this->task);
-        // unlock the task if locked (we lock in the operation worker)
-        if($this->task->isLocked($this->task->getTaskGuid())){
-            $this->task->unlock();
-        }
+
+        $events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+        /* @var $events ZfExtended_EventManager */
+        $events->trigger("operationFinished", $this, array('operationType' => $this->operationType, 'task' => $this->task));
+        
+        $this->task->setState($this->taskInitialState);
+        $this->task->save();
+        
         return true;
     }
 }

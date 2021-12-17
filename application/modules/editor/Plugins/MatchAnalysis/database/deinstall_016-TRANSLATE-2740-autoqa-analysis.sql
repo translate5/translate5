@@ -25,4 +25,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
+DELETE FROM `Zf_worker_dependencies` WHERE `worker` = 'editor_Plugins_MatchAnalysis_Worker' AND `dependency` = 'editor_Task_Operation_StartingWorker';
+DELETE FROM `Zf_worker_dependencies` WHERE `worker` = 'editor_Plugins_MatchAnalysis_BatchWorker' AND `dependency` = 'editor_Task_Operation_StartingWorker';
+DELETE FROM `Zf_worker_dependencies` WHERE `worker` = 'editor_Segment_Quality_OperationWorker' AND `dependency` = 'editor_Plugins_MatchAnalysis_BatchWorker';
 DELETE FROM `Zf_worker_dependencies` WHERE `worker` = 'editor_Segment_Quality_OperationWorker' AND `dependency` = 'editor_Plugins_MatchAnalysis_Worker';

@@ -26,11 +26,15 @@
 -- */
 
 INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES
+	('editor_Segment_Quality_OperationWorker',  'editor_Task_Operation_StartingWorker'),
     ('editor_Segment_Quality_OperationFinishingWorker',  'editor_Segment_Quality_OperationWorker'),
     ('editor_Segment_Quality_OperationFinishingWorker',  'editor_Plugins_TermTagger_Worker_TermTaggerImport'),
-    ('editor_Segment_Quality_OperationFinishingWorker',  'editor_Plugins_TermTagger_Worker_Remove');
+    ('editor_Segment_Quality_OperationFinishingWorker',  'editor_Plugins_TermTagger_Worker_Remove'),
+    ('editor_Task_Operation_FinishingWorker',  'editor_Segment_Quality_OperationFinishingWorker');
     
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) VALUES
+	('runtimeOptions.worker.editor_Task_Operation_StartingWorker.maxParallelWorkers', 1, 'editor', 'worker', '1', '1', '', 'integer', 'Max parallel running workers of an operations starting worker.', 1),
+	('runtimeOptions.worker.editor_Task_Operation_FinishingWorker.maxParallelWorkers', 1, 'editor', 'worker', '1', '1', '', 'integer', 'Max parallel running workers of an operations finishing worker', 1),
     ('runtimeOptions.worker.editor_Segment_Quality_OperationFinishingWorker.maxParallelWorkers', 1, 'editor', 'worker', '1', '1', '', 'integer', 'Max parallel running workers of the global quality check operation finishing worker', 1),
     ('runtimeOptions.worker.editor_Segment_Quality_OperationWorker.maxParallelWorkers', 1, 'editor', 'worker', '1', '1', '', 'integer', 'Max parallel running workers of the global quality check operation worker.', 1);
     

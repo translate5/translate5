@@ -34,17 +34,11 @@ class editor_Segment_Quality_OperationWorker extends editor_Models_Task_Abstract
      * @var string
      */
     private $processingMode;
-    /**
-     * Defines the initial state of the task before the operation was started
-     * @var string
-     */
-    private $taskWorkingState;
     
     protected function validateParameters($parameters = array()) {
         // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
-        if(array_key_exists('processingMode', $parameters) && array_key_exists('taskWorkingState', $parameters)){
+        if(array_key_exists('processingMode', $parameters)){
             $this->processingMode = $parameters['processingMode'];
-            $this->taskWorkingState = $parameters['taskWorkingState'];
             return true;
         }
         return false;
@@ -52,16 +46,10 @@ class editor_Segment_Quality_OperationWorker extends editor_Models_Task_Abstract
     
     protected function work(){
         
-        $workerId = $this->workerModel->getId();
-        
-        if ($this->task->lock(NOW_ISO, editor_Segment_Quality_Manager::TASK_STATE_QUALITY_OPERATION)) {
-            // lock the task while QA is running
-            $this->task->setState($this->taskWorkingState);
-            $this->task->save();
-        } else {
+        if (!$this->task->lock(NOW_ISO, editor_Task_Operation::AUTOQA)) {
             return false;
         }
-        
+
         // Crucial: remove any existing segment tag models
         editor_Models_Db_SegmentTags::removeByTaskGuid($this->taskGuid);
         
@@ -70,7 +58,7 @@ class editor_Segment_Quality_OperationWorker extends editor_Models_Task_Abstract
         $table->removeByTaskGuid($this->taskGuid);
         
         // add the dependant workers
-        editor_Segment_Quality_Manager::instance()->prepareOperation($this->processingMode, $this->task, $workerId);
+        editor_Segment_Quality_Manager::instance()->prepareOperation($this->processingMode, $this->task, $this->workerModel->getId());
         
         return true;
     }
