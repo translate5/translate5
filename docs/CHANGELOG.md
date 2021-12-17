@@ -16,6 +16,69 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.5.6] - 2021-12-17
+
+### Important Notes:
+#### [TRANSLATE-2756](https://jira.translate5.net/browse/TRANSLATE-2756)
+The match-rate in the editor for repetitions is now 102% as defined and not any more the original percentage from the repeated segment. This is now the same behaviour as it is already in the analysis.
+ 
+
+
+### Changed
+**[TRANSLATE-2761](https://jira.translate5.net/browse/TRANSLATE-2761): Test for tbx specialchars import** <br>
+Added test for import tbx containing specialchars
+
+**[TRANSLATE-2760](https://jira.translate5.net/browse/TRANSLATE-2760): AutoQA also processed when performing an Analysis  & add AutoQA Reanalysis** <br>
+* The AnalysisOperation in a task's MatchAnalysis panel now covers a re-evaluation of the QA
+* This makes the seperate Button to tag the Terms obsolete, so it is removed
+* added Button to Re-check the QA in the task's QA panel
+
+**[TRANSLATE-2488](https://jira.translate5.net/browse/TRANSLATE-2488): Excel export of TermCollection** <br>
+Added ability to export TermCollections into xlsx-format
+
+
+### Bugfixes
+**[TRANSLATE-2763](https://jira.translate5.net/browse/TRANSLATE-2763): Term term entries older than current import deletes also unchanged terms** <br>
+TBX Import: The setting "Term term entries older than current import" did also delete the terms which are contained unchanged in the TBX.
+
+**[TRANSLATE-2759](https://jira.translate5.net/browse/TRANSLATE-2759): Deleted newlines were still counting as newline in length calculation** <br>
+When using the line counting feature in segment content deleted newlines were still counted since they still exist as trackchanges.
+
+**[TRANSLATE-2758](https://jira.translate5.net/browse/TRANSLATE-2758): scrollToAnnotation: Annotation references, sorting and size** <br>
+Scrolling, size and sorting of annotations has been fixed
+
+**[TRANSLATE-2756](https://jira.translate5.net/browse/TRANSLATE-2756): Segments were locked after pre-translation but no translation content was set** <br>
+It could happen that repeated segments were blocked with a matchrate >= 100% but no content was pre-translated in the segment. Also the target original field was filled wrong on using repetitions. And the match-rate for repetitions is now 102% as defined and not original the percentage from the repeated segment. This is now the same behaviour as in the analysis.
+
+**[TRANSLATE-2755](https://jira.translate5.net/browse/TRANSLATE-2755): Workers getting PHP fatal errors remain running** <br>
+Import workers getting PHP fatal errors were remain running, instead of being properly marked crashed. 
+
+**[TRANSLATE-2751](https://jira.translate5.net/browse/TRANSLATE-2751): Mouse over segment with add-annotation active** <br>
+The cursor will be of type cross when the user is in annotation creation mode and the mouse is over the segment.
+
+**[TRANSLATE-2750](https://jira.translate5.net/browse/TRANSLATE-2750): Make project tasks overview and task properties resizable and stateful** <br>
+The height of the project tasks overview and the property panel of a single task are now resizeable.
+
+**[TRANSLATE-2749](https://jira.translate5.net/browse/TRANSLATE-2749): Blocked segments in workflow progress** <br>
+The blocked segments now will be included in the workflow step progress calculation.
+
+**[TRANSLATE-2747](https://jira.translate5.net/browse/TRANSLATE-2747): Proposals are not listed in search results in some cases** <br>
+TermPortal: it's now possible to find proposals for existing terms using 'Unprocessed' as a value of 'Process status' filter
+
+**[TRANSLATE-2746](https://jira.translate5.net/browse/TRANSLATE-2746): Add a Value for "InstantTranslate: TM minimum match rate"** <br>
+Set the default value to 70 for minimum matchrate allowed to be displayed in InstantTranslate result list for TM language resources.
+
+**[TRANSLATE-2745](https://jira.translate5.net/browse/TRANSLATE-2745): 500 Internal Server Error on creating comments** <br>
+Creating a segment comment was leading to an error due the new comment overview feature.
+
+**[TRANSLATE-2744](https://jira.translate5.net/browse/TRANSLATE-2744): XLIFF2 Export with more than one translator does not work** <br>
+The XLIFF2 export was not working with more than one translator associated to the task.
+
+**[TRANSLATE-2719](https://jira.translate5.net/browse/TRANSLATE-2719): TermPortal result column is empty, despite matches are shown** <br>
+TermPortal: fixed 'left column is empty, despite matches are shown' bug
+
+
 ## [5.5.5] - 2021-12-08
 
 ### Important Notes:
