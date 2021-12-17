@@ -95,9 +95,10 @@ class editor_Models_Segment_RepetitionUpdater {
      * @param string $originalContent the content where the tags should be used from (normally the original field of the repetition)
      * @param string $segmentContent the content which is repeated and should be used, and where the tags should be applied to (normally the edit field of the master segment)
      * @param callable $updateField callback to deal with the updated segment content
+     * @param bool $ignoreWhitespace default true, ignores whitespace tags
      * @return bool
      */
-    protected function updateSegmentContent(string $originalContent, string $segmentContent, Callable $updateField) : bool {
+    protected function updateSegmentContent(string $originalContent, string $segmentContent, Callable $updateField, bool $ignoreWhitespace = true) : bool {
         // TODO: we could make much more use of the segment-tags code if only it would be more clear what this code does ...
 
         //replace the repeatedSegment tags with the original repetition ones,
@@ -107,7 +108,13 @@ class editor_Models_Segment_RepetitionUpdater {
         //get only the real tags, we do not consider whitespace tags in repetitions,
         // this is because whitespace belongs to the content and not to the segment (tags instead belong to the segment)
         // if the original had no content (mostly translation context), we have to load the source tags.
-        $tagsForRepetition = $this->tagHelper->getRealTags($useSourceTags ? $this->repeatedSegment->getSource() : $originalContent);
+        $loadTagsFrom = $useSourceTags ? $this->repeatedSegment->getSource() : $originalContent;
+        if($ignoreWhitespace) {
+            $tagsForRepetition = $this->tagHelper->getRealTags($loadTagsFrom);
+        }
+        else {
+            $tagsForRepetition = $this->tagHelper->get($loadTagsFrom);
+        }
         $shortTagNumbers = $this->tagHelper->getTagNumbers($tagsForRepetition);
 
         if(empty($shortTagNumbers)) {
@@ -125,10 +132,10 @@ class editor_Models_Segment_RepetitionUpdater {
         else {
             $i = 0;
             $segmentContent = $this->trackChangesTagHelper->protect($segmentContent);
-            $segmentContent = $this->tagHelper->replace($segmentContent, function($match) use (&$i, $tagsForRepetition, $shortTagNumbers, &$newShortTagNumber){
+            $segmentContent = $this->tagHelper->replace($segmentContent, function($match) use (&$i, $tagsForRepetition, $shortTagNumbers, &$newShortTagNumber, $ignoreWhitespace){
                 $id = $match[3];
                 //if it is a whitespace tag, we do not replace it:
-                if(in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
+                if($ignoreWhitespace && in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
                     if(in_array($this->tagHelper->getTagNumber($match[0]), $shortTagNumbers)) {
                         return $this->tagHelper->replaceTagNumber($match[0], $newShortTagNumber++);
                     }
@@ -189,7 +196,7 @@ class editor_Models_Segment_RepetitionUpdater {
             else {
                 $this->repeatedSegment->setSource($segmentContent);
             }
-            $this->repeatedSegment->updateToSort('source');
-        });
+            $this->repeatedSegment->updateToSort($toSort);
+        }, $editable); //if modifying the editable source, whitespace should be ignored, if repeating the source all tags must be taken over
     }
 }
