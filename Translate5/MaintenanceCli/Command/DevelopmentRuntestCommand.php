@@ -139,6 +139,8 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             'phpunit',
             '--colors',
             '--verbose',
+	    '--testdox-text',
+            'last-test-result.txt',
             '--cache-result-file',
             '.phpunit.result.cache',
             '--bootstrap',
