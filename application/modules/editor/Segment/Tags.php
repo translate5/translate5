@@ -203,7 +203,7 @@ class editor_Segment_Tags implements JsonSerializable {
             $this->targetOriginalIdx = 0;
             
         } else {
-            // evaluating the targets
+            
             foreach ($fieldManager->getFieldList() as $field) {
                 /* @var $field Zend_Db_Table_Row */
                 if($field->type == editor_Models_SegmentField::TYPE_TARGET && $field->editable) {
@@ -389,15 +389,10 @@ class editor_Segment_Tags implements JsonSerializable {
     }
     /**
      * Retrieves ALL our field tags
-     * @param bool $withOriginalTarget: if set, the original target will be added to the tags (only if it is not actually one of the targets)
      * @return editor_Segment_FieldTags[]
      */
-    private function getFieldTags(bool $withOriginalTarget=false){
+    private function getFieldTags(){
         $tags = $this->getTargets();
-        // we include the orginal target only, if it is not in the "normal" targets
-        if($this->hasOriginalTarget() && $this->targetOriginalIdx == -1){
-            array_unshift($tags, $this->targetOriginal);
-        }
         if($this->hasSource()){
             array_unshift($tags, $this->source);
         }
@@ -442,31 +437,28 @@ class editor_Segment_Tags implements JsonSerializable {
     /**
      * Removes the tags of the passed type in all our field tags
      * @param string $type
-     * @param bool $withOriginalTarget
      */
-    public function removeTagsByType(string $type, bool $withOriginalTarget=false){
-        foreach($this->getFieldTags($withOriginalTarget) as $fieldTags){
+    public function removeTagsByType(string $type){
+        foreach($this->getFieldTags() as $fieldTags){
             $fieldTags->removeByType($type);
         }
     }
     /**
      * Removes all field tags leaving just the pure text content
-     * @param bool $withOriginalTarget
      */
-    public function removeAllTags(bool $withOriginalTarget=false){
-        foreach($this->getFieldTags($withOriginalTarget) as $fieldTags){
+    public function removeAllTags(){
+        foreach($this->getFieldTags() as $fieldTags){
             $fieldTags->removeAll();
         }
     }
     /**
      * Retrieves all tags from all our field tags
      * @param string $type
-     * @param bool $withOriginalTarget
      * @return editor_Segment_Tag[]
      */
-    public function getTagsByType(string $type, bool $withOriginalTarget=false) : array {
+    public function getTagsByType(string $type) : array {
         $result = [];
-        foreach($this->getFieldTags($withOriginalTarget) as $fieldTags){
+        foreach($this->getFieldTags() as $fieldTags){
             $result = array_merge($result, $fieldTags->getByType($type));
         }
         return $result;
@@ -474,12 +466,11 @@ class editor_Segment_Tags implements JsonSerializable {
     /**
      * Retrieves all tags from all our field tags and ranges them by field
      * @param string $type
-     * @param bool $withOriginalTarget
      * @return array
      */
-    public function getTagsByTypeForField(string $type, bool $withOriginalTarget=false) : array {
+    public function getTagsByTypeForField(string $type) : array {
         $result = [];
-        foreach($this->getFieldTags($withOriginalTarget) as $fieldTags){
+        foreach($this->getFieldTags() as $fieldTags){
             $field = $fieldTags->getField();
             if(!array_key_exists($field, $result)){
                 $result[$field] = [];
