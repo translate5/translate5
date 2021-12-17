@@ -54,33 +54,15 @@ Ext.define('Editor.controller.CommentNavigation', {
         },
         messagebus: {
             '#translate5 task': {
-                commentChanged: function carryChangeToStore({comment,connectionId}){
-                    var cl = this.getCommentList();
-                    var store = cl.store;
-                    var updated = new store.model(comment);
-                    var existing = store.getById(comment.id);
-                    /** Update exsiting record - Why this way?
-                    * store.update(...) triggers a request
-                    * store.data.replace() does not replace (at least in ExtJS-6.2.0)
-                    * Modifying existing saves sort operations
-                    */
-                    if(existing) {
-                        //store.update({records:[new store.model(comment)]}) //trigers request
-                        var changed = [];
-                        for(prop in existing.data){
-                            if(existing.get(prop) !== updated.get(prop)){
-                                existing.set(prop,updated.get(prop),{silent:true, commit:false});
-                                changed.push(prop);
-                            }
-                            if(changed.length){
-                                existing.commit(false, changed);
-                            }
-                        }
-                        updated = existing;
-                    } else {
-                        store.addSorted(updated)
+                commentChanged: function handleCommentChange({comment,connectionId,typeOfChange}) {
+                    switch(typeOfChange) {
+                        case 'afterPostAction':
+                        case 'afterPutAction':
+                            this.updateStore(new (this.getCommentList().store.model)(comment))
+                            break;
+                        case 'beforeDeleteAction':
+                            this.removeRemark(comment.id, comment.type)
                     }
-                    cl.scrollable.doHighlight(cl.getNodeByRecord(updated));
                 }
             }
         }
@@ -112,6 +94,57 @@ Ext.define('Editor.controller.CommentNavigation', {
                 }
                 break;
         }
+    },
 
+    /**
+     * Change existing remark in store or add new one
+     */
+    updateStore: function updateStore(remark, typeOfChange){
+        var cl=this.getCommentList();
+        var store=cl.store;
+        var vr=Ext.first('visualReviewPanel'); 
+        var existing =typeOfChange==='afterPostAction' ? store.getById(remark.id) : null;
+        /** Update exsiting record - Why this way?
+        * store.data.replace() does not replace (at least in ExtJS-6.2.0)
+        * store.update(...) triggers request
+        * less sort operations
+        */
+        if(existing) {
+            var old = existing.data, fresh = updated.data, changedProps = [], setOpts = {silent: true,commit: false}, prop;
+            for(prop in old) {
+                if(old[prop] !== fresh[prop]) {
+                    existing.set(prop, fresh[prop], setOpts);
+                    changedProps.push(prop);
+                }
+            }
+            if(changedProps.length) {
+                existing.commit(false,changedProps);
+            }
+            remark = existing;
+        } else {
+            store.addSorted(remark);
+            if(remark.data.type === 'visualAnnotation') {
+                Ext.getStore('visualReviewAnnotations').add(remark)
+                var page = vr.iframeController.type === 'htmlscroller'
+                ? vr.getAnnotationController().getDomPages()[0]
+                : vr.iframeController.getPageByIndex(remark.get('page')-1);
+                vr.getAnnotationController().renderAnnotations(page);
+            }
+        }
+        cl.scrollable.doHighlight(cl.getNodeByRecord(remark));
+    },
+    /**
+     * Remove remark from commentnav and where else it appears
+     */
+    removeRemark: function removeRemark(remarkId, remarkType){
+        var cl=this.getCommentList();
+        var store=cl.store;
+        store.data.removeByKey(remarkId);
+        if(remarkType === 'visualAnnotation') {
+            Ext.getStore('visualReviewAnnotations').data.removeByKey(remarkId)
+            var vr=Ext.first('visualReviewPanel');
+            var domEl = vr.iframeController.document.getElementById('pageAnnotation'+remarkId)
+            if(domEl) domEl.remove();
+        }
     }
 })

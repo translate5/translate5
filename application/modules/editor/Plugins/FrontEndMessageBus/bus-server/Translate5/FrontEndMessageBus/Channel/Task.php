@@ -189,6 +189,9 @@ class Task extends Channel {
         $this->releaseLocalSegment($answer->segmentId);
         //we delegate the leaving call of the master segment to the leaveAlikes,so we send only one message
         $alikes[] = $answer->segmentId;
+        if(!$answer->selectedSegmentId){
+            $answer->selectedSegmentId = $answer->segmentId;
+        }
         $this->leaveAlikes($answer, $alikes);
     }
     
@@ -463,10 +466,11 @@ class Task extends Channel {
         $this->sendToTaskUsers($segment['taskGuid'], $sessionId, $answer, $saverConn);
     }
 
-    public function commentChanged(string $connectionId, array $comment, string $sessionId) {
+    public function commentChanged(string $connectionId, string $typeOfChange, array $comment, string $sessionId) {
         $this->sendToTaskUsers($comment['taskGuid'], $sessionId, FrontendMsg::create(self::CHANNEL_NAME, 'commentChanged', [
             'comment' => $comment,
             'connectionId' => $connectionId,
+            'typeOfChange' => $typeOfChange,
         ]));
     }
 
