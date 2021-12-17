@@ -36,7 +36,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.admin.config.ConfigWizard',
         'Editor.view.admin.task.UserAssocWizard',
         'Editor.view.admin.task.UserAssocWizardViewModel',
-        'Editor.view.admin.projectWizard.UploadGrid'
+        'Editor.view.admin.projectWizard.UploadGrid',
+        'Editor.view.admin.TaskAddWindowViewController'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -47,6 +48,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     viewModel: {
         type: 'adminTaskAddWindow'
     },
+    controller:'adminTaskAddWindow',
     title: '#UT#Projekt erstellen',
     strings: {
         importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (Angabe notwendig)',
@@ -76,7 +78,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         cancelBtn: '#UT#Abbrechen',
         btnSkip:'#UT#Importieren (weitere überspringen)',
         importDefaultsButtonText:'#UT#Importieren (Standards nutzen)',
-        description: '#Projektbeschreibung'
+        description: '#Projektbeschreibung',
+        autoRemovedUploadFilesWarningMessage:'#UT#All matching bilingual files for this language are removed from the upload grid'
     },
     modal : true,
     layout: 'anchor',
@@ -279,12 +282,17 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     html: Ext.String.format(me.strings.importNews, Editor.data.pathToRunDir)
                                 },{
                                     xtype: 'languagecombo',
+                                    itemId:'sourceLangaugeTaskUploadWizard',
                                     name: 'sourceLang',
                                     toolTip: me.strings.sourceLangTip,
                                     fieldLabel: me.strings.sourceLangLabel
                                 },{
                                     xtype:'tagfield',
+                                    itemId:'targetLangaugeTaskUploadWizard',
                                     name:'targetLang[]',
+                                    listeners:{
+                                        beforedeselect:'onBeforeTargetLangDeselect'
+                                    },
                                     toolTip: me.strings.targetLangTip,
                                     fieldLabel: me.strings.targetLangLabel,
                                     //each combo needs its own store instance, see EXT6UPD-8
@@ -301,6 +309,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     allowBlank: false
                                 },{
                                     xtype: 'hiddenfield',
+                                    itemId:'relaisLangaugeTaskUploadWizard',
                                     name: 'relaisLang'
                                 }]
                             }]

@@ -27,48 +27,49 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @class Editor.model.admin.projectWizard.File
- * @extends Ext.data.Model
+ * @class Editor.view.admin.TaskAddWindowViewController
+ * @extends Ext.app.ViewController
  */
-Ext.define('Editor.model.admin.projectWizard.File', {
-    extend: 'Ext.data.Model',
+Ext.define('Editor.view.admin.TaskAddWindowViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.adminTaskAddWindow',
 
-    statics: {
-        TYPE_ERROR: 'error',
-        TYPE_PIVOT: 'pivot',
-        TYPE_WORKFILES: 'workfiles',
-    },
+    /***
+     * Target langauge before-deselect event handler
+     * @param component
+     * @param record
+     * @param index
+     */
+    onBeforeTargetLangDeselect:function (component, record, index){
+        var me = this,
+            grid = me.getView().down('wizardUploadGrid'),
+            store = grid.getStore(),
+            toRemove = [];
 
-    fields: [{
-        name: 'file'
-    },{
-        name: 'name'
-    },{
-        name: 'size'
-    },{
-        name: 'type'
-    },{
-        type: 'int',
-        name: 'sourceLang',
-        convert:function (val){
-            if(!val){
-                return '';
+        store.each(function (rec){
+            if(rec.get('targetLang') === record.get('id')){
+                toRemove.push(rec);
             }
-            return Ext.StoreManager.get('admin.Languages').getIdByRfc(val);
+        });
+        if(toRemove.length > 0){
+            store.remove(toRemove);
+            Editor.MessageBox.addWarning(me.getView().strings.autoRemovedUploadFilesWarningMessage);
         }
-    },{
-        type: 'int',
-        name: 'targetLang',
-        convert:function (val){
-            if(!val){
-                return '';
-            }
-            return Ext.StoreManager.get('admin.Languages').getIdByRfc(val);
-        }
-    },{
-        name: 'error'
-    },{
-        name: 'bilingual',
-        type: 'bool'
-    }]
+    }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

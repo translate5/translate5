@@ -50,9 +50,28 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         this.handleDropZoneCss(true);
     },
     removeFiles: function() {
-        Ext.Array.forEach(Ext.Array.from(this.getView().getSelection()), function(file){
+        var me = this,
+            grid = me.getView(),
+            store = grid.getStore(),
+            items,
+            view = me.getView(),
+            container = view.up('#taskSecondCardContainer'),
+            sourceField = container.down('#sourceLangaugeTaskUploadWizard'),
+            targetField = container.down('#targetLangaugeTaskUploadWizard');
+
+        Ext.Array.forEach(Ext.Array.from(grid.getSelection()), function(file){
             file.drop();
         });
+        items = store.queryBy(function (rec){
+            return rec.get('bilingual');
+        });
+        if(items.length < 1){
+            sourceField.setReadOnly(false);
+        }
+        if(store.getCount() === 0){
+            sourceField.setValue(null);
+            targetField.setValue(null);
+        }
     },
     addFilesToStore: function(files, type) {
         var me = this,
@@ -113,13 +132,17 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             sl = rec.get('sourceLang'),
             tl = rec.get('targetLang'),
             view = me.getView(),
-            window = view.up('#adminTaskAddWindow'),
-            sourceField = window.down('languagecombo[name="sourceLang"]'),
-            targetField = window.down('tagfield[name="targetLang[]"]'),
-            relaisLang = window.down('hiddenfield[name="relaisLang"]');
+            container = view.up('#taskSecondCardContainer'),
+            sourceField = container.down('#sourceLangaugeTaskUploadWizard'),
+            targetField = container.down('#targetLangaugeTaskUploadWizard'),
+            relaisLang = container.down('#relaisLangaugeTaskUploadWizard'),
+            isBilingual = !(Ext.isEmpty(sl) && Ext.isEmpty(tl));// no langauge detection in the file -> bilingual. The extension validation is done before.
 
 
-        if(Ext.isEmpty(sl) && Ext.isEmpty(tl)){
+        rec.set('bilingual',isBilingual);
+
+        // if the file is not bilingual
+        if(!isBilingual){
 
             // if source and target are empty - no languages where detected after file-read
             if(isPivotType) {
@@ -141,7 +164,12 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             rec.set('type','error');
             return;
         }
-        if(!sourceField.readOnly && Ext.isEmpty(sourceField.getValue())){
+        if(!Ext.isEmpty(sourceField.getValue()) && sourceField.getValue() !== sl){
+            // bilingual upload where the source language of the bilingual file is not the same as the one selected/set before
+            rec.set('error','Target not valid');
+            rec.set('type','error');
+            return;
+        }else if(!sourceField.readOnly && Ext.isEmpty(sourceField.getValue())){
             // convert the rfc value of the record to id
             sourceField.setValue(sl);
             sourceField.setReadOnly(true);

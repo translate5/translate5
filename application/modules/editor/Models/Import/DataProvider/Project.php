@@ -48,10 +48,16 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      */
     protected array $fileTypes = [];
 
+    /***
+     * @var editor_Models_Import_SupportedFileTypes|mixed
+     */
+    protected editor_Models_Import_SupportedFileTypes $supportedFiles;
+
     public function __construct(array $files, array $langauges, array $types){
         $this->files = $files;
         $this->fileLanguages = $langauges;
         $this->fileTypes = $types;
+        $this->supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
     }
 
     /**
@@ -100,11 +106,8 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         for($i=0;$i<count($importFilesValues);$i++){
             if($this->isPivotFileMatch($i)){
                 foreach($matchingFiles as $fileName) {
-                    similar_text($fileName,$importFilesValues[$i],$sim);
-
-                    if($sim > 80){
-                    // check if the pivot file name matches one of the matching work-file name
-                    //if(pathinfo($fileName,PATHINFO_FILENAME) === pathinfo($importFilesValues[$i],PATHINFO_FILENAME) ){
+                    if($this->filesMatch($fileName,$importFilesValues[$i])){
+                        // check if the pivot file name matches one of the matching work-file name
                         $pivotFiles[$importFilesKeys[$i]] = $importFilesValues[$i];
                         // collect the matching type for the file
                         $matchingFilesTypes[$importFilesKeys[$i]] = $this->fileTypes[$i];
@@ -252,5 +255,28 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
     protected function isPivotFileMatch(int $arrayIndex): bool
     {
         return $this->isPivotFile($arrayIndex) && $this->fileLanguages[$arrayIndex] === $this->task->getRelaisLang();
+    }
+
+    /***
+     * Check if the workFile and the pivotFiles names are the same.
+     * If the workFile uses okapi parser, we add .xlf as additional extension, since this will be the final
+     * filename which will be matched for pivot patch
+     * @param string $workFile
+     * @param string $pivotFile
+     * @return bool
+     */
+    protected function filesMatch(string $workFile, string $pivotFile): bool
+    {
+        if($workFile === $pivotFile){
+            return true;
+        }
+        $ext = pathinfo($workFile,PATHINFO_EXTENSION);
+        // if the workFile has native parser and the files are not matched by name then those files have different name
+        if($this->supportedFiles->hasParser($ext)){
+            return false;
+        }
+        // if the extension is supported, this file will be processed by okapi
+        $supported = in_array($ext,$this->supportedFiles->getSupportedExtensions());
+        return $supported && ($workFile.'.xlf' === $pivotFile);
     }
 }

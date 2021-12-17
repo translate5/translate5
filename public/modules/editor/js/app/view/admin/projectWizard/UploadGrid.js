@@ -169,7 +169,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         var lang = Ext.StoreMgr.get('admin.Languages').getById(val),
             label;
         if (lang) {
-            label = lang.get('label');
+            label = lang.get('rfc5646');
             md.tdAttr = 'data-qtip="' + label + '"';
             return label;
         }
