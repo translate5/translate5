@@ -153,11 +153,8 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $isSourceRepetition = $this->entity->getSourceMd5() === $entity->getSourceMd5();
                 //if isSourceEditable, then update also the source field
                 //if $isSourceRepetition, then update also the source field to overtake changed terms in the source
-                if($this->isSourceEditable) {
-                    $sourceSuccess = $repetitionUpdater->updateSourceEditable();
-                }
-                elseif($isSourceRepetition) {
-                    $sourceSuccess = $repetitionUpdater->updateSource();
+                if($this->isSourceEditable || $isSourceRepetition) {
+                    $sourceSuccess = $repetitionUpdater->updateSource($this->isSourceEditable);
                 }
 
                 if(!$sourceSuccess || !$repetitionUpdater->updateTarget()) {
