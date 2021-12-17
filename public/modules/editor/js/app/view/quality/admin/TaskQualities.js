@@ -216,7 +216,7 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
 	            if(!record){
 	                return;
 	            }
-	            record.set('state', 'autoqa');
+	            record.set('state', 'opautoqa');
 	        };
 	    // before the analysis is started, set the task state to 'autoqa'
 	    // the matchanalysis and languageresourcesassoc panel loading masks are binded 

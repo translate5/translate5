@@ -36,10 +36,20 @@ END LICENSE AND COPYRIGHT
 final class editor_Segment_Quality_Manager {
     
     /**
-     * This state is used to identify a running autoqa on the task (when performing operations lige matchanalysis or retagging)
-     * @var string
+     * AutoQA-Operation: Performs a re-evaluation of all qualities for the task, retags all segments
+     * This Operation also tag's terms and may needs a while
+     * @param editor_Models_Task $task
      */
-    const TASK_STATE_QUALITY_OPERATION = 'autoqa';
+    public static function autoqaOperation(editor_Models_Task $task){
+        
+        $parentId = editor_Task_Operation::create(editor_Task_Operation::AUTOQA, $task);
+  
+        self::instance()->queueOperation(editor_Segment_Processing::RETAG, $task, $parentId);
+        
+        $workerQueue = ZfExtended_Factory::get('ZfExtended_Worker_Queue');
+        /* @var $wq ZfExtended_Worker_Queue */
+        $workerQueue->trigger();
+    }
     /**
      * @var editor_Segment_Quality_Manager
      */
@@ -151,14 +161,14 @@ final class editor_Segment_Quality_Manager {
     /**
      * Adds the neccessary import workers
      * @param string $taskGuid
-     * @param int $parentId
+     * @param int $workerParentId
      */
-    public function queueImport(editor_Models_Task $task, int $parentId=0){
+    public function queueImport(editor_Models_Task $task, int $workerParentId=0){
         // add starting worker
         $worker = ZfExtended_Factory::get('editor_Segment_Quality_ImportWorker');
         /* @var $worker editor_Segment_Quality_ImportWorker */
-        if($worker->init($task->getTaskGuid())) {
-            $qualityParentId = $worker->queue($parentId, null, false);
+        if($worker->init($task->getTaskGuid())){
+            $qualityParentId = $worker->queue($workerParentId, null, false);
             // add finishing worker
             $worker = ZfExtended_Factory::get('editor_Segment_Quality_ImportFinishingWorker');
             /* @var $worker editor_Segment_Quality_ImportFinishingWorker */
@@ -171,28 +181,20 @@ final class editor_Segment_Quality_Manager {
      * Adds the neccessary workers for an operation
      * @param string $processingMode: as defined in editor_Segment_Processing
      * @param editor_Models_Task $task
-     * @param int $parentId
+     * @param int $workerParentId: this must be the id of the wrapping operation worker
      */
-    public function queueOperation(string $processingMode, editor_Models_Task $task, int $parentId=0, array $workerParams=[]){
+    public function queueOperation(string $processingMode, editor_Models_Task $task, int $workerParentId){
         // add starting worker
-        $workerParams['processingMode'] = $processingMode; // mandatory for any processing
-        if(!array_key_exists('taskInitialState', $workerParams)){
-            // if not inherited, the workers need to know the task's initial state
-            $workerParams['taskInitialState'] = $task->getState();
-        }
-        if(!array_key_exists('taskWorkingState', $workerParams)){
-            // if not inherited, the workers need to know the task's initial state
-            $workerParams['taskWorkingState'] = self::TASK_STATE_QUALITY_OPERATION;
-        }
+        $workerParams = ['processingMode' => $processingMode ]; // mandatory for any quality processing
         $worker = ZfExtended_Factory::get('editor_Segment_Quality_OperationWorker');
         /* @var $worker editor_Segment_Quality_OperationWorker */
         if($worker->init($task->getTaskGuid(), $workerParams)) {
-            $qualityParentId = $worker->queue($parentId, null, false);
+            $worker->queue($workerParentId, null, false);
             // add finishing worker
             $worker = ZfExtended_Factory::get('editor_Segment_Quality_OperationFinishingWorker');
             /* @var $worker editor_Segment_Quality_ImportFinishingWorker */
             if($worker->init($task->getTaskGuid(), $workerParams)) {
-                $worker->queue($qualityParentId, null, false);
+                $worker->queue($workerParentId, null, false);
             }
         }
     }

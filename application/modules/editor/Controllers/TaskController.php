@@ -771,14 +771,8 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * This Operation refreshes (recalculates / retags) all qualities
      */
-    public function autoqaOperation(){
-        
-        // triggers the workers needed to process the auto-qa retagging / reevaluation
-        editor_Segment_Quality_Manager::instance()->queueOperation(editor_Segment_Processing::RETAG, $this->entity);
-        
-        $workerQueue = ZfExtended_Factory::get('ZfExtended_Worker_Queue');
-        /* @var $wq ZfExtended_Worker_Queue */
-        $workerQueue->trigger();
+    public function autoqaOperation(){        
+        editor_Segment_Quality_Manager::autoqaOperation($this->entity);
     }
     /**
      * Starts the export of a task into an excel file

@@ -25,5 +25,8 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES 
+INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES
+('editor_Plugins_MatchAnalysis_Worker', 'editor_Task_Operation_StartingWorker'),
+('editor_Plugins_MatchAnalysis_BatchWorker', 'editor_Task_Operation_StartingWorker'),
+('editor_Segment_Quality_OperationWorker', 'editor_Plugins_MatchAnalysis_BatchWorker'),
 ('editor_Segment_Quality_OperationWorker', 'editor_Plugins_MatchAnalysis_Worker');

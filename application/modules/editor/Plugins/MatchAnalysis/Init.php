@@ -196,16 +196,15 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-        $parentWorkerId = 0;
-        // this is needed by the analysis-worker and the QA finishing worker to set the temporary analysis state back to the initial state
-        $taskInitialState = $task->getState();
 
         if($task->isImporting()) {
             //on import we use the import worker as parentId
             $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
         } else {
-            // crucial: add a different behaviour for the import worker
+            // crucial: add a different behaviour for the workers when performig an operation
             $workerParameters['workerBehaviour'] = 'ZfExtended_Worker_Behaviour_Default';
+            // this creates the operation start/finish workers
+            $parentWorkerId = editor_Task_Operation::create(editor_Task_Operation::MATCHANALYSIS, $task);
         }
         
         if(empty($valid)){
@@ -222,27 +221,18 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         if(!empty($this->batchAssocs) && $workerParameters['batchQuery']){
             $this->queueBatchWorkers($task, $workerParameters, $parentWorkerId);
         }
-        
+        // init worker and queue it
         $worker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Worker');
         /* @var $worker editor_Plugins_MatchAnalysis_Worker */
-
-        // init worker and queue it
-        // we have to add the needed states to handle the state management
-        $workerParameters['taskInitialState'] = $taskInitialState;
-        // only an analysis operation needs to set the state to 'autoqa' to trigger frontend stuff, an import can stay an import ...
-        $workerParameters['taskNextState'] = ($task->isImporting()) ? $taskInitialState : editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS;
         if (!$worker->init($taskGuid, $workerParameters)) {
             $this->addWarn($task,'MatchAnalysis-Error on worker init(). Worker could not be initialized');
             return false;
         }
-        
-        $parentWorkerId = $worker->queue($parentWorkerId, null, false);
+        $worker->queue($parentWorkerId, null, false);
         
         // if we are not importing we need to add the quality workers (which also include the termtagger)
         if(!$task->isImporting()){
-            // we want the autoqa to work as matchanalysis
-            $qaWorkerParameters = [ 'taskInitialState' => $taskInitialState, 'taskWorkingState' => editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS ];
-            editor_Segment_Quality_Manager::instance()->queueOperation(editor_Segment_Processing::ANALYSIS, $task, $parentWorkerId, $qaWorkerParameters);
+            editor_Segment_Quality_Manager::instance()->queueOperation(editor_Segment_Processing::ANALYSIS, $task, $parentWorkerId);
         }
         
         return true;

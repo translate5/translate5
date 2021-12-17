@@ -39,11 +39,6 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
      * @var editor_Plugins_MatchAnalysis_Analysis
      */
     protected $analysis;
-    /**
-     * 
-     * @var string
-     */
-    private $taskInitialState;
 
     public function __construct()
     {
@@ -57,11 +52,8 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
      */
     protected function validateParameters($parameters = array())
     {
-        $neededEntries = ['internalFuzzy', 'pretranslateMatchrate', 'pretranslateTmAndTerm', 'pretranslateMt', 'isTaskImport', 'pretranslate', 'taskInitialState', 'taskNextState'];
+        $neededEntries = ['internalFuzzy', 'pretranslateMatchrate', 'pretranslateTmAndTerm', 'pretranslateMt', 'isTaskImport', 'pretranslate'];
         $foundEntries = array_keys($parameters);
-        if(array_key_exists('taskInitialState', $parameters)){
-            $this->taskInitialState = $parameters['taskInitialState'];
-        }
         $keyDiff = array_diff($neededEntries, $foundEntries);
         //if there is not keyDiff all needed were found
         return empty($keyDiff);
@@ -83,10 +75,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
                 //clean after analysis exception
                 $this->analysis->clean();
             }
-
-            //when error happens, revoke the task old state, and unlock the task
-            $this->task->setState($this->taskInitialState);
-            $this->task->save();
+            // when error happens unlock the task
             $this->task->unlock();
             $this->log->error('E1100', 'MatchAnalysis Plug-In: analysis and pre-translation cannot be run. See additional errors for more Information.', [
                 'task' => $this->task,
@@ -107,21 +96,13 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
     protected function doWork()
     {
         $params = $this->workerModel->getParameters();
-        $stateNeedsToBeReset = false;
-
         // lock the task dedicated for analysis
         if ($this->task->lock(NOW_ISO, editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS)) {
-            // lock the task while match analysis are running
-            $stateNeedsToBeReset = true;
-            $this->task->setState(editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS);
-            $this->task->save();
             // else check if we are in import, then no separate lock is needed. Therefore if we are not in import this is an error
         } else if ($this->task->getState() != editor_Models_Task::STATE_IMPORT) {
             $this->log->error('E1167', 'MatchAnalysis Plug-In: task can not be locked for analysis and pre-translation.', [
                 'task' => $this->task
             ]);
-            $this->task->setState($this->taskInitialState);
-            $this->task->save();
             return false;
         }
         $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
@@ -136,7 +117,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
 
         $analysisId = $analysisAssoc->save();
 
-        $this->analysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis', [$this->task, $analysisId, $this->taskInitialState]);
+        $this->analysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis', [$this->task, $analysisId]);
 
         $this->analysis->setPretranslate($params['pretranslate']);
         $this->analysis->setInternalFuzzy($params['internalFuzzy']);
@@ -161,11 +142,6 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
 
         if (!empty($lastProgress)) {
             $this->updateProgress($lastProgress);
-        }
-        // set the state to the next worker following the analysis or the initial state in case of an import
-        if($stateNeedsToBeReset && $this->task->getState() != $params['taskNextState']){
-            $this->task->setState($params['taskNextState']);
-            $this->task->save();
         }
 
         //setting null takes the current date from DB

@@ -286,7 +286,7 @@ Ext.define('Editor.model.admin.Task', {
      * Is the task state autoqa (which also applies for being match analysis since the match analysis incorporates an auto qa
      */
     isAutoqa: function () {
-        return (this.get('state') === 'autoqa' || this.get('state') === 'matchanalysis');
+        return (this.get('state') === 'opautoqa' || this.get('state') === 'matchanalysis');
     },
     /**
      * Is the current task state open

@@ -85,13 +85,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     /**
      * @param editor_Models_Task $task
      * @param integer $analysisId
-     * @param string $taskState the real state of the task, the state in the Task Model will be matchanalysis
      */
-    public function __construct(editor_Models_Task $task, $analysisId, string $taskState)
+    public function __construct(editor_Models_Task $task, $analysisId)
     {
         $this->task = $task;
         $this->analysisId = $analysisId;
-        $this->taskState = $taskState;
         $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         parent::__construct($analysisId);
     }
