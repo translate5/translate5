@@ -391,7 +391,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
             $wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
             $a_comment = $wfAnonymize->anonymizeUserdata($taskGuid, $a_comment['userGuid'], $a_comment);
         }
-        $a_comment['type'] = 'segmentComment';
+        $a_comment['type'] = $comment::FRONTEND_ID;
         $this->triggerCommentNavUpdate($a_comment, $event->getName());
     }
 
@@ -411,7 +411,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
             $a_anno = $wfAnonymize->anonymizeUserdata($taskGuid, $a_anno['userGuid'], $a_anno);
         }
         $a_anno['comment'] = htmlspecialchars($a_anno['text']);
-        $a_anno['type'] = 'visualAnnotation';
+        $a_anno['type'] = $anno::FRONTEND_ID;
         $this->triggerCommentNavUpdate($a_anno, $event->getName());
     }
 
@@ -423,13 +423,9 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $ent = $event->getParam('entity');
         /* @var $session Zend_Session_Namespace */
         $session = new Zend_Session_Namespace();
-        $typeMap = [
-            'editor_Models_Comment' => 'segmentComment',
-            'editor_Plugins_VisualReview_Annotation_Entity' => 'visualAnnotation'
-        ];
         $a_ent = [
             'taskGuid' => $session->taskGuid, //data has already been deleted, get it from session
-            'type' => $typeMap[$ent::class],
+            'type' => $ent::FRONTEND_ID,
             'id' => $event->getParams()['params']['id'],
         ];
         $this->triggerCommentNavUpdate($a_ent, $event->getName());

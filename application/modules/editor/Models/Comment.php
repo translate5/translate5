@@ -52,6 +52,7 @@ END LICENSE AND COPYRIGHT
  * @method void setModified() setModified(string $modified)
  */
 class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
+      const FRONTEND_ID = 'segmentComment';
   protected $dbInstanceClass = 'editor_Models_Db_Comments';
   protected $validatorInstanceClass = 'editor_Models_Validator_Comment';
 

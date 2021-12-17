@@ -28,28 +28,27 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Loads segment comments.
- * Exposes fields for adding further entities via afterIndexAction event.
+ * Adding further entities can be done via afterIndexAction event.
  * See e.g. editor_Plugins_VisualReview_Init
  */
 class Editor_CommentnavController extends ZfExtended_RestController {
 
     /**
-     * @var Zend_Session_Namespace
-     */
-    public $session;
-    /**
      * @var editor_Workflow_Anonymize
      */
     public $wfAnonymize;
-    /**
-     * @var editor_Models_Task
-     */
-    public $task;
 
     const RESTRICTION = "commentnav supports only GET Action";
 
     public function init() {
         $this->initRestControllerSpecific();
+    }
+    
+    /**
+     * @return editor_Workflow_Anonymize
+     */
+    public function getWfAnonymize(){
+        return $this->wfAnonymize;
     }
 
 /**
@@ -59,13 +58,11 @@ class Editor_CommentnavController extends ZfExtended_RestController {
  * $eventManager->attach('Editor_CommentnavController', 'afterIndexAction, $callback)
  */
     public function indexAction() {
-        $this->session = new Zend_Session_Namespace();
-        $this->task = ZfExtended_Factory::get('editor_Models_Task');
-        $this->task->loadByTaskGuid($this->session->taskGuid);
-        $this->wfAnonymize = false;
-        if($this->task->anonymizeUsers()){
-            $this->wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-        }
+        $session = new Zend_Session_Namespace();
+        $this->task = editor_ModelInstances::taskByGuid($session->taskGuid);
+        $this->wfAnonymize = editor_ModelInstances::taskByGuid($session->taskGuid)->anonymizeUsers()
+                            ? ZfExtended_Factory::get('editor_Workflow_Anonymize')
+                            : false;
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
 
@@ -74,13 +71,14 @@ class Editor_CommentnavController extends ZfExtended_RestController {
     }
 
     protected function loadSegmentCommentArray(){
+        $session = new Zend_Session_Namespace();
         $comment_entity = ZfExtended_Factory::get('editor_Models_Comment');
-        $comments = $comment_entity->loadByTaskPlainWithPage($this->session->taskGuid);
+        $comments = $comment_entity->loadByTaskPlainWithPage($session->taskGuid);
         foreach ($comments as &$row) {
             $row['comment'] = htmlspecialchars($row['comment']);
-            $row['type'] = 'segmentComment';
+            $row['type'] = $comment_entity::FRONTEND_ID;
             if($this->wfAnonymize) {
-                $row = $this->wfAnonymize->anonymizeUserdata($this->session->taskGuid, $row['userGuid'], $row);
+                $row = $this->wfAnonymize->anonymizeUserdata($session->taskGuid, $row['userGuid'], $row);
             }
         }
         return $comments;
