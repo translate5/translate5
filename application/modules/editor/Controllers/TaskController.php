@@ -768,7 +768,12 @@ class editor_TaskController extends ZfExtended_RestController {
             $saveModel && $model->save();
         }
     }
-
+    /**
+     * This Operation refreshes (recalculates / retags) all qualities
+     */
+    public function autoqaOperation(){        
+        editor_Segment_Quality_Manager::autoqaOperation($this->entity);
+    }
     /**
      * Starts the export of a task into an excel file
      */

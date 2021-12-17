@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,39 +27,36 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * The store for the task quality panel
+ * 
+ * An Operation is wrapped by two workers, this is the starting one
+ * Mainly this sets the state of the task & triggers an operation event
+ *
  */
-Ext.define('Editor.store.quality.Task', {
-    extend : 'Ext.data.TreeStore',
-    model: 'Editor.model.quality.Task',
-    storeId: 'TaskQualities',
-    autoLoad: false,
-    autoSync: false,
-    isLoaded: false,
-    folderSort: false,
-    defaultRootId: 'task',
-    taskGuid: null,
-    taskId: null,
-    root: {
-        expanded: false,
-        text: 'ROOT',
-        children: []
-    },
-    proxy : {
-        type : 'rest',  
-        url: Editor.data.restpath+'quality/',
-        reader : {
-            type : 'json',
-            rootProperty: 'children'
+class editor_Task_Operation_StartingWorker extends editor_Models_Task_AbstractWorker {
+    
+    /**
+     * This defines the ongoing operation
+     * @var string
+     */
+    private $operationType;
+    
+    protected function validateParameters($parameters = array()) {
+        if(array_key_exists('operationType', $parameters)){
+            $this->operationType = $parameters['operationType'];
+            return true;
         }
-    },
-    listeners: {
-        beforeload: function(store, operation, eOpts) {
-            if(!store.taskGuid){
-                return false;
-            } else {
-                operation.setParams({ taskGuid: store.taskGuid });
-            }
-        }
+        return false;
     }
-}); 
+    
+    protected function work(){
+        
+        $this->task->setState($this->operationType);
+        $this->task->save();
+        
+        $events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+        /* @var $events ZfExtended_EventManager */
+        $events->trigger("operationStarted", $this, array('operationType' => $this->operationType, 'task' => $this->task));
+        
+        return true;
+    }
+}

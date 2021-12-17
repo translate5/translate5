@@ -350,10 +350,30 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @return int
      */
     public function removeBySegmentAndType(int $segmentId, string $type) : int {
-        $where = array();
+        $where = [];
         $where[] = $this->getAdapter()->quoteInto('segmentId = ?', $segmentId);
         $where[] = $this->getAdapter()->quoteInto('type = ?', $type);
         return $this->delete($where);
+    }
+    /**
+     * Removes all qualities for a task and a certain type
+     * @param string $taskGuid
+     * @param string $type
+     * @return int
+     */
+    public function removeByTaskGuidAndType(string $taskGuid, string $type) : int {
+        $where = [];
+        $where[] = $this->getAdapter()->quoteInto('taskGuid = ?', $taskGuid);
+        $where[] = $this->getAdapter()->quoteInto('type = ?', $type);
+        return $this->delete($where);
+    }
+    /**
+     * Removes all qualities for a task
+     * @param string $taskGuid
+     * @return int
+     */
+    public function removeByTaskGuid(string $taskGuid) : int {
+        return $this->delete([$this->getAdapter()->quoteInto('taskGuid = ?', $taskGuid)]);
     }
     /**
      * 

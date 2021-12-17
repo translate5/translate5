@@ -26,6 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * 
+ * Finishes the Import regarding the Quality processing
+ *
+ */
 class editor_Segment_Quality_ImportFinishingWorker extends editor_Models_Task_AbstractWorker {
     
     protected function validateParameters($parameters=[]){
@@ -33,10 +38,8 @@ class editor_Segment_Quality_ImportFinishingWorker extends editor_Models_Task_Ab
     }
     
     protected function work(){
-
-        // add the dependant workers
-        editor_Segment_Quality_Manager::instance()->finishImport($this->task);
-        
+        // write the segments tags-model back to the segments data
+        editor_Segment_Quality_Manager::instance()->finishOperation(editor_Segment_Processing::IMPORT, $this->task);        
         return true;
     }
 }

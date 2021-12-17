@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,39 +27,35 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * The store for the task quality panel
+ * 
+ * Finishes Operations regarding the Quality processing
+ *
  */
-Ext.define('Editor.store.quality.Task', {
-    extend : 'Ext.data.TreeStore',
-    model: 'Editor.model.quality.Task',
-    storeId: 'TaskQualities',
-    autoLoad: false,
-    autoSync: false,
-    isLoaded: false,
-    folderSort: false,
-    defaultRootId: 'task',
-    taskGuid: null,
-    taskId: null,
-    root: {
-        expanded: false,
-        text: 'ROOT',
-        children: []
-    },
-    proxy : {
-        type : 'rest',  
-        url: Editor.data.restpath+'quality/',
-        reader : {
-            type : 'json',
-            rootProperty: 'children'
+class editor_Segment_Quality_OperationFinishingWorker extends editor_Models_Task_AbstractWorker {
+    
+    /**
+     * This defines the processing mode for the segments we process
+     * This worker is used in various situations
+     * @var string
+     */
+    private $processingMode;
+    
+    protected function validateParameters($parameters = array()) {
+        // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
+        if(array_key_exists('processingMode', $parameters)){
+            $this->processingMode = $parameters['processingMode'];
+            return true;
         }
-    },
-    listeners: {
-        beforeload: function(store, operation, eOpts) {
-            if(!store.taskGuid){
-                return false;
-            } else {
-                operation.setParams({ taskGuid: store.taskGuid });
-            }
-        }
+        return false;
     }
-}); 
+    
+    protected function work(){        
+        // write the segments back to the segments model
+        editor_Segment_Quality_Manager::instance()->finishOperation($this->processingMode, $this->task);
+        // unlock the task if locked (we lock in the operation worker)
+        if($this->task->isLocked($this->task->getTaskGuid())){
+            $this->task->unlock();
+        }
+        return true;
+    }
+}

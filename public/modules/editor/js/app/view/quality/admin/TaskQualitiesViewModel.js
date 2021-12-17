@@ -26,16 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel', {
+Ext.define('Editor.view.quality.admin.TaskQualitiesViewModel', {
     extend : 'Ext.app.ViewModel',
-    alias : 'viewmodel.matchAnalysisPanel',
+    alias : 'viewmodel.taskQualities',
     data: {
         hasAnalysisData: false
     },
     formulas : {
         isAnalysisRunning : {
             get : function (task) {
-                return !task ? false : task.isAnalysis();
+                return !task ? false : task.isAutoqa();
             },
             bind : {
                 bindTo : '{currentTask}',
@@ -50,36 +50,6 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel', {
             bind : {
                 bindTo : '{currentTask}',
                 deep : true
-            }
-        }
-    },
-
-    stores : {
-        // this store is defined here because the reference filter binding is
-        // required
-        analysisStore : {
-            model : 'Editor.plugins.MatchAnalysis.model.MatchAnalysis',
-            remoteSort : true,
-            remoteFilter : true,
-            pageSize : false,
-            autoLoad : true,
-            listeners : {
-                load : 'onAnalysisRecordLoad',
-                metachange: 'onMetaChange'
-            },
-            setFilters : function (filters) {
-                // the binding is triggered wiht empty values to, we do not want
-                // to filter for empty taskGuid
-                if (filters && !filters.value) {
-                    this.loadData([], false);
-                    return;
-                }
-                this.superclass.superclass.setFilters.apply(this, [ filters ]);
-            },
-            filters : {
-                property : 'taskGuid',
-                operator : "eq",
-                value : '{projectTaskSelection.taskGuid}'
             }
         }
     }

@@ -30,17 +30,10 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
 {
 
     /***
-     * Task old state before the match analysis were started
-     * @var string
-     */
-    private $taskOldState = null;
-
-    /***
      *
      * @var ZfExtended_Logger
      */
     protected $log;
-
     /***
      *
      * @var editor_Plugins_MatchAnalysis_Analysis
@@ -82,10 +75,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
                 //clean after analysis exception
                 $this->analysis->clean();
             }
-
-            //when error happens, revoke the task old state, and unlock the task
-            $this->task->setState($this->taskOldState);
-            $this->task->save();
+            // when error happens unlock the task
             $this->task->unlock();
             $this->log->error('E1100', 'MatchAnalysis Plug-In: analysis and pre-translation cannot be run. See additional errors for more Information.', [
                 'task' => $this->task,
@@ -106,23 +96,13 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
     protected function doWork()
     {
         $params = $this->workerModel->getParameters();
-
-        $newState = null;
-        $this->taskOldState = $this->task->getState();
-
-        //lock the task dedicated for analysis
+        // lock the task dedicated for analysis
         if ($this->task->lock(NOW_ISO, editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS)) {
-            //lock the task while match analysis are running
-            $newState = editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS;
-            $this->task->setState(editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS);
-            $this->task->save();
-            //else check if we are in import, then no separate lock is needed. Therefore if we are not in import this is an error
-        } elseif ($this->task->getState() != editor_Models_Task::STATE_IMPORT) {
+            // else check if we are in import, then no separate lock is needed. Therefore if we are not in import this is an error
+        } else if ($this->task->getState() != editor_Models_Task::STATE_IMPORT) {
             $this->log->error('E1167', 'MatchAnalysis Plug-In: task can not be locked for analysis and pre-translation.', [
                 'task' => $this->task
             ]);
-            $this->task->setState($this->taskOldState);
-            $this->task->save();
             return false;
         }
         $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
@@ -137,7 +117,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
 
         $analysisId = $analysisAssoc->save();
 
-        $this->analysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis', [$this->task, $analysisId, $this->taskOldState]);
+        $this->analysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis', [$this->task, $analysisId]);
 
         $this->analysis->setPretranslate($params['pretranslate']);
         $this->analysis->setInternalFuzzy($params['internalFuzzy']);
@@ -162,12 +142,6 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
 
         if (!empty($lastProgress)) {
             $this->updateProgress($lastProgress);
-        }
-
-        //unlock the state
-        if (!empty($newState)) {
-            $this->task->setState($this->taskOldState);
-            $this->task->save();
         }
 
         //setting null takes the current date from DB

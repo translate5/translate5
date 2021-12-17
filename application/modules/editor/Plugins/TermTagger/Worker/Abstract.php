@@ -164,7 +164,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             }
             return true;
         }
-        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, $this->processingMode, $segments, ($this->processingMode == editor_Segment_Processing::IMPORT)), $slot);
+        
+        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, $this->processingMode, $segments, editor_Segment_Processing::isOperation($this->processingMode)), $slot);
     }
     
     protected function processSegmentsTags(array $segmentsTags, string $slot) : bool {

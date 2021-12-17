@@ -26,21 +26,39 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Segment_Quality_ImportWorker extends editor_Models_Task_AbstractWorker {
+class editor_Segment_Quality_OperationWorker extends editor_Models_Task_AbstractWorker {
     
-    protected function validateParameters($parameters=[]){
-        return true;
+    /**
+     * This defines the processing mode for the segments we process
+     * This worker is used in various situations
+     * @var string
+     */
+    private $processingMode;
+    
+    protected function validateParameters($parameters = array()) {
+        // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
+        if(array_key_exists('processingMode', $parameters)){
+            $this->processingMode = $parameters['processingMode'];
+            return true;
+        }
+        return false;
     }
     
     protected function work(){
         
-        $workerId = $this->workerModel->getId();
-        
+        if (!$this->task->lock(NOW_ISO, editor_Task_Operation::AUTOQA)) {
+            return false;
+        }
+
         // Crucial: remove any existing segment tag models
         editor_Models_Db_SegmentTags::removeByTaskGuid($this->taskGuid);
         
+        // Also, we have to remove all existing qualities
+        $table = new editor_Models_Db_SegmentQuality();
+        $table->removeByTaskGuid($this->taskGuid);
+        
         // add the dependant workers
-        editor_Segment_Quality_Manager::instance()->prepareOperation(editor_Segment_Processing::IMPORT, $this->task, $workerId);
+        editor_Segment_Quality_Manager::instance()->prepareOperation($this->processingMode, $this->task, $this->workerModel->getId());
         
         return true;
     }
