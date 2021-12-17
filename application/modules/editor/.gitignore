@@ -1,5 +1,6 @@
 testcases/apitest.conf
 testcases/.phpunit.result.cache
+testcases/last-test-result.txt
 Plugins/MatchResource/public/.vscode
 Plugins/TermImport/config/filesystem.config
 Plugins/TermImport/config/crossapi.config

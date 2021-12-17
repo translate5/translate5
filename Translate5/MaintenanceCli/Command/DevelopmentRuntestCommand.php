@@ -139,12 +139,15 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             'phpunit',
             '--colors',
             '--verbose',
+	    '--testdox-text',
+            'last-test-result.txt',
             '--cache-result-file',
             '.phpunit.result.cache',
             '--bootstrap',
             self::RELATIVE_TEST_ROOT.'bootstrap.php',
             $testGiven ?? self::RELATIVE_TEST_DIR
         ]);
+	$this->io->success('Last test result stored in TEST_ROOT/last-test-result.txt');
 
         return 0;
     }
