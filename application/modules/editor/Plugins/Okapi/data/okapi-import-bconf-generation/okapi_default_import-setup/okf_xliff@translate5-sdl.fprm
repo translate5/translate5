@@ -35,6 +35,7 @@ iwsBlockMultipleExact.b=false
 inlineCdata.b=false
 skipNoMrkSegSource.b=false
 useCodeFinder.b=false
+subAsTextUnit.b=false
 sdlSegConfValue=Translated
 codeFinderRules.count.i=0
 codeFinderRules.sample=
