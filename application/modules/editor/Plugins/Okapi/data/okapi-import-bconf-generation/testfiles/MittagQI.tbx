@@ -105,6 +105,8 @@
                 </transacGrp>
                 <langSet xml:lang="de">
                     <descrip type="Definition">Continuous development means a continuous cycle of improvement according to the steps development, usage, extension, reusage.</descrip>
+                    <descrip type="context">sedfasdfgsdfreusage.</descrip>
+                    <descrip type="asydf">ssssssssssssssss.</descrip>
                     <tig>
                         <term id="5">kontinuierliche Weiterentwicklung</term>
                         <termNote type="normativeAuthorization">preferredTerm</termNote>
