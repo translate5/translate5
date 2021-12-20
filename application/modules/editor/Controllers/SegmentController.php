@@ -707,6 +707,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         $this->getResponse()->setHeader('Content-Type', 'text/html', TRUE);
         $this->_helper->viewRenderer->setNoRender(false);
 
+        $pluginmanager = Zend_Registry::get('PluginManager');
+        /* @var $pluginmanager ZfExtended_Plugin_Manager */
+        $plugin = $pluginmanager->get('TermPortal');
+        $this->view->linkPortal = $this->isAllowed('editor_termportal') && !empty($plugin);
+
         //Erstellung und Setzen der Nutzdaten:
         $session = new Zend_Session_Namespace();
         $terms = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');

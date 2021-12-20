@@ -95,11 +95,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
 
         $duration = new stdClass();
         
-        $this->fieldLoop(function($field) use ($duration){
-            $editField = $field.editor_Models_SegmentFieldManager::_EDIT_PREFIX;
-            $duration->$editField = (int)$this->_getParam('duration');
-        });
-        
+        $this->updateDuration(editor_Models_SegmentField::TYPE_TARGET, $duration);
+        if($this->isSourceEditable) {
+            $this->updateDuration(editor_Models_SegmentField::TYPE_SOURCE, $duration);
+        }
+
         $this->entity->load($editedSegmentId);
         
         $ids = (array) Zend_Json::decode($this->_getParam('alikes', "[]"));
@@ -115,9 +115,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         
         $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [ $this->entity, $task->getConfig() ]);
         /* @var $repetitionUpdater editor_Models_Segment_RepetitionUpdater */
-        
+
         $alikeQualities = new editor_Segment_Alike_Qualities($this->entity->getId());
-        
+
+
         $alikeCount = count($ids);
         foreach($ids as $id) {
             $id = (int) $id;
@@ -144,17 +145,33 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 }
 
                 $repetitionUpdater->setRepetition($entity);
-                //if source editing = true, then fieldLoop loops also over the source field
-                //replace the masters tags with the original repetition ones
-                //if there was an error in taking over the segment content into the repetition, we return false, so the segment is inored later on
-                $fieldLoopResult = $this->fieldLoop([$repetitionUpdater, 'updateSegmentContent']);
-                if($fieldLoopResult['target'] === false || $this->isSourceEditable && $fieldLoopResult['source'] === false ) {
+
+                //updateSegmentContent does replace the masters tags with the original repetition ones
+                //if there was an error in taking over the segment content into the repetition (returning false) the segment must be ignored
+
+                $sourceSuccess = true;
+                $isSourceRepetition = $this->entity->getSourceMd5() === $entity->getSourceMd5();
+                //if isSourceEditable, then update also the source field
+                //if $isSourceRepetition, then update also the source field to overtake changed terms in the source
+                if($this->isSourceEditable || $isSourceRepetition) {
+                    $sourceSuccess = $repetitionUpdater->updateSource($this->isSourceEditable);
+                }
+
+                if(!$sourceSuccess || !$repetitionUpdater->updateTarget()) {
                     //the segment has to be ignored!
                     continue;
                 }
+
                 // process all quality related stuff
-                editor_Segment_Quality_Manager::instance()->processAlikeSegment($entity, $task, $alikeQualities);
-  
+                if($this->isSourceEditable || $isSourceRepetition) {
+                    //the source was updated by the repetition updater, process them as alike qualities
+                    editor_Segment_Quality_Manager::instance()->processAlikeSegment($entity, $task, $alikeQualities);
+                }
+                else {
+                    //since the source was not processed, we have to trigger here the quality processing as it was a sole segment (this also triggers retagging via termtagger)
+                    editor_Segment_Quality_Manager::instance()->processSegment($entity, $task, editor_Segment_Processing::EDIT);
+                }
+
                 if(!is_null($this->entity->getStateId())) {
                     $entity->setStateId($this->entity->getStateId());
                 }
@@ -162,8 +179,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity->setUserGuid($this->entity->getUserGuid());
                 $entity->setWorkflowStep($this->entity->getWorkflowStep());
                 $entity->setWorkflowStepNr($this->entity->getWorkflowStepNr());
-                
-                $entity->setMatchRate($this->entity->getMatchRate());
+
+                //a used repetition has always the 102% matchrate
+                $entity->setMatchRate(editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE);
                 $entity->setMatchRateType($this->entity->getMatchRateType());
                 
                 $entity->setAutoStateId($states->calculateAlikeState($entity, $tua));
@@ -306,16 +324,12 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      * (currently only source and target! Since ChangeAlikes are deactivated for alternatives)
      * Closure Parameters: $field → 'target' or 'source'
      *
-     * @param Callable $callback
-     * @return array
+     * @param string $field
+     * @param stdClass $duration
      */
-    protected function fieldLoop(Callable $callback) {
-        $result = array();
-        if($this->isSourceEditable) {
-            $result['source'] = $callback('source');
-        }
-        $result['target'] = $callback('target');
-        return $result;
+    protected function updateDuration(string $field, stdClass $duration) {
+        $editField = $field.editor_Models_SegmentFieldManager::_EDIT_PREFIX;
+        $duration->$editField = (int)$this->_getParam('duration');
     }
 
     public function indexAction(){

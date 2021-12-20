@@ -76,7 +76,8 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 bind:{
                     disabled:'{disabledDuringTaskImport}',
                     extraParams:{
-                        taskGuid: '{projectTaskSelection.taskGuid}'
+                        taskGuid: '{projectTaskSelection.taskGuid}',
+                        taskId: '{projectTaskSelection.id}'                        
                     }
                 }
             });

@@ -765,6 +765,61 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $proposals->exportProposals($rows);
     }
 
+    public function xlsxexportAction() {
+
+        // Load utils
+        class_exists('editor_Utils');
+
+        // Get params
+        $params = $this->getRequest()->getParams();
+
+        // Check params
+        $_ = editor_Utils::jcheck([
+            'collectionId' => [
+                'req' => true,
+                'rex' => 'int11',
+                'key' => 'LEK_languageresources'
+            ]
+        ], $params);
+
+        // Turn off time limit
+        set_time_limit(0);
+
+        // Export collection
+        $xlsx = ZfExtended_Factory::get('editor_Models_Export_Terminology_Xlsx');
+
+        // If session's 'download' flag is set
+        if ($_SESSION['download'] ?? false) {
+
+            // Build file path
+            $file = $xlsx->file($_['collectionId']['id']);
+
+            // Unset session's download flag
+            unset($_SESSION['download']);
+
+            // Convert collection name to filename
+            $filename = rawurlencode($_['collectionId']['name']);
+
+            // Set up headers
+            header('Cache-Control: no-cache');
+            header('X-Accel-Buffering: no');
+            header('Content-Type: text/xml');
+            header('Content-Disposition: attachment; filename*=UTF-8\'\'' . $filename . '.xlsx; filename=' . $filename . '.xlsx');
+
+            // Flush the entire file
+            readfile($file);
+
+            // Delete the file
+            unlink($file);
+
+            // Exit
+            exit;
+        }
+
+        // Do export
+        $xlsx->exportCollectionById($params['collectionId']);
+    }
+
     /***
      * This is used for the tests. It will return the proposals for the current date and for the
      * assigned collections of the customers of the authenticated user
@@ -774,7 +829,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $proposals editor_Models_Terminology_Models_TermModel */
         $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        $this->view->rows = $proposals->loadProposalExportData($termCollection->getCollectionForAuthenticatedUser(), date('Y-m-d'));
+        $collectionIdA = $termCollection->getCollectionForAuthenticatedUser();
+        if ($required = $this->getParam('collectionId')) {
+            $required = is_array($required) ? $required : explode(',', $required);
+            $collectionIdA = array_intersect($collectionIdA, $required);
+        }
+        $this->view->rows = $proposals->loadProposalExportData($collectionIdA, date('Y-m-d'));
     }
 
 

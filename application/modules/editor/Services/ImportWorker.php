@@ -36,7 +36,7 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
     protected $languageResource;
     
     public function init($taskGuid = NULL, $parameters = array()) {
-        $this->behaviour->setConfig(['isMaintenanceScheduled' => true]);
+        $this->behaviour->setConfig(['isMaintenanceScheduled' => 60]);
         $init = parent::init($taskGuid, $parameters);
 
         $workerModel = $this->workerModel;

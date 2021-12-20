@@ -4285,6 +4285,12 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='TnVyIFRCWCBCYXNpYyBTdGFuZGFyZGF0dHJpYnV0ZSArIHByb2Nlc3NTdGF0dXMgZXhwb3J0aWVyZW4='><source>Nur TBX Basic Standardattribute + processStatus exportieren</source><target>Export only TBX Basic standard attributes + processStatus</target></trans-unit>
 <trans-unit id='QmlsZGVyIGltIEhleC1Gb3JtYXQgZXhwb3J0aWVyZW4sIGVpbmdlYmV0dGV0IGluIFRCWA=='><source>Bilder im Hex-Format exportieren, eingebettet in TBX</source><target>Export images in hex format, embedded in TBX</target></trans-unit>
 <trans-unit id='QWxzIFRCWCBleHBvcnRpZXJlbg=='><source>Als TBX exportieren</source><target>Export as TBX</target></trans-unit>
+<trans-unit id='QWxzIFhMU1ggZXhwb3J0aWVyZW4='><source>Als XLSX exportieren</source><target>Export as XLSX</target></trans-unit>
+<trans-unit id='R2VzYW10emFobCBkZXIgVGVybWVpbnRyw6RnZTogJXM='><source>Gesamtzahl der Termeinträge: %s</source><target>Total number of term entries: %s</target></trans-unit>
+<trans-unit id='QmVnaW5uIGRlcyBFeHBvcnRzLi4u'><source>Beginn des Exports...</source><target>Starting export...</target></trans-unit>
+<trans-unit id='Rm9ydHNjaHJpdHQ6ICVz'><source>Fortschritt: %s</source><target>Progress: %s</target></trans-unit>
+<trans-unit id='Vm9yYmVyZWl0ZW4gZGVzIERvd25sb2Fkcy4uLg=='><source>Vorbereiten des Downloads...</source><target>Preparing the download...</target></trans-unit>
+<trans-unit id='RXJsZWRpZ3QgaW4gJXMgU2VrLg=='><source>Erledigt in %s Sek.</source><target>Done in %s sec</target></trans-unit>
 <trans-unit id='MS4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'>
   <source>1. Lektorat (sprachlich)</source>
   <target>1st revision - language</target>
@@ -4348,6 +4354,18 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='TmljaHQgZW1wZm9obGVuIQ=='>
     <source>Nicht empfohlen!</source>
     <target>Not recommended!</target>
+</trans-unit>
+<trans-unit id='Q29tcGxleCBXb3JrZmxvdw=='>
+  <source>Complex Workflow</source>
+  <target>Complex Workflow</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmQgV29ya2Zsb3cgKMOcYmVyc2V0enVuZywgTGVrdG9yYXQsIFp3ZWl0ZXMgTGVrdG9yYXQp'>
+    <source>Standard Workflow (Übersetzung, Lektorat, Zweites Lektorat)</source>
+    <target>Standard Workflow</target>
+</trans-unit>
+<trans-unit id='SW1wb3J0IGFiYnJlY2hlbg=='>
+    <source>Import abbrechen</source>
+    <target>Cancel import</target>
 </trans-unit>
 </body>
   </file>

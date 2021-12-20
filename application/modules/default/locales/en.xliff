@@ -280,7 +280,21 @@ If you did not send the request yourself, please inform us of this.
 </figure>
 </target>
 </trans-unit>
-<trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='><source>{LinkConsortium}</source><target>https://www.translate5.net/en/2021/03/22/the-translate5-consortium-a-full-service-open-source-cloud-based-translation-system</target></trans-unit>
+<trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{TaskOverviewYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/flQOCo6AgXA</target></trans-unit>
+<trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{TaskOverviewYoutubeVideoGuideDescriptionContent}</source>
+<target><br/>
+<figure>
+    <figcaption><b>Übersicht:</b></figcaption>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/flQOCo6AgXA?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/flQOCo6AgXA?start=11&amp;autoplay=1" dir="auto">0:11</a> Task overview<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/flQOCo6AgXA?start=25&amp;autoplay=1" dir="auto">0:25</a> Status header<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/flQOCo6AgXA?start=38&amp;autoplay=1" dir="auto">0:38</a> Current workflow header<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/flQOCo6AgXA?start=44&amp;autoplay=1" dir="auto">0:44</a> Language header<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/flQOCo6AgXA?start=58&amp;autoplay=1" dir="auto">0:58</a> Advanced filters<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/flQOCo6AgXA?start=85&amp;autoplay=1" dir="auto">1:25</a> Key performance indicators<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/flQOCo6AgXA?start=101&amp;autoplay=1" dir="auto">1:41</a> Contact information<br/>
+</figure>
+</target></trans-unit>
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>

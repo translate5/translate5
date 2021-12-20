@@ -711,7 +711,12 @@ class editor_TaskController extends ZfExtended_RestController {
             $saveModel && $model->save();
         }
     }
-
+    /**
+     * This Operation refreshes (recalculates / retags) all qualities
+     */
+    public function autoqaOperation(){        
+        editor_Segment_Quality_Manager::autoqaOperation($this->entity);
+    }
     /**
      * Starts the export of a task into an excel file
      */
@@ -1592,6 +1597,12 @@ class editor_TaskController extends ZfExtended_RestController {
                 /* @var $worker editor_Models_Export_Worker */
                 $exportFolder = $worker->initExport($this->entity, $diff);
                 break;
+        }
+
+        if($this->isMaintenanceLoginLock(30)) {
+            //since file is fetched for download we simply print out that text without decoration.
+            echo 'Maintenance is scheduled, exports are not possible at the moment.';
+            exit;
         }
 
         //FIXME multiple problems here with the export worker

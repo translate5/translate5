@@ -46,9 +46,9 @@ set_include_path($APPLICATION_ROOT.PATH_SEPARATOR.$path.PATH_SEPARATOR.$zendLib)
 $_SERVER['REQUEST_URI'] = '/';
 $_SERVER['SERVER_NAME'] = 'localhost';
 $_SERVER['HTTP_HOST'] = 'localhost';
-define('APPLICATION_ROOT', $APPLICATION_ROOT);
-define('APPLICATION_PATH', $APPLICATION_ROOT.DIRECTORY_SEPARATOR.'application');
-define('APPLICATION_ENV', 'application');
+defined('APPLICATION_ROOT') || define('APPLICATION_ROOT', $APPLICATION_ROOT);
+defined('APPLICATION_PATH') || define('APPLICATION_PATH', $APPLICATION_ROOT.DIRECTORY_SEPARATOR.'application');
+defined('APPLICATION_ENV') || define('APPLICATION_ENV', 'application');
 // define a general marker for unit tests
 // be aware, that this marker affects the TESTING installation and the tests running in it, not the via API tested installation
 define('T5_IS_UNIT_TEST', true);

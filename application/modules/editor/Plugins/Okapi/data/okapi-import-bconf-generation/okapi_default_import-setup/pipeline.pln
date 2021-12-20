@@ -4,8 +4,8 @@
 segmentSource.b=true
 segmentTarget.b=true
 renumberCodes.b=false
-sourceSrxPath=/home/marc/Schreibtisch/test-new-bconf/languages.srx
-targetSrxPath=/home/marc/Schreibtisch/test-new-bconf/languages.srx
+sourceSrxPath=/home/marc/Schreibtisch/testa/languages.srx
+targetSrxPath=/home/marc/Schreibtisch/testa/languages.srx
 copySource.b=false
 checkSegments.b=false
 trimSrcLeadingWS.i=-1

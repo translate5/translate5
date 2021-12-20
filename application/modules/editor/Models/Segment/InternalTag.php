@@ -100,6 +100,11 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @return array
      */
     public function getLinesAccordingToNewlineTags(string $segment) {
+        // remove TrackChanges Tags
+        $taghelperTrackChanges = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $taghelperTrackChanges editor_Models_Segment_TrackChangeTag */
+        $segment = $taghelperTrackChanges->removeTrackChanges($segment);
+
         $replacer = function($match) {
             if (in_array('hardReturn', $match) || in_array('softReturn', $match)) {
                 return '<hardReturn/>';

@@ -233,6 +233,18 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     }
 
     /**
+     * Copies a given file to the unique file name / given filename
+     * @param string $source
+     * @param int $collectionId
+     * @param string|null $targetFile if omitted use internal unique ID
+     * @return bool
+     */
+    public function copyImage(string $source, int $collectionId, string $targetFile = null): bool {
+        $this->checkImageTermCollectionFolder($collectionId);
+        return copy($source, $this->getImagePath($collectionId, $targetFile ?? $this->getUniqueName()));
+    }
+
+    /**
      * creates a unique name out of the given one
      * @param string $name
      * @return string

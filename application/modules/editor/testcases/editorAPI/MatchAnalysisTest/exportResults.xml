@@ -13,9 +13,9 @@
     <analyse>
       <perfect segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <inContextExact segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <exact segments="50" words="385" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <exact segments="48" words="379" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <locked segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
-      <crossFileRepeated segments="13" words="56" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
+      <crossFileRepeated segments="15" words="62" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <repeated segments="0" words="0" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <total segments="163" words="1270" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>
       <new segments="73" words="478" characters="0" placeables="0" tags="0" repairWords="0" fullRecallWords="0" partialRecallWords="0" edits="0" adaptiveWords="0" baselineWords="0"/>

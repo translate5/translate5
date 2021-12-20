@@ -302,8 +302,20 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
 </figure>
 </target>
 </trans-unit>
-<trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='><source>{LinkConsortium}</source><target>https://www.translate5.net/2021/03/19/das-translate5-konsortium-ein-vollumfaengliches-open-source-cloud-uebersetzungssystem</target></trans-unit>
-
+<trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{TaskOverviewYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/iZHRx6vpjCU</target></trans-unit>
+<trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{TaskOverviewYoutubeVideoGuideDescriptionContent}</source>
+<target><br/>
+        <figure>
+            <figcaption><b>Übersicht:</b></figcaption>
+              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=10&amp;autoplay=1" dir="auto">0:10</a> Aufgabenübersicht<br/>
+              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=22&amp;autoplay=1" dir="auto">0:22</a> Status-Kopfzeile<br/>
+              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=34&amp;autoplay=1" dir="auto">0:34</a> Aktueller Workflow-Kopfzeile<br/>
+              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=57&amp;autoplay=1" dir="auto">0:57</a> Erweiterte Filter<br/>
+              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=81&amp;autoplay=1" dir="auto">1:21</a> Auswertungen anzeigen (KPIs)<br/>
+              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=94&amp;autoplay=1" dir="auto">1:34</a> Kontaktinformationen<br/>
+        </figure>
+</target></trans-unit>
   </body>
  </file>
 </xliff>

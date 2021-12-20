@@ -74,11 +74,7 @@ Ext.define('Editor.controller.JsLogger', {
      * they open the Editor).
      */
     onEditorAppLaunched: function () {
-        try {
-            jslogger && this.initJsLogger();
-        } catch(err) {
-            // = no jslogger
-        }
+       if(window.jslogger) this.initJsLogger();
     },
     
     /**

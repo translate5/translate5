@@ -707,7 +707,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * see therefore TRANSLATE-487
      *
      * @param string $segmentContent
-     * @return string $segmentContent
+     * @return string $segmentContent (only containing internal and MQM tags, internal tags sanitized)
      */
     public function stripTermTagsAndTrackChanges($segmentContent)
     {
@@ -716,7 +716,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $segmentContent = $tag->protect($segmentContent);
         //keep internal tags and MQM, remove all other
         $segmentContent = strip_tags($segmentContent, '<img>' . $tag::PLACEHOLDER_TAG);
-        return $tag->unprotect($segmentContent);
+        $segmentContent = $tag->unprotect($segmentContent);
+        //remove the class attribute of the span, since its position is changed by tag object usage
+        return preg_replace('/(<span[^>]*)( class="[^"]+")([^>]*>)/', '$1$3', $segmentContent);
     }
 
     /**

@@ -225,7 +225,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             $return['definition'] = $this->replicateDefinition('deleted');
 
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
-        if ($misc['userName'])
+        if ($misc['userName'] ?? 0)
             $return['updated'] = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
 
@@ -233,7 +233,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         parent::delete();
 
         // Return
-        return $return;
+        return $return ?? null;
     }
 
     /***
@@ -515,7 +515,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      */
     public function getExportData($termEntryIds, $tbxBasicOnly = false) {
         return array_group_by($this->db->getAdapter()->query('
-            SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`, `isDescripGrp` 
+            SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`, `isDescripGrp`, `dataTypeId` 
             FROM `terms_attributes`
             WHERE `termEntryId` IN (' . $termEntryIds . ')' . editor_Utils::rif($tbxBasicOnly, ' AND `dataTypeId` IN ($1)')
         )->fetchAll(), 'termEntryId', 'language', 'termId');
@@ -566,7 +566,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             ? $this->getLanguage()
             : join(',', $this->_getLanguagesWithNoOrEmptyDefinition());
 
-        i($bind, 'a');
         // Get ids of terms, that will be affected
         $termIdA = $this->db->getAdapter()->query('
             SELECT `id` 
@@ -670,5 +669,40 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             WHERE ' . $where . '
             ORDER BY `type` = "processStatus" DESC, `id` DESC', $bind
         )->fetchAll(PDO::FETCH_GROUP);
+    }
+
+    /**
+     * Set up `isDraft` = 0 for records identified by comma-separated ids given by $ids arg
+     *
+     * @param $ids
+     */
+    public function undraftByIds($ids) {
+        $this->db->getAdapter()->query('
+            UPDATE `terms_attributes` SET `isDraft` = "0" WHERE `id` IN (' . $ids . ')
+        ');
+    }
+
+    /**
+     * Delete attributes having isDraft=1
+     * This is currently used by cron
+     *
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function deleteDrafts() {
+
+        // Get ids array of draft attributes
+        $attrIdA_isDraft = $this->db->getAdapter()->query('
+            SELECT `id` FROM `terms_attributes` WHERE `isDraft` = "1"
+        ')->fetchAll(PDO::FETCH_COLUMN);
+
+        // Foreach id
+        foreach ($attrIdA_isDraft as $attrId) {
+
+            // Load model instance
+            $this->load($attrId);
+
+            // Call delete method
+            $this->delete();
+        }
     }
 }

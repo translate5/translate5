@@ -113,13 +113,6 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     protected $mtConnectors=array();
     
     /**
-     * contains the real state of the task. $this->task->state will contain matchanalysis
-     * @var string
-     */
-    protected $taskState;
-    
-    
-    /**
      * @var ZfExtended_EventManager
      */
     protected $events = false;
@@ -151,6 +144,17 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     public static function renderDummyTargetText($taskGuid) {
         return "translate5-unique-id[".$taskGuid."]";
     }
+
+    /**
+     * returns true if the given segment content is from a internal fuzzy
+     * @param string $segmentContent
+     * @return bool
+     */
+    protected function isInternalFuzzy(string $segmentContent): bool
+    {
+        $dummyTargetText = self::renderDummyTargetText($this->task->getTaskGuid());
+        return str_contains($segmentContent, $dummyTargetText);
+    }
     
     /***
      * Use the given TM analyse (or MT if analyse was empty) result to update the segment
@@ -166,9 +170,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         if($segment->getAutoStateId() != editor_Models_Segment_AutoStates::NOT_TRANSLATED){
             return;
         }
-        //if($result->matchrate==editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE){
-            //return;
-        //}
+
         //the internalLanguageResourceid is set when the segment bestmatchrate is found(see analysis getbestmatchrate function)
         $languageResourceid=$result->internalLanguageResourceid;
         
@@ -190,8 +192,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $type = $languageResource->getServiceName().' - '.$languageResource->getName();
         
         //ignore internal fuzzy match target
-        $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
-        if (strpos($targetResult, $dummyTargetText) !== false){
+        if ($this->isInternalFuzzy($targetResult)){
             //set the internal fuzzy available matchrate type
             $matchrateType->initPretranslated(editor_Models_Segment_MatchRateType::TYPE_INTERNAL_FUZZY_AVAILABLE,$type);
             $segment->setMatchRateType((string) $matchrateType);

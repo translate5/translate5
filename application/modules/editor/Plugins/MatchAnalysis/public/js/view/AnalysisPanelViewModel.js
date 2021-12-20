@@ -45,7 +45,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel', {
         enablePanel : {
             get : function (task) {
                 // if import status error disabled
-                return task && (!task.isErroneous() && !task.isImporting());
+                return (task && !task.isErroneous() && !task.isImporting());
             },
             bind : {
                 bindTo : '{currentTask}',
