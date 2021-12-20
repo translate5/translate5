@@ -67,7 +67,10 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
     public function checkAndPrepare(editor_Models_Task $task) {
         $this->setTask($task);
         $this->checkAndMakeTempImportFolder();
-        $this->handleUploads();
+        // if the current task is project, no need to move files
+        if(!$task->isProject()){
+            $this->handleUploads();
+        }
         if(!is_dir($this->importFolder)){
             //DataProvider Directory: The importRootFolder "{importRoot}" does not exist!
             throw new editor_Models_Import_DataProvider_Exception('E1248', [
