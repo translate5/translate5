@@ -40,11 +40,16 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
      * @param record
      * @param index
      */
-    onBeforeTargetLangDeselect:function (component, record, index){
+    onBeforeTargetLangDeselect:function (component, record){
         var me = this,
-            grid = me.getView().down('wizardUploadGrid'),
-            store = grid.getStore(),
+            view = me.getView(),
+            grid = view && view.down('wizardUploadGrid'),
+            store = grid && grid.getStore(),
             toRemove = [];
+
+        if(!view.isVisible()){
+            return;
+        }
 
         store.each(function (rec){
             if(rec.get('targetLang') === record.get('id')){

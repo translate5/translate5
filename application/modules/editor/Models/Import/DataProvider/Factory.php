@@ -72,7 +72,6 @@ class editor_Models_Import_DataProvider_Factory {
             $dp = 'editor_Models_Import_DataProvider_Zip';
             $tmpfiles = array_keys($files);
             $args = [reset($tmpfiles)]; //first uploaded review file is used as ZIP file
-            $dp =  ZfExtended_Factory::get($dp, $args);
         }else if($this->isProjectUpload($data)){
             $dp = 'editor_Models_Import_DataProvider_Project';
             $args = [

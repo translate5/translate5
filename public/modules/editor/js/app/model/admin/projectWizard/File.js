@@ -70,5 +70,13 @@ Ext.define('Editor.model.admin.projectWizard.File', {
     },{
         name: 'bilingual',
         type: 'bool'
-    }]
+    }],
+
+    /***
+     * Get the file xtension from the file name
+     * @returns {any|string}
+     */
+    getExtension:function (){
+        return Editor.util.Util.getFileExtension(this.get('name'));
+    }
 });
