@@ -516,4 +516,12 @@ class editor_Models_Export_Terminology_Tbx {
         // Clear lines
         $lines = [];
     }
+
+    /**
+     * @param array $termIds
+     * @param string $noTranslationForLanguage
+     */
+    public function exportTermsHavingNoTranslationFor(array $termIds, string $noTranslationForLanguage = '') {
+
+    }
 }

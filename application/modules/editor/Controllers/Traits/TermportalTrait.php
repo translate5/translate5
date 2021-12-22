@@ -15,6 +15,17 @@ trait editor_Controllers_Traits_TermportalTrait {
     }
 
     /**
+     * Alias for editor_Utils::jflush()
+     *
+     * @param $success
+     * @param string $msg
+     * @return mixed
+     */
+    public function jflush($success, $msg = '') {
+        return forward_static_call_array(array('editor_Utils', 'jflush'), func_get_args());
+    }
+
+    /**
      * If request contains json-encoded 'data'-param, decode it and append to request params
      * This may happen while running tests
      *
