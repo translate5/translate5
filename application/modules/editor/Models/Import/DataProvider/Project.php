@@ -122,8 +122,12 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         $matchingFiles = array_merge($matchingFiles,$pivotFiles);
 
         if(empty($matchingFiles)){
-            //TODO: Error code
-            throw new ZfExtended_ErrorCodeException();
+            throw new editor_Models_Import_DataProvider_Exception('E1369', [
+                'task' => $this->task,
+                'files' => $this->files,
+                'fileLanguages' => $this->fileLanguages,
+                'fileTypes' => $this->fileTypes,
+            ]);
         }
 
 
@@ -252,6 +256,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
     }
 
     /***
+     * Check if for the given index,there is pivot file match
      * @param int $arrayIndex
      * @return bool
      */

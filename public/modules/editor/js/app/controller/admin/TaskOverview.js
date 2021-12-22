@@ -426,7 +426,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         if (!me.getTaskAddForm()) {
             return;
         }
-        me.getTaskAddForm().getForm().reset();
         me.getTaskAddWindow().close();
     },
 
