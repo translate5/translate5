@@ -1920,15 +1920,21 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      * Get data for tbx-export
      *
-     * @param $termEntryIds Comma-separated list of ids
+     * @param $ids Comma-separated list of ids, or array of ids
+     * @param string $idsProp Name of ids-prop, 'termEntryId' by default
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getExportData($termEntryIds) {
+    public function getExportData($ids, $idsProp = 'termEntryId') {
+
+        // Build clause for termIds
+        $where = $this->db->getAdapter()->quoteInto('`' . $idsProp . '` IN (?)', editor_Utils::ar($ids));
+
+        // Fetch and return terms, grouped by termEntryId and language props
         return array_group_by($this->db->getAdapter()->query('
             SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId`, `processStatus` 
             FROM `terms_term`
-            WHERE `termEntryId` IN (' . $termEntryIds . ')
+            WHERE ' . $where . '
         ')->fetchAll(), 'termEntryId', 'language');
     }
 
@@ -2415,5 +2421,52 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             FROM `terms_term`
             WHERE `termEntryId` = :termEntryId' . $certain
         , $bind)->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Exclude values from $termIds, having $language-translations,
+     * so the only ones which have no translation for given $language will be kept and returned
+     *
+     * @param array $termIds
+     * @param string $language
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function havingNoTranslation(array $termIds, string $language) {
+
+        // Build termIds-where clause
+        $termIds = $this->db->getAdapter()->quoteInto('`t`.`id` IN (?)', $termIds);
+
+        // Run query and fetch results
+        return $this->db->getAdapter()->query('
+            SELECT `t`.`collectionId`, `t`.`id` 
+            FROM 
+              `terms_term` `t` 
+              LEFT JOIN `terms_term` AS `t2` ON (
+                `t`.`termEntryId` = `t2`.`termEntryId` AND `t2`.`languageId` = ?
+              )
+            WHERE ' . $termIds . ' AND ISNULL(`t2`.`id`)
+        ', $language)->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Get distinct values for columns, specified by $cols arg, for terms, identified by $termIds arg
+     *
+     * @param string $cols Comma-separated column names
+     * @param array $termIds
+     */
+    public function distinctColsForTermIds($cols = 'termEntryId,language', array $termIds) {
+
+        // Build termIds-where clause
+        $termIds = $this->db->getAdapter()->quoteInto('`id` IN (?)', $termIds);
+
+        // Fetch data
+        $data = $this->db->getAdapter()->query('SELECT ' . $cols . ' FROM `terms_term` WHERE ' . $termIds)->fetchAll();
+
+        // Collect distinct values for given $cols
+        foreach (explode(',', $cols) as $col) $distinct[$col] = array_unique(array_column($data, $col));
+
+        // Return collected
+        return $distinct;
     }
 }
