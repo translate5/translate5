@@ -156,7 +156,7 @@ Ext.define('Editor.model.quality.Filter', {
      */
     getTypeCatKey(){
         if(this.get('qcategory') == ''){
-            return this.get('qtype');
+            return this.get('qtype') + (this.get('children') ? '' : ':' + this.get('qtype'));
         }
         return this.get('qtype') + ':' + this.get('qcategory');
     }

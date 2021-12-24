@@ -246,7 +246,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         // retrieve all checked filters. When reloading the store, this has to cover the rubrics as well
         Ext.Array.each(this.getView().getChecked(), function(record){
             // send the rubrics only for a store reload
-            if(record.isCategory() || forStoreReload){
+            if(record.isCategory() || forStoreReload || !record.data.children){
                 checkedVals.push(record.getTypeCatKey());
             }
         });

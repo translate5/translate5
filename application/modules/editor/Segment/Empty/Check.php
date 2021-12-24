@@ -37,7 +37,7 @@ class editor_Segment_Empty_Check {
     /**
      * @var string
      */
-    const IS_EMPTY = 'is_empty';
+    const IS_EMPTY = 'empty'; // same as editor_Segment_Empty_QualityProvider::$type
 
     /* *
      * @var editor_Segment_FieldTags
