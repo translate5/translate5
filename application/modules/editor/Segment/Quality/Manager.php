@@ -138,6 +138,9 @@ final class editor_Segment_Quality_Manager {
         // Length
         $provider = new editor_Segment_Length_QualityProvider();
         $this->registry[$provider->getType()] = $provider;
+        // Empty
+        $provider = new editor_Segment_Empty_QualityProvider();
+        $this->registry[$provider->getType()] = $provider;
     }
     /**
      * 
