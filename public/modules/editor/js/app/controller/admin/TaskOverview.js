@@ -1098,7 +1098,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             win = me.getTaskAddWindow(),
             grid = me.getWizardUploadGrid(),
             formData = new FormData(),
-            form = me.getTaskAddForm();
+            form = me.getTaskAddForm(),
+            params = form.getForm().getValues();
 
         if (!form.isValid()) {
             return;
@@ -1115,6 +1116,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 formData.append('importUpload_type[]', record.get('type'));
             }
         });
+
+        me.fireEvent('beforeCreateTask',params , formData);
 
         //INFO: this will convert array to coma separated values requires additional handling on backend. We do not want that
         // Ext.Object.each(form.getForm().getValues(), function(property, value){

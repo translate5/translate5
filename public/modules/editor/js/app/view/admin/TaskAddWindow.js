@@ -176,26 +176,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         itemId: 'taskMainCard',
                         importType:'import',
                         scrollable:'y',
-                        listeners: {
-                            //TODO: is this Thomas stuff ?
-                            XXXdrop: {
-                                element: 'el',
-                                fn: 'onMainCardDrop'
-                            }
-                        },
-                        onMainCardDrop: function(e) {
-                            var dt = new DataTransfer(),
-                                be = e.browserEvent,
-                                bedt = be && be.dataTransfer,
-                                file =  bedt.files && bedt.files[0],
-                                fileField = this.down('filefield[name="importUpload"]');
-                            if(!file) {
-                                return;
-                            }
-                            dt.items.add(file);
-                            fileField.fileInputEl.dom.files = dt.files;
-                            fileField.onFileChange(null, null, file.name);
-                        },
                         items:[{
                             xtype: 'form',
                             padding: 5,

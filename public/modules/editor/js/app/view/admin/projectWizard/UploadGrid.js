@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -72,6 +71,9 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'wizardFileButton',
                     text: 'Add work file(s)',
                     name:'workFilesFilesButton',
+                    bind: {
+                        disabled: '{isZipUpload}'
+                    },
                     listeners: {
                         change: 'onManualAdd'
                     }
@@ -79,6 +81,9 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'wizardFileButton',
                     text: 'Add pivot file(s)',
                     name:'pivotFilesFilesButton',
+                    bind: {
+                        disabled: '{isZipUpload}'
+                    },
                     listeners: {
                         change: 'onManualAddPivot'
                     }
@@ -88,13 +93,13 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'button',
                     text: 'remove file',
                     handler: 'removeFiles',
-                    //disabled: true,
                     bind: {
                         disabled: '{!uploadgrid.selection}'
                     }
                 }],
                 viewConfig: {
                     emptyText: 'Drag and drop files here to add them as work files, or to one of the above buttons to add them with a different type. (BUTTON DD TO BE DONE!)',
+                    markDirty: false,
                     getRowClass: function (record) {
                         var res = [];
                         if(record.get('type') === Editor.model.admin.projectWizard.File.TYPE_ERROR){

@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -29,6 +28,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.projectWizard.UploadGridViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.wizardUploadGrid',
+
     stores: {
         files: {
             model:'Editor.model.admin.projectWizard.File',

@@ -1,23 +1,22 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -68,11 +67,19 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         if(items.length < 1){
             sourceField.setReadOnly(false);
         }
+        // clean the selected languages when there are no files in the store
         if(store.getCount() === 0){
             sourceField.setValue(null);
             targetField.setValue(null);
         }
+
+        // update isZipUpload view model after the files are removed
+        items = store.queryBy(function (rec){
+            return Editor.util.Util.getFileExtension(rec.get('name')) === 'zip';
+        });
+        me.setIsZipUploadViewModel(items.length > 0);
     },
+
     addFilesToStore: function(items, type) {
         var me = this,
             files = me.zipFileFilter(items),
@@ -201,7 +208,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         rec.set('name',this.checkFileName(rec.get('name'),rec.get('type'),rec.get('targetLang')));
     },
 
-     /***
+    /***
      * Check if the given name is duplicate for the new task. Is duplicated when the record
      * has same name, type and target language
      * @param fileName
@@ -282,6 +289,9 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                 filtered.push(file);
             }
         });
+
+        this.setIsZipUploadViewModel(filtered.length > 0);
+
         // if no zip files where found, return all files
         if(filtered.length === 0){
             return files;
@@ -291,7 +301,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
     /***
      * Check if a file is allowed to be uploaded.
-     * If in the uploaded files there is already zip file, no more uploads are alowed
+     * If in the uploaded files there is already zip file, no more uploads are allowed
      * @param store
      * @param record
      * @returns {boolean}
@@ -313,5 +323,15 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             return false;
         }
         return true;
+    },
+
+    /***
+     * Set the isZipUpload view model flat with the given value
+     * @param isZip
+     */
+    setIsZipUploadViewModel:function (isZip){
+        var me = this,
+            window = me.getView().up('#adminTaskAddWindow');
+        window && window.getViewModel().set('isZipUpload',isZip);
     }
 });
