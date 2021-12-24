@@ -59,7 +59,7 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
 
     public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
         //return ($qualityConfig->enableSegmentLengthCheck == 1 && static::getRestriction($qualityConfig, $taskConfig)->active);
-        return true; //($qualityConfig->enableSegmentEmptyCheck == 1);
+        return ($qualityConfig->enableSegmentEmptyCheck == 1);
     }
     /**
      * 
@@ -69,10 +69,11 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
 
         // If this check is turned Off in config - return $tags
-        /*if (!$qualityConfig->enableSegmentEmptyCheck == 1) {
+        if (!$qualityConfig->enableSegmentEmptyCheck == 1) {
             return $tags;
         }
-        $restriction = static::getRestriction($qualityConfig, $task->getConfig());
+
+        /*$restriction = static::getRestriction($qualityConfig, $task->getConfig());
         if(!$restriction->active){
             return $tags;
         }
@@ -88,14 +89,14 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
             /* if($processingMode == editor_Segment_Processing::IMPORT && !$segment->isPretranslated()){
                 return $tags;
             }*/
+            $chars = $qualityConfig->segmentPunctuationChars;
             foreach($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
                 // if the target is empty, we do not need to check
                 //if(!$target->isEmpty()){
-                    $check = new editor_Segment_Empty_Check($target, $segment);//, $restriction);
-                    if ($check->hasStates()) {
-                        foreach ($check->getStates() as $state) {
-                            $tags->addQuality($target->getField(), static::$type, $state);
-                        }
+                    //$check = new editor_Segment_Empty_Check($target, $segment, $restriction);
+                    $check = new editor_Segment_Empty_Check($target, $segment, $chars);
+                    foreach ($check->getStates() as $state) {
+                        $tags->addQuality($target->getField(), static::$type, $state);
                     }
                 //}
             }
@@ -108,16 +109,10 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
     }
 
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        switch ($category) {
-            case editor_Segment_Empty_Check::IS_EMPTY:
-                return $translate->_('Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.');
-        }
-        return NULL;
+        return '';
     }
     
     public function getAllCategories(editor_Models_Task $task) : array {
-        return [
-            editor_Segment_Empty_Check::IS_EMPTY,
-        ];
+        return [];
     }
 }

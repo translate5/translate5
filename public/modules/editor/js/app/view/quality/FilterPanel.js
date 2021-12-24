@@ -63,6 +63,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
         incompleteCatText: '#UT#Diese Kategorie wurde nicht oder nur unvollständig geprüft',
         startAnalysisHint: '#UT#Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben',
         newAnalysis: '#UT#Neu überprüfen',
+        typeEmptyTip: '#UT#Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.'
     },
     initConfig: function(instanceConfig) {
         this.isQualityManager = Editor.app.authenticatedUser.isAllowed('editorManageQualities');
@@ -100,6 +101,9 @@ Ext.define('Editor.view.quality.FilterPanel', {
                     if(record.get('qtype') == 'mqm' && record.get('qcatidx') > -1){
                         symbol += '<img class="x-tree-symbol qmflag qmflag-' + record.get('qcatidx') + '" src="' 
                             + Editor.data.segments.subSegment.tagPath + 'qmsubsegment-' + record.get('qcatidx') + '-left.png"> ';
+                    }
+                    if (record.get('qtype') == 'empty' && record.get('qcatidx') == -1){
+                        meta.tdAttr = 'data-qtip="' + me.strings.typeEmptyTip + '"';
                     }
                     return symbol + text + ' ('+record.get('qcount')+')';
                 },

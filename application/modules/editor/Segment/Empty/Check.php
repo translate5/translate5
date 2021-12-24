@@ -71,7 +71,7 @@ class editor_Segment_Empty_Check {
      * @param editor_Models_Segment $segment
      * @param stdClass $lengthRestriction
      */
-    public function __construct(editor_Segment_FieldTags $fieldTags, editor_Models_Segment $segment) {//, editor_Segment_Empty_Restriction $lengthRestriction){
+    public function __construct(editor_Segment_FieldTags $fieldTags, editor_Models_Segment $segment, string $chars) {//, editor_Segment_Empty_Restriction $lengthRestriction){
         /*// just to make sure
         if(!$lengthRestriction->active){
             return;
@@ -103,23 +103,20 @@ class editor_Segment_Empty_Check {
             }
         }*/
 
-        //class_exists('editor_Utils');
-        //i($segment->getDataObject());
+        // Get source text, strip tags, replace htmlentities, strip whitespace and punctuation chars
+        $source = $segment->getSourceToSort();
+        $source = strip_tags($source);
+        $source = str_replace(['&lt;', '&gt;'], ['<', '>'], $source);
+        $source = preg_replace('~[\s' .  preg_quote($chars, '~'). ']~', '', $source);
 
-        // Get target text
+        // Get target text, strip tags, replace htmlentities, strip whitespace and punctuation chars
         $target = $segment->getTargetEditToSort();
-
-        // Strip tags
         $target = strip_tags($target);
-
-        // Replace htmlentities
         $target = str_replace(['&lt;', '&gt;'], ['<', '>'], $target);
+        $target = preg_replace('~[\s' .  preg_quote($chars, '~'). ']~', '', $target);
 
-        // Stip whitespace and punctuation chars
-        $target = preg_replace('~[\s' .  preg_quote(',.-;:_!?¿()}{[]"\'~<>„“”‘’«»', '~'). ']~', '', $target);
-
-        // If $target became zero-length - flag it's empty
-        if (!strlen($target)) $this->states[] = self::IS_EMPTY;
+        // If $source is still non zero-length, but $target is  - flag it's empty
+        if (!strlen($target) && strlen($source)) $this->states[] = self::IS_EMPTY;
     }
 
     /**
