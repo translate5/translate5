@@ -39,30 +39,34 @@
  */
 class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provider {
 
+    /**
+     * Quality type
+     *
+     * @var string
+     */
     protected static $type = 'empty';
-    /* *
-     * Holds the current restriction based on the quality config
-     * This needs to be evaluated only once per request so it is static
-     * @var editor_Segment_Empty_Restriction
-     * /
-    private static $restriction = NULL;
-    /**
-     * 
-     * @return editor_Segment_Empty_Restriction
-     * /
-    public static function getRestriction(Zend_Config $qualityConfig, Zend_Config $taskConfig){
-        if(static::$restriction === NULL){
-            static::$restriction = new editor_Segment_Empty_Restriction($qualityConfig, $taskConfig);
-        }
-        return static::$restriction;
-    }*/
 
-    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
-        //return ($qualityConfig->enableSegmentLengthCheck == 1 && static::getRestriction($qualityConfig, $taskConfig)->active);
-        return ($qualityConfig->enableSegmentEmptyCheck == 1);
-    }
     /**
-     * 
+     * Flag indicating whether this quality has categories
+     *
+     * @var bool
+     */
+    public static $hasCategories = false;
+
+    /**
+     * Method to check whether this quality is turned On
+     *
+     * @param Zend_Config $qualityConfig
+     * @param Zend_Config $taskConfig
+     * @return bool
+     */
+    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
+        return $qualityConfig->enableSegmentEmptyCheck == 1;
+    }
+
+    /**
+     * Check segment against quality
+     *
      * {@inheritDoc}
      * @see editor_Segment_Quality_Provider::processSegment()
      */
@@ -73,45 +77,82 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
             return $tags;
         }
 
-        /*$restriction = static::getRestriction($qualityConfig, $task->getConfig());
-        if(!$restriction->active){
-            return $tags;
-        }
-        if($processingMode == editor_Segment_Processing::ALIKE){
+        // If processing mode is 'alike'
+        if ($processingMode == editor_Segment_Processing::ALIKE){
             
             // the only task in an alike process is cloning the qualities ...
             $tags->cloneAlikeQualitiesByType(static::$type);
-            
-        } else if($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode)) {*/
 
+        // Else
+        } else if ($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode)) {
+
+            // Get segment shortcut
             $segment = $tags->getSegment();
-            // on Import, check only pretranslated segments
-            /* if($processingMode == editor_Segment_Processing::IMPORT && !$segment->isPretranslated()){
-                return $tags;
-            }*/
+
+            // Get punctuation chars shortcut
             $chars = $qualityConfig->segmentPunctuationChars;
-            foreach($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
-                // if the target is empty, we do not need to check
-                //if(!$target->isEmpty()){
-                    //$check = new editor_Segment_Empty_Check($target, $segment, $restriction);
+
+            // Foreach target
+            foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
+
+                // If the target is empty, we do not need to check
+                if (!$target->isEmpty()) {
+
+                    // Do check
                     $check = new editor_Segment_Empty_Check($target, $segment, $chars);
+
+                    // Process check results
                     foreach ($check->getStates() as $state) {
                         $tags->addQuality($target->getField(), static::$type, $state);
                     }
-                //}
+                }
             }
-        //}
+        }
+
+        // Return
         return $tags;
     }
-    
+
+    /**
+     * Translate quality type
+     *
+     * @param ZfExtended_Zendoverwrites_Translate $translate
+     * @return string|null
+     * @throws Zend_Exception
+     */
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
         return $translate->_('Leere Segmente');
     }
 
+    /**
+     * Translate quality type tooltip
+     *
+     * @param ZfExtended_Zendoverwrites_Translate $translate
+     * @return string|null
+     * @throws Zend_Exception
+     */
+    public function translateTypeTooltip(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
+        return $translate->_('Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.');
+    }
+
+    /**
+     * Translate category: nothing to translate for this quality
+     *
+     * @param ZfExtended_Zendoverwrites_Translate $translate
+     * @param string $category
+     * @param editor_Models_Task $task
+     * @return string|null
+     */
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         return '';
     }
-    
+
+    /**
+     * Categories in this quality: no categories
+     *
+     * @param editor_Models_Task $task
+     * @return array
+     */
     public function getAllCategories(editor_Models_Task $task) : array {
         return [];
     }

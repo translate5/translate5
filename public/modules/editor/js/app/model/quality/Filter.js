@@ -61,6 +61,9 @@ Ext.define('Editor.model.quality.Filter', {
     isEmptyRubric: function(){
         return (this.isRubric() && this.get('qtotal') == 0);
     },
+    isTypeWithNoCategories: function() {
+        return this.get('qtype') != 'root' && this.get('qcategory') == '' && !this.get('children');
+    },
     isEmpty: function(){
         if(this.get('qtype') == 'root' || this.get('qcategory') == ''){
             return (this.get('qtotal') == 0);
@@ -156,6 +159,10 @@ Ext.define('Editor.model.quality.Filter', {
      */
     getTypeCatKey(){
         if(this.get('qcategory') == ''){
+
+            // If current record has empty 'qcategory' prop and no children it means
+            // that it's a quality having no categories, so in that case to keep filters
+            // server-side compatibility we append ':<qtype>' here
             return this.get('qtype') + (this.get('children') ? '' : ':' + this.get('qtype'));
         }
         return this.get('qtype') + ':' + this.get('qcategory');

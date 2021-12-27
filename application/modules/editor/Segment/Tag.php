@@ -49,10 +49,6 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     /**
      * @var string
      */
-    const TYPE_EMPTY = 'empty';
-    /**
-     * @var string
-     */
     const TYPE_MQM = 'mqm';
     /**
      * @var string

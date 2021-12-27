@@ -403,6 +403,7 @@ abstract class editor_Models_Quality_AbstractView {
         if($this->isTree){
             $row->children = [];
             $row->qcategory = NULL;
+            $row->textTooltip = $this->manager->translateQualityTypeTooltip($type);
         }
         if($this->hasNumFalsePositives){
             $row->qcountfp = 0;

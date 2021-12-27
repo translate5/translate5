@@ -44,6 +44,12 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @var string
      */
     protected static $type = NULL;
+
+    /**
+     * @var bool
+     */
+    public static $hasCategories = true;
+
     /**
      * MUST be set in inheriting classes if there is a related segment tag
      * @var string
@@ -103,6 +109,16 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      */
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
         return NULL;
+    }
+
+    /**
+     * Returns a translation for the Provider tooltip
+     *
+     * @param ZfExtended_Zendoverwrites_Translate $translate
+     * @return string
+     */
+    public function translateTypeTooltip(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
+        return '';
     }
     /**
      * Returns a translation for a Quality. These Codes are stored in the category column of the LEK_segment_quality model
