@@ -144,7 +144,10 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
      * @return string|null
      */
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        return '';
+        if($category == static::$type){
+            return $this->translateType($translate);
+        }
+        return NULL;
     }
 
     /**
