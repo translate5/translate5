@@ -332,11 +332,11 @@ final class editor_Segment_Quality_Manager {
         if($this->hasProvider($type)){
             $translation = $this->getProvider($type)->translateType($this->getTranslate());
             if($translation === NULL){
-                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation for the type".');
+                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityType: provider of type "'.$type.'" has no translation for the type".');
             }
             return $translation;
         }
-        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityType: provider of type "'.$type.'" not present.');
         return '';
     }
     /**
@@ -349,7 +349,7 @@ final class editor_Segment_Quality_Manager {
         if ($this->hasProvider($type)) {
             return $this->getProvider($type)->translateTypeTooltip($this->getTranslate());
         }
-        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityTypeTooltip: provider of type "'.$type.'" not present.');
         return '';
     }
     /**
@@ -364,12 +364,20 @@ final class editor_Segment_Quality_Manager {
         if($this->hasProvider($type)){
             $translation = $this->getProvider($type)->translateCategory($this->getTranslate(), $category, $task);
             if($translation === NULL){
-                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation of category "'.$category.'".');
+                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityCategory: provider of type "'.$type.'" has no translation of category "'.$category.'".');
             }
             return $translation;
         }
-        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityCategory: provider of type "'.$type.'" not present.');
         return '';
+    }
+    /**
+     * Evaluates, if the quality of the given type has categories
+     * @param string $type
+     * @return bool
+     */
+    public function hasCategories(string $type) : bool {
+        return $this->getProvider($type)->hasCategories();
     }
     /**
      * Evaluates, if a quality of the given type renders tags in the tags texts

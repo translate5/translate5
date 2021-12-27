@@ -61,7 +61,7 @@ Ext.define('Editor.model.quality.Filter', {
     isEmptyRubric: function(){
         return (this.isRubric() && this.get('qtotal') == 0);
     },
-    isTypeWithNoCategories: function() {
+    hasNoCategories: function() {
         return this.get('qtype') != 'root' && this.get('qcategory') == '' && !this.get('children');
     },
     isEmpty: function(){

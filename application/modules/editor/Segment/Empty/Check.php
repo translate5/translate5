@@ -28,17 +28,10 @@ END LICENSE AND COPYRIGHT
 
 /**
  * 
- * evaluates the quality state of a segment regarding length-restrictions
- * NOTE: Currently we only evaluate the pixel length and the fullfillment of the maxLength (either if a segment is longer or not long enough relative to the max-length
  *
  */
 class editor_Segment_Empty_Check {
     
-    /**
-     * @var string
-     */
-    const IS_EMPTY = 'empty'; // same as editor_Segment_Empty_QualityProvider::$type
-
     /**
      * @var string[]
      */
@@ -48,9 +41,9 @@ class editor_Segment_Empty_Check {
      * 
      * @param editor_Segment_FieldTags $fieldTags
      * @param editor_Models_Segment $segment
-     * @param stdClass $lengthRestriction
+     * @param string $chars
      */
-    public function __construct(editor_Segment_FieldTags $fieldTags, editor_Models_Segment $segment, string $chars) {//, editor_Segment_Empty_Restriction $lengthRestriction){
+    public function __construct(editor_Segment_FieldTags $fieldTags, editor_Models_Segment $segment, string $chars) {
 
         // Get source text, strip tags, replace htmlentities, strip whitespace and punctuation chars
         $source = $segment->getSourceToSort();
@@ -65,7 +58,9 @@ class editor_Segment_Empty_Check {
         $target = preg_replace('~[\s' .  preg_quote($chars, '~'). ']~', '', $target);
 
         // If $source is still non zero-length, but $target is  - flag it's empty
-        if (!strlen($target) && strlen($source)) $this->states[] = self::IS_EMPTY;
+        if (!strlen($target) && strlen($source)) {
+            $this->states[] = editor_Segment_Empty_QualityProvider::$type;
+        }
     }
 
     /**

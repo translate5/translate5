@@ -51,7 +51,7 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
      *
      * @var bool
      */
-    public static $hasCategories = false;
+    protected static $hasCategories = false;
 
     /**
      * Method to check whether this quality is turned On

@@ -101,8 +101,8 @@ Ext.define('Editor.view.quality.FilterPanel', {
                         symbol += '<img class="x-tree-symbol qmflag qmflag-' + record.get('qcatidx') + '" src="' 
                             + Editor.data.segments.subSegment.tagPath + 'qmsubsegment-' + record.get('qcatidx') + '-left.png"> ';
                     }
-                    if (record.get('textTooltip')) {
-                        meta.tdAttr = 'data-qtip="' + record.get('textTooltip') + '"';
+                    if (record.get('qtooltip')) {
+                        meta.tdAttr = 'data-qtip="' + record.get('qtooltip') + '"';
                     }
                     return symbol + text + ' ('+record.get('qcount')+')';
                 },

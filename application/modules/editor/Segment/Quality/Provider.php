@@ -48,7 +48,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     /**
      * @var bool
      */
-    public static $hasCategories = true;
+    protected static $hasCategories = true;
 
     /**
      * MUST be set in inheriting classes if there is a related segment tag
@@ -171,6 +171,13 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      */
     public function isFullyChecked(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
         return true;
+    }
+    /**
+     * Retrieves, if a quality has categories
+     * @return bool
+     */
+    public function hasCategories() : bool {
+        return static::$hasCategories;
     }
     /**
      * Retrieves all Categories a quality can have
