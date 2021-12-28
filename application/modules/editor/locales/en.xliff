@@ -4015,6 +4015,11 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Internal tags</target></trans-unit>
 <trans-unit id='TGVlcmUgU2VnbWVudGU='><source>Leere Segmente</source><target>Empty segments</target></trans-unit>
 <trans-unit id='RGFzIFppZWwgZW50aMOkbHQgbnVyIFRhZ3MsIExlZXJ6ZWljaGVuIG9kZXIgSW50ZXJwdW5rdGlvbiwgZGllIFF1ZWxsZSBqZWRvY2ggbmljaHQu'><source>Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.</source><target>Target only contains tags, spaces or punctuation, but source does not.</target></trans-unit>
+<trans-unit id='RWluaGVpdGxpY2hrZWl0'><source>Einheitlichkeit</source><target>Consistency</target></trans-unit>
+<trans-unit id='VW5laW5oZWl0bGljaGUgUXVlbGxl'><source>Uneinheitliche Quelle</source><target>Inconsistent source</target></trans-unit>
+<trans-unit id='RmluZGV0IFNlZ21lbnRlIG1pdCBkZW0gc2VsYmVuIFppZWwsIGFiZXIgdW50ZXJzY2hpZWRsaWNoZXIgUXVlbGxlIChUYWdzIHdlcmRlbiBpZ25vcmllcnQp'><source>Findet Segmente mit dem selben Ziel, aber unterschiedlicher Quelle (Tags werden ignoriert)</source><target>Finds segments with same target, but different source (tags ignored)</target></trans-unit>
+<trans-unit id='VW5laW5oZWl0bGljaGVzIFppZWw='><source>Uneinheitliches Ziel</source><target>Inconsistent target</target></trans-unit>
+<trans-unit id='RmluZGV0IFNlZ21lbnRlIG1pdCBkZXIgc2VsYmVuIFF1ZWxsZSwgYWJlciB1bnRlcnNjaGllZGxpY2hlbSBaaWVsIChUYWdzIHdlcmRlbiBpZ25vcmllcnQp'><source>Findet Segmente mit der selben Quelle, aber unterschiedlichem Ziel (Tags werden ignoriert)</source><target>Finds segments with same source, but different target (tags ignored)</target></trans-unit>
 <trans-unit id='VmVyYm90ZW4gaW4gWmllbA=='><source>Verboten in Ziel</source><target>Forbidden in target</target></trans-unit>
 <trans-unit id='VmVyYm90ZW4gaW4gUXVlbGxl'><source>Verboten in Quelle</source><target>Forbidden in source</target></trans-unit>
 <trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unedited fuzzy match</target></trans-unit>

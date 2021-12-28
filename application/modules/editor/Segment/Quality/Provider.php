@@ -131,7 +131,18 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         return NULL;
     }
-    
+
+    /**
+     * Translate quality category tooltip
+     *
+     * @param ZfExtended_Zendoverwrites_Translate $translate
+     * @return string|null
+     * @throws Zend_Exception
+     */
+    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
+        return '';
+    }
+
     /* *************** REST view API *************** */
     
     /**

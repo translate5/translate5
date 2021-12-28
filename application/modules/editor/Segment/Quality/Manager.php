@@ -141,6 +141,9 @@ final class editor_Segment_Quality_Manager {
         // Empty
         $provider = new editor_Segment_Empty_QualityProvider();
         $this->registry[$provider->getType()] = $provider;
+        // Consistent
+        $provider = new editor_Segment_Consistent_QualityProvider();
+        $this->registry[$provider->getType()] = $provider;
     }
     /**
      * 
@@ -378,6 +381,21 @@ final class editor_Segment_Quality_Manager {
      */
     public function hasCategories(string $type) : bool {
         return $this->getProvider($type)->hasCategories();
+    }
+    /**
+     * Translates a Segment Quality category tooltip
+     * @param string $type
+     * @param string $category
+     * @param editor_Models_Task $task
+     * @throws ZfExtended_Exception
+     * @return string
+     */
+    public function translateQualityCategoryTooltip(string $type, string $category, editor_Models_Task $task) : string {
+        if ($this->hasProvider($type)) {
+            return $this->getProvider($type)->translateCategoryTooltip($this->getTranslate(), $category, $task);
+        }
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+        return '';
     }
     /**
      * Evaluates, if a quality of the given type renders tags in the tags texts
