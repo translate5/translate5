@@ -63,107 +63,95 @@ class editor_Segment_Consistent_Check {
     public function __construct(editor_Segment_FieldTags $fieldTags, editor_Models_Segment $segment) {
 
         // Get all segments in current task
-        if (self::$segments === null) {
-            self::$segments = $segment->getMaterializedViewData();
+        if (self::$segments === null) self::$segments = $segment->getMaterializedViewData();
+
+        // We need to build two snapshots of the 'same'-targets/sources info,
+        // First one is without respect to current segment's new target, second one is with
+        foreach (['was', 'now'] as $snapshot) {
+
+            // Build the dictionaries with the info regarding same sources for different targets
+            // if $snapshot is 'now' - current segment's new target will be respected
+            foreach (self::$segments as $segmentI) {
+
+                // If iterated segment is current segment - spoof old target with new one
+                if ($snapshot == 'now' && $segmentI['id'] == $segment->getId()) $segmentI['target'] = $segment->getTargetEditToSort();
+
+                // If empty target - skip
+                if (!$segmentI['target']) continue;
+
+                // If iterated segment is current segment - detect old target
+                if ($snapshot == 'was' && $segmentI['id'] == $segment->getId()) $prevTargetEditToSort = $segmentI['target'];
+
+                // Build array containing different targets for same sources
+                $same['source'][$snapshot][$segmentI['source']] [$segmentI['target']] [$segmentI['id']] = true;
+
+                // Build array containing different sources for same targets
+                $same['target'][$snapshot][$segmentI['target']] [$segmentI['source']] [$segmentI['id']] = true;
+            }
         }
 
-        // Foreach segments collect the info regarding same sources for different targets, and upside down
-        // with current $segment usage where need, and it is not yet saved into database, and therefore data
-        // in self::$segments is not up to date for current $segment for our 'same'-stuff detection
-        foreach (self::$segments as $segmentI) {
-            if (!$segmentI['target']) continue;
-            if ($segmentI['id'] == $segment->getId()) $prevTargetEditToSort = $segmentI['target'];
-            $same['source']['was'][$segmentI['source']] [$segmentI['target']] [$segmentI['id']] = true;
-            $same['target']['was'][$segmentI['target']] [$segmentI['source']] [$segmentI['id']] = true;
-        }
-        foreach (self::$segments as $segmentI) {
-            if ($segmentI['id'] == $segment->getId()) $segmentI['target'] = $segment->getTargetEditToSort();
-            if (!$segmentI['target']) continue;
-            $same['source']['now'][$segmentI['source']] [$segmentI['target']] [$segmentI['id']] = true;
-            $same['target']['now'][$segmentI['target']] [$segmentI['source']] [$segmentI['id']] = true;
-        }
-
-        class_exists('editor_Utils');
-        //i($check->getStates(), 'a');
-        i($same, 'a');
-
+        // Get 'was'-dictionary data for current segment
         $was['source'] = $same['source']['was'][$segment->getSourceToSort()] ?? [];
         $was['target'] = $same['target']['was'][$prevTargetEditToSort ?? ''] ?? [];
 
+        // Get 'now'-dictionary data for current segment
         $now['source'] = $same['source']['now'][$segment->getSourceToSort()];
         $now['target'] = $same['target']['now'][$segment->getTargetEditToSort()];
 
-        // If we now have same sources for different targets - apply 'Inconsistent target' state
-        if (count($now['source']) > 1) {
+        // Foreach [category => prop] pair
+        foreach ([self::SOURCE => 'target', self::TARGET => 'source'] as $category => $prop) {
 
-            // If same sources qty is now exactly 2, it means we need to append
-            // same quality to the segment, that current segment is same as
-            if (count($now['source']) == 2) {
+            // Reset arrays
+            $now['merged'] = $was['merged'] = [];
 
-                // So we merge arrays of ids of segments having same sources
-                $merged = []; foreach ($now['source'] as $idA) $merged += $idA;
+            // If we have same targets for different sources - apply 'Inconsistent source' state
+            if (count($now[$prop]) > 1) {
 
-                // Unset current one
-                unset($merged[$segment->getId()]);
-
-                // And get single one remaining
-                $this->states[self::TARGET] = key($merged);
-
-            // Else just pust state
-            } else {
-                $this->states[self::TARGET] = true;
-            }
-
-        // Else if current segment was involved in the same sources plenty, and that plenty size was exactly 2
-        // it mean that we need remove same quality from remaining segment
-        } else if (count($was['source'] ?? []) == 2) {
-
-            // So we merge arrays of ids of segments having same sources
-            $merged = []; foreach ($was['source'] as $idA) $merged += $idA;
-
-            // Unset current one
-            unset($merged[$segment->getId()]);
-
-            // And get single one remaining, with negative sign, indicating that
-            // we need to remove state (quality category) from that segment
-            $this->states[self::TARGET] = key($merged) * -1;
-        }
-
-        // If we have same targets for different sources - apply 'Inconsistent source' state
-        if (count($now['target']) > 1) {
-
-            // If same targets qty is now exactly 2, it means we need to append
-            // same quality to the segment, that current segment is same as
-            if (count($now['target']) == 2) {
+                // Key 'own' mean that we need to add $category-quality to the current segment independently
+                // on whether we'll additionally need to add/remove that quality to/from other segments
+                $this->states[$category]['own'] = true;
 
                 // So we merge arrays of ids of segments having same targets
-                $merged = []; foreach ($now['target'] as $idA) $merged += $idA;
+                foreach ($now[$prop] as $idA) $now['merged'] += $idA;
 
-                // Unset current one
-                unset($merged[$segment->getId()]);
+                // If 'same'-qty is now exactly 2, it means we need to append
+                // same quality to the segment, that current segment is same as
+                if (count($now[$prop]) == 2) {
 
-                // And get single one remaining
-                $this->states[self::SOURCE] = key($merged);
+                    // Unset current one
+                    unset($now['merged'][$segment->getId()]);
 
-            // Else just pust state
-            } else {
-                $this->states[self::SOURCE] = true;
+                    // And get single one remaining
+                    $this->states[$category]['ins'] = key($now['merged']);
+                }
             }
 
-        // Else if current segment was involved in the same targets plenty, and that plenty size was exactly 2
-        // it mean that we need remove same quality from remaining segment
-        } else if (count($was['target'] ?? []) == 2) {
+            // Else if current segment was counted in the 'same'-qty, and that qty
+            // was exactly 2 it mean that we need remove quality from remaining segment
+            if (count($was[$prop] ?? []) == 2) {
 
-            // So we merge arrays of ids of segments having same sources
-            $merged = []; foreach ($was['target'] as $idA) $merged += $idA;
+                // So we merge arrays of ids of segments having same sources
+                foreach ($was[$prop] as $idA) $was['merged'] += $idA;
 
-            // Unset current one
-            unset($merged[$segment->getId()]);
+                // Unset current one
+                unset($was['merged'][$segment->getId()]);
 
-            // And get single one remaining, with negative sign, indicating that
-            // we need to remove state (quality category) from that segment
-            $this->states[self::SOURCE] = key($merged) * -1;
+                // If $was['merged'] is equal to $now['merged'], it means that the change that was made to the target
+                // is not affecting the presence of current segment in 'same'-plenties
+                if (count($now['merged']) == count($was['merged'])
+                    && count($now['merged']) == count(array_intersect_key($now['merged'], $was['merged'])))
+                    continue;
+
+                // And get single one remaining, with negative sign, indicating that
+                // we need to remove state (quality category) from that segment
+                $this->states[$category]['del'] = key($was['merged']);
+            }
         }
+
+        class_exists('editor_Utils');
+        i($this->states);
+        i($was['target'], 'a');
+        i($now['target'], 'a');
     }
 
     /**

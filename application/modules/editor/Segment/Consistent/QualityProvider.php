@@ -97,38 +97,46 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
                     // Do check
                     $check = new editor_Segment_Consistent_Check($target, $segment);
-                    $states = $check->getStates();
-
-                    class_exists('editor_Utils');
-                    i($states, 'a');
 
                     // Process check results
-                    foreach ($states as $state => $segmentId) {
+                    foreach ($check->getStates() as $state => $info) {
 
                         //
-                        if (is_bool($segmentId) || $segmentId > 0) $tags->addQuality($target->getField(), static::$type, $state);
+                        if ($info['own'] ?? 0) $tags->addQuality($target->getField(), static::$type, $state);
 
-                        // If $segmentId is integer, it means we should add/remove quality to/from segment
-                        if (is_int($segmentId)) {
+                        //
+                        if ($info['ins'] ?? 0) {
 
                             // Load segment
-                            $_segment = ZfExtended_Factory::get('editor_Models_Segment'); $_segment->load(abs($segmentId));
+                            $_segment = ZfExtended_Factory::get('editor_Models_Segment'); $_segment->load($info['ins']);
 
                             // Get tags
                             $_tags = editor_Segment_Tags::fromSegment($task, $processingMode, $_segment, false);
 
                             // Foreach target
                             foreach ($_tags->getTargets() as $_target) {
-
-                                // If $segmentId is greater than 0, it means we should add quality
-                                if ($segmentId > 0) {
-                                    $_tags->addQuality($_target->getField(), static::$type, $state);
-
-                                // Else if $segmentId is less than 0, it means we should drop quality
-                                } else if ($segmentId < 0) {
-                                    $_tags->dropQuality($_target->getField(), static::$type, $state);
-                                }
+                                $_tags->addQuality($_target->getField(), static::$type, $state);
                             }
+
+                            //
+                            $_tags->flush();
+                        }
+
+                        //
+                        if ($info['del'] ?? 0) {
+
+                            // Load segment
+                            $_segment = ZfExtended_Factory::get('editor_Models_Segment'); $_segment->load($info['del']);
+
+                            // Get tags
+                            $_tags = editor_Segment_Tags::fromSegment($task, $processingMode, $_segment, false);
+
+                            // Foreach target
+                            foreach ($_tags->getTargets() as $_target) {
+                                $_tags->dropQuality($_target->getField(), static::$type, $state);
+                            }
+
+                            //
                             $_tags->flush();
                         }
                     }
