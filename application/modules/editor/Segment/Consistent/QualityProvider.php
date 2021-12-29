@@ -104,11 +104,11 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
                         //
                         if ($info['own'] ?? 0) $tags->addQuality($target->getField(), static::$type, $state);
 
-                        //
-                        if ($info['ins'] ?? 0) {
+                        // Foreach segmentId that quality should be added to
+                        foreach ($info['ins'] ?? [] as $ins) {
 
                             // Load segment
-                            $_segment = ZfExtended_Factory::get('editor_Models_Segment'); $_segment->load($info['ins']);
+                            $_segment = ZfExtended_Factory::get('editor_Models_Segment'); $_segment->load($ins);
 
                             // Get tags
                             $_tags = editor_Segment_Tags::fromSegment($task, $processingMode, $_segment, false);
@@ -118,15 +118,15 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
                                 $_tags->addQuality($_target->getField(), static::$type, $state);
                             }
 
-                            //
+                            // Flush changes
                             $_tags->flush();
                         }
 
-                        //
-                        if ($info['del'] ?? 0) {
+                        // Foreach segmentId that quality should be dropped from
+                        foreach ($info['del'] ?? [] as $del) {
 
                             // Load segment
-                            $_segment = ZfExtended_Factory::get('editor_Models_Segment'); $_segment->load($info['del']);
+                            $_segment = ZfExtended_Factory::get('editor_Models_Segment'); $_segment->load($del);
 
                             // Get tags
                             $_tags = editor_Segment_Tags::fromSegment($task, $processingMode, $_segment, false);
@@ -136,7 +136,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
                                 $_tags->dropQuality($_target->getField(), static::$type, $state);
                             }
 
-                            //
+                            // Flush changes
                             $_tags->flush();
                         }
                     }

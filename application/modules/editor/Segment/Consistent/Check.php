@@ -109,7 +109,7 @@ class editor_Segment_Consistent_Check {
 
                 // Key 'own' mean that we need to add $category-quality to the current segment independently
                 // on whether we'll additionally need to add/remove that quality to/from other segments
-                $this->states[$category]['own'] = true;
+                $this->states[$category]['own'] = $segment->getId();
 
                 // So we merge arrays of ids of segments having same targets
                 foreach ($now[$prop] as $idA) $now['merged'] += $idA;
@@ -122,13 +122,13 @@ class editor_Segment_Consistent_Check {
                     unset($now['merged'][$segment->getId()]);
 
                     // And get single one remaining
-                    $this->states[$category]['ins'] = key($now['merged']);
+                    $this->states[$category]['ins'] = array_keys($now['merged']);
                 }
             }
 
             // Else if current segment was counted in the 'same'-qty, and that qty
             // was exactly 2 it mean that we need remove quality from remaining segment
-            if (count($was[$prop] ?? []) == 2) {
+            if (count($was[$prop] ?? []) == 2 && count($now[$prop]) <= 2) {
 
                 // So we merge arrays of ids of segments having same sources
                 foreach ($was[$prop] as $idA) $was['merged'] += $idA;
@@ -144,7 +144,7 @@ class editor_Segment_Consistent_Check {
 
                 // And get single one remaining, with negative sign, indicating that
                 // we need to remove state (quality category) from that segment
-                $this->states[$category]['del'] = key($was['merged']);
+                $this->states[$category]['del'] = array_keys($was['merged']);
             }
         }
 
