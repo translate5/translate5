@@ -107,7 +107,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * @param string $path
      * @throws editor_Models_Import_DataProvider_Exception
      */
-    protected function mkdir(string $path) {
+    public function mkdir(string $path) {
         if(is_dir($path)){
             return;
         }
@@ -139,6 +139,13 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     protected function setTask(editor_Models_Task $task){
         $this->taskPath = $task->getAbsoluteTaskDataPath();
         $this->task = $task;
+    }
+
+    /***
+     * @return editor_Models_Task
+     */
+    public function getTask(){
+        return $this->task;
     }
 
     /**

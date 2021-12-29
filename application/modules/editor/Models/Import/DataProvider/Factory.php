@@ -108,6 +108,6 @@ class editor_Models_Import_DataProvider_Factory {
      */
     protected function isProjectUpload(array $data): bool
     {
-        return isset($data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_TYPE_NAME]);
+        return is_array($data['targetLang']) && count($data['targetLang']) > 1 && !empty($data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME]);
     }
 }

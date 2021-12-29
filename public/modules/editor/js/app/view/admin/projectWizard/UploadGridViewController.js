@@ -48,13 +48,15 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     onDragEnter:function (e){
         this.handleDropZoneCss(true);
     },
+    /***
+     * Remove selected files from the upload grid
+     */
     removeFiles: function() {
         var me = this,
             grid = me.getView(),
             store = grid.getStore(),
             items,
-            view = me.getView(),
-            container = view.up('#taskSecondCardContainer'),
+            container = grid.up('#taskSecondCardContainer'),
             sourceField = container.down('#sourceLangaugeTaskUploadWizard'),
             targetField = container.down('#targetLangaugeTaskUploadWizard');
 
@@ -117,11 +119,12 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                 readFile = reader.target.result;
                 source = readFile.match(/<file[^>]+source-language=["']([^"']+)["']/i);
                 if(source) {
-                    rec.set('sourceLang', source[1]);
+                    // convert the rfc to id
+                    rec.set('sourceLang', Ext.StoreMgr.get('admin.Languages').getIdByRfc(source[1]));
                 }
                 target = readFile.match(/<file[^>]+target-language=["']([^"']+)["']/i);
                 if(target) {
-                    rec.set('targetLang', target[1]);
+                    rec.set('targetLang', Ext.StoreMgr.get('admin.Languages').getIdByRfc(target[1]));
                 }
 
                 me.validateLanguages(rec);
@@ -152,7 +155,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             targetField = container.down('#targetLangaugeTaskUploadWizard'),
             relaisLang = container.down('#relaisLangaugeTaskUploadWizard'),
             errorMsg = null,
-
             isBilingual = !(Ext.isEmpty(sl) && Ext.isEmpty(tl));// no langauge detection in the file -> bilingual. The extension validation is done before.
 
 

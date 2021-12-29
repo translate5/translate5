@@ -60,7 +60,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         },
         scope: 'controller'
     },
-    // CLICK / PROOF OF CONCEPT DUMMY FOR CONCEPTION, CLEAN UP, FIX TRANSLATIONS!
+
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
@@ -69,7 +69,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                 sortableColumns:false,
                 tbar: [{
                     xtype: 'wizardFileButton',
-                    text: 'Add work file(s)',
+                    text: '#UT#Add work file(s)',
                     name:'workFilesFilesButton',
                     bind: {
                         disabled: '{isZipUpload}'
@@ -79,7 +79,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     }
                 },{
                     xtype: 'wizardFileButton',
-                    text: 'Add pivot file(s)',
+                    text: '#UT#Add pivot file(s)',
                     name:'pivotFilesFilesButton',
                     bind: {
                         disabled: '{isZipUpload}'
@@ -91,7 +91,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'tbseparator'
                 },{
                     xtype: 'button',
-                    text: 'remove file',
+                    text: '#UT#Remove file',
                     handler: 'removeFiles',
                     bind: {
                         disabled: '{!uploadgrid.selection}'
@@ -108,8 +108,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                         return res.join(' ');
                     }
                 },
-                //FIXME disable manual sort in general!
-
                 selModel: {
                     selType: 'checkboxmodel'
                 },
@@ -118,12 +116,12 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     width: 140,
                     dataIndex: 'targetLang',
                     renderer:me.langRenderer,
-                    text: 'Target Language'
+                    text: '#UT#Target Language'
                 },{
                     xtype: 'gridcolumn',
                     dataIndex: 'name',
                     flex: 1,
-                    text: 'File'
+                    text: '#UT#File'
                 },{
                     xtype: 'gridcolumn',
                     width: 90,
@@ -136,13 +134,13 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     },
                     dataIndex: 'type',
                     tdCls: 'type',
-                    text: 'Type'
+                    text: '#UT#Type'
                 },{
                     xtype: 'gridcolumn',
                     width: 90,
                     formatter: 'fileSize',
                     dataIndex: 'size',
-                    text: 'Size'
+                    text: '#UT#Size'
                 }]
             };
         

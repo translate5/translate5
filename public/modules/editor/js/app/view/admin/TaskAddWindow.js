@@ -79,7 +79,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         btnSkip:'#UT#Importieren (weitere überspringen)',
         importDefaultsButtonText:'#UT#Importieren (Standards nutzen)',
         description: '#Projektbeschreibung',
-        autoRemovedUploadFilesWarningMessage:'#UT#All matching bilingual files for this language are removed from the upload grid'
+        autoRemovedUploadFilesWarningMessage:'#UT#All matching bilingual files for this language are removed from the upload grid',
+        allFilesAreBilingualLanguageMessage:'#UT#All of the uploaded files are bilingual and can not be mapped to the selected language'
     },
     modal : true,
     layout: 'anchor',

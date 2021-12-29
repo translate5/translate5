@@ -33,16 +33,12 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewModel', {
         files: {
             model:'Editor.model.admin.projectWizard.File',
             sorters: [{
-                // use the transform or sorterFn function to return the rfc value for the language to the here stored ID
-                property: 'targetLang',
+                sorterFn: function(record1, record2) {
+                    var name1 = Ext.StoreMgr.get('admin.Languages').getRfcById(record1.data.targetLang),
+                        name2 = Ext.StoreMgr.get('admin.Languages').getRfcById(record2.data.targetLang);
+                    return name1 > name2 ? 1 : (name1 === name2) ? 0 : -1;
+                },
                 direction: 'ASC'
-            },{
-                property: 'file',
-                direction: 'ASC'
-            },{
-                property: 'type',
-                // direction DESC is sufficient to sort pivot files under the same named workflows, with additional types we may use a sorterFn here
-                direction: 'DESC'
             }]
         }
     }

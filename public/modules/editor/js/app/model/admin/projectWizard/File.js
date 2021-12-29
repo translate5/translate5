@@ -48,23 +48,9 @@ Ext.define('Editor.model.admin.projectWizard.File', {
     },{
         name: 'type'
     },{
-        type: 'int',
-        name: 'sourceLang',
-        convert:function (val){
-            if(!val){
-                return '';
-            }
-            return Ext.StoreManager.get('admin.Languages').getIdByRfc(val);
-        }
+        name: 'sourceLang'
     },{
-        type: 'int',
-        name: 'targetLang',
-        convert:function (val){
-            if(!val){
-                return '';
-            }
-            return Ext.StoreManager.get('admin.Languages').getIdByRfc(val);
-        }
+        name: 'targetLang'
     },{
         name: 'error'
     },{
