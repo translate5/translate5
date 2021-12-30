@@ -61,7 +61,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
      * @return bool
      */
     public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
-        return true;//$qualityConfig->enableSegmentConsistentCheck == 1;
+        return $qualityConfig->enableSegmentConsistentCheck == 1;
     }
 
     /**
@@ -70,82 +70,62 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
      * {@inheritDoc}
      * @see editor_Segment_Quality_Provider::processSegment()
      */
-    public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
-
+    public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags
+    {
         // If this check is turned Off in config - return $tags
         if (!$qualityConfig->enableSegmentConsistentCheck == 1) {
-            //return $tags;
+            return $tags;
         }
 
-        // If processing mode is 'alike'
+        // If processing mode is 'alike' - the only task in an alike process is cloning the qualities
         if ($processingMode == editor_Segment_Processing::ALIKE) {
-            
-            // the only task in an alike process is cloning the qualities ...
             $tags->cloneAlikeQualitiesByType(static::$type);
+        }
+
+        // Return tags
+        return $tags;
+    }
+
+    /**
+     * Check task segments against quality
+     *
+     * {@inheritDoc}
+     * @see editor_Segment_Quality_Provider::processSegments()
+     */
+    public function processSegments(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
+
+        // If this check is turned Off in config - return $tags
+        if (!$qualityConfig->enableSegmentConsistentCheck == 1) return;
 
         // Else
-        } else if ($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode)) {
+        if (!($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode)))
+            return;
 
-            // Get segment shortcut
-            $segment = $tags->getSegment();
+        // Get check object, containing detected quality categories
+        $check = new editor_Segment_Consistent_Check($task);
 
-            // Foreach target
-            foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
+        // Drop task's existing qualities of `type` = `consistent`
+        $task->clearQualitiesByType(editor_Segment_Consistent_QualityProvider::qualityType());
 
-                // If the target is empty, we do not need to check
-                if (!$target->isEmpty()) {
+        // Process check results
+        foreach ($check->getStates() as $segmentId => $qualityCategoryA) {
 
-                    // Do check
-                    $check = new editor_Segment_Consistent_Check($target, $segment);
+            // Load segment
+            $_segment = ZfExtended_Factory::get('editor_Models_Segment'); $_segment->load($segmentId);
 
-                    // Process check results
-                    foreach ($check->getStates() as $state => $info) {
+            // Get tags
+            $_tags = editor_Segment_Tags::fromSegment($task, $processingMode, $_segment, false);
 
-                        //
-                        if ($info['own'] ?? 0) $tags->addQuality($target->getField(), static::$type, $state);
-
-                        // Foreach segmentId that quality should be added to
-                        foreach ($info['ins'] ?? [] as $ins) {
-
-                            // Load segment
-                            $_segment = ZfExtended_Factory::get('editor_Models_Segment'); $_segment->load($ins);
-
-                            // Get tags
-                            $_tags = editor_Segment_Tags::fromSegment($task, $processingMode, $_segment, false);
-
-                            // Foreach target
-                            foreach ($_tags->getTargets() as $_target) {
-                                $_tags->addQuality($_target->getField(), static::$type, $state);
-                            }
-
-                            // Flush changes
-                            $_tags->flush();
-                        }
-
-                        // Foreach segmentId that quality should be dropped from
-                        foreach ($info['del'] ?? [] as $del) {
-
-                            // Load segment
-                            $_segment = ZfExtended_Factory::get('editor_Models_Segment'); $_segment->load($del);
-
-                            // Get tags
-                            $_tags = editor_Segment_Tags::fromSegment($task, $processingMode, $_segment, false);
-
-                            // Foreach target
-                            foreach ($_tags->getTargets() as $_target) {
-                                $_tags->dropQuality($_target->getField(), static::$type, $state);
-                            }
-
-                            // Flush changes
-                            $_tags->flush();
-                        }
-                    }
+            // Foreach target - add qualities
+            foreach ($_tags->getTargets() as $_target) {
+                foreach ($qualityCategoryA as $qualityCategoryI) {
+                    $_tags->addQuality($_target->getField(), static::$type, $qualityCategoryI);
                 }
             }
-        }
 
-        // Return
-        return $tags;
+            // Flush changes
+            $_tags->flush();
+        }
     }
 
     /**

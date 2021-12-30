@@ -1319,4 +1319,19 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->faultySegmentsCache[$this->getId()];
     }
+
+    /**
+     * Drop task's existing qualities of `type` = `consistent`
+     */
+    public function clearQualitiesByType(string $type) {
+        $this->db->getAdapter()->query('
+            DELETE FROM `LEK_segment_quality`
+            WHERE 1
+              AND `taskGuid` = ?
+              AND `type` = ?
+        ', [
+            $this->getTaskGuid(),
+            $type
+        ]);
+    }
 }

@@ -99,7 +99,18 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         return $tags;
     }
-    
+
+    /**
+     * Update qualities for cases when we need full list of task's segments to be analysed for quality detection
+     *
+     * @param editor_Models_Task $task
+     * @param Zend_Config $qualityConfig: the quality configuration as defined in runtimeOptions.autoQA.XXX
+     * @param string $processingMode
+     */
+    public function processSegments(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
+
+    }
+
     /* *************** Translation API *************** */
     
     /**

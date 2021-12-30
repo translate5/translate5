@@ -113,6 +113,9 @@ class editor_Models_Segment_Updater {
 
         //update the segment finish count for the current workflow step
         $this->task->changeSegmentFinishCount($this->task, $segment->getAutoStateId(), $history->getAutoStateId());
+
+        // Update qualities for cases when we need full list of task's segments to be analysed for quality detection
+        editor_Segment_Quality_Manager::instance()->processSegments($this->task, editor_Segment_Processing::EDIT);
     }
     
     /**
