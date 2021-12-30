@@ -79,7 +79,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         btnSkip:'#UT#Importieren (weitere überspringen)',
         importDefaultsButtonText:'#UT#Importieren (Standards nutzen)',
         description: '#Projektbeschreibung',
-        autoRemovedUploadFilesWarningMessage:'#UT#All matching bilingual files for this language are removed from the upload grid'
+        autoRemovedUploadFilesWarningMessage:'#UT#All matching bilingual files for this language are removed from the upload grid',
+        allFilesAreBilingualLanguageMessage:'#UT#All of the uploaded files are bilingual and can not be mapped to the selected language'
     },
     modal : true,
     layout: 'anchor',
@@ -176,26 +177,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         itemId: 'taskMainCard',
                         importType:'import',
                         scrollable:'y',
-                        listeners: {
-                            //TODO: is this Thomas stuff ?
-                            XXXdrop: {
-                                element: 'el',
-                                fn: 'onMainCardDrop'
-                            }
-                        },
-                        onMainCardDrop: function(e) {
-                            var dt = new DataTransfer(),
-                                be = e.browserEvent,
-                                bedt = be && be.dataTransfer,
-                                file =  bedt.files && bedt.files[0],
-                                fileField = this.down('filefield[name="importUpload"]');
-                            if(!file) {
-                                return;
-                            }
-                            dt.items.add(file);
-                            fileField.fileInputEl.dom.files = dt.files;
-                            fileField.onFileChange(null, null, file.name);
-                        },
                         items:[{
                             xtype: 'form',
                             padding: 5,

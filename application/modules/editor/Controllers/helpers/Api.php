@@ -62,4 +62,19 @@ class Editor_Controller_Helper_Api extends Zend_Controller_Action_Helper_Abstrac
         $languageParameter = $language->getId();
         return $language;
     }
+
+    /**+
+     * Sorts the given langauges array alphabetically.
+     *
+     * @param array $languages language ids
+     */
+    public function sortLanguages(array &$languages){
+        if(empty($languages)){
+            return [];
+        }
+        $model = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $model editor_Models_Languages */
+        $return = $model->loadByIds(implode(',',$languages));
+        $languages = array_column($return,'id');
+    }
 }

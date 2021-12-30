@@ -1358,7 +1358,7 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id="SW1wb3J0IERhdGVpwrk="><source>Import Datei¹</source><target>Import file¹</target></trans-unit>
 <trans-unit id="QXVmdHJhZ3NudW1tZXI="><source>Auftragsnummer</source><target>Order number</target></trans-unit>
 <trans-unit id="UHJvamVrdG5hbWUgKGZyZWkgd8OkaGxiYXIsIEFuZ2FiZSBub3R3ZW5kaWcp"><source>Projektname (frei wählbar, Angabe notwendig)</source><target>Task name (user-selectable, required)</target></trans-unit>
-<trans-unit id="UHJvamVrdG5hbWXCuQ=="><source>Projektname¹</source><target>Task name¹</target></trans-unit>
+<trans-unit id="UHJvamVrdG5hbWXCuQ=="><source>Projektname¹</source><target>Project name¹</target></trans-unit>
 <trans-unit id="UXVlbGxzcHJhY2hlIGRlcyBQcm9qZWt0ZXMgKEFuZ2FiZSBub3R3ZW5kaWcp"><source>Quellsprache des Projektes (Angabe notwendig)</source><target>Source language of the task (required)</target></trans-unit>
 <trans-unit id="UXVlbGxzcHJhY2hlwrk="><source>Quellsprache¹</source><target>Source language¹</target></trans-unit>
 <trans-unit id="WmllbHNwcmFjaGUgZGVzIFByb2pla3RlcyAoQW5nYWJlIG5vdHdlbmRpZyk="><source>Zielsprache des Projektes (Angabe notwendig)</source><target>Target language of the task (required)</target></trans-unit>

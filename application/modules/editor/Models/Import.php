@@ -59,7 +59,7 @@ class editor_Models_Import {
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $this->importConfig = ZfExtended_Factory::get('editor_Models_Import_Configuration');
     }
-    
+
     /**
      * führt den Import aller Dateien eines Task durch
      * @param string $importFolderPath
@@ -104,7 +104,7 @@ class editor_Models_Import {
         }
         catch (Exception $e) {
             //the DP exception handler is only needed before we have a valid task in the database, 
-            // after that the clean up is done implicitly by deleting the erroneous task, which is not possible before.
+            // after that the cleanup is done implicitly by deleting the erroneous task, which is not possible before.
             $this->task->setErroneous();
             $dataProvider->handleImportException($e);
             throw $e;

@@ -1098,7 +1098,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             win = me.getTaskAddWindow(),
             grid = me.getWizardUploadGrid(),
             formData = new FormData(),
-            form = me.getTaskAddForm();
+            form = me.getTaskAddForm(),
+            params = form.getForm().getValues();
 
         if (!form.isValid()) {
             return;
@@ -1109,12 +1110,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         grid.getStore().each(function(record) {
             if(record.get('type') !== 'error'){
                 // Add file to AJAX request
-                //FIXME append only files where the type is a processable one(workfile/pivotfile) at the moment.
                 formData.append('importUpload[]', record.get('file'), record.get('name'));
                 formData.append('importUpload_language[]', record.get('targetLang'));
                 formData.append('importUpload_type[]', record.get('type'));
             }
         });
+
+        me.fireEvent('beforeCreateTask',params , formData);
 
         //INFO: this will convert array to coma separated values requires additional handling on backend. We do not want that
         // Ext.Object.each(form.getForm().getValues(), function(property, value){
@@ -1122,8 +1124,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         // });
 
         Ext.Ajax.request({
-            params:form.getForm().getValues(),// send all other form fields as json params to skip the formdata parameter conversions
+            params:params,// send all other form fields as json params to skip the formdata parameter conversions
             rawData: formData,
+            method:'POST',
             headers: {'Content-Type':null}, //to use content type of FormData
             url: Editor.data.restpath + 'task',
             success: function (response, opts) {
@@ -1145,7 +1148,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 
                 win.setLoading(false);
 
-                if (response.status === 422) {
+                if (response.status === 422 || !Ext.isEmpty(resp.errorsTranslated)) {
                     win.getLayout().setActiveItem('taskMainCard');
                     win.getViewModel().set('activeItem', win.down('#taskMainCard'));
                     form.markInvalid(resp.errorsTranslated);

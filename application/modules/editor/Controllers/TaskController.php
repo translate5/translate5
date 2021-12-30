@@ -600,6 +600,9 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->_helper->Api->convertLanguageParameters($target);
         }
 
+        // sort the langauges alphabetically
+        $this->_helper->Api->sortLanguages($this->data['targetLang']);
+
         //task is handled as a project (one source language, multiple target languages, each combo one own task)
         if(count($this->data['targetLang']) > 1) {
             //with multiple target languages, the current task will be a project!
@@ -884,6 +887,8 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             $this->handleIntegrityConstraint($e);
+        }catch(editor_Models_Import_DataProvider_Exception $e) {
+            $this->handleDataProviderException($e);
         }
     }
 
@@ -921,6 +926,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * @param ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_UnprocessableEntity
+     * @throws ZfExtended_ErrorCodeException
      */
     protected function handleIntegrityConstraint(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
         //check if the error comes from the customer assoc or not
@@ -930,6 +936,17 @@ class editor_TaskController extends ZfExtended_RestController {
         throw ZfExtended_UnprocessableEntity::createResponse('E1064', [
             'customerId' => 'Der referenzierte Kunde existiert nicht (mehr)'
         ], [], $e);
+    }
+
+    /***
+     * @param editor_Models_Import_DataProvider_Exception $e
+     * @return mixed
+     * @throws ZfExtended_ErrorCodeException
+     */
+    protected function handleDataProviderException(editor_Models_Import_DataProvider_Exception $e){
+        throw ZfExtended_Models_Entity_Conflict::createResponse('E1369',[
+            'targetLang[]' => 'No work files found for one of the target langauges. This happens when the user select multiple target languaes in the dropdown, and after this drug and drop bilingual file.',
+        ],[],$e);
     }
 
     /**
@@ -2161,13 +2178,6 @@ class editor_TaskController extends ZfExtended_RestController {
 
         foreach($this->data['targetLang'] as $target) {
             $task = clone $this->entity;
-
-            $dp = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Project',[
-                $upload->getFiles(),
-                $this->data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME],
-                $this->data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_TYPE_NAME]
-            ]);
-            /* @var $dp editor_Models_Import_DataProvider_Project  */
 
             $task->setProjectId($entityId);
             $task->setTaskType($task::INITIAL_TASKTYPE_PROJECT_TASK);
