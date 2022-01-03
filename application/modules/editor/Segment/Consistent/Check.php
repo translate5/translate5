@@ -54,21 +54,16 @@ class editor_Segment_Consistent_Check {
      */
     public function __construct(editor_Models_Task $task) {
 
-        // Get all segments in current task
-        $segmentA = ZfExtended_Factory
-            ::get('editor_Models_Segment')
-            ->getMaterializedViewData($task->getTaskGuid()); class_exists('editor_Utils');
+        // Get arrays of comma-separated ids of segments having inconsistent sources/targets
+        $detected = $task->getInconsistentSegmentIds(); class_exists('editor_Utils');
 
-        // Build the dictionaries with the info regarding same sources/targets for different targets/sources
-        foreach ($segmentA as $segmentI) {
-            $same['source'][$segmentI['source']][$segmentI['target']][$segmentI['id']] = true;
-            $same['target'][$segmentI['target']][$segmentI['source']][$segmentI['id']] = true;
-        }
-
-        // Foreach serment
-        foreach ($segmentA as $segmentI) {
-            if (count($same['target'][$segmentI['target']]) > 1) $this->states[$segmentI['id']] []= 'source';
-            if (count($same['source'][$segmentI['source']]) > 1) $this->states[$segmentI['id']] []= 'target';
+        // Collect states for each segmentId
+        foreach ($detected as $category => $segmentIdListA) {
+            foreach ($segmentIdListA as $list) {
+                foreach (explode(',', $list) as $segmentId) {
+                    $this->states[$segmentId] []= $category;
+                }
+            }
         }
     }
 

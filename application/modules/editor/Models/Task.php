@@ -1334,4 +1334,42 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $type
         ]);
     }
+
+    /**
+     * Get ids of segments having inconsistent sources or targets, with respect to task's 'enableSourceEditing' option
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getInconsistentSegmentIds() {
+
+        // Get materialized view
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
+        $mv->setTaskGuid($this->getTaskGuid());
+
+        // Col names
+        $col['target'] = 'targetEditToSort';
+        $col['source'] = $this->getEnableSourceEditing() ? 'sourceEditToSort' : 'sourceToSort';
+
+        // Get ids of segments having inconsistent targets
+        $result['target'] = $this->db->getAdapter()->query('
+            SELECT GROUP_CONCAT(`id`) AS `ids`
+            FROM `' . $mv->getName() . '` 
+            WHERE `' . $col['target'] . '` != "" AND `' . $col['source'] . '` != ""
+            GROUP BY `' . $col['source'] . '`
+            HAVING COUNT(DISTINCT `' . $col['target'] . '`) > 1
+        ')->fetchAll(PDO::FETCH_COLUMN);
+
+        // Get ids of segments having inconsistent sources
+        $result['source'] = $this->db->getAdapter()->query('
+            SELECT GROUP_CONCAT(`id`) AS `ids`
+            FROM `' . $mv->getName() . '` 
+            WHERE `' . $col['source'] . '` != "" AND `' . $col['target'] . '` != "" 
+            GROUP BY `' . $col['target'] . '`
+            HAVING COUNT(DISTINCT `' . $col['source'] . '`) > 1        
+        ')->fetchAll(PDO::FETCH_COLUMN);
+
+        // Return
+        return $result;
+    }
 }

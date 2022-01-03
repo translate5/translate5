@@ -1845,29 +1845,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         return $adapter->query($sql)->fetchAll();
     }
 
-    /**
-     * Get of task's materialized view data, sufficient for qualities detection
-     *
-     * @param string|null $taskGuid
-     * @return array
-     * @throws Zend_Db_Statement_Exception
-     */
-    public function getMaterializedViewData(string $taskGuid = null) {
-        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
-        $mv->setTaskGuid(func_num_args() ? $taskGuid : $this->getTaskGuid());
-        $viewName = $mv->getName();
-        return $this->db->getAdapter()->query('
-            SELECT 
-              `id`, 
-              `sourceToSort` AS `source`, 
-              `targetEditToSort` AS `target`
-            FROM ' . $viewName . '
-            WHERE 1
-              AND `sourceToSort` != ""
-              AND `targetEditToSort` != ""  
-        ')->fetchAll();
-    }
-
     /***
      * Unset row data columns which are not existing in the $dbWritable
      */
