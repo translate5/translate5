@@ -265,6 +265,14 @@ final class editor_Segment_Quality_Manager {
         // save qualities
         editor_Models_Db_SegmentQuality::saveRows($qualities);
 
+        // Append qualities, that can be detected only after all segments are created
+        foreach($this->registry as $type => $provider){
+            /* @var $provider editor_Segment_Quality_Provider */
+            if (!$provider->hasOperationWorker($processingMode)) {
+                $tags = $provider->processSegments($task, $qualityConfig, $processingMode);
+            }
+        }
+
         $db->getAdapter()->commit();
     }
     /**
