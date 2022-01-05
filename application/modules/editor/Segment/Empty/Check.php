@@ -38,33 +38,41 @@ class editor_Segment_Empty_Check {
     private $states = [];
 
     /**
-     * 
-     * @param editor_Segment_FieldTags $fieldTags
+     * Check whether target is empty or contains only spaces, punctuation, or alike
+     *
+     * @param editor_Models_Task $task
+     * @param string $targetField
      * @param editor_Models_Segment $segment
      * @param string $chars
      */
-    public function __construct(editor_Segment_FieldTags $fieldTags, editor_Models_Segment $segment, string $chars) {
+    public function __construct(editor_Models_Task $task, $targetField, editor_Models_Segment $segment, string $chars) {
 
         // Get source text, strip tags, replace htmlentities, strip whitespace and punctuation chars
-        $source = $segment->getSourceToSort();
+        $source = $task->getEnableSourceEditing() ? $segment->getSourceEditToSort() : $segment->getSourceToSort();
         $source = strip_tags($source);
         $source = str_replace(['&lt;', '&gt;'], ['<', '>'], $source);
         $source = preg_replace('~[\s' .  preg_quote($chars, '~'). ']~', '', $source);
 
         // Get target text, strip tags, replace htmlentities, strip whitespace and punctuation chars
-        $target = $segment->getTargetEditToSort();
+        $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
         $target = strip_tags($target);
         $target = str_replace(['&lt;', '&gt;'], ['<', '>'], $target);
         $target = preg_replace('~[\s' .  preg_quote($chars, '~'). ']~', '', $target);
 
         // If $source is still non zero-length, but $target is  - flag it's empty
         if (!strlen($target) && strlen($source)) {
-            $this->states[] = editor_Segment_Empty_QualityProvider::$type;
+
+            // Get quality shortcut
+            $state = editor_Segment_Empty_QualityProvider::qualityType();
+
+            // Append to states
+            $this->states[$state] = $state;
         }
     }
 
     /**
      * Retrieves the evaluated states
+     *
      * @return string[]
      */
     public function getStates(){
@@ -72,7 +80,8 @@ class editor_Segment_Empty_Check {
     }
 
     /**
-     * 
+     * Check whether this instance has non-empty states array
+     *
      * @return boolean
      */
     public function hasStates() {
