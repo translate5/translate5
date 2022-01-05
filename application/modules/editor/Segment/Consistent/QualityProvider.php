@@ -116,12 +116,12 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
             // Get tags
             $_tags = editor_Segment_Tags::fromSegment($task, $processingMode, $_segment, false);
 
-            // Foreach target - add qualities
-            foreach ($_tags->getTargets() as $_target) {
+            // Add qualities for the whole segment rather than for each target
+            //foreach ($_tags->getTargets() as $_target) {
                 foreach ($qualityCategoryA as $qualityCategoryI) {
-                    $_tags->addQuality($_target->getField(), static::$type, $qualityCategoryI);
+                    $_tags->addQuality('target', static::$type, $qualityCategoryI);
                 }
-            }
+            //}
 
             // Flush changes
             $_tags->flush();
