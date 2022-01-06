@@ -1887,6 +1887,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='V2VubiBkZWFrdGl2aWVydCB3ZXJkZW4gZ2VzcGVycnRlIDEwMCUtTWF0Y2hlcyBuaWNodCBtZWhyIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4u'><source>Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.</source><target>Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.</target></trans-unit>
 <trans-unit id='UVMgU3RhdGlzdGlr'><source>QS Statistik</source><target>QS Statistik</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Interne Tags</target></trans-unit>
+<trans-unit id='TGVlcmUgU2VnbWVudGU='><source>Leere Segmente</source><target>Leere Segmente</target></trans-unit>
+<trans-unit id='RGFzIFppZWwgZW50aMOkbHQgbnVyIFRhZ3MsIExlZXJ6ZWljaGVuIG9kZXIgSW50ZXJwdW5rdGlvbiwgZGllIFF1ZWxsZSBqZWRvY2ggbmljaHQu'><source>Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.</source><target>Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.</target></trans-unit>
 <trans-unit id='VmVyYm90ZW4gaW4gWmllbA=='><source>Verboten in Ziel</source><target>Verboten in Ziel</target></trans-unit>
 <trans-unit id='VmVyYm90ZW4gaW4gUXVlbGxl'><source>Verboten in Quelle</source><target>Verboten in Quelle</target></trans-unit>
 <trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unbearbeiteter Fuzzy</target></trans-unit>
