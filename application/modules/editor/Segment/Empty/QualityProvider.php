@@ -34,7 +34,7 @@
 
 /**
  * 
- * The Quality provider 
+ * The Quality provider for the Empty segments Check
  * This class just provides the translations for the filter backend
  */
 class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provider {
@@ -154,15 +154,5 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
             return $this->translateType($translate);
         }
         return NULL;
-    }
-
-    /**
-     * Categories in this quality: no categories
-     *
-     * @param editor_Models_Task $task
-     * @return array
-     */
-    public function getAllCategories(editor_Models_Task $task) : array {
-        return [];
     }
 }
