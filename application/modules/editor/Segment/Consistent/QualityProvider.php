@@ -54,6 +54,13 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
     public static $hasCategories = true;
 
     /**
+     * Array of all task's qualities active before segment save
+     *
+     * @var array
+     */
+    public static $was = [];
+
+    /**
      * Method to check whether this quality is turned On
      *
      * @param Zend_Config $qualityConfig
@@ -95,37 +102,105 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
     public function processSegments(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
 
         // If this check is turned Off in config - return $tags
-        if (!$qualityConfig->enableSegmentConsistentCheck == 1) return;
+        if (!$qualityConfig->enableSegmentConsistentCheck == 1) {
+            return;
+        }
 
         // Else
-        if (!($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode)))
+        if (!($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode))) {
             return;
+        }
 
         // Get check object, containing detected quality categories
         $check = new editor_Segment_Consistent_Check($task);
 
-        // Drop task's existing qualities of `type` = `consistent`
-        $task->clearQualitiesByType(editor_Segment_Consistent_QualityProvider::qualityType());
-
         // Process check results
-        foreach ($check->getStates() as $segmentId => $qualityCategoryA) {
+        foreach ($check->getStates() as $segmentId => $nowCategoryA) {
 
-            // Load segment
-            $_segment = ZfExtended_Factory::get('editor_Models_Segment'); $_segment->load($segmentId);
+            // Get segment qualities that were active before segment was saved
+            $wasCategoryA = static::$was[$segmentId] ?? [];
 
-            // Get tags
-            $_tags = editor_Segment_Tags::fromSegment($task, $processingMode, $_segment, false);
+            // If there are qualities that should be added to the segment
+            if ($insCategoryA = array_diff($nowCategoryA, $wasCategoryA)) {
 
-            // Add qualities for the whole segment rather than for each target
-            //foreach ($_tags->getTargets() as $_target) {
-                foreach ($qualityCategoryA as $qualityCategoryI) {
-                    $_tags->addQuality('target', static::$type, $qualityCategoryI);
+                // Load segment
+                $_segment = ZfExtended_Factory::get('editor_Models_Segment');
+                $_segment->load($segmentId);
+
+                // Get tags
+                $_tags = editor_Segment_Tags::fromSegment($task, $processingMode, $_segment, false);
+
+                // Force existing qualities to be kept
+                foreach ($_tags->getQualities() as $quality) {
+                    $quality->processingState = 'keep';
                 }
-            //}
 
-            // Flush changes
-            $_tags->flush();
+                // Add new qualities
+                foreach ($insCategoryA as $insCategoryI) {
+                    $_tags->addQuality('target', static::$type, $insCategoryI);
+                }
+
+                // Flush changes
+                $_tags->flush();
+            }
         }
+
+        // Get SegmentQuality model shortcut
+        $sqm = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
+
+        // Foreach quality, that was active before segment was saved
+        foreach (static::$was as $segmentId => $wasCategoryA) {
+
+            // Get segment qualities that are still active after segment was saved
+            $nowCategoryA = $check->getStates()[$segmentId] ?? [];
+
+            // If there are qualities that should be removed from the segment
+            if ($delCategoryA = array_diff($wasCategoryA, $nowCategoryA)) {
+
+                // Drop qualities if need
+                $sqm->removeBySegmentAndType($segmentId, static::$type, $delCategoryA);
+
+                /*editor_Utils::db()->query('
+                    DELETE FROM `LEK_segment_quality` 
+                    WHERE 1
+                      AND `segmentId` = ? 
+                      AND `type` = ? 
+                      AND FIND_IN_SET(`category`, ?)
+                ', [
+                    $segmentId,
+                    static::$type,
+                    $delCategoryA
+                ]);*/
+            }
+        }
+    }
+
+    /**
+     * Do preparations for cases when we need full list of task's segments to be analysed for quality detection
+     * Currently it is used only for consistency-check to detect consistency qualities BEFORE segment is saved,
+     * so that it would be possible to do the same AFTER segment is saved, calculate the difference and insert/delete
+     * qualities on segments where needed
+     *
+     * {@inheritDoc}
+     * @see editor_Segment_Quality_Provider::processSegments()
+     */
+    public function preProcessSegments(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
+
+        // If this check is turned Off in config - return $tags
+        if (!$qualityConfig->enableSegmentConsistentCheck == 1) {
+            return;
+        }
+
+        // Else
+        if (!($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode))) {
+            return;
+        }
+
+        // Get check object, containing detected quality categories
+        $check = new editor_Segment_Consistent_Check($task);
+
+        // Remember active states before segment saved
+        static::$was = $check->getStates();
     }
 
     /**

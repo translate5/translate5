@@ -55,17 +55,18 @@ class editor_Segment_Consistent_Check {
     public function __construct(editor_Models_Task $task) {
 
         // Get arrays of comma-separated ids of segments having inconsistent sources/targets
-        $byCategory = $task->getInconsistentSegmentIds(); class_exists('editor_Utils');
+        $byCategory = $task->getInconsistentSegmentIds();
 
         // Collect states for each segmentId
-        foreach ($byCategory as $category => $byTarget)
-            foreach ($byTarget as $target => $segmentIdListA)
-                foreach ($segmentIdListA as $list)
-                    foreach (explode(',', $list) as $segmentId)
+        foreach ($byCategory as $category => $byTarget) {
+            foreach ($byTarget as $target => $segmentIdListA) {
+                foreach ($segmentIdListA as $list) {
+                    foreach (explode(',', $list) as $segmentId) {
                         $this->states[$segmentId][$category] = $category;
-
-        // Convert keys
-        foreach ($this->states as &$states) $states = array_values($states);
+                    }
+                }
+            }
+        }
     }
 
     /**

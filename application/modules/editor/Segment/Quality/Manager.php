@@ -304,6 +304,20 @@ final class editor_Segment_Quality_Manager {
             $provider->processSegments($task, $qualityConfig, $processingMode);
         }
     }
+
+    /**
+     * Do preparations for cases when we need full list of task's segments to be analysed for quality detection
+     *
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     */
+    public function preProcessSegments(editor_Models_Task $task, string $processingMode) {
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        foreach ($this->registry as $type => $provider) {
+            /* @var $provider editor_Segment_Quality_Provider */
+            $provider->preProcessSegments($task, $qualityConfig, $processingMode);
+        }
+    }
     /**
      * Alike Segments have a special processing as they clone some qualities from their original segment
      * @param editor_Models_Segment $segment

@@ -592,7 +592,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * internal
      * @return editor_Segment_Qualities
      */
-    private function getQualities() : editor_Segment_Qualities {
+    public function getQualities() : editor_Segment_Qualities {
         if($this->qualities == NULL){
             $this->qualities = new editor_Segment_Qualities($this->segmentId, $this->task->getTaskGuid(), $this->processingMode);
         }

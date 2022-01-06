@@ -1321,21 +1321,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * Drop task's existing qualities of `type` = `consistent`
-     */
-    public function clearQualitiesByType(string $type) {
-        $this->db->getAdapter()->query('
-            DELETE FROM `LEK_segment_quality`
-            WHERE 1
-              AND `taskGuid` = ?
-              AND `type` = ?
-        ', [
-            $this->getTaskGuid(),
-            $type
-        ]);
-    }
-
-    /**
      * Get ids of segments having inconsistent sources or targets, with respect to task's 'enableSourceEditing' option
      *
      * @return array
@@ -1355,6 +1340,21 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             ORDER BY CAST(REPLACE(`name`, "target", "") AS UNSIGNED)
         ', $this->getTaskGuid())->fetchAll(PDO::FETCH_COLUMN);
 
+        // For calculations of how big value of group_concat_max_len should be we assume the following:
+        // 1.100k is the real-life maximum qty of segments in a task
+        // 2.10% is the maximum fraction of segments that can have same target for different sources (or upside down)
+        // 3.Docs:
+        //   - Maximum Value (64-bit platforms)	18446744073709551615
+        //   - Maximum Value (32-bit platforms)	4294967295
+        //
+        // 1.If we rely on `id`, which is int(11), we need
+        //   100 000 * 10 000 000 000 / 10 = 100 000 000 000 000 = 100TB-length
+        // 2.If we rely on `segmentNrInTask`, we need
+        //   100 000 * 100 000 / 10 = 1 000 000 000 = 1GB-length
+
+        // Set group_concat_max_len to be ~ 4GB
+        $this->db->getAdapter()->query('SET @@session.group_concat_max_len = 4294967295');
+
         // Foreach target field
         foreach ($targetA as $targetI) {
 
@@ -1366,7 +1366,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $result['target'][$targetI] = $this->db->getAdapter()->query('
                 SELECT GROUP_CONCAT(`id`) AS `ids`
                 FROM `' . $mv->getName() . '` 
-                WHERE `' . $col['target'] . '` != "" AND `' . $col['source'] . '` != ""
+                WHERE `' . $col['target'] . '` != "" AND `' . $col['source'] . '` != "" #AND `pretrans` != "0"
                 GROUP BY `' . $col['source'] . '`
                 HAVING COUNT(DISTINCT `' . $col['target'] . '`) > 1
             ')->fetchAll(PDO::FETCH_COLUMN);
@@ -1375,7 +1375,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $result['source'][$targetI] = $this->db->getAdapter()->query('
                 SELECT GROUP_CONCAT(`id`) AS `ids`
                 FROM `' . $mv->getName() . '` 
-                WHERE `' . $col['source'] . '` != "" AND `' . $col['target'] . '` != "" 
+                WHERE `' . $col['source'] . '` != "" AND `' . $col['target'] . '` != "" #AND `pretrans` != "0" 
                 GROUP BY `' . $col['target'] . '`
                 HAVING COUNT(DISTINCT `' . $col['source'] . '`) > 1        
             ')->fetchAll(PDO::FETCH_COLUMN);
