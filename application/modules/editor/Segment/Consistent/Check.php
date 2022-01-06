@@ -50,19 +50,26 @@ class editor_Segment_Consistent_Check {
     private $states = [];
 
     /**
+     * Materialized view name
+     *
+     * @var null
+     */
+    public $mvName = null;
+
+    /**
      * @param editor_Models_Task $task
      */
     public function __construct(editor_Models_Task $task) {
 
         // Get arrays of comma-separated ids of segments having inconsistent sources/targets
-        $byCategory = $task->getInconsistentSegmentIds();
+        $byCategory = $this->getInconsistentSegmentNrsInTask($task);
 
         // Collect states for each segmentId
         foreach ($byCategory as $category => $byTarget) {
-            foreach ($byTarget as $target => $segmentIdListA) {
-                foreach ($segmentIdListA as $list) {
-                    foreach (explode(',', $list) as $segmentId) {
-                        $this->states[$segmentId][$category] = $category;
+            foreach ($byTarget as $target => $segmentNrInTaskListA) {
+                foreach ($segmentNrInTaskListA as $list) {
+                    foreach (explode(',', $list) as $segmentNrInTask) {
+                        $this->states[$segmentNrInTask][$category] = $category;
                     }
                 }
             }
@@ -83,5 +90,77 @@ class editor_Segment_Consistent_Check {
      */
     public function hasStates() {
         return count($this->states) > 0;
+    }
+
+    /**
+     * Get `segmentNrInTask`-values of segments having inconsistent sources or targets, with respect to task's 'enableSourceEditing' option
+     *
+     * @param editor_Models_Task $task
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getInconsistentSegmentNrsInTask(editor_Models_Task $task) {
+
+        // Get materialized view
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
+        $mv->setTaskGuid($task->getTaskGuid());
+
+        // Set materialized view name
+        $this->mvName = $mv->getName();
+
+        // Db adapter shortcut
+        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+
+        // Get target fields
+        $targetA = $db->query('
+            SELECT `name`
+            FROM `LEK_segment_field` 
+            WHERE `taskGuid` = ? AND `name` LIKE "target%"
+            ORDER BY CAST(REPLACE(`name`, "target", "") AS UNSIGNED)
+        ', $task->getTaskGuid())->fetchAll(PDO::FETCH_COLUMN);
+
+        // For calculations of how big value of group_concat_max_len should be we assume the following:
+        // 1.100k is the real-life maximum qty of segments in a task
+        // 2.10% is the maximum fraction of segments that can have same target for different sources (or upside down)
+        // 3.Docs:
+        //   - Maximum Value (64-bit platforms)	18446744073709551615
+        //   - Maximum Value (32-bit platforms)	4294967295
+        //
+        // 1.If we rely on `id`, which is int(11), we need
+        //   100 000 * 10 000 000 000 / 10 = 100 000 000 000 000 = 100TB-length
+        // 2.If we rely on `segmentNrInTask`, we need
+        //   100 000 * 100 000 / 10 = 1 000 000 000 = 1GB-length
+
+        // Set group_concat_max_len to be ~ 4GB
+        $db->query('SET @@session.group_concat_max_len = 4294967295');
+
+        // Foreach target field
+        foreach ($targetA as $targetI) {
+
+            // Col names
+            $col['target'] = $targetI . 'EditToSort';
+            $col['source'] = $task->getEnableSourceEditing() ? 'sourceEditToSort' : 'sourceToSort';
+
+            // Get ids of segments having inconsistent targets
+            $result['target'][$targetI] = $db->query('
+                SELECT GROUP_CONCAT(`segmentNrInTask`) AS `ids`
+                FROM `' . $this->mvName . '` 
+                WHERE `' . $col['target'] . '` != "" AND `' . $col['source'] . '` != ""
+                GROUP BY `' . $col['source'] . '`
+                HAVING COUNT(DISTINCT `' . $col['target'] . '`) > 1
+            ')->fetchAll(PDO::FETCH_COLUMN);
+
+            // Get ids of segments having inconsistent sources
+            $result['source'][$targetI] = $db->query('
+                SELECT GROUP_CONCAT(`segmentNrInTask`) AS `ids`
+                FROM `' . $this->mvName . '` 
+                WHERE `' . $col['source'] . '` != "" AND `' . $col['target'] . '` != "" 
+                GROUP BY `' . $col['target'] . '`
+                HAVING COUNT(DISTINCT `' . $col['source'] . '`) > 1        
+            ')->fetchAll(PDO::FETCH_COLUMN);
+        }
+
+        // Return
+        return $result;
     }
 }

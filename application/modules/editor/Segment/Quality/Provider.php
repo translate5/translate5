@@ -107,19 +107,19 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @param Zend_Config $qualityConfig: the quality configuration as defined in runtimeOptions.autoQA.XXX
      * @param string $processingMode
      */
-    public function processSegments(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
+    public function postProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
 
     }
 
     /**
      * Do preparations for cases when we need full list of task's segments to be analysed for quality detection
      *
-     * @see editor_Segment_Consistent_QualityProvider::preProcessSegments()
+     * @see editor_Segment_Consistent_QualityProvider::preProcessTask()
      * @param editor_Models_Task $task
      * @param Zend_Config $qualityConfig: the quality configuration as defined in runtimeOptions.autoQA.XXX
      * @param string $processingMode
      */
-    public function preProcessSegments(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
+    public function preProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
 
     }
 

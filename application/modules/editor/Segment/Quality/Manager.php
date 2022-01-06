@@ -269,7 +269,7 @@ final class editor_Segment_Quality_Manager {
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
             if (!$provider->hasOperationWorker($processingMode)) {
-                $tags = $provider->processSegments($task, $qualityConfig, $processingMode);
+                $tags = $provider->postProcessTask($task, $qualityConfig, $processingMode);
             }
         }
 
@@ -297,11 +297,11 @@ final class editor_Segment_Quality_Manager {
      * @param editor_Models_Task $task
      * @param string $processingMode
      */
-    public function processSegments(editor_Models_Task $task, string $processingMode) {
+    public function postProcessTask(editor_Models_Task $task, string $processingMode) {
         $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
         foreach ($this->registry as $type => $provider) {
             /* @var $provider editor_Segment_Quality_Provider */
-            $provider->processSegments($task, $qualityConfig, $processingMode);
+            $provider->postProcessTask($task, $qualityConfig, $processingMode);
         }
     }
 
@@ -311,11 +311,11 @@ final class editor_Segment_Quality_Manager {
      * @param editor_Models_Task $task
      * @param string $processingMode
      */
-    public function preProcessSegments(editor_Models_Task $task, string $processingMode) {
+    public function preProcessTask(editor_Models_Task $task, string $processingMode) {
         $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
         foreach ($this->registry as $type => $provider) {
             /* @var $provider editor_Segment_Quality_Provider */
-            $provider->preProcessSegments($task, $qualityConfig, $processingMode);
+            $provider->preProcessTask($task, $qualityConfig, $processingMode);
         }
     }
     /**
