@@ -34,7 +34,7 @@
 
 /**
  * 
- * The Quality provider 
+ * The Quality provider for the Empty segments Check
  * This class just provides the translations for the filter backend
  */
 class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provider {
@@ -92,6 +92,9 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
             // Get punctuation chars shortcut
             $chars = $qualityConfig->segmentPunctuationChars;
 
+            // Distinct states
+            $states = [];
+
             // Foreach target
             foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
 
@@ -99,13 +102,16 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
                 if (!$target->isEmpty()) {
 
                     // Do check
-                    $check = new editor_Segment_Empty_Check($target, $segment, $chars);
+                    $check = new editor_Segment_Empty_Check($task, $target->getField(), $segment, $chars);
 
-                    // Process check results
-                    foreach ($check->getStates() as $state) {
-                        $tags->addQuality($target->getField(), static::$type, $state);
-                    }
+                    // Collect distinct states
+                    $states += $check->getStates();
                 }
+            }
+
+            // Process check results
+            foreach ($states as $state) {
+                $tags->addQuality('target', static::$type, $state);
             }
         }
 
@@ -148,15 +154,5 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
             return $this->translateType($translate);
         }
         return NULL;
-    }
-
-    /**
-     * Categories in this quality: no categories
-     *
-     * @param editor_Models_Task $task
-     * @return array
-     */
-    public function getAllCategories(editor_Models_Task $task) : array {
-        return [];
     }
 }
