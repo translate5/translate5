@@ -98,10 +98,16 @@ class editor_Models_Segment_Updater {
         ));
         
         $this->updateMatchRateType();
-        
+
+        // Do preparations for cases when we need full list of task's segments to be analysed for quality detection
+        // Currently it is used only for consistency-check to detect consistency qualities BEFORE segment is saved,
+        // so that it would be possible to do the same AFTER segment is saved, calculate the difference and insert/delete
+        // qualities on segments where needed
+        editor_Segment_Quality_Manager::instance()->preProcessTask($this->task, editor_Segment_Processing::EDIT);
+
         // Update the Quality Tags
         editor_Segment_Quality_Manager::instance()->processSegment($this->segment, $this->task, editor_Segment_Processing::EDIT);
-        
+
         //saving history directly before normal saving,
         // so no exception between can lead to history entries without changing the master segment
         $history->save();
@@ -113,6 +119,9 @@ class editor_Models_Segment_Updater {
 
         //update the segment finish count for the current workflow step
         $this->task->changeSegmentFinishCount($this->task, $segment->getAutoStateId(), $history->getAutoStateId());
+
+        // Update qualities for cases when we need full list of task's segments to be analysed for quality detection
+        editor_Segment_Quality_Manager::instance()->postProcessTask($this->task, editor_Segment_Processing::EDIT);
     }
     
     /**

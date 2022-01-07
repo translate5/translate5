@@ -141,6 +141,9 @@ final class editor_Segment_Quality_Manager {
         // Empty
         $provider = new editor_Segment_Empty_QualityProvider();
         $this->registry[$provider->getType()] = $provider;
+        // Consistent
+        $provider = new editor_Segment_Consistent_QualityProvider();
+        $this->registry[$provider->getType()] = $provider;
     }
     /**
      * 
@@ -262,6 +265,14 @@ final class editor_Segment_Quality_Manager {
         // save qualities
         editor_Models_Db_SegmentQuality::saveRows($qualities);
 
+        // Append qualities, that can be detected only after all segments are created
+        foreach($this->registry as $type => $provider){
+            /* @var $provider editor_Segment_Quality_Provider */
+            if (!$provider->hasOperationWorker($processingMode)) {
+                $tags = $provider->postProcessTask($task, $qualityConfig, $processingMode);
+            }
+        }
+
         $db->getAdapter()->commit();
     }
     /**
@@ -279,6 +290,38 @@ final class editor_Segment_Quality_Manager {
         }
         $tags->flush();
     }
+    
+    /**
+     * Special API for qualities which can only be evaluated by processing all segments of a task
+     * This method is called BEFORE saving the segments and it's repetitions
+     * Operations like Import or Analyze will only have ::postProcessTask being called since there are no differences to be detected
+     *
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     */
+    public function preProcessTask(editor_Models_Task $task, string $processingMode) {
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        foreach ($this->registry as $type => $provider) {
+            /* @var $provider editor_Segment_Quality_Provider */
+            $provider->preProcessTask($task, $qualityConfig, $processingMode);
+        }
+    }
+    
+    /**
+     * Special API for qualities which can only be evaluated by processing all segments of a task
+     * This method is called AFTER saving the segments and it's repetitions
+     *
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     */
+    public function postProcessTask(editor_Models_Task $task, string $processingMode) {
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        foreach ($this->registry as $type => $provider) {
+            /* @var $provider editor_Segment_Quality_Provider */
+            $provider->postProcessTask($task, $qualityConfig, $processingMode);
+        }
+    }
+    
     /**
      * Alike Segments have a special processing as they clone some qualities from their original segment
      * @param editor_Models_Segment $segment
@@ -296,7 +339,6 @@ final class editor_Segment_Quality_Manager {
         }
         $tags->flush();
     }
-        
     /**
      * The central API to identify the needed Tag class by classnames and attributes
      * @param string $tagType
@@ -378,6 +420,21 @@ final class editor_Segment_Quality_Manager {
      */
     public function hasCategories(string $type) : bool {
         return $this->getProvider($type)->hasCategories();
+    }
+    /**
+     * Translates a Segment Quality category tooltip
+     * @param string $type
+     * @param string $category
+     * @param editor_Models_Task $task
+     * @throws ZfExtended_Exception
+     * @return string
+     */
+    public function translateQualityCategoryTooltip(string $type, string $category, editor_Models_Task $task) : string {
+        if ($this->hasProvider($type)) {
+            return $this->getProvider($type)->translateCategoryTooltip($this->getTranslate(), $category, $task);
+        }
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+        return '';
     }
     /**
      * Evaluates, if a quality of the given type renders tags in the tags texts
