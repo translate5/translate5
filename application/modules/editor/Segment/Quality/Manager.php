@@ -55,14 +55,30 @@ final class editor_Segment_Quality_Manager {
      */
     private static $_instance = null;
     /**
+     * Holds all quality provider classes before instantiation (which locks adding to this array)
+     * Here base quality checks that are always present / not being added by plugins are defined initially
      * @var string[]
      */
-    private static $_provider = [];
+    private static $_provider = [
+        'editor_Segment_Internal_Provider',
+        'editor_Segment_MatchRate_Provider',
+        'editor_Segment_Mqm_Provider',
+        'editor_Segment_Qm_Provider',
+        'editor_Segment_Length_QualityProvider',
+        'editor_Segment_Empty_QualityProvider',
+        'editor_Segment_Consistent_QualityProvider'
+    ];
     /**
      * @var boolean
      */
     private static $_locked = false;
-    
+    /**
+     * 
+     * @var string[]
+     */
+    private static $_baseProvider = [
+        
+    ];
     /**
      * Adds a Provider to the Quality manager
      * @param string $className
@@ -122,28 +138,6 @@ final class editor_Segment_Quality_Manager {
                 throw new ZfExtended_Exception('Quality Provider '.$providerClass.' does not exist');
             }
         }
-        // Some Base Providers that do not come from Plugins
-        // Tag Check
-        $provider = new editor_Segment_Internal_Provider();
-        $this->registry[$provider->getType()] = $provider;
-        // MatchRate
-        $provider = new editor_Segment_MatchRate_Provider();
-        $this->registry[$provider->getType()] = $provider;
-        // MQM
-        $provider = new editor_Segment_Mqm_Provider();
-        $this->registry[$provider->getType()] = $provider;
-        // QM
-        $provider = new editor_Segment_Qm_Provider();
-        $this->registry[$provider->getType()] = $provider;
-        // Length
-        $provider = new editor_Segment_Length_QualityProvider();
-        $this->registry[$provider->getType()] = $provider;
-        // Empty
-        $provider = new editor_Segment_Empty_QualityProvider();
-        $this->registry[$provider->getType()] = $provider;
-        // Consistent
-        $provider = new editor_Segment_Consistent_QualityProvider();
-        $this->registry[$provider->getType()] = $provider;
     }
     /**
      * 
