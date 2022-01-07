@@ -51,14 +51,14 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
      *
      * @var bool
      */
-    public static $hasCategories = true;
+    protected static $hasCategories = true;
 
     /**
-     * Array of all task's qualities active before segment save
+     * Cache of all task's qualities active before segment save
      *
      * @var array
      */
-    public static $was = [];
+    private static $was = [];
 
     /**
      * Method to check whether this quality is turned On

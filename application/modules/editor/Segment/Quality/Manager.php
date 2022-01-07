@@ -290,23 +290,11 @@ final class editor_Segment_Quality_Manager {
         }
         $tags->flush();
     }
-
+    
     /**
-     * Update qualities for cases when we need full list of task's segments to be analysed for quality detection
-     *
-     * @param editor_Models_Task $task
-     * @param string $processingMode
-     */
-    public function postProcessTask(editor_Models_Task $task, string $processingMode) {
-        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
-        foreach ($this->registry as $type => $provider) {
-            /* @var $provider editor_Segment_Quality_Provider */
-            $provider->postProcessTask($task, $qualityConfig, $processingMode);
-        }
-    }
-
-    /**
-     * Do preparations for cases when we need full list of task's segments to be analysed for quality detection
+     * Special API for qualities which can only be evaluated by processing all segments of a task
+     * This method is called BEFORE saving the segments and it's repetitions
+     * Operations like Import or Analyze will only have ::postProcessTask being called since there are no differences to be detected
      *
      * @param editor_Models_Task $task
      * @param string $processingMode
@@ -318,6 +306,22 @@ final class editor_Segment_Quality_Manager {
             $provider->preProcessTask($task, $qualityConfig, $processingMode);
         }
     }
+    
+    /**
+     * Special API for qualities which can only be evaluated by processing all segments of a task
+     * This method is called AFTER saving the segments and it's repetitions
+     *
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     */
+    public function postProcessTask(editor_Models_Task $task, string $processingMode) {
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        foreach ($this->registry as $type => $provider) {
+            /* @var $provider editor_Segment_Quality_Provider */
+            $provider->postProcessTask($task, $qualityConfig, $processingMode);
+        }
+    }
+    
     /**
      * Alike Segments have a special processing as they clone some qualities from their original segment
      * @param editor_Models_Segment $segment
@@ -335,7 +339,6 @@ final class editor_Segment_Quality_Manager {
         }
         $tags->flush();
     }
-        
     /**
      * The central API to identify the needed Tag class by classnames and attributes
      * @param string $tagType

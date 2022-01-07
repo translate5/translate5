@@ -99,6 +99,18 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         return $tags;
     }
+    
+    /**
+     * Do preparations for cases when we need full list of task's segments to be analysed for quality detection
+     * On Import and other operations, only ::postProcessTask is called since there are no differences to be detected
+     *
+     * @param editor_Models_Task $task
+     * @param Zend_Config $qualityConfig: the quality configuration as defined in runtimeOptions.autoQA.XXX
+     * @param string $processingMode
+     */
+    public function preProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
+        
+    }
 
     /**
      * Update qualities for cases when we need full list of task's segments to be analysed for quality detection
@@ -108,18 +120,6 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @param string $processingMode
      */
     public function postProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
-
-    }
-
-    /**
-     * Do preparations for cases when we need full list of task's segments to be analysed for quality detection
-     *
-     * @see editor_Segment_Consistent_QualityProvider::preProcessTask()
-     * @param editor_Models_Task $task
-     * @param Zend_Config $qualityConfig: the quality configuration as defined in runtimeOptions.autoQA.XXX
-     * @param string $processingMode
-     */
-    public function preProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
 
     }
 
