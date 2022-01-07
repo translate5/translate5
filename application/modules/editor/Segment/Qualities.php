@@ -93,12 +93,6 @@ final class editor_Segment_Qualities {
         }
         // error_log('PROCESS QUALITIES FOR SEGMENT '.$this->segmentId.', MODE '.$this->processingMode.', EXISTING: '.count($this->existing));
     }
-
-    public function drop(string $field, string $type, string $category, int $startIndex, int $endIndex, stdClass $additionalData=NULL) {
-        $quality = $this->findExistingByProps($field, $type, $category, $additionalData);
-        if ($quality) $quality->delete();
-    }
-
     /**
      * Adds a quality independently of a tag (usually do not use start & end index then)
      * NOTE that the $additopnal data only can be a flat Object !
@@ -136,6 +130,22 @@ final class editor_Segment_Qualities {
                 $quality->save();
             }
             $quality->processingState = 'keep';            
+        }
+    }
+    /**
+     * Drops a quality independently of a tag
+     * NOTE that the $additopnal data only can be a flat Object !
+     * @param string $field
+     * @param string $type
+     * @param string $category
+     * @param int $startIndex
+     * @param int $endIndex
+     * @param stdClass $additionalData
+     */
+    public function drop(string $field, string $type, string $category, int $startIndex, int $endIndex, stdClass $additionalData=NULL) {
+        $quality = $this->findExistingByProps($field, $type, $category, $additionalData);
+        if ($quality) {
+            $quality->delete();
         }
     }
     /**
