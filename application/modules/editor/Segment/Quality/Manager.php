@@ -73,13 +73,6 @@ final class editor_Segment_Quality_Manager {
      */
     private static $_locked = false;
     /**
-     * 
-     * @var string[]
-     */
-    private static $_baseProvider = [
-        
-    ];
-    /**
      * Adds a Provider to the Quality manager
      * @param string $className
      * @throws ZfExtended_Exception
