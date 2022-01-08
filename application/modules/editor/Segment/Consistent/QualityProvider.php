@@ -89,6 +89,13 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
             $tags->cloneAlikeQualitiesByType(static::$type);
         }
 
+        // Force existing qualities to be kept
+        foreach ($tags->getQualities()->getExisting() as $quality) {
+            if ($quality->type == self::$type) {
+                $quality->processingState = 'keep';
+            }
+        }
+
         // Return tags
         return $tags;
     }
@@ -131,7 +138,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
                 $_tags = editor_Segment_Tags::fromSegment($task, $processingMode, $_segment, false);
 
                 // Force existing qualities to be kept
-                foreach ($_tags->getQualities() as $quality) {
+                foreach ($_tags->getQualities()->getExisting() as $quality) {
                     $quality->processingState = 'keep';
                 }
 

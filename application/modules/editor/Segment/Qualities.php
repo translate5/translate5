@@ -347,4 +347,11 @@ final class editor_Segment_Qualities {
         }
         return NULL;
     }
+
+    /**
+     * @return editor_Models_Db_SegmentQualityRow[]
+     */
+    public function getExisting() {
+        return $this->existing;
+    }
 }
