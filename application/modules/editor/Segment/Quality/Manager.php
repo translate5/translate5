@@ -55,14 +55,23 @@ final class editor_Segment_Quality_Manager {
      */
     private static $_instance = null;
     /**
+     * Holds all quality provider classes before instantiation (which locks adding to this array)
+     * Here base quality checks that are always present / not being added by plugins are defined initially
      * @var string[]
      */
-    private static $_provider = [];
+    private static $_provider = [
+        'editor_Segment_Internal_Provider',
+        'editor_Segment_MatchRate_Provider',
+        'editor_Segment_Mqm_Provider',
+        'editor_Segment_Qm_Provider',
+        'editor_Segment_Length_QualityProvider',
+        'editor_Segment_Empty_QualityProvider',
+        'editor_Segment_Consistent_QualityProvider'
+    ];
     /**
      * @var boolean
      */
     private static $_locked = false;
-    
     /**
      * Adds a Provider to the Quality manager
      * @param string $className
@@ -122,28 +131,6 @@ final class editor_Segment_Quality_Manager {
                 throw new ZfExtended_Exception('Quality Provider '.$providerClass.' does not exist');
             }
         }
-        // Some Base Providers that do not come from Plugins
-        // Tag Check
-        $provider = new editor_Segment_Internal_Provider();
-        $this->registry[$provider->getType()] = $provider;
-        // MatchRate
-        $provider = new editor_Segment_MatchRate_Provider();
-        $this->registry[$provider->getType()] = $provider;
-        // MQM
-        $provider = new editor_Segment_Mqm_Provider();
-        $this->registry[$provider->getType()] = $provider;
-        // QM
-        $provider = new editor_Segment_Qm_Provider();
-        $this->registry[$provider->getType()] = $provider;
-        // Length
-        $provider = new editor_Segment_Length_QualityProvider();
-        $this->registry[$provider->getType()] = $provider;
-        // Empty
-        $provider = new editor_Segment_Empty_QualityProvider();
-        $this->registry[$provider->getType()] = $provider;
-        // Consistent
-        $provider = new editor_Segment_Consistent_QualityProvider();
-        $this->registry[$provider->getType()] = $provider;
     }
     /**
      * 
@@ -290,23 +277,11 @@ final class editor_Segment_Quality_Manager {
         }
         $tags->flush();
     }
-
+    
     /**
-     * Update qualities for cases when we need full list of task's segments to be analysed for quality detection
-     *
-     * @param editor_Models_Task $task
-     * @param string $processingMode
-     */
-    public function postProcessTask(editor_Models_Task $task, string $processingMode) {
-        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
-        foreach ($this->registry as $type => $provider) {
-            /* @var $provider editor_Segment_Quality_Provider */
-            $provider->postProcessTask($task, $qualityConfig, $processingMode);
-        }
-    }
-
-    /**
-     * Do preparations for cases when we need full list of task's segments to be analysed for quality detection
+     * Special API for qualities which can only be evaluated by processing all segments of a task
+     * This method is called BEFORE saving the segments and it's repetitions
+     * Operations like Import or Analyze will only have ::postProcessTask being called since there are no differences to be detected
      *
      * @param editor_Models_Task $task
      * @param string $processingMode
@@ -318,6 +293,22 @@ final class editor_Segment_Quality_Manager {
             $provider->preProcessTask($task, $qualityConfig, $processingMode);
         }
     }
+    
+    /**
+     * Special API for qualities which can only be evaluated by processing all segments of a task
+     * This method is called AFTER saving the segments and it's repetitions
+     *
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     */
+    public function postProcessTask(editor_Models_Task $task, string $processingMode) {
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        foreach ($this->registry as $type => $provider) {
+            /* @var $provider editor_Segment_Quality_Provider */
+            $provider->postProcessTask($task, $qualityConfig, $processingMode);
+        }
+    }
+    
     /**
      * Alike Segments have a special processing as they clone some qualities from their original segment
      * @param editor_Models_Segment $segment
@@ -335,7 +326,6 @@ final class editor_Segment_Quality_Manager {
         }
         $tags->flush();
     }
-        
     /**
      * The central API to identify the needed Tag class by classnames and attributes
      * @param string $tagType

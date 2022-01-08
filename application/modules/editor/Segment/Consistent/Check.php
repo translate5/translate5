@@ -28,8 +28,8 @@ END LICENSE AND COPYRIGHT
 
 /**
  * 
- * evaluates the quality state of a segment regarding length-restrictions
- * NOTE: Currently we only evaluate the pixel length and the fullfillment of the maxLength (either if a segment is longer or not long enough relative to the max-length
+ * Checks the consistency of translations: Segments with an identical target but different sources or with identical sources but different targets
+ * This Check can only be done for all segments of a task at once
  *
  */
 class editor_Segment_Consistent_Check {
