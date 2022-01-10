@@ -100,14 +100,14 @@ Ext.define('Editor.controller.CommentNavigation', {
      * Change existing remark in store or add new one
      */
     updateStore: function updateStore(remark, typeOfChange){
-        var cl=this.getCommentList();
-        var store=cl.store;
-        var vr=Ext.first('visualReviewPanel'); 
-        var existing =typeOfChange==='afterPostAction' ? store.getById(remark.id) : null;
+        var cl = this.getCommentList();
+        var store = cl.store;
+        var vr = Ext.first('visualReviewPanel'); 
+        var existing = typeOfChange === 'afterPostAction' ? store.getById(remark.id) : null;
         /** Update exsiting record - Why this way?
-        * store.data.replace() does not replace (at least in ExtJS-6.2.0)
-        * store.update(...) triggers request
-        * less sort operations
+         * store.data.replace() does not replace (at least in ExtJS-6.2.0)
+         * store.update(...) triggers request
+         * less sort operations
         */
         if(existing) {
             var old = existing.data, fresh = updated.data, changedProps = [], setOpts = {silent: true,commit: false}, prop;
@@ -123,11 +123,11 @@ Ext.define('Editor.controller.CommentNavigation', {
             remark = existing;
         } else {
             store.addSorted(remark);
-            if(remark.data.type === 'visualAnnotation') {
-                Ext.getStore('visualReviewAnnotations').add(remark)
-                var page = vr.iframeController.type === 'htmlscroller'
-                ? vr.getAnnotationController().getDomPages()[0]
-                : vr.iframeController.getPageByIndex(remark.get('page')-1);
+            if(remark.data.type === 'visualAnnotation' && !vr.hasVideo()) {
+                Ext.getStore('visualReviewAnnotations').add(remark);
+                var page = vr.iframeController.isScrollerType('htmlscroller')
+                    ? vr.getAnnotationController().getDomPages()[0]
+                    : vr.iframeController.getPageByIndex(remark.get('page') - 1);
                 vr.getAnnotationController().renderAnnotations(page);
             }
         }
@@ -137,14 +137,15 @@ Ext.define('Editor.controller.CommentNavigation', {
      * Remove remark from commentnav and where else it appears
      */
     removeRemark: function removeRemark(remarkId, remarkType){
-        var cl=this.getCommentList();
-        var store=cl.store;
+        var cl = this.getCommentList();
+        var store = cl.store;
         store.data.removeByKey(remarkId);
         if(remarkType === 'visualAnnotation') {
-            Ext.getStore('visualReviewAnnotations').data.removeByKey(remarkId)
-            var vr=Ext.first('visualReviewPanel');
-            var domEl = vr.iframeController.document.getElementById('pageAnnotation'+remarkId)
-            if(domEl) domEl.remove();
+            Ext.getStore('visualReviewAnnotations').data.removeByKey(remarkId);
+            var vr = Ext.first('visualReviewPanel');
+            if(!vr.hasVideo()){
+                vr.iframeController.removeDomElementById('pageAnnotation' + remarkId);
+            }
         }
     }
 })
