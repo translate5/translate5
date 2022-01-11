@@ -1,12 +1,12 @@
 INSERT INTO `LEK_okapi_bconf` (`name`, `customer_id`, `default`, `extensions`, `description`) VALUES
-                                                                                                  ('Okapi_open', '12', 1, 'doc,txt', 'This is the default filter which is not editable'),
-                                                                                                  ('Okapi_exel', '12', 0, 'doc,txt', 'This is the custom filter.'),
-                                                                                                  ('Okapi_pdf', '12', 0, 'doc,txt', 'This is the custom filter.'),
+	('Okapi_open', '12', 1, 'doc,txt', 'This is the default filter which is not editable'),
+	('Okapi_exel', '12', 0, 'doc,txt', 'This is the custom filter.'),
+	('Okapi_pdf', '12', 0, 'doc,txt', 'This is the custom filter.');
 
 INSERT INTO `LEK_okapi_bconf_filter` (`okapiId`, `configId`, `okapiName`, `mime`, `default`, `name`, `notes`, `extensions`, `configuration`, `codeId`) VALUES
-    (1, 'okf_simplification-xmlResources', 'XML (Simplified resources)', 'text/xml', b'1', 'XML (Simplified resources)', 'Configuration for extracting resources from an XML file. Resources are simplified.', '.xml', '#v1\r\nmimeType=new\r\nfileNames=*.tmx,*.xlf,*.xlff\r\nconfigIds=okf_tmx,okf_xliff,okf_xliff', NULL),
-    (3, 'okf_simplification-xmlResources', 'XML (Simplified resources)', 'text/xml', b'1', 'XML (Simplified resources)', 'Configuration for extracting resources from an XML file. Resources are simplified.', '.xml', 'net.sf.okapi.lib.preprocessing.filters.simplification.SimplificationFilter', NULL),
-    (1, 'okf_simplification-xmlResources1', 'XML (Simplified resources)', 'text/xml', b'1', 'XML (Simplified resources)', 'Configuration for extracting resources from an XML file. Resources are simplified.', '.doc,.pdf', '#v1\r\nmimeType=new\r\nfileNames=*.tmx,*.xlf,*.xlff\r\nconfigIds=okf_tmx,okf_xliff,okf_xliff', NULL),
+	(1, 'okf_simplification-xmlResources', 'XML (Simplified resources)', 'text/xml', b'1', 'XML (Simplified resources)', 'Configuration for extracting resources from an XML file. Resources are simplified.', '.xml', '#v1\r\nmimeType=new\r\nfileNames=*.tmx,*.xlf,*.xlff\r\nconfigIds=okf_tmx,okf_xliff,okf_xliff', NULL),
+	(3, 'okf_simplification-xmlResources', 'XML (Simplified resources)', 'text/xml', b'1', 'XML (Simplified resources)', 'Configuration for extracting resources from an XML file. Resources are simplified.', '.xml', 'net.sf.okapi.lib.preprocessing.filters.simplification.SimplificationFilter', NULL),
+	(1, 'okf_simplification-xmlResources1', 'XML (Simplified resources)', 'text/xml', b'1', 'XML (Simplified resources)', 'Configuration for extracting resources from an XML file. Resources are simplified.', '.doc,.pdf', '#v1\r\nmimeType=new\r\nfileNames=*.tmx,*.xlf,*.xlff\r\nconfigIds=okf_tmx,okf_xliff,okf_xliff', NULL);
 
 
 
@@ -94,4 +94,4 @@ INSERT INTO `LEK_okapi_bconf_default_filter` (`configId`, `mimeType`, `name`, `e
     ('okf_xmlstream', 'text/xml', 'XML Stream', NULL, 'Large XML Documents'),
     ('okf_xmlstream-dita', 'text/xml', 'DITA', '.dita,.ditamap', 'DITA XML'),
     ('okf_xmlstream-JavaPropertiesHTML', 'text/xml', 'Java Properties XML + HTML', NULL, 'Java Properties XML with Embedded HTML'),
-    ('okf_openoffice@copy-of-default', 'application/x-openof', 'okf_openoffice@copy-of-default', NULL, 'Configuration okf_openoffice@copy-of-default')
+    ('okf_openoffice@copy-of-default', 'application/x-openof', 'okf_openoffice@copy-of-default', NULL, 'Configuration okf_openoffice@copy-of-default');

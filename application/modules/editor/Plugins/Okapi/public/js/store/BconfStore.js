@@ -50,10 +50,5 @@ Ext.define('Editor.plugins.Okapi.store.BconfStore', {
       rootProperty: 'data',
       writeAllFields: false
     }
-  },
-  data:[{
-    name:'okapi',
-    extensions:'doc',
-    description:'new filter'
-  }]
+  }
 });

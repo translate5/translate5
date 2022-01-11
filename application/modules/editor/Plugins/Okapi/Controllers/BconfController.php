@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
 {
-     
+    const FILE_UPLOAD_NAME='bconffile';
      /**
       *
       * @var string
@@ -56,15 +56,55 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
      /**
       * Export bconf
       */
-     public function postAction()
+     public function exportbconfAction()
      {
-          $bconf = new editor_Plugins_Okapi_Bconf_BconfExport();
-          $okapiName = $this->getParam('okapiName');
-          $okapiId = $this->getParam('okapiId');
-          if($okapiId ==null || $okapiId ==""){
+            $bconf = new editor_Plugins_Okapi_Models_Bconf();
+            $okapiName = $this->getParam('okapiName');
+            $okapiId = $this->getParam('okapiId');
+            if($okapiId ==null || $okapiId ==""){
                return false;
-          }
-          $bconf->ExportBconf($okapiName,$okapiId);
+            }
+            $bconfFile = $bconf->ExportBconf($okapiName,$okapiId);
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename='.basename($bconfFile));
+            header('Content-Transfer-Encoding: binary');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+            header('Pragma: public');
+            header('Content-Length: '.filesize($bconfFile));
+            ob_clean();
+            flush();
+            readfile($bconfFile);
+            exit;
+    
      }
+	
+	/**
+	 * Import bconf
+	 */
+	public function importbconfAction()
+	{
+        $upload = new Zend_File_Transfer();
+        $files = $upload->getFileInfo();
+        
+        if(empty($files)){
+            throw new exception('E1212', [
+                'msg' => "No upload files were found. Please try again. If the error persists, please contact support."
+            ]);
+        }
+        
+        $file = [];
+        if(array_key_exists('0', $files)){
+            $file = $files[0];
+        }else{
+            $file = $files[self::FILE_UPLOAD_NAME];
+        }
+        
+        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+		//TODO get the file name from UI
+  
+		$bconf->importBconf($file);
+	}
      
 }

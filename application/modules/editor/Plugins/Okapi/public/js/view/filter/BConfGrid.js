@@ -64,6 +64,8 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
         searchText: "#UT#Search",
         searchEmptyText: "#UT#Search Bconf",
         export: "#UT#Export",
+        browse:'#UT#Browse',
+        bconfRequired:'#UT#Bconf required'
     },
     store: {
         type: "bconfStore",
@@ -205,10 +207,29 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
                                 handler: "addNewFilterSet",
                             },
                             {
-                                xtype: "button",
-                                glyph: "f093@FontAwesome5FreeSolid",
-                                text: me.strings.uploadBconf,
-                                tooltip: me.strings.uploadBconf,
+                                xtype:'form',
+                                layout:'hbox',
+                                border: false,
+                                margin:'0 10px 0 10px',
+                                items: [{
+                                    xtype: 'filefield',
+                                    name: 'bconffile',
+                                    msgTarget: 'side',
+                                    regex: new RegExp('\.bconf$', 'i'),
+                                    regexText: this.strings.bconfRequired,
+                                    allowBlank: false,
+                                    anchor: '100%',
+                                    width:300,
+                                    buttonText: me.strings.browse
+                                },{
+                                    xtype: "button",
+                                    margin:'0 10px 0 10px',
+                                    glyph: "f093@FontAwesome5FreeSolid",
+                                    tooltip: me.strings.addBconf,
+                                    text: me.strings.upload,
+                                    handler: "uploadBconf",
+                                    //formBind: true,
+                                }]
                             },
                             {
                                 xtype: "textfield",
