@@ -167,10 +167,14 @@ abstract class editor_Models_Quality_AbstractData {
                 $this->data[$segmentId] = [];
             }
             if($this->addTranslations){
-                $row['text'] =
-                    $this->manager->translateQualityType($row['type'])
-                    .$this->translationSeperator
-                    .$this->manager->translateQualityCategory($row['type'], $row['category'], $this->task);
+                if($this->manager->hasCategories($row['type'])){
+                    $row['text'] =
+                        $this->manager->translateQualityType($row['type'])
+                        .$this->translationSeperator
+                        .$this->manager->translateQualityCategory($row['type'], $row['category'], $this->task);
+                } else {
+                    $row['text'] = $this->manager->translateQualityType($row['type']);
+                }
             }
             $this->data[$segmentId][] = $this->transformRow($row);
         }

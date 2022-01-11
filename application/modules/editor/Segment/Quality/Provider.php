@@ -44,6 +44,12 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @var string
      */
     protected static $type = NULL;
+
+    /**
+     * @var bool
+     */
+    protected static $hasCategories = true;
+
     /**
      * MUST be set in inheriting classes if there is a related segment tag
      * @var string
@@ -94,6 +100,29 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
         return $tags;
     }
     
+    /**
+     * Do preparations for cases when we need full list of task's segments to be analysed for quality detection
+     * On Import and other operations, only ::postProcessTask is called since there are no differences to be detected
+     *
+     * @param editor_Models_Task $task
+     * @param Zend_Config $qualityConfig: the quality configuration as defined in runtimeOptions.autoQA.XXX
+     * @param string $processingMode
+     */
+    public function preProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
+        
+    }
+
+    /**
+     * Update qualities for cases when we need full list of task's segments to be analysed for quality detection
+     *
+     * @param editor_Models_Task $task
+     * @param Zend_Config $qualityConfig: the quality configuration as defined in runtimeOptions.autoQA.XXX
+     * @param string $processingMode
+     */
+    public function postProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
+
+    }
+
     /* *************** Translation API *************** */
     
     /**
@@ -103,6 +132,16 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      */
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
         return NULL;
+    }
+
+    /**
+     * Returns a translation for the Provider tooltip
+     *
+     * @param ZfExtended_Zendoverwrites_Translate $translate
+     * @return string
+     */
+    public function translateTypeTooltip(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
+        return '';
     }
     /**
      * Returns a translation for a Quality. These Codes are stored in the category column of the LEK_segment_quality model
@@ -115,7 +154,18 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         return NULL;
     }
-    
+
+    /**
+     * Translate quality category tooltip
+     *
+     * @param ZfExtended_Zendoverwrites_Translate $translate
+     * @return string|null
+     * @throws Zend_Exception
+     */
+    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
+        return '';
+    }
+
     /* *************** REST view API *************** */
     
     /**
@@ -155,6 +205,13 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      */
     public function isFullyChecked(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
         return true;
+    }
+    /**
+     * Retrieves, if a quality has categories
+     * @return bool
+     */
+    public function hasCategories() : bool {
+        return static::$hasCategories;
     }
     /**
      * Retrieves all Categories a quality can have

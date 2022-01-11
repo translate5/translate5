@@ -349,10 +349,11 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param string $type
      * @return int
      */
-    public function removeBySegmentAndType(int $segmentId, string $type) : int {
+    public function removeBySegmentAndType(int $segmentId, string $type, array $categories = []) : int {
         $where = [];
         $where[] = $this->getAdapter()->quoteInto('segmentId = ?', $segmentId);
         $where[] = $this->getAdapter()->quoteInto('type = ?', $type);
+        if ($categories) $where[] = $this->getAdapter()->quoteInto('category IN (?)', $categories);
         return $this->delete($where);
     }
     /**

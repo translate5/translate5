@@ -262,7 +262,11 @@ class editor_Models_Quality_RequestState {
      */
     public function getUserRestrictedSegmentNrs() : ?array {
         if($this->userGuid != NULL){
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($this->userGuid, $this->task);
+            try {
+                $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($this->userGuid, $this->task);
+            } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                return null;
+            }
             /* @var $tua editor_Models_TaskUserAssoc */
             $step = $tua->getWorkflowStepName();
             if(!$tua->isSegmentrangedTaskForStep($this->task, $step)){
