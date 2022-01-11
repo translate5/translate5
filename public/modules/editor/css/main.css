@@ -910,3 +910,11 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 #commentNavList>div.usernr7::before {background-color: var(--color-usernr7);}
 #commentNavList>div.usernr8::before {background-color: var(--color-usernr8);}
 #commentNavList>div.usernrX::before {background-color: var(--color-usernrX);}
+
+/* BCONF management */
+.okapifilterGrid .x-action-col-icon{
+    margin: 5px !important;
+}
+.customFilterGrid .x-action-col-icon{
+    margin: 5px !important;
+}
