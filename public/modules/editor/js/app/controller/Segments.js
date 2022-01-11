@@ -602,19 +602,34 @@ Ext.define('Editor.controller.Segments', {
           scope: me,
           //prevent default ServerException handling
           preventDefaultHandler: true,
-          callback: me.saveChainSaveCallback //NEXT step in save chain
+          //callback: me.saveChainSaveCallback //NEXT step in save chain
+          callback: function(record, operation, success){
+
+              // Call initial callback function
+              me.saveChainSaveCallback(record, operation, success);
+
+              // update length stuff in siblings of store
+              me.updateSiblingsMetaCache(record);
+
+              //fire event to process things after save call is started, like change alike handling
+              //parameters are the callback to the final save chain call,
+              //for later usage in ChangeAlike Handling and the saved record
+              me.fireEvent('afterSaveCall', function(){
+                  me.saveChainEnd(record);
+              }, record);
+          }
       });
       me.saveIsRunning = true;
       
       // update length stuff in siblings of store
-      me.updateSiblingsMetaCache(record);
-      
+      /*me.updateSiblingsMetaCache(record);
+
       //fire event to process things after save call is started, like change alike handling
       //parameters are the callback to the final save chain call,
       //for later usage in ChangeAlike Handling and the saved record
       me.fireEvent('afterSaveCall', function(){
           me.saveChainEnd(record);
-      }, record);
+      }, record);*/
   },
   /**
    * callback of saving a segment record

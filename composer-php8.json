@@ -24,13 +24,46 @@
 				}
 			}
 		}, {
+			"type" : "package",
+			"package" : {
+				"name" : "translate5/instanttranslate-roboto-font",
+				"license" : "Apache-2.0",
+				"version" : "26",
+				"description" : "package introducing roboto font from google for instanttranslation",
+				"dist" : {
+					"url" : "https://downloads.translate5.net/instanttranslate-font-roboto.zip",
+					"type" : "zip"
+				}
+			}
+		}, {
 			"type" : "vcs",
 			"url" : "https://github.com/dream-group/horde-text-diff/"
 		}, {
 			"_README" : "If the pull request https://github.com/technosophos/querypath/pull/208 will go into upstream master we will not need the separate version and URL anymore. version was ~3.0",
 			"type" : "vcs",
 			"url" : "https://github.com/thomaslauria/querypath"
-		}
+		}, {
+			"_README" : "If our pull request will go into upstream shardj/zf1-future as project we will not need the separate version and URL anymore.",
+			"type" : "vcs",
+			"url" : "https://github.com/MittagQI/zf1-php7.3"
+		}, {
+			"type" : "package",
+                        "package" : {
+                                "name" : "jquery/jquery-ui",
+                                "license" : "MIT",
+                                "version" : "1.13.0",
+                                "description" : "A curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library.",
+				"dist": {
+					"url": "https://jqueryui.com/resources/download/jquery-ui-1.13.0.zip",
+			                "type": "zip"
+				},
+                                "source" : {
+                                        "url" : "https://github.com/jquery/jquery-ui.git",
+                                        "type" : "git",
+                                        "reference" : "1.13.0"
+                                }
+                        }
+		}		
 	],
 	"require" : {
 		"ext-simplexml": "*",
@@ -51,7 +84,11 @@
 		"google/cloud-translate" : "~1.7",
 		"dream-group/horde-text-diff" : "dev-master",
 		"lesstif/php-jira-rest-client" : "~2.4",
-		"paquettg/php-html-parser": "^3.1"
+		"paquettg/php-html-parser": "^3.1",
+		"jquery/jquery-ui": "1.13.0",
+		"translate5/instanttranslate-roboto-font": "26",
+		"axelbecher/material-design-icons": "^1.0",
+		"wilsonglasser/spout": "^3.0"
 	},
 	"extra" : {
 		"merge-plugin" : {

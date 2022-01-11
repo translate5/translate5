@@ -50,6 +50,7 @@ Ext.define('Editor.util.TaskActions', {
         taskConfirmed: '#UT#Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.',
         taskFinished: '#UT#Aufgabe wurde erfolgreich abgeschlossen.',
         taskClosing: '#UT#Aufgabe wird verlassen...',
+        taskCancelImport: '#UT#Import wird abgebrochen...',
         taskConfirming: '#UT#Aufgabe wird bestätigt...',
         taskFinishing: '#UT#Aufgabe wird abgeschlossen und verlassen...',
         saveSegmentFirst: '#UT#Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.',
@@ -90,6 +91,26 @@ Ext.define('Editor.util.TaskActions', {
         openTask: function(task, readonly) {
             (new this()).openTask(task, readonly);
             return;
+        },
+        /**
+         * Opens the given task for editing or viewing (readonly = true)
+         * @param {Editor.models.admin.Task} task
+         */
+        cancelImport: function(task) {
+            var me = new this();
+            me.modifyTask(function(){
+                Editor.app.unmask();
+            }, {'state': 'error'}, me.strings.taskCancelImport, task);
+            return;
+        },
+        /**
+         * Returns true if the currently opened task is exportable
+         * (currently checks only if a segment save is still in progress)
+         * @return {Boolean}
+         */
+        isTaskExportable: function() {
+            var ctrl = Editor.app.getController('Segments');
+            return !ctrl.saveChainMutex && !ctrl.saveIsRunning;
         }
     },
     /**
@@ -172,9 +193,9 @@ Ext.define('Editor.util.TaskActions', {
     /**
      * internal method to modify the task with the given values
      */
-    modifyTask: function(callback, data, maskingText) {
+    modifyTask: function(callback, data, maskingText, task) {
         var me = this,
-            task = Editor.data.task,
+            task = task || Editor.data.task,
             app = Editor.app;
         
         if(!task){

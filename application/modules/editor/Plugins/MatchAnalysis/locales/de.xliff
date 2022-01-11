@@ -4,7 +4,12 @@
   <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
   <file original="php-sourcecode" source-language="ha" target-language="en" datatype="php">
     <body>
-    
+
+        <trans-unit id='RGF0dW0gZGVyIEFuYWx5c2U='>
+            <source>Datum der Analyse</source>
+            <target>Datum der Analyse</target>
+        </trans-unit>
+
     	<trans-unit id='TWF0Y2gtQW5hbHlzZQ=='>
 		    <source>Match-Analyse</source>
 		    <target>Match-Analyse</target>
@@ -30,12 +35,19 @@
 		    <target>Analyse Starten</target>
 		</trans-unit>
 		
-<trans-unit id='RXhwb3J0IGFscyBFeGNlbA=='><source>Export als Excel</source><target>Export als Excel</target></trans-unit>
-
+		<trans-unit id='VW1mYXNzdCBlaW5lIFFTIHVuZCBUZXJtaW5vbG9naWUgUHLDvGZ1bmc='>
+		    <source>Umfasst eine QS und Terminologie Prüfung</source>
+		    <target>Umfasst eine QS und Terminologie Prüfung</target>
+		</trans-unit>
 		
-		<trans-unit id='U3RhcnQgZGVyIEFuYWx5c2UgaW0gVGFiIOKAnFNwcmFjaHJlc3NvdXJjZW4genV3ZWlzZW7igJw='>
-		    <source>Start der Analyse im Tab “Sprachressourcen zuweisen“</source>
-		    <target>Start der Analyse im Tab “Sprachressourcen zuweisen“</target>
+        <trans-unit id='RXhwb3J0IGFscyBFeGNlbA=='>
+            <source>Export als Excel</source>
+            <target>Export als Excel</target>
+        </trans-unit>
+
+		<trans-unit id='RXMgd3VyZGUgYmlzaGVyIGtlaW5lIEFuYWx5c2UgZXJzdGVsbHQuIFN0YXJ0ZW4gU2llIGVpbmUgQW5hbHlzZSBpbSBUYWIg4oCcU3ByYWNocmVzc291cmNlbiB6dXdlaXNlbuKAnA=='>
+		    <source>Es wurde bisher keine Analyse erstellt. Starten Sie eine Analyse im Tab “Sprachressourcen zuweisen“</source>
+		    <target>Es wurde bisher keine Analyse erstellt. Starten Sie eine Analyse im Tab “Sprachressourcen zuweisen“</target>
 		</trans-unit>
 
 		<trans-unit id='V2llZGVyaG9sdW5nZW46'>
@@ -58,9 +70,9 @@
 		    <target>Zähle interne Fuzzy</target>
 		</trans-unit>
 
-		<trans-unit id='Vm9yw7xiZXJzZXR6dW5ncyBNYXRjaC1SYXRl'>
-		    <source>Vorübersetzungs Match-Rate</source>
-		    <target>Vorübersetzungs Match-Rate</target>
+		<trans-unit id='VE0gVm9yw7xiZXJzZXR6dW5ncyBNYXRjaC1SYXRl'>
+		    <source>TM Vorübersetzungs Match-Rate</source>
+		    <target>TM Vorübersetzungs Match-Rate</target>
 		</trans-unit>
 
 		<trans-unit id='Vm9yw7xiZXJzZXR6dW5nIG1pdCBUTS1NYXRjaCwgZGllIGdyw7bDn2VyIG9kZXIgZ2xlaWNoIGRlbSBhdXNnZXfDpGhsdGVuIFdlcnQgaXN0'>
@@ -125,14 +137,17 @@
 		    <source>Analyse läuft</source>
 		    <target>Analyse läuft</target>
 		</trans-unit>
+		
         <trans-unit id='R2VzcGVycnRlIDEwMCUtTWF0Y2hlcyBzaW5kIG5pY2h0IFRlaWwgZGVyIEFuYWx5c2Uu'>
             <source>Gesperrte 100%-Matches sind nicht Teil der Analyse.</source>
             <target>Gesperrte 100%-Matches sind nicht Teil der Analyse.</target>
         </trans-unit>
+        
         <trans-unit id='RXhwb3J0IFRyYWRvcy1saWtlIFhNTA=='>
             <source>Export Trados-like XML</source>
             <target>Export Trados-like XML</target>
         </trans-unit>
+
     </body>
   </file>
 </xliff>

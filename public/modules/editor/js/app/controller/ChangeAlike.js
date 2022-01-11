@@ -225,6 +225,7 @@ Ext.define('Editor.controller.ChangeAlike', {
    */
   handleBusReconnect: function(bus) {
       var grid = this.getSegmentGrid();
+      Editor.app.getController('JsLogger').addLogEntryToLogger('ChangeAlike::handleBusReconnect');
       if(grid && grid.editingPlugin.editing) {
           //trigger alikes GET again! No ability to trigger that via a senseful event, 
           this.handleBeforeEdit(grid.editingPlugin, grid.editingPlugin.context);
@@ -245,6 +246,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       }
       
       me.fetchedAlikes = operation.getRecords();
+      Editor.app.getController('JsLogger').addLogEntryToLogger('ChangeAlike::handleAlikesRead for id '+id+', loaded alikes: '+me.getAllAlikeIds().join(','));
       if(me.isManualProcessing()) {
           me.window.setAlikes(id, me.fetchedAlikes);
       }
@@ -260,6 +262,8 @@ Ext.define('Editor.controller.ChangeAlike', {
 	  me.callbackToSaveChain = finalCallback;
 	  me.actualRecord = record;
 	  me.saveIsRunning = true;
+
+      Editor.app.getController('JsLogger').addLogEntryToLogger('ChangeAlike::onAfterSaveCall set record id: '+record.get('id'));
 
 	  //If it is set to true, the repetition editor only pops up (processes automatically) 
 	  //when the target of the current segment is empty
@@ -348,7 +352,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     if(me.isManualProcessing()) {
         me.window.close();
     }
-    
+
     if(!me.saveIsRunning) {
         me.savePendingAlikes();
     }
@@ -519,6 +523,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       });
       Editor.MessageBox.addError(me.messages.alikesNotAllSaved);
       me.callbackToSaveChain();
+      throw "not all alikes saved"; // exception here to trigger the rootcause logging
   },
   /**
    * Befüllt das Segment mit der gegebenen ID im Segment Store mit den übergebenen Daten,

@@ -182,11 +182,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * Queue the match analysis worker
      *
      * @param string $taskGuid
-     * @param bool $pretranlsate
-     * @param array $eventParams
-     * @return void|boolean
+     * @param array $workerParameters
+     * @return boolean
      */
-    protected function queueAnalysis($taskGuid, $workerParameters = []) {
+    protected function queueAnalysis(string $taskGuid, array $workerParameters) : bool {
         if(!$this->hasAssoc($taskGuid)){
             //you can not run analysis without resources to be associated to the task
             return false;
@@ -198,17 +197,18 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
 
-        $parentWorkerId = 0;
         if($task->isImporting()) {
             //on import we use the import worker as parentId
             $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
-        }
-        else {
+        } else {
+            // crucial: add a different behaviour for the workers when performig an operation
             $workerParameters['workerBehaviour'] = 'ZfExtended_Worker_Behaviour_Default';
+            // this creates the operation start/finish workers
+            $parentWorkerId = editor_Task_Operation::create(editor_Task_Operation::MATCHANALYSIS, $task);
         }
         
         if(empty($valid)){
-            $this->addWarn($task,'MatchAnalysis Plug-In: No valid analysable language resources found.',['invalid'=>print_r($this->assocs,1)]);
+            $this->addWarn($task,'MatchAnalysis Plug-In: No valid analysable language resources found.', ['invalid' => print_r($this->assocs, 1)]);
             return false;
         }
         
@@ -216,22 +216,25 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $workerParameters['userGuid'] = $user->data->userGuid;
         $workerParameters['userName'] = $user->data->userName;
 
-        //enable bath query via config
+        //enable batch query via config
         $workerParameters['batchQuery'] = (boolean) $this->config->enableBatchQuery;
         if(!empty($this->batchAssocs) && $workerParameters['batchQuery']){
             $this->queueBatchWorkers($task, $workerParameters, $parentWorkerId);
         }
-        
+        // init worker and queue it
         $worker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Worker');
         /* @var $worker editor_Plugins_MatchAnalysis_Worker */
-
-        // init worker and queue it
         if (!$worker->init($taskGuid, $workerParameters)) {
             $this->addWarn($task,'MatchAnalysis-Error on worker init(). Worker could not be initialized');
             return false;
         }
-        
         $worker->queue($parentWorkerId, null, false);
+        
+        // if we are not importing we need to add the quality workers (which also include the termtagger)
+        if(!$task->isImporting()){
+            editor_Segment_Quality_Manager::instance()->queueOperation(editor_Segment_Processing::ANALYSIS, $task, $parentWorkerId);
+        }
+        
         return true;
     }
     

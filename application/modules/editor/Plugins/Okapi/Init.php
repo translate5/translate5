@@ -160,6 +160,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         'tmx',
         'txp',
         'rtf',
+        'tbx',
         'ts',
         'ttx',
         'txml',

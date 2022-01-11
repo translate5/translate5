@@ -98,6 +98,14 @@ abstract class editor_Models_Terminology_TbxObjects_Abstract
      * @return string
      */
     public function getDataHash(): string {
-        return md5(print_r(array_intersect_key(get_object_vars($this), static::$updatableTableFields[get_class($this)]),1));
+        return md5(print_r($this->makeDataForHash(),1));
+    }
+
+    /**
+     * generates the data to be hashed
+     * @return array
+     */
+    protected function makeDataForHash(): array {
+        return array_intersect_key(get_object_vars($this), static::$updatableTableFields[get_class($this)]);
     }
 }

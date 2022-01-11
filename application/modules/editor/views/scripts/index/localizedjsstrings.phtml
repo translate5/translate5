@@ -265,6 +265,7 @@ Ext.define('Editor.controller.Localizer', {
         messageIsViewModeDueHiddenTags: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die "Tags" ausgeblendet wurden. Klicken Sie auf "Ansicht" und blenden Sie die Tags wieder ein.');?>'
     });
 
+    Editor.view.Filepanel.prototype.title = '<?php echo $this->translate->_('Dateien');?>';
   	Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
   	Editor.view.fileorder.ReferenceTree.prototype.title = '<?php echo $this->translate->_('Referenz-Dateien');?>';
 
@@ -280,6 +281,17 @@ Ext.define('Editor.controller.Localizer', {
 		startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
         newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
 	};
+
+    Ext.define("Editor.locale.view.comments.Navigation", {
+        override: "Editor.view.comments.Navigation",
+        title: Editor.view.segments.column.Comments.prototype.text,
+    });
+    Editor.view.comments.Navigation.prototype.tipTpl.type = {
+        'segmentComment': '<?php echo $this->translate->_('Segment-Kommentar');?>',
+        'visualAnnotation': '<?php echo $this->translate->_('Freie Anmerkung');?>',
+        'videoAnnotation': '<?php echo $this->translate->_('Video-Anmerkung');?>',
+    }
+
   	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('Manuelle QS (im Segment)');?>';
   	Editor.view.quality.mqm.Fieldset.prototype.strings = {
 		severityLabel: '<?php echo $this->translate->_('Gewichtung');?>',
@@ -871,6 +883,7 @@ Ext.define('Editor.controller.Localizer', {
             actionUnFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer wieder öffnen');?>',
             actionEnd: '<?php echo $this->translate->_('Aufgabe komplett beenden');?>',
             actionDelete: '<?php echo $this->translate->_('Aufgabe komplett löschen');?>',
+            actionCancel: '<?php echo $this->translate->_('Import abbrechen');?>',
             actionLog: '<?php echo $this->translate->_('Ereignis-Protokoll');?>',
             assocUser: '<?php echo $this->translate->_('Benutzer der Aufgabe zuweisen');?>', //FIXME remove me!
             taskPrefs: '<?php echo $this->translate->_('Aufgabenspezifische Einstellungen');?>',
@@ -879,6 +892,9 @@ Ext.define('Editor.controller.Localizer', {
             actionExcelReimport: '<?php echo $this->translate->_('Excel Re-Importieren');?>',
             projectOverview: '<?php echo $this->translate->_('zum Projekt springen');?>',
             taskOverview: '<?php echo $this->translate->_('zur Aufgabe springen');?>'
+        },
+        strings:{
+            cancelImportText: '<?php echo $this->translate->_('Import abbrechen');?>'
         }
     });
     
@@ -935,6 +951,11 @@ Ext.define('Editor.controller.Localizer', {
             toolbarFilter: '<?php echo $this->translate->_('Suche');?>',
             overwriteLevelList: '<?php echo $this->translate->_('Überschreibbar auf Ebene:');?>',
             readOnlyFilter: '<?php echo $this->translate->_('Schreibgeschützte Konfigurationen sichtbar:');?>',
+            configLocales:{
+                default: '<?php echo $this->translate->_('Default');?>',
+                aria: '<?php echo $this->translate->_('Dunkles Layout (Aria)');?>',
+                triton: '<?php echo $this->translate->_('Standard Layout (Triton)');?>',
+            }
         }
     });
     
@@ -1163,6 +1184,7 @@ Ext.define('Editor.controller.Localizer', {
             taskConfirmed: '<?php echo $this->translate->_('Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.');?>',
             taskFinished: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich abgeschlossen.');?>',
             taskClosing: '<?php echo $this->translate->_('Aufgabe wird verlassen...');?>',
+            taskCancelImport: '<?php echo $this->translate->_('Import wird abgebrochen...');?>',
             taskConfirming: '<?php echo $this->translate->_('Aufgabe wird bestätigt...');?>',
             taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen und verlassen...');?>',
             saveSegmentFirst: '<?php echo $this->translate->_('Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.');?>'
@@ -1173,7 +1195,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.util.LanguageResources",
         strings: {
 		    exactMatch: '<?php echo $this->translate->_('101% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt.');?>',
-            repetitionMatch: '<?php echo $this->translate->_('Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.');?>',
+            repetitionMatch: '<?php echo $this->translate->_('102% ist eine Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.');?>',
             contextMatch: '<?php echo $this->translate->_('103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.');?>',
             termcollectionMatch: '<?php echo $this->translate->_('104% ist ein 100% Treffer, der aus einer Termcollection kommt.');?>'
         }
@@ -1777,7 +1799,8 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.LanguageResources.TermCollectionExportActionMenu",
         strings: {
             exportProposal: '<?php echo $this->translate->_('Vorschläge exportieren');?>',
-            exportCollection: '<?php echo $this->translate->_('Als TBX exportieren');?>'
+            exportCollection: '<?php echo $this->translate->_('Als TBX exportieren');?>',
+            exportSpreadsheet: '<?php echo $this->translate->_('Als XLSX exportieren');?>'
         }
     });
 

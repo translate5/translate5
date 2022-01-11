@@ -41,9 +41,8 @@ Ext.define('Editor.model.LanguageResources.Resource', {
 
   statics: {
     //name of the sdl language cloud service
-    SDL_SERVICE_NAME: 'SDLLanguageCloud',
-    TERMCOLLECTION_SERVICE_NAME:'TermCollection',
-    OPENTM2_SERVICE_NAME:'OpenTM2'
+    SDL_SERVICE_NAME: 'SDLLanguageCloud', //TODO deprecated, usages must be changed to polymorph services
+    TERMCOLLECTION_SERVICE_NAME:'TermCollection' //TODO deprecated, usages must be changed to polymorph services
   },
 
   fields: [

@@ -69,7 +69,7 @@ class Application {
         $_SERVER['HTTP_HOST'] = 'localhost';
         defined('APPLICATION_PATH') || define('APPLICATION_PATH', $cwd.DIRECTORY_SEPARATOR.'application');
         defined('APPLICATION_ENV') || define('APPLICATION_ENV', 'application');
-        
+
         require_once 'Zend/Session.php';
         \Zend_Session::$_unitTestEnabled = ! self::$startSession;
         require_once 'library/ZfExtended/BaseIndex.php';
@@ -78,14 +78,17 @@ class Application {
         $index->initApplication()->bootstrap();
         $index->addModuleOptions('default');
         $index->addModuleOptions('editor');
-        
+
         //set the hostname to the configured one:
         $config = \Zend_Registry::get('config');
         $this->hostname = $config->runtimeOptions->server->name;
-        
+
         $this->version = \ZfExtended_Utils::getAppVersion();
+
+        //fix so that messagebus installation hash will work.
+        $_SERVER['SERVER_ADDR'] = $config->runtimeOptions->cronIP;
     }
-    
+
     /**
      * returns the translate5 version
      * @return string

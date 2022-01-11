@@ -580,7 +580,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                 $this->itsPersonGuid = $this->task->getPmGuid();
             }
 
-            if($this->workflow->isStepOfRole($segment['workflowStep'], [editor_Workflow_Default::ROLE_REVIEWER])){
+            if(!empty($segment['workflowStep']) && $this->workflow->isStepOfRole($segment['workflowStep'], [editor_Workflow_Default::ROLE_REVIEWER])){
                 $this->revPersonGuid = $this->task->getPmGuid();
             }
         }

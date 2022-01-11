@@ -176,8 +176,8 @@ Ext.define('Editor.view.comments.PanelViewController', {
         var me = this,
             comments = me.getCommentsStore(),
             rec = comments.getAt(rowIdx),
-            del = ev.getTarget('div.ico-comment-delete'),
-            edit = ev.getTarget('div.ico-comment-edit');
+            del = ev.getTarget('div.deleteCommentClass'),
+            edit = ev.getTarget('div.editCommentClass');
         if(!rec.get('isEditable')){
             return;
         }
@@ -303,6 +303,7 @@ Ext.define('Editor.view.comments.PanelViewController', {
                 origRec.set('workflowStep', rec.get('workflowStep'));
                 origRec.set('comments', rec.get('comments'));
                 origRec.endEdit();
+                origRec.commit();
                 if(ed && ed.context && me.loadedSegmentId == segId) {
                     //update the context of the editor, because the set comments above changes the grid view
                     ed.context.row = me.getSegmentGrid().getView().getNode(origRec);

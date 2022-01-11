@@ -62,6 +62,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'Fileorder'                     => true,
         'ChangeAlike'                   => true,
         'Comments'                      => true,
+        'CommentNavigation'            => true,
         'SearchReplace'                 => true,
         'SnapshotHistory'               => true,
         'Termportal'                    => true,
@@ -366,7 +367,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         // set the max allowed upload filesize into frontend variable. This is used for upload file size validation in tm import
         $this->view->Php2JsVars()->set('frontend.php.upload_max_filesize',$uploadMaxFilesize);
-
+        
+        // show Consortium Logos on application load for xyz seconds [default 3]
+        $this->view->Php2JsVars()->set('startup.showConsortiumLogos', $rop->startup->showConsortiumLogos);
+        
         $this->setJsAppData();
     }
 

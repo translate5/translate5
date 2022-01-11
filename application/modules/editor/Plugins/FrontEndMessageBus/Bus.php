@@ -36,6 +36,7 @@ END LICENSE AND COPYRIGHT
  * @method void resyncDone() resyncDone(string $connectionId)
  * @method void garbageCollection() garbageCollection(array $existingSessionIds)
  * @method void updateMetrics() updateMetrics(array $metrics)
+ * @method void notifyUser() notifyUser(string $message)
  */
 class editor_Plugins_FrontEndMessageBus_Bus {
     const CHANNEL = 'instance';

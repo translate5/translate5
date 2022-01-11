@@ -170,8 +170,8 @@ class Translate2417Test extends editor_Test_JsonTest {
 
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
 
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
         //remove the created resources
-        self::$api->removeResources();
+        self::$api->cleanup && self::$api->removeResources();
     }
 }

@@ -41,7 +41,15 @@ Ext.define('Editor.view.project.ProjectPanel', {
     helpSection: 'project',
     title: '#UT#Projekte',
     glyph: 'xf0e8@FontAwesome5FreeSolid',
-    layout: 'border',
+    layout: {
+        type: 'border',
+        regionWeights: {
+            west: 20,
+            north: 10,
+            south: -10,
+            east: -20
+        }
+    },
     viewModel:{
         type: 'projectPanel'
     },
@@ -57,44 +65,62 @@ Ext.define('Editor.view.project.ProjectPanel', {
             config={
             title:me.title,
             items:[{
-                    xtype:'projectGrid',
-                    reference:'projectGrid',
-                    header:false,
-                    region: 'center',
+                    xtype: 'projectGrid',
+                    reference: 'projectGrid',
+                    stateful: {
+                        height: false,
+                        weight: false,
+                        columns: false, //grid state not tested here yet, so save only height and width
+                        width: true
+                    },
+                    stateId: 'projectGrid',
+                    stateEvents: ['resize'], //currently we save sizes only!
+                    header: false,
+                    region: 'west',
                     split: true,
-                    resizable: false,
+                    //resizable: false,
+                    width: '50%',
                     scrollable: true
                 },{
-                    xtype: 'panel',
-                    region: 'east',
+                    xtype: 'projectTaskGrid',
+                    reference:'projectTaskGrid',
+                    stateful: {
+                        height: true,
+                        weight: false,
+                        columns: false, //grid state not tested here yet, so save only height and width
+                        width: true
+                    },
+                    stateId: 'projectTaskGrid',
+                    stateEvents: ['resize'], //currently we save sizes only!
+                    region: 'center',
+                    scrollable: true,
+                    //resizable: false,
+                    height: '30%',
+                    width: '50%',
                     split: true,
-                    resizable: true,
-                    width:'50%',
-                    layout: {
-                        type: 'vbox',
-                        pack: 'start',
-                        align: 'stretch'
-                    },
                     bind:{
-                        disabled:'{!projectSelection}'
+                        title:me.strings.projectTasksTitle,
+                        disabled:'{!projectSelection}',
+                        store:'{projectTasks}'
+                    }
+                },{
+                    xtype:'adminTaskPreferencesWindow',
+                    scrollable: true,
+                    stateful: {
+                        height: true,
+                        weight: false,
+                        width: true
                     },
-                    items: [{
-                        xtype: 'projectTaskGrid',
-                        reference:'projectTaskGrid',
-                        scrollable: true,
-                        flex:0.3,
-                        bind:{
-                            title:me.strings.projectTasksTitle,
-                            store:'{projectTasks}'
-                        }
-                    },{
-                        xtype:'adminTaskPreferencesWindow',
-                        scrollable: true,
-                        flex:0.7,
-                        bind:{
-                            currentTask:'{projectTaskSelection}'
-                        }
-                    }]
+                    stateId: 'projectTaskPrefWindow',
+                    stateEvents: ['resize'], //currently we save sizes only!
+                    region: 'south',
+                    height: '70%',
+                    width: '50%',
+                    split: true,
+                    bind:{
+                        disabled:'{!projectSelection}',
+                        currentTask:'{projectTaskSelection}'
+                    }
                 }]
         };
         if (instanceConfig) {

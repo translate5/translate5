@@ -98,7 +98,7 @@ class Translate678ExportDiffEntityTest extends \ZfExtended_Test_ApiTestcase {
         
         $expectedData = $this->api()->getFileContent('apiTest.csv');
         //insert the swapped <> characters into the expectedData for comparsion
-        $expectedData = str_replace(array('< and >'), '<ins>> </ins><del>< </del>and <ins><</ins><del>></del>', $expectedData);
+        $expectedData = str_replace(array('< and >'), '<ins>></ins><del><</del> and <ins><</ins><del>></del>', $expectedData);
 
         $this->assertEquals(rtrim($expectedData), rtrim($exportedData), 'Exported result does not equal to '.$expectedData);
     }

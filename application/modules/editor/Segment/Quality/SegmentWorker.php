@@ -63,7 +63,7 @@ abstract class editor_Segment_Quality_SegmentWorker extends editor_Models_Import
      * @return bool
      */
     protected function processSegment(editor_Models_Segment $segment, string $slot){
-        return $this->processSegmentTags(editor_Segment_Tags::fromSegment($this->task, $this->processingMode, $segment, $this->isWorkerThread), $slot);
+        return $this->processSegmentTags(editor_Segment_Tags::fromSegment($this->task, $this->processingMode, $segment, editor_Segment_Processing::isOperation($this->processingMode)), $slot);
     }
     /**
      * Process multiple segments as a batch
@@ -73,7 +73,7 @@ abstract class editor_Segment_Quality_SegmentWorker extends editor_Models_Import
      * @return bool
      */
     protected function processSegments(array $segments, string $slot) : bool {
-        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, $this->processingMode, $segments, $this->isWorkerThread), $slot);
+        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, $this->processingMode, $segments, editor_Segment_Processing::isOperation($this->processingMode)), $slot);
     }
     /**
      * Processes the segment-tags and write them back to the segment-tags-model

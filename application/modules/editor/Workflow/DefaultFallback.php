@@ -32,9 +32,9 @@ END LICENSE AND COPYRIGHT
 class editor_Workflow_DefaultFallback extends editor_Workflow_Default {
     public function __construct($name) {
         $this->definition = ZfExtended_Factory::get('editor_Workflow_CachableDefinition');
-        
-	$this->definition->name = $name;
-        $this->definition->label = 'Standard Workflow (Übersetzung, Lektorat, Zweites Lektorat)';
+
+	    $this->definition->name = $name;
+        $this->definition->label = ZfExtended_Zendoverwrites_Translate::getInstance()->_('Standard Workflow');
 
         $this->definition->stepChain[] = self::STEP_NO_WORKFLOW;
         $this->definition->stepChain[] = 'translation';
@@ -42,9 +42,9 @@ class editor_Workflow_DefaultFallback extends editor_Workflow_Default {
         $this->definition->stepChain[] = 'translatorCheck';
         $this->definition->stepChain[] = self::STEP_WORKFLOW_ENDED;
 
-	$this->definition->steps2Roles['translation'] = 'translator';
-	$this->definition->steps2Roles['reviewing'] = 'reviewer';
-	$this->definition->steps2Roles['visiting'] = 'visitor';
+        $this->definition->steps2Roles['translation'] = 'translator';
+        $this->definition->steps2Roles['reviewing'] = 'reviewer';
+        $this->definition->steps2Roles['visiting'] = 'visitor';
 
         $this->definition->stepsWithFilter[] = 'translatorCheck';
 

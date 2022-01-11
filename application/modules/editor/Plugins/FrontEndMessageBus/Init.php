@@ -74,13 +74,23 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
 
         $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleTaskOperation'));
+        $this->eventManager->attach('editor_TaskController', 'autoqaOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('ZfExtended_Models_Worker', 'updateProgress',array($this, 'handleUpdateProgress'));
-        
+
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
-        
+
         //inject JS strings
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
+
+        //updating entities in the comment nav
+        $this->eventManager->attach('Editor_CommentController', 'afterPostAction', array($this, 'handleNormalComment'));
+        $this->eventManager->attach('Editor_CommentController', 'afterPutAction', array($this, 'handleNormalComment'));
+        $this->eventManager->attach('Editor_CommentController', 'beforeDeleteAction', array($this, 'handleDelete')); // need beforeDeleteAction for id
+
+        $this->eventManager->attach('editor_Plugins_VisualReview_AnnotationController', 'afterPostAction', array($this, 'handleAnnotation'));
+        $this->eventManager->attach('editor_Plugins_VisualReview_AnnotationController', 'afterPutAction', array($this, 'handleAnnotation'));
+        $this->eventManager->attach('editor_Plugins_VisualReview_AnnotationController', 'beforeDeleteAction', array($this, 'handleDelete'));  // need beforeDeleteAction for id
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {
@@ -365,5 +375,69 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $f = Zend_Registry::get('frontController');
         /* @var $f Zend_Controller_Front */
         return $f->getRequest()->getHeader('X-Translate5-MessageBus-ConnId');
+    }
+
+    /**
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleNormalComment(Zend_EventManager_Event $event) {
+        $comment = $event->getParam('entity');
+        /* @var $comment editor_Models_Comment */
+        $taskGuid = $comment->getTaskGuid();
+        $a_comment  = $comment->loadByTaskPlainWithPage($taskGuid, $comment->getId());
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        $task->loadByTaskGuid($taskGuid);
+        if($task->anonymizeUsers()){
+            $wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            $a_comment = $wfAnonymize->anonymizeUserdata($taskGuid, $a_comment['userGuid'], $a_comment);
+        }
+        $a_comment['type'] = $comment::FRONTEND_ID;
+        $this->triggerCommentNavUpdate($a_comment, $event->getName());
+    }
+
+    /**
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAnnotation(Zend_EventManager_Event $event) {
+        $anno = $event->getParam('entity');
+        /* @var $anno editor_Plugins_VisualReview_Annotation_Entity */
+        $taskGuid = $anno->getTaskGuid();
+        $a_anno  = $anno->toArray();
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        $task->loadByTaskGuid($taskGuid);
+        if($task->anonymizeUsers()){
+            $wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            $a_anno = $wfAnonymize->anonymizeUserdata($taskGuid, $a_anno['userGuid'], $a_anno);
+        }
+        $a_anno['comment'] = htmlspecialchars($a_anno['text']);
+        $a_anno['type'] = $anno::FRONTEND_ID;
+        $this->triggerCommentNavUpdate($a_anno, $event->getName());
+    }
+
+    /**
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleDelete(Zend_EventManager_Event $event) {
+        /* @var $ent editor_Plugins_VisualReview_Annotation_Entity|editor_Models_Comment */
+        $ent = $event->getParam('entity');
+        /* @var $session Zend_Session_Namespace */
+        $session = new Zend_Session_Namespace();
+        $a_ent = [
+            'taskGuid' => $session->taskGuid, //data has already been deleted, get it from session
+            'type' => $ent::FRONTEND_ID,
+            'id' => $event->getParams()['params']['id'],
+        ];
+        $this->triggerCommentNavUpdate($a_ent, $event->getName());
+    }
+
+    public function triggerCommentNavUpdate(array $commentData, string $typeOfChange) {
+        $this->bus->notify(self::CHANNEL_TASK, 'commentChanged', [
+            'connectionId' => $this->getHeaderConnId(),
+            'typeOfChange' => $typeOfChange,
+            'comment'      => $commentData,
+            'sessionId'    => Zend_Session::getId(),
+        ]);
     }
 }

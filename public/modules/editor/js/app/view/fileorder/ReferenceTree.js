@@ -35,19 +35,20 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.fileorder.ReferenceTree', {
   extend: 'Ext.tree.Panel',
   alias: 'widget.referenceFileTree',
+  //title: 'Referenz-Dateien',
+  header: {
+      hidden:false,
+      height:32,
+      padding:'7 10 6',
+      style:'background-color:rgb(212 212 217)' 
+},
   itemId:'referenceFileTree',
   store: 'ReferenceFiles',
   cls: 'fileTree',
   rootVisible: false,
-  initComponent: function() {
-    var me = this;
-
-    Ext.applyIf(me, {
-      viewConfig: {
-        singleSelect: true
-      }
-    });
-
-    me.callParent(arguments);
+  collapsible: false,
+  bodyPadding: 0,
+  viewConfig: {
+    singleSelect: true
   }
 });

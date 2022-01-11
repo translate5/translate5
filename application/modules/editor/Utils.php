@@ -84,7 +84,11 @@ class editor_Utils {
             (?<other>   (-|\.|[0-9]|\x{B7}|[\x{0300}-\x{036F}]|[\x{203F}-\x{2040}]) )
             (?<second>  (?&first) | (?&other)  )
             (?<xmlid>   (?&first)   (?&second)* )
-        )^(?&xmlid)$~ixu'
+        )^(?&xmlid)$~ixu',
+        'rfc5646list' => '~(?(DEFINE)
+            (?<rfc5646>       ([a-z]{2,3}(-[a-zA-Z0-9]{2,4}|)(-[a-zA-Z]{2}|)) )
+            (?<rfc5646list>   (?&rfc5646)  (?: , (?&rfc5646)  )* )
+        )^(?&rfc5646list)$~xu',
     ];
 
     /**
@@ -306,33 +310,100 @@ class editor_Utils {
 
     /**
      * Check props, stored in $data arg to match rules, given in $ruleA arg
-     * and return array of *_Row objects, collected for props, that have 'key' rule
+     * Example usage:
+     * $_ = editor_Utils::jcheck([
+     *        'propName1,propName2' => [
+     *            'ruleName1' => 'ruleValue1',
+     *            'ruleName2' => 'ruleValue2',
+     *        ],
+     *        'prop1' => [
+     *            ...
+     *        ]
+     *        'prop3' => [
+     *            ...
+     *        ]
+     *    ], [
+     *        'propName1' => 'propValue1',
+     *        'propName2' => 'propValue2',
+     *        'propName3' => 'propValue3',
+     *    ]);
      *
+     * In most cases this method does not return any value, unless there are 'key', 'ext' or 'rex' == 'json' rules used for any of props.
+     * If any validation failed, the ZfExtended_Mismatch exception is thrown immediately.
+     * Currently supported rule names and their possible values are:
+     *  'req' - Required. If rule value is truly - then prop value is required, e.g. should have non-zero length.
+     *  'rex' - Regular expression. Prop value should match regular expression. Rule value can be raw expression
+     *          or preset name, like 'int11', 'email' or other (see self::$_rex). If 'json'-preset is used as
+     *          a rule value, and prop value is a valid json-encoded string - it will be decoded into a php array
+     *          and accessible within return value using the following mapping: $_['propNameX']
+     *  'eql' - Equal. Prop value should be equal to given rule value. Equality check is done using non-strict comparison, e.g '!='
+     *  'key' - Key(s) pointing to existing record(s). Possible rule values:
+     *
+     *          - 'tableName'                             - Single row mode. Here columnName is not given, so 'id' assumed
+     *          - 'tableName.columnName'                  - Single row mode. Here columnName is explicitly given
+     *
+     *          - 'tableName*'                            - Multiple rows mode. Prop value should be comma-separated list or array
+     *          - 'tableName.columnName*'                   of values, that can be, for example, ids, slugs or others kind of data
+     *
+     *          - 'editor_Models_MyModelName'             - Single row mode. Model class name can be used
+     *          - 'editor_Models_MyModelName.columnName'  - Single row mode. Model class name can be used
+     *          - $this->entity                           - Single row mode. Model class instance can be used
+     *
+     *          Found data is accessible within return value using the same mapping: $_['propNameX'],
+     *          and is represented as:
+     *
+     *          - an array with single record data - in case of rule value was 'tableName' or 'tableName.columnName'
+     *              ['id' => 123, 'colName1' => 'valueX', ...]
+     *
+     *          - an array with multiple records data in case of rule was 'tableName*' or 'tableName.columnName*'
+     *              [
+     *                ['id' => 123, 'colName1' => 'valueX', ...],
+     *                ['id' => 124, 'colName1' => 'valueY', ...]
+     *              ]
+     *
+     *          - a model class instance having ->row property loaded with Zend_Db_Table_Row instance, in case of rule
+     *            value was 'editor_Models_MyModelName' or $this->entity
+     *  'fis' - FIND_IN_SET(). No sql queries will be made, it's just quick way to remember such rule name.
+     *          Prop value should be in the list of allowed values, given by rule value.
+     *          Rule value should be comma-separated list or array of values
+     *  'dis' - Disabled. Prop value should NOT be in the list of disabled values, given by rule value. Rule value
+     *          should be comma-separated list or array of disabled values
+     *  'ext' - Extension of an uploaded file. Rule value can be:
+     *            - regular expression, for example '~^(png|jpe?g|gif)$~'
+     *            - single extension, for example 'jpg'
+     *            - comma-separated list of extensions, for example 'gif,jpg'
+     *          Prop value should be given as just $_FILES['propNameX'], and if validation is ok - prop value is attached
+     *          to return value under $_['propNameX'] mapping
+     *
+     * Todo: Add support for 'min' and 'max' rules, that would work for strings, numbers and file sizes
      * @param $ruleA
-     * @param $data
-     * @param $fn
+     * @param array|stdClass|ZfExtended_Models_Entity_Abstract $data Data to checked
      * @return array
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Mismatch
      */
-    public static function jcheck($ruleA, $data, $fn = 'jflush') {
+    public static function jcheck($ruleA, $data) {
 
         // Declare $rowA array
         $rowA = [];
+
+        // If $data is an object
+        if (is_object($data)) {
+
+            // If $data arg is a model instance - convert it to array
+            if (is_subclass_of($data, 'ZfExtended_Models_Entity_Abstract')) $data = $data->toArray();
+
+            // Else if $data arg is an instance of stdClass - convert it to array as well
+            else if ($data instanceof stdClass) $data = (array) $data;
+        }
 
         // Foreach prop having mismatch rules
         foreach ($ruleA as $props => $rule) foreach (self::ar($props) as $prop) {
 
             // Explicitly set up the rule-type keys for which not exist
-            foreach (['ext', 'rex', 'req', 'unq', 'key', 'fis', 'dis'] as $type)
+            foreach (['req', 'rex', 'ext', 'unq', 'key', 'fis', 'dis'] as $type)
                 if (!isset($rule[$type]))
                     $rule[$type] = '';
-
-             // settype($rule['ext'], 'string');
-             // settype($rule['rex'], 'string');
-             // settype($rule['req'], 'string');
-             // settype($rule['unq'], 'string');
-             // settype($rule['key'], 'string');
-             // settype($rule['fis'], 'string'); // If this is given as array, it becomes 'Array', so validation fails
-             // settype($rule['dis'], 'string');
 
             // Shortcut to $data[$prop]
             $value = $data[$prop] ?? null;
@@ -342,15 +413,6 @@ class editor_Utils {
 
             // Get label, or use $prop if label/meta is not given
             $label = $meta['fieldLabel'] ?? $prop;
-
-            // Flush fn
-            //$flushFn = ($fn == 'mflush' ? 'mflush' : 'jflush');
-
-            // First arg for flush fn
-            //$arg1 = $flushFn == 'mflush' ? $prop : false;
-
-            // Constant name
-            //$c = 'I_' . ($flushFn == 'mflush' ? 'M' : 'J') . 'CHECK_';
 
             // If prop is required, but has empty/null/zero value - flush error
             if (($rule['req'] || $rule['unq'])
@@ -367,8 +429,11 @@ class editor_Utils {
                 // Get extension
                 $ext = strtolower(self::rexm('ext', $value['name'], 1));
 
-                // If extension is allowed -
-                if (self::rexm($rule['ext'], $ext)) {
+                // Check if rule is a regular expression, and not just one extension or comma-separated list of extensions
+                $rex = preg_match('~,~', $rule['ext']) || preg_match('~^[a-z0-9]+$~', $rule['ext']) ? false : true;
+
+                // If extension is allowed
+                if ($rex ? self::rexm($rule['ext'], $ext) : in_array($ext, self::ar($rule['ext']))) {
 
                     // Pass file info into return value
                     $rowA[$prop] = $value;
@@ -415,37 +480,95 @@ class editor_Utils {
             if ($rule['dis'] && in_array($value, self::ar($rule['dis'])))
                 throw new ZfExtended_Mismatch('E2005', [$value, $label]);
 
-            // If prop's value should be an identifier of an existing object, but such object not found - flush error
+            // If prop's value should be an identifier of an existing database record
             if ($rule['key'] && strlen($value) && $value != '0') {
 
-                // Get table name
-                $table = preg_replace('/\*$/', '', $rule['key']);
+                // If the rule value is a string
+                if (is_string($rule['key'])) {
 
-                // Setup $s as a flag indicating whether *_Row (single row) or *_Rowset should be fetched
-                $isSingleRow = $table == $rule['key'];
+                    // Get table name
+                    $table = preg_replace('/\*$/', '', $rule['key']);
 
-                // Get key's target table and column
-                $target = explode('.', $table); $table = $target[0]; $column = $target[1] ?? 'id';
+                    // Setup $isSingleRow as a flag indicating whether *_Row (single row) or *_Rowset should be fetched
+                    $isSingleRow = $table == $rule['key'];
 
-                // Setup WHERE clause and method name to be used for fetching
-                $where = $isSingleRow
-                    ? self::db()->quoteInto('`' . $column . '` = ?', $value)
-                    : self::db()->quoteInto('`' . $column . '` IN (?)', self::ar($value));
+                    // Get key's target table and column
+                    $target = explode('.', $table); $table = $target[0]; $column = $target[1] ?? 'id';
 
-                // Prepare statement
-                $stmt = self::db()->query('
-                    SELECT * 
-                    FROM `' . $table . '` 
-                    WHERE ' . $where . self::rif($isSingleRow, '
-                    LIMIT 1'
-                ));
+                // Else if
+                } else {
 
-                // Fetch
-                $rowA[$prop] = $isSingleRow ? $stmt->fetch() : $stmt->fetchAll();
+                    //
+                    $isSingleRow = true;
+
+                    //
+                    $table = $rule['key'];
+                }
+
+                // If $rule['key'] arg is a class name (or an instance) of model, that is a subclass of ZfExtended_Models_Entity_Abstract
+                if (is_subclass_of($table, 'ZfExtended_Models_Entity_Abstract')) {
+
+                    // If rule value is string
+                    if (is_string($rule['key'])) {
+
+                        // Get model
+                        $m = ZfExtended_Factory::get($table);
+
+                        // If single row mode
+                        if ($isSingleRow) {
+
+                            // Load row
+                            $m->loadRow("$column = ?", $value);
+
+                        // Else
+                        } else {
+                             // Not yet supported
+                        }
+
+                    // Else if rule value is a model instance
+                    } else {
+
+                        // Get model
+                        $m = $rule['key'];
+
+                        // If single row mode
+                        if ($isSingleRow) {
+
+                            // Load row
+                            $m->load($value);
+
+                        // Else
+                        } else {
+                            // Not yet supported
+                        }
+                    }
+
+                    // Assign model into return value
+                    $rowA[$prop] = $m->getId() ? $m : false;
+
+                // Else
+                } else {
+
+                    // Setup WHERE clause and method name to be used for fetching
+                    $where = $isSingleRow
+                        ? self::db()->quoteInto('`' . $column . '` = ?', $value)
+                        : self::db()->quoteInto('`' . $column . '` IN (?)', self::ar($value));
+
+                    // Prepare statement
+                    $stmt = self::db()->query('
+                        SELECT * 
+                        FROM `' . $table . '` 
+                        WHERE ' . $where . self::rif($isSingleRow, '
+                        LIMIT 1'
+                    ));
+
+                    // Fetch
+                    $rowA[$prop] = $isSingleRow ? $stmt->fetch() : $stmt->fetchAll();
+                }
 
                 // If no *_Row was fetched, or empty *_Rowset was fetched - flush error
                 if (!$rowA[$prop])
-                    throw new ZfExtended_Mismatch('E2002', [$rule['key'], $value]);
+                    throw new ZfExtended_Mismatch('E2002', [is_string($rule['key']) ? $rule['key'] : get_class($rule['key']), $value]);
             }
 
             // If prop's value should be unique within the whole database table, but it's not - flush error

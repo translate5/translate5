@@ -62,6 +62,29 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
             return;
         }
         $this->view->rows = $this->entity->loadByBestMatchRate($taskGuid);
+
+        $fieldConfig = [[
+            'name' => 'id',
+            'type' => 'int'
+        ],[
+            'name' => 'created',
+        ],[
+            'name' => 'wordCountTotal',
+            'type' => 'int'
+        ]];
+        foreach($this->entity->getFuzzyRanges() as $begin => $end) {
+            $fieldConfig[] = [
+                'name' => (string) $begin,
+                'begin' => (string) $begin, //we just deliver begin and end in the field config to be used by the grid in the GUI then
+                'end' => (string) $end,
+                'type' => 'int',
+            ];
+        }
+
+        //the columns information is calculated from the field data in the GUI
+        $this->view->metaData = [
+            "fields" => $fieldConfig
+        ];
     }
 
 
@@ -83,12 +106,16 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         switch ($params["type"]) {
             case "exportExcel":
                 $rows = $this->entity->loadByBestMatchRate($params['taskGuid']);
-                ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_ExportExcel')->generateExcelAndProvideDownload($rows, $fileName);
+                $exporter = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_ExportExcel');
+                /* @var $exporter editor_Plugins_MatchAnalysis_Export_ExportExcel */
+                $exporter->generateExcelAndProvideDownload($task, $rows, $fileName);
                 break;
             case "exportXml":
                 $rows = $this->entity->loadByBestMatchRate($params['taskGuid'], false);
-                $x = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_Xml')->generateXML($rows, $params['taskGuid']);
-                
+                $exporter = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_Xml', [$task]);
+                /* @var $exporter editor_Plugins_MatchAnalysis_Export_Xml */
+                $x = $exporter->generateXML($rows, $params['taskGuid']);
+
                 $fileName = $fileName.' '.date('- Y-m-d').'.xml';
                 
                 header("Content-Disposition: attachment; filename*=UTF-8''".rawurlencode($fileName));

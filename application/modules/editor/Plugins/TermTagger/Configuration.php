@@ -156,6 +156,8 @@ class editor_Plugins_TermTagger_Configuration {
                 return self::IMPORT_LOGGER_DOMAIN;
                 
             case editor_Segment_Processing::ANALYSIS:
+            case editor_Segment_Processing::RETAG:
+            case editor_Segment_Processing::TAGTERMS:
                 return self::ANALYSIS_LOGGER_DOMAIN;
                 
             case editor_Segment_Processing::EDIT:

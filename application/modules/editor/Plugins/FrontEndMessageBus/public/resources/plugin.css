@@ -32,35 +32,35 @@ END LICENSE AND COPYRIGHT
 .multi-user-list .usernr-1 span.icon,
 .x-grid-item-selected.usernr-1,
 #segment-grid .x-grid-item .other-user-edit.usernr-1,
-#segment-grid .x-grid-item .other-user-select.usernr-1 {background-color: #f9e788;}    /* yellow pale */
+#segment-grid .x-grid-item .other-user-select.usernr-1 {background-color:var(--color-usernr1);}    /* yellow pale */
 .multi-user-list .usernr-2 span.icon,
 .x-grid-item-selected.usernr-2,
 #segment-grid .x-grid-item .other-user-edit.usernr-2,
-#segment-grid .x-grid-item .other-user-select.usernr-2 {background-color: #f9b372;}    /* orange pale */
+#segment-grid .x-grid-item .other-user-select.usernr-2 {background-color: var(--color-usernr2);}    /* orange pale */
 .multi-user-list .usernr-3 span.icon,
 .x-grid-item-selected.usernr-3,
 #segment-grid .x-grid-item .other-user-edit.usernr-3,
-#segment-grid .x-grid-item .other-user-select.usernr-3 {background-color: #cbe0f9;}    /* blue pale */
+#segment-grid .x-grid-item .other-user-select.usernr-3 {background-color: var(--color-usernr3);}    /* blue pale */
 .multi-user-list .usernr-4 span.icon,
 .x-grid-item-selected.usernr-4,
 #segment-grid .x-grid-item .other-user-edit.usernr-4,
-#segment-grid .x-grid-item .other-user-select.usernr-4 {background-color: #f3d5ed;}    /* lilac pale */
+#segment-grid .x-grid-item .other-user-select.usernr-4 {background-color: var(--color-usernr4);}    /* lilac pale */
 .multi-user-list .usernr-5 span.icon,
 .x-grid-item-selected.usernr-5,
 #segment-grid .x-grid-item .other-user-edit.usernr-5,
-#segment-grid .x-grid-item .other-user-select.usernr-5 {background-color: #e4fb81;}    /* yellowish green pale */
+#segment-grid .x-grid-item .other-user-select.usernr-5 {background-color:var(--color-usernr5);}    /* yellowish green pale */
 .multi-user-list .usernr-6 span.icon,
 .x-grid-item-selected.usernr-6,
 #segment-grid .x-grid-item .other-user-edit.usernr-6,
-#segment-grid .x-grid-item .other-user-select.usernr-6 {background-color: #FFD8D4;}    /* pink pale */
+#segment-grid .x-grid-item .other-user-select.usernr-6 {background-color: var(--color-usernr6);}    /* pink pale */
 .multi-user-list .usernr-7 span.icon,
 .x-grid-item-selected.usernr-7,
 #segment-grid .x-grid-item .other-user-edit.usernr-7,
-#segment-grid .x-grid-item .other-user-select.usernr-7 {background-color: #9af2db;}    /* turquoise pale */
+#segment-grid .x-grid-item .other-user-select.usernr-7 {background-color: var(--color-usernr7);}    /* turquoise pale */
 .multi-user-list .usernr-8 span.icon,
 .x-grid-item-selected.usernr-8,
 #segment-grid .x-grid-item .other-user-edit.usernr-8,
-#segment-grid .x-grid-item .other-user-select.usernr-8 {background-color: #b5f3bf;}    /* lime green pale */
+#segment-grid .x-grid-item .other-user-select.usernr-8 {background-color: var(--color-usernr8);}    /* lime green pale */
 
 .multi-user-list span.user {    
     padding-right:10px;

@@ -38,13 +38,16 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
     //card type, used for card display order
     importType: 'postimport',
     store: null,
-    reAnalysisHidden: true,
     // autoScroll: true,
     requires: [
         'Editor.store.quality.Task',
+        'Editor.view.quality.admin.TaskQualitiesViewModel',
         'Editor.view.quality.admin.TaskQualitiesController'
     ],
     controller: 'taskQualities',
+    viewModel: {
+        type: 'taskQualities'
+    },
     strings: {
         category: '#UT#Kategorie',
         total: '#UT#Anzahl',
@@ -63,18 +66,19 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
         //publish this field so it is bindable
         extraParams: true
     },
+    bind: {
+        loading: '{isAnalysisRunning}',
+        disabled: '{!enablePanel}'
+    },
     /**
      * allow the store extra params to be configurable on grid level. This will enable flexible loads via binding
      * This function only expects and handles extraParams with valid taskGuid
      */
     setExtraParams: function(extraParams){
-        if(!this.reAnalysisHidden){
-            this.down('#analysisToolbar').setHidden(true);
-            this.reAnalysisHidden = true;
-        }
         this.store.getProxy().abort(); // abort running requests to avoid contextless requests
-        if(extraParams && extraParams.taskGuid){
+        if(extraParams && extraParams.taskGuid && extraParams.taskId){
             this.store.taskGuid = extraParams.taskGuid;
+            this.store.taskId = extraParams.taskId;
             this.store.reload();
         } else {
             this.store.removeAll(false);
@@ -154,12 +158,6 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                                     + '<b>' + me.strings.incompleteTipCaption +'</b><br/>'
                                     + me.strings.incompleteTipText + '. ' + me.strings.startAnalysisHint
                                     + '">'+ Ext.String.fromCodePoint(parseInt('0xf071', 16)) + '</span>';
-                                // somehow ugly: adjusting the view from a column renderer.
-                                // The store load-event comes to early and this is the easiest way, this one detail does not really justify an own view-controller
-                                if(me.reAnalysisHidden){
-                                    me.down('#analysisToolbar').setHidden(false);
-                                    me.reAnalysisHidden = false;
-                                }
                             } else {
                                 html = '<span class="x-grid-symbol t5-quality-complete" data-qtip="'
                                     + '<b>' + me.strings.completeTipCaption +'</b>">'
@@ -183,7 +181,6 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                     dock: 'bottom',
                     ui: 'footer',
                     itemId: 'analysisToolbar',
-                    hidden: me.reAnalysisHidden,
                     items: [{
                         xtype: 'button',
                         text: me.strings.newAnalysis,
@@ -203,11 +200,40 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
         return me.callParent([ config ]);
     },
     /**
-     * TODO AUTOQA: implement
-     * Opens the re-analysis dialog
+     * TODO AUTOQA: add dialog to modify the QA configuration
+     * Starts a re-analysis
      */
     onAnalysisButtonClick: function(btn){
-        console.log('onAnalysisButtonClick: ', btn);
-    }    
+    	if(!this.store || !this.store.taskGuid || !this.store.taskId){
+    		return;
+    	}
+        var me = this,
+        	taskGuid = this.store.taskGuid,
+        	taskId = this.store.taskId,
+        	projectTaskGrid = Ext.ComponentQuery.query('#projectTaskGrid').at(0),
+	        setAnalysisRecordState = function(store, taskId){
+	            var record = store ? store.getById(taskId) : null;
+	            if(!record){
+	                return;
+	            }
+	            record.set('state', 'opautoqa');
+	        };
+	    // before the analysis is started, set the task state to 'autoqa'
+	    // the matchanalysis and languageresourcesassoc panel loading masks are binded 
+	    // to the task status. Changing the status to autoqa will automaticly apply the loading masks for those panels
+	    setAnalysisRecordState(Ext.StoreManager.get('admin.Tasks'), taskId);
+	    if(projectTaskGrid){
+	    	setAnalysisRecordState(projectTaskGrid.getStore(), taskId);
+	    }
+        Ext.Ajax.request({
+            url: Editor.data.restpath+'task/'+taskId+'/autoqa/operation',
+            method: "PUT",
+            params: { "taskGuid": taskGuid, "taskId": taskId },
+            scope: this,
+            failure: function(response){
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        });
+    }
 });
 

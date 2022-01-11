@@ -29,7 +29,9 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel', {
     extend : 'Ext.app.ViewModel',
     alias : 'viewmodel.matchAnalysisPanel',
-
+    data: {
+        hasAnalysisData: false
+    },
     formulas : {
         isAnalysisRunning : {
             get : function (task) {
@@ -43,20 +45,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel', {
         enablePanel : {
             get : function (task) {
                 // if import status error disabled
-                return task && (!task.isErroneous() && !task.isImporting());
-            },
-            bind : {
-                bindTo : '{currentTask}',
-                deep : true
-            }
-        },
-        getEdit100PercentMatchLableText : {
-            get : function (task) {
-                if(!task){
-                    return false;
-                }
-                var strings = this.getView().strings;
-                return task.get('edit100PercentMatch') ? '' : strings.edit100PercentMatchDisabledMessage;
+                return (task && !task.isErroneous() && !task.isImporting());
             },
             bind : {
                 bindTo : '{currentTask}',
@@ -75,7 +64,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel', {
             pageSize : false,
             autoLoad : true,
             listeners : {
-                load : 'onAnalysisRecordLoad'
+                load : 'onAnalysisRecordLoad',
+                metachange: 'onMetaChange'
             },
             setFilters : function (filters) {
                 // the binding is triggered wiht empty values to, we do not want

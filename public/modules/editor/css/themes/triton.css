@@ -27,3 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 /* This css will be applied when this theme is active. */
+
+.commentPanel .customMaterialIconStyle{
+    color: #34383f;
+    opacity:1 !important;
+}

@@ -35,7 +35,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     requires: [
         'Editor.plugins.MatchAnalysis.view.AnalysisPanel',
-        'Editor.plugins.MatchAnalysis.view.LanguageResources'
+        'Editor.plugins.MatchAnalysis.view.LanguageResources',
+        'Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig'
     ],
     
     models: ['Editor.plugins.MatchAnalysis.model.MatchAnalysis'],
@@ -71,12 +72,14 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         taskGridIconTooltip:'#UT#Match-Analyse',
         finishTask:'#UT#Beenden',
         analysis:'#UT#Analyse Starten',
+        analysisHint:'#UT#Umfasst eine QS und Terminologie Prüfung',
+        startTermCheck:'#UT#Terminologie Prüfung starten',
         preTranslation:'#UT#Analyse &amp; Vorübersetzungen starten',
         preTranslationTooltip:'#UT#Die Vorübersetzung löst auch eine neue Analyse aus',
         startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.',
         finishAnalysisMsg:'#UT#Die Match-Analyse und die Vorübersetzung sind abgeschlossen.',
         internalFuzzy:'#UT#Zähle interne Fuzzy',
-        pretranslateMatchRate:'#UT#Vorübersetzungs Match-Rate',
+        pretranslateMatchRate:'#UT#TM Vorübersetzungs Match-Rate',
         pretranslateMatchRateTooltip:'#UT#Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist',
         pretranslateTmAndTerm:'#UT#Vorübersetzen (TM &amp; Terme)',
         pretranslateTmAndTermTooltip:'#UT#Treffer aus der Terminologie werden bevorzugt vorübersetzt.',
@@ -222,13 +225,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             xtype : 'toolbar',
             dock : 'bottom',
             ui: 'footer',
-            layout: {
-                type: 'hbox',
-                pack: 'start'
-            },
             items: [{
                 xtype:'button',
-                text:this.strings.analysis,
+                text: me.strings.analysis,
                 itemId:'btnAnalysis',
                 width:150,
                 dock:'bottom',
@@ -239,67 +238,68 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 },
                 listeners:{
                     click:{
-                        fn:this.matchAnalysisButtonHandler,
-                        scope:this
+                        fn: me.matchAnalysisButtonHandler,
+                        scope:me
                     }
+                }
+            },{
+                xtype: 'tbseparator'
+            },{
+                xtype: 'container',
+                html: me.strings.analysisHint,
+                bind: {
+                    hidden:'{isAnalysisButtonHidden}'
                 }
             }]
         },{
-            xtype : 'toolbar',
+            xtype : 'container',
             dock : 'bottom',
-            ui: 'footer',
             bind:{
                 disabled:'{!enableDockedToolbar || !hasLanguageResourcesAssoc}'
             },
             layout: {
-                type: 'vbox',
-                align: 'left'
+                type: 'column',
+                //align: 'left'
+            },
+            padding: 5,
+
+            defaults: {
+                padding: 5
             },
             items : [{
                 xtype:'checkbox',
                 value: 1,
-                boxLabel:this.strings.internalFuzzy,
-                itemId:'cbInternalFuzzy',
-                dock:'bottom'
+                boxLabel: me.strings.internalFuzzy,
+                itemId: 'cbInternalFuzzy',
             },{
-                dock:'bottom',
-                xtype:'container',
-                layout: {
-                    type: 'hbox',
-                    align: 'left'
+                xtype:'checkbox',
+                bind:{
+                    disabled:'{!hasTmOrCollection}'
                 },
-                items:[
-                    {
-                        xtype:'checkbox',
-                        bind:{
-                            disabled:'{!hasTmOrCollection}'
-                        },
-                        value: 1,
-                        cls:'lableInfoIcon',
-                        boxLabel:me.strings.pretranslateTmAndTerm,
-                        autoEl: {
-                            tag: 'div',
-                            'data-qtip': me.strings.pretranslateTmAndTermTooltip
-                        },
-                        itemId:'pretranslateTmAndTerm',
-                        padding: '0 20 0 0'
-                    },{
-                        xtype:'combobox',
-                        stretch: false,
-                        align: 'left',
-                        itemId:'cbMinMatchrate',
-                        fieldLabel: me.strings.pretranslateMatchRate,
-                        tooltip:me.strings.pretranslateMatchRateTooltip,
-                        store: Ext.create('Ext.data.Store', {
-                            fields: ['id', 'value'],
-                            data : storeData
-                        }),
-                        value:100,
-                        displayField: 'value',
-                        valueField: 'id',
-                        queryMode: 'local'
-                    }
-                ]
+                value: 1,
+                cls: 'lableInfoIcon',
+                boxLabel:me.strings.pretranslateTmAndTerm,
+                autoEl: {
+                    tag: 'div',
+                    'data-qtip': me.strings.pretranslateTmAndTermTooltip
+                },
+                itemId:'pretranslateTmAndTerm',
+            },{
+                xtype:'combobox',
+                // stretch: false,
+                // align: 'left',
+                itemId:'cbMinMatchrate',
+                fieldLabel: me.strings.pretranslateMatchRate,
+                labelWidth: 120,
+                tooltip:me.strings.pretranslateMatchRateTooltip,
+                store: Ext.create('Ext.data.Store', {
+                    fields: ['id', 'value'],
+                    data : storeData
+                }),
+                value:100,
+                displayField: 'value',
+                valueField: 'id',
+                queryMode: 'local'
             },{
                 xtype:'checkbox',
                 bind:{
@@ -399,7 +399,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     startAnalysis:function(taskId,operation,importDefaults){
         //'editor/:entity/:id/operation/:operation',
         var me = this,
-            removeDefaults = importDefaults===undefined ? false : importDefaults,
+            removeDefaults = importDefaults === undefined ? false : importDefaults,
             params = {
                 internalFuzzy: me.isCheckboxChecked('cbInternalFuzzy'),
                 pretranslateTmAndTerm: me.isCheckboxChecked('pretranslateTmAndTerm'),

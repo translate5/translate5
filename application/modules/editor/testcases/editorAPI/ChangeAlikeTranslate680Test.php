@@ -388,6 +388,6 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         //open task for whole testcase
         self::$api->login('testmanager');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }

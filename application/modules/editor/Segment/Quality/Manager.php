@@ -34,7 +34,22 @@ END LICENSE AND COPYRIGHT
  *
  */
 final class editor_Segment_Quality_Manager {
-   
+    
+    /**
+     * AutoQA-Operation: Performs a re-evaluation of all qualities for the task, retags all segments
+     * This Operation also tag's terms and may needs a while
+     * @param editor_Models_Task $task
+     */
+    public static function autoqaOperation(editor_Models_Task $task){
+        
+        $parentId = editor_Task_Operation::create(editor_Task_Operation::AUTOQA, $task);
+  
+        self::instance()->queueOperation(editor_Segment_Processing::RETAG, $task, $parentId);
+        
+        $workerQueue = ZfExtended_Factory::get('ZfExtended_Worker_Queue');
+        /* @var $wq ZfExtended_Worker_Queue */
+        $workerQueue->trigger();
+    }
     /**
      * @var editor_Segment_Quality_Manager
      */
@@ -123,6 +138,12 @@ final class editor_Segment_Quality_Manager {
         // Length
         $provider = new editor_Segment_Length_QualityProvider();
         $this->registry[$provider->getType()] = $provider;
+        // Empty
+        $provider = new editor_Segment_Empty_QualityProvider();
+        $this->registry[$provider->getType()] = $provider;
+        // Consistent
+        $provider = new editor_Segment_Consistent_QualityProvider();
+        $this->registry[$provider->getType()] = $provider;
     }
     /**
      * 
@@ -144,27 +165,75 @@ final class editor_Segment_Quality_Manager {
         return NULL;
     }
     /**
-     * Prepares the import: adds all Import Workers that exist for Quality tags
-     * @param editor_Models_Task $task
-     * @param int $parentWorkerId
+     * Adds the neccessary import workers
+     * @param string $taskGuid
+     * @param int $workerParentId
      */
-    public function prepareImport(editor_Models_Task $task, int $parentWorkerId){
-        
-        foreach($this->registry as $type => $provider){
-            /* @var $provider editor_Segment_Quality_Provider */
-            if($provider->hasImportWorker()){
-                $provider->addWorker($task, $parentWorkerId, editor_Segment_Processing::IMPORT);
+    public function queueImport(editor_Models_Task $task, int $workerParentId=0){
+        // add starting worker
+        $worker = ZfExtended_Factory::get('editor_Segment_Quality_ImportWorker');
+        /* @var $worker editor_Segment_Quality_ImportWorker */
+        if($worker->init($task->getTaskGuid())){
+            $qualityParentId = $worker->queue($workerParentId, null, false);
+            // add finishing worker
+            $worker = ZfExtended_Factory::get('editor_Segment_Quality_ImportFinishingWorker');
+            /* @var $worker editor_Segment_Quality_ImportFinishingWorker */
+            if($worker->init($task->getTaskGuid())) {
+                $worker->queue($qualityParentId, null, false);
             }
         }
     }
     /**
-     * Finishes the import: processes all non-worker providers & saves the processed tags-model back to the segments
+     * Adds the neccessary workers for an operation
+     * @param string $processingMode: as defined in editor_Segment_Processing
+     * @param editor_Models_Task $task
+     * @param int $workerParentId: this must be the id of the wrapping operation worker
+     */
+    public function queueOperation(string $processingMode, editor_Models_Task $task, int $workerParentId){
+        // add starting worker
+        $workerParams = ['processingMode' => $processingMode ]; // mandatory for any quality processing
+        $worker = ZfExtended_Factory::get('editor_Segment_Quality_OperationWorker');
+        /* @var $worker editor_Segment_Quality_OperationWorker */
+        if($worker->init($task->getTaskGuid(), $workerParams)) {
+            $worker->queue($workerParentId, null, false);
+            // add finishing worker
+            $worker = ZfExtended_Factory::get('editor_Segment_Quality_OperationFinishingWorker');
+            /* @var $worker editor_Segment_Quality_ImportFinishingWorker */
+            if($worker->init($task->getTaskGuid(), $workerParams)) {
+                $worker->queue($workerParentId, null, false);
+            }
+        }
+    }
+    /**
+     * Prepares Term tagging only
+     * @param editor_Models_Task $task
+     * @param int $parentWorkerId
+     */
+    public function prepareTagTerms(editor_Models_Task $task, int $parentWorkerId) {
+        $this->prepareOperation(editor_Segment_Processing::TAGTERMS, $task, $parentWorkerId);
+    }
+    /**
+     * Prepares the quality workers depending on the context/processing type
+     * @param string $processingMode
+     * @param editor_Models_Task $task
+     * @param int $parentWorkerId
+     * @param array $workerParams
+     */
+    public function prepareOperation(string $processingMode, editor_Models_Task $task, int $parentWorkerId, array $workerParams=[]){
+        foreach($this->registry as $type => $provider){
+            /* @var $provider editor_Segment_Quality_Provider */
+            if($provider->hasOperationWorker($processingMode)){
+                $provider->addWorker($task, $parentWorkerId, $processingMode, $workerParams);
+            }
+        }
+    }
+    /**
+     * Finishes an operation: processes all non-worker providers & saves the processed tags-model back to the segments
      * @param editor_Models_Task $task
      */
-    public function finishImport(editor_Models_Task $task){
+    public function finishOperation(string $processingMode, editor_Models_Task $task){
         
         $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
-        $processingMode = editor_Segment_Processing::IMPORT;
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $db editor_Models_Db_Segments */
         $db->getAdapter()->beginTransaction();
@@ -180,11 +249,11 @@ final class editor_Segment_Quality_Manager {
         /* @var $segment editor_Models_Segment */
         foreach($segmentIds as $segmentId){
             $segment->load($segmentId);
-            $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, true);
+            $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, editor_Segment_Processing::isOperation($processingMode));
             // process all quality providers that do not have an import worker
             foreach($this->registry as $type => $provider){
                 /* @var $provider editor_Segment_Quality_Provider */
-                if(!$provider->hasImportWorker()){
+                if(!$provider->hasOperationWorker($processingMode)){
                     $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
                 }
             }
@@ -195,9 +264,15 @@ final class editor_Segment_Quality_Manager {
         }
         // save qualities
         editor_Models_Db_SegmentQuality::saveRows($qualities);
-        // remove segment tags model
-        editor_Models_Db_SegmentTags::removeByTaskGuid($task->getTaskGuid());
-        
+
+        // Append qualities, that can be detected only after all segments are created
+        foreach($this->registry as $type => $provider){
+            /* @var $provider editor_Segment_Quality_Provider */
+            if (!$provider->hasOperationWorker($processingMode)) {
+                $tags = $provider->postProcessTask($task, $qualityConfig, $processingMode);
+            }
+        }
+
         $db->getAdapter()->commit();
     }
     /**
@@ -215,6 +290,38 @@ final class editor_Segment_Quality_Manager {
         }
         $tags->flush();
     }
+    
+    /**
+     * Special API for qualities which can only be evaluated by processing all segments of a task
+     * This method is called BEFORE saving the segments and it's repetitions
+     * Operations like Import or Analyze will only have ::postProcessTask being called since there are no differences to be detected
+     *
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     */
+    public function preProcessTask(editor_Models_Task $task, string $processingMode) {
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        foreach ($this->registry as $type => $provider) {
+            /* @var $provider editor_Segment_Quality_Provider */
+            $provider->preProcessTask($task, $qualityConfig, $processingMode);
+        }
+    }
+    
+    /**
+     * Special API for qualities which can only be evaluated by processing all segments of a task
+     * This method is called AFTER saving the segments and it's repetitions
+     *
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     */
+    public function postProcessTask(editor_Models_Task $task, string $processingMode) {
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        foreach ($this->registry as $type => $provider) {
+            /* @var $provider editor_Segment_Quality_Provider */
+            $provider->postProcessTask($task, $qualityConfig, $processingMode);
+        }
+    }
+    
     /**
      * Alike Segments have a special processing as they clone some qualities from their original segment
      * @param editor_Models_Segment $segment
@@ -232,7 +339,6 @@ final class editor_Segment_Quality_Manager {
         }
         $tags->flush();
     }
-        
     /**
      * The central API to identify the needed Tag class by classnames and attributes
      * @param string $tagType
@@ -268,11 +374,24 @@ final class editor_Segment_Quality_Manager {
         if($this->hasProvider($type)){
             $translation = $this->getProvider($type)->translateType($this->getTranslate());
             if($translation === NULL){
-                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation for the type".');
+                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityType: provider of type "'.$type.'" has no translation for the type".');
             }
             return $translation;
         }
-        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityType: provider of type "'.$type.'" not present.');
+        return '';
+    }
+    /**
+     * Translates a Segment Quality Type tooltip
+     * @param string $type
+     * @throws ZfExtended_Exception
+     * @return string
+     */
+    public function translateQualityTypeTooltip(string $type) : string {
+        if ($this->hasProvider($type)) {
+            return $this->getProvider($type)->translateTypeTooltip($this->getTranslate());
+        }
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityTypeTooltip: provider of type "'.$type.'" not present.');
         return '';
     }
     /**
@@ -287,9 +406,32 @@ final class editor_Segment_Quality_Manager {
         if($this->hasProvider($type)){
             $translation = $this->getProvider($type)->translateCategory($this->getTranslate(), $category, $task);
             if($translation === NULL){
-                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation of category "'.$category.'".');
+                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityCategory: provider of type "'.$type.'" has no translation of category "'.$category.'".');
             }
             return $translation;
+        }
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityCategory: provider of type "'.$type.'" not present.');
+        return '';
+    }
+    /**
+     * Evaluates, if the quality of the given type has categories
+     * @param string $type
+     * @return bool
+     */
+    public function hasCategories(string $type) : bool {
+        return $this->getProvider($type)->hasCategories();
+    }
+    /**
+     * Translates a Segment Quality category tooltip
+     * @param string $type
+     * @param string $category
+     * @param editor_Models_Task $task
+     * @throws ZfExtended_Exception
+     * @return string
+     */
+    public function translateQualityCategoryTooltip(string $type, string $category, editor_Models_Task $task) : string {
+        if ($this->hasProvider($type)) {
+            return $this->getProvider($type)->translateCategoryTooltip($this->getTranslate(), $category, $task);
         }
         throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
         return '';

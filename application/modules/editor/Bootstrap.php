@@ -111,7 +111,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     {
         
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
-            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'comment',
+            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'comment', 'attributedatatype',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                                 'config', 'segmentuserassoc', 'session', 'language','termcollection','languageresourceresource','languageresourcetaskassoc',
                                 'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category', 'quality','userassocdefault'
@@ -227,7 +227,12 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'project'
         )));
 
-
+        $this->front->getRouter()->addRoute('editorTaskCommentNav', new ZfExtended_Controller_RestLikeRoute(
+            'editor/commentnav',[
+                'module' => 'editor',
+                'controller' => 'commentnav',
+                'action' => 'index'
+            ]));
 
         //FIXME convert me to RestLikeRoute (see filemap)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
@@ -375,25 +380,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                         'action' => 'testgetattributes'
                 ));
         $this->front->getRouter()->addRoute('testgetattributes', $getCollectionAttributes);
-        
-        $searchTermCollection= new ZfExtended_Controller_RestLikeRoute(
-                'editor/termcollection/search/*',
-                array(
-                        'module' => 'editor',
-                        'controller' => 'termcollection',
-                        'action' => 'search'
-                ));
-        $this->front->getRouter()->addRoute('searchtermcollection', $searchTermCollection);
-        
-        $searchAttributeTermCollection= new ZfExtended_Controller_RestLikeRoute(
-                'editor/termcollection/searchattribute/*',
-                array(
-                        'module' => 'editor',
-                        'controller' => 'termcollection',
-                        'action' => 'searchattribute'
-                ));
-        $this->front->getRouter()->addRoute('searchattributetermcollection', $searchAttributeTermCollection);
-        
+
         $searchTermExists = new ZfExtended_Controller_RestLikeRoute(
             'editor/termcollection/searchtermexists/*',
             array(
@@ -486,6 +473,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'module' => 'editor',
                 'controller' => 'languageresourceinstance',
                 'action' => 'tbxexport'
+            )
+        ));
+
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_xlsxexport', new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/xlsxexport',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'xlsxexport'
             )
         ));
 

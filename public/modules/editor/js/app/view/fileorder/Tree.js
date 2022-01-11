@@ -41,23 +41,25 @@ Ext.define('Editor.view.fileorder.Tree', {
   extend: 'Ext.tree.Panel',
   alias: 'widget.fileorder.tree',
   itemId: 'fileorderTree',
+  //title: 'Arbeits-Dateien',
   cls: 'fileTree',
   store: 'Files',
-  rootVisible: false,  
-  initConfig: function(instanceConfig) {
-    var me = this,
-        config = {
-          viewConfig: {
-            singleSelect: true,
-            plugins: [
-              Ext.create('Ext.tree.plugin.TreeViewDragDrop')
-            ]
-          }
-        };
-
-    if (instanceConfig) {
-        me.self.getConfigurator().merge(me, config, instanceConfig);
-    }
-    return me.callParent([config]);
+  rootVisible: false,
+  collapsible: false,
+  bodyPadding: 0,
+  header: {
+    hidden:false,
+    height:32,
+    padding:'7 10 6',
+    style:'background-color:rgb(212 212 217)' 
+  },
+  bodyPadding: 0,
+  viewConfig: {
+    selModel:{
+      singleSelect: true,
+    },
+    plugins: [{
+        ptype: 'treeviewdragdrop',
+    }]
   }
 });

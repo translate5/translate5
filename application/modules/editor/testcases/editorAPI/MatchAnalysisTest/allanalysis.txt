@@ -786,7 +786,7 @@
     {
         "segmentNrInTask": "39",
         "internalFuzzy": "0",
-        "matchRate": "104",
+        "matchRate": "102",
         "wordCount": "3",
         "type": "auto-propagated"
     },
@@ -1962,7 +1962,7 @@
     {
         "segmentNrInTask": "101",
         "internalFuzzy": "0",
-        "matchRate": "104",
+        "matchRate": "102",
         "wordCount": "3",
         "type": "auto-propagated"
     },
