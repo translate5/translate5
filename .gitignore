@@ -22,4 +22,4 @@ cghooks.lock
 _mails
 /.idea
 .idea
-/windows-installer-config.ini
+.jshintrc
