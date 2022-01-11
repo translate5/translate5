@@ -26,6 +26,20 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+
+/* --------------- Variables for user color in track changes and multi user editing --------------- */
+:root {
+    --color-usernr1: #f9e788;/* yellow pale */
+    --color-usernr2: #f9b372;/* orange pale */
+    --color-usernr3: #cbe0f9;/* blue pale */
+    --color-usernr4: #f3d5ed;/* lilac pale */
+    --color-usernr5: #e4fb81;/* yellowish green pale */
+    --color-usernr6: #FFD8D4;/* pink pale */
+    --color-usernr7: #9af2db;/* turquoise pale */
+    --color-usernr8: #b5f3bf;/* lime green pale */
+    --color-usernrX: lightgray;/* lightgray */
+}
+
 /* T5DEV-161: visual review requres this to be set to 'initial' and not to 'relative' else the review file will not be displayed! */
 div.x-container.x-container-default {position: initial;}
 
@@ -218,11 +232,13 @@ div.single + div {
 .head-panel-info-panel span.task-readonly {font-style: italic;}
 /* END - Headpanel */
 
-/*Terminologie:*/
+/*Terminology:*/
 .metaTermPanel .term-group {padding:2px 0px; text-align:left;vertical-align: top;}
 .metaTermPanel .term-group > div {padding: 2px 1px;}
 .metaTermPanel .term-group > div.target-terms {padding-left: 14px;}
 .metaTermPanel .target-terms {border-top:1px dotted #BFC2C2;}
+.metaTermPanel .term-box span.term a {color:inherit;text-decoration:none;}
+.metaTermPanel .term-box span.term a:hover {text-decoration:underline;}
 
 .x-form-cb-label-after {white-space: normal;}
 
@@ -867,9 +883,30 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
     text-align: center;
 }
 
-.okapifilterGrid .x-action-col-icon{
-    margin: 5px !important;
+#commentNavList>div {
+    font-size: 16px;
 }
-.customFilterGrid .x-action-col-icon{
-    margin: 5px !important;
+
+#commentNavList>div:hover {
+    background-color: #99BCE8;
 }
+
+#commentNavList>div::before{
+    display: inline-block;
+    width: 1.28571em;
+    width: 25px;
+    text-align: center;
+    border-radius: 3px;
+    margin: -3px 0 -6px -5px;
+    line-height: 25px;
+}
+
+#commentNavList>div.usernr1::before {background-color: var(--color-usernr1);}
+#commentNavList>div.usernr2::before {background-color: var(--color-usernr2);}
+#commentNavList>div.usernr3::before {background-color: var(--color-usernr3);}
+#commentNavList>div.usernr4::before {background-color: var(--color-usernr4);}
+#commentNavList>div.usernr5::before {background-color: var(--color-usernr5);}
+#commentNavList>div.usernr6::before {background-color: var(--color-usernr6);}
+#commentNavList>div.usernr7::before {background-color: var(--color-usernr7);}
+#commentNavList>div.usernr8::before {background-color: var(--color-usernr8);}
+#commentNavList>div.usernrX::before {background-color: var(--color-usernrX);}
