@@ -274,20 +274,9 @@ class editor_Models_Import {
         }
         
         // queueing the quality workers, which have a kind of "sub-plugin" systematic to trigger the dependant workers like termtaggers etc.
+        editor_Segment_Quality_Manager::instance()->queueImport($this->task, $parentId);
         
-        $worker = ZfExtended_Factory::get('editor_Segment_Quality_ImportWorker');
-        /* @var $worker editor_Segment_Quality_ImportWorker */
-        if($worker->init($taskGuid)) {
-            $worker->queue($parentId, null, false);
-        }
-        $worker = ZfExtended_Factory::get('editor_Segment_Quality_ImportFinishingWorker');
-        /* @var $worker editor_Segment_Quality_ImportFinishingWorker */
-        if($worker->init($taskGuid)) {
-            $worker->queue($parentId, null, false);
-        }
-        
-        // the worker finishing the import
-        
+        // the worker finishing the import        
         $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_FinalStep');
         /* @var $worker editor_Models_Import_Worker_FinalStep */
         if($worker->init($taskGuid, ['config' => $this->importConfig])) {

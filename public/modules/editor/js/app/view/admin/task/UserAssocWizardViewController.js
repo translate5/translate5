@@ -124,6 +124,8 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
 
         // set the checkbox default value from config
         me.setNotifyAllUsersTaskConfig();
+
+        me.onAddAssocBtnClick();
     },
 
     /***
@@ -150,7 +152,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             success: function() {
                 me.getView().down('grid').getStore().load();
                 Editor.MessageBox.addSuccess('Assoc saved');
-                me.resetRecord();
+                me.onAddAssocBtnClick();
                 taskStore.load();
             }
         });

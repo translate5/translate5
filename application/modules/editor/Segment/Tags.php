@@ -502,7 +502,7 @@ class editor_Segment_Tags implements JsonSerializable {
     }
     
     /* SegmentQuality API */
-    
+
     /**
      * Adds a general quality to the tags (segment-quality model)
      * Do NOT use this API to add a quality that has related segment tags, use ::addQualityByTag instead
@@ -517,6 +517,19 @@ class editor_Segment_Tags implements JsonSerializable {
      */
     public function addQuality(string $field, string $type, string $category, int $startIndex=0, int $endIndex=-1, stdClass $additionalData=NULL){
         $this->getQualities()->add($field, $type, $category, $startIndex, $endIndex, $additionalData);
+    }
+    /**
+     * Drops a general quality from the tags (segment-quality model)
+     * Do NOT use this API to drop a quality that has related segment tags
+     * @param string $field
+     * @param string $type
+     * @param string $category
+     * @param int $startIndex
+     * @param int $endIndex
+     * @param stdClass $additionalData: a FLAT object with additional data needed for re-identification. Deeper nested objects will be ignored
+     */
+    public function dropQuality(string $field, string $type, string $category, int $startIndex=0, int $endIndex=-1, stdClass $additionalData=NULL){
+        $this->getQualities()->drop($field, $type, $category, $startIndex, $endIndex, $additionalData);
     }
     /**
      * Adds a quality entry by tag
@@ -576,7 +589,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * internal
      * @return editor_Segment_Qualities
      */
-    private function getQualities() : editor_Segment_Qualities {
+    public function getQualities() : editor_Segment_Qualities {
         if($this->qualities == NULL){
             $this->qualities = new editor_Segment_Qualities($this->segmentId, $this->task->getTaskGuid(), $this->processingMode);
         }

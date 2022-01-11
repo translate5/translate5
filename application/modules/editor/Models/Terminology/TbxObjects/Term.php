@@ -50,9 +50,9 @@ class editor_Models_Terminology_TbxObjects_Term extends editor_Models_Terminolog
         'langSetGuid' => false,
         'guid' => false,
         'tbxCreatedBy' => true,
-        'tbxCreatedAt' => true,
+        'tbxCreatedAt' => true, //see special hash treatment below!
         'tbxUpdatedBy' => true,
-        'tbxUpdatedAt' => true,
+        'tbxUpdatedAt' => true, //see special hash treatment below!
     ];
 
     const TERM_DEFINITION = 'definition';
@@ -91,9 +91,9 @@ class editor_Models_Terminology_TbxObjects_Term extends editor_Models_Terminolog
     public ?string $guid = null;
 
     public ?int $tbxCreatedBy = null;
-    public string $tbxCreatedAt = '';
+    public string $tbxCreatedAt = ''; //see special hash treatment below!
     public ?int $tbxUpdatedBy = null;
-    public string $tbxUpdatedAt = '';
+    public string $tbxUpdatedAt = ''; //see special hash treatment below!
 
     public string $descrip = '';
     public string $descripType = '';
@@ -111,5 +111,16 @@ class editor_Models_Terminology_TbxObjects_Term extends editor_Models_Terminolog
     public function getCollectionKey(): string
     {
         return $this->termEntryTbxId.'-'.$this->language.'-'.$this->termTbxId;
+    }
+
+    protected function makeDataForHash(): array
+    {
+        $data = parent::makeDataForHash();
+        foreach(['tbxUpdatedAt', 'tbxCreatedAt'] as $dateItem) {
+            if($data[$dateItem] === '0000-00-00 00:00:00') {
+                $data[$dateItem] = '';
+            }
+        }
+        return $data;
     }
 }

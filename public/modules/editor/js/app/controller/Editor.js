@@ -187,6 +187,7 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-g':         ['G',{ctrl: true, alt: false}, me.scrollToSegment, true],
             'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
             'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
+            'ctrl-l':         ['L',{ctrl: true, alt: false}, me.focusSegmentShortcut],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
             'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
@@ -679,6 +680,20 @@ Ext.define('Editor.controller.Editor', {
     redo: function() {
         this.fireEvent('redo'); // see SnapshotHistory
     },
+
+    /***
+     * Focus the segment given in the prompt window input
+     */
+    focusSegmentShortcut:function (){
+        var me = this,
+            prompt = Ext.Msg.prompt('Go to segment', 'No.:', function(btn, text){
+            if (btn === 'ok'){
+                me.focusSegment(text);
+            }
+        });
+        prompt.down('textfield').focus(200);
+    },
+
     /**
      * handleAfterContentChange: save snapshot.
      */
@@ -1738,9 +1753,9 @@ Ext.define('Editor.controller.Editor', {
      * "Reference files info message" window button handler
      */
     onShowReferenceFilesButtonClick:function(){
-        var filePanel =this.getFilepanel(); 
-        filePanel.expand();
-        filePanel.down('referenceFileTree').expand();
+        var filePanel =this.getFilepanel().expand();
+        var taskFiles = filePanel.down('taskfiles').expand();
+        taskFiles.scrollable.scrollIntoView(taskFiles.down('referenceFileTree').view.el);
     },
 
     /**

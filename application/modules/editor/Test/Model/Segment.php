@@ -30,7 +30,8 @@ END LICENSE AND COPYRIGHT
  * defines the compared & sanitized data for a segment
  */
 class editor_Test_Model_Segment extends editor_Test_Model_Abstract {
-    
+
+    //FIXME make a black list instead a whitelist here!!!
     protected $compared = [
         'segmentNrInTask',
         'mid',

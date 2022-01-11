@@ -145,7 +145,14 @@ Ext.application({
 
     launch: function () {
         var me = this;
-        me.initViewportLaunch();
+        // if consortium logos should be shown for additional xyz seconds...
+        var showConsortiumLogos = Editor.data.startup.showConsortiumLogos;
+        if (showConsortiumLogos > 0) {
+            setTimeout(function() { me.initViewportLaunch(); }, showConsortiumLogos * 1000);
+        }
+        else {
+            me.initViewportLaunch();
+        }
     },
 
     /***
@@ -585,5 +592,6 @@ Ext.application({
             return row;
         }
         return row.get('value');
-    }
+    },
+
 });

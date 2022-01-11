@@ -45,19 +45,20 @@ END LICENSE AND COPYRIGHT
             //are the sublanguages used as dropdown selections
             $useLanguage=strpos($sourceLocale, '-') === false || $this->showSublanguages;
             if (!in_array($sourceLocale, $allSourceLanguageLocales) && $useLanguage) {
-                $allSourceLanguageLocales[] = $sourceLocale;
+                $allSourceLanguageLocales[$sourceLocale] = ($this->allDbLanguages[$sourceLocale][1] ?? $sourceLocale);
             }
         }
         foreach ($languageResource['target']as $key => $targetLocale) {
             //are the sublanguages used as dropdown selections
             $useLanguage=strpos($targetLocale, '-') === false || $this->showSublanguages;
             if (!in_array($targetLocale, $allTargetLanguageLocales) && $useLanguage) {
-                $allTargetLanguageLocales[] = $targetLocale;
+                $allTargetLanguageLocales[$targetLocale] = ($this->allDbLanguages[$targetLocale][1] ?? $targetLocale);
             }
         }
     }
-    sort($allSourceLanguageLocales);
-    sort($allTargetLanguageLocales);
+    // sort the languages by their speaking names
+    asort($allSourceLanguageLocales);
+    asort($allTargetLanguageLocales);
     
     // the lowest number of characters that any of the LanguageResources can handle
     // is our limit for what the user is allowed to enter:
@@ -70,17 +71,18 @@ END LICENSE AND COPYRIGHT
     $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 ?>
 
-<div class="loadingSpinnerLayer"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
+<div class="loadingSpinnerLayer" xmlns="http://www.w3.org/1999/html"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
 
-<div id="containerHeader" class="container">
+<div id="containerHeader">
+    <div class="container container__instanttranslate container__instanttranslateheader">
     <div id="logo"></div>
+    
+    <div class="buttonContainer">
 <?php
 
-    //check if the user is allowed to acces the term portal
-    if($this->isUserTermportalAllowed){
-        echo '<div id="termPortalButtonContainer"><a id="termPortalButton" class="ui-button ui-widget ui-corner-all">'.$translate->_("TermPortal").'</a></div>';
-    }else{
-        echo '<div id="termPortalButtonContainer"></div>';
+    //check if the user is allowed to access the term portal
+    if ($this->isUserTermportalAllowed) {
+        echo '<div id="termPortalButtonContainer"><a id="termPortalButton" class="">'.$translate->_("TermPortal").'</a></div>';
     }
     
     // see View_Helper_LanguageSelector
@@ -107,6 +109,7 @@ END LICENSE AND COPYRIGHT
         "notAllowed"                => $translate->_("nicht erlaubt"),
         "openInTermPortal"          => $translate->_("Term im TermPortal öffnen"),
         "attentionFuzzyMatch"       => $translate->_("Achtung! FuzzyMatch ({0})"),
+        "attentionFuzzyMatch"       => $translate->_('Achtung! Fuzzy Match ({0}%) - die Quelle im Translation Memory unterscheidet sich von Ihrer Anfrage. Die Unterschiede sind mit einem grauen Hintergrund gekennzeichnet.'),
         "differenceIsHighlighted"   => $translate->_("Quellsegment zum TM-Match: Unterschied zu Ihrer Texteingabe hervorgehoben"),
         "selectLanguages"           => $translate->_("Bitte wählen Sie eine Sprachkombination für die Übersetzung."),
         "noLanguageResource"        => $translate->_("Für diese Sprachkombination steht keine Sprachressource zur Verfügung."),
@@ -123,10 +126,16 @@ END LICENSE AND COPYRIGHT
         "asOf"                      => $translate->_("Stand:"),
         "translationBasedOn"        => $translate->_("Übersetzt unter Verwendung von:"),
         "singleResultBestMatchrateTooltip"        => $translate->_("Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet."),
+        "languageresourceNames"     => [
+                'TermCollection'    => $translate->_("TermCollection"),
+                'OpenTM2'           => $translate->_("OpenTM2"),
+                'GroupShare'        => $translate->_("GroupShare"),
+        ],
     );
-    $this->Php2JsVars()->set('languageresource.translatedStrings',$this->translations);
+    $this->Php2JsVars()->set('languageresource.translatedStrings', $this->translations);
+    $this->Php2JsVars()->set('allDbLanguages', $this->allDbLanguages);
     
-    $languageSelector[]='<form action="#" method="post" name="languageSelector" id="languageSelector">';
+    $languageSelector[]='<form action="#" method="post" name="languageSelector" id="languageSelector" class="languageSelector">';
     $languageSelector[]='<select id="locale">';
     foreach ($availableTranslations as $locale => $translation) {
         $selected = ($locale == $session->locale) ? ' selected="selected"' : '';
@@ -140,84 +149,154 @@ END LICENSE AND COPYRIGHT
 <?php
 //if the user is not ip based, show the logout button
 if(!$this->isIpBasedUser){
-    echo '<div id="logoutContainer"><a id="logout" href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus">'.$translate->_('Abmelden').'</a></div>';
+    echo '<div id="logoutContainer"><a id="logout" href="#" class="">'.$translate->_('Abmelden').'</a></div>';
 }
+?>
+    </div> <?php // end of buttonContainer ?>
+    </div> <?php // end of container container__instanttranslate ?>
+
+
+<?php
+// SBE: tempDev .. setting this value to TRUE will show some Code which can be usefull for development. E.g. a list of all defined icons is shown
+$isTempDevTemplatesShow = FALSE;
 ?>
     
 </div>
+<div class="sourceSelector">
+    <span class="sourceSelectorItem sourceSelector__text"><svg class="icon icon-t5_translate_text" /> Translate text</span>
+    <span class="sourceSelectorItem sourceSelector__file"><svg class="icon icon-t5_translate_file" /> Translate file</span>
+</div>
 
-<div id="containerTranslation" class="container">
-	<div id="source">
+<div id="containerTranslation" class="container container__instanttranslate container__instanttranslatebody">
+    <div id="source">
+        <div class="switchSourceTarget box bg-grey_01">
+            <svg class="icon icon-t5_switcher" />
+        </div>
         <form id="sourceLanguageAndContent">
-            <select id="sourceLocale" name="sourceLocale">
+            <select id="sourceLocale" class="selectSourceTarget" name="sourceLocale">
                 <?php
-                    $sourceLangSelected = false;
-                    $getParamSource = $this->source;
-                    if (!is_null($getParamSource)) {
-                        $sourceLangSelected = $getParamSource;
-                    } else if (!empty($this->sourceSearchLanguagePreselectionLocale)) {
-                        $sourceLangSelected = $this->sourceSearchLanguagePreselectionLocale;
-                    }
-                    $optionValues=[];
-                    $sourceLangSelected=strtolower($sourceLangSelected);
-                    foreach ($allSourceLanguageLocales as $sourceLangLocale) {
-                        // get the language display name from all languages array. The display name is at index 1
-                        $displayLanguage = $this->allDbLanguages[$sourceLangLocale][1] ?? $sourceLangLocale;
-                        $selected = ($sourceLangSelected != false && $sourceLangSelected == strtolower($sourceLangLocale)) ? ' selected="selected"' : '';
-                        $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$displayLanguage.'</option>';
-                    }
-                    echo implode(' ', $optionValues);
+                $sourceLangSelected = false;
+                $getParamSource = $this->source;
+                if (!is_null($getParamSource)) {
+                    $sourceLangSelected = $getParamSource;
+                } else if (!empty($this->sourceSearchLanguagePreselectionLocale)) {
+                    $sourceLangSelected = $this->sourceSearchLanguagePreselectionLocale;
+                }
+                $optionValues=[];
+                $sourceLangSelected=strtolower($sourceLangSelected);
+                foreach ($allSourceLanguageLocales as $sourceLangLocale => $displayLanguage) {
+                    $selected = ($sourceLangSelected != false && $sourceLangSelected == strtolower($sourceLangLocale)) ? ' selected="selected"' : '';
+                    $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$displayLanguage.'</option>';
+                }
+                echo implode(' ', $optionValues);
                 ?>
             </select>
-            <div id="sourceIsText" class="source-toggle show-if-source-is-text infotext"></div>
-            <div id="sourceIsFile" class="source-toggle show-if-source-is-file infotext"></div>
-            <div id="sourceContent" class="clearable">
-                <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"><?php echo htmlspecialchars($this->text); ?></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
-                <span class="clearable-clear show-if-source-is-text" title="<?php echo $this->translations["clearText"];?>">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
-                <span id="countedCharacters" class="show-if-source-is-text">0</span>
-                <input id="sourceFile" name="sourceFile" type="file" class="show-if-source-is-file"/>
+            
+            <div id="sourceContent" class="textinput clearable box marginTop show-if-source-is-text">
+                <textarea id="sourceText" name="sourceText" wrap="SOFT" class="" placeholder="<?= $translate->_("Geben Sie Text ein"); ?>"><?php echo htmlspecialchars($this->text); ?></textarea>
+                <svg class="icon icon-t5_close clearTextinput clearable-clear" title="<?php echo $this->translations["clearText"];?>" />
+                <span id="countedCharacters" class="countedCharacters_">0</span>
             </div>
-        <div id="sourceError" class="instant-translation-error ui-state-error ui-corner-all"></div>
-        <div id="pretranslatedfiles"></div>
+            <div class="dropSourceFile box marginTop show-if-source-is-file font-size-big">
+                <svg class="icon icon-t5_upload iconsize-giant" /><br>
+                <?= $translate->_('Drag and Drop oder anklicken zum hochladen einer Datei'); ?>
+            </div>
+            <?php // the following input type="file" must be outside of the <div class="dropSourceFile.. else we have a JS problem and Drag'nDrop will not work ?>
+            <input id="sourceFile" name="sourceFile" type="file" class="hide" accept=".<?= implode(',.', $this->Php2JsVars()->get('languageresource')->fileExtension); ?>" />
+            
+            <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="translationSubmit marginTop click-starts-translation ui-corner-all ui-button ui-widget"/>
+            
+            <div id="sourceError" class="instant-translation-error ui-state-error ui-corner-all box marginTop"></div>
         </form>
     </div>
-    <button id="switchSourceTarget">
-    </button>
     <div id="target">
         <form id="targetControls">
-            <select id="targetLocale" name="targetLocale">
+            <select id="targetLocale" class="selectSourceTarget" name="targetLocale">
                 <?php
-                    $targetLangSelected = false;
-                    $getParamTarget = $this->target;
-                    if (!is_null($getParamTarget)) {
-                        $targetLangSelected = $getParamTarget;
-                    } else if (!empty($this->targetSearchLanguagePreselectionLocale)) {
-                        $targetLangSelected = $this->targetSearchLanguagePreselectionLocale;
-                    }
-                    $optionValues=[];
-                    $targetLangSelected=strtolower($targetLangSelected);
-                    foreach ($allTargetLanguageLocales as $targetLangLocale) {
-                        // get the language display name from all languages array. The display name is at index 1
-                        $displayLanguage = $this->allDbLanguages[$targetLangLocale][1] ?? $targetLangLocale;
-                        $selected = ($targetLangSelected != false && $targetLangSelected == strtolower($targetLangLocale)) ? ' selected="selected"' : '';
-                        $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$displayLanguage.'</option>';
-                    }
-                    echo implode(' ', $optionValues);
+                $targetLangSelected = false;
+                $getParamTarget = $this->target;
+                if (!is_null($getParamTarget)) {
+                    $targetLangSelected = $getParamTarget;
+                } else if (!empty($this->targetSearchLanguagePreselectionLocale)) {
+                    $targetLangSelected = $this->targetSearchLanguagePreselectionLocale;
+                }
+                $optionValues=[];
+                $targetLangSelected=strtolower($targetLangSelected);
+                foreach ($allTargetLanguageLocales as $targetLangLocale => $displayLanguage) {
+                    $selected = ($targetLangSelected != false && $targetLangSelected == strtolower($targetLangLocale)) ? ' selected="selected"' : '';
+                    $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$displayLanguage.'</option>';
+                }
+                echo implode(' ', $optionValues);
                 ?>
             </select>
-            <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="click-starts-translation ui-corner-all ui-button ui-widget"/>
         </form>
-        <div id="targetError" class="instant-translation-error ui-state-error ui-corner-all"></div>
-        <div class="loadingSpinnerIndicator"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
-        <div id="translations">
-            <!-- inject translations here  -->
-        </div>
+        <div id="targetError" class="instant-translation-error ui-state-error ui-corner-all marginTop"></div>
+        <div class="loadingSpinnerIndicator marginTop"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
+        
+        <div id="translations" class="show-if-source-is-text"><!-- inject text-translations here  --></div>
+        <div id="pretranslatedfiles" class="show-if-source-is-file"><!-- inject file-translations here  --></div>
+
+
+        <?php if ($isTempDevTemplatesShow) : ?>
+            <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+            <p>SBE-DEV: Test-Ausgabe</p>
+            <div class="box box__result__header box__result__header__green font-size-big">
+                <h2>Result-Header</h2>
+            </div>
+            <div class="box box__result__content">
+                <p class="font-size-medium">
+                    Some kind of subheader here.
+                </p>
+                <p>
+                    Detailed result-content with some text inside.
+                </p>
+            </div>
+            <p class="box marginTop">
+                Liste aller Icons:<br>
+                <svg class="icon icon-t5_attention" title="Hallo Welt! Dies ist ein Icon mit title." /> icon-t5_attention
+                <svg class="icon icon-t5_check_cyan" /> icon-t5_check_cyan
+                <svg class="icon icon-t5_check_green" /> icon-t5_check_green
+                <svg class="icon icon-t5_check_grey" /> icon-t5_check_grey
+                <svg class="icon icon-t5_chevron_grey" /> icon-t5_chevron_grey
+                <svg class="icon icon-t5_chevron" /> icon-t5_chevron
+                <svg class="icon icon-t5_close" /> icon-t5_close
+                <svg class="icon icon-t5_close" /> icon-t5_close
+                <svg class="icon icon-t5_circle_plus_grey" /> icon-t5_circle_plus_grey
+                <svg class="icon icon-t5_document_black" /> icon-t5_document_black
+                <svg class="icon icon-t5_document_grey" /> icon-t5_document_grey
+                <svg class="icon icon-t5_download" /> icon-t5_download
+                <svg class="icon icon-t5_info" /> icon-t5_info
+                <svg class="icon icon-t5_switcher" /> icon-t5_switcher
+                <svg class="icon icon-t5_translate_file_cyan" /> icon-t5_translate_file_cyan
+                <svg class="icon icon-t5_translate_file" /> icon-t5_translate_file
+                <svg class="icon icon-t5_translate_text_cyan" /> icon-t5_translate_text_cyan
+                <svg class="icon icon-t5_translate_text" /> icon-t5_translate_text
+                <svg class="icon icon-t5_upload" /> icon-t5_upload
+            </p>
+            <p class="box marginTop">
+                Liste der Term (Usage) Stati:<br>
+                <svg class="icon icon-t5_termstate-preferred" /> icon-t5_termstate-preferred<br>
+                <svg class="icon icon-t5_termstate-permitted" /> icon-t5_termstate-permitted<br>
+                <svg class="icon icon-t5_termstate-forbidden" /> icon-t5_termstate-forbidden<br>
+                <svg class="icon icon-t5_termstate-unknown" /> icon-t5_termstate-unknown<br>
+            </p>
+            <div class="box box__result__header font-size-big" id="DEV-progressCheck">
+                <a href="#" class="color-grey_09"><h2>My-ProgressBar:</h2></a>
+            </div>
+            <div class="progress" style="margin-top: -3px;">
+                <div id="progressBar_DEV_01" class="progressBar progressBarThin" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+            <script>
+                $('#DEV-progressCheck').click(function () {
+                    setProgressBar('progressBar_DEV_01', (Math.random() * 100));
+                });
+            </script>
+        <?php endif; ?>
     </div>
 </div>
 
 <script type="text/javascript">
     var characterLimit = '<?php echo $characterLimit;?>';
-    
 </script>
 
 <script type="text/javascript">
@@ -243,40 +322,51 @@ $( function() {
             $("#languageSelector").attr("action", "?locale=" + action);
             $("#languageSelector").submit();
         }
-      });
+    });
+    
     $('#sourceLocale').selectmenu({
+        appendTo: "#source",
         open: function() {
             updateLocalesSelectLists($(this));
         },
         change: function() {
             checkInstantTranslation();
         }
-      }).selectmenu("menuWidget").addClass("overflow localesSelectList");
+    }).selectmenu("menuWidget").addClass("overflow localesSelectList");
     $('#targetLocale').selectmenu({
+        appendTo: "#target",
         open: function() {
             updateLocalesSelectLists($(this));
         },
         change: function() {
             checkInstantTranslation();
         }
-      }).selectmenu("menuWidget").addClass("overflow localesSelectList");
+    }).selectmenu("menuWidget").addClass("overflow localesSelectList");
+    // cause the select-menuWidget will not re-size and re-postition itself on windows resize, we just close it.
+    $(window).resize(function() {
+        $('.selectSourceTarget').selectmenu('close');
+    });
+    
     $('#sourceFile').button();
     $('#translationSubmit').button();
-    $('#sourceContent').tooltip({
-        position: { my: "left+15 center", at: "bottom", of: ".clearable-clear" }
+    
+    // activate jQuery-UI tooltip to show title in styled box
+    $( document ).tooltip({
+        position: {
+            my: "center top",
+            at: "center bottom+14",
+            using: function( position, feedback ) {
+                $( this ).css( position );
+                $( "<div>" )
+                    .addClass( "arrow" )
+                    .addClass( "top" )
+                    .addClass( feedback.vertical )
+                    .addClass( feedback.horizontal )
+                    .appendTo( this );
+            }
+        }
     });
-    $('#translations .translation-sourcediff').tooltip({
-        position: { my: "left+15 center", at: "bottom", of: ".translation-sourcediff" }
-    });
-    $('#translations .copyable-copy').tooltip({
-        position: { my: "left+15 center", at: "bottom", of: ".copyable-copy" }
-    });
-    $('#translations .term-info').tooltip({
-        position: { my: "left+15 center", at: "bottom", of: ".term-info" }
-    });
-    $('#translations .term-status').tooltip({
-        position: { my: "left+15 center", at: "bottom", of: ".term-info" }
-    });
+    
     //check if the source and the target are the same
     if($('#sourceLocale').val()==$('#targetLocale').val()){
     	setTargetFirstAvailable($('#sourceLocale').val());
@@ -289,24 +379,57 @@ $( function() {
     setfileUploadLanguageCombinationsAvailable();
     setTextForSource();
     showSource();
-    $('#switchSourceTarget').button({
-    	icon: "ui-icon-transfer-e-w"
-	}).on("click",function(){
-		//switch source and target languages on button click
-		var sourceLocale=$("#sourceLocale").val(),
-			targetLocale=$("#targetLocale").val();
-		$("#sourceLocale").val(targetLocale);
-		$("#targetLocale").val(sourceLocale);
-		$("#sourceLocale").selectmenu("refresh");
-		$("#targetLocale").selectmenu("refresh");
-		var results=$('div.translation-result');
-		checkInstantTranslation();
-		if(results.length>0){
-			$('#sourceText').val(results[0].textContent);
-		}
-		$('#translations').hide();
-		startTranslation();
+    
+    // press the button to swap source-/target-language
+    $('.switchSourceTarget').on("click", function() {
+        // detect old languages
+        var $oldSourceLang = $('#sourceLocale').val();
+        var $oldTargetLang = $('#targetLocale').val();
+        
+        // now swap the language selections
+        $("#sourceLocale").val($oldTargetLang);
+        $("#targetLocale").val($oldSourceLang);
+        $("#sourceLocale").selectmenu("refresh");
+        $("#targetLocale").selectmenu("refresh");
+        
+        // renew the results, if there are any
+        var results=$('div.translation-result');
+        checkInstantTranslation();
+        if(results.length>0) {
+            $('#sourceText').val(results[0].textContent);
+        }
+        $('#translations').hide();
+        startTranslation();
     });
+    
+    //$('.dropSourceFile').droppable();
+    // $("input[type='file']").prop("files", e.dataTransfer.files);
+    
+    // prefent funny behaviour of some browsers
+    $('.dropSourceFile').on('dragover', function(e) {e.preventDefault(); e.stopPropagation();});
+    $('.dropSourceFile').on('dragenter', function(e) {e.preventDefault(); e.stopPropagation();});
+    // add a special class "dargover" and remove it on dragleave
+    $('.dropSourceFile').on('dragover', function() {$(this).addClass('dragover');});
+    $('.dropSourceFile').on('dragleave', function() {$(this).removeClass('dragover')});
+    
+    // do actual "file-dropping"
+    $('.dropSourceFile').on(
+        'drop',
+        function(e) {
+            $(this).removeClass('dragover');
+            if(e.originalEvent.dataTransfer){
+                if(e.originalEvent.dataTransfer.files.length) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    /*UPLOAD FILES HERE*/
+                    $('#sourceFile').prop('files', e.originalEvent.dataTransfer.files);
+                    $('#sourceFile').trigger('change');
+                }
+            }
+        }
+    );
+    // route click event to the input #sourceFile for normal file-select
+    $('.dropSourceFile').on('click', function(e) {e.preventDefault(); e.stopPropagation(); $('#sourceFile').click();});
 } );
 </script>
 
@@ -314,15 +437,45 @@ $( function() {
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js<?php echo $version; ?>"></script>
 
 <script type="text/javascript">
-// show list of available files
-showDownloads(<?php echo json_encode($this->allPretranslatedFiles); ?>, <?php echo json_encode($this->dateAsOf); ?>);
-// "toggle" source (text/file)
-$(document).on('click', '.source-toggle .change-source-type' , function() {
-    $('.source-toggle').toggle();
-    chosenSourceIsText = !chosenSourceIsText;
-    clearAllErrorMessages();
-    document.getElementById("sourceFile").value = "";
-    showSource();
-});
+    // show list of available files
+    showDownloads(<?php echo json_encode($this->allPretranslatedFiles); ?>, <?php echo json_encode($this->dateAsOf); ?>);
+    
+    // "toggle" source (text/file)
+    $(document).on('click', '.source-toggle .change-source-type' , function() {toggleSourceTextFile();});
+    $(document).on('click', '.sourceSelector__text' , function() {toggleSourceTextFile('text');});
+    $(document).on('click', '.sourceSelector__file' , function() {toggleSourceTextFile('file');});
+    $('body').addClass('sourceIsText');
+    
+    function toggleSourceTextFile($source, $hardset = false) {
+        // do nothing if:
+        // want to change to source "text" and is already "text"
+        if (!$hardset && $source === 'text' && chosenSourceIsText) {return;}
+        // want to change to source "file" and is already "file"
+        if (!$hardset && $source === 'file' && !chosenSourceIsText) {return;}
+        // want to change to source "file" and file upload is not aavailable (e.g. for this language combination)
+        if ($source === 'file' && !isFileUploadAvailable()) {return;}
+        
+        $('.source-toggle').toggle();
+        if ($hardset) {
+            if ($source === 'file') {
+                chosenSourceIsText = false;
+            }
+            else {
+                chosenSourceIsText = true;
+            }
+        }
+        else {
+            chosenSourceIsText = !chosenSourceIsText;
+        }
+        
+        clearAllErrorMessages();
+        document.getElementById("sourceFile").value = "";
+        showSource();
+        $('body').removeClass('sourceIsText');
+        $('body').removeClass('sourceIsFile');
+
+        if(chosenSourceIsText) {$('body').addClass('sourceIsText');}
+        else {$('body').addClass('sourceIsFile');}
+    }
 </script>
 

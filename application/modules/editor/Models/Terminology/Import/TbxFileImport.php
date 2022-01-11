@@ -57,6 +57,21 @@ class editor_Models_Terminology_Import_TbxFileImport
      */
     protected array $tbxMap;
 
+    /**
+     * Array to map any known values of transac and transacType to tbx-standard values,
+     * for converting non-standard values into standard prior saving into database
+     *
+     * @var array
+     */
+    protected array $transacMap = [
+        'origination' => 'origination',
+        'modification' => 'modification',
+        'creation' => 'origination',                // Not part of tbx-standart
+
+        'responsibility' => 'responsibility',
+        'responsiblePerson' => 'responsibility',    // Not part of tbx-standart
+    ];
+
     /***
      * @var bool
      */
@@ -172,8 +187,6 @@ class editor_Models_Terminology_Import_TbxFileImport
         $this->collection = $collection;
         $this->mergeTerms = $mergeTerms;
         $this->prepareImportArrays($user);
-
-        error_log("File to import: ".$tbxFilePath);
 
         $xmlReader = (new class() extends XMLReader {
             public function reopen(string $tbxFilePath) {
@@ -296,28 +309,30 @@ $memLog('Loaded terms:        ');
         while ($xmlReader->read() && $xmlReader->name !== $this->tbxMap[$this::TBX_TERM_ENTRY]);
         //process termentry
         while ($xmlReader->name === $this->tbxMap[$this::TBX_TERM_ENTRY]) {
-            $termEntryNode = new SimpleXMLElement($xmlReader->readOuterXML());
-            $parentEntry = $this->handleTermEntry($termEntryNode);
+            if (strlen($_xml = $xmlReader->readOuterXML())) {
+                $termEntryNode = new SimpleXMLElement($_xml);
+                $parentEntry = $this->handleTermEntry($termEntryNode);
 
-            foreach ($termEntryNode->{$this->tbxMap[$this::TBX_LANGSET]} as $languageGroup) {
+                foreach ($termEntryNode->{$this->tbxMap[$this::TBX_LANGSET]} as $languageGroup) {
 
-                $parentLangSet = $this->handleLanguageGroup($languageGroup, $parentEntry);
-                if (is_null($parentLangSet)) {
-                    continue;
+                    $parentLangSet = $this->handleLanguageGroup($languageGroup, $parentEntry);
+                    if (is_null($parentLangSet)) {
+                        continue;
+                    }
+                    foreach ($languageGroup->{$this->tbxMap[$this::TBX_TIG]} as $termGroup) {
+                        $this->handleTermGroup($termGroup, $parentLangSet);
+                    }
                 }
-                foreach ($languageGroup->{$this->tbxMap[$this::TBX_TIG]} as $termGroup) {
-                    $this->handleTermGroup($termGroup, $parentLangSet);
-                }
-            }
-            $this->saveParsedTermEntryNode();
-            $importCount++;
+                $this->saveParsedTermEntryNode();
+                $importCount++;
 
-            //since we do not want to kill the worker table by updating the progress too often,
-            // we do that only 100 times per import, in other words once per percent
-            $newProgress = min(100, round(($importCount/$totalCount)*100));
-            if($newProgress > $progress) {
-                $progress = $newProgress;
-                $this->events->trigger('afterTermEntrySave', $this, ['progress' => $progress]);
+                //since we do not want to kill the worker table by updating the progress too often,
+                // we do that only 100 times per import, in other words once per percent
+                $newProgress = min(100, round(($importCount/$totalCount)*100));
+                if($newProgress > $progress) {
+                    $progress = $newProgress;
+                    $this->events->trigger('afterTermEntrySave', $this, ['progress' => $progress / 100]); //we store the value as value between 0 and 1
+                }
             }
 
             // Uncomment this to print the progress
@@ -407,6 +422,9 @@ $memLog('Loaded terms:        ');
                 $newEntry->transacGrp = $this->setTransacAttributes($transacGrp, false, 'termEntry', $newEntry);
             }
         }
+        if (isset($termEntry->note)) {
+            $this->setAttributeTypes($termEntry->note, $newEntry);
+        }
         if (isset($termEntry->xref)) {
             $this->setAttributeTypes($termEntry->xref, $newEntry);
         }
@@ -446,6 +464,17 @@ $memLog('Loaded terms:        ');
         $newLangSet->entryId = $parentEntry->id;
         $newLangSet->termEntryGuid = $parentEntry->entryGuid;
 
+        // Collect and set the descrip attributes, and check if there is a definition
+        if (isset($languageGroup->descrip)) {
+            $descrips = $this->setAttributeTypes($languageGroup->descrip, $newLangSet);
+            /* @var editor_Models_Terminology_TbxObjects_Attribute $descrip */
+            foreach ($descrips as $descrip) {
+                if ($descrip->type == 'definition') {
+                    $newLangSet->definition = $descrip->value;
+                    break;
+                }
+            }
+        }
 
         $this->setDiscriptGrp($languageGroup,$newLangSet,'langSet');
 
@@ -683,28 +712,28 @@ $memLog('Loaded terms:        ');
         $replicateToTerm = false;
 
         if (isset($transacGrp->transac)) {
-            $transacGrpObject->transac = (string)$transacGrp->transac;
+            $transacGrpObject->transac = $this->getTransacMappingIfExists((string) $transacGrp->transac);
 
             // If $elementName is 'tig'
             if ($elementName == 'tig')
-                if (in_array($transacGrpObject->transac, ['creation', 'modification']))
+                if (in_array($transacGrpObject->transac, ['origination', 'modification']))
                     $replicateToTerm = $transacGrpObject->transac;
         }
         if (isset($transacGrp->date)) {
             $transacGrpObject->date = ZfExtended_Utils::toMysqlDateTime((string)$transacGrp->date);
 
-            // Replicate creation/modification date into term tbx(Created|Updated)At prop
+            // Replicate origination/modification date into term tbx(Created|Updated)At prop
             if ($replicateToTerm)
                 $parentNode->{$replicateToTerm == 'modification' ? 'tbxUpdatedAt' : 'tbxCreatedAt'}
                     = $transacGrpObject->date;
         }
         if (isset($transacGrp->transacNote)) {
-            $transacGrpObject->transacType = (string)$transacGrp->transacNote->attributes()->{'type'};
+            $transacGrpObject->transacType = $this->getTransacMappingIfExists((string)$transacGrp->transacNote->attributes()->{'type'});
             $transacGrpObject->target = (string)$transacGrp->transacNote->attributes()->{'target'};
-            $transacGrpObject->transacNote = (string)$transacGrp->transacNote;
+            $transacGrpObject->transacNote = trim((string)$transacGrp->transacNote);
 
-            // Replicate creation/modification responsible person into term tbx(Created|Updated)By prop
-            if ($replicateToTerm && in_array($transacGrpObject->transacType, ['responsiblePerson', 'responsibility']))
+            // Replicate origination/modification responsible person into term tbx(Created|Updated)By prop
+            if ($replicateToTerm && $transacGrpObject->transacType == 'responsibility')
                 $parentNode->{$replicateToTerm == 'modification' ? 'tbxUpdatedBy' : 'tbxCreatedBy'}
                     = $this->getTransacPersonIdByName($transacGrpObject->transacNote);
         }
@@ -902,6 +931,9 @@ $memLog('Loaded terms:        ');
      */
     protected function getTransacPersonIdByName($name) {
 
+        // Get current collectionId
+        $collectionId = $this->collection->getId();
+
         // If person dictionary was not loaded so far
         // or there is no person with given $name in a dictionary yet
         // - load persons model
@@ -910,17 +942,28 @@ $memLog('Loaded terms:        ');
 
         // If person dictionary was not loaded so far - do load
         if ($this->transacgrpPersons === null)
-            foreach ($m->loadAll() as $person)
+            foreach ($m->loadByCollectionIds([$collectionId]) as $person)
                 $this->transacgrpPersons[$person['name']] = $person['id'];
 
         // If there is no person with given $name in a dictionary yet - add it
         if (!isset($this->transacgrpPersons[$name])) {
-            $m->init(['name' => $name]);
+            $m->init(['collectionId' => $collectionId, 'name' => $name]);
             $m->save();
             $this->transacgrpPersons[$name] = $m->getId();
         }
 
         // Return person id
         return $this->transacgrpPersons[$name];
+    }
+
+    /**
+     * Get mapping for a $value, according to tbx-standard.
+     * If no mapping exists - $value is returned
+     *
+     * @param $value
+     * @return string
+     */
+    protected function getTransacMappingIfExists($value) {
+        return $this->transacMap[$value] ?? $value;
     }
 }

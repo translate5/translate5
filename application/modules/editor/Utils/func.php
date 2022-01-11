@@ -132,3 +132,12 @@ function array_group_by(array $arr, $key) : array
 
     return $grouped;
 }
+
+/**
+ * Get call stack
+ *
+ * @return string
+ */
+function stack() {
+    ob_start(); debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); return ob_get_clean();
+}

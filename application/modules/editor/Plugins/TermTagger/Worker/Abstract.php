@@ -164,7 +164,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             }
             return true;
         }
-        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, $this->processingMode, $segments, ($this->processingMode == editor_Segment_Processing::IMPORT)), $slot);
+        
+        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, $this->processingMode, $segments, editor_Segment_Processing::isOperation($this->processingMode)), $slot);
     }
     
     protected function processSegmentsTags(array $segmentsTags, string $slot) : bool {
@@ -190,7 +191,17 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             if($exception instanceof editor_Plugins_TermTagger_Exception_Down) {
                 $this->config->disableResourceSlot($slot);
             }
-            $this->setTermtagState($this->loadedSegmentIds, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED);
+            //if we run in a timeout then set status retag, so that the affected segments are tagged lonely not as batch
+            if($exception instanceof editor_Plugins_TermTagger_Exception_TimeOut) {
+                // if we are in the retag loop the timeout should be handled as malfunction
+                $state = $this->malfunctionState; //this is either retag or defect (later if we are already processing retags)
+            }
+            else {
+                $state = editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED;
+            }
+
+            $this->setTermtagState($this->loadedSegmentIds, $state);
+
             $exception->addExtraData([
                 'task' => $this->task
             ]);
@@ -222,7 +233,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             ->where('termtagState IS NULL OR termtagState IN (?)', [editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED])
             ->order('id')
             ->limit(editor_Plugins_TermTagger_Configuration::IMPORT_SEGMENTS_PER_CALL)
-            ->forUpdate(true);
+            ->forUpdate(Zend_Db_Select::FU_MODE_SKIP);
         $segmentIds = $db->fetchAll($sql)->toArray();
         $segmentIds = array_column($segmentIds, 'segmentId');
         

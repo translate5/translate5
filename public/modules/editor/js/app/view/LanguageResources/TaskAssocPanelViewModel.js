@@ -88,7 +88,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
                 var me=this,
                     isAddTask=me.getView().up('window')!==undefined;
                 if(!isAddTask){
-                    return task && (!task.isErroneous() && !task.isImporting());
+                    return task && (!task.isErroneous() && !task.isImporting() && !task.isLocked());
                 }
                 return isAddTask;
             },

@@ -38,8 +38,8 @@ class editor_Models_Import_Worker_Behaviour extends ZfExtended_Worker_Behaviour_
     protected $task;
 
     public function __construct() {
-        //in import worker behaviour isMaintenanceScheduled is by default on
-        $this->config['isMaintenanceScheduled'] = true;
+        //in import worker behaviour isMaintenanceScheduled is by default on and does not start anymore 60 minutes before maintenance
+        $this->config['isMaintenanceScheduled'] = 60;
     }
     
     /**
@@ -72,16 +72,25 @@ class editor_Models_Import_Worker_Behaviour extends ZfExtended_Worker_Behaviour_
         $this->workerModel->defuncRemainingOfGroup(['editor_Models_Import_Worker_FinalStep']);
         $this->wakeUpAndStartNextWorkers($this->workerModel);
     }
-    
+
     /**
      * basicly sets the task to be imported to state error when a fatal error happens after the work method
      */
     public function registerShutdown() {
-        register_shutdown_function(function($task) {
+        register_shutdown_function(function($task, $worker) {
             $error = error_get_last();
             if(!is_null($error) && ($error['type'] & FATAL_ERRORS_TO_HANDLE)) {
-                $task->setErroneous();
+                /* @var $task editor_Models_Task */
+                if(!is_null($task)) {
+                    $task->setErroneous();
+                }
+                if(!is_null($worker)) {
+                    /* @var $worker ZfExtended_Models_Worker */
+                    $worker->defuncRemainingOfGroup(['editor_Models_Import_Worker_FinalStep']);
+                    $worker->setState($worker::STATE_DEFUNCT);
+                    $worker->save();
+                }
             }
-        }, $this->task);
+        }, $this->task, $this->workerModel);
     }
 }
