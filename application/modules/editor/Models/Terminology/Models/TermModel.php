@@ -2428,11 +2428,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * so the only ones which have no translation for given $language will be kept and returned
      *
      * @param array $termIds
-     * @param string $language
+     * @param string $languageId
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function havingNoTranslation(array $termIds, string $language) {
+    public function havingNoTranslation(array $termIds, int $languageId) {
 
         // Build termIds-where clause
         $termIds = $this->db->getAdapter()->quoteInto('`t`.`id` IN (?)', $termIds);
@@ -2446,7 +2446,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 `t`.`termEntryId` = `t2`.`termEntryId` AND `t2`.`languageId` = ?
               )
             WHERE ' . $termIds . ' AND ISNULL(`t2`.`id`)
-        ', $language)->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
+        ', $languageId)->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
     }
 
     /**

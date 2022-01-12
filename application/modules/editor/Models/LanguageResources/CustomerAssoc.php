@@ -152,12 +152,14 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * If no $customerIds is provided, all results where useAsDefault is set to 1 will be returned.
      * INFO: this function is used by useAsDefault filter in the language resources. Do not change the layout.
      * @param array $customerIds
+     * @param string $column If given, array_column(<returnValue>, $column) will be returned instead of <returnValue>
      * @return array
      */
-    public function loadByCustomerIdsUseAsDefault(array $customerIds = []){
+    public function loadByCustomerIdsUseAsDefault(array $customerIds = [], string $column = ''){
         $s=$this->getCustomerIdsSelect($customerIds);
         $s->where('useAsDefault=1');
-        return $this->db->fetchAll($s)->toArray();
+        $return = $this->db->fetchAll($s)->toArray();
+        return $column ? array_column($return, $column) : $return;
     }
     
     /***
