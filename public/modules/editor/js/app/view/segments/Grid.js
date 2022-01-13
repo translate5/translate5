@@ -475,12 +475,17 @@ Ext.define('Editor.view.segments.Grid', {
             sm = me.getSelectionModel();
         if(sm.isSelected(rowIdx)){
             me.getView().focusRow(rowIdx);
-        }
-        else {
+        } else {
             sm.select(rowIdx);
         }
     },
     
+    /**
+     * unselects and removes the focus of the segment on the given rowindex
+     */
+    unSelectOrFocus: function() {
+        this.getSelectionModel().deselectAll();
+    },
     /***
      * Return visible row indexes in segment grid
      * TODO if needed move this as overide so it can be used for all grids
