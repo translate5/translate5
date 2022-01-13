@@ -526,10 +526,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * and return array containing new value and ids of affected `terms_term` records for
      * being able to apply that on client side
      *
-     * Accepts a definition text as a first arg and spread it across
-     * `terms_term`.`definition` where need according to the agreed logic
-     *
-     * @param $definition
+     * @param $event
      */
     public function replicateDefinition($event) {
 
@@ -538,8 +535,8 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
             // If it's a language-level definition-attribute is going to be deleted
             // get termEntry-level definition-attribute to be used as a replacement
-            // or just use null
-            $value = $this->getLanguage() ? $this->_entryLevelDef() : null;
+            // or just use empty string
+            $value = $this->getLanguage() ? $this->_entryLevelDef() : '';
 
         // Else if $event is 'updated'
         } else if ($event == 'updated') {
@@ -603,7 +600,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      */
     protected function _entryLevelDef() {
         return $this->db->getAdapter()->query('
-            SELECT `value` 
+            SELECT IFNULL(`value`, "") 
             FROM `terms_attributes` 
             WHERE 1
               AND `termEntryId` = ? 
