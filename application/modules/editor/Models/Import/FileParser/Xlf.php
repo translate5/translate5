@@ -733,11 +733,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         //$hasEmptyTarget includes $hasTargetSingle
         $hasEmptyTarget = !$hasNoTarget && $this->isEmptyTarget($this->currentPlainTarget['openerMeta'], $this->currentPlainTarget['closer']);
 
-        //for processSegment == false (translate="no") (which evaluates later to locked == true && editable == true) it may happen that
+        //for processSegment == false (translate="no") (which evaluates later to locked == true && editable == false) it may happen that
         // seg-source is segmented, but since it is translate="no" the target contains the content unsegmented.
         // In that case we have to ignore the seg-source content and just import source and target, for read-only access
         // and add no placeholders for export for such segments so that the original content is kept.
-        if(!$this->processSegment && !$hasNoTarget && !$hasEmptyTarget && !empty(array_diff(array_keys($this->currentSource), array_keys($this->currentTarget)))) {
+        if(!$this->processSegment && !$hasNoTarget && !$hasEmptyTarget && $this->isSourceSegmentedButTargetNot()) {
             $mid = $this->calculateMid(['tag' => 'source', 'attributes' => $transUnit], true);
             $this->sourceProcessOrder = [$mid];
             $this->currentSource = [$mid => $this->currentPlainSource['unsegmentedSource'] ?? $this->currentPlainSource];
@@ -938,7 +938,21 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 
         return $createdSegmentIds;
     }
-    
+
+    /**
+     * returns true if the source is segmented with MRKs, but target not, may happen with translate=no segments from acr*
+     * DOES NOT CHECK IF TARGET IS EMPTY! MUST BE DONE BEFORE!
+     * @return bool
+     */
+    private function isSourceSegmentedButTargetNot(): bool {
+        $isMrk = function($id) {
+            return strpos($id, 'mrk-') === 0;
+        };
+        $sourceSegmented = !empty(array_filter($this->currentSource, $isMrk, ARRAY_FILTER_USE_KEY));
+        $targetSegmented = !empty(array_filter($this->currentTarget, $isMrk, ARRAY_FILTER_USE_KEY));
+        return $sourceSegmented && !$targetSegmented;
+    }
+
     /**
      * It must be sure, that this code runs after all other attribute calculations!
      * {@inheritDoc}
