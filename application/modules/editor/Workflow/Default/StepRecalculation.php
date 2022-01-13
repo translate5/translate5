@@ -73,13 +73,13 @@ class editor_Workflow_Default_StepRecalculation {
         $task->loadByTaskGuid($taskGuid);
         
         $matchingSteps = [];
-        $pmOvverideCount=0;
+        $pmOverrideCount=0;
         foreach($tuas as $tua) {
             if($tua['isPmOverride']==1){
-                $pmOvverideCount++;
+                $pmOverrideCount++;
             }
         }
-        if(empty($tuas) && count($tuas) == $pmOvverideCount){
+        if(empty($tuas) && count($tuas) == $pmOverrideCount){
             $matchingSteps[]=$this->workflow::STEP_NO_WORKFLOW;
         }else{
             foreach($this->workflow->getValidStates() as $step => $roleStates) {
@@ -105,22 +105,24 @@ class editor_Workflow_Default_StepRecalculation {
     }
     
     /**
-     * Checks if the given Jobs (tuas) are a subset of the list be compared
+     * Checks if the given Jobs are a subset of the list be compared
      * @param array $toCompare
      * @param string $currentStep
-     * @param array $tuas
+     * @param array $jobs
      * @return bool
      */
-    protected function areTuasSubset(array $toCompare, string $currentStep, array $tuas): bool {
+    protected function areTuasSubset(array $toCompare, string $currentStep, array $jobs): bool {
         $hasStepToCurrentTaskStep = false;
-        foreach($tuas as $tua) {
-            if(empty($toCompare[$tua['workflowStepName']])) {
+        foreach($jobs as $job) {
+            if(empty($toCompare[$job['workflowStepName']])) {
+                // if a job's step does not exist in the compare list, we just ignore that job
+                continue;
+            }
+            if(!in_array($job['state'], $toCompare[$job['workflowStepName']])) {
+                // if the jobs step exist, but its state is not configured, then the configuration is invalid for that step
                 return false;
             }
-            if(!in_array($tua['state'], $toCompare[$tua['workflowStepName']])) {
-                return false;
-            }
-            $hasStepToCurrentTaskStep = $hasStepToCurrentTaskStep || ($currentStep == $tua['workflowStepName']);
+            $hasStepToCurrentTaskStep = $hasStepToCurrentTaskStep || ($currentStep == $job['workflowStepName']);
         }
         //we can only return true, if the Tuas contain at least one role belonging to the currentStep,
         // in other words we can not reset the task to reviewing, if we do not have a reviewer
