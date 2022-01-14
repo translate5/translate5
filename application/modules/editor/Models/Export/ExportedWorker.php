@@ -66,7 +66,42 @@ class editor_Models_Export_ExportedWorker extends ZfExtended_Worker_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
-        
+
+        // If 'transfer'-param is given
+        if ($parameters['transfer']) {
+
+            // Get all exported tbx files
+            $tbxA = glob($parameters['folderToBeZipped'] . DIRECTORY_SEPARATOR . 'TermCollection*.tbx');
+
+            // Create API instance
+            $api = new ZfExtended_Test_ApiHelper('ZfExtended_Test_ApiTestcase');
+            $api->setAuthCookie($parameters['cookie']);
+            $url = $parameters['url'];
+
+            // Api request data
+            $data = [
+                'format' => 'jsontext',
+                'deleteTermsLastTouchedOlderThan' => '',
+                'deleteProposalsLastTouchedOlderThan' => '',
+            ];
+
+            // Responses
+            $json = [];
+
+            // Foreach exported tbx file
+            foreach ($tbxA as $idx => $tbx) {
+
+                // If exported tbx file name does not match the pattern - skip
+                if (!preg_match('~TermCollection_([0-9]+)_[0-9]+\.tbx$~', $tbx, $m)) continue;
+
+                // Add file upload
+                $api->addFilePlain('tmUpload', file_get_contents($tbx), 'text/xml', $m[0]);
+
+                // Make request to imitate language resource tbx import dialog submit
+                $json[$idx] = $api->requestJson($url . 'languageresourceinstance/' . $m[1] . '/import/', 'POST', $data);
+            }
+        }
+
         if(empty($parameters['waitOnly'])) {
             //creates an export.zip if necessary
             $this->exportToZip($task);
@@ -104,7 +139,23 @@ class editor_Models_Export_ExportedWorker extends ZfExtended_Worker_Abstract {
                 'waitOnly' => true,
         ]);
     }
-    
+
+    public function initTransfer($taskGuid, $exportFolder, $url, $cookie) {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        $zipFile = tempnam($task->getAbsoluteTaskDataPath(), 'taskExport_');
+        $this->init($taskGuid, [
+            'folderToBeZipped' => $exportFolder,
+            'zipFile' => $zipFile,
+            'waitOnly' => true,
+            'transfer' => true,
+            'cookie' => $cookie,
+            'url' => $url
+        ]);
+        return $zipFile;
+    }
+
     /**
      * exports the task as zipfile export.zip in the taskData if configured
      * @param editor_Models_Task $task
@@ -123,7 +174,7 @@ class editor_Models_Export_ExportedWorker extends ZfExtended_Worker_Abstract {
                 'exportFolder' => $params['folderToBeZipped'],
             ]);
         }
-        
+
         
         $filter = ZfExtended_Factory::get('Zend_Filter_Compress',array(
             array(

@@ -1591,6 +1591,7 @@ class editor_TaskController extends ZfExtended_RestController {
     public function exportAction() {
         $this->getAction();
         $diff = (boolean)$this->getRequest()->getParam('diff');
+        $transfer = (boolean) $this->getParam('transfer');
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
 
         switch ($context) {
@@ -1639,6 +1640,11 @@ class editor_TaskController extends ZfExtended_RestController {
         if($context == 'filetranslation') {
             $zipFile = $worker->initWaitOnly($this->entity->getTaskGuid(), $exportFolder);
         }
+        else if ($transfer) {
+            $url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/editor/';
+            $cookie = $_COOKIE[ZfExtended_Test_ApiHelper::AUTH_COOKIE_KEY];
+            $worker->initTransfer($this->entity->getTaskGuid(), $exportFolder, $url, $cookie);
+        }
         else {
             $zipFile = $worker->initZip($this->entity->getTaskGuid(), $exportFolder);
         }
@@ -1647,6 +1653,11 @@ class editor_TaskController extends ZfExtended_RestController {
         // better would be a URL to fetch the latest export or so (perhaps using state 202?)
         $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
         $worker->queue($workerId);
+        if ($transfer) {
+            echo '<script>window.close();</script>';
+            $this->logInfo('Task exported. reimport started', ['context' => $context, 'diff' => $diff]);
+            exit;
+        }
 
         if($context == 'filetranslation') {
             $this->provideFiletranslationDownload($exportFolder);

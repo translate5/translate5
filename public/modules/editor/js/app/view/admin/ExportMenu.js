@@ -36,6 +36,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
   itemId: 'exportMenu',
   messages: {
       exportDef: '#UT#Originalformat, {0}',
+      transfer: '#UT#Transfer translated terms to TermCollection(s)',
       exportTranslation: '#UT#übersetzt',
       exportReview: '#UT#lektoriert',
       exportDiff: '#UT#SDLXLIFF mit Änderungsmarkierungen',
@@ -113,6 +114,13 @@ Ext.define('Editor.view.admin.ExportMenu', {
               hrefTarget: '_blank',
               href: me.makePath('task/export/id/{0}'),
               text : Ext.String.format(me.messages.exportDef,exportDiffString),
+              handler: alertHandler
+          },{
+              itemId: 'transferItem',
+              hidden:!exportAllowed,
+              hrefTarget: '_blank',
+              href: me.makePath('task/export/id/{0}?transfer=1'),
+              text : me.messages.transfer,
               handler: alertHandler
           },{
               itemId: 'exportDiffItem',

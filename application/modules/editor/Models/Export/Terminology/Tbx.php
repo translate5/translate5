@@ -339,8 +339,14 @@ class editor_Models_Export_Terminology_Tbx {
             // Foreach termEntry
             foreach ($termEntryA as $termEntry) {
                 $line []= $this->tabs[3] . '<termEntry id="' . $termEntry['termEntryTbxId'] . '">';
-                $this->descripGrpNodes(4, $line, $attrA, $trscA, $termEntry['id']);
-                $this->attributeNodes (4, $line, $attrA, $termEntry['id']);
+
+                // If $selected arg is given, it means we do export to transfer terms from TermPortal to main Translate5 app
+                // so termEntry-level descripGrp- and attribute-nodes should not be exported as we don't need
+                // to overwrite existing values with translated values for them
+                if (!$selected) {
+                    $this->descripGrpNodes(4, $line, $attrA, $trscA, $termEntry['id']);
+                    $this->attributeNodes (4, $line, $attrA, $termEntry['id']);
+                }
                 $this->transacGrpNodes(4, $line, $trscA, $termEntry['id']);
                 foreach ($termA[$termEntry['id']] as $lang => $terms) {
                     $line []= $this->tabs[4] . '<langSet xml:lang="' . $lang . '">';
