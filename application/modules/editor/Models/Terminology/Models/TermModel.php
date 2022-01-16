@@ -821,7 +821,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         // Data columns, that would be fetched by search SQL query
-        $termQueryCol = $allExcept ? '`t`.`id`' : '
+        $termQueryCol = $allExcept ? '`t`.`' . ($params['column'] ?? 'id') . '`' : '
           `t`.`id`, 
           `t`.`collectionId`, 
           `t`.`termEntryId`, 
@@ -928,7 +928,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Make sure some termIds will be excluded
         if ($allExcept && $params['except'] ?? 0) {
-            $where []= '`t`.`id` NOT IN (' . $params['except'] . ')';
+            $where []= '`t`.`' . ($params['column'] ?? 'id') . '` NOT IN (' . $params['except'] . ')';
         }
 
         // Term query template

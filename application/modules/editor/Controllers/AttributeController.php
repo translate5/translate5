@@ -111,6 +111,49 @@ class editor_AttributeController extends ZfExtended_RestController
         throw new BadMethodCallException();
     }
 
+    /**
+     * Get 'termEntryId'-param from request
+     * If 'except'-param is given, termEntryId-values of all records found
+     * matching last used search params would be fetched and returned, except the ones given by termEntryId-param
+     *
+     * @return array
+     */
+    private function _termEntryIds() {
+
+        // Get termEntryId-param from request
+        $termEntryIdA = array_unique(editor_Utils::ar($this->getParam('termEntryId')));
+
+        // If except-param is given as true
+        if ($this->getParam('except')) {
+
+            // If $_SESSION['lastParams'] is not set - flush error msg
+            if (!isset($_SESSION['lastParams'])) {
+                $this->jflush(false, 'Your should run search at least once');
+            }
+
+            // 2nd arg required to be passed by reference (see below)
+            $total = false;
+
+            // Fetch ids of ALL terms matching last search, excluding ids given by 'except'-param
+            $termEntryIdA = ZfExtended_Factory
+                ::get('editor_Models_Terminology_Models_TermModel')
+                ->searchTermByParams(
+                    $_SESSION['lastParams'] + [
+                        'except' => join(',', $termEntryIdA),
+                        'column' => 'termEntryId'
+                    ],
+                    $total
+                );
+
+            // If nothing found - flush error msg
+            if (!$termEntryIdA) {
+                $this->jflush(false, 'Nothing to edit');
+            }
+        }
+
+        // Return ids
+        return array_unique($termEntryIdA);
+    }
 
     /**
      * Create attribute
@@ -163,7 +206,7 @@ class editor_AttributeController extends ZfExtended_RestController
             if ($_['level'] == 'entry') {
 
                 // Get array of termEntryIds
-                $termEntryIdA = array_unique(editor_Utils::ar($this->getParam('termEntryId')));
+                $termEntryIdA = $this->_termEntryIds();
 
                 // Foreach termEntryId
                 foreach ($termEntryIdA as $termEntryId) {
@@ -180,7 +223,7 @@ class editor_AttributeController extends ZfExtended_RestController
             } else if ($_['level'] == 'language') {
 
                 // Get array of termEntryIds
-                $termEntryIdA = array_unique(editor_Utils::ar($this->getParam('termEntryId')));
+                $termEntryIdA = $this->_termEntryIds();
 
                 // If language-param is not 'batch' - make sure it's a
                 // comma-separated list of rfc-codes before usage it in sql query
@@ -223,7 +266,7 @@ class editor_AttributeController extends ZfExtended_RestController
             } else if ($_['level'] == 'term') {
 
                 // Get array of termEntryIds
-                $termEntryIdA = array_unique(editor_Utils::ar($this->getParam('termEntryId')));
+                $termEntryIdA = $this->_termEntryIds();
 
                 // Drop termEntryId and language params, as we don't need them
                 $this->setParam('termEntryId', '');
