@@ -224,14 +224,17 @@ class editor_Models_Converter_XmlPairer {
      */
     protected function adjustContainerLevel(string $node) {
         $matches = [];
-        if(preg_match('#<(/)?[^>]*>#', $node, $matches)) {
-            // if the "/" is not found in matches, then it is a opener
-            if(count($matches) == 1) {
-                $this->containerStack[] = ++$this->containerId;
-            }
-            else {
+        //check if the node is a opener, closer or single tag
+        if(preg_match('#<(/)?[^>/]*(/>|>)#', $node, $matches)) {
+            // if the "/" is found at the start, then it is a closer
+            if($matches[1] === '/') {
                 array_pop($this->containerStack);
             }
+            // if the closing bracket has no preceding "/" it is the closing tag
+            elseif($matches[2] === '>') {
+                $this->containerStack[] = ++$this->containerId;
+            }
+            // else means $matches[2] === '/>': if the "/" is found at the end, then it is a self closing single tag, which is to be ignored
         }
     }
     

@@ -300,7 +300,7 @@ class editor_TermController extends ZfExtended_RestController
             //'langSetGuid' => $langSetGuid = '???',
             'guid' => ZfExtended_Utils::uuid(),
             'processStatus' => 'unprocessed',
-            //'definition' => '',
+            'definition' => '',
             'updatedBy' => $this->_session->id,
             'updatedAt' => date('Y-m-d H:i:s')
         ]);
