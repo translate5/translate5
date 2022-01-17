@@ -89,6 +89,13 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
             $tags->cloneAlikeQualitiesByType(static::$type);
         }
 
+        // Force existing qualities to be kept
+        foreach ($tags->getQualities()->getExisting() as $quality) {
+            if ($quality->type == self::$type) {
+                $quality->processingState = 'keep';
+            }
+        }
+
         // Return tags
         return $tags;
     }
@@ -114,7 +121,10 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
         // Get check object, containing detected quality categories
         $check = new editor_Segment_Consistent_Check($task);
 
-        // Process check results
+        // Quality categories to be inserted/deleted, grouped by segmentNrInTask-prop
+        $bySegmentNrA = [];
+
+        // Foreach quality, that is active after segment was saved
         foreach ($check->getStates() as $segmentNrInTask => $nowCategoryA) {
 
             // Get segment qualities that were active before segment was saved
@@ -122,31 +132,9 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
             // If there are qualities that should be added to the segment
             if ($insCategoryA = array_diff($nowCategoryA, $wasCategoryA)) {
-
-                // Load segment
-                $_segment = ZfExtended_Factory::get('editor_Models_Segment');
-                $_segment->loadBySegmentNrInTask($segmentNrInTask, $task->getTaskGuid());
-
-                // Get tags
-                $_tags = editor_Segment_Tags::fromSegment($task, $processingMode, $_segment, false);
-
-                // Force existing qualities to be kept
-                foreach ($_tags->getQualities() as $quality) {
-                    $quality->processingState = 'keep';
-                }
-
-                // Add new qualities
-                foreach ($insCategoryA as $insCategoryI) {
-                    $_tags->addQuality('target', static::$type, $insCategoryI);
-                }
-
-                // Flush changes
-                $_tags->flush();
+                $bySegmentNrA[$segmentNrInTask]['ins'] = $insCategoryA;
             }
         }
-
-        // Quality categories to be dropped, grouped by segmentNrInTask-prop
-        $bySegmentNrA = [];
 
         // Foreach quality, that was active before segment was saved
         foreach (static::$was as $segmentNrInTask => $wasCategoryA) {
@@ -156,7 +144,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
             // If there are qualities that should be removed from the segment
             if ($delCategoryA = array_diff($wasCategoryA, $nowCategoryA)) {
-                $bySegmentNrA[$segmentNrInTask] = $delCategoryA;
+                $bySegmentNrA[$segmentNrInTask]['del'] = $delCategoryA;
             }
         }
 
@@ -164,7 +152,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
         if ($bySegmentNrA) {
 
             // Get SegmentQuality model shortcut
-            $sqm = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
+            $qualityM = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
 
             // Get [segmentNrInTask => id] pairs
             $segmentIdA = Zend_Db_Table_Abstract::getDefaultAdapter()->query('
@@ -174,8 +162,23 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
             ')->fetchAll(PDO::FETCH_KEY_PAIR);
 
             // Drop qualities if need
-            foreach ($bySegmentNrA as $segmentNr => $delCategoryA) {
-                $sqm->removeBySegmentAndType($segmentIdA[$segmentNr], static::$type, $delCategoryA);
+            foreach ($bySegmentNrA as $segmentNr => $categoriesByAction) {
+
+                // If there is smth to be inserted - do insert
+                foreach ($categoriesByAction['ins'] ?? [] as $insCategoryI) {
+                    $qualityR = $qualityM->createRow();
+                    $qualityR->segmentId = $segmentIdA[$segmentNr];
+                    $qualityR->taskGuid = $task->getTaskGuid();
+                    $qualityR->field = 'target';
+                    $qualityR->type = static::$type;
+                    $qualityR->category = $insCategoryI;
+                    $qualityR->save();
+                }
+
+                // If there is smth to be deleted - do delete
+                if ($categoriesByAction['del'] ?? 0) {
+                    $qualityM->removeBySegmentAndType($segmentIdA[$segmentNr], static::$type, $categoriesByAction['del']);
+                }
             }
         }
     }
