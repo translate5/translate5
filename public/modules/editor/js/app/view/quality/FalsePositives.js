@@ -94,7 +94,7 @@ Ext.define('Editor.view.quality.FalsePositives', {
      */
     addCheckbox: function(record){
         // add the tag-icons for MQM to help to identify the MQMs in the markup
-        var label = record.get('typeText') + ' > ' + record.get('text');
+        var label = (record.get('typeText') == record.get('text')) ? record.get('typeText') : (record.get('typeText') + ' > ' + record.get('text'));
         if(record.get('type') == 'mqm' && record.get('categoryIndex') > -1){
             label += ' <img class="x-label-symbol qmflag qmflag-' + record.get('categoryIndex') + '" src="' 
                 + Editor.data.segments.subSegment.tagPath + 'qmsubsegment-' + record.get('categoryIndex') + '-left.png"> ';

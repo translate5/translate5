@@ -55,14 +55,23 @@ final class editor_Segment_Quality_Manager {
      */
     private static $_instance = null;
     /**
+     * Holds all quality provider classes before instantiation (which locks adding to this array)
+     * Here base quality checks that are always present / not being added by plugins are defined initially
      * @var string[]
      */
-    private static $_provider = [];
+    private static $_provider = [
+        'editor_Segment_Internal_Provider',
+        'editor_Segment_MatchRate_Provider',
+        'editor_Segment_Mqm_Provider',
+        'editor_Segment_Qm_Provider',
+        'editor_Segment_Length_QualityProvider',
+        'editor_Segment_Empty_QualityProvider',
+        'editor_Segment_Consistent_QualityProvider'
+    ];
     /**
      * @var boolean
      */
     private static $_locked = false;
-    
     /**
      * Adds a Provider to the Quality manager
      * @param string $className
@@ -122,22 +131,6 @@ final class editor_Segment_Quality_Manager {
                 throw new ZfExtended_Exception('Quality Provider '.$providerClass.' does not exist');
             }
         }
-        // Some Base Providers that do not come from Plugins
-        // Tag Check
-        $provider = new editor_Segment_Internal_Provider();
-        $this->registry[$provider->getType()] = $provider;
-        // MatchRate
-        $provider = new editor_Segment_MatchRate_Provider();
-        $this->registry[$provider->getType()] = $provider;
-        // MQM
-        $provider = new editor_Segment_Mqm_Provider();
-        $this->registry[$provider->getType()] = $provider;
-        // QM
-        $provider = new editor_Segment_Qm_Provider();
-        $this->registry[$provider->getType()] = $provider;
-        // Length
-        $provider = new editor_Segment_Length_QualityProvider();
-        $this->registry[$provider->getType()] = $provider;
     }
     /**
      * 
@@ -259,6 +252,14 @@ final class editor_Segment_Quality_Manager {
         // save qualities
         editor_Models_Db_SegmentQuality::saveRows($qualities);
 
+        // Append qualities, that can be detected only after all segments are created
+        foreach($this->registry as $type => $provider){
+            /* @var $provider editor_Segment_Quality_Provider */
+            if (!$provider->hasOperationWorker($processingMode)) {
+                $tags = $provider->postProcessTask($task, $qualityConfig, $processingMode);
+            }
+        }
+
         $db->getAdapter()->commit();
     }
     /**
@@ -276,6 +277,38 @@ final class editor_Segment_Quality_Manager {
         }
         $tags->flush();
     }
+    
+    /**
+     * Special API for qualities which can only be evaluated by processing all segments of a task
+     * This method is called BEFORE saving the segments and it's repetitions
+     * Operations like Import or Analyze will only have ::postProcessTask being called since there are no differences to be detected
+     *
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     */
+    public function preProcessTask(editor_Models_Task $task, string $processingMode) {
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        foreach ($this->registry as $type => $provider) {
+            /* @var $provider editor_Segment_Quality_Provider */
+            $provider->preProcessTask($task, $qualityConfig, $processingMode);
+        }
+    }
+    
+    /**
+     * Special API for qualities which can only be evaluated by processing all segments of a task
+     * This method is called AFTER saving the segments and it's repetitions
+     *
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     */
+    public function postProcessTask(editor_Models_Task $task, string $processingMode) {
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        foreach ($this->registry as $type => $provider) {
+            /* @var $provider editor_Segment_Quality_Provider */
+            $provider->postProcessTask($task, $qualityConfig, $processingMode);
+        }
+    }
+    
     /**
      * Alike Segments have a special processing as they clone some qualities from their original segment
      * @param editor_Models_Segment $segment
@@ -293,7 +326,6 @@ final class editor_Segment_Quality_Manager {
         }
         $tags->flush();
     }
-        
     /**
      * The central API to identify the needed Tag class by classnames and attributes
      * @param string $tagType
@@ -329,11 +361,24 @@ final class editor_Segment_Quality_Manager {
         if($this->hasProvider($type)){
             $translation = $this->getProvider($type)->translateType($this->getTranslate());
             if($translation === NULL){
-                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation for the type".');
+                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityType: provider of type "'.$type.'" has no translation for the type".');
             }
             return $translation;
         }
-        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityType: provider of type "'.$type.'" not present.');
+        return '';
+    }
+    /**
+     * Translates a Segment Quality Type tooltip
+     * @param string $type
+     * @throws ZfExtended_Exception
+     * @return string
+     */
+    public function translateQualityTypeTooltip(string $type) : string {
+        if ($this->hasProvider($type)) {
+            return $this->getProvider($type)->translateTypeTooltip($this->getTranslate());
+        }
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityTypeTooltip: provider of type "'.$type.'" not present.');
         return '';
     }
     /**
@@ -348,9 +393,32 @@ final class editor_Segment_Quality_Manager {
         if($this->hasProvider($type)){
             $translation = $this->getProvider($type)->translateCategory($this->getTranslate(), $category, $task);
             if($translation === NULL){
-                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation of category "'.$category.'".');
+                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityCategory: provider of type "'.$type.'" has no translation of category "'.$category.'".');
             }
             return $translation;
+        }
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityCategory: provider of type "'.$type.'" not present.');
+        return '';
+    }
+    /**
+     * Evaluates, if the quality of the given type has categories
+     * @param string $type
+     * @return bool
+     */
+    public function hasCategories(string $type) : bool {
+        return $this->getProvider($type)->hasCategories();
+    }
+    /**
+     * Translates a Segment Quality category tooltip
+     * @param string $type
+     * @param string $category
+     * @param editor_Models_Task $task
+     * @throws ZfExtended_Exception
+     * @return string
+     */
+    public function translateQualityCategoryTooltip(string $type, string $category, editor_Models_Task $task) : string {
+        if ($this->hasProvider($type)) {
+            return $this->getProvider($type)->translateCategoryTooltip($this->getTranslate(), $category, $task);
         }
         throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
         return '';

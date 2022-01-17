@@ -1,0 +1,51 @@
+<?xml version='1.0'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">
+<martif>
+    <martifHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Export of translate5 termCollection TC test</title>
+                <note>Contains the languages: de, it</note>
+            </titleStmt>
+            <sourceDesc>
+                <p>File is exported from translate5 instance at HTTP_URL by the user manager test</p>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <p type="XCSURI">http://www.lisa.org/fileadmin/standards/tbx_basic/TBXBasicXCSV02.xcs</p>
+        </encodingDesc>
+    </martifHeader>
+    <text>
+        <body>
+            <termEntry id="c1">
+                <langSet xml:lang="it">
+                    <tig>
+                        <term id="90d9de3e-8749-4c46-ab8d-033cf78d9d99">to be deleted</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de">
+                    <tig>
+                        <term id="b55815f8-22b5-4257-a0df-d0976fce11eb">Notstopp</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                    </tig>
+                    <tig>
+                        <term id="24ba1c1e-85a2-4bcd-a733-790b065120dc">Not-Stopp</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                    </tig>
+                    <tig>
+                        <term id="7b80428a-852b-429f-97f0-f5f7c5d74ee9">Nothalt</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                    </tig>
+                </langSet>
+            </termEntry>
+        </body>
+        <back>
+            <refObjectList type="respPerson">
+            </refObjectList>
+        </back>
+    </text>
+</martif>

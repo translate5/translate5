@@ -49,7 +49,10 @@ class editor_Models_Quality_SegmentView {
         $row->categoryIndex = $qualityRow->categoryIndex;
         $row->falsePositive = $qualityRow->falsePositive;
         $row->typeText = $manager->translateQualityType($qualityRow->type);
-        $row->text = $manager->translateQualityCategory($qualityRow->type, $qualityRow->category, $task);
+        // if a quality has no categories, we use the typeText also as text. This will be detected in the frontend to avoid sth like "TYPENAME > TYPENAME"
+        $row->text = ($manager->hasCategories($qualityRow->type)) ?
+            $manager->translateQualityCategory($qualityRow->type, $qualityRow->category, $task)
+            : $row->typeText;
         $row->filterable = $manager->isFilterableType($qualityRow->type);
         $row->falsifiable = $manager->canBeFalsePositiveCategory($qualityRow->type, $qualityRow->category);
         $provider = $manager->getProvider($qualityRow->type);
