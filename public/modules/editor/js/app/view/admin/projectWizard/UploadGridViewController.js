@@ -33,6 +33,17 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.wizardUploadGrid',
 
+    errorMessages:{
+        extension:'#UT#Die Datei {0} mit der Erweiterung {1} wird nicht unterstützt.',
+        fileMix:'#UT#Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!',
+        pivotNotBilingual:'#UT#Die Pivot-Datei ist nicht zweisprachig.',
+        sourceNotValid:'#UT#Ungültige Ausgangssprache.',
+        targetNotValid:'#UT#Ungültige Zielsprache.',
+        sourceNotSame:'#UT#Die Ausgangssprache der Datei stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.',
+        pivotSourceNotSame:'#UT#Die Quellsprache in der Pivot-Datei {0} ist nicht dieselbe wie die aktuelle Quellsprache des Projekts {1}.',
+        additionalRelaisNotSameTarget:'#UT#Die Relaisdatei {0} hat eine andere Zielsprache {1} als erwartet {2}.'
+    },
+
     onManualAdd: function(btn) {
         this.addFilesToStore(btn.fileInputEl.dom.files, Editor.model.admin.projectWizard.File.TYPE_WORKFILES);
     },
@@ -84,6 +95,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
     addFilesToStore: function(items, type) {
         var me = this,
+            msg = me.errorMessages,
             files = me.zipFileFilter(items),
             store = me.getView().store;
 
@@ -101,12 +113,12 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                 });
 
             if(!Ext.Array.contains(Editor.data.import.validExtensions,rec.getExtension())){
-                Editor.MessageBox.getInstance().showDirectError(Ext.String.format('Files {0} with extension {1} are not supported', file.name, rec.getExtension()));
+                Editor.MessageBox.getInstance().showDirectError(Ext.String.format(msg.extension, file.name, rec.getExtension()));
                 return true;
             }
 
             if(!me.isAllowed(store,rec)){
-                Editor.MessageBox.getInstance().showDirectError('Either select one ZIP file, or multiple other files. A mix of ZIP files and other files is not possible!');
+                Editor.MessageBox.getInstance().showDirectError(msg.fileMix);
                 return false;
             }
 
@@ -145,6 +157,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
      */
     validateLanguages:function (rec){
         var me = this,
+            msg = me.errorMessages,
             languages = Ext.StoreMgr.get('admin.Languages'),
             isPivotType = rec.get('type') === Editor.model.admin.projectWizard.File.TYPE_PIVOT,
             sl = rec.get('sourceLang'),
@@ -169,21 +182,21 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
         if(!isBilingual && isPivotType){
             // for pivot language only bilingual files can be used
-            errorMsg = 'Pivot file is not bilingual.';
+            errorMsg = msg.pivotNotBilingual;
         }else if(Ext.isEmpty(sl)){
-            errorMsg = 'Source not valid';
+            errorMsg = msg.sourceNotValid;
         }else if(Ext.isEmpty(tl)){
-            errorMsg = 'Target not valid';
+            errorMsg = msg.targetNotValid;
         }else if(!Ext.isEmpty(sourceField.getValue()) && sourceField.getValue() !== sl){
             // bilingual upload where the source language of the bilingual file is not the same as the one selected/set before
-            errorMsg = 'The source language is not the same as the selected one.';
+            errorMsg = msg.sourceNotSame;
         }else if(isPivotType && sl !== sourceField.getValue()){
             // if there is already source lang set, and the pivot file source lang is different, this is not allowed
             // All uploaded pivot files must have same source-language
-            errorMsg = Ext.String.format('The source language in the pivot file {0} is not the same as the current source language of the project {1}.',languages.getRfcById(sl),languages.getRfcById(sourceField.getValue()));
+            errorMsg = Ext.String.format(msg.pivotSourceNotSame,languages.getRfcById(sl),languages.getRfcById(sourceField.getValue()));
         }else if(isPivotType && !Ext.isEmpty(relaisLang.getValue()) && tl !== relaisLang.getValue()){
             // the relais language is set and the relais file target language is different
-            errorMsg = Ext.String.format('The file {0} has different target language {1} as the expected {2}.', rec.get('name'),languages.getRfcById(tl),languages.getRfcById(relaisLang.getValue()));
+            errorMsg = Ext.String.format(msg.additionalRelaisNotSameTarget, rec.get('name'),languages.getRfcById(tl),languages.getRfcById(relaisLang.getValue()));
         }
 
         if(errorMsg!== null){

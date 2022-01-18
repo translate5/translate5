@@ -79,8 +79,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         btnSkip:'#UT#Importieren (weitere überspringen)',
         importDefaultsButtonText:'#UT#Importieren (Standards nutzen)',
         description: '#Projektbeschreibung',
-        autoRemovedUploadFilesWarningMessage:'#UT#All matching bilingual files for this language are removed from the upload grid',
-        allFilesAreBilingualLanguageMessage:'#UT#All of the uploaded files are bilingual and can not be mapped to the selected language'
+        autoRemovedUploadFilesWarningMessage:'#UT#Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.'
     },
     modal : true,
     layout: 'anchor',
@@ -291,6 +290,11 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                 },{
                                     xtype: 'hiddenfield',
                                     itemId:'relaisLangaugeTaskUploadWizard',
+                                    markInvalid:function (error){
+                                        // show error message when the field is marked as invalid from the backend
+                                        // (this field is not visible to the user)
+                                        Editor.MessageBox.addError(error);
+                                    },
                                     name: 'relaisLang'
                                 }]
                             }]
@@ -438,6 +442,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         var me = this,
             form = me.getForm(),
             field = null;
+
         Ext.Object.each(errors, function(key, value) {
             field = form.findField(key) ?form.findField(key) :  me.down('#'+key);
             if(field && field.markInvalid){
