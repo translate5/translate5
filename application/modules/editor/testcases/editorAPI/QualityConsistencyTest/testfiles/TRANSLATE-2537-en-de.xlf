@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file original="/var/lib/tomcat9/work/Okapi-Longhorn-Files/1/input/original-255.odt/styles.xml" source-language="en" target-language="de" datatype="x-undefined">
+<body>
+</body>
+</file>
+<file original="/var/lib/tomcat9/work/Okapi-Longhorn-Files/1/input/original-255.odt/meta.xml" source-language="en" target-language="de" datatype="x-undefined">
+<body>
+</body>
+</file>
+<file original="/var/lib/tomcat9/work/Okapi-Longhorn-Files/1/input/original-255.odt/content.xml" source-language="en" target-language="de" datatype="x-undefined">
+<body>
+<trans-unit id="1" restype="x-text:h">
+<source xml:lang="en"><g id="1"><g id="2"></g><g id="3">Translate5</g></g><g id="4">Open Source Translation System</g> </source>
+<seg-source><mrk mid="0" mtype="seg"><g id="1"><g id="2"></g><g id="3">Translate5</g></g><g id="4">Open Source Translation System</g></mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="2" restype="x-text:h">
+<source xml:lang="en">Cloud translation, review, post-editing and terminology platform</source>
+<seg-source><mrk mid="0" mtype="seg">Cloud translation, review, post-editing and terminology platform</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="3" restype="x-text:p">
+<source xml:lang="en"><g id="1"><g id="2"><g id="3"></g></g></g></source>
+<seg-source><mrk mid="0" mtype="seg"><g id="1"><g id="2"><g id="3"></g></g></g></mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"><g id="1"><g id="2"><g id="3"></g></g></g></mrk></target>
+</trans-unit>
+<trans-unit id="4" restype="x-text:p">
+<source xml:lang="en"><g id="1"><g id="2"><g id="3"></g></g></g></source>
+<seg-source><mrk mid="0" mtype="seg"><g id="1"><g id="2"><g id="3"></g></g></g></mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"><g id="1"><g id="2"><g id="3"></g></g></g></mrk></target>
+</trans-unit>
+<trans-unit id="5" restype="x-text:p">
+<source xml:lang="en"><g id="1"><g id="2"><g id="3"></g></g></g></source>
+<seg-source><mrk mid="0" mtype="seg"><g id="1"><g id="2"><g id="3"></g></g></g></mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"><g id="1"><g id="2"><g id="3"></g></g></g></mrk></target>
+</trans-unit>
+<trans-unit id="6" restype="x-text:h">
+<source xml:lang="en">Rooted<x id="1"/>in community</source>
+<seg-source><mrk mid="0" mtype="seg">Rooted<x id="1"/>in community</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="7" restype="x-text:p">
+<source xml:lang="en">Open source </source>
+<seg-source><mrk mid="0" mtype="seg">Open source</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">zxc1</mrk></target>
+</trans-unit>
+<trans-unit id="29" restype="x-text:p">
+<source xml:lang="en">Open source </source>
+<seg-source><mrk mid="0" mtype="seg">Open source</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">zxc1</mrk></target>
+</trans-unit>
+<trans-unit id="30" restype="x-text:p">
+<source xml:lang="en">Open source </source>
+<seg-source><mrk mid="0" mtype="seg">Open source</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">zxc1</mrk></target>
+</trans-unit>
+<trans-unit id="31" restype="x-text:p">
+<source xml:lang="en">Open source </source>
+<seg-source><mrk mid="0" mtype="seg">Open source</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">zxc</mrk></target>
+</trans-unit>
+<trans-unit id="8" restype="x-text:p">
+<source xml:lang="en">Community – <x id="1"/>Influence and contribute! </source>
+<seg-source><mrk mid="0" mtype="seg">Community – <x id="1"/>Influence and contribute!</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="9" restype="x-text:p">
+<source xml:lang="en">Crowdfunding </source>
+<seg-source><mrk mid="0" mtype="seg">Crowdfunding</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="10" restype="x-text:p">
+<source xml:lang="en">Events &amp; Conferences </source>
+<seg-source><mrk mid="0" mtype="seg">Events &amp; Conferences</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">zxc2</mrk></target>
+</trans-unit>
+<trans-unit id="10" restype="x-text:p">
+<source xml:lang="en">Events &amp; Conferences </source>
+<seg-source><mrk mid="0" mtype="seg">Events &amp; Conferences</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">zxc1</mrk></target>
+</trans-unit>
+<trans-unit id="11" restype="x-text:h">
+<source xml:lang="en">Solving<x id="1"/>your translation process need</source>
+<seg-source><mrk mid="0" mtype="seg">Solving<x id="1"/>your translation process need</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="12" restype="x-text:p">
+<source xml:lang="en">For developers </source>
+<seg-source><mrk mid="0" mtype="seg">For developers</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="13" restype="x-text:p">
+<source xml:lang="en">For industrial companies </source>
+<seg-source><mrk mid="0" mtype="seg">For industrial companies</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="14" restype="x-text:p">
+<source xml:lang="en">For language service providers </source>
+<seg-source><mrk mid="0" mtype="seg">For language service providers</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="15" restype="x-text:p">
+<source xml:lang="en">For state institutions </source>
+<seg-source><mrk mid="0" mtype="seg">For state institutions</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="16" restype="x-text:p">
+<source xml:lang="en">For freelancers </source>
+<seg-source><mrk mid="0" mtype="seg">For freelancers</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="17" restype="x-text:h">
+<source xml:lang="en">Find<x id="1"/>your translation solution</source>
+<seg-source><mrk mid="0" mtype="seg">Find<x id="1"/>your translation solution</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="18" restype="x-text:p">
+<source xml:lang="en">In-context translation </source>
+<seg-source><mrk mid="0" mtype="seg">In-context translation</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="19" restype="x-text:p">
+<source xml:lang="en">Translation management </source>
+<seg-source><mrk mid="0" mtype="seg">Translation management</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="20" restype="x-text:p">
+<source xml:lang="en">In-country review </source>
+<seg-source><mrk mid="0" mtype="seg">In-country review</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="21" restype="x-text:p">
+<source xml:lang="en">Terminology management </source>
+<seg-source><mrk mid="0" mtype="seg">Terminology management</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="22" restype="x-text:p">
+<source xml:lang="en">Extremely flexible for integration </source>
+<seg-source><mrk mid="0" mtype="seg">Extremely flexible for integration</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="23" restype="x-text:h">
+<source xml:lang="en">Outstanding features</source>
+<seg-source><mrk mid="0" mtype="seg">Outstanding features</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="24" restype="x-text:p">
+<source xml:lang="en"><g id="1"><g id="2"><g id="3"></g></g></g><g id="4"><g id="5">VisualTranslation: In-Context Translation</g></g></source>
+<seg-source><mrk mid="0" mtype="seg"><g id="1"><g id="2"><g id="3"></g></g></g><g id="4"><g id="5">VisualTranslation: In-Context Translation</g></g></mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="25" restype="x-text:p">
+<source xml:lang="en">Real-time text changes in the layout (What you see is what you get) – coming soon </source>
+<seg-source><mrk mid="0" mtype="seg">Real-time text changes in the layout (What you see is what you get) – coming soon</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="26" restype="x-text:p">
+<source xml:lang="en">Source text gets replaced by translation during translation and pre-translation – coming soon </source>
+<seg-source><mrk mid="0" mtype="seg">Source text gets replaced by translation during translation and pre-translation – coming soon</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="27" restype="x-text:p">
+<source xml:lang="en">For all printable file formats </source>
+<seg-source><mrk mid="0" mtype="seg">For all printable file formats</mrk> </seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+<trans-unit id="28" restype="x-text:h">
+<source xml:lang="en">Rooted<x id="1"/>in community</source>
+<seg-source><mrk mid="0" mtype="seg">Rooted<x id="1"/>in community</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0"></mrk></target>
+</trans-unit>
+</body>
+</file>
+</xliff>
