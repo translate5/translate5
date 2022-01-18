@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Testcase for TRANSLATE-2540: AutoQA: AutoQA: Check inconsistent translations
+ * Testcase for 'TRANSLATE-2540: AutoQA: Check inconsistent translations'
  */
 class QualityConsistencyTest extends editor_Test_JsonTest {
 
