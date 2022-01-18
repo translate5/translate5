@@ -3789,6 +3789,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UHJvamVrdGU='><source>Projekte</source><target>Projects</target></trans-unit>
 <trans-unit id='enVtIFByb2pla3Qgc3ByaW5nZW4='><source>zum Projekt springen</source><target>jump to project</target></trans-unit>
 <trans-unit id='UHJvamVrdGxpc3RlIHZvbSBTZXJ2ZXIgYWt0dWFsaXNpZXJlbi4='><source>Projektliste vom Server aktualisieren.</source><target>Refresh project list from the server.</target></trans-unit>
+<trans-unit id='UHJvamVrdCBha3R1YWxpc2llcmVu'>
+  <source>Projekt aktualisieren</source>
+  <target>Refresh project</target>
+</trans-unit>
 <trans-unit id="QXVmZ2FiZW5saXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4u"><source>Aufgabenliste vom Server aktualisieren.</source><target>Refresh task list from the server.</target></trans-unit>
 <trans-unit id="QWxsZSBFcndlaXRlcm4="><source>Alle Erweitern</source><target>Expand all</target></trans-unit>
 <trans-unit id="QWxsZSBQcm9qZWt0ZSBFcndlaXRlcm4="><source>Alle Projekte Erweitern</source><target>Expand all projects</target></trans-unit>

@@ -320,7 +320,34 @@ class AppInstance {
         unset($this->sessions[$sessionId]);
         $this->eachChannel(__FUNCTION__, $sessionId, $connectionId);
     }
-    
+
+    /**
+     * returns true if the given session has a connection
+     * @param string $sessionId
+     * @return bool
+     */
+    protected function sessionHasConnection(string $sessionId): bool {
+        foreach($this->connections as $conn) {
+            if(isset($conn->sessionId) && $conn->sessionId === $sessionId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * returns true if the given session has a connection
+     */
+    protected function getConnectionSessions(): array {
+        $sessions = [];
+        foreach($this->connections as $conn) {
+            if(isset($conn->sessionId)) {
+                $sessions[] = $conn->sessionId;
+            }
+        }
+        return array_unique($sessions);
+    }
+
     /**
      * Processes queued frontend messages previously not processable due data not in sync
      * @param string $connectionId
