@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Testcase for TRANSLATE-2540
  */
-class Translate2540Test extends editor_Test_JsonTest {
+class QualitySegmentEmptyTest extends editor_Test_JsonTest {
 
     /**
      * @var array
