@@ -61,6 +61,17 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         scope: 'controller'
     },
 
+    strings:{
+        gridEmptyText:'#UT#Ziehen Sie die Dateien entweder hierher, um sie als Arbeitsdateien hinzuzufügen, oder klicken Sie auf eine der obigen Schaltflächen, um andere Dateitypen zu wählen.',
+        workFilesFilesButton:'#UT#Arbeitsdatei(en) hinzufügen',
+        pivotFilesFilesButton:'#UT#Pivot-Datei(en) hinzufügen',
+        removeFilesFilesButton:'#UT#Datei löschen',
+        targetLang:'#UT#Zielsprache',
+        file:'#UT#Datei',
+        type:'#UT#Typ',
+        size:'#UT#Größe'
+    },
+
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
@@ -69,7 +80,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                 sortableColumns:false,
                 tbar: [{
                     xtype: 'wizardFileButton',
-                    text: '#UT#Add work file(s)',
+                    text: me.strings.workFilesFilesButton,
                     name:'workFilesFilesButton',
                     bind: {
                         disabled: '{isZipUpload}'
@@ -79,7 +90,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     }
                 },{
                     xtype: 'wizardFileButton',
-                    text: '#UT#Add pivot file(s)',
+                    text: me.strings.pivotFilesFilesButton,
                     name:'pivotFilesFilesButton',
                     bind: {
                         disabled: '{isZipUpload}'
@@ -91,14 +102,14 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'tbseparator'
                 },{
                     xtype: 'button',
-                    text: '#UT#Remove file',
+                    text: me.strings.removeFilesFilesButton,
                     handler: 'removeFiles',
                     bind: {
                         disabled: '{!uploadgrid.selection}'
                     }
                 }],
                 viewConfig: {
-                    emptyText: 'Drag and drop files here to add them as work files, or to one of the above buttons to add them with a different type. (BUTTON DD TO BE DONE!)',
+                    emptyText: me.strings.gridEmptyText,
                     markDirty: false,
                     getRowClass: function (record) {
                         var res = [];
@@ -116,12 +127,12 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     width: 140,
                     dataIndex: 'targetLang',
                     renderer:me.langRenderer,
-                    text: '#UT#Target Language'
+                    text: me.strings.targetLang,
                 },{
                     xtype: 'gridcolumn',
                     dataIndex: 'name',
                     flex: 1,
-                    text: '#UT#File'
+                    text: me.strings.file
                 },{
                     xtype: 'gridcolumn',
                     width: 90,
@@ -134,13 +145,13 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     },
                     dataIndex: 'type',
                     tdCls: 'type',
-                    text: '#UT#Type'
+                    text: me.strings.type
                 },{
                     xtype: 'gridcolumn',
                     width: 90,
                     formatter: 'fileSize',
                     dataIndex: 'size',
-                    text: '#UT#Size'
+                    text: me.strings.size
                 }]
             };
         

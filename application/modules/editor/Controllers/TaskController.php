@@ -945,7 +945,7 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function handleDataProviderException(editor_Models_Import_DataProvider_Exception $e){
         throw ZfExtended_Models_Entity_Conflict::createResponse('E1369',[
-            'targetLang[]' => 'No work files found for one of the target langauges. This happens when the user select multiple target languaes in the dropdown, and after this drug and drop bilingual file.',
+            'targetLang[]' => 'No work files found for one of the target languages. This happens when the user selects multiple target languages in the dropdown and then imports a bilingual file via drag and drop.',
         ],[],$e);
     }
 
