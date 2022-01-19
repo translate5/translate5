@@ -51,11 +51,6 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
         self::assertNeededUsers();
         self::assertLogin('testmanager');
 
-        // Set config
-        self::$api->testConfig([
-            'runtimeOptions.import.xlf.preserveWhitespace' => 1,
-        ]);
-
         // Import xlf-file
         $api->addImportFile($api->getFile('testfiles/TRANSLATE-2537-en-de.xlf'));
         $api->import([
