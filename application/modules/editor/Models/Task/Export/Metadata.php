@@ -129,27 +129,14 @@ class editor_Models_Task_Export_Metadata {
     }
     
     /**
-     * export xls from stored task, returns true if file was created
-     * @param string $fileName where the XLS should go to
-     * @return bool
-     */
-    public function exportAsFile(string $fileName): bool {
-        try {
-            $this->export($fileName);
-            return true;
-        }
-        catch (Exception $e) {
-            return false;
-        }
-    }
-    
-    /**
      * provides the excel as download to the browser
      */
     public function exportAsDownload(): void {
-        // output: first send headers
-        if(!$this->exportAsFile('php://output')) {
-            throw new editor_Models_Task_Excel_MetadataException('E1170');
+        try {
+            $this->export('php://output');
+        }
+        catch (Exception $e) {
+            throw new editor_Models_Task_Excel_MetadataException('E1170',[],$e);
         }
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="'.$this->getFilenameForDownload().'"');

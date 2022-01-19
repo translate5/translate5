@@ -240,6 +240,8 @@
 <trans-unit id='UmVmZXJlbnpkYXRlaWVu'><source>Referenzdateien</source><target>Referenzdateien</target></trans-unit>
 <trans-unit id='VW52ZXLDpG5kZXJ0ZSAxMDAlIFRNIE1hdGNoZXMgc2luZCBlZGl0aWVyYmFy'><source>Unveränderte 100% TM Matches sind editierbar</source><target>Unveränderte 100% TM Matches sind editierbar</target></trans-unit>
 <trans-unit id='QmVzdGVsbGRhdHVt'><source>Bestelldatum</source><target>Bestelldatum</target></trans-unit>
+<trans-unit id='RGFzIERhdHVtLCB3YW5uIGRlciBQcm9qZWt0bWFuYWdlciBkaWUgQXVmZ2FiZSBiZWVuZGV0IGhhdCB1bmQgbmljaHQgZGFzIERhdHVtIGFuIGRlbSBlaW56ZWxuZSBXb3JrZmxvd3NjaHJpdHRlIGFiZ2VzY2hsb3NzZW4gd3VyZGVuLg=='><source>Das Datum, wann der Projektmanager die Aufgabe beendet hat und nicht das Datum an dem einzelne Workflowschritte abgeschlossen wurden.</source><target>Das Datum, wann der Projektmanager die Aufgabe beendet hat und nicht das Datum an dem einzelne Workflowschritte abgeschlossen wurden.</target></trans-unit>
+<trans-unit id='RW5kZGF0dW0='><source>Enddatum</source><target>Enddatum</target></trans-unit>
 <trans-unit id='UXVlbGxzcHJhY2hlIGJlYXJiZWl0YmFy'><source>Quellsprache bearbeitbar</source><target>Quellsprache bearbeitbar</target></trans-unit>
 <trans-unit id='UHJvamVrdCBlcnN0ZWxsZW4='><source>Projekt erstellen</source><target>Projekt erstellen</target></trans-unit>
 <trans-unit id='SW1wb3J0ZGF0ZWnCuQ=='><source>Importdatei¹</source><target>Importdatei¹</target></trans-unit>

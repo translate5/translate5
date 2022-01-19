@@ -224,6 +224,14 @@
         <source>Bestelldatum</source>
         <target>Order date</target>
       </trans-unit>
+      <trans-unit id='RGFzIERhdHVtLCB3YW5uIGRlciBQcm9qZWt0bWFuYWdlciBkaWUgQXVmZ2FiZSBiZWVuZGV0IGhhdCB1bmQgbmljaHQgZGFzIERhdHVtIGFuIGRlbSBlaW56ZWxuZSBXb3JrZmxvd3NjaHJpdHRlIGFiZ2VzY2hsb3NzZW4gd3VyZGVuLg=='>
+        <source>Das Datum, wann der Projektmanager die Aufgabe beendet hat und nicht das Datum an dem einzelne Workflowschritte abgeschlossen wurden.</source>
+        <target>The date, the project manager set the task to ended. NOT the date, a workflow step was finished.</target>
+      </trans-unit>
+      <trans-unit id='RW5kZGF0dW0='>
+        <source>Enddatum</source>
+        <target>Ended date</target>
+      </trans-unit>
       <trans-unit id="UXVlbGxzcHJhY2hlIGJlYXJiZWl0YmFy">
         <source>Quellsprache bearbeitbar</source>
         <target>Source language editable</target>

@@ -71,6 +71,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         pmName: '#UT#Projektmanager',
         pmGuid: '#UT#Projektmanager',
         orderdate: '#UT#Bestelldatum',
+        enddate: '#UT#Enddatum',
         edit100PercentMatch: '#UT#100%-Treffer editierbar',
         fullMatchEdit: '#UT#Unveränderte 100% TM Matches sind editierbar',
         emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
@@ -116,6 +117,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         addFilterText: '#UT#Erweiterte Filter',
         jobStatus: '#UT#Job-Status',
         exelExportedTooltip: '#UT#Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.',
+        enddateTooltip: '#UT#Das Datum, wann der Projektmanager die Aufgabe beendet hat und nicht das Datum an dem einzelne Workflowschritte abgeschlossen wurden.',
         qualityErrorCount: '#UT#QS Fehler'
     },
     states: {
@@ -672,6 +674,17 @@ Ext.define('Editor.view.admin.TaskGrid', {
                             dateFormat: Editor.DATE_ISO_FORMAT
                         },
                         text: me.text_cols.orderdate
+                    }, {
+                        xtype: 'datecolumn',
+                        width: 100,
+                        dataIndex: 'enddate',
+                        stateId: 'enddate',
+                        filter: {
+                            type: 'date',
+                            dateFormat: Editor.DATE_ISO_FORMAT
+                        },
+                        tooltip: me.strings.enddateTooltip,
+                        text: me.text_cols.enddate
                     }, {
                         xtype: 'owncheckcolumn',
                         width: 45,
