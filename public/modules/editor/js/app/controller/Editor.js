@@ -1859,15 +1859,20 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
 
-        if(store.proxy.reader.metaData && store.proxy.reader.metaData.jumpToSegmentIndex > -1){
-            me.getSegmentGrid().scrollTo(store.proxy.reader.metaData.jumpToSegmentIndex);
-            return;
-        }
-        if(segmentIdFromHash > 0){
-            me.focusSegment(segmentIdFromHash);
-            return;
-        }
-        me.focusSegment(1);
+        //must be deferred, not because of the time, but to put the execution onto the end of the execution queue
+        // the problem is that in rendering this is done also somewhere, then it happened that this code here was
+        // called before the elsewhere deferred rendering code and that was leading to a blank segment grid
+        Ext.defer(function() {
+            if (store.proxy.reader.metaData && store.proxy.reader.metaData.jumpToSegmentIndex > -1) {
+                me.getSegmentGrid().scrollTo(store.proxy.reader.metaData.jumpToSegmentIndex);
+                return;
+            }
+            if (segmentIdFromHash > 0) {
+                me.focusSegment(segmentIdFromHash);
+                return;
+            }
+            me.focusSegment(1);
+        });
     },
 
     /**
