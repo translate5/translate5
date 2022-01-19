@@ -164,7 +164,9 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $lrcaM = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
 
         // Fetch `languageResourceId`-values by $customerId, having `useAsDefault`=1
-        $languageResourceIds = $lrcaM->loadByCustomerIdsUseAsDefault([$customerId], 'languageResourceId');
+        if (!$languageResourceIds = $lrcaM->loadByCustomerIdsUseAsDefault([$customerId], 'languageResourceId')) {
+            return [];
+        }
 
         // Get info about which language resources can be associated with tasks having $targetLangs languages
         return $this->db->getAdapter()->query('
