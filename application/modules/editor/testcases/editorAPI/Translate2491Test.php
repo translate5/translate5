@@ -109,12 +109,12 @@ class Translate2491Test extends editor_Test_JsonTest {
             'translated' =>  0,
             'clientId' =>  $this->api()->getCustomer()->id,
             'sourceLang' =>  $english->id,
-            'terms' =>  'all',
-            'except' =>  array_reverse(array_column($termsearch->data, 'id'))[0],
+            'terms' => 'all',
+            'except' => array_reverse(array_column($termsearch->data, 'id'))[0],
         ]);
 
         // Wait for import
-        $this->api()->setTask($task = $transfer->json1);
+        $this->api()->setTask($task = $transfer->step1->rows);
         $this->api()->getTask()->originalSourceLang = $taskCfg['sourceLang'];
         $this->api()->getTask()->originalTargetLang = $taskCfg['targetLang'];
         $this->api()->getTask()->taskType == ZfExtended_Test_ApiHelper::INITIAL_TASKTYPE_PROJECT
