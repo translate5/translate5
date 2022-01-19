@@ -381,39 +381,40 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      * @param Zend_EventManager_Event $event
      */
     public function handleNormalComment(Zend_EventManager_Event $event) {
-        $comment = $event->getParam('entity');
-        /* @var $comment editor_Models_Comment */
-        $taskGuid = $comment->getTaskGuid();
-        $a_comment  = $comment->loadByTaskPlainWithPage($taskGuid, $comment->getId());
+        $entity = $event->getParam('entity');
+        /* @var $entity editor_Models_Comment */
+        $taskGuid = $entity->getTaskGuid();
+        $comments  = $entity->loadByTaskPlainWithPage($taskGuid, $entity->getId());
+        $comment = $comments[0];
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         $task->loadByTaskGuid($taskGuid);
         if($task->anonymizeUsers()){
             $wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-            $a_comment = $wfAnonymize->anonymizeUserdata($taskGuid, $a_comment['userGuid'], $a_comment);
+            $comment = $wfAnonymize->anonymizeUserdata($taskGuid, $comment['userGuid'], $comment);
         }
-        $a_comment['type'] = $comment::FRONTEND_ID;
-        $this->triggerCommentNavUpdate($a_comment, $event->getName());
+        $comment['type'] = $entity::FRONTEND_ID;
+        $this->triggerCommentNavUpdate($comment, $event->getName());
     }
 
     /**
      * @param Zend_EventManager_Event $event
      */
     public function handleAnnotation(Zend_EventManager_Event $event) {
-        $anno = $event->getParam('entity');
-        /* @var $anno editor_Plugins_VisualReview_Annotation_Entity */
-        $taskGuid = $anno->getTaskGuid();
-        $a_anno  = $anno->toArray();
+        $entity = $event->getParam('entity');
+        /* @var $entity editor_Plugins_VisualReview_Annotation_Entity */
+        $taskGuid = $entity->getTaskGuid();
+        $annotation  = $entity->toArray();
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         $task->loadByTaskGuid($taskGuid);
         if($task->anonymizeUsers()){
             $wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-            $a_anno = $wfAnonymize->anonymizeUserdata($taskGuid, $a_anno['userGuid'], $a_anno);
+            $annotation = $wfAnonymize->anonymizeUserdata($taskGuid, $annotation['userGuid'], $annotation);
         }
-        $a_anno['comment'] = htmlspecialchars($a_anno['text']);
-        $a_anno['type'] = $anno::FRONTEND_ID;
-        $this->triggerCommentNavUpdate($a_anno, $event->getName());
+        $annotation['comment'] = htmlspecialchars($annotation['text']);
+        $annotation['type'] = $entity::FRONTEND_ID;
+        $this->triggerCommentNavUpdate($annotation, $event->getName());
     }
 
     /**

@@ -72,26 +72,28 @@ Ext.define('Editor.controller.CommentNavigation', {
         this.getCommentList().getStore().load();
     },
     
-    handleItemClick: function(origin, record) {
-        switch(record.get('type')) {
+    handleItemClick: function(origin, remarkRecord) {
+        switch(remarkRecord.get('type')) {
             
             case 'segmentComment':
-                var
-                    grid = Ext.getCmp('segment-grid'),
+                var grid = Ext.getCmp('segment-grid'),
                     view = grid.getView(),
-                    rec = grid.getStore().getById(record.get('segmentId'));
-                //grid.scrollTo(recIdx); // does not animate upwards direction
-                var rowTableEl = view.getEl().getById(view.getRowId(rec)); //table has bgColor set for end of animation
-                grid.setSelection(rec);
-                grid.getScrollable().scrollIntoView(rowTableEl, false, true, true);
-                break;
+                    segmentRecord = grid.getStore().getById(remarkRecord.get('segmentId'));
+                // TODO ANNOTATIONS FIXME: the grid-store does NOT contain all segments but just the visible ones !!
+                if(segmentRecord){
+                    //grid.scrollTo(recIdx); // does not animate upwards direction
+                    var rowTableEl = view.getEl().getById(view.getRowId(segmentRecord)); //table has bgColor set for end of animation
+                    grid.setSelection(segmentRecord);
+                    grid.getScrollable().scrollIntoView(rowTableEl, false, true, true);
+                    break;
+                }  
 
             case 'visualAnnotation':
                 var
                     vr = Ext.first('visualReviewPanel'),
                     vc = vr && vr.getController();
                 if(vc){
-                    vc.scrollToAnnotation(record);
+                    vc.scrollToAnnotation(remarkRecord);
                 }
                 break;
         }
@@ -119,17 +121,14 @@ Ext.define('Editor.controller.CommentNavigation', {
                 }
             }
             if(changedProps.length) {
-                existing.commit(false,changedProps);
+                existing.commit(false, changedProps);
             }
             remark = existing;
         } else {
             store.addSorted(remark);
-            if(remark.get('type') === 'visualAnnotation' && !vr.hasVideo()) {
+            if(remark.get('type') === 'visualAnnotation'){
                 Ext.getStore('visualReviewAnnotations').add(remark);
-                var page = vr.iframeController.isScrollerType('htmlscroller')
-                    ? vr.getAnnotationController().getDomPages()[0]
-                    : vr.iframeController.getPageByIndex(remark.get('page') - 1);
-                vr.getAnnotationController().renderAnnotations(page);
+                vr.getAnnotationController().renderAnnotationsByPageNo(remark.getPageHexNo());
             }
         }
         cl.highlightRemark(remark);

@@ -52,7 +52,13 @@ END LICENSE AND COPYRIGHT
  * @method void setModified() setModified(string $modified)
  */
 class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
-      const FRONTEND_ID = 'segmentComment';
+    
+  /**
+   * Used to identify a Comment in the Frontend /comment overview) and distinguish it from an Annotation
+   * @var string
+   */
+  const FRONTEND_ID = 'segmentComment';
+  
   protected $dbInstanceClass = 'editor_Models_Db_Comments';
   protected $validatorInstanceClass = 'editor_Models_Validator_Comment';
 
@@ -141,13 +147,14 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
                 'comments.segmentId = sm.segmentId',
                 ['page' => 'segmentPage', 'reviewFileId']
             );
-        if ($cid) {
+        if($cid) {
             $s->where('comments.id = ?', $cid);
-            return $this->db->getAdapter()->fetchRow($s); // returns array
+            $row = $this->db->getAdapter()->fetchRow($s);
+            return ($row) ? [ $row ] : [];
         } else {
             return $this->db->getAdapter()->fetchAll($s);
         }
-    }
+  }
   /**
    * Loads all comments of a segment by segmentid and taskguid, orders by creation order
    * does not provide isEditable info

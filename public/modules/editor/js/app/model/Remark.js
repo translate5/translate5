@@ -53,14 +53,27 @@ END LICENSE AND COPYRIGHT
       {name: 'comment', type: 'string'},
       {name: 'modified', type: 'string', dateFormat: Editor.DATE_ISO_FORMAT, mapping:'updated'},
       {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
-      {name: 'page', type: 'integer',  default: -1, convert: function(v, rec){
-        if(v==0) v=rec.get('reviewFileId');
-        return v;
-      }},
+      {name: 'reviewFileId', type: 'integer'},
+      {name: 'page', type: 'string',  default: '0' },
       {name: 'x', type: 'number', default: -1},
       {name: 'y', type: 'number', default: -1},
+      {name: 'timecode', type: 'int', default: -1},
       {name: 'type', type: 'string'},
     ],
+    /**
+     * Returns the hexadecimal no. of a virtual page in a pdfconverter output. This no are either segment-attributes "data-t5segment-page-nr" in the Markup or as "data-page-no" attributes of a page node
+     * @returns {String}
+     */
+    getPageHexNo: function(){
+        return this.get('page');
+    },
+    /**
+     * Returns the parsed page number as used in the iframe dom controller
+     * @returns {Number}
+     */
+    getPageNr: function(){
+        return parseInt(this.get('page'), 16);
+    },
     idProperty: 'id',
     proxy : {
       type : 'rest',

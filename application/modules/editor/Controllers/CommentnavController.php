@@ -72,11 +72,12 @@ class Editor_CommentnavController extends ZfExtended_RestController {
 
     protected function loadSegmentCommentArray(){
         $session = new Zend_Session_Namespace();
-        $comment_entity = ZfExtended_Factory::get('editor_Models_Comment');
-        $comments = $comment_entity->loadByTaskPlainWithPage($session->taskGuid);
+        $commentEntity = ZfExtended_Factory::get('editor_Models_Comment');
+        /* @var $commentEntity editor_Models_Comment */
+        $comments = $commentEntity->loadByTaskPlainWithPage($session->taskGuid);
         foreach ($comments as &$row) {
             $row['comment'] = htmlspecialchars($row['comment']);
-            $row['type'] = $comment_entity::FRONTEND_ID;
+            $row['type'] = $commentEntity::FRONTEND_ID;
             if($this->wfAnonymize) {
                 $row = $this->wfAnonymize->anonymizeUserdata($session->taskGuid, $row['userGuid'], $row);
             }

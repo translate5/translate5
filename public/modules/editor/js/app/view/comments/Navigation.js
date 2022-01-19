@@ -42,7 +42,8 @@ Ext.define('Editor.view.comments.Navigation', {
             type: 'AllComments',
             autoLoad: true,
             sorters: [ // must sort here in frontend for new comments' correct position
-                { property: 'page', direction: 'ASC' },
+                { property: 'reviewFileId', direction: 'ASC' },
+                { property: 'page', direction: 'ASC' }, // TODO FIXME: These are HEX-values, so sorters wil only bring the expected results if < 9 (= A)
                 { property: 'type', direction: 'DESC' },
                 { property: 'segmentId', direction: 'ASC' },
                 { property: 'y', direction: 'ASC' },
