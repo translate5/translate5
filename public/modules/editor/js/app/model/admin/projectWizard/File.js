@@ -48,9 +48,11 @@ Ext.define('Editor.model.admin.projectWizard.File', {
     },{
         name: 'type'
     },{
-        name: 'sourceLang'
+        name: 'sourceLang',
+        defaultValue:''
     },{
-        name: 'targetLang'
+        name: 'targetLang',
+        defaultValue:''
     },{
         name: 'error'
     },{
