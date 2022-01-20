@@ -62,13 +62,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         }, 0);
         
         $cleanUp = function(){
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->cleanupLockedJobs();
-            
+            // first clean up jobs
             $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             /* @var $tua editor_Models_TaskUserAssoc */
             $tua->cleanupLocked();
+
+            // second clean up tasks, jobs must be before in order to clean also not used multiuser tasks anymore
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->cleanupLockedJobs();
 
             $config = ZfExtended_Factory::get('editor_Models_UserConfig');
             /* @var $config editor_Models_UserConfig */

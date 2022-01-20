@@ -60,7 +60,11 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
         }
         project && project.load();
     },
-    
+
+    handleProjectReload: function (task, ev) {
+        this.onTriggerTaskReload({taskId: task.get('id')});
+    },
+
     /***
      * Reset filter button click handler
      */

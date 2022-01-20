@@ -262,7 +262,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             me.segmentUnlock(me.getSegmentMeta(id), data.connectionId, keepRender);
             if(keepRender){
                 segment = grid.store.getById(id);
-                segment.load();
+                segment && segment.load();
             }
         });
     },

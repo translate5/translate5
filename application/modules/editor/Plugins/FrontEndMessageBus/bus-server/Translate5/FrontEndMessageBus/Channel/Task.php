@@ -189,7 +189,7 @@ class Task extends Channel {
         $this->releaseLocalSegment($answer->segmentId);
         //we delegate the leaving call of the master segment to the leaveAlikes,so we send only one message
         $alikes[] = $answer->segmentId;
-        if(!$answer->selectedSegmentId){
+        if(!isset($answer->selectedSegmentId)){
             $answer->selectedSegmentId = $answer->segmentId;
         }
         $this->leaveAlikes($answer, $alikes);

@@ -755,12 +755,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = currentUser) and respects multiuser editing
+     * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = givenUser) and respects multiuser editing
+     * @param string $userGuid
+     * @param string|null $taskGuid optional, use the internally loaded taskGuid by default
      * @return boolean false if task had not been locked or does not exist,
      *          true if task has been unlocked successfully
      */
-    public function unlockForUser($userGuid) {
-        $taskGuid = $this->db->getAdapter()->quote($this->getTaskGuid());
+    public function unlockForUser(string $userGuid, string $taskGuid = null): bool
+    {
+        $taskGuid = $this->db->getAdapter()->quote($taskGuid ?? $this->getTaskGuid());
         $userGuid = $this->db->getAdapter()->quote($userGuid);
         $multiUserId = $this->db->getAdapter()->quote(self::INTERNAL_LOCK.self::USAGE_MODE_SIMULTANEOUS);
 

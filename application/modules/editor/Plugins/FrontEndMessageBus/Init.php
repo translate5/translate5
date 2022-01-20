@@ -71,11 +71,12 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('editor_SessionController', 'beforeDeleteAction', array($this, 'handleLogout'));
         $this->eventManager->attach('editor_SessionController', 'resyncOperation', array($this, 'handleSessionResync'));
         $this->eventManager->attach('LoginController', 'beforeLogoutAction', array($this, 'handleLogout'));
-
+        $this->eventManager->attach('Editor_TaskuserassocController', 'beforePutAction', array($this, 'handleJobPut'));
         $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'autoqaOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('ZfExtended_Models_Worker', 'updateProgress',array($this, 'handleUpdateProgress'));
+        $this->eventManager->attach('ZfExtended_Models_Db_Session', 'getValidSessionsSql',array($this, 'handleGetValidSessionsSql'));
 
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
@@ -159,6 +160,53 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         }
         
         $this->bus->stopSession($sessionId, $this->getHeaderConnId());
+    }
+
+    /**
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleJobPut(Zend_EventManager_Event $event) {
+        //1. load the desired job
+        $id = $event->getParam('params')['id'] ?? 0;
+        $job = clone $event->getParam('entity');
+        /* @var $job editor_Models_TaskUserAssoc */
+        try {
+            $job->load($id); //empty id evaluates above to 0 which triggers not found then
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            return;
+        }
+
+        //2. check if there is a locking session, if no, do nothing
+        if(empty($job->getUsedInternalSessionUniqId())) {
+            return;
+        }
+
+        //3. load the session id to the internal session
+        $sessIntId = new ZfExtended_Models_Db_SessionMapInternalUniqId();
+        $row = $sessIntId->fetchRow(['internalSessionUniqId = ?' => $job->getUsedInternalSessionUniqId()]);
+        $result = $this->bus->sessionHasConnection($row->session_id);
+        $hasConnection = $result->instanceResult ?? true; //in doubt say true so the job is not unlocked!
+        if(empty($row) || $hasConnection) { //row is empty, this is cleaned by the next garbage collection call
+            return;
+        }
+
+        //4. release job for that user if the session has no connections anymore in the socket server
+        if($job->getIsPmOverride()) {
+            $job->deletePmOverride();
+        }
+        else {
+            //direct update, no entity save to override entity version check
+            $job->db->update([
+                'usedState' => null,
+                'usedInternalSessionUniqId' => null,
+            ],['id' => $job->getId()]);
+        }
+
+        //5. unlock the task too, if locked by the jobs user
+        $task = ZfExtended_Factory::get('editor_Models_task');
+        /* @var $task editor_Models_task */
+        $task->unlockForUser($job->getUserGuid(), $job->getTaskGuid());
     }
     
     /**
@@ -310,8 +358,14 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
             'progress' => $progress['progress']
         ]);
     }
-    
-    
+
+    /**
+     * @return array
+     */
+    public function handleGetValidSessionsSql() {
+        $res = $this->bus->getConnectionSessions();
+        return $res->instanceResult ?? [];
+    }
 
     /***
      * Notify the task chanel with fresh task data
