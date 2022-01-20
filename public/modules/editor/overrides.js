@@ -911,12 +911,7 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
         // If there are columns to trigger rendering, and the rendered block or not either the view size 
         // or, if store count less than view size, the store count, set the view count to the rows count
         if (view.getVisibleColumnManager().getColumns().length && rows.getCount() !== Math.min(me.store.getCount(), me.viewSize)) {
-            //view.refresh();
-            // Refreshing the view, does not solve this problem in some cases. The exception bellow will not be thrown, but the viewSize
-            // calculations is wrong. This leeds to not rendering the table in Editor segments grid.
-            // Setting the viewSite to the rows count solves this problem
-            // https://jira.translate5.net/browse/TRANSLATE-2455
-            me.viewSize = rows.getCount();
+            view.refresh();
         }
         
         //<debug> 

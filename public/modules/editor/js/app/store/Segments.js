@@ -80,7 +80,7 @@ Ext.define('Editor.store.Segments', {
       params[proxy.getFilterParam()] = proxy.encodeFilters(this.getFilters().items);
       params[proxy.getSortParam()] = proxy.encodeSorters(this.getSorters().items);
       if(proxy.extraParams.qualities && proxy.extraParams.qualities !== ''){
-          params.qualities = proxy.extraParam.qualities;
+          params.qualities = proxy.extraParams.qualities;
       }
       return params;
   },
