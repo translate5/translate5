@@ -126,7 +126,7 @@ Ext.define('Editor.controller.CommentNavigation', {
             remark = existing;
         } else {
             store.addSorted(remark);
-            if(remark.get('type') === 'visualAnnotation'){
+            if(remark.get('type') === 'visualAnnotation'&& vr){
                 Ext.getStore('visualReviewAnnotations').add(remark);
                 vr.getAnnotationController().renderAnnotationsByPageNo(remark.getPageHexNo());
             }
@@ -137,14 +137,14 @@ Ext.define('Editor.controller.CommentNavigation', {
      * Remove remark from commentnav and where else it appears
      */
     removeRemark: function removeRemark(remarkId, remarkType){
-        var cl = this.getCommentList();
-        var store = cl.getStore();
+        var cl = this.getCommentList()
+            store = cl.getStore();
         store.getData().removeByKey(remarkId);
-        if(remarkType === 'visualAnnotation') {
-            Ext.getStore('visualReviewAnnotations').getData().removeByKey(remarkId);
+        if(remarkType === 'visualAnnotation'){
             var vr = Ext.first('visualReviewPanel');
-            if(!vr.hasVideo()){
-                vr.iframeController.removeDomElementById('pageAnnotation' + remarkId);
+            if(vr){
+                Ext.getStore('visualReviewAnnotations').getData().removeByKey(remarkId);
+                vr.getIframeController().removeDomElementById('pageAnnotation' + remarkId);
             }
         }
     }
