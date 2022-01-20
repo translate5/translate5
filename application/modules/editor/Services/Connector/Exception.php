@@ -36,15 +36,16 @@ class editor_Services_Connector_Exception extends ZfExtended_BadGatewayErrorCode
     protected $domain = 'editor.languageresource.service.connector';
     
     static protected $localErrorCodes = [
-        'E1282' => 'Language resource communication error.',
+        'E1282' => 'Language resource communication error.',
         'E1288' => 'The language code [{languageCode}] from resource [{resourceName}] is not valid or does not exist in the translate5 language code collection.',
         'E1311' => 'Could not connect to language resource {service}: server not reachable',
         'E1312' => 'Could not connect to language resource {service}: timeout on connection to server',
+        'E1370' => 'Empty response from language resource {service}',
         'E1313' => 'The queried language resource {service} returns an error.',
     ];
     
     protected function setDuplication() {
         parent::setDuplication();
-        ZfExtended_Logger::addDuplicatesByMessage('E1311', 'E1312');
+        ZfExtended_Logger::addDuplicatesByMessage('E1311', 'E1312', 'E1370');
     }
 }
