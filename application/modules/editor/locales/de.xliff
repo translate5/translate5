@@ -1751,6 +1751,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='UHJvamVrdGU='><source>Projekte</source><target>Projekte</target></trans-unit>
 <trans-unit id='enVtIFByb2pla3Qgc3ByaW5nZW4='><source>zum Projekt springen</source><target>zum Projekt springen</target></trans-unit>
 <trans-unit id='UHJvamVrdGxpc3RlIHZvbSBTZXJ2ZXIgYWt0dWFsaXNpZXJlbi4='><source>Projektliste vom Server aktualisieren.</source><target>Projektliste vom Server aktualisieren.</target></trans-unit>
+<trans-unit id='UHJvamVrdCBha3R1YWxpc2llcmVu'><source>Projekt aktualisieren</source><target>Projekt aktualisieren</target></trans-unit>
 <trans-unit id="QWxsZSBFcndlaXRlcm4="><source>Alle Erweitern</source><target>Alle Erweitern</target></trans-unit>
 <trans-unit id="QWxsZSBQcm9qZWt0ZSBFcndlaXRlcm4="><source>Alle Projekte Erweitern</source><target>Alle Projekte Erweitern</target></trans-unit>
 <trans-unit id="QWxsZSBSZWR1emllcm4="><source>Alle Reduziern</source><target>Alle Reduziern</target></trans-unit>

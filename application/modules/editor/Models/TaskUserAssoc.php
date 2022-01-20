@@ -455,16 +455,10 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
 
     protected function _cleanupLocked($taskGuid = null, $forced = false) {
-        if(empty($taskGuid)){
-            $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->get('default');
-            /* @var $workflow editor_Workflow_Default */
-        }
-        else {
-            $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($taskGuid);
-            /* @var $workflow editor_Workflow_Default */
-        }
+        $sessions = new ZfExtended_Models_Db_Session();
+        $validSessionIds = $sessions->getValidSessionsSql();
 
-        $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
+        //load all used jobs where the usage is not valid anymore
         $where = array('not usedState is null and (usedInternalSessionUniqId not in ('.$validSessionIds.') or usedInternalSessionUniqId is null)');
         if(!empty($taskGuid)) {
             if($forced) {
@@ -474,13 +468,26 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $where['taskGuid = ?'] = $taskGuid;
         }
 
-        //FIXME this is not correct here, we should loop over all affected tuas, and should load the workflow then by taskGuid of the associated task
-        // since until writing this comment a bug in getActive always returns the Default Workflow, we just keep that (getActive returns Default Workflow if no taskGuid given)
-        if(!empty($workflow)) {
-            //updates the workflow state back to open if allowed
-            $where2 = $where;
-            $where2['state in (?)'] = $workflow->getAllowedTransitionStates($workflow::STATE_OPEN);
-            $this->db->update(array('state' => $workflow::STATE_OPEN), $where2);
+        $s = $this->db->select()->from($this->db, ['taskGuid', 'userGuid']);
+        foreach($where as $one) {
+            $s->where($one);
+        }
+        $taskUserAssoc = $this->db->fetchAll($s)->toArray();
+
+        //reopen each found job, keeping workflow transition check
+        $taskGuids = array_unique(array_column($taskUserAssoc, 'taskGuid'));
+        foreach($taskGuids as $jobTaskGuid) {
+            $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($jobTaskGuid);
+            /* @var $workflow editor_Workflow_Default */
+            if(!empty($workflow)) {
+                //updates the workflow state back to open if allowed
+                $where2 = $where;
+                $where2['state in (?)'] = $workflow->getAllowedTransitionStates($workflow::STATE_OPEN);
+                if(!empty($taskGuid)) {
+                    $where2['taskGuid = ?'] = $jobTaskGuid;
+                }
+                $this->db->update(array('state' => $workflow::STATE_OPEN), $where2);
+            }
         }
 
         //delete all pmEditAll fake entries
@@ -488,8 +495,15 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $where3[] = 'isPmOverride = 1';
         $this->db->delete($where3);
 
-        //unuse the associations where the using sessionId was expired, this update must be performed after the other!
+        //unuse the associations where the using sessionId was expired, this update must be performed last on the jobs
         $this->db->update(array('usedState' => null,'usedInternalSessionUniqId' => null), $where);
+
+        //finally unlock also the tasks
+        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        foreach($taskUserAssoc as $job) {
+            $task->unlockForUser($job['userGuid'], $job['taskGuid']);
+        }
     }
 
     /**
