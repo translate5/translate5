@@ -1872,7 +1872,7 @@ Ext.define('Editor.controller.Editor', {
                 return;
             }
             me.focusSegment(1);
-        });
+        },1);
     },
 
     /**
