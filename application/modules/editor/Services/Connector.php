@@ -168,15 +168,17 @@ class editor_Services_Connector {
         }
         return $serviceResult;
     }
-    
+
     /***
      * This magic method is invoked each time a nonexistent method is called on the object.
      * If the function exist in the adapter it will be called there.
      * @param string $method
      * @param mixed $arguments
      * @return mixed
+     * @throws ZfExtended_BadGateway
+     * @throws editor_Services_Connector_Exception
      */
-    public function __call($method, $arguments){
+    public function __call(string $method, array $arguments): mixed {
         $toThrow = null;
         // if is called getStatus, the determined status is calculated there.
         // If there is an error in getStatus, this is either handled there, or in doubt we set NO_CONNECTION
@@ -193,15 +195,17 @@ class editor_Services_Connector {
             }
         } catch (ZfExtended_BadGateway $toThrow) {
             //handle legacy BadGateway messages, see below
-        } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut | ZfExtended_Zendoverwrites_Http_Exception_Down $e) {
-            if($e instanceof  ZfExtended_Zendoverwrites_Http_Exception_Down) {
+        } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $e) {
                 //'E1311' => 'Could not connect to language resource {service}: server not reachable',
                 $ecode = 'E1311';
-            }
-            else {
+        } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut $e) {
                 //'E1312' => 'Could not connect to language resource {service}: timeout on connection to server',
                 $ecode = 'E1312';
-            }
+        } catch (ZfExtended_Zendoverwrites_Http_Exception_NoResponse $e) {
+                //'E1370' => 'Empty response from language resource {service}',
+                $ecode = 'E1370';
+        }
+        if(isset($ecode) && isset($e)) {
             $toThrow = new editor_Services_Connector_Exception($ecode, [
                 'service' => $this->adapter->getResource()->getName(),
                 'languageResource' => $this->languageResource,
@@ -218,8 +222,8 @@ class editor_Services_Connector {
         if(!empty($toThrow)) {
             throw $toThrow;
         }
-        
         //do nothing if the method does not exist in the underyling adapter.
+        return null;
     }
     
     /**

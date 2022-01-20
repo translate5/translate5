@@ -584,12 +584,29 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
             //if internal fuzzy is active and the connector supports the internal fuzzy calculation, get the fuzzy connector
             if ($this->internalFuzzy) {
-                $this->connectors[$assoc['id']] = $connector->initForFuzzyAnalysis($this->analysisId);
+                $this->connectors[$assoc['id']] = $this->initFuzzyConnector($connector);
             } else {
                 $this->connectors[$assoc['id']] = $connector;
             }
         }
         return $this->connectors;
+    }
+
+    protected function initFuzzyConnector(editor_Services_Connector $connector): editor_Services_Connector {
+        try {
+            $fuzzyConnector = $connector->initForFuzzyAnalysis($this->analysisId);
+        }
+        catch (Exception $e) {
+            $fuzzyConnector = clone $connector;
+            //the whole connector must be invalidated and the problem must be logged.
+            $fuzzyConnector->disable();
+            $this->log->exception($e);
+            $this->log->error('E1371', 'Internal Fuzzy language resource could not be created. Check log for previous errors.', [
+                'task' => $this->task,
+                'languageResource' => $connector->getLanguageResource(),
+            ]);
+        }
+        return $fuzzyConnector;
     }
 
     /***
