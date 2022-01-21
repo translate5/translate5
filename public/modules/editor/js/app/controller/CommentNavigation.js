@@ -105,7 +105,6 @@ Ext.define('Editor.controller.CommentNavigation', {
     updateStore: function updateStore(remark, typeOfChange){
         var cl = this.getCommentList();
         var store = cl.getStore();
-        var vr = Ext.first('visualReviewPanel'); 
         var existing = (typeOfChange === 'afterPostAction') ? store.getById(remark.id) : null;
         /** Update exsiting record - Why this way?
          * store.data.replace() does not replace (at least in ExtJS-6.2.0)
@@ -126,9 +125,13 @@ Ext.define('Editor.controller.CommentNavigation', {
             remark = existing;
         } else {
             store.addSorted(remark);
-            if(remark.get('type') === 'visualAnnotation'&& vr){
-                Ext.getStore('visualReviewAnnotations').add(remark);
-                vr.getAnnotationController().renderAnnotationsByPageNo(remark.getPageHexNo());
+            
+            if(remark.get('type') === 'visualAnnotation'){
+                var annotationsController = Editor.app.getController('Editor.plugins.VisualReview.controller.Annotations');
+                // the plugin may not be loaded
+                if(annotationsController){
+                    annotationsController.addGlobalRemark(remark);
+                }
             }
         }
         cl.highlightRemark(remark);
@@ -141,10 +144,10 @@ Ext.define('Editor.controller.CommentNavigation', {
             store = cl.getStore();
         store.getData().removeByKey(remarkId);
         if(remarkType === 'visualAnnotation'){
-            var vr = Ext.first('visualReviewPanel');
-            if(vr){
-                Ext.getStore('visualReviewAnnotations').getData().removeByKey(remarkId);
-                vr.getIframeController().removeDomElementById('pageAnnotation' + remarkId);
+            var annotationsController = Editor.app.getController('Editor.plugins.VisualReview.controller.Annotations');
+            // the plugin may not be loaded
+            if(annotationsController){
+                annotationsController.removeGlobalRemarkById(remarkId);
             }
         }
     }
