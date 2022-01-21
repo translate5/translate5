@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.wizardUploadGrid',
+    id:'importWizardUploadGridViewController',
 
     errorMessages:{
         extension:'#UT#Die Datei {0} mit der Erweiterung {1} wird nicht unterstützt.',
@@ -91,6 +92,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             return Editor.util.Util.getFileExtension(rec.get('name')) === 'zip';
         });
         me.setIsZipUploadViewModel(items.length > 0);
+
+        me.fireEvent('workfilesRemoved',store.getData());
     },
 
     addFilesToStore: function(items, type) {
@@ -147,6 +150,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                 rec.commit();
 
                 store.addSorted(rec);
+
+                me.fireEvent('workfileAdded',rec);
             };
         });
     },
@@ -226,6 +231,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     /***
      * Check if the given name is duplicate for the new task. Is duplicated when the record
      * has same name, type and target language
+     * TODO: move me to utils and refactor duplicate
      * @param fileName
      * @param type
      * @param targetLang

@@ -4456,5 +4456,9 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Größe</source>
   <target>Size</target>
 </trans-unit>
+<trans-unit id='RGF0ZWkgbMO2c2NoZW4='>
+    <source>Datei löschen</source>
+    <target>Remove file</target>
+</trans-unit>
   </file>
 </xliff>

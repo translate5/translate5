@@ -47,7 +47,7 @@ Ext.define('Editor.view.admin.config.ConfigWizard', {
     
     //card type, used for card display order
     importType:'postimport',
-    
+    defaultListenerScope:true, // Until this component does not have his own view controller, this flag is required. It enables string defined event methods to be mapped to this class
     task:null,
     autoScroll: true,
     strings:{
