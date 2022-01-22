@@ -37,14 +37,14 @@ VALUES('runtimeOptions.worker.editor_Models_Export_Exported_ZipDefaultWorker.max
 INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`)
 SELECT "editor_Models_Export_Exported_TransferWorker", `dependency` 
 FROM `Zf_worker_dependencies` 
-WHERE `worker` = "editor_Models_Export_ExportedWorker"
+WHERE `worker` = "editor_Models_Export_ExportedWorker";
 
 INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`)
 SELECT "editor_Models_Export_Exported_FiletranslationWorker", `dependency` 
 FROM `Zf_worker_dependencies` 
-WHERE `worker` = "editor_Models_Export_ExportedWorker"
+WHERE `worker` = "editor_Models_Export_ExportedWorker";
 
 INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`)
 SELECT "editor_Models_Export_Exported_ZipDefaultWorker", `dependency` 
 FROM `Zf_worker_dependencies` 
-WHERE `worker` = "editor_Models_Export_ExportedWorker"
+WHERE `worker` = "editor_Models_Export_ExportedWorker";
