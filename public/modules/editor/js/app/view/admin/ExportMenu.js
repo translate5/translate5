@@ -119,7 +119,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
               itemId: 'transferItem',
               hidden:!exportAllowed,
               hrefTarget: '_blank',
-              href: me.makePath('task/export/id/{0}?transfer=1'),
+              href: me.makePath('task/export/id/{0}?format=transfer'),
               text : me.messages.transfer,
               handler: alertHandler
           },{

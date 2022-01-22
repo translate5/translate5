@@ -37,7 +37,7 @@ class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
         $this->eventManager->attach('editor_Models_Import_Worker_SetTaskToOpen', 'importCompleted', array($this, 'handleImportCompleted'));
         $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExport'));
-        $this->eventManager->attach('editor_Models_Export_ExportedWorker', 'exportCompleted', array($this, 'handleExportCompleted'));
+        $this->eventManager->attach('editor_Models_Export_Exported_Worker', 'exportCompleted', array($this, 'handleExportCompleted'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
     }
     
@@ -89,7 +89,7 @@ class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract {
     }
     
     /**
-     * handler for event: editor_Models_Export_ExportedWorker#exportCompleted
+     * handler for event: editor_Models_Export_Exported_Worker#exportCompleted
      * @param $event Zend_EventManager_Event
      */
     public function handleExportCompleted(Zend_EventManager_Event $event) {
