@@ -144,7 +144,7 @@ class Translate2491Test extends editor_Test_JsonTest {
         $this->api()->requestJson('editor/task/' . $task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
 
         // Re-import into termcollection
-        $this->api()->request('editor/task/export/id/' . $task->id . '?transfer=1');
+        $this->api()->request('editor/task/export/id/' . $task->id . '?format=transfer');
 
         // [10] search for the term attributes
         $terminfo = $this->api()->requestJson('editor/plugins_termportal_data/terminfo', 'POST', ['termId' => $termsearch->data[0]->id]);
