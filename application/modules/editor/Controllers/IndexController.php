@@ -62,7 +62,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'Fileorder'                     => true,
         'ChangeAlike'                   => true,
         'Comments'                      => true,
-        'CommentNavigation'            => true,
+        'CommentNavigation'             => true,
         'SearchReplace'                 => true,
         'SnapshotHistory'               => true,
         'Termportal'                    => true,
