@@ -2080,7 +2080,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RGllIEF1c2dhbmdzc3ByYWNoZSBkZXIgRGF0ZWkgc3RpbW10IG5pY2h0IG1pdCBkZXIgYWt0dWVsbCBhdXNnZXfDpGhsdGVuIEF1c2dhbmdzc3ByYWNoZSDDvGJlcmVpbi4='><source>Die Ausgangssprache der Datei stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.</source><target>Die Ausgangssprache der Datei stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.</target></trans-unit>
 <trans-unit id='RGF0ZWk='><source>Datei</source><target>Datei</target></trans-unit>
 <trans-unit id='R3LDtsOfZQ=='><source>Größe</source><target>Größe</target></trans-unit>
-
+<trans-unit id='RGF0ZWkgbMO2c2NoZW4='><source>Datei löschen</source><target>Datei löschen</target></trans-unit>
   </body>
  </file>
 </xliff>

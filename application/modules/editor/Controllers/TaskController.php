@@ -31,6 +31,9 @@ END LICENSE AND COPYRIGHT
  */
 class editor_TaskController extends ZfExtended_RestController {
 
+    use editor_Controllers_Traits_ImportTrait;
+
+
     protected $entityClass = 'editor_Models_Task';
 
     /**
@@ -867,93 +870,6 @@ class editor_TaskController extends ZfExtended_RestController {
                 //if there is no worker, nothing can be done
             }
         }
-    }
-
-    /**
-     * imports the uploaded file into the given task
-     * @param editor_Models_Task $task
-     * @param editor_Models_Import_DataProvider_Abstract $dp
-     * @throws Exception
-     */
-    protected function processUploadedFile(editor_Models_Task $task, editor_Models_Import_DataProvider_Abstract $dp) {
-        $import = ZfExtended_Factory::get('editor_Models_Import');
-        /* @var $import editor_Models_Import */
-        $import->setUserInfos($this->user->data->userGuid, $this->user->data->userName);
-
-        $import->setLanguages(
-            $task->getSourceLang(),
-            $task->getTargetLang(),
-            $task->getRelaisLang(),
-            editor_Models_Languages::LANG_TYPE_ID);
-        $import->setTask($task);
-        try {
-            $import->import($dp);
-        }
-        catch(editor_Models_Import_ConfigurationException $e) {
-            $this->handleConfigurationException($e);
-        }
-        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
-            $this->handleIntegrityConstraint($e);
-        }catch(editor_Models_Import_DataProvider_Exception $e) {
-            $this->handleDataProviderException($e);
-        }
-    }
-
-    /**
-     * Converts the ConfigurationException caused by wrong user input to ZfExtended_UnprocessableEntity exceptions
-     * @param editor_Models_Import_ConfigurationException $e
-     * @throws editor_Models_Import_ConfigurationException
-     * @throws ZfExtended_UnprocessableEntity
-     */
-    protected function handleConfigurationException(editor_Models_Import_ConfigurationException $e) {
-        $codeToFieldAndMessage = [
-            'E1032' => ['sourceLang', 'Die übergebene Quellsprache "{language}" ist ungültig!'],
-            'E1033' => ['targetLang', 'Die übergebene Zielsprache "{language}" ist ungültig!'],
-            'E1034' => ['relaisLang', 'Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.'],
-            'E1039' => ['importUpload', 'Das importierte Paket beinhaltet kein gültiges "{review}" Verzeichnis.'],
-            'E1040' => ['importUpload', 'Das importierte Paket beinhaltet keine Dateien im "{review}" Verzeichnis.'],
-        ];
-        $code = $e->getErrorCode();
-        if(empty($codeToFieldAndMessage[$code])) {
-            throw $e;
-        }
-        // the config exceptions causing unprossable entity exceptions are logged on level info
-        $this->log->exception($e, [
-            'level' => ZfExtended_Logger::LEVEL_INFO
-        ]);
-
-        throw ZfExtended_UnprocessableEntity::createResponseFromOtherException($e, [
-            //fieldName => error message to field
-            $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
-        ]);
-    }
-
-    /**
-     * Converts the IntegrityConstraint Exceptions caused by wrong user input to ZfExtended_UnprocessableEntity exceptions
-     * @param ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_UnprocessableEntity
-     * @throws ZfExtended_ErrorCodeException
-     */
-    protected function handleIntegrityConstraint(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
-        //check if the error comes from the customer assoc or not
-        if(! $e->isInMessage('REFERENCES `LEK_customer`')) {
-            throw $e;
-        }
-        throw ZfExtended_UnprocessableEntity::createResponse('E1064', [
-            'customerId' => 'Der referenzierte Kunde existiert nicht (mehr)'
-        ], [], $e);
-    }
-
-    /***
-     * @param editor_Models_Import_DataProvider_Exception $e
-     * @return mixed
-     * @throws ZfExtended_ErrorCodeException
-     */
-    protected function handleDataProviderException(editor_Models_Import_DataProvider_Exception $e){
-        throw ZfExtended_Models_Entity_Conflict::createResponse('E1369',[
-            'targetLang[]' => 'No work files found for one of the target languages. This happens when the user selects multiple target languages in the dropdown and then imports a bilingual file via drag and drop.',
-        ],[],$e);
     }
 
     /**
@@ -2017,23 +1933,6 @@ class editor_TaskController extends ZfExtended_RestController {
         ]);
         return $projectOnly;
     }
-    
-    /***
-     * Handle the task usage log for given entity. This will update the sum counter or insert new record
-     * based on the unique key of `taskType`,`customerId`,`yearAndMonth`
-     *
-     * @param editor_Models_task $task
-     */
-    protected function insertTaskUsageLog(editor_Models_task $task) {
-        $log = ZfExtended_Factory::get('editor_Models_TaskUsageLog');
-        /* @var $log editor_Models_TaskUsageLog */
-        $log->setTaskType($task->getTaskType());
-        $log->setSourceLang($task->getSourceLang());
-        $log->setTargetLang($task->getTargetLang());
-        $log->setCustomerId($task->getCustomerId());
-        $log->setYearAndMonth(date('Y-m'));
-        $log->updateInsertTaskCount();
-    }
 
     /***
      * Check if the session allows the task to be opened for editing by the current user.
@@ -2126,97 +2025,5 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         $this->entity->unlock();
         $this->log->info('E1011', 'Task import cancelled', ['task' => $this->entity]);
-    }
-
-
-    public function isProjectUpload(){
-        return is_array($this->data['targetLang']) && count($this->data['targetLang']) > 1 && !empty($this->data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME]);
-    }
-
-
-    public function handleTaskImport(){
-        //gets and validates the uploaded zip file
-        $upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
-        /* @var $upload editor_Models_Import_UploadProcessor */
-        $dpFactory = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Factory');
-        /* @var $dpFactory editor_Models_Import_DataProvider_Factory */
-        $upload->initAndValidate();
-        $dp = $dpFactory->createFromUpload($upload,$this->data);
-
-        //DEFAULT (SINGLE) TASK:
-
-        //was set as array in setDataInEntity
-        $this->entity->setTargetLang(reset($this->data['targetLang']));
-        //$this->entity->save(); => is done by the import call!
-        //handling project tasks is also done in processUploadedFile
-        $this->processUploadedFile($this->entity, $dp);
-
-        // add task defaults (user associations and language resources)
-        $this->setTaskDefaults($this->entity);
-
-        //if the current task type is for instant translate pretransaltion, the usage log requires different handling
-        if($this->entity->isHiddenTask() == false){
-            //update the task usage log for the current task
-            $this->insertTaskUsageLog($this->entity);
-        }
-    }
-
-    public function handleProjectUpload(){
-        //gets and validates the uploaded zip file
-        $upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
-        /* @var $upload editor_Models_Import_UploadProcessor */
-
-        $upload->initAndValidate();
-
-        $dp = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Project',[
-            $upload->getFiles(),
-            $this->data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME],
-            $this->data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_TYPE_NAME]
-        ]);
-        /* @var $dp editor_Models_Import_DataProvider_Project  */
-
-
-        $entityId=$this->entity->save();
-        $this->entity->initTaskDataDirectory();
-
-        // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
-        $this->events->trigger("afterUploadPreparation", $this, array('task' => $this->entity, 'dataProvider' => $dp));
-
-        $dp->checkAndPrepare($this->entity);
-
-        //for projects this have to be done once before the single tasks are imported
-        $dp->archiveImportedData();
-
-        $this->entity->setProjectId($entityId);
-
-        $languages=ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $languages editor_Models_Languages */
-        $languages=$languages->loadAllKeyValueCustom('id','rfc5646');
-
-        $projectTasks = [];
-
-        foreach($this->data['targetLang'] as $target) {
-            $task = clone $this->entity;
-
-            $task->setProjectId($entityId);
-            $task->setTaskType($task::INITIAL_TASKTYPE_PROJECT_TASK);
-            $task->setTargetLang($target);
-            $task->setTaskName($this->entity->getTaskName().' - '.$languages[$task->getSourceLang()].' / '.$languages[$task->getTargetLang()]);
-
-            $this->processUploadedFile($task, $dp);
-
-            // add task defaults (user associations and language resources)
-            $this->setTaskDefaults($task);
-
-            //update the task usage log for this project-task
-            $this->insertTaskUsageLog($task);
-
-            $projectTasks[] = $task->getDataObject();
-        }
-
-        $this->entity->setState($this->entity::INITIAL_TASKTYPE_PROJECT);
-        $this->entity->save();
-
-        return $projectTasks;
     }
 }

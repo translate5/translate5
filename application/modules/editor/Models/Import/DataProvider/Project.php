@@ -236,12 +236,12 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
 
     /***
      * Is the file-type pivot at given index
-     * @param int $arrayIdex
+     * @param int $arrayIndex
      * @return bool
      */
-    protected function isPivotFile(int $arrayIdex): bool
+    protected function isPivotFile(int $arrayIndex): bool
     {
-        return $this->fileTypes[$arrayIdex] === 'pivot';
+        return $this->fileTypes[$arrayIndex] === 'pivot';
     }
 
     /***

@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.wizardUploadGrid',
+    id:'importWizardUploadGridViewController',
 
     errorMessages:{
         extension:'#UT#Die Datei {0} mit der Erweiterung {1} wird nicht unterstützt.',
@@ -91,6 +92,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             return Editor.util.Util.getFileExtension(rec.get('name')) === 'zip';
         });
         me.setIsZipUploadViewModel(items.length > 0);
+
+        me.fireEvent('workfilesRemoved',store.getData());
     },
 
     addFilesToStore: function(items, type) {
@@ -147,6 +150,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                 rec.commit();
 
                 store.addSorted(rec);
+
+                me.fireEvent('workfileAdded',rec);
             };
         });
     },
@@ -188,12 +193,14 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         }else if(Ext.isEmpty(tl)){
             errorMsg = msg.targetNotValid;
         }else if(!Ext.isEmpty(sourceField.getValue()) && sourceField.getValue() !== sl){
-            // bilingual upload where the source language of the bilingual file is not the same as the one selected/set before
-            errorMsg = msg.sourceNotSame;
-        }else if(isPivotType && sl !== sourceField.getValue()){
-            // if there is already source lang set, and the pivot file source lang is different, this is not allowed
-            // All uploaded pivot files must have same source-language
-            errorMsg = Ext.String.format(msg.pivotSourceNotSame,languages.getRfcById(sl),languages.getRfcById(sourceField.getValue()));
+
+                errorMsg = isPivotType ?
+                    // if there is already source lang set, and the pivot file source lang is different, this is not allowed
+                    // All uploaded pivot files must have same source-language
+                    Ext.String.format(msg.pivotSourceNotSame,languages.getRfcById(sl),languages.getRfcById(sourceField.getValue()))
+                    :
+                    // bilingual upload where the source language of the bilingual file is not the same as the one selected/set before
+                    errorMsg = msg.sourceNotSame;
         }else if(isPivotType && !Ext.isEmpty(relaisLang.getValue()) && tl !== relaisLang.getValue()){
             // the relais language is set and the relais file target language is different
             errorMsg = Ext.String.format(msg.additionalRelaisNotSameTarget, rec.get('name'),languages.getRfcById(tl),languages.getRfcById(relaisLang.getValue()));
@@ -226,6 +233,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     /***
      * Check if the given name is duplicate for the new task. Is duplicated when the record
      * has same name, type and target language
+     * TODO: move me to utils and refactor duplicate
      * @param fileName
      * @param type
      * @param targetLang
