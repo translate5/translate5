@@ -72,6 +72,7 @@ trait editor_Controllers_Traits_ImportTrait {
         $dp->archiveImportedData();
 
         $this->entity->setProjectId($entityId);
+        $this->entity->setTaskType($this->entity::INITIAL_TASKTYPE_PROJECT);
 
         $languages=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languages editor_Models_Languages */
@@ -140,7 +141,7 @@ trait editor_Controllers_Traits_ImportTrait {
      */
     public function isProjectUpload(): bool
     {
-        return is_array($this->data['targetLang']) && count($this->data['targetLang']) > 1 && !empty($this->data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME]);
+        return !empty($this->data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME]);
     }
 
     /***

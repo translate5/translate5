@@ -82,7 +82,7 @@ class DevelopmentGithookCommand extends Translate5AbstractCommand
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
-    {
+    {return 0;
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
