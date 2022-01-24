@@ -89,11 +89,10 @@ Ext.define('Editor.controller.CommentNavigation', {
                 }  
 
             case 'visualAnnotation':
-                var
-                    vr = Ext.first('visualReviewPanel'),
-                    vc = vr && vr.getController();
-                if(vc){
-                    vc.scrollToAnnotation(remarkRecord);
+                var annotationsController = Editor.app.getController('Editor.plugins.VisualReview.controller.Annotations');
+                if(annotationsController){
+                    // to fully identify an annotation the dabase-id is needed, the virtual page for PDF-based visuals and the file-id of the physical html page
+                    annotationsController.scrollToRemark(remarkRecord);
                 }
                 break;
         }
@@ -125,7 +124,7 @@ Ext.define('Editor.controller.CommentNavigation', {
             remark = existing;
         } else {
             store.addSorted(remark);
-            
+            // TODO ANNOTATIONS FIXME: Why is this neccessary ? Annotations are added to the annotation-store before the message-bus is called ...
             if(remark.get('type') === 'visualAnnotation'){
                 var annotationsController = Editor.app.getController('Editor.plugins.VisualReview.controller.Annotations');
                 // the plugin may not be loaded
@@ -143,6 +142,7 @@ Ext.define('Editor.controller.CommentNavigation', {
         var cl = this.getCommentList()
             store = cl.getStore();
         store.getData().removeByKey(remarkId);
+        // TODO ANNOTATIONS FIXME: Why is this neccessary ? Annotations are removed from the annotation-store before the message-bus is called ...
         if(remarkType === 'visualAnnotation'){
             var annotationsController = Editor.app.getController('Editor.plugins.VisualReview.controller.Annotations');
             // the plugin may not be loaded

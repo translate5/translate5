@@ -33,13 +33,28 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.model.Comment
+ * @class Editor.model.Remark
  * @extends Ext.data.Model
  */
  Ext.define('Editor.model.Remark', {
     extend: 'Ext.data.Model',
+    idProperty: 'id',
+    proxy : {
+      type : 'rest',
+      url: Editor.data.restpath+'commentnav',
+      reader : {
+        rootProperty: 'rows',
+        type : 'json'
+      },
+      writer: {
+        encode: true,
+        rootProperty: 'data',
+        writeAllFields: false
+      }
+    },
     fields: [
       {name: 'id', type: 'int'},
+      {name: 'dbId', type: 'int'},
       {name: 'segmentId', type: 'int'},
       {name: 'userName', type: 'string', mapping: function(data){
           if(data.userName) return data.userName;
@@ -58,6 +73,7 @@ END LICENSE AND COPYRIGHT
       {name: 'x', type: 'number', default: -1},
       {name: 'y', type: 'number', default: -1},
       {name: 'timecode', type: 'int', default: -1},
+      // this is either "segmentComment" or "visualAnnotation"
       {name: 'type', type: 'string'},
     ],
     /**
@@ -72,20 +88,14 @@ END LICENSE AND COPYRIGHT
      * @returns {Number}
      */
     getPageNr: function(){
-        return parseInt(this.get('page'), 16);
+        return parseInt(this.get('page'), 10);
     },
-    idProperty: 'id',
-    proxy : {
-      type : 'rest',
-      url: Editor.data.restpath+'commentnav',
-      reader : {
-        rootProperty: 'rows',
-        type : 'json'
-      },
-      writer: {
-        encode: true,
-        rootProperty: 'data',
-        writeAllFields: false
-      }
-    }
+    /**
+     * ATTENTION: when adding visual annotations their "id" may not be the id from the database !!
+     * Returns the real id of the item in the database
+     * @returns {Number}
+     */
+    getDatabaseId: function(){
+        return this.get('dbId');
+    }    
   });
