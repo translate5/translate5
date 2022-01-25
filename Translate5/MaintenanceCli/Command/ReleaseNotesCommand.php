@@ -209,6 +209,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         $ret = $issueService->search($jql, 0, -1, [
             'summary',
             'description',
+            'components',
             'issuetype',
             'customfield_11800', //'ChangeLog Description'
             'customfield_11700', //'Important release notes'
@@ -217,6 +218,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             $item = new \stdClass();
             $item->key = $issue->key;
             $item->summary = trim($issue->fields->summary);
+            $item->components = join(', ', array_column($issue->fields->components ?? [], 'name'));
             $item->description = empty($issue->fields->customfield_11800) ? $issue->fields->description : $issue->fields->customfield_11800;
             if(!empty($issue->fields->customfield_11700)) {
                 $this->importantNotes[$issue->key] = preg_replace('~\R~u', "\n", trim($issue->fields->customfield_11700));
@@ -265,7 +267,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             $this->io->section($label);
             foreach($this->issues[$type] as $issue) {
                 $this->io->text([
-                    '<info>'.$issue->key.': '.$issue->summary.'</info>',
+                    '<info>'.$issue->key.' ('.$issue->components.'): '.$issue->summary.'</info>',
                     $this->linkIssue($issue->key, true),
                     $issue->description, ''
                 ]);
@@ -376,21 +378,21 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
             $md .= "\n### Added\n";
         }
         foreach($this->issues['new feature'] as $row) {
-            $md .= '**'.$this->linkIssue($row->key).': '.$row->summary."** <br>\n".$row->description."\n\n";
+            $md .= '**'.$this->linkIssue($row->key).': '.$row->components.' - '.$row->summary."** <br>\n".$row->description."\n\n";
         }
         
         if(!empty($this->issues['change'])) {
             $md .= "\n### Changed\n";
         }
         foreach($this->issues['change'] as $row) {
-            $md .= '**'.$this->linkIssue($row->key).': '.$row->summary."** <br>\n".$row->description."\n\n";
+            $md .= '**'.$this->linkIssue($row->key).': '.$row->components.' - '.$row->summary."** <br>\n".$row->description."\n\n";
         }
         
         if(!empty($this->issues['fix'])) {
             $md .= "\n### Bugfixes\n";
         }
         foreach($this->issues['fix'] as $row) {
-            $md .= '**'.$this->linkIssue($row->key).': '.$row->summary."** <br>\n".$row->description."\n\n";
+            $md .= '**'.$this->linkIssue($row->key).': '.$row->components.' - '.$row->summary."** <br>\n".$row->description."\n\n";
         }
         
         $filename = APPLICATION_ROOT.'/docs/CHANGELOG.md';
@@ -407,7 +409,7 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
     protected function makeSqlRow($row, $type, $date, $groups) {
         //using only the issue nr, not the issue text
         $issue = $row->key;
-        $title = addcslashes($row->summary, "'");
+        $title = addcslashes($row->components.' - '.$row->summary, "'");
         $desc = addcslashes($row->description, "'");
 
         //calculate the group integer
