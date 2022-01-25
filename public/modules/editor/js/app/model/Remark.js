@@ -70,6 +70,7 @@ END LICENSE AND COPYRIGHT
       {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
       {name: 'reviewFileId', type: 'integer'},
       {name: 'page', type: 'string',  default: '0' },
+      {name: 'pageNum', type: 'int' },
       {name: 'x', type: 'number', default: -1},
       {name: 'y', type: 'number', default: -1},
       {name: 'timecode', type: 'int', default: -1},

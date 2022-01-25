@@ -76,8 +76,12 @@ class Editor_CommentnavController extends ZfExtended_RestController {
         /* @var $commentEntity editor_Models_Comment */
         $comments = $commentEntity->loadByTaskPlainWithPage($session->taskGuid);
         foreach ($comments as &$row) {
+            // if other controllers add records we have a potential id-overlap. So the frontend has to work with virtual IDs and need to know the real database ID
+            $row['dbId'] = $row['id'];
             $row['comment'] = htmlspecialchars($row['comment']);
             $row['type'] = $commentEntity::FRONTEND_ID;
+            // the segment mappings segmentPage column  is a Hex-Value and does not qualify for sorting, therefore we add a parsed decimal property
+            $row['pageNum'] = hexdec($row['page']);
             if($this->wfAnonymize) {
                 $row = $this->wfAnonymize->anonymizeUserdata($session->taskGuid, $row['userGuid'], $row);
             }
