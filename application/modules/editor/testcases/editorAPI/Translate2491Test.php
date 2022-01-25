@@ -114,7 +114,7 @@ class Translate2491Test extends editor_Test_JsonTest {
         ]);
 
         // Wait for import
-        $this->api()->setTask($task = $transfer->step1->rows);
+        $this->api()->setTask($task = $transfer->step1->rows->projectTasks[0]);
         $this->api()->getTask()->originalSourceLang = $taskCfg['sourceLang'];
         $this->api()->getTask()->originalTargetLang = $taskCfg['targetLang'];
         $this->api()->getTask()->taskType == ZfExtended_Test_ApiHelper::INITIAL_TASKTYPE_PROJECT
