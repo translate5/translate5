@@ -591,6 +591,7 @@ Ext.define('Editor.controller.Localizer', {
             finishedDateHeader: '<?php echo $this->translate->_('Abschlussdatum');?>',
             deadlineDateHeader: '<?php echo $this->translate->_('Deadline Datum');?>',
             exelExportedTooltip: '<?php echo $this->translate->_('Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.');?>',
+            enddateTooltip: '<?php echo $this->translate->_('Das Datum, wann der Projektmanager die Aufgabe beendet hat und nicht das Datum an dem einzelne Workflowschritte abgeschlossen wurden.');?>',
             qualityErrorCount: '<?php echo $this->translate->_('QS Fehler');?>'
         },
         text_cols: {
@@ -608,6 +609,7 @@ Ext.define('Editor.controller.Localizer', {
             wordCountTT: '<?php echo $this->translate->_('Anzahl Wörter');?>',
             fileCount: '<?php echo $this->translate->_('Dateien');?>',
             orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            enddate: '<?php echo $this->translate->_('Enddatum');?>',
             referenceFiles: '<?php echo $this->translate->_('Referenzdateien');?>',
             terminologie: '<?php echo $this->translate->_('Terminologie');?>',
             fullMatchEdit: '<?php echo $this->translate->_('Unveränderte 100% TM Matches sind editierbar');?>',
@@ -934,7 +936,8 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.project.ProjectActionMenu", {
         override: "Editor.view.project.ProjectActionMenu",
         messages: {
-            actionDeleteProject: '<?php echo $this->translate->_('Projekt komplett löschen');?>'
+            actionDeleteProject: '<?php echo $this->translate->_('Projekt komplett löschen');?>',
+            actionReloadProject: '<?php echo $this->translate->_('Projekt aktualisieren');?>',
         }
     });
     

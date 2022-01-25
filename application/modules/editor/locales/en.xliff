@@ -224,6 +224,14 @@
         <source>Bestelldatum</source>
         <target>Order date</target>
       </trans-unit>
+      <trans-unit id='RGFzIERhdHVtLCB3YW5uIGRlciBQcm9qZWt0bWFuYWdlciBkaWUgQXVmZ2FiZSBiZWVuZGV0IGhhdCB1bmQgbmljaHQgZGFzIERhdHVtIGFuIGRlbSBlaW56ZWxuZSBXb3JrZmxvd3NjaHJpdHRlIGFiZ2VzY2hsb3NzZW4gd3VyZGVuLg=='>
+        <source>Das Datum, wann der Projektmanager die Aufgabe beendet hat und nicht das Datum an dem einzelne Workflowschritte abgeschlossen wurden.</source>
+        <target>The date, the project manager set the task to ended. NOT the date, a workflow step was finished.</target>
+      </trans-unit>
+      <trans-unit id='RW5kZGF0dW0='>
+        <source>Enddatum</source>
+        <target>Ended date</target>
+      </trans-unit>
       <trans-unit id="UXVlbGxzcHJhY2hlIGJlYXJiZWl0YmFy">
         <source>Quellsprache bearbeitbar</source>
         <target>Source language editable</target>
@@ -3793,6 +3801,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UHJvamVrdGU='><source>Projekte</source><target>Projects</target></trans-unit>
 <trans-unit id='enVtIFByb2pla3Qgc3ByaW5nZW4='><source>zum Projekt springen</source><target>jump to project</target></trans-unit>
 <trans-unit id='UHJvamVrdGxpc3RlIHZvbSBTZXJ2ZXIgYWt0dWFsaXNpZXJlbi4='><source>Projektliste vom Server aktualisieren.</source><target>Refresh project list from the server.</target></trans-unit>
+<trans-unit id='UHJvamVrdCBha3R1YWxpc2llcmVu'>
+  <source>Projekt aktualisieren</source>
+  <target>Refresh project</target>
+</trans-unit>
 <trans-unit id="QXVmZ2FiZW5saXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4u"><source>Aufgabenliste vom Server aktualisieren.</source><target>Refresh task list from the server.</target></trans-unit>
 <trans-unit id="QWxsZSBFcndlaXRlcm4="><source>Alle Erweitern</source><target>Expand all</target></trans-unit>
 <trans-unit id="QWxsZSBQcm9qZWt0ZSBFcndlaXRlcm4="><source>Alle Projekte Erweitern</source><target>Expand all projects</target></trans-unit>

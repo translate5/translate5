@@ -64,29 +64,36 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
 
         $isDemo = $authKey === 'demomode';
 
-        /*
-         ** to test not authenticated requests:
-         */
-//         header('HTTP/1.0 403 Forbidden');
-//         exit;
         header('Content-Type: application/json', true);
+
         /*
          ** to test other deepl errors:
          */
-//         here we do not know the real HTTP status code, I assume some 5xx
-//        header('HTTP/1.0 503 Service Unavailable');
-//        echo "upstream connect error or disconnect/reset before headers. reset reason: overflow";
-//        exit;
-//          header('HTTP/1.0 502 Bad Gateway');
-//          echo '<html>
-// <head><title>502 Bad Gateway</title></head>
-// <body bgcolor="white">
-// <center><h1>502 Bad Gateway</h1></center>
-// <hr><center>nginx</center>
-// </body>
-// </html>';
-//         exit;
-        
+        //choose and set here one of the below errors to be tested
+        switch ('NONE') {
+            //not testable here, returning an empty content
+            case '403':
+                header('HTTP/1.0 403 Forbidden');
+                exit;
+            case '503':
+                // here we do not know the real HTTP status code, I assume some 5xx
+                header('HTTP/1.0 503 Service Unavailable');
+                echo "upstream connect error or disconnect/reset before headers. reset reason: overflow";
+                exit;
+            case '502':
+                header('HTTP/1.0 502 Bad Gateway');
+                echo '<html>
+ <head><title>502 Bad Gateway</title></head>
+ <body bgcolor="white">
+ <center><h1>502 Bad Gateway</h1></center>
+ <hr><center>nginx</center>
+ </body>
+ </html>';
+                exit;
+            default: break;
+        }
+
+
         $calledUrl = $this->getUriApiPart();
         switch ($calledUrl) {
             //Requesting which languages do exist:

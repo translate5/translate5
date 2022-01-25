@@ -756,6 +756,18 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         this.getProjectGrid().getController().handleProjectDelete(task, ev);
     },
 
+    editorReloadProject: function (task, ev) {
+        var me = this;
+        task.load({
+            success: function() {
+                if (me.isProjectPanelActive()) {
+                    me.getProjectTaskGrid().getStore().load();
+                }
+            }
+        });
+
+    },
+
     /**
      * Task grid action icon click handler
      *

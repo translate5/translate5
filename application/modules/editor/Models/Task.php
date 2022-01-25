@@ -72,6 +72,8 @@ END LICENSE AND COPYRIGHT
  * @method void setWordCount() setWordCount(int $wordcount)
  * @method string getOrderdate() getOrderdate()
  * @method void setOrderdate() setOrderdate(string $datetime)
+ * @method string getEnddate() getEnddate()
+ * @method void setEnddate() setEnddate(string $datetime)
  * @method boolean getReferenceFiles() getReferenceFiles()
  * @method void setReferenceFiles() setReferenceFiles(bool $flag)
  * @method boolean getEnableSourceEditing() getEnableSourceEditing()
@@ -753,12 +755,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = currentUser) and respects multiuser editing
+     * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = givenUser) and respects multiuser editing
+     * @param string $userGuid
+     * @param string|null $taskGuid optional, use the internally loaded taskGuid by default
      * @return boolean false if task had not been locked or does not exist,
      *          true if task has been unlocked successfully
      */
-    public function unlockForUser($userGuid) {
-        $taskGuid = $this->db->getAdapter()->quote($this->getTaskGuid());
+    public function unlockForUser(string $userGuid, string $taskGuid = null): bool
+    {
+        $taskGuid = $this->db->getAdapter()->quote($taskGuid ?? $this->getTaskGuid());
         $userGuid = $this->db->getAdapter()->quote($userGuid);
         $multiUserId = $this->db->getAdapter()->quote(self::INTERNAL_LOCK.self::USAGE_MODE_SIMULTANEOUS);
 
@@ -1092,6 +1097,26 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
+     * overwrites task save to update enddate if needed
+     * @return mixed
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function save() {
+        //automatically set enddate field
+        $state = $this->getState();
+        $oldState = $this->getOldValue('state');
+        if($state === self::STATE_END && $state != $oldState) {
+            $this->setEnddate(NOW_ISO);
+        }
+        elseif($oldState == self::STATE_END && $state != self::STATE_END) {
+            $this->setEnddate(null); //old value was ended and task is set to open again
+        }
+        return parent::save();
+    }
+
+    /**
      * Return all combinations of font-family and font-size that are used in the task.
      * @return array
      */
@@ -1277,6 +1302,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'fullMatchEdit' => 'Unveränderte 100% TM Matches sind editierbar',
             'lockLocked' => 'Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
             'orderdate' => 'Bestelldatum',
+            'enddate' => 'Enddatum',
             'pmGuid' => 'Projektmanager',
             'pmName' => 'Projektmanager',
             'referenceFiles' => 'Referenzdateien',

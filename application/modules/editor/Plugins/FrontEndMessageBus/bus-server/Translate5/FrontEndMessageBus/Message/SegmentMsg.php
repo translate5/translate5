@@ -78,4 +78,8 @@ class SegmentMsg extends FrontendMsg {
     public function __get($name) {
         return $this->payload[$name];
     }
+
+    public function __isset($name) {
+        return array_key_exists($name, $this->payload);
+    }
 }

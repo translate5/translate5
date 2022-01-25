@@ -504,6 +504,9 @@ class editor_TaskController extends ZfExtended_RestController {
         settype($this->data['enableSourceEditing'], 'integer');
         settype($this->data['edit100PercentMatch'], 'integer');
         settype($this->data['lockLocked'], 'integer');
+        if(array_key_exists('enddate', $this->data)) {
+            unset($this->data['enddate']);
+        }
         if(array_key_exists('autoStartImport', $this->data)) {
             //if the value exists we assume boolean
             settype($this->data['autoStartImport'], 'boolean');
@@ -1000,6 +1003,9 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         if (isset($this->data->initial_tasktype)) {
             unset($this->data->initial_tasktype);
+        }
+        if (isset($this->data->enddate)) {
+            unset($this->data->enddate);
         }
         $this->processClientReferenceVersion();
         $this->setDataInEntity();
