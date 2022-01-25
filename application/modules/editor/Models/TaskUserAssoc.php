@@ -469,8 +469,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
 
         $s = $this->db->select()->from($this->db, ['taskGuid', 'userGuid']);
-        foreach($where as $one) {
-            $s->where($one);
+        foreach($where as $oneSql => $oneVal) {
+            $s->where($oneSql, $oneVal);
         }
         $taskUserAssoc = $this->db->fetchAll($s)->toArray();
 
