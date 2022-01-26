@@ -78,11 +78,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     }
 
     public function indexAction() {
-        
-        $taskGuid = $this->session->taskGuid;
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
+        //FIXME DUMMY IMPLEMENTATION OF GETTING THE TASK
+        $task = editor_Task_Current::getInstance();
+        $taskGuid = $task->getTaskGuid();
+
         // apply quality filter
         if($this->getRequest()->getParam('qualities', '') != ''){
             $qualityState = new editor_Models_Quality_RequestState($this->getRequest()->getParam('qualities'), $task);
@@ -99,10 +98,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         $this->addJumpToSegmentIndex();
 
         // ----- Specific handling of rows (start) -----
-
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
 
         $handleSegmentranges = $this->checkAndGetSegmentsRange($task);
         if (is_array($handleSegmentranges)) {

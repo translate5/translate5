@@ -259,7 +259,18 @@ Ext.application({
 
         me.loadEditorConfigData(task, function () {
 
+            //FIXME DUMMY IMPLEMENTATION OF SETTING THE URL
+            var currentLocation = window.location.href,
+                newLocation,
+                matchTask = /\/editor\/taskid\/[0-9]+\/go/; //a trailing string is needed for working with relative paths
             me.fireEvent('editorConfigLoaded', me, task);
+
+            if(! matchTask.test(currentLocation)) {
+                // current task not given yet, insert it
+                matchTask = /\/editor/;
+            }
+            newLocation = currentLocation.replace(matchTask, '/editor/taskid/'+task.get('id')+'/go');
+            window.history.pushState({ additionalInformation: 'Updated the URL with JS' }, "FOO", newLocation);
 
             Editor.data.task = task;
             Editor.model.Segment.redefine(task.segmentFields());

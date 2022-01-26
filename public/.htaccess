@@ -12,6 +12,17 @@ RewriteRule ^(ext-6\..\../build)/classic/theme-classic/resources/images/btn/btn-
 RewriteCond %{REQUEST_FILENAME} !-f 
 RewriteRule ^(ext-6\..\../build)/classic/theme-(classic|gray)/(.*) /$1/examples/kitchensink/$2-en/$3 [NC,L]
 
+# remove the current opened task from URL, so that resources (JS, CSS) are loaded properly
+RewriteRule ^editor/taskid/([0-9]+)/go/(.*)$ $2?currentTaskId=$1 [NC,L,QSA]
+
+#/currenttask/123/editor
+#remap to
+#/editor
+#should fix above Resource problems.
+#Then the model URLs could be relative too.
+
+#([0-9]+)/(.*) editor/$3?currentTaskId=$2
+
 RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]
 RewriteCond %{REQUEST_FILENAME} -d 
