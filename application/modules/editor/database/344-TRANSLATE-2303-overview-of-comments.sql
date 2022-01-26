@@ -26,5 +26,5 @@
 -- */
 
 -- just a fix, was forgotten in the associated feature
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) 
+INSERT IGNORE INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) 
 VALUES ('runtimeOptions.frontend.defaultState.editor.commentNav', '1', 'editor', 'system', '{}', '{}', '', 'map', 'Default state configuration for the editor west panel comment overview panel. If this field value is empty ({} is not an empty value!), no state will be applied/saved for this component.', 32, 'Editor left panel comment overview default configuration', 'Editor: UI layout & more', '');
