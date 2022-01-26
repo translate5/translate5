@@ -45,5 +45,6 @@ class editor_Models_Import_DataProvider_Exception extends editor_Models_Import_E
             'E1250' => 'DataProvider ZippedUrl: ZIP file could not be fetched from URL {url}',
             'E1265' => 'DataProvider Factory: The task to be cloned does not have a import archive zip! Path: {path}',
             'E1369' => 'DataProvider Project: No matching work-files where found for the task.',
+            'E1372' => 'DataProvider Zip: Uploaded zip file "{file}" cannot be moved to "{target}'
         ];
 }

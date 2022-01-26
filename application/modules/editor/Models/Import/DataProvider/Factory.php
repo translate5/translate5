@@ -95,10 +95,10 @@ class editor_Models_Import_DataProvider_Factory {
      * @return array
      */
     protected function handleProjectLanguages(array $langauges){
-        foreach ($langauges as $lang){
+        foreach ($langauges as &$lang){
             $language = ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $language editor_Models_Languages */
-            $lang = $language->convertLanguage($lang);
+            $language->convertLanguage($lang);
         }
         return $langauges;
     }

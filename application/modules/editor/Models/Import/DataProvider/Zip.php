@@ -69,9 +69,8 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
         // because of project uploads, copy is required instead of rename
         // at the end of the request the tmp files are removed
         if(!copy($this->importZip, $target)) {
-            //TODO: new error code
-            //DataProvider SingleUpload: Uploaded file "{file}" cannot be moved to "{target}',
-            throw new editor_Models_Import_DataProvider_Exception('E1244', [
+            //DataProvider Zip: Uploaded zip file "{file}" cannot be moved to "{target},
+            throw new editor_Models_Import_DataProvider_Exception('E1372', [
                 'task' => $this->task,
                 'file' => $this->importZip,
                 'target' => $target,

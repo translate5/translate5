@@ -74,6 +74,8 @@ trait editor_Controllers_Traits_ImportTrait {
         $this->entity->setProjectId($entityId);
         $this->entity->setTaskType($this->entity::INITIAL_TASKTYPE_PROJECT);
 
+        $this->entity->save();// save the entity to keep the project id in case the task import fails.
+
         $languages=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languages editor_Models_Languages */
         $languages=$languages->loadAllKeyValueCustom('id','rfc5646');
@@ -121,17 +123,25 @@ trait editor_Controllers_Traits_ImportTrait {
             $task->getTargetLang(),
             $task->getRelaisLang(),
             editor_Models_Languages::LANG_TYPE_ID);
+
         $import->setTask($task);
+
         try {
             $import->import($dp);
-        }
-        catch(editor_Models_Import_ConfigurationException $e) {
-            $this->handleConfigurationException($e);
-        }
-        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
-            $this->handleIntegrityConstraint($e);
-        }catch(editor_Models_Import_DataProvider_Exception $e) {
-            $this->handleDataProviderException($e);
+        }catch (ZfExtended_ErrorCodeException $e){
+            // in case there is task, remove it
+            $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
+            /* @var $remover editor_Models_Task_Remover */
+            $remover->remove(true);
+
+            if($e instanceof editor_Models_Import_ConfigurationException){
+                $this->handleConfigurationException($e);
+            }elseif ($e instanceof ZfExtended_Models_Entity_Exceptions_IntegrityConstraint){
+                $this->handleIntegrityConstraint($e);
+            }elseif ($e instanceof editor_Models_Import_DataProvider_Exception){
+                $this->handleDataProviderException($e);
+            }
+            throw $e;
         }
     }
 
