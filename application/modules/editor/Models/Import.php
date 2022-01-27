@@ -72,7 +72,18 @@ class editor_Models_Import {
         
         //pre import methods:
         try {
+
             $dataProvider->checkAndPrepare($this->task);
+
+            // After the files are moved, set the languages for the import configuration. For project uploads, relais language
+            // is evaluated based on the file name match. If no relais file match for the current workfile is found, the same check will be
+            // done for the following up project tasks
+            $this->setLanguages(
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
+                $this->task->getRelaisLang(),
+                editor_Models_Languages::LANG_TYPE_ID);
+
             // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
             $this->events->trigger("afterUploadPreparation", $this, array('task' => $this->task, 'dataProvider' => $dataProvider));
             
