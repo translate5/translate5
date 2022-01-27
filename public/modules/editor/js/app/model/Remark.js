@@ -56,6 +56,7 @@ END LICENSE AND COPYRIGHT
       {name: 'id', type: 'int'},
       {name: 'dbId', type: 'int'},
       {name: 'segmentId', type: 'int'},
+      {name: 'segmentNrInTask', type: 'int'},
       {name: 'userName', type: 'string', mapping: function(data){
           if(data.userName) return data.userName;
           var ret = '';

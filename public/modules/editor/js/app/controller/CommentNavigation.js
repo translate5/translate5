@@ -73,24 +73,11 @@ Ext.define('Editor.controller.CommentNavigation', {
     },
     
     handleItemClick: function(origin, remarkRecord) {
-        switch(remarkRecord.get('type')) {
-            
-            case 'segmentComment':
-                var grid = Ext.getCmp('segment-grid'),
-                    view = grid.getView(),
-                    segmentRecord = grid.getStore().getById(remarkRecord.get('segmentId'));
-                // TODO ANNOTATIONS FIXME: the grid-store does NOT contain all segments but just the visible ones !!
-                if(segmentRecord){
-                    //grid.scrollTo(recIdx); // does not animate upwards direction
-                    var rowTableEl = view.getEl().getById(view.getRowId(segmentRecord)); //table has bgColor set for end of animation
-                    grid.setSelection(segmentRecord);
-                    grid.getScrollable().scrollIntoView(rowTableEl, false, true, true);
-                    break;
-                }  
-
-            case 'visualAnnotation':
-                this.fireEvent('visualRemarkClicked', remarkRecord);
-                break;
+        var segmentNrInTask=remarkRecord.get('segmentNrInTask');
+        if(segmentNrInTask) { // segmentComment
+            Ext.getCmp('segment-grid').scrollTo(segmentNrInTask-1); // segmentStore starts with 0, so decrease segmentNrInTask
+        } else { // visualAnnotation
+            this.fireEvent('visualRemarkClicked',remarkRecord);
         }
     },
 

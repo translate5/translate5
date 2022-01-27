@@ -145,7 +145,7 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
             ->joinLeft(
                 ['sm' => 'LEK_visualreview_segmentmapping'],
                 'comments.segmentId = sm.segmentId',
-                ['page' => 'segmentPage', 'reviewFileId']
+                ['page' => 'segmentPage', 'reviewFileId', 'segmentNrInTask']
             );
         if($cid) {
             $s->where('comments.id = ?', $cid);
