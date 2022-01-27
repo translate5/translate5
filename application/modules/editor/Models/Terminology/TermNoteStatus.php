@@ -194,7 +194,8 @@ class editor_Models_Terminology_TermNoteStatus
             if (empty(self::$termStatusMap[$tag]) || !in_array($type, array_keys(self::$termStatusMap[$tag]))) {
                 continue;
             }
-            if($type == $sourceType) {
+            //value must be given, on new attributes it may be empty
+            if($type == $sourceType && strlen($attribute['value']) > 0) {
                 $usedStatus = $this->getStatusFromAttribute($tag, $type, $attribute['value']);
             }
         }
