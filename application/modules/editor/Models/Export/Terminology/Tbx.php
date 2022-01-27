@@ -124,9 +124,10 @@ class editor_Models_Export_Terminology_Tbx {
     /**
      * TODO: add the term attributes and term entry attributes
      * exports the internally stored data
+     * @param bool $format
      * @return string the generated data
      */
-    public function export(): string
+    public function export(bool $format = false): string
     {
         $body = $this->createTbx();
 
@@ -160,12 +161,24 @@ class editor_Models_Export_Terminology_Tbx {
             $termNote = $tig->addChild('termNote', $row->status);
             $termNote->addAttribute('type', 'normativeAuthorization');
         }
-        //SimpleXML throws an error when giving null, so we need this workaround:
-        if (empty($this->target) && $this->target !== '0') {
-            return $this->tbx->asXML();
+
+        $toFile = strlen($this->target) > 0;
+
+        if($format) {
+            $dom = dom_import_simplexml($this->tbx)->ownerDocument;
+            $dom->formatOutput = true;
+            if($toFile) {
+                $dom->save($this->target);
+            }
+            return $dom->saveXML();
         }
 
-        return $this->tbx->asXML($this->target);
+        //SimpleXML throws an error when giving null, so we need this workaround:
+        if ($toFile) {
+            $this->tbx->asXML($this->target);
+        }
+        return $this->tbx->asXML(); //the function signature returns always a string, so we do that
+
     }
 
     /**

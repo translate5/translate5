@@ -101,14 +101,16 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>self::$collId, 'customerIds' => $this->api()->getCustomer()->id,'mergeTerms'=>true));
 
         //export the generated file
-        $response=$this->api()->requestJson('editor/termcollection/export', 'POST', array('collectionId' =>self::$collId));
+        $response = $this->api()->requestJson('editor/termcollection/export?format=1', 'POST', array('collectionId' =>self::$collId));
 
         $this->assertTrue(is_object($response),"Unable to export the terms by term collection");
         $this->assertNotEmpty($response->filedata,"The exported tbx file by collection is empty");
 
-        //file_put_contents($this->api()->getFile('/E_'.$fileName, null, false), $response->filedata);
-        $expected=$this->api()->getFileContent('E_'.$fileName);
-        $actual=$response->filedata;
+        if($this->api()->isCapturing()) {
+            file_put_contents($this->api()->getFile('/E_'.$fileName, null, false), $response->filedata);
+        }
+        $expected = $this->api()->getFileContent('E_'.$fileName);
+        $actual = $response->filedata;
 
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file an the result file does not match.Test file name: ".$fileName);
@@ -124,7 +126,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
 
     public static function tearDownAfterClass(): void {
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/termcollection/'.self::$collId,'DELETE');
+        self::$api->cleanup && self::$api->requestJson('editor/termcollection/'.self::$collId,'DELETE');
     }
 
 }
