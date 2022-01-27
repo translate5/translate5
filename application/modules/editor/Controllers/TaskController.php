@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_TaskController extends ZfExtended_RestController {
 
-    use editor_Controllers_Traits_ImportTrait;
+    use editor_Controllers_Task_ImportTrait;
 
 
     protected $entityClass = 'editor_Models_Task';

@@ -3,7 +3,7 @@
 /***
  * Here ale place all task import related functions just to split them from the main controller
  */
-trait editor_Controllers_Traits_ImportTrait {
+trait editor_Controllers_Task_ImportTrait {
 
     /***
      * Handles the import for non project data.
@@ -117,12 +117,6 @@ trait editor_Controllers_Traits_ImportTrait {
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
         $import->setUserInfos($this->user->data->userGuid, $this->user->data->userName);
-
-        $import->setLanguages(
-            $task->getSourceLang(),
-            $task->getTargetLang(),
-            $task->getRelaisLang(),
-            editor_Models_Languages::LANG_TYPE_ID);
 
         $import->setTask($task);
 
