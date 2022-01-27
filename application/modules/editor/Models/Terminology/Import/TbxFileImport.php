@@ -127,9 +127,9 @@ class editor_Models_Terminology_Import_TbxFileImport
 
     /**
      * contains the whole term note status mapping
-     * @var editor_Models_Terminology_TermNoteStatus
+     * @var editor_Models_Terminology_TermStatus
      */
-    protected editor_Models_Terminology_TermNoteStatus $termNoteStatus;
+    protected editor_Models_Terminology_TermStatus $termNoteStatus;
 
     /**
      * @var ZfExtended_EventManager
@@ -168,7 +168,7 @@ class editor_Models_Terminology_Import_TbxFileImport
         $this->bulkTransacGrp = new editor_Models_Terminology_BulkOperation_TransacGrp();
         $this->bulkTerm = new editor_Models_Terminology_BulkOperation_Term();
 
-        $this->termNoteStatus = new editor_Models_Terminology_TermNoteStatus();
+        $this->termNoteStatus = new editor_Models_Terminology_TermStatus();
     }
 
     /**

@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 /**
  * encapsulates the mapping of configurable attribute states to influence the final term status
  */
-class editor_Models_Terminology_TermNoteStatus
+class editor_Models_Terminology_TermStatus
 {
     const DEFAULT_TAG = 'termNote';
     const DEFAULT_TYPE_ADMINISTRATIVE_STATUS = 'administrativeStatus';
@@ -128,7 +128,7 @@ class editor_Models_Terminology_TermNoteStatus
      */
     public function setTermStatusOnImport(editor_Models_Terminology_TbxObjects_Term $term, editor_Models_Terminology_BulkOperation_Attribute $bulkAttributes, bool &$admnStatFound = false): bool {
 
-        $importHelper = new editor_Models_Terminology_TermNoteStatus_ImportHelper($this, $term);
+        $importHelper = new editor_Models_Terminology_TermStatus_ImportHelper($this, $term);
 
         //loop over the collected attributes for the term and search for attributes which may influence the state
         $bulkAttributes->foreachToBeProcessed(function(editor_Models_Terminology_TbxObjects_Attribute $attribute) use ($importHelper) {
@@ -291,7 +291,7 @@ class editor_Models_Terminology_TermNoteStatus
     }
 }
 
-class editor_Models_Terminology_TermNoteStatus_ImportHelper {
+class editor_Models_Terminology_TermStatus_ImportHelper {
     private bool $admnStatFound = false;
 
     /* @var $foundByPrecedenceType editor_Models_Terminology_TbxObjects_Attribute[] */
@@ -302,9 +302,9 @@ class editor_Models_Terminology_TermNoteStatus_ImportHelper {
 
     private editor_Models_Terminology_TbxObjects_Term $term;
 
-    private editor_Models_Terminology_TermNoteStatus $statusInstance;
+    private editor_Models_Terminology_TermStatus $statusInstance;
 
-    public function __construct(editor_Models_Terminology_TermNoteStatus $statusInstance, editor_Models_Terminology_TbxObjects_Term $term) {
+    public function __construct(editor_Models_Terminology_TermStatus $statusInstance, editor_Models_Terminology_TbxObjects_Term $term) {
         $this->term = $term;
         $this->statusInstance = $statusInstance;
     }
