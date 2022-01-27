@@ -62,7 +62,7 @@ class Editor_CommentnavController extends ZfExtended_RestController {
         $this->task = editor_ModelInstances::taskByGuid($session->taskGuid);
         $this->wfAnonymize = editor_ModelInstances::taskByGuid($session->taskGuid)->anonymizeUsers()
                             ? ZfExtended_Factory::get('editor_Workflow_Anonymize')
-                            : false;
+                            : NULL;
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
 
@@ -82,9 +82,7 @@ class Editor_CommentnavController extends ZfExtended_RestController {
             $row['type'] = $commentEntity::FRONTEND_ID;
             // the segment mappings segmentPage column  is a Hex-Value and does not qualify for sorting, therefore we add a parsed decimal property
             $row['pageNum'] = hexdec($row['page']);
-            if($this->wfAnonymize) {
-                $row = $this->wfAnonymize->anonymizeUserdata($session->taskGuid, $row['userGuid'], $row);
-            }
+            $this->getWfAnonymize()?->anonymizeUserdata($session->taskGuid, $row['userGuid'], $row);
         }
         return $comments;
     }
