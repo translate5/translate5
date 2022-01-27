@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,38 +25,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.TaskAddWindowViewModel', {
+Ext.define('Editor.view.admin.projectWizard.UploadGridViewModel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.adminTaskAddWindow',
+    alias: 'viewmodel.wizardUploadGrid',
 
-    requires: [
-        'Ext.app.bind.Formula'
-    ],
-    data:{
-        currentTask : null,
-        isZipUpload:false
-    },
-    activeItem: null,
-    
-    formulas: {
-        disableSkipButton:function(get){
-            return get('activeItem').disableSkipButton();
-        },
-        
-        disableContinueButton:function(get){
-            return get('activeItem').disableContinueButton();
-        },
-        
-        disableAddButton:function(get){
-            return get('activeItem').disableAddButton();
-        },
-
-        disableCancelButton:function(get){
-            return get('activeItem').disableCancelButton();
-        },
-
-        disableImportDefaults:function(get){
-            return get('activeItem').disableImportDefaults();
+    stores: {
+        files: {
+            model:'Editor.model.admin.projectWizard.File',
+            sorters: [{
+                sorterFn: function(record1, record2) {
+                    var name1 = Ext.StoreMgr.get('admin.Languages').getRfcById(record1.data.targetLang),
+                        name2 = Ext.StoreMgr.get('admin.Languages').getRfcById(record2.data.targetLang);
+                    return name1 > name2 ? 1 : (name1 === name2) ? 0 : -1;
+                },
+                direction: 'ASC'
+            }]
         }
     }
 });

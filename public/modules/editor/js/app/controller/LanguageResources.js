@@ -45,7 +45,8 @@ Ext.define('Editor.controller.LanguageResources', {
       'Editor.util.LanguageResources',
       'Editor.view.LanguageResources.services.Default',
       'Editor.view.LanguageResources.services.TermCollection',
-      'Editor.view.LanguageResources.services.OpenTM2'
+      'Editor.view.LanguageResources.services.OpenTM2',
+      'Editor.view.LanguageResources.services.DummyFileTm'
   ],
   refs:[{
       ref: 'matchgrid',

@@ -106,6 +106,23 @@ Ext.define('Editor.util.Util', {
                 stepName=rec.get('text');
             }
             return stepName;
+        },
+
+        /***
+         * Get the file extension from the file name
+         * @returns {any|string}
+         */
+        getFileExtension:function (name){
+            return name ? name.split('.').pop() : '';
+        },
+
+        /***
+         * Return only the file name and ignoring the file extension
+         * @param filename
+         * @returns {string}
+         */
+        getFileNameNoExtension:function (filename){
+            return filename.substring(0, filename.lastIndexOf('.')) || filename;
         }
     }
     

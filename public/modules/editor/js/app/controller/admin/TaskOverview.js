@@ -99,6 +99,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },{
         ref:'userAssocGrid',
         selector: '#adminTaskUserAssocGrid'
+    },{
+        ref:'wizardUploadGrid',
+        selector:'#adminTaskAddWindow wizardUploadGrid'
     }],
     alias: 'controller.taskOverviewController',
 
@@ -337,12 +340,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     handleImportDefaults: function () {
         var me = this;
-        if (me.getTaskAddForm().isValid()) {
-            me.saveTask(function (task) {
-                me.fireEvent('wizardCardImportDefaults',task);
-                me.startImport(task);
-            });
-        }
+
+        me.saveTask(function (task) {
+            me.fireEvent('wizardCardImportDefaults',task);
+            me.startImport(task);
+        });
     },
 
     /**
@@ -424,7 +426,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         if (!me.getTaskAddForm()) {
             return;
         }
-        me.getTaskAddForm().getForm().reset();
         me.getTaskAddWindow().close();
     },
 
@@ -1107,24 +1108,43 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     saveTask: function (successCallback) {
         var me = this,
             win = me.getTaskAddWindow(),
-            form = this.getTaskAddForm();
+            grid = me.getWizardUploadGrid(),
+            formData = new FormData(),
+            form = me.getTaskAddForm(),
+            params = form.getForm().getValues();
+
+        if (!form.isValid()) {
+            return;
+        }
 
         win.setLoading(me.strings.loadingWindowMessage);
 
-        form.submit({
-            //Accept Header of submitted file uploads could not be changed:
-            //http://stackoverflow.com/questions/13344082/fileupload-accept-header
-            //so use format parameter jsontext here, for jsontext see REST_Controller_Action_Helper_ContextSwitch
+        grid.getStore().each(function(record) {
+            if(record.get('type') !== 'error'){
+                // Add file to AJAX request
+                formData.append('importUpload[]', record.get('file'), record.get('name'));
+                formData.append('importUpload_language[]', record.get('targetLang'));
+                formData.append('importUpload_type[]', record.get('type'));
+            }
+        });
 
-            params: {
-                format: 'jsontext',
-                autoStartImport: 0
-            },
-            timeout: 3600,
-            url: Editor.data.restpath + 'task?format=json', //to fix POST_MAX_SIZE problems, see TRANSLATE-1034
-            scope: this,
-            success: function (form, submit) {
-                var task = me.getModel('admin.Task').create(submit.result.rows);
+        me.fireEvent('beforeCreateTask',params , formData);
+
+        //INFO: this will convert array to coma separated values requires additional handling on backend. We do not want that
+        // Ext.Object.each(form.getForm().getValues(), function(property, value){
+        //     formData.append(property, value);
+        // });
+
+        Ext.Ajax.request({
+            params:params,// send all other form fields as json params to skip the formdata parameter conversions
+            rawData: formData,
+            method:'POST',
+            headers: {'Content-Type':null}, //to use content type of FormData
+            url: Editor.data.restpath + 'task',
+            success: function (response, opts) {
+                var resp = Ext.decode(response.responseText),
+                    task = me.getModel('admin.Task').create(resp.rows);
+
                 me.fireEvent('taskCreated', task);
                 win.setLoading(false);
 
@@ -1133,21 +1153,23 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                     successCallback(task);
                 }
             },
-            failure: function (form, submit) {
-                var card, errorHandler = Editor.app.getController('ServerException');
+            failure: function (response) {
+                var card,
+                    errorHandler = Editor.app.getController('ServerException'),
+                    resp = (response.responseText && response.responseText !== "") ? Ext.decode(response.responseText) : {};
+
                 win.setLoading(false);
-                if (submit.failureType === 'server' && submit.result && !submit.result.success) {
-                    if (submit.result.httpStatus === "422") {
-                        win.getLayout().setActiveItem('taskMainCard');
-                        win.getViewModel().set('activeItem', win.down('#taskMainCard'));
-                        form.markInvalid(submit.result.errorsTranslated);
-                    } else {
-                        card = win.down('#taskUploadCard');
-                        if (card.isVisible()) {
-                            card.update(errorHandler.renderHtmlMessage(me.strings.taskError, submit.result));
-                        }
-                        errorHandler.handleException(submit.response);
+
+                if (response.status === 422 || !Ext.isEmpty(resp.errorsTranslated)) {
+                    win.getLayout().setActiveItem('taskMainCard');
+                    win.getViewModel().set('activeItem', win.down('#taskMainCard'));
+                    form.markInvalid(resp.errorsTranslated);
+                } else {
+                    card = win.down('#taskUploadCard');
+                    if (card.isVisible()) {
+                        card.update(errorHandler.renderHtmlMessage(me.strings.taskError, response.statusText));
                     }
+                    errorHandler.handleException(response);
                 }
             }
         });

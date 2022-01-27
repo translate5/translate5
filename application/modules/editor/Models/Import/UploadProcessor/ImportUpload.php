@@ -53,21 +53,30 @@ class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Im
         $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
         $allValidExtensions = $supportedFiles->getSupportedExtensions();
-        
-        $ext = $this->getFileExtension();
-        if(in_array($ext, $allValidExtensions)){
+
+        $files = $this->getFiles();
+        $errors = [];
+
+        foreach ($files as $file){
+            $ext = $this->getFileExtension($file);
+            if(!in_array($ext, $allValidExtensions)){
+                $data = [
+                    'ext' => $ext,
+                    'filename' => $file,
+                ];
+
+                $log = Zend_Registry::get('logger');
+                /* @var $log ZfExtended_Logger */
+                $log->info('E1031', 'A file "{filename}" with an unknown file extension "{ext}" was tried to be imported.', $data);
+                $errors[] = editor_Models_Import_UploadProcessor::ERROR_INVALID_FILE;
+            }
+        }
+
+        if(empty($errors)){
             return true;
         }
-        
-        $data = [
-            'ext' => $ext,
-            'filename' => $this->fileInfo['name'],
-        ];
-        
-        $log = Zend_Registry::get('logger');
-        /* @var $log ZfExtended_Logger */
-        $log->info('E1031', 'A file "{filename}" with an unknown file extension "{ext}" was tried to be imported.', $data);
-        $addErrorCallback([editor_Models_Import_UploadProcessor::ERROR_INVALID_FILE]);
+
+        $addErrorCallback($errors);
         return false;
     }
 }

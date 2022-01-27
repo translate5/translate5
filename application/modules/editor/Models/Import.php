@@ -59,7 +59,7 @@ class editor_Models_Import {
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $this->importConfig = ZfExtended_Factory::get('editor_Models_Import_Configuration');
     }
-    
+
     /**
      * führt den Import aller Dateien eines Task durch
      * @param string $importFolderPath
@@ -72,7 +72,18 @@ class editor_Models_Import {
         
         //pre import methods:
         try {
+
             $dataProvider->checkAndPrepare($this->task);
+
+            // After the files are moved, set the languages for the import configuration. For project uploads, relais language
+            // is evaluated based on the file name match. If no relais file match for the current workfile is found, the same check will be
+            // done for the following up project tasks
+            $this->setLanguages(
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
+                $this->task->getRelaisLang(),
+                editor_Models_Languages::LANG_TYPE_ID);
+
             // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
             $this->events->trigger("afterUploadPreparation", $this, array('task' => $this->task, 'dataProvider' => $dataProvider));
             
@@ -82,8 +93,6 @@ class editor_Models_Import {
             $this->importConfig->isValid($this->task->getTaskGuid());
             
             if(! $this->importConfig->hasRelaisLanguage()) {
-                //@todo in new rest api and / or new importwizard show ereror, if no relaislang is set, but relais data is given or viceversa (see translate5 featurelist)
-                
                 //reset given relais language value if no relais data is provided / feature is off
                 $this->task->setRelaisLang(0); 
             }
@@ -104,7 +113,7 @@ class editor_Models_Import {
         }
         catch (Exception $e) {
             //the DP exception handler is only needed before we have a valid task in the database, 
-            // after that the clean up is done implicitly by deleting the erroneous task, which is not possible before.
+            // after that the cleanup is done implicitly by deleting the erroneous task, which is not possible before.
             $this->task->setErroneous();
             $dataProvider->handleImportException($e);
             throw $e;

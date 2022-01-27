@@ -26,38 +26,45 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.TaskAddWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.adminTaskAddWindow',
+/**
+ * @class Editor.model.admin.projectWizard.File
+ * @extends Ext.data.Model
+ */
+Ext.define('Editor.model.admin.projectWizard.File', {
+    extend: 'Ext.data.Model',
 
-    requires: [
-        'Ext.app.bind.Formula'
-    ],
-    data:{
-        currentTask : null,
-        isZipUpload:false
+    statics: {
+        TYPE_ERROR: 'error',
+        TYPE_PIVOT: 'pivot',
+        TYPE_WORKFILES: 'workfiles',
     },
-    activeItem: null,
-    
-    formulas: {
-        disableSkipButton:function(get){
-            return get('activeItem').disableSkipButton();
-        },
-        
-        disableContinueButton:function(get){
-            return get('activeItem').disableContinueButton();
-        },
-        
-        disableAddButton:function(get){
-            return get('activeItem').disableAddButton();
-        },
 
-        disableCancelButton:function(get){
-            return get('activeItem').disableCancelButton();
-        },
+    fields: [{
+        name: 'file'
+    },{
+        name: 'name'
+    },{
+        name: 'size'
+    },{
+        name: 'type'
+    },{
+        name: 'sourceLang',
+        defaultValue:''
+    },{
+        name: 'targetLang',
+        defaultValue:''
+    },{
+        name: 'error'
+    },{
+        name: 'bilingual',
+        type: 'bool'
+    }],
 
-        disableImportDefaults:function(get){
-            return get('activeItem').disableImportDefaults();
-        }
+    /***
+     * Get the file xtension from the file name
+     * @returns {any|string}
+     */
+    getExtension:function (){
+        return Editor.util.Util.getFileExtension(this.get('name'));
     }
 });

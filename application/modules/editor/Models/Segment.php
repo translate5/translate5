@@ -1052,7 +1052,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     public function getFieldExport(string $field, editor_Models_Task $task, bool $edited=true, bool $fixKnownFaultyTags=true) : editor_Segment_Export {
         //since fields can be merged from different files, data for a field can be empty
         if (empty($this->segmentdata[$field])) {
-            return NULL;
+            return null;
         }
         $fieldTags = ($edited) ?
             new editor_Segment_FieldTags($task, $this->getId(), $this->segmentdata[$field]->edited, $field, $this->segmentFieldManager->getEditIndex($field)) :

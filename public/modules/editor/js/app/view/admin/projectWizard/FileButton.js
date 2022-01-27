@@ -26,38 +26,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.TaskAddWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.adminTaskAddWindow',
-
-    requires: [
-        'Ext.app.bind.Formula'
+/**
+ * @class Editor.view.admin.projectWizard.FileButton
+ * @extends Ext.form.field.FileButton
+ */
+Ext.define('Editor.view.admin.projectWizard.FileButton', {
+    extend: 'Ext.form.field.FileButton',
+    alias: 'widget.wizardFileButton',
+    requires:[
+      'Ext.form.field.FileButton',
     ],
-    data:{
-        currentTask : null,
-        isZipUpload:false
-    },
-    activeItem: null,
-    
-    formulas: {
-        disableSkipButton:function(get){
-            return get('activeItem').disableSkipButton();
-        },
-        
-        disableContinueButton:function(get){
-            return get('activeItem').disableContinueButton();
-        },
-        
-        disableAddButton:function(get){
-            return get('activeItem').disableAddButton();
-        },
-
-        disableCancelButton:function(get){
-            return get('activeItem').disableCancelButton();
-        },
-
-        disableImportDefaults:function(get){
-            return get('activeItem').disableImportDefaults();
-        }
+    afterTpl: [
+        '<input id="{id}-fileInputEl" data-ref="fileInputEl" class="{childElCls} {inputCls}" ',
+        'type="file" size="1" name="{inputName}" unselectable="on" multiple ',
+        '<tpl if="accept != null">accept="{accept}"</tpl>',
+        '<tpl if="tabIndex != null">tabindex="{tabIndex}"</tpl>',
+        '>'
+    ],
+    createFileInput: function() {
+        this.callParent(arguments);
+        this.fileInputEl.dom.setAttribute('multiple', '');
     }
 });

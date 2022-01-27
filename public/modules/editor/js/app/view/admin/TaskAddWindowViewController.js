@@ -26,38 +26,39 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.TaskAddWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.adminTaskAddWindow',
+/**
+ * @class Editor.view.admin.TaskAddWindowViewController
+ * @extends Ext.app.ViewController
+ */
+Ext.define('Editor.view.admin.TaskAddWindowViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.adminTaskAddWindow',
 
-    requires: [
-        'Ext.app.bind.Formula'
-    ],
-    data:{
-        currentTask : null,
-        isZipUpload:false
-    },
-    activeItem: null,
-    
-    formulas: {
-        disableSkipButton:function(get){
-            return get('activeItem').disableSkipButton();
-        },
-        
-        disableContinueButton:function(get){
-            return get('activeItem').disableContinueButton();
-        },
-        
-        disableAddButton:function(get){
-            return get('activeItem').disableAddButton();
-        },
+    /***
+     * Target langauge before-deselect event handler
+     * @param component
+     * @param record
+     * @param index
+     */
+    onBeforeTargetLangDeselect:function (component, record){
+        var me = this,
+            view = me.getView(),
+            grid = view && view.down('wizardUploadGrid'),
+            store = grid && grid.getStore(),
+            toRemove = [];
 
-        disableCancelButton:function(get){
-            return get('activeItem').disableCancelButton();
-        },
+        if(!view.isVisible()){
+            return;
+        }
 
-        disableImportDefaults:function(get){
-            return get('activeItem').disableImportDefaults();
+        store.each(function (rec){
+            if(rec.get('targetLang') === record.get('id')){
+                toRemove.push(rec);
+            }
+        });
+        if(toRemove.length > 0){
+            store.remove(toRemove);
+            Editor.MessageBox.addWarning(me.getView().strings.autoRemovedUploadFilesWarningMessage);
         }
     }
 });
