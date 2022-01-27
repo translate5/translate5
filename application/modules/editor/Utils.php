@@ -777,7 +777,7 @@ class editor_Utils {
      * @return bool
      */
     public static function isIE() {
-        return !!preg_match('/(MSIE|Trident|rv:)/', $_SERVER['HTTP_USER_AGENT']);
+        return !!preg_match('/(MSIE|Trident|rv:)/', $ua = $_SERVER['HTTP_USER_AGENT']) && !preg_match('~Firefox~', $ua);
     }
 
 

@@ -2462,6 +2462,10 @@ A task was associated to you in the task-portal {portalLink}.<br />
     <source>Originalformat, {0}</source>
     <target>Original format, {0}</target>
 </trans-unit>
+<trans-unit id='w5xiZXJzZXR6dGUgVGVybWUgaW4gVGVybUNvbGxlY3Rpb24ocykgw7xiZXJ0cmFnZW4='>
+    <source>Übersetzte Terme in TermCollection(s) übertragen</source>
+    <target>Transfer translated terms to TermCollection(s)</target>
+</trans-unit>
 <trans-unit id="U0RMWExJRkYgbWl0IMOEbmRlcnVuZ3NtYXJraWVydW5nZW4=">
     <source>SDLXLIFF mit Änderungsmarkierungen</source>
     <target>SDLXLIFF with track changes</target>

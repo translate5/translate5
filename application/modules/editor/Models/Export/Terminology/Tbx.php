@@ -239,24 +239,39 @@ class editor_Models_Export_Terminology_Tbx {
      * @param bool $exportImages
      * @param int $byTermEntryQty How many termEntries should be processed at once
      * @param int $byImageQty How many image binaries should be processed at once
+     * @param array $selected Bunch of arguments passed by $this->renderRawForTaskImport(). Should look like below: [
+     *    'termEntryIds' => [123, 234],
+     *    'language' => ['en-us', 'en-gb'],
+     *    'termIds' => [456, 567]
+     * ]
      * @throws Zend_Db_Statement_Exception
      */
     public function exportCollectionById(int $collectionId, $tbxBasicOnly = false, $exportImages = true,
-                                         $userName, $byTermEntryQty = 1000, $byImageQty = 50) {
+                                         $userName, $byTermEntryQty = 1000, $byImageQty = 50, $selected = null) {
 
         // Setup export file absolute path
         $this->file = editor_Models_LanguageResources_LanguageResource::exportFilename($collectionId);
 
+        // Models shortcuts
+        $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        $attrM = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+        $trscM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+
         // Get total qty of entries to be processed
-        $qty = ZfExtended_Factory
-            ::get('editor_Models_Terminology_Models_TermEntryModel')
-            ->getQtyByCollectionId($collectionId);
+        $qty = $selected
+            ? count($selected['termEntryIds'])
+            : ZfExtended_Factory
+                ::get('editor_Models_Terminology_Models_TermEntryModel')
+                ->getQtyByCollectionId($collectionId);
 
         /** @var editor_Models_Terminology_Models_TermEntryModel $m */
         $m = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
 
         // Build WHERE clause
         $where = 'collectionId = ' . $collectionId;
+
+        // If $termEntryIds arg is given - make sure only those will be fetched
+        if ($selected) $where .= $m->db->getAdapter()->quoteInto(' AND `id` IN (?)', $selected['termEntryIds'] ?: [0]);
 
         // Lines array
         $line = [];
@@ -281,7 +296,7 @@ class editor_Models_Export_Terminology_Tbx {
         $collectionName = $collection->getName();
 
         // Get list of languages
-        $languages = join(', ', array_column($collection->getLanguagesInTermCollections([$collectionId]), 'rfc5646'));
+        $languages = join(', ', $selected['languages'] ?? array_column($collection->getLanguagesInTermCollections([$collectionId]), 'rfc5646'));
 
         // Write <martifHeader> nodes
         $line []= $this->tabs[1] . '<martifHeader>';
@@ -302,12 +317,7 @@ class editor_Models_Export_Terminology_Tbx {
         // Open <text> and <body> nodes
         $line []= $this->tabs[1] . '<text>';
         $line []= $this->tabs[2] . '<body>';
-        $this->write($line, $collectionName);
-
-        // Models shortcuts
-        $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        $attrM = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        $trscM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+        $this->write($line, $selected ? null : $collectionName);
 
         // Fetch usages by $byTermEntryQty at a time
         for ($p = 1; $p <= ceil($qty / $byTermEntryQty); $p++) {
@@ -319,15 +329,24 @@ class editor_Models_Export_Terminology_Tbx {
             $termEntryIds = join(',', array_column($termEntryA, 'id') ?: [0]);
 
             // Get inner data for given termEntries
-            $termA = $termM->getExportData($termEntryIds);
+            $termA = $termM->getExportData(
+                $selected ? $selected['termIds'] : $termEntryIds,
+                $selected ? 'id'                 : 'termEntryId'
+            );
             $attrA = $attrM->getExportData($termEntryIds, $tbxBasicOnly);
             $trscA = $trscM->getExportData($termEntryIds);
 
             // Foreach termEntry
             foreach ($termEntryA as $termEntry) {
                 $line []= $this->tabs[3] . '<termEntry id="' . $termEntry['termEntryTbxId'] . '">';
-                $this->descripGrpNodes(4, $line, $attrA, $trscA, $termEntry['id']);
-                $this->attributeNodes (4, $line, $attrA, $termEntry['id']);
+
+                // If $selected arg is given, it means we do export to transfer terms from TermPortal to main Translate5 app
+                // so termEntry-level descripGrp- and attribute-nodes should not be exported as we don't need
+                // to overwrite existing values with translated values for them
+                if (!$selected) {
+                    $this->descripGrpNodes(4, $line, $attrA, $trscA, $termEntry['id']);
+                    $this->attributeNodes (4, $line, $attrA, $termEntry['id']);
+                }
                 $this->transacGrpNodes(4, $line, $trscA, $termEntry['id']);
                 foreach ($termA[$termEntry['id']] as $lang => $terms) {
                     $line []= $this->tabs[4] . '<langSet xml:lang="' . $lang . '">';
@@ -336,7 +355,8 @@ class editor_Models_Export_Terminology_Tbx {
                     $this->transacGrpNodes(5, $line, $trscA, $termEntry['id'], $lang);
                     foreach ($terms as $term) {
                         $line []= $this->tabs[5] . '<tig>';
-                        $line []= $this->tabs[6] . '<term id="' . $term['termTbxId'] . '">' . htmlentities($term['term'], ENT_XML1) . '</term>';
+                        $tbxId = $selected ? '' : ' id="' . $term['termTbxId'] . '"';
+                        $line []= $this->tabs[6] . '<term' . $tbxId . '>' . htmlentities($term['term'], ENT_XML1) . '</term>';
                         $this->descripGrpNodes(6, $line, $attrA, $trscA, $termEntry['id'], $lang, $term['id']);
                         $this->attributeNodes (6, $line, $attrA, $termEntry['id'], $lang, $term['id']);
                         $this->transacGrpNodes(6, $line, $trscA, $termEntry['id'], $lang, $term['id']);
@@ -419,7 +439,7 @@ class editor_Models_Export_Terminology_Tbx {
         // Read
         //header('Content-Type: text/xml;');
         //readfile($this->file);
-        die();
+        if (!$selected) die();
     }
 
     public function descripGrpNodes($level, &$line, &$attrA, &$trscA, $termEntryId, $language = '', $termId = '') {
@@ -515,5 +535,42 @@ class editor_Models_Export_Terminology_Tbx {
 
         // Clear lines
         $lines = [];
+    }
+
+    /**
+     * Render raw tbx contents for given $termIds, as if corrensponding termCollection would have only those terms
+     *
+     * @param array $termIds
+     * @param string $noTranslationForLanguage
+     */
+    public function renderRawForTaskImport(array $termIds, $userName = '') {
+
+        // If $termIds arg is an empty array - return empty string
+        if (!$termIds) return '';
+
+        // Get distinct values
+        $distinct
+            = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel')
+                ->distinctColsForTermIds('collectionId,termEntryId,language', $termIds);
+
+        // Get distinct values for termEntryId and language columns for given $termIds
+        list ($collectionId, $termEntryId, $language) = array_values($distinct);
+
+        // Start output buffering
+        ob_start();
+
+        // Flush tbx contents in buffer
+        $this->exportCollectionById(
+            collectionId: array_shift($collectionId),
+            userName: $userName,
+            selected: [
+                'termEntryIds' => $termEntryId,
+                'languages' => $language,
+                'termIds' => $termIds,
+            ]
+        );
+
+        // Get buffered tbx contents
+        return ob_get_clean();
     }
 }

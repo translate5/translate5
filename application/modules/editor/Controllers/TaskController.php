@@ -181,6 +181,13 @@ class editor_TaskController extends ZfExtended_RestController {
         ])
         ->addActionContext('export', 'xliff2')
 
+        ->addContext('transfer', [
+            'headers' => [
+                'Content-Type'          => 'text/xml',
+            ]
+        ])
+        ->addActionContext('export', 'transfer')
+
         ->addContext('importArchive', [
             'headers' => [
                 'Content-Type'          => 'application/zip',
@@ -1530,6 +1537,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 break;
 
             case 'filetranslation':
+            case 'transfer':
             default:
                 $this->entity->checkStateAllowsActions();
                 $worker = ZfExtended_Factory::get('editor_Models_Export_Worker');
@@ -1555,20 +1563,31 @@ class editor_TaskController extends ZfExtended_RestController {
         // we have to ensure that each export worker get its own export directory.
         $workerId = $worker->queue();
 
-        $worker = ZfExtended_Factory::get('editor_Models_Export_ExportedWorker');
-        /* @var $worker editor_Models_Export_ExportedWorker */
+        // Get worker
+        /* @var $worker editor_Models_Export_Exported_Worker */
+        $worker = editor_Models_Export_Exported_Worker::factory($context);
 
-        if($context == 'filetranslation') {
-            $zipFile = $worker->initWaitOnly($this->entity->getTaskGuid(), $exportFolder);
-        }
-        else {
-            $zipFile = $worker->initZip($this->entity->getTaskGuid(), $exportFolder);
+        // Setup worker. 'cookie' in 2nd arg is important only if $context is 'transfer'
+        $inited = $worker->setup($this->entity->getTaskGuid(), [
+            'exportFolder' => $exportFolder,
+            'cookie' => Zend_Session::getId()
+        ]);
+
+        // If $content is not 'filetranslation' or 'transfer' assume init return value is zipFile name
+        if (!in_array($context, ['filetranslation', 'transfer'])) {
+            $zipFile = $inited;
         }
 
         //TODO for the API usage of translate5 blocking on export makes no sense
         // better would be a URL to fetch the latest export or so (perhaps using state 202?)
         $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
         $worker->queue($workerId);
+
+        if ($context == 'transfer') {
+            $this->logInfo('Task exported. reimport started', ['context' => $context, 'diff' => $diff]);
+            echo $this->view->render('task/ontransfer.phtml');
+            exit;
+        }
 
         if($context == 'filetranslation') {
             $this->provideFiletranslationDownload($exportFolder);
