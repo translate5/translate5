@@ -79,6 +79,10 @@
             <term id="tid-0-de-4">Term verboten</term>
             <termNote type="normativeAuthorization">supersededTerm</termNote>
           </tig>
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="tid-0-de-5">Term auch verboten</term>
+            <termNote type="normativeAuthorization">supersededTerm</termNote>
+          </tig>
         </langSet>
       </termEntry>
     </body>

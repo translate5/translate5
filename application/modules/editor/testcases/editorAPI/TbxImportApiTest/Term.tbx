@@ -226,6 +226,10 @@
 							<descrip type="PartialTreshold">Half</descrip>
 						</descripGrp>
 					</tig>
+					<tig>
+						<term id="tid-0-de-5">Term auch verboten</term>
+						<descrip type="xBool_Forbidden">False</descrip>
+					</tig>
 				</langSet>
 				<langSet xml:lang="en-us">
 					<descripGrp>
