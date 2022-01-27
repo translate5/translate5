@@ -93,8 +93,6 @@ class editor_Models_Import {
             $this->importConfig->isValid($this->task->getTaskGuid());
             
             if(! $this->importConfig->hasRelaisLanguage()) {
-                //@todo in new rest api and / or new importwizard show ereror, if no relaislang is set, but relais data is given or viceversa (see translate5 featurelist)
-                
                 //reset given relais language value if no relais data is provided / feature is off
                 $this->task->setRelaisLang(0); 
             }

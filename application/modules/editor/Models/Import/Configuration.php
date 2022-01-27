@@ -235,6 +235,9 @@ class editor_Models_Import_Configuration {
         $dir = $this->importFolder.DIRECTORY_SEPARATOR.$config->runtimeOptions->import->relaisDirectory;
         if($this->relaisLangValue > 0 && !is_dir($dir)) {
             $this->relaisLang = null;
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.import.configuration');
+            /* @var $logger ZfExtended_Logger */
+            $logger->warn('E1034','The given pivot language was removed because no pivot files were found for the current task.');
         }
         
         $guidValidator = new ZfExtended_Validate_Guid();
@@ -258,10 +261,6 @@ class editor_Models_Import_Configuration {
         if(is_null($this->targetLang)){
             //The passed target language is not valid.
             throw new editor_Models_Import_ConfigurationException('E1033',['language' => $this->targetLangValue]);
-        }
-        if(!empty($this->relaisLangValue) && is_null($this->relaisLang)){
-            //The import did not contain relais files but a relais language was given
-            throw new editor_Models_Import_ConfigurationException('E1034',['language' => $this->relaisLangValue]);
         }
     }
     
