@@ -37,7 +37,6 @@ class editor_Models_Import_ConfigurationException extends ZfExtended_ErrorCodeEx
     static protected $localErrorCodes = [
         'E1032' => 'The passed source language "{language}" is not valid.',
         'E1033' => 'The passed target language "{language}" is not valid.',
-        'E1034' => 'The import did not contain files for the relais language "{language}".',
         'E1035' => 'The given taskGuid "{taskGuid}" was not valid GUID.',
         'E1036' => 'The given userGuid "{userGuid}" was not valid GUID.',
         'E1037' => 'The given userName "{userName}" was not valid user name.',

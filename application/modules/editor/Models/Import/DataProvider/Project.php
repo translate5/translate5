@@ -147,7 +147,6 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         if(!in_array('pivot',$matchingFilesTypes)){
             $this->task->setRelaisLang(0);
         }
-
     }
 
     /***
