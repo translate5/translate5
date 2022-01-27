@@ -696,7 +696,6 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
-     * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
     public function attrcreateAction($_) {
@@ -1032,20 +1031,11 @@ class editor_AttributeController extends ZfExtended_RestController
      */
     protected function _updateTermStatus(editor_Models_Terminology_Models_TermModel $termM, editor_Models_Terminology_Models_AttributeModel $attrM): array {
 
-        /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
-        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
-        // Get attributes, that may affect term status
-        $termNotes = $attrM->loadByTerm($termM->getId(), ['termNote'], $termNoteStatus->getAllTypes());
+        /* @var $termNoteStatus editor_Models_Terminology_TermStatus */
+        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermStatus');
 
         $others = [];
-        if($termNoteStatus->isStatusRelevant($attrM)) {
-            // in this case we sync the changed attribute to the other status relevant attributes
-            $status = $termNoteStatus->fromTermNotes($termNotes, $attrM->getType(), $others);
-        }
-        else {
-            // in this case the administrativeStatus may be changed implictly, so we sync its value to the others
-            $status = $termNoteStatus->fromTermNotes($termNotes, $termNoteStatus::DEFAULT_TYPE_ADMINISTRATIVE_STATUS, $others);
-        }
+        $status = $termNoteStatus->getStatusForUpdatedAttribute($attrM, $others);
 
         //update the other attributes with the new value
         foreach($others as $id => $other) {

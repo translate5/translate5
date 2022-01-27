@@ -90,8 +90,8 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         }
         $config = $rows[$toUpdate];
 
-        /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
-        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
+        /* @var $termNoteStatus editor_Models_Terminology_TermStatus */
+        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermStatus');
 
 
         $defaults = implode(',',$termNoteStatus->getAdministrativeStatusValues());
