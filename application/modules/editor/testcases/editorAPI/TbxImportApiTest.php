@@ -63,7 +63,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
 
 
         //import the first tbx file,
-        $this->singleTest('Term.tbx', 8, 49, 6,3);
+        $this->singleTest('Term.tbx', 13, 66, 6,5);
 
         //change existing term entry attribute
         //change existing term attribute
