@@ -246,5 +246,24 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         }
         return array_column($result, 'customers');
     }
+
+    /**
+     * Get customers, having access for all given collections
+     *
+     * @param array $collectionIds
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getSharedCustomers(array $collectionIds) {
+
+        // Get customer ids, grouped by collectionId
+        $customerIdAByCollectionId = $this->db->getAdapter()->query('
+            SELECT `languageResourceId`, `customerId`  
+            FROM `LEK_languageresources_customerassoc` 
+            WHERE FIND_IN_SET(`languageResourceId`, ?) 
+        ', join(',', $collectionIds))->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
+
+        // Get customers, assigned to all given term collections, e.g. shared customers
+        return call_user_func_array('array_intersect', $customerIdAByCollectionId);
+    }
 }
 
