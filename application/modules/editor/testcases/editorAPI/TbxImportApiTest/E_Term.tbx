@@ -55,6 +55,32 @@
           </tig>
         </langSet>
       </termEntry>
+      <termEntry id="eid-0">
+        <langSet lang="en-US">
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="tid-1-en-2">Term allowed</term>
+            <termNote type="normativeAuthorization">admittedTerm</termNote>
+          </tig>
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="tid-1-en-3">Term preferred</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="tid-1-en-4">Term forbidden</term>
+            <termNote type="normativeAuthorization">supersededTerm</termNote>
+          </tig>
+        </langSet>
+        <langSet lang="de-DE">
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="tid-0-de-3">Term erlaubt</term>
+            <termNote type="normativeAuthorization">admittedTerm</termNote>
+          </tig>
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="tid-0-de-4">Term verboten</term>
+            <termNote type="normativeAuthorization">supersededTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
     </body>
   </text>
 </martif>
