@@ -70,7 +70,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             items,
             container = grid.up('#taskSecondCardContainer'),
             sourceField = container.down('#sourceLangaugeTaskUploadWizard'),
-            targetField = container.down('#targetLangaugeTaskUploadWizard');
+            targetField = container.down('#targetLangaugeTaskUploadWizard'),
+            relaisLang = container.down('#relaisLangaugeTaskUploadWizard');
 
         Ext.Array.forEach(Ext.Array.from(grid.getSelection()), function(file){
             file.drop();
@@ -92,6 +93,14 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             return Editor.util.Util.getFileExtension(rec.get('name')) === 'zip';
         });
         me.setIsZipUploadViewModel(items.length > 0);
+
+        items = store.queryBy(function (rec){
+            return rec.get('type') === Editor.model.admin.projectWizard.File.TYPE_PIVOT;
+        });
+        // clean the relais lang field when there are no relais files anymore
+        if(items.length < 1){
+            relaisLang.setValue(null);
+        }
 
         me.fireEvent('workfilesRemoved',store.getData());
     },

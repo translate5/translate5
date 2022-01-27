@@ -39,28 +39,9 @@ class Editor_Controller_Helper_Api extends Zend_Controller_Action_Helper_Abstrac
      * @return editor_Models_Languages
      */
     public function convertLanguageParameters(&$languageParameter) {
-        //ignoring if already integer like value or empty
         $language = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $language editor_Models_Languages */
-        try {
-            //if empty a notFound is triggered
-            if(empty($languageParameter) || (int)$languageParameter > 0) {
-                $language->load($languageParameter);
-                return $language;
-            }
-            $matches = [];
-            if(preg_match('/^lcid-([0-9]+)$/i', $languageParameter, $matches)) {
-                $language->loadByLcid($matches[1]);
-            }else {
-                $language->loadByRfc5646($languageParameter);
-            }
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            $languageParameter = 0;
-            return null;
-        }
-        $languageParameter = $language->getId();
-        return $language;
+        return $language->convertLanguage($languageParameter);
     }
 
     /**+

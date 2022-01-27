@@ -76,7 +76,7 @@ class editor_Models_Import_DataProvider_Factory {
             $dp = 'editor_Models_Import_DataProvider_Project';
             $args = [
                 $upload->getFiles(),
-                $data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME],
+                $this->handleProjectLanguages($data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME]),
                 $data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_TYPE_NAME]
             ];
         } else {
@@ -87,6 +87,20 @@ class editor_Models_Import_DataProvider_Factory {
             ];
         }
         return ZfExtended_Factory::get($dp, $args);
+    }
+
+    /***
+     * For each langauge check and convert the given value to internal language id.
+     * @param array $langauges
+     * @return array
+     */
+    protected function handleProjectLanguages(array $langauges){
+        foreach ($langauges as &$lang){
+            $language = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $language editor_Models_Languages */
+            $language->convertLanguage($lang);
+        }
+        return $langauges;
     }
 
     /***
