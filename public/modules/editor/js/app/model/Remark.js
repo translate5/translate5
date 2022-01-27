@@ -53,13 +53,17 @@ END LICENSE AND COPYRIGHT
       }
     },
     fields: [
-      {name: 'id', type: 'int'},
+      {name: 'type', type: 'string'}, // this is either "segmentComment" or "visualAnnotation"
+      {name: 'id', type: 'string', // 2 different entities are merged in this store, so convert to virtual id
+          convert:function(v, raw){ 
+            return raw.data.type[0] + v; // 's123' or 'v456'
+      }, depends: 'type'},
       {name: 'dbId', type: 'int'},
       {name: 'segmentId', type: 'int'},
       {name: 'segmentNrInTask', type: 'int'},
-      {name: 'userName', type: 'string', mapping: function(data){
-          if(data.userName) return data.userName;
-          var ret = '';
+      {name: 'userName', type: 'string', convert: function(v, raw){
+          if(v) return v;
+          var ret = '', data = raw.data;
           if(data.firstName) ret += data.firstName;
           if(data.surName) ret += (ret && ' ') + data.surName;
           if(!ret) ret = 'Anonymous';
@@ -75,8 +79,6 @@ END LICENSE AND COPYRIGHT
       {name: 'x', type: 'number', default: -1},
       {name: 'y', type: 'number', default: -1},
       {name: 'timecode', type: 'int', default: -1},
-      // this is either "segmentComment" or "visualAnnotation"
-      {name: 'type', type: 'string'},
     ],
     /**
      * Returns the hexadecimal no. of a virtual page in a pdfconverter output. This no are either segment-attributes "data-t5segment-page-nr" in the Markup or as "data-page-no" attributes of a page node
@@ -91,13 +93,5 @@ END LICENSE AND COPYRIGHT
      */
     getPageNr: function(){
         return parseInt(this.get('page'), 10);
-    },
-    /**
-     * ATTENTION: when adding visual annotations their "id" may not be the id from the database !!
-     * Returns the real id of the item in the database
-     * @returns {Number}
-     */
-    getDatabaseId: function(){
-        return this.get('dbId');
-    }    
+    } 
   });
