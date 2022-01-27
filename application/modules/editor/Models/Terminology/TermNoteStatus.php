@@ -26,10 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 /**
- * encapsulates the term note status mapping
+ * encapsulates the mapping of configurable attribute states to influence the final term status
  */
 class editor_Models_Terminology_TermNoteStatus
 {
+    const DEFAULT_TAG = 'termNote';
     const DEFAULT_TYPE_ADMINISTRATIVE_STATUS = 'administrativeStatus';
     const DEFAULT_TYPE_NORMATIVE_AUTHORIZATION = 'normativeAuthorization';
 
@@ -45,7 +46,7 @@ class editor_Models_Terminology_TermNoteStatus
      *
      * @var array
      */
-    static protected array $termNoteMap;
+    static protected array $termStatusMap;
 
     /**
      * Collected term states not listed in statusMap
@@ -64,16 +65,13 @@ class editor_Models_Terminology_TermNoteStatus
         $this->config = Zend_Registry::get('config');
 
         //load termNoteMap
-        if(empty(self::$termNoteMap)) {
-            self::$termNoteMap = [];
+        if(empty(self::$termStatusMap)) {
+            self::$termStatusMap = [];
             /* @var $db editor_Models_Db_Terminology_TermStatusMap */
             $db = ZfExtended_Factory::get('editor_Models_Db_Terminology_TermStatusMap');
             $loaded = $db->fetchAll()->toArray();
-            foreach ($loaded as $statusMap) {
-                if(!array_key_exists($statusMap['termNoteType'], self::$termNoteMap)) {
-                    self::$termNoteMap[$statusMap['termNoteType']] = [];
-                }
-                self::$termNoteMap[$statusMap['termNoteType']][$statusMap['termNoteValue']] = $statusMap['mappedStatus'];
+            foreach ($loaded as $map) {
+                self::$termStatusMap[$map['tag']][$map['tagAttributeType']][$map['tagValue']] = $map['mappedStatus'];
             }
         }
     }
@@ -84,11 +82,11 @@ class editor_Models_Terminology_TermNoteStatus
      */
     public function getDefaultTermStatus() {
         $def = $this->config->runtimeOptions->tbx->defaultAdministrativeStatus;
-        if(empty(self::$termNoteMap[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS][$def])) {
+        if(empty(self::$termStatusMap[self::DEFAULT_TAG][self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS][$def])) {
             //this may not happen, therefore just a anonymous exception
             throw new ZfExtended_Exception('value of runtimeOptions->tbx->defaultAdministrativeStatus does not map to a valid value in terms_term_status_map');
         }
-        return self::$termNoteMap[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS][$def];
+        return self::$termStatusMap[self::DEFAULT_TAG][self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS][$def];
     }
 
     /**
@@ -96,120 +94,124 @@ class editor_Models_Terminology_TermNoteStatus
      * @return array
      */
     public function getAdministrativeStatusValues(): array {
-        return array_keys(self::$termNoteMap[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS]);
+        return array_keys(self::$termStatusMap[self::DEFAULT_TAG][self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS]);
     }
 
     /**
-     * returns all termNote types where the termNotes contain a term status relevant value
-     * @return array
-     */
-    public function getAllTypes(): array {
-        return array_keys(self::$termNoteMap);
-    }
-
-    /**
-     * returns boolean if the given attribute is relevant for term status
+     * returns the calculated final term status for the updated attribute
      * @param editor_Models_Terminology_Models_AttributeModel $attribute
-     * @return bool
-     */
-    public function isStatusRelevant(editor_Models_Terminology_Models_AttributeModel $attribute): bool {
-        return $attribute->getElementName() == 'termNote' && in_array($attribute->getType(), $this->getAllTypes());
-    }
-
-    /**
-     * @param editor_Models_Terminology_TbxObjects_Attribute[] $termNotes
+     * @param array $others
+     * @return string
      * @throws ZfExtended_Exception
      */
-    public function fromTermNotesOnImport(array $termNotes, bool &$admnStatFound = false): string {
-        $foundByPrecedenceType = [];
+    public function getStatusForUpdatedAttribute(editor_Models_Terminology_Models_AttributeModel $attribute, array &$others): string {
+        // Get attributes, that may affect term status
+        $elementsAndTypes = array_map('array_keys', self::$termStatusMap);
 
-        foreach($termNotes as $note) {
-            $type = $note->type;
+        $attribute->getTermId();
+        $isMapped = in_array($attribute->getType(), $elementsAndTypes[$attribute->getElementName()] ?? []);
+        $mappedAttributes = $attribute->loadByTerm($attribute->getTermId(), array_keys($elementsAndTypes), array_merge(... array_values($elementsAndTypes)));
+
+        // the changed attribute status is synced to the other status relevant attributes
+        //  if it is mapped state, use it, if not consider the default admin state, since it may have been changed
+        $sourceType = $isMapped ? $attribute->getType() : $this::DEFAULT_TYPE_ADMINISTRATIVE_STATUS;
+        return $this->fromTermNotes($mappedAttributes, $sourceType, $others);
+    }
+
+    /**
+     * Sets on import the term status in the term out of the collected attributes
+     * @param editor_Models_Terminology_TbxObjects_Term $term
+     * @param editor_Models_Terminology_BulkOperation_Attribute $bulkAttributes
+     * @param bool $admnStatFound
+     * @return bool
+     * @throws ZfExtended_Exception
+     */
+    public function setTermStatusOnImport(editor_Models_Terminology_TbxObjects_Term $term, editor_Models_Terminology_BulkOperation_Attribute $bulkAttributes, bool &$admnStatFound = false): bool {
+
+        $importHelper = new editor_Models_Terminology_TermNoteStatus_ImportHelper($this, $term);
+
+        //loop over the collected attributes for the term and search for attributes which may influence the state
+        $bulkAttributes->foreachToBeProcessed(function(editor_Models_Terminology_TbxObjects_Attribute $attribute) use ($importHelper) {
+            $tag = $attribute->elementName;
+            $type = $attribute->type;
+
+            //if the attribute is of a different term (for sure we are in the same termEntry)
+            if($attribute->parentTerm !== $importHelper->getTerm()) {
+                return;
+            }
 
             //if current termNote type is not allowed to provide a status then we jump over
-            if (!in_array($type, array_keys(self::$termNoteMap))) {
+            if (empty(self::$termStatusMap[$tag]) || !in_array($type, array_keys(self::$termStatusMap[$tag]))) {
+                return;
+            }
+
+            $importHelper->investigateAttribute($attribute);
+        });
+
+        //returns by reference if a administrative status was found or not
+        $admnStatFound = $importHelper->isAdmnStatFound();
+
+        //from the following attribute the status should be used
+        $attrToBeUsed = $importHelper->getToBeUsedAttribute();
+
+        //if nothing found, use default value
+        if(empty($attrToBeUsed)) {
+            $term->status = $this->getDefaultTermStatus();
+            return false;
+        }
+
+        $statusToBeUsed = $this->getStatusFromAttribute($attrToBeUsed->elementName, $attrToBeUsed->type, $attrToBeUsed->value);
+
+        //now sync the to be used status to the other found status relevant attributes
+        foreach ($importHelper->getAffectedAttributes() as $attribute) {
+            if($attribute === $attrToBeUsed) {
                 continue;
             }
-
-            if($note->type == self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS) {
-                $admnStatFound = true;
-            }
-
-            if($type != self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS && $type != self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION) {
-                $type = 'custom';
-            }
-
-            //if multiple, then we collect only the first one
-            if(isset($foundByPrecedenceType[$type])) {
-                continue;
-            }
-
-            //collect all results for the different types
-            $foundByPrecedenceType[$type] = $note;
-
+            $attribute->value = $this->getAttributeValueFromTermStatus($attribute->elementName, $attribute->type, $statusToBeUsed);
         }
 
-        $noteToBeUsed = null;
-        // precedence by $termNote->type: administrative before normative before custom states if given multiple on import
-        if(!empty($foundByPrecedenceType[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS])) {
-            $noteToBeUsed = $foundByPrecedenceType[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS];
-        }
-        elseif(!empty($foundByPrecedenceType[self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION])) {
-            $noteToBeUsed = $foundByPrecedenceType[self::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION];
-        }
-        elseif(!empty($foundByPrecedenceType['custom'])) {
-            $noteToBeUsed = $foundByPrecedenceType['custom'];
-        }
-
-        if(empty($noteToBeUsed)) {
-            return $this->getDefaultTermStatus();
-        }
-
-        $statusToBeUsed = $this->getStatusFromTermNote($noteToBeUsed->type, $noteToBeUsed->value);
-
-        //now sync the to be used status to the other found status relevant termNote notes
-        foreach ($termNotes as $termNote) {
-            if($termNote === $noteToBeUsed || !in_array($termNote->type, array_keys(self::$termNoteMap))) {
-                continue;
-            }
-            $termNote->value = $this->getAttributeValueFromTermStatus($statusToBeUsed, $termNote->type);
-        }
-
-        return $statusToBeUsed;
+        //set the final value in the term too
+        $term->status = $statusToBeUsed;
+        return true;
     }
 
     /**
      * returns the translate5 internal available term status to the one given as termNote in TBX
-     * @param array[] $termNotes
+     * @param array[] $mappedAttributes
      * @param string $sourceType
      * @param array[] $statusPerAttribute
      * @return string
      * @throws ZfExtended_Exception
      */
-    public function fromTermNotes(array $termNotes, string $sourceType, array &$statusPerAttribute) : string
+    protected function fromTermNotes(array $mappedAttributes, string $sourceType, array &$statusPerAttribute) : string
     {
         //first find the used value to a given type, default as fallback
         $usedStatus = $this->getDefaultTermStatus();
-        foreach ($termNotes as $termNote) {
-            $type = $termNote['type'];
-            //if current termNote type is not allowed to provide a status then we jump over
-            if (!in_array($type, array_keys(self::$termNoteMap))) {
+        foreach ($mappedAttributes as $attribute) {
+            $tag = $attribute['elementName'];
+            $type = $attribute['type'];
+            //if current attribute tag or type is not allowed to provide a status then we jump over
+            if (empty(self::$termStatusMap[$tag]) || !in_array($type, array_keys(self::$termStatusMap[$tag]))) {
                 continue;
             }
             if($type == $sourceType) {
-                $usedStatus = $this->getStatusFromTermNote($termNote['type'], $termNote['value']);
+                $usedStatus = $this->getStatusFromAttribute($tag, $type, $attribute['value']);
             }
         }
 
         //then sync this value into the other datatypes, returned as reference
-        foreach ($termNotes as $termNote) {
-            $type = $termNote['type'];
+        foreach ($mappedAttributes as $attribute) {
+            $type = $attribute['type'];
+            $tag = $attribute['elementName'];
             //if current termNote type is not allowed to provide a status then we jump over
-            if (!in_array($type, array_keys(self::$termNoteMap))) {
+            if (empty(self::$termStatusMap[$tag]) || !in_array($type, array_keys(self::$termStatusMap[$tag]))) {
                 continue;
             }
             if($type != $sourceType) {
-                $statusPerAttribute[$termNote['id']] = ['dataTypeId' => $termNote['dataTypeId'], 'status' => $this->getAttributeValueFromTermStatus($usedStatus, $type)];
+                $statusPerAttribute[$attribute['id']] = [
+                    'dataTypeId' => $attribute['dataTypeId'],
+                    'status' => $this->getAttributeValueFromTermStatus($tag, $type, $usedStatus)
+                ];
             }
         }
 
@@ -217,20 +219,21 @@ class editor_Models_Terminology_TermNoteStatus
     }
 
     /**
-     * returns the mapped status to given termNote type and value, or null if nothing found
-     * @param $termNoteType
-     * @param $termNoteValue
+     * returns the mapped status to given attribute type and value, or null if nothing found
+     * @param string $tag
+     * @param string $tagAttributeType
+     * @param string $tagValue
      * @return string|null
      * @throws ZfExtended_Exception
      */
-    public function getStatusFromTermNote($termNoteType, $termNoteValue): ?string {
+    protected function getStatusFromAttribute(string $tag, string $tagAttributeType, string $tagValue): ?string {
         //return mapped status from specific configuration
-        if (!empty(self::$termNoteMap[$termNoteType]) && !empty(self::$termNoteMap[$termNoteType][$termNoteValue])) {
-            return self::$termNoteMap[$termNoteType][$termNoteValue];
+        if (!empty(self::$termStatusMap[$tag][$tagAttributeType][$tagValue])) {
+            return self::$termStatusMap[$tag][$tagAttributeType][$tagValue];
         }
 
         //collect unknown state
-        $logValue = $termNoteType.': '.$termNoteValue;
+        $logValue = $tag.'#'.$tagAttributeType.': '.$tagValue;
         if (!in_array($logValue, $this->unknownStates)) {
             $this->unknownStates[] = $logValue;
         }
@@ -254,12 +257,12 @@ class editor_Models_Terminology_TermNoteStatus
         /* @var $db editor_Models_Db_Terminology_TermStatusMap */
         $db = ZfExtended_Factory::get('editor_Models_Db_Terminology_TermStatusMap');
         $db->getAdapter()->query("UPDATE terms_attributes_datatype dt, (
-                SELECT termNoteType as type, GROUP_CONCAT(termNoteValue) AS picklistValues
+                SELECT tag, tagAttributeType as type, GROUP_CONCAT(tagValue) AS picklistValues
                 FROM terms_term_status_map
-                GROUP BY termNoteType
+                GROUP BY tag,tagAttributeType
             ) as s
         SET dt.picklistValues = s.picklistValues, dt.dataType = 'picklist'
-        WHERE dt.label = 'termNote' AND dt.level = 'term' AND dt.type = s.type");
+        WHERE dt.label = s.tag AND dt.level = 'term' AND dt.type = s.type");
     }
 
     /**
@@ -268,20 +271,112 @@ class editor_Models_Terminology_TermNoteStatus
      * @return string
      */
     public function getAdmnStatusFromTermStatus(string $termStatus): string {
-        return $this->getAttributeValueFromTermStatus($termStatus, self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS) ?? reset(self::$termNoteMap[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS]);
+        return $this->getAttributeValueFromTermStatus(self::DEFAULT_TAG, self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS, $termStatus) ?? reset(self::$termStatusMap[self::DEFAULT_TYPE_ADMINISTRATIVE_STATUS]);
     }
 
     /**
-     * returns the attributes value (by type) from a given term status (returns the first matching), returns the first one too as fallback
+     * returns the attributes value (by tag and type) from a given term status (returns the first matching), returns the first one too as fallback
+     * @param string $tag
      * @param string $termStatus
      * @param string $type
      * @return string|null
      */
-    protected function getAttributeValueFromTermStatus(string $termStatus, string $type): ?string {
-        $result = array_search($termStatus, self::$termNoteMap[$type]);
+    protected function getAttributeValueFromTermStatus(string $tag, string $type, string $termStatus): ?string {
+        $result = array_search($termStatus, self::$termStatusMap[$tag][$type]);
         if($result === false) {
             return null;
         }
         return $result;
+    }
+}
+
+class editor_Models_Terminology_TermNoteStatus_ImportHelper {
+    private bool $admnStatFound = false;
+
+    /* @var $foundByPrecedenceType editor_Models_Terminology_TbxObjects_Attribute[] */
+    private array $foundByPrecedenceType = [];
+
+    /* @var $affectedAttributes editor_Models_Terminology_TbxObjects_Attribute[] */
+    private array $affectedAttributes = [];
+
+    private editor_Models_Terminology_TbxObjects_Term $term;
+
+    private editor_Models_Terminology_TermNoteStatus $statusInstance;
+
+    public function __construct(editor_Models_Terminology_TermNoteStatus $statusInstance, editor_Models_Terminology_TbxObjects_Term $term) {
+        $this->term = $term;
+        $this->statusInstance = $statusInstance;
+    }
+
+    /**
+     * Investigates the given attribute and collects data for further processing about it
+     * @param editor_Models_Terminology_TbxObjects_Attribute $attribute
+     */
+    public function investigateAttribute(editor_Models_Terminology_TbxObjects_Attribute $attribute)
+    {
+        $type = $attribute->type;
+
+        //we collect all attributes, which are affected by the status map for later updating
+        $this->affectedAttributes[] = $attribute;
+
+        if($type == $this->statusInstance::DEFAULT_TYPE_ADMINISTRATIVE_STATUS) {
+            $this->admnStatFound = true;
+        }
+
+        if($type != $this->statusInstance::DEFAULT_TYPE_ADMINISTRATIVE_STATUS && $type != $this->statusInstance::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION) {
+            $type = 'custom';
+        }
+
+        //if multiple, then we collect only the first one
+        if(isset($this->foundByPrecedenceType[$type])) {
+            return;
+        }
+
+        //collect all results for the different types
+        $this->foundByPrecedenceType[$type] = $attribute;
+    }
+
+    /**
+     * returns the attribute from which the status should be used, keeps a defined precedence
+     * @return editor_Models_Terminology_TbxObjects_Attribute|null
+     */
+    public function getToBeUsedAttribute(): ?editor_Models_Terminology_TbxObjects_Attribute
+    {
+        /* @var $attrToBeUsed editor_Models_Terminology_TbxObjects_Attribute */
+        // precedence by $termNote->type: administrative before normative before custom states if given multiple on import
+        if(!empty($this->foundByPrecedenceType[$this->statusInstance::DEFAULT_TYPE_ADMINISTRATIVE_STATUS])) {
+            return $this->foundByPrecedenceType[$this->statusInstance::DEFAULT_TYPE_ADMINISTRATIVE_STATUS];
+        }
+        if(!empty($this->foundByPrecedenceType[$this->statusInstance::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION])) {
+            return $this->foundByPrecedenceType[$this->statusInstance::DEFAULT_TYPE_NORMATIVE_AUTHORIZATION];
+        }
+        if(!empty($this->foundByPrecedenceType['custom'])) {
+            return $this->foundByPrecedenceType['custom'];
+        }
+        return null;
+    }
+
+    /**
+     * @return editor_Models_Terminology_TbxObjects_Term
+     */
+    public function getTerm(): editor_Models_Terminology_TbxObjects_Term
+    {
+        return $this->term;
+    }
+
+    /**
+     * @return editor_Models_Terminology_TbxObjects_Attribute[]
+     */
+    public function getAffectedAttributes(): array
+    {
+        return $this->affectedAttributes;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAdmnStatFound(): bool
+    {
+        return $this->admnStatFound;
     }
 }

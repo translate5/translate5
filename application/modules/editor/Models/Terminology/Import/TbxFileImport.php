@@ -530,30 +530,8 @@ $memLog('Loaded terms:        ');
             $newTerm->definition = $newTerm->parentEntry->definition;
         }
 
-        $hasTermNote = isset($tig->termNote);
         $this->addProcessStatusNodeIfNotExists($tig);
         $newTerm->termNote = $this->setAttributeTypes($tig->termNote, $newTerm);
-
-        $admnStatFound = false;
-        if ($hasTermNote) {
-            $newTerm->status = $this->termNoteStatus->fromTermNotesOnImport($newTerm->termNote, $admnStatFound);
-            $newTerm->processStatus = $this->getProcessStatus($newTerm->termNote);
-        } else {
-            $newTerm->status = $this->termNoteStatus->getDefaultTermStatus();
-            $newTerm->processStatus = $newTerm::TERM_STANDARD_PROCESS_STATUS;
-        }
-
-        //if no termNote with administrativeStatus was found, we create one
-        if(!$admnStatFound) {
-            $newStatus = $this->termNoteStatus->getAdmnStatusFromTermStatus($newTerm->status);
-            $newTerm->termNote[] = $this->createAndAddAttribute($newTerm, 'termNote', 'administrativeStatus', '', $newStatus);
-        }
-
-        //check if termNote administrativeStatus is set, if not add it to $newTerm->termNote and bulk with $newTerm->status value
-
-        if ($newTerm->processStatus === '') {
-            $newTerm->processStatus = $newTerm::TERM_STANDARD_PROCESS_STATUS;
-        }
 
         if (isset($tig->note)) {
             $this->setAttributeTypes($tig->note, $newTerm);
@@ -573,6 +551,25 @@ $memLog('Loaded terms:        ');
             }
         }
         $this->setDiscriptGrp($tig,$newTerm,'tig');
+
+        $admnStatFound = false;
+        if ($this->termNoteStatus->setTermStatusOnImport($newTerm, $this->bulkAttribute, $admnStatFound)) {
+            $newTerm->processStatus = $this->getProcessStatus($newTerm->termNote);
+        } else {
+            $newTerm->processStatus = $newTerm::TERM_STANDARD_PROCESS_STATUS;
+        }
+
+        //if no termNote with administrativeStatus was found, we create one
+        if(!$admnStatFound) {
+            $newStatus = $this->termNoteStatus->getAdmnStatusFromTermStatus($newTerm->status);
+            $newTerm->termNote[] = $this->createAndAddAttribute($newTerm, 'termNote', 'administrativeStatus', '', $newStatus);
+        }
+
+        //check if termNote administrativeStatus is set, if not add it to $newTerm->termNote and bulk with $newTerm->status value
+
+        if ($newTerm->processStatus === '') {
+            $newTerm->processStatus = $newTerm::TERM_STANDARD_PROCESS_STATUS;
+        }
 
         $this->bulkTerm->add($newTerm);
     }

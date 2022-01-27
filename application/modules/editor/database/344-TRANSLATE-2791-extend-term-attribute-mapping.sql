@@ -26,7 +26,7 @@
 -- */
 
 alter table terms_term_status_map
-    add tag varchar(64) default 'termNote' not null;
+    add tag varchar(64) default 'termNote' not null after id;
 
 alter table terms_term_status_map change termNoteType tagAttributeType varchar(128) not null;
 alter table terms_term_status_map change termNoteValue tagValue varchar(64) not null;
@@ -35,7 +35,7 @@ alter table terms_term_status_map
     drop key termNoteType;
 
 alter table terms_term_status_map
-    add unique mapTagType (tag, tagAttributeType, tagValue);
+    add constraint mapTagType unique (tag, tagAttributeType, tagValue);
 
 insert into terms_term_status_map (tag, tagAttributeType, tagValue, mappedStatus)
 values ('descrip', 'xBool_Forbidden', 'False', 'supersededTerm'),
