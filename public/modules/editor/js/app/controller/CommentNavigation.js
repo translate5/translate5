@@ -58,10 +58,10 @@ Ext.define('Editor.controller.CommentNavigation', {
                     switch(typeOfChange) {
                         case 'afterPostAction':
                         case 'afterPutAction':
-                            this.updateStore(new (this.getCommentList().getStore().getModel())(comment))
+                            this.updateStore(new (this.getCommentList().getStore().getModel())(comment), typeOfChange);
                             break;
                         case 'beforeDeleteAction':
-                            this.removeRemark(comment.id, comment.type)
+                            this.getCommentList().getStore().getData().removeByKey(comment.id);
                     }
                 }
             }
@@ -87,7 +87,7 @@ Ext.define('Editor.controller.CommentNavigation', {
     updateStore: function updateStore(remark, typeOfChange){
         var cl = this.getCommentList();
         var store = cl.getStore();
-        var existing = (typeOfChange === 'afterPostAction') ? store.getById(remark.id) : null;
+        var existing = (typeOfChange === 'afterPutAction') ? store.getById(remark.id) : null; // in ZF1 Put is UPDATE, Post is CREATE
         /** Update exsiting record - Why this way?
          * store.data.replace() does not replace (at least in ExtJS-6.2.0)
          * store.update(...) triggers request
@@ -109,13 +109,5 @@ Ext.define('Editor.controller.CommentNavigation', {
             store.addSorted(remark);
         }
         cl.highlightRemark(remark);
-    },
-    /**
-     * Remove remark from commentnav and where else it appears
-     */
-    removeRemark: function removeRemark(remarkId, remarkType){
-        var cl = this.getCommentList()
-            store = cl.getStore();
-        store.getData().removeByKey(remarkId);
     }
 })
