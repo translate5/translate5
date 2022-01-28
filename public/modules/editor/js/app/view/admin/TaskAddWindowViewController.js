@@ -35,6 +35,77 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
     alias: 'controller.adminTaskAddWindow',
 
     /***
+     *
+     * @param win
+     */
+    onTaskAddWindowBeforeRender:function(win){
+        //insert the taskUpload card in before render
+        win.insertCard({
+            xtype:'taskUpload',
+            itemId:'taskUploadCard',
+            groupIndex:5
+        },'postimport');
+
+        win.insertCard({
+            xtype:'adminTaskUserAssocWizard',
+            itemId:'adminTaskUserAssocWizard',
+            groupIndex:1//index 2 is language resources assoc
+        },'postimport');
+
+        if(Editor.app.authenticatedUser.isAllowed('taskConfigOverwriteGrid')) {
+            win.insertCard({
+                xtype: 'adminConfigWizard',
+                itemId: 'adminConfigWizard',
+                groupIndex: 3//index 2 is language resources assoc
+            }, 'postimport');
+        }
+    },
+
+    /***
+     *
+     * @param win
+     */
+    onTaskAddWindowRender: function(win){
+
+        //sort the group by group index
+        win.groupCards['preimport'].sort(function (a, b) {
+            return a.groupIndex - b.groupIndex;
+        });
+
+        //add all of the cards in the window by order: preimport, import, postimport
+        for(var i=0;i<win.groupCards['preimport'].length;i++){
+            win.add(win.groupCards['preimport'][i]);
+        }
+
+        //sort the group by group index
+        win.groupCards['import'].sort(function (a, b) {
+            return a.groupIndex - b.groupIndex;
+        });
+
+        for(i=0;i<win.groupCards['import'].length;i++){
+            win.add(win.groupCards['import'][i]);
+        }
+        //sort the group by group index
+        win.groupCards['postimport'].sort(function (a, b) {
+            return a.groupIndex - b.groupIndex;
+        });
+
+        for(i=0;i<win.groupCards['postimport'].length;i++){
+            win.add(win.groupCards['postimport'][i]);
+        }
+    },
+
+    /***
+     *
+     * @param win
+     */
+    onTaskAddWindowAfterRender: function(win){
+        var winLayout=win.getLayout(),
+            vm=win.getViewModel();
+        vm.set('activeItem',winLayout.getActiveItem());
+    },
+
+    /***
      * Target langauge before-deselect event handler
      * @param component
      * @param record
@@ -60,5 +131,65 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
             store.remove(toRemove);
             Editor.MessageBox.addWarning(me.getView().strings.autoRemovedUploadFilesWarningMessage);
         }
+    },
+
+    /***
+     * Triggered when the files are dragged over the import wizard
+     * @param e
+     */
+    onDragEnter:function (e){
+        if (!e.browserEvent.dataTransfer || Ext.Array.from(e.browserEvent.dataTransfer.types).indexOf('Files') === -1) {
+            return;
+        }
+        e.stopEvent();
+        this.handleDropZoneCss(true);
+    },
+
+    /***
+     * Triggered when the items are dragged out of the import wizard
+     * @param e
+     */
+    onDragLeave:function (e){
+        var me = this,
+            el = e.getTarget(),
+            thisEl = me.getView().getEl();
+
+        e.stopEvent();
+
+        if (el === thisEl.dom) {
+            me.handleDropZoneCss(false);
+            return;
+        }
+
+        while (el !== thisEl.dom && el && el.parentNode) {
+            el = el.parentNode;
+        }
+
+        if (el !== thisEl.dom) {
+            me.handleDropZoneCss(false);
+        }
+    },
+
+    /***
+     * Triggered when the items are dropped on to import wizard
+     * @param e
+     */
+    onDrop:function (e){
+        this.handleDropZoneCss(false);
+    },
+
+    /***
+     * Add or remove dropzone css from droppable components
+     * @param add
+     */
+    handleDropZoneCss: function (add){
+        var me = this,
+            fn = add ? 'addCls' : 'removeCls',
+            view = me.getView().down('wizardUploadGrid'),
+            dropZones = view.query('wizardFileButton');
+        view.getView()[fn]('dropZone');
+        dropZones.forEach(function (cmp){
+            cmp[fn]('dropZone');
+        });
     }
 });

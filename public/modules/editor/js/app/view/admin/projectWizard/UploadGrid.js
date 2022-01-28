@@ -54,10 +54,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
             element: 'el',
             fn: 'onDrop'
         },
-        dragenter: {
-            element: 'el',
-            fn: 'onDragEnter'
-        },
         scope: 'controller'
     },
 
@@ -69,7 +65,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         targetLang:'#UT#Zielsprache',
         file:'#UT#Datei',
         type:'#UT#Typ',
-        size:'#UT#Größe'
+        size:'#UT#Größe',
+        errorColumnText:'#UT#Fehler'
     },
 
     initConfig: function(instanceConfig) {
@@ -139,7 +136,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     renderer:function (val,meta,record) {
                         if(record.get('type') === Editor.model.admin.projectWizard.File.TYPE_ERROR){
                             meta.tdAttr= 'data-qtip="'+record.get('error')+'"';
-                            return 'error';
+                            return me.strings.errorColumnText;
                         }
                         return val;
                     },

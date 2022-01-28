@@ -158,5 +158,13 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
                  }
              });
          });
+    },
+
+    /***
+     * On file(s) drop on add project button
+     * @param e
+     */
+    onAddProjectBtnDrop: function (e){
+        Editor.app.getController('admin.TaskOverview').openWindowWithFilesDrop(e);
     }
 });

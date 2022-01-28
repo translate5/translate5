@@ -594,4 +594,11 @@ Ext.application({
         return row.get('value');
     },
 
+    /***
+     * @returns {boolean}
+     */
+    isDevelopmentVersion:function (){
+        return Editor.data.app.version === "development";
+    }
+
 });

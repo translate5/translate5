@@ -93,63 +93,21 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     maximizable:true,
 
     listeners:{
-        beforerender:function(win){
-            //insert the taskUpload card in before render
-            win.insertCard({
-                xtype:'taskUpload', 
-                itemId:'taskUploadCard',
-                groupIndex:5
-            },'postimport');
-
-            win.insertCard({
-                xtype:'adminTaskUserAssocWizard',
-                itemId:'adminTaskUserAssocWizard',
-                groupIndex:1//index 2 is language resources assoc
-            },'postimport');
-
-            if(Editor.app.authenticatedUser.isAllowed('taskConfigOverwriteGrid')) {
-                win.insertCard({
-                    xtype: 'adminConfigWizard',
-                    itemId: 'adminConfigWizard',
-                    groupIndex: 3//index 2 is language resources assoc
-                }, 'postimport');
-            }
-
+        beforerender:'onTaskAddWindowBeforeRender',
+        render:'onTaskAddWindowRender',
+        afterrender:'onTaskAddWindowAfterRender',
+        dragenter: {
+            element: 'el',
+            fn: 'onDragEnter'
         },
-        render:function(win){
-            
-            //sort the group by group index
-            win.groupCards['preimport'].sort(function (a, b) {
-                return a.groupIndex - b.groupIndex;
-            });
-            
-            //add all of the cards in the window by order: preimport, import, postimport
-            for(var i=0;i<win.groupCards['preimport'].length;i++){
-                win.add(win.groupCards['preimport'][i]);
-            }
-            
-            //sort the group by group index
-            win.groupCards['import'].sort(function (a, b) {
-                return a.groupIndex - b.groupIndex;
-            });
-            
-            for(i=0;i<win.groupCards['import'].length;i++){
-                win.add(win.groupCards['import'][i]);
-            }
-            //sort the group by group index
-            win.groupCards['postimport'].sort(function (a, b) {
-                return a.groupIndex - b.groupIndex;
-            });
-            
-            for(i=0;i<win.groupCards['postimport'].length;i++){
-                win.add(win.groupCards['postimport'][i]);
-            }
+        dragleave: {
+            element: 'el',
+            fn: 'onDragLeave'
         },
-        afterrender:function(win){
-            var winLayout=win.getLayout(),
-                vm=win.getViewModel();
-          vm.set('activeItem',winLayout.getActiveItem());
-      }
+        drop: {
+            element: 'el',
+            fn: 'onDrop'
+        },
     },
     
     importTaskMessage:"#UT#Hochladen beendet. Import und Vorbereitung laufen.",
@@ -450,5 +408,4 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
             }
         });
     }
-
 });
