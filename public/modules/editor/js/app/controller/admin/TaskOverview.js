@@ -556,10 +556,31 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
 
     handleTaskAddShow: function () {
+        this.showTaskAddWindow();
+    },
+
+    /***
+     * Show the task add window if the user is allowed to
+     */
+    showTaskAddWindow: function (fn){
         if (!this.isAllowed('editorAddTask')) {
             return;
         }
-        Ext.widget('adminTaskAddWindow').show();
+        return Ext.widget('adminTaskAddWindow').show(null,fn);
+    },
+
+    /***
+     * If the users drops files on the add task button, show the task add window, and add those files in the drop zone
+     * @param e
+     */
+    openWindowWithFilesDrop: function (e){
+        var me = this,
+            grid = null;
+
+        me.showTaskAddWindow(function (){
+            grid = me.getWizardUploadGrid();
+            grid && grid.getController().onDrop(e);
+        });
     },
 
     /**

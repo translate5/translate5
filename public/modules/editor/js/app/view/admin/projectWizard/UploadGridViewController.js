@@ -48,18 +48,22 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     onManualAdd: function(btn) {
         this.addFilesToStore(btn.fileInputEl.dom.files, Editor.model.admin.projectWizard.File.TYPE_WORKFILES);
     },
+
     onManualAddPivot: function(btn) {
         this.addFilesToStore(btn.fileInputEl.dom.files, Editor.model.admin.projectWizard.File.TYPE_PIVOT);
     },
+
     onDrop: function(e) {
         e.stopEvent();
-        var me = this;
-        me.handleDropZoneCss(false);
+        var me = this,
+            adminTaskAddWindow = me.getView().up('#adminTaskAddWindow');
+
+        // remove the drop zone css
+        adminTaskAddWindow && adminTaskAddWindow.getController().handleDropZoneCss(false);
+
         me.addFilesToStore(e.browserEvent.dataTransfer.files, me.getTypByTarget(e.getTarget()));
     },
-    onDragEnter:function (e){
-        this.handleDropZoneCss(true);
-    },
+
     /***
      * Remove selected files from the upload grid
      */
@@ -109,7 +113,13 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         var me = this,
             msg = me.errorMessages,
             files = me.zipFileFilter(items),
-            store = me.getView().store;
+            store = me.getView().getViewModel().getStore('files');
+
+
+        // INFO: workaround when files are dropped in the Add project button in project overview.
+        if(store.isEmptyStore){
+            store.loadRawData([]);
+        }
 
         Ext.Array.forEach(files, function(file) {
             var source,
@@ -153,7 +163,9 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
                 me.validateLanguages(rec);
 
-                me.validateFileName(rec);
+                me.handleDuplicateFileName(rec);
+
+                me.autofillProjectFields(rec);
 
                 // commit the changes before the record is added to the store
                 rec.commit();
@@ -235,8 +247,36 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
     },
 
-    validateFileName:function (rec){
+    /***
+     * Validate if the file name is duplicate for the selected filetype and target language.
+     * If it is duplicate, index number will be appended to te name.
+     * @param rec
+     */
+    handleDuplicateFileName:function (rec){
         rec.set('name',this.checkFileName(rec.get('name'),rec.get('type'),rec.get('targetLang')));
+    },
+
+    /***
+     * Set the project name from the given record only if the project name is not set
+     * and the given record is not with type error.
+     * @param rec
+     */
+    autofillProjectFields:function (rec){
+        var container = Ext.ComponentQuery.query('#taskMainCardContainer')[0],
+            taskName = container.down('textfield[name="taskName"]'),
+            customer = null;
+
+        if(Ext.isEmpty(taskName.getValue()) && rec.get('type') !== 'error'){
+            taskName.setValue(Editor.util.Util.getFileNameNoExtension(rec.get('name')));
+        }
+
+        // auto set the customer for dev version only
+        if(Editor.app.isDevelopmentVersion()){
+            customer = container.down('#customerId');
+            if(Ext.isEmpty(customer.getValue())){
+                customer.setValue(Ext.getStore('userCustomers').getDefaultCustomerId());
+            }
+        }
     },
 
     /***
@@ -290,21 +330,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             default:
                 return Editor.model.admin.projectWizard.File.TYPE_WORKFILES;
         }
-    },
-
-    /***
-     * Add or remove dropzone css from droppable components
-     * @param add
-     */
-    handleDropZoneCss: function (add){
-        var me = this,
-            fn = add ? 'addCls' : 'removeCls',
-            view = me.getView(),
-            dropZones = view.query('wizardFileButton');
-        view.getView()[fn]('dropZone');
-        dropZones.forEach(function (cmp){
-            cmp[fn]('dropZone');
-        });
     },
 
     /***

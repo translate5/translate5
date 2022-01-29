@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
-<file original="word/document.xml" source-language="de" target-language="en" datatype="x-undefined">
+<file original="original-145.html" source-language="de" target-language="en" datatype="html">
 <body>
-<trans-unit id="NFDBB2FA9-tu1" xml:space="preserve">
-<source xml:lang="de">Das ist ein Test</source>
-<seg-source><mrk mid="0" mtype="seg">Das ist ein Test</mrk></seg-source>
-<target xml:lang="en">This is a test</target>
+<trans-unit id="tu1" restype="x-paragraph">
+<source xml:lang="de">Go to overview #melony#.</source>
+<seg-source><mrk mid="0" mtype="seg">Go to overview #melony#.</mrk></seg-source>
+<target xml:lang="en"><mrk mtype="seg" mid="0">Go to overview #melony#.</mrk></target>
+</trans-unit>
+<trans-unit id="tu2" restype="x-paragraph">
+<source xml:lang="de">another #sment#, to try#, to #reproduce#. END</source>
+<seg-source><mrk mid="0" mtype="seg">another #sment#, to try#, to #reproduce#.</mrk> <mrk mid="1" mtype="seg">END</mrk></seg-source>
+<target xml:lang="en"><mrk mtype="seg" mid="0">another #sment#, to try#, to #reproduce#.</mrk> <mrk mtype="seg" mid="1">END</mrk></target>
 </trans-unit>
 </body>
 </file>
