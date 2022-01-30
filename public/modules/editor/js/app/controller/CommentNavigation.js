@@ -72,29 +72,34 @@ Ext.define('Editor.controller.CommentNavigation', {
         this.getCommentList().getStore().load();
     },
     
-    handleItemClick: function(origin, remarkRecord) {
-        var segmentNrInTask=remarkRecord.get('segmentNrInTask');
-        if(segmentNrInTask) { // segmentComment
-            Ext.getCmp('segment-grid').scrollTo(segmentNrInTask-1); // segmentStore starts with 0, so decrease segmentNrInTask
-        } else { // visualAnnotation
-            this.fireEvent('visualRemarkClicked',remarkRecord);
+    handleItemClick: function(origin, remarkRecord){
+        switch(remarkRecord.get('type')){
+            
+            case 'segmentComment':
+                Ext.getCmp('segment-grid').scrollTo(remarkRecord.get('segmentNrInTask'));
+                break;  
+
+            case 'visualAnnotation':
+                this.fireEvent('visualRemarkClicked', remarkRecord);
+                break;
         }
     },
 
     /**
      * Change existing remark in store or add new one
      */
-    updateStore: function updateStore(remark, typeOfChange){
+    updateStore: function(remark, typeOfChange){
         var cl = this.getCommentList();
         var store = cl.getStore();
         var existing = (typeOfChange === 'afterPutAction') ? store.getById(remark.id) : null; // in ZF1 Put is UPDATE, Post is CREATE
+
         /** Update exsiting record - Why this way?
          * store.data.replace() does not replace (at least in ExtJS-6.2.0)
          * store.update(...) triggers request
          * less sort operations
         */
         if(existing) {
-            var old = existing.data, fresh = updated.data, changedProps = [], setOpts = { silent: true, commit: false }, prop;
+            var old = existing.data, fresh = remark.data, changedProps = [], setOpts = { silent: true, commit: false }, prop;
             for(prop in old) {
                 if(old[prop] !== fresh[prop]) {
                     existing.set(prop, fresh[prop], setOpts);
