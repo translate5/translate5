@@ -1944,7 +1944,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Fetch and return terms, grouped by termEntryId and language props
         return array_group_by($this->db->getAdapter()->query('
-            SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId`, `processStatus` 
+            SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId`, `processStatus`, `termTbxId` 
             FROM `terms_term`
             WHERE ' . $where . '
         ')->fetchAll(), 'termEntryId', 'language');
