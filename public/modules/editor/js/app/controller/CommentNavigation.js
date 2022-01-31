@@ -58,7 +58,7 @@ Ext.define('Editor.controller.CommentNavigation', {
                     switch(typeOfChange) {
                         case 'afterPostAction':
                         case 'afterPutAction':
-                            this.updateStore(new (this.getCommentList().getStore().getModel())(comment), typeOfChange);
+                            this.updateStore(new (this.getCommentList().getStore().getModel())(Ext.clone(comment)), typeOfChange);
                             break;
                         case 'beforeDeleteAction':
                             this.getCommentList().getStore().getData().removeByKey(comment.id);
@@ -76,7 +76,8 @@ Ext.define('Editor.controller.CommentNavigation', {
         switch(remarkRecord.get('type')){
             
             case 'segmentComment':
-                Ext.getCmp('segment-grid').scrollTo(remarkRecord.get('segmentNrInTask'));
+                var segmentIndex = remarkRecord.get('segmentNrInTask') - 1; // segment grid indexes from 0 on, segmentNrInTask from 1
+                Ext.getCmp('segment-grid').scrollTo(segmentIndex);
                 break;  
 
             case 'visualAnnotation':
