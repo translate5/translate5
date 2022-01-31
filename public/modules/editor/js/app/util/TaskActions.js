@@ -134,7 +134,7 @@ Ext.define('Editor.util.TaskActions', {
         }
         me.modifyTask(callback, {
             userState: 'open'
-        }, me.strings.taskClosing);
+        }, me.strings.taskClosing, null, true);
     },
     /**
      * finishes the current task
@@ -167,7 +167,7 @@ Ext.define('Editor.util.TaskActions', {
         var me = this;
         me.modifyTask(callback, {
             userState: 'finished'
-        }, me.strings.taskFinishing);        
+        }, me.strings.taskFinishing, null, true);        
     },
     /**
      * confirms the current task
@@ -193,7 +193,7 @@ Ext.define('Editor.util.TaskActions', {
     /**
      * internal method to modify the task with the given values
      */
-    modifyTask: function(callback, data, maskingText, task) {
+    modifyTask: function(callback, data, maskingText, task, doFireLeaveEvent) {
         var me = this,
             task = task || Editor.data.task,
             app = Editor.app;
@@ -203,6 +203,10 @@ Ext.define('Editor.util.TaskActions', {
             return;
         }
         
+        if(doFireLeaveEvent){
+            Editor.app.fireEvent('beforeLeaveTask');
+        }
+
         callback = callback || Ext.emptyFn;
         app.mask(maskingText, task.get('taskName'));
         task.set(data);
