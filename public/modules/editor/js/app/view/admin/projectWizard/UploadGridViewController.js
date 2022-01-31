@@ -296,7 +296,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             }
         }
 
-        if(!langs || langs.length !== 3){
+        if(rec.getExtension() !== 'zip' || !langs || langs.length !== 3){
             return;
         }
 
