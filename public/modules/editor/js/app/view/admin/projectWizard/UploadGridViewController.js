@@ -268,16 +268,23 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     },
 
     /***
-     * Set the project name from the given record only if the project name is not set
-     * and the given record is not with type error.
+     * Auto set the project name, project languages and customer based on the import file name.
      * @param rec
      */
-    autofillProjectFields:function (rec){
+    autofillProjectFields: function (rec) {
         var container = Ext.ComponentQuery.query('#taskMainCardContainer')[0],
-            taskName = container.down('textfield[name="taskName"]'),
-            customer = null;
+            languageContainer = Ext.ComponentQuery.query('#taskSecondCardContainer')[0],
+            customer = null,
+            taskName = container.down('textfield[name=taskName]'),
+            srcLang = languageContainer.down('combo[name=sourceLang]'),
+            targetLang = languageContainer.down('tagfield[name^=targetLang]'),
+            langs = rec.get('name').match(/-([a-zA-Z_]{2,5})-([a-zA-Z_]{2,5})\.[^.]+$/);
 
-        if(Ext.isEmpty(taskName.getValue()) && rec.get('type') !== 'error'){
+        if(rec.get('type') === 'error'){
+            return;
+        }
+
+        if(Ext.isEmpty(taskName.getValue())){
             taskName.setValue(Editor.util.Util.getFileNameNoExtension(rec.get('name')));
         }
 
@@ -287,6 +294,32 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             if(Ext.isEmpty(customer.getValue())){
                 customer.setValue(Ext.getStore('userCustomers').getDefaultCustomerId());
             }
+        }
+
+        if(!langs || langs.length !== 3){
+            return;
+        }
+
+        //simple algorithmus to get the language from the filename
+        //try to convert deDE language to de-DE for searching in the store
+        var regex = /^([a-z]+)_?([A-Z]+)$/;
+        if (regex.test(langs[1])) {
+            langs[1] = langs[1].match(/^([a-z]+)_?([A-Z]+)$/).splice(1).join('-');
+        }
+        if (regex.test(langs[2])) {
+            langs[2] = langs[2].match(/^([a-z]+)_?([A-Z]+)$/).splice(1).join('-');
+        }
+
+        var srcStore = srcLang.getStore(),
+            targetStore = targetLang.getStore(),
+            srcIdx = srcStore.find('label', '(' + langs[1] + ')', 0, true, true),
+            targetIdx = targetStore.find('label', '(' + langs[2] + ')', 0, true, true);
+
+        if (srcIdx >= 0) {
+            srcLang.setValue(srcStore.getAt(srcIdx).get('id'));
+        }
+        if (targetIdx >= 0) {
+            targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
         }
     },
 
