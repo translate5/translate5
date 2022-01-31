@@ -236,9 +236,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             '#adminTaskAddWindow #skip-wizard-btn': {
                 click: 'handleSkipWizardClick'
             },
-            '#adminTaskAddWindow filefield[name=importUpload]': {
-                change: 'handleChangeImportFile'
-            },
             'adminTaskAddWindow panel:not([hidden])': {
                 wizardCardFinished: 'onWizardCardFinished',
                 wizardCardSkiped: 'onWizardCardSkiped'
@@ -291,49 +288,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     loadTasks: function () {
         this.getAdminTasksStore().load();
     },
-    handleChangeImportFile: function (field, val) {
-        var me = this,
-            name = me.getTaskAddForm().down('textfield[name=taskName]'),
-            srcLang = me.getTaskAddForm().down('combo[name=sourceLang]'),
-            targetLang = me.getTaskAddForm().down('tagfield[name^=targetLang]'),
-            customer = me.getTaskAddForm().down('combo[name=customerId]'),
-            idx,
-            customerId,
-            langs = val.match(/-([a-zA-Z_]{2,5})-([a-zA-Z_]{2,5})\.[^.]+$/);
-        if (name && name.getValue() === '') {
-            name.setValue(val.replace(/\.[^.]+$/, '').replace(/^C:\\fakepath\\/, ''));
-        }
-        //simple algorithmus to get the language from the filename
-        if (langs && langs.length === 3) {
-            //try to convert deDE language to de-DE for searching in the store
-            var regex = /^([a-z]+)_?([A-Z]+)$/;
-            if (regex.test(langs[1])) {
-                langs[1] = langs[1].match(/^([a-z]+)_?([A-Z]+)$/).splice(1).join('-');
-            }
-            if (regex.test(langs[2])) {
-                langs[2] = langs[2].match(/^([a-z]+)_?([A-Z]+)$/).splice(1).join('-');
-            }
-
-            var srcStore = srcLang.store,
-                targetStore = targetLang.store,
-                srcIdx = srcStore.find('label', '(' + langs[1] + ')', 0, true, true),
-                targetIdx = targetStore.find('label', '(' + langs[2] + ')', 0, true, true);
-
-            if (srcIdx >= 0) {
-                srcLang.setValue(srcStore.getAt(srcIdx).get('id'));
-            }
-            if (targetIdx >= 0) {
-                targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
-            }
-            //if we set a language automatically we also assume the default customer
-            idx = customer.store.findExact('name', 'defaultcustomer');
-            if (idx >= 0) {
-                customerId = customer.store.getAt(idx).get('id');
-                customer.setValue(customerId);
-            }
-        }
-    },
-
     /***
      * Import with defaults button handler. After the task is created, and before the import is triggered,
      * wizardCardImportDefaults event is thrown. Everything after task creation and before task import should be done/registered within this event

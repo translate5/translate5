@@ -130,7 +130,6 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
             ]);
         }
 
-
         foreach($matchingFiles as $tmpFile => $fileName) {
             $name = $this->getFilepathByName($fileName,$matchingFilesTypes[$tmpFile]);
             if(!copy($tmpFile, $name)) {
@@ -141,11 +140,6 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
                     'target' => $name,
                 ]);
             }
-        }
-
-        // if the current task does not have relais files, set the relais language of this task to 0
-        if(!in_array('pivot',$matchingFilesTypes)){
-            $this->task->setRelaisLang(0);
         }
     }
 
