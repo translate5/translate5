@@ -782,10 +782,12 @@ Ext.define('Editor.controller.Localizer', {
             cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
             btnSkip: '<?php echo $this->translate->_('Importieren (weitere überspringen)');?>',
             importDefaultsButtonText: '<?php echo $this->translate->_('Importieren (Standards nutzen)');?>',
-            description: '<?php echo $this->translate->_('Projektbeschreibung');?>'
+            description: '<?php echo $this->translate->_('Projektbeschreibung');?>',
+            autoRemovedUploadFilesWarningMessage: '<?php echo $this->translate->_('Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.');?>'
         }
     });
-    
+
+
     Ext.define("Editor.locale.view.admin.TaskUpload", {
         override: "Editor.view.admin.TaskUpload",
         strings: {
@@ -793,7 +795,37 @@ Ext.define('Editor.controller.Localizer', {
             finishButton: '<?php echo $this->translate->_('Schließen');?>',
         }
     });
-    
+
+
+    Ext.define("Editor.locale.view.admin.projectWizard.UploadGrid", {
+        override: "Editor.view.admin.projectWizard.UploadGrid",
+        strings: {
+            gridEmptyText: '<?php echo $this->translate->_('Ziehen Sie die Dateien entweder hierher, um sie als Arbeitsdateien hinzuzufügen, oder klicken Sie auf eine der obigen Schaltflächen, um andere Dateitypen zu wählen.');?>',
+            workFilesFilesButton: '<?php echo $this->translate->_('Arbeitsdatei(en) hinzufügen');?>',
+            pivotFilesFilesButton: '<?php echo $this->translate->_('Pivot-Datei(en) hinzufügen');?>',
+            removeFilesFilesButton: '<?php echo $this->translate->_('Datei löschen');?>',
+            targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+            file: '<?php echo $this->translate->_('Datei');?>',
+            type: '<?php echo $this->translate->_('Typ');?>',
+            size: '<?php echo $this->translate->_('Größe');?>',
+            errorColumnText: '<?php echo $this->translate->_('Fehler');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.view.admin.projectWizard.UploadGridViewController", {
+        override: "Editor.view.admin.projectWizard.UploadGridViewController",
+        errorMessages: {
+            extension: '<?php echo $this->translate->_('Die Datei {0} mit der Erweiterung {1} wird nicht unterstützt.');?>',
+            fileMix: '<?php echo $this->translate->_('Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!');?>',
+            pivotNotBilingual:'<?php echo $this->translate->_('Die Pivot-Datei ist nicht zweisprachig.');?>',
+            sourceNotValid:'<?php echo $this->translate->_('Ungültige Ausgangssprache.');?>',
+            targetNotValid:'<?php echo $this->translate->_('Ungültige Zielsprache.');?>',
+            sourceNotSame:'<?php echo $this->translate->_('Die Ausgangssprache der Datei stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.');?>',
+            pivotSourceNotSame:'<?php echo $this->translate->_('Die Quellsprache in der Pivot-Datei {0} ist nicht dieselbe wie die aktuelle Quellsprache des Projekts {1}.');?>',
+            additionalRelaisNotSameTarget:'<?php echo $this->translate->_('Die Relaisdatei {0} hat eine andere Zielsprache {1} als erwartet {2}.');?>'
+        }
+    });
+
     Ext.define("Editor.locale.de.view.admin.TaskActionColumn", {
         override: "Editor.view.admin.TaskActionColumn",
         messages: {
@@ -861,6 +893,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.ExportMenu",
         messages: {
             exportDef: '<?php echo $this->translate->_('Originalformat, {0}');?>',
+            transfer: '<?php echo $this->translate->_('Übersetzte Terme in TermCollection(s) übertragen');?>',
             exportDiff: '<?php echo $this->translate->_('SDLXLIFF mit Änderungsmarkierungen');?>',
             export2Def: '<?php echo $this->translate->_('XLIFF 2.1');?>',
             exportQmField: '<?php echo $this->translate->_('Export QS-Statistik (XML) für Feld: {0}');?>',

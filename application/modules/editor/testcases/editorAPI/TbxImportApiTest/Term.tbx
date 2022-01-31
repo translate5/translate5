@@ -197,6 +197,54 @@
 					</tig>
 				</langSet>
 			</termEntry>
+			<termEntry id="eid-0">
+				<langSet xml:lang="de-de">
+					<descripGrp>
+						<descrip type="Definition">Test the mapping of custom descrip values to the administrative status</descrip>
+					</descripGrp>
+					<tig>
+						<term id="tid-0-de-3">Term erlaubt</term>
+						<descripGrp>
+							<descrip type="CaseSense">Near</descrip>
+						</descripGrp>
+						<descripGrp>
+							<descrip type="xBool_Forbidden">True</descrip>
+						</descripGrp>
+						<descripGrp>
+							<descrip type="PartialTreshold">Half</descrip>
+						</descripGrp>
+					</tig>
+					<tig>
+						<term id="tid-0-de-4">Term verboten</term>
+						<descripGrp>
+							<descrip type="CaseSense">Near</descrip>
+						</descripGrp>
+						<descripGrp>
+							<descrip type="xBool_Forbidden">False</descrip>
+						</descripGrp>
+						<descripGrp>
+							<descrip type="PartialTreshold">Half</descrip>
+						</descripGrp>
+					</tig>
+				</langSet>
+				<langSet xml:lang="en-us">
+					<descripGrp>
+						<descrip type="Definition">Test the mapping of custom termNote values to the administrative status</descrip>
+					</descripGrp>
+					<tig>
+						<term id="tid-1-en-2">Term allowed</term>
+						<termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+					</tig>
+					<tig>
+						<term id="tid-1-en-3">Term preferred</term>
+						<termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+					</tig>
+					<tig>
+						<term id="tid-1-en-4">Term forbidden</term>
+						<termNote type="across_ISO_picklist_Usage">do not use</termNote>
+					</tig>
+				</langSet>
+			</termEntry>
 		</body>
 		<back>
 			<refObjectList type="projectSet">

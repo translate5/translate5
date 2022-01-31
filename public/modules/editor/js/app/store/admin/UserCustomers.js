@@ -68,5 +68,17 @@ Ext.define('Editor.store.admin.UserCustomers', {
                 });
             }
         });
+    },
+
+    /***
+     * Return the default customer id. If there is no default customer in the current store, the first record in the store is returned.
+     * @returns {*|null}
+     */
+    getDefaultCustomerId:function (){
+       var rec = this.findRecord( 'number', Editor.model.admin.Customer.DEFAULTCUSTOMER_NUMBER, 0, false, true, true);
+       if(!rec){
+           rec = this.getAt(0);
+       }
+       return rec ? rec.get('id') : null;
     }
 });

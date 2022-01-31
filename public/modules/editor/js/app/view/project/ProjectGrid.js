@@ -188,6 +188,14 @@ Ext.define('Editor.view.project.ProjectGrid', {
         	            xtype: 'button',
         	            glyph: 'f067@FontAwesome5FreeSolid',
         	            itemId: 'add-project-btn',
+                        listeners: {
+                            // INFO: the drop event only works when is defined here.
+                            drop: {
+                                element: 'el',
+                                fn: 'onAddProjectBtnDrop'
+                            },
+                            scope: 'controller'
+                        },
         	            text: me.strings.addProject,
         	            hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),
         	            tooltip: me.strings.addProjectTip

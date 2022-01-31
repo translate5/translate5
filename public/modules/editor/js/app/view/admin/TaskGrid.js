@@ -744,13 +744,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     tooltip: me.strings.reloadBtnTip
                 }, {
                     xtype: 'button',
-                    glyph: 'f067@FontAwesome5FreeSolid',
-                    itemId: 'add-project-btn',
-                    text: me.strings.addProject,
-                    hidden: !Editor.app.authenticatedUser.isAllowed('editorAddTask'),
-                    tooltip: me.strings.addProjectTip
-                }, {
-                    xtype: 'button',
                     itemId: 'addAdvanceFilterBtn',
                     glyph: 'f0b0@FontAwesome5FreeSolid',
                     text: me.strings.addFilterText,

@@ -84,6 +84,16 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
     }
 
     /**
+     * Loops over all to be processed items and pass each to the callback
+     * @param callable $callback
+     */
+    public function foreachToBeProcessed(Callable $callback) {
+        foreach($this->toBeProcessed as $importObject) {
+            $callback($importObject);
+        }
+    }
+
+    /**
      * @throws Zend_Db_Statement_Exception
      */
     public function loadExisting(int $id) {

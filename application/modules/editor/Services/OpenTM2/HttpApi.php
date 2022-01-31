@@ -48,6 +48,11 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     protected $fixLanguages;
 
+    /**
+     * @var bool true if the used resource is T5Memory, false for OpenTM2
+     */
+    protected bool $isT5Memory = false;
+
     public function __construct() {
         $this->fixLanguages = ZfExtended_Factory::get('editor_Services_OpenTM2_FixLanguageCodes');
     }
@@ -88,10 +93,14 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         //Out: { "ReturnValue":0, "ErrorMsg":"" }
         
         $data = new stdClass();
-        $tmData = $this->fixLanguages->tmxOnUpload($tmData);
-        /* @var $tmxRepairer editor_Services_OpenTM2_FixImportParser */
-        $tmxRepairer = ZfExtended_Factory::get('editor_Services_OpenTM2_FixImportParser');
-        $data->tmxData = base64_encode($tmxRepairer->convert($tmData));
+
+        if($this->isOpenTM2()) {
+            $tmData = $this->fixLanguages->tmxOnUpload($tmData);
+            /* @var $tmxRepairer editor_Services_OpenTM2_FixImportParser */
+            $tmxRepairer = ZfExtended_Factory::get('editor_Services_OpenTM2_FixImportParser');
+            $tmData = $tmxRepairer->convert($tmData);
+        }
+        $data->tmxData = base64_encode($tmData);
 
         $http = $this->getHttpWithMemory('POST', '/import');
         $http->setConfig(['timeout' => 1200]);
@@ -295,7 +304,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->target = $target;
 
         //$json->segmentNumber = $segment->getSegmentNrInTask(); FIXME TRANSLATE-793 must be implemented first, since this is not segment in task, but segment in file
-        $json->documentName = $filename;
+        $json->documentName = $filename; // 101 doc match
         $json->author = $segment->getUserName();
         $json->timeStamp = $this->nowDate();
         $json->context = $segment->getMid();
@@ -358,14 +367,29 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
      */
     public function setLanguageResource(editor_Models_LanguageResources_LanguageResource $languageResource) {
-        $this->resource = $languageResource->getResource();
+        $this->setResource($languageResource->getResource());
         $this->languageResource = $languageResource;
     }
     
     public function getLanguageResource() {
         return $this->languageResource;
     }
-    
+
+    public function setResource(editor_Models_LanguageResources_Resource $resource)
+    {
+        parent::setResource($resource);
+        $this->isT5Memory != strstr($resource->getUrl(), '/otmmemoryservice');
+        $this->fixLanguages->setDisabled($this->isT5Memory);
+    }
+
+    /**
+     * returns true if the target system is OpenTM2, false if isT5Memory
+     * @return bool
+     */
+    public function isOpenTM2(): bool {
+        return !$this->isT5Memory;
+    }
+
     /**
      * returns true if string is to long for OpenTM2
      * According some research, it seems that the magic border to crash OpenTM2 is on 2048 characters, but:
