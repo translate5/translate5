@@ -4419,9 +4419,9 @@ The following task was imported with errors / warnings / notices. Please take ca
   <target>Either drag and drop files here to add them as work files, or to one of the buttons above to add them as a different type.</target>
 </trans-unit>
 </body>
-<trans-unit id='RGllIERhdGVpIHswfSBtaXQgZGVyIEVyd2VpdGVydW5nIHsxfSB3aXJkIG5pY2h0IHVudGVyc3TDvHR6dC4='>
-  <source>Die Datei {0} mit der Erweiterung {1} wird nicht unterstützt.</source>
-  <target>The file {0} with the extension {1} is not supported.</target>
+<trans-unit id='RGllIERhdGVpICh7MH0pIG1pdCBkZXIgRXJ3ZWl0ZXJ1bmcgKHsxfSkgd2lyZCBuaWNodCB1bnRlcnN0w7x0enQu'>
+  <source>Die Datei ({0}) mit der Erweiterung ({1}) wird nicht unterstützt.</source>
+  <target>The file ({0}) with the extension ({1}) is not supported.</target>
 </trans-unit>
 <trans-unit id='V8OkaGxlbiBTaWUgZW50d2VkZXIgZWluZSBaSVAtRGF0ZWkgb2RlciBtZWhyZXJlIGFuZGVyZSBEYXRlaWVuLiBFaW4gTWl4IGF1cyBaSVAtRGF0ZWllbiB1bmQgYW5kZXJlbiBEYXRlaWVuIGlzdCBuaWNodCBtw7ZnbGljaCE='>
   <source>Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!</source>
@@ -4443,13 +4443,13 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Die Ausgangssprache stimmt nicht mit der ausgewählten Sprache überein.</source>
   <target>Source language and selected language do not match.</target>
 </trans-unit>
-<trans-unit id='RGllIFF1ZWxsc3ByYWNoZSBpbiBkZXIgUGl2b3QtRGF0ZWkgezB9IGlzdCBuaWNodCBkaWVzZWxiZSB3aWUgZGllIGFrdHVlbGxlIFF1ZWxsc3ByYWNoZSBkZXMgUHJvamVrdHMgezF9Lg=='>
-  <source>Die Quellsprache in der Pivot-Datei {0} ist nicht dieselbe wie die aktuelle Quellsprache des Projekts {1}.</source>
-  <target>The source language in the pivot file {0} is not the same as the current source language of the project {1}.</target>
+<trans-unit id='RGllIFF1ZWxsc3ByYWNoZSBpbiBkZXIgUGl2b3QtRGF0ZWkgKHswfSkgaXN0IG5pY2h0IGRpZXNlbGJlIHdpZSBkaWUgYWt0dWVsbGUgUXVlbGxzcHJhY2hlIGRlcyBQcm9qZWt0cyAoezF9KS4='>
+  <source>Die Quellsprache in der Pivot-Datei ({0}) ist nicht dieselbe wie die aktuelle Quellsprache des Projekts ({1}).</source>
+  <target>The source language in the pivot file ({0}) is not the same as the current source language of the project ({1}).</target>
 </trans-unit>
-<trans-unit id='RGllIFJlbGFpc2RhdGVpIHswfSBoYXQgZWluZSBhbmRlcmUgWmllbHNwcmFjaGUgezF9IGFscyBlcndhcnRldCB7Mn0u'>
-  <source>Die Relaisdatei {0} hat eine andere Zielsprache {1} als erwartet {2}.</source>
-  <target>The relais file {0} has a different target language {1} than expected {2}.</target>
+<trans-unit id='RGllIFBpdm90LURhdGVpICh7MH0pIGhhdCBlaW5lIGFuZGVyZSBaaWVsc3ByYWNoZSAoezF9KSBhbHMgZXJ3YXJ0ZXQgKHsyfSku'>
+  <source>Die Pivot-Datei ({0}) hat eine andere Zielsprache ({1}) als erwartet ({2}).</source>
+  <target>The pivot file ({0}) has a different target language ({1}) than expected ({2}).</target>
 </trans-unit>
 <trans-unit id='VXJsIGhpbnp1ZsO8Z2Vu'>
   <source>Url hinzufügen</source>
@@ -4463,17 +4463,17 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Url</source>
   <target>Url</target>
 </trans-unit>
-<trans-unit id='VW5nw7xsdGlnZSBBdXNnYW5nc3NwcmFjaGUu'>
-  <source>Ungültige Ausgangssprache.</source>
-  <target>Source language is not valid.</target>
+<trans-unit id='VW5nw7xsdGlnZSBBdXNnYW5nc3NwcmFjaGUgKHswfSku'>
+  <source>Ungültige Ausgangssprache ({0}).</source>
+  <target>Source language ({0}) is not valid.</target>
 </trans-unit>
-<trans-unit id='VW5nw7xsdGlnZSBaaWVsc3ByYWNoZS4='>
-  <source>Ungültige Zielsprache.</source>
-  <target>Target language is not valid.</target>
+<trans-unit id='VW5nw7xsdGlnZSBaaWVsc3ByYWNoZSAoezB9KS4'>
+  <source>Ungültige Zielsprache ({0}).</source>
+  <target>Target language ({0}) is not valid.</target>
 </trans-unit>
-<trans-unit id='RGllIEF1c2dhbmdzc3ByYWNoZSBkZXIgRGF0ZWkgc3RpbW10IG5pY2h0IG1pdCBkZXIgYWt0dWVsbCBhdXNnZXfDpGhsdGVuIEF1c2dhbmdzc3ByYWNoZSDDvGJlcmVpbi4='>
-  <source>Die Ausgangssprache der Datei stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.</source>
-  <target>The source language of the file does not match the currently selected source language.</target>
+<trans-unit id='RGllIEF1c2dhbmdzc3ByYWNoZSBkZXIgRGF0ZWkgKHswfSkgc3RpbW10IG5pY2h0IG1pdCBkZXIgYWt0dWVsbCBhdXNnZXfDpGhsdGVuIEF1c2dhbmdzc3ByYWNoZSDDvGJlcmVpbi4='>
+  <source>Die Ausgangssprache der Datei ({0}) stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.</source>
+  <target>The source language ({0}) of the file does not match the currently selected source language.</target>
 </trans-unit>
 <trans-unit id='RGF0ZWk='>
   <source>Datei</source>

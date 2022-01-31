@@ -222,6 +222,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     xtype: 'languagecombo',
                                     itemId:'sourceLangaugeTaskUploadWizard',
                                     name: 'sourceLang',
+                                    readOnlyCls:'x-item-disabled', // This will enable using the disabled css when the field is in readOnly mode (readOnly field value is submitted to the server disabled field is not).
                                     toolTip: me.strings.sourceLangTip,
                                     fieldLabel: me.strings.sourceLangLabel
                                 },{
