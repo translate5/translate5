@@ -37,12 +37,13 @@ Ext.define('Editor.view.comments.Navigation', {
     items: [{
         xtype: 'dataview',
         itemId: 'commentList',
-        id:'commentNavList',
+        id: 'commentNavList',
         store: {
-            type:'AllComments',
-            autoLoad:true,
+            type: 'AllComments',
+            autoLoad: true,
             sorters: [ // must sort here in frontend for new comments' correct position
-                { property: 'page', direction: 'ASC' },
+                { property: 'reviewFileId', direction: 'ASC' },
+                { property: 'pageNum', direction: 'ASC' },
                 { property: 'type', direction: 'DESC' },
                 { property: 'segmentId', direction: 'ASC' },
                 { property: 'y', direction: 'ASC' },
@@ -63,7 +64,7 @@ Ext.define('Editor.view.comments.Navigation', {
                 },
                 // internal user tracking number cache used for assigning unique css annotation class(when anonymized users is active we need to augo generate one).
                 trackingUserNumberCache: [],
-                getUserColor:function(userGuid){
+                getUserColor: function(userGuid){
                     var me = this;
                     if(me.trackingUserNumberCache[userGuid] === undefined){
                         var trackedUser = me.tracking.findRecord('userGuid',userGuid);
@@ -73,26 +74,33 @@ Ext.define('Editor.view.comments.Navigation', {
                 }
             }
         ],
+        highlightRemark: function(remark){
+            // TODO FIXME: these are mostly private methods ...
+            var node = this.getNodeByRecord(remark)
+                scroller = this.getScrollable();
+            if(node && this.isVisible() && scroller && typeof scroller === 'object'){
+                scroller.doHighlight(node);
+            }
+        }
     }],
     tipTpl: new Ext.XTemplate([
         `<div style="padding:10px;font-size:16px;font-weight:normal;line-height:1.5">{comment}</div>
          <hr>
          <small><i>{userName} {modified}</i></small>
-         `,
-        {
-            // type: -> see localizedjsstrings.phtml
-        }
+         `
     ]),
 
     //title: 'Kommentare', // see EXT6UPD-9 + localizedjsstrings.phtml
     itemId: 'commentNavigation',
+    
     layout: 'fit',
-    initComponent:function(){
+    
+    initComponent: function(){
         this.callParent(arguments);
         var dataview = this.down('dataview');
-        dataview.store.addListener('beforeload',function(){
+        dataview.getStore().addListener('beforeload', function(){
             dataview.tpl.tracking = Editor.data.task.userTracking();
-        }, dataview.store, {single:true});
+        }, dataview.getStore(), { single:true });
     },
 
     afterRender: function(){
@@ -100,7 +108,7 @@ Ext.define('Editor.view.comments.Navigation', {
         me.callParent(arguments);
         var view = me.down('dataview');
         view.tip = Ext.create('Ext.tip.ToolTip', {
-            target: view.el,
+            target: view.getEl(),
             delegate: view.itemSelector,
             trackMouse: true,
             mouseOffset: [30, 1],
@@ -108,9 +116,9 @@ Ext.define('Editor.view.comments.Navigation', {
                 beforeshow: function updateTipBody(tip) {
                     var rec = view.getRecord(tip.triggerElement);
                     if(tip.pointerEvent.clientX <= 25){ // left side: show type of annotation as tooltip
-                         tip.update(me.tipTpl.type[rec.data.type])
+                         tip.update(me.tipTpl.type[rec.get('type')])
                     } else { // show regular tooltip
-                        tip.update(me.tipTpl.apply(rec.data));
+                        tip.update(me.tipTpl.apply(rec.getData()));
                     }
                 }
             }
