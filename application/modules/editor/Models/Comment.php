@@ -52,7 +52,13 @@ END LICENSE AND COPYRIGHT
  * @method void setModified() setModified(string $modified)
  */
 class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
-      const FRONTEND_ID = 'segmentComment';
+    
+  /**
+   * Used to identify a Comment in the Frontend /comment overview) and distinguish it from an Annotation
+   * @var string
+   */
+  const FRONTEND_ID = 'segmentComment';
+  
   protected $dbInstanceClass = 'editor_Models_Db_Comments';
   protected $validatorInstanceClass = 'editor_Models_Validator_Comment';
 
@@ -132,22 +138,23 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    */
   public function loadByTaskPlainWithPage(string $taskGuid, string $cid='') {
         $s = $this->db->select()
-        ->distinct()
-        ->setIntegrityCheck(false)
-        ->from(['comments' => $this->db->info($this->db::NAME)])
-        ->where('comments.taskGuid = ?', $taskGuid) // sort in frontend, see there
-        ->joinLeft(
-            ['sm' => 'LEK_visualreview_segmentmapping'],
-            'comments.segmentId = sm.segmentId',
-            ['page' => 'segmentPage', 'reviewFileId']
-        );
-        if ($cid) {
+            ->distinct()
+            ->setIntegrityCheck(false)
+            ->from(['comments' => $this->db->info($this->db::NAME)])
+            ->where('comments.taskGuid = ?', $taskGuid) // sort in frontend, see there
+            ->joinLeft(
+                ['sm' => 'LEK_visualreview_segmentmapping'],
+                'comments.segmentId = sm.segmentId',
+                ['page' => 'segmentPage', 'reviewFileId', 'segmentNrInTask']
+            );
+        if($cid) {
             $s->where('comments.id = ?', $cid);
-            return $this->db->getAdapter()->fetchRow($s); // returns array
+            $row = $this->db->getAdapter()->fetchRow($s);
+            return ($row) ? [ $row ] : [];
         } else {
             return $this->db->getAdapter()->fetchAll($s);
         }
-    }
+  }
   /**
    * Loads all comments of a segment by segmentid and taskguid, orders by creation order
    * does not provide isEditable info
@@ -157,9 +164,9 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    */
   public function loadBySegmentAndTaskPlain(int $segmentId, string $taskGuid) {
       $s = $this->db->select()
-      ->where('taskGuid = ?', $taskGuid)
-      ->where('segmentId = ?', $segmentId)
-      ->order('id DESC');
+          ->where('taskGuid = ?', $taskGuid)
+          ->where('segmentId = ?', $segmentId)
+          ->order('id DESC');
       return $this->db->getAdapter()->fetchAll($s);
   }
   
@@ -171,9 +178,9 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
       //SELECT explained: 
       //if there are newer comments (id > ?) to this segment (segId=?) of another user (userGuid=?), the actual user cant edit the comment anymore
       $s = $this->db->select()
-      ->where('id > ?', $this->getId())
-      ->where('segmentId = ?', $this->getSegmentId())
-      ->where('userGuid != ?', $sessionUser->data->userGuid);
+          ->where('id > ?', $this->getId())
+          ->where('segmentId = ?', $this->getSegmentId())
+          ->where('userGuid != ?', $sessionUser->data->userGuid);
       $res = $this->db->getAdapter()->fetchAll($s);
       return empty($res);
   }

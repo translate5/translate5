@@ -33,34 +33,11 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.model.Comment
+ * @class Editor.model.Remark
  * @extends Ext.data.Model
  */
  Ext.define('Editor.model.Remark', {
     extend: 'Ext.data.Model',
-    fields: [
-      {name: 'id', type: 'int'},
-      {name: 'segmentId', type: 'int'},
-      {name: 'userName', type: 'string', mapping: function(data){
-          if(data.userName) return data.userName;
-          var ret = '';
-          if(data.firstName) ret += data.firstName;
-          if(data.surName) ret += (ret && ' ') + data.surName;
-          if(!ret) ret = 'Anonymous';
-          return ret;
-        }
-      },
-      {name: 'comment', type: 'string'},
-      {name: 'modified', type: 'string', dateFormat: Editor.DATE_ISO_FORMAT, mapping:'updated'},
-      {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
-      {name: 'page', type: 'integer',  default: -1, convert: function(v, rec){
-        if(v==0) v=rec.get('reviewFileId');
-        return v;
-      }},
-      {name: 'x', type: 'number', default: -1},
-      {name: 'y', type: 'number', default: -1},
-      {name: 'type', type: 'string'},
-    ],
     idProperty: 'id',
     proxy : {
       type : 'rest',
@@ -74,5 +51,47 @@ END LICENSE AND COPYRIGHT
         rootProperty: 'data',
         writeAllFields: false
       }
-    }
+    },
+    fields: [
+      {name: 'type', type: 'string'}, // this is either "segmentComment" or "visualAnnotation"
+      {name: 'id', type: 'string', // 2 different entities are merged in this store, so convert to virtual id
+          convert:function(v, raw){ 
+            return raw.data.type[0] + v; // 's123' or 'v456'
+      }, depends: 'type'},
+      {name: 'dbId', type: 'int'},
+      {name: 'segmentId', type: 'int'},
+      {name: 'segmentNrInTask', type: 'int'},
+      {name: 'userName', type: 'string', convert: function(v, raw){
+          if(v) return v;
+          var ret = '', data = raw.data;
+          if(data.firstName) ret += data.firstName;
+          if(data.surName) ret += (ret && ' ') + data.surName;
+          if(!ret) ret = 'Anonymous';
+          return ret;
+        }
+      },
+      {name: 'comment', type: 'string'},
+      {name: 'modified', type: 'string', dateFormat: Editor.DATE_ISO_FORMAT, mapping:'updated'},
+      {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+      {name: 'reviewFileId', type: 'integer'},
+      {name: 'page', type: 'string',  default: '0' },
+      {name: 'pageNum', type: 'int' },
+      {name: 'x', type: 'number', default: -1},
+      {name: 'y', type: 'number', default: -1},
+      {name: 'timecode', type: 'int', default: -1},
+    ],
+    /**
+     * Returns the hexadecimal no. of a virtual page in a pdfconverter output. This no are either segment-attributes "data-t5segment-page-nr" in the Markup or as "data-page-no" attributes of a page node
+     * @returns {String}
+     */
+    getPageHexNo: function(){
+        return this.get('page');
+    },
+    /**
+     * Returns the parsed page number as used in the iframe dom controller
+     * @returns {Number}
+     */
+    getPageNr: function(){
+        return parseInt(this.get('page'), 10);
+    } 
   });
