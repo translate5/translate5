@@ -80,7 +80,7 @@ END LICENSE AND COPYRIGHT
       }},
       {name: 'x', type: 'number', default: -1},
       {name: 'y', type: 'number', default: -1},
-      {name: 'timecode', type: 'int', default: -1},
+      {name: 'timecode', type: 'int', default: 0}
     ],
     /**
      * Returns the hexadecimal no. of a virtual page in a pdfconverter output. This no are either segment-attributes "data-t5segment-page-nr" in the Markup or as "data-page-no" attributes of a page node

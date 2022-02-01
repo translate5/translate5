@@ -44,6 +44,7 @@ Ext.define('Editor.view.comments.Navigation', {
             sorters: [ // must sort here in frontend for new comments' correct position
                 { property: 'reviewFileId', direction: 'ASC' },
                 { property: 'pageNum', direction: 'ASC' },
+                { property: 'timecode', direction: 'ASC' },
                 { property: 'type', direction: 'DESC' },
                 { property: 'segmentId', direction: 'ASC' },
                 { property: 'y', direction: 'ASC' },
