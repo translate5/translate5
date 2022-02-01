@@ -2486,6 +2486,10 @@ A task was associated to you in the task-portal {portalLink}.<br />
     <source>TermPortal</source>
     <target>TermPortal</target>
 </trans-unit>
+<trans-unit id='VGVybS1Db2xsZWN0aW9uIGltIFRlcm1Qb3J0YWwgw7ZmZm5lbg=='>
+  <source>Term-Collection im TermPortal öffnen</source>
+  <target>Open term-collection in TermPortal</target>
+</trans-unit>
 <trans-unit id='U3VjaGU='><source>Suche</source><target>Search</target></trans-unit>
 <trans-unit id='RmlsdGVy'>
     <source>Filter</source>
