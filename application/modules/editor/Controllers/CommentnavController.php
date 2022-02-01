@@ -74,12 +74,11 @@ class Editor_CommentnavController extends ZfExtended_RestController {
         $session = new Zend_Session_Namespace();
         $commentEntity = ZfExtended_Factory::get('editor_Models_Comment');
         /* @var $commentEntity editor_Models_Comment */
-        $comments = $commentEntity->loadByTaskPlainWithPage($session->taskGuid);
+        $comments = $commentEntity->loadByTaskPlain($session->taskGuid);
         foreach ($comments as &$row) {
             $row['comment'] = htmlspecialchars($row['comment']);
             $row['type'] = $commentEntity::FRONTEND_ID;
             // the segment mappings segmentPage column  is a Hex-Value and does not qualify for sorting, therefore we add a parsed decimal property
-            $row['pageNum'] = hexdec($row['page']);
             $this->getWfAnonymize()?->anonymizeUserdata($session->taskGuid, $row['userGuid'], $row);
         }
         return $comments;

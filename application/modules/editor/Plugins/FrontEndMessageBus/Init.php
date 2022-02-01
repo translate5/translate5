@@ -438,7 +438,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $entity = $event->getParam('entity');
         /* @var $entity editor_Models_Comment */
         $taskGuid = $entity->getTaskGuid();
-        $comments  = $entity->loadByTaskPlainWithPage($taskGuid, $entity->getId());
+        $comments  = $entity->loadByTaskPlain($taskGuid, $entity->getId());
         $comment = $comments[0];
         
         $task = ZfExtended_Factory::get('editor_Models_Task');

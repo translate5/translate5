@@ -134,19 +134,19 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    * does not provide isEditable info
    * @param string $taskGuid
    * @param string $cid (optional) - commentId if only one comment
-   * @return array|null
+   * @return array
    */
-  public function loadByTaskPlainWithPage(string $taskGuid, string $cid='') {
+  public function loadByTaskPlain(string $taskGuid, string $cid='') {
         $s = $this->db->select()
             ->distinct()
             ->setIntegrityCheck(false)
             ->from(['comments' => $this->db->info($this->db::NAME)])
             ->where('comments.taskGuid = ?', $taskGuid) // sort in frontend, see there
             ->joinLeft(
-                ['sm' => 'LEK_visualreview_segmentmapping'],
-                'comments.segmentId = sm.segmentId',
-                ['page' => 'segmentPage', 'reviewFileId', 'segmentNrInTask']
-            );
+                    ['segments' => 'LEK_segments'],
+                    'comments.segmentId = segments.id',
+                    ['segmentNrInTask' => 'segments.segmentNrInTask']
+                );
         if($cid) {
             $s->where('comments.id = ?', $cid);
             $row = $this->db->getAdapter()->fetchRow($s);
