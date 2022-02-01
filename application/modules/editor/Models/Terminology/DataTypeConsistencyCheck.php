@@ -301,7 +301,7 @@ protected array $referenceData = [
 from terms_attributes_datatype tad
 JOIN terms_attributes ta on tad.id = ta.dataTypeId and (tad.label != ta.elementName or tad.`type` != ta.`type`)
 group by tad.id, tad.label, tad.type, ta.collectionId, ta.elementName, ta.`type`');
-        return $q->fetchAll(Zend_Db::FETCH_OBJ);
+        return $q->fetchAll(Zend_Db::FETCH_ASSOC);
     }
 
     /**
