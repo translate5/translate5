@@ -37,7 +37,7 @@ Ext.define('Editor.view.admin.projectWizard.FileButton', {
       'Ext.form.field.FileButton',
     ],
     afterTpl: [
-        '<input id="{id}-fileInputEl" data-ref="fileInputEl" class="{childElCls} {inputCls}" ',
+        '<input title="" id="{id}-fileInputEl" data-ref="fileInputEl" class="{childElCls} {inputCls}" ',
         'type="file" size="1" name="{inputName}" unselectable="on" multiple ',
         '<tpl if="accept != null">accept="{accept}"</tpl>',
         '<tpl if="tabIndex != null">tabindex="{tabIndex}"</tpl>',

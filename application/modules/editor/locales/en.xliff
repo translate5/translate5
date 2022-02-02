@@ -4499,5 +4499,9 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Pivot-Datei</source>
     <target>pivot file</target>
 </trans-unit>
+<trans-unit id='RGF0ZWkoZW4pIGhpbnp1ZsO8Z2Vu'>
+    <source>Datei(en) hinzufügen</source>
+    <target>Add file(s)</target>
+</trans-unit>
   </file>
 </xliff>

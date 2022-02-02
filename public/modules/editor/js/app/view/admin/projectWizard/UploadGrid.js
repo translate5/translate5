@@ -68,7 +68,9 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         size:'#UT#Größe',
         errorColumnText:'#UT#Fehler',
         workFilesTypeText:'#UT#Arbeitsdatei',
-        pivotFilesTypeText:'#UT#Pivot-Datei'
+        pivotFilesTypeText:'#UT#Pivot-Datei',
+        addFilesDefaultTooltip: '#UT#Datei(en) hinzufügen',
+        fileMix:'#UT#Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!'
     },
 
     initConfig: function(instanceConfig) {
@@ -81,6 +83,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'wizardFileButton',
                     text: me.strings.workFilesFilesButton,
                     name:'workFilesFilesButton',
+                    tooltip:me.strings.fileMix,
                     bind: {
                         disabled: '{isZipUpload}'
                     },
@@ -91,6 +94,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'wizardFileButton',
                     text: me.strings.pivotFilesFilesButton,
                     name:'pivotFilesFilesButton',
+                    tooltip:me.strings.fileMix,
                     bind: {
                         disabled: '{isZipUpload}'
                     },
