@@ -42,7 +42,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         targetNotValid:'#UT#Ungültige Zielsprache ({0}).',
         sourceNotSame:'#UT#Die Ausgangssprache der Datei ({0}) stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.',
         pivotSourceNotSame:'#UT#Die Quellsprache in der Pivot-Datei ({0}) ist nicht dieselbe wie die aktuelle Quellsprache des Projekts ({1}).',
-        additionalRelaisNotSameTarget:'#UT#Die Pivot-Datei ({0}) hat eine andere Zielsprache ({1}) als erwartet ({2}).'
+        additionalRelaisNotSameTarget:'#UT#Die Pivot-Datei ({0}) hat eine andere Zielsprache ({1}) als erwartet ({2}).',
+        pivotNameNotSameAsWorkfile:'#UT#Keine Arbeitsdatei mit gleichem Dateinamen gefunden.'
     },
 
     onManualAdd: function(btn) {
@@ -122,10 +123,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         }
 
         Ext.Array.forEach(files, function(file) {
-            var source,
-                target,
-                readFile,
-                reader = new FileReader(),
+            var reader = new FileReader(),
                 rec = Ext.create('Editor.model.admin.projectWizard.File',{
                     file: file,
                     name: file.name,
@@ -135,10 +133,9 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                 });
 
             if(!Ext.Array.contains(Editor.data.import.validExtensions,rec.getExtension())){
-                var task = new Ext.util.DelayedTask(function(){
+                new Ext.util.DelayedTask(function(){
                     Ext.Msg.alert(me.getView().strings.errorColumnText, Ext.String.format(msg.extension, file.name, rec.getExtension()));
-                });
-                task.delay(100); // needs to be delayed because it is not shown when the error pops-up when drag and drop on "Add project" button
+                }).delay(100);// needs to be delayed because it is not shown when the error pops-up when drag and drop on "Add project" button
                 return true;
             }
 
@@ -153,21 +150,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             reader.readAsText(file);
 
             reader.onload = function (reader) {
-                readFile = reader.target.result;
-                source = readFile.match(/<file[^>]+source-language=["']([^"']+)["']/i);
-                source = source ? source[1] : null;
-                if(source) {
-                    // convert the rfc to id
-                    rec.set('sourceLang', Ext.StoreMgr.get('admin.Languages').getIdByRfc(source));
-                }
-                target = readFile.match(/<file[^>]+target-language=["']([^"']+)["']/i);
-                target = target ? target[1] : null;
-                if(target) {
-                    rec.set('targetLang', Ext.StoreMgr.get('admin.Languages').getIdByRfc(target));
-                }
-
                 // validate project langauges fields (source,target and pivot)
-                me.validateLanguages(rec, source, target);
+                me.validateFileLanguages(rec, reader.target.result);
 
                 // check if the current filename exist in the uploaded files.
                 me.handleDuplicateFileName(rec);
@@ -180,6 +164,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
                 store.addSorted(rec);
 
+                me.validatePivotFileName();
+
                 me.fireEvent('workfileAdded',rec);
             };
         });
@@ -189,42 +175,53 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
      * Validates and sets the language fields in the current file record
      *
      * @param rec
-     * @param fileSourceLang
-     * @param fileTargetLang
+     * @param fileContent
      */
-    validateLanguages:function (rec, fileSourceLang, fileTargetLang){
+    validateFileLanguages:function (rec, fileContent){
         var me = this,
             msg = me.errorMessages,
             languages = Ext.StoreMgr.get('admin.Languages'),
             isPivotType = rec.get('type') === Editor.model.admin.projectWizard.File.TYPE_PIVOT,
-            sl = rec.get('sourceLang'),
-            tl = rec.get('targetLang'),
+            fileSourceLang = fileContent.match(/<file[^>]+source-language=["']([^"']+)["']/i),
+            fileTargetLang = fileContent.match(/<file[^>]+target-language=["']([^"']+)["']/i),
             view = me.getView(),
             container = view.up('#taskSecondCardContainer'),
             sourceField = container.down('#sourceLangaugeTaskUploadWizard'),
             targetField = container.down('#targetLangaugeTaskUploadWizard'),
             relaisLang = container.down('#relaisLangaugeTaskUploadWizard'),
-            errorMsg = null,
-            isBilingual = !(Ext.isEmpty(sl) && Ext.isEmpty(tl));// no langauge detection in the file -> bilingual. The extension validation is done before.
+            errorMsg = null;
 
+        // evaluate the sourceLang from the file content
+        fileSourceLang = fileSourceLang ? fileSourceLang[1] : null;
+        if(fileSourceLang) {
+            // convert the rfc to id
+            rec.set('sourceLang', languages.getIdByRfc(fileSourceLang));
+        }
 
-        rec.set('bilingual',isBilingual);
+        // evaluate the targetLang from the file content
+        fileTargetLang = fileTargetLang ? fileTargetLang[1] : null;
+        if(fileTargetLang) {
+            rec.set('targetLang', languages.getIdByRfc(fileTargetLang));
+        }
+
+        // no langauge detection in the file -> bilingual. The extension validation is done before.
+        rec.set('bilingual',!(Ext.isEmpty(rec.get('sourceLang')) && Ext.isEmpty(rec.get('targetLang'))));
 
         // if the file is not bilingual(source and target are not detected) and
         // the dropped file is not a pivot file, this is file for okapi
-        if(!isBilingual && !isPivotType){
+        if(!rec.get('bilingual') && !isPivotType){
             // no language was detected but the uploaded extension is supported -> do not mark this record as error
             return;
         }
 
-        if(!isBilingual && isPivotType){
+        if(!rec.get('bilingual') && isPivotType){
             // for pivot language only bilingual files can be used
             errorMsg = msg.pivotNotBilingual;
-        }else if(Ext.isEmpty(sl)){
+        }else if(Ext.isEmpty(rec.get('sourceLang'))){
             errorMsg = Ext.String.format(msg.sourceNotValid,fileSourceLang);
-        }else if(Ext.isEmpty(tl)){
+        }else if(Ext.isEmpty(rec.get('targetLang'))){
             errorMsg = Ext.String.format(msg.targetNotValid,fileTargetLang);
-        }else if(!Ext.isEmpty(sourceField.getValue()) && sourceField.getValue() !== sl){
+        }else if(!Ext.isEmpty(sourceField.getValue()) && sourceField.getValue() !== rec.get('sourceLang')){
 
                 errorMsg = isPivotType ?
                     // if there is already source lang set, and the pivot file source lang is different, this is not allowed
@@ -233,7 +230,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                     :
                     // bilingual upload where the source language of the bilingual file is not the same as the one selected/set before
                     Ext.String.format(msg.sourceNotSame,fileSourceLang);
-        }else if(isPivotType && !Ext.isEmpty(relaisLang.getValue()) && tl !== relaisLang.getValue()){
+        }else if(isPivotType && !Ext.isEmpty(relaisLang.getValue()) && rec.get('targetLang') !== relaisLang.getValue()){
             // the relais language is set and the relais file target language is different
             errorMsg = Ext.String.format(msg.additionalRelaisNotSameTarget, rec.get('name'),fileTargetLang,languages.getRfcById(relaisLang.getValue()));
         }
@@ -246,16 +243,65 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
         if(!sourceField.readOnly && Ext.isEmpty(sourceField.getValue())){
             // convert the rfc value of the record to id
-            sourceField.setValue(sl);
+            sourceField.setValue(rec.get('sourceLang'));
             sourceField.setReadOnly(true);
         }
 
         if(isPivotType){
-            relaisLang.setValue(tl);
+            relaisLang.setValue(rec.get('targetLang'));
             return;
         }
-        targetField.addValue(tl);
+        targetField.addValue(rec.get('targetLang'));
 
+    },
+
+    /***
+     * Validate if for each uploaded pivot file, there is work-file with the same name. If no work-file with the same name is found,
+     * the pivot file will be marked as error
+     */
+    validatePivotFileName: function (){
+        var me = this,
+            store = me.getView().getStore(),
+            workFiles = store && store.queryBy(function (rec){
+                return rec.get('type') === Editor.model.admin.projectWizard.File.TYPE_WORKFILES;
+            }),
+            pivotFiles = store && store.queryBy(function (rec){
+                return rec.get('type') === Editor.model.admin.projectWizard.File.TYPE_PIVOT;
+            });
+
+        pivotFiles.each(function (pivot){
+            workFiles.each(function (file){
+                if(me.filesMatch(file.get('name'),pivot.get('name')) === false){
+                    pivot.set('error',me.errorMessages.pivotNameNotSameAsWorkfile);
+                    pivot.set('type','error');
+                }
+            });
+        });
+    },
+
+    /***
+     * Check if the workFile and the pivotFiles names are the same.
+     * If the workFile uses okapi parser, we add .xlf as additional extension, since this will be the final
+     * filename which will be matched for pivot patch
+     *
+     * @param workFile
+     * @param pivotFile
+     * @returns {*|boolean|boolean}
+     */
+    filesMatch: function(workFile,pivotFile){
+        if(workFile === pivotFile){
+            return true;
+        }
+        var ext = Editor.util.Util.getFileExtension(workFile),
+            supported = false;
+
+        // if the workFile has native parser and the files are not matched by name then those files have different name
+        if(Ext.Array.contains(Editor.data.import.nativeParserExtensions,ext)){
+            return false;
+        }
+        // if the extension is supported, this file will be processed by okapi
+        supported = Ext.Array.contains(Editor.data.import.validExtensions,ext);
+        return supported && (workFile+'.xlf' === pivotFile);
     },
 
     /***

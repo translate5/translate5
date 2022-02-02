@@ -301,6 +301,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
         $this->view->Php2JsVars()->set('import.validExtensions', $supportedFiles->getSupportedExtensions());
+        $this->view->Php2JsVars()->set('import.nativeParserExtensions', $supportedFiles->getNativeParserExtensions());
 
         $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float)$rop->editor->columns->widthFactorHeader);
         $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (int)$rop->editor->columns->widthOffsetEditable);
