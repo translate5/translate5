@@ -36,7 +36,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
     errorMessages:{
         extension:'#UT#Die Datei ({0}) mit der Erweiterung ({1}) wird nicht unterstützt.',
-        fileMix:'#UT#Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!',
         pivotNotBilingual:'#UT#Die Pivot-Datei ist nicht zweisprachig.',
         sourceNotValid:'#UT#Ungültige Ausgangssprache ({0}).',
         targetNotValid:'#UT#Ungültige Zielsprache ({0}).',
@@ -137,11 +136,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                     Ext.Msg.alert(me.getView().strings.errorColumnText, Ext.String.format(msg.extension, file.name, rec.getExtension()));
                 }).delay(100);// needs to be delayed because it is not shown when the error pops-up when drag and drop on "Add project" button
                 return true;
-            }
-
-            if(!me.isAllowed(store,rec)){
-                Ext.Msg.alert(me.getView().strings.errorColumnText, msg.fileMix);
-                return false;
             }
 
             //FIXME read file only if xlf or sdlxliff, or other xlf based formats at the end.
@@ -429,47 +423,32 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
      * @returns {*}
      */
     zipFileFilter:function (items) {
-        var files = Ext.Array.from(items),
+        var me = this,
+            filesStore = me.getView().getStore(),
+            existing = filesStore && filesStore.queryBy(function (rec){ return Editor.util.Util.getFileExtension(rec.get('name')) === 'zip';}),
+            files = Ext.Array.from(items),
             filtered = [];
+
         Ext.Array.forEach(Ext.Array.from(files), function (file) {
             if(Editor.util.Util.getFileExtension(file.name) === 'zip'){
                 filtered.push(file);
             }
         });
 
-        this.setIsZipUploadViewModel(filtered.length > 0);
+        // mixing of zips and non zip workfiles is not allowed.
+        if(existing.length > 0 || (filtered.length > 0 && filesStore.getCount() > 0)){
+            Ext.Msg.alert(me.getView().strings.errorColumnText, me.getView().strings.fileMix);
+            return [];
+        }
+
+        // this will disable the add files buttons when there is zip pachage in the current items drop
+        me.setIsZipUploadViewModel(filtered.length > 0);
 
         // if no zip files where found, return all files
         if(filtered.length === 0){
             return files;
         }
         return filtered.slice(0,1);
-    },
-
-    /***
-     * Check if a file is allowed to be uploaded.
-     * If in the uploaded files there is already zip file, no more uploads are allowed
-     * @param store
-     * @param record
-     * @returns {boolean}
-     */
-    isAllowed:function (store, record) {
-        var hasZip = false,
-            isZip = record.getExtension() === 'zip';
-
-        store.each(function (r){
-            if(r.getExtension() === 'zip'){
-                hasZip = true;
-                return false;
-            }
-        });
-
-        // if there is already zip uploaded file or if the upload is zip and
-        // there are other uploads, no other files are allowed
-        if(hasZip || (isZip && store.getCount() > 0)){
-            return false;
-        }
-        return true;
     },
 
     /***

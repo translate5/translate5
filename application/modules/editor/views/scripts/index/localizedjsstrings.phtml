@@ -41,7 +41,7 @@ Editor Translation Files
 */
 Ext.define('Editor.controller.Localizer', {
     extend : 'Ext.app.Controller',
-    
+
     statics: {
         pluginTranslationInit: {},
         addPluginInit: function(name, callback) {
@@ -108,17 +108,17 @@ Ext.define('Editor.controller.Localizer', {
     Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.
     Hier kann es aber zu unvorhergesehenen Fehlern kommen.
     Potentiell können auch manche Features komplett nicht funktionieren.';
-        
+
         //for translated strings without without line breaks:
         $disclaimer = str_replace("\n", '', $disclaimer);
-    
+
         $disclaimer = $this->translate->_($disclaimer);
         $disclaimer = sprintf($disclaimer, $app); //replacing application name placeholders
     ?>
-    
+
     Ext.app.Application.prototype.browserAdviceTextTitle = '<?php echo $this->translate->_('Nicht unterstützte Browser-Version');?>';
     Ext.app.Application.prototype.browserAdviceText = '<?php echo $disclaimer;?>';
-    
+
     Editor.view.QuickTip.prototype.strings = {
 		loading: '<?php echo $this->translate->_('Lade...');?>'
 	};
@@ -143,7 +143,7 @@ Ext.define('Editor.controller.Localizer', {
             leaveTaskWindowCancelBtn: '<?php echo $this->translate->_('Aufgabe später weiterbearbeiten');?>'
         }
     });
-  	
+
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
   	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansicht');?>';
   	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Zu Detailansicht zurücksetzen');?>';
@@ -165,7 +165,7 @@ Ext.define('Editor.controller.Localizer', {
     gridToolbar.item_themeMenuConfigText = '<?php echo $this->translate->_('Layout');?>';
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
-    
+
     Ext.define("Editor.locale.view.segments.column.Content", {
         override: "Editor.view.segments.column.Content",
         strings: {
@@ -173,13 +173,13 @@ Ext.define('Editor.controller.Localizer', {
             missingTarget: '<?php echo $this->translate->_('ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.segments.column.IsWatched", {
         override: "Editor.view.segments.column.IsWatched",
         text: '<?php echo $this->translate->_('Lesezeichen');?>',
         text_tip: '<?php echo $this->translate->_('mit Lesezeichen versehen');?>'
     });
-    
+
     Ext.define("Editor.locale.de.view.segments.column.IsRepeated", {
         override: "Editor.view.segments.column.IsRepeated",
         text: '<?php echo $this->translate->_('Mit Wiederholungen');?>',
@@ -199,7 +199,7 @@ Ext.define('Editor.controller.Localizer', {
             }
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.segments.column.MatchrateType", {
         override: "Editor.view.segments.column.MatchrateType",
         text: '<?php echo $this->translate->_('Matchrate Typ');?>',
@@ -246,7 +246,7 @@ Ext.define('Editor.controller.Localizer', {
             }
         }
     });
-  	
+
   	Editor.view.segments.column.Editable.prototype.text = '<?php echo $this->translate->_('Gesperrt');?>';
   	Editor.view.segments.column.AutoState.prototype.text = '<?php echo $this->translate->_('Bearbeitungsstatus');?>';
   	Editor.view.ui.segments.column.State.prototype.text = '<?php echo $this->translate->_('Status');?>';
@@ -270,7 +270,7 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.fileorder.ReferenceTree.prototype.title = '<?php echo $this->translate->_('Referenz-Dateien');?>';
 
   	Editor.view.preferences.Window.prototype.title = '<?php echo $this->translate->_('Einstellungen');?>';
-    
+
   	Editor.view.quality.FilterPanel.prototype.title = '<?php echo $this->translate->_('QS Statistik');?>';
   	Editor.view.quality.FilterPanel.prototype.strings = {
 		modeAll: '<?php echo $this->translate->_('Alle zeigen');?>',
@@ -326,7 +326,7 @@ Ext.define('Editor.controller.Localizer', {
         faultyTipText: '<?php echo $this->translate->_('Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern');?>',
         newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
 	};
-    
+
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_individual_boxLabel = '<?php echo $this->translate->_('Bei jeder Wiederholung einzeln entscheiden');?>';
@@ -357,14 +357,14 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_whitespaceButtonGroup= '<?php echo $this->translate->_('Sonderzeichen hinzufügen:');?>';
-   
+
    Ext.define("Editor.locale.de.view.segments.MetaPanel", {
         override: "Editor.view.segments.MetaPanel",
         strings: {
             title: '<?php echo $this->translate->_('Segment-Metadaten');?>',
         }
     });
-    
+
     Ext.define("Editor.locale.de.controller.Editor", {
         override: "Editor.controller.Editor",
         messages: {
@@ -400,7 +400,7 @@ Ext.define('Editor.controller.Localizer', {
             cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.controller.JsLogger", {
         override: "Editor.controller.JsLogger",
         strings: {
@@ -426,7 +426,7 @@ Ext.define('Editor.controller.Localizer', {
       		siblingSegments: '<?php echo $this->translate->_('Seg.: {siblings}');?>'
         }
     });
-    
+
 
     Editor.view.segments.RowEditor.prototype.messages = {
         segmentNotSavedUserMessage: '<?php echo $this->translate->_('Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/>');?>',
@@ -465,7 +465,7 @@ Ext.define('Editor.controller.Localizer', {
         alikesFailure: '<?php echo $this->translate->_('Die Wiederholungen konnten nicht gespeichert werden');?>',
         alikesNotAllSaved: '<?php echo $this->translate->_('Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.');?>'
     };
-    
+
   	Ext.grid.column.Boolean.prototype.falseText = '<?php echo $no;?>';
   	Ext.grid.column.Boolean.prototype.trueText = '<?php echo $yes;?>';
 
@@ -502,7 +502,7 @@ Ext.define('Editor.controller.Localizer', {
         delete_confirm_title: '<?php echo $this->translate->_('Löschen des Kommentars bestätigen');?>',
         delete_confirm_msg: '<?php echo $this->translate->_('Soll der Kommentar wirklich gelöscht werden?');?>'
     });
-    
+
     Ext.define("Editor.locale.de.controller.admin.TaskUserAssoc", {
         override: "Editor.controller.admin.TaskUserAssoc",
         messages: {
@@ -551,7 +551,7 @@ Ext.define('Editor.controller.Localizer', {
             "editorDeleteTask":       {title: "<?php echo $this->translate->_('Aufgabe "{0}" komplett löschen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.TaskGrid", {
         override: "Editor.view.admin.TaskGrid",
         title: '<?php echo $this->translate->_('Aufgaben');?>',
@@ -636,7 +636,7 @@ Ext.define('Editor.controller.Localizer', {
             deadlineDate:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.task.KpiWindow", {
         override: "Editor.view.admin.task.KpiWindow",
         title: '<?php echo $this->translate->_('Key Performance Indicators');?>',
@@ -647,12 +647,12 @@ Ext.define('Editor.controller.Localizer', {
             filterInfoLabel: '<?php echo $this->translate->_('Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.task.LogWindow", {
         override: "Editor.view.admin.task.LogWindow",
         title: '<?php echo $this->translate->_('Ereignisse zu Aufgabe "{0}"');?>'
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.log.Window", {
         override: "Editor.view.admin.log.Window",
         strings: {
@@ -661,20 +661,20 @@ Ext.define('Editor.controller.Localizer', {
             btnBack: '<?php echo $this->translate->_('Zurück zu den Ereignissen');?>'
     	}
     });
-    
-    
+
+
     Ext.define("Editor.locale.de.view.LanguageResources.log.LogWindow", {
         override: "Editor.view.LanguageResources.log.LogWindow",
         title: '<?php echo $this->translate->_('Ereignisse zu Sprachressource "{0}"');?>'
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.task.filter.AdvancedFilter", {
         override: "Editor.view.admin.task.filter.AdvancedFilter",
         strings:{
         	filterHolderLabel: '<?php echo $this->translate->_('Gesetzte Filter');?>',
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.task.filter.FilterWindow", {
         override: "Editor.view.admin.task.filter.FilterWindow",
         strings:{
@@ -691,8 +691,8 @@ Ext.define('Editor.controller.Localizer', {
             deadlineDateText:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>'
         }
     });
-    
-    
+
+
     Ext.define("Editor.locale.de.view.help.HelpWindow", {
         override: "Editor.view.help.HelpWindow",
         strings:{
@@ -749,7 +749,7 @@ Ext.define('Editor.controller.Localizer', {
             edit100PercentMatchDisabledMessage: '<?php echo $this->translate->_('Wenn deaktiviert werden gesperrte 100%-Matches nicht mehr in die Analyse und Wortanzahl einbezogen.');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.TaskAddWindow", {
         override: "Editor.view.admin.TaskAddWindow",
         title: '<?php echo $this->translate->_('Projekt erstellen');?>',
@@ -810,7 +810,8 @@ Ext.define('Editor.controller.Localizer', {
             size: '<?php echo $this->translate->_('Größe');?>',
             errorColumnText: '<?php echo $this->translate->_('Fehler');?>',
             workFilesTypeText: '<?php echo $this->translate->_('Arbeitsdatei');?>',
-            pivotFilesTypeText: '<?php echo $this->translate->_('Pivot-Datei');?>'
+            pivotFilesTypeText: '<?php echo $this->translate->_('Pivot-Datei');?>',
+            fileMix: '<?php echo $this->translate->_('Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!');?>'
         }
     });
 
@@ -818,7 +819,6 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.projectWizard.UploadGridViewController",
         errorMessages: {
             extension: '<?php echo $this->translate->_('Die Datei ({0}) mit der Erweiterung ({1}) wird nicht unterstützt.');?>',
-            fileMix: '<?php echo $this->translate->_('Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!');?>',
             pivotNotBilingual:'<?php echo $this->translate->_('Die Pivot-Datei ist nicht zweisprachig.');?>',
             sourceNotValid:'<?php echo $this->translate->_('Ungültige Ausgangssprache ({0}).');?>',
             targetNotValid:'<?php echo $this->translate->_('Ungültige Zielsprache ({0}).');?>',
@@ -839,7 +839,7 @@ Ext.define('Editor.controller.Localizer', {
             actionEdit: '<?php echo $this->translate->_('Aufgabe bearbeiten');?>'
         }
     });
-    
+
   	Ext.define("Editor.locale.de.view.project.ProjectPanel", {
         override: "Editor.view.project.ProjectPanel",
         title:'<?php echo $this->translate->_('Projekte');?>',
@@ -847,7 +847,7 @@ Ext.define('Editor.controller.Localizer', {
         	projectTasksTitle:'<?php echo $this->translate->_('Aufgaben für das Projekt: {projectSelection.taskName}');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.project.ProjectPanelViewController", {
         override: "Editor.view.project.ProjectPanelViewController",
         strings:{
@@ -856,7 +856,7 @@ Ext.define('Editor.controller.Localizer', {
         	noProjectInFilter:'<?php echo $this->translate->_('Projekt im aktuellen Filter nicht gefunden');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.project.ProjectGrid", {
         override: "Editor.view.project.ProjectGrid",
         strings: {
@@ -879,7 +879,7 @@ Ext.define('Editor.controller.Localizer', {
             pmGuid: '<?php echo $this->translate->_('Projektmanager');?>'
         }
     });
-    
+
      Ext.define("Editor.locale.de.view.project.ProjectGridViewController", {
         override: "Editor.view.project.ProjectGridViewController",
         strings: {
@@ -890,8 +890,8 @@ Ext.define('Editor.controller.Localizer', {
             projectRemovedMessage: '<?php echo $this->translate->_('Das Projekt "{0}" wurde erfolgreich entfernt!');?>'
         }
     });
-    
-    
+
+
     Ext.define("Editor.locale.de.view.admin.ExportMenu", {
         override: "Editor.view.admin.ExportMenu",
         messages: {
@@ -908,7 +908,7 @@ Ext.define('Editor.controller.Localizer', {
             faultyQualityAlertText: '<?php echo $this->translate->_('Es gibt in dieser Aufgabe interne Tag Fehler, die für einen fehlerfreien Export automatisch korrigiert wurden');?>',
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.task.menu.TaskActionMenu", {
         override: "Editor.view.admin.task.menu.TaskActionMenu",
         messages: {
@@ -935,8 +935,8 @@ Ext.define('Editor.controller.Localizer', {
             cancelImportText: '<?php echo $this->translate->_('Import abbrechen');?>'
         }
     });
-    
-    
+
+
     Ext.define("Editor.locale.de.view.project.ProjectActionMenu", {
         override: "Editor.view.project.ProjectActionMenu",
         messages: {
@@ -944,7 +944,7 @@ Ext.define('Editor.controller.Localizer', {
             actionReloadProject: '<?php echo $this->translate->_('Projekt aktualisieren');?>',
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.task.ExcelReimportWindow", {
         override: "Editor.view.admin.task.ExcelReimportWindow",
         title: '<?php echo $this->translate->_('Excel reimportieren');?>',
@@ -958,7 +958,7 @@ Ext.define('Editor.controller.Localizer', {
             loadingWindowMessage: '<?php echo $this->translate->_('Datei wird hochgeladen');?>',
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.task.PreferencesWindow", {
         override: "Editor.view.admin.task.PreferencesWindow",
         strings: {
@@ -967,7 +967,7 @@ Ext.define('Editor.controller.Localizer', {
             config: '<?php echo $this->translate->_('Standardkonfiguration Kunde überschreiben');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.config.Grid", {
         override: "Editor.view.admin.config.Grid",
         strings: {
@@ -997,14 +997,14 @@ Ext.define('Editor.controller.Localizer', {
             }
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.config.ConfigWizard", {
         override: "Editor.view.admin.config.ConfigWizard",
         strings: {
             wizardTitle:'<?php echo $this->translate->_('Konfiguration');?>',
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.config.Editor", {
         override: "Editor.view.admin.config.Editor",
         title: "<?php echo $this->translate->_('Konfiguration bearbeiten');?>",
@@ -1015,7 +1015,7 @@ Ext.define('Editor.controller.Localizer', {
             value: '<?php echo $this->translate->_('Value');?>',
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.log.Grid", {
         override: "Editor.view.admin.log.Grid",
         strings: {
@@ -1037,7 +1037,7 @@ Ext.define('Editor.controller.Localizer', {
             eventCodeInfoText: '<?php echo $this->translate->_('Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.task.UserAssoc", {
         override: "Editor.view.admin.task.UserAssoc",
         title: '<?php echo $this->translate->_('Benutzer-Plural');?>',
@@ -1132,11 +1132,11 @@ Ext.define('Editor.controller.Localizer', {
             fieldWorkflow: '<?php echo $this->translate->_('Workflow');?>'
         }
     });
-    
+
     Ext.ux.DateTimePicker.prototype.todayText = '<?php echo $this->translate->_('Aktuelles Datum');?>';
     Ext.ux.DateTimePicker.prototype.hourText = '<?php echo $this->translate->_('Stunde');?>';
     Ext.ux.DateTimePicker.prototype.minuteText = '<?php echo $this->translate->_('Minuten');?>';
-    
+
     Ext.define("Editor.view.admin.task.UserAssocViewModel", {
         override: "Editor.view.admin.task.UserAssocViewModel",
         strings: {
@@ -1211,7 +1211,7 @@ Ext.define('Editor.controller.Localizer', {
             cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.util.TaskActions", {
         override: "Editor.util.TaskActions",
         strings: {
@@ -1229,7 +1229,7 @@ Ext.define('Editor.controller.Localizer', {
             saveSegmentFirst: '<?php echo $this->translate->_('Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.util.LanguageResources", {
         override: "Editor.util.LanguageResources",
         strings: {
@@ -1248,7 +1248,7 @@ Ext.define('Editor.controller.Localizer', {
             confirmBtn: '<?php echo $this->translate->_('bestätigen');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.ReferenceFilesInfoMessage", {
         override: "Editor.view.ReferenceFilesInfoMessage",
         strings: {
@@ -1257,8 +1257,8 @@ Ext.define('Editor.controller.Localizer', {
             buttonText: '<?php echo $this->translate->_('Liste öffnen');?>',
         }
     });
-    
-    
+
+
     Ext.define("Editor.locale.de.controller.SearchReplace", {
         override: "Editor.controller.SearchReplace",
         strings: {
@@ -1276,15 +1276,15 @@ Ext.define('Editor.controller.Localizer', {
             searchReplaceToolbarBtn: '<?php echo $this->translate->_('Suche');?>'
         }
     });
-    
-    
+
+
     Ext.define("Editor.locale.de.controller.Termportal", {
         override: "Editor.controller.Termportal",
         strings: {
             termPortal: '<?php echo $this->translate->_('TermPortal');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.searchandreplace.SearchReplaceWindow", {
         override: "Editor.view.searchandreplace.SearchReplaceWindow",
         strings: {
@@ -1292,7 +1292,7 @@ Ext.define('Editor.controller.Localizer', {
             helpButtonTooltip: '<?php echo $this->translate->_('Info zum Suchen und Ersetzen');?>',
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.searchandreplace.SearchTab", {
         override: "Editor.view.searchandreplace.SearchTab",
         strings: {
@@ -1311,7 +1311,7 @@ Ext.define('Editor.controller.Localizer', {
             searchInLockedSegments: '<?php echo $this->translate->_('Suche in gesperrten Segmenten');?>'
         }
     });
-    
+
 	Ext.define("Editor.locale.de.view.searchandreplace.TabPanel", {
         override: "Editor.view.searchandreplace.TabPanel",
         strings: {
@@ -1325,7 +1325,7 @@ Ext.define('Editor.controller.Localizer', {
             multiUsersTooltip: '<?php echo $this->translate->_('Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.ToolTip", {
         override: "Editor.view.ToolTip",
         messages: {
@@ -1336,7 +1336,7 @@ Ext.define('Editor.controller.Localizer', {
             severity: '<?php echo $this->translate->_('Gewichtung');?>'
         }
     });
-    
+
      Ext.define("Editor.locale.view.ApplicationInfoPanel", {
         override: "Editor.view.ApplicationInfoPanel",
         strings: {
@@ -1346,7 +1346,7 @@ Ext.define('Editor.controller.Localizer', {
             readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.help.HelpButton", {
         override: "Editor.view.help.HelpButton",
         text: '<?php echo $this->translate->_('Hilfe');?>'
@@ -1372,7 +1372,7 @@ Ext.define('Editor.controller.Localizer', {
             pwSave: '<?php echo $this->translate->_('Passwort erfolgreich gespeichert!');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.admin.preferences.User", {
         override: "Editor.view.admin.preferences.User",
         title: '<?php echo $this->translate->_('Meine Einstellungen');?>',
@@ -1387,7 +1387,7 @@ Ext.define('Editor.controller.Localizer', {
             changeUiLangaugeLabelText: '<?php echo $this->translate->_('Sprache ändern');?>',
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.user.GridViewController", {
         override: "Editor.view.admin.user.GridViewController",
         strings: {
@@ -1425,7 +1425,7 @@ Ext.define('Editor.controller.Localizer', {
             localeTooltip: '<?php echo $this->translate->_('Benutzersprache');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.user.AddWindowViewController", {
         override: "Editor.view.admin.user.AddWindowViewController",
         strings: {
@@ -1433,7 +1433,7 @@ Ext.define('Editor.controller.Localizer', {
             userAdded: '<?php echo $this->translate->_('Der Benutzer "{0}" wurde erfolgreich erstellt.');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.de.view.admin.user.AddWindow", {
         override: "Editor.view.admin.user.AddWindow",
         title: '<?php echo $this->translate->_('Benutzer erstellen');?>',
@@ -1493,7 +1493,7 @@ Ext.define('Editor.controller.Localizer', {
         vis_hide: '<?php echo $this->translate->_('ausblenden');?>',
         vis_disable: '<?php echo $this->translate->_('nicht vorhanden');?>'
     };
-    
+
     Editor.view.admin.task.UserPrefsForm.prototype.title_edit = '<?php echo $this->translate->_('Bearbeite Eintrag: "{0} - {1}"');?>';
     Editor.view.admin.task.UserPrefsForm.prototype.title_add = '<?php echo $this->translate->_('Eintrag erstellen');?>';
     Editor.view.admin.task.UserPrefsForm.prototype.strings = {
@@ -1510,11 +1510,11 @@ Ext.define('Editor.controller.Localizer', {
         visDisabled: '<?php echo $this->translate->_('nicht vorhanden');?>',
         forAll: '<?php echo $this->translate->_('für alle');?>'
     };
-    
+
     Editor.view.admin.task.Preferences.prototype.title = '<?php echo $this->translate->_('Benutzer-Spezialeinstellungen');?>';
     Editor.view.admin.task.Preferences.prototype.workflow_label = '<?php echo $this->translate->_('Workflow');?>';
     Editor.view.admin.task.Preferences.prototype.editInfo = '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>';
-    
+
     Editor.controller.admin.TaskPreferences.prototype.strings = {
       taskWorkflowSaved: '<?php echo $this->translate->_('Änderung des Workflows der Aufgabe gespeichert!');?>',
       entrySaved: '<?php echo $this->translate->_('Eintrag gespeichert');?>',
@@ -1601,7 +1601,7 @@ Ext.define('Editor.controller.Localizer', {
     	override: "Editor.view.admin.customer.TagField",
         fieldLabel:'<?php echo $this->translate->_("Endkunde");?>'
     });
-    
+
     Ext.define("Editor.locale.controller.LanguageResources", {
         override: "Editor.controller.LanguageResources",
         strings: {
@@ -1643,7 +1643,7 @@ Ext.define('Editor.controller.Localizer', {
             panelTitle:'<?php echo $this->translate->_('Matches und Konkordanz-Suche');?>',
         }
     });
-    
+
     Ext.define("Editor.locale.view.LanguageResources.MatchGrid", {
         override: "Editor.view.LanguageResources.MatchGrid",
         strings: {
@@ -1657,7 +1657,7 @@ Ext.define('Editor.controller.Localizer', {
             createdTooltipMsg: '<?php echo $this->translate->_('erstellt:');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.view.LanguageResources.SearchGrid", {
         override: "Editor.view.LanguageResources.SearchGrid",
         strings: {
@@ -1672,7 +1672,7 @@ Ext.define('Editor.controller.Localizer', {
             singleSearch:'<?php echo $this->translate->_('Suche in {0}');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.view.LanguageResources.ProposalExport", {
         override: "Editor.view.LanguageResources.ProposalExport",
         strings: {
@@ -1700,7 +1700,7 @@ Ext.define('Editor.controller.Localizer', {
             assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.view.LanguageResources.TaskAssocPanel", {
         override: "Editor.view.LanguageResources.TaskAssocPanel",
         title: '<?php echo $this->translate->_('Sprachressourcen');?>',
@@ -1736,7 +1736,7 @@ Ext.define('Editor.controller.Localizer', {
             mergeTermsWarnMessage: '<?php echo $this->translate->_('Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.view.LanguageResources.AddTmWindow", {
         override: "Editor.view.LanguageResources.AddTmWindow",
         strings: {
@@ -1761,14 +1761,14 @@ Ext.define('Editor.controller.Localizer', {
             collectionUploadTooltip: '<?php echo $this->translate->_('Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.');?>'
         }
     });
-    
+
     Ext.define("Editor.view.LanguageResources.TmWindowViewController", {
         override: "Editor.view.LanguageResources.TmWindowViewController",
         messages: {
             notConfigured: '<?php echo $this->translate->_('Die Sprachressource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.view.LanguageResources.EditTmWindow", {
         override: "Editor.view.LanguageResources.EditTmWindow",
         strings: {
@@ -1793,7 +1793,7 @@ Ext.define('Editor.controller.Localizer', {
             writeAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden');?>',
         }
     });
-    
+
     Ext.define("Editor.locale.view.LanguageResources.TmOverviewPanel", {
         override: "Editor.view.LanguageResources.TmOverviewPanel",
         title: '<?php echo $this->translate->_('Sprachressourcen');?>',
@@ -1853,14 +1853,14 @@ Ext.define('Editor.controller.Localizer', {
         exportTooltip: '<?php echo $this->translate->_('Exportieren');?>',
         log: '<?php echo $this->translate->_('Log');?>'
     });
-    
+
     Ext.define("Editor.locale.view.LanguageResources.services.OpenTM2", {
         override: "Editor.view.LanguageResources.services.OpenTM2",
         addTooltip: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen');?>',
         download: '<?php echo $this->translate->_('Dateibasiertes TM herunterladen und lokal speichern');?>'
     });
 
-    
+
     Ext.define("Editor.locale.view.LanguageResources.ImportTmWindow", {
         override: "Editor.view.LanguageResources.ImportTmWindow",
         title: '<?php echo $this->translate->_('Sprachressourcen');?>',
@@ -1894,7 +1894,7 @@ Ext.define('Editor.controller.Localizer', {
             collectionUploadTooltip: '<?php echo $this->translate->_('Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.');?>'
         }
     });
-    
+
     Ext.define("Editor.locale.view.LanguageResources.TaskGridWindow", {
         override: "Editor.view.LanguageResources.TaskGridWindow",
         strings: {
@@ -1913,7 +1913,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.MaintenancePanel",
         maintenanceMessage: '<?php echo $this->translate->_("<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Die Anwendung wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>");?>'
     });
-    
+
     Ext.define("Editor.locale.view.LanguageCombo", {
         override: "Editor.view.LanguageCombo",
         strings: {
