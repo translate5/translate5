@@ -44,9 +44,9 @@ class editor_Models_Export_Terminology_Xlsx {
     public $cols = [
         'main' => [
             'cols' => [
-                'termEntryId' => 'Term Entry ID',
+                'termEntryTbxId' => 'Term Entry TBX ID',
                 'language' => 'Language',
-                'termId' => 'Term ID',
+                'termTbxId' => 'Term TBX ID',
                 'term' => 'Term',
                 'processStatus' => 'processStatus',
             ],
@@ -344,9 +344,9 @@ class editor_Models_Export_Terminology_Xlsx {
 
                 // Prepare data
                 $data = [
-                    'termEntryId' => $termEntry['id'],
+                    'termEntryTbxId' => $termEntry['termEntryTbxId'],
                     'language' => $lang,
-                    'termId' => $term['id'],
+                    'termTbxId' => $term['termTbxId'],
                     'term' => $term['term'],
                     'processStatus' => $term['processStatus'],
                 ];
