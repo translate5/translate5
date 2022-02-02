@@ -727,10 +727,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             $attrWHERE = ['`dataTypeId` = :dataTypeId'];
 
             // Setup WHERE clauses for entry-, language- and term- level attributes
-            $attrWHERE []= '((' . implode(') OR (', [
-                'ISNULL(`language`) AND ISNULL(`termId`)', // entry-level
-                '`language` IN ("' . implode('","', $codeA) . '")', // both language- and term- levels
-            ]) . '))';
+            $attrWHERE[] = '(ISNULL(`language`) OR `language` IN ("' . implode('","', $codeA) . '"))';
 
             // If filter value is given
             if ($aValue) {
@@ -743,20 +740,29 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             }
 
             // Mind previous query results to apply intersection
-            if (isset($termEntryIds)) {
-                $attrWHERE []= '`termEntryId` IN (' . $termEntryIds . ')';
+            if ($matched ?? 0) {
+                $or = [];
+                if ($matched['termEntryId'] ?? 0) {
+                    $or []= '`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
+                }
+                if ($matched['termId'] ?? 0) {
+                    $or []= '`termId` IN (' . join(',', $matched['termId']) . ')';
+                }
+                $attrWHERE []= '(' . join(' OR ', $or) . ')';
             }
 
-            // Get termEntryIds of matched attributes
-            $termEntryIds = implode(',', $this->db->getAdapter()->query('
-                SELECT DISTINCT `termEntryId` 
+            // Get termEntryIds and/or termIds of matched attributes
+            $matched = $this->db->getAdapter()->query('
+                SELECT DISTINCT 
+                  IF(`termId`, "termId", "termEntryId") AS `prop`, 
+                  IF(`termId`, `termId`, `termEntryId`) AS `value`
                 FROM `terms_attributes` 
                 WHERE ' . implode(' AND ', $attrWHERE),
                 $bind
-            )->fetchAll(PDO::FETCH_COLUMN));
+            )->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
 
             // If nothing found
-            if (!$termEntryIds) {
+            if (!$matched) {
 
                 // Setup &$total variable by reference, as 0
                 $total = 0;
@@ -806,7 +812,16 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         // Mind attr-filters in WHERE clause
-        if (isset($termEntryIds)) array_unshift($where, '`t`.`termEntryId` IN (' . $termEntryIds . ')');
+        if ($matched ?? 0) {
+            $or = [];
+            if ($matched['termEntryId'] ?? 0) {
+                $or []= '`t`.`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
+            }
+            if ($matched['termId'] ?? 0) {
+                $or []= '`t`.`id` IN (' . join(',', $matched['termId']) . ')';
+            }
+            array_unshift($where, '(' . join(' OR ', $or) . ')');
+        }
 
         // If 'noTermDefinedFor' param is given
         if ($_ = (int) $params['noTermDefinedFor']) {
