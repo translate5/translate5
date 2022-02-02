@@ -27,12 +27,25 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use editor_Models_Task;
+use editor_Models_TaskUserAssoc;
+use editor_Plugins_FrontEndMessageBus_Bus;
+use editor_Plugins_FrontEndMessageBus_Init;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
+use Zend_Db_Statement_Exception;
+use Zend_Registry;
+use ZfExtended_Factory;
+use ZfExtended_Models_Db_ErrorLog;
+use ZfExtended_Models_SystemRequirement_Result;
+use ZfExtended_Models_SystemRequirement_Validator;
+use ZfExtended_Models_Worker;
+use ZfExtended_Plugin_Manager;
 
 
 class StatusCommand extends Translate5AbstractCommand
@@ -88,15 +101,15 @@ class StatusCommand extends Translate5AbstractCommand
     }
 
     protected function messageBus(): string {
-        $pluginmanager = \Zend_Registry::get('PluginManager');
-        /* @var $pluginmanager \ZfExtended_Plugin_Manager */
+        $pluginmanager = Zend_Registry::get('PluginManager');
+        /* @var $pluginmanager ZfExtended_Plugin_Manager */
         if(! $pluginmanager->isActive('FrontEndMessageBus')) {
             return '<fg=red;options=bold>Plugin FrontEndMessageBus NOT ACTIVE</>';
         }
-        /* @var $bus \editor_Plugins_FrontEndMessageBus_Bus */
-        $bus = \ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Bus', [\editor_Plugins_FrontEndMessageBus_Init::CLIENT_VERSION]);
+        /* @var $bus editor_Plugins_FrontEndMessageBus_Bus */
+        $bus = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Bus', [editor_Plugins_FrontEndMessageBus_Init::CLIENT_VERSION]);
         $exception = null;
-        $bus->setExceptionHandler(function(\Throwable $e) use (&$exception){
+        $bus->setExceptionHandler(function(Throwable $e) use (&$exception){
             $exception = $e;
         });
         $count = count($bus->getConnectionSessions()?->instanceResult ?? []);
@@ -112,8 +125,8 @@ class StatusCommand extends Translate5AbstractCommand
      * Prints a table with tasks status information
      */
     protected function writeTaskAndJobs() {
-        /** @var \editor_Models_Task $task */
-        $task = \ZfExtended_Factory::get('editor_Models_Task');
+        /** @var editor_Models_Task $task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
         $summary = $task->getSummary();
         if(empty($summary)) {
             $this->io->info('No tasks available!');
@@ -121,8 +134,8 @@ class StatusCommand extends Translate5AbstractCommand
             $this->writeTable($summary);
         }
 
-        /** @var \editor_Models_TaskUserAssoc $job */
-        $job = \ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /** @var editor_Models_TaskUserAssoc $job */
+        $job = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         $summary = $job->getSummary();
 
         if(empty($summary)) {
@@ -133,8 +146,8 @@ class StatusCommand extends Translate5AbstractCommand
     }
 
     protected function workerSummary(): string {
-        $worker = \ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker \ZfExtended_Models_Worker */
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $worker ZfExtended_Models_Worker */
 
         $workerSummary = $worker->getSummary();
         $workerSumText = [
@@ -161,8 +174,8 @@ class StatusCommand extends Translate5AbstractCommand
     }
 
     protected function systemCheck(): string {
-        $validator = new \ZfExtended_Models_SystemRequirement_Validator(false);
-        /* @var $validator \ZfExtended_Models_SystemRequirement_Validator */
+        $validator = new ZfExtended_Models_SystemRequirement_Validator(false);
+        /* @var $validator ZfExtended_Models_SystemRequirement_Validator */
         $results = $validator->validate();
 
         $error =  0;
@@ -170,7 +183,7 @@ class StatusCommand extends Translate5AbstractCommand
         $ok =  0;
 
         foreach($results as $module => $oneResult) {
-            /* @var $validator \ZfExtended_Models_SystemRequirement_Result */
+            /* @var $validator ZfExtended_Models_SystemRequirement_Result */
             if($oneResult->hasError()) {
                 $error++;
             }
@@ -198,11 +211,11 @@ class StatusCommand extends Translate5AbstractCommand
     }
 
     /**
-     * @throws \Zend_Db_Statement_Exception
+     * @throws Zend_Db_Statement_Exception
      */
     protected function writeLastErrors()
     {
-        $log = new \ZfExtended_Models_Db_ErrorLog();
+        $log = new ZfExtended_Models_Db_ErrorLog();
         $foo = $log->getAdapter()->query('select id, created, duplicates, level, eventCode, message, domain from Zf_errorlog where level < 8 order by id desc limit 5;');
         foreach($foo->fetchAll() as $row) {
             $idBlock = '(# '.$row['id'];
