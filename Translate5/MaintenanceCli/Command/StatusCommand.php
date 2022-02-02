@@ -42,10 +42,12 @@ use Zend_Db_Statement_Exception;
 use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Models_Db_ErrorLog;
+use ZfExtended_Models_Installer_Downloader;
 use ZfExtended_Models_SystemRequirement_Result;
 use ZfExtended_Models_SystemRequirement_Validator;
 use ZfExtended_Models_Worker;
 use ZfExtended_Plugin_Manager;
+use ZfExtended_Utils;
 
 
 class StatusCommand extends Translate5AbstractCommand
@@ -84,20 +86,19 @@ class StatusCommand extends Translate5AbstractCommand
         $this->initTranslate5();
         $this->writeTitle('Translate5 status overview');
 
-        $this->writeSection('System Check', $this->systemCheck());
-        $this->writeSection('Worker', $this->workerSummary());
+        $this->writeSystemCheck();
+        $this->writeVersion();
+        $this->writeWorkerSummary();
         $this->writeSection('Connected Sessions', $this->messageBus());
-        $this->writeSection('Task/Jobs');
         $this->writeTaskAndJobs();
         $this->io->text('');
-        $this->writeSection('Last Log (Errors / Warnings)');
         $this->writeLastErrors();
 
         return 0;
     }
 
     protected function writeSection(string $title, string $data = '') {
-        $this->io->text(str_pad('<options=bold>'.OutputFormatter::escape($title).'</>', self::SECTION_LENGTH, ' ', STR_PAD_RIGHT).': '.OutputFormatter::escape($data));
+        $this->io->text(str_pad('<options=bold>'.OutputFormatter::escape($title).'</>', self::SECTION_LENGTH, ' ', STR_PAD_RIGHT).': '.$data);
     }
 
     protected function messageBus(): string {
@@ -127,25 +128,65 @@ class StatusCommand extends Translate5AbstractCommand
     protected function writeTaskAndJobs() {
         /** @var editor_Models_Task $task */
         $task = ZfExtended_Factory::get('editor_Models_Task');
-        $summary = $task->getSummary();
-        if(empty($summary)) {
-            $this->io->info('No tasks available!');
-        } else {
-            $this->writeTable($summary);
-        }
+        $taskSummary = $task->getSummary();
 
         /** @var editor_Models_TaskUserAssoc $job */
         $job = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        $summary = $job->getSummary();
+        $jobSummary = $job->getSummary();
 
-        if(empty($summary)) {
-            $this->io->info('No jobs available!');
-        } else {
-            $this->writeTable($summary);
+        $taskStateSums = [];
+        foreach($taskSummary as $oneTask) {
+            $taskStateSums[$oneTask['state']] += $oneTask['taskCount'];
         }
+        asort($taskStateSums);
+        $taskStateSums = array_reverse($taskStateSums,1);
+
+        $jobStateSums = [];
+        foreach($jobSummary as $oneJob) {
+            $jobStateSums[$oneJob['state']] += $oneJob['jobCount'];
+        }
+        asort($jobStateSums);
+        $jobStateSums = array_reverse($jobStateSums,1);
+
+
+        $taskResult = [];
+        foreach($taskStateSums as $id => $value) {
+            if($id == editor_Models_Task::STATE_ERROR) {
+                $taskResult[] = '<fg=red;options=bold>'.$id.': '.$value.'</>';
+            }
+            elseif(in_array($id, [editor_Models_Task::STATE_END, editor_Models_Task::STATE_OPEN, editor_Models_Task::STATE_UNCONFIRMED])) {
+                $taskResult[] = '<fg=green;options=bold>'.$id.': '.$value.'</>';
+            }
+            else {
+                $taskResult[] = '<fg=yellow;options=bold>'.$id.': '.$value.'</>';
+            }
+        }
+
+        $jobResult = [];
+        foreach($jobStateSums as $id => $value) {
+            $jobResult[] = $id.': <options=bold>'.$value.'</>';
+        }
+
+        $this->writeSection('Task', join(', ', $taskResult));
+        $this->writeSection('Jobs', join(', ', $jobResult));
+
+        //FIXME show that with --detail or so:
+        //
+//        if(empty($taskSummary)) {
+//            $this->io->info('No tasks available!');
+//        } else {
+//            $this->writeTable($taskSummary);
+//        }
+//
+//
+//        if(empty($jobSummary)) {
+//            $this->io->info('No jobs available!');
+//        } else {
+//            $this->writeTable($jobSummary);
+//        }
     }
 
-    protected function workerSummary(): string {
+    protected function writeWorkerSummary() {
         $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $worker ZfExtended_Models_Worker */
 
@@ -170,10 +211,10 @@ class StatusCommand extends Translate5AbstractCommand
             }
         }
 
-        return join(', ', $result);
+        $this->writeSection('Worker', join(', ', $result));
     }
 
-    protected function systemCheck(): string {
+    protected function writeSystemCheck() {
         $validator = new ZfExtended_Models_SystemRequirement_Validator(false);
         /* @var $validator ZfExtended_Models_SystemRequirement_Validator */
         $results = $validator->validate();
@@ -207,7 +248,7 @@ class StatusCommand extends Translate5AbstractCommand
             }
             $shortResult .= '</>, call translate5.sh system:check command';
         }
-        return $shortResult;
+        $this->writeSection('System Check', $shortResult);
     }
 
     /**
@@ -215,6 +256,7 @@ class StatusCommand extends Translate5AbstractCommand
      */
     protected function writeLastErrors()
     {
+        $this->writeSection('Last Log (Errors / Warnings)');
         $log = new ZfExtended_Models_Db_ErrorLog();
         $foo = $log->getAdapter()->query('select id, created, duplicates, level, eventCode, message, domain from Zf_errorlog where level < 8 order by id desc limit 5;');
         foreach($foo->fetchAll() as $row) {
@@ -227,6 +269,25 @@ class StatusCommand extends Translate5AbstractCommand
                 LogCommand::LEVELS[$row['level']].' <options=bold>'.$row['eventCode'].'</> '.$idBlock.
                 OutputFormatter::escape((string) $row['domain']).' → '.
                 OutputFormatter::escape((string)str_replace("\n", ' ', $row['message'])));
+        }
+    }
+
+    protected function writeVersion()
+    {
+        $downloader = ZfExtended_Factory::get('ZfExtended_Models_Installer_Downloader', [APPLICATION_PATH.'/..']);
+        /* @var $downloader ZfExtended_Models_Installer_Downloader */
+        try {
+            $isUptodate = $downloader->applicationIsUptodate();
+        } catch (\Exception $e) {
+            $isUptodate = false;
+        }
+        $version = ZfExtended_Utils::getAppVersion();
+        if($version == ZfExtended_Utils::VERSION_DEVELOPMENT) {
+            $this->writeSection('Version', '<fg=green;options=bold>development:</> '.exec('cd '.APPLICATION_PATH.'; git status -bs | head -1'));
+        }
+        else {
+            $color = $isUptodate ? 'green' : 'red';
+            $this->writeSection('Version', '<fg='.$color.';options=bold>'.$version.'</>');
         }
     }
 }
