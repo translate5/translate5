@@ -136,6 +136,7 @@ class StatusCommand extends Translate5AbstractCommand
 
         $taskStateSums = [];
         foreach($taskSummary as $oneTask) {
+            settype($taskStateSums[$oneTask['state']], 'integer');
             $taskStateSums[$oneTask['state']] += $oneTask['taskCount'];
         }
         asort($taskStateSums);
@@ -143,6 +144,7 @@ class StatusCommand extends Translate5AbstractCommand
 
         $jobStateSums = [];
         foreach($jobSummary as $oneJob) {
+            settype($jobStateSums[$oneJob['state']], 'integer');
             $jobStateSums[$oneJob['state']] += $oneJob['jobCount'];
         }
         asort($jobStateSums);
