@@ -742,8 +742,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             // Mind previous query results to apply intersection
             if ($matched ?? 0) {
                 $or = [];
-                if ($matched['termEntryId'] ?? 0) $or []= '`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
-                if ($matched['termId']      ?? 0) $or []=      '`termId` IN (' . join(',', $matched['termId']) . ')';
+                if ($matched['termEntryId'] ?? 0) {
+                    $or []= '`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
+                }
+                if ($matched['termId'] ?? 0) {
+                    $or []= '`termId` IN (' . join(',', $matched['termId']) . ')';
+                }
                 $attrWHERE []= '(' . join(' OR ', $or) . ')';
             }
 
@@ -810,8 +814,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Mind attr-filters in WHERE clause
         if ($matched ?? 0) {
             $or = [];
-            if ($matched['termEntryId'] ?? 0) $or []= '`t`.`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
-            if ($matched['termId']      ?? 0) $or []=          '`t`.`id` IN (' . join(',', $matched['termId']) . ')';
+            if ($matched['termEntryId'] ?? 0) {
+                $or []= '`t`.`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
+            }
+            if ($matched['termId'] ?? 0) {
+                $or []= '`t`.`id` IN (' . join(',', $matched['termId']) . ')';
+            }
             array_unshift($where, '(' . join(' OR ', $or) . ')');
         }
 
