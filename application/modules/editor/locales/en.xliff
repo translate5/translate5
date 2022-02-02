@@ -4487,5 +4487,17 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Datei löschen</source>
     <target>Remove file</target>
 </trans-unit>
+<trans-unit id='S2VpbmUgQXJiZWl0c2RhdGVpIG1pdCBnbGVpY2hlbSBEYXRlaW5hbWVuIGdlZnVuZGVuLg=='>
+  <source>Keine Arbeitsdatei mit gleichem Dateinamen gefunden.</source>
+  <target>No workfile with same filename found.</target>
+</trans-unit>
+<trans-unit id='QXJiZWl0c2RhdGVp'>
+  <source>Arbeitsdatei</source>
+  <target>work file</target>
+</trans-unit>
+<trans-unit id='UGl2b3QtRGF0ZWk='>
+    <source>Pivot-Datei</source>
+    <target>pivot file</target>
+</trans-unit>
   </file>
 </xliff>

@@ -163,6 +163,14 @@ class editor_Models_Import_SupportedFileTypes {
         }
         return self::$extensionsWithParser[$ext];
     }
+
+    /***
+     * Return all extensions of the supported native parsers
+     * @return string[]
+     */
+    public function getNativeParserExtensions(){
+        return array_keys(self::$extensionsWithParser);
+    }
     
     /**
      * returns true if file extension is supported natively by a fileparser (no pre conversion like Okapi is needed for that file).

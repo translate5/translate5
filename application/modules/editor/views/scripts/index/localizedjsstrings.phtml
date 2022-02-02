@@ -808,7 +808,9 @@ Ext.define('Editor.controller.Localizer', {
             file: '<?php echo $this->translate->_('Datei');?>',
             type: '<?php echo $this->translate->_('Typ');?>',
             size: '<?php echo $this->translate->_('Größe');?>',
-            errorColumnText: '<?php echo $this->translate->_('Fehler');?>'
+            errorColumnText: '<?php echo $this->translate->_('Fehler');?>',
+            workFilesTypeText: '<?php echo $this->translate->_('Arbeitsdatei');?>',
+            pivotFilesTypeText: '<?php echo $this->translate->_('Pivot-Datei');?>'
         }
     });
 
@@ -822,7 +824,8 @@ Ext.define('Editor.controller.Localizer', {
             targetNotValid:'<?php echo $this->translate->_('Ungültige Zielsprache ({0}).');?>',
             sourceNotSame:'<?php echo $this->translate->_('Die Ausgangssprache der Datei ({0}) stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.');?>',
             pivotSourceNotSame:'<?php echo $this->translate->_('Die Quellsprache in der Pivot-Datei ({0}) ist nicht dieselbe wie die aktuelle Quellsprache des Projekts ({1}).');?>',
-            additionalRelaisNotSameTarget:'<?php echo $this->translate->_('Die Pivot-Datei ({0}) hat eine andere Zielsprache ({1}) als erwartet ({2}).');?>'
+            additionalRelaisNotSameTarget:'<?php echo $this->translate->_('Die Pivot-Datei ({0}) hat eine andere Zielsprache ({1}) als erwartet ({2}).');?>',
+            pivotNameNotSameAsWorkfile:'<?php echo $this->translate->_('Keine Arbeitsdatei mit gleichem Dateinamen gefunden.');?>'
         }
     });
 
