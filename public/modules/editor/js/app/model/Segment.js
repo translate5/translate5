@@ -93,6 +93,7 @@ Ext.define('Editor.model.Segment', {
     proxy : {
         type : 'rest',
         url: Editor.data.restpath+'segment',
+        appendId: false, // then is loadable via Editor.model.Segment.load($id)
         reader : {
             rootProperty: 'rows',
             type : 'json'

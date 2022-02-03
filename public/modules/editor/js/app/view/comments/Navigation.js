@@ -77,7 +77,7 @@ Ext.define('Editor.view.comments.Navigation', {
         ],
         highlightRemark: function(remark){
             // TODO FIXME: these are mostly private methods ...
-            var node = this.getNodeByRecord(remark)
+            var node = this.getNodeByRecord(remark),
                 scroller = this.getScrollable();
             if(node && this.isVisible() && scroller && typeof scroller === 'object'){
                 scroller.doHighlight(node);

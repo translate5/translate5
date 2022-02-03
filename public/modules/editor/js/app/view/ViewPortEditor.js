@@ -105,6 +105,7 @@ Ext.define('Editor.view.ViewPortEditor', {
             region: 'center', // implicit flex:1
             height: 236, // 236 is high enough to show all action buttons on the right
             xtype: 'segments.grid',
+                id: 'segment-grid',
                 itemId: 'segmentgrid',
                 stateful: {
                     segmentSize: true,

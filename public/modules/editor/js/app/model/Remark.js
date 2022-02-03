@@ -71,8 +71,12 @@ END LICENSE AND COPYRIGHT
         }
       },
       {name: 'comment', type: 'string'},
-      {name: 'modified', type: 'string', dateFormat: Editor.DATE_ISO_FORMAT, mapping:'updated'},
       {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+      {name: 'modified',type: 'string',dateFormat: Editor.DATE_ISO_FORMAT,mapping: 'updated',convert: function(v,raw) {
+              if(!v) v=raw.data.updated||raw.data.created;
+              return v;
+          }
+      },
       {name: 'reviewFileId', type: 'integer'},
       {name: 'page', type: 'string',  default: '0' },
       {name: 'pageNum', type: 'int', convert: function(v, raw){
