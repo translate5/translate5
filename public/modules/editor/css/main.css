@@ -915,3 +915,9 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 #commentNavList>div.usernr7::before {background-color: var(--color-usernr7);}
 #commentNavList>div.usernr8::before {background-color: var(--color-usernr8);}
 #commentNavList>div.usernrX::before {background-color: var(--color-usernrX);}
+
+.invalidGridBorder{
+    border-color: #cf4c35;
+    border-style: solid;
+    border-width: thin;
+}

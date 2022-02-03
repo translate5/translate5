@@ -181,9 +181,14 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity->setWorkflowStepNr($this->entity->getWorkflowStepNr());
 
                 //a used repetition has always the 102% matchrate
-                $entity->setMatchRate(editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE);
+                if((bool) $task->getEmptyTargets()) {
+                    $entity->setMatchRate(editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE);
+                }
+                else {
+                    $entity->setMatchRate($this->entity->getMatchRate());
+                }
                 $entity->setMatchRateType($this->entity->getMatchRateType());
-                
+
                 $entity->setAutoStateId($states->calculateAlikeState($entity, $tua));
                 
                 
