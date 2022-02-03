@@ -63,15 +63,13 @@ Ext.define('Editor.view.comments.Navigation', {
                     'visualAnnotation': 'x-fa fa-map-marker',
                     'videoAnnotation': 'x-fa fa-video-camera',
                 },
-                // internal user tracking number cache used for assigning unique css annotation class(when anonymized users is active we need to augo generate one).
-                trackingUserNumberCache: [],
+                /**  @property trackingUserNumberCache:
+                 * Internal user tracking number cache used for assigning unique css annotation class(when anonymized users is active we need to augo generate one).
+                 * see store berforeload below for setup.
+                 */
+                 trackingUserNumberCache:{},
                 getUserColor: function(userGuid){
-                    var me = this;
-                    if(me.trackingUserNumberCache[userGuid] === undefined){
-                        var trackedUser = me.tracking.findRecord('userGuid',userGuid);
-                        me.trackingUserNumberCache[userGuid] = trackedUser === null ? 'X' : trackedUser.get('taskOpenerNumber');
-                    }
-                    return 'usernr'+me.trackingUserNumberCache[userGuid];
+                    return 'usernr' + (this.trackingUserNumberCache[userGuid] || 'X');
                 }
             }
         ],
@@ -99,8 +97,20 @@ Ext.define('Editor.view.comments.Navigation', {
     initComponent: function(){
         this.callParent(arguments);
         var dataview = this.down('dataview');
+        /* Initialize XTemplate with neccessary user mapping, unanonymize own user */
         dataview.getStore().addListener('beforeload', function(){
-            dataview.tpl.tracking = Editor.data.task.userTracking();
+            var userGuid = Editor.app.authenticatedUser.getUserGuid();
+            var cache = dataview.tpl.trackingUserNumberCache;
+            var tracking = Editor.data.task.userTracking();
+
+            tracking.each(function(rec) {
+                cache[rec.getId()]=rec.get('taskOpenerNumber');
+            });
+
+            var ownTrackinRecord = tracking.findRecord('userGuid',userGuid);
+            if(ownTrackinRecord){
+                cache[userGuid] = ownTrackinRecord.get('taskOpenerNumber');
+            }
         }, dataview.getStore(), { single:true });
     },
 

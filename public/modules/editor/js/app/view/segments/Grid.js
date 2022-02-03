@@ -82,17 +82,20 @@ Ext.define('Editor.view.segments.Grid', {
 
     /** @var Ext.data.Connection segInfoConn - Used for built in request management via autoAbort*/
     segInfoConn: new Ext.data.Connection({
-        autoAbort: true,
         defaultHeaders: {Accept: 'application/json'},
         id: 'segmentInfoConnection',
+        autoAbort: true,
         listeners: {
-            beforerequest: function(conn,{segmentNrInTask},eOpts) {
-                if(!segmentNrInTask) return false;
-                conn.setUrl(Editor.data.restpath+'segment/'+segmentNrInTask+'/position');
+            beforerequest: function(conn, {segmentNrInTask}, eOpts) {
+                if(segmentNrInTask > -1){
+                    conn.setUrl(Editor.data.restpath + 'segment/' + segmentNrInTask + '/position');
+                } else {
+                    return false;
+                }
             }
         }
     }),
-    onDestroy:function(){
+    onDestroy: function() {
         this.segInfoConn.abortAll(); // do not destroy, this is still the same in the next opened task
     },
 
