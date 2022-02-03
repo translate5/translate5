@@ -27,15 +27,15 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * This test class will create test task and pretranslate it with Moses MT and OpenTm2 TM
+ * This test class will create test task and pretranslate it with ZDemoMT and OpenTm2 TM
  * Then the export result from the logg will be compared against the expected result.
  */
 class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
     /* @var $this Translate1484Test */
     
     protected static $customerTest;
-    protected static $sourceLangRfc = 'de';
-    protected static $targetLangRfc = 'en';
+    protected static $sourceLangRfc = 'en';
+    protected static $targetLangRfc = 'de';
 
 
     
@@ -45,6 +45,7 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
         $appState = self::assertAppState();
         self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
         self::assertContains('editor_Plugins_MatchAnalysis_Init', $appState->pluginsLoaded, 'Plugin MatchAnalysis must be activated for this test case!');
+        self::assertContains('editor_Plugins_ZDemoMT_Init', $appState->pluginsLoaded, 'Plugin ZDemoMT must be activated for this test case!');
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
@@ -57,7 +58,7 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
         ]);
         
         $this->createTask();
-        $this->addMosesMt();
+        $this->addMt();
         $this->addOpenTm2Tm();
         $this->addTaskAssoc();
         $this->queueAnalysys();
@@ -102,11 +103,12 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId'=>self::$customerTest->id,
-            'autoStartImport'=>0
+            'customerId' => self::$customerTest->id,
+            'edit100PercentMatch' => false,
+            'autoStartImport' => 0
         ];
         self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('import-test-file.html'));
+        self::$api->addImportFile(self::$api->getFile('simple-en-de.xlf'));
         self::$api->import($task,false,false);
         error_log('Task created. '.self::$api->getTask()->taskName);
     }
@@ -115,19 +117,19 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
 
     
     /***
-     * Create moses mt resource.
+     * Create dummy mt
      */
-    protected function addMosesMt(){
+    protected function addMt(){
         $params=[
-            'resourceId'=>'editor_Services_Moses_1',
+            'resourceId'=>'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Services_Moses',
-            'serviceName'=> 'Moses',
-            'name' => 'API Testing::MosesMt_'.__CLASS__
+            'serviceType' => 'editor_Plugins_ZDemoMT',
+            'serviceName'=> 'ZDemoMT',
+            'name' => 'API Testing::ZDemoMT_'.__CLASS__
         ];
         
         self::$api->addResource($params);

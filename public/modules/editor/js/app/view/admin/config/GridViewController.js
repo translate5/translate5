@@ -65,11 +65,15 @@ Ext.define('Editor.view.admin.config.GridViewController', {
     },
 
     onCollapseAll: function() {
-        this.groupingFeature.collapseAll();
+        if(this.groupingFeature){
+            this.groupingFeature.collapseAll();
+        }
     },
 
     onExpandAll: function() {
-        this.groupingFeature.expandAll();
+        if(this.groupingFeature){
+            this.groupingFeature.expandAll();
+        }
     },
     
     onSaveClick: function(view, recIndex, cellIndex, item, e, record){

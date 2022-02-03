@@ -65,7 +65,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'CommentNavigation'             => true,
         'SearchReplace'                 => true,
         'SnapshotHistory'               => true,
-        'Termportal'                    => true,
+        'Termportal'                    => true, //FIXME should be moved into the termportal plugin
         'JsLogger'                      => true,
         'editor.CustomPanel'            => true,
         'admin.TaskOverview'            => ['taskOverviewFrontendController'], //controlled by ACL, enabling frontend rights given here
@@ -653,7 +653,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             'png' => 'image/png',
             'gif' => 'image/gif',
             'webp' => 'image/webp',
-            'svg' => 'image/svg',
+            'svg' => 'image/svg+xml',
             'woff' => 'application/woff',
             'woff2' => 'application/woff2',
             'ttf' => 'application/ttf',
