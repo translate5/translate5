@@ -94,10 +94,10 @@ class editor_Workflow_Anonymize {
      * @param string $currentUserGuid optional, if null use the current authenticated users guid
      * @return array
      */
-    public function anonymizeUserdata(string $taskGuid, string $userGuid, array &$data, string $currentUserGuid = null) {
+    public function anonymizeUserdata(string $taskGuid, string $userGuid, array &$data, string $currentUserGuid = null, bool $forced = false) {
         $this->taskGuid = $taskGuid;
         $this->userGuid = $userGuid;
-        if ($this->isCurrentUserOrPM($currentUserGuid ?? $this->sessionUserGuid)) {
+        if (!$forced && $this->isCurrentUserOrPM($currentUserGuid ?? $this->sessionUserGuid)) {
             return $data;
         }
         $keysToAnonymize = ['comments','email','firstName','lockingUser','lockingUsername','login','userGuid','userName','surName'];
