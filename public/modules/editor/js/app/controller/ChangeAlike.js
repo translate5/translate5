@@ -269,13 +269,13 @@ Ext.define('Editor.controller.ChangeAlike', {
 	  //when the target of the current segment is empty
 	  if(Editor.app.getUserConfig('alike.showOnEmptyTarget') && record.get('target') != ''){
 		  me.fireEvent('segmentUsageFinished', me);
-		  me.callbackToSaveChain();
+		  //no callback to save chain here, since we are still in the save chain!
 		  return;
 	  }
 	  
       if(me.isDisabled || me.isManualProcessingDisabled() || me.noAlikes()) {
           me.fireEvent('segmentUsageFinished', me);
-          me.callbackToSaveChain();
+          //no callback to save chain here, since we are still in the save chain! 
           return;
       }
       if(me.isAutoProcessing()) {
@@ -381,8 +381,8 @@ Ext.define('Editor.controller.ChangeAlike', {
           me.savePendingAlikes();
       }
       me.saveIsRunning = false;
-      //if no alikes are used, return to save chain
-      if(me.isManualProcessingDisabled()) {
+      //if no alikes are used or available, return to save chain
+      if(me.isDisabled || me.isManualProcessingDisabled() || me.noAlikes()) {
           return true;
       }
       //returning false prevents saveChain to end. Therefore the given finalCallback must be called after wards to proceed
