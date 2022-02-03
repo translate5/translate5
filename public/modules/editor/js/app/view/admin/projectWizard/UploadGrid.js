@@ -38,6 +38,11 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         'Editor.view.admin.projectWizard.FileButton',
         'Editor.model.admin.projectWizard.File'
     ],
+
+    mixins : {
+        field : 'Ext.form.field.Base'
+    },
+
     controller:'wizardUploadGrid',
     viewModel: {
         type: 'wizardUploadGrid'
@@ -158,17 +163,63 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         return me.callParent([ config ]);
     },
 
+
+    /***
+     * Custom isValid implementation for the upload grid. With this, the grid is part of the importWizard form validation, and
+     * if there are files with error, the form will not be submitted
+     * @returns {*|boolean}
+     */
+    isValid: function() {
+        var me = this,
+            errors = me.getErrors(),
+            isValid = Ext.isEmpty(errors);
+        if (!me.preventMark) {
+            if (isValid) {
+                me.clearInvalid();
+            } else {
+                me.markInvalid(errors);
+            }
+        }
+        return isValid;
+    },
+
+    /***
+     * Check if the grid there are files in state error.
+     * This is only used for internal validation
+     * @returns {*[]}
+     */
+    getErrors:function (){
+        var me = this,
+            errors = [];
+        me.getStore().each(function(record) {
+            if(record.get('type') === Editor.model.admin.projectWizard.File.TYPE_ERROR){
+                errors.push(record);
+            }
+        });
+        return errors;
+    },
+
+    /***
+     * Custom implementation for invalid. This will add invalid css class to the grid
+     * @param error
+     */
     markInvalid: function (error){
         if(Ext.isEmpty(error)){
             return;
         }
         var me = this,
             gridview  = me.getView();
-
-        me.getStore().removeAll();
-
-        gridview.emptyText = '<div class="x-grid-empty redTextColumn">'+error+'</div>';
+        gridview.addCls('invalidGridBorder');
         gridview.refresh();
+    },
+
+    /***
+     * Custom implementation for clear invalid. This will remove the invalid css clss from the grid.
+     */
+    clearInvalid: function() {
+        var me = this,
+            gridview  = me.getView();
+        gridview.removeCls('invalidGridBorder');
     },
 
     /***

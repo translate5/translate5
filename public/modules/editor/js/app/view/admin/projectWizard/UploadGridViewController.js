@@ -45,6 +45,11 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         pivotNameNotSameAsWorkfile:'#UT#Keine Arbeitsdatei mit gleichem Dateinamen gefunden.'
     },
 
+    listeners:{
+        workfileAdded:'onWorkfileAdded',
+        workfilesRemoved:'onWorkfilesRemoved'
+    },
+
     onManualAdd: function(btn) {
         this.addFilesToStore(btn.fileInputEl.dom.files, Editor.model.admin.projectWizard.File.TYPE_WORKFILES);
     },
@@ -162,6 +167,43 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
                 me.fireEvent('workfileAdded',rec);
             };
+        });
+    },
+
+
+    /***
+     * Triggered after workfile is added to the workfiles-upload grid in the import wizard
+     * @param data
+     */
+    onWorkfileAdded: function (data){
+        this.getView().isValid();
+    },
+
+    /***
+     * Triggered after workfiles are removed from the workfiles store with Remove files button
+     * @param itemsLeft
+     */
+    onWorkfilesRemoved:function (itemsLeft){
+        this.getView().isValid();
+    },
+
+    updateFormIsValid:function (){
+        var me = this,
+            view = me.getView(),
+            store = view && view.getStore(),
+            form = view && view.up('#taskMainCard').down('form'),
+            items = [];
+
+        if(!store){
+            return;
+        }
+
+        items = store.queryBy(function (record){
+            return record.get('type') !== Editor.model.admin.projectWizard.File.TYPE_ERROR;
+        });
+
+        form && items.length === 0 && form.markInvalid({
+            importUpload : 'No valid upload files found'
         });
     },
 
@@ -320,7 +362,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             targetLang = languageContainer.down('tagfield[name^=targetLang]'),
             langs = rec.get('name').match(/-([a-zA-Z_]{2,5})-([a-zA-Z_]{2,5})\.[^.]+$/);
 
-        if(rec.get('type') === 'error'){
+        if(rec.get('type') === Editor.model.admin.projectWizard.File.TYPE_ERROR){
             return;
         }
 
