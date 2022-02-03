@@ -176,7 +176,7 @@ Ext.define('Editor.view.admin.user.Grid', {
                   return "";
               }
               return Ext.Array.map(v.split(','), function(item){
-                  return Editor.data.app.roles[item].label || item;
+                  return Editor.data.app.roles[item] && Editor.data.app.roles[item].label || item;
               }).join(', ');
           },
           filter: {

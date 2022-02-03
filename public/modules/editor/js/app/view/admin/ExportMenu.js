@@ -118,10 +118,9 @@ Ext.define('Editor.view.admin.ExportMenu', {
           },{
               itemId: 'transferItem',
               hidden:!exportAllowed,
-              hrefTarget: '_blank',
-              href: me.makePath('task/export/id/{0}?format=transfer'),
               text : me.messages.transfer,
-              handler: alertHandler
+              path: me.makePath('task/export/id/{0}?format=transfer'),
+              handler: me.transferHandler
           },{
               itemId: 'exportDiffItem',
               hrefTarget: '_blank',
@@ -153,5 +152,14 @@ Ext.define('Editor.view.admin.ExportMenu', {
   },
   createFaultyExportAlert: function(){
       Ext.Msg.alert(this.messages.faultyQualityAlertTitle + '!', this.messages.faultyQualityAlertText);
+  },
+  transferHandler: function(c) {
+      Ext.Msg.alert('Status', 'Starting re-import of translated terms...');
+      Ext.Ajax.request({
+          url: c.path,
+          success: function(){
+              Ext.Msg.alert('Status', 'Re-import of translated terms has successfully started');
+          }
+      });
   }
 });

@@ -66,7 +66,11 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         file:'#UT#Datei',
         type:'#UT#Typ',
         size:'#UT#Größe',
-        errorColumnText:'#UT#Fehler'
+        errorColumnText:'#UT#Fehler',
+        workFilesTypeText:'#UT#Arbeitsdatei',
+        pivotFilesTypeText:'#UT#Pivot-Datei',
+        addFilesDefaultTooltip: '#UT#Datei(en) hinzufügen',
+        fileMix:'#UT#Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!'
     },
 
     initConfig: function(instanceConfig) {
@@ -79,6 +83,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'wizardFileButton',
                     text: me.strings.workFilesFilesButton,
                     name:'workFilesFilesButton',
+                    tooltip:me.strings.fileMix,
                     bind: {
                         disabled: '{isZipUpload}'
                     },
@@ -89,6 +94,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'wizardFileButton',
                     text: me.strings.pivotFilesFilesButton,
                     name:'pivotFilesFilesButton',
+                    tooltip:me.strings.fileMix,
                     bind: {
                         disabled: '{isZipUpload}'
                     },
@@ -133,13 +139,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                 },{
                     xtype: 'gridcolumn',
                     width: 90,
-                    renderer:function (val,meta,record) {
-                        if(record.get('type') === Editor.model.admin.projectWizard.File.TYPE_ERROR){
-                            meta.tdAttr= 'data-qtip="'+record.get('error')+'"';
-                            return me.strings.errorColumnText;
-                        }
-                        return val;
-                    },
+                    renderer:me.typeRenderer,
                     dataIndex: 'type',
                     tdCls: 'type',
                     text: me.strings.type
@@ -169,6 +169,27 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
 
         gridview.emptyText = '<div class="x-grid-empty redTextColumn">'+error+'</div>';
         gridview.refresh();
+    },
+
+    /***
+     * Custom renderer for the type column
+     * @param val
+     * @param meta
+     * @param record
+     * @returns {string|*}
+     */
+    typeRenderer: function (val,meta,record) {
+        var me = this;
+        switch (val){
+            case Editor.model.admin.projectWizard.File.TYPE_ERROR:
+                meta.tdAttr= 'data-qtip="'+record.get('error')+'"';
+                return me.strings.errorColumnText;
+            case Editor.model.admin.projectWizard.File.TYPE_WORKFILES:
+                return me.strings.workFilesTypeText;
+            case Editor.model.admin.projectWizard.File.TYPE_PIVOT:
+                return me.strings.pivotFilesTypeText;
+        }
+        return val;
     },
 
     /**

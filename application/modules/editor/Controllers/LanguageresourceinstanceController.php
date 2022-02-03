@@ -786,6 +786,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         set_time_limit(0);
 
         // Export collection
+        /** @var editor_Models_Export_Terminology_Xlsx $xlsx */
         $xlsx = ZfExtended_Factory::get('editor_Models_Export_Terminology_Xlsx');
 
         // If session's 'download' flag is set

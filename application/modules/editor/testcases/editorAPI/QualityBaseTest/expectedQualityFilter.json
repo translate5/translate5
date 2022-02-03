@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 487,
-    "qtotal": 487,
+    "qcount": 489,
+    "qtotal": 489,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -10,6 +10,54 @@
     "checked": false,
     "text": "All categories",
     "children": [
+        {
+            "qid": -1,
+            "qtype": "consistent",
+            "qcount": 2,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "37220",
+                    "qtype": "consistent",
+                    "qcount": 2,
+                    "qcomplete": true,
+                    "qcategory": "source",
+                    "qcatidx": "-1",
+                    "text": "Inconsistent source",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "consistent",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "target",
+                    "text": "Inconsistent target",
+                    "textTooltip": "Finds segments with same source, but different target (tags ignored)",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Consistency",
+            "qtotal": 2,
+            "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "empty",
+            "qcount": 0,
+            "qcomplete": true,
+            "qcategory": null,
+            "qtooltip": "Target only contains tags, spaces or punctuation, but source does not.",
+            "text": "Empty segments",
+            "qtotal": 0,
+            "leaf": true,
+            "checked": false
+        },
         {
             "qid": -1,
             "qtype": "internal",
@@ -23,6 +71,7 @@
                     "qcomplete": true,
                     "qcategory": "internal_tag_structure_faulty",
                     "text": "Internal tags have an incorrect structure",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false,
                     "qfaulty": true
@@ -34,6 +83,7 @@
                     "qcomplete": true,
                     "qcategory": "internal_tags_added",
                     "text": "Internal tags have been added",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -44,6 +94,7 @@
                     "qcomplete": true,
                     "qcategory": "internal_tags_missing",
                     "text": "Internal tags missing",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -54,6 +105,7 @@
                     "qcomplete": true,
                     "qcategory": "whitespace_tags_added",
                     "text": "Whitespace has been added",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -64,11 +116,13 @@
                     "qcomplete": true,
                     "qcategory": "whitespace_tags_missing",
                     "text": "Whitespace has been removed",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 }
             ],
             "qcategory": null,
+            "qtooltip": "",
             "text": "Internal tags",
             "qtotal": 0,
             "expanded": false,
@@ -87,6 +141,7 @@
                     "qcomplete": true,
                     "qcategory": "not_long_enough",
                     "text": "Segment relevantly shorter than allowed (more than 20% shorter or at least 100 Pixel shorter or at least 20 characters shorter)",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -97,6 +152,7 @@
                     "qcomplete": true,
                     "qcategory": "too_long",
                     "text": "Segment longer than allowed",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -107,6 +163,7 @@
                     "qcomplete": true,
                     "qcategory": "too_many_lines",
                     "text": "Segment has too many lines",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -117,11 +174,13 @@
                     "qcomplete": true,
                     "qcategory": "too_short",
                     "text": "Segment shorter than allowed",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 }
             ],
             "qcategory": null,
+            "qtooltip": "",
             "text": "Length check",
             "qtotal": 0,
             "expanded": false,
@@ -140,6 +199,7 @@
                     "qcomplete": true,
                     "qcategory": "qm_1",
                     "text": "Demo QM error 1",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -150,6 +210,7 @@
                     "qcomplete": true,
                     "qcategory": "qm_2",
                     "text": "Mistranslation",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -160,6 +221,7 @@
                     "qcomplete": true,
                     "qcategory": "qm_3",
                     "text": "Terminology problem",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -170,6 +232,7 @@
                     "qcomplete": true,
                     "qcategory": "qm_4",
                     "text": "Fluency issue",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -180,11 +243,13 @@
                     "qcomplete": true,
                     "qcategory": "qm_5",
                     "text": "Inconsistency",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 }
             ],
             "qcategory": null,
+            "qtooltip": "",
             "text": "Manual QA (complete segment)",
             "qtotal": 0,
             "expanded": false,
@@ -203,7 +268,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "68864",
+                            "qid": "36866",
                             "qtype": "mqm",
                             "qcount": 171,
                             "qcomplete": true,
@@ -215,7 +280,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "69120",
+                            "qid": "37120",
                             "qtype": "mqm",
                             "qcount": 105,
                             "qcomplete": true,
@@ -227,7 +292,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "69131",
+                            "qid": "37121",
                             "qtype": "mqm",
                             "qcount": 12,
                             "qcomplete": true,
@@ -239,7 +304,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "68984",
+                            "qid": "36929",
                             "qtype": "mqm",
                             "qcount": 3,
                             "qcomplete": true,
@@ -251,7 +316,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "68914",
+                            "qid": "37175",
                             "qtype": "mqm",
                             "qcount": 13,
                             "qcomplete": true,
@@ -277,7 +342,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "69125",
+                            "qid": "36869",
                             "qtype": "mqm",
                             "qcount": 21,
                             "qcomplete": true,
@@ -289,13 +354,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "68929",
+                            "qid": "36874",
                             "qtype": "mqm",
                             "qcount": 6,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "69134",
+                                    "qid": "37124",
                                     "qtype": "mqm",
                                     "qcount": 12,
                                     "qcomplete": true,
@@ -315,13 +380,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "68823",
+                            "qid": "36768",
                             "qtype": "mqm",
                             "qcount": 2,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "69184",
+                                    "qid": "37129",
                                     "qtype": "mqm",
                                     "qcount": 4,
                                     "qcomplete": true,
@@ -341,7 +406,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "68867",
+                            "qid": "36905",
                             "qtype": "mqm",
                             "qcount": 10,
                             "qcomplete": true,
@@ -371,7 +436,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "69133",
+                                    "qid": "36867",
                                     "qtype": "mqm",
                                     "qcount": 32,
                                     "qcomplete": true,
@@ -383,7 +448,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "68865",
+                                    "qid": "37123",
                                     "qtype": "mqm",
                                     "qcount": 28,
                                     "qcomplete": true,
@@ -395,7 +460,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "68879",
+                                    "qid": "36864",
                                     "qtype": "mqm",
                                     "qcount": 51,
                                     "qcomplete": true,
@@ -407,7 +472,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "69121",
+                                    "qid": "37138",
                                     "qtype": "mqm",
                                     "qcount": 17,
                                     "qcomplete": true,
@@ -448,6 +513,7 @@
                 }
             ],
             "qcategory": null,
+            "qtooltip": "",
             "text": "Manual QA (inside segment)",
             "qtotal": 487,
             "expanded": true,
@@ -466,6 +532,7 @@
                     "qcomplete": true,
                     "qcategory": "forbidden_in_source",
                     "text": "Forbidden in source",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -476,6 +543,7 @@
                     "qcomplete": true,
                     "qcategory": "forbidden_in_target",
                     "text": "Forbidden in target",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -486,6 +554,7 @@
                     "qcomplete": true,
                     "qcategory": "not_defined_in_target",
                     "text": "Not defined in target terminology",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -496,11 +565,13 @@
                     "qcomplete": true,
                     "qcategory": "not_found_in_target",
                     "text": "Not found in target",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 }
             ],
             "qcategory": null,
+            "qtooltip": "",
             "text": "Terminology",
             "qtotal": 0,
             "expanded": false,
@@ -519,6 +590,7 @@
                     "qcomplete": true,
                     "qcategory": "edited_100percent_match",
                     "text": "Edited 100% match",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -529,11 +601,13 @@
                     "qcomplete": true,
                     "qcategory": "unedited_fuzzy_match",
                     "text": "Unedited fuzzy match",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 }
             ],
             "qcategory": null,
+            "qtooltip": "",
             "text": "Usage of TM-matches",
             "qtotal": 0,
             "expanded": false,

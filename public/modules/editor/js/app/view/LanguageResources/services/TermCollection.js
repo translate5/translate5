@@ -42,6 +42,7 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
     id: 'TermCollection',
 
     addTooltip: '#UT#Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen',
+    openTermPortal: '#UT#Term-Collection im TermPortal öffnen',
 
     /**
      * returns the row css class for the associated service in the tm overview panel
@@ -87,6 +88,22 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
      */
     getImportWindow:function(){
         return 'importCollectionWindow';
+    },
+
+    /**
+     * @returns {(function(*, *, *): (string|*))|*}
+     */
+    getNameRenderer: function() {
+        var ttip = this.openTermPortal;
+        return function(v, meta, rec) {
+            var ctrl = Editor.app.getController('Termportal'),
+                //since we are in a termcollection (so term specific) we do that call not via event, but directly on termportal controller:
+                url = ctrl && ctrl.urlToTermPortal(rec);
+            if(url) {
+                meta.tdAttr = 'data-qtip="'+ttip+'"';
+                return '<a href="'+url+'" target="termportalandinstanttranslate">' + v + '</a>';
+            }
+            return v;
+        }
     }
-    
 });
