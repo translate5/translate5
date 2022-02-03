@@ -64,7 +64,6 @@ Ext.define('Editor.view.segments.Grid', {
     alias: 'widget.segments.grid',
     helpSection: 'editor',
     stateId: 'editor.segmentsGrid',
-    id: 'segment-grid',
     viewModel: {
         type:'segmentsGrid'
     },
@@ -80,6 +79,25 @@ Ext.define('Editor.view.segments.Grid', {
     hasRelaisColumn: false,
     stateData: {},
     qualityData: {},
+
+    /** @var Ext.data.Connection segInfoConn - Used for built in request management via autoAbort*/
+    segInfoConn: new Ext.data.Connection({
+        defaultHeaders: {Accept: 'application/json'},
+        id: 'segmentInfoConnection',
+        autoAbort: true,
+        listeners: {
+            beforerequest: function(conn, {segmentNrInTask}, eOpts) {
+                if(segmentNrInTask > -1){
+                    conn.setUrl(Editor.data.restpath + 'segment/' + segmentNrInTask + '/position');
+                } else {
+                    return false;
+                }
+            }
+        }
+    }),
+    onDestroy: function() {
+        this.segInfoConn.abortAll(); // do not destroy, this is still the same in the next opened task
+    },
 
     currentSegmentSize: null,
 
@@ -137,8 +155,7 @@ Ext.define('Editor.view.segments.Grid', {
      */
     setSegmentSize: function(size, relative, ignorestatechange) {
         var me=this,
-            oldSize = me.currentSegmentSize,
-            sizer;
+            oldSize = me.currentSegmentSize;
         if(ignorestatechange) {
             this.stateful = false;
         }
@@ -146,11 +163,9 @@ Ext.define('Editor.view.segments.Grid', {
             size = oldSize + size;
         }
         size = Math.min(Math.max(size, 1), 6);
-        me.currentSegmentSize = size;
-        me.segmentSize = me.currentSegmentSize;
-        sizer = function(size) {return 'segment-size-'+size};
-        size = sizer(size);
-        oldSize = sizer(oldSize);
+        me.currentSegmentSize = me.segmentSize = size;
+        size = 'segment-size-' + size;
+        oldSize = 'segment-size-' + oldSize;
         Ext.getBody().removeCls(oldSize);
         Ext.getBody().addCls(size);
         me.fireEvent('segmentSizeChanged', me, size, oldSize);
@@ -174,8 +189,7 @@ Ext.define('Editor.view.segments.Grid', {
             firstTargetFound = false,
             fields = Editor.data.task.segmentFields(),
             userPref = Editor.data.task.userPrefs().first(),
-            fieldList = [],
-            fieldClsList;
+            fieldList = [];
 
         if(Editor.app.authenticatedUser.isAllowed('editorCommentsForLockedSegments')) {
             me.addCls('comments-for-locked-segments');
@@ -341,8 +355,6 @@ Ext.define('Editor.view.segments.Grid', {
         });
 
         me.callParent(arguments);
-
-        fieldClsList = me.query('contentEditableColumn').concat(me.query('contentColumn'));
     },
     
     initConfig: function(instanceConfig) {
@@ -350,7 +362,6 @@ Ext.define('Editor.view.segments.Grid', {
             config = {
                 title: me.title, //see EXT6UPD-9
                 viewConfig: {
-                    //FIXME rowParams is marked as deprecated in extjs 6.2 docu
                     getRowClass: function(record, rowIndex, rowParams, store){
                         var newClass = ['segment-font-sizable'],
                             // only on non sorted list we mark last file segments
@@ -425,7 +436,12 @@ Ext.define('Editor.view.segments.Grid', {
      *   callback: {Function} callback which will be called in every case after final scroll animation
 
      */
-    positionRowAfterScroll: function(rowindex, row, config) {
+    positionRowAfterScroll: function(rowindex, row, config = {}) {
+        config = Ext.applyIf(config, {
+            target: 'editor',
+            notScrollCallback: Ext.emptyFn,
+            callback: Ext.emptyFn
+        });
         var me = this,
             view = me.getView(),
             editor = me.editingPlugin.editor,
@@ -435,11 +451,6 @@ Ext.define('Editor.view.segments.Grid', {
             topMargin = 20,
             viewHeight = view.getHeight(),
             bottomMargin = 20,
-            config = Ext.applyIf(config || {}, {
-                target: 'editor',
-                notScrollCallback: Ext.emptyFn,
-                callback: Ext.emptyFn
-            }),
             target = config.target,
             deltaY;
                     
@@ -540,5 +551,85 @@ Ext.define('Editor.view.segments.Grid', {
                 }
             });
         });
-    }
+    },
+    /**
+     * Focus the segment in editor (open the segment for editing)
+     */
+     focusEditorSegment: function(segmentNrInTask, forEditing, failureEvent) {
+        if(!segmentNrInTask||this.locked) return;
+        segmentNrInTask  = parseInt(segmentNrInTask);
+        var segmentIndex = Ext.getStore('Segments').findBy(rec => rec.data.segmentNrInTask === segmentNrInTask); // direct access here for fastest lookup
+        if(segmentIndex >= 0) {
+            this.scrollToSegmentInGrid(this,segmentIndex,segmentNrInTask,forEditing);
+        } else {
+            this.focussedSegmentNotFound(segmentNrInTask,forEditing, failureEvent);
+        }
+    },
+    /**
+     * Scroll the editor grid to a given index
+     */
+    scrollToSegmentInGrid: function(segmentGrid,segmentIndex,segmentNrInTask,forEditing) {
+        if(this.locked) return;
+        var me=this,
+            ed=segmentGrid.editingPlugin,
+            selModel=segmentGrid.getSelectionModel(),
+            callback=function() {
+                var editorMissing=!ed.editor,
+                    sel=selModel.getSelection();
+                // if the user clicked on the layout with add annotation active we have to trigger this on the annotation controller
+                if(sel) {
+                    if(me.wasAddAnnotationClick) {
+                        me.getAnnotationsController().handleSegmentCommentEditing(sel[0],me.segmentDomClientRect);
+                        me.wasAddAnnotationClick=false;
+                    } else {
+                        segmentGrid.selectOrFocus(segmentIndex);
+                        if(forEditing) {
+                            ed.startEdit(sel[0],null,ed.self.STARTEDIT_SCROLLUNDER);
+                            editorMissing&&ed.editor.reposition();
+                        }
+                    }
+                }
+            };
+        segmentGrid.scrollTo(segmentIndex,{
+            callback: callback,
+            notScrollCallback: callback
+        });
+    },
+    /**
+     * UnFocus any focussed segment in the grid
+     */
+    unfocusEditorSegment: function() {
+        if(!this.locked) return;
+        segmentGrid.unSelectOrFocus();
+    },
+    /**
+     * If the segment is not loaded in Segments store, try to find the segment index in the database
+     * @param failureEvent - string that is fired as event, for plugins to provide a custom error message
+     */
+    focussedSegmentNotFound: function(segmentNrInTask, forEditing, failureEvent='') {
+        if(this.locked) return;
+        var me=this,
+            segmentStore=me.getStore(),
+            proxy=segmentStore.getProxy(),
+            params={}, segmentInfoNotFoundMsg;
+
+        params[proxy.getFilterParam()]= proxy.encodeFilters(segmentStore.getFilters().items);
+        params[proxy.getSortParam()]  = proxy.encodeSorters(segmentStore.getSorters().items);
+        me.segInfoConn.request({
+            segmentNrInTask,
+            params,
+            callback: function(request, success, response) {
+                var responseData=Ext.JSON.decode(response.responseText, true)||{};
+                if(responseData.index > -1){
+                    me.scrollToSegmentInGrid(me,responseData.index,responseData.segmentNrInTask,forEditing);
+                } else { // failure
+                    segmentInfoNotFoundMsg = me.fireEvent(failureEvent, response);
+                    if(!Ext.isString(segmentInfoNotFoundMsg) && response.status !== 403){
+                        segmentInfoNotFoundMsg = Editor.app.getSegmentsController().messages.noIndexFound;
+                    }
+                    if(segmentInfoNotFoundMsg) Editor.MessageBox.addInfo(segmentInfoNotFoundMsg);
+                }
+            }
+        });
+    },
 });
