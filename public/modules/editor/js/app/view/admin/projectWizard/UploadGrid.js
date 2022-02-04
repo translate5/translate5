@@ -89,6 +89,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     text: me.strings.workFilesFilesButton,
                     name:'workFilesFilesButton',
                     tooltip:me.strings.fileMix,
+                    componentCls: 'disabledButtonTooltip',
                     bind: {
                         disabled: '{isZipUpload}'
                     },
@@ -100,6 +101,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     text: me.strings.pivotFilesFilesButton,
                     name:'pivotFilesFilesButton',
                     tooltip:me.strings.fileMix,
+                    componentCls: 'disabledButtonTooltip',
                     bind: {
                         disabled: '{isZipUpload}'
                     },

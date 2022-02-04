@@ -921,3 +921,7 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
     border-style: solid;
     border-width: thin;
 }
+
+.disabledButtonTooltip.x-item-disabled, .disabledButtonTooltip.x-item-disabled * {
+    pointer-events: auto !important;
+}
