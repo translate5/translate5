@@ -147,6 +147,8 @@ Ext.application({
         var me = this;
         // if consortium logos should be shown for additional xyz seconds...
         var showConsortiumLogos = Editor.data.startup.showConsortiumLogos;
+        
+        me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user); // must be set before setTimeout for routing handlers
         if (showConsortiumLogos > 0) {
             setTimeout(function() { me.initViewportLaunch(); }, showConsortiumLogos * 1000);
         }
@@ -164,8 +166,6 @@ Ext.application({
             initMethod = Editor.data.app.initMethod;
 
         me.windowTitle = Ext.getDoc().dom.title;
-
-        me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
 
         // load the customers store if the user is allowed
         if (me.authenticatedUser.isAllowed('customerAdministration')) {
