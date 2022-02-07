@@ -1474,7 +1474,7 @@ Ext.define('Editor.controller.Editor', {
         //if neither the text or html clipboard content matches the internally stored content, 
         // that means that the pasted content comes from outside and we insert just text:
         if(me.copiedSelectionWithTagHandling === null || !textMatch || !htmlMatch) {
-            me.htmlEditor.insertMarkup(clipboardText);
+            me.htmlEditor.insertMarkup(Ext.String.htmlEncode(clipboardText));
             me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
             me.copiedSelectionWithTagHandling = null;
             return;
