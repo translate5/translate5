@@ -274,10 +274,15 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                     grid.getSelectionModel().select(rec);
                     me.fireEvent('addUserAssoc', me, rec, store);
                 }
-                task.load();//reload only the task, not the whole task prefs, should be OK
-                Editor.MessageBox.addByOperation(op);
-                Editor.MessageBox.addSuccess(me.messages.assocSave);
-                win.setLoading(false);
+                //reload only the task, not the whole task prefs, should be OK
+                task.load({
+                    callback:function (){
+                        // enable the panel again after the task is reloaded
+                        Editor.MessageBox.addByOperation(op);
+                        Editor.MessageBox.addSuccess(me.messages.assocSave);
+                        win.setLoading(false);
+                    }
+                });
             },
             failure: function () {
                 store.load();
