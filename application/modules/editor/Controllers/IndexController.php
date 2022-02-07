@@ -705,25 +705,37 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             // this leads to problems with files without extensions as is often the case with wget downloaded websites
             header('Content-Type: ');
         }
-        //FIXME add version URL suffix to plugin.css inclusion
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $publicFile->getMTime()));
-        //with etags we would have to use the values of $_SERVER['HTTP_IF_NONE_MATCH'] too!
-        //makes sense to do so!
-        //header('ETag: '.md5(of file content));
+        
+        $lastModified = $publicFile->getMTime();
+              
+        if($requestedType == 'resources'){
 
-        header_remove('Cache-Control');
-        header_remove('Expires');
-        header_remove('Pragma');
-        header_remove('X-Powered-By');
+            // Public Resources will use a ETag to solve problems with Caching when these resources go through the proxy
+            $lastModified = $publicFile->getMTime();
+            $etag = md5(file_get_contents($publicFile));            
+            $modifiedSince = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) : false);
+            $etagHeader = (isset( $_SERVER['HTTP_IF_NONE_MATCH']) ? trim($_SERVER['HTTP_IF_NONE_MATCH']) : false);
+            // if last modified date is same as "HTTP_IF_MODIFIED_SINCE", send 304 then exit
+            if((int) $modifiedSince === (int) $lastModified && $etag === $etagHeader){
+                header('HTTP/1.1 304 Not Modified');
+                exit;
+            }
+            //set last-modified header
+            header('Last-Modified: '.gmdate('D, d M Y H:i:s', $lastModified).' GMT');
+            //set etag-header
+            header('Etag: '.$etag);
+            
+            error_log('ETAG: '.$etag.' / LAST MODIFIED: '.gmdate('D, d M Y H:i:s', $lastModified));
 
-        /*
-        header('Pragma: public');
-        header('Cache-Control: max-age=86400');
-        header('Expires: '. gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
-        header('Content-Type: image/png');
-        */
-
-
+        } else {
+            
+            // General Rules for other Files. TODO FIXME: Documentation why this is done            
+            header_remove('Cache-Control');
+            header_remove('Expires');
+            header_remove('Pragma');
+            header_remove('X-Powered-By');
+            header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $lastModified));
+        }
         readfile($publicFile);
         //FIXME: Optimierung bei den Plugin Assets: public Dateien die durch die Plugins geroutet werden, sollten chachebar sein und B keine Plugin Inits triggern. Geht letzteres überhaupt wg. VisualReview welches die Dateien ebenfalls hier durchschiebt?
         exit;
