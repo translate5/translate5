@@ -117,7 +117,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
               handler: alertHandler
           },{
               itemId: 'transferItem',
-              hidden:!exportAllowed,
+              hidden:!exportAllowed || !me.task.get('isTransfer'),
               text : me.messages.transfer,
               path: me.makePath('task/export/id/{0}?format=transfer'),
               handler: me.transferHandler
@@ -155,11 +155,6 @@ Ext.define('Editor.view.admin.ExportMenu', {
   },
   transferHandler: function(c) {
       Ext.Msg.alert('Status', 'Starting re-import of translated terms...');
-      Ext.Ajax.request({
-          url: c.path,
-          success: function(){
-              Ext.Msg.alert('Status', 'Re-import of translated terms has successfully started');
-          }
-      });
+      Ext.Ajax.request({url: c.path});
   }
 });

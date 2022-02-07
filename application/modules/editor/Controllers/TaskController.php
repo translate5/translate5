@@ -334,9 +334,11 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function loadAllForProjectOverview() {
         $rows = $this->loadAll();
         $customerData = $this->getCustomersForRendering($rows);
+        $isTransfer = $file->getTransfersPerTasks(array_column($rows, 'taskGuid'));
         foreach ($rows as &$row) {
             unset($row['qmSubsegmentFlags']); // unneccessary in the project overview
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
+            $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
         }
         return $rows;
     }
@@ -354,6 +356,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $fileCount = $file->getFileCountPerTasks($taskGuids);
+        $isTransfer = $file->getTransfersPerTasks($taskGuids);
 
         $this->_helper->TaskUserInfo->initUserAssocInfos($rows);
 
@@ -392,6 +395,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
 
             $row['fileCount'] = empty($fileCount[$row['taskGuid']]) ? 0 : $fileCount[$row['taskGuid']];
+            $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
 
             //add task assoc if exist
             if(isset($taskassocs[$row['taskGuid']])){
