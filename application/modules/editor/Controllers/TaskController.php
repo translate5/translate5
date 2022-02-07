@@ -334,6 +334,8 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function loadAllForProjectOverview() {
         $rows = $this->loadAll();
         $customerData = $this->getCustomersForRendering($rows);
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
         $isTransfer = $file->getTransfersPerTasks(array_column($rows, 'taskGuid'));
         foreach ($rows as &$row) {
             unset($row['qmSubsegmentFlags']); // unneccessary in the project overview
