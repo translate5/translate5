@@ -218,25 +218,34 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
      */
     handleDeleteConfirmClick: function (grid, toDelete) {
         var me = this,
-            task = me.getPrefWindow().getCurrentTask(),
+            userAssocPanel = me.getPrefWindow(),
+            task = userAssocPanel.getCurrentTask(),
             assoc = me.getAdminTaskUserAssocsStore();
 
+        userAssocPanel.setLoading(true);
+
         Ext.Array.each(toDelete, function (toDel) {
-            me.getPrefWindow().lookupViewModel().set('userAssocDirty', true);
+
             toDel.eraseVersioned(task, {
+
                 success: function (rec, op) {
+
                     assoc.remove(toDel);
-                    if (assoc.getCount() === 0) {
-                        //if there is no user assoc entry anymore, we consider that as not dirty
-                        me.getPrefWindow().lookupViewModel().set('userAssocDirty', false);
-                    }
+
                     me.fireEvent('removeUserAssoc', me, toDel, assoc);
-                    task.load();//reload only the task, not the whole task prefs, should be OK
-                    Editor.MessageBox.addByOperation(op); //does nothing since content is not provided from server :(
-                    Editor.MessageBox.addSuccess(me.messages.assocDeleted);
+
+                    //reload only the task, not the whole task prefs, should be OK
+                    task.load({
+                        callback:function (){
+                            Editor.MessageBox.addByOperation(op); //does nothing since content is not provided from server :(
+                            Editor.MessageBox.addSuccess(me.messages.assocDeleted);
+                            userAssocPanel.setLoading(false);
+                        }
+                    });
                 },
                 failure: function () {
                     me.application.getController('admin.TaskPreferences').handleReload();
+                    userAssocPanel.setLoading(false);
                 }
             });
         });
@@ -257,19 +266,25 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
             return;
         }
         win.setLoading(true);
-        win.lookupViewModel().set('userAssocDirty', true);
         rec.saveVersioned(task, {
             success: function (savedRec, op) {
-                me.handleCancel();
-                if (!rec.store) {
-                    store.insert(0, rec);
-                    grid.getSelectionModel().select(rec);
-                    me.fireEvent('addUserAssoc', me, rec, store);
-                }
-                task.load();//reload only the task, not the whole task prefs, should be OK
-                Editor.MessageBox.addByOperation(op);
-                Editor.MessageBox.addSuccess(me.messages.assocSave);
-                win.setLoading(false);
+                //reload only the task, not the whole task prefs, should be OK
+                task.load({
+                    callback:function (){
+
+                        me.handleCancel();
+                        if (!rec.store) {
+                            store.insert(0, rec);
+                            grid.getSelectionModel().select(rec);
+                            me.fireEvent('addUserAssoc', me, rec, store);
+                        }
+
+                        // enable the panel again after the task is reloaded
+                        Editor.MessageBox.addByOperation(op);
+                        Editor.MessageBox.addSuccess(me.messages.assocSave);
+                        win.setLoading(false);
+                    }
+                });
             },
             failure: function () {
                 store.load();

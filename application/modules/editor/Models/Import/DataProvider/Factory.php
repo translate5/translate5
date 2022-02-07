@@ -63,13 +63,22 @@ class editor_Models_Import_DataProvider_Factory {
      * @param editor_Models_Import_UploadProcessor $upload
      * @return editor_Models_Import_DataProvider_Abstract
      */
-    public function createFromUpload(editor_Models_Import_UploadProcessor $upload): editor_Models_Import_DataProvider_Abstract {
+    public function createFromUpload(editor_Models_Import_UploadProcessor $upload, array $data = []): editor_Models_Import_DataProvider_Abstract {
         $mainUpload = $upload->getMainUpload();
 
-        if($mainUpload->getFileExtension() === $upload::TYPE_ZIP) {
+        $files = $mainUpload->getFiles();
+
+        if($this->isZipUpload($upload)) {
             $dp = 'editor_Models_Import_DataProvider_Zip';
-            $tmpfiles = array_keys($mainUpload->getFiles());
+            $tmpfiles = array_keys($files);
             $args = [reset($tmpfiles)]; //first uploaded review file is used as ZIP file
+        }else if($this->isProjectUpload($data)){
+            $dp = 'editor_Models_Import_DataProvider_Project';
+            $args = [
+                $upload->getFiles(),
+                $this->handleProjectLanguages($data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME]),
+                $data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_TYPE_NAME]
+            ];
         } else {
             $dp = 'editor_Models_Import_DataProvider_SingleUploads';
             $args = [
@@ -78,5 +87,41 @@ class editor_Models_Import_DataProvider_Factory {
             ];
         }
         return ZfExtended_Factory::get($dp, $args);
+    }
+
+    /***
+     * For each langauge check and convert the given value to internal language id.
+     * @param array $langauges
+     * @return array
+     */
+    protected function handleProjectLanguages(array $langauges){
+        foreach ($langauges as &$lang){
+            $language = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $language editor_Models_Languages */
+            $language->convertLanguage($lang);
+        }
+        return $langauges;
+    }
+
+    /***
+     * Is the current upload zip package
+     * @param editor_Models_Import_UploadProcessor $upload
+     * @return bool
+     */
+    protected function isZipUpload(editor_Models_Import_UploadProcessor $upload): bool {
+        $mainUpload = $upload->getMainUpload();
+        $files = $mainUpload->getFiles();
+        return count($files) === 1 && $mainUpload->getFileExtension((array_values($files)[0])) === $upload::TYPE_ZIP;
+    }
+
+    /***
+     * Is the current upload project upload
+     *
+     * @param array $data
+     * @return bool
+     */
+    protected function isProjectUpload(array $data): bool
+    {
+        return !empty($data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME]);
     }
 }

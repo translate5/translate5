@@ -86,6 +86,11 @@ class editor_ConfigController extends ZfExtended_RestController {
         if(!$type->validateValue($this->entity->getType(), $value, $error)) {
             throw new ZfExtended_UnprocessableEntity('E1363', ['errorMsg' => $error]);
         }
+        if(!$type->isValidInDefaults($this->entity, $value)) {
+            throw new ZfExtended_UnprocessableEntity('E1363', [
+                'errorMsg' => 'The given value(s) is/are not allowed according to the available default values.'
+            ]);
+        }
 
         $userGuid = $this->data->userGuid ?? null;
         if(!empty($userGuid)){

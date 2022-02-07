@@ -49,19 +49,20 @@ Ext.define('Editor.controller.CommentNavigation', {
     listen: {
         component: {
             '#commentList': {
-                itemclick: 'jumpThere'
+                itemclick: 'handleItemClick'
             }
         },
         messagebus: {
             '#translate5 task': {
-                commentChanged: function handleCommentChange({comment,connectionId,typeOfChange}) {
+                commentChanged: function handleCommentChange({comment, connectionId, typeOfChange}) {
+                    var remarkRecord = new (this.getCommentList().getStore().getModel())(Ext.clone(comment));
                     switch(typeOfChange) {
                         case 'afterPostAction':
                         case 'afterPutAction':
-                            this.updateStore(new (this.getCommentList().store.model)(comment))
+                            this.updateStore(remarkRecord, typeOfChange);
                             break;
                         case 'beforeDeleteAction':
-                            this.removeRemark(comment.id, comment.type)
+                            this.getCommentList().getStore().remove(remarkRecord);
                     }
                 }
             }
@@ -69,29 +70,18 @@ Ext.define('Editor.controller.CommentNavigation', {
     },
 
     loadStore: function() {
-        var cl = this.getCommentList();
-        cl.store.load();
+        this.getCommentList().getStore().load();
     },
-    jumpThere: function(origin, record, item, index, e) {
-        switch(record.data.type) {
+    
+    handleItemClick: function(origin, remarkRecord){
+        switch(remarkRecord.get('type')){
+            
             case 'segmentComment':
-                var
-                    grid = Ext.getCmp('segment-grid'),
-                    view = grid.view,
-                    rec = grid.store.getById(record.data.segmentId);
-                //grid.scrollTo(recIdx); // does not animate upwards direction
-                var rowTableEl = view.el.getById(view.getRowId(rec)); //table has bgColor set for end of animation
-                grid.setSelection(rec);
-                grid.getScrollable().scrollIntoView(rowTableEl, false, true, true);
-                break;
+                Ext.getCmp('segment-grid').focusEditorSegment(remarkRecord.get('segmentNrInTask'));
+                break;  
 
             case 'visualAnnotation':
-                var
-                    vr = Ext.first('visualReviewPanel'),
-                    vc = vr && vr.getController();
-                if(vc){
-                    vc.scrollToAnnotation(record);
-                }
+                this.fireEvent('visualRemarkClicked', remarkRecord);
                 break;
         }
     },
@@ -99,18 +89,18 @@ Ext.define('Editor.controller.CommentNavigation', {
     /**
      * Change existing remark in store or add new one
      */
-    updateStore: function updateStore(remark, typeOfChange){
-        var cl=this.getCommentList();
-        var store=cl.store;
-        var vr=Ext.first('visualReviewPanel'); 
-        var existing =typeOfChange==='afterPostAction' ? store.getById(remark.id) : null;
+    updateStore: function(remark, typeOfChange){
+        var cl = this.getCommentList();
+        var store = cl.getStore();
+        var existing = (typeOfChange === 'afterPutAction') ? store.getById(remark.id) : null; // in ZF1 Put is UPDATE, Post is CREATE
+
         /** Update exsiting record - Why this way?
-        * store.data.replace() does not replace (at least in ExtJS-6.2.0)
-        * store.update(...) triggers request
-        * less sort operations
+         * store.data.replace() does not replace (at least in ExtJS-6.2.0)
+         * store.update(...) triggers request
+         * less sort operations
         */
         if(existing) {
-            var old = existing.data, fresh = updated.data, changedProps = [], setOpts = {silent: true,commit: false}, prop;
+            var old = existing.data, fresh = remark.data, changedProps = [], setOpts = { silent: true, commit: false }, prop;
             for(prop in old) {
                 if(old[prop] !== fresh[prop]) {
                     existing.set(prop, fresh[prop], setOpts);
@@ -118,33 +108,12 @@ Ext.define('Editor.controller.CommentNavigation', {
                 }
             }
             if(changedProps.length) {
-                existing.commit(false,changedProps);
+                existing.commit(false, changedProps);
             }
             remark = existing;
         } else {
             store.addSorted(remark);
-            if(remark.data.type === 'visualAnnotation') {
-                Ext.getStore('visualReviewAnnotations').add(remark)
-                var page = vr.iframeController.type === 'htmlscroller'
-                ? vr.getAnnotationController().getDomPages()[0]
-                : vr.iframeController.getPageByIndex(remark.get('page')-1);
-                vr.getAnnotationController().renderAnnotations(page);
-            }
         }
-        cl.scrollable.doHighlight(cl.getNodeByRecord(remark));
-    },
-    /**
-     * Remove remark from commentnav and where else it appears
-     */
-    removeRemark: function removeRemark(remarkId, remarkType){
-        var cl=this.getCommentList();
-        var store=cl.store;
-        store.data.removeByKey(remarkId);
-        if(remarkType === 'visualAnnotation') {
-            Ext.getStore('visualReviewAnnotations').data.removeByKey(remarkId)
-            var vr=Ext.first('visualReviewPanel');
-            var domEl = vr.iframeController.document.getElementById('pageAnnotation'+remarkId)
-            if(domEl) domEl.remove();
-        }
+        cl.highlightRemark(remark);
     }
 })

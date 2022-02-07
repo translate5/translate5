@@ -139,8 +139,8 @@ class editor_TermController extends ZfExtended_RestController
             $diff['attribute'] ++; // processStatus-attr was added for source term
         }
 
-        /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
-        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
+        /* @var $termNoteStatus editor_Models_Terminology_TermStatus */
+        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermStatus');
 
         // Apply data
         $this->_postTermInit([
@@ -300,7 +300,7 @@ class editor_TermController extends ZfExtended_RestController
             //'langSetGuid' => $langSetGuid = '???',
             'guid' => ZfExtended_Utils::uuid(),
             'processStatus' => 'unprocessed',
-            //'definition' => '',
+            'definition' => '',
             'updatedBy' => $this->_session->id,
             'updatedAt' => date('Y-m-d H:i:s')
         ]);

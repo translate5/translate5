@@ -711,7 +711,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
 
-        // Get the comma-separated list of termEntryIds matching attr-filters
+        // Get the comma-separated list of termEntryIds and/or termIds matching attr-filters
         foreach ($params['attrs'] as $aDataTypeId => $aValue) {
 
             // Fuzzy search for text-attrs
@@ -727,10 +727,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             $attrWHERE = ['`dataTypeId` = :dataTypeId'];
 
             // Setup WHERE clauses for entry-, language- and term- level attributes
-            $attrWHERE []= '((' . implode(') OR (', [
-                'ISNULL(`language`) AND ISNULL(`termId`)', // entry-level
-                '`language` IN ("' . implode('","', $codeA) . '")', // both language- and term- levels
-            ]) . '))';
+            $attrWHERE[] = '(ISNULL(`language`) OR `language` IN ("' . implode('","', $codeA) . '"))';
 
             // If filter value is given
             if ($aValue) {
@@ -743,20 +740,29 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             }
 
             // Mind previous query results to apply intersection
-            if (isset($termEntryIds)) {
-                $attrWHERE []= '`termEntryId` IN (' . $termEntryIds . ')';
+            if ($matched ?? 0) {
+                $or = [];
+                if ($matched['termEntryId'] ?? 0) {
+                    $or []= '`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
+                }
+                if ($matched['termId'] ?? 0) {
+                    $or []= '`termId` IN (' . join(',', $matched['termId']) . ')';
+                }
+                $attrWHERE []= '(' . join(' OR ', $or) . ')';
             }
 
-            // Get termEntryIds of matched attributes
-            $termEntryIds = implode(',', $this->db->getAdapter()->query('
-                SELECT DISTINCT `termEntryId` 
+            // Get termEntryIds and/or termIds of matched attributes
+            $matched = $this->db->getAdapter()->query('
+                SELECT DISTINCT 
+                  IF(`termId`, "termId", "termEntryId") AS `prop`, 
+                  IF(`termId`, `termId`, `termEntryId`) AS `value`
                 FROM `terms_attributes` 
                 WHERE ' . implode(' AND ', $attrWHERE),
                 $bind
-            )->fetchAll(PDO::FETCH_COLUMN));
+            )->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
 
             // If nothing found
-            if (!$termEntryIds) {
+            if (!$matched) {
 
                 // Setup &$total variable by reference, as 0
                 $total = 0;
@@ -769,22 +775,13 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // If wildcards are used, convert them to the mysql syntax
         $keyword = str_replace(['*', '?'], ['%', '_'], $params['query']);
 
+        // Flag, indicating whether we're in allExcept-mode
+        $allExcept = array_key_exists('except', $params);
+
         // If we're not going to count $total -
         // it means we're in autocomplete mode,
         // so append wildcard if not already added
-        if ($total === false) $keyword = rtrim($keyword, '%') . '%';
-
-        // Flag, indicating whether or not current user is allowed to propose terms
-        $isProposer = ZfExtended_Factory::get('ZfExtended_Models_User')->hasRole('termProposer');
-
-        // If current user has no 'termProposer' role - remove 'unprocessed'
-        // from the values list of 'processStatus' filter, so that proposals
-        // will be excluded from search results. Note that $params['processStatus']
-        // is still kept here as comma-separated list, as it's the format
-        // this param initially arrived in as an item within $params argument
-        if (!$isProposer)
-            $params['processStatus']
-                = implode(',', array_diff(editor_Utils::ar($params['processStatus']), [self::PROCESS_STATUS_UNPROCESSED]));
+        if ($total === false && !$allExcept) $keyword = rtrim($keyword, '%') . '%';
 
         // Shared WHERE clause, that will be used for querying both terms and proposals tables
         $where = [
@@ -798,12 +795,19 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             if (preg_match('~unprocessed~', $params['processStatus'])) {
                 $where []= '(' . array_pop($where) . ' OR `t`.`proposal` != "")';
             }
-        } else if (!$isProposer) {
-            $where []= '`t`.`processStatus` != "' . self::PROCESS_STATUS_UNPROCESSED . '"';
         }
 
         // Mind attr-filters in WHERE clause
-        if (isset($termEntryIds)) array_unshift($where, '`t`.`termEntryId` IN (' . $termEntryIds . ')');
+        if ($matched ?? 0) {
+            $or = [];
+            if ($matched['termEntryId'] ?? 0) {
+                $or []= '`t`.`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
+            }
+            if ($matched['termId'] ?? 0) {
+                $or []= '`t`.`id` IN (' . join(',', $matched['termId']) . ')';
+            }
+            array_unshift($where, '(' . join(' OR ', $or) . ')');
+        }
 
         // If 'noTermDefinedFor' param is given
         if ($_ = (int) $params['noTermDefinedFor']) {
@@ -818,7 +822,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         // Data columns, that would be fetched by search SQL query
-        $termQueryCol = '
+        $termQueryCol = $allExcept ? '`t`.`' . ($params['column'] ?? 'id') . '`' : '
           `t`.`id`, 
           `t`.`collectionId`, 
           `t`.`termEntryId`, 
@@ -832,16 +836,18 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         ';
 
         // Assume limit arg can be comma-separated string containing '<LIMIT>,<OFFSET>'
-        list($limit, $offset) = explode(',', $params['limit']);
+        if (!$allExcept) list($limit, $offset) = explode(',', $params['limit']);
 
         // Cols that we're going to search in by default
         $cols = ['`t`.`term`', '`t`.`proposal`'];
 
         // If we should only search for `term`-column (e.g. `proposal`-column won't be involved)
-        if (!$isProposer || ($params['processStatus'] && !in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus']))))
+        if ($params['processStatus']
+            && !in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus']))) {
 
             // Drop proposal-col from $cols, so it won't be mentioned in $keywordWHERE
             array_pop($cols);
+        }
 
         // Keyword WHERE clauses using LIKE
         foreach ($cols as $col) $keywordWHERE []= sprintf('LOWER(%s) LIKE LOWER(:keyword) COLLATE utf8mb4_bin', $col);
@@ -923,6 +929,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             }
         }
 
+        // Make sure some termIds will be excluded
+        if ($allExcept && $params['except'] ?? 0) {
+            $where []= '`t`.`' . ($params['column'] ?? 'id') . '` NOT IN (' . $params['except'] . ')';
+        }
+
         // Term query template
         $termQueryTpl = '
             SELECT SQL_NO_CACHE %s 
@@ -942,14 +953,18 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         // Render query for getting actual results from terms table
-        $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor ?? '', $keywordWHERE)
-            . 'LIMIT ' . (int) $offset . ',' . (int) $limit;
+        $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor ?? '', $keywordWHERE);
 
+        // If we're not in allExcept-mode - append LIMIT clause
+        if (!$allExcept) $termQuery .= 'LIMIT ' . (int) $offset . ',' . (int) $limit;
+
+        // If we're on allExcept-mode - make sure ids will be fetched
+        $fetchMode = $allExcept ? PDO::FETCH_COLUMN : null;
         //i($termQuery, 'a');
         //i($bindParam, 'a');
 
         // Return results
-        return $this->db->getAdapter()->query($termQuery, $bindParam)->fetchAll();
+        return $this->db->getAdapter()->query($termQuery, $bindParam)->fetchAll($fetchMode);
     }
 
     /***
@@ -1920,15 +1935,21 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      * Get data for tbx-export
      *
-     * @param $termEntryIds Comma-separated list of ids
+     * @param $ids Comma-separated list of ids, or array of ids
+     * @param string $idsProp Name of ids-prop, 'termEntryId' by default
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getExportData($termEntryIds) {
+    public function getExportData($ids, $idsProp = 'termEntryId') {
+
+        // Build clause for termIds
+        $where = $this->db->getAdapter()->quoteInto('`' . $idsProp . '` IN (?)', editor_Utils::ar($ids));
+
+        // Fetch and return terms, grouped by termEntryId and language props
         return array_group_by($this->db->getAdapter()->query('
-            SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId`, `processStatus` 
+            SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId`, `processStatus`, `termTbxId` 
             FROM `terms_term`
-            WHERE `termEntryId` IN (' . $termEntryIds . ')
+            WHERE ' . $where . '
         ')->fetchAll(), 'termEntryId', 'language');
     }
 
@@ -2415,5 +2436,52 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             FROM `terms_term`
             WHERE `termEntryId` = :termEntryId' . $certain
         , $bind)->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Exclude values from $termIds, having $language-translations,
+     * so the only ones which have no translation for given $language will be kept and returned
+     *
+     * @param array $termIds
+     * @param string $languageId
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function havingNoTranslation(array $termIds, int $languageId) {
+
+        // Build termIds-where clause
+        $termIds = $this->db->getAdapter()->quoteInto('`t`.`id` IN (?)', $termIds);
+
+        // Run query and fetch results
+        return $this->db->getAdapter()->query('
+            SELECT `t`.`collectionId`, `t`.`id` 
+            FROM 
+              `terms_term` `t` 
+              LEFT JOIN `terms_term` AS `t2` ON (
+                `t`.`termEntryId` = `t2`.`termEntryId` AND `t2`.`languageId` = ?
+              )
+            WHERE ' . $termIds . ' AND ISNULL(`t2`.`id`)
+        ', $languageId)->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Get distinct values for columns, specified by $cols arg, for terms, identified by $termIds arg
+     *
+     * @param string $cols Comma-separated column names
+     * @param array $termIds
+     */
+    public function distinctColsForTermIds($cols = 'termEntryId,language', array $termIds) {
+
+        // Build termIds-where clause
+        $termIds = $this->db->getAdapter()->quoteInto('`id` IN (?)', $termIds);
+
+        // Fetch data
+        $data = $this->db->getAdapter()->query('SELECT ' . $cols . ' FROM `terms_term` WHERE ' . $termIds)->fetchAll();
+
+        // Collect distinct values for given $cols
+        foreach (explode(',', $cols) as $col) $distinct[$col] = array_unique(array_column($data, $col));
+
+        // Return collected
+        return $distinct;
     }
 }

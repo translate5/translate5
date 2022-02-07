@@ -71,11 +71,12 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('editor_SessionController', 'beforeDeleteAction', array($this, 'handleLogout'));
         $this->eventManager->attach('editor_SessionController', 'resyncOperation', array($this, 'handleSessionResync'));
         $this->eventManager->attach('LoginController', 'beforeLogoutAction', array($this, 'handleLogout'));
-
+        $this->eventManager->attach('Editor_TaskuserassocController', 'beforePutAction', array($this, 'handleJobPut'));
         $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'autoqaOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('ZfExtended_Models_Worker', 'updateProgress',array($this, 'handleUpdateProgress'));
+        $this->eventManager->attach('ZfExtended_Models_Db_Session', 'getValidSessionsSql',array($this, 'handleGetValidSessionsSql'));
 
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
@@ -159,6 +160,53 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         }
         
         $this->bus->stopSession($sessionId, $this->getHeaderConnId());
+    }
+
+    /**
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleJobPut(Zend_EventManager_Event $event) {
+        //1. load the desired job
+        $id = $event->getParam('params')['id'] ?? 0;
+        $job = clone $event->getParam('entity');
+        /* @var $job editor_Models_TaskUserAssoc */
+        try {
+            $job->load($id); //empty id evaluates above to 0 which triggers not found then
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            return;
+        }
+
+        //2. check if there is a locking session, if no, do nothing
+        if(empty($job->getUsedInternalSessionUniqId())) {
+            return;
+        }
+
+        //3. load the session id to the internal session
+        $sessIntId = new ZfExtended_Models_Db_SessionMapInternalUniqId();
+        $row = $sessIntId->fetchRow(['internalSessionUniqId = ?' => $job->getUsedInternalSessionUniqId()]);
+        $result = $this->bus->sessionHasConnection($row->session_id);
+        $hasConnection = $result->instanceResult ?? true; //in doubt say true so the job is not unlocked!
+        if(empty($row) || $hasConnection) { //row is empty, this is cleaned by the next garbage collection call
+            return;
+        }
+
+        //4. release job for that user if the session has no connections anymore in the socket server
+        if($job->getIsPmOverride()) {
+            $job->deletePmOverride();
+        }
+        else {
+            //direct update, no entity save to override entity version check
+            $job->db->update([
+                'usedState' => null,
+                'usedInternalSessionUniqId' => null,
+            ],['id' => $job->getId()]);
+        }
+
+        //5. unlock the task too, if locked by the jobs user
+        $task = ZfExtended_Factory::get('editor_Models_task');
+        /* @var $task editor_Models_task */
+        $task->unlockForUser($job->getUserGuid(), $job->getTaskGuid());
     }
     
     /**
@@ -310,8 +358,14 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
             'progress' => $progress['progress']
         ]);
     }
-    
-    
+
+    /**
+     * @return array
+     */
+    public function handleGetValidSessionsSql() {
+        $res = $this->bus->getConnectionSessions();
+        return $res->instanceResult ?? [];
+    }
 
     /***
      * Notify the task chanel with fresh task data
@@ -381,39 +435,40 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      * @param Zend_EventManager_Event $event
      */
     public function handleNormalComment(Zend_EventManager_Event $event) {
-        $comment = $event->getParam('entity');
-        /* @var $comment editor_Models_Comment */
-        $taskGuid = $comment->getTaskGuid();
-        $a_comment  = $comment->loadByTaskPlainWithPage($taskGuid, $comment->getId());
+        $entity = $event->getParam('entity');
+        /* @var $entity editor_Models_Comment */
+        $taskGuid = $entity->getTaskGuid();
+        $comments  = $entity->loadByTaskPlain($taskGuid, $entity->getId());
+        $comment = $comments[0];
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         $task->loadByTaskGuid($taskGuid);
-        if($task->anonymizeUsers()){
+        if($task->anonymizeUsers(false)){
             $wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-            $a_comment = $wfAnonymize->anonymizeUserdata($taskGuid, $a_comment['userGuid'], $a_comment);
+            $comment = $wfAnonymize->anonymizeUserdata($taskGuid, $comment['userGuid'], $comment, null, true);
         }
-        $a_comment['type'] = $comment::FRONTEND_ID;
-        $this->triggerCommentNavUpdate($a_comment, $event->getName());
+        $comment['type'] = $entity::FRONTEND_ID;
+        $this->triggerCommentNavUpdate($comment, $event->getName());
     }
 
     /**
      * @param Zend_EventManager_Event $event
      */
     public function handleAnnotation(Zend_EventManager_Event $event) {
-        $anno = $event->getParam('entity');
-        /* @var $anno editor_Plugins_VisualReview_Annotation_Entity */
-        $taskGuid = $anno->getTaskGuid();
-        $a_anno  = $anno->toArray();
+        $entity = $event->getParam('entity');
+        /* @var $entity editor_Plugins_VisualReview_Annotation_Entity */
+        $taskGuid = $entity->getTaskGuid();
+        $annotation  = $entity->toArray();
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         $task->loadByTaskGuid($taskGuid);
-        if($task->anonymizeUsers()){
+        if($task->anonymizeUsers(false)){
             $wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-            $a_anno = $wfAnonymize->anonymizeUserdata($taskGuid, $a_anno['userGuid'], $a_anno);
+            $annotation = $wfAnonymize->anonymizeUserdata($taskGuid, $annotation['userGuid'], $annotation, null, true);
         }
-        $a_anno['comment'] = htmlspecialchars($a_anno['text']);
-        $a_anno['type'] = $anno::FRONTEND_ID;
-        $this->triggerCommentNavUpdate($a_anno, $event->getName());
+        $annotation['comment'] = htmlspecialchars($annotation['text']);
+        $annotation['type'] = $entity::FRONTEND_ID;
+        $this->triggerCommentNavUpdate($annotation, $event->getName());
     }
 
     /**

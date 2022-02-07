@@ -36,6 +36,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
   itemId: 'exportMenu',
   messages: {
       exportDef: '#UT#Originalformat, {0}',
+      transfer: '#UT#Transfer translated terms to TermCollection(s)',
       exportTranslation: '#UT#übersetzt',
       exportReview: '#UT#lektoriert',
       exportDiff: '#UT#SDLXLIFF mit Änderungsmarkierungen',
@@ -115,6 +116,12 @@ Ext.define('Editor.view.admin.ExportMenu', {
               text : Ext.String.format(me.messages.exportDef,exportDiffString),
               handler: alertHandler
           },{
+              itemId: 'transferItem',
+              hidden:!exportAllowed,
+              text : me.messages.transfer,
+              path: me.makePath('task/export/id/{0}?format=transfer'),
+              handler: me.transferHandler
+          },{
               itemId: 'exportDiffItem',
               hrefTarget: '_blank',
               href: me.makePath('task/export/id/{0}/diff/1'),
@@ -145,5 +152,14 @@ Ext.define('Editor.view.admin.ExportMenu', {
   },
   createFaultyExportAlert: function(){
       Ext.Msg.alert(this.messages.faultyQualityAlertTitle + '!', this.messages.faultyQualityAlertText);
+  },
+  transferHandler: function(c) {
+      Ext.Msg.alert('Status', 'Starting re-import of translated terms...');
+      Ext.Ajax.request({
+          url: c.path,
+          success: function(){
+              Ext.Msg.alert('Status', 'Re-import of translated terms has successfully started');
+          }
+      });
   }
 });

@@ -144,7 +144,40 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         //merge the data as instanttransalte format
         return $sdl->mergeEngineData($engines,$addArrayId);
     }
-    
+
+    /**
+     * Get info about which language resources can be associated with tasks having $targetLangs languages
+     * Return value would be like below:
+     * [
+     *  'targetLang1Id' => [langResource1Id, langResource2Id],
+     *  'targetLang2Id' => [langResource1Id, langResource3Id],
+     * ]
+     *
+     * @param int $customerId
+     * @param array $targetLangs
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getUseAsDefaultForTaskAssoc(int $customerId, array $targetLangs) {
+
+        // Get editor_Models_LanguageResources_CustomerAssoc model shortcut
+        $lrcaM = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+
+        // Fetch `languageResourceId`-values by $customerId, having `useAsDefault`=1
+        if (!$languageResourceIds = $lrcaM->loadByCustomerIdsUseAsDefault([$customerId], 'languageResourceId')) {
+            return [];
+        }
+
+        // Get info about which language resources can be associated with tasks having $targetLangs languages
+        return $this->db->getAdapter()->query('
+            SELECT DISTINCT `targetLang`, `languageResourceId`
+            FROM `LEK_languageresources_languages` 
+            WHERE 1
+              AND `languageResourceId` IN (' . join(',', $languageResourceIds) . ') 
+              AND `targetLang` IN (' . join(',', $targetLangs) . ')
+        ')->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
+    }
+
     /***
      * Load all resources associated customers of a user
      *

@@ -505,7 +505,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
     onTaskMainCardRender: function (taskMainCard, eOpts) {
         var me = this, store,
             auth = Editor.app.authenticatedUser,
-            taskMainCardContainer = taskMainCard.down('#taskSecondCardContainer');
+            taskMainCardContainer = taskMainCard.down('#taskMainCardContainer');
 
         // add the customer field to the taskUpload window
         if (auth.isAllowed('editorCustomerSwitch')) {

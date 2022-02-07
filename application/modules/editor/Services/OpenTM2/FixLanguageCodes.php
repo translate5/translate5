@@ -34,8 +34,14 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * OpenTM2 HTTP Connection API
+        //FIXME in FixImportParser: fixing that only languages are imported which are supported by the language resource.
+        // 1. get the language and its fuzzy languages from the corresponding language resource
+        // 2. filter the tu's by the second tuv xml:lang attribute, which must be one of the fuzzy languages
+ 
  */
 class editor_Services_OpenTM2_FixLanguageCodes {
+
+    protected bool $disabled = false;
 
     /**
      * The mapping of language keys.
@@ -43,7 +49,7 @@ class editor_Services_OpenTM2_FixLanguageCodes {
      * In tmxOnDownload the concrete values send by OpenTM2 to be replaced back must be tested out.
      * @var array
      */
-    protected $languageMap = [
+    protected array $languageMap = [
         //langcode_search => langcode_replace
         'mn'    => 'ru',
         'mn-MN' => 'ru',
@@ -57,7 +63,7 @@ class editor_Services_OpenTM2_FixLanguageCodes {
      * Must contain search and replace language keys
      * @var array
      */
-    protected $labels = [
+    protected array $labels = [
         //langcode_search => langcode_replace
         'mn'    => 'Mongolian',
         'mn-MN' => 'Mongolian',
@@ -79,7 +85,7 @@ class editor_Services_OpenTM2_FixLanguageCodes {
      * @return string
      */
     public function key(string $key): string {
-        if(empty($this->languageMap[$key])) {
+        if($this->disabled || empty($this->languageMap[$key])) {
             return $key;
         }
         return $this->languageMap[$key];
@@ -91,9 +97,13 @@ class editor_Services_OpenTM2_FixLanguageCodes {
      * @return string
      */
     public function tmxOnUpload(string $tmxData): string {
+        if($this->disabled) {
+            return $tmxData;
+        }
         //fix datatype from unknown to plaintext
         //if file is utf-16, convert it first to utf-8 and check, if it is utf-16
         //TODO improve that and make iconv only if it was detected as utf-16
+        //FIXME use unix file command if available
         $tmxData_utf16 = @iconv('utf-16','utf-8',$tmxData);
         if(preg_match('#^<\?xml[^>]*encoding="utf-16"[^>]*\?>#i',$tmxData_utf16)){
             $tmxData = $tmxData_utf16;
@@ -122,8 +132,10 @@ class editor_Services_OpenTM2_FixLanguageCodes {
      * @param string $tmxData
      * @return string
      */
-    public function tmxOnDownload($sourceLang, $targetLang, $tmxData) {
-        
+    public function tmxOnDownload(string $sourceLang, string $targetLang, string $tmxData): string {
+        if($this->disabled) {
+            return $tmxData;
+        }
         $search = [];
         $replace = [];
         
@@ -157,5 +169,9 @@ class editor_Services_OpenTM2_FixLanguageCodes {
         }
         
         return str_replace($search, $replace, $tmxData);
+    }
+
+    public function setDisabled(bool $disable) {
+        $this->disabled = $disable;
     }
 }

@@ -90,7 +90,7 @@ class editor_Models_Terminology_TbxObjects_Attribute extends editor_Models_Termi
         if(!empty($this->parentLangset) && !empty($this->parentTerm)){
             return self::ATTRIBUTE_LEVEL_TERM;
         }
-        if(empty($this->parentLangset) && !empty($this->parentTerm)){
+        if(!empty($this->parentLangset) && empty($this->parentTerm)){
             return self::ATTRIBUTE_LEVEL_LANGUAGE;
         }
         if(!empty($this->parentEntry)){

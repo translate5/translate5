@@ -72,6 +72,7 @@
 		"ext-mysqli": "*",
 		"ext-xmlreader": "*",
 		"ext-sockets" : "*",
+		"ext-iconv" : "*",
 		"phpunit/phpunit": "^9",
 		"shardj/zf1-future" : "dev-master",
 		"symfony/console" : "^5.0",

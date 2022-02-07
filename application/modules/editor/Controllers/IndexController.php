@@ -62,10 +62,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'Fileorder'                     => true,
         'ChangeAlike'                   => true,
         'Comments'                      => true,
-        'CommentNavigation'            => true,
+        'CommentNavigation'             => true,
         'SearchReplace'                 => true,
         'SnapshotHistory'               => true,
-        'Termportal'                    => true,
+        'Termportal'                    => true, //FIXME should be moved into the termportal plugin
         'JsLogger'                      => true,
         'editor.CustomPanel'            => true,
         'admin.TaskOverview'            => ['taskOverviewFrontendController'], //controlled by ACL, enabling frontend rights given here
@@ -301,6 +301,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
         $this->view->Php2JsVars()->set('import.validExtensions', $supportedFiles->getSupportedExtensions());
+        $this->view->Php2JsVars()->set('import.nativeParserExtensions', $supportedFiles->getNativeParserExtensions());
 
         $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float)$rop->editor->columns->widthFactorHeader);
         $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (int)$rop->editor->columns->widthOffsetEditable);
@@ -652,7 +653,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             'png' => 'image/png',
             'gif' => 'image/gif',
             'webp' => 'image/webp',
-            'svg' => 'image/svg',
+            'svg' => 'image/svg+xml',
             'woff' => 'application/woff',
             'woff2' => 'application/woff2',
             'ttf' => 'application/ttf',

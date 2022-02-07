@@ -196,7 +196,7 @@ Modified values are shown bold in the simple listing.');
             return 1;
         }
 
-        if(!$config->isValidInDefaults($exactConfig['value'])) {
+        if(!$type->isValidInDefaults($config, $exactConfig['value'])) {
             $this->io->error(sprintf('The given value "%s" is not valid, only the following values are allowed: %s', $exactConfig['value'], $config->getDefaults()));
             return 1;
         }

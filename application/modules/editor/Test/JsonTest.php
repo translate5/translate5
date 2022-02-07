@@ -27,9 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Abstraction layer for performing API tests which involve comparing Segment Texts.
- * This solves the problem, that Tags in segment text are enriched with quality-id's in some cases that contain auto-increment id's and thus have to be stripped
- * Also, the attributes in tags may be in a different order because historically there have been different attribute orders for differen tags
+ * Abstraction layer for API tests comparing REST-Data with stored JSON files
+ * To achieve this, a Model-based architecture is used that filters & sanitizes both, the REST data & the JSON data before comparing them.
+ * This solves problems with autoincrement values & other dynamic data
+ * See editor_Test_Model_Abstract & descendants
  */
 abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
 

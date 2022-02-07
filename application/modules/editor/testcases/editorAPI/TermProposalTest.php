@@ -207,7 +207,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             'target' => $importedTerm->termEntryTbxId,
         ]);
         $this->assertTrue(is_object($refupdate)
-            && $refupdate->value == $importedTerm->term, 'Unable to update ref-attribute for the entry-level');
+            && $refupdate->value == $rejected->inserted->term, 'Unable to update ref-attribute for the entry-level');
 
         // [14] create ref-attr for term-level for Term1
         $refcreate = $this->api()->requestJson('editor/attribute', 'POST', $data = [
@@ -272,7 +272,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         // Check props presence
         foreach ([
              'locale', 'role', 'permission', 'activeItem', 'l10n', 'filterWindow', 'filterPanel', 'lang',
-             'langInclSubs', 'flag', 'newTermLang', 'language', 'cfg', 'itranslateQuery', 'time'] as $prop)
+             'langInclSubs', 'flag', 'langAll', 'language', 'cfg', 'itranslateQuery', 'time'] as $prop)
             $this->assertObjectHasAttribute($prop, self::$setup, 'Termportal setup data has no ' . $prop . '-property');
 
         // [21] call siblinginfo to get attributes for Term1
