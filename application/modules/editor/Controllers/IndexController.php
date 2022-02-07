@@ -711,7 +711,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if($requestedType == 'resources'){
 
             // Public Resources will use a ETag to solve problems with Caching when these resources go through the proxy
-            $lastModified = $publicFile->getMTime();
             $etag = md5(file_get_contents($publicFile));            
             $modifiedSince = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) : false);
             $etagHeader = (isset( $_SERVER['HTTP_IF_NONE_MATCH']) ? trim($_SERVER['HTTP_IF_NONE_MATCH']) : false);
@@ -724,8 +723,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             header('Last-Modified: '.gmdate('D, d M Y H:i:s', $lastModified).' GMT');
             //set etag-header
             header('Etag: '.$etag);
-            
-            error_log('ETAG: '.$etag.' / LAST MODIFIED: '.gmdate('D, d M Y H:i:s', $lastModified));
 
         } else {
             
