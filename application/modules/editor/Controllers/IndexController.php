@@ -711,11 +711,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if($requestedType == 'resources'){
 
             // Public Resources will use a ETag to solve problems with Caching when these resources go through the proxy
-            $etag = md5(file_get_contents($publicFile));            
-            $modifiedSince = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) : false);
-            $etagHeader = (isset( $_SERVER['HTTP_IF_NONE_MATCH']) ? trim($_SERVER['HTTP_IF_NONE_MATCH']) : false);
+            // QUIRK: to save the strain of fingerprinting each file we use the Verion-ID of the Application as fingerprint
+            $etag = ZfExtended_Utils::getAppVersion();            
+            $modifiedSince = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) : -1);
+            $etagHeader = (isset( $_SERVER['HTTP_IF_NONE_MATCH']) ? trim($_SERVER['HTTP_IF_NONE_MATCH']) : -1);
             // if last modified date is same as "HTTP_IF_MODIFIED_SINCE", send 304 then exit
-            if((int) $modifiedSince === (int) $lastModified && $etag === $etagHeader){
+            if($modifiedSince === $lastModified && $etag === $etagHeader){
                 header('HTTP/1.1 304 Not Modified');
                 exit;
             }
