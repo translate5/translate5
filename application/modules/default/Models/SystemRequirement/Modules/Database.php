@@ -203,6 +203,10 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
 
     protected function checkOpenUpdates()
     {
+        //then we are in installation and no update check is possible
+        if(!class_exists('ZfExtended_Factory')) {
+            return;
+        }
         $dbUpdater = ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
         /* @var $dbUpdater ZfExtended_Models_Installer_DbUpdater */
         $dbUpdater->calculateChanges();
