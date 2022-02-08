@@ -70,7 +70,11 @@ Ext.define('Editor.controller.CommentNavigation', {
     },
 
     loadStore: function() {
-        this.getCommentList().getStore().load();
+        var commentStore = this.getCommentList().getStore();
+        if(!commentStore.hasPendingLoad()){
+            commentStore.load();
+        }
+
     },
     
     handleItemClick: function(origin, remarkRecord){
