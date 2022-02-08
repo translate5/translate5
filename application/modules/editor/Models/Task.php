@@ -658,6 +658,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function isTranslation() {
         return $this->getEmptyTargets();
     }
+
+    /**
+     * Convenience API
+     * @return boolean
+     */
+    public function isReview() {
+        return $this->getEmptyTargets() === false;
+    }
+
     /**
      * unlocks all tasks, where the associated session is invalid
      */
