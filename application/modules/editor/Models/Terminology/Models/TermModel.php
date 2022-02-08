@@ -711,7 +711,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
 
-        // Get the comma-separated list of termEntryIds matching attr-filters
+        // Get the comma-separated list of termEntryIds and/or termIds matching attr-filters
         foreach ($params['attrs'] as $aDataTypeId => $aValue) {
 
             // Fuzzy search for text-attrs
@@ -783,18 +783,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // so append wildcard if not already added
         if ($total === false && !$allExcept) $keyword = rtrim($keyword, '%') . '%';
 
-        // Flag, indicating whether or not current user is allowed to propose terms
-        $isProposer = ZfExtended_Factory::get('ZfExtended_Models_User')->hasRole('termProposer');
-
-        // If current user has no 'termProposer' role - remove 'unprocessed'
-        // from the values list of 'processStatus' filter, so that proposals
-        // will be excluded from search results. Note that $params['processStatus']
-        // is still kept here as comma-separated list, as it's the format
-        // this param initially arrived in as an item within $params argument
-        if (!$isProposer)
-            $params['processStatus']
-                = implode(',', array_diff(editor_Utils::ar($params['processStatus']), [self::PROCESS_STATUS_UNPROCESSED]));
-
         // Shared WHERE clause, that will be used for querying both terms and proposals tables
         $where = [
             '`t`.`languageId` IN (' . $params['language'] . ')',
@@ -807,8 +795,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             if (preg_match('~unprocessed~', $params['processStatus'])) {
                 $where []= '(' . array_pop($where) . ' OR `t`.`proposal` != "")';
             }
-        } else if (!$isProposer) {
-            $where []= '`t`.`processStatus` != "' . self::PROCESS_STATUS_UNPROCESSED . '"';
         }
 
         // Mind attr-filters in WHERE clause
@@ -856,10 +842,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $cols = ['`t`.`term`', '`t`.`proposal`'];
 
         // If we should only search for `term`-column (e.g. `proposal`-column won't be involved)
-        if (!$isProposer || ($params['processStatus'] && !in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus']))))
+        if ($params['processStatus']
+            && !in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus']))) {
 
             // Drop proposal-col from $cols, so it won't be mentioned in $keywordWHERE
             array_pop($cols);
+        }
 
         // Keyword WHERE clauses using LIKE
         foreach ($cols as $col) $keywordWHERE []= sprintf('LOWER(%s) LIKE LOWER(:keyword) COLLATE utf8mb4_bin', $col);

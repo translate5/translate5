@@ -255,6 +255,10 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                         Editor.MessageBox.addError(error);
                                     },
                                     name: 'relaisLang'
+                                },{
+                                    xtype: 'hiddenfield',
+                                    name:'autoStartImport',
+                                    value: 0
                                 }]
                             }]
                         

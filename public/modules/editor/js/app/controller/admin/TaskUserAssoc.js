@@ -268,15 +268,17 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         win.setLoading(true);
         rec.saveVersioned(task, {
             success: function (savedRec, op) {
-                me.handleCancel();
-                if (!rec.store) {
-                    store.insert(0, rec);
-                    grid.getSelectionModel().select(rec);
-                    me.fireEvent('addUserAssoc', me, rec, store);
-                }
                 //reload only the task, not the whole task prefs, should be OK
                 task.load({
                     callback:function (){
+
+                        me.handleCancel();
+                        if (!rec.store) {
+                            store.insert(0, rec);
+                            grid.getSelectionModel().select(rec);
+                            me.fireEvent('addUserAssoc', me, rec, store);
+                        }
+
                         // enable the panel again after the task is reloaded
                         Editor.MessageBox.addByOperation(op);
                         Editor.MessageBox.addSuccess(me.messages.assocSave);

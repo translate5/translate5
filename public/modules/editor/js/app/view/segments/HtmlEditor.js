@@ -436,6 +436,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         plainContent.push(Ext.htmlEncode(text));
         return;
       }
+      //if somehow an HTML comment is added, this may not be processed.
+      if(item.nodeName === '#comment'){
+          return;
+      }
       // INS- & DEL-nodes
       if( (item.tagName.toLowerCase() === 'ins' || item.tagName.toLowerCase() === 'del')){
           var regExOpening = new RegExp('<\s*'+item.tagName.toLowerCase()+'.*?>'),              // Example: /<\s*ins.*?>/g
