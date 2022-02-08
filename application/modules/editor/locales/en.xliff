@@ -4414,9 +4414,9 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Die Reihenfolge der Urls entspricht der Reihenfolge der hochgeladenen Arbeitsdateien.</source>
   <target>The order of the urls will match the order of the uploaded work files.</target>
 </trans-unit>
-<trans-unit id='PGEgaHJlZj0iaHR0cHM6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L2Rpc3BsYXkvdmlzdWFsUmV2aWV3L1VwbG9hZCtyb29scyIgdGFyZ2V0PSJfYmxhbmsiPkxlc2VuIFNpZSBtZWhyIMO8YmVyIGRpZSBadW9yZG51bmcgdm9uIERhdGVpZW4uPC9hPg=='>
-  <source><a href="https://confluence.translate5.net/display/visualReview/Upload+rools" target="_blank">Lesen Sie mehr über die Zuordnung von Dateien.</a></source>
-  <target><a href="https://confluence.translate5.net/display/visualReview/Upload+rools" target="_blank">Read more about files mapping.</a></target>
+<trans-unit id='PGEgaHJlZj0iaHR0cHM6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L2Rpc3BsYXkvdmlzdWFsUmV2aWV3L1VwbG9hZCtydWxlcyIgdGFyZ2V0PSJfYmxhbmsiPkxlc2VuIFNpZSBtZWhyIMO8YmVyIGRpZSBadW9yZG51bmcgdm9uIERhdGVpZW4uPC9hPg=='>
+  <source><a href="https://confluence.translate5.net/display/visualReview/Upload+rules" target="_blank">Lesen Sie mehr über die Zuordnung von Dateien.</a></source>
+  <target><a href="https://confluence.translate5.net/display/visualReview/Upload+rules" target="_blank">Read more about files mapping.</a></target>
 </trans-unit>
 <trans-unit id='WmllaGVuIFNpZSBkaWUgRGF0ZWllbiBlbnR3ZWRlciBoaWVyaGVyLCB1bSBzaWUgYWxzIEFyYmVpdHNkYXRlaWVuIGhpbnp1enVmw7xnZW4sIG9kZXIga2xpY2tlbiBTaWUgYXVmIGVpbmUgZGVyIG9iaWdlbiBTY2hhbHRmbMOkY2hlbiwgdW0gYW5kZXJlIERhdGVpdHlwZW4genUgd8OkaGxlbi4='>
   <source>Ziehen Sie die Dateien entweder hierher, um sie als Arbeitsdateien hinzuzufügen, oder klicken Sie auf eine der obigen Schaltflächen, um andere Dateitypen zu wählen.</source>
