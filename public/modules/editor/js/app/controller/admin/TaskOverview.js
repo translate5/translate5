@@ -1110,12 +1110,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         //     formData.append(property, value);
         // });
 
-        // set the timeout to 60s to prevent timeouts on video uploads or larger files
-        Ext.Ajax.setTimeout(60000);
-
         Ext.Ajax.request({
             params:params,// send all other form fields as json params to skip the formdata parameter conversions
             rawData: formData,
+            timeout: 3600000, // set the timeout to 1H to prevent timeouts on video uploads or larger files
             method:'POST',
             headers: {'Content-Type':null}, //to use content type of FormData
             url: Editor.data.restpath + 'task',
