@@ -135,7 +135,7 @@ class editor_Models_Segment_Updater {
         // With alternates no recalc is needed at all, since no repetition editor can be used
         
         //FIXME: it is currently in discussion with the community if the setTargetMd5 is done always on segment save!
-        if($this->task->getWorkflowStep() == 1 && (bool) $this->task->isTranslation()){
+        if($this->task->getWorkflowStep() == 1 && $this->task->isTranslation()){
             $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$this->task]);
             /* @var $hasher editor_Models_Segment_RepetitionHash */
             $this->segment->setTargetMd5($hasher->hashTarget($this->segment->getTargetEdit(), $this->segment->getSource()));

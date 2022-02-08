@@ -181,7 +181,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity->setWorkflowStepNr($this->entity->getWorkflowStepNr());
 
                 //a used repetition has always the 102% matchrate
-                if((bool) $task->isTranslation()) {
+                if($task->isTranslation()) {
                     $entity->setMatchRate(editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE);
                 }
                 else {
@@ -268,7 +268,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     protected function getHasher(editor_Models_Task $task) {
         //TODO: also a check is missing, if task has alternate targets or not.
         // With alternates no recalc is needed at all, since no repetition editor can be used
-        if($task->getWorkflowStep() == 1 && (bool) $task->isTranslation()){
+        if($task->getWorkflowStep() == 1 && $task->isTranslation()){
             return ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$task]);
         }
         return null;
