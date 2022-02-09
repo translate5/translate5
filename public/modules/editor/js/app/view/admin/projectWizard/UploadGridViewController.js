@@ -306,12 +306,16 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             });
 
         pivotFiles.each(function (pivot){
+            var fileFound = false;
             workFiles.each(function (file){
-                if(me.filesMatch(file.get('name'),pivot.get('name')) === false){
-                    pivot.set('error',me.errorMessages.pivotNameNotSameAsWorkfile);
-                    pivot.set('type','error');
+                if(!fileFound && me.filesMatch(file.get('name'),pivot.get('name'))) {
+                    fileFound = true;
                 }
             });
+            if(! fileFound){
+                pivot.set('error',me.errorMessages.pivotNameNotSameAsWorkfile);
+                pivot.set('type','error');
+            }
         });
     },
 
