@@ -104,9 +104,10 @@ class editor_Models_LanguageResources_UsageExporter{
      * Document usage task types
      * @var array
      */
-    protected $documentTaskType = [editor_Models_Task::INITIAL_TASKTYPE_DEFAULT,editor_Models_Task::INITIAL_TASKTYPE_PROJECT_TASK];
+    protected array $documentTaskType;
     
     public function __construct() {
+        $this->documentTaskType = editor_Task_Type::getInstance()->getUsageExportTypes();
         $this->init();
     }
     

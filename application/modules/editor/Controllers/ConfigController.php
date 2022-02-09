@@ -277,7 +277,7 @@ class editor_ConfigController extends ZfExtended_RestController {
             }
             
             //if the requested change is not for project type, throw exception
-            if($task->getState() != $task::INITIAL_TASKTYPE_PROJECT){
+            if($task->getState() != $task::STATE_PROJECT){
                 throw new editor_Models_ConfigException('E1296', [
                     'name' => $this->entity->getName()
                 ]);

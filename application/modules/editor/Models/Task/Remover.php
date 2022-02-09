@@ -145,10 +145,6 @@ class editor_Models_Task_Remover {
         if(count($tasks)>1 || empty($tasks)){
             return;
         }
-        $task=reset($tasks);
-        if($task['taskType']!=$model::INITIAL_TASKTYPE_PROJECT){
-            return;
-        }
         $this->task->load($projectId);
         $this->remove(true);
     }

@@ -30,8 +30,8 @@ trait editor_Controllers_Task_ImportTrait {
         // add task defaults (user associations and language resources)
         $this->setTaskDefaults($this->entity);
 
-        //if the current task type is for instant translate pretransaltion, the usage log requires different handling
-        if($this->entity->isHiddenTask() == false){
+        //for internal tasks the usage log requires different handling, so log only non internal tasks
+        if(!$this->entity->getTaskType()->isInternalTask()){
             //update the task usage log for the current task
             $this->insertTaskUsageLog($this->entity);
         }
@@ -72,7 +72,7 @@ trait editor_Controllers_Task_ImportTrait {
         $dp->archiveImportedData();
 
         $this->entity->setProjectId($entityId);
-        $this->entity->setTaskType($this->entity::INITIAL_TASKTYPE_PROJECT);
+        $this->entity->setTaskType(editor_Task_Type_Project::ID);
 
         $this->entity->save();// save the entity to keep the project id in case the task import fails.
 
@@ -86,7 +86,7 @@ trait editor_Controllers_Task_ImportTrait {
             $task = clone $this->entity;
 
             $task->setProjectId($entityId);
-            $task->setTaskType($task::INITIAL_TASKTYPE_PROJECT_TASK);
+            $task->setTaskType(editor_Task_Type_ProjectTask::ID);
             $task->setTargetLang($target);
             $task->setTaskName($this->entity->getTaskName().' - '.$languages[$task->getSourceLang()].' / '.$languages[$task->getTargetLang()]);
 
@@ -101,7 +101,7 @@ trait editor_Controllers_Task_ImportTrait {
             $projectTasks[] = $task->getDataObject();
         }
 
-        $this->entity->setState($this->entity::INITIAL_TASKTYPE_PROJECT);
+        $this->entity->setState($this->entity::STATE_PROJECT);
         $this->entity->save();
 
         return $projectTasks;
@@ -157,7 +157,7 @@ trait editor_Controllers_Task_ImportTrait {
     protected function insertTaskUsageLog(editor_Models_task $task) {
         $log = ZfExtended_Factory::get('editor_Models_TaskUsageLog');
         /* @var $log editor_Models_TaskUsageLog */
-        $log->setTaskType($task->getTaskType());
+        $log->setTaskType($task->getTaskType()->id());
         $log->setSourceLang($task->getSourceLang());
         $log->setTargetLang($task->getTargetLang());
         $log->setCustomerId($task->getCustomerId());

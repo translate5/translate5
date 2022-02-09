@@ -26,14 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TaskUsageLog extends ZfExtended_Models_Validator_Abstract {
-    protected function defineValidators() {
-        $this->addValidator("id", "int");
-        $this->addValidator("taskType",'inArray', [editor_Task_Type::getInstance()->getValidTypes()]);
-        $this->addValidator("sourceLang", "int");
-        $this->addValidator("targetLang", "int");
-        $this->addValidator("customerId", "int");
-        $this->addValidator("yearAndMonth","stringLength", array("min" => 1, "max" => 45));
-        $this->addValidator("taskCount", "int");
-    }
+/**
+ * The ProjectTask task type represents a task inside a project
+ */
+class editor_Task_Type_ProjectTask extends editor_Task_Type_Abstract {
+    const ID = 'projectTask';
+
+    protected bool $isInternalTask = false;
+    protected bool $isTask = true;
+    protected bool $isProject = false;
+    protected bool $terminologyDisabled = false;
+    protected bool $exportUsage = true;
 }

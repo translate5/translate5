@@ -174,7 +174,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         $taskState = $task->getState();
         
         //when the task is not with state import or project, change for task config and task import config is allowed
-        $isImportDisabled = !in_array($taskState, [$task::STATE_IMPORT, $task::INITIAL_TASKTYPE_PROJECT]);
+        $isImportDisabled = !in_array($taskState, [$task::STATE_IMPORT, $task::STATE_PROJECT]);
 
         //load the task customer config as config base for this task
         //on customer level, we can override task specific config. With this, those overrides will be loaded

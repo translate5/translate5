@@ -532,7 +532,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
 
         if (empty($this->data['taskType'])) {
-            $this->data['taskType'] = $this->entity->getDefaultTasktype();
+            $this->data['taskType'] = editor_Task_Type_Default::ID;
         }
 
         $this->data['pmName'] = $pm->getUsernameLong();
@@ -619,13 +619,13 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->_helper->Api->convertLanguageParameters($target);
         }
 
-        // sort the langauges alphabetically
+        // sort the languages alphabetically
         $this->_helper->Api->sortLanguages($this->data['targetLang']);
 
         //task is handled as a project (one source language, multiple target languages, each combo one own task)
         if(count($this->data['targetLang']) > 1) {
             //with multiple target languages, the current task will be a project!
-            $this->entity->setTaskType($this->entity::INITIAL_TASKTYPE_PROJECT);
+            $this->entity->setTaskType(editor_Task_Type_Default::ID);
             $this->entity->setTargetLang(0);
         }
         else {
@@ -840,9 +840,9 @@ class editor_TaskController extends ZfExtended_RestController {
         }
 
         $tasks = [];
-        //if it is a project, start the import workers for each task project
+        //if it is a project, start the import workers for each sub task
         if($task->isProject()) {
-            $tasks=$task->loadProjectTasks($task->getProjectId(),true);
+            $tasks = $task->loadProjectTasks($task->getProjectId(),true);
         } else {
             $tasks[] = $task;
         }
@@ -908,7 +908,7 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($data['userCount']);
         //is the source task a single project task
         if($this->entity->getId()==$this->entity->getProjectId()){
-            $data['taskType'] = $this->entity::INITIAL_TASKTYPE_PROJECT_TASK;
+            $data['taskType'] = editor_Task_Type_ProjectTask::ID;
         }
         $data['state'] = 'import';
         $this->entity->init($data);
@@ -1442,7 +1442,7 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function validateTaskType() {
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
-        $isTaskTypeAllowed = $acl->isInAllowedRoles($this->user->data->roles, 'initial_tasktype', $this->entity->getTaskType());
+        $isTaskTypeAllowed = $acl->isInAllowedRoles($this->user->data->roles, 'initial_tasktype', $this->entity->getTaskType()->id());
         if (!$isTaskTypeAllowed) {
             ZfExtended_UnprocessableEntity::addCodes([
                 'E1217' => 'TaskType not allowed.'
@@ -1917,24 +1917,23 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function handleProjectRequest(): bool{
         $projectOnly = (bool) $this->getRequest()->getParam('projectsOnly', false);
-        $filter=$this->entity->getFilter();
+        $filter = $this->entity->getFilter();
+        $taskTypes = editor_Task_Type::getInstance();
         if($filter->hasFilter('projectId') && !$projectOnly){
             //filter for all tasks in the project(return also the single task projects)
             $filter->addFilter((object)[
                 'field' => 'taskType',
-                'value' =>[editor_Models_Task::INITIAL_TASKTYPE_PROJECT],
+                'value' => $taskTypes->getProjectTypes(true),
                 'type' => 'notInList',
                 'comparison' => 'in'
             ]);
             return false;
         }
-        
-        $filterValues = [editor_Models_Task::INITIAL_TASKTYPE_DEFAULT];
-        
+
         if($projectOnly){
-            $filterValues[]=editor_Models_Task::INITIAL_TASKTYPE_PROJECT;
-        }else{
-            $filterValues[]=editor_Models_Task::INITIAL_TASKTYPE_PROJECT_TASK;
+            $filterValues = $taskTypes->getProjectTypes();
+        } else {
+            $filterValues = $taskTypes->getTaskTypes();
         }
         
         $filter->addFilter((object)[
@@ -1984,24 +1983,24 @@ class editor_TaskController extends ZfExtended_RestController {
     /***
      * Check if the given task/project can be deleted based on the task state. When project task is provided,
      * all project tasks will be checked
+     * @throws ZfExtended_Models_Entity_Conflict
      */
     protected function checkStateDelete(editor_Models_Task $taskEntity, bool $forced){
 
         // if it is not project, do regular check
-        if(!$taskEntity->isProject()){
-
-            //if task is erroneous then it is also deleteable, regardless of its locking state
-            if(!$taskEntity->isImporting() && !$taskEntity->isErroneous() && !$forced){
-                $taskEntity->checkStateAllowsActions();
-            }
-        }else{
-            $model=ZfExtended_Factory::get('editor_Models_Task');
+        if($taskEntity->isProject()){
+            $model = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $model editor_Models_Task */
-            $tasks=$model->loadProjectTasks($this->entity->getProjectId(),true);
+            $tasks = $model->loadProjectTasks($this->entity->getProjectId(),true);
             // if it is project, load all project tasks, and check the state for each one of them
             foreach ($tasks as $projectTask){
                 $model->init($projectTask);
                 $this->checkStateDelete($model,$forced);
+            }
+        } else {
+            //if task is erroneous then it is also deleteable, regardless of its locking state
+            if(!$taskEntity->isImporting() && !$taskEntity->isErroneous() && !$forced){
+                $taskEntity->checkStateAllowsActions();
             }
         }
     }
