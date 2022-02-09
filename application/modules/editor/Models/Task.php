@@ -666,7 +666,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function isReview(): bool
     {
-        return $this->getEmptyTargets();
+        return !$this->getEmptyTargets();
     }
 
     /**
