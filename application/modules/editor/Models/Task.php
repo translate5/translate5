@@ -1248,7 +1248,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function loadProjectTasks(int $projectId,bool $tasksOnly=false) : array{
         $s=$this->db->select();
         if($tasksOnly){
-            $s->where('taskType NOT IN(?)',editor_Task_Type_ProjectTask::ID);
+            $s->where('taskType IN (?)', editor_Task_Type::getInstance()->getNonInternalTaskTypes());
         }
         $s->where('projectId=?',$projectId);
         return $this->db->fetchAll($s)->toArray();

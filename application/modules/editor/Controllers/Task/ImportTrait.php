@@ -72,7 +72,7 @@ trait editor_Controllers_Task_ImportTrait {
         $dp->archiveImportedData();
 
         $this->entity->setProjectId($entityId);
-        $this->entity->setTaskType(editor_Task_Type_Project::ID);
+        $this->entity->setTaskType(editor_Task_Type::getInstance()->getImportProjectType());
 
         $this->entity->save();// save the entity to keep the project id in case the task import fails.
 
@@ -86,7 +86,7 @@ trait editor_Controllers_Task_ImportTrait {
             $task = clone $this->entity;
 
             $task->setProjectId($entityId);
-            $task->setTaskType(editor_Task_Type_ProjectTask::ID);
+            $task->setTaskType(editor_Task_Type::getInstance()->getImportTaskType());
             $task->setTargetLang($target);
             $task->setTaskName($this->entity->getTaskName().' - '.$languages[$task->getSourceLang()].' / '.$languages[$task->getTargetLang()]);
 
@@ -137,15 +137,6 @@ trait editor_Controllers_Task_ImportTrait {
             }
             throw $e;
         }
-    }
-
-    /***
-     * Check if in the current post data, the content is for project create
-     * @return bool
-     */
-    public function isProjectUpload(): bool
-    {
-        return count($this->data['targetLang']) > 1;
     }
 
     /***

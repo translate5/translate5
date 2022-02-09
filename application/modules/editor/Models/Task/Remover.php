@@ -59,10 +59,10 @@ class editor_Models_Task_Remover {
         if(empty($taskGuid)) {
             return false;
         }
-        if(!$isProject){
-            $this->removeTask($forced);
-        }else{
+        if($isProject && $projectId > 0){
             $this->removeProject($projectId,$forced,true);
+        }else{
+            $this->removeTask($forced);
         }
 
         // on import error project may not be created:

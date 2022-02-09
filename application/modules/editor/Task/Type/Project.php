@@ -37,4 +37,10 @@ class editor_Task_Type_Project extends editor_Task_Type_Abstract {
     protected bool $isTask = false;
     protected bool $terminologyDisabled = true;
     protected bool $exportUsage = false;
+
+    public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType) {
+        //if a project is requested, the default task type is ProjectTask
+        $projectType = editor_Task_Type_Project::ID;
+        $taskType = editor_Task_Type_ProjectTask::ID;
+    }
 }

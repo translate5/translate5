@@ -499,6 +499,8 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * creates a task and starts import of the uploaded task files
      * (non-PHPdoc)
+     * @throws Zend_Exception
+     * @throws Exception
      * @see ZfExtended_RestController::postAction()
      */
     public function postAction() {
@@ -540,8 +542,9 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $this->setDataInEntity();
 
-        $this->prepareLanguages();
-        
+        $targetLangCount = $this->prepareLanguages();
+        $singleTask = $this->prepareTaskType($targetLangCount);
+
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
 
@@ -577,10 +580,10 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $this->initWorkflow();
 
-        if($this->isProjectUpload()){
-            $tasks = $this->handleProjectUpload();
-        }else{
+        if($singleTask){
             $tasks = $this->handleTaskImport();
+        }else{
+            $tasks = $this->handleProjectUpload();
         }
 
         //warn the api user for the targetDeliveryDate ussage
@@ -604,9 +607,21 @@ class editor_TaskController extends ZfExtended_RestController {
     }
 
     /**
-     * prepares the languages in $this->data for the import
+     * prepares the tasks type, by considering the language count and the initial given task type via API
+     * returns if it should be a single task (project = task) or a project with sub tasks
      */
-    protected function prepareLanguages() {
+    protected function prepareTaskType(int $targetLangCount): bool {
+        $taskType = editor_Task_Type::getInstance();
+        $taskType->calculateImportTypes($targetLangCount > 1, $this->data['taskType']);
+        $this->entity->setTaskType($taskType->getImportProjectType());
+        return $taskType->getImportTaskType() === $taskType->getImportProjectType();
+    }
+
+    /**
+     * prepares the languages in $this->data for the import
+     * @return int the target language count
+     */
+    protected function prepareLanguages(): int {
         if(!is_array($this->data['targetLang'])) {
             $this->data['targetLang'] = [$this->data['targetLang']];
         }
@@ -623,9 +638,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->_helper->Api->sortLanguages($this->data['targetLang']);
 
         //task is handled as a project (one source language, multiple target languages, each combo one own task)
-        if(count($this->data['targetLang']) > 1) {
+        $targetLangCount = count($this->data['targetLang']);
+        if($targetLangCount > 1) {
             //with multiple target languages, the current task will be a project!
-            $this->entity->setTaskType(editor_Task_Type_Default::ID);
             $this->entity->setTargetLang(0);
         }
         else {
@@ -634,6 +649,8 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
         $this->entity->setRelaisLang($this->data['relaisLang']);
+
+        return $targetLangCount;
     }
 
     /**

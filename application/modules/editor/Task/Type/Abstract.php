@@ -106,6 +106,14 @@ abstract class editor_Task_Type_Abstract {
         return $this::ID;
     }
 
+    /**
+     * calculates the project and task types to be used out of the current type (which was the desired one) and the multiTarget info
+     * @param bool $multiTarget
+     * @param string $projectType
+     * @param string $taskType
+     */
+    abstract public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType);
+
     public function __toString(): string
     {
         return $this->id();

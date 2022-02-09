@@ -47,6 +47,18 @@ class editor_Task_Type {
     ];
 
     /**
+     * The calculated initial taskType for projects
+     * @var string
+     */
+    protected $importTypeProject = editor_Task_Type_Default::ID;
+
+    /**
+     * The calculated initial taskType for tasks
+     * @var string
+     */
+    protected $importTypeTask = editor_Task_Type_Default::ID;
+
+    /**
      * Returns the singleton of the task type manager
      * @return editor_Task_Type
      */
@@ -88,7 +100,7 @@ class editor_Task_Type {
      * gets all type IDs for which the usage should be exported
      */
     public function getUsageExportTypes(): array {
-        return $this->filterTypes(function($id, $type) {
+        return $this->filterTypes(function(string $id, editor_Task_Type_Abstract $type) {
             return $type->isExportUsage();
         });
     }
@@ -97,7 +109,7 @@ class editor_Task_Type {
      * gets all type IDs which are considered to be a project, since there are tasks being a task and a project, we have to exclude the tasks optionally
      */
     public function getProjectTypes(bool $excludeTasks = false): array {
-        return $this->filterTypes(function($id, $type) use ($excludeTasks){
+        return $this->filterTypes(function(string $id, editor_Task_Type_Abstract $type) use ($excludeTasks){
             return $type->isProject() && !($excludeTasks && $type->isTask());
         });
     }
@@ -106,8 +118,17 @@ class editor_Task_Type {
      * gets all type IDs which are considered to be a task
      */
     public function getTaskTypes(): array {
-        return $this->filterTypes(function($id, $type) {
+        return $this->filterTypes(function(string $id, editor_Task_Type_Abstract $type) {
             return $type->isTask();
+        });
+    }
+
+    /**
+     * gets all type IDs which are considered to be a task and which are non internal
+     */
+    public function getNonInternalTaskTypes(): array {
+        return $this->filterTypes(function(string $id, editor_Task_Type_Abstract $type) {
+            return $type->isTask() && !$type->isInternalTask();
         });
     }
 
@@ -135,5 +156,31 @@ class editor_Task_Type {
     public function getType(string $type): editor_Task_Type_Abstract
     {
         return self::$registeredTypes[$type] ?? self::$registeredTypes[editor_Task_Type_Default::ID];
+    }
+
+    /**
+     * Calculates the to be used task and project types, based on the currently only relevant information
+     * @param bool $multiTarget
+     * @param string $initialType
+     */
+    public function calculateImportTypes(bool $multiTarget, string $initialType = editor_Task_Type_Default::ID) {
+        $type = $this->getType($initialType);
+        $type->calculateImportTypes($multiTarget, $this->importTypeProject, $this->importTypeTask);
+    }
+
+    /**
+     * returns the task type to be used on import
+     * @return string
+     */
+    public function getImportTaskType() {
+        return $this->importTypeTask;
+    }
+
+    /**
+     * returns the project type to be used on import
+     * @return string
+     */
+    public function getImportProjectType() {
+        return $this->importTypeProject;
     }
 }
