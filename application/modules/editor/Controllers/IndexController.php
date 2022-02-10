@@ -668,7 +668,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $requestedFile = $this->getParam(2);
         $requestedFileParts = explode($slash, $requestedFile);
         $extension = strtolower(pathinfo($requestedFile, PATHINFO_EXTENSION));
-
+        
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase!
         $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($requestedFileParts)));
@@ -729,16 +729,18 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         * Cf. https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching 
         */
         $cacheBehaviour = ($version !== 'development') ? 'max-age=36000, must-revalidate' : 'no-cache';
-        $disableCacheParam = ($version === 'development') ? null : $this->getParam('_dc'); // e.g. 5.6.0
+        $disableCacheParam = ($version === 'development') ? null : $this->getParam('_dc'); // e.g. 5.6.0. Most js files will have one; css not.
         if (
             $disableCacheParam // The param will change with a new release and query an updated version
             || 
             (str_starts_with($requestedType, 'visualReview-t') // The outputs of pdf2HtmlEx will never change, e.g visualReview-t123/VisualReview/bg1.png
-                && $extension !== 'html') // FIXME: Will planned feature of editable segments make changes to review.html?
+                && $extension !== 'html') // FIXME: Planned feature of editable segments could change review.html
             ) { 
             $cacheBehaviour = ' max-age=31536000, immutable';
         }
         header('Cache-Control: ' . $cacheBehaviour);
+        header('Content-Length: '.($publicFile->getSize() ?: ''));
+        header('Last-Modified: '.gmdate('D, d M Y H:i:s', $publicFile->getMtime()).' GMT');
 
         readfile($publicFile);
         exit;
