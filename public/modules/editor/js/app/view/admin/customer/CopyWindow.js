@@ -30,9 +30,20 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
     alias: 'widget.copyCustomerWindow',
     itemId: 'copyCustomerWindow',
     controller: 'copyCustomerWindow',
+    viewModel: {
+        type: 'copyCustomerWindow'
+    },
     requires: [
-        'Editor.view.admin.customer.CopyWindowViewController'
+        'Editor.view.admin.customer.CopyWindowViewController',
+        'Editor.view.admin.customer.CopyWindowViewModel'
     ],
+    listen: {
+        store:{
+            '#copyCustomers':{
+                load:'onCopyCustomersStoreLoad'
+            }
+        }
+    },
     autoHeight: true,
     autoScroll: true,
     modal: true,
@@ -44,7 +55,8 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
         copyConfigLabel:'#UT#Konfigurationen kopieren von',
         copyConfigTooltip:'#UT#Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren',
         copySuccess:'#UT#Kopieren erfolgreich',
-        copyFromText:'#UT#Kopieren von'
+        copyFromText:'#UT#Kopieren von',
+        copyBtnText:'#UT#Kopieren'
     },
     record: null,
 
@@ -62,9 +74,17 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
                         xtype: 'customersCombo',
                         name: 'copyDefaultAssignmentsCustomer',
                         itemId: 'copyDefaultAssignmentsCustomer',
+                        store:null,
+                        bind:{
+                            store:'{copyCustomers}',
+                        },
                         margin: '0 10 0 0',
                         allowBlank:true,
-                        toolTip: me.strings.copyUserAssocTooltip,
+                        labelCls: 'labelInfoIcon',
+                        autoEl: {
+                            tag: 'span',
+                            'data-qtip': me.strings.copyUserAssocTooltip
+                        },
                         fieldLabel:me.strings.copyUserAssocLabel
                     },{
                         xtype: 'button',
@@ -73,7 +93,7 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
                         listeners: {
                             click:'onAddCopyDefaultAssignmentsCustomerClick'
                         },
-                        text: 'Add'
+                        text: me.strings.copyBtnText
                     }]
                 }, {
                     xtype: 'fieldcontainer',
@@ -85,9 +105,17 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
                         xtype: 'customersCombo',
                         name: 'copyConfigCustomer',
                         itemId: 'copyConfigCustomer',
+                        store:null,
+                        bind:{
+                            store:'{copyCustomers}',
+                        },
                         margin: '0 10 0 0',
                         allowBlank: true,
-                        toolTip: me.strings.copyConfigTooltip,
+                        labelCls: 'labelInfoIcon',
+                        autoEl: {
+                            tag: 'span',
+                            'data-qtip': me.strings.copyConfigTooltip
+                        },
                         fieldLabel: me.strings.copyConfigLabel
                     },{
                         xtype: 'button',
@@ -96,7 +124,7 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
                         listeners: {
                             click:'onAddCopyConfigCustomerClick'
                         },
-                        text: 'Add'
+                        text: me.strings.copyBtnText
                     }]
                 }]
             };

@@ -26,10 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/***
+ * Copy configuration and user assignments from one customer to another.
+ */
 class editor_Models_Customer_CopyCustomer {
 
-
-    /**
+    /***
+     *  Copy user assignments + runtimeOptions.import.initialTaskUsageMode and runtimeOptions.workflow.initialWorkflow configs
+     * from the $source customer to the $target customer
+     * @param int $source
+     * @param int $target
+     * @return void
      * @throws Zend_Db_Table_Exception
      */
     public function copyUserAssoc(int $source, int $target){
@@ -44,9 +51,25 @@ class editor_Models_Customer_CopyCustomer {
         $sql .= "SELECT ".implode(',',$columns)." FROM LEK_user_assoc_default where customerId = ?";
 
         $adapter = $model->db->getAdapter();
+        // copy the default user assignments
+        $adapter->query($sql,[$target,$source]);
+
+        /** @var editor_Models_Customer_CustomerConfig $model */
+        $model = ZfExtended_Factory::get('editor_Models_Customer_CustomerConfig');
+
+        // in this action additionally copy the usage mode and the initial workflow
+        $sql = "INSERT IGNORE INTO LEK_customer_config (customerId, name, value) 
+                SELECT  ?, name, value FROM LEK_customer_config where customerId = ? and name in('runtimeOptions.import.initialTaskUsageMode','runtimeOptions.workflow.initialWorkflow')";
+        $adapter = $model->db->getAdapter();
         $adapter->query($sql,[$target,$source]);
     }
 
+    /***
+     * Copy all customer specific configs from $source customer to $target customer
+     * @param int $source
+     * @param int $target
+     * @return void
+     */
     public function copyConfig(int $source, int $target){
         /** @var editor_Models_Customer_CustomerConfig $model */
         $model = ZfExtended_Factory::get('editor_Models_Customer_CustomerConfig');

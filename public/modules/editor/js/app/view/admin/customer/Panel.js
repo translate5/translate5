@@ -113,10 +113,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             },{
                                 xtype: 'actioncolumn',
                                 text:  me.strings.actionColumn,
-                                menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter.
-                                // NOTE: when this is uncommented, the last action icon is always hidden. You need to resize the action column to make all action items visible.
                                 sortable: false,
-                                width: 60,
+                                fixed: true,
                                 items:[{
                                     glyph: 'f044@FontAwesome5FreeSolid',
                                     tooltip: me.strings.customerEditActionIcon,

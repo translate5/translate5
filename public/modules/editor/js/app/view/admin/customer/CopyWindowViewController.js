@@ -36,8 +36,8 @@ Ext.define('Editor.view.admin.customer.CopyWindowViewController', {
      */
     onAddCopyDefaultAssignmentsCustomerClick: function (){
         var me = this,
-            combo = me.query('#copyDefaultAssignmentsCustomer');
-        me.copyCustomerMessageBox({
+            combo = me.getView().down('#copyDefaultAssignmentsCustomer');
+        me.copyCustomer({
             copyDefaultAssignmentsCustomer:combo && combo.getValue()
         });
     },
@@ -49,28 +49,16 @@ Ext.define('Editor.view.admin.customer.CopyWindowViewController', {
      */
     onAddCopyConfigCustomerClick: function (){
         var me = this,
-            combo = me.query('#copyConfigCustomer');
-        me.copyCustomerMessageBox({
+            combo = me.getView().down('#copyConfigCustomer');
+        me.copyCustomer({
             copyConfigCustomer:combo && combo.getValue()
         });
     },
 
-
-    copyCustomerMessageBox:function (params){
-        var me = this;
-        Ext.Msg.show({
-            title:'Save Changes?',
-            message: 'You are closing a tab that has unsaved changes. Would you like to save your changes?',
-            buttons: Ext.Msg.YESNO,
-            icon: Ext.Msg.QUESTION,
-            fn:function (btn){
-                if (btn === 'yes') {
-                    me.copyCustomer(params);
-                }
-            }
-        });
-    },
-
+    /***
+     *
+     * @param params
+     */
     copyCustomer: function(params) {
         var me = this,
             record = me.getView().getRecord();
@@ -91,6 +79,21 @@ Ext.define('Editor.view.admin.customer.CopyWindowViewController', {
             failure: function (response) {
                 Editor.app.getController('ServerException').handleException(response);
             }
+        });
+    },
+
+    /***
+     * Filter out the current selected customer(copy from customer) from the copy customers store
+     * @param store
+     */
+    onCopyCustomersStoreLoad:function (store){
+        var me = this,
+            view = me.getView();
+        if(!view || !view.getRecord()){
+            return;
+        }
+        store.filterBy(function (r){
+            return r.get('id') !== view.getRecord().get('id');
         });
     }
 });
