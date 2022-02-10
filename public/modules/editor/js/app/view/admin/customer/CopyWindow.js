@@ -47,16 +47,18 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
     autoHeight: true,
     autoScroll: true,
     modal: true,
-    bodyPadding: 10,
+    bodyPadding: 27,
     strings: {
-        title: '#UT#Kundeneinstellungen kopieren',
+        title: '#UT#Kundeneinstellungen in den aktuellen Kunden übernehmen',
         copyUserAssocLabel:'#UT#Standard-Benutzerzuweisungen kopieren von',
         copyUserAssocTooltip:'#UT#Alle Standard-Benutzerzuweisungen des ausgewählten Kunden, einschließlich des ausgewählten Mehrbenutzermodus und Workflows, in den aktuellen Kunden kopieren',
         copyConfigLabel:'#UT#Konfigurationen kopieren von',
         copyConfigTooltip:'#UT#Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren',
         copySuccess:'#UT#Kopieren erfolgreich',
         copyFromText:'#UT#Kopieren von',
-        copyBtnText:'#UT#Kopieren'
+        copyBtnText:'#UT#Kopieren',
+        saveConfirmMessage:'#UT#Dadurch werden alle zuvor konfigurierten Werte entfernt.',
+        saveConfirmMessageTitle:'#UT#Auswahl speichern'
     },
     record: null,
 
@@ -65,6 +67,15 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
             config = {
                 title:me.strings.title,
                 items: [{
+                    xtype: 'displayfield',
+                    hideLabel:true,
+                    fieldCls: 'lableInfoIcon',
+                    autoEl: {
+                        tag: 'span',
+                        'data-qtip': me.strings.copyUserAssocTooltip
+                    },
+                    value:me.strings.copyUserAssocLabel
+                },{
                     xtype: 'fieldcontainer',
                     layout: {
                         type: 'hbox',
@@ -78,14 +89,7 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
                         bind:{
                             store:'{copyCustomers}',
                         },
-                        margin: '0 10 0 0',
-                        allowBlank:true,
-                        labelCls: 'labelInfoIcon',
-                        autoEl: {
-                            tag: 'span',
-                            'data-qtip': me.strings.copyUserAssocTooltip
-                        },
-                        fieldLabel:me.strings.copyUserAssocLabel
+                        hideLabel:true
                     },{
                         xtype: 'button',
                         glyph: 'f00c@FontAwesome5FreeSolid',
@@ -95,6 +99,15 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
                         },
                         text: me.strings.copyBtnText
                     }]
+                },{
+                    xtype: 'displayfield',
+                    hideLabel: true,
+                    fieldCls: 'lableInfoIcon',
+                    autoEl: {
+                        tag: 'span',
+                        'data-qtip': me.strings.copyConfigTooltip
+                    },
+                    value: me.strings.copyConfigLabel
                 }, {
                     xtype: 'fieldcontainer',
                     layout: {
@@ -109,14 +122,7 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
                         bind:{
                             store:'{copyCustomers}',
                         },
-                        margin: '0 10 0 0',
-                        allowBlank: true,
-                        labelCls: 'labelInfoIcon',
-                        autoEl: {
-                            tag: 'span',
-                            'data-qtip': me.strings.copyConfigTooltip
-                        },
-                        fieldLabel: me.strings.copyConfigLabel
+                        hideLabel:true
                     },{
                         xtype: 'button',
                         glyph: 'f00c@FontAwesome5FreeSolid',

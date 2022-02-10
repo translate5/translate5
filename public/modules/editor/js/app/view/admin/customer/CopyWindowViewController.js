@@ -37,7 +37,7 @@ Ext.define('Editor.view.admin.customer.CopyWindowViewController', {
     onAddCopyDefaultAssignmentsCustomerClick: function (){
         var me = this,
             combo = me.getView().down('#copyDefaultAssignmentsCustomer');
-        me.copyCustomer({
+        me.copyCustomerMessageBox({
             copyDefaultAssignmentsCustomer:combo && combo.getValue()
         });
     },
@@ -50,8 +50,23 @@ Ext.define('Editor.view.admin.customer.CopyWindowViewController', {
     onAddCopyConfigCustomerClick: function (){
         var me = this,
             combo = me.getView().down('#copyConfigCustomer');
-        me.copyCustomer({
+        me.copyCustomerMessageBox({
             copyConfigCustomer:combo && combo.getValue()
+        });
+    },
+
+    copyCustomerMessageBox:function (params){
+        var me = this;
+        Ext.Msg.show({
+            title:me.getView().saveConfirmMessageTitle,
+            message: me.getView().saveConfirmMessage,
+            buttons: Ext.Msg.YESNO,
+            icon: Ext.Msg.QUESTION,
+            fn:function (btn){
+                if (btn === 'yes') {
+                    me.copyCustomer(params);
+                }
+            }
         });
     },
 

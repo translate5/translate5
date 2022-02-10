@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Customer_CopyCustomer {
 
     /***
-     *  Copy user assignments + runtimeOptions.import.initialTaskUsageMode and runtimeOptions.workflow.initialWorkflow configs
+     * Copy user assignments + runtimeOptions.import.initialTaskUsageMode and runtimeOptions.workflow.initialWorkflow configs
      * from the $source customer to the $target customer
      * @param int $source
      * @param int $target
@@ -42,6 +42,19 @@ class editor_Models_Customer_CopyCustomer {
     public function copyUserAssoc(int $source, int $target){
         /** @var editor_Models_UserAssocDefault $model */
         $model = ZfExtended_Factory::get('editor_Models_UserAssocDefault');
+
+        $adapter = $model->db->getAdapter();
+
+        $sql = "DELETE FROM LEK_user_assoc_default where customerId = ?";
+        // delete all user associations for the target customer
+        $adapter->query($sql,[$target]);
+
+        // remove the usage mode and the initial workflow config before the new values are copied
+        $sql = "DELETE FROM LEK_customer_config where customerId = ? and name in('runtimeOptions.import.initialTaskUsageMode','runtimeOptions.workflow.initialWorkflow')";
+        // delete all user associations for the target customer
+        $adapter->query($sql,[$target]);
+
+        // get all table columns
         $columns = $model->db->info($model->db::COLS);
         array_shift($columns); // remove the id from the column
 
@@ -57,7 +70,7 @@ class editor_Models_Customer_CopyCustomer {
         /** @var editor_Models_Customer_CustomerConfig $model */
         $model = ZfExtended_Factory::get('editor_Models_Customer_CustomerConfig');
 
-        // in this action additionally copy the usage mode and the initial workflow
+        // in this action, additionally copy the usage mode and the initial workflow
         $sql = "INSERT IGNORE INTO LEK_customer_config (customerId, name, value) 
                 SELECT  ?, name, value FROM LEK_customer_config where customerId = ? and name in('runtimeOptions.import.initialTaskUsageMode','runtimeOptions.workflow.initialWorkflow')";
         $adapter = $model->db->getAdapter();
@@ -74,9 +87,13 @@ class editor_Models_Customer_CopyCustomer {
         /** @var editor_Models_Customer_CustomerConfig $model */
         $model = ZfExtended_Factory::get('editor_Models_Customer_CustomerConfig');
 
+        $adapter = $model->db->getAdapter();
+        $sql = "DELETE FROM LEK_customer_config where customerId = ?";
+        // remove all existing configs before new values are copied
+        $adapter->query($sql,[$target]);
+
         $sql = "INSERT IGNORE INTO LEK_customer_config (customerId, name, value) 
                 SELECT  ?, name, value FROM LEK_customer_config where customerId = ?";
-        $adapter = $model->db->getAdapter();
         $adapter->query($sql,[$target,$source]);
     }
 }
