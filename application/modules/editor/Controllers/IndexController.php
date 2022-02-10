@@ -701,11 +701,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // Override default content-type text/html https://www.php.net/manual/en/ini.core.php#ini.default-mimetype
         // Prevents problems with files without extensions as is often the case with wget downloaded websites
         header('Content-Type: ' . ($types[$extension] ?? ''));
+
+        // Unset default caching headers here in case we exit early with 304
+        header_remove('Cache-Control');
+        header_remove('Expires');
+        header_remove('Pragma');
+        header_remove('X-Powered-By'); //FIXME: this is configurable in php.ini via 'expose_php = Off'
         
-        /* Caching Identifiers
-        * $etag - version number of release. Trumps $mtime
-        * $mtime - modification time. If new release detected by mismatching $etags, check if file really changed via $mtime
-        * In dev mode use mtime as etag to simulate new version on file change.
+        /* Caching Identifier
+        * $etag - version number of release. Can only be updated by sending whole resource again
+        * In dev mode use mtime to simulate new version on file change.
         */
         $version = ZfExtended_Utils::getAppVersion();
         $etag = ($version !== 'development') ? $version : strval($publicFile->getMTime());
@@ -717,36 +722,23 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // Version has changed, update etag on clientside
         header('Etag: '.$etag);
 
-        $mtime = $publicFile->getMTime();
-        $mtimeClient = strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? '');
-        if($mtimeClient === $mtime){ // Check if file has changed, not only version
-            header('HTTP/1.1 304 Not Modified');
-            exit;
-        }
-        // File has changed
-        header('Last-Modified: '.gmdate('D, d M Y H:i:s', $mtime).' GMT');
-
         /* Set caching behaviour.
         * - Default to 10 hours == 36000s to revalidate daily for new release
         * - In dev mode revalidate always
         * - "Never" (== yearly == 31536000s) revalidate immutable resources
         * Cf. https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching 
         */
-        header_remove('Cache-Control');
         $cacheBehaviour = ($version !== 'development') ? 'max-age=36000, must-revalidate' : 'no-cache';
         $disableCacheParam = ($version === 'development') ? null : $this->getParam('_dc'); // e.g. 5.6.0
         if (
             $disableCacheParam // The param will change with a new release and query an updated version
-            ||
-            str_starts_with($requestedType, 'visualReview-t') // The outputs of pdf2HtmlEx will never change, e.g visualReview-t123/VisualReview/bg1.png
-        ) {
+            || 
+            (str_starts_with($requestedType, 'visualReview-t') // The outputs of pdf2HtmlEx will never change, e.g visualReview-t123/VisualReview/bg1.png
+                && $extension !== 'html') // FIXME: Will planned feature of editable segments make changes to review.html?
+            ) { 
             $cacheBehaviour = ' max-age=31536000, immutable';
         }
         header('Cache-Control: ' . $cacheBehaviour);
-
-        header_remove('Expires');
-        header_remove('Pragma');
-        header_remove('X-Powered-By'); //FIXME: this is configurable in php.ini via 'expose_php = Off'
 
         readfile($publicFile);
         exit;
