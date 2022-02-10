@@ -187,26 +187,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         this.getView().isValid();
     },
 
-    updateFormIsValid:function (){
-        var me = this,
-            view = me.getView(),
-            store = view && view.getStore(),
-            form = view && view.up('#taskMainCard').down('form'),
-            items = [];
-
-        if(!store){
-            return;
-        }
-
-        items = store.queryBy(function (record){
-            return record.get('type') !== Editor.model.admin.projectWizard.File.TYPE_ERROR;
-        });
-
-        form && items.length === 0 && form.markInvalid({
-            importUpload : 'No valid upload files found'
-        });
-    },
-
     /***
      * Validates and sets the language fields in the current file record
      *
