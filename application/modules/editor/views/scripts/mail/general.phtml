@@ -104,8 +104,8 @@ if(!empty($this->task)) {
     $taskData['deadlineDate'] = $this->taskUserAssoc['deadlineDate'] ?? '-';
     $taskData['wordCount'] = $this->task->getWordCount() > 0 ? $this->task->getWordCount() : '-';
     
-    $customer=ZfExtended_Factory::get('editor_Models_Customer');
-    /* @var $customer editor_Models_Customer */
+    $customer=ZfExtended_Factory::get('editor_Models_Customer_Customer');
+    /* @var $customer editor_Models_Customer_Customer */
     $customer->load($this->task->getCustomerId());
     //if the customer domain is set, use this domain as portal url and link
     if(empty($customer->getDomain())){

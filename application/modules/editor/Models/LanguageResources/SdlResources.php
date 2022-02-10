@@ -121,8 +121,8 @@ class editor_Models_LanguageResources_SdlResources {
             return false;
         };
         
-        $customer=ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $customer editor_Models_Customer */
+        $customer=ZfExtended_Factory::get('editor_Models_Customer_Customer');
+        /* @var $customer editor_Models_Customer_Customer */
         $customerLimit=$customer->getMinCharactersByUser();
         
         //if the customer config is not defined, set the customer limit to max int, so it is compared against engine limit

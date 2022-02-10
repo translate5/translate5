@@ -34,7 +34,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
         'Editor.view.admin.customer.ViewController',
         'Editor.view.admin.config.Grid',
         'Editor.view.admin.user.Assoc',
-        'Editor.view.admin.customer.OpenIdPanel'
+        'Editor.view.admin.customer.OpenIdPanel',
+        'Editor.view.admin.customer.CopyWindow'
     ],
 
     stores:['admin.Customers'],
@@ -126,6 +127,11 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     tooltip: me.strings.export,
                                     scope:'controller',
                                     handler:'onTmExportClick'
+                                },{
+                                    glyph: 'f0c5@FontAwesome5FreeSolid',
+                                    tooltip: 'Copy',
+                                    scope:'controller',
+                                    handler:'onCopyActionClick'
                                 },{
                                     glyph: 'f2ed@FontAwesome5FreeSolid',
                                     tooltip:me.strings.remove,
@@ -254,8 +260,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         visible:'{!isOpenIdHidden}'
                                     },
                                     itemId:'openIdDomain'
-                                }
-                            ]
+                                }]
                         },{
                             xtype: 'adminUserAssoc',
                             bind:{

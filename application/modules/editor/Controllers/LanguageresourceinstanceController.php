@@ -430,7 +430,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //check if filtering for useAsDefault should be done
         if(isset($useAsDefault)) {
             if(isset($useAsDefault->value) && is_string($useAsDefault->value)) {
-                $resultList=$searchEntity($useAsDefault->value,'editor_Models_Customer');
+                $resultList=$searchEntity($useAsDefault->value,'editor_Models_Customer_Customer');
                 $handleFilter($useAsDefault,$resultList,'editor_Models_LanguageResources_CustomerAssoc','loadByCustomerIdsUseAsDefault','languageResourceId');
             }
             else {
@@ -441,7 +441,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //check if filtering for writeAsDefault should be done
         if(isset($writeAsDefault)) {
             if(isset($writeAsDefault->value) && is_string($writeAsDefault->value)) {
-                $resultList=$searchEntity($writeAsDefault->value,'editor_Models_Customer');
+                $resultList=$searchEntity($writeAsDefault->value,'editor_Models_Customer_Customer');
                 $handleFilter($writeAsDefault,$resultList,'editor_Models_LanguageResources_CustomerAssoc','loadByCustomerIdsWriteAsDefault','languageResourceId');
             }
             else {

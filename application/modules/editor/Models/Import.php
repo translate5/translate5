@@ -207,7 +207,7 @@ class editor_Models_Import {
         $edit100PercentMatch = (bool) $config->runtimeOptions->frontend->importTask->edit100PercentMatch;
         $task->setEdit100PercentMatch((int) (! empty($params->editFullMatch) && $edit100PercentMatch));
         
-        $task->setCustomerId($params->customerId ?? ZfExtended_Factory::get('editor_Models_Customer')->loadByDefaultCustomer()->getId());
+        $task->setCustomerId($params->customerId ?? ZfExtended_Factory::get('editor_Models_Customer_Customer')->loadByDefaultCustomer()->getId());
         
         $task->validate();
         $this->setTask($task);
