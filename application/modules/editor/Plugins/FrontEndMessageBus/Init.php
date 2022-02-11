@@ -362,9 +362,9 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     /**
      * @return array
      */
-    public function handleGetValidSessionsSql() {
+    public function handleGetValidSessionsSql(): array {
         $res = $this->bus->getConnectionSessions();
-        return $res->instanceResult ?? [];
+        return (array) ($res->instanceResult ?? []);
     }
 
     /***

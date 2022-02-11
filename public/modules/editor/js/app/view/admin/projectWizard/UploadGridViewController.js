@@ -187,26 +187,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         this.getView().isValid();
     },
 
-    updateFormIsValid:function (){
-        var me = this,
-            view = me.getView(),
-            store = view && view.getStore(),
-            form = view && view.up('#taskMainCard').down('form'),
-            items = [];
-
-        if(!store){
-            return;
-        }
-
-        items = store.queryBy(function (record){
-            return record.get('type') !== Editor.model.admin.projectWizard.File.TYPE_ERROR;
-        });
-
-        form && items.length === 0 && form.markInvalid({
-            importUpload : 'No valid upload files found'
-        });
-    },
-
     /***
      * Validates and sets the language fields in the current file record
      *
@@ -228,14 +208,14 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             errorMsg = null;
 
         // evaluate the sourceLang from the file content
-        fileSourceLang = fileSourceLang ? fileSourceLang[1] : null;
+        fileSourceLang = me.parseFileLanguage(fileSourceLang);
         if(fileSourceLang) {
             // convert the rfc to id
             rec.set('sourceLang', languages.getIdByRfc(fileSourceLang));
         }
 
         // evaluate the targetLang from the file content
-        fileTargetLang = fileTargetLang ? fileTargetLang[1] : null;
+        fileTargetLang = me.parseFileLanguage(fileTargetLang);
         if(fileTargetLang) {
             rec.set('targetLang', languages.getIdByRfc(fileTargetLang));
         }
@@ -505,5 +485,20 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         var me = this,
             window = me.getView().up('#adminTaskAddWindow');
         window && window.getViewModel().set('isZipUpload',isZip);
+    },
+
+    /***
+     * Parse language from file read search and adjust it to rfc parsable strings
+     * @param language
+     * @returns {null|*}
+     */
+    parseFileLanguage:function (language){
+        if(!language || language[1] === undefined){
+            return null;
+        }
+        // remove any whitespaces from the langauge
+        language = language[1].trim();
+        // replace the _ with - so it can be validated as rfc
+        return language.replace('_','-');
     }
 });

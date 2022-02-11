@@ -45,12 +45,12 @@ Ext.define('Editor.store.admin.Languages', {
     },
 
     /***
-     * Find language in store by given rfc value
+     * Find language in store by given rfc value. Case sensitiv is off when searching.
      * @param rfc
      * @returns {*}
      */
     getByRfc: function (rfc) {
-        var rec = this.findRecord('rfc5646', rfc, 0, false, true, true);
+        var rec = this.findRecord('rfc5646', rfc, 0, false, false, true);
         return rec !== null ? rec : null;
     },
 
