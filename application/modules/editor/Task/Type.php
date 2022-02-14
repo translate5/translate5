@@ -44,6 +44,8 @@ class editor_Task_Type {
         'editor_Task_Type_Default',
         'editor_Task_Type_Project',
         'editor_Task_Type_ProjectTask',
+        'editor_Task_Type_TermTranslation',
+        'editor_Task_Type_TermTranslationTask',
     ];
 
     /**
