@@ -89,7 +89,16 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         }
         return true;
     }
-    
+
+    public function init($taskGuid = NULL, $parameters = array()) {
+        $result = parent::init($taskGuid, $parameters);
+        if($result && $parameters['type'] === self::TYPE_EXPORT) {
+            //on export we just use normal maintenance check, not the extended one for imports
+            $this->behaviour->setConfig(['isMaintenanceScheduled' => true]);
+        }
+        return $result;
+    }
+
     /**
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::work()

@@ -65,6 +65,31 @@ Ext.ClassManager.onCreated(function (className) {
     }
 });
 
+//Since IE does not support ES6 code, which we have now in the app, we should prevent problems by communicating that in an early stage.
+if(Ext.browser.is.IE) {
+    Ext.application = Ext.emptyFn;
+    Ext.onReady(function() {
+        Ext.Ajax.request({
+            url: Editor.data.pathToRunDir + '/editor/index/logbrowsertype',
+            method: 'post',
+            params: {
+                appVersion: navigator.appVersion,
+                userAgent: navigator.userAgent,
+                browserName: navigator.appName,
+                maxHeight: window.screen.availHeight,
+                maxWidth: window.screen.availWidth,
+                usedHeight: 0,
+                usedWidth: 0
+            }
+        });
+        var loadBox = Ext.select("body > div.loading");
+        if (loadBox) {
+            loadBox.setCls('loading-error');
+            loadBox.update('<div id="head-panel"></div><h1>Internet Explorer is not supported anymore!</h1>');
+        }
+    });
+}
+
 Ext.application({
     name: 'Editor',
     models: ['File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field', 'Config', 'TaskConfig', 'CustomerConfig', 'admin.UserAssocDefault'],
@@ -144,16 +169,7 @@ Ext.application({
     },
 
     launch: function () {
-        var me = this;
-        me.initViewportLaunch();
-    },
-
-    /***
-     * Init and prepare the viewport for application launch
-     */
-    initViewportLaunch: function () {
         var me = this,
-            viewSize = Ext.getBody().getViewSize(),
             initMethod = Editor.data.app.initMethod;
 
         me.windowTitle = Ext.getDoc().dom.title;
@@ -183,6 +199,23 @@ Ext.application({
         } else if (window.location.hash !== '') {
             initMethod = 'openAdministration';
         }
+
+        // if consortium logos should be shown for additional xyz seconds...
+        var showConsortiumLogos = Editor.data.startup.showConsortiumLogos;
+        showConsortiumLogos = showConsortiumLogos > 0 ? showConsortiumLogos * 1000 : 1;
+        Ext.defer(function() {
+            //we defer always this call, not only if showlogos = on, so that the defer is used stringently not only in some cases.
+            // There is no other technical need for the defer as showing the logos
+            me.initViewportLaunch(initMethod);
+        }, showConsortiumLogos);
+    },
+
+    /***
+     * Init and prepare the viewport for application launch
+     */
+    initViewportLaunch: function (initMethod) {
+        var me = this,
+            viewSize = Ext.getBody().getViewSize();
 
         me[initMethod]();
 
@@ -585,5 +618,13 @@ Ext.application({
             return row;
         }
         return row.get('value');
+    },
+
+    /***
+     * @returns {boolean}
+     */
+    isDevelopmentVersion:function (){
+        return Editor.data.app.version === "development";
     }
+
 });

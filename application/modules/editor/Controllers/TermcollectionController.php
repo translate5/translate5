@@ -84,7 +84,7 @@ class editor_TermcollectionController extends ZfExtended_RestController
 
         $data = $term->loadSortedByCollectionAndLanguages([$this->data->collectionId]);
         $export->setData($data);
-        $exportData = $export->export();
+        $exportData = $export->export((bool) $this->getParam('format', false));
 
         $this->view->filedata = $exportData;
     }
@@ -110,89 +110,6 @@ class editor_TermcollectionController extends ZfExtended_RestController
             $this->view->success = $this->entity->importTbx($filePath, $params);
         }
     }
-
-    /***
-     * Search terms
-     */
-    public function searchAction()
-    {
-        $params = $this->getRequest()->getParams();
-        $responseArray = [];
-
-        $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        $collectionIds=$termCollection->getCollectionForAuthenticatedUser();
-
-        if (empty($collectionIds)) {
-            $this->view->rows = $responseArray;
-            return;
-        }
-
-        $model = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $model editor_Models_Terminology_Models_TermModel */
-
-        $config = Zend_Registry::get('config');
-        $termCount = $config->runtimeOptions->termportal->searchTermsCount;
-
-        if (isset($params['term'])) {
-            $languages = $params['language'] ?? null;
-            $processStats = $params['processStats'] ?? array_values($model->getAllProcessStatus());
-
-            if (isset($params['collectionIds'])) {
-                // use only the collectionIds that the user has selected and be sure that these are allowed
-                $collectionIds = array_intersect($params['collectionIds'], $collectionIds);
-            }
-
-            //if the limit is disabled, do not use it
-            if (isset($params['disableLimit']) && $params['disableLimit'] === "true") {
-                $termCount=null;
-            }
-
-            $responseArray['term'] = $model->searchTermByLanguage($params['term'], $languages, $collectionIds, $termCount, $processStats);
-        }
-
-        $this->view->rows = $responseArray;
-    }
-
-    /***
-     * Search term entry and term attributes in group
-     */
-    /*public function searchattributeAction()
-    {
-        $params = $this->getRequest()->getParams();
-        $responseArray = [];
-        $collectionIds = isset($params['collectionId']) ? $params['collectionId'] : [];
-
-        $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $termCollection editor_Models_TermCollection_TermCollection * /
-
-        if (!empty($collectionIds)) {
-            // use only the collectionIds that the user has selected and be sure that these are allowed
-            $collectionIds = array_intersect($collectionIds, $termCollection->getCollectionForAuthenticatedUser());
-        } else {
-            $collectionIds = $termCollection->getCollectionForAuthenticatedUser();
-        }
-
-        if (empty($collectionIds)) {
-            $this->view->rows = $responseArray;
-            return;
-        }
-
-        $model = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $model editor_Models_Terminology_Models_TermModel * /
-
-        if (isset($params['termEntryId'])) {
-
-            $termAttributesInTermEntry = $model->searchTermAttributesInTermEntry($params['termEntryId'], $collectionIds);
-            $responseArray['termAttributes'] = $model->groupTermsAndAttributes($termAttributesInTermEntry);
-
-            $entryAttr = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-            /* @var $entryAttr editor_Models_Terminology_Models_AttributeModel * /
-            $responseArray['termEntryAttributes'] = $entryAttr->getAttributesForTermEntry($params['termEntryId'], $collectionIds);
-        }
-
-        $this->view->rows = $responseArray;
-    }*/
 
     /***
      * Check if any of the given terms exist in any allowed collection

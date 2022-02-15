@@ -1,0 +1,86 @@
+[
+    {
+        "id": "90824",
+        "taskGuid": "{0c88071c-9f3b-4f5d-aa92-fe659fd59a70}",
+        "analysisId": "710",
+        "segmentId": "4419790",
+        "segmentNrInTask": "1",
+        "internalFuzzy": "0",
+        "languageResourceid": "6821",
+        "matchRate": "96",
+        "wordCount": "3",
+        "type": "tm"
+    },
+    {
+        "id": "90825",
+        "taskGuid": "{0c88071c-9f3b-4f5d-aa92-fe659fd59a70}",
+        "analysisId": "710",
+        "segmentId": "4419791",
+        "segmentNrInTask": "2",
+        "internalFuzzy": "0",
+        "languageResourceid": "6821",
+        "matchRate": "96",
+        "wordCount": "3",
+        "type": "tm"
+    },
+    {
+        "id": "90826",
+        "taskGuid": "{0c88071c-9f3b-4f5d-aa92-fe659fd59a70}",
+        "analysisId": "710",
+        "segmentId": "4419792",
+        "segmentNrInTask": "3",
+        "internalFuzzy": "0",
+        "languageResourceid": "6821",
+        "matchRate": "91",
+        "wordCount": "3",
+        "type": "tm"
+    },
+    {
+        "id": "90827",
+        "taskGuid": "{0c88071c-9f3b-4f5d-aa92-fe659fd59a70}",
+        "analysisId": "710",
+        "segmentId": "4419793",
+        "segmentNrInTask": "4",
+        "internalFuzzy": "0",
+        "languageResourceid": "0",
+        "matchRate": "102",
+        "wordCount": "3",
+        "type": "auto-propagated"
+    },
+    {
+        "id": "90828",
+        "taskGuid": "{0c88071c-9f3b-4f5d-aa92-fe659fd59a70}",
+        "analysisId": "710",
+        "segmentId": "4419794",
+        "segmentNrInTask": "5",
+        "internalFuzzy": "1",
+        "languageResourceid": "6821",
+        "matchRate": "96",
+        "wordCount": "3",
+        "type": "tm"
+    },
+    {
+        "id": "90829",
+        "taskGuid": "{0c88071c-9f3b-4f5d-aa92-fe659fd59a70}",
+        "analysisId": "710",
+        "segmentId": "4419795",
+        "segmentNrInTask": "6",
+        "internalFuzzy": "0",
+        "languageResourceid": "6821",
+        "matchRate": "100",
+        "wordCount": "3",
+        "type": "tm"
+    },
+    {
+        "id": "90830",
+        "taskGuid": "{0c88071c-9f3b-4f5d-aa92-fe659fd59a70}",
+        "analysisId": "710",
+        "segmentId": "4419796",
+        "segmentNrInTask": "7",
+        "internalFuzzy": "0",
+        "languageResourceid": "0",
+        "matchRate": "102",
+        "wordCount": "3",
+        "type": "auto-propagated"
+    }
+]

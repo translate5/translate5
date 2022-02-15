@@ -62,7 +62,20 @@ class Translate1841Test extends \ZfExtended_Test_ApiTestcase {
         $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
         $api->reloadTask();
     }
-    
+
+    /**
+     * fixing TRANSLATE-1841 was causing TRANSLATE-2771 - tag pairing of segments containing a single tag did not work any more - this is tested here as PHP Unit test
+     */
+    public function testTranslate2771() {
+        $tag = new \editor_Models_Segment_InternalTag();
+        //tag pairs only must work
+        $tagPairsOnly = '<div class="open 672069643d223122 internal-tag ownttip"><span class="short" title="&lt;g id=&quot;1&quot;&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;g id=&quot;1&quot;&gt;</span></div><div class="open 672069643d223222 internal-tag ownttip"><span class="short" title="&lt;g id=&quot;2&quot;&gt;">&lt;2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;g id=&quot;2&quot;&gt;</span></div><div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/g&gt;">&lt;/2&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;/g&gt;</span></div>Test<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/g&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/g&gt;</span></div>';
+        //tag pair with single tag must work too
+        $tagPairWithSingleTag = '<div class="open 6270742069643d2231223e266c743b53796d626f6c20466f726d61743d22417269616c223e3c2f627074 internal-tag ownttip"><span class="short" title="&lt;Symbol Format=&quot;Arial&quot;&gt;">&lt;2&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;Symbol Format="Arial"></span></div><div class="single 70682069643d2232223e6d3c2f7068 internal-tag ownttip"><span class="short" title="m">&lt;3/&gt;</span><span class="full" data-originalid="2" data-length="-1">m</span></div><div class="close 6570742069643d2231223e266c743b2f53796d626f6c3e3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/Symbol&gt;">&lt;/2&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/Symbol></span></div>Test 2';
+        $this->assertEquals('<g id="1"><g id="2"></g>Test</g>', $tag->toXliffPaired($tagPairsOnly), 'XLF Pairer with tag pairs only does not work');
+        $this->assertEquals('<g id="1"><x id="2"/></g>Test 2', $tag->toXliffPaired($tagPairWithSingleTag), 'XLF Pairer with tag pair and single tag does not work');
+    }
+
     /**
      * Test the issues fixed behaviour
      */
@@ -131,6 +144,6 @@ class Translate1841Test extends \ZfExtended_Test_ApiTestcase {
         self::$api->login('testlector');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }

@@ -1358,7 +1358,7 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id="SW1wb3J0IERhdGVpwrk="><source>Import Datei¹</source><target>Import file¹</target></trans-unit>
 <trans-unit id="QXVmdHJhZ3NudW1tZXI="><source>Auftragsnummer</source><target>Order number</target></trans-unit>
 <trans-unit id="UHJvamVrdG5hbWUgKGZyZWkgd8OkaGxiYXIsIEFuZ2FiZSBub3R3ZW5kaWcp"><source>Projektname (frei wählbar, Angabe notwendig)</source><target>Task name (user-selectable, required)</target></trans-unit>
-<trans-unit id="UHJvamVrdG5hbWXCuQ=="><source>Projektname¹</source><target>Task name¹</target></trans-unit>
+<trans-unit id="UHJvamVrdG5hbWXCuQ=="><source>Projektname¹</source><target>Project name¹</target></trans-unit>
 <trans-unit id="UXVlbGxzcHJhY2hlIGRlcyBQcm9qZWt0ZXMgKEFuZ2FiZSBub3R3ZW5kaWcp"><source>Quellsprache des Projektes (Angabe notwendig)</source><target>Source language of the task (required)</target></trans-unit>
 <trans-unit id="UXVlbGxzcHJhY2hlwrk="><source>Quellsprache¹</source><target>Source language¹</target></trans-unit>
 <trans-unit id="WmllbHNwcmFjaGUgZGVzIFByb2pla3RlcyAoQW5nYWJlIG5vdHdlbmRpZyk="><source>Zielsprache des Projektes (Angabe notwendig)</source><target>Target language of the task (required)</target></trans-unit>
@@ -1473,6 +1473,10 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id='RXJlaWduaXNzZSB6dSBTcHJhY2hyZXNvdXJjZSAiezB9Ig=='><source>Ereignisse zu Sprachresource "{0}"</source><target>Results for Language-Resource "{0}"</target></trans-unit>
 <trans-unit id='TG9n'><source>Log</source><target>Log</target></trans-unit>
 <trans-unit id='T2JlcmZsw6RjaGU='><source>Oberfläche</source><target>interface</target></trans-unit>
+<trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='><source>{LinkConsortium}</source><target>https://www.translate5.net/en/consortium</target></trans-unit>
+<trans-unit id='U2VnbWVudC1Lb21tZW50YXI='><source>Segment-Kommentar</source><target>Segment comment</target></trans-unit>
+<trans-unit id='RnJlaWUgQW5tZXJrdW5n'><source>Freie Anmerkung</source><target>Free annotation</target></trans-unit>
+<trans-unit id='VmlkZW8tQW5tZXJrdW5n'><source>Video-Anmerkung</source><target>Video annotation</target></trans-unit>
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>

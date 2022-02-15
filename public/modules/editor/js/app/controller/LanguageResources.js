@@ -45,7 +45,8 @@ Ext.define('Editor.controller.LanguageResources', {
       'Editor.util.LanguageResources',
       'Editor.view.LanguageResources.services.Default',
       'Editor.view.LanguageResources.services.TermCollection',
-      'Editor.view.LanguageResources.services.OpenTM2'
+      'Editor.view.LanguageResources.services.OpenTM2',
+      'Editor.view.LanguageResources.services.DummyFileTm'
   ],
   refs:[{
       ref: 'matchgrid',
@@ -104,6 +105,7 @@ Ext.define('Editor.controller.LanguageResources', {
       //add the specific service instances, if needed
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.TermCollection'));
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.OpenTM2'));
+      Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.DummyFileTm'));
   },
   assocStore: null,
   SERVER_STATUS: null,//initialized after center panel is rendered

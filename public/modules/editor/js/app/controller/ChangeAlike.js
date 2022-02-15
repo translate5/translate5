@@ -225,6 +225,7 @@ Ext.define('Editor.controller.ChangeAlike', {
    */
   handleBusReconnect: function(bus) {
       var grid = this.getSegmentGrid();
+      Editor.app.getController('JsLogger').addLogEntryToLogger('ChangeAlike::handleBusReconnect');
       if(grid && grid.editingPlugin.editing) {
           //trigger alikes GET again! No ability to trigger that via a senseful event, 
           this.handleBeforeEdit(grid.editingPlugin, grid.editingPlugin.context);
@@ -245,6 +246,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       }
       
       me.fetchedAlikes = operation.getRecords();
+      Editor.app.getController('JsLogger').addLogEntryToLogger('ChangeAlike::handleAlikesRead for id '+id+', loaded alikes: '+me.getAllAlikeIds().join(','));
       if(me.isManualProcessing()) {
           me.window.setAlikes(id, me.fetchedAlikes);
       }
@@ -261,16 +263,20 @@ Ext.define('Editor.controller.ChangeAlike', {
 	  me.actualRecord = record;
 	  me.saveIsRunning = true;
 
+      Editor.app.getController('JsLogger').addLogEntryToLogger('ChangeAlike::onAfterSaveCall set record id: '+record.get('id'));
+
 	  //If it is set to true, the repetition editor only pops up (processes automatically) 
 	  //when the target of the current segment is empty
 	  if(Editor.app.getUserConfig('alike.showOnEmptyTarget') && record.get('target') != ''){
 		  me.fireEvent('segmentUsageFinished', me);
-		  me.callbackToSaveChain();
+		  //FIXME should be no callback to save chain here, since we are still in the save chain!
+          me.callbackToSaveChain();
 		  return;
 	  }
 	  
       if(me.isDisabled || me.isManualProcessingDisabled() || me.noAlikes()) {
           me.fireEvent('segmentUsageFinished', me);
+          //FIXME should be no callback to save chain here, since we are still in the save chain!
           me.callbackToSaveChain();
           return;
       }
@@ -348,7 +354,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     if(me.isManualProcessing()) {
         me.window.close();
     }
-    
+
     if(!me.saveIsRunning) {
         me.savePendingAlikes();
     }
@@ -377,7 +383,8 @@ Ext.define('Editor.controller.ChangeAlike', {
           me.savePendingAlikes();
       }
       me.saveIsRunning = false;
-      //if no alikes are used, return to save chain
+      //if no alikes are used or available, return to save chain
+      //FIXME SHOULD BE: if(me.isDisabled || me.isManualProcessingDisabled() || me.noAlikes()) {
       if(me.isManualProcessingDisabled()) {
           return true;
       }
@@ -519,6 +526,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       });
       Editor.MessageBox.addError(me.messages.alikesNotAllSaved);
       me.callbackToSaveChain();
+      throw "not all alikes saved"; // exception here to trigger the rootcause logging
   },
   /**
    * Befüllt das Segment mit der gegebenen ID im Segment Store mit den übergebenen Daten,

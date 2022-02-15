@@ -112,8 +112,10 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
         'LEK_user_changelog_info' => false,
         'LEK_user_config' => false,
         'LEK_user_meta' => false,
+        'LEK_visualreview_annotation' => 'taskGuid',
         'LEK_visualreview_files' => 'taskGuid',
         'LEK_visualreview_segmentmapping' => 'taskGuid',
+        'LEK_visualreview_segmenttimecodes' => 'taskGuid',
         // visualreview font tables disabled for archiving, since task data is not depending from them and fonts can be reapplied
         'LEK_visualreview_font' => false,
         'LEK_visualreview_font_taskassoc' => false,

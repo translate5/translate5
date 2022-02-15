@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd" >
+  <file source-language="en-DB" target-language="de-DE">
+    <header>
+      <tool tool-id="translate5 test" tool-name="translate5" />
+    </header>
+    <body>
+      <trans-unit id="1" translate="no">
+        <!-- Test TRANSLATE-2776: must be locked but still width different mrk counts -->
+        <source><ph id="1">&lt;p_in&gt;</ph>must be imported locked due translate no<ph id="2">&lt;/p_in&gt;</ph></source>
+        <seg-source><mrk mtype="seg" mid="1"><ph id="1">&lt;p_in&gt;</ph>must</mrk> <mrk mtype="seg" mid="2">be</mrk> <mrk mtype="seg" mid="3">imported</mrk> <mrk mtype="seg" mid="4">locked</mrk> <mrk mtype="seg" mid="5">due translate no</mrk><ph id="2">&lt;/p_in&gt;</ph></seg-source>
+        <target><mrk mtype="seg" mid="1"><ph id="1">&lt;p_in&gt;</ph>muss</mrk> <mrk mtype="seg" mid="2">gesperrt</mrk> <mrk mtype="seg" mid="3">importiert</mrk> <mrk mtype="seg" mid="4">werden wegen translate no</mrk><ph id="2">&lt;/p_in&gt;</ph></target>
+      </trans-unit>
+      <trans-unit id="2" translate="no">
+        <!-- must be locked with plain content, see TRANSLATE-2584 (implicitly tested here) - fixing that was causing above TRANSLATE-2776 -->
+        <source><ph id="1">&lt;p_in&gt;</ph>must be imported locked due translate no<ph id="2">&lt;/p_in&gt;</ph></source>
+        <seg-source><mrk mtype="seg" mid="1"><ph id="1">&lt;p_in&gt;</ph>must</mrk> <mrk mtype="seg" mid="2">be</mrk> <mrk mtype="seg" mid="3">imported</mrk> <mrk mtype="seg" mid="4">locked</mrk> <mrk mtype="seg" mid="5">due translate no</mrk><ph id="2">&lt;/p_in&gt;</ph></seg-source>
+        <target><ph id="1">&lt;p_in&gt;</ph>muss gesperrt importiert werden wegen translate no<ph id="2">&lt;/p_in&gt;</ph></target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

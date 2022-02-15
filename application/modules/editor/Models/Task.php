@@ -72,6 +72,8 @@ END LICENSE AND COPYRIGHT
  * @method void setWordCount() setWordCount(int $wordcount)
  * @method string getOrderdate() getOrderdate()
  * @method void setOrderdate() setOrderdate(string $datetime)
+ * @method string getEnddate() getEnddate()
+ * @method void setEnddate() setEnddate(string $datetime)
  * @method boolean getReferenceFiles() getReferenceFiles()
  * @method void setReferenceFiles() setReferenceFiles(bool $flag)
  * @method boolean getEnableSourceEditing() getEnableSourceEditing()
@@ -319,14 +321,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
 
         $anonSql = '';
         if(!$ignoreAnonStuff) {
-            //filter out all anonymited tasks
+            //filter out all anonimized tasks
             //task is anonymized if runtimeOptions.customers.anonymizeUsers is set to 1 on task level
-            //if anonymizeUsers is not defined on taks level, the task customer anonymizeUsers value is used
+            //if anonymizeUsers is not defined on task level, the task customer anonymizeUsers value is used
             //if anonymizeUsers is also not defined on customer level, then the instance anonymizeUsers value is used
             $anonSql = 'AND filter.taskGuid NOT IN(SELECT IF((SELECT IF(t.value IS NOT NULL,t.value, if(c.value IS NOT NULL,c.value,z.value = 1)) FROM Zf_configuration z
                         LEFT JOIN LEK_customer_config c on z.name = c.name
                         LEFT JOIN LEK_task_config t on t.name = z.name
-                        WHERE (t.taskGuid = LEK_task.taskGuid OR c.customerId = LEK_task.customerId)
+                        WHERE ((t.taskGuid = LEK_task.taskGuid) OR (c.customerId = LEK_task.customerId AND t.taskGuid IS NULL)) 
                         AND z.name =  "runtimeOptions.customers.anonymizeUsers") = 1,LEK_task.taskGuid,NULL) AS s
                         FROM LEK_task
                         GROUP BY LEK_task.taskGuid
@@ -653,9 +655,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Convenience API
      * @return boolean
      */
-    public function isTranslation() {
+    public function isTranslation(): bool
+    {
         return $this->getEmptyTargets();
     }
+
+    /**
+     * Convenience API
+     * @return boolean
+     */
+    public function isReview(): bool
+    {
+        return !$this->getEmptyTargets();
+    }
+
     /**
      * unlocks all tasks, where the associated session is invalid
      */
@@ -753,12 +766,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = currentUser) and respects multiuser editing
+     * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = givenUser) and respects multiuser editing
+     * @param string $userGuid
+     * @param string|null $taskGuid optional, use the internally loaded taskGuid by default
      * @return boolean false if task had not been locked or does not exist,
      *          true if task has been unlocked successfully
      */
-    public function unlockForUser($userGuid) {
-        $taskGuid = $this->db->getAdapter()->quote($this->getTaskGuid());
+    public function unlockForUser(string $userGuid, string $taskGuid = null): bool
+    {
+        $taskGuid = $this->db->getAdapter()->quote($taskGuid ?? $this->getTaskGuid());
         $userGuid = $this->db->getAdapter()->quote($userGuid);
         $multiUserId = $this->db->getAdapter()->quote(self::INTERNAL_LOCK.self::USAGE_MODE_SIMULTANEOUS);
 
@@ -785,7 +801,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * marks the task erroneous and unlocks its
      * @return boolean false if task had not been updated or does not exist,
-     * @throws Zend_Exception if something went wrong
      */
     public function setErroneous() {
         $data = [
@@ -1093,6 +1108,26 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
+     * overwrites task save to update enddate if needed
+     * @return mixed
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function save() {
+        //automatically set enddate field
+        $state = $this->getState();
+        $oldState = $this->getOldValue('state');
+        if($state === self::STATE_END && $state != $oldState) {
+            $this->setEnddate(NOW_ISO);
+        }
+        elseif($oldState == self::STATE_END && $state != self::STATE_END) {
+            $this->setEnddate(null); //old value was ended and task is set to open again
+        }
+        return parent::save();
+    }
+
+    /**
      * Return all combinations of font-family and font-size that are used in the task.
      * @return array
      */
@@ -1168,12 +1203,16 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             return;
         }
         $states = $this->getTaskRoleAutoStates();
+        // include blocked autostate in total segments finish count because blocked segments can not be edited and therefore they should count as finished.
+        //TODO: with TRANSLATE-2753 this will be changed
+        $states[] = editor_Models_Segment_AutoStates::BLOCKED;
+
         $isWorkflowEnded = $workflow->isEnded($this);
 
         $adapted = $this->db->getAdapter();
         
         if(!$isWorkflowEnded && !$states) {
-            //if workflow is not ended and we do not have any states to the current steps role, we do not update anything
+            //if workflow is not ended, and we do not have any states to the current steps' role, we do not update anything
             return;
         }
         
@@ -1274,6 +1313,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'fullMatchEdit' => 'Unveränderte 100% TM Matches sind editierbar',
             'lockLocked' => 'Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
             'orderdate' => 'Bestelldatum',
+            'enddate' => 'Enddatum',
             'pmGuid' => 'Projektmanager',
             'pmName' => 'Projektmanager',
             'referenceFiles' => 'Referenzdateien',

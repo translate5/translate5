@@ -132,6 +132,16 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
      */
     getImportWindow:function(){
         return 'importTmWindow';
+    },
+
+    /**
+     * Must return the renderer as function to keep scope correct
+     * @returns {function(*, *, *): *}
+     */
+    getNameRenderer: function() {
+        return function(v, meta, rec) {
+            return v;
+        }
     }
 
 

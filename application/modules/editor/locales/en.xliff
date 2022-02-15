@@ -224,6 +224,14 @@
         <source>Bestelldatum</source>
         <target>Order date</target>
       </trans-unit>
+      <trans-unit id='RGFzIERhdHVtLCB3YW5uIGRlciBQcm9qZWt0bWFuYWdlciBkaWUgQXVmZ2FiZSBiZWVuZGV0IGhhdCB1bmQgbmljaHQgZGFzIERhdHVtIGFuIGRlbSBlaW56ZWxuZSBXb3JrZmxvd3NjaHJpdHRlIGFiZ2VzY2hsb3NzZW4gd3VyZGVuLg=='>
+        <source>Das Datum, wann der Projektmanager die Aufgabe beendet hat und nicht das Datum an dem einzelne Workflowschritte abgeschlossen wurden.</source>
+        <target>The date, the project manager set the task to ended. NOT the date, a workflow step was finished.</target>
+      </trans-unit>
+      <trans-unit id='RW5kZGF0dW0='>
+        <source>Enddatum</source>
+        <target>Ended date</target>
+      </trans-unit>
       <trans-unit id="UXVlbGxzcHJhY2hlIGJlYXJiZWl0YmFy">
         <source>Quellsprache bearbeitbar</source>
         <target>Source language editable</target>
@@ -239,6 +247,14 @@
       <trans-unit id="QXVmZ2FiZSBrb21wbGV0dCBsw7ZzY2hlbg==">
         <source>Aufgabe komplett l&#xF6;schen</source>
         <target>Delete task completely</target>
+      </trans-unit>
+      <trans-unit id='SW1wb3J0IGFiYnJlY2hlbg=='>
+        <source>Import abbrechen</source>
+        <target>abort import</target>
+      </trans-unit>
+      <trans-unit id='SW1wb3J0IHdpcmQgYWJnZWJyb2NoZW4uLi4='>
+        <source>Import wird abgebrochen...</source>
+        <target>aborting import...</target>
       </trans-unit>
       <trans-unit id="Vm9ybmFtZQ==">
         <source>Vorname</source>
@@ -2446,6 +2462,10 @@ A task was associated to you in the task-portal {portalLink}.<br />
     <source>Originalformat, {0}</source>
     <target>Original format, {0}</target>
 </trans-unit>
+<trans-unit id='w5xiZXJzZXR6dGUgVGVybWUgaW4gVGVybUNvbGxlY3Rpb24ocykgw7xiZXJ0cmFnZW4='>
+    <source>Übersetzte Terme in TermCollection(s) übertragen</source>
+    <target>Transfer translated terms to TermCollection(s)</target>
+</trans-unit>
 <trans-unit id="U0RMWExJRkYgbWl0IMOEbmRlcnVuZ3NtYXJraWVydW5nZW4=">
     <source>SDLXLIFF mit Änderungsmarkierungen</source>
     <target>SDLXLIFF with track changes</target>
@@ -2465,6 +2485,10 @@ A task was associated to you in the task-portal {portalLink}.<br />
 <trans-unit id='VGVybVBvcnRhbA=='>
     <source>TermPortal</source>
     <target>TermPortal</target>
+</trans-unit>
+<trans-unit id='VGVybS1Db2xsZWN0aW9uIGltIFRlcm1Qb3J0YWwgw7ZmZm5lbg=='>
+  <source>Term-Collection im TermPortal öffnen</source>
+  <target>Open term-collection in TermPortal</target>
 </trans-unit>
 <trans-unit id='U3VjaGU='><source>Suche</source><target>Search</target></trans-unit>
 <trans-unit id='RmlsdGVy'>
@@ -2655,9 +2679,9 @@ A task was associated to you in the task-portal {portalLink}.<br />
   <target>101% is a 100% match, that originates from a file with the same name.</target>
 </trans-unit>
 
-<trans-unit id='V2llZGVyaG9sdW5nLiBFaW5lIFdpZWRlcmhvbHVuZyBpc3QgZWluIFRyZWZmZXIsIGRlciBpZGVudGlzY2ggaW4gZGVyIGFrdHVlbGxlbiBBdWZnYWJlIG5vY2htYWxzIHZvcmtvbW10Lg=='>
-<source>Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.</source>
-<target>Repetition. A repetition is a match that occurs identically in the current task again.</target>
+<trans-unit id='MTAyJSBpc3QgZWluZSBXaWVkZXJob2x1bmcuIEVpbmUgV2llZGVyaG9sdW5nIGlzdCBlaW4gVHJlZmZlciwgZGVyIGlkZW50aXNjaCBpbiBkZXIgYWt0dWVsbGVuIEF1ZmdhYmUgbm9jaG1hbHMgdm9ya29tbXQu'>
+<source>102% ist eine Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.</source>
+<target>102% is a repetition. A repetition is a match that occurs identically in the current task again.</target>
 </trans-unit>
 
 <trans-unit id='MTAzJSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIHVyc3Byw7xuZ2xpY2ggYXVzIGVpbmVyIERhdGVpIG1pdCBkZW0gc2VsYmVuIE5hbWVuIHN0YW1tdCAod2llIGVpbiAxMDElIFRyZWZmZXIpLiBadXPDpHR6bGljaCB6dW0gMTAxJSBUcmVmZmVyIGlzdCBkaWUgU2VnbWVudC1JRCBub2NoIGlkZW50aXNjaCBvZGVyIGdsZWljaCBtaXQgZGVyIFNlZ21lbnQtSUQgaW4gZGVyIGFrdHVlbGxlbiBEYXRlaS4='>
@@ -3781,6 +3805,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UHJvamVrdGU='><source>Projekte</source><target>Projects</target></trans-unit>
 <trans-unit id='enVtIFByb2pla3Qgc3ByaW5nZW4='><source>zum Projekt springen</source><target>jump to project</target></trans-unit>
 <trans-unit id='UHJvamVrdGxpc3RlIHZvbSBTZXJ2ZXIgYWt0dWFsaXNpZXJlbi4='><source>Projektliste vom Server aktualisieren.</source><target>Refresh project list from the server.</target></trans-unit>
+<trans-unit id='UHJvamVrdCBha3R1YWxpc2llcmVu'>
+  <source>Projekt aktualisieren</source>
+  <target>Refresh project</target>
+</trans-unit>
 <trans-unit id="QXVmZ2FiZW5saXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4u"><source>Aufgabenliste vom Server aktualisieren.</source><target>Refresh task list from the server.</target></trans-unit>
 <trans-unit id="QWxsZSBFcndlaXRlcm4="><source>Alle Erweitern</source><target>Expand all</target></trans-unit>
 <trans-unit id="QWxsZSBQcm9qZWt0ZSBFcndlaXRlcm4="><source>Alle Projekte Erweitern</source><target>Expand all projects</target></trans-unit>
@@ -3892,6 +3920,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='U3VjaGUgaW0gQXVzZ2FuZ3N0ZXh0'><source>Suche im Ausgangstext</source><target>Search in the source text</target></trans-unit>
 <trans-unit id='U3VjaGUgaW0gWmllbHRleHQ='><source>Suche im Zieltext</source><target>Search in the target text</target></trans-unit>
 <trans-unit id='RsO8ciBqZWRlbiBTYXR6IHd1cmRlIGRhcyBiZXN0ZSB2ZXJmw7xnYmFyZSBUcmFuc2xhdGlvbi1NZW1vcnktTWF0Y2ggdmVyd2VuZGV0ICgxMDAlIG9kZXIgYmVzc2VyKS4gV2VubiBrZWluZSAxMDAlaWdlIMOcYmVyZWluc3RpbW11bmcgaW0gVHJhbnNsYXRpb24gTWVtb3J5IGdlZnVuZGVuIHd1cmRlLCB3aXJkIGRpZSBtYXNjaGluZWxsZSDDnGJlcnNldHp1bmcgdmVyd2VuZGV0Lg=='><source>Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet.</source><target>For each sentence the best available translation memory match has been used (100% or better). If not translation memory 100% match was found, machine translation is used.</target></trans-unit>
+<trans-unit id='S29uZmlndXJhdGlvbiBnZXNwZWljaGVydA=='>
+  <source>Konfiguration gespeichert</source>
+  <target>Configuration saved</target>
+</trans-unit>
 <trans-unit id='S29uZmlndXJhdGlvbiBiZWFyYmVpdGVu'><source>Konfiguration bearbeiten</source><target>Edit configuration</target></trans-unit>
 <trans-unit id='S29uZmlndXJhdGlvbg=='><source>Konfiguration</source><target>System configuration</target></trans-unit>
 <trans-unit id='RGllIMOEbmRlcnVuZyB3aXJkIGJlaW0gbsOkY2hzdGVuIExvZ2luIHdpcmtzYW0uIERpZXMgZ2lsdCBhdWNoIGbDvHIgYW5kZXJlIGRlcnplaXQgZWluZ2Vsb2dndGUgQmVudXR6ZXIu'><source>Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.</source><target>This change will take effect on next login. This also applies to other users who are currently logged in.</target></trans-unit>
@@ -4005,6 +4037,13 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UVMgU3RhdGlzdGlr'><source>QS Statistik</source><target>QA statistics</target></trans-unit>
 <trans-unit id='TWF0Y2gtQW5hbHlzZQ=='><source>Match-Analyse</source><target>Match analysis</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Internal tags</target></trans-unit>
+<trans-unit id='TGVlcmUgU2VnbWVudGU='><source>Leere Segmente</source><target>Empty segments</target></trans-unit>
+<trans-unit id='RGFzIFppZWwgZW50aMOkbHQgbnVyIFRhZ3MsIExlZXJ6ZWljaGVuIG9kZXIgSW50ZXJwdW5rdGlvbiwgZGllIFF1ZWxsZSBqZWRvY2ggbmljaHQu'><source>Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.</source><target>Target only contains tags, spaces or punctuation, but source does not.</target></trans-unit>
+<trans-unit id='RWluaGVpdGxpY2hrZWl0'><source>Einheitlichkeit</source><target>Consistency</target></trans-unit>
+<trans-unit id='VW5laW5oZWl0bGljaGUgUXVlbGxl'><source>Uneinheitliche Quelle</source><target>Inconsistent source</target></trans-unit>
+<trans-unit id='RmluZGV0IFNlZ21lbnRlIG1pdCBkZW0gc2VsYmVuIFppZWwsIGFiZXIgdW50ZXJzY2hpZWRsaWNoZXIgUXVlbGxlIChUYWdzIHdlcmRlbiBpZ25vcmllcnQp'><source>Findet Segmente mit dem selben Ziel, aber unterschiedlicher Quelle (Tags werden ignoriert)</source><target>Finds segments with same target, but different source (tags ignored)</target></trans-unit>
+<trans-unit id='VW5laW5oZWl0bGljaGVzIFppZWw='><source>Uneinheitliches Ziel</source><target>Inconsistent target</target></trans-unit>
+<trans-unit id='RmluZGV0IFNlZ21lbnRlIG1pdCBkZXIgc2VsYmVuIFF1ZWxsZSwgYWJlciB1bnRlcnNjaGllZGxpY2hlbSBaaWVsIChUYWdzIHdlcmRlbiBpZ25vcmllcnQp'><source>Findet Segmente mit der selben Quelle, aber unterschiedlichem Ziel (Tags werden ignoriert)</source><target>Finds segments with same source, but different target (tags ignored)</target></trans-unit>
 <trans-unit id='VmVyYm90ZW4gaW4gWmllbA=='><source>Verboten in Ziel</source><target>Forbidden in target</target></trans-unit>
 <trans-unit id='VmVyYm90ZW4gaW4gUXVlbGxl'><source>Verboten in Quelle</source><target>Forbidden in source</target></trans-unit>
 <trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unedited fuzzy match</target></trans-unit>
@@ -4277,6 +4316,12 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='TnVyIFRCWCBCYXNpYyBTdGFuZGFyZGF0dHJpYnV0ZSArIHByb2Nlc3NTdGF0dXMgZXhwb3J0aWVyZW4='><source>Nur TBX Basic Standardattribute + processStatus exportieren</source><target>Export only TBX Basic standard attributes + processStatus</target></trans-unit>
 <trans-unit id='QmlsZGVyIGltIEhleC1Gb3JtYXQgZXhwb3J0aWVyZW4sIGVpbmdlYmV0dGV0IGluIFRCWA=='><source>Bilder im Hex-Format exportieren, eingebettet in TBX</source><target>Export images in hex format, embedded in TBX</target></trans-unit>
 <trans-unit id='QWxzIFRCWCBleHBvcnRpZXJlbg=='><source>Als TBX exportieren</source><target>Export as TBX</target></trans-unit>
+<trans-unit id='QWxzIFhMU1ggZXhwb3J0aWVyZW4='><source>Als XLSX exportieren</source><target>Export as XLSX</target></trans-unit>
+<trans-unit id='R2VzYW10emFobCBkZXIgVGVybWVpbnRyw6RnZTogJXM='><source>Gesamtzahl der Termeinträge: %s</source><target>Total number of term entries: %s</target></trans-unit>
+<trans-unit id='QmVnaW5uIGRlcyBFeHBvcnRzLi4u'><source>Beginn des Exports...</source><target>Starting export...</target></trans-unit>
+<trans-unit id='Rm9ydHNjaHJpdHQ6ICVz'><source>Fortschritt: %s</source><target>Progress: %s</target></trans-unit>
+<trans-unit id='Vm9yYmVyZWl0ZW4gZGVzIERvd25sb2Fkcy4uLg=='><source>Vorbereiten des Downloads...</source><target>Preparing the download...</target></trans-unit>
+<trans-unit id='RXJsZWRpZ3QgaW4gJXMgU2VrLg=='><source>Erledigt in %s Sek.</source><target>Done in %s sec</target></trans-unit>
 <trans-unit id='MS4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'>
   <source>1. Lektorat (sprachlich)</source>
   <target>1st revision - language</target>
@@ -4341,6 +4386,126 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Nicht empfohlen!</source>
     <target>Not recommended!</target>
 </trans-unit>
+<trans-unit id='Q29tcGxleCBXb3JrZmxvdw=='>
+  <source>Complex Workflow</source>
+  <target>Complex Workflow</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmQgV29ya2Zsb3cgKMOcYmVyc2V0enVuZywgTGVrdG9yYXQsIFp3ZWl0ZXMgTGVrdG9yYXQp'>
+    <source>Standard Workflow (Übersetzung, Lektorat, Zweites Lektorat)</source>
+    <target>Standard Workflow</target>
+</trans-unit>
+<trans-unit id='SW1wb3J0IGFiYnJlY2hlbg=='>
+    <source>Import abbrechen</source>
+    <target>Cancel import</target>
+</trans-unit>
+<trans-unit id='QWxsZSBwYXNzZW5kZW4gendlaXNwcmFjaGlnZW4gRGF0ZWllbiBmw7xyIGRpZXNlIFNwcmFjaGUgd2VyZGVuIGF1cyBkZXIgTGlzdGUgaG9jaGdlbGFkZW5lciBEYXRlaWVuIGVudGZlcm50Lg=='>
+  <source>Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.</source>
+  <target>All matching bilingual files for this language are removed from the list of the uploaded files.</target>
+</trans-unit>
+<trans-unit id='QXJiZWl0c2RhdGVpKGVuKSBoaW56dWbDvGdlbg=='>
+  <source>Arbeitsdatei(en) hinzufügen</source>
+  <target>Add work file(s)</target>
+</trans-unit>
+<trans-unit id='UGl2b3QtRGF0ZWkoZW4pIGhpbnp1ZsO8Z2Vu'>
+  <source>Pivot-Datei(en) hinzufügen</source>
+  <target>Add pivot file(s)</target>
+</trans-unit>
+<trans-unit id='RGllIFJlaWhlbmZvbGdlIGRlciBVcmxzIGVudHNwcmljaHQgZGVyIFJlaWhlbmZvbGdlIGRlciBob2NoZ2VsYWRlbmVuIEFyYmVpdHNkYXRlaWVuLg=='>
+  <source>Die Reihenfolge der Urls entspricht der Reihenfolge der hochgeladenen Arbeitsdateien.</source>
+  <target>The order of the urls will match the order of the uploaded work files.</target>
+</trans-unit>
+<trans-unit id='PGEgaHJlZj0iaHR0cHM6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L2Rpc3BsYXkvdmlzdWFsUmV2aWV3L1VwbG9hZCtydWxlcyIgdGFyZ2V0PSJfYmxhbmsiPkxlc2VuIFNpZSBtZWhyIMO8YmVyIGRpZSBadW9yZG51bmcgdm9uIERhdGVpZW4uPC9hPg=='>
+  <source><a href="https://confluence.translate5.net/display/visualReview/Upload+rules" target="_blank">Lesen Sie mehr über die Zuordnung von Dateien.</a></source>
+  <target><a href="https://confluence.translate5.net/display/visualReview/Upload+rules" target="_blank">Read more about files mapping.</a></target>
+</trans-unit>
+<trans-unit id='WmllaGVuIFNpZSBkaWUgRGF0ZWllbiBlbnR3ZWRlciBoaWVyaGVyLCB1bSBzaWUgYWxzIEFyYmVpdHNkYXRlaWVuIGhpbnp1enVmw7xnZW4sIG9kZXIga2xpY2tlbiBTaWUgYXVmIGVpbmUgZGVyIG9iaWdlbiBTY2hhbHRmbMOkY2hlbiwgdW0gYW5kZXJlIERhdGVpdHlwZW4genUgd8OkaGxlbi4='>
+  <source>Ziehen Sie die Dateien entweder hierher, um sie als Arbeitsdateien hinzuzufügen, oder klicken Sie auf eine der obigen Schaltflächen, um andere Dateitypen zu wählen.</source>
+  <target>Either drag and drop files here to add them as work files, or to one of the buttons above to add them as a different type.</target>
+</trans-unit>
 </body>
+<trans-unit id='RGllIERhdGVpICh7MH0pIG1pdCBkZXIgRXJ3ZWl0ZXJ1bmcgKHsxfSkgd2lyZCBuaWNodCB1bnRlcnN0w7x0enQu'>
+  <source>Die Datei ({0}) mit der Erweiterung ({1}) wird nicht unterstützt.</source>
+  <target>The file ({0}) with the extension ({1}) is not supported.</target>
+</trans-unit>
+<trans-unit id='V8OkaGxlbiBTaWUgZW50d2VkZXIgZWluZSBaSVAtRGF0ZWkgb2RlciBtZWhyZXJlIGFuZGVyZSBEYXRlaWVuLiBFaW4gTWl4IGF1cyBaSVAtRGF0ZWllbiB1bmQgYW5kZXJlbiBEYXRlaWVuIGlzdCBuaWNodCBtw7ZnbGljaCE='>
+  <source>Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!</source>
+  <target>Select either one ZIP file or multiple other files. A mix of ZIP files and other files is not possible!</target>
+</trans-unit>
+<trans-unit id='RGllIFBpdm90LURhdGVpIGlzdCBuaWNodCB6d2Vpc3ByYWNoaWcu'>
+  <source>Die Pivot-Datei ist nicht zweisprachig.</source>
+  <target>Pivot file is not bilingual.</target>
+</trans-unit>
+<trans-unit id='UXVlbGxlIHVuZ8O8bHRpZy4='>
+  <source>Quelle ungültig.</source>
+  <target>Source not valid.</target>
+</trans-unit>
+<trans-unit id='WmllbCB1bmfDvGx0aWcu'>
+  <source>Ziel ungültig.</source>
+  <target>Target not valid.</target>
+</trans-unit>
+<trans-unit id='RGllIEF1c2dhbmdzc3ByYWNoZSBzdGltbXQgbmljaHQgbWl0IGRlciBhdXNnZXfDpGhsdGVuIFNwcmFjaGUgw7xiZXJlaW4u'>
+  <source>Die Ausgangssprache stimmt nicht mit der ausgewählten Sprache überein.</source>
+  <target>Source language and selected language do not match.</target>
+</trans-unit>
+<trans-unit id='RGllIFF1ZWxsc3ByYWNoZSBpbiBkZXIgUGl2b3QtRGF0ZWkgKHswfSkgaXN0IG5pY2h0IGRpZXNlbGJlIHdpZSBkaWUgYWt0dWVsbGUgUXVlbGxzcHJhY2hlIGRlcyBQcm9qZWt0cyAoezF9KS4='>
+  <source>Die Quellsprache in der Pivot-Datei ({0}) ist nicht dieselbe wie die aktuelle Quellsprache des Projekts ({1}).</source>
+  <target>The source language in the pivot file ({0}) is not the same as the current source language of the project ({1}).</target>
+</trans-unit>
+<trans-unit id='RGllIFBpdm90LURhdGVpICh7MH0pIGhhdCBlaW5lIGFuZGVyZSBaaWVsc3ByYWNoZSAoezF9KSBhbHMgZXJ3YXJ0ZXQgKHsyfSku'>
+  <source>Die Pivot-Datei ({0}) hat eine andere Zielsprache ({1}) als erwartet ({2}).</source>
+  <target>The pivot file ({0}) has a different target language ({1}) than expected ({2}).</target>
+</trans-unit>
+<trans-unit id='VXJsIGhpbnp1ZsO8Z2Vu'>
+  <source>Url hinzufügen</source>
+  <target>Add url</target>
+</trans-unit>
+<trans-unit id='VXJsIGVudGZlcm5lbg=='>
+  <source>Url entfernen</source>
+  <target>Remove url</target>
+</trans-unit>
+<trans-unit id='VXJs'>
+  <source>Url</source>
+  <target>Url</target>
+</trans-unit>
+<trans-unit id='VW5nw7xsdGlnZSBBdXNnYW5nc3NwcmFjaGUgKHswfSku'>
+  <source>Ungültige Ausgangssprache ({0}).</source>
+  <target>Source language ({0}) is not valid.</target>
+</trans-unit>
+<trans-unit id='VW5nw7xsdGlnZSBaaWVsc3ByYWNoZSAoezB9KS4'>
+  <source>Ungültige Zielsprache ({0}).</source>
+  <target>Target language ({0}) is not valid.</target>
+</trans-unit>
+<trans-unit id='RGllIEF1c2dhbmdzc3ByYWNoZSBkZXIgRGF0ZWkgKHswfSkgc3RpbW10IG5pY2h0IG1pdCBkZXIgYWt0dWVsbCBhdXNnZXfDpGhsdGVuIEF1c2dhbmdzc3ByYWNoZSDDvGJlcmVpbi4='>
+  <source>Die Ausgangssprache der Datei ({0}) stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.</source>
+  <target>The source language ({0}) of the file does not match the currently selected source language.</target>
+</trans-unit>
+<trans-unit id='RGF0ZWk='>
+  <source>Datei</source>
+  <target>File</target>
+</trans-unit>
+<trans-unit id='R3LDtsOfZQ=='>
+  <source>Größe</source>
+  <target>Size</target>
+</trans-unit>
+<trans-unit id='RGF0ZWkgbMO2c2NoZW4='>
+    <source>Datei löschen</source>
+    <target>Remove file</target>
+</trans-unit>
+<trans-unit id='S2VpbmUgQXJiZWl0c2RhdGVpIG1pdCBnbGVpY2hlbSBEYXRlaW5hbWVuIGdlZnVuZGVuLg=='>
+  <source>Keine Arbeitsdatei mit gleichem Dateinamen gefunden.</source>
+  <target>No workfile with same filename found.</target>
+</trans-unit>
+<trans-unit id='QXJiZWl0c2RhdGVp'>
+  <source>Arbeitsdatei</source>
+  <target>work file</target>
+</trans-unit>
+<trans-unit id='UGl2b3QtRGF0ZWk='>
+    <source>Pivot-Datei</source>
+    <target>pivot file</target>
+</trans-unit>
+<trans-unit id='RGF0ZWkoZW4pIGhpbnp1ZsO8Z2Vu'>
+    <source>Datei(en) hinzufügen</source>
+    <target>Add file(s)</target>
+</trans-unit>
   </file>
 </xliff>

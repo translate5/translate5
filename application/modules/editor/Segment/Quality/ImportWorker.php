@@ -35,10 +35,13 @@ class editor_Segment_Quality_ImportWorker extends editor_Models_Task_AbstractWor
     protected function work(){
         
         $workerId = $this->workerModel->getId();
-
-        // add the dependant workers
-        editor_Segment_Quality_Manager::instance()->prepareImport($this->task, $workerId);
         
-        return $workerId;
+        // Crucial: remove any existing segment tag models
+        editor_Models_Db_SegmentTags::removeByTaskGuid($this->taskGuid);
+        
+        // add the dependant workers
+        editor_Segment_Quality_Manager::instance()->prepareOperation(editor_Segment_Processing::IMPORT, $this->task, $workerId);
+        
+        return true;
     }
 }

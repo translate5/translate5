@@ -60,7 +60,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             throw new ZfExtended_Exception('The attached task can not be set to state "end": '.print_r($task->getDataObject(),1));
         }
         $oldTask = clone $task;
-        $task->setState('end');
+        $task->setState($task::STATE_END);
 
         try {
             $this->config->workflow->hookin()->doWithTask($oldTask, $task);

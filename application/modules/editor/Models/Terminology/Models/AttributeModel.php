@@ -99,20 +99,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         return $this->db->fetchAll($s)->toArray();
     }
 
-    public function getAttributeCollectionByEntryId($collectionId, $termEntryId): array
-    {
-        $attributeByKey = [];
-
-        $query = "SELECT * FROM terms_attributes WHERE collectionId = :collectionId AND termEntryId = :termEntryId";
-        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId, 'termEntryId' => $termEntryId]);
-
-        foreach ($queryResults as $key => $attribute) {
-            $attributeByKey[$attribute['elementName'].'-'.$attribute['type'].'-'.$attribute['termEntryId'].'-'.$attribute['language'].'-'.$attribute['termTbxId']] = $attribute;
-        }
-
-        return $attributeByKey;
-    }
-
     /***
      * Is the user allowed for attribute proposal
      * @return boolean
@@ -123,46 +109,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         /* @var $user ZfExtended_Models_User */
 
         return $user->hasRole('termProposer');
-    }
-
-    /***
-     * Update term modification attribute group with the term proposal values.
-     * The modification group date and editor will be set as term proposal date an term proposal editor.
-     *
-     * @param array $attributes
-     * @param array $termProposal
-     * @return array
-     */
-    public function updateModificationGroupDate(array $attributes, array $termProposal): array
-    {
-//        if (empty($attributes) || empty($termProposal) || empty($termProposal['created']) || empty($termProposal['userName'])) {
-//            return $attributes;
-//        }
-
-        //foreach term attribute check, find the transac modification attribute
-        foreach ($attributes as &$attribute) {
-
-            if (empty($attribute['children'])) {
-                continue;
-            }
-
-            //ignore non modification tags
-//            if ($attribute['name'] != 'transac' || $attribute['attrType'] != 'modification') {
-//                continue;
-//            }
-
-//            foreach ($attribute['children'] as &$child) {
-//                if ($child['name'] === 'tig' || $child['name'] === 'langSet' || $child['name'] === 'transac') {
-//                    //convert the date to unix timestamp
-//                    $child['attrValue'] = strtotime($termProposal['created']);
-//                }
-//                if ($child['name'] === 'transacNote' && $this->isResponsablePersonAttribute($child['attrType'])) {
-//                    $child['attrValue'] = $termProposal['userName'];
-//                }
-//            }
-        }
-
-        return $attributes;
     }
 
     /**
@@ -183,85 +129,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         return false;
     }
 
-    /***
-     * Group the attributes by parent-child
-     *
-     * @param array $list
-     * @param int $parentId
-     * @return array
-     */
-    public function createChildTree(array $list, $parentId = 0): array
-    {
-        $transacGrpModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
-        /* @var $transacGrpModel editor_Models_Terminology_Models_TransacgrpModel */
-
-        $attCols = [
-            'id AS attributeId',
-            'elementName AS name',
-            'transacType AS attrType',
-            'guid AS attrId',
-            'transac AS attrValue',
-            'date AS date',
-            'adminType AS attrDataType',
-            new Zend_Db_Expr('"termAttribute" as attributeOriginType')//this is needed as fixed value
-        ];
-
-        $cols = [
-            'id AS transacGrpId',
-            'elementName AS name',
-            'transac AS transacType',
-            'transacNote AS attrValue',
-            'date AS date',
-            'transacType AS attrType'
-            ];
-
-        $tree = [];
-        foreach ($list as $element) {
-            if ($element['transacGrpId']) {
-//                $select = $transacGrpModel->db->select()
-//                    ->from($transacGrpModel->db, $attCols)
-//                    ->where('terms_transacgrp.id = ?', $element['transacGrpId'])
-//                    ->group('terms_transacgrp.id');
-//                $rows = $this->db->fetchAll($select)->toArray();
-                $rows = $transacGrpModel->db->find($element['transacGrpId'])->toArray();
-
-                if ($rows) {
-                    $element['children'] = $this->prepareTransacGrpChild($rows);
-                } else {
-                    $element['children'] = [];
-                }
-
-                $tree[] = $element;
-            }
-        }
-
-        return $tree;
-    }
-
-    private function prepareTransacGrpChild(array $transacGrp): array
-    {
-        $transacGrpChild = [];
-
-        foreach ($transacGrp as $tGrp) {
-            $transacGrpChild['id'] = $tGrp['id'];
-//            $transacGrpChild['name'] = $tGrp['elementName'];
-            $transacGrpChild['attributeId'] = $tGrp['transac'];
-            $transacGrpChild['dataTypeId'] = $tGrp['date'];
-            $transacGrpChild['termEntryId'] = $tGrp['adminType'];
-            $transacGrpChild['internalCount'] = $tGrp['adminValue'];
-            $transacGrpChild['language'] = $tGrp['transacNote'];
-            $transacGrpChild['name'] = $tGrp['transacType'];
-            $transacGrpChild['attrType'] = $tGrp['isDescripGrp'];
-            $transacGrpChild['attrDataType'] = $tGrp['collectionId'];
-            $transacGrpChild['attrTarget'] = $tGrp['termEntryId'];
-            $transacGrpChild['attrId'] = $tGrp['termId'];
-            $transacGrpChild['attrValue'] = $tGrp['termEntryGuid'];
-            $transacGrpChild['attrCreated'] = $tGrp['langSetGuid'];
-            $transacGrpChild['attrUpdated'] = $tGrp['guid'];
-        }
-
-        return $transacGrpChild;
-    }
     /**
      * returns true if the attribute is proposable according to its values.
      * Additional ACL checks must be done outside (in the controllers)
@@ -276,232 +143,9 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         return !($name == 'date'
             || $name=='termNote' && $type=='processStatus'
             || $name=='transacNote' && ($this->isResponsablePersonAttribute($type))
-            || $name=='transac' && ($type=='creation' || $type=='origination')
+            || $name=='transac' && ($type=='origination' || $type=='origination')
             || $name=='transac' && $type=='modification');
     }
-    /***
-     * Get all attributes for the given term entry (groupId)
-     * @param string $termEntryId
-     * @param array $collectionIds
-     * @return array|NULL
-     */
-    public function getAttributesForTermEntry(string $termEntryId, array $collectionIds): ?array
-    {
-        $cols = [
-            'terms_attributes.id AS attributeId',
-            'terms_attributes.dataTypeId as dataTypeId',
-            'terms_attributes.termEntryId AS termEntryId',
-            //'terms_attributes.internalCount AS internalCount',
-            'terms_attributes.language AS language',
-            'terms_attributes.elementName AS name',
-            'terms_attributes.type AS attrType',
-            'terms_attributes.target AS attrTarget',
-            'terms_attributes.guid AS attrId',
-            'terms_attributes.value AS attrValue',
-            'terms_attributes.created AS attrCreated',
-            'terms_attributes.updatedAt AS attrUpdated',
-            'terms_term_entry.collectionId AS collectionId',
-            new Zend_Db_Expr('"termEntryAttribute" as attributeOriginType')//this is needed as fixed value
-        ];
-
-        $s = $this->db->select()
-            ->from($this->db,[])
-            ->join('terms_term_entry', 'terms_term_entry.id = terms_attributes.termEntryId', $cols)
-            ->joinLeft('terms_attributes_datatype', 'terms_attributes_datatype.id = terms_attributes.dataTypeId', ['terms_attributes_datatype.labelText as headerText']);
-
-        $s->join('terms_transacgrp', 'terms_transacgrp.termEntryId = terms_term_entry.id',[
-            'terms_transacgrp.transac as transac',
-            'terms_transacgrp.transacNote as transacNote',
-            'terms_transacgrp.transacType as transacType',
-        ]);
-
-        if ($this->isProposableAllowed()) {
-            $s->joinLeft('terms_attributes_proposal', 'terms_attributes_proposal.attributeId = terms_attributes.id',[
-                'terms_attributes_proposal.value as proposalAttributeValue',
-                'terms_attributes_proposal.id as proposalAttributelId',
-            ]);
-        }
-
-        $s->where('terms_attributes.termId is null OR terms_attributes.termId = ""')
-            ->where('terms_term_entry.id = ?', $termEntryId)
-            ->where('terms_term_entry.collectionId IN(?)', $collectionIds)
-            ->group('terms_term_entry.id');
-        $s->setIntegrityCheck(false);
-
-        $rows = $this->db->fetchAll($s)->toArray();
-
-        if (empty($rows)) {
-            return null;
-        }
-
-        $mapProposal = function($item) {
-            $item['proposable'] = $this->isProposable($item['name'],$item['attrType']);
-            $item['proposal'] = null;
-
-            if (!isset($item['proposalAttributelId'])) {
-                unset($item['proposalAttributelId']);
-
-                if (!isset($item['proposalAttributeValue'])) {
-                    unset($item['proposalAttributeValue']);
-                }
-                return $item;
-            }
-            $obj = new stdClass();
-            $obj->id = $item['proposalAttributelId'];
-            $obj->value = $item['proposalAttributeValue'];
-            $item['proposal'] = $obj;
-
-            return $item;
-        };
-        $rows = array_map($mapProposal, $rows);
-
-        return $rows;
-    }
-
-    /***
-     * Check if for the current term there is a processStatus attribute. When there is no one, create it.
-     * @param int $termId
-     */
-    /*public function checkOrCreateProcessStatus(int $termId)
-    {
-        $s=$this->db->select()
-            ->where('termId=?',$termId)
-            ->where('elementName="termNote"')
-            ->where('type="processStatus"');
-
-        $result=$this->db->fetchAll($s)->toArray();
-
-        if (count($result) > 0) {
-            return;
-        }
-
-        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $term editor_Models_Terminology_Models_TermModel * /
-        $term->load($termId);
-
-        $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language editor_Models_Languages * /
-
-        $language->loadById($term->getLanguage());
-
-        $this->setCollectionId($term->getCollectionId());
-        $this->setTermId($term->getTermId());
-        $this->setGuid(ZfExtended_Utils::guid());
-        $this->setTermEntryId($term->getTermEntryId());
-        $this->setLangSetGuid($term->getLangSetGuid());
-        $this->setLanguage($language->getRfc5646());
-        $this->setElementName('termNote');
-        $this->setType('processStatus');
-
-        $label = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
-        /* @var $label editor_Models_Terminology_Models_AttributeDataType * /
-        $label->loadOrCreate('termNote', 'processStatus',editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_LEVEL_TERM);
-        $this->setDataTypeId($label->getId());
-
-//        $this->setAttrLang($language->getRfc5646());
-
-        $this->setUserGuid($term->getUserGuid());
-        $this->setUserName($term->getUserName());
-        $this->setProcessStatus($term->getProcessStatus());
-        $this->setValue($term->getProcessStatus());
-
-        $this->save();
-    }*/
-
-    /**
-     * Loads an attribute for the given term
-     * @param editor_Models_Terminology_Models_TermModel $term
-     * @param string $name
-     * @param string $level
-     */
-    public function loadByTermAndName(editor_Models_Terminology_Models_TermModel $term, string $name, string $level = self::ATTR_LEVEL_TERM) {
-        $s = $this->db->select()->where('collectionId = ?', $term->getCollectionId());
-        $s->where('termEntryId = ?', $term->getTermEntryId());
-        if ($level == self::ATTR_LEVEL_LANGSET || $level == self::ATTR_LEVEL_TERM) {
-            $lang = ZfExtended_Factory::get('editor_Models_Languages');
-            /* @var $lang editor_Models_Languages */
-            $lang->loadById($term->getLanguageId());
-            $s->where('language = ?', strtolower($lang->getRfc5646()));
-        } else {
-            $s->where('language is null OR language = "none"');
-        }
-
-        if ($level === self::ATTR_LEVEL_TERM) {
-            $s->where('termId = ?', $term->getTermId());
-        } else {
-            $s->where('termId is null OR termId = ""');
-        }
-        $s->where('elementName = ?', $name);
-
-        $row = $this->db->fetchRow($s);
-        if (!$row) {
-            $this->notFound(__CLASS__ . '#termAndName', $term->getId().'; '.$name);
-        }
-        //load implies loading one Row, so use only the first row
-        $this->row = $row;
-    }
-    /***
-     * Add comment attribute for given term
-     * @param int $termId
-     * @param string $termText
-     * @return editor_Models_Terminology_Models_AttributeModel
-     */
-    /*public function addTermComment(int $termId,string $termText): self
-    {
-        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $term editor_Models_Terminology_Models_TermModel * /
-        $term->load($termId);
-
-        $lang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $lang editor_Models_Languages * /
-        $lang->loadById($term->getLanguageId());
-
-        $label = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
-        /* @var $label editor_Models_Terminology_Models_AttributeDataType * /
-        $label->loadOrCreate('note');
-
-        $this->init([
-            'elementName' => 'note',
-            'created' => NOW_ISO,
-          //'internalCount' => 1,
-            'collectionId' => $term->getCollectionId(),
-            'termId' => $term->getTermId(),
-            'termEntryId' => $term->getTermEntryId(),
-            'termEntryGuid' => $term->getTermEntryGuid(),
-            'langSetGuid' => $term->getLangSetGuid(),
-            'guid' => ZfExtended_Utils::guid(),
-            'language' => strtolower($lang->getRfc5646()),
-            'dataTypeId' => $label->getId(),
-            'isCreatedLocally' => 1
-        ]);
-        $this->setValue(trim($termText));
-        $sessionUser = new Zend_Session_Namespace('user');
-        $this->setUserGuid($sessionUser->data->userGuid);
-        $this->setUserName($sessionUser->data->userName);
-        $this->hasField('updatedAt') && $this->setUpdatedAt(NOW_ISO);
-        $this->save();
-
-        return $this;
-    }*/
-
-    /**
-     * creates a new, unsaved term attribute history entity
-     * @return editor_Models_Term_AttributeHistory
-     */
-    /*public function getNewHistoryEntity(): editor_Models_Term_AttributeHistory
-    {
-        $history = ZfExtended_Factory::get('editor_Models_Term_AttributeHistory');
-        /* @var $history editor_Models_Term_AttributeHistory * /
-        $history->setAttributeId($this->getId());
-        $history->setHistoryCreated(NOW_ISO);
-
-        $fields = $history->getFieldsToUpdate();
-        foreach ($fields as $field) {
-            $history->__call('set' . ucfirst($field), array($this->get($field)));
-        }
-
-        return $history;
-    }*/
 
     /**
      * @return mixed
@@ -550,7 +194,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         $return = parent::save();
 
         // Affect transacgrp-records
-        if ($misc['userName'])
+        if ($misc['userName'] ?? 0)
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
 
@@ -581,7 +225,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             $return['definition'] = $this->replicateDefinition('deleted');
 
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
-        if ($misc['userName'])
+        if ($misc['userName'] ?? 0)
             $return['updated'] = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
 
@@ -589,7 +233,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         parent::delete();
 
         // Return
-        return $return;
+        return $return ?? null;
     }
 
     /***
@@ -603,7 +247,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
     public function removeProposalsOlderThan(array $collectionIds,string $olderThan): bool
     {
         // Get ids of attrs, that were created or updated after tbx-import
-        $attrIdA = editor_Utils::db()->query('
+        $attrIdA = $this->db->getAdapter()->query('
             SELECT `id` 
             FROM `terms_attributes` 
             WHERE TRUE
@@ -617,7 +261,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
 
         // Get tbx-imported values for `value` and `target` props, that now have changed values in attributes-table
-        $tbxA = editor_Utils::db()->query('
+        $tbxA = $this->db->getAdapter()->query('
             SELECT `attrId`, `value`, `target` 
             FROM `terms_attributes_history`
             WHERE TRUE
@@ -643,7 +287,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         }
 
         // Overwrite $attrIdA_updated array for it to keep only ids of attributes, that were last updated before $olderThan arg
-        if ($attrIdA_updated) $attrIdA_updated = editor_Utils::db()->query($sql = '
+        if ($attrIdA_updated) $attrIdA_updated = $this->db->getAdapter()->query($sql = '
             SELECT `id` 
             FROM `terms_attributes` 
             WHERE TRUE
@@ -871,7 +515,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      */
     public function getExportData($termEntryIds, $tbxBasicOnly = false) {
         return array_group_by($this->db->getAdapter()->query('
-            SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`, `isDescripGrp` 
+            SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`, `isDescripGrp`, `dataTypeId` 
             FROM `terms_attributes`
             WHERE `termEntryId` IN (' . $termEntryIds . ')' . editor_Utils::rif($tbxBasicOnly, ' AND `dataTypeId` IN ($1)')
         )->fetchAll(), 'termEntryId', 'language', 'termId');
@@ -882,10 +526,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * and return array containing new value and ids of affected `terms_term` records for
      * being able to apply that on client side
      *
-     * Accepts a definition text as a first arg and spread it across
-     * `terms_term`.`definition` where need according to the agreed logic
-     *
-     * @param $definition
+     * @param $event
      */
     public function replicateDefinition($event) {
 
@@ -894,8 +535,8 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
             // If it's a language-level definition-attribute is going to be deleted
             // get termEntry-level definition-attribute to be used as a replacement
-            // or just use null
-            $value = $this->getLanguage() ? $this->_entryLevelDef() : null;
+            // or just use empty string
+            $value = $this->getLanguage() ? $this->_entryLevelDef() : '';
 
         // Else if $event is 'updated'
         } else if ($event == 'updated') {
@@ -910,7 +551,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
                 : $this->getValue();
         }
 
-        i('here3', 'a');
         // Prepare query bindings
         $bind = [$this->getTermEntryId()];
 
@@ -923,7 +563,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             ? $this->getLanguage()
             : join(',', $this->_getLanguagesWithNoOrEmptyDefinition());
 
-        i($bind, 'a');
         // Get ids of terms, that will be affected
         $termIdA = $this->db->getAdapter()->query('
             SELECT `id` 
@@ -961,7 +600,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      */
     protected function _entryLevelDef() {
         return $this->db->getAdapter()->query('
-            SELECT `value` 
+            SELECT IFNULL(`value`, "") 
             FROM `terms_attributes` 
             WHERE 1
               AND `termEntryId` = ? 
@@ -997,5 +636,70 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             GROUP BY `t`.`language`
             HAVING `hasDef` = 0 OR `butEmpty` = 1
         ', $this->getTermEntryId())->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * This method retrieves attributes grouped by level.
+     * It is used internally by TermModel->terminfo() and ->siblinginfo()
+     * and should not be called directly
+     *
+     * @param $levelColumnToBeGroupedBy
+     * @param $where
+     * @param $bind
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function loadGroupedByLevel($levelColumnToBeGroupedBy, $where, $bind) {
+        return $this->db->getAdapter()->query('
+            SELECT 
+              ' . $levelColumnToBeGroupedBy . ', 
+              `id`, 
+              `elementName`,
+              `value`,
+              `type`,
+              `dataTypeId`,
+              `language`,
+              `target`,
+              IFNULL(`createdBy`, 0) AS `createdBy`, DATE_FORMAT(`createdAt`, "%d.%m.%Y %H:%i:%s") AS `createdAt`,
+              IFNULL(`updatedBy`, 0) AS `updatedBy`, DATE_FORMAT(`updatedAt`, "%d.%m.%Y %H:%i:%s") AS `updatedAt`
+            FROM `terms_attributes` 
+            WHERE ' . $where . '
+            ORDER BY `type` = "processStatus" DESC, `id` DESC', $bind
+        )->fetchAll(PDO::FETCH_GROUP);
+    }
+
+    /**
+     * Set up `isDraft` = 0 for records identified by comma-separated ids given by $ids arg
+     *
+     * @param $ids
+     */
+    public function undraftByIds($ids) {
+        $this->db->getAdapter()->query('
+            UPDATE `terms_attributes` SET `isDraft` = "0" WHERE `id` IN (' . $ids . ')
+        ');
+    }
+
+    /**
+     * Delete attributes having isDraft=1
+     * This is currently used by cron
+     *
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function deleteDrafts() {
+
+        // Get ids array of draft attributes
+        $attrIdA_isDraft = $this->db->getAdapter()->query('
+            SELECT `id` FROM `terms_attributes` WHERE `isDraft` = "1"
+        ')->fetchAll(PDO::FETCH_COLUMN);
+
+        // Foreach id
+        foreach ($attrIdA_isDraft as $attrId) {
+
+            // Load model instance
+            $this->load($attrId);
+
+            // Call delete method
+            $this->delete();
+        }
     }
 }

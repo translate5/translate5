@@ -133,6 +133,22 @@ final class editor_Segment_Qualities {
         }
     }
     /**
+     * Drops a quality independently of a tag
+     * NOTE that the $additopnal data only can be a flat Object !
+     * @param string $field
+     * @param string $type
+     * @param string $category
+     * @param int $startIndex
+     * @param int $endIndex
+     * @param stdClass $additionalData
+     */
+    public function drop(string $field, string $type, string $category, int $startIndex, int $endIndex, stdClass $additionalData=NULL) {
+        $quality = $this->findExistingByProps($field, $type, $category, $additionalData);
+        if ($quality) {
+            $quality->delete();
+        }
+    }
+    /**
      * Adds a quality by it's associated tag
      * @param editor_Segment_Tag $tag
      * @param string $field: if not given, it is assumed, the tag has it's field property set and will be used
@@ -340,5 +356,12 @@ final class editor_Segment_Qualities {
             }
         }
         return NULL;
+    }
+
+    /**
+     * @return editor_Models_Db_SegmentQualityRow[]
+     */
+    public function getExisting() {
+        return $this->existing;
     }
 }

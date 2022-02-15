@@ -76,10 +76,10 @@ class editor_Models_Segment_RepetitionUpdater {
      * @param editor_Models_Segment $repetition the segment to write to
      * @return boolean true if the repetition could be processed, false otherwise
      */
-    public function updateRepetition(editor_Models_Segment $master, editor_Models_Segment $repetition): bool {
+    public function updateTargetOfRepetition(editor_Models_Segment $master, editor_Models_Segment $repetition): bool {
         $this->originalSegment = $master;
         $this->setRepetition($repetition);
-        return $this->updateSegmentContent('target');
+        return $this->updateTarget();
     }
     
     /**
@@ -89,40 +89,41 @@ class editor_Models_Segment_RepetitionUpdater {
     public function setRepetition(editor_Models_Segment $entity) {
         $this->repeatedSegment = $entity;
     }
-    
+
     /**
-     * call back for the fieldloop over all editable segments, 
-     *   replaces the tags in the given content with the tags which were before in the segemnt
-     * @param string $field: can be 'target' or 'source', no other operations suported for repetitions! Source is expected to be an editable source
+     * Takes the tags from the first content, and applies them to the second content. After that pass both contents to the update field callback to set the content to the desired place
+     * @param string $originalContent the content where the tags should be used from (normally the original field of the repetition)
+     * @param string $segmentContent the content which is repeated and should be used, and where the tags should be applied to (normally the edit field of the master segment)
+     * @param callable $updateField callback to deal with the updated segment content
+     * @param bool $ignoreWhitespace default true, ignores whitespace tags
      * @return bool
      */
-    public function updateSegmentContent(string $field) : bool {
-        
-        if($field != 'target' && $field != 'source'){
-            throw new ZfExtended_BadMethodCallException('editor_Models_Segment_RepetitionUpdater: Param "field" can only be "target" or "source"');
-        }
-
+    protected function updateSegmentContent(string $originalContent, string $segmentContent, Callable $updateField, bool $ignoreWhitespace = true) : bool {
         // TODO: we could make much more use of the segment-tags code if only it would be more clear what this code does ...
-        
-        $originalContent = ($field == 'target') ? $this->repeatedSegment->getTarget() : $this->repeatedSegment->getSource();
-        $segmentContent = ($field == 'target') ? $this->originalSegment->getTargetEdit() : $this->originalSegment->getSourceEdit();
-        
-        //replace the repeatedSegment tags with the original repetition ones
+
+        //replace the repeatedSegment tags with the original repetition ones,
+        // if the original (mostly target) is empty use the tags from source
         $useSourceTags = empty($originalContent);
-        if($useSourceTags) {
-            //if the original had no content (mostly translation context), we have to load the source tags.
-            $originalContent = $this->repeatedSegment->getSource();
-        }
-        //get only the real tags, we do not consider whitespace tags in repetitions, 
+
+        //get only the real tags, we do not consider whitespace tags in repetitions,
         // this is because whitespace belongs to the content and not to the segment (tags instead belong to the segment)
-        $tagsForRepetition = $this->tagHelper->getRealTags($originalContent);
+        // if the original had no content (mostly translation context), we have to load the source tags.
+        $loadTagsFrom = $useSourceTags ? $this->repeatedSegment->getSource() : $originalContent;
+        if($ignoreWhitespace) {
+            $tagsForRepetition = $this->tagHelper->getRealTags($loadTagsFrom);
+        }
+        else {
+            $tagsForRepetition = $this->tagHelper->get($loadTagsFrom);
+        }
         $shortTagNumbers = $this->tagHelper->getTagNumbers($tagsForRepetition);
+
         if(empty($shortTagNumbers)) {
             $newShortTagNumber = 1;
         }
         else {
             $newShortTagNumber = max($shortTagNumbers) + 1;
         }
+
         if(empty($tagsForRepetition)) {
             //if there are no original tags we have to init $i with the realTagCount in the targetEdit for below check
             $stat = $this->tagHelper->statistic($this->trackChangesTagHelper->protect($segmentContent));
@@ -131,10 +132,10 @@ class editor_Models_Segment_RepetitionUpdater {
         else {
             $i = 0;
             $segmentContent = $this->trackChangesTagHelper->protect($segmentContent);
-            $segmentContent = $this->tagHelper->replace($segmentContent, function($match) use (&$i, $tagsForRepetition, $shortTagNumbers, &$newShortTagNumber){
+            $segmentContent = $this->tagHelper->replace($segmentContent, function($match) use (&$i, $tagsForRepetition, $shortTagNumbers, &$newShortTagNumber, $ignoreWhitespace){
                 $id = $match[3];
                 //if it is a whitespace tag, we do not replace it:
-                if(in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
+                if($ignoreWhitespace && in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
                     if(in_array($this->tagHelper->getTagNumber($match[0]), $shortTagNumbers)) {
                         return $this->tagHelper->replaceTagNumber($match[0], $newShortTagNumber++);
                     }
@@ -151,16 +152,51 @@ class editor_Models_Segment_RepetitionUpdater {
         if(count($tagsForRepetition) !== $i) {
             return false;
         }
-        if($field == 'target'){
+        $updateField($originalContent, $segmentContent);
+        return true;
+    }
+
+    /**
+     * Updates the target fields in the repeated segment with the content of the original segment with the tags replaced with the previous tags (in the repeated)
+     * @return bool
+     */
+    public function updateTarget(): bool
+    {
+        $originalContent = $this->repeatedSegment->getTarget();
+        $segmentContent = $this->originalSegment->getTargetEdit();
+        return $this->updateSegmentContent($originalContent, $segmentContent, function($originalContent, $segmentContent){
             $this->repeatedSegment->setTargetEdit($segmentContent);
             // when copying targets originating from a language-resource, we copy the original target as well ...
             if($this->originalSegment->isFromLanguageResource()){
-                $this->repeatedSegment->setTarget($originalContent);
+                $this->updateSegmentContent($originalContent, $this->originalSegment->getTarget(), function($originalContent, $segmentContent){
+                    $this->repeatedSegment->setTarget($segmentContent);
+                    $this->repeatedSegment->updateToSort('target');
+                });
             }
-        } else {
-            $this->repeatedSegment->setSourceEdit($segmentContent);
-        }
-        $this->repeatedSegment->updateToSort($field.editor_Models_SegmentFieldManager::_EDIT_PREFIX);
-        return true;
+            $this->repeatedSegment->updateToSort('target'.editor_Models_SegmentFieldManager::_EDIT_PREFIX);
+        });
+    }
+
+    /**
+     * Updates the non editable source field to take over the term markup into the repetition
+     * @param bool $editable
+     * @return bool
+     */
+    public function updateSource(bool $editable): bool
+    {
+        $originalContent = $this->repeatedSegment->getSource();
+        $segmentContent = $editable ? $this->originalSegment->getSourceEdit() : $this->originalSegment->getSource();
+
+        return $this->updateSegmentContent($originalContent, $segmentContent, function($originalContent, $segmentContent) use ($editable){
+            $toSort = 'source';
+            if($editable) {
+                $this->repeatedSegment->setSourceEdit($segmentContent);
+                $toSort .= editor_Models_SegmentFieldManager::_EDIT_PREFIX;
+            }
+            else {
+                $this->repeatedSegment->setSource($segmentContent);
+            }
+            $this->repeatedSegment->updateToSort($toSort);
+        }, $editable); //if modifying the editable source, whitespace should be ignored, if repeating the source all tags must be taken over
     }
 }

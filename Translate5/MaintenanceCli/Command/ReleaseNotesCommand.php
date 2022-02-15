@@ -133,9 +133,17 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         if(!$this->io->confirm('Does the important release notes contain all API / GUI relevant changes?', false)) {
             return 0;
         }
-        if($this->io->confirm('Create the SQL and Update the change log (or modify them in JIRA again)?', false)) {
-            $this->createSql();
-            $this->updateChangeLog();
+        if($this->io->confirm('Create the SQL and Update the change log (or modify them in JIRA again)?', true)) {
+            $sql = $this->createSql();
+            $md = $this->updateChangeLog();
+            if($this->io->confirm('git: stage above files and commit them?', true)) {
+                $sql = str_replace(getcwd().'/', '', $sql);
+                $md = str_replace(getcwd().'/', '', $md);
+                passthru('git add '.$md);
+                passthru('git add '.$sql);
+                passthru('git commit -m "change log release '.$this->releaseVersion->name.'" '.$sql.' '.$md);
+                passthru('git push');
+            }
         }
         if(!$this->releaseVersion->released) {
             $this->io->note('Please release the version on URL https://jira.translate5.net/projects/TRANSLATE/versions/'.$this->releaseVersion->id);
@@ -201,6 +209,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         $ret = $issueService->search($jql, 0, -1, [
             'summary',
             'description',
+            'components',
             'issuetype',
             'customfield_11800', //'ChangeLog Description'
             'customfield_11700', //'Important release notes'
@@ -209,6 +218,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             $item = new \stdClass();
             $item->key = $issue->key;
             $item->summary = trim($issue->fields->summary);
+            $item->components = join(', ', array_column($issue->fields->components ?? [], 'name'));
             $item->description = empty($issue->fields->customfield_11800) ? $issue->fields->description : $issue->fields->customfield_11800;
             if(!empty($issue->fields->customfield_11700)) {
                 $this->importantNotes[$issue->key] = preg_replace('~\R~u', "\n", trim($issue->fields->customfield_11700));
@@ -257,15 +267,19 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             $this->io->section($label);
             foreach($this->issues[$type] as $issue) {
                 $this->io->text([
-                    '<info>'.$issue->key.': '.$issue->summary.'</info>',
+                    '<info>'.$issue->key.' ('.$issue->components.'): '.$issue->summary.'</info>',
                     $this->linkIssue($issue->key, true),
                     $issue->description, ''
                 ]);
             }
         }
     }
-    
-    protected function createSql() {
+
+    /**
+     * creates the SQL changelog and returns the path to it
+     * @return string
+     */
+    protected function createSql(): string {
         $sql = '
 -- /*
 -- START LICENSE AND COPYRIGHT
@@ -335,12 +349,14 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
         $filename = APPLICATION_ROOT.'/application/modules/editor/database/sql-changelog-'.$version.'.sql';
         $this->io->success('Created SQL changelog file '.$filename);
         file_put_contents($filename, $sql);
+        return $filename;
     }
     
     /**
      * Injects the MarkDown changelog into the CHANGELOG.md file
+     * @return string returns the filename of the changelog.md file
      */
-    protected function updateChangeLog() {
+    protected function updateChangeLog(): string {
         $date = date('Y-m-d', time());
         
         //headlines
@@ -362,21 +378,21 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
             $md .= "\n### Added\n";
         }
         foreach($this->issues['new feature'] as $row) {
-            $md .= '**'.$this->linkIssue($row->key).': '.$row->summary."** <br>\n".$row->description."\n\n";
+            $md .= '**'.$this->linkIssue($row->key).': '.$row->components.' - '.$row->summary."** <br>\n".$row->description."\n\n";
         }
         
         if(!empty($this->issues['change'])) {
             $md .= "\n### Changed\n";
         }
         foreach($this->issues['change'] as $row) {
-            $md .= '**'.$this->linkIssue($row->key).': '.$row->summary."** <br>\n".$row->description."\n\n";
+            $md .= '**'.$this->linkIssue($row->key).': '.$row->components.' - '.$row->summary."** <br>\n".$row->description."\n\n";
         }
         
         if(!empty($this->issues['fix'])) {
             $md .= "\n### Bugfixes\n";
         }
         foreach($this->issues['fix'] as $row) {
-            $md .= '**'.$this->linkIssue($row->key).': '.$row->summary."** <br>\n".$row->description."\n\n";
+            $md .= '**'.$this->linkIssue($row->key).': '.$row->components.' - '.$row->summary."** <br>\n".$row->description."\n\n";
         }
         
         $filename = APPLICATION_ROOT.'/docs/CHANGELOG.md';
@@ -387,12 +403,13 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
         $lastPos = mb_strpos($content, "\n## [");
         $this->io->success('Updated changelog file '.$filename);
         file_put_contents($filename, substr_replace($content, $md, $lastPos, 0));
+        return $filename;
     }
     
     protected function makeSqlRow($row, $type, $date, $groups) {
         //using only the issue nr, not the issue text
         $issue = $row->key;
-        $title = addcslashes($row->summary, "'");
+        $title = addcslashes($row->components.' - '.$row->summary, "'");
         $desc = addcslashes($row->description, "'");
 
         //calculate the group integer

@@ -46,9 +46,8 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
             return $tags;
         }
         // 1) Tag check: Bei Translation: Internal Tags gegen Source prüfen, bei Review: gegen original Target (insofern gesetzt)          
-        $isTranslationTask = $task->getEmptyTargets();
         $against = $tags->getOriginalOrNormalSource();
-        if(!$isTranslationTask){
+        if(!$task->isTranslation()){
             $originalTarget = $tags->getOriginalTarget();
             if(!$originalTarget->isEmpty()){
                 $against = $originalTarget;

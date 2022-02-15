@@ -71,7 +71,7 @@ class editor_Segment_Export {
      */
     public function process() : string {
         // this removes all segment tags not needed for export
-        $this->fieldTags = ($this->fieldTags->hasTrackChanges()) ?        
+        $this->fieldTags = ($this->fieldTags->hasTrackChanges()) ?
             $this->fieldTags->cloneWithoutTrackChanges(editor_Segment_Quality_Manager::instance()->getAllExportedTypes()) : 
             $this->fieldTags->cloneFiltered(editor_Segment_Quality_Manager::instance()->getAllExportedTypes());
         if($this->isFaultyInTask && $this->fixFaulty){

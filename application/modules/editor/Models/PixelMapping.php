@@ -207,7 +207,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
      * @param array $charsNotSet
      * @return int|NULL
      */
-    public function getCharWidth ($char, $pixelMappingForSegment, $fileId, &$charsNotSet): int {
+    public function getCharWidth ($char, $pixelMappingForSegment, $fileId, &$charsNotSet): ?int {
         $unicodeCharNumeric = $this->getNumericValueOfUnicodeChar($char);
         if (array_key_exists($unicodeCharNumeric, $pixelMappingForSegment)) {
             $pixelMappingForCharacter = $pixelMappingForSegment[$unicodeCharNumeric];

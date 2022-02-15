@@ -65,16 +65,11 @@ class UserCreateCommand extends UserAbstractCommand
         $this->addArgument('lastname', InputArgument::REQUIRED, 'The last name of the new user.');
         $this->addArgument('email', InputArgument::OPTIONAL, 'The e-mail to be used, is needed if login is not a valid e-mail.');
         
-        $this->initTranslate5();
-        $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-        $this->allRoles = array_diff($acl->getAllRoles(), self::ROLES_FIXED);
-        
         $this->addOption(
             'roles',
             'r',
             InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-            'Give one or multiple roles for the user. Valid values are: '.join(', ', $this->allRoles).'. Provide one -r per role, see example. If omitted just role editor is used.',
+            'Give one or multiple roles for the user. To get valid roles call with -R. Provide one -r per role, see example. If omitted just role editor is used.',
             ['editor']);
 
         $this->addOption(
@@ -99,6 +94,12 @@ class UserCreateCommand extends UserAbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
+        $this->initTranslate5();
+
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        $this->allRoles = array_diff($acl->getAllRoles(), self::ROLES_FIXED);
+
         $login = $this->input->getArgument('login');
         $email = $this->input->getArgument('email');
         $this->writeTitle('Create user "'.$login.'"');

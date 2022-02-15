@@ -89,10 +89,14 @@ Ext.define('Editor.view.comments.Grid', {
             xtype: 'actioncolumn',
             width: 60,
             items: [{
-                iconCls: 'ico-comment-edit',
+                iconCls: 'editCommentClass',
+                tabIndex:1,
+                glyph:'e3c9@Material Icons',
                 tooltip: me.text_edit
             },{
-                iconCls: 'ico-comment-delete',
+                iconCls: 'deleteCommentClass',
+                tabIndex:2,
+                glyph:'e92b@Material Icons',
                 tooltip: me.text_delete
             }]
         }

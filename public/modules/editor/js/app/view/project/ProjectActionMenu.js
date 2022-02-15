@@ -34,7 +34,8 @@ Ext.define('Editor.view.project.ProjectActionMenu', {
 	  type:'projectActionMenu'
   },
   messages: {
-      actionDeleteProject: '#UT#Projekt komplett löschen'
+      actionDeleteProject: '#UT#Projekt komplett löschen',
+      actionReloadProject: '#UT#Projekt aktualisieren',
   },
   alias: 'widget.projectActionMenu',
 
@@ -49,8 +50,13 @@ Ext.define('Editor.view.project.ProjectActionMenu', {
 		        bind:{
 		        	hidden:'{!isEditorDeleteProject}'
 		        },
-		        sortIndex:1
-		    }]
+                sortIndex:1
+            },{
+                text: me.messages.actionReloadProject,
+                action: 'editorReloadProject',
+                glyph: 'f021@FontAwesome5FreeSolid',
+                sortIndex:2
+            }]
 	    };
 	    if (instanceConfig) {
 	        me.self.getConfigurator().merge(me, config, instanceConfig);

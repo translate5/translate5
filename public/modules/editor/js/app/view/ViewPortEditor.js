@@ -47,7 +47,9 @@ Ext.define('Editor.view.ViewPortEditor', {
         'Editor.view.segments.Grid',
         'Editor.view.segments.MetaPanelNavi',
         'Editor.view.segments.MetaPanel',
-        'Editor.view.quality.FilterPanel'
+        'Editor.view.quality.FilterPanel',
+        'Editor.view.comments.Navigation',
+        'Editor.view.Filepanel'
     ],
 
     viewModel: {
@@ -62,100 +64,104 @@ Ext.define('Editor.view.ViewPortEditor', {
     items_north_title: 'Header',
     items_west_title: '#UT#QS &amp; Dateien',
     initComponent: function() {
-      var me = this,
-          task = Editor.data.task,
-          isEditor = Editor.app.authenticatedUser.isAllowed('editorEditTask', task),
-          items = [{
-              xtype: 'panel',
-              stateId: 'editor.westPanel',
-              stateEvents: ['collapse', 'expand'],
-              stateful:true,
-              region: 'west',
-              weight: 30,
-              resizable: true,
-              resizeHandles: 'e',
-              title: me.items_west_title,
-              width: 250,
-              collapsible: true,
-              layout: {type:'accordion'},
-              animCollapse: true,
-              itemId: 'filepanel',
-              items: [{
-                  xtype: 'qualityFilterPanel',
-                  stateId: 'editor.westPanelQualityFilter',
-                  stateEvents: ['collapse', 'expand'],
-                  stateful: true
-              },{
-                  xtype: 'fileorder.tree',
-                  stateId: 'editor.westPanelFileorderTree',
-                  stateEvents: ['collapse', 'expand'],
-                  stateful: true
-              },{
-                  xtype: 'referenceFileTree',
-                  stateId: 'editor.westPanelReferenceFileTree',
-                  stateEvents: ['collapse', 'expand'],
-                  stateful: true
-              }]
-          },{
-              region: 'center',
-              flex:Editor.app.getController('LanguageResources').isLanguageResourcesDisabled() ? 0.3 : 0.5,
-              xtype: 'segments.grid',
-              itemId: 'segmentgrid',
-              stateful: {
-                  segmentSize: true,
-                  columns: true,
-                  sorters: false,
-                  filters: false,
-                  grouper: false,
-                  storeState: false // → does not work
-              }
-              //stateful:true → see additional config in Grid Class
-          },{
-              xtype: 'panel',
-              stateId: 'editor.eastPanel',
-              itemId:'editorEastPanel',
-              stateEvents: ['collapse', 'expand'],
-              stateful:true,
-              region: 'east',
-              width: 330,
-              weight: 30,
-              collapsible: true,
-              layout:'border',
-              animCollapse: true,
-              border:0,
-              header:{
-            	  height:49,
-              },
-              items:[
-                  me.getBrandConfig(), {
-                      xtype: 'panel',
-                      region: 'center',
-                      listeners: {
-                          afterrender: function() {
-                              this.disable();
-                          }
-                      },
-                      preventHeader: true,
-                      border:0,
-                      itemId: 'metapanel',
-                      layout: { type:'accordion' },
-                      dockedItems: [{
-                          xtype: 'metapanelNavi',
-                          dock: 'top'
-                      }],
-                      items: [{
-                          xtype: 'segmentsMetapanel',
-                          stateId: 'editor.eastPanelSegmentsMetapanel',
-                          stateEvents: ['collapse', 'expand'],
-                          stateful:true
-                      },{
-                          xtype: 'commentPanel',
-                          stateId: 'editor.eastPanelCommentPanel',
-                          stateEvents: ['collapse', 'expand'],
-                          stateful:true
-                      }]
-                  }]
-              }];
+    var me = this,
+        task = Editor.data.task,
+        isEditor = Editor.app.authenticatedUser.isAllowed('editorEditTask', task),
+        items = [{
+            xtype: 'panel',
+            stateId: 'editor.westPanel',
+            stateEvents: ['collapse', 'expand'],
+            stateful:true,
+            region: 'west',
+            weight: 30,
+            resizable: true,
+            resizeHandles: 'e',
+            title: me.items_west_title,
+            width: 250,
+            collapsible: true,
+            layout: {type:'accordion'}, // accordian layout requires panels as children, calls e.g. addBodyCls
+            animCollapse: true,
+            bodyPadding: 0,
+            defaults: {margin:0},
+            itemId: 'filepanel',
+            items: [{
+                xtype: 'qualityFilterPanel',
+                stateId: 'editor.westPanelQualityFilter',
+                stateEvents: ['collapse', 'expand'],
+                stateful: true
+            },{
+                xtype: 'commentNavigation',
+                stateId: 'editor.commentNav',
+                stateEvents: ['collapse', 'expand'],
+                stateful: true
+            },{
+                xtype:'taskfiles',
+                stateId: 'editor.taskFiles',
+                stateEvents: ['collapse', 'expand'],
+                stateful: {collapsed:true},
+                itemId: 'filesection'
+            }]
+        },{
+            region: 'center', // implicit flex:1
+            height: 236, // 236 is high enough to show all action buttons on the right
+            xtype: 'segments.grid',
+                id: 'segment-grid',
+                itemId: 'segmentgrid',
+                stateful: {
+                    segmentSize: true,
+                    columns: true,
+                    sorters: false,
+                    filters: false,
+                    grouper: false,
+                    storeState: false // → does not work
+                }
+                //stateful:true → see additional config in Grid Class
+        },{
+            xtype: 'panel',
+            stateId: 'editor.eastPanel',
+            itemId:'editorEastPanel',
+            stateEvents: ['collapse', 'expand'],
+            stateful:true,
+            region: 'east',
+            width: 330,
+            weight: 30,
+            collapsible: true,
+            layout:'border',
+            animCollapse: true,
+            border:0,
+            header:{
+                height:49,
+            },
+            items:[
+                me.getBrandConfig(),{
+                xtype: 'panel',
+                region: 'center',
+                listeners: {
+                    afterrender: function() {
+                        this.disable();
+                    }
+                },
+                preventHeader: true,
+                border:0,
+                itemId: 'metapanel',
+                layout: { type:'accordion' },
+                dockedItems: [{
+                    xtype: 'metapanelNavi',
+                    dock: 'top'
+                }],
+                items: [{
+                    xtype: 'segmentsMetapanel',
+                    stateId: 'editor.eastPanelSegmentsMetapanel',
+                    stateEvents: ['collapse', 'expand'],
+                    stateful:true
+                },{
+                    xtype: 'commentPanel',
+                    stateId: 'editor.eastPanelCommentPanel',
+                    stateEvents: ['collapse', 'expand'],
+                    stateful:true
+                }]
+            }]
+        }];
       //},{
       //example of adding an additional south panel with width 100%, 
       // as heigher the weight of the region, as "outer" it is rendererd, 

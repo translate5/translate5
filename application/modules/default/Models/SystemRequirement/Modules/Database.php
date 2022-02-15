@@ -50,9 +50,11 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         $config = Zend_Registry::get('config');
         $db = Zend_Db::factory($config->resources->db);
         
+        $this->checkOpenUpdates();
         $this->checkCharset($db);
         $this->checkTimezones($db);
         $this->checkDbSettings($db);
+        $this->checkSkipLock($db);
         $this->checkTableCharsets($db);
         $this->checkDbTriggerCreation($db);
         $this->checkFulltextIndexSettings($db);
@@ -86,23 +88,33 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         while($row = $result->fetchObject()) {
             $this->result->error[] = 'DB table '.$row->TABLE_NAME.' has collation "'.$row->TABLE_COLLATION.'" instead of "utf8mb4_unicode_ci"';
         }
+
+        $result = $db->query('
+        SELECT table_schema, table_name, column_name, character_set_name, collation_name
+        FROM information_schema.columns
+        WHERE character_set_name != "utf8mb4"
+        AND table_schema = database()
+        ORDER BY table_schema, table_name,ordinal_position');
+
+        while($row = $result->fetchObject()) {
+            $this->result->error[] = 'DB column '.$row->table_name.'.'.$row->column_name.' has charset "'.$row->character_set_name.'" instead of "utf8mb4" (collation is '.$row->collation_name.')';
+        }
     }
     
-    protected function checkJsonFunctions(Zend_Db_Adapter_Abstract $db) {
+    protected function checkSkipLock(Zend_Db_Adapter_Abstract $db) {
         $m = $e = null;
         try {
-            $db->query("SELECT JSON_VALID('{}');SELECT JSON_EXTRACT('{\"id\": 1}', \"$.id\");");
+            $db->query('SELECT 1 FROM DUAL FOR UPDATE SKIP LOCKED');
             return;
         }
         catch(Zend_Db_Statement_Exception $e) {
             $m = $e->getMessage();
         }
-        if(preg_match('/FUNCTION .*JSON_.*does not exist/', $m)) {
-            //trigger does really not exist, so all is ok
-            $this->result->error[] = "Your DB version is not supported anymore. Please update to newer version (MariaDB or MySQL >= 5.7) supporting the JSON functions.";
+        if(strpos($m, 'You have an error in your SQL syntax') !== false) {
+            $this->result->error[] = "Your DB version is not supported anymore. Please update to newer version (MariaDB >= 10.6 or MySQL >= 5.7) supporting the JSON functions.";
             return;
         }
-        
+
         //some other error occured
         throw $e;
     }
@@ -187,5 +199,24 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         
         //some other error occured
         throw $e;
+    }
+
+    protected function checkOpenUpdates()
+    {
+        //then we are in installation and no update check is possible
+        if(!class_exists('ZfExtended_Factory')) {
+            return;
+        }
+        $dbUpdater = ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
+        /* @var $dbUpdater ZfExtended_Models_Installer_DbUpdater */
+        $dbUpdater->calculateChanges();
+        $newCount = count($dbUpdater->getNewFiles());
+        $modCount = count($dbUpdater->getModifiedFiles());
+        if($newCount > 0) {
+            $this->result->warning[] = 'Database is not up to date: there are '.$newCount.' DB files to be imported! call "translate5.[sh|bat] database:update"';
+        }
+        if($modCount > 0) {
+            $this->result->warning[] = 'Database is not up to date: there are '.$modCount.' modified DB files! call "translate5.[sh|bat] database:update"';
+        }
     }
 }

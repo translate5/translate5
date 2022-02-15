@@ -58,11 +58,11 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     /***
      * Load configs fron the database by given level
      * @param mixed $level
-     * @param array $excludeType config types to be excluded
+     * @param array $excludeType config types to be excluded, expect a typeClass is set!
      * @throws ZfExtended_ErrorCodeException
      * @return array[]
      */
-    public function loadByLevel($level,array $excludeType = []) {
+    protected function loadByLevel($level, array $excludeType = []) {
         if(!is_array($level)){
             $level = [$level];
         }
@@ -70,7 +70,8 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         ->from('Zf_configuration',['Zf_configuration.*',new Zend_Db_Expr($this->db->getAdapter()->quote(self::CONFIG_SOURCE_DB).' as origin')])
         ->where('level & ? > 0', array_sum($level));
         if(!empty($excludeType)){
-            $s->where('type NOT IN(?)',$excludeType);
+            $s->where('(type NOT IN(?)',$excludeType);
+            $s->orWhere('typeClass IS NOT NULL)');
         }
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
@@ -85,10 +86,17 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         $dbResultsNamed = [];
         //merge the ini with zfconfig values
         $iniOptions = Zend_Registry::get('bootstrap')->getApplication()->getOptions();
+
+        $typeManager = Zend_Registry::get('configTypeManager');
+        /* @var $typeManager ZfExtended_DbConfig_Type_Manager */
+
         foreach($dbResults as &$row) {
             $this->mergeWithIni($iniOptions, explode('.', $row['name']), $row);
+            $type = $typeManager->getType($row['typeClass']);
+            $row['typeClassGui'] = $type->getGuiViewCls(); //we can overwrite the typeClass here, since php class value is not usable in GUI
             $dbResultsNamed[$row['name']] = $row;
         }
+
         return $dbResultsNamed;
     }
     /***
@@ -210,7 +218,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             //include task levels so we can set the baase values for task config
             //do not load all map config types (usualy default state) since no config editor for the frontend
             //is available for now
-            $dbResults = $this->loadByLevel($level,[ZfExtended_Resource_DbConfig::TYPE_MAP]);
+            $dbResults = $this->loadByLevel($level,[ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP]);
         }
         array_walk($dbResults, function(&$r) use($customerId){
             $r['customerId'] = $customerId;
@@ -241,7 +249,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             $levels = array_map([$this, 'convertStringLevelToInt'], $userLevelStrings);
             //do not load all map config types (usualy default state) since no config editor for the frontend
             //is available for now
-            $dbResults = $this->loadByLevel($levels,[ZfExtended_Resource_DbConfig::TYPE_MAP]);
+            $dbResults = $this->loadByLevel($levels,[ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP]);
         }
         return $this->mergeConfig([], $dbResults, self::CONFIG_LEVEL_SYSTEM);
     }
@@ -298,7 +306,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         $row['origin'] = editor_Models_Config::CONFIG_SOURCE_INI;
         $row['overwritten'] = $row['value'];
         $row['value'] = $root[$part];
-        if($row['type'] == ZfExtended_Resource_DbConfig::TYPE_MAP || $row['type'] == ZfExtended_Resource_DbConfig::TYPE_LIST){
+        if($row['type'] == ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP || $row['type'] == ZfExtended_DbConfig_Type_CoreTypes::TYPE_LIST){
             $row['value'] = json_encode($row['value'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
     }

@@ -1,2 +1,86 @@
 <?xml version="1.0"?>
-<martif noNamespaceSchemaLocation="TBXcsV02.xsd" type="TBX" TBX="en"><martifHeader><fileDesc><sourceDesc><p>TBX recovered from Translate5 DB</p></sourceDesc></fileDesc></martifHeader><text><body><termEntry id="626a86ec-4979-43e5-8293-6bb6532b7cf5"><langSet lang="en-US"><tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1"><term id="add5dad8-61cd-4830-9c6e-1ceaff00c8c1">Bike #new2#</term><termNote type="normativeAuthorization">admittedTerm</termNote></tig><tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1"><term id="a2301cd4-6be8-469d-95b4-62946571aa2e">Bicycle #new2#</term><termNote type="normativeAuthorization">admittedTerm</termNote></tig></langSet><langSet lang="de-DE"><tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1"><term id="9eaaafc9-e256-4bce-a2e5-ce848c0b7cd9">Fahrrad</term><termNote type="normativeAuthorization">admittedTerm</termNote></tig><tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1"><term id="9eaaafc9-e256-4bce-a2e5-ce848c0b7cd9-alexnewterm">Rad</term><termNote type="normativeAuthorization">admittedTerm</termNote></tig></langSet><langSet lang="fr-FR"><tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1"><term id="d3a56ef0-2e6c-49c6-80a5-88b54819a733">V&#xE9;lo #new2#</term><termNote type="normativeAuthorization">admittedTerm</termNote></tig></langSet></termEntry><termEntry id="9f7a1227-eb7d-491e-ace1-4ab859a92c2a"><langSet lang="en-US"><tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1"><term id="462bed50-6779-4cb1-be6b-223e78b54f26">Desk #new3#</term><termNote type="normativeAuthorization">admittedTerm</termNote></tig></langSet><langSet lang="de-DE"><tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1"><term id="37705a81-e0df-4209-9a12-eaddc93674e0">Schreibtisch #new2#</term><termNote type="normativeAuthorization">admittedTerm</termNote></tig><tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1"><term id="fb1b8aca-bbc9-4e94-9469-c19f0b310074">Schmierplatz #new2#</term><termNote type="normativeAuthorization">supersededTerm</termNote></tig></langSet></termEntry></body></text></martif>
+<martif noNamespaceSchemaLocation="TBXcsV02.xsd" type="TBX" TBX="en">
+  <martifHeader>
+    <fileDesc>
+      <sourceDesc>
+        <p>TBX recovered from Translate5 DB</p>
+      </sourceDesc>
+    </fileDesc>
+  </martifHeader>
+  <text>
+    <body>
+      <termEntry id="626a86ec-4979-43e5-8293-6bb6532b7cf5">
+        <langSet lang="en-US">
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="add5dad8-61cd-4830-9c6e-1ceaff00c8c1">Bike #new2#</term>
+            <termNote type="normativeAuthorization">admittedTerm</termNote>
+          </tig>
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="a2301cd4-6be8-469d-95b4-62946571aa2e">Bicycle #new2#</term>
+            <termNote type="normativeAuthorization">admittedTerm</termNote>
+          </tig>
+        </langSet>
+        <langSet lang="de-DE">
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="9eaaafc9-e256-4bce-a2e5-ce848c0b7cd9">Fahrrad</term>
+            <termNote type="normativeAuthorization">admittedTerm</termNote>
+          </tig>
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="9eaaafc9-e256-4bce-a2e5-ce848c0b7cd9-alexnewterm">Rad</term>
+            <termNote type="normativeAuthorization">admittedTerm</termNote>
+          </tig>
+        </langSet>
+        <langSet lang="fr-FR">
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="d3a56ef0-2e6c-49c6-80a5-88b54819a733">V&#xE9;lo #new2#</term>
+            <termNote type="normativeAuthorization">admittedTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="9f7a1227-eb7d-491e-ace1-4ab859a92c2a">
+        <langSet lang="en-US">
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="462bed50-6779-4cb1-be6b-223e78b54f26">Desk #new3#</term>
+            <termNote type="normativeAuthorization">admittedTerm</termNote>
+          </tig>
+        </langSet>
+        <langSet lang="de-DE">
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="37705a81-e0df-4209-9a12-eaddc93674e0">Schreibtisch #new2#</term>
+            <termNote type="normativeAuthorization">admittedTerm</termNote>
+          </tig>
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="fb1b8aca-bbc9-4e94-9469-c19f0b310074">Schmierplatz #new2#</term>
+            <termNote type="normativeAuthorization">supersededTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="eid-0">
+        <langSet lang="en-US">
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="tid-1-en-2">Term allowed</term>
+            <termNote type="normativeAuthorization">admittedTerm</termNote>
+          </tig>
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="tid-1-en-3">Term preferred</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="tid-1-en-4">Term forbidden</term>
+            <termNote type="normativeAuthorization">supersededTerm</termNote>
+          </tig>
+        </langSet>
+        <langSet lang="de-DE">
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="tid-0-de-3">Term erlaubt</term>
+            <termNote type="normativeAuthorization">admittedTerm</termNote>
+          </tig>
+          <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
+            <term id="tid-0-de-4">Term verboten</term>
+            <termNote type="normativeAuthorization">supersededTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+    </body>
+  </text>
+</martif>

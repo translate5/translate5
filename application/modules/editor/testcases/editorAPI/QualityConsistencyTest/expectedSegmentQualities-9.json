@@ -1,0 +1,18 @@
+[
+    {
+        "id": "35751",
+        "segmentId": "231569",
+        "field": "target",
+        "type": "consistent",
+        "category": "target",
+        "categoryIndex": "-1",
+        "falsePositive": "0",
+        "typeText": "Consistency",
+        "text": "Inconsistent target",
+        "filterable": true,
+        "falsifiable": true,
+        "hasTag": true,
+        "tagName": "span",
+        "cssClass": "any"
+    }
+]

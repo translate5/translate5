@@ -34,8 +34,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
         var me= this,
             params = {},
             task = me.getView().lookupViewModel(true).get('currentTask');
-        params["taskGuid"] = task.get('taskGuid');
-        params["type"] = type.itemId;
+
+        params.taskGuid = task.get('taskGuid');
+        params.type = type.itemId;
         window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
     },
     /***
@@ -44,22 +45,36 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
     onAnalysisRecordLoad:function(store) {
         var me=this,
         	view=me.getView(),
+            vm = view.getViewModel(),
+            task = vm.get('currentTask'),
         	record=store.getAt(0),
-            noRecords=!record;
-        
-        view.down('#exportExcel').setDisabled(noRecords);
-        view.down('#exportXml').setDisabled(noRecords);
-    	if(noRecords){
-    		return;
-    	}
-    	
-    	view.down('#analysisDatum').setValue(record.get('created'));
-    	view.down('#internalFuzzy').setValue(record.get('internalFuzzy'));
+            hasData = !!record;
+
+        vm.set('hasAnalysisData', hasData);
+
+        view.down('#infoPanel').update({
+            hasAnalysisData: hasData,
+            created: record && record.get('created'),
+            internalFuzzy: record && record.get('internalFuzzy'),
+            editFullMatch: task && task.get('edit100PercentMatch'),
+            strings: view.strings
+        });
     },
     
     onMatchAnalysisPanelActivate:function(){
     	var me=this;
     	me.getView().down('#matchAnalysisGrid').getStore().load();
+    },
+
+    /**
+     * reconfigure the grid to use the configured match rate fields
+     * @param {Editor.plugins.MatchAnalysis.store.MatchAnalysis} store
+     * @param {Object} meta
+     */
+    onMetaChange: function(store, meta) {
+        var view = this.getView(),
+            grid = view && view.down('#matchAnalysisGrid');
+        grid && grid.reconfigure(store, view.getColumnConfig(meta.fields));
     }
 
 });

@@ -707,7 +707,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * see therefore TRANSLATE-487
      *
      * @param string $segmentContent
-     * @return string $segmentContent
+     * @return string $segmentContent (only containing internal and MQM tags, internal tags sanitized)
      */
     public function stripTermTagsAndTrackChanges($segmentContent)
     {
@@ -716,7 +716,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $segmentContent = $tag->protect($segmentContent);
         //keep internal tags and MQM, remove all other
         $segmentContent = strip_tags($segmentContent, '<img>' . $tag::PLACEHOLDER_TAG);
-        return $tag->unprotect($segmentContent);
+        $segmentContent = $tag->unprotect($segmentContent);
+        //remove the class attribute of the span, since its position is changed by tag object usage
+        return preg_replace('/(<span[^>]*)( class="[^"]+")([^>]*>)/', '$1$3', $segmentContent);
     }
 
     /**
@@ -1050,7 +1052,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     public function getFieldExport(string $field, editor_Models_Task $task, bool $edited=true, bool $fixKnownFaultyTags=true) : editor_Segment_Export {
         //since fields can be merged from different files, data for a field can be empty
         if (empty($this->segmentdata[$field])) {
-            return NULL;
+            return null;
         }
         $fieldTags = ($edited) ?
             new editor_Segment_FieldTags($task, $this->getId(), $this->segmentdata[$field]->edited, $field, $this->segmentFieldManager->getEditIndex($field)) :

@@ -13,6 +13,523 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+
+
+
+
+## [5.6.1] - 2022-02-09
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-2810](https://jira.translate5.net/browse/TRANSLATE-2810): TermPortal - All roles should be able to see all terms with all process status.** <br>
+unprocessed-terms are now searchable even if user has no termProposer-role
+
+**[TRANSLATE-2809](https://jira.translate5.net/browse/TRANSLATE-2809): TermPortal - Reimport term should be only possible for tasks created by the Term-Translation workflow** <br>
+Reimport of terms back to their TermCollections is possible only for task, created via TermPortal terms transfer function
+
+
+### Bugfixes
+**[TRANSLATE-2825](https://jira.translate5.net/browse/TRANSLATE-2825): Task Management - Multiple files with multiple pivot files can not be uploaded** <br>
+Multiple files with multiple pivot files can not be added in the task creation wizard. The pivot files are marked as invalid.
+
+**[TRANSLATE-2824](https://jira.translate5.net/browse/TRANSLATE-2824): Okapi integration - Enable aggressive tag clean-up in Okapi for MS Office files by default** <br>
+Office often creates an incredible mess with inline tags, if users edit with character based markup.
+Okapi has an option to partly clean this up when converting an office file.
+This option is now switched on by default.
+
+**[TRANSLATE-2821](https://jira.translate5.net/browse/TRANSLATE-2821): Auto-QA - Empty segment check does not report completely empty segments** <br>
+Segments with completely empty targets are now counted in AutoQA: Empty-check
+
+**[TRANSLATE-2817](https://jira.translate5.net/browse/TRANSLATE-2817): VisualReview / VisualTranslation - Solve Problems with CommentNavigation causing too much DB strain** <br>
+FIX: Loading of Comment Navigation may was slow
+
+**[TRANSLATE-2816](https://jira.translate5.net/browse/TRANSLATE-2816): Comments - Comment Overview performance problem and multiple loading calls** <br>
+"AllComments" store: Prevent multiple requests by only making new ones when none are pending.
+
+**[TRANSLATE-2815](https://jira.translate5.net/browse/TRANSLATE-2815): Import/Export, Task Management - Upload time out for bigger files** <br>
+The upload timeout in the import wizard is increased to prevent timeouts for slower connections.
+
+**[TRANSLATE-2814](https://jira.translate5.net/browse/TRANSLATE-2814): VisualReview / VisualTranslation - Solve Problems with Caching of plugin resources** <br>
+FIX: Resources needed for the visual may become cached too long generating JS errors
+
+**[TRANSLATE-2808](https://jira.translate5.net/browse/TRANSLATE-2808): TermPortal - Mind sublanguages while terms transfer validation** <br>
+Sublanguages are now respected while terms transfer validation
+
+**[TRANSLATE-2803](https://jira.translate5.net/browse/TRANSLATE-2803): Editor general - Displaying the logos causes issues** <br>
+If the consortium logos were shown with a configured delay on the application startup, this may lead to problems when loading the application via an URL containing a task ID to open that task directly.
+
+**[TRANSLATE-2802](https://jira.translate5.net/browse/TRANSLATE-2802): Task Management - Add isReview and isTranslation methods to task entity** <br>
+Internal functions renamed.
+
+**[TRANSLATE-2685](https://jira.translate5.net/browse/TRANSLATE-2685): Editor general - Error on pasting tags inside segment-editor** <br>
+There was JS problem when editing a segment and pasting external content containing XML fragments.
+
+
+## [5.6.0] - 2022-02-03
+
+### Important Notes:
+#### [TRANSLATE-2801](https://jira.translate5.net/browse/TRANSLATE-2801)
+In the last release it was introduced that segments edited with the repetition editor was getting always the 102% match-rate for repetitions. Since is now changed so that this affects only translations and in review tasks the match rate is not touched in using repetitions.
+
+#### [TRANSLATE-2796](https://jira.translate5.net/browse/TRANSLATE-2796)
+
+
+#### [TRANSLATE-2780](https://jira.translate5.net/browse/TRANSLATE-2780)
+For embedded usage of the translate5 editor only: In visual review simple mode there is now also a close application button.
+
+
+
+
+#### [TRANSLATE-2671](https://jira.translate5.net/browse/TRANSLATE-2671)
+There is a JavaScript Mediaplayer used which is under MIT License:
+https://github.com/mediaelement/mediaelement
+https://www.mediaelementjs.com/
+This player is added as a resource to the public resources of the visual, not via composer
+
+#### [TRANSLATE-2080](https://jira.translate5.net/browse/TRANSLATE-2080)
+The first page of the project / task creation wizard was completely reworked with regard to the file upload. Now files can be added by drag and drop. The source and target language of bilingual files is automatically read out from the file and set then in wizard. This allows project creation directly out of a bunch of files without putting them in a ZIP file before. The well known ZIP import will still work.
+ 
+
+
+### Added
+**[TRANSLATE-2727](https://jira.translate5.net/browse/TRANSLATE-2727): Task Management - Column for "ended" date of a task in the task grid and the exported meta data file for a task** <br>
+A new column "ended date" is added to the task overview. It is filled automatically with the timestamp when the task is ended by the pm (not to be confused with finishing a workflow step).
+
+**[TRANSLATE-2671](https://jira.translate5.net/browse/TRANSLATE-2671): Import/Export, VisualReview / VisualTranslation - WYSIWIG for Videos** <br>
+The visual now has capabilities to load a video as source together with segments and their timecodes (either as XSLX or SRT file). This gives the following new Features:
+
+* Video highlights the timecoded segments when the player reaches the play position
+* Annotations can be added to the video that appear as tooltip with an arrow pointing to the position on the selected timecodes frame
+* Import of subtitle (.srt) files as workfiles
+* Player can be navigated by clicking on the segments in the grid to play the segment
+* Clicking on the timerail of the video highlights the associated segment
+* Jumping from segment to segment, forth and back with player buttons and shortcuts
+* In the Comment/Annotation Overview, clicking Comments/Annotations will navigate the video
+* The Items in the Comment/Annotation Overview show their timecodes and are ordered by timecode
+
+The Following prequesites must be fullfilled by a video to be used as visual source:
+* mp4 file-format,
+* h264 Codec
+* max FullHD (1920x1080) resolution
+
+
+**[TRANSLATE-2540](https://jira.translate5.net/browse/TRANSLATE-2540): Auto-QA - Check "target is empty or contains only spaces, punctuation, or alike"** <br>
+Empty segments check added
+
+**[TRANSLATE-2537](https://jira.translate5.net/browse/TRANSLATE-2537): Auto-QA - Check inconsistent translations** <br>
+Added consistency checks: segments with same target, but different source and segments with same source, but different target. In both cases tags ignored.
+
+**[TRANSLATE-2491](https://jira.translate5.net/browse/TRANSLATE-2491): TermPortal - Term-translation-Workflow** <br>
+Added ability to transfer terms from TermPortal to Translate5, and import back to those terms TermCollection(s) once translated
+
+**[TRANSLATE-2080](https://jira.translate5.net/browse/TRANSLATE-2080): Task Management - Round up project creation wizard by refactoring and enhancing first screen** <br>
+The first page of the project / task creation wizard was completely reworked with regard to the file upload. Now files can be added by drag and drop. The source and target language of bilingual files is automatically read out from the file and set then in wizard. This allows project creation directly out of a bunch of files without putting them in a ZIP file before. The well known ZIP import will still work.
+
+
+### Changed
+**[TRANSLATE-2792](https://jira.translate5.net/browse/TRANSLATE-2792): TermPortal - Sort attributes filter drop down alphabetically** <br>
+options in TermPortal filter-window attributes-combobox are now sorted alphabetically
+
+**[TRANSLATE-2777](https://jira.translate5.net/browse/TRANSLATE-2777): TermPortal - Usability enhancements for TermPortal** <br>
+Added a number of usability enhancements for TermPortal
+
+
+
+
+**[TRANSLATE-2678](https://jira.translate5.net/browse/TRANSLATE-2678): VisualReview / VisualTranslation - WYSIWIG for Videos: Export Video Annotations** <br>
+See TRANSLATE-2671
+
+**[TRANSLATE-2676](https://jira.translate5.net/browse/TRANSLATE-2676): VisualReview / VisualTranslation - WYSIWIG for Videos: Frontend: Extending Annotations for Videos** <br>
+See TRANSLATE-2671
+
+**[TRANSLATE-2675](https://jira.translate5.net/browse/TRANSLATE-2675): VisualReview / VisualTranslation - WYSIWIG for Videos: Frontend: New IframeController "Video", new Visual iframe for Videos** <br>
+See TRANSLATE-2671
+
+**[TRANSLATE-2674](https://jira.translate5.net/browse/TRANSLATE-2674): VisualReview / VisualTranslation - WYSIWIG for Videos: Add new Review-type, Video-HTML-Template** <br>
+See TRANSLATE-2671
+
+**[TRANSLATE-2673](https://jira.translate5.net/browse/TRANSLATE-2673): Import/Export - WYSIWIG for Videos: Import Videos with Excel Timeline** <br>
+See TRANSLATE-2671
+
+
+### Bugfixes
+**[TRANSLATE-2801](https://jira.translate5.net/browse/TRANSLATE-2801): Repetition editor - Do not update matchrate on repetitions for review tasks** <br>
+In the last release it was introduced that segments edited with the repetition editor was getting always the 102% match-rate for repetitions. Since is now changed so that this affects only translations and in review tasks the match rate is not touched in using repetitions.
+
+**[TRANSLATE-2800](https://jira.translate5.net/browse/TRANSLATE-2800): Editor general - User association wizard error when removing users** <br>
+Solves problem when removing associated users from the task and quickly selecting another user from the grid afterwards.
+
+**[TRANSLATE-2797](https://jira.translate5.net/browse/TRANSLATE-2797): TBX-Import - Definition is not addable on language level due wrong default datatype** <br>
+In some special cases the collected term attribute types and labels were overwriting some default labels. This so overwritten labels could then not be edited any more in the GUI.
+
+**[TRANSLATE-2796](https://jira.translate5.net/browse/TRANSLATE-2796): TermPortal - Change tooltip / Definition on language level cant be set / Double attribute of "Definition" on entry level** <br>
+tooltips changed to 'Forbidden' / 'Verboten' for deprecatedTerm and supersededTerm statuses
+
+**[TRANSLATE-2795](https://jira.translate5.net/browse/TRANSLATE-2795): Import/Export, TermPortal - Term TBX-ID and term tbx-entry-id should be exported in excel-export** <br>
+TermCollection Excel-export feature is now exporting Term/Entry tbx-ids instead of db-ids
+
+**[TRANSLATE-2794](https://jira.translate5.net/browse/TRANSLATE-2794): TermPortal - TermEntries are not deleted on TermCollection deletion** <br>
+TermEntries are not deleted automatically on TermCollection deletion due a missing foreign key connection in database.
+
+**[TRANSLATE-2791](https://jira.translate5.net/browse/TRANSLATE-2791): TermTagger integration - Extend term attribute mapping to <descrip> elements** <br>
+In the TermPortal proprietary TBX attributes could be mapped to the Usage Status. This was restricted to termNotes, now all types of attributes can be mapped (for example xBool_Forbidden in descrip elements).
+
+**[TRANSLATE-2790](https://jira.translate5.net/browse/TRANSLATE-2790): OpenTM2 integration - Disable OpenTM2 fixes if requesting t5memory** <br>
+The OpenTM2 TMX import fixes are not needed anymore for the new t5memory, they should be disabled if the language resource is pointing to t5memory instead OpenTM2.
+
+**[TRANSLATE-2788](https://jira.translate5.net/browse/TRANSLATE-2788): Configuration - No default values in config editor for list type configs with defaults provided** <br>
+For some configuration values the config editor in the settings was not working properly. This is fixed now.
+
+**[TRANSLATE-2785](https://jira.translate5.net/browse/TRANSLATE-2785): LanguageResources - Improve DeepL error handling and other fixes** <br>
+DeepL was shortly not reachable, the produced errors were not handled properly in translate5, this is fixed. 
+
+**[TRANSLATE-2781](https://jira.translate5.net/browse/TRANSLATE-2781): Editor general - Access to job is still locked after user has closed his window** <br>
+If a user just closes the browser it may happen that the there triggered automaticall logout does not work. Then the edited task of the user remains locked. The garbage cleaning and the API access to so locked jobs are improved, so that the task is getting unlocked then.
+
+**[TRANSLATE-2780](https://jira.translate5.net/browse/TRANSLATE-2780): VisualReview / VisualTranslation - Add missing close button to visual review simple mode** <br>
+For embedded usage of the translate5 editor only: In visual review simple mode there is now also a close application button - in the normal mode it was existing already.
+
+**[TRANSLATE-2776](https://jira.translate5.net/browse/TRANSLATE-2776): Import/Export - XLF translate no with different mrk counts lead to unknown mrk tag error** <br>
+The combination of XLF translate = no and a different amount of mrk segments in source and target was triggering erroneously this error.
+
+**[TRANSLATE-2775](https://jira.translate5.net/browse/TRANSLATE-2775): InstantTranslate - Issue with changing the language in InstantTranslate** <br>
+fixed issue with changing the language in InstantTranslate
+
+**[TRANSLATE-2774](https://jira.translate5.net/browse/TRANSLATE-2774): Workflows - The calculation of a tasks workflow step is not working properly** <br>
+The workflow step calculation of a task was calculating a wrong result if a workflow step (mostly visiting of a visitor) was added as first user.
+
+**[TRANSLATE-2773](https://jira.translate5.net/browse/TRANSLATE-2773): Auto-QA - Wrong job loading method in quality context used** <br>
+There were errors on loading a tasks qualities on a no workflow task.
+
+**[TRANSLATE-2771](https://jira.translate5.net/browse/TRANSLATE-2771): OpenTM2 integration - translate5 sends bx / ex tags to opentm2 instead of paired g-tag** <br>
+The XLF tag pairer does not work if the string contains a single tag in addition to the paired tag.
+
+**[TRANSLATE-2770](https://jira.translate5.net/browse/TRANSLATE-2770): TermPortal - Creating terms in TermPortal are creating null definitions instead empty strings** <br>
+Fixed a bug on importing TBX files with empty definitions.
+
+**[TRANSLATE-2769](https://jira.translate5.net/browse/TRANSLATE-2769): VisualReview / VisualTranslation - Hide and collapse annotations is not working** <br>
+Fixes the problem with hide and collapse annotations in visual.
+
+**[TRANSLATE-2767](https://jira.translate5.net/browse/TRANSLATE-2767): TermPortal - Issues popped up in Transline presentation** <br>
+fixed js error, added tooltips for BatchWindow buttons
+
+**[TRANSLATE-2723](https://jira.translate5.net/browse/TRANSLATE-2723): Task Management, User Management - Reminder E-Mail sent multiple times** <br>
+Fixed an annoying bug responsible for sending the deadline reminder e-mails multiple times. 
+
+**[TRANSLATE-2712](https://jira.translate5.net/browse/TRANSLATE-2712): VisualReview / VisualTranslation - Visual review: cancel segment editing removes the content from layout** <br>
+FIXED: Bug where Text in the Visual disappeared, when the segment-editing was canceled
+
+
+## [5.5.6] - 2021-12-17
+
+### Important Notes:
+#### [TRANSLATE-2756](https://jira.translate5.net/browse/TRANSLATE-2756)
+The match-rate in the editor for repetitions is now 102% as defined and not any more the original percentage from the repeated segment. This is now the same behaviour as it is already in the analysis.
+ 
+
+
+### Changed
+**[TRANSLATE-2761](https://jira.translate5.net/browse/TRANSLATE-2761): Test for tbx specialchars import** <br>
+Added test for import tbx containing specialchars
+
+**[TRANSLATE-2760](https://jira.translate5.net/browse/TRANSLATE-2760): AutoQA also processed when performing an Analysis  & add AutoQA Reanalysis** <br>
+* The AnalysisOperation in a task's MatchAnalysis panel now covers a re-evaluation of the QA
+* This makes the seperate Button to tag the Terms obsolete, so it is removed
+* added Button to Re-check the QA in the task's QA panel
+
+**[TRANSLATE-2488](https://jira.translate5.net/browse/TRANSLATE-2488): Excel export of TermCollection** <br>
+Added ability to export TermCollections into xlsx-format
+
+
+### Bugfixes
+**[TRANSLATE-2763](https://jira.translate5.net/browse/TRANSLATE-2763): Term term entries older than current import deletes also unchanged terms** <br>
+TBX Import: The setting "Term term entries older than current import" did also delete the terms which are contained unchanged in the TBX.
+
+**[TRANSLATE-2759](https://jira.translate5.net/browse/TRANSLATE-2759): Deleted newlines were still counting as newline in length calculation** <br>
+When using the line counting feature in segment content deleted newlines were still counted since they still exist as trackchanges.
+
+**[TRANSLATE-2758](https://jira.translate5.net/browse/TRANSLATE-2758): scrollToAnnotation: Annotation references, sorting and size** <br>
+Scrolling, size and sorting of annotations has been fixed
+
+**[TRANSLATE-2756](https://jira.translate5.net/browse/TRANSLATE-2756): Segments were locked after pre-translation but no translation content was set** <br>
+It could happen that repeated segments were blocked with a matchrate >= 100% but no content was pre-translated in the segment. Also the target original field was filled wrong on using repetitions. And the match-rate for repetitions is now 102% as defined and not original the percentage from the repeated segment. This is now the same behaviour as in the analysis.
+
+**[TRANSLATE-2755](https://jira.translate5.net/browse/TRANSLATE-2755): Workers getting PHP fatal errors remain running** <br>
+Import workers getting PHP fatal errors were remain running, instead of being properly marked crashed. 
+
+**[TRANSLATE-2751](https://jira.translate5.net/browse/TRANSLATE-2751): Mouse over segment with add-annotation active** <br>
+The cursor will be of type cross when the user is in annotation creation mode and the mouse is over the segment.
+
+**[TRANSLATE-2750](https://jira.translate5.net/browse/TRANSLATE-2750): Make project tasks overview and task properties resizable and stateful** <br>
+The height of the project tasks overview and the property panel of a single task are now resizeable.
+
+**[TRANSLATE-2749](https://jira.translate5.net/browse/TRANSLATE-2749): Blocked segments in workflow progress** <br>
+The blocked segments now will be included in the workflow step progress calculation.
+
+**[TRANSLATE-2747](https://jira.translate5.net/browse/TRANSLATE-2747): Proposals are not listed in search results in some cases** <br>
+TermPortal: it's now possible to find proposals for existing terms using 'Unprocessed' as a value of 'Process status' filter
+
+**[TRANSLATE-2746](https://jira.translate5.net/browse/TRANSLATE-2746): Add a Value for "InstantTranslate: TM minimum match rate"** <br>
+Set the default value to 70 for minimum matchrate allowed to be displayed in InstantTranslate result list for TM language resources.
+
+**[TRANSLATE-2745](https://jira.translate5.net/browse/TRANSLATE-2745): 500 Internal Server Error on creating comments** <br>
+Creating a segment comment was leading to an error due the new comment overview feature.
+
+**[TRANSLATE-2744](https://jira.translate5.net/browse/TRANSLATE-2744): XLIFF2 Export with more than one translator does not work** <br>
+The XLIFF2 export was not working with more than one translator associated to the task.
+
+**[TRANSLATE-2719](https://jira.translate5.net/browse/TRANSLATE-2719): TermPortal result column is empty, despite matches are shown** <br>
+TermPortal: fixed 'left column is empty, despite matches are shown' bug
+
+
+## [5.5.5] - 2021-12-08
+
+### Important Notes:
+#### [TRANSLATE-2740](https://jira.translate5.net/browse/TRANSLATE-2740)
+WARNING: PHP 8 is now required on server side!
+
+#### [TRANSLATE-2666](https://jira.translate5.net/browse/TRANSLATE-2666)
+To use this Feature the following prequesites must be fullfilled:
+* Google Vision API Key stored in  configuration
+* PHP Imagick Extension installed & working
+
+#### [TRANSLATE-2387](https://jira.translate5.net/browse/TRANSLATE-2387)
+Google material icons are integrated per composer.
+
+#### [TRANSLATE-2303](https://jira.translate5.net/browse/TRANSLATE-2303)
+A new Comment section has been added to the left-hand side of the Segment editor. It lists all the segment comments and visual annotations ordered by page.
+ 
+
+
+### Added
+**[TRANSLATE-2728](https://jira.translate5.net/browse/TRANSLATE-2728): Link terms in segment meta panel to the termportal** <br>
+In the segments meta panel all terms of the currently edited segment are shown. This terms are now clickable linked to the termportal - if the termportal is available.
+
+**[TRANSLATE-2713](https://jira.translate5.net/browse/TRANSLATE-2713): Use HTML linking in Visual based on xml/xsl, if workfiles are xliff** <br>
+Added option to add a XML/XSL combination as visual source direct in the /visual folder of the import zip: If there is an XML in the /visual folder with a linked XSL stylesheet that is present in the /visual folder as well, the visual HTML is generated from these files using the normal, text-based segmentation (and not aligning the XML against the imported bilingual workfiles)
+
+**[TRANSLATE-2666](https://jira.translate5.net/browse/TRANSLATE-2666): WYSIWYG for Images with Text** <br>
+This new feature enables using a single Image as a source for a Visual. 
+This Image is then analyzed (OCR) and the found text can be edited in the right WYSIWIG-frame. 
+* The Image must be imported in the subfolder /visual/image of the import-zip
+* A single WebFont-file (*.woff) can be added alongside the Image and then will be used as Font for the whole text on the Image
+* If no font is provided, Arial is the general fallback
+* Any text not present in the bilingual file in /workfiles will be removed from the OCR's output. This means, the bilingual file should contain exactly the text, that is expected to be on the image and to be translated
+
+**[TRANSLATE-2387](https://jira.translate5.net/browse/TRANSLATE-2387): Annotate visual** <br>
+The users are able to add text annotations(markers) where ever he likes in the visual area.  Also the users are able to create segment annotations when clicking on a segment in the layout.
+
+**[TRANSLATE-2303](https://jira.translate5.net/browse/TRANSLATE-2303): Overview of comments** <br>
+A new Comment section has been added to the left-hand side of the Segment editor.
+It lists all the segment comments and visual annotations ordered by page. The type is indicated by a small symbol to the left. Its background color indicates the authoring user.
+When an element of that list is clicked, translate5 jumps to the corresponding remark, either in the VisualReview or in the segment grid.
+On hover the full remark is shown in a tooltip, together with the authoring user and the last change date.
+New comments are added in realtime to the list.
+
+
+### Changed
+**[TRANSLATE-2740](https://jira.translate5.net/browse/TRANSLATE-2740): PHP 8 is now required - support for older PHP versions is dropped** <br>
+Translate5 and all dependencies use now PHP 8.
+
+**[TRANSLATE-2733](https://jira.translate5.net/browse/TRANSLATE-2733): Embed translate5 task video in help window** <br>
+Embed the translate5 task videos as iframe in the help window. The videos are either in german or english, they are chosen automatically depending on the GUI interface. A list of links to jump to specific parts of the videos are provided.
+
+**[TRANSLATE-2726](https://jira.translate5.net/browse/TRANSLATE-2726): Invert tooltipt font color in term-column in left panel** <br>
+Term tooltip font color set to black for proposals to be readable
+
+**[TRANSLATE-2693](https://jira.translate5.net/browse/TRANSLATE-2693): Write tests for new TermPortal** <br>
+Created tests for all termportal api endpoints
+
+**[TRANSLATE-2670](https://jira.translate5.net/browse/TRANSLATE-2670): WYSIWIG for Images: Frontend - General Review-type, new (mostly dummy) ImageScroller, extensions IframeController** <br>
+see Translate-2666
+
+**[TRANSLATE-2669](https://jira.translate5.net/browse/TRANSLATE-2669): WYSIWIG for Images: Extend Font-Management** <br>
+see TRANSLATE-2666
+
+**[TRANSLATE-2668](https://jira.translate5.net/browse/TRANSLATE-2668): WYSIWIG for Images: Add new Review-type, add worker & file managment, creation of HTML file representing the review** <br>
+see TRANSLATE-2666
+
+**[TRANSLATE-2667](https://jira.translate5.net/browse/TRANSLATE-2667): WYSIWIG for Images: Implement Text Recognition** <br>
+see TRANSLATE-2666
+
+**[TRANSLATE-2487](https://jira.translate5.net/browse/TRANSLATE-2487): Edit an attribute for multiple occurrences at once** <br>
+Added ability for attributes batch editing
+
+
+### Bugfixes
+**[TRANSLATE-2741](https://jira.translate5.net/browse/TRANSLATE-2741): Segment processing status is wrong on unchanged segments with tags** <br>
+On reviewing the processing state of a segment was set wrong if the segment contains tags and was saved unchanged.
+
+**[TRANSLATE-2739](https://jira.translate5.net/browse/TRANSLATE-2739): Segment length validation does also check original target on TM usage** <br>
+On tasks using segment length restrictions some segments could not be saved if content was overtaken manually from a language resource and edited afterwards to fit in the length restriction.
+
+**[TRANSLATE-2737](https://jira.translate5.net/browse/TRANSLATE-2737): VisualReview height not saved in session** <br>
+Persist VisualReview height between reloads.
+
+**[TRANSLATE-2736](https://jira.translate5.net/browse/TRANSLATE-2736): State of show/hide split iframe is not saved correctly** <br>
+Fix issues with the saved state of the show/hide split frame button in the visual
+
+**[TRANSLATE-2732](https://jira.translate5.net/browse/TRANSLATE-2732): Advanced filter users list anonymized users query** <br>
+Solves advanced filter error for users with no "read-anonymized" users right.
+
+**[TRANSLATE-2731](https://jira.translate5.net/browse/TRANSLATE-2731): No redirect to login page if maintenance is scheduled** <br>
+The initial page of the translate5 instance does not redirect to the login page if a maintenance is scheduled.
+
+**[TRANSLATE-2730](https://jira.translate5.net/browse/TRANSLATE-2730): Improve maintenance handling regarding workers** <br>
+If maintenance is scheduled the export was hanging in a endless loop, also import related workers won't start anymore one hour before maintenance. 
+
+**[TRANSLATE-2729](https://jira.translate5.net/browse/TRANSLATE-2729): PDO type casting error in bind parameters** <br>
+The user will no longer receive an error when the customer was deleted.
+
+**[TRANSLATE-2724](https://jira.translate5.net/browse/TRANSLATE-2724): Translation error in the Layout** <br>
+Workflow name is localized now.
+
+**[TRANSLATE-2720](https://jira.translate5.net/browse/TRANSLATE-2720): Termportal initial loading takes dozens of seconds** <br>
+Solved termportal long initial loading problem
+
+**[TRANSLATE-2715](https://jira.translate5.net/browse/TRANSLATE-2715): String could not be parsed as XML - on tbx import** <br>
+The exported TBX was no valid XML therefore was an error on re-importing that TBX.
+
+**[TRANSLATE-2708](https://jira.translate5.net/browse/TRANSLATE-2708): Visual review: iframe scaling problem** <br>
+Enables zoom in in all directions in visual.
+
+**[TRANSLATE-2707](https://jira.translate5.net/browse/TRANSLATE-2707): correct display language-selection in Instant-Translate** <br>
+Fixed the language listing in InstantTranslate, which was broken for a lot of languages.
+
+**[TRANSLATE-2706](https://jira.translate5.net/browse/TRANSLATE-2706): Not all repetitions are saved after exchanging the term-collection** <br>
+Not all repeated segments were changed if saving repetitions with terminology and the term-collection was changed in the task.
+
+**[TRANSLATE-2700](https://jira.translate5.net/browse/TRANSLATE-2700): Improve termtagging performance due table locks** <br>
+The queuing of the segments prepared for term tagging is improved, so that multiple term taggers really should work in parallel. 
+
+
+## [5.5.4] - 2021-11-15
+
+### Important Notes:
+#### [TRANSLATE-2638](https://jira.translate5.net/browse/TRANSLATE-2638)
+Implement new layout for InstantTranslate as discussed with the consortium members.
+
+#### [TRANSLATE-2404](https://jira.translate5.net/browse/TRANSLATE-2404)
+The layout of the start analysis panel has been changed. The checkboxes were reordered, so that they need less space. And a separate button was introduced to run the terminology check. That means running a terminology check after the import is now completely independent of running analyses.
+ 
+
+
+### Added
+**[TRANSLATE-2638](https://jira.translate5.net/browse/TRANSLATE-2638): Implement new layout for InstantTranslate** <br>
+Implement new layout for InstantTranslate as discussed with the consortium members.
+
+
+### Changed
+**[TRANSLATE-2683](https://jira.translate5.net/browse/TRANSLATE-2683): Editor Embedded: export may be started while last edited segment still is saving** <br>
+For translate5 embedded usage: the JS API function Editor.util.TaskActions.isTaskExportable() returns true or false if the currently opened task can be exported regarding the last segment save call.
+
+**[TRANSLATE-2649](https://jira.translate5.net/browse/TRANSLATE-2649): Small fixes for TermPortal** <br>
+A number of fixes/improvements implemented
+
+**[TRANSLATE-2632](https://jira.translate5.net/browse/TRANSLATE-2632): TermPortal code refactoring** <br>
+Termportal code and related tests are now refactored for better maintainability.
+
+**[TRANSLATE-2489](https://jira.translate5.net/browse/TRANSLATE-2489): Change of attribute label in GUI** <br>
+Added ability to edit attribute labels
+
+
+### Bugfixes
+**[TRANSLATE-2701](https://jira.translate5.net/browse/TRANSLATE-2701): Source term from InstantTranslate not saved along with target term** <br>
+TermPortal: In case the source term, that had been translated in InstantTranslate was not contained in the TermCollection, only the target term was added, the new source term not. This is fixed.
+
+**[TRANSLATE-2699](https://jira.translate5.net/browse/TRANSLATE-2699): Add missing ID column to task overview and fix date type in meta data excel** <br>
+Add missing ID column to task overview and fix date type in meta data excel export.
+
+**[TRANSLATE-2696](https://jira.translate5.net/browse/TRANSLATE-2696): Malicious segments may lead to endless loop while term tagging** <br>
+Segments with specific / malicious content may lead to endless loops while term tagging so that the task import is running forever.
+
+**[TRANSLATE-2695](https://jira.translate5.net/browse/TRANSLATE-2695): JS error task is null** <br>
+Due unknown conditions there might be an error task is null in the GUI. Since the reason could not be determined, we just fixed the symptoms. As a result a user might click twice on the menu action item to get all items.
+
+**[TRANSLATE-2694](https://jira.translate5.net/browse/TRANSLATE-2694): Improve GUI logging for false positive "Not all repeated segments could be saved" messages** <br>
+Improve GUI logging for message like: Not all repeated segments could be saved. With the advanced logging should it be possible to detect the reason behind.
+
+**[TRANSLATE-2691](https://jira.translate5.net/browse/TRANSLATE-2691): SDLXLIFF diff export is failing with an endless loop** <br>
+The SDLXLIFF export with diff fails by hanging in an endless loop if the segment content has a specific form. This is fixed by updating the underlying diff library.
+
+**[TRANSLATE-2690](https://jira.translate5.net/browse/TRANSLATE-2690): task is null: User association in import wizard** <br>
+Fix for "task is null" error in import user-assoc wizard
+
+**[TRANSLATE-2689](https://jira.translate5.net/browse/TRANSLATE-2689): TBX import fails because of some ID error** <br>
+Terminology containing string based IDs could not be imported if the same ID was used one time lower case and one time uppercase.
+
+**[TRANSLATE-2688](https://jira.translate5.net/browse/TRANSLATE-2688): For many languages the lcid is missing in LEK_languages** <br>
+Added some missing LCID values in the language table.
+
+**[TRANSLATE-2687](https://jira.translate5.net/browse/TRANSLATE-2687): Wrong texts in system config options** <br>
+Improve description and GUI-text for system configurations.
+
+**[TRANSLATE-2686](https://jira.translate5.net/browse/TRANSLATE-2686): TermTagging does not work after import** <br>
+If term tagging is started along with analysis on an already imported task, nothing gets tagged.
+
+**[TRANSLATE-2404](https://jira.translate5.net/browse/TRANSLATE-2404): There is no way to run only the terminology check only after import** <br>
+There is no way to start the terminology check only from the language resource association panel, a analysis is always started as well. This is changed now.
+
+
+## [5.5.3] - 2021-10-28
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-2613](https://jira.translate5.net/browse/TRANSLATE-2613): Add Locaria Logo to Website and App** <br>
+Added Locaria logo to the app
+
+**[TRANSLATE-2076](https://jira.translate5.net/browse/TRANSLATE-2076): Define analysis fuzzy match ranges** <br>
+The ranges of the match rates for the analysis can now be defined in the configuration: runtimeOptions.plugins.MatchAnalysis.fuzzyBoundaries
+
+
+### Changed
+**[TRANSLATE-2652](https://jira.translate5.net/browse/TRANSLATE-2652): Add keyboard short-cuts for Accept/Reject TrackChanges** <br>
+ENHANCEMENT: Keyboard Shortcuts for TrackChanges accept/reject feature
+
+**[TRANSLATE-2625](https://jira.translate5.net/browse/TRANSLATE-2625): Solve tag errors automatically on export** <br>
+Internal Tag Errors (faulty structure) will be fixed automatically when exporting a task: Orphan opening/closing tags will be removed, structurally broken tag pairs will be corrected. The errors in the task itself will remain.
+
+
+### Bugfixes
+**[TRANSLATE-2681](https://jira.translate5.net/browse/TRANSLATE-2681): Language naming mismatch regarding the chinese languages** <br>
+The languages zh-Hans and zh-Hant were missing. Currently zh-CN was named "Chinese simplified", this is changed now to Chinese (China).
+
+**[TRANSLATE-2680](https://jira.translate5.net/browse/TRANSLATE-2680): Okapi empty target fix was working only for tasks with editable source** <br>
+The Okapi export fix TRANSLATE-2384 was working only for tasks with editable source. Now it works in general. Also in case of an export error, the XLF in the export zip was named as original file (so file.docx was containing XLF). This is changed, so that the XLF is named now file.docx.xlf). Additionally a export-error.txt is created which explains the problem.
+
+
+**[TRANSLATE-2679](https://jira.translate5.net/browse/TRANSLATE-2679): Microsoft translator connection language code mapping is not case insensitive** <br>
+Microsoft translator returns zh-Hans for simplified Chinese, we have configured zh-hans in our language table. Therefore the language can not be used. This is fixed now.
+
+**[TRANSLATE-2672](https://jira.translate5.net/browse/TRANSLATE-2672): UI theme selection may be wrong if system default is not triton theme** <br>
+The users selected theme may be resetted to triton theme instead to the system default theme.
+
+**[TRANSLATE-2664](https://jira.translate5.net/browse/TRANSLATE-2664): Fix TermPortal client-specific favicon and CSS usage** <br>
+The technical possibilities to customize the TermPortal layout were not fully migrated from the old termportal.
+
+**[TRANSLATE-2658](https://jira.translate5.net/browse/TRANSLATE-2658): Wrong tag numbering between source and target in imported MemoQ XLF files** <br>
+For MemoQ XLF files it may happen that tag numbering between source and target was wrong. This is corrected now.
+
+**[TRANSLATE-2657](https://jira.translate5.net/browse/TRANSLATE-2657): Missing term roles for legacy admin users** <br>
+Activate the term portal roles for admin users not having them.
+
+**[TRANSLATE-2656](https://jira.translate5.net/browse/TRANSLATE-2656): Notify associated users checkbox is not effective** <br>
+The bug is fixed where the "notify associated users checkbox" in the import wizard does not take effect when disabled.
+
+**[TRANSLATE-2592](https://jira.translate5.net/browse/TRANSLATE-2592): Reduce and by default hide use of TrackChanges in the translation step** <br>
+Regarding translation and track changes: changes are only recorded for pre-translated segments and changes are hidden by default for translators (and can be activated by the user in the view modes drop-down of the editor)
+
+
+
+
 ## [5.5.2] - 2021-10-11
 
 ### Important Notes:

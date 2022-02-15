@@ -1,0 +1,37 @@
+<?xml version='1.0'?>
+<martif type="TBX" xml:lang="en">
+	<martifHeader>
+		<fileDesc>
+			<titleStmt>
+				<title>TBX-Glossary</title>
+			</titleStmt>
+			<sourceDesc><p>automatically created by Glossary Converter</p></sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<p type="XCSURI">http://www.ttt.org/oscarStandards/tbx/TBXXCS.xcs</p>
+		</encodingDesc>
+	</martifHeader>
+	<text>
+		<body>
+      <termEntry id="c1">
+        <langSet xml:lang="it">
+          <tig>
+            <term id="90d9de3e-8749-4c46-ab8d-033cf78d9d99">to be deleted</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="de">
+          <tig>
+            <term id="b55815f8-22b5-4257-a0df-d0976fce11eb">Notstopp</term>
+          </tig>
+          <tig>
+            <term id="24ba1c1e-85a2-4bcd-a733-790b065120dc">Not-Stopp</term>
+          </tig>
+          <tig>
+            <term id="7b80428a-852b-429f-97f0-f5f7c5d74ee9">Nothalt</term>
+          </tig>
+        </langSet>
+      </termEntry>
+		</body>
+	</text>
+</martif>
+

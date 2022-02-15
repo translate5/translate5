@@ -130,8 +130,8 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $plainResponse = $this->api()->getLastResponse();
         $this->assertEquals(200, $plainResponse->getStatus(), 'Server did not respond HTTP 200');
         $this->assertNotFalse($response, 'JSON Login request was not successful!');
-        $this->assertRegExp('/[a-zA-Z0-9]{26}/', $sessionId, 'Login call does not return a valid sessionId!');
-        $this->assertRegExp('/[0-9a-fA-F]{32}/', $sessionToken, 'Login call does not return a valid sessionToken!');
+        $this->assertMatchesRegularExpression('/[a-zA-Z0-9]{26}/', $sessionId, 'Login call does not return a valid sessionId!');
+        $this->assertMatchesRegularExpression('/[0-9a-fA-F]{32}/', $sessionToken, 'Login call does not return a valid sessionToken!');
         
         $response = $this->api()->request('editor/?sessionToken='.$sessionToken.'&APItest=true');
         $this->assertNotFalse(strpos($response->getBody(), '<div id="loading-indicator-text"></div>'), 'The editor page does not contain the expected content.');
@@ -150,11 +150,11 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         if(!empty($sessionData->user->customers)) {
             //if a customer is set, it must like the following regex
             //but customers are not mandatory, so empty check before
-            $this->assertRegExp('/^,[0-9]+,$/', $sessionData->user->customers);
+            $this->assertMatchesRegularExpression('/^,[0-9]+,$/', $sessionData->user->customers);
         }
         $sessionData->user->customers = null;
-        
-        $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"support@translate5.net","roles":["pm","editor","admin","instantTranslate","api","basic","noRights"],"passwd":"********","editable":0,"locale":"en","parentIds":null,"customers":null,"userName":"manager test"}}';
+
+        $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"support@translate5.net","roles":["pm","editor","admin","instantTranslate","api","termCustomerSearch","termProposer","termFinalizer","termPM","termPM_allClients","termReviewer","basic","noRights"],"passwd":"********","editable":0,"locale":"en","parentIds":null,"customers":null,"userName":"manager test"}}';
         $this->assertEquals(json_decode($expected), $sessionData, 'User was not properly authenticated via ');
         
         $this->api()->logout();
@@ -172,7 +172,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertLogin('testapiuser');
         $assoc = $this->api()->requestJson('editor/taskuserassoc/'.$assoc->id);
         $hash = $assoc->staticAuthHash;
-        $this->assertRegExp('/^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/',$hash, 'Single click auth hash is no valid guid');
+        $this->assertMatchesRegularExpression('/^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/',$hash, 'Single click auth hash is no valid guid');
         $this->api()->logout();
         $response = $this->api()->request('editor/session?authhash='.$hash);
         $taskGuid = $this->api()->getTask()->taskGuid;

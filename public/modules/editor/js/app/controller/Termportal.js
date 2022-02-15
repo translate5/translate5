@@ -93,7 +93,46 @@ Ext.define('Editor.controller.Termportal', {
      */
     isTermportalAllowed:function(){
         var userRoles=Editor.data.app.user.roles.split(",");
+
+        //FIXME must check the rights, not the roles! a new frontend right must be added and distributed over the roles
         return (Ext.Array.indexOf(userRoles, "termCustomerSearch") >= 0) || (Ext.Array.indexOf(userRoles, "termProposer") >= 0) ;
+    },
+
+    /**
+     * Returns the URL to the TermPortal for a given collectionid or null if no access to termportal given
+     * @param langRes
+     * @returns {null|String}
+     */
+    urlToTermPortal: function(langRes) {
+        if(!this.isTermportalAllowed()) {
+            return null;
+        }
+        var customers = Editor.data.app.user.customers.split(',').filter(function(i){return i>0;}),
+            srcLang = langRes.get('sourceLang');
+
+        if(Ext.Array.intersect(customers, langRes.get('customerIds')).length > 0) {
+            //param array must be term, language, client, which are all empty, and then the collectionId
+            return Editor.data.restpath+'termportal#termportal/search/'+Ext.util.Base64.encode(Ext.encode([
+                '*', //term
+                srcLang[0] ? srcLang[0].toString() : '', //language
+                '', //client, implicit by term collection
+                langRes.get('id').toString(),
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                ''
+            ]));;
+        }
+        return null;
     }
 });
     

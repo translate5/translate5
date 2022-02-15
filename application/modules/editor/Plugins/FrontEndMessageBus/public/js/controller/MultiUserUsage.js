@@ -254,9 +254,19 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
     },
     onSegmentLeave: function(data) {
         var me = this,
-            ids = (Ext.isArray(data.segmentId) ? data.segmentId : [data.segmentId]);
+            ids = (Ext.isArray(data.segmentId) ? data.segmentId : [data.segmentId]),
+            grid = this.getSegmentGrid(),
+            segment, keepRender;
+        if(!grid){
+            return
+        }
         Ext.Array.each(ids, function(id){
-            me.segmentUnlock(me.getSegmentMeta(id), data.connectionId);
+            keepRender = id === data.selectedSegmentId;
+            me.segmentUnlock(me.getSegmentMeta(id), data.connectionId, keepRender);
+            if(keepRender){
+                segment = grid && grid.store.getById(id);
+                segment && segment.load();
+            }
         });
     },
     onSegmentSave: function(data) {

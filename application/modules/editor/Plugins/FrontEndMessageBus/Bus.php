@@ -32,10 +32,13 @@ END LICENSE AND COPYRIGHT
  * @method void triggerReload() triggerReload(string $storeId, integer $id = null) first parameter is a store id. Second optional parameter is a id to reload just a record in the previously defined store. If omitted reload the whole store.
  * @method void startSession() startSession($sessionId, stdClass $userData)
  * @method void stopSession() stopSession(string $sessionId, string $connectionId)
+ * @method bool sessionHasConnection() sessionHasConnection(string $sessionId)
+ * @method array getConnectionSessions() getConnectionSessions() returns the sessionIds with an active connection
  * @method void ping() ping()
  * @method void resyncDone() resyncDone(string $connectionId)
  * @method void garbageCollection() garbageCollection(array $existingSessionIds)
  * @method void updateMetrics() updateMetrics(array $metrics)
+ * @method void notifyUser() notifyUser(string $message)
  */
 class editor_Plugins_FrontEndMessageBus_Bus {
     const CHANNEL = 'instance';

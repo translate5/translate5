@@ -62,9 +62,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'Fileorder'                     => true,
         'ChangeAlike'                   => true,
         'Comments'                      => true,
+        'CommentNavigation'             => true,
         'SearchReplace'                 => true,
         'SnapshotHistory'               => true,
-        'Termportal'                    => true,
+        'Termportal'                    => true, //FIXME should be moved into the termportal plugin
         'JsLogger'                      => true,
         'editor.CustomPanel'            => true,
         'admin.TaskOverview'            => ['taskOverviewFrontendController'], //controlled by ACL, enabling frontend rights given here
@@ -300,6 +301,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
         $this->view->Php2JsVars()->set('import.validExtensions', $supportedFiles->getSupportedExtensions());
+        $this->view->Php2JsVars()->set('import.nativeParserExtensions', $supportedFiles->getNativeParserExtensions());
 
         $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float)$rop->editor->columns->widthFactorHeader);
         $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (int)$rop->editor->columns->widthOffsetEditable);
@@ -366,7 +368,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         // set the max allowed upload filesize into frontend variable. This is used for upload file size validation in tm import
         $this->view->Php2JsVars()->set('frontend.php.upload_max_filesize',$uploadMaxFilesize);
-
+        
+        // show Consortium Logos on application load for xyz seconds [default 3]
+        $this->view->Php2JsVars()->set('startup.showConsortiumLogos', $rop->startup->showConsortiumLogos);
+        
         $this->setJsAppData();
     }
 
@@ -648,7 +653,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             'png' => 'image/png',
             'gif' => 'image/gif',
             'webp' => 'image/webp',
-            'svg' => 'image/svg',
+            'svg' => 'image/svg+xml',
             'woff' => 'application/woff',
             'woff2' => 'application/woff2',
             'ttf' => 'application/ttf',
@@ -693,34 +698,57 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if (empty($publicFile) || !$publicFile->isFile()) {
             throw new ZfExtended_NotFoundException();
         }
-        if (array_key_exists($extension, $types)) {
-            header('Content-Type: ' . $types[$extension]);
-        } else {
-            // TODO FIXME: it seems by default the content-type text/html is set by apache instead of no content-type
-            // this leads to problems with files without extensions as is often the case with wget downloaded websites
-            header('Content-Type: ');
+        // Override default content-type text/html https://www.php.net/manual/en/ini.core.php#ini.default-mimetype
+        // Prevents problems with files without extensions as is often the case with wget downloaded websites
+        header('Content-Type: ' . ($types[$extension] ?? ''));
+        
+        /* Caching Identifiers
+        * $etag - version number of release. Trumps $mtime
+        * $mtime - modification time. If new release detected by mismatching $etags, check if file really changed via $mtime
+        * In dev mode use mtime as etag to simulate new version on file change.
+        */
+        $version = ZfExtended_Utils::getAppVersion();
+        $etag = ($version !== 'development') ? $version : strval($publicFile->getMTime());
+        $etagClient = $_SERVER['HTTP_IF_NONE_MATCH'] ?? -1;
+        if($etagClient === $etag){
+            header('HTTP/1.1 304 Not Modified');
+            exit;
         }
-        //FIXME add version URL suffix to plugin.css inclusion
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $publicFile->getMTime()));
-        //with etags we would have to use the values of $_SERVER['HTTP_IF_NONE_MATCH'] too!
-        //makes sense to do so!
-        //header('ETag: '.md5(of file content));
+        // Version has changed, update etag on clientside
+        header('Etag: '.$etag);
 
+        $mtime = $publicFile->getMTime();
+        $mtimeClient = strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? '');
+        if($mtimeClient === $mtime){ // Check if file has changed, not only version
+            header('HTTP/1.1 304 Not Modified');
+            exit;
+        }
+        // File has changed
+        header('Last-Modified: '.gmdate('D, d M Y H:i:s', $mtime).' GMT');
+
+        /* Set caching behaviour.
+        * - Default to 10 hours == 36000s to revalidate daily for new release
+        * - In dev mode revalidate always
+        * - "Never" (== yearly == 31536000s) revalidate immutable resources
+        * Cf. https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching 
+        */
         header_remove('Cache-Control');
+        $cacheBehaviour = ($version !== 'development') ? 'max-age=36000, must-revalidate' : 'no-cache';
+        $disableCacheParam = ($version === 'development') ? null : $this->getParam('_dc'); // e.g. 5.6.0
+        if (
+            $disableCacheParam // The param will change with a new release and query an updated version
+            ||
+            str_starts_with($requestedType, 'visualReview-t') // The outputs of pdf2HtmlEx will never change, e.g visualReview-t123/VisualReview/bg1.png
+        ) {
+            $cacheBehaviour = ' max-age=31536000, immutable';
+        }
+        header('Cache-Control: ' . $cacheBehaviour);
+
         header_remove('Expires');
         header_remove('Pragma');
-        header_remove('X-Powered-By');
-
-        /*
-        header('Pragma: public');
-        header('Cache-Control: max-age=86400');
-        header('Expires: '. gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
-        header('Content-Type: image/png');
-        */
-
+        header_remove('X-Powered-By'); //FIXME: this is configurable in php.ini via 'expose_php = Off'
 
         readfile($publicFile);
-        //FIXME: Optimierung bei den Plugin Assets: public Dateien die durch die Plugins geroutet werden, sollten chachebar sein und B keine Plugin Inits triggern. Geht letzteres überhaupt wg. VisualReview welches die Dateien ebenfalls hier durchschiebt?
         exit;
     }
 

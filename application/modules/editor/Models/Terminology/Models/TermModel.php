@@ -132,7 +132,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             // Load or create person
             $person = ZfExtended_Factory
                 ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
-                ->loadOrCreateByName($misc['userName']);
+                ->loadOrCreateByName($misc['userName'], $this->getCollectionId());
 
             // Use person id as tbxCreatedBy and tbxUpdatedBy
             $this->setTbxCreatedBy($by = $person->getId());
@@ -179,15 +179,15 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         // If attributes should be copied from other term
-        if ($misc['copyAttrsFromTermId'] ?? false) {
+        if ($misc['copyAttrsFromTermId'] ?? 0) {
 
             // Array of dataTypeIds to be ignored while copying attributes from other term
             $except = [$dataTypeIds['termNote#processStatus']];
-            if ($misc['note']) $except []= $dataTypeIds['note#'];
+            if ($misc['note'] ?? 0) $except []= $dataTypeIds['note#'];
             if ($this->getProcessStatus() == 'rejected') $except []= $dataTypeIds['termNote#administrativeStatus'];
 
             // Fetch attributes of existing term, except at least 'processStatus' attribute
-            $attrA += editor_Utils::db()->query('
+            $attrA += $this->db->getAdapter()->query('
                 SELECT `dataTypeId`, `type`, `value`, `target`, `elementName`, `attrLang`  
                 FROM `terms_attributes` 
                 WHERE `termId` = ? AND `dataTypeId` NOT IN (' . implode(',', $except) . ') 
@@ -198,7 +198,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         foreach ($attrA as $attrI) $this->initAttr($attrI)->save();
 
         // Check whether there were no terms for this language previously within same termEntryId
-        $isTermForNewLanguage = !editor_Utils::db()->query('
+        $isTermForNewLanguage = !$this->db->getAdapter()->query('
             SELECT `id` 
             FROM `terms_term` 
             WHERE TRUE 
@@ -224,8 +224,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // No props actually, but this allows us to cycle through $levelA
         if ($isTermForNewLanguage) $levelA['language'] = ['elementName' => 'langSet'];
 
-        // Create 'creation' and 'modification' `terms_transacgroup`-entries for term-level (and language-level, if need)
-        foreach ($levelA as $byLevel) foreach (['creation', 'modification'] as $type) {
+        // Create 'origination' and 'modification' `terms_transacgroup`-entries for term-level (and language-level, if need)
+        foreach ($levelA as $byLevel) foreach (['origination', 'modification'] as $type) {
 
             // Create `terms_transacgrp` model instance
             $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
@@ -237,7 +237,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 'date' => date('Y-m-d H:i:s'),
                 'transacNote' => $misc['userName'],
                 'target' => $misc['userGuid'],
-                'transacType' => 'responsiblePerson',
+                'transacType' => 'responsibility',
                 'language' => $this->getLanguage(),
                 // 'attrLang' => $this->getLanguage(), // ?
                 'collectionId' => $this->getCollectionId(),
@@ -258,7 +258,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         if (!$isTermForNewLanguage) $language = '(' . $language . ' OR `language` = "' . $this->getLanguage() . '")';
 
         // Update 'modification'-record of termEntry-level (and language-level, if need)
-        editor_Utils::db()->query('
+        $this->db->getAdapter()->query('
             UPDATE `terms_transacgrp` 
             SET 
               `date` = :date, 
@@ -404,14 +404,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 ', $info[0]['id'])->fetchAll(PDO::FETCH_KEY_PAIR);
             }
         }
-
-        // Remove old language assocs
-        /*ZfExtended_Factory
-            ::get('editor_Models_LanguageResources_Languages')
-            ->removeByResourceId([$this->getCollectionId()]);
-
-        // Add the new language assocs
-        $this->updateAssocLanguages([$this->getCollectionId()]);*/
     }
 
     /**
@@ -452,7 +444,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             // If we should update processStatus-attribute, but we don't know it's `id` yet - detect it
             // else just pick that id from $misc['updateProcessStatusAttr']
             $attrId = $misc['updateProcessStatusAttr'] === true
-                ? editor_Utils::db()->query('
+                ? $this->db->getAdapter()->query('
                         SELECT `id` FROM `terms_attributes` WHERE `termId` = ? AND `type` = "processStatus"
                     ', $this->getId())->fetchColumn()
                 : $misc['updateProcessStatusAttr'];
@@ -470,7 +462,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
                 // Set 'normativeAuthorization' attribute to 'deprecatedTerm'
                 // If no such attribute yet exists - it will be created
-                $return['normativeAuthorization'] = $this
+                $this->normativeAuthorization = $this
                     ->setAttr('normativeAuthorization', 'deprecatedTerm')
                     ->toArray();
         }
@@ -499,8 +491,19 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $collectionId = $this->getCollectionId();
         $languageId = $this->getLanguageId();
 
+        // Backup tbx(Created|Updated)By props
+        $personIds = [];
+        if ($this->getTbxCreatedBy()) $personIds[$this->getTbxCreatedBy()] = true;
+        if ($this->getTbxUpdatedBy()) $personIds[$this->getTbxUpdatedBy()] = true;
+        $personIds = array_keys($personIds);
+
         // Call parent
         parent::delete();
+
+        // Drop terms_transacgrp_person-records if not used anymore
+        ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
+            ->dropIfNotUsedAnymore($personIds);
 
         // Restore collectionId and languageId
         $this->setCollectionId($collectionId);
@@ -566,12 +569,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     public function setAttr($type, $value) {
 
         // Get dataTypeId todo: throw exception if not found
-        if (!$dataTypeId = editor_Utils::db()->query('
+        if (!$dataTypeId = $this->db->getAdapter()->query('
             SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = ? LIMIT 1
         ', $type)->fetchColumn()) return;
 
         // Try to find id of existing attribute having such $dataTypeId
-        $attrId = editor_Utils::db()->query(
+        $attrId = $this->db->getAdapter()->query(
             'SELECT `id` FROM `terms_attributes` WHERE `termId` = ? AND `dataTypeId` = ? LIMIT 1',
         [$this->getId(), $dataTypeId])->fetchColumn();
 
@@ -607,25 +610,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Return attribute
         return $a;
     }
-
-    /**
-     * creates a new, unsaved term history entity
-     * @return editor_Models_Term_History
-     */
-    /*public function getNewHistoryEntity(): editor_Models_Term_History
-    {
-        $history = ZfExtended_Factory::get('editor_Models_Term_History');
-        /* @var $history editor_Models_Term_History * /
-        $history->setTermId($this->getId());
-        $history->setHistoryCreated(NOW_ISO);
-
-        $fields = $history->getFieldsToUpdate();
-        foreach ($fields as $field) {
-            $history->__call('set' . ucfirst($field), array($this->get($field)));
-        }
-
-        return $history;
-    }*/
 
     /**
      * returns a map CONSTNAME => value of all term status
@@ -664,21 +648,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         self::$termEntryTbxIdCache[$termId] = $res;
 
         return $res->toArray();
-    }
-
-    /***
-     * check if the term with the same termEntry,collection but different termId exist
-     *
-     * @return Zend_Db_Table_Rowset_Abstract
-     */
-    public function getRestTermsOfTermEntry($termEntryTbxId, $termId, $collectionId)
-    {
-        $s = $this->db->select()
-            ->where('termEntryTbxId = ?', $termEntryTbxId)
-            ->where('termTbxId != ?', $termId)
-            ->where('collectionId = ?',$collectionId);
-
-        return $this->db->fetchAll($s);
     }
 
     /***
@@ -736,13 +705,13 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 $codeA []= $codeByLangIdA[$langId];
 
             // Get text-attributes datatype ids
-            $textA = editor_Utils::db()
+            $textA = $this->db->getAdapter()
                 ->query('SELECT `id`, 1 FROM `terms_attributes_datatype` WHERE `dataType` != "picklist"')
                 ->fetchAll(PDO::FETCH_KEY_PAIR);
         }
 
 
-        // Get the comma-separated list of termEntryIds matching attr-filters
+        // Get the comma-separated list of termEntryIds and/or termIds matching attr-filters
         foreach ($params['attrs'] as $aDataTypeId => $aValue) {
 
             // Fuzzy search for text-attrs
@@ -758,10 +727,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             $attrWHERE = ['`dataTypeId` = :dataTypeId'];
 
             // Setup WHERE clauses for entry-, language- and term- level attributes
-            $attrWHERE []= '((' . implode(') OR (', [
-                'ISNULL(`language`) AND ISNULL(`termId`)', // entry-level
-                '`language` IN ("' . implode('","', $codeA) . '")', // both language- and term- levels
-            ]) . '))';
+            $attrWHERE[] = '(ISNULL(`language`) OR `language` IN ("' . implode('","', $codeA) . '"))';
 
             // If filter value is given
             if ($aValue) {
@@ -774,20 +740,29 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             }
 
             // Mind previous query results to apply intersection
-            if (isset($termEntryIds)) {
-                $attrWHERE []= '`termEntryId` IN (' . $termEntryIds . ')';
+            if ($matched ?? 0) {
+                $or = [];
+                if ($matched['termEntryId'] ?? 0) {
+                    $or []= '`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
+                }
+                if ($matched['termId'] ?? 0) {
+                    $or []= '`termId` IN (' . join(',', $matched['termId']) . ')';
+                }
+                $attrWHERE []= '(' . join(' OR ', $or) . ')';
             }
 
-            // Get termEntryIds of matched attributes
-            $termEntryIds = implode(',', editor_Utils::db()->query('
-                SELECT DISTINCT `termEntryId` 
+            // Get termEntryIds and/or termIds of matched attributes
+            $matched = $this->db->getAdapter()->query('
+                SELECT DISTINCT 
+                  IF(`termId`, "termId", "termEntryId") AS `prop`, 
+                  IF(`termId`, `termId`, `termEntryId`) AS `value`
                 FROM `terms_attributes` 
                 WHERE ' . implode(' AND ', $attrWHERE),
                 $bind
-            )->fetchAll(PDO::FETCH_COLUMN));
+            )->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
 
             // If nothing found
-            if (!$termEntryIds) {
+            if (!$matched) {
 
                 // Setup &$total variable by reference, as 0
                 $total = 0;
@@ -800,35 +775,39 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // If wildcards are used, convert them to the mysql syntax
         $keyword = str_replace(['*', '?'], ['%', '_'], $params['query']);
 
+        // Flag, indicating whether we're in allExcept-mode
+        $allExcept = array_key_exists('except', $params);
+
         // If we're not going to count $total -
         // it means we're in autocomplete mode,
         // so append wildcard if not already added
-        if ($total === false) $keyword = rtrim($keyword, '%') . '%';
-
-        // Flag, indicating whether or not current user is allowed to propose terms
-        $isProposer = ZfExtended_Factory::get('ZfExtended_Models_User')->hasRole('termProposer');
-
-        // If current user has no 'termProposer' role - remove 'unprocessed'
-        // from the values list of 'processStatus' filter, so that proposals
-        // will be excluded from search results. Note that $params['processStatus']
-        // is still kept here as comma-separated list, as it's the format
-        // this param initially arrived in as an item within $params argument
-        if (!$isProposer)
-            $params['processStatus']
-                = implode(',', array_diff(editor_Utils::ar($params['processStatus']), [self::PROCESS_STATUS_UNPROCESSED]));
+        if ($total === false && !$allExcept) $keyword = rtrim($keyword, '%') . '%';
 
         // Shared WHERE clause, that will be used for querying both terms and proposals tables
         $where = [
             '`t`.`languageId` IN (' . $params['language'] . ')',
-            '`t`.`collectionId` IN (' . $params['collectionIds'] . ')',
+            '`t`.`collectionId` IN (' . ($params['collectionIds'] ?: 0) . ')',
         ];
 
         // Append clause for prosessStatus
-        if ($params['processStatus']) $where []= '`t`.`processStatus` IN ("' . str_replace(',', '","', $params['processStatus']) . '")';
-        else if (!$isProposer)        $where []= '`t`.`processStatus` != "' . self::PROCESS_STATUS_UNPROCESSED . '"';
+        if ($params['processStatus']) {
+            $where []= '`t`.`processStatus` IN ("' . str_replace(',', '","', $params['processStatus']) . '")';
+            if (preg_match('~unprocessed~', $params['processStatus'])) {
+                $where []= '(' . array_pop($where) . ' OR `t`.`proposal` != "")';
+            }
+        }
 
         // Mind attr-filters in WHERE clause
-        if (isset($termEntryIds)) array_unshift($where, '`t`.`termEntryId` IN (' . $termEntryIds . ')');
+        if ($matched ?? 0) {
+            $or = [];
+            if ($matched['termEntryId'] ?? 0) {
+                $or []= '`t`.`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
+            }
+            if ($matched['termId'] ?? 0) {
+                $or []= '`t`.`id` IN (' . join(',', $matched['termId']) . ')';
+            }
+            array_unshift($where, '(' . join(' OR ', $or) . ')');
+        }
 
         // If 'noTermDefinedFor' param is given
         if ($_ = (int) $params['noTermDefinedFor']) {
@@ -843,7 +822,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         // Data columns, that would be fetched by search SQL query
-        $termQueryCol = '
+        $termQueryCol = $allExcept ? '`t`.`' . ($params['column'] ?? 'id') . '`' : '
           `t`.`id`, 
           `t`.`collectionId`, 
           `t`.`termEntryId`, 
@@ -857,16 +836,18 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         ';
 
         // Assume limit arg can be comma-separated string containing '<LIMIT>,<OFFSET>'
-        list($limit, $offset) = explode(',', $params['limit']);
+        if (!$allExcept) list($limit, $offset) = explode(',', $params['limit']);
 
         // Cols that we're going to search in by default
         $cols = ['`t`.`term`', '`t`.`proposal`'];
 
         // If we should only search for `term`-column (e.g. `proposal`-column won't be involved)
-        if (!$isProposer || ($params['processStatus'] && !in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus']))))
+        if ($params['processStatus']
+            && !in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus']))) {
 
             // Drop proposal-col from $cols, so it won't be mentioned in $keywordWHERE
             array_pop($cols);
+        }
 
         // Keyword WHERE clauses using LIKE
         foreach ($cols as $col) $keywordWHERE []= sprintf('LOWER(%s) LIKE LOWER(:keyword) COLLATE utf8mb4_bin', $col);
@@ -900,7 +881,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         foreach (['termEntryTbxId', 'termTbxId'] as $prop)
             if (isset($params[$prop]) && $params[$prop]) {
                 $token = ':' . $prop;
-                $where []= '`t`.`' . $prop . '` = ' . $token;
+                $where []= '`t`.`' . $prop . '` LIKE CONCAT("%%", ' . $token . ', "%%")';
                 $bindParam[$token] = $params[$prop];
             }
 
@@ -948,6 +929,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             }
         }
 
+        // Make sure some termIds will be excluded
+        if ($allExcept && $params['except'] ?? 0) {
+            $where []= '`t`.`' . ($params['column'] ?? 'id') . '` NOT IN (' . $params['except'] . ')';
+        }
+
         // Term query template
         $termQueryTpl = '
             SELECT SQL_NO_CACHE %s 
@@ -963,117 +949,22 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             $totalQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor ?? '', $keywordWHERE);
 
             // Setup &$total variable by reference
-            $total = (int) editor_Utils::db()->query($totalQuery, $bindParam)->fetchColumn();
+            $total = (int) $this->db->getAdapter()->query($totalQuery, $bindParam)->fetchColumn();
         }
 
         // Render query for getting actual results from terms table
-        $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor ?? '', $keywordWHERE)
-            . 'LIMIT ' . (int) $offset . ',' . (int) $limit;
+        $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor ?? '', $keywordWHERE);
 
+        // If we're not in allExcept-mode - append LIMIT clause
+        if (!$allExcept) $termQuery .= 'LIMIT ' . (int) $offset . ',' . (int) $limit;
+
+        // If we're on allExcept-mode - make sure ids will be fetched
+        $fetchMode = $allExcept ? PDO::FETCH_COLUMN : null;
         //i($termQuery, 'a');
         //i($bindParam, 'a');
 
         // Return results
-        return editor_Utils::db()->query($termQuery, $bindParam)->fetchAll();
-    }
-
-    /**
-     * Search terms in the term collection with the given search string and languages.
-     * @param string $queryString
-     * @param string $languages
-     * @param array $collectionIds
-     * @param mixed $limit
-     * @param array $processStats
-     * @param bool $total
-     * @param int $noTermDefinedFor
-     * @return array
-     */
-    public function searchTermByLanguage(string $queryString, string $languages, array $collectionIds, $limit = null, array $processStats, &$total = null, $noTermDefinedFor = null, $query = null): array
-    {
-        $termObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_Term');
-
-        //if wildcards are used, adopt them to the mysql needs
-        $queryString = str_replace("*","%",$query ?: $queryString);
-        $queryString = str_replace("?","_",$queryString);
-
-        //when limit is provided -> autocomplete search
-        if ($limit) {
-            $queryString = $queryString.'%';
-        }
-
-        $isProposalAllowed = $this->isProposableAllowed();
-
-        //remove the unprocessed status if the user is not allowed for proposals
-        if (!$isProposalAllowed) {
-            $processStats = array_diff($processStats,[self::PROCESS_STATUS_UNPROCESSED]);
-        }
-
-        $tableTerm = $this->db->info($this->db::NAME);
-        $tableProposal = (new editor_Models_Db_Term_Proposal())->info($this->db::NAME);
-        $s = $this->db->select()
-            ->setIntegrityCheck(false)
-            ->from($tableTerm, ['term as label', 'id as value', 'id', 'term as desc', 'processStatus', 'status', 'definition', 'termEntryTbxId', 'collectionId', 'termEntryId', 'languageId'])
-            ->where('lower(`'.$tableTerm.'`.term) like lower(?) COLLATE utf8mb4_bin',$queryString)
-            ->where('`'.$tableTerm.'`.languageId IN(?)', explode(',', $languages))
-            ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
-            ->where('`'.$tableTerm.'`.processStatus IN(?)',$processStats);
-
-        if ($noTermDefinedFor) {
-            $s->joinLeft(['t2' => $tableTerm], '`'.$tableTerm.'`.`termEntryId` = `t2`.`termEntryId` AND `t2`.`languageId` = "' . explode(',', $noTermDefinedFor)[0] . '"', '');
-            $s->where('ISNULL(`t2`.`term`)');
-        }
-        $s->order($tableTerm.'.term asc');
-
-        // Assume limit arg can be comma-separated string containing '<LIMIT>,<OFFSET>'
-        if ($limit) list($limit, $offset) = explode(',', $limit);
-
-        //
-        if (!$isProposalAllowed || !in_array(self::PROCESS_STATUS_UNPROCESSED, $processStats)) {
-
-            // Set LIMIT clause
-            if ($limit) $s->limit($limit, $offset ?: 0);
-
-            // Return results
-            return $this->db->fetchAll($s)->toArray();
-        }
-
-        //if proposal is allowed, search also in the proposal table for results
-        $tableProposal = (new editor_Models_Db_Term_Proposal())->info($this->db::NAME);
-        $sp = $this->db->select()
-            ->setIntegrityCheck(false)
-            ->from($tableProposal, ['term as label', 'termId as value', 'termId as id', 'term as desc'])
-            ->joinInner($tableTerm, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['processStatus', 'status', 'definition', 'termEntryTbxId', 'collectionId', 'termEntryId', 'languageId'])
-            ->where('lower(`'.$tableProposal.'`.term) like lower(?) COLLATE utf8mb4_bin', $queryString)
-            ->where('`'.$tableTerm.'`.languageId IN(?)', explode(',', $languages))
-            ->where('`'.$tableTerm.'`.collectionId IN(?)', $collectionIds)
-            ->order($tableTerm.'.term asc');
-
-        if ($noTermDefinedFor) {
-            $sp->joinLeft(['t2' => $tableTerm], '`'.$tableTerm.'`.`termEntryId` = `t2`.`termEntryId` AND `t2`.`languageId` = "' . explode(',', $noTermDefinedFor)[0] . '"', '');
-            $sp->where('ISNULL(`t2`.`term`)');
-        }
-
-        // Build LIMIT clause
-        $limit = editor_Utils::rif($limit, 'LIMIT ' . editor_Utils::rif($offset, '$1,') . '$1', '');
-        //d($sp->assemble());
-        // Append LIMIT clause to the UNION-ed query
-        $sql = '(' . $s->assemble() . ') UNION (' . $sp->assemble() . ') ' . $limit;
-
-        // If $total arg is given
-        if (func_num_args() >= 6 && !$query) {
-
-            // Replace columns with 'COUNT(*)' for both *_Select instances
-            $s->reset(Zend_Db_Select::COLUMNS)->columns(['COUNT(*)']);
-            $sp->reset(Zend_Db_Select::COLUMNS)->columns(['COUNT(*)']);
-
-            // Get total
-            $total = $this->db->getAdapter()->query(
-              'SELECT (' . $s->assemble() . ') + (' . $sp->assemble() . ') AS `total`'
-            )->fetchColumn();
-        }
-
-        // Fetch and return results
-        return $this->db->getAdapter()->query($sql)->fetchAll();
+        return $this->db->getAdapter()->query($termQuery, $bindParam)->fetchAll($fetchMode);
     }
 
     /***
@@ -1127,324 +1018,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             }
         }
     }
-
-    /***
-     * Get loaded data as object with term attributes included
-     * @return stdClass
-     */
-    /*public function getDataObjectWithAttributes(): stdClass
-    {
-        $result = $this->getDataObject();
-        //load all attributes for the term
-        $rows = $this->groupTermsAndAttributes($this->findTermAndAttributes($result->id));
-        $result->attributes = [];
-        if (!empty($rows) && !empty($rows[0]['attributes'])) {
-            $result->attributes = $rows[0]['attributes'];
-        }
-
-        return $result;
-    }*/
-
-    public function groupTerms(array $data): ?array
-    {
-
-    }
-
-    /***
-     * Group term and term attributes data by term. Each row will represent one term and its attributes in attributes array.
-     * The term attributes itself will be grouped in parent-child structure
-     * @param array $data
-     * @return array
-     */
-    /*public function groupTermsAndAttributes(array $data): ?array
-    {
-        if (empty($data)) {
-            return $data;
-        }
-        $map = [];
-        $termColumns = [
-            'definition',
-            'groupId',
-            'label',
-            'value',
-            'desc',
-            'termStatus',
-            'processStatus',
-            'termTbxId',
-            'termEntryId',
-            'collectionId',
-            'languageId',
-            'langSetGuid',
-            'term'
-        ];
-        //available term proposal columns
-        $termProposalColumns = [
-            'proposalTerm',
-            'proposalId',
-            'proposalCreated',
-            'proposalUserName'
-        ];
-        //maping between database name and term proposal table real name
-        $termProposalColumnsNameMap = [
-            'proposalTerm' => 'term',
-            'proposalId' => 'id',
-            'proposalCreated' => 'created',
-            'proposalUserName' => 'userName'
-        ];
-
-        //available attribute proposal columns
-        $attributeProposalColumns = [
-            'proposalAttributeValue',
-            'proposalAttributelId'
-        ];
-
-        //maping between database name and attribute proposal table real name
-        $attributeProposalColumnsNameMap = [
-            'proposalAttributeValue' => 'value',
-            'proposalAttributelId' => 'id'
-        ];
-
-        $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        /* @var $attribute editor_Models_Terminology_Models_AttributeModel * /
-
-        //Group term-termattribute data by term. For each grouped attributes field will be created
-        $oldKey = '';
-        $groupOldKey = false;
-        $termProposalData = [];
-
-        $termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $termModel editor_Models_Terminology_Models_TermModel * /
-        $isTermProposalAllowed = $termModel->isProposableAllowed();
-
-        $attributeModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        /* @var $attributeModel editor_Models_Terminology_Models_AttributeModel * /
-        $isAttributeProposalAllowed = $attributeModel->isProposableAllowed();
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-
-        //map the term id to array index (this is used because the jquery json decode changes the array sorting based on the termId)
-        $keyMap = [];
-        $indexKeyMap = function($termId) use (&$keyMap){
-            if (!isset($keyMap[$termId])) {
-                $keyMap[$termId] = count($keyMap);
-                return $keyMap[$termId];
-            }
-            return $keyMap[$termId];
-        };
-
-        foreach ($data as $tmp) {
-            $termKey = $indexKeyMap($tmp['termId']);
-
-            if (!isset($map[$termKey])) {
-                $termKey = $indexKeyMap($tmp['termId']);
-                $map[$termKey] = [];
-                $map[$termKey]['attributes'] = [];
-
-                if (isset($oldKey) && isset($map[$oldKey])) {
-//                    $map[$oldKey]['attributes'] = $attribute->createChildTree($map[$oldKey]['attributes']);
-                    $groupOldKey = true;
-
-                    $map[$oldKey]['proposable'] = $isTermProposalAllowed;
-                    //collect the term proposal data if the user is allowed to
-                    if ($isTermProposalAllowed) {
-                        $map[$oldKey]['proposal'] = !empty($termProposalData['term']) ? $termProposalData : null;
-                        $map[$oldKey]['attributes'] = $attribute->updateModificationGroupDate($map[$oldKey]['attributes'],isset($map[$oldKey]['proposal'])?$map[$oldKey]['proposal']:[]);
-                        $termProposalData = [];
-                    }
-                }
-            }
-
-            //split the term fields and term attributes
-            $atr = [];
-            $attProposal = [];
-            foreach ($tmp as $key => $value) {
-                //check if it is term specific data
-                if (in_array($key, $termColumns)) {
-                    $map[$termKey][$key] = $value;
-                    continue;
-                }
-                //is term attribute proposal specific data
-                if (in_array($key, $attributeProposalColumns)) {
-                    $attProposal[$attributeProposalColumnsNameMap[$key]] = $value;
-                    continue;
-                }
-                //is term proposal specific columnt
-                if (in_array($key, $termProposalColumns)) {
-                    $termProposalData[$termProposalColumnsNameMap[$key]] = $value;
-                    continue;
-                }
-
-                if ($key == 'headerText') {
-                    $value = $translate->_($value);
-                }
-
-                //it is attribute column
-                $atr[$key] = $value;
-
-            }
-
-            //is attribute proposable (is user attribute proposal allowed and the attribute is proposal whitelisted)
-            $atr['proposable'] = $isAttributeProposalAllowed && $attribute->isProposable($atr['name'], $atr['attrType']);
-            if ($isAttributeProposalAllowed) {
-                $atr['proposal'] = !empty($attProposal['id']) ? $attProposal : null;
-                $attProposal = [];
-            }
-
-//            $newAttributes = $attributeModel->load($tmp['attributeId'])->toArray();
-//            $atr = $this->createNewAttributeTermArray($newAttributes);
-//
-//            if ($atr) {
-                array_push($map[$termKey]['attributes'], $atr);
-//            }
-
-
-
-            $oldKey = $indexKeyMap($tmp['termId']);
-            $groupOldKey = false;
-        }
-
-        //if not grouped after foreach, group the last result
-        if (!$groupOldKey) {
-            $map[$oldKey]['proposable'] = $isTermProposalAllowed;
-//            $map[$oldKey]['attributes'] = $attribute->createChildTree($map[$oldKey]['attributes']);
-
-            //collect the term proposal data if the user is allowed to
-            if ($isTermProposalAllowed) {
-                $map[$oldKey]['proposal'] = !empty($termProposalData['term']) ? $termProposalData : null;
-//                $map[$oldKey]['attributes'] = $attribute->updateModificationGroupDate($map[$oldKey]['attributes'],isset($map[$oldKey]['proposal']) ? $map[$oldKey]['proposal'] : []);
-            }
-        }
-
-        if (empty($map)) {
-            return null;
-        }
-
-        return $map;
-    }*/
-
-    /**
-     * Find term in collection by given language and term value
-     * @param string $termText
-     * @param int|null $languageId optional, if omitted use internal value
-     * @param int|null $termCollection optional, if omitted use internal value
-     * @return Zend_Db_Table_Rowset_Abstract
-     */
-    public function findTermInCollection(string $termText, int $languageId = null, int $termCollection = null): Zend_Db_Table_Rowset_Abstract
-    {
-        $s = $this->db->select()
-            ->where('term = ?', $termText)
-            ->where('languageId = ?', $languageId ?? $this->getLanguage())
-            ->where('collectionId = ?',$termCollection ?? $this->getCollectionId());
-
-        return $this->db->fetchAll($s);
-    }
-
-    /***
-     * Find the term and the term attributes by given term id
-     * @param int $termId
-     * @return array
-     */
-    /*public function findTermAndAttributes(int $termId): array
-    {
-        $s = $this->getSearchTermSelect();
-        $s->where('terms_term.termTbxId=?', $termId);
-            $s->order('LEK_languages.rfc5646')
-            ->order('terms_term.term');
-
-        return $this->db->fetchAll($s)->toArray();
-    }*/
-
-    /***
-     * Get term search select. It the user is proposal allowed, the term and attribute proposals will be joined.
-     *
-     * @return Zend_Db_Select
-     */
-    /*protected function getSearchTermSelect(): Zend_Db_Select
-    {
-        $attCols = [
-            'terms_attributes.dataTypeId as dataTypeId',
-            'terms_attributes.id AS attributeId',
-//            'terms_attributes.parentId AS parentId',
-            //'terms_attributes.internalCount AS internalCount',
-            'terms_attributes.elementName AS name',
-            'terms_attributes.type AS attrType',
-            'terms_attributes.target AS attrTarget',
-            'terms_attributes.guid AS attrId',
-            'terms_attributes.language AS attrLang',
-            'terms_attributes.value AS attrValue',
-            'terms_attributes.created AS attrCreated',
-            'terms_attributes.updatedAt AS attrUpdated',
-            'terms_attributes.isCreatedLocally AS attrIsCreatedLocally',
-            'terms_attributes.termId AS termGuid',
-            'terms_attributes.langSetGuid AS langSetGuid',
-            new Zend_Db_Expr('"termAttribute" as attributeOriginType') //this is needed as fixed value
-        ];
-
-        $cols = [
-            'definition',
-            'termEntryTbxId as groupId',
-            'term as label',
-            'term as term',//for consistency
-            'id as value',
-            'term as desc',
-            'status as termStatus',
-            'processStatus as processStatus',
-            'id as termId',
-            'termEntryId',
-            'collectionId',
-            'langSetGuid',
-            'languageId as languageId'
-        ];
-
-        $s = $this->db->select()
-            ->setIntegrityCheck(false)
-            ->from($this->db, $cols)
-            ->joinLeft('terms_attributes', 'terms_attributes.termId = terms_term.id ', $attCols)
-            ->joinLeft('terms_attributes_datatype', 'terms_attributes_datatype.id = terms_attributes.dataTypeId',['terms_attributes_datatype.labelText as headerText'])
-            ->join('LEK_languages', 'terms_term.languageId = LEK_languages.id', ['LEK_languages.rfc5646 AS language']);
-
-        if($this->isProposableAllowed()){
-            $s->joinLeft('terms_proposal', 'terms_proposal.termId = terms_term.id',[
-                'terms_proposal.term as proposalTerm',
-                'terms_proposal.id as proposalId',
-                'terms_proposal.created as proposalCreated',
-                'terms_proposal.userName as proposalUserName'
-            ]);
-        }
-
-        $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        /* @var $attribute editor_Models_Terminology_Models_AttributeModel * /
-
-        if($attribute->isProposableAllowed()){
-            $s->joinLeft('terms_attributes_proposal', 'terms_attributes_proposal.attributeId = terms_attributes.id',[
-                'terms_attributes_proposal.value as proposalAttributeValue',
-                'terms_attributes_proposal.id as proposalAttributelId',
-            ]);
-        }else{
-            //exclude the proposals
-            $s->where('terms_term.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED)
-                ->where('terms_attributes.isCreatedLocally!=?',1);
-        }
-
-        return $s;
-    }*/
-    /***
-     * Find term attributes in the given term entry (lek_terms groupId)
-     *
-     * @param string $termEntryId
-     * @param array $collectionIds
-     * @return array
-     */
-    /*public function searchTermAttributesInTermEntry(string $termEntryId, array $collectionIds): array
-    {
-        $s = $this->getSearchTermSelect();
-        $s->where('terms_term.termEntryId = ?', (int)$termEntryId)
-            ->where('terms_term.collectionId IN(?)', $collectionIds)
-            ->order('LEK_languages.rfc5646')
-            ->order('terms_term.term')
-            ->order('terms_term.id');
-
-        return $this->db->fetchAll($s)->toArray();
-    }*/
 
     /***
      * Returns all terms of the given $searchTerms that don't exist in
@@ -2125,7 +1698,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Spoof user ids with user names
         foreach ($resultArray as $idx => $item)
             foreach ($item as $prop => $value)
-                if (preg_match('~-lastEditor$~', $prop))
+                if (preg_match('~-lastEditor$~', $prop) && $value)
                     $resultArray[$idx][$prop] = $userNameA[$value];
 
         if (empty($resultArray)) {
@@ -2362,15 +1935,553 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      * Get data for tbx-export
      *
-     * @param $termEntryIds Comma-separated list of ids
+     * @param $ids Comma-separated list of ids, or array of ids
+     * @param string $idsProp Name of ids-prop, 'termEntryId' by default
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getExportData($termEntryIds) {
+    public function getExportData($ids, $idsProp = 'termEntryId') {
+
+        // Build clause for termIds
+        $where = $this->db->getAdapter()->quoteInto('`' . $idsProp . '` IN (?)', editor_Utils::ar($ids));
+
+        // Fetch and return terms, grouped by termEntryId and language props
         return array_group_by($this->db->getAdapter()->query('
-            SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId` 
+            SELECT `termEntryId`, `id`, `term`, `language`, `termTbxId`, `processStatus`, `termTbxId` 
             FROM `terms_term`
-            WHERE `termEntryId` IN (' . $termEntryIds . ')
+            WHERE ' . $where . '
         ')->fetchAll(), 'termEntryId', 'language');
+    }
+
+    /**
+     * Check whether current term is the last one having it's termEntryId or / and languageId
+     *
+     * @return bool|string
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function isLast() {
+
+        // Get data, that will help to detect whether this term is the last in it's termEntry or language
+        $isLast_data = $this->db->getAdapter()->query('
+            SELECT `language`, COUNT(`id`) AS `termQty` 
+            FROM `terms_term` 
+            WHERE `termEntryId` = ? 
+            GROUP BY `language` 
+            ORDER BY `language` = ? DESC 
+            LIMIT 2        
+        ', [$this->getTermEntryId(), $this->getLanguage()])->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // Return false, if not last, or 'language' or 'entry' if is last within language or entry
+        return $isLast_data[$this->getLanguage()] < 2
+            ? (count($isLast_data) < 2 ? 'entry' : 'language')
+            : false;
+    }
+
+    /**
+     * Delete language-level things:
+     * 1. `terms_images`-records
+     * 2. image-files
+     * 3.`terms_transacgrp`-records
+     * 4.`terms_attributes`-records
+     */
+    public function preDeleteIfLast4Language() {
+
+        // Delete `terms_images`-records and image-files found by those records
+        editor_Models_Terminology_Models_AttributeModel
+            ::deleteImages($this->getCollectionId(), $this->getTermEntryId(), $this->getLanguage());
+
+        // Delete `terms_transacgrp`- and `terms_attributes`- records for language-level and term-level
+        $where = '`termEntryId` = ? AND `language` = ? AND `termId` IS NULL';
+        $bind = [$this->getTermEntryId(), $this->getLanguage()];
+        $this->db->getAdapter()->query('DELETE FROM `terms_transacgrp` WHERE ' . $where, $bind);
+        $this->db->getAdapter()->query('DELETE FROM `terms_attributes` WHERE ' . $where, $bind);
+    }
+
+    /**
+     * Delete termEntry- levels things:
+     * 1.`terms_images`-records (both on termEntry- and language- levels)
+     * 2.`terms_term_entry`-record. Note: current terms_term-record will be deleted by ON DELETE CASCADE
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function preDeleteIfLast4Entry() {
+
+        // Delete `terms_images`-records and image-files found by those records
+        editor_Models_Terminology_Models_AttributeModel
+            ::deleteImages($this->getCollectionId(), $this->getTermEntryId());
+
+        /** @var editor_Models_Terminology_Models_TermEntryModel $termEntry */
+        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        $termEntry->load($this->getTermEntryId());
+        $termEntry->delete();
+    }
+
+    /**
+     * Detach current term proposal into new term, with attributes replication,
+     * and return newly created term data in a format, compatible with TermPortal siblings-panel
+     *
+     * @param string $processStatus
+     * @param int $userId
+     * @param string $userName
+     * @param string $userGuid
+     * @param int|null $processStatusAttrId
+     * @return array
+     */
+    public function detachProposal(string &$processStatus, int $userId, string $userName, string $userGuid, int $processStatusAttrId = null): array {
+
+        // Prepare the data to be used for init a new term based on current term's proposal
+        $init = $this->toArray(); unset($init['id'], $init['proposal']);
+        $init['processStatus'] = $processStatus;
+        $init['term'] = $this->getProposal();
+        $init['guid'] = ZfExtended_Utils::uuid();
+        $init['termTbxId'] = 'id' . ZfExtended_Utils::uuid();
+        $init['updatedBy'] = $userId;
+
+        // Move existing term's proposal to the new term, with attributes replicated
+        $p = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        $p->init($init);
+        $p->insert([
+            'userName' => $userName,
+            'userGuid' => $userGuid,
+            'copyAttrsFromTermId' => $this->getId()
+        ]);
+
+        // If processStatus is 'rejected', it means that proposal for existing term was rejected,
+        // so that we spoof $params['value'] with processStatus of existing term,
+        // as it will be flushed within json response
+        if ($processStatus == 'rejected') $processStatus = $this->getProcessStatus();
+
+        // Else if existing term's proposal is accepted, e.g. is 'provisionallyProcessed'
+        // or 'finalized' - then, for existing term, setup `processStatus` = 'rejected'
+        // Also, spoof $params['value'] for it to be 'rejected', as it will be flushed within json response
+        else $this->setProcessStatus($processStatus = 'rejected');
+
+        // Remove proposal from existing term
+        $this->setProposal('');
+        $this->setUpdatedBy($userId);
+        $this->update(['updateProcessStatusAttr' => $processStatusAttrId ?? true]);
+
+        // Return new term data in format, compatible with TermPortal's siblings-panel store
+        return [
+            'id' => $p->getId(),
+            'tbx' => $p->getTermTbxId(),
+            'languageId' => $p->getLanguageId(),
+            'language' => $p->getLanguage(),
+            'term' => $p->getTerm(),
+            'proposal' => $p->getProposal(),
+            'status' => $p->getStatus(),
+            'processStatus' => $p->getProcessStatus(),
+            'termEntryTbxId' => $p->getTermEntryTbxId(),
+
+            // For store's new record, images array will be copied from source record
+            'images' => [],
+        ];
+    }
+
+    /**
+     * Do process status change, with (if need)
+     *  - detaching the proposal
+     *  - creating/updating normativeAuthorization-attr
+     *  - updating collections stats
+     *
+     * @param string $processStatus
+     * @param string $userId
+     * @param string $userName
+     * @param string $userGuid
+     * @param editor_Models_Terminology_Models_AttributeModel|null $processStatusAttr
+     * @return array
+     */
+    public function doProcessStatusChange(string $processStatus, string $userId, string $userName, string $userGuid,
+                                          editor_Models_Terminology_Models_AttributeModel $processStatusAttr = null) {
+        // Return value
+        $data = [];
+
+        // If term, that we're going to change processStatus for - has a proposal
+        if ($this->getProposal()) {
+
+            // If new processStatus is 'rejected', 'provisionallyProcessed' or 'finalized'
+            // - cut proposal from existing into separate term
+            if ($processStatus != 'unprocessed') {
+
+                // Make sure newly created term's data to be flushed within json response,
+                // so it'll be possible to add record into siblings-panel grid's store
+                $data['inserted'] = $this->detachProposal(
+                    $processStatus,
+                    $userId,
+                    $userName,
+                    $userGuid,
+                    $processStatusAttr->getId()
+                );
+
+                // If $this->normativeAuthorization was set by the above $this->detachProposal() -> $this->update() call
+                // it means that term processStatus was changed to 'rejected', so 'normativeAuthorization'
+                // attribute was set to 'deprecatedTerm', and in case if there was no such attribute previously
+                // we need to pass attr info to client side for new attr-field to be added into the attr-panel
+                if ($this->normativeAuthorization ?? 0)
+                    $data['normativeAuthorization'] = $this->_normativeAuthorization($userName);
+
+                // Update collection stats
+                ZfExtended_Factory
+                    ::get('editor_Models_TermCollection_TermCollection')
+                    ->updateStats($this->getCollectionId(), ['termEntry' => 0, 'term' => 1]);
+            }
+
+        // Else
+        } else {
+
+            // Update `processStatus` on `terms_term`-record
+            $this->setProcessStatus($processStatus);
+            $this->setUpdatedBy($userId);
+            $this->update(['updateProcessStatusAttr' => $processStatusAttr->getId()]);
+
+            // If $this->normativeAuthorization was set by the above $this->update() call
+            // it means that term processStatus was changed to 'rejected', so 'normativeAuthorization'
+            // attribute was set to 'deprecatedTerm', and in case if there was no such attribute previously
+            // we need to pass attr info to client side for attr-field to be added into the attr-panel
+            if ($this->normativeAuthorization ?? 0) {
+                $data['normativeAuthorization'] = $this->_normativeAuthorization($userName);
+
+                // Increment collection stats 'attribute'-prop only
+                ZfExtended_Factory
+                    ::get('editor_Models_TermCollection_TermCollection')
+                    ->updateStats($this->getCollectionId(), [
+                        'termEntry' => 0,
+                        'term' => 0,
+                        'attribute' => 1
+                    ]);
+            }
+        }
+
+        // Append processStatus-attr info into return value
+        $data['processStatus'] = [
+            'id' => $processStatusAttr->getId(),
+            'value' => $processStatus,
+            'type' => 'processStatus',
+            'dataTypeId' => $processStatusAttr->getDataTypeId(),
+            'created' => $userName . ', ' . date('d.m.Y H:i:s', strtotime($processStatusAttr->getCreatedAt())),
+            'updated' => $userName . ', ' . date('d.m.Y H:i:s'),
+        ];
+
+        // Return data
+        return $data;
+    }
+
+    /**
+     * @param $userName
+     * @return array|void
+     */
+    protected function _normativeAuthorization($userName) {
+
+        // If no 'normativeAuthorization' prop is set - return
+        if (!$na = $this->normativeAuthorization ?? 0) return;
+
+        // Else return attribute-info compatible with TermPortal {xtype: 'attrpanel'}
+        return [
+            'id' => $na['id'],
+            'value' => $na['value'],
+            'type' => $na['type'],
+            'dataTypeId' => $na['dataTypeId'],
+            'created' => $userName . ', ' . date('d.m.Y H:i:s', strtotime($na['createdAt'])),
+            'updated' => $userName . ', ' . date('d.m.Y H:i:s', strtotime($na['updatedAt'])),
+        ];
+    }
+
+    /**
+     * Fetch attributes and transacgrps data for TermPortal right panels,
+     * and image/figure-attributes for center panel
+     *
+     * @return array
+     */
+    public function terminfo(): array {
+
+        // Setup different `language`-column clauses to be used
+        // for fetching attributes-data and fetching transacgrp-data
+        // because we need to fetch image-attributes not only for right-panels
+        // but also for center panel
+        $cond = [
+            'transacgrp' => '`language` = :language',
+            'attribute'  => '(`language` = :language OR (`type` = "figure" AND NOT ISNULL(`language`)))'
+        ];
+
+        // Setup definition for level-column
+        $levelColumnToBeGroupedBy = '
+          IF ((`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`)), "entry", 
+            IF ((`termEntryId` = :termEntryId AND %s AND ISNULL(`termId`)), "language", 
+              IF (`termId` = :termId, "term", "other"))) AS `level`';
+
+        // Setup WHERE clauses for entry-, language- and term-level attributes/transacgrp
+        $levelWHERE = implode(' AND ', [
+            '`termEntryId` = :termEntryId',
+            '(ISNULL(`language`) OR %s)',
+            '(ISNULL(`termId`)   OR `termId` = :termId)'
+        ]);
+
+        // Params for binding to the attribute/transacgrp-fetching query
+        $bind = [
+            ':termEntryId' => $this->getTermEntryId(),
+            ':language' => $this->getLanguage(),
+            ':termId' => $this->getId()
+        ];
+
+        // Get attributes grouped by level
+        $attributeA = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_AttributeModel')
+            ->loadGroupedByLevel(
+                sprintf($levelColumnToBeGroupedBy, $cond['attribute']),
+                sprintf($levelWHERE, $cond['attribute']),
+                $bind
+            );
+
+        // Get `transacgrp` data grouped by level
+        $transacgrpA = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_TransacgrpModel')
+            ->loadGroupedByLevel(
+                sprintf($levelColumnToBeGroupedBy, $cond['transacgrp']),
+                sprintf($levelWHERE, $cond['transacgrp']),
+                $bind
+            );
+
+        // Convert transacgrp-data
+        foreach (['entry', 'language', 'term'] as $level)
+            $transacgrpA[$level]
+                = array_column($transacgrpA[$level] ?? [], 'whowhen', 'transac');
+
+        // Return attributes and transacgrps
+        return [$attributeA, $transacgrpA];
+    }
+
+    /**
+     * Fetch attributes and transacgrps data for TermPortal right panels
+     *
+     * @return array
+     */
+    public function siblinginfo(): array {
+
+        // Setup different entry-level clauses to be used
+        // for fetching attributes-data and fetching transacgrp-data
+        // because we need to fetch ref-attributes not only for
+        // language- and term- levels, but for entry-level as well
+        $cond = [
+            'attribute'  => '`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`) AND `elementName` = "ref"',
+            'transacgrp' => 'FALSE',
+        ];
+
+        // Setup definition for level-column
+        $levelColumnToBeGroupedBy = '
+          IF ((`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`)), "entry", 
+            IF ((`termEntryId` = :termEntryId AND `language` = :language AND ISNULL(`termId`)), "language", 
+              IF (`termId` = :termId, "term", "other"))) AS `level`';
+
+        // Setup WHERE clauses for entry-, language- and term-level attributes
+        $levelWHERE = '`termEntryId` = :termEntryId AND ((' . implode(') OR (', [
+            'entry'    => '%s',
+            'language' => '`termEntryId` = :termEntryId AND `language` = :language AND ISNULL(`termId`)',
+            'term'     => '`termId` = :termId'
+        ]) . '))';
+
+        // Params for binding to the attribute/transacgrp-fetching query
+        $bind = [
+            ':termEntryId' => $this->getTermEntryId(),
+            ':language' => $this->getLanguage(),
+            ':termId' => $this->getId()
+        ];
+
+        // Get attributes grouped by level
+        $attributeA = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_AttributeModel')
+            ->loadGroupedByLevel(
+                $levelColumnToBeGroupedBy,
+                sprintf($levelWHERE, $cond['attribute']),
+                $bind
+            );
+
+        // Get transacgrps grouped by level
+        $transacgrpA = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_TransacgrpModel')
+            ->loadGroupedByLevel(
+                $levelColumnToBeGroupedBy,
+                sprintf($levelWHERE, $cond['transacgrp']),
+                $bind
+            );
+
+        // Convert transacgrp-data
+        foreach (['entry', 'language', 'term'] as $level)
+            $transacgrpA[$level]
+                = array_column($transacgrpA[$level] ?? [], 'whowhen', 'transac');
+
+        // Return attributes and transacgrps
+        return [$attributeA, $transacgrpA];
+    }
+
+    /**
+     * Get client name
+     *
+     * @return string
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getClientName() {
+
+        // Get `clientId` of a term collection
+        $clientId = $this->db->getAdapter()->query(
+            'SELECT `customerId` FROM `LEK_languageresources_customerassoc` WHERE `languageResourceId` = ?',
+            $this->getCollectionId()
+        )->fetchColumn();
+
+        // Use that `clientId` to get the client name
+        return $this->db->getAdapter()->query('SELECT `name` FROM `LEK_customer` WHERE `id` = ?', $clientId)->fetchColumn();
+    }
+
+    /**
+     * Get all terms having same termEntryId as current term has, orderded:
+     *   by current search language(s), and then
+     *   by termportal languages
+     *
+     * @param string $searchLangIds
+     * @param string $termPortalLangRfcs
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getSiblingsOrderedBy(string $searchLangIds = '', string $termPortalLangRfcs = ''): array {
+
+        // Bind params
+        $bind = [
+            ':termEntryId' => $this->getTermEntryId(),
+        ];
+
+        // If we have current search term languages ids given
+        if ($searchLangIds) {
+
+            // Make sure this languages terms will be at the top
+            $order []= 'FIND_IN_SET(`languageId`, :searchLangIds) DESC';
+
+            // Append binding
+            $bind[':searchLangIds'] = join(',', array_reverse(explode(',', $searchLangIds)));
+        }
+
+        // If we have termportal languages given
+        if ($termPortalLangRfcs) {
+
+            // Setup secondary order clause
+            $order []= 'FIND_IN_SET(`language`, :termPortalLangRfcs)';
+
+            // Append binding
+            $bind[':termPortalLangRfcs'] = $termPortalLangRfcs;
+        }
+
+        // Join ORDER clauses
+        $order = join(', ', $order) ?: '`id`';
+
+        // Get raw siblings
+        return $this->db->getAdapter()->query($sql = '
+            SELECT 
+              `id`, 
+              `id`, 
+              `termTbxId` AS `tbx`, 
+              `languageId`, 
+              LOWER(`language`) AS `language`, 
+              `term`,
+              `proposal`,
+              `collectionId`,
+              `status`,
+              `processStatus`,
+              `termEntryId`,
+              `termEntryTbxId`
+            FROM `terms_term` 
+            WHERE `termEntryId` = :termEntryId
+            ORDER BY ' . $order,
+            $bind
+        )->fetchAll(PDO::FETCH_UNIQUE);
+    }
+
+    /**
+     * Get ids of all terms having given $termEntryId
+     *
+     * @param $termEntryId
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getIdsByTermEntryId($termEntryId) {
+        return $this->db->getAdapter()->query('
+            SELECT `id` 
+            FROM `terms_term`
+            WHERE `termEntryId` = ?
+        ', $termEntryId)->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Get distinct languages of all terms having given $termEntryId
+     *
+     * @param $termEntryId
+     * @param $certain
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getLanguagesByTermEntryId($termEntryId, $certain = false) {
+
+        // Query param binding
+        $bind = [':termEntryId' => $termEntryId];
+
+        // If $certain arg is given
+        if ($certain) {
+
+            // Append binding
+            $bind[':certain'] = $certain;
+
+            // Append WHERE clause
+            $certain = ' AND FIND_IN_SET(`language`, :certain)';
+        }
+
+        // Return distinc languages
+        return $this->db->getAdapter()->query('
+            SELECT DISTINCT `language` 
+            FROM `terms_term`
+            WHERE `termEntryId` = :termEntryId' . $certain
+        , $bind)->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Exclude values from $termIds, having $language-translations,
+     * so the only ones which have no translation for given $language will be kept and returned
+     *
+     * @param array $termIds
+     * @param string $languageId
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function havingNoTranslation(array $termIds, int $languageId) {
+
+        // Build termIds-where clause
+        $termIds = $this->db->getAdapter()->quoteInto('`t`.`id` IN (?)', $termIds);
+
+        // Run query and fetch results
+        return $this->db->getAdapter()->query('
+            SELECT `t`.`collectionId`, `t`.`id` 
+            FROM 
+              `terms_term` `t` 
+              LEFT JOIN `terms_term` AS `t2` ON (
+                `t`.`termEntryId` = `t2`.`termEntryId` AND `t2`.`languageId` = ?
+              )
+            WHERE ' . $termIds . ' AND ISNULL(`t2`.`id`)
+        ', $languageId)->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Get distinct values for columns, specified by $cols arg, for terms, identified by $termIds arg
+     *
+     * @param string $cols Comma-separated column names
+     * @param array $termIds
+     */
+    public function distinctColsForTermIds($cols = 'termEntryId,language', array $termIds) {
+
+        // Build termIds-where clause
+        $termIds = $this->db->getAdapter()->quoteInto('`id` IN (?)', $termIds);
+
+        // Fetch data
+        $data = $this->db->getAdapter()->query('SELECT ' . $cols . ' FROM `terms_term` WHERE ' . $termIds)->fetchAll();
+
+        // Collect distinct values for given $cols
+        foreach (explode(',', $cols) as $col) $distinct[$col] = array_unique(array_column($data, $col));
+
+        // Return collected
+        return $distinct;
     }
 }

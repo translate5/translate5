@@ -70,4 +70,26 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Term_AttributeHistory extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Term_AttributeHistory';
+
+    /**
+     * Get values, that were set up by tbx import and but are in history now
+     *
+     * @param array $attrIds
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getImportedByAttrIds(array $attrIds): array {
+
+        // Prepare WHERE clause
+        $where = $this->db->getAdapter()
+            ->quoteInto('`attrId` IN (?)', $attrIds ?: [0])
+            . ' AND `isCreatedLocally` = "0"';
+
+        // Get imported values
+        return $this->db->getAdapter()->query('
+            SELECT `attrId`, `value`, `target` 
+            FROM `terms_attributes_history`
+            WHERE '. $where
+        )->fetchAll(PDO::FETCH_UNIQUE);
+    }
 }

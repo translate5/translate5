@@ -608,7 +608,7 @@ Ext.define('Editor.controller.Segments', {
       
       // update length stuff in siblings of store
       me.updateSiblingsMetaCache(record);
-      
+
       //fire event to process things after save call is started, like change alike handling
       //parameters are the callback to the final save chain call,
       //for later usage in ChangeAlike Handling and the saved record

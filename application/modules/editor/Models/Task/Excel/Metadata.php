@@ -130,7 +130,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
         ]);
         
         // write fieldnames in header, set their font to bold, set their width to auto
-        $sheetCols = range('A','Z');
+        $sheetCol = 'A';
         $taskModel = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $taskModel editor_Models_Task */
         $taskGridTextCols = $taskModel::getTaskGridTextCols();
@@ -140,9 +140,10 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
             } else {
                 $colHeadline = $colName;
             }
-            $sheet->setCellValue($sheetCols[$key].'1', ucfirst($colHeadline));
-            $sheet->getStyle($sheetCols[$key].'1')->getFont()->setBold(true);
-            $sheet->getColumnDimension($sheetCols[$key])->setAutoSize(true);
+            $sheet->setCellValue($sheetCol.'1', ucfirst($colHeadline));
+            $sheet->getStyle($sheetCol.'1')->getFont()->setBold(true);
+            $sheet->getColumnDimension($sheetCol)->setAutoSize(true);
+            $sheetCol++; //inc alphabetical
         }
     }
     
@@ -169,10 +170,11 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      */
     public function addTask($task) {
         $sheet = $this->excelExport->getWorksheetByName($this->sheetNameTaskOverview);
-        $sheetCols = range('A','Z');
+        $sheetCol = 'A';
         foreach ($this->taskColumns as $key => $colName) {
             if (!array_key_exists($colName, $task)) {
                 // eg taskassoc is not always set for every task
+                $sheetCol++;
                 continue;
             }
             switch ($colName) {
@@ -183,9 +185,15 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                     $value = $customer->getName();
                     break;
                 case 'orderdate':
-                    $format = Zend_Locale_Format::getDateFormat();
-                    $date = new Zend_Date($task[$colName], Zend_Date::ISO_8601);
-                    $value = $date->toString($format);
+                case 'enddate':
+                    $value = \PhpOffice\PhpSpreadsheet\Shared\Date::stringToExcel($task[$colName]);
+
+                    $sheet->getStyle($sheetCol.$this->taskRow)
+                        ->getNumberFormat()
+                        ->setFormatCode(
+                            \PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_DATE_YYYYMMDD
+                        );
+
                     break;
                 case 'relaisLang':
                 case 'sourceLang':
@@ -196,12 +204,23 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                     } else {
                         $languages = ZfExtended_Factory::get('editor_Models_Languages');
                         /* @var $languages editor_Models_Languages */
-                        $languages->load($task[$colName]);
-                        $value = $languages->getLangName() . ' (' . $languages->getRfc5646() . ')';
+                        try {
+                            $languages->load($task[$colName]);
+                            $value = $languages->getLangName() . ' (' . $languages->getRfc5646() . ')';
+                        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                            $value = '- notfound -';
+                        }
                     }
                     break;
                 case 'state':
-                    $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($task['taskGuid']);
+                        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($task['taskGuid']);
+                    try {
+                        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($task['taskGuid']);
+                    }
+                    catch (editor_Workflow_Exception $e) {
+                        //normally that means that the workflow was not found, so we just use the default one
+                        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->get('default');
+                    }
                     /* @var $workflow editor_Workflow_Default */
                     $states = $workflow->getStates();
                     $labels = $workflow->getLabels(true);
@@ -222,7 +241,8 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                     $value = $task[$colName];
                     break;
             }
-            $sheet->setCellValue($sheetCols[$key].$this->taskRow, $value);
+            $sheet->setCellValue($sheetCol.$this->taskRow, $value);
+            $sheetCol++;
         }
         $this->taskRow++;
     }

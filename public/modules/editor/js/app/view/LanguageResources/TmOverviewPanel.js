@@ -90,6 +90,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 
     initConfig: function(instanceConfig) {
         var me = this,
+            service = function(rec) {
+                return Editor.util.LanguageResources.getService(rec.get('serviceName'));
+            },
             config = {
                 title: me.title, //see EXT6UPD-9
                 store :'Editor.store.LanguageResources.LanguageResource',
@@ -97,8 +100,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 viewConfig: {
                     getRowClass: function(record) {
                         //adds service specific handled css to the row 
-                        var service = Editor.util.LanguageResources.getService(record.get('serviceName'));
-                        return service.getTmOverviewRowCls(record).join(' ');
+                        return service(record).getTmOverviewRowCls(record).join(' ');
                     }
                 },
                 selModel: {
@@ -140,6 +142,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     filter: {
                         type: 'string'
                     },
+                    renderer: function(v, meta, rec){
+                        return service(rec).getNameRenderer().call(this, v, meta, rec);
+                    },
                     text: me.strings.name
                 },{
                     xtype: 'actioncolumn',
@@ -168,37 +173,37 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         }
                     },{
                         action: 'import',
-	                    getClass:function(v,meta,record) {
-                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getImportIconClass(record);
+	                    getClass:function(v,meta,r) {
+                        	return service(r).getImportIconClass(r);
                         },
 	                    getTip:function(view,metadata,r){
-                            return Editor.util.LanguageResources.getService(r.get('serviceName')).getAddTooltip(r);
+                            return service(r).getAddTooltip(r);
 	                    }
                         
                     },{
                         action: 'download',
-                        getClass:function(v,meta,record) {
-                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getDownloadIconClass(record);
+                        getClass:function(v,meta,r) {
+                        	return service(r).getDownloadIconClass(r);
                         },
 	                    getTip:function(view,metadata,r){
-	                    	return Editor.util.LanguageResources.getService(r.get('serviceName')).getDownloadTooltip(r);
+	                    	return service(r).getDownloadTooltip(r);
 	                    }
                     },{
                         action: 'export',
-                        getClass:function(v,meta,record) {
-                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getExportIconClass();
+                        getClass:function(v,meta,r) {
+                        	return service(r).getExportIconClass();
                         },
 	                    getTip:function(view,metadata,r){
-	                    	return Editor.util.LanguageResources.getService(r.get('serviceName')).getExportTooltip();
+	                    	return service(r).getExportTooltip();
 	                    }
                     },{
                         tooltip: me.strings.log,
                         action: 'log',
-                        getTip:function(view,metadata,record){
-                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getLogTooltip(record);
+                        getTip:function(view,metadata,r){
+                        	return service(r).getLogTooltip(r);
 	                    },
-	                    getClass:function(view,metadata,record){
-	                    	return Editor.util.LanguageResources.getService(record.get('serviceName')).getLogIconClass(record);
+	                    getClass:function(view,metadata,r){
+	                    	return service(r).getLogIconClass(r);
 	                    }
                     }]
                 },{

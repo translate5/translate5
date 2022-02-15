@@ -187,6 +187,7 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-g':         ['G',{ctrl: true, alt: false}, me.scrollToSegment, true],
             'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
             'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
+            'ctrl-l':         ['L',{ctrl: true, alt: false}, me.focusSegmentShortcut],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
             'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
@@ -679,6 +680,20 @@ Ext.define('Editor.controller.Editor', {
     redo: function() {
         this.fireEvent('redo'); // see SnapshotHistory
     },
+
+    /***
+     * Focus the segment given in the prompt window input
+     */
+    focusSegmentShortcut:function (){
+        var me = this,
+            prompt = Ext.Msg.prompt('Go to segment', 'No.:', function(btn, text){
+            if (btn === 'ok'){
+                me.focusSegment(text);
+            }
+        });
+        prompt.down('textfield').focus(200);
+    },
+
     /**
      * handleAfterContentChange: save snapshot.
      */
@@ -1459,7 +1474,7 @@ Ext.define('Editor.controller.Editor', {
         //if neither the text or html clipboard content matches the internally stored content, 
         // that means that the pasted content comes from outside and we insert just text:
         if(me.copiedSelectionWithTagHandling === null || !textMatch || !htmlMatch) {
-            me.htmlEditor.insertMarkup(clipboardText);
+            me.htmlEditor.insertMarkup(Ext.String.htmlEncode(clipboardText));
             me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
             me.copiedSelectionWithTagHandling = null;
             return;
@@ -1738,9 +1753,9 @@ Ext.define('Editor.controller.Editor', {
      * "Reference files info message" window button handler
      */
     onShowReferenceFilesButtonClick:function(){
-        var filePanel =this.getFilepanel(); 
-        filePanel.expand();
-        filePanel.down('referenceFileTree').expand();
+        var filePanel =this.getFilepanel().expand();
+        var taskFiles = filePanel.down('taskfiles').expand();
+        taskFiles.scrollable.scrollIntoView(taskFiles.down('referenceFileTree').view.el);
     },
 
     /**
@@ -1844,15 +1859,20 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
 
-        if(store.proxy.reader.metaData && store.proxy.reader.metaData.jumpToSegmentIndex > -1){
-            me.getSegmentGrid().scrollTo(store.proxy.reader.metaData.jumpToSegmentIndex);
-            return;
-        }
-        if(segmentIdFromHash > 0){
-            me.focusSegment(segmentIdFromHash);
-            return;
-        }
-        me.focusSegment(1);
+        //must be deferred, not because of the time, but to put the execution onto the end of the execution queue
+        // the problem is that in rendering this is done also somewhere, then it happened that this code here was
+        // called before the elsewhere deferred rendering code and that was leading to a blank segment grid
+        Ext.defer(function() {
+            if (store.proxy.reader.metaData && store.proxy.reader.metaData.jumpToSegmentIndex > -1) {
+                me.getSegmentGrid().scrollTo(store.proxy.reader.metaData.jumpToSegmentIndex);
+                return;
+            }
+            if (segmentIdFromHash > 0) {
+                me.focusSegment(segmentIdFromHash);
+                return;
+            }
+            me.focusSegment(1);
+        },1);
     },
 
     /**

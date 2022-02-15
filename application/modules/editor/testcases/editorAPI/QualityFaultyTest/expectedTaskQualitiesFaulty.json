@@ -1,6 +1,43 @@
 {
-    "text": "{4b154c5d-7bcf-4dd9-b6af-2f0b3fcfbea6}",
+    "text": "{c150c215-c196-4275-9d4c-3238568148f9}",
     "children": [
+        {
+            "qid": -1,
+            "qtype": "consistent",
+            "qcount": 3,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "35796",
+                    "qtype": "consistent",
+                    "qcount": 3,
+                    "qcomplete": true,
+                    "qcategory": "source",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Inconsistent source",
+                    "leaf": true
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "qcountfp": 0,
+            "text": "Consistency",
+            "qtotal": 3,
+            "expanded": false
+        },
+        {
+            "qid": -1,
+            "qtype": "empty",
+            "qcount": 0,
+            "qcomplete": true,
+            "qcategory": null,
+            "qtooltip": "Target only contains tags, spaces or punctuation, but source does not.",
+            "qcountfp": 0,
+            "text": "Empty segments",
+            "qtotal": 0,
+            "leaf": true
+        },
         {
             "qid": -1,
             "qtype": "internal",
@@ -8,7 +45,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "70520",
+                    "qid": "35794",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -20,7 +57,7 @@
                     "qfaulty": true
                 },
                 {
-                    "qid": "70521",
+                    "qid": "35795",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -32,6 +69,7 @@
                 }
             ],
             "qcategory": null,
+            "qtooltip": "",
             "qcountfp": 0,
             "text": "Internal tags",
             "qtotal": 2,
@@ -43,6 +81,7 @@
             "qcount": 0,
             "qcomplete": true,
             "qcategory": null,
+            "qtooltip": "",
             "qcountfp": 0,
             "text": "Length check",
             "qtotal": 0,
@@ -54,6 +93,7 @@
             "qcount": 0,
             "qcomplete": true,
             "qcategory": null,
+            "qtooltip": "",
             "qcountfp": 0,
             "text": "Manual QA (complete segment)",
             "qtotal": 0,
@@ -65,6 +105,7 @@
             "qcount": 0,
             "qcomplete": true,
             "qcategory": null,
+            "qtooltip": "",
             "qcountfp": 0,
             "text": "Manual QA (inside segment)",
             "qtotal": 0,
@@ -77,7 +118,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "70513",
+                    "qid": "35787",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -88,7 +129,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "70509",
+                    "qid": "35783",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -99,7 +140,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "70515",
+                    "qid": "35789",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
@@ -111,6 +152,7 @@
                 }
             ],
             "qcategory": null,
+            "qtooltip": "",
             "qcountfp": 0,
             "text": "Terminology",
             "qtotal": 10,
@@ -122,6 +164,7 @@
             "qcount": 0,
             "qcomplete": true,
             "qcategory": null,
+            "qtooltip": "",
             "qcountfp": 0,
             "text": "Usage of TM-matches",
             "qtotal": 0,
@@ -129,7 +172,7 @@
         }
     ],
     "metaData": {
-        "numSegments": 12,
+        "numSegments": 15,
         "hasFaultyInternalTags": true
     }
 }

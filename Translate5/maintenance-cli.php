@@ -41,6 +41,7 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     DevelopmentRuntestCommand,
     LogCommand,
     MaintenanceAnnounceCommand,
+    MaintenanceNotifyCommand,
     MaintenanceCommand,
     MaintenanceDisableCommand,
     MaintenanceMessageCommand,
@@ -50,10 +51,12 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     PluginListCommand,
     ReleaseNotesCommand,
     SessionImpersonateCommand,
+    StatusCommand,
     SystemCheckCommand,
     SystemMailtestCommand,
     TaskCleanCommand,
     TermportalReindexCommand,
+    TermportalDatatypecheckCommand,
     UserCreateCommand,
     UserInfoCommand,
     WorkerListCommand,
@@ -68,6 +71,7 @@ $commands = [
     new DatabaseUpdateCommand(),
     new LogCommand(),
     new MaintenanceAnnounceCommand(),
+    new MaintenanceNotifyCommand(),
     new MaintenanceCommand(),
     new MaintenanceDisableCommand(),
     new MaintenanceMessageCommand(),
@@ -77,10 +81,12 @@ $commands = [
     new PluginListCommand(),
     new SegmentHistoryCommand(),
     new SessionImpersonateCommand(),
+    new StatusCommand(),
     new SystemCheckCommand(),
     new SystemMailtestCommand(),
     new TaskCleanCommand(),
     new TermportalReindexCommand(),
+    new TermportalDatatypecheckCommand(),
     new UserCreateCommand(),
     new UserInfoCommand(),
     new WorkerListCommand(),
@@ -93,6 +99,7 @@ if(file_exists('.git')) {
     $commands[] = new DevelopmentRuntestCommand();
     $commands[] = new ReleaseNotesCommand();
     $commands[] = new DevelopmentNewModelCommand();
+    $commands[] = new \Translate5\MaintenanceCli\Command\TmxTs1040Command();
 }
 $app->addCommands($commands);
 $app->run();

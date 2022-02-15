@@ -33,21 +33,6 @@ END LICENSE AND COPYRIGHT
  * Warning: the here listed public methods are called as configured in LEK_workflow_action table!
  */
 class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
-
-    /***
-     * Task log message for deadline notificiation
-     * @var string
-     */
-    const DEADLINE_NOTIFICATION_LOG_MESSAGE='Deadline notification send.';
-
-    /***
-     * How frequent do cron periodical action is triggered. This is required
-     * for the deadline periodical notification so we adjast the deadline date select arount
-     * this periond
-     * @var integer
-     */
-    const CRON_PERIODICAL_CALL_FREQUENCY_MIN=30;
-
     /**
      * @var ZfExtended_TemplateBasedMail
      */
@@ -730,22 +715,18 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param string $template: template to be used for the mail
      * @param bool $isApproaching: default will notify daysOffset before deadline
      */
-    protected function deadlineNotifier(stdClass $triggerConfig,string $template,bool $isApproaching=false) {
-
-        //if no receiverRole is defined, all roles will be used
-        $notifyRole=null;
-        if(isset($triggerConfig->receiverRole)){
-            $notifyRole=$triggerConfig->receiverRole;
-        }
-
+    protected function deadlineNotifier(stdClass $triggerConfig, string $template, bool $isApproaching=false) {
         if(isset($triggerConfig->template)){
             $template=$triggerConfig->template;
         }
 
-        $daysOffset=$triggerConfig->daysOffset ?? 1;
+        $deadlineHelper = ZfExtended_Factory::get('editor_Workflow_Actions_DeadlineHelper');
+        /* @var $deadlineHelper editor_Workflow_Actions_DeadlineHelper */
+
+        $deadlineHelper->init($this->config);
 
         //get all user assocs not notifiead
-        $tuas = $this->getDeadlineUnnotifiedAssocs($daysOffset, $isApproaching, $notifyRole);
+        $tuas = $deadlineHelper->getDeadlineUnnotifiedAssocs($triggerConfig, $isApproaching);
 
         if(empty($tuas)){
             return ;
@@ -772,121 +753,15 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             }
 
             $params = [
-                'task' => $this->config->task,
-                'taskUserAssoc'=>$tua,
-                'daysOffset'=>$daysOffset
+                'task'          =>  $this->config->task,
+                'taskUserAssoc' =>  $tua,
+                'daysOffset'    =>  $triggerConfig->daysOffset ?? 1
             ];
 
             $this->createNotification($tua['role'], $template, $params);
             $this->addCopyReceivers($triggerConfig, $tua['workflowStepName']);
             $this->notify($assoc);
-            $this->logDeadlineNotified($assoc,$this->generateDeadlineNotifiedMessage($isApproaching));
+            $deadlineHelper->logDeadlineNotified($assoc,$isApproaching);
         }
-    }
-
-
-    /***
-     * Get the deadline not notified assocs
-     *
-     * @param int $daysOffset
-     * @param bool $isApproaching
-     * @param $role
-     * @return array|array
-     */
-    protected function getDeadlineUnnotifiedAssocs(int $daysOffset, bool $isApproaching,$role=null) {
-        $symbol = $isApproaching ? '+' : '-';
-        //date select when this is triggered from the daily action
-        $dateSelect = 'DATE(tua.deadlineDate)=DATE(CURRENT_DATE) '.$symbol.' INTERVAL ? DAY';
-
-        if($this->config->trigger == 'doCronPeriodical'){
-            //the deadline check date will be between: "days offset date" +/- "cron periodical call frequency"
-            $dateSelect='tua.deadlineDate BETWEEN '.
-                ' DATE_SUB(NOW() '.$symbol.' INTERVAL ? DAY,INTERVAL '.Zend_Db_Table::getDefaultAdapter()->quote(self::CRON_PERIODICAL_CALL_FREQUENCY_MIN).' MINUTE)'.
-                ' AND '.
-                ' DATE_ADD(NOW() '.$symbol.' INTERVAL ? DAY,INTERVAL '.Zend_Db_Table::getDefaultAdapter()->quote(self::CRON_PERIODICAL_CALL_FREQUENCY_MIN).' MINUTE)';
-        }
-
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-
-        $db = Zend_Registry::get('db');
-        /* @var $db Zend_Db_Table */
-        $s = $db->select()
-        ->from(array('tua' => 'LEK_taskUserAssoc'))
-        ->join(array('u' => $user->db->info($user->db::NAME)),'tua.userGuid=u.userGuid',['userGuid', 'firstName', 'surName', 'gender', 'login', 'email', 'roles', 'locale'])
-        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid',[]);
-        if(!empty($role)){
-            $s->where('tua.role = ?', $role);
-        }
-        $s->where('tua.state != ?', $this->config->workflow::STATE_FINISH)
-        ->where('t.state = ?', editor_Models_Task::STATE_OPEN)
-        ->where($dateSelect, $daysOffset);
-        $tuas = $db->fetchAll($s);
-        if(empty($tuas)){
-            return [];
-        }
-        //filter out the notified assoc
-        return $this->checkDeadlineNotified($tuas,$this->generateDeadlineNotifiedMessage($isApproaching));
-    }
-
-    /***
-     * Filter out the task assocs from $assocs for which deadline notification is already send
-     * @param array $assocs
-     * @param string $message
-     * @return array
-     */
-    protected function checkDeadlineNotified(array $assocs,string $message) {
-        if(empty($assocs)){
-            return $assocs;
-        }
-        $jsonIds=array_map(function($row){
-            //in the db the task assoc is stored as json
-            return '["'.$row['id'].'"]';
-        }, $assocs);
-
-        $db = Zend_Registry::get('db');
-        /* @var $db Zend_Db_Table */
-
-        $s = $db->select()
-        ->from('LEK_task_log',['extra'])
-        ->where('message = ?',$message)
-        ->where('extra IN (?)', $jsonIds);
-        $tuas = $db->fetchAll($s);
-
-        if(empty($tuas)){
-            //no notifications send so far
-            return $assocs;
-        }
-
-        //remove already notified users
-        foreach ($tuas as $t){
-            $id=preg_replace('/[^0-9]/', '', $t['extra']);
-            $index = array_search($id, array_column($assocs, 'id'));
-            if($index!==false){
-                unset($assocs[$index]);
-            }
-        }
-        return $assocs;
-    }
-
-    /***
-     * Write deadline notifiead log entry into task log table
-     * @param array $tua
-     * @param string $message
-     */
-    protected function logDeadlineNotified(array $tua,string $message) {
-        $this->log->info('E1012', $message, [
-            $tua['id'],
-            'task'=>$this->config->task
-        ]);
-    }
-
-    /***
-     * Get the deadline log message based on the call source
-     * @param bool $isApproaching
-     * @return string
-     */
-    protected function generateDeadlineNotifiedMessage(bool $isApproaching){
-        return self::DEADLINE_NOTIFICATION_LOG_MESSAGE.($isApproaching ? 'DeadlineApproaching' : 'OverdueDeadline');
     }
 }

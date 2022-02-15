@@ -263,9 +263,9 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testmanager');
-        
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+
+        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
         //remove the created resources
-        self::$api->removeResources();
+        self::$api->cleanup && self::$api->removeResources();
     }
 }

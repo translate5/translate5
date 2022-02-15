@@ -71,6 +71,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         pmName: '#UT#Projektmanager',
         pmGuid: '#UT#Projektmanager',
         orderdate: '#UT#Bestelldatum',
+        enddate: '#UT#Enddatum',
         edit100PercentMatch: '#UT#100%-Treffer editierbar',
         fullMatchEdit: '#UT#Unveränderte 100% TM Matches sind editierbar',
         emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
@@ -116,6 +117,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         addFilterText: '#UT#Erweiterte Filter',
         jobStatus: '#UT#Job-Status',
         exelExportedTooltip: '#UT#Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.',
+        enddateTooltip: '#UT#Das Datum, wann der Projektmanager die Aufgabe beendet hat und nicht das Datum an dem einzelne Workflowschritte abgeschlossen wurden.',
         qualityErrorCount: '#UT#QS Fehler'
     },
     states: {
@@ -360,6 +362,16 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     menuDisabled: !Editor.app.authenticatedUser.isAllowed('editorTaskOverviewColumnMenu')
                 },
                 items: [{
+                    xtype: 'gridcolumn',
+                    width: 60,
+                    dataIndex: 'id',
+                    stateId: 'id',
+                    filter: {
+                        type: 'numeric'
+                    },
+                    text: 'id',
+                    text: me.text_cols.id
+                },{
                     text: me.text_cols.taskActions,
                     menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
                     stateId: 'taskGridActionColumn',
@@ -663,6 +675,17 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         },
                         text: me.text_cols.orderdate
                     }, {
+                        xtype: 'datecolumn',
+                        width: 100,
+                        dataIndex: 'enddate',
+                        stateId: 'enddate',
+                        filter: {
+                            type: 'date',
+                            dateFormat: Editor.DATE_ISO_FORMAT
+                        },
+                        tooltip: me.strings.enddateTooltip,
+                        text: me.text_cols.enddate
+                    }, {
                         xtype: 'owncheckcolumn',
                         width: 45,
                         cls: 'fullMatchEdit',
@@ -721,13 +744,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     tooltip: me.strings.reloadBtnTip
                 }, {
                     xtype: 'button',
-                    glyph: 'f067@FontAwesome5FreeSolid',
-                    itemId: 'add-project-btn',
-                    text: me.strings.addProject,
-                    hidden: !Editor.app.authenticatedUser.isAllowed('editorAddTask'),
-                    tooltip: me.strings.addProjectTip
-                }, {
-                    xtype: 'button',
                     itemId: 'addAdvanceFilterBtn',
                     glyph: 'f0b0@FontAwesome5FreeSolid',
                     text: me.strings.addFilterText,
@@ -768,16 +784,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
         if (Editor.data.debug && Editor.data.debug.showTaskGuid) {
             config.columns.items.unshift({
-                xtype: 'gridcolumn',
-                width: 60,
-                dataIndex: 'id',
-                stateId: 'id',
-                filter: {
-                    type: 'numeric'
-                },
-                text: 'id',
-                text: me.text_cols.id
-            }, {
                 xtype: 'gridcolumn',
                 width: 140,
                 dataIndex: 'taskGuid',
