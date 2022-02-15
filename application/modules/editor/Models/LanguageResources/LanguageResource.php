@@ -45,14 +45,21 @@ END LICENSE AND COPYRIGHT
  * @method void setServiceName() setServiceName(string $resName)
  * @method string getResourceType() getResourceType()  tm or mt
  * @method void setResourceType() setResourceType(string $resourceType)
+ * @method string getWriteSource() getWriteSource()
+ * @method void setWriteSource() setWriteSource(string $writeSource)
+ *
  */
 class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract {
     use editor_Models_Entity_SpecificDataTrait;
     
-    // set as match rate type when matchrate was changed
+    /***
+     * set as match rate type when match-rate was changed
+     */
     const MATCH_RATE_TYPE_EDITED = 'matchresourceusage';
     
-    //set by changealike editor
+    /***
+     * set by change alike editor
+     */
     const MATCH_RATE_TYPE_EDITED_AUTO = 'matchresourceusageauto';
     
     protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_LanguageResource';
