@@ -26,7 +26,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @class Editor.view.admin.TaskUpload
+ * @class Editor.view.admin.projectWizard.UploadGrid
  * @extends Ext.panel.Panel
  */
 Ext.define('Editor.view.admin.projectWizard.UploadGrid', {

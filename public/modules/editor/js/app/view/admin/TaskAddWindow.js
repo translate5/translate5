@@ -36,7 +36,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.admin.config.ConfigWizard',
         'Editor.view.admin.task.UserAssocWizard',
         'Editor.view.admin.task.UserAssocWizardViewModel',
-        'Editor.view.admin.projectWizard.UploadGrid',
+        'Editor.view.admin.projectWizard.UploadTabPanel',
         'Editor.view.admin.TaskAddWindowViewController'
     ],
     mixins:[
@@ -211,7 +211,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     anchor: '100%'
                                 },
                                 items: [{
-                                    xtype: 'wizardUploadGrid',
+                                    xtype: 'uploadTabPanel',
                                     margin: '0 0 10 0'
                                 },{
                                     xtype: 'container',
