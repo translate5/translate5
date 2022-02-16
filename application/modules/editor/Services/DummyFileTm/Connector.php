@@ -208,13 +208,13 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @param string $target
      */
     protected function makeMatch($queryString, $source, $target) {
-        $source = $this->tagHandler->restoreInResult($source);
-        $target = $this->tagHandler->restoreInResult($target);
         $percent = 0;
         similar_text($queryString, $source, $percent);
         if($percent < 80) {
             return;
         }
+        $source = $this->tagHandler->restoreInResult($source);
+        $target = $this->tagHandler->restoreInResult($target);
         $this->resultList->addResult($target, $percent);
         $this->resultList->setSource($source);
         $this->resultList->setAttributes('Attributes: can be empty when service does not provide attributes. If not empty, then already preformatted for tooltipping!');
