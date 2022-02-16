@@ -102,7 +102,7 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
         $errorMsg = '';
         // check here the loaded XML content, if it is XLF everything is ok, since we extend the Xlf parser
         // if it is another (not supported) XML type we throw an exception
-        if(strpos($fileHead,'<!DOCTYPE Book SYSTEM "TRANSLATE_DISPLAYTEXTS.dtd">') === false) {
+        if(strpos($fileHead,'<!DOCTYPE Book SYSTEM "TRANSLATE_DISPLAYTEXTS.dtd"') === false) {
             $errorMsg = 'File is no doctype Book SYSTEM TRANSLATE_DISPLAYTEXTS.dtd!';
             return false;
         }
