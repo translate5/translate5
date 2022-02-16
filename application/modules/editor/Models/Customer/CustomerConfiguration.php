@@ -54,7 +54,7 @@ END LICENSE AND COPYRIGHT
  * 
  * 
 */
-class editor_Models_CustomerConfiguration extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_Customer_CustomerConfiguration extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_CustomerConfiguration';
     protected $validatorInstanceClass   = 'editor_Models_Validator_CustomerConfiguration';
     

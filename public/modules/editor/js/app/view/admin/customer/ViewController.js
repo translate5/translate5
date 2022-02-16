@@ -71,6 +71,21 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         this.exportCustomerResourceUsage(record && record.get('id'));
     },
 
+    /***
+     *
+     * @param view
+     * @param cell
+     * @param row
+     * @param col
+     * @param ev
+     * @param record
+     */
+    onCopyActionClick:function(view, cell, row, col, ev, record) {
+        var win = Ext.create('Editor.view.admin.customer.CopyWindow');
+        win.setRecord(record);
+        win.show();
+    },
+
     /**
      * Save record
      */
@@ -277,6 +292,5 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         });
 
         window.open(url);
-    }
-
+    },
 });
