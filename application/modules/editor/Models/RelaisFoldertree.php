@@ -110,10 +110,16 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
         	parent::handleFile($child, $path);
     	    return;
     	}
+
     	$filepath = $path.$child->filename;
     	$fullpath = $this->relaisRootPath.DIRECTORY_SEPARATOR.ZfExtended_Utils::filesystemEncode($filepath);
+
         if(empty($child->relaisFileStatus)){
-            $child->relaisFileStatus = file_exists($fullpath) ? self::RELAIS_NOT_IMPORTED : self::RELAIS_NOT_FOUND;
+            // check if relais file exist in the given path. This check will also apply fizzy name matching
+            $child->relaisFileStatus = $this->pivotFileExist($fullpath,$child);
+            // update the $filepath and $fullpath, the child filename can be changed in the fileExist method
+            $filepath = $path.$child->filename;
+            $fullpath = $this->relaisRootPath.DIRECTORY_SEPARATOR.ZfExtended_Utils::filesystemEncode($filepath);
         }
 
         //here can invoke import filters to manipulate the file information, needed for example if the filename changes and therefore the filename based relais file matching would fail.
@@ -125,12 +131,41 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
             'taskGuid' => $this->getTaskGuid(),
             'importConfig' => $this->importConfig//INFO:(TRANSLATE-1596)Afte we remove the depricate support for proofRead this can be removed
         ));
+        // update the $filepath since it can be changed in customHandleFile event handlers
         $filepath = $path.$child->filename;
         
         //stores the handled file in the internal path array (which is returned filtered later)
         parent::handleFile($child, $path);
         $this->collectMissingFile($path, $child);
         $this->relaisFilesStati[$this->_pathPrefix.DIRECTORY_SEPARATOR.$filepath] = $child->relaisFileStatus;
+    }
+
+    /***
+     * Check if relais file exist in the given path. This will also try to find relais file matching until the firs ".".
+     * If fuzzy match is found, $child->filename will be set with the name of the match.
+     *
+     * ex: ex: my-test-project.de-en.xlf will match my-test-project.de-it.xlf
+     *
+     * @param string $fullPath
+     * @param stdClass $child
+     * @return int
+     */
+    private function pivotFileExist(string $fullPath,stdClass $child): int
+    {
+        if(file_exists($fullPath)){
+            return self::RELAIS_NOT_IMPORTED;
+        }
+        // if the file does not exist in the given path, try to match a name until the first "."
+        $fileInfo = pathinfo($fullPath);
+        $filterName = explode('.',$fileInfo['filename'])[0];
+        $nameToCheck = $fileInfo['dirname'].DIRECTORY_SEPARATOR.$filterName.'.*.'.$fileInfo['extension'];
+        $matches = glob($nameToCheck);
+        if(empty($matches)){
+            return self::RELAIS_NOT_FOUND;
+        }
+        // update the filename of the child to the matched "fuzzy" name
+        $child->filename = ZfExtended_Utils::filesystemEncode(basename($matches[0]));
+        return self::RELAIS_NOT_IMPORTED;
     }
     
     /**

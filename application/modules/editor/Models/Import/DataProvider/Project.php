@@ -62,6 +62,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
 
     /**
      * (non-PHPdoc)
+     * @throws editor_Models_Import_DataProvider_Exception|ZfExtended_ErrorCodeException
      * @see editor_Models_Import_DataProvider_Abstract::checkAndPrepare()
      */
     public function checkAndPrepare(editor_Models_Task $task) {
@@ -115,7 +116,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         }
 
         $pivotFiles = [];
-        // find all matching pivot files
+        // check for pivot and reference files
         for($i=0;$i<count($importFilesValues);$i++){
             if($this->isPivotFileMatch($i)){
                 foreach($matchingFiles as $fileName) {
@@ -295,7 +296,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      */
     protected function filesMatch(string $workFile, string $pivotFile): bool
     {
-        if($workFile === $pivotFile){
+        if(editor_Utils::compareImportStyleFileName($workFile,$pivotFile)){
             return true;
         }
         $ext = pathinfo($workFile,PATHINFO_EXTENSION);

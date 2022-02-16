@@ -311,28 +311,15 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     },
 
     /***
-     * Check if the workFile and the pivotFiles names are the same.
-     * If the workFile uses okapi parser, we add .xlf as additional extension, since this will be the final
-     * filename which will be matched for pivot patch
-     *
+     * Check if the workfile-name and the pivot file-name are matching.
+     *  The files are equal when the names are matching until the first “.“.
+     *  ex: my-test-project.de-en.xlf will match my-test-project.de-it.xlf
      * @param workFile
      * @param pivotFile
      * @returns {*|boolean|boolean}
      */
     filesMatch: function(workFile,pivotFile){
-        if(workFile === pivotFile){
-            return true;
-        }
-        var ext = Editor.util.Util.getFileExtension(workFile),
-            supported = false;
-
-        // if the workFile has native parser and the files are not matched by name then those files have different name
-        if(Ext.Array.contains(Editor.data.import.nativeParserExtensions,ext)){
-            return false;
-        }
-        // if the extension is supported, this file will be processed by okapi
-        supported = Ext.Array.contains(Editor.data.import.validExtensions,ext);
-        return supported && (workFile+'.xlf' === pivotFile);
+        return Editor.util.Util.compareImportStyleFileName(workFile,pivotFile);
     },
 
     /***
