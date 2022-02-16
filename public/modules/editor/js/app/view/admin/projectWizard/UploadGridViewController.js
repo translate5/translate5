@@ -58,6 +58,10 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         this.addFilesToStore(btn.fileInputEl.dom.files, Editor.model.admin.projectWizard.File.TYPE_PIVOT);
     },
 
+    onManualAddReference: function(btn) {
+        this.addFilesToStore(btn.fileInputEl.dom.files, Editor.model.admin.projectWizard.File.TYPE_REFERENCE);
+    },
+
     onDrop: function(e) {
         e.stopEvent();
         var me = this,
@@ -135,6 +139,13 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                     type: type,
                     error: null
                 });
+
+            // no validation is needed for reference files, everything is allowed to be set as reference file
+            if(rec.get('type') === Editor.model.admin.projectWizard.File.TYPE_REFERENCE){
+                rec.commit();
+                store.addSorted(rec);
+                return true;
+            }
 
             if(!Ext.Array.contains(Editor.data.import.validExtensions,rec.getExtension())){
                 new Ext.util.DelayedTask(function(){
@@ -437,6 +448,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                 return Editor.model.admin.projectWizard.File.TYPE_WORKFILES;
             case 'pivotFilesFilesButton':
                 return Editor.model.admin.projectWizard.File.TYPE_PIVOT;
+            case 'referenceFilesFilesButton':
+                return Editor.model.admin.projectWizard.File.TYPE_REFERENCE;
             default:
                 return Editor.model.admin.projectWizard.File.TYPE_WORKFILES;
         }

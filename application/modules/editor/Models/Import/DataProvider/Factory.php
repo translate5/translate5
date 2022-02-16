@@ -61,6 +61,7 @@ class editor_Models_Import_DataProvider_Factory {
     /**
      * Determines which UploadProcessor should be used for uploaded data, creates and returns it
      * @param editor_Models_Import_UploadProcessor $upload
+     * @param array $data post request data
      * @return editor_Models_Import_DataProvider_Abstract
      */
     public function createFromUpload(editor_Models_Import_UploadProcessor $upload, array $data = []): editor_Models_Import_DataProvider_Abstract {

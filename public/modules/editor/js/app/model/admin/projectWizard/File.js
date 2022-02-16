@@ -37,6 +37,7 @@ Ext.define('Editor.model.admin.projectWizard.File', {
         TYPE_ERROR: 'error',
         TYPE_PIVOT: 'pivot',
         TYPE_WORKFILES: 'workfiles',
+        TYPE_REFERENCE: 'reference',
     },
 
     fields: [{

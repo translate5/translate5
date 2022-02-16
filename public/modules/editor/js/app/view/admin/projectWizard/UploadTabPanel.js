@@ -35,8 +35,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadTabPanel', {
         'Editor.view.admin.projectWizard.UploadGrid'
     ],
 
-    strings:{
-    },
+    layout:'fit',
 
     initConfig: function(instanceConfig) {
         var me = this,

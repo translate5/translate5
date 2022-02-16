@@ -75,7 +75,9 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         workFilesTypeText:'#UT#Arbeitsdatei',
         pivotFilesTypeText:'#UT#Pivot-Datei',
         addFilesDefaultTooltip: '#UT#Datei(en) hinzufügen',
-        fileMix:'#UT#Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!'
+        fileMix:'#UT#Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!',
+        referenceFilesFilesButton:'#UT#Referenz-Dateien(en) hinzufügen',
+        referenceFilesTypeText:'#UT#Referenz-Datei'
     },
 
     initConfig: function(instanceConfig) {
@@ -107,6 +109,18 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     },
                     listeners: {
                         change: 'onManualAddPivot'
+                    }
+                },{
+                    xtype: 'wizardFileButton',
+                    text: me.strings.referenceFilesFilesButton,
+                    name:'referenceFilesFilesButton',
+                    tooltip:me.strings.fileMix,
+                    componentCls: 'disabledButtonTooltip',
+                    bind: {
+                        disabled: '{isZipUpload}'
+                    },
+                    listeners: {
+                        change: 'onManualAddReference'
                     }
                 },{
                     xtype: 'tbseparator'
@@ -241,6 +255,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                 return me.strings.workFilesTypeText;
             case Editor.model.admin.projectWizard.File.TYPE_PIVOT:
                 return me.strings.pivotFilesTypeText;
+            case Editor.model.admin.projectWizard.File.TYPE_REFERENCE:
+                return me.strings.referenceFilesTypeText;
         }
         return val;
     },
