@@ -105,7 +105,7 @@ class editor_Models_Segment_RepetitionUpdater {
         // if the original (mostly target) is empty use the tags from source
         // also do that if the repeated segment was pretranslated, since
         $useSourceTags = ZfExtended_Utils::emptyString($originalContent);
-        
+
         //get only the real tags, we do not consider whitespace tags in repetitions,
         // this is because whitespace belongs to the content and not to the segment (tags instead belong to the segment)
         // if the original had no content (mostly translation context), we have to load the source tags.
