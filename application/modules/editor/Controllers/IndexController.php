@@ -706,42 +706,28 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         header_remove('Cache-Control');
         header_remove('Expires');
         header_remove('Pragma');
-        header_remove('X-Powered-By'); //FIXME: this is configurable in php.ini via 'expose_php = Off'
-        
-        /* Caching Identifier
-        * $etag - version number of release. Can only be updated by sending whole resource again
-        * In dev mode use mtime to simulate new version on file change.
-        */
+
         $version = ZfExtended_Utils::getAppVersion();
-        $etag = ($version !== 'development') ? $version : strval($publicFile->getMTime());
-        $etagClient = $_SERVER['HTTP_IF_NONE_MATCH'] ?? -1;
-        if($etagClient === $etag){
+        if($version === 'development'){
+            $version = $publicFile->getMTime();  // changed file means new version
+        }
+        if($_SERVER['HTTP_IF_NONE_MATCH']??-1 == $version){ // compare Etag. We use version number to fetch file every release.
             header('HTTP/1.1 304 Not Modified');
             exit;
         }
-        // Version has changed, update etag on clientside
-        header('Etag: '.$etag);
 
-        /* Set caching behaviour.
-        * - Default to 10 hours == 36000s to revalidate daily for new release
-        * - In dev mode revalidate always
-        * - "Never" (== yearly == 31536000s) revalidate immutable resources
-        * Cf. https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching 
-        */
-        $cacheBehaviour = ($version !== 'development') ? 'max-age=36000, must-revalidate' : 'no-cache';
-        $disableCacheParam = ($version === 'development') ? null : $this->getParam('_dc'); // e.g. 5.6.0. Most js files will have one; css not.
-        if (
-            $disableCacheParam // The param will change with a new release and query an updated version
-            || 
-            (str_starts_with($requestedType, 'visualReview-t') // The outputs of pdf2HtmlEx will never change, e.g visualReview-t123/VisualReview/bg1.png
-                && $extension !== 'html') // FIXME: Planned feature of editable segments could change review.html
-            ) { 
-            $cacheBehaviour = ' max-age=31536000, immutable';
+        $isStaticVRFile = (str_starts_with($requestedType, 'visualReview-t') && $extension !== 'html'); // pdfconverter outputs that will never change
+        if($version === 'development' && !$isStaticVRFile){
+            $cacheBehaviour = 'no-cache'; // check for new version always
+        } else if ($isStaticVRFile || $this->getParam('_dc')){ // refreshed through url (plugin js)
+            $cacheBehaviour = 'max-age=31536000, immutable'; // check after 1 year aka 'never'
+        } else {
+            $cacheBehaviour = 'max-age=36000, must-revalidate'; // check after 10 hours (plugin css/png, VR/scroller.js)
         }
-        header('Cache-Control: ' . $cacheBehaviour);
-        header('Content-Length: '.($publicFile->getSize() ?: ''));
-        header('Last-Modified: '.gmdate('D, d M Y H:i:s', $publicFile->getMtime()).' GMT');
 
+        header('Etag: '.$version);
+        header('Cache-Control: '.$cacheBehaviour);
+        header('Content-Length: '.$publicFile->getSize());
         readfile($publicFile);
         exit;
     }
