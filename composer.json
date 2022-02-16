@@ -89,7 +89,8 @@
 		"jquery/jquery-ui": "1.13.0",
 		"translate5/instanttranslate-roboto-font": "26",
 		"axelbecher/material-design-icons": "^1.0",
-		"wilsonglasser/spout": "^3.0"
+		"wilsonglasser/spout": "^3.0",
+		"setasign/tfpdf": "1.32"
 	},
 	"extra" : {
 		"merge-plugin" : {
