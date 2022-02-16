@@ -29,6 +29,10 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.wizardUploadGrid',
 
+    data:{
+        uploadErrorMsg:null
+    },
+
     stores: {
         files: {
             model:'Editor.model.admin.projectWizard.File',
