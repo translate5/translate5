@@ -102,6 +102,29 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         bind: {
                             store: 'customersStore'
                         },
+                        listeners: {
+                            itemdblclick: {
+                                fn: 'dblclick',
+                                scope: 'controller'
+                            },
+                            select: {
+                                fn: 'customerGridSelect',
+                                scope: 'controller'
+                            }
+                        },
+                        selModel: {
+                            selType: 'rowmodel'
+                        },
+                        plugins: [
+                            {
+                                ptype: 'gridfilters'
+                            }
+                        ],
+                        viewConfig: {
+                            listeners: {
+                                beforerefresh: 'onViewBeforeRefresh'
+                            }
+                        },
                         columns: [{
                                 xtype: 'gridcolumn',
                                 dataIndex: 'id',
@@ -151,26 +174,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     type: 'string'
                                 }
                             }
-                        ],
-                        listeners: {
-                            itemdblclick: {
-                                fn: 'dblclick',
-                                scope: 'controller'
-                            }
-                        },
-                        selModel: {
-                            selType: 'rowmodel'
-                        },
-                        plugins: [
-                            {
-                                ptype: 'gridfilters'
-                            }
-                        ],
-                        viewConfig: {
-                            listeners: {
-                                beforerefresh: 'onViewBeforeRefresh'
-                            }
-                        }
+                        ]
                     },{
                         xtype: 'tabpanel',
                         flex: 0.7,

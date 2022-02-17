@@ -58,6 +58,13 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     },
 
     /***
+     * Customer grid row select handler
+     */
+    customerGridSelect: function(grid, record){
+        this.editCustomer(record);
+    },
+
+    /***
      * Action icon "edit customer" event handler
      */
     onCustomerEditClick:function(view, cell, row, col, ev, record) {
