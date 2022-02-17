@@ -106,6 +106,7 @@ Ext.define('Editor.view.admin.customer.CopyWindowViewController', {
             unmaskAndClose = function (){
                 if(view && view.isMasked()){
                     view.unmask();
+                    Editor.MessageBox.addSuccess(view.strings.copySuccess);
                     view.destroy();
                 }
             };
