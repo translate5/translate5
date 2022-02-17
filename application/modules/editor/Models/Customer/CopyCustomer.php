@@ -45,6 +45,7 @@ class editor_Models_Customer_CopyCustomer {
 
         $adapter = $model->db->getAdapter();
 
+        // when we copy from one to another customer, all existing assignments for the target customer must be removed
         $sql = "DELETE FROM LEK_user_assoc_default where customerId = ?";
         // delete all user associations for the target customer
         $adapter->query($sql,[$target]);
