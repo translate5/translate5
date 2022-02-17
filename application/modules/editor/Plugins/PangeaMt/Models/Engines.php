@@ -86,8 +86,8 @@ class editor_Plugins_PangeaMt_Models_Engines {
         $service = ZfExtended_Factory::get('editor_Plugins_PangeaMt_Service');
         /* @var $service editor_Plugins_PangeaMt_Service */
         
-        $customer=ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $customer editor_Models_Customer */
+        $customer=ZfExtended_Factory::get('editor_Models_Customer_Customer');
+        /* @var $customer editor_Models_Customer_Customer */
         $customerLimit=$customer->getMinCharactersByUser();
         //if the customer config is not defined, set the customer limit to max int, so it is compared against engine limit
         if($customerLimit < 1){

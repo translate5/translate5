@@ -1,3 +1,4 @@
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -25,25 +26,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.projectWizard.UploadGridViewModel', {
+Ext.define('Editor.view.admin.customer.CopyWindowViewModel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.wizardUploadGrid',
+    alias: 'viewmodel.copyCustomerWindow',
 
-    data:{
-        uploadErrorMsg:null
-    },
-
-    stores: {
-        files: {
-            model:'Editor.model.admin.projectWizard.File',
-            sorters: [{
-                sorterFn: function(record1, record2) {
-                    var name1 = Ext.StoreMgr.get('admin.Languages').getRfcById(record1.data.targetLang),
-                        name2 = Ext.StoreMgr.get('admin.Languages').getRfcById(record2.data.targetLang);
-                    return name1 > name2 ? 1 : (name1 === name2) ? 0 : -1;
-                },
-                direction: 'ASC'
-            }]
+    stores:{
+        copyCustomers:{
+            model:'Editor.model.admin.Customer',
+            pageSize: 0,
+            autoLoad:true,
+            listeners: {
+                load:'onCopyCustomersStoreLoad'
+            }
         }
     }
 });
