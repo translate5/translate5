@@ -2091,6 +2091,16 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RGF0ZWkoZW4pIGhpbnp1ZsO8Z2Vu'><source>Datei(en) hinzufügen</source><target>Datei(en) hinzufügen</target></trans-unit>
 <trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbikgaGluenVmw7xnZW4='><source>Referenz-Dateien(en) hinzufügen</source><target>Referenz-Dateien(en) hinzufügen</target></trans-unit>
 <trans-unit id='UmVmZXJlbnotRGF0ZWk='><source>Referenz-Datei</source><target>Referenz-Datei</target></trans-unit>
+<trans-unit id='S3VuZGVuZWluc3RlbGx1bmdlbiBpbiBkZW4gYWt0dWVsbGVuIEt1bmRlbiDDvGJlcm5laG1lbg=='><source>Kundeneinstellungen in den aktuellen Kunden übernehmen</source><target>Kundeneinstellungen in den aktuellen Kunden übernehmen</target></trans-unit>
+<trans-unit id='U3RhbmRhcmQtQmVudXR6ZXJ6dXdlaXN1bmdlbiBrb3BpZXJlbiB2b24='><source>Standard-Benutzerzuweisungen kopieren von</source><target>Standard-Benutzerzuweisungen kopieren von</target></trans-unit>
+<trans-unit id='QWxsZSBTdGFuZGFyZC1CZW51dHplcnp1d2Vpc3VuZ2VuIGRlcyBhdXNnZXfDpGhsdGVuIEt1bmRlbiwgZWluc2NobGllw59saWNoIGRlcyBhdXNnZXfDpGhsdGVuIE1laHJiZW51dHplcm1vZHVzIHVuZCBXb3JrZmxvd3MsIGluIGRlbiBha3R1ZWxsZW4gS3VuZGVuIGtvcGllcmVu'><source>Alle Standard-Benutzerzuweisungen des ausgewählten Kunden, einschließlich des ausgewählten Mehrbenutzermodus und Workflows, in den aktuellen Kunden kopieren</source><target>Alle Standard-Benutzerzuweisungen des ausgewählten Kunden, einschließlich des ausgewählten Mehrbenutzermodus und Workflows, in den aktuellen Kunden kopieren</target></trans-unit>
+<trans-unit id='S29uZmlndXJhdGlvbmVuIGtvcGllcmVuIHZvbg=='><source>Konfigurationen kopieren von</source><target>Konfigurationen kopieren von</target></trans-unit>
+<trans-unit id='QWxsZSDDvGJlcnNjaHJpZWJlbmVuIFN5c3RlbWtvbmZpZ3VyYXRpb25lbiBkZXMgYXVzZ2V3w6RobHRlbiBLdW5kZW4gaW4gZGVuIGFrdHVlbGxlbiBLdW5kZW4ga29waWVyZW4='><source>Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren</source><target>Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren</target></trans-unit>
+<trans-unit id='S29waWVyZW4gZXJmb2xncmVpY2g='><source>Kopieren erfolgreich</source><target>Kopieren erfolgreich</target></trans-unit>
+<trans-unit id='S29waWVyZW4gdm9u'><source>Kopieren von</source><target>Kopieren von</target></trans-unit>
+<trans-unit id='RGFkdXJjaCB3ZXJkZW4gYWxsZSB6dXZvciBrb25maWd1cmllcnRlbiBXZXJ0ZSBlbnRmZXJudC4='><source>Dadurch werden alle zuvor konfigurierten Werte entfernt.</source><target>Dadurch werden alle zuvor konfigurierten Werte entfernt.</target></trans-unit>
+<trans-unit id='QXVzd2FobCBzcGVpY2hlcm4='><source>Auswahl speichern</source><target>Auswahl speichern</target></trans-unit>
+<trans-unit id='TWluZGVzdGVucyBlaW4gS3VuZGUgbXVzcyBhdXNnZXfDpGhsdCBzZWlu'><source>Mindestens ein Kunde muss ausgewählt sein</source><target>Mindestens ein Kunde muss ausgewählt sein</target></trans-unit>
   </body>
  </file>
 </xliff>

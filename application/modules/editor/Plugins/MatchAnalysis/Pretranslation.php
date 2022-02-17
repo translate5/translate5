@@ -155,13 +155,16 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $dummyTargetText = self::renderDummyTargetText($this->task->getTaskGuid());
         return str_contains($segmentContent, $dummyTargetText);
     }
-    
+
     /***
      * Use the given TM analyse (or MT if analyse was empty) result to update the segment
      * Update the segment only if it is not TRANSLATED
      *
      * @param editor_Models_Segment $segment
      * @param stdClass $result - match resources result
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
     protected function updateSegment(editor_Models_Segment $segment, $result){
         
@@ -211,7 +214,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             $targetResult = $this->internalTag->removeIgnoredTags($targetResult);
             $segment->setMatchRate($result->matchrate);
             $matchrateType->initPretranslated($languageResource->getResourceType(), $type);
-            //negated explanation is easier: lock the pretranslations if 100 matches in the task are not editable
+
+            //negated explanation is easier: lock the pretranslations if 100 matches in the task are not editable,
             $segment->setEditable($result->matchrate < 100 || $this->task->getEdit100PercentMatch());
         }
         else {

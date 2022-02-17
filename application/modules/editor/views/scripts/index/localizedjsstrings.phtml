@@ -1572,6 +1572,20 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
+    Ext.define("Editor.locale.view.admin.customer.CopyWindow", {
+        override: "Editor.view.admin.customer.CopyWindow",
+        strings: {
+            title:'<?php echo $this->translate->_("Kundeneinstellungen in den aktuellen Kunden übernehmen");?>',
+            copyUserAssocLabel:'<?php echo $this->translate->_("Standard-Benutzerzuweisungen kopieren von");?>',
+            copyUserAssocTooltip:'<?php echo $this->translate->_("Alle Standard-Benutzerzuweisungen des ausgewählten Kunden, einschließlich des ausgewählten Mehrbenutzermodus und Workflows, in den aktuellen Kunden kopieren");?>',
+            copyConfigLabel:'<?php echo $this->translate->_("Konfigurationen kopieren von");?>',
+            copyConfigTooltip:'<?php echo $this->translate->_("Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren");?>',
+            copySuccess:'<?php echo $this->translate->_("Kopieren erfolgreich");?>',
+            copyFromText:'<?php echo $this->translate->_("Kopieren von");?>',
+            copyBtnText:'<?php echo $this->translate->_("Kopieren");?>',
+            noCustomerSelected:'<?php echo $this->translate->_("Mindestens ein Kunde muss ausgewählt sein");?>'
+        }
+    });
 
     Ext.define("Editor.locale.view.admin.customer.OpenIdPanel", {
     	override: "Editor.view.admin.customer.OpenIdPanel",

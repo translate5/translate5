@@ -131,6 +131,14 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     bind: {
                         disabled: '{!uploadgrid.selection}'
                     }
+                },{
+                    xtype:'displayfield',
+                    fieldLabel:false,
+                    fieldCls:'redTextColumn',
+                    bind:{
+                        value : '{uploadErrorMsg}',
+                        hidden: '{!uploadErrorMsg}'
+                    }
                 }],
                 viewConfig: {
                     emptyText: me.strings.gridEmptyText,
@@ -224,8 +232,11 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
             return;
         }
         var me = this,
-            gridview  = me.getView();
+            gridview  = me.getView(),
+            tpl = Ext.isArray(error) ? error.join('<br/>') : error;
+
         gridview.addCls('invalidGridBorder');
+        me.getViewModel().set('uploadErrorMsg',tpl);
         gridview.refresh();
     },
 
@@ -236,6 +247,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         var me = this,
             gridview  = me.getView();
         gridview.removeCls('invalidGridBorder');
+        me.getViewModel().set('uploadErrorMsg',null);
     },
 
     /***

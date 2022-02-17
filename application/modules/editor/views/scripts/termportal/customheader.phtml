@@ -1,3 +1,4 @@
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -24,26 +25,11 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+/* @var $this Zend_View */
+?>
+<img src="/images/translate5.png?v=1" style="width: 80px;height: 55px;"/>
 
-Ext.define('Editor.view.admin.projectWizard.UploadGridViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.wizardUploadGrid',
+<!--<script type="text/javascript">-->
+<!--    alert('test');-->
+<!--</script>-->
 
-    data:{
-        uploadErrorMsg:null
-    },
-
-    stores: {
-        files: {
-            model:'Editor.model.admin.projectWizard.File',
-            sorters: [{
-                sorterFn: function(record1, record2) {
-                    var name1 = Ext.StoreMgr.get('admin.Languages').getRfcById(record1.data.targetLang),
-                        name2 = Ext.StoreMgr.get('admin.Languages').getRfcById(record2.data.targetLang);
-                    return name1 > name2 ? 1 : (name1 === name2) ? 0 : -1;
-                },
-                direction: 'ASC'
-            }]
-        }
-    }
-});

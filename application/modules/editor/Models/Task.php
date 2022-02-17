@@ -213,12 +213,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * access customer instances in a cached way
      * @param int $id
-     * @return editor_Models_Customer
+     * @return editor_Models_Customer_Customer
      */
-    protected function _getCachedCustomer(int $id): editor_Models_Customer {
+    protected function _getCachedCustomer(int $id): editor_Models_Customer_Customer {
         if(empty(self::$customerCache[$id])) {
-            $customer = ZfExtended_Factory::get('editor_Models_Customer');
-            /* @var $customer editor_Models_Customer */
+            $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+            /* @var $customer editor_Models_Customer_Customer */
             $customer->load($id);
             self::$customerCache[$id] = $customer;
         }

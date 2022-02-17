@@ -57,6 +57,13 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
 
+        // remove all assigned users if the task is in state error
+        if($task->isErroneous()){
+            /** @var editor_Models_TaskUserAssoc $assoc */
+            $assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+            $assoc->deleteByTaskGuid($task->getTaskGuid());
+        }
+
         $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $workflowManager editor_Workflow_Manager */
         //we have to initialize the workflow so that it can listen to further events (like importCompleted)
