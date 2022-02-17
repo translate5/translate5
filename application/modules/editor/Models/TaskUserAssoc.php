@@ -423,6 +423,17 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
     }
 
+    /***
+     * Delete all user association for given taskGuid
+     * @return void
+     */
+    public function deleteByTaskGuid(string $taskGuid){
+        $this->db->delete([
+            'taskGuid = ?' => $taskGuid
+        ]);
+        $this->updateTask($taskGuid);
+    }
+
     /**
      * updates the task table count field
      */

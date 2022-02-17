@@ -466,8 +466,8 @@ class editor_TaskController extends ZfExtended_RestController {
             return [];
         }
 
-        $customer = ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $customer editor_Models_Customer */
+        $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+        /* @var $customer editor_Models_Customer_Customer */
         $customerData = $customer->loadByIds($customerIds);
         return array_combine(array_column($customerData, 'id'), array_column($customerData, 'name'));
     }
@@ -656,11 +656,11 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * Loads the customer by id, or number, or the default customer
      * stores the customerid internally and in this->data
-     * @return editor_Models_Customer the loaded customer if any
+     * @return editor_Models_Customer_Customer the loaded customer if any
      */
-    protected function prepareCustomer(): ?editor_Models_Customer {
-        $result = $customer = ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $customer editor_Models_Customer */
+    protected function prepareCustomer(): ?editor_Models_Customer_Customer {
+        $result = $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+        /* @var $customer editor_Models_Customer_Customer */
 
         if(empty($this->data['customerId'])) {
             $customer->loadByDefaultCustomer();

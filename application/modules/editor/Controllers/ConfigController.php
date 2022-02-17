@@ -165,8 +165,8 @@ class editor_ConfigController extends ZfExtended_RestController {
                 ];
                 break;
             case $this->entity::CONFIG_LEVEL_CUSTOMER:
-                $customerConfig=ZfExtended_Factory::get('editor_Models_CustomerConfig');
-                /* @var $customerConfig editor_Models_CustomerConfig */
+                $customerConfig=ZfExtended_Factory::get('editor_Models_Customer_CustomerConfig');
+                /* @var $customerConfig editor_Models_Customer_CustomerConfig */
                 $oldValue = $customerConfig->getCurrentValue($customerId, $this->data->name);
                 $customerConfig->updateInsertConfig($customerId,$this->data->name,$value);
                 //this value may not be saved! It is just for setting the return value to the gui.

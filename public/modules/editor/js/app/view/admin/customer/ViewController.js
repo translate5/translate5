@@ -58,6 +58,13 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     },
 
     /***
+     * Customer grid row select handler
+     */
+    customerGridSelect: function(grid, record){
+        this.editCustomer(record);
+    },
+
+    /***
      * Action icon "edit customer" event handler
      */
     onCustomerEditClick:function(view, cell, row, col, ev, record) {
@@ -69,6 +76,21 @@ Ext.define('Editor.view.admin.customer.ViewController', {
      */
     onTmExportClick:function(view, cell, row, col, ev, record) {
         this.exportCustomerResourceUsage(record && record.get('id'));
+    },
+
+    /***
+     *
+     * @param view
+     * @param cell
+     * @param row
+     * @param col
+     * @param ev
+     * @param record
+     */
+    onCopyActionClick:function(view, cell, row, col, ev, record) {
+        var win = Ext.create('Editor.view.admin.customer.CopyWindow');
+        win.setRecord(record);
+        win.show();
     },
 
     /**
@@ -277,6 +299,5 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         });
 
         window.open(url);
-    }
-
+    },
 });

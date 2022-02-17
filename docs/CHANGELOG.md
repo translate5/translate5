@@ -18,6 +18,58 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.6.1] - 2022-02-09
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-2810](https://jira.translate5.net/browse/TRANSLATE-2810): TermPortal - All roles should be able to see all terms with all process status.** <br>
+unprocessed-terms are now searchable even if user has no termProposer-role
+
+**[TRANSLATE-2809](https://jira.translate5.net/browse/TRANSLATE-2809): TermPortal - Reimport term should be only possible for tasks created by the Term-Translation workflow** <br>
+Reimport of terms back to their TermCollections is possible only for task, created via TermPortal terms transfer function
+
+
+### Bugfixes
+**[TRANSLATE-2825](https://jira.translate5.net/browse/TRANSLATE-2825): Task Management - Multiple files with multiple pivot files can not be uploaded** <br>
+Multiple files with multiple pivot files can not be added in the task creation wizard. The pivot files are marked as invalid.
+
+**[TRANSLATE-2824](https://jira.translate5.net/browse/TRANSLATE-2824): Okapi integration - Enable aggressive tag clean-up in Okapi for MS Office files by default** <br>
+Office often creates an incredible mess with inline tags, if users edit with character based markup.
+Okapi has an option to partly clean this up when converting an office file.
+This option is now switched on by default.
+
+**[TRANSLATE-2821](https://jira.translate5.net/browse/TRANSLATE-2821): Auto-QA - Empty segment check does not report completely empty segments** <br>
+Segments with completely empty targets are now counted in AutoQA: Empty-check
+
+**[TRANSLATE-2817](https://jira.translate5.net/browse/TRANSLATE-2817): VisualReview / VisualTranslation - Solve Problems with CommentNavigation causing too much DB strain** <br>
+FIX: Loading of Comment Navigation may was slow
+
+**[TRANSLATE-2816](https://jira.translate5.net/browse/TRANSLATE-2816): Comments - Comment Overview performance problem and multiple loading calls** <br>
+"AllComments" store: Prevent multiple requests by only making new ones when none are pending.
+
+**[TRANSLATE-2815](https://jira.translate5.net/browse/TRANSLATE-2815): Import/Export, Task Management - Upload time out for bigger files** <br>
+The upload timeout in the import wizard is increased to prevent timeouts for slower connections.
+
+**[TRANSLATE-2814](https://jira.translate5.net/browse/TRANSLATE-2814): VisualReview / VisualTranslation - Solve Problems with Caching of plugin resources** <br>
+FIX: Resources needed for the visual may become cached too long generating JS errors
+
+**[TRANSLATE-2808](https://jira.translate5.net/browse/TRANSLATE-2808): TermPortal - Mind sublanguages while terms transfer validation** <br>
+Sublanguages are now respected while terms transfer validation
+
+**[TRANSLATE-2803](https://jira.translate5.net/browse/TRANSLATE-2803): Editor general - Displaying the logos causes issues** <br>
+If the consortium logos were shown with a configured delay on the application startup, this may lead to problems when loading the application via an URL containing a task ID to open that task directly.
+
+**[TRANSLATE-2802](https://jira.translate5.net/browse/TRANSLATE-2802): Task Management - Add isReview and isTranslation methods to task entity** <br>
+Internal functions renamed.
+
+**[TRANSLATE-2685](https://jira.translate5.net/browse/TRANSLATE-2685): Editor general - Error on pasting tags inside segment-editor** <br>
+There was JS problem when editing a segment and pasting external content containing XML fragments.
+
+
 ## [5.6.0] - 2022-02-03
 
 ### Important Notes:

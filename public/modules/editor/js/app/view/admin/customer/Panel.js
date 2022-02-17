@@ -34,7 +34,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
         'Editor.view.admin.customer.ViewController',
         'Editor.view.admin.config.Grid',
         'Editor.view.admin.user.Assoc',
-        'Editor.view.admin.customer.OpenIdPanel'
+        'Editor.view.admin.customer.OpenIdPanel',
+        'Editor.view.admin.customer.CopyWindow'
     ],
 
     stores:['admin.Customers'],
@@ -101,6 +102,29 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         bind: {
                             store: 'customersStore'
                         },
+                        listeners: {
+                            itemdblclick: {
+                                fn: 'dblclick',
+                                scope: 'controller'
+                            },
+                            select: {
+                                fn: 'customerGridSelect',
+                                scope: 'controller'
+                            }
+                        },
+                        selModel: {
+                            selType: 'rowmodel'
+                        },
+                        plugins: [
+                            {
+                                ptype: 'gridfilters'
+                            }
+                        ],
+                        viewConfig: {
+                            listeners: {
+                                beforerefresh: 'onViewBeforeRefresh'
+                            }
+                        },
                         columns: [{
                                 xtype: 'gridcolumn',
                                 dataIndex: 'id',
@@ -112,10 +136,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             },{
                                 xtype: 'actioncolumn',
                                 text:  me.strings.actionColumn,
-                                menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter.
-                                // NOTE: when this is uncommented, the last action icon is always hidden. You need to resize the action column to make all action items visible.
                                 sortable: false,
-                                width: 60,
+                                fixed: true,
                                 items:[{
                                     glyph: 'f044@FontAwesome5FreeSolid',
                                     tooltip: me.strings.customerEditActionIcon,
@@ -126,6 +148,11 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     tooltip: me.strings.export,
                                     scope:'controller',
                                     handler:'onTmExportClick'
+                                },{
+                                    glyph: 'f0c5@FontAwesome5FreeSolid',
+                                    tooltip: 'Copy',
+                                    scope:'controller',
+                                    handler:'onCopyActionClick'
                                 },{
                                     glyph: 'f2ed@FontAwesome5FreeSolid',
                                     tooltip:me.strings.remove,
@@ -147,26 +174,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     type: 'string'
                                 }
                             }
-                        ],
-                        listeners: {
-                            itemdblclick: {
-                                fn: 'dblclick',
-                                scope: 'controller'
-                            }
-                        },
-                        selModel: {
-                            selType: 'rowmodel'
-                        },
-                        plugins: [
-                            {
-                                ptype: 'gridfilters'
-                            }
-                        ],
-                        viewConfig: {
-                            listeners: {
-                                beforerefresh: 'onViewBeforeRefresh'
-                            }
-                        }
+                        ]
                     },{
                         xtype: 'tabpanel',
                         flex: 0.7,
@@ -254,8 +262,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         visible:'{!isOpenIdHidden}'
                                     },
                                     itemId:'openIdDomain'
-                                }
-                            ]
+                                }]
                         },{
                             xtype: 'adminUserAssoc',
                             bind:{

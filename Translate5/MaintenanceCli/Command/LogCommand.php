@@ -40,7 +40,7 @@ class LogCommand extends Translate5AbstractCommand
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'log';
 
-    protected $levels = [
+    const LEVELS = [
         1 => '<fg=red;options=bold>FATAL</>',
         2 => '<fg=red>ERROR</>',
         4 => '<fg=yellow>WARN </>',
@@ -163,7 +163,7 @@ the format is:
             }
         }
         
-        //defining always the --follow loop but break if if not using following
+        //defining always the --follow loop but break it, if not using following
         while(true) {
             $s = $log->db->select()->order('id ASC');
             
@@ -237,7 +237,7 @@ the format is:
             $this->lastFoundId = $last['id'];
         }
         $ecodes = [];
-        $this->summary['levels'] = array_fill_keys(array_keys($this->levels), 0);
+        $this->summary['levels'] = array_fill_keys(array_keys(self::LEVELS), 0);
         if($this->withSummary && !$summaryOnly && !$this->input->getOption('follow')) {
             $this->io->section('Found log entries:');
         }
@@ -263,7 +263,7 @@ the format is:
                 }
                 $idBlock .= ') ';
                 $this->io->text($row['created'].' '.
-                    $this->levels[$row['level']].' <options=bold>'.$row['eventCode'].'</> '.$idBlock.
+                    self::LEVELS[$row['level']].' <options=bold>'.$row['eventCode'].'</> '.$idBlock.
                     OutputFormatter::escape((string) $row['domain']).' → '.
                     OutputFormatter::escape((string)str_replace("\n", ' ', $row['message'])));
             }
@@ -295,7 +295,7 @@ the format is:
                 if($count == 0) {
                     continue;
                 }
-                $this->io->text('  '.$this->levels[$key].': '.$count);
+                $this->io->text('  '.self::LEVELS[$key].': '.$count);
             }
         }
         else {
@@ -457,7 +457,7 @@ the format is:
     protected function showDetail(array $row) {
         $out = [
             '         <info>id:</> '.(string) $row['id'],
-            '      <info>level:</> '.(string) $this->levels[$row['level']],
+            '      <info>level:</> '.(string) self::LEVELS[$row['level']],
             '    <info>created:</> '.(string) $row['created'],
             ' <info>duplicates:</> <options=bold>'.(string) $row['duplicates'].'</>',
             '       <info>last:</> '.(string) $row['last'],
