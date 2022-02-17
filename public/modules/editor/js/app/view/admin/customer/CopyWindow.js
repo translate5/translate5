@@ -44,10 +44,15 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
             }
         }
     },
+    layout: {
+        type: 'vbox',
+        align: 'stretch'
+    },
+    bodyPadding: 15,
     autoHeight: true,
     autoScroll: true,
     modal: true,
-    bodyPadding: 27,
+    shrinkWrapDock:true, // resize the window based on the title
     strings: {
         title: '#UT#Kundeneinstellungen in den aktuellen Kunden übernehmen',
         copyUserAssocLabel:'#UT#Standard-Benutzerzuweisungen kopieren von',
@@ -57,8 +62,7 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
         copySuccess:'#UT#Kopieren erfolgreich',
         copyFromText:'#UT#Kopieren von',
         copyBtnText:'#UT#Kopieren',
-        saveConfirmMessage:'#UT#Dadurch werden alle zuvor konfigurierten Werte entfernt.',
-        saveConfirmMessageTitle:'#UT#Auswahl speichern'
+        noCustomerSelected:'#UT#Mindestens ein Kunde muss ausgewählt sein'
     },
     record: null,
 
@@ -76,29 +80,15 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
                     },
                     value:me.strings.copyUserAssocLabel
                 },{
-                    xtype: 'fieldcontainer',
-                    layout: {
-                        type: 'hbox',
-                        align: 'center'
+                    xtype: 'customersCombo',
+                    name: 'copyDefaultAssignmentsCustomer',
+                    itemId: 'copyDefaultAssignmentsCustomer',
+                    store:null,
+                    allowBlank: true,
+                    bind:{
+                        store:'{copyCustomers}',
                     },
-                    items:[{
-                        xtype: 'customersCombo',
-                        name: 'copyDefaultAssignmentsCustomer',
-                        itemId: 'copyDefaultAssignmentsCustomer',
-                        store:null,
-                        bind:{
-                            store:'{copyCustomers}',
-                        },
-                        hideLabel:true
-                    },{
-                        xtype: 'button',
-                        glyph: 'f00c@FontAwesome5FreeSolid',
-                        margin: '0 0 0 10',
-                        listeners: {
-                            click:'onAddCopyDefaultAssignmentsCustomerClick'
-                        },
-                        text: me.strings.copyBtnText
-                    }]
+                    hideLabel:true
                 },{
                     xtype: 'displayfield',
                     hideLabel: true,
@@ -109,29 +99,23 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
                     },
                     value: me.strings.copyConfigLabel
                 }, {
-                    xtype: 'fieldcontainer',
-                    layout: {
-                        type: 'hbox',
-                        align: 'center'
+                    xtype: 'customersCombo',
+                    name: 'copyConfigCustomer',
+                    itemId: 'copyConfigCustomer',
+                    store:null,
+                    allowBlank: true,
+                    bind:{
+                        store:'{copyCustomers}',
                     },
-                    items: [{
-                        xtype: 'customersCombo',
-                        name: 'copyConfigCustomer',
-                        itemId: 'copyConfigCustomer',
-                        store:null,
-                        bind:{
-                            store:'{copyCustomers}',
-                        },
-                        hideLabel:true
-                    },{
-                        xtype: 'button',
-                        glyph: 'f00c@FontAwesome5FreeSolid',
-                        margin: '0 0 0 10',
-                        listeners: {
-                            click:'onAddCopyConfigCustomerClick'
-                        },
-                        text: me.strings.copyBtnText
-                    }]
+                    hideLabel:true
+                }],
+                bbar:[{
+                    xtype: 'button',
+                    glyph: 'f00c@FontAwesome5FreeSolid',
+                    listeners: {
+                        click:'onCopyButtonClick'
+                    },
+                    text: me.strings.copyBtnText
                 }]
             };
         if (instanceConfig) {

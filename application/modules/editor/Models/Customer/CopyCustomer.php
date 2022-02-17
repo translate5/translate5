@@ -45,6 +45,7 @@ class editor_Models_Customer_CopyCustomer {
 
         $adapter = $model->db->getAdapter();
 
+        // when we copy from one to another customer, all existing assignments for the target customer must be removed
         $sql = "DELETE FROM LEK_user_assoc_default where customerId = ?";
         // delete all user associations for the target customer
         $adapter->query($sql,[$target]);
@@ -87,13 +88,15 @@ class editor_Models_Customer_CopyCustomer {
         /** @var editor_Models_Customer_CustomerConfig $model */
         $model = ZfExtended_Factory::get('editor_Models_Customer_CustomerConfig');
 
+        //INFO: "Selected workflow" and "multi user moder" are not be copied when "Copy all other client configuration" is selected.
+        // But only when copy "user assignment defaults" is selected.
         $adapter = $model->db->getAdapter();
-        $sql = "DELETE FROM LEK_customer_config where customerId = ?";
+        $sql = "DELETE FROM LEK_customer_config where customerId = ? and name not in('runtimeOptions.import.initialTaskUsageMode','runtimeOptions.workflow.initialWorkflow')";
         // remove all existing configs before new values are copied
         $adapter->query($sql,[$target]);
 
         $sql = "INSERT IGNORE INTO LEK_customer_config (customerId, name, value) 
-                SELECT  ?, name, value FROM LEK_customer_config where customerId = ?";
+                SELECT  ?, name, value FROM LEK_customer_config where customerId = ? and name not in('runtimeOptions.import.initialTaskUsageMode','runtimeOptions.workflow.initialWorkflow')";
         $adapter->query($sql,[$target,$source]);
     }
 }

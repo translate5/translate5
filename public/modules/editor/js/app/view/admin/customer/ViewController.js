@@ -134,8 +134,13 @@ Ext.define('Editor.view.admin.customer.ViewController', {
      */
     editCustomer:function(record){
         var me=this,
+            grid = me.getView().down('grid'),
             formPanel = me.getView().down('#customersForm'),
             vm = me.getViewModel();
+
+        if(grid && Ext.isEmpty(grid.getSelection())){
+            grid.setSelection(record);
+        }
 
         vm.set('record', record);
 
