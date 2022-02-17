@@ -116,10 +116,10 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
 
         if(empty($child->relaisFileStatus)){
             // check if relais file exist in the given path. This check will also apply fizzy name matching
-            $child->relaisFileStatus = $this->pivotFileExist($fullpath,$child);
+            // $fullpath and child->filename will be updated by reference if fuzzy match is found
+            $child->relaisFileStatus = $this->getFileStatusAndFullPath($fullpath,$child,$path);
             // update the $filepath and $fullpath, the child filename can be changed in the fileExist method
             $filepath = $path.$child->filename;
-            $fullpath = $this->relaisRootPath.DIRECTORY_SEPARATOR.ZfExtended_Utils::filesystemEncode($filepath);
         }
 
         //here can invoke import filters to manipulate the file information, needed for example if the filename changes and therefore the filename based relais file matching would fail.
@@ -143,14 +143,16 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
     /***
      * Check if relais file exist in the given path. This will also try to find relais file matching until the firs ".".
      * If fuzzy match is found, $child->filename will be set with the name of the match.
+     * $fullPath and $child->filename will be updated in case fuzzy mathc is found
      *
      * ex: ex: my-test-project.de-en.xlf will match my-test-project.de-it.xlf
      *
      * @param string $fullPath
      * @param stdClass $child
+     * @param $path
      * @return int
      */
-    private function pivotFileExist(string $fullPath,stdClass $child): int
+    private function getFileStatusAndFullPath(string &$fullPath,stdClass $child,$path): int
     {
         if(file_exists($fullPath)){
             return self::RELAIS_NOT_IMPORTED;
@@ -164,7 +166,10 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
             return self::RELAIS_NOT_FOUND;
         }
         // update the filename of the child to the matched "fuzzy" name
-        $child->filename = ZfExtended_Utils::filesystemEncode(basename($matches[0]));
+        $child->filename = basename($matches[0]);
+
+        $fullPath = $this->relaisRootPath.DIRECTORY_SEPARATOR.ZfExtended_Utils::filesystemEncode($path.$child->filename);
+
         return self::RELAIS_NOT_IMPORTED;
     }
     
