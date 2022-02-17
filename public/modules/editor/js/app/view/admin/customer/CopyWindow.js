@@ -58,7 +58,7 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
         copyUserAssocLabel:'#UT#Standard-Benutzerzuweisungen kopieren von',
         copyUserAssocTooltip:'#UT#Alle Standard-Benutzerzuweisungen des ausgewählten Kunden, einschließlich des ausgewählten Mehrbenutzermodus und Workflows, in den aktuellen Kunden kopieren',
         copyConfigLabel:'#UT#Konfigurationen kopieren von',
-        copyConfigTooltip:'#UT#Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren',
+        copyConfigTooltip:'#UT#Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren, außer <i>Initial workflow on task creation</i> und <i>Multi user task editing mode</i>',
         copySuccess:'#UT#Kopieren erfolgreich',
         copyFromText:'#UT#Kopieren von',
         copyBtnText:'#UT#Kopieren',

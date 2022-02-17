@@ -100,7 +100,8 @@ Ext.define('Editor.view.admin.customer.CopyWindowViewController', {
         var me = this,
             view = me.getView(),
             panel = Ext.ComponentQuery.query('customerPanel')[0],
-            adminUserAssoc = panel && panel.down('adminUserAssoc'),
+            assocPanel = panel && panel.down('adminUserAssoc'),
+            adminUserAssocGrid = assocPanel && assocPanel.down('adminUserAssocGrid'),
             adminConfigGrid = panel && panel.down('adminConfigGrid'),
             unmaskAndClose = function (){
                 if(view && view.isMasked()){
@@ -109,8 +110,8 @@ Ext.define('Editor.view.admin.customer.CopyWindowViewController', {
                 }
             };
 
-        if(adminUserAssoc && adminUserAssoc.getStore){
-            adminUserAssoc.getStore().load({callback:unmaskAndClose});
+        if(adminUserAssocGrid && adminUserAssocGrid.getStore){
+            adminUserAssocGrid.getStore().load({callback:unmaskAndClose});
         }
 
         if(adminConfigGrid && adminConfigGrid.getStore){

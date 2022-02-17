@@ -4531,9 +4531,9 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Konfigurationen kopieren von</source>
     <target>Copy configuration from</target>
 </trans-unit>
-<trans-unit id='QWxsZSDDvGJlcnNjaHJpZWJlbmVuIFN5c3RlbWtvbmZpZ3VyYXRpb25lbiBkZXMgYXVzZ2V3w6RobHRlbiBLdW5kZW4gaW4gZGVuIGFrdHVlbGxlbiBLdW5kZW4ga29waWVyZW4='>
-    <source>Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren</source>
-    <target>Copy all other system configuration overwrites from the selected client to the current client</target>
+<trans-unit id='QWxsZSDDvGJlcnNjaHJpZWJlbmVuIFN5c3RlbWtvbmZpZ3VyYXRpb25lbiBkZXMgYXVzZ2V3w6RobHRlbiBLdW5kZW4gaW4gZGVuIGFrdHVlbGxlbiBLdW5kZW4ga29waWVyZW4sIGF1w59lciA8aT5Jbml0aWFsIHdvcmtmbG93IG9uIHRhc2sgY3JlYXRpb248L2k+IHVuZCA8aT5NdWx0aSB1c2VyIHRhc2sgZWRpdGluZyBtb2RlPC9pPg=='>
+    <source>Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren, außer <i>Initial workflow on task creation</i> und <i>Multi user task editing mode</i></source>
+    <target>Copy all other system configuration overwrites from the selected client to the current client, except <i>Initial workflow on task creation</i> und <i>Multi user task editing mode</i></target>
 </trans-unit>
 <trans-unit id='S29waWVyZW4gZXJmb2xncmVpY2g='>
     <source>Kopieren erfolgreich</source>
