@@ -250,6 +250,21 @@ class editor_Utils {
         $name = preg_replace('/-{2,}/', '-',  $name);
         return $name;
     }
+
+    /***
+     * Compare file names in import style. The files are equal when the names are matching until the first "."
+     * This is used when comparing if the pivot/workfile are matching.
+     * ex: my-test-project.de-en.xlf will match my-test-project.de-it.xlf
+     *
+     * @param string $file1
+     * @param string $file2
+     * @return bool
+     */
+    public static function compareImportStyleFileName(string $file1, string $file2): bool
+    {
+        return explode('.',$file1)[0] === explode('.',$file2)[0];
+    }
+
     /**
      * Normalizes all sequences of whitespace to the given replacement (default: single blank)
      * @param string $text

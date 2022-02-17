@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,45 +26,29 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @class Editor.model.admin.projectWizard.File
- * @extends Ext.data.Model
  */
-Ext.define('Editor.model.admin.projectWizard.File', {
-    extend: 'Ext.data.Model',
+Ext.define('Editor.view.admin.projectWizard.UploadTabPanel', {
+    extend:'Ext.tab.Panel',
+    alias: 'widget.uploadTabPanel',
+    itemId: 'uploadTabPanel',
+    requires:[
+        'Editor.view.admin.projectWizard.UploadGrid'
+    ],
 
-    statics: {
-        TYPE_ERROR: 'error',
-        TYPE_PIVOT: 'pivot',
-        TYPE_WORKFILES: 'workfiles',
-        TYPE_REFERENCE: 'reference',
-    },
+    layout:'fit',
 
-    fields: [{
-        name: 'file'
-    },{
-        name: 'name'
-    },{
-        name: 'size'
-    },{
-        name: 'type'
-    },{
-        name: 'sourceLang',
-        defaultValue:''
-    },{
-        name: 'targetLang',
-        defaultValue:''
-    },{
-        name: 'error'
-    },{
-        name: 'bilingual',
-        type: 'bool'
-    }],
-
-    /***
-     * Get the file xtension from the file name
-     * @returns {any|string}
-     */
-    getExtension:function (){
-        return Editor.util.Util.getFileExtension(this.get('name'));
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config = {
+                items:[{
+                    xtype:'wizardUploadGrid',
+                    title:'General'
+                }]
+            };
+        
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([ config ]);
     }
 });

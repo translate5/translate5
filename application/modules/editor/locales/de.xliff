@@ -2089,6 +2089,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QXJiZWl0c2RhdGVp'><source>Arbeitsdatei</source><target>Arbeitsdatei</target></trans-unit>
 <trans-unit id='UGl2b3QtRGF0ZWk='><source>Pivot-Datei</source><target>Pivot-Datei</target></trans-unit>
 <trans-unit id='RGF0ZWkoZW4pIGhpbnp1ZsO8Z2Vu'><source>Datei(en) hinzufügen</source><target>Datei(en) hinzufügen</target></trans-unit>
+<trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbikgaGluenVmw7xnZW4='><source>Referenz-Dateien(en) hinzufügen</source><target>Referenz-Dateien(en) hinzufügen</target></trans-unit>
+<trans-unit id='UmVmZXJlbnotRGF0ZWk='><source>Referenz-Datei</source><target>Referenz-Datei</target></trans-unit>
 <trans-unit id='S3VuZGVuZWluc3RlbGx1bmdlbiBpbiBkZW4gYWt0dWVsbGVuIEt1bmRlbiDDvGJlcm5laG1lbg=='><source>Kundeneinstellungen in den aktuellen Kunden übernehmen</source><target>Kundeneinstellungen in den aktuellen Kunden übernehmen</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQtQmVudXR6ZXJ6dXdlaXN1bmdlbiBrb3BpZXJlbiB2b24='><source>Standard-Benutzerzuweisungen kopieren von</source><target>Standard-Benutzerzuweisungen kopieren von</target></trans-unit>
 <trans-unit id='QWxsZSBTdGFuZGFyZC1CZW51dHplcnp1d2Vpc3VuZ2VuIGRlcyBhdXNnZXfDpGhsdGVuIEt1bmRlbiwgZWluc2NobGllw59saWNoIGRlcyBhdXNnZXfDpGhsdGVuIE1laHJiZW51dHplcm1vZHVzIHVuZCBXb3JrZmxvd3MsIGluIGRlbiBha3R1ZWxsZW4gS3VuZGVuIGtvcGllcmVu'><source>Alle Standard-Benutzerzuweisungen des ausgewählten Kunden, einschließlich des ausgewählten Mehrbenutzermodus und Workflows, in den aktuellen Kunden kopieren</source><target>Alle Standard-Benutzerzuweisungen des ausgewählten Kunden, einschließlich des ausgewählten Mehrbenutzermodus und Workflows, in den aktuellen Kunden kopieren</target></trans-unit>

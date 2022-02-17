@@ -4507,6 +4507,14 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Datei(en) hinzufügen</source>
     <target>Add file(s)</target>
 </trans-unit>
+<trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbikgaGluenVmw7xnZW4='>
+    <source>Referenz-Dateien(en) hinzufügen</source>
+    <target>Add reference file(s)</target>
+</trans-unit>
+<trans-unit id='UmVmZXJlbnotRGF0ZWk='>
+    <source>Referenz-Datei</source>
+    <target>reference file</target>
+</trans-unit>
 <trans-unit id='S3VuZGVuZWluc3RlbGx1bmdlbiBpbiBkZW4gYWt0dWVsbGVuIEt1bmRlbiDDvGJlcm5laG1lbg=='>
     <source>Kundeneinstellungen in den aktuellen Kunden übernehmen</source>
     <target>Copy client settings to current client</target>
