@@ -45,8 +45,8 @@ class editor_Task_Type_Default extends editor_Task_Type_Abstract {
             $taskType = editor_Task_Type_ProjectTask::ID;
         }
         else {
-            $projectType = self::ID;
-            $taskType = self::ID;
+            $projectType = static::ID;
+            $taskType = static::ID;
         }
     }
 }

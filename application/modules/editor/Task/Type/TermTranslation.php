@@ -45,13 +45,12 @@ class editor_Task_Type_TermTranslation extends editor_Task_Type_Default {
      */
     public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType) {
 
-        // A default task may have only one target, otherwise its project/task combo
+        // Call parent
+        parent::calculateImportTypes($multiTarget, $projectType, $taskType);
+
+        // If $multiTarget - spoof $taskType
         if ($multiTarget) {
-            $projectType = editor_Task_Type_Project::ID;
-            $taskType = editor_Task_Type_TermTranslationTask::ID; // this line is the only difference with parent class's method
-        } else {
-            $projectType = self::ID;
-            $taskType = self::ID;
+            $taskType = editor_Task_Type_TermTranslationTask::ID;
         }
     }
 }
