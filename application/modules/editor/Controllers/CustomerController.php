@@ -111,22 +111,17 @@ class Editor_CustomerController extends ZfExtended_RestController {
     }
 
     public function copyOperation(){
-        $target = $this->entity->getId();
-        if(is_null($target)){
-            throw new ZfExtended_ErrorCodeException();
-        }
         $copy = ZfExtended_Factory::get('editor_Models_Customer_CopyCustomer');
         /** @var editor_Models_Customer_CopyCustomer $copy */
 
-        $source = $this->getParam('copyDefaultAssignmentsCustomer');
-        if(!is_null($source)){
-            $copy->copyUserAssoc($source,$target);
-            return;
+        $source = $this->getParam('copyDefaultAssignmentsCustomer',false);
+        if(!empty($source)){
+            $copy->copyUserAssoc($source,$this->entity->getId());
         }
 
-        $source = $this->getParam('copyConfigCustomer');
-        if(!is_null($source)){
-            $copy->copyConfig($source,$target);
+        $source = $this->getParam('copyConfigCustomer',false);
+        if(!empty($source)){
+            $copy->copyConfig($source,$this->entity->getId());
         }
     }
     

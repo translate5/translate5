@@ -31,42 +31,22 @@ Ext.define('Editor.view.admin.customer.CopyWindowViewController', {
 
     /***
      *
-     * @param combo
-     * @param newValue
      */
-    onAddCopyDefaultAssignmentsCustomerClick: function (){
+    onCopyButtonClick: function (){
         var me = this,
-            combo = me.getView().down('#copyDefaultAssignmentsCustomer');
-        me.copyCustomerMessageBox({
-            copyDefaultAssignmentsCustomer:combo && combo.getValue()
-        });
-    },
+            copyDefaultAssignmentsCustomer = me.getView().down('#copyDefaultAssignmentsCustomer'),
+            copyConfigCustomer = me.getView().down('#copyConfigCustomer'),
+            assignmentsValue = copyDefaultAssignmentsCustomer && copyDefaultAssignmentsCustomer.getValue(),
+            configsValue = copyConfigCustomer && copyConfigCustomer.getValue();
 
-    /***
-     *
-     * @param combo
-     * @param newValue
-     */
-    onAddCopyConfigCustomerClick: function (){
-        var me = this,
-            combo = me.getView().down('#copyConfigCustomer');
-        me.copyCustomerMessageBox({
-            copyConfigCustomer:combo && combo.getValue()
-        });
-    },
+        if(Ext.isEmpty(assignmentsValue) && Ext.isEmpty(configsValue)){
+            Editor.MessageBox.addInfo(me.getView().strings.noCustomerSelected);
+            return;
+        }
 
-    copyCustomerMessageBox:function (params){
-        var me = this;
-        Ext.Msg.show({
-            title:me.getView().saveConfirmMessageTitle,
-            message: me.getView().saveConfirmMessage,
-            buttons: Ext.Msg.YESNO,
-            icon: Ext.Msg.QUESTION,
-            fn:function (btn){
-                if (btn === 'yes') {
-                    me.copyCustomer(params);
-                }
-            }
+        me.copyCustomer({
+            copyDefaultAssignmentsCustomer:assignmentsValue,
+            copyConfigCustomer:configsValue,
         });
     },
 
@@ -82,16 +62,17 @@ Ext.define('Editor.view.admin.customer.CopyWindowViewController', {
             return;
         }
 
+        me.getView().mask();
         Ext.Ajax.request({
             url: Editor.data.restpath+'customer/'+record.get('id')+'/copy/operation',
             params:params,
             method: 'post',
             scope: this,
-            success: function (response) {
-                Ext.StoreManager.get('customersStore').load();
-                Editor.MessageBox.addSuccess(me.getView().strings.copySuccess);
+            success: function () {
+                me.reloadStores();
             },
             failure: function (response) {
+                me.getView().unmask();
                 Editor.app.getController('ServerException').handleException(response);
             }
         });
@@ -110,5 +91,30 @@ Ext.define('Editor.view.admin.customer.CopyWindowViewController', {
         store.filterBy(function (r){
             return r.get('id') !== view.getRecord().get('id');
         });
+    },
+
+    /***
+     * Reload the user defaults store and the config store
+     */
+    reloadStores:function (){
+        var me = this,
+            view = me.getView(),
+            panel = Ext.ComponentQuery.query('customerPanel')[0],
+            adminUserAssoc = panel && panel.down('adminUserAssoc'),
+            adminConfigGrid = panel && panel.down('adminConfigGrid'),
+            unmaskAndClose = function (){
+                if(view && view.isMasked()){
+                    view.unmask();
+                    view.destroy();
+                }
+            };
+
+        if(adminUserAssoc && adminUserAssoc.getStore){
+            adminUserAssoc.getStore().load({callback:unmaskAndClose});
+        }
+
+        if(adminConfigGrid && adminConfigGrid.getStore){
+            adminConfigGrid.getStore().load({callback:unmaskAndClose});
+        }
     }
 });

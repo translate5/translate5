@@ -4543,5 +4543,9 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Auswahl speichern</source>
     <target>Save selection</target>
 </trans-unit>
+<trans-unit id='TWluZGVzdGVucyBlaW4gS3VuZGUgbXVzcyBhdXNnZXfDpGhsdCBzZWlu'>
+  <source>Mindestens ein Kunde muss ausgewählt sein</source>
+  <target>At least one customer must be selected</target>
+</trans-unit>
   </file>
 </xliff>
