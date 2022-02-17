@@ -157,7 +157,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     $sourceSuccess = $repetitionUpdater->updateSource($this->isSourceEditable);
                 }
 
-                if(!$sourceSuccess || !$repetitionUpdater->updateTarget()) {
+                //the update target method tries to update the repetition target by transforming the
+                // desired tags (all tags from source on translation or targetOriginal on review)
+                // into the targetEdit of the master segment and take the result then.
+                // if that fails, the segment can not be processed automatically and must remain for a manual review by the user
+                if(!$sourceSuccess || !$repetitionUpdater->updateTarget($task->isTranslation())) {
                     //the segment has to be ignored!
                     continue;
                 }
