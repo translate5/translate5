@@ -19,6 +19,65 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.6.2] - 2022-02-17
+
+### Important Notes:
+#### [TRANSLATE-2834](https://jira.translate5.net/browse/TRANSLATE-2834)
+The calculation of the match-rate of repeated and pre-translated fuzzy segments has been changed. More details in the concrete change log entry of that issue.
+
+#### [TRANSLATE-2827](https://jira.translate5.net/browse/TRANSLATE-2827)
+The matching between the workfile and pivot filenames is more easier right now, since the filename is compared now only to the first dot. So file.en-de.xlf matches now file.en-it.xlf and there is no need to rename such pivot files.
+ 
+
+
+### Added
+**[TRANSLATE-2789](https://jira.translate5.net/browse/TRANSLATE-2789): Import/Export - Import: Support specially tagged bilingual pdfs from a certain client** <br>
+FEATURE: Support special bilingual PDFs as source for the Visual
+
+**[TRANSLATE-2717](https://jira.translate5.net/browse/TRANSLATE-2717): Client management, Configuration - Take over client configuration from another client** <br>
+New feature where customer configuration and default user assignments can be copied from one customer to another.
+
+
+### Changed
+**[TRANSLATE-2819](https://jira.translate5.net/browse/TRANSLATE-2819): SpellCheck (LanguageTool integration) - SpellChecker: Add toggle button to activate/deactivate the SpellCheck** <br>
+
+
+**[TRANSLATE-2722](https://jira.translate5.net/browse/TRANSLATE-2722): InstantTranslate, TermPortal - Customizable header for InstantTranslate including custom HTML** <br>
+Enables custom header content configuration in instant-translate and term-portal. For more info see the instant-translate and term-portal header section in this link https://confluence.translate5.net/pages/viewpage.action?pageId=3866712
+
+
+### Bugfixes
+**[TRANSLATE-2841](https://jira.translate5.net/browse/TRANSLATE-2841): Client management - Contents of clients tabs are not updated, when a new client is selected** <br>
+Editing a customer in the customer panel is now possible with just selecting a row.
+
+**[TRANSLATE-2840](https://jira.translate5.net/browse/TRANSLATE-2840): Import/Export - Delete user association if the task import fails** <br>
+Remove all user associations from a task, if the task import fails. So no e-mail will be sent to the users.
+
+**[TRANSLATE-2837](https://jira.translate5.net/browse/TRANSLATE-2837): Okapi integration - Change default segmentation rules to match Trados and MemoQ instead of Okapi and Across** <br>
+So far translate5 (based on Okapi) did not segment after a colon.
+Since Trados and MemoQ do that by default, this is changed now to make translate5 better compatible with the vast majority of TMs out there.
+
+**[TRANSLATE-2834](https://jira.translate5.net/browse/TRANSLATE-2834): MatchAnalysis & Pretranslation - Change repetition behaviour in pre-translation** <br>
+On pre-translations with using fuzzy matches, repeated segments may be filled with different tags / amount of tags as there are tags in the source content. Then the repetition algorithm could not process such segments as repetitions and finally the analysis was not counting them as repetitions.
+Now such segments always count as repetition in the analysis, but it does not get the 102% matchrate (since this may lead the translator to jump over the segment and ignore its content). Therefore such a repeated segment is filled with the fuzzy match content and the fuzzy match-rate. If the translator then edits and fix the fuzzy to be the correct translation , and then uses the repetition editor to fill the repetitions, then it is set to 102% matchrate.
+
+**[TRANSLATE-2832](https://jira.translate5.net/browse/TRANSLATE-2832): LanguageResources - Language filter in language resources overview is wrong** <br>
+Language filter in language resources overview will filter for rfc values instead of language name.
+
+**[TRANSLATE-2828](https://jira.translate5.net/browse/TRANSLATE-2828): Editor general - Pivot language selector for zip uploads** <br>
+Pivot language can now be set when uploading zip in the import wizard.
+
+**[TRANSLATE-2827](https://jira.translate5.net/browse/TRANSLATE-2827): Import/Export, Task Management - Improve workfile and pivot file matching** <br>
+The matching between the workfile and pivot filenames is more easier right now, since the filename is compared now only to the first dot. So file.en-de.xlf matches now file.en-it.xlf and there is no need to rename such pivot files.
+
+**[TRANSLATE-2826](https://jira.translate5.net/browse/TRANSLATE-2826): TermPortal, TermTagger integration - processStatus is not correctly mapped by tbx import** <br>
+processStatus is now set up correctly on processStatus-col in terms_term-table
+
+**[TRANSLATE-2818](https://jira.translate5.net/browse/TRANSLATE-2818): Auto-QA - AutoQA: Length-Check must Re-Evaluate also when processing Repititions** <br>
+FIX: AutoQA now re-evaluates the length check for each segment individually when saving repititions
+
+
 ## [5.6.1] - 2022-02-09
 
 ### Important Notes:
