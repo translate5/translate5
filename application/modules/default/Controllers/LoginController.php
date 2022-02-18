@@ -340,15 +340,11 @@ class LoginController extends ZfExtended_Controllers_Login {
 
     /**
      * Parse and adjust the redirect hash when the current request is for terportal/instant-translate
-     * @return mixed|string|null
+     * @return string
      */
     protected function handleAppsRedirectHash(){
 
-        if(!isset($this->_session->redirecthash)){
-            return null;
-        }
-
-        $hash = $this->_session->redirecthash;
+        $hash = $this->_session->redirecthash ?: '';
         if(preg_match('~^#name=(termportal|instanttranslate)~', $hash, $matches)){
             // Drop redirecthash prop from session
             $this->_session->redirecthash = '';
