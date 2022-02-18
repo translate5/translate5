@@ -161,7 +161,7 @@ final class  editor_Segment_Internal_ContentTag extends editor_Tag implements Js
         return new editor_Segment_Internal_ContentTag($this->name);
     }
     
-    public function jsonSerialize(){
+    public function jsonSerialize() : mixed {
         $data = new stdClass();
         $data->name = $this->getName();
         $data->classes = $this->classes;
