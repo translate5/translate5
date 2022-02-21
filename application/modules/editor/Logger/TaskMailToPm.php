@@ -71,7 +71,7 @@ class editor_Logger_TaskMailToPm extends ZfExtended_Logger_Writer_Abstract {
      * @see ZfExtended_Logger_Writer_Abstract::isAccepted()
      */
     public function isAccepted(ZfExtended_Logger_Event $event) {
-        if(empty($event->extra) || empty($event->extra['task']) || !is_a($event->extra['task'], 'editor_Models_Task') || $event->extra['task']->isHiddenTask()) {
+        if(empty($event->extra) || empty($event->extra['task']) || !is_a($event->extra['task'], 'editor_Models_Task') || $event->extra['task']->getTaskType()->isInternalTask()) {
             return false;
         }
         return parent::isAccepted($event);

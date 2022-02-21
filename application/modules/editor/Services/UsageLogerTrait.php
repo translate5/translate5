@@ -89,8 +89,8 @@ trait editor_Services_UsageLogerTrait {
             //by default, set the customers to the task customer
             $logger->setCustomers($this->task->getCustomerId());
 
-            //if the task type is hidden task( file-pretranslation), we need to load the pre-translation task user, and calculate the customers
-            if($this->task->isHiddenTask()){
+            //for internal tasks (for example file-pretranslation), we need to load the pre-translation task user, and calculate the customers
+            if($this->task->getTaskType()->isInternalTask()){
 
                 // load the user which pre-translates the task and store the user in class variable
                 $this->loadUserFilePretranslate();

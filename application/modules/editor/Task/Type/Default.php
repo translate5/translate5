@@ -26,14 +26,27 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TaskUsageLog extends ZfExtended_Models_Validator_Abstract {
-    protected function defineValidators() {
-        $this->addValidator("id", "int");
-        $this->addValidator("taskType",'inArray', [editor_Task_Type::getInstance()->getValidTypes()]);
-        $this->addValidator("sourceLang", "int");
-        $this->addValidator("targetLang", "int");
-        $this->addValidator("customerId", "int");
-        $this->addValidator("yearAndMonth","stringLength", array("min" => 1, "max" => 45));
-        $this->addValidator("taskCount", "int");
+/**
+ * The default task type is a mixture of project and task!
+ */
+class editor_Task_Type_Default extends editor_Task_Type_Abstract {
+    const ID = 'default';
+
+    protected bool $isInternalTask = false;
+    protected bool $isProject = true;
+    protected bool $isTask = true;
+    protected bool $terminologyDisabled = false;
+    protected bool $exportUsage = true;
+
+    public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType) {
+        //a default task may have only one target, otherwise its project/task combo
+        if($multiTarget) {
+            $projectType = editor_Task_Type_Project::ID;
+            $taskType = editor_Task_Type_ProjectTask::ID;
+        }
+        else {
+            $projectType = static::ID;
+            $taskType = static::ID;
+        }
     }
 }

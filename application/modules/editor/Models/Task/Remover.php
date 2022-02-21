@@ -59,10 +59,10 @@ class editor_Models_Task_Remover {
         if(empty($taskGuid)) {
             return false;
         }
-        if(!$isProject){
-            $this->removeTask($forced);
-        }else{
+        if($isProject && $projectId > 0){
             $this->removeProject($projectId,$forced,true);
+        }else{
+            $this->removeTask($forced);
         }
 
         // on import error project may not be created:
@@ -143,10 +143,6 @@ class editor_Models_Task_Remover {
         /* @var $model editor_Models_Task */
         $tasks=$model->loadProjectTasks($projectId);
         if(count($tasks)>1 || empty($tasks)){
-            return;
-        }
-        $task=reset($tasks);
-        if($task['taskType']!=$model::INITIAL_TASKTYPE_PROJECT){
             return;
         }
         $this->task->load($projectId);
