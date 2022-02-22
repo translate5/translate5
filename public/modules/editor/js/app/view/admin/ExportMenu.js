@@ -117,7 +117,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
               handler: alertHandler
           },{
               itemId: 'transferItem',
-              hidden:!exportAllowed || !me.task.get('isTransfer'),
+              hidden:!exportAllowed || !me.task.get('taskType').match('termtranslation'),
               text : me.messages.transfer,
               path: me.makePath('task/export/id/{0}?format=transfer'),
               handler: me.transferHandler

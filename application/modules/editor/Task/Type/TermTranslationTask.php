@@ -26,14 +26,29 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TaskUsageLog extends ZfExtended_Models_Validator_Abstract {
-    protected function defineValidators() {
-        $this->addValidator("id", "int");
-        $this->addValidator("taskType",'inArray', [editor_Task_Type::getInstance()->getValidTypes()]);
-        $this->addValidator("sourceLang", "int");
-        $this->addValidator("targetLang", "int");
-        $this->addValidator("customerId", "int");
-        $this->addValidator("yearAndMonth","stringLength", array("min" => 1, "max" => 45));
-        $this->addValidator("taskCount", "int");
+/**
+ * The TermTranslationTask task type is same as projectTask, but have different ID so
+ * that it appears the possibility for distinction between termtranslation- and other tasks
+ * Currently it is only used to decide whether reimport back to TermCollection export menu option should be shown
+ */
+class editor_Task_Type_TermTranslationTask extends editor_Task_Type_ProjectTask {
+
+    /**
+     * Type ID
+     */
+    const ID = 'termtranslationTask';
+
+    /**
+     * @param bool $multiTarget
+     * @param string $projectType
+     * @param string $taskType
+     */
+    public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType) {
+
+        // If a project task is requested, the default project type is Project
+        $projectType = editor_Task_Type_Project::ID;
+
+        // This line is the only difference with parent class's method
+        $taskType = editor_Task_Type_TermTranslationTask::ID;
     }
 }
