@@ -90,8 +90,21 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @var String
      */
     public $targetLangCode;
-    
-    
+
+    /***
+     * Init the language resource instance for given editor_Models_LanguageResources_Resource
+     * @param editor_Models_LanguageResources_Resource $resource
+     * @return void
+     */
+    public function initByResource(editor_Models_LanguageResources_Resource $resource){
+        $this->createLangResUuid();
+        $this->setColor($resource->getDefaultColor());
+        $this->setResourceId($resource->getId());
+        $this->setServiceType($resource->getServiceType());
+        $this->setServiceName($resource->getService());
+        $this->setResourceType($resource->getType());
+    }
+
     /***
      * Load all resources for all available services
      *
