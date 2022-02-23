@@ -179,8 +179,8 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
             }
             switch ($colName) {
                 case 'customerId':
-                    $customer = ZfExtended_Factory::get('editor_Models_Customer');
-                    /* @var $customer editor_Models_Customer */
+                    $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+                    /* @var $customer editor_Models_Customer_Customer */
                     $customer->load($task['customerId']);
                     $value = $customer->getName();
                     break;

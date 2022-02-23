@@ -31,10 +31,10 @@ END LICENSE AND COPYRIGHT
  */
 class Editor_CustomerController extends ZfExtended_RestController {
     
-    protected $entityClass = 'editor_Models_Customer';
+    protected $entityClass = 'editor_Models_Customer_Customer';
     
     /**
-     * @var editor_Models_Customer
+     * @var editor_Models_Customer_Customer
      */
     protected $entity;
     
@@ -83,7 +83,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
             throw new ZfExtended_Models_Entity_Conflict('E1047');
         }
     }
-    
+
     /***
      * Export language resources usage as excel document
      */
@@ -107,6 +107,21 @@ class Editor_CustomerController extends ZfExtended_RestController {
         if($export->excel($customerId)){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
             $this->view->result = $t->_("Es wurden keine Ergebnisse gefunden");
+        }
+    }
+
+    public function copyOperation(){
+        $copy = ZfExtended_Factory::get('editor_Models_Customer_CopyCustomer');
+        /** @var editor_Models_Customer_CopyCustomer $copy */
+
+        $source = $this->getParam('copyDefaultAssignmentsCustomer',false);
+        if(!empty($source)){
+            $copy->copyUserAssoc($source,$this->entity->getId());
+        }
+
+        $source = $this->getParam('copyConfigCustomer',false);
+        if(!empty($source)){
+            $copy->copyConfig($source,$this->entity->getId());
         }
     }
     
@@ -152,7 +167,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
         }
         
         foreach ($this->view->rows as &$row){
-            if($row['number']!=editor_Models_Customer::DEFAULTCUSTOMER_NUMBER){
+            if($row['number']!=editor_Models_Customer_Customer::DEFAULTCUSTOMER_NUMBER){
                 continue;
             }
             $row['domain']=null;

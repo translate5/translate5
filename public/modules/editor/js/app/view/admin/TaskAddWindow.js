@@ -36,7 +36,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.admin.config.ConfigWizard',
         'Editor.view.admin.task.UserAssocWizard',
         'Editor.view.admin.task.UserAssocWizardViewModel',
-        'Editor.view.admin.projectWizard.UploadGrid',
+        'Editor.view.admin.projectWizard.UploadTabPanel',
         'Editor.view.admin.TaskAddWindowViewController'
     ],
     mixins:[
@@ -211,7 +211,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     anchor: '100%'
                                 },
                                 items: [{
-                                    xtype: 'wizardUploadGrid',
+                                    xtype: 'uploadTabPanel',
                                     margin: '0 0 10 0'
                                 },{
                                     xtype: 'container',
@@ -247,14 +247,20 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     valueField: 'id',
                                     allowBlank: false
                                 },{
-                                    xtype: 'hiddenfield',
+                                    xtype: 'languagecombo',
                                     itemId:'relaisLangaugeTaskUploadWizard',
+                                    name: 'relaisLang',
                                     markInvalid:function (error){
                                         // show error message when the field is marked as invalid from the backend
                                         // (this field is not visible to the user)
                                         Editor.MessageBox.addError(error);
                                     },
-                                    name: 'relaisLang'
+                                    bind:{
+                                        hidden: '{!isZipUpload}'
+                                    },
+                                    allowBlank: true,
+                                    toolTip: me.strings.relaisLangTip,
+                                    fieldLabel: me.strings.relaisLangLabel
                                 },{
                                     xtype: 'hiddenfield',
                                     name:'autoStartImport',

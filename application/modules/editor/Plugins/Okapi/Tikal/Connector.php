@@ -190,9 +190,9 @@ class editor_Plugins_Okapi_Tikal_Connector {
      * @return string
      */
     protected function makeCmd($filepath, $import = true) {
-        $cmd = array(escapeshellarg($this->executable));
+        $cmd = array(editor_Utils::escapeshellarg($this->executable));
         $cmd[] = $import ? '-x1' : '-m1 -ie UTF8';
-        $cmd[] = escapeshellarg($filepath);
+        $cmd[] = editor_Utils::escapeshellarg($filepath);
         //if($addFileParam) {
         //$cmd[] = '< %s';
         //}
