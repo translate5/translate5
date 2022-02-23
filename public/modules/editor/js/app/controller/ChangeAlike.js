@@ -72,6 +72,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     alikeSingular: '#UT#Wiederholung wurde bearbeitet und gespeichert',
     alikePlural: '#UT#Wiederholungen wurden bearbeitet und gespeichert',
     alikesDisabled: '#UT#Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.',
+    alikesFailure: '#UT#Die Wiederholungen konnten nicht gespeichert werden',
     alikesNotAllSaved: '#UT#Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.'
   },
   alikesToProcess: null,
@@ -466,7 +467,7 @@ Ext.define('Editor.controller.ChangeAlike', {
    * @param {Object} options
    */
   alikesSaveFailureHandler: function(resp, options) {
-    this.cleanUpAlikeSegments();
+    this.cleanUpAlikeSegments(true);
     Editor.MessageBox.addError(this.messages.alikesFailure);
   },
   /**
@@ -481,7 +482,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     alikes = me.alikesToProcess,
     alikesSaved = (data.rows.length == 1 ? me.messages.alikeSingular : me.messages.alikePlural);
     if(!data.rows || data.rows.length == 0) {
- 	    me.cleanUpAlikeSegments();
+ 	    me.cleanUpAlikeSegments(false);
     	return;
     }
     //Auslesen und Verarbeiten der IDs der Alike Segmente die auf dem Server erfolgreich gespeichert wurden
@@ -496,9 +497,11 @@ Ext.define('Editor.controller.ChangeAlike', {
     	    Ext.Array.remove(alikes, updateId);
     	}
     });
-    
-    me.cleanUpAlikeSegments();
-    Editor.MessageBox.addSuccess(Ext.String.format(alikesSaved, data.rows.length));
+    // finish process by checking of unsaved alikes occured
+    if(me.cleanUpAlikeSegments(false)){
+        Editor.MessageBox.addSuccess(Ext.String.format(alikesSaved, data.rows.length));
+    }
+
     //TODO: change to websocket
     me.fireEvent('alikesSaveSuccess',data);
   },
@@ -506,15 +509,16 @@ Ext.define('Editor.controller.ChangeAlike', {
    * Die übriggebliebenen IDs in der Pending Liste wurden auf dem Server nicht erfolgreich gespeichert, 
    * und werden daher im Segments Store rejectet, sprich wieder die unveränderten Daten angezeigt 
    * 
-   * This method should be the last called method in the changealike processing. Its responsible to jump back to the saveChain 
+   * This method should be the last called method in the changealike processing. Its responsible to jump back to the saveChain
+   * It returns, if no error saving the alikes occured (and no message-box was generated unless "silent" was passed)
    */
-  cleanUpAlikeSegments: function() {
+  cleanUpAlikeSegments: function(silent) {
       var me = this,
           alikes = me.alikesToProcess;
       me.alikesToProcess = null;
       if(!alikes || alikes.length == 0) {
           me.callbackToSaveChain();
-          return;
+          return true;
       }
       Ext.Array.each(alikes, function(revertId){
           var rec = me.getStore('Segments').getById(revertId);
@@ -524,9 +528,13 @@ Ext.define('Editor.controller.ChangeAlike', {
               delete rec._editorDataSave;
           }
       });
-      Editor.MessageBox.addError(me.messages.alikesNotAllSaved);
+      if(!silent){
+          Editor.MessageBox.addError(me.messages.alikesNotAllSaved);
+      }
       me.callbackToSaveChain();
-      throw "not all alikes saved"; // exception here to trigger the rootcause logging
+      // TODO FIXME: This leads to ugly JS-Errors, it seems Rootcause does not catch these reliably. therefore deactivated
+      // throw "not all alikes saved"; // exception here to trigger the rootcause logging
+      return false;
   },
   /**
    * Befüllt das Segment mit der gegebenen ID im Segment Store mit den übergebenen Daten,
