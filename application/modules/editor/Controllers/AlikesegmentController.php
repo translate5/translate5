@@ -195,6 +195,13 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     $entity->setMatchRateType((string) $matchRateType);
                 }
 
+                //is called before save the alike to the DB, after doing all alike data handling (include recalc of the autostate)
+                $this->events->trigger('beforeSaveAlike', $this, array(
+                    'masterSegment' => $this->entity,
+                    'alikeSegment' => $entity,
+                    'isSourceEditable' => $this->isSourceEditable,
+                ));
+
                 // validate the segment after the repitition updater did it's work and states are set
                  $entity->validate();
 
@@ -206,13 +213,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     //since the source was not processed, we have to trigger here the quality processing as it was a sole segment (this also triggers retagging via termtagger)
                     editor_Segment_Quality_Manager::instance()->processSegment($entity, $task, editor_Segment_Processing::EDIT);
                 }
-                
-                //is called before save the alike to the DB, after doing all alike data handling (include recalc of the autostate)
-                $this->events->trigger('beforeSaveAlike', $this, array(
-                        'masterSegment' => $this->entity,
-                        'alikeSegment' => $entity,
-                        'isSourceEditable' => $this->isSourceEditable,
-                ));
+
                 //must be called after validation, since validation does not allow original and originalMd5 updates
                 $this->updateTargetHashAndOriginal($entity, $hasher);
                 
