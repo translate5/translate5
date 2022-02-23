@@ -506,9 +506,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                             // We use the loader-feature of the qtips
                             return '<span data-qtipurl="' + Editor.data.restpath + 'quality/tasktooltip?taskGuid=' + rec.get('taskGuid') + '">' + val + '</span>';
                         },
-                        filter: {
-                            type: 'numeric'
-                        },
+                        filter: false,
                         text: me.strings.qualityErrorCount
                     }, {
                         xtype: 'gridcolumn',
