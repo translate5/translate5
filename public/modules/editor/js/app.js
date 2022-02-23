@@ -246,26 +246,14 @@ Ext.application({
         if (!Editor.data.logoutOnWindowClose) {
             return;
         }
-        var me = this,
-            logout = function (e) {
+        Ext.get(window).on({
+            beforeunload: function (e) {
                 if (!Editor.data.logoutOnWindowClose) {
                     return;
                 }
-                //send logout request, this will destroy the user session
-                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout');
-
-                function sleep(delay) {
-                    const start = new Date().getTime();
-                    while (new Date().getTime() < start + delay) ;
-                }
-
-                //wait 0,5 second for the logout request to be processed
-                //the beforeunload is also triggered with application reload(browser reload)
-                //so we need to give the logout request some time untill the new page reload is requested
-                sleep(500);
-            };
-        Ext.get(window).on({
-            beforeunload: logout
+                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout?noredirect=1'); // destroy the user session
+                Ext.util.Cookies.clear('zfExtended'); // remove now invalid session cookie
+            }
         });
     },
     /**
@@ -483,7 +471,7 @@ Ext.application({
             },
             // Create the form
             form = Ext.DomHelper.append(Ext.getBody(), formSpec);
-
+        // disable logoutOnWindowClose when the language is changed
         Editor.data.logoutOnWindowClose = false;
         form.submit();
     },
@@ -502,7 +490,7 @@ Ext.application({
         record.set('value',newTheme);
         record.save({
             callback:function(){
-                // disable logout on windows close when the theme is changed
+                // disable logoutOnWindowClose when the theme is changed
                 Editor.data.logoutOnWindowClose = false;
                 location.reload();
             }
