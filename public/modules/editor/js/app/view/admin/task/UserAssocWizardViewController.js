@@ -26,9 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/***
+ * @event wizardCardFinished
+ * Fires when next card should be loaded after all operations are finished by the current card.
+ *
+ * @param skipCards how many cards should be skipped after the current card
+ *
+ * This controller is extension of AssocViewController and will overwrite some parent methods and event handlers.
+ */
 Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
     extend: 'Editor.view.admin.user.AssocViewController',
     alias: 'controller.adminTaskUserAssocWizard',
+
+    listeners:{
+        'userAssocRecordDeleted':'onUserAssocRecordDeleted'
+    },
 
     listen:{
         component:{
@@ -79,25 +91,20 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
     },
 
     /***
-     * Load the taskuserassoc store for current workflow and projectId and set the formTask view model
-     * for single task project.
-     * The workflow is get from the workflowCombo
+     * Load the taskuserassoc store for current workflow and projectId
      */
     loadAssocData: function (){
         var me=this,
             view = me.getView(),
+            project = view.task,
             workflowCombo = view.down('#workflowCombo'),
             store=view.down('grid').getStore();
 
         store.setExtraParams({
-            projectId:view.task.get('projectId'),
+            projectId:project.get('projectId'),
             workflow: workflowCombo.getValue()
         });
         store.load();
-
-        if(!view.task.hasProjectTasks()){
-            me.getViewModel().set('formTask',me.getFormTask());
-        }
     },
 
     /***
@@ -105,15 +112,15 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
     onUserAssocWizardActivate:function(){
         var me=this,
             view = me.getView(),
-            task = view.task,
+            project = me.getFormTask(),
             workflowCombo = view.down('#workflowCombo'),
             usersStore = Ext.StoreManager.get('admin.Users'),
             usageMode = view.down('#usageMode');
 
         // first set the combo value on panel activate then load the store.
-        workflowCombo.setValue(task.get('workflow'));
+        workflowCombo.setValue(project.get('workflow'));
         // set the usageMode default from the task. The default value is set from the config after the task is created
-        usageMode.setValue(task.get('usageMode') ? task.get('usageMode') : Editor.model.admin.Task.USAGE_MODE_COOPERATIVE);
+        usageMode.setValue(project.get('usageMode') ? project.get('usageMode') : Editor.model.admin.Task.USAGE_MODE_COOPERATIVE);
 
         me.loadAssocData();
 
@@ -129,21 +136,23 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
     },
 
     /***
-     * @override
+     * @override Editor.view.admin.user.AssocViewController::onSaveAssocBtnClick
      */
     onSaveAssocBtnClick : function(){
         var me = this,
             formPanel = me.lookup('assocForm'),
             taskStore = Ext.StoreManager.get('admin.Tasks'),
             form = formPanel.getForm(),
-            rec = formPanel.getRecord();
+            rec = formPanel.getRecord(),
+            task = me.getFormTask();
+        
         form.updateRecord(rec);
 
         if(! form.isValid()) {
             return;
         }
 
-        rec.saveVersioned(me.getFormTask(),{
+        rec.saveVersioned(task,{
             failure: function(rec, op) {
                 var errorHandler = Editor.app.getController('ServerException');
                 errorHandler.handleFormFailure(form, rec, op);
@@ -158,6 +167,10 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         });
     },
 
+    /***
+     *
+     * @override Editor.view.admin.user.AssocViewController::onAddAssocBtnClick
+     */
     onAddAssocBtnClick : function(){
         var me=this,
             newRecord = me.getView().getDefaultFormRecord(),
@@ -188,7 +201,6 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
             targetLangField.suspendEvents();
             targetLangField.setValue(null);
             targetLangField.resumeEvents(true);
-            me.getViewModel().set('formTask',null);
         }
      
         // reset the current form and load the new record
@@ -197,7 +209,21 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         formPanel.setDisabled(false);
     },
 
-    onTargetlangSelect: function (combo, record){
+    /***
+     * After the user assoc record is deleted, reload the form task if exist
+     */
+    onUserAssocRecordDeleted: function (){
+        var me = this,
+            task = me.getFormTask();
+        if(task){
+            task.load();
+        }
+    },
+
+    /***
+     * On target language select update the taskGuid in the form record
+     */
+    onTargetlangSelect: function (){
         var me = this,
             formPanel = me.lookup('assocForm'),
             formRecord = formPanel.getRecord(),
@@ -205,8 +231,6 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
 
         // on target language change, set the current form taskGuid to matching project task/single task
         formRecord.set('taskGuid',task.get('taskGuid'));
-
-        me.getViewModel().set('formTask',task);
     },
 
     /***
@@ -289,6 +313,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
 
     /***
      * Find the task or projectTask based on the selected combobox target language.
+     * The matched task will always be loaded from the tasks store
      */
     getFormTask: function (){
         var me = this,
@@ -321,9 +346,10 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
      */
     preimportOperation:function (params,successCallback){
         var me=this,
-            view = me.getView();
+            view = me.getView(),
+            project = view.task;
         Ext.Ajax.request({
-            url:Editor.data.restpath+'task/{id}/preimport/operation'.replace("{id}",view.task.get('id')),
+            url:Editor.data.restpath+'task/{id}/preimport/operation'.replace("{id}",project.get('id')),
             method: 'POST',
             params: params,
             success: successCallback,
@@ -349,12 +375,13 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
     setNotifyAllUsersTaskConfig:function(){
         var me=this,
             view = me.getView(),
+            project = view.task,
             notifyAssociatedUsersCheckBox = view.down('#notifyAssociatedUsersCheckBox'),
             store = Ext.create('Editor.store.admin.CustomerConfig');
 
         view.mask();
 
-        store.loadByCustomerId(view.task.get('customerId'),function (){
+        store.loadByCustomerId(project.get('customerId'),function (){
             notifyAssociatedUsersCheckBox.setValue(store.getConfig('workflow.notifyAllUsersAboutTask'));
             view.unmask();
         });
