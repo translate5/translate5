@@ -416,6 +416,18 @@ class editor_TaskController extends ZfExtended_RestController {
             // add user-segment assocs
             $this->addMissingSegmentrangesToResult($row);
         }
+        // sorting of qualityErrorCount can only be done after QS data is attached
+        if($this->entity->getFilter()->hasSort('qualityErrorCount')){
+            $direction = SORT_ASC;
+            foreach($this->entity->getFilter()->getSort() as $sort){
+                if($sort->property == 'qualityErrorCount' && $sort->direction === 'DESC'){
+                    $direction = SORT_DESC;
+                    break;
+                }
+            }
+            $columns = array_column($rows, 'qualityErrorCount');
+            array_multisort($columns, $direction, $rows);
+        }
         return $rows;
     }
     /**
