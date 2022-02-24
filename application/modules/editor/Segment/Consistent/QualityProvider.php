@@ -84,11 +84,6 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
             return $tags;
         }
 
-        // If processing mode is 'alike' - the only task in an alike process is cloning the qualities
-        if ($processingMode == editor_Segment_Processing::ALIKE) {
-            $tags->cloneAlikeQualitiesByType(static::$type);
-        }
-
         // Force existing qualities to be kept
         foreach ($tags->getQualities()->getExisting() as $quality) {
             if ($quality->type == self::$type) {
