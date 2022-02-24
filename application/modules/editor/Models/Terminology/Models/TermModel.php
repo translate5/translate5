@@ -2347,6 +2347,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             ':termEntryId' => $this->getTermEntryId(),
         ];
 
+        // Order clauses
+        $order = [];
+
         // If we have current search term languages ids given
         if ($searchLangIds) {
 
