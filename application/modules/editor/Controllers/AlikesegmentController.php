@@ -122,7 +122,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         // Currently it is used only for consistency-check to detect consistency qualities BEFORE segment is saved,
         // so that it would be possible to do the same AFTER segment is saved, calculate the difference and insert/delete
         // qualities on segments where needed
-        editor_Segment_Quality_Manager::instance()->preProcessTask($task, editor_Segment_Processing::EDIT);
+        editor_Segment_Quality_Manager::instance()->preProcessTask($task, editor_Segment_Processing::ALIKE);
 
         $alikeCount = count($ids);
         foreach($ids as $id) {
@@ -269,7 +269,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $this->view->total = count($result);
 
         // Update qualities for cases when we need full list of task's segments to be analysed for quality detection
-        editor_Segment_Quality_Manager::instance()->postProcessTask($task, editor_Segment_Processing::EDIT);
+        editor_Segment_Quality_Manager::instance()->postProcessTask($task, editor_Segment_Processing::ALIKE);
     }
     
     /**

@@ -109,7 +109,8 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
         }
 
         // Else
-        if (!($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode))) {
+        if (!(in_array($processingMode, [editor_Segment_Processing::EDIT, editor_Segment_Processing::ALIKE])
+            || editor_Segment_Processing::isOperation($processingMode))) {
             return;
         }
 
@@ -195,15 +196,15 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
         }
 
         // Else
-        if (!($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode))) {
-            return;
+        if (in_array($processingMode, [editor_Segment_Processing::EDIT, editor_Segment_Processing::ALIKE])
+            || editor_Segment_Processing::isOperation($processingMode)) {
+
+            // Get check object, containing detected quality categories
+            $check = new editor_Segment_Consistent_Check($task);
+
+            // Remember active states before segment saved
+            static::$was = $check->getStates();
         }
-
-        // Get check object, containing detected quality categories
-        $check = new editor_Segment_Consistent_Check($task);
-
-        // Remember active states before segment saved
-        static::$was = $check->getStates();
     }
 
     /**
