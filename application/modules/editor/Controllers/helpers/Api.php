@@ -55,7 +55,7 @@ class Editor_Controller_Helper_Api extends Zend_Controller_Action_Helper_Abstrac
         }
         $model = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $model editor_Models_Languages */
-        $return = $model->loadByIds(implode(',',$languages));
+        $return = $model->loadByIds($languages);
         $languages = array_column($return,'id');
     }
 }

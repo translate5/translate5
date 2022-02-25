@@ -98,15 +98,11 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
             // Foreach target
             foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
 
-                // If the target is empty, we do not need to check
-                if (!$target->isEmpty()) {
+                // Do check
+                $check = new editor_Segment_Empty_Check($task, $target->getField(), $segment, $chars);
 
-                    // Do check
-                    $check = new editor_Segment_Empty_Check($task, $target->getField(), $segment, $chars);
-
-                    // Collect distinct states
-                    $states += $check->getStates();
-                }
+                // Collect distinct states
+                $states += $check->getStates();
             }
 
             // Process check results

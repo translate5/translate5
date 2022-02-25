@@ -184,8 +184,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
     listeners: {
         afterTaskDelete: 'onAfterTaskDeleteEventHandler',
-        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler',
-        taskCreated:'onTaskCreated'
+        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler'
     },
     listen: {
         controller: {
@@ -1110,12 +1109,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         //     formData.append(property, value);
         // });
 
-        // set the timeout to 60s to prevent timeouts on video uploads or larger files
-        Ext.Ajax.setTimeout(60000);
-
         Ext.Ajax.request({
             params:params,// send all other form fields as json params to skip the formdata parameter conversions
             rawData: formData,
+            timeout: 3600000, // set the timeout to 1H to prevent timeouts on video uploads or larger files
             method:'POST',
             headers: {'Content-Type':null}, //to use content type of FormData
             url: Editor.data.restpath + 'task',
@@ -1123,13 +1120,16 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 var resp = Ext.decode(response.responseText),
                     task = me.getModel('admin.Task').create(resp.rows);
 
-                me.fireEvent('taskCreated', task);
-                win.setLoading(false);
+                // reload the required data for the import wizard and fire taskCreated event
+                me.notifyTaskCreated(task,function (){
 
-                //call the callback if exist
-                if (successCallback) {
-                    successCallback(task);
-                }
+                    win.setLoading(false);
+
+                    //call the callback if exist
+                    if (successCallback) {
+                        successCallback(task);
+                    }
+                });
             },
             failure: function (response) {
                 var card,
@@ -1266,20 +1266,37 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
 
     /***
-     * On task created event listener
+     * Notify the application that the task is created. The event taskCreated will be fired after the task store and the
+     * project store are reloaded. The store reload is required so there are no entity version conflicts later in the
+     * import wizard
      * @param task
+     * @param callback
      */
-    onTaskCreated:function (task){
+    notifyTaskCreated:function (task, callback){
         var me = this;
 
-        me.getAdminTasksStore().load();
-        me.getProjectGrid().getController().reloadProjects().then(function(){
-            me.handleProjectAfterImport(task);
+        // reload the task store so the new tasks are included inside.
+        me.getAdminTasksStore().load({
+            callback:function (){
+                // reload the project store after the task store is reloaded
+                me.getProjectGrid().getController().reloadProjects().then(function(){
+
+                    // update the project route based on the current task
+                    me.handleProjectAfterImport(task);
+                    //set the store reference to the model(it is missing), it is used later when the task is deleted
+                    task.store = me.getAdminTasksStore();
+
+                    // for each import wizard card, set the project/task object
+                    me.setCardsTask(task);
+
+                    // fire the taskCreated after all stores are reloaded
+                    me.fireEvent('taskCreated', task);
+
+                    if(callback){
+                        callback();
+                    }
+                });
+            }
         });
-
-        //set the store reference to the model(it is missing), it is used later when the task is deleted
-        task.store = me.getAdminTasksStore();
-
-        me.setCardsTask(task);
     }
 });

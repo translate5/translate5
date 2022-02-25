@@ -132,8 +132,8 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
         
         $customersMap = $rop->authentication->ipbased->IpCustomerMap->toArray();
         
-        $customer = ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $customer editor_Models_Customer */
+        $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+        /* @var $customer editor_Models_Customer_Customer */
         
         //is customer configured for the client ip
         if(isset($customersMap[$this->ip])){

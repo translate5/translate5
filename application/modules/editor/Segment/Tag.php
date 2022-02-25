@@ -420,7 +420,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return $this;
     }
 
-    public function jsonSerialize(){
+    public function jsonSerialize() : mixed {
         $data = new stdClass();
         $data->type = static::$type;
         $data->name = $this->getName();

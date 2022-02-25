@@ -58,6 +58,10 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         this.addFilesToStore(btn.fileInputEl.dom.files, Editor.model.admin.projectWizard.File.TYPE_PIVOT);
     },
 
+    onManualAddReference: function(btn) {
+        this.addFilesToStore(btn.fileInputEl.dom.files, Editor.model.admin.projectWizard.File.TYPE_REFERENCE);
+    },
+
     onDrop: function(e) {
         e.stopEvent();
         var me = this,
@@ -136,6 +140,13 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                     error: null
                 });
 
+            // no validation is needed for reference files, everything is allowed to be set as reference file
+            if(rec.get('type') === Editor.model.admin.projectWizard.File.TYPE_REFERENCE){
+                rec.commit();
+                store.addSorted(rec);
+                return true;
+            }
+
             if(!Ext.Array.contains(Editor.data.import.validExtensions,rec.getExtension())){
                 new Ext.util.DelayedTask(function(){
                     Ext.Msg.alert(me.getView().strings.errorColumnText, Ext.String.format(msg.extension, file.name, rec.getExtension()));
@@ -187,26 +198,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         this.getView().isValid();
     },
 
-    updateFormIsValid:function (){
-        var me = this,
-            view = me.getView(),
-            store = view && view.getStore(),
-            form = view && view.up('#taskMainCard').down('form'),
-            items = [];
-
-        if(!store){
-            return;
-        }
-
-        items = store.queryBy(function (record){
-            return record.get('type') !== Editor.model.admin.projectWizard.File.TYPE_ERROR;
-        });
-
-        form && items.length === 0 && form.markInvalid({
-            importUpload : 'No valid upload files found'
-        });
-    },
-
     /***
      * Validates and sets the language fields in the current file record
      *
@@ -228,14 +219,14 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             errorMsg = null;
 
         // evaluate the sourceLang from the file content
-        fileSourceLang = fileSourceLang ? fileSourceLang[1] : null;
+        fileSourceLang = me.parseFileLanguage(fileSourceLang);
         if(fileSourceLang) {
             // convert the rfc to id
             rec.set('sourceLang', languages.getIdByRfc(fileSourceLang));
         }
 
         // evaluate the targetLang from the file content
-        fileTargetLang = fileTargetLang ? fileTargetLang[1] : null;
+        fileTargetLang = me.parseFileLanguage(fileTargetLang);
         if(fileTargetLang) {
             rec.set('targetLang', languages.getIdByRfc(fileTargetLang));
         }
@@ -306,38 +297,29 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             });
 
         pivotFiles.each(function (pivot){
+            var fileFound = false;
             workFiles.each(function (file){
-                if(me.filesMatch(file.get('name'),pivot.get('name')) === false){
-                    pivot.set('error',me.errorMessages.pivotNameNotSameAsWorkfile);
-                    pivot.set('type','error');
+                if(!fileFound && me.filesMatch(file.get('name'),pivot.get('name'))) {
+                    fileFound = true;
                 }
             });
+            if(! fileFound){
+                pivot.set('error',me.errorMessages.pivotNameNotSameAsWorkfile);
+                pivot.set('type','error');
+            }
         });
     },
 
     /***
-     * Check if the workFile and the pivotFiles names are the same.
-     * If the workFile uses okapi parser, we add .xlf as additional extension, since this will be the final
-     * filename which will be matched for pivot patch
-     *
+     * Check if the workfile-name and the pivot file-name are matching.
+     *  The files are equal when the names are matching until the first “.“.
+     *  ex: my-test-project.de-en.xlf will match my-test-project.de-it.xlf
      * @param workFile
      * @param pivotFile
      * @returns {*|boolean|boolean}
      */
     filesMatch: function(workFile,pivotFile){
-        if(workFile === pivotFile){
-            return true;
-        }
-        var ext = Editor.util.Util.getFileExtension(workFile),
-            supported = false;
-
-        // if the workFile has native parser and the files are not matched by name then those files have different name
-        if(Ext.Array.contains(Editor.data.import.nativeParserExtensions,ext)){
-            return false;
-        }
-        // if the extension is supported, this file will be processed by okapi
-        supported = Ext.Array.contains(Editor.data.import.validExtensions,ext);
-        return supported && (workFile+'.xlf' === pivotFile);
+        return Editor.util.Util.compareImportStyleFileName(workFile,pivotFile);
     },
 
     /***
@@ -453,6 +435,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                 return Editor.model.admin.projectWizard.File.TYPE_WORKFILES;
             case 'pivotFilesFilesButton':
                 return Editor.model.admin.projectWizard.File.TYPE_PIVOT;
+            case 'referenceFilesFilesButton':
+                return Editor.model.admin.projectWizard.File.TYPE_REFERENCE;
             default:
                 return Editor.model.admin.projectWizard.File.TYPE_WORKFILES;
         }
@@ -501,5 +485,20 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         var me = this,
             window = me.getView().up('#adminTaskAddWindow');
         window && window.getViewModel().set('isZipUpload',isZip);
+    },
+
+    /***
+     * Parse language from file read search and adjust it to rfc parsable strings
+     * @param language
+     * @returns {null|*}
+     */
+    parseFileLanguage:function (language){
+        if(!language || language[1] === undefined){
+            return null;
+        }
+        // remove any whitespaces from the langauge
+        language = language[1].trim();
+        // replace the _ with - so it can be validated as rfc
+        return language.replace('_','-');
     }
 });

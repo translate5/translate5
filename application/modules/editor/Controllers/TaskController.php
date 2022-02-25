@@ -334,9 +334,13 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function loadAllForProjectOverview() {
         $rows = $this->loadAll();
         $customerData = $this->getCustomersForRendering($rows);
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
+        $isTransfer = $file->getTransfersPerTasks(array_column($rows, 'taskGuid'));
         foreach ($rows as &$row) {
             unset($row['qmSubsegmentFlags']); // unneccessary in the project overview
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
+            $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
         }
         return $rows;
     }
@@ -354,6 +358,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $fileCount = $file->getFileCountPerTasks($taskGuids);
+        $isTransfer = $file->getTransfersPerTasks($taskGuids);
 
         $this->_helper->TaskUserInfo->initUserAssocInfos($rows);
 
@@ -392,6 +397,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
 
             $row['fileCount'] = empty($fileCount[$row['taskGuid']]) ? 0 : $fileCount[$row['taskGuid']];
+            $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
 
             //add task assoc if exist
             if(isset($taskassocs[$row['taskGuid']])){
@@ -409,6 +415,18 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->addQualitiesToResult($row);
             // add user-segment assocs
             $this->addMissingSegmentrangesToResult($row);
+        }
+        // sorting of qualityErrorCount can only be done after QS data is attached
+        if($this->entity->getFilter()->hasSort('qualityErrorCount')){
+            $direction = SORT_ASC;
+            foreach($this->entity->getFilter()->getSort() as $sort){
+                if($sort->property == 'qualityErrorCount' && $sort->direction === 'DESC'){
+                    $direction = SORT_DESC;
+                    break;
+                }
+            }
+            $columns = array_column($rows, 'qualityErrorCount');
+            array_multisort($columns, $direction, $rows);
         }
         return $rows;
     }
@@ -460,8 +478,8 @@ class editor_TaskController extends ZfExtended_RestController {
             return [];
         }
 
-        $customer = ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $customer editor_Models_Customer */
+        $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+        /* @var $customer editor_Models_Customer_Customer */
         $customerData = $customer->loadByIds($customerIds);
         return array_combine(array_column($customerData, 'id'), array_column($customerData, 'name'));
     }
@@ -493,6 +511,8 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * creates a task and starts import of the uploaded task files
      * (non-PHPdoc)
+     * @throws Zend_Exception
+     * @throws Exception
      * @see ZfExtended_RestController::postAction()
      */
     public function postAction() {
@@ -526,7 +546,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
 
         if (empty($this->data['taskType'])) {
-            $this->data['taskType'] = $this->entity->getDefaultTasktype();
+            $this->data['taskType'] = editor_Task_Type_Default::ID;
         }
 
         $this->data['pmName'] = $pm->getUsernameLong();
@@ -534,8 +554,9 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $this->setDataInEntity();
 
-        $this->prepareLanguages();
-        
+        $targetLangCount = $this->prepareLanguages();
+        $singleTask = $this->prepareTaskType($targetLangCount);
+
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
 
@@ -571,10 +592,10 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $this->initWorkflow();
 
-        if($this->isProjectUpload()){
-            $tasks = $this->handleProjectUpload();
-        }else{
+        if($singleTask){
             $tasks = $this->handleTaskImport();
+        }else{
+            $tasks = $this->handleProjectUpload();
         }
 
         //warn the api user for the targetDeliveryDate ussage
@@ -598,9 +619,21 @@ class editor_TaskController extends ZfExtended_RestController {
     }
 
     /**
-     * prepares the languages in $this->data for the import
+     * prepares the tasks type, by considering the language count and the initial given task type via API
+     * returns if it should be a single task (project = task) or a project with sub tasks
      */
-    protected function prepareLanguages() {
+    protected function prepareTaskType(int $targetLangCount): bool {
+        $taskType = editor_Task_Type::getInstance();
+        $taskType->calculateImportTypes($targetLangCount > 1, $this->data['taskType']);
+        $this->entity->setTaskType($taskType->getImportProjectType());
+        return $taskType->getImportTaskType() === $taskType->getImportProjectType();
+    }
+
+    /**
+     * prepares the languages in $this->data for the import
+     * @return int the target language count
+     */
+    protected function prepareLanguages(): int {
         if(!is_array($this->data['targetLang'])) {
             $this->data['targetLang'] = [$this->data['targetLang']];
         }
@@ -613,13 +646,13 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->_helper->Api->convertLanguageParameters($target);
         }
 
-        // sort the langauges alphabetically
+        // sort the languages alphabetically
         $this->_helper->Api->sortLanguages($this->data['targetLang']);
 
         //task is handled as a project (one source language, multiple target languages, each combo one own task)
-        if(count($this->data['targetLang']) > 1) {
+        $targetLangCount = count($this->data['targetLang']);
+        if($targetLangCount > 1) {
             //with multiple target languages, the current task will be a project!
-            $this->entity->setTaskType($this->entity::INITIAL_TASKTYPE_PROJECT);
             $this->entity->setTargetLang(0);
         }
         else {
@@ -628,16 +661,18 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
         $this->entity->setRelaisLang($this->data['relaisLang']);
+
+        return $targetLangCount;
     }
 
     /**
      * Loads the customer by id, or number, or the default customer
      * stores the customerid internally and in this->data
-     * @return editor_Models_Customer the loaded customer if any
+     * @return editor_Models_Customer_Customer the loaded customer if any
      */
-    protected function prepareCustomer(): ?editor_Models_Customer {
-        $result = $customer = ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $customer editor_Models_Customer */
+    protected function prepareCustomer(): ?editor_Models_Customer_Customer {
+        $result = $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+        /* @var $customer editor_Models_Customer_Customer */
 
         if(empty($this->data['customerId'])) {
             $customer->loadByDefaultCustomer();
@@ -834,9 +869,9 @@ class editor_TaskController extends ZfExtended_RestController {
         }
 
         $tasks = [];
-        //if it is a project, start the import workers for each task project
+        //if it is a project, start the import workers for each sub task
         if($task->isProject()) {
-            $tasks=$task->loadProjectTasks($task->getProjectId(),true);
+            $tasks = $task->loadProjectTasks($task->getProjectId(),true);
         } else {
             $tasks[] = $task;
         }
@@ -902,7 +937,7 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($data['userCount']);
         //is the source task a single project task
         if($this->entity->getId()==$this->entity->getProjectId()){
-            $data['taskType'] = $this->entity::INITIAL_TASKTYPE_PROJECT_TASK;
+            $data['taskType'] = editor_Task_Type_ProjectTask::ID;
         }
         $data['state'] = 'import';
         $this->entity->init($data);
@@ -1436,7 +1471,7 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function validateTaskType() {
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
-        $isTaskTypeAllowed = $acl->isInAllowedRoles($this->user->data->roles, 'initial_tasktype', $this->entity->getTaskType());
+        $isTaskTypeAllowed = $acl->isInAllowedRoles($this->user->data->roles, 'initial_tasktype', $this->entity->getTaskType()->id());
         if (!$isTaskTypeAllowed) {
             ZfExtended_UnprocessableEntity::addCodes([
                 'E1217' => 'TaskType not allowed.'
@@ -1911,24 +1946,23 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function handleProjectRequest(): bool{
         $projectOnly = (bool) $this->getRequest()->getParam('projectsOnly', false);
-        $filter=$this->entity->getFilter();
+        $filter = $this->entity->getFilter();
+        $taskTypes = editor_Task_Type::getInstance();
         if($filter->hasFilter('projectId') && !$projectOnly){
             //filter for all tasks in the project(return also the single task projects)
             $filter->addFilter((object)[
                 'field' => 'taskType',
-                'value' =>[editor_Models_Task::INITIAL_TASKTYPE_PROJECT],
+                'value' => $taskTypes->getProjectTypes(true),
                 'type' => 'notInList',
                 'comparison' => 'in'
             ]);
             return false;
         }
-        
-        $filterValues = [editor_Models_Task::INITIAL_TASKTYPE_DEFAULT];
-        
+
         if($projectOnly){
-            $filterValues[]=editor_Models_Task::INITIAL_TASKTYPE_PROJECT;
-        }else{
-            $filterValues[]=editor_Models_Task::INITIAL_TASKTYPE_PROJECT_TASK;
+            $filterValues = $taskTypes->getProjectTypes();
+        } else {
+            $filterValues = $taskTypes->getTaskTypes();
         }
         
         $filter->addFilter((object)[
@@ -1978,24 +2012,24 @@ class editor_TaskController extends ZfExtended_RestController {
     /***
      * Check if the given task/project can be deleted based on the task state. When project task is provided,
      * all project tasks will be checked
+     * @throws ZfExtended_Models_Entity_Conflict
      */
     protected function checkStateDelete(editor_Models_Task $taskEntity, bool $forced){
 
         // if it is not project, do regular check
-        if(!$taskEntity->isProject()){
-
-            //if task is erroneous then it is also deleteable, regardless of its locking state
-            if(!$taskEntity->isImporting() && !$taskEntity->isErroneous() && !$forced){
-                $taskEntity->checkStateAllowsActions();
-            }
-        }else{
-            $model=ZfExtended_Factory::get('editor_Models_Task');
+        if($taskEntity->isProject()){
+            $model = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $model editor_Models_Task */
-            $tasks=$model->loadProjectTasks($this->entity->getProjectId(),true);
+            $tasks = $model->loadProjectTasks($this->entity->getProjectId(),true);
             // if it is project, load all project tasks, and check the state for each one of them
             foreach ($tasks as $projectTask){
                 $model->init($projectTask);
                 $this->checkStateDelete($model,$forced);
+            }
+        } else {
+            //if task is erroneous then it is also deleteable, regardless of its locking state
+            if(!$taskEntity->isImporting() && !$taskEntity->isErroneous() && !$forced){
+                $taskEntity->checkStateAllowsActions();
             }
         }
     }

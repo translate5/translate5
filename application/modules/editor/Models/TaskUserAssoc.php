@@ -309,7 +309,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             ->where('tua.isPmOverride = 0')
             ->where('tua.workflow = ?',$workflow)
             ->where('t.projectId = ?',$projectId)
-            ->where('t.taskType != ?',editor_Models_Task::INITIAL_TASKTYPE_PROJECT);
+            ->where('t.taskType not in(?)', editor_Task_Type::getInstance()->getProjectTypes(true));
 
         //default sort:
         if(!$this->filter->hasSort()) {
@@ -421,6 +421,17 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $this->init($assoc);
             $this->delete();
         }
+    }
+
+    /***
+     * Delete all user association for given taskGuid
+     * @return void
+     */
+    public function deleteByTaskGuid(string $taskGuid){
+        $this->db->delete([
+            'taskGuid = ?' => $taskGuid
+        ]);
+        $this->updateTask($taskGuid);
     }
 
     /**

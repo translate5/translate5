@@ -46,7 +46,7 @@ class editor_Plugins_DummyPretranslator_Init extends ZfExtended_Plugin_Abstract 
     public function handleAfterImport(Zend_EventManager_Event $event) {
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
-        if(!$task->getEmptyTargets()) {
+        if(!$task->isTranslation()) {
             error_log("DummyPretranslator disabled due existing targets for Task ".$task->getTaskGuid().' - '.$task->getTaskName());
             return;
         }

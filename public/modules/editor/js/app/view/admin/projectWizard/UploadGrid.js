@@ -26,7 +26,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @class Editor.view.admin.TaskUpload
+ * @class Editor.view.admin.projectWizard.UploadGrid
  * @extends Ext.panel.Panel
  */
 Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
@@ -75,7 +75,9 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         workFilesTypeText:'#UT#Arbeitsdatei',
         pivotFilesTypeText:'#UT#Pivot-Datei',
         addFilesDefaultTooltip: '#UT#Datei(en) hinzufügen',
-        fileMix:'#UT#Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!'
+        fileMix:'#UT#Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!',
+        referenceFilesFilesButton:'#UT#Referenz-Dateien(en) hinzufügen',
+        referenceFilesTypeText:'#UT#Referenz-Datei'
     },
 
     initConfig: function(instanceConfig) {
@@ -109,6 +111,18 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                         change: 'onManualAddPivot'
                     }
                 },{
+                    xtype: 'wizardFileButton',
+                    text: me.strings.referenceFilesFilesButton,
+                    name:'referenceFilesFilesButton',
+                    tooltip:me.strings.fileMix,
+                    componentCls: 'disabledButtonTooltip',
+                    bind: {
+                        disabled: '{isZipUpload}'
+                    },
+                    listeners: {
+                        change: 'onManualAddReference'
+                    }
+                },{
                     xtype: 'tbseparator'
                 },{
                     xtype: 'button',
@@ -116,6 +130,14 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     handler: 'removeFiles',
                     bind: {
                         disabled: '{!uploadgrid.selection}'
+                    }
+                },{
+                    xtype:'displayfield',
+                    fieldLabel:false,
+                    fieldCls:'redTextColumn',
+                    bind:{
+                        value : '{uploadErrorMsg}',
+                        hidden: '{!uploadErrorMsg}'
                     }
                 }],
                 viewConfig: {
@@ -210,8 +232,11 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
             return;
         }
         var me = this,
-            gridview  = me.getView();
+            gridview  = me.getView(),
+            tpl = Ext.isArray(error) ? error.join('<br/>') : error;
+
         gridview.addCls('invalidGridBorder');
+        me.getViewModel().set('uploadErrorMsg',tpl);
         gridview.refresh();
     },
 
@@ -222,6 +247,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         var me = this,
             gridview  = me.getView();
         gridview.removeCls('invalidGridBorder');
+        me.getViewModel().set('uploadErrorMsg',null);
     },
 
     /***
@@ -241,6 +267,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                 return me.strings.workFilesTypeText;
             case Editor.model.admin.projectWizard.File.TYPE_PIVOT:
                 return me.strings.pivotFilesTypeText;
+            case Editor.model.admin.projectWizard.File.TYPE_REFERENCE:
+                return me.strings.referenceFilesTypeText;
         }
         return val;
     },

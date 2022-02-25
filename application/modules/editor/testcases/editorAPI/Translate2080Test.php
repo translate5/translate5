@@ -67,12 +67,10 @@ class Translate2080Test extends editor_Test_JsonTest {
         $projectTasks = self::$api->getTask()->projectTasks;
 
         $this->assertEquals(count($projectTasks), 2, 'No project tasks created.');
-
-        $task = self::$api->getTask();
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 
     public static function tearDownAfterClass(): void {
-
+        $task = self::$api->getTask();
+        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }

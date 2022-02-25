@@ -62,7 +62,7 @@ $config = Zend_Registry::get('config');
         <?php echo $this->translate->_('translate5 wird geladen:');?>
         <div id="loading-indicator-text"></div>
     	<div id="head-panel"></div>
-        <?php if($this->getScriptPath('fragments/header-consortium-logos.phtml') && $config->runtimeOptions->startup->showConsortiumLogos > 0) : ?>
+        <?php if($config->runtimeOptions->startup->showConsortiumLogos > 0 && $this->getScriptPath('fragments/header-consortium-logos.phtml')) : ?>
             <div class="containerConsortium">
                 <a href="https://www.translate5.net" target="_blank">
                     <?= $this->render('fragments/header-consortium-logos.phtml') ?>

@@ -3287,7 +3287,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </rule>
 <!-- z.B. "bla (...) blubb" -> kein Satzende -->
 <rule break="no">
-<beforebreak>[\(\)\[\]]\s</beforebreak>
+<beforebreak>[\(\)\[\]][ \t]</beforebreak>
 <afterbreak></afterbreak>
 </rule>
 <!-- don't split at cases like "Friedrich II. wird auch..." -->
@@ -3354,7 +3354,11 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>\b(Tel|Temp|trans|Tsd|übertr|übl|ff|ugs|univ|urspr|usw|vgl|Vol|vorm|vorm|Vp|Vs|vs|wg|Hd|Ztr|zus|Zus|zzt|zz|zzgl|Zz|Zt|Min|bzgl|bezügl|Frhr|ggfs|insb)\.\s</beforebreak>
 <afterbreak></afterbreak>
 </rule>
-
+<!-- yes rule added by translate5 / Marc -->
+<rule break="yes">
+<beforebreak>(\:)</beforebreak>
+<afterbreak>[\s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
+</rule>
 <!-- srx rules as found at https://bitbucket.org/okapiframework/srx-repository at 2019-01-29 -->
 <!--sentence final punctuation (incl. quotation marks) - GERMAN-->
 <rule break="yes">

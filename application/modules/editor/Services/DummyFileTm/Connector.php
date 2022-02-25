@@ -208,9 +208,9 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @param string $target
      */
     protected function makeMatch($queryString, $source, $target) {
+        $percent = 0;
         $source = $this->tagHandler->restoreInResult($source);
         $target = $this->tagHandler->restoreInResult($target);
-        $percent = 0;
         similar_text($queryString, $source, $percent);
         if($percent < 80) {
             return;

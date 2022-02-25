@@ -50,27 +50,7 @@ class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Im
             return false;
         }
         
-        $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
-        /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
-        $allValidExtensions = $supportedFiles->getSupportedExtensions();
-
-        $files = $this->getFiles();
-        $errors = [];
-
-        foreach ($files as $file){
-            $ext = $this->getFileExtension($file);
-            if(!in_array($ext, $allValidExtensions)){
-                $data = [
-                    'ext' => $ext,
-                    'filename' => $file,
-                ];
-
-                $log = Zend_Registry::get('logger');
-                /* @var $log ZfExtended_Logger */
-                $log->info('E1031', 'A file "{filename}" with an unknown file extension "{ext}" was tried to be imported.', $data);
-                $errors[] = editor_Models_Import_UploadProcessor::ERROR_INVALID_FILE;
-            }
-        }
+        $errors = $this->checkForFilesErrors($this->getFiles());
 
         if(empty($errors)){
             return true;
@@ -78,5 +58,67 @@ class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Im
 
         $addErrorCallback($errors);
         return false;
+    }
+
+    /***
+     * Check if the uploaded files are correct. This function will validate if the file extension.
+     * @param array $files
+     * @return array
+     * @throws Zend_Exception
+     */
+    private function checkForFilesErrors(array $files): array
+    {
+        $errors = [];
+
+        $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+        /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
+        $allValidExtensions = $supportedFiles->getSupportedExtensions();
+
+        $log = Zend_Registry::get('logger');
+        /* @var $log ZfExtended_Logger */
+
+        $fileIndex = 0;
+        foreach ($files as $file){
+
+            if(!$this->validateFileExtension($fileIndex)){
+                $fileIndex++;
+                continue;
+            }
+
+            $ext = $this->getFileExtension($file);
+            if(!in_array($ext, $allValidExtensions)){
+                $data = [
+                    'ext' => $ext,
+                    'filename' => $file,
+                ];
+
+                $log->info('E1031', 'A file "{filename}" with an unknown file extension "{ext}" was tried to be imported.', $data);
+                $errors[] = editor_Models_Import_UploadProcessor::ERROR_INVALID_FILE;
+            }
+            $fileIndex++;
+        }
+        return $errors;
+    }
+
+    /***
+     * Check if the file extension should be validated. For project uploads for reference files there is no need for extension validations.
+     *
+     * @param int $fileIndex
+     * @return bool
+     */
+    private function validateFileExtension(int $fileIndex): bool{
+        if(!$this->isProjectUpload()){
+            return true;
+        }
+        $type = $_REQUEST['importUpload_type'][$fileIndex] ?? false;
+        return $type !== 'reference';
+    }
+
+    /***
+     * Is the current upload project upload
+     * @return bool
+     */
+    private function isProjectUpload(): bool{
+        return isset($_REQUEST['importUpload_type']);
     }
 }
