@@ -291,12 +291,11 @@ Ext.override(Ext.grid.CellContext, {
  * must be rechecked!
  */
 Ext.override(Ext.panel.Table, {
-    ensureVisible: function(record, options) {
+    ensureVisible: function(recordId, options) {
         // record can be integer (segment index or id)
-        if(record === undefined || record === null || record === -1){
-            return;
+        if(recordId || recordId === 0){
+            this.doEnsureVisible(recordId, options);
         }
-        this.doEnsureVisible(record, options);
     }
 });
 
