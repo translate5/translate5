@@ -31,9 +31,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewModel', {
     alias: 'viewmodel.adminTaskUserAssocWizard',
 
     data:{
-        sendPreImportOperation:false,
-        formTask:null
-
+        sendPreImportOperation:false
     },
 
     stores: {

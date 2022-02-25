@@ -20,6 +20,36 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.6.3] - 2022-02-24
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-2852](https://jira.translate5.net/browse/TRANSLATE-2852): TermPortal - Allow role TermPM to start Term-Translation-Workflow** <br>
+termPM-role is now sifficient for Transfer-button to be shown.
+TermPortal filter window will assume *-query if yet empty.
+
+**[TRANSLATE-2851](https://jira.translate5.net/browse/TRANSLATE-2851): TermPortal - Security dialogue, when deleting something in TermPortal** <br>
+Added confirmation dialogs on term/attribute deletion attempt
+
+
+### Bugfixes
+**[TRANSLATE-2856](https://jira.translate5.net/browse/TRANSLATE-2856): API, Editor general - Login/Logout issues** <br>
+Fixed a race condition on logout that sometimes resulted in HTML being parsed as javascript.
+
+**[TRANSLATE-2853](https://jira.translate5.net/browse/TRANSLATE-2853): Editor general - User association error** <br>
+Solves problem when assigning users in import wizard after a workflow is changed and the current import produces only one task.
+
+**[TRANSLATE-2846](https://jira.translate5.net/browse/TRANSLATE-2846): Task Management - Filter on QA errors column is not working** <br>
+FIX: Sorting/Filtering of column "QS Errors" in task grid now functional
+
+**[TRANSLATE-2818](https://jira.translate5.net/browse/TRANSLATE-2818): Auto-QA - Length-Check must Re-Evaluate also when processing Repititions** <br>
+FIX: AutoQA now re-evaluates the length check for each segment individually when saving repititions
+
+
 ## [5.6.2] - 2022-02-17
 
 ### Important Notes:
