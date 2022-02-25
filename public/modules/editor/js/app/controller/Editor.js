@@ -745,7 +745,6 @@ Ext.define('Editor.controller.Editor', {
 	    // New position of cursor?
 	    if (me.eventIsArrowKey()) {
 	    	me.handleAfterCursorMove();
-	    	return;
 	    }
     },
     /**
@@ -1060,11 +1059,10 @@ Ext.define('Editor.controller.Editor', {
     handleChangeState: function(key, e) {
         var param = Number(key) - 48;
         //we ignore 0, since this is no valid state
-        if(param === 0){
-            return false;
+        if(param !== 0){
+            this.fireEvent('changeSegmentState', param);
+            e.stopEvent();
         }
-        this.fireEvent('changeSegmentState', param);
-        e.stopEvent();
         return false;
     },
     /**

@@ -281,7 +281,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
                 break;
             case 500:
             case 502:
-                json = Ext.JSON.decode(response.responseText);
+                var json = Ext.JSON.decode(response.responseText);
                 errorEntry.source = me.strings.serverErrorMsg500;
                 errorEntry.target = json.errorMessage;
                 break;
@@ -293,7 +293,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
      * @param {Boolean} [scrollToBottom] if true, the grid scrolls to the bottom after adding the data
      */
     loadDataIntoGrid: function(resp, scrollToBottom) {
-        var me = this;
+        var me = this,
             view = me.getView(),
             store = me.getViewModel().getStore('editorsearch');
         store.loadRawData(resp.rows,true);

@@ -2,6 +2,9 @@
 	"config" : {
 		"platform" : {
 			"php" : "8"
+		},
+		"allow-plugins": {
+			"wikimedia/composer-merge-plugin": true
 		}
 	},
 	"autoload" : {

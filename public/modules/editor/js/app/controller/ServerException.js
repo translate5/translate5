@@ -65,10 +65,10 @@ Ext.define('Editor.controller.ServerException', {
      * @return {Boolean} true if request was successfull, false otherwise
      */
     handleFormFailure: function(form, record, operation) {
-        var json, resp = operation.error && operation.error.response;
-        if(resp && resp.responseText) {
+        var json, resp = operation.error?.response;
+        if(resp?.responseText) {
             json = Ext.decode(resp.responseText);
-            if(json.errorsTranslated && operation.error && operation.error.status == '422') {
+            if(json.errorsTranslated && operation.error?.status == '422') {
                 form.markInvalid(json.errorsTranslated);
                 return;
             }
@@ -85,14 +85,13 @@ Ext.define('Editor.controller.ServerException', {
      * @return {Boolean} true if request was successfull, false otherwise
      */
     handleCallback: function(records, operation, success) {
-        var resp = operation.getResponse();
         if(operation.success) {
             return true;
         }
+        var resp = operation?.getResponse();
         if(resp) {
             this.handleException(resp);
-        }
-        else {
+        } else {
             this.handleFailedRequest(operation.error.status, operation.error.statusText, operation.error.response);
         }
         return false;
@@ -103,8 +102,8 @@ Ext.define('Editor.controller.ServerException', {
      * @returns void
      */
     handleException: function(response){
-        var status = (response && response.status ? response.status : -1),
-            statusText = (response && response.statusText ? response.statusText : '');
+        var status = response?.status || -1,
+            statusText = response?.statusText || '';
         this.handleFailedRequest(status, statusText, response);
     },
     /**
@@ -279,10 +278,7 @@ Ext.define('Editor.controller.ServerException', {
         Editor.MessageBox.addError(text+tpl.apply([_status, statusText]), errorCode);
     },
     renderHtmlMessage: function(title, response){
-        var me = this,
-            str = me.strings,
-            tpl = new Ext.Template(str.serverMsg),
-            result = '<h1>'+title+'</h1>';
+        var result = '<h1>'+title+'</h1>';
         
         if(response.errorMessage && response.errorMessage.length > 0) {
             result += '<p>'+response.errorMessage+'</p>';

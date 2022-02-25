@@ -412,16 +412,14 @@ Ext.define('Editor.view.segments.Grid', {
     scrollTo: function(rowindex, config) {
         var me = this,
             options = {
-                animate: false //may not be animated, to place the callback at the correct place 
+                animate: false, //may not be animated, to place the callback at the correct place 
+                callback: function(alwaysTrue, model, row) {
+                    if(model.get('editable')){
+                        me.selectOrFocus(rowindex);
+                    }
+                    me.positionRowAfterScroll(rowindex, row, config);
+                }
             };
-        
-        options.callback = function(idx, model, row) {
-            if(model.get('editable')){
-                me.selectOrFocus(rowindex);
-            }
-            me.positionRowAfterScroll(rowindex, row, config);
-        };
-
         me.ensureVisible(rowindex, options);
     },
     /**
@@ -542,8 +540,7 @@ Ext.define('Editor.view.segments.Grid', {
                     res(index);
                 },
                 failure: function(response){
-                    if(response.status===404 && (response.statusText ==="Nicht gefunden!" || response.statusText ==="Not Found")){
-                        //404 means no index found
+                    if(response.status === 404 && response.statusText.match(/Nicht gefunden!|Not Found/)){
                         res(-1);
                         return;
                     }
