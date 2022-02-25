@@ -237,7 +237,7 @@ class editor_Models_Excel_ExImport {
             $tempSegment->nr = $nr;
             $tempSegment->source = $sheet->getCell('B'.$this->segmentRow)->getValue();
             $tempSegment->target = $sheet->getCell('C'.$this->segmentRow)->getValue();
-            $tempSegment->comment = trim($sheet->getCell('D'.$this->segmentRow)->getValue());
+            $tempSegment->comment = trim($sheet->getCell('D'.$this->segmentRow)->getValue()?:'');
             $tempReturn[] = $tempSegment;
             
             $this->segmentRow++;
