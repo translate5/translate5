@@ -63,8 +63,11 @@ class editor_TermcollectionController extends ZfExtended_RestController
     /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
+     * @param bool|null $associative When TRUE, returned objects will be converted into associative arrays.
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData(?bool $associative = false)
+    {
         parent::decodePutData();
         unset($this->data->langResUuid);
     }

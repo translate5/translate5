@@ -45,8 +45,8 @@ END LICENSE AND COPYRIGHT
  * @method void setServiceName() setServiceName(string $resName)
  * @method string getResourceType() getResourceType()  tm or mt
  * @method void setResourceType() setResourceType(string $resourceType)
- * @method string getWriteSource() getWriteSource()
- * @method void setWriteSource() setWriteSource(string $writeSource)
+ * @method bool getWriteSource() getWriteSource()
+ * @method void setWriteSource() setWriteSource(bool $writeSource)
  *
  */
 class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract {

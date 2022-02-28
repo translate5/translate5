@@ -114,8 +114,11 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
      * does some prechecking of the data
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
+     * @param bool|null $associative When TRUE, returned objects will be converted into associative arrays.
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData(?bool $associative = false)
+    {
         parent::decodePutData();
         
         //this flag may not be set via API

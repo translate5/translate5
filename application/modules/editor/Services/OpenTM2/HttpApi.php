@@ -196,6 +196,44 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         }
     }
 
+    /***
+     * Check for the resource status until it is available. If the resource is not available after 10 trys,
+     * exception will be thrown.
+     * TODO: This can not be used because OpenTM2 does not return valid response for status check when empty memory is created
+     * @return void
+     * @throws editor_Services_Exceptions_InvalidResponse
+     */
+    public function waitForStatus(){
+
+        $status = $this->status();
+        $statusCheckCounter = 0;
+        while ($status != 'available'){
+
+            if($status == 'error'){
+                $logger = Zend_Registry::get('logger');
+                $msg = str_replace('{status}',$status,'OpenTM2: Unable to use the memory because of the memory status {status}.');
+                $logger->error('E1377', $msg, [
+                    'languageResource' => $this->languageResource,
+                    'status' => $status,
+                ]);
+                $this->error = new stdClass();
+                $this->error->method = $this->httpMethod;
+                $this->error->url = $this->http->getUri(true);
+                $this->error->type = 'NOT_AVAILABLE';
+                $this->error->error = $msg;
+                return;
+            }
+
+            if($statusCheckCounter === 10){
+                return;
+            }
+
+            sleep(2);
+            $status = $this->status();
+            $statusCheckCounter++;
+        }
+    }
+
     /**
      * This method deletes a memory.
      */
@@ -268,56 +306,88 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      * This method updates (or adds) a memory proposal in the memory.
      * Note: This method updates an existing proposal when a proposal with the same key information (source text, language, segment number, and document name) exists.
      *
+     * @param string $source
+     * @param string $target
      * @param editor_Models_Segment $segment
+     * @param $filename
      * @return boolean
+     * @throws Zend_Http_Client_Exception
      */
-    public function update(string $source, string $target, editor_Models_Segment $segment, $filename) {
-        /*
-         * In:{ "Method":"update", "Memory": "TestMemory", "Proposal": {
-         *  "Source": "This is the source text",
-         *  "Target": "This is the translated text",
-         *  "Segment":231,
-         *  "DocumentName":"Anothertest.txt",
-         *  "SourceLanguage":"en-US",
-         *  "TargetLanguage":"de-de",
-         *  "Type":"Manual",
-         *  "Author":"A.Nonymous",
-         *  "DateTime":"20161013T152948Z",
-         *  "Markup":"EQFHTML3",
-         *  "Context":"",
-         *  "AddInfo":"" }  }
-         */
-        //Out: { "ReturnValue":0, "ErrorMsg":"" }
-        $json = $this->json(__FUNCTION__);
+    public function update(string $source, string $target, editor_Models_Segment $segment, $filename): bool
+    {
         $http = $this->getHttpWithMemory('POST', 'entry');
-        
+        $json = $this->getUpdateJson(__FUNCTION__,$source,$target);
+        if(!is_null($this->error)){
+            return false;
+        }
+
+        $json->documentName = $filename; // 101 doc match
+        $json->author = $segment->getUserName();
+        $json->timeStamp = $this->nowDate();
+        $json->context = $segment->getMid(); //INFO: this is segment stuff
+
+        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+        return $this->processResponse($http->request());
+    }
+
+    /***
+     * Update text values ($source/$target) to the current tm memory
+     * @param string $source
+     * @param string $target
+     * @return bool
+     * @throws Zend_Http_Client_Exception
+     */
+    public function updateText(string $source, string $target): bool
+    {
+
+        //$this->waitForStatus();
+
+        $http = $this->getHttpWithMemory('POST', 'entry');
+        $json = $this->getUpdateJson(__FUNCTION__,$source,$target);
+        if(!is_null($this->error)){
+            return false;
+        }
+
+        $json->documentName = 'source';
+        $userData = editor_User::instance()->getData();
+        $json->author = $userData->firstName . ' '. $userData->surName;
+        $json->context = '';
+        $json->addInfo = $json->documentName;
+
+        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+
+        return $this->processResponse($http->request());
+    }
+
+    /***
+     * Get the default update memory json
+     * @param string $function
+     * @param string $source
+     * @param string $target
+     * @return stdClass
+     */
+    private function getUpdateJson(string $function,string $source, string $target): stdClass
+    {
+
         if($this->isToLong($source) || $this->isToLong($target)) {
             $this->error = new stdClass();
             $this->error->method = $this->httpMethod;
             $this->error->url = $this->http->getUri(true);
             $this->error->type = 'TO_LONG';
             $this->error->error = 'The given segment data is to long and would crash OpenTM2 on saving it.';
-            return false;
+            return new stdClass();
         }
-        
+
+        $json = $this->json($function);
         $json->source = $source;
         $json->target = $target;
-
-        //$json->segmentNumber = $segment->getSegmentNrInTask(); FIXME TRANSLATE-793 must be implemented first, since this is not segment in task, but segment in file
-        $json->documentName = $filename; // 101 doc match
-        $json->author = $segment->getUserName();
-        $json->timeStamp = $this->nowDate();
-        $json->context = $segment->getMid();
-        
         $json->type = "Manual";
         $json->markupTable = "OTMXUXLF"; //fixed markup table for our XLIFF subset
-        
         $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
         $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
-        
-        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+        $json->timeStamp = $this->nowDate();
 
-        return $this->processResponse($http->request());
+        return $json;
     }
     
     /**

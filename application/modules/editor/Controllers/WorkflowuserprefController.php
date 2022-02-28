@@ -48,10 +48,13 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController {
     
     /**
      * overridden to prepare data
-     * (non-PHPdoc)
+     *
      * @see ZfExtended_RestController::decodePutData()
+     * @param bool|null $associative When TRUE, returned objects will be converted into associative arrays.
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData(?bool $associative = false)
+    {
         parent::decodePutData();
         if($this->_request->isPost()) {
             unset($this->data->id); //don't set the ID from client side

@@ -109,8 +109,13 @@ class Editor_CustomerController extends ZfExtended_RestController {
             $this->view->result = $t->_("Es wurden keine Ergebnisse gefunden");
         }
     }
-    
-    protected function decodePutData(){
+
+    /***
+     * @param bool|null $associative When TRUE, returned objects will be converted into associative arrays.
+     * @return void
+     */
+    protected function decodePutData(?bool $associative = false)
+    {
         parent::decodePutData();
         $this->handleDomainField();
     }

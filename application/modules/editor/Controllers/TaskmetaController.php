@@ -54,8 +54,11 @@ class editor_TaskmetaController extends ZfExtended_RestController {
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::decodePutData()
+     * @param bool|null $associative When TRUE, returned objects will be converted into associative arrays.
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData(?bool $associative = false)
+    {
         parent::decodePutData();
         //taskGuid may not be overwritten by frontend
         unset($this->data->taskGuid);
