@@ -196,44 +196,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         }
     }
 
-    /***
-     * Check for the resource status until it is available. If the resource is not available after 10 trys,
-     * exception will be thrown.
-     * TODO: This can not be used because OpenTM2 does not return valid response for status check when empty memory is created
-     * @return void
-     * @throws editor_Services_Exceptions_InvalidResponse
-     */
-    public function waitForStatus(){
-
-        $status = $this->status();
-        $statusCheckCounter = 0;
-        while ($status != 'available'){
-
-            if($status == 'error'){
-                $logger = Zend_Registry::get('logger');
-                $msg = str_replace('{status}',$status,'OpenTM2: Unable to use the memory because of the memory status {status}.');
-                $logger->error('E1377', $msg, [
-                    'languageResource' => $this->languageResource,
-                    'status' => $status,
-                ]);
-                $this->error = new stdClass();
-                $this->error->method = $this->httpMethod;
-                $this->error->url = $this->http->getUri(true);
-                $this->error->type = 'NOT_AVAILABLE';
-                $this->error->error = $msg;
-                return;
-            }
-
-            if($statusCheckCounter === 10){
-                return;
-            }
-
-            sleep(2);
-            $status = $this->status();
-            $statusCheckCounter++;
-        }
-    }
-
     /**
      * This method deletes a memory.
      */
@@ -339,8 +301,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     public function updateText(string $source, string $target): bool
     {
-
-        //$this->waitForStatus();
 
         $http = $this->getHttpWithMemory('POST', 'entry');
         $json = $this->getUpdateJson(__FUNCTION__,$source,$target);

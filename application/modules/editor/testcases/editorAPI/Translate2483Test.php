@@ -67,15 +67,20 @@ class Translate2483Test extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
         self::assertNeededUsers(); //last authed user is testmanager
+        self::assertCustomer();
+
         $json = self::assertLogin('testmanager');
         self::assertContains('instantTranslate', $json->user->roles, 'Missing role for user.');
         self::assertContains('instantTranslateWriteTm', $json->user->roles, 'Missing role for user.');
+        self::assertContains(self::$api->getCustomer()->id, array_filter(explode(',',$json->user->customers)), 'The test customer is not assigned to the testmanager');
+
 
         $appState = self::assertAppState();
         self::assertContains('editor_Plugins_InstantTranslate_Init', $appState->pluginsLoaded, 'Plugin InstantTranslate must be activated for this test case!');
 
         self::$sourceText = bin2hex(random_bytes(10));
         self::$targetText = bin2hex(random_bytes(10));
+
         self::assertNeededUsers();
     }
 
@@ -103,6 +108,8 @@ class Translate2483Test extends editor_Test_JsonTest {
      * InstantTranslate:
      * Run a translation with our OpenTM2-LanguageResource
      * and check if the result is as expected.
+     * IMPORTANT: the translate function will return only the results for the customers of the current user. And memories
+     * will be created for all user customers where the user has instantTranslate role
      */
     public function testTranslation() {
         $params = [];
@@ -118,6 +125,9 @@ class Translate2483Test extends editor_Test_JsonTest {
         $allTranslations = (array)$responseBody->rows;
         $this->assertIsArray($allTranslations);
         $this->assertArrayHasKey('OpenTM2', $allTranslations, 'InstantTranslate: Translations do not include a response for OpenTM2.');
+
+        self::assertNotEmpty($allTranslations['OpenTM2'],"InstantTranslate: no translation where saved to the TM");
+
         // Does the result match our expectations?
         foreach ($allTranslations['OpenTM2'] as $translation){
             $translation = htmlspecialchars_decode($translation[0]->target);

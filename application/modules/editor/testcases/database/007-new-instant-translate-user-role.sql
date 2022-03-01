@@ -27,3 +27,6 @@
 UPDATE `Zf_users`
 SET `roles` = CONCAT(`roles`, ',instantTranslateWriteTm')
 WHERE `login` = 'testmanager' AND `roles` NOT LIKE '%instantTranslateWriteTm%';
+
+INSERT INTO `LEK_customer_config` (`customerId`, `name`, `value`)
+VALUES ((SELECT id FROM LEK_customer where number='123456789'), 'runtimeOptions.InstantTranslate.saveToServices', 'OpenTM2');
