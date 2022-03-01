@@ -133,8 +133,11 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     bind: {
                         disabled: '{!uploadgrid.selection}'
                     }
-                },{
+                }],
+                dockedItems:[{
+                    dock: 'top',
                     xtype:'displayfield',
+                    padding: 10,
                     fieldLabel:false,
                     fieldCls:'redTextColumn',
                     bind:{
