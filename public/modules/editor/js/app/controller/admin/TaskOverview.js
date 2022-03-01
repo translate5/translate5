@@ -937,13 +937,18 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      * @param {Editor.model.admin.Task} task
      */
     editorCloneTask: function (task, event) {
-        var me = this;
+        var me = this,
+            isDefaultTask = task.get('taskType') === 'default';
         Ext.Ajax.request({
             url: Editor.data.pathToRunDir + '/editor/task/' + task.getId() + '/clone',
             method: 'post',
-            scope: this,
+            scope: me,
             success: function (response) {
-                if (me.isProjectPanelActive()) {
+                if(isDefaultTask) {
+                    //we have to reload the project overview since the id of the shown project was changing
+                    me.getProjectProjectStore().load();
+                }
+                else if (me.isProjectPanelActive()) {
                     me.getProjectTaskGrid().getStore().load();
                 }
                 me.handleTaskReload();
@@ -1101,6 +1106,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 formData.append('importUpload_type[]', record.get('type'));
             }
         });
+
+        //ensure that UI always generates projects with projectTasks
+        formData.append('taskType', 'project');
 
         me.fireEvent('beforeCreateTask',params , formData);
 
