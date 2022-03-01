@@ -4509,7 +4509,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 </trans-unit>
 <trans-unit id='SW5zdGFudFRyYW5zbGF0ZVdyaXRlVG0'>
     <source>InstantTranslateWriteTm</source>
-    <target>Instant-Translate write</target>
+    <target>Instant-Translate write TM</target>
 </trans-unit>
   </file>
 </xliff>
