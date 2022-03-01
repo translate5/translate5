@@ -64,8 +64,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
 
     strings:{
         gridEmptyText:'#UT#Ziehen Sie die Dateien entweder hierher, um sie als Arbeitsdateien hinzuzufügen, oder klicken Sie auf eine der obigen Schaltflächen, um andere Dateitypen zu wählen.',
-        workFilesFilesButton:'#UT#Arbeitsdatei(en) hinzufügen',
-        pivotFilesFilesButton:'#UT#Pivot-Datei(en) hinzufügen',
+        workFilesFilesButton:'#UT#Arbeitsdatei(en)',
+        pivotFilesFilesButton:'#UT#Pivot-Datei(en)',
         removeFilesFilesButton:'#UT#Datei löschen',
         targetLang:'#UT#Zielsprache',
         file:'#UT#Datei',
@@ -74,9 +74,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         errorColumnText:'#UT#Fehler',
         workFilesTypeText:'#UT#Arbeitsdatei',
         pivotFilesTypeText:'#UT#Pivot-Datei',
-        addFilesDefaultTooltip: '#UT#Datei(en) hinzufügen',
         fileMix:'#UT#Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!',
-        referenceFilesFilesButton:'#UT#Referenz-Dateien(en) hinzufügen',
+        referenceFilesFilesButton:'#UT#Referenz-Dateien(en)',
         referenceFilesTypeText:'#UT#Referenz-Datei'
     },
 
@@ -88,6 +87,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                 sortableColumns:false,
                 tbar: [{
                     xtype: 'wizardFileButton',
+                    glyph: 'f067@FontAwesome5FreeSolid',
                     text: me.strings.workFilesFilesButton,
                     name:'workFilesFilesButton',
                     tooltip:me.strings.fileMix,
@@ -100,6 +100,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     }
                 },{
                     xtype: 'wizardFileButton',
+                    glyph: 'f067@FontAwesome5FreeSolid',
                     text: me.strings.pivotFilesFilesButton,
                     name:'pivotFilesFilesButton',
                     tooltip:me.strings.fileMix,
@@ -112,6 +113,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     }
                 },{
                     xtype: 'wizardFileButton',
+                    glyph: 'f067@FontAwesome5FreeSolid',
                     text: me.strings.referenceFilesFilesButton,
                     name:'referenceFilesFilesButton',
                     tooltip:me.strings.fileMix,
