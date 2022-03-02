@@ -57,18 +57,15 @@ Ext.define('Editor.controller.ServerException', {
     },
     
     /**
-     * Can be used in Operation callbacks to trigger the "default ServerException" failure behaviour
-     * handles only failed requests, ignores successfully HTTP 2XX requests
-     * @param {Array} records
-     * @param {Ext.data.Operation} operation
-     * @param {Boolean} success [not yet, ext > 4.0.7]
-     * @return {Boolean} true if request was successfull, false otherwise
+     * Handle unproccessable entities
+     * @param {Ext.form.BasicForm} form
+     * @param {Ext.data.Model} record
+     * @param {Ext.data.Operation} operation with operation.error = {response.status, response.statusText, response}
      */
     handleFormFailure: function(form, record, operation) {
-        var json, resp = operation.error?.response;
-        if(resp?.responseText) {
-            json = Ext.decode(resp.responseText);
-            if(json.errorsTranslated && operation.error?.status == '422') {
+        if(operation?.error.status === 422) {
+            var json = Ext.decode(operation.error.response.responseText);
+            if(json.errorsTranslated) {
                 form.markInvalid(json.errorsTranslated);
                 return;
             }
@@ -88,7 +85,7 @@ Ext.define('Editor.controller.ServerException', {
         if(operation.success) {
             return true;
         }
-        var resp = operation?.getResponse();
+        var resp = operation.getResponse();
         if(resp) {
             this.handleException(resp);
         } else {
@@ -102,9 +99,7 @@ Ext.define('Editor.controller.ServerException', {
      * @returns void
      */
     handleException: function(response){
-        var status = response?.status || -1,
-            statusText = response?.statusText || '';
-        this.handleFailedRequest(status, statusText, response);
+        this.handleFailedRequest(response.status || -1, response.statusText || '', response);
     },
     /**
      * handles / displays the given error

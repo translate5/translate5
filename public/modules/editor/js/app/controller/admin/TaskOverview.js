@@ -922,7 +922,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             failure: function (batch, operation) {
                 task.reject();
                 app.unmask();
-                if (operation.error.status === '405') {
+                if (operation.error.status === 405) {
                     Editor.MessageBox.addError(me.strings.taskNotDestroyed);
                 } else {
                     Editor.app.getController('ServerException').handleException(operation.error.response);

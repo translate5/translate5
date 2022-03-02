@@ -1778,7 +1778,7 @@ Ext.define('Editor.controller.Editor', {
             // Maybe openTask can return a promise after the grid exists.
             Ext.getStore('Segments').on('load',function(){
                 me.getSegmentGrid().focusEditorSegment(segmentNrInTask);
-            },store,{ single : true});
+            }, undefined, {single : true});
         }
     },
 

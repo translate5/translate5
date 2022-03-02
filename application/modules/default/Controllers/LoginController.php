@@ -318,7 +318,7 @@ class LoginController extends ZfExtended_Controllers_Login {
                     redirecthashField.value=(window.location.hash);
                 }
 
-                if(redirectField != null && (!rgx.test(redirectField.value) && !!redirectField.value)){
+                if(redirectField?.value && !rgx.test(redirectField.value) ){
                     //redirect directly to the open id sso. This is needed, since this is the only way to perserve the hash when we redirect directly to the openid sso
                     redirectField.value = 'openid';
                     //if there is no sso error, submit the form. This case is only when we redirect without showing translate5 login form
