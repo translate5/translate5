@@ -309,59 +309,41 @@ function() {
     //override Ext.data.proxy.Server
     Ext.data.proxy.Server.override({
         afterRequest: function(request,success) {
-            this.callOverridden(arguments);
-            var mntpnl = Ext.first('maintenancePanel'),
-                viewport = Ext.first('viewport'),
-                response = request._operation._response,
-                version,
-                data = {
-                    appName: Editor.data.app.name
-                },
-                serverException = Editor.controller.ServerException.prototype;
-            if(!response){
+            if(!request._operation._response){
                 return;
             }
-            version = response.getResponseHeader('x-translate5-version');
-            if(!Ext.isEmpty(version) && version != Editor.data.app.version) {
+            var data = request._operation._response.getAllResponseHeaders(),
+                version = data['x-translate5-version'];
+                
+            if(version !== Editor.data.app.version && version) {
+                var exStrings = Editor.controller.ServerException.prototype.strings;
                 Ext.MessageBox.show({
-                     title: serverException.strings.update_title,
-                     msg: Ext.String.format(serverException.strings.update_msg, version),
+                     title: exStrings.update_title,
+                     msg: Ext.String.format(exStrings.update_msg, version),
+                     icon: Ext.MessageBox.WARNING,
                      buttons: Ext.MessageBox.OK,
-                     fn: function(){
-                         return serverException.handleMaintenance();
-                     },
-                     icon: Ext.MessageBox.WARNING
+                     fn: location.reload,
                 });
             }
     		//FIXME neuen WebScoket Issue anlegen, der sammelt was alles auf websockets umgebaut werden kann wenn diese Fix aktiv sind.
     		// Diese Funktionalität gehört da mit dazu!
-    		data.date = response.getResponseHeader('x-translate5-shownotice');
-    		data.msg = response.getResponseHeader('x-translate5-maintenance-message');
+    		data.date = data['x-translate5-shownotice'];
+    		data.msg  = data['x-translate5-maintenance-message'];
 			if(data.date || data.msg){
-	            if(!viewport){
-	                return;
-                }
-				if(mntpnl){
-				    mntpnl.update(data);
-					return;
-				}
-				viewport.add({
-					  xtype:'maintenancePanel',
-					  region:'north',
-					  weight: 100,
-					  data: data
-				});
-				return;
+                (Ext.getCmp('mtpnl') || Ext.first('viewport')?.add({
+                    xtype:'maintenancePanel',
+                    id:'mtpnl',
+                    region:'north',
+                    weight: 100,
+                }))?.update(data);
     		}
-			mntpnl && mntpnl.destroy();
     	},
         constructor: function() {
             this.callOverridden(arguments);
             this.on('exception', function(proxy, resp, op){
                 if(op.preventDefaultHandler){
                     op.response = resp; //Operation does not contain response by default
-                }
-                else {
+                } else {
                     Editor.app.getController('ServerException').handleException(resp);
                 }
             });
