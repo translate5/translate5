@@ -71,11 +71,11 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->cleanupLockedJobs();
+            $task->cleanupDanglingImports();
 
             $config = ZfExtended_Factory::get('editor_Models_UserConfig');
             /* @var $config editor_Models_UserConfig */
             $config->cleanUpThemeTemporary();
-
         };
         
         $eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', $cleanUp);

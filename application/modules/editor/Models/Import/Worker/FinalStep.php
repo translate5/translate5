@@ -75,8 +75,41 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract {
             'task' => $task,
             'importConfig' => $this->workerModel->getParameters()['config'],
         ]);
-        
+
+        $this->callback($task);
+
         //init default user prefs
         return true;
+    }
+
+    /**
+     * Calls the import callback - if configured!
+     * @throws Zend_Http_Client_Exception
+     * @throws editor_Models_ConfigException
+     */
+    private function callback(editor_Models_Task $task) {
+        $config = $task->getConfig();
+        $url = $config->runtimeOptions->import->callbackUrl ?? null;
+        if(empty($url)) {
+            return;
+        }
+        /** @var Zend_Http_Client $http */
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        $http->setUri($url);
+        $http->setMethod($http::POST);
+        $http->setHeaders('Accept-charset', 'UTF-8');
+        $http->setHeaders('Accept', 'application/json; charset=utf-8');
+        $data = $task->getDataObject();
+        unset($data->lockedInternalSessionUniqId);
+        unset($data->qmSubsegmentFlags);
+        $http->setRawData(json_encode($data, JSON_PRETTY_PRINT));
+        $response = $http->request();
+        //we consider all non 200 status values as invalid and log that!
+        if($response->getStatus() !== 200) {
+            $task->logger('editor.task.import')->warn('E1378', 'The task import callback HTTP status code is {code} instead 200.', [
+                'code' => $response->getStatus(),
+                'result' => $response->getBody(),
+            ]);
+        }
     }
 }
