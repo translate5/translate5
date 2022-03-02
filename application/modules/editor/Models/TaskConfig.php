@@ -89,13 +89,13 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
         //fetch all config from DB
         $dbConfig = ZfExtended_Factory::get('ZfExtended_Models_Config');
         /* @var $dbConfig ZfExtended_Models_Config */
-        $base = $dbConfig->loadAll();
+        $base = $configModel->mergeIniValues($dbConfig->loadAll());
+
         //for merge set config name as array key
         $base = $configModel->nameAsKey($base);
-        
+
         // merge task overwrites with task customer overwrites
-        $result = $configModel->mergeTaskValues($taskGuid, $base);
-        return $result;
+        return $configModel->mergeTaskValues($taskGuid, $base);
     }
     /***
      * Load all configs for given taskGuid
@@ -176,12 +176,11 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
         $db = $this->db->getAdapter();
         $values = [];
 
-        $model = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $model editor_Models_Task */
+        /** @var editor_Models_Task $model */
         foreach ($tasks as $task){
 
             if(is_array($task)){
-                $model->load($task['id']);
+                $model = editor_ModelInstances::task($task['id']);
             } else {
                 $model = $task;
             }

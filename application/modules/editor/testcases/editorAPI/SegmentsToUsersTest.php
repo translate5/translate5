@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  */
 class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
     
-    const ROLE = 'translator';
+    const STEP = 'translation';
     const SEGMENTRANGE_USER1 = '1-3,5';
     const SEGMENTS_USER1 = [1,2,3,5];
     const SEGMENTRANGE_USER2 = '6-7';
@@ -67,11 +67,11 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
         
         // => testEditableSegmentsForUser1
         $api->reloadTask();
-        $api->addUser('testlector', 'open', self::ROLE, ['segmentrange' => self::SEGMENTRANGE_USER1]);
+        $api->addUser('testlector', 'open', self::STEP, ['segmentrange' => self::SEGMENTRANGE_USER1]);
         
         // => testEditableSegmentsForUser2
         $api->reloadTask();
-        $api->addUser('testtranslator', 'open', self::ROLE, ['segmentrange' => self::SEGMENTRANGE_USER2]);
+        $api->addUser('testtranslator', 'open', self::STEP, ['segmentrange' => self::SEGMENTRANGE_USER2]);
     }
     
     /**
