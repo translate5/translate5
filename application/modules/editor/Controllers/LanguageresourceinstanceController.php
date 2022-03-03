@@ -685,10 +685,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
-     * @param bool|null $associative When TRUE, returned objects will be converted into associative arrays.
      * @return void
      */
-    protected function decodePutData(?bool $associative = false)
+    protected function decodePutData()
     {
         parent::decodePutData();
         unset($this->data->langResUuid);

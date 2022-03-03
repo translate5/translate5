@@ -50,10 +50,9 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController {
      * overridden to prepare data
      *
      * @see ZfExtended_RestController::decodePutData()
-     * @param bool|null $associative When TRUE, returned objects will be converted into associative arrays.
      * @return void
      */
-    protected function decodePutData(?bool $associative = false)
+    protected function decodePutData()
     {
         parent::decodePutData();
         if($this->_request->isPost()) {

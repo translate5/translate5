@@ -46,10 +46,9 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController {
 
 
     /***
-     * @param bool|null $associative When TRUE, returned objects will be converted into associative arrays.
      * @return void
      */
-    protected function decodePutData(?bool $associative = false)
+    protected function decodePutData()
     {
         parent::decodePutData();
         // check and convert the languages to lek_languages id

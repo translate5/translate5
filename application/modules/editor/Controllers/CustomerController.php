@@ -111,10 +111,9 @@ class Editor_CustomerController extends ZfExtended_RestController {
     }
 
     /***
-     * @param bool|null $associative When TRUE, returned objects will be converted into associative arrays.
      * @return void
      */
-    protected function decodePutData(?bool $associative = false)
+    protected function decodePutData()
     {
         parent::decodePutData();
         $this->handleDomainField();

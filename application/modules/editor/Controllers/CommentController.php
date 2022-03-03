@@ -153,10 +153,9 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
     /**
      * removes HTML from comment
      * @see ZfExtended_RestController::decodePutData()
-     * @param bool|null $associative When TRUE, returned objects will be converted into associative arrays.
      * @return void
      */
-    protected function decodePutData(?bool $associative = false)
+    protected function decodePutData()
     {
         parent::decodePutData();
         $this->data->comment = strip_tags($this->data->comment);
