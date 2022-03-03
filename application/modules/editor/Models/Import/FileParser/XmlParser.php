@@ -97,7 +97,7 @@ class editor_Models_Import_FileParser_XmlParser {
             $this->nonXmlBlocks[$key] = $item[0];
             return $key;
         }, $xml);
-        $this->parseList(preg_split('/(<[^>]+>)/i', $xml, null, PREG_SPLIT_DELIM_CAPTURE), $preserveWhitespaceRoot);
+        $this->parseList(preg_split('/(<[^>]+>)/i', $xml, flags: PREG_SPLIT_DELIM_CAPTURE), $preserveWhitespaceRoot);
         return str_replace(array_keys($this->nonXmlBlocks), array_values($this->nonXmlBlocks), $this->__toString());
     }
     

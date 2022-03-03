@@ -1193,7 +1193,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if(empty($workflow)) {
             return;
         }
-        $states = $this->getTaskRoleAutoStates();
+        $states = $this->getTaskRoleAutoStates() ?: [];
         // include blocked autostate in total segments finish count because blocked segments can not be edited and therefore they should count as finished.
         //TODO: with TRANSLATE-2753 this will be changed
         $states[] = editor_Models_Segment_AutoStates::BLOCKED;

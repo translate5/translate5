@@ -90,7 +90,7 @@ trait editor_Models_Export_FileParser_MQMTrait {
         if(editor_Segment_Mqm_Configuration::instance($this->_task)->isEmpty()){
             return $segment;
         }
-        $split = preg_split('"(<img[^>]+class=\"[^\"]*qmflag[^\"]*\"[^>]*>)"', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $split = preg_split('"(<img[^>]+class=\"[^\"]*qmflag[^\"]*\"[^>]*>)"', $segment, flags: PREG_SPLIT_DELIM_CAPTURE);
         $count = count($split);
         if($count==1) {
             return $segment;

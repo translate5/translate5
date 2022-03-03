@@ -78,7 +78,7 @@ class editor_Plugins_DummyPretranslator_Init extends ZfExtended_Plugin_Abstract 
             $placeHolder[$id] = $matches[0];
             return $id;
         });
-        $split = preg_split('/(<tag-[0-9]+>)/', $source, null, PREG_SPLIT_DELIM_CAPTURE);
+        $split = preg_split('/(<tag-[0-9]+>)/', $source, flags: PREG_SPLIT_DELIM_CAPTURE);
         $max = count($split);
 
         for($i = 0; $i < $max; $i = $i+2) {
