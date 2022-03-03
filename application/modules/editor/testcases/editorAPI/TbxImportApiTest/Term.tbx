@@ -208,7 +208,7 @@
 							<descrip type="CaseSense">Near</descrip>
 						</descripGrp>
 						<descripGrp>
-							<descrip type="xBool_Forbidden">True</descrip>
+							<descrip type="xBool_Forbidden">False</descrip>
 						</descripGrp>
 						<descripGrp>
 							<descrip type="PartialTreshold">Half</descrip>
@@ -220,7 +220,7 @@
 							<descrip type="CaseSense">Near</descrip>
 						</descripGrp>
 						<descripGrp>
-							<descrip type="xBool_Forbidden">False</descrip>
+							<descrip type="xBool_Forbidden">True</descrip>
 						</descripGrp>
 						<descripGrp>
 							<descrip type="PartialTreshold">Half</descrip>

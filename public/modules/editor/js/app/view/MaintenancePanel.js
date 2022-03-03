@@ -66,6 +66,15 @@ Ext.define('Editor.view.MaintenancePanel', {
                 }
             }
         );
+        // If maintenance is over, destroy this panel
+        Ext.Ajax.on('requestcomplete',function(owner, response, options){
+            var data = response.getAllResponseHeaders();
+            data.date = data['x-translate5-shownotice'];
+    		data.msg  = data['x-translate5-maintenance-message'];
+			if(!data['x-translate5-shownotice'] && !data['x-translate5-maintenance-message']){
+                this.destroy();
+            }
+        }, this);
         
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
@@ -77,9 +86,10 @@ Ext.define('Editor.view.MaintenancePanel', {
         Ext.TaskManager.start({
             run: function() {
                 Ext.Ajax.request({
+                    method: 'HEAD',
                     url:Editor.data.restpath+'/index/applicationState',
                     failure: function(response){
-                        if(response && response.status == 503){
+                        if(response.status === 503){
                             location.href=Editor.data.loginUrl;
                         }
                     }

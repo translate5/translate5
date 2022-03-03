@@ -88,7 +88,7 @@ the format is:
         
         $this->addOption(
             'level',
-            'l',
+            'L',
             InputOption::VALUE_REQUIRED,
             'Filtering for specific level(s). If given as string, only the level given as string is shown. Given as integer: filtering for all levels as bitmask.');
         
@@ -115,7 +115,15 @@ the format is:
             'u',
             InputOption::VALUE_REQUIRED,
             'Shows log data until the given point in time (strtotime parsable string). If the parameter starts with a "+" it is automatically added to the since date.');
-        
+
+        $this->addOption(
+            'last',
+            'l',
+            InputOption::VALUE_OPTIONAL,
+            'Shows only the last X log entries (default 5).',
+            false
+        );
+
         $this->addOption(
             'no-summary',
             null,
@@ -165,15 +173,22 @@ the format is:
         
         //defining always the --follow loop but break it, if not using following
         while(true) {
-            $s = $log->db->select()->order('id ASC');
+            $s = $log->db->select()->order('id DESC');
             
-            //FIXME implement a pager / default limit?
-                
             $filtered = $this->parseArgumentToSelect($s);
             $filtered = $this->parseDateToSelect($s) || $filtered;
             $filtered = $this->parseLevelToSelect($s) || $filtered;
-            
+
+            $limit = $input->getOption('last');
+            if($limit !== false) { // if === false, then it was not given at all
+                $s->limit($limit ?? 5); //if $limit is null, then it was given empty, so defaulting to 5
+            }
+
             if($input->getOption('follow')) {
+                //on first run we respect limit, after that not anymore to get all logs in the 2 second gap
+                if($this->lastFoundId > 0) {
+                    $s->reset($s::LIMIT_COUNT);
+                }
                 $s->where('id > ?', $this->lastFoundId);
                 $this->processResults($log, $s);
                 sleep(2);
@@ -185,8 +200,6 @@ the format is:
                 return 0;
             }
         }
-        
-        return 0;
     }
     
     /**
@@ -229,6 +242,7 @@ the format is:
     protected function processResults(\ZfExtended_Models_Log $log, \Zend_Db_Table_Select $s) {
         $summaryOnly = $this->input->getOption('summary-only');
         $rows = $log->db->fetchAll($s)->toArray();
+        $rows = array_reverse($rows);
         $this->summary['count'] = count($rows);
         if($this->summary['count'] > 0) {
             $last = end($rows);

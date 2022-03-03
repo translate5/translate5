@@ -141,7 +141,6 @@ class LoginController extends ZfExtended_Controllers_Login {
         }
         
         throw new ZfExtended_NoAccessException("No initial_page resource is found.");
-        exit;
     }
 
     /***
@@ -175,7 +174,7 @@ class LoginController extends ZfExtended_Controllers_Login {
      * Redirect to the editor module (append the hash if exist).
      */
     protected function editorRedirect(){
-        $redirecthash = isset($this->_session->redirecthash) ? $this->_session->redirecthash : null;
+        $redirecthash = $this->_session->redirecthash ?? null;
         $redirectHeader = 'Location: '.APPLICATION_RUNDIR.'/editor';
         if(!empty($redirecthash)){
             //remove the redirect hash from the session. The rout handling is done by extjs
@@ -285,7 +284,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         //the openid authentication is valid
         if($oidc->isOpenIdCustomerSet()){
             $userSession = new Zend_Session_Namespace('openId');
-            $idToken=$userSession->data->idToken ? $userSession->data->idToken : null;
+            $idToken = $userSession->data->idToken ?: null;
             $userSession=null;
             if($idToken){
                 try {
@@ -319,7 +318,7 @@ class LoginController extends ZfExtended_Controllers_Login {
                     redirecthashField.value=(window.location.hash);
                 }
 
-                if(redirectField != null && (!rgx.test(redirectField.value) && !!redirectField.value)){
+                if(redirectField?.value && !rgx.test(redirectField.value) ){
                     //redirect directly to the open id sso. This is needed, since this is the only way to perserve the hash when we redirect directly to the openid sso
                     redirectField.value = 'openid';
                     //if there is no sso error, submit the form. This case is only when we redirect without showing translate5 login form
@@ -342,7 +341,7 @@ class LoginController extends ZfExtended_Controllers_Login {
      * Parse and adjust the redirect hash when the current request is for terportal/instant-translate
      * @return string
      */
-    protected function handleAppsRedirectHash(){
+    protected function handleAppsRedirectHash() : string {
 
         $hash = $this->_session->redirecthash ?: '';
         if(preg_match('~^#name=(termportal|instanttranslate)~', $hash, $matches)){
