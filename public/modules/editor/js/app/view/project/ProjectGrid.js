@@ -217,7 +217,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
     initComponent:function(){
     	var me=this;
     	me.callParent();
-    	me.store.load();
+    	//me.store.load(); // initiated by 'gridfilters' plugin
     	me.configureActionColumn();
     },
     

@@ -206,7 +206,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             },
             failure: function(response){
                 window.setLoading(false);
-                if(response.status=401){
+                if(response.status === 401){
                     Editor.MessageBox.addError(me.strings.authErrorMsg);
                     return;
                 }

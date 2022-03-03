@@ -814,8 +814,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             },
             success: app.unmask,
             failure: function (rec, op) {
-                var recs = op.getRecords(),
-                    task = recs && recs[0] || false;
+                var task = op.getRecords()?.[0];
                 task && task.reject();
                 app.unmask();
             }
@@ -923,7 +922,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             failure: function (batch, operation) {
                 task.reject();
                 app.unmask();
-                if (operation.error.status === '405') {
+                if (operation.error.status === 405) {
                     Editor.MessageBox.addError(me.strings.taskNotDestroyed);
                 } else {
                     Editor.app.getController('ServerException').handleException(operation.error.response);

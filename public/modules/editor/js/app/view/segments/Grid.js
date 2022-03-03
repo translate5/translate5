@@ -412,16 +412,14 @@ Ext.define('Editor.view.segments.Grid', {
     scrollTo: function(rowindex, config) {
         var me = this,
             options = {
-                animate: false //may not be animated, to place the callback at the correct place 
+                animate: false, //may not be animated, to place the callback at the correct place 
+                callback: function(alwaysTrue, model, row) {
+                    if(model?.get('editable')){
+                        me.selectOrFocus(rowindex);
+                    }
+                    me.positionRowAfterScroll(rowindex, row, config);
+                }
             };
-        
-        options.callback = function(idx, model, row) {
-            if(model.get('editable')){
-                me.selectOrFocus(rowindex);
-            }
-            me.positionRowAfterScroll(rowindex, row, config);
-        };
-
         me.ensureVisible(rowindex, options);
     },
     /**
@@ -524,45 +522,20 @@ Ext.define('Editor.view.segments.Grid', {
         };
     },
 
-    /***
-     * Search for segment position in the current store filtering
-     */
-    searchPosition:function(segmentNrInTask){
-        var me = this,
-            params = me.getStore().getParams();        
-        return new Promise((res,rej) => {
-            Ext.Ajax.request({
-                url: Editor.data.restpath+'segment/'+segmentNrInTask+'/position',
-                method: 'GET',
-                params: params,
-                scope: me,
-                success: function(response){
-                    var responseData = Ext.JSON.decode(response.responseText),
-                        index = responseData ? responseData.index : -1;
-                    res(index);
-                },
-                failure: function(response){
-                    if(response.status===404 && (response.statusText ==="Nicht gefunden!" || response.statusText ==="Not Found")){
-                        //404 means no index found
-                        res(-1);
-                        return;
-                    }
-                    Editor.app.getController('ServerException').handleException(response);
-                }
-            });
-        });
-    },
     /**
      * Focus the segment in editor (open the segment for editing)
      */
      focusEditorSegment: function(segmentNrInTask, forEditing, failureEvent) {
-        if(!segmentNrInTask||this.locked) return;
+        var me = this;
+        if(!segmentNrInTask || me.locked || me.selection?.get('segmentNrInTask') == segmentNrInTask){
+            return;
+        }
         segmentNrInTask  = parseInt(segmentNrInTask);
-        var segmentIndex = Ext.getStore('Segments').findBy(rec => rec.data.segmentNrInTask === segmentNrInTask); // direct access here for fastest lookup
+        var segmentIndex = me.getStore().findBy(rec => rec.data.segmentNrInTask === segmentNrInTask); // direct access here for fastest lookup
         if(segmentIndex >= 0) {
-            this.scrollToSegmentInGrid(this,segmentIndex,segmentNrInTask,forEditing);
+            me.scrollToSegmentInGrid(me,segmentIndex,segmentNrInTask,forEditing);
         } else {
-            this.focussedSegmentNotFound(segmentNrInTask,forEditing, failureEvent);
+            me.focussedSegmentNotFound(segmentNrInTask,forEditing, failureEvent);
         }
     },
     /**

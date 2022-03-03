@@ -16,10 +16,10 @@ _translate5.sh()
 
     if [[ ${cur} == --* ]]; then
         state="option"
-        opts=("--help:Display this help message" "--quiet:Do not output any message" "--verbose:Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug" "--version:Display this application version" "--ansi:Force ANSI output" "--no-ansi:Disable ANSI output" "--no-interaction:Do not ask any interactive question")
+        opts=("--help:Display help for the given command. When no command is given display help for the <info>list</info> command" "--quiet:Do not output any message" "--verbose:Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug" "--version:Display this application version" "--ansi:Force \(or disable --no-ansi\) ANSI output" "--no-ansi:Negate the "--ansi" option" "--no-interaction:Do not ask any interactive question")
     elif [[ $cur == $com ]]; then
         state="command"
-        coms=("changelog:Show the last changelog entries." "config:List, get and set translate5 configuration values." "help:Displays help for a command" "list:Lists commands" "log:Query the translate5 log" "database\:update:Maintain database updates." "dev\:createtest:Development: Creates a new API test, gets the name \(ISSUE-XXX\) from the current branch." "dev\:githook:Development: Executes code checks invoked by git hooks. The checks are implemented in here." "dev\:newdbchange:Development: Creates a new DB alter file, gets the filename from the current branch." "dev\:newmodel:Development: Creates a new model php file." "maintenance\:announce:Sends an announcement via email with the given time and message to the configured users." "maintenance\:disable:Disable the maintenance mode." "maintenance\:message:Sets just a message in the maintenance announce message box to application users." "maintenance\:set:Sets the maintenance mode." "maintenance\:status:Returns information about the maintenance mode." "plugin\:disable:Deactivate one or more plug-ins." "plugin\:enable:Activate one or more plug-ins." "plugin\:list:List all installed plugins." "release\:notes:Updates the release notes, only usable in development installations." "segment\:history:Shows the segment editing history, from the oldest to the current version." "session\:impersonate:Returns a URL to authenticate password less as the given user." "system\:check:Checks the system requirements." "task\:clean:provides information about and the possibility to delete hanging import / erroneous tasks and orphaned task data directories" "worker\:list:Prints a list of current workers or details about one worker")
+        coms=("_complete:Internal command to provide shell completion suggestions" "changelog:Show the last changelog entries." "completion:Dump the shell completion script" "config:List, get and set translate5 configuration values." "help:Display help for a command" "list:List commands" "log:Query the translate5 log" "status:Prints a instance status." "cache\:purge:Cleans the application cache." "database\:update:Maintain database updates." "dev\:createtest:Development: Creates a new API test, gets the name \(ISSUE-XXX\) from the current branch." "dev\:githook:Development: Executes code checks invoked by git hooks. The checks are implemented in here." "dev\:newdbchange:Development: Creates a new DB alter file, gets the filename from the current branch." "dev\:newmodel:Development: Creates a new model php file." "dev\:runtest:Development: Runs all or a given test a new API test." "maintenance\:announce:Sends an announcement via email with the given time and message to the configured users." "maintenance\:disable:Disable the maintenance mode." "maintenance\:message:Sets just a message in the maintenance announce message box to application users." "maintenance\:notify:Sends a message directly to all connected users \(if messagebus enabled\) which opens a popup to the user then." "maintenance\:set:Sets the maintenance mode." "maintenance\:status:Returns information about the maintenance mode." "plugin\:disable:Deactivate one or more plug-ins." "plugin\:enable:Activate one or more plug-ins." "plugin\:list:List all installed plugins." "release\:notes:Updates the release notes, only usable in development installations." "segment\:history:Shows the segment editing history, from the oldest to the current version." "session\:impersonate:Returns a URL to authenticate password less as the given user." "system\:check:Checks the system requirements." "system\:mailtest:Sends a test e-mail to the given address as argument." "task\:clean:provides information about and the possibility to delete hanging import / erroneous tasks and orphaned task data directories" "termportal\:datatypecheck:Checks the integrity of the term datatypes against the content in the attributes table. This is necessary due TRANSLATE-2797." "termportal\:reindex:Re-index the fulltext index of the term database." "tmx\:ts1040:Helper tool to convert TMX files according to TS-1040" "user\:create:Creates a user via CLI." "user\:info:Returns information about one or more users in translate5." "worker\:list:Prints a list of current workers or details about one worker" "worker\:queue:Triggers the worker queue - may be necessary after an apache restart or maintenance mode.")
     fi
 
     case $state in
@@ -29,8 +29,16 @@ _translate5.sh()
         option)
             case "$com" in
 
+            _complete)
+            opts+=("--shell:The shell type \("bash"\)" "--input:An array of input tokens \(e.g. COMP_WORDS or argv\)" "--current:The index of the "input" array that the cursor is in \(e.g. COMP_CWORD\)" "--symfony:The version of the completion script")
+            ;;
+
             changelog)
-            opts+=("--important:Show the important release notes only.")
+            opts+=("--important:Show the important release notes only." "--summary:Show only a summary")
+            ;;
+
+            completion)
+            opts+=("--debug:Tail the completion debug log")
             ;;
 
             config)
@@ -42,11 +50,19 @@ _translate5.sh()
             ;;
 
             list)
-            opts+=("--raw:To output raw command list" "--format:The output format \(txt, xml, json, or md\)")
+            opts+=("--raw:To output raw command list" "--format:The output format \(txt, xml, json, or md\)" "--short:To skip describing commands\' arguments")
             ;;
 
             log)
             opts+=("--level:Filtering for specific level\(s\). If given as string, only the level given as string is shown. Given as integer: filtering for all levels as bitmask." "--follow:Show the most recent log entries, and continuously print new entries as they are appended to the log. Do not show a summary." "--all:Shows the full blown log data \(extra, trace, etc\)" "--since:Shows log data since the given point in time \(strtotime parsable string\)." "--until:Shows log data until the given point in time \(strtotime parsable string\). If the parameter starts with a "+" it is automatically added to the since date." "--no-summary:Do not print the summary and intro texts - for further shell scripting." "--summary-only:Print only the summary." "--purge:Warning: purges the logs found be the given filters. Is asking for confirmation of not used with -q\|--quiet or -n\|--no-interaction.")
+            ;;
+
+            status)
+            opts+=()
+            ;;
+
+            cache:purge)
+            opts+=()
             ;;
 
             database:update)
@@ -69,6 +85,10 @@ _translate5.sh()
             opts+=("--name:Force to enter Model name" "--table:Force to enter database table name" "--plugin:Plugin name when the current files are create in plugin contenxt.")
             ;;
 
+            dev:runtest)
+            opts+=("--capture:Use this option to re-capture the test data of a test. Probably not all tests are adopted yet to support this switch." "--legacy-segment:Use this option when re-capturing segment test data to use the old order of the segment data. Comparing the changes then with git diff is easier. Then commit and re-run the test without this option, then finally commit the result. Only usable with -c" "--xdebug:Send the XDEBUG cookie to enable interactive debugging." "--keep-data:Prevents that the test data \(tasks, etc\) is cleaned up after the test. Useful for debugging a test. Must be implemented in the test itself, so not all tests support that flag yet.")
+            ;;
+
             maintenance:announce)
             opts+=("--message:Sets the message announced to the users about the maintenance.")
             ;;
@@ -78,6 +98,10 @@ _translate5.sh()
             ;;
 
             maintenance:message)
+            opts+=()
+            ;;
+
+            maintenance:notify)
             opts+=()
             ;;
 
@@ -117,12 +141,40 @@ _translate5.sh()
             opts+=("--pre-installation:In installation mode only the basic environment check \(or the given module\) is called and the Zend Application is not initialized")
             ;;
 
+            system:mailtest)
+            opts+=()
+            ;;
+
             task:clean)
             opts+=("--delete-error:deletes one \(with ID\) or all tasks with errors" "--delete-import:deletes one task in state import" "--set-to-error:sets a task to status error \(for example to gain access to clone/delete/download of a hanging import task\)" "--delete-data:deletes all orphaned data folders")
             ;;
 
+            termportal:datatypecheck)
+            opts+=()
+            ;;
+
+            termportal:reindex)
+            opts+=()
+            ;;
+
+            tmx:ts1040)
+            opts+=("--analyze:Analyzes the used content tags \(ph it bpt ept\)" "--count:Counts the used XML tags." "--utf8out:returns the content in UTF8 instead the usual UTF16 which is used in TMX files" "--write:writes the output back to a new file \(same name with .cleaned.tmx suffix\) instead to stdout")
+            ;;
+
+            user:create)
+            opts+=("--roles:Give one or multiple roles for the user. To get valid roles call with -R. Provide one -r per role, see example. If omitted just role editor is used." "--choose-roles:With this option you can select interactively the roles of the new user. -r is ignored then." "--locale:The initial locale to be used, defaults to "en". Alternative is just "de" at the moment.")
+            ;;
+
+            user:info)
+            opts+=()
+            ;;
+
             worker:list)
             opts+=("--all:List also done and defunc workers.")
+            ;;
+
+            worker:queue)
+            opts+=()
             ;;
 
             esac
