@@ -2487,4 +2487,36 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // Return collected
         return $distinct;
     }
+
+    /**
+     * Remove items from $termIdByAttrIdA, for which no proposals were detected,
+     * so only the ones for which they were detected would be kept and returned
+     */
+    public function detectProposals(array $termIdByAttrIdA) {
+
+        // If first arg is empty array - return empty array
+        if (!$termIdByAttrIdA) return [];
+
+        // Build where clause for `id`-column
+        $idWHERE = $this->db->getAdapter()->quoteInto('`id` IN (?)', array_unique($termIdByAttrIdA));
+
+        // Get termIds (as keys), for which proposals are detected
+        $detected = $this->db->getAdapter()->query('
+            SELECT `id`, 1 
+            FROM `terms_term` 
+            WHERE 1
+              AND ' . $idWHERE . '
+              AND (`processStatus` = "unprocessed" OR `proposal` != "") 
+        ')->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // Unset those items from $termIdByAttrIdA for which no proposals were detected
+        foreach ($termIdByAttrIdA as $attrId => $termId) {
+            if (!isset($detected[$termId])) {
+                unset($termIdByAttrIdA[$attrId]);
+            }
+        }
+
+        // Return
+        return $termIdByAttrIdA;
+    }
 }

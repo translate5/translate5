@@ -565,7 +565,55 @@ class editor_AttributeController extends ZfExtended_RestController
             $dataTypeIdA[$this->entity->getDataTypeId()] = true;
         }
 
-        // Foreach attribute - do checks
+        // If current user has none of termPM, termPM_allClients or admin roles, but has termProposer role
+        if (count(array_diff(['termPM', 'termPM_allClients', 'admin'], $this->_session->roles)) == 3
+            && in_array('termProposer', $this->_session->roles)) {
+
+            // Collect termIds where possible
+            $termIdByAttrIdA = [];
+            foreach ($entityA as $attrId => $entity) {
+                if ($termId = $entity->getTermId()) {
+                    $termIdByAttrIdA[$attrId] = $termId;
+                }
+            }
+
+            // Remove items from $termIdByAttrIdA, for which no proposals were detected,
+            // so only the ones for which they were detected would be kept
+            $detectedA = ZfExtended_Factory
+                ::get('editor_Models_Terminology_Models_TermModel')
+                ->detectProposals($termIdByAttrIdA);
+
+            // Foreach attribute - do delete
+            foreach ($entityA as $attrId => $entity) {
+
+                // Deletion is disabled by default
+                $deletable = false;
+
+                // If current user is the one who created this attr
+                if ($entity->getCreatedBy() == $this->_session->id) {
+
+                    // If it's a term-level attr
+                    if ($entity->getTermId()) {
+
+                        // If that term is a proposal or has a proposal
+                        if (isset($detectedA[$attrId])) {
+                            $deletable = true;
+                        }
+
+                    // Else
+                    } else {
+                        $deletable = true;
+                    }
+                }
+
+                // If at least one is not deletable - flush failure
+                if (!$deletable) $this->jflush(false, count($entityA) == 1
+                    ? 'This attribute is not deletable'
+                    : 'Some of the attributes are not delatable');
+            }
+        }
+
+        // Foreach attribute - do delete
         foreach ($entityA as $attrId => $entity) {
 
             // Spoof $this->entity
