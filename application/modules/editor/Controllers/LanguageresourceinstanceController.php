@@ -685,8 +685,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData()
+    {
         parent::decodePutData();
         unset($this->data->langResUuid);
     }

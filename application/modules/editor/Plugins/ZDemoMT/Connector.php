@@ -84,7 +84,9 @@ class editor_Plugins_ZDemoMT_Connector extends editor_Services_Connector_Abstrac
         if(empty($allResults)) {
             return $this->resultList;
         }
-        
+
+        $this->resultList->setDefaultSource($searchString);
+
         foreach ($allResults as $result) {
             $this->resultList->addResult($result,$this->defaultMatchRate);
         }
