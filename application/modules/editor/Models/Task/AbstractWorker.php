@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  *
  * The task based worker, is able to load a different behaviour, depending on a non mandatory worker parameter workerBehaviour.
  */
-abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstract {
+abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstract implements editor_Models_Task_WorkerProgressInterface {
     /**
      * @var editor_Models_Task
      */
@@ -99,14 +99,9 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
      * @param float $progress
      */
     protected function triggerUpdateProgressEvent(float $progress) {
-        //parentId: The context(worker parentId or workerId) represents set of workers connected with same parentId.
-        $parentId = $this->workerModel->getParentId() ? $this->workerModel->getParentId() : $this->workerModel->getId();
-        //fire event if progress was called
-        $this->events->trigger("updateProgress", __CLASS__, [
-            'taskGuid'      =>  $this->task->getTaskGuid(),
-            'progress'      => $progress,
-            'context'       => $parentId
-        ]);
+        /** @var editor_Models_Task_WorkerProgress $progress */
+        $progress = ZfExtended_Factory::get('editor_Models_Task_WorkerProgress');
+        $progress->updateProgress($this->task, $progress, $this->workerModel);
     }
 
     /**
@@ -134,5 +129,14 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
                 'task' => $this->task
             ],
         ]);
+    }
+
+    /**
+     * Worker weight/percent of the total import proccess.
+     * @return integer
+     */
+    public function getWeight(): int
+    {
+        return 1;
     }
 }

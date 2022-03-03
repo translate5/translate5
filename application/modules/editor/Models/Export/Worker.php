@@ -127,13 +127,4 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
         $eventManager->trigger('afterExport', $this, array('task' => $task, 'parentWorkerId' => $this->workerModel->getId()));
         return true;
     }
-    
-    /***
-     * The export takes approximately 2% from the import(file pre-translation)
-     * {@inheritDoc}
-     * @see ZfExtended_Worker_Abstract::getWeight()
-     */
-    public function getWeight(): int {
-        return 2;
-    }
 }
