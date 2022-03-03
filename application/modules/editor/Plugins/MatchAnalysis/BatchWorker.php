@@ -92,7 +92,7 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::getWeight()
      */
-    public function getWeight() {
+    public function getWeight(): int {
         return 50;
     }
 }

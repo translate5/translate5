@@ -389,7 +389,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::getWeight()
      */
-    public function getWeight() {
+    public function getWeight(): int {
         return 5;
     }
 }
