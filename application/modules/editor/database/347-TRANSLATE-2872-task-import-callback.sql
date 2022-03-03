@@ -30,7 +30,9 @@ VALUES ('runtimeOptions.import.callbackUrl', '1', 'editor', 'import', '', '', ''
        ('runtimeOptions.import.timeout', '1', 'editor', 'import', '48', '48', '', 'integer', 'The timeout in hours after which a task in status import is set to status error.', 2, 'Import: timeout', 'System setup: Import', '');
 
 -- fix wrong ACL rule
-UPDATE `Zf_acl_rules` set `resource` = 'editor_fakelangres' WHERE `resource` = 'editor_fakelang';
+DELETE FROM `Zf_acl_rules` WHERE `resource` = 'editor_fakelangres' or `resource` = 'editor_fakelang';
+INSERT INTO `Zf_acl_rules` (`id`, `module`, `role`, `resource`, `right`)
+VALUES (null, 'editor', 'noRights', 'editor_fakelangres', 'all');
 
 -- add a created timestamp for tasks
 ALTER TABLE LEK_task
