@@ -1830,18 +1830,18 @@ class editor_TaskController extends ZfExtended_RestController {
         if(empty($taskGuid)){
             throw new editor_Models_Task_Exception('E1339');
         }
-        $this->view->progress = $this->getTaskImportProgres($taskGuid);
+        $this->view->progress = $this->getTaskImportProgress($taskGuid);
     }
 
-    /***
-     * Get/calculate the taskImport progres for given taskGuid
+    /**
+     * Get/calculate the taskImport progress for given taskGuid
      * @param string $taskGuid
-     * @return number]
+     * @return array
      */
-    protected function getTaskImportProgres(string $taskGuid) {
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker ZfExtended_Models_Worker */
-        return $worker->calculateProgress($taskGuid);
+    protected function getTaskImportProgress(string $taskGuid): array {
+        /** @var editor_Models_Task_WorkerProgress $progress */
+        $progress = ZfExtended_Factory::get('editor_Models_Task_WorkerProgress');
+        return $progress->calculateProgress($taskGuid);
     }
 
     /**

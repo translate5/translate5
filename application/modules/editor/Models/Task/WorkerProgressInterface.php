@@ -27,27 +27,15 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * 
- * Tags the segments on task edit and will only be used sequentially via the run()-method
+ * Extends the default worker with task specific additions, basically if the task is on state error, then the worker should set to defunc.
+ * All other functionality reacting on the worker run is encapsulated in the behaviour classes
+ *
+ * The task based worker, is able to load a different behaviour, depending on a non mandatory worker parameter workerBehaviour.
  */
-class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTagger_Worker_Abstract {
-    
-    protected $resourcePool = 'gui';    
+interface editor_Models_Task_WorkerProgressInterface {
     /**
-     * Deactivates maintenance for editor-save mode / non-threaded run
-     * {@inheritDoc}
-     * @see editor_Plugins_TermTagger_Worker_Abstract::init()
+     * Worker weight/percent of the total import proccess.
+     * @return integer
      */
-    public function init($taskGuid = NULL, $parameters = array()) {
-        $this->behaviour->setConfig(['isMaintenanceScheduled' => false]);
-        return parent::init($taskGuid, $parameters);
-    }    
-    /***
-     * Term tagging takes approximately 15 % of the import time
-     * {@inheritDoc}
-     * @see ZfExtended_Worker_Abstract::getWeight()
-     */
-    public function getWeight(): int {
-        return 15;
-    }
+    public function getWeight(): int;
 }
