@@ -72,6 +72,7 @@
 		"ext-simplexml": "*",
 		"ext-libxml": "*",
 		"ext-pdo": "*",
+		"ext-dom": "*",
 		"ext-mysqli": "*",
 		"ext-xmlreader": "*",
 		"ext-sockets" : "*",
