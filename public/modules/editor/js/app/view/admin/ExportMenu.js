@@ -55,29 +55,33 @@ Ext.define('Editor.view.admin.ExportMenu', {
   initComponent: function() {
     var me = this,
         task = me.initialConfig.task;
+    me.items = [];
     
-    if(!task || task.isErroneous()) {
-        me.items = [{
-            itemId: 'exportItemImportArchive',
-            text: me.messages.notAvailable,
-            iconCls: 'x-fa fa-times',
-            disabled: true
-        }];
-    } else {
+    if(task && !task.isErroneous()) {
         me.items = me.initExportOptions();
         me.addExcelExport(task);
     }
     
     //add download archive link if allowed
     if(Editor.app.authenticatedUser.isAllowed('downloadImportArchive', this.initialConfig.task)) {
-        me.items.length == 0 || me.items.push("-");
+        me.items.length && me.items.push("-");
         me.items.push({
             itemId: 'exportItemImportArchive',
             hrefTarget: '_blank',
             href: me.makePath('task/export/id/{0}?format=importArchive'),
             text: me.messages.downloadImportArchive
         });
-    } 
+    }
+
+    // fallback if nothing available
+    if(!me.items.length){
+        me.items.push({
+            itemId: 'exportItemImportArchive',
+            text: me.messages.notAvailable,
+            iconCls: 'x-fa fa-times',
+            disabled: true
+        });
+    }
     
     me.callParent(arguments);
   },
@@ -108,10 +112,9 @@ Ext.define('Editor.view.admin.ExportMenu', {
    */
   initExportOptions: function() {
       var me = this,
-          fields = this.initialConfig.fields,
           exportAllowed = Editor.app.authenticatedUser.isAllowed('editorExportTask', me.task),
           exportDiffString = me.task.get('emptyTargets') ? me.messages.exportTranslation : me.messages.exportReview,
-          alertHandler = (me.task.get('qualityHasFaults')) ? function(){ me.createFaultyExportAlert(); } : null;
+          alertHandler = (me.task.get('qualityHasFaults')) ? function(){ me.createFaultyExportAlert(); } : null,
           result = [{
               itemId: 'exportItem',
               hidden:!exportAllowed,
@@ -140,18 +143,13 @@ Ext.define('Editor.view.admin.ExportMenu', {
               handler: alertHandler
           }];
       
-      if(fields !== false) {
-          fields.each(function(field){
-              if(!field.get('editable')) {
-                  return;
-              }
-              result.push({
-                  hrefTarget: '_blank',
-                  href: me.makePath('quality/downloadstatistics/taskGuid/{1}/?type={2}', field.get('name')),
-                  text : Ext.String.format(me.messages.exportQmField, field.get('label'))
-              });
-          });
-      }
+        me.initialConfig.fields?.each(function(field){
+            field.get('editable') && result.push({
+                hrefTarget: '_blank',
+                href: me.makePath('quality/downloadstatistics/taskGuid/{1}/?type={2}', field.get('name')),
+                text : Ext.String.format(me.messages.exportQmField, field.get('label'))
+            });
+        });
       return result;
   },
   createFaultyExportAlert: function(){
