@@ -812,7 +812,9 @@ Ext.define('Editor.controller.Localizer', {
             errorColumnText: '<?php echo $this->translate->_('Fehler');?>',
             workFilesTypeText: '<?php echo $this->translate->_('Arbeitsdatei');?>',
             pivotFilesTypeText: '<?php echo $this->translate->_('Pivot-Datei');?>',
-            fileMix: '<?php echo $this->translate->_('Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!');?>'
+            fileMix: '<?php echo $this->translate->_('Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!');?>',
+            referenceFilesFilesButton: '<?php echo $this->translate->_('Referenz-Dateien(en) hinzufügen');?>',
+            referenceFilesTypeText: '<?php echo $this->translate->_('Referenz-Datei');?>',
         }
     });
 
@@ -1570,6 +1572,20 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
+    Ext.define("Editor.locale.view.admin.customer.CopyWindow", {
+        override: "Editor.view.admin.customer.CopyWindow",
+        strings: {
+            title:'<?php echo $this->translate->_("Kundeneinstellungen in den aktuellen Kunden übernehmen");?>',
+            copyUserAssocLabel:'<?php echo $this->translate->_("Standard-Benutzerzuweisungen kopieren von");?>',
+            copyUserAssocTooltip:'<?php echo $this->translate->_("Alle Standard-Benutzerzuweisungen des ausgewählten Kunden, einschließlich des ausgewählten Mehrbenutzermodus und Workflows, in den aktuellen Kunden kopieren");?>',
+            copyConfigLabel:'<?php echo $this->translate->_("Konfigurationen kopieren von");?>',
+            copyConfigTooltip:'<?php echo $this->translate->_("Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren, außer <i>Initial workflow on task creation</i> und <i>Multi user task editing mode</i>");?>',
+            copySuccess:'<?php echo $this->translate->_("Kopieren erfolgreich");?>',
+            copyFromText:'<?php echo $this->translate->_("Kopieren von");?>',
+            copyBtnText:'<?php echo $this->translate->_("Kopieren");?>',
+            noCustomerSelected:'<?php echo $this->translate->_("Mindestens ein Kunde muss ausgewählt sein");?>'
+        }
+    });
 
     Ext.define("Editor.locale.view.admin.customer.OpenIdPanel", {
     	override: "Editor.view.admin.customer.OpenIdPanel",

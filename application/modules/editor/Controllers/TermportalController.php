@@ -82,4 +82,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action
             : 'index.php';
         echo $this->view->render($which);
     }
+
+    public function customheaderAction(){
+        $this->view->layout()->disableLayout();
+    }
 }

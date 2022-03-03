@@ -2347,6 +2347,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             ':termEntryId' => $this->getTermEntryId(),
         ];
 
+        // Order clauses
+        $order = [];
+
         // If we have current search term languages ids given
         if ($searchLangIds) {
 
@@ -2470,7 +2473,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * @param string $cols Comma-separated column names
      * @param array $termIds
      */
-    public function distinctColsForTermIds($cols = 'termEntryId,language', array $termIds) {
+    public function distinctColsForTermIds(string $cols, array $termIds) {
 
         // Build termIds-where clause
         $termIds = $this->db->getAdapter()->quoteInto('`id` IN (?)', $termIds);

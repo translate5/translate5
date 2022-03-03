@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
 * @method string getValue() getValue()
 */
 
-class editor_Models_CustomerConfig extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_Customer_CustomerConfig extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = "editor_Models_Db_CustomerConfig";
     protected $validatorInstanceClass = "editor_Models_Validator_CustomerConfig";
     

@@ -62,6 +62,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
 
     /**
      * (non-PHPdoc)
+     * @throws editor_Models_Import_DataProvider_Exception|ZfExtended_ErrorCodeException
      * @see editor_Models_Import_DataProvider_Abstract::checkAndPrepare()
      */
     public function checkAndPrepare(editor_Models_Task $task) {
@@ -104,8 +105,18 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
             }
         }
 
+        // if not work-files are found, trigger exception
+        if(empty($matchingFiles)){
+            throw new editor_Models_Import_DataProvider_Exception('E1369', [
+                'task' => $this->task,
+                'files' => $this->files,
+                'fileLanguages' => $this->fileLanguages,
+                'fileTypes' => $this->fileTypes,
+            ]);
+        }
+
         $pivotFiles = [];
-        // find all matching pivot files
+        // check for pivot and reference files
         for($i=0;$i<count($importFilesValues);$i++){
             if($this->isPivotFileMatch($i)){
                 foreach($matchingFiles as $fileName) {
@@ -116,19 +127,16 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
                         $matchingFilesTypes[$importFilesKeys[$i]] = $this->fileTypes[$i];
                     }
                 }
+            }elseif ($this->isReferenceMatch($i)){ // is reference file at index $i
+                $matchingFiles[$importFilesKeys[$i]] = $importFilesValues[$i];
+                // collect the matching type for the file
+                $matchingFilesTypes[$importFilesKeys[$i]] = $this->fileTypes[$i];
             }
         }
+
+
         // merge the other files with the pivot files
         $matchingFiles = array_merge($matchingFiles,$pivotFiles);
-
-        if(empty($matchingFiles)){
-            throw new editor_Models_Import_DataProvider_Exception('E1369', [
-                'task' => $this->task,
-                'files' => $this->files,
-                'fileLanguages' => $this->fileLanguages,
-                'fileTypes' => $this->fileTypes,
-            ]);
-        }
 
         foreach($matchingFiles as $tmpFile => $fileName) {
             $name = $this->getFilepathByName($fileName,$matchingFilesTypes[$tmpFile]);
@@ -196,6 +204,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         return match ($type) {
             'workfile' => editor_Models_Import_Configuration::WORK_FILES_DIRECTORY,
             'pivot' => editor_Models_Import_Configuration::RELAIS_FILES_DIRECTORY,
+            'reference' => Zend_Registry::get('config')->runtimeOptions->import->referenceDirectory ?? 'referenceFiles',
             default => $type,
         };
     }
@@ -238,6 +247,16 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
     }
 
     /***
+     * Is the file-type reference at given index
+     * @param int $arrayIndex
+     * @return bool
+     */
+    protected function isReferenceFile(int $arrayIndex): bool
+    {
+        return $this->fileTypes[$arrayIndex] === 'reference';
+    }
+
+    /***
      * Check if the language at the task index matches the current task target language.
      * The match is true also when the language is empty at that index (non-bilingual file)
      * @param int $arrayIndex
@@ -259,6 +278,15 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
     }
 
     /***
+     * Check if for the given inde, there is reference file match
+     * @param int $arrayIndex
+     * @return bool
+     */
+    protected function isReferenceMatch(int $arrayIndex): bool{
+        return $this->isReferenceFile($arrayIndex);
+    }
+
+    /***
      * Check if the workFile and the pivotFiles names are the same.
      * If the workFile uses okapi parser, we add .xlf as additional extension, since this will be the final
      * filename which will be matched for pivot patch
@@ -268,7 +296,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      */
     protected function filesMatch(string $workFile, string $pivotFile): bool
     {
-        if($workFile === $pivotFile){
+        if(editor_Utils::compareImportStyleFileName($workFile,$pivotFile)){
             return true;
         }
         $ext = pathinfo($workFile,PATHINFO_EXTENSION);

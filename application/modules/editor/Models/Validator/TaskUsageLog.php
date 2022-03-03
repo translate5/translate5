@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Validator_TaskUsageLog extends ZfExtended_Models_Validator_Abstract {
     protected function defineValidators() {
         $this->addValidator("id", "int");
-        $this->addValidator("taskType",'inArray', [editor_Models_Task::getValidTaskTypes()]);
+        $this->addValidator("taskType",'inArray', [editor_Task_Type::getInstance()->getValidTypes()]);
         $this->addValidator("sourceLang", "int");
         $this->addValidator("targetLang", "int");
         $this->addValidator("customerId", "int");

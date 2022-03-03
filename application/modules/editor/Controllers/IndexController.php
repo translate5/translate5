@@ -668,7 +668,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $requestedFile = $this->getParam(2);
         $requestedFileParts = explode($slash, $requestedFile);
         $extension = strtolower(pathinfo($requestedFile, PATHINFO_EXTENSION));
-
+        
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase!
         $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($requestedFileParts)));
@@ -701,53 +701,33 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // Override default content-type text/html https://www.php.net/manual/en/ini.core.php#ini.default-mimetype
         // Prevents problems with files without extensions as is often the case with wget downloaded websites
         header('Content-Type: ' . ($types[$extension] ?? ''));
-        
-        /* Caching Identifiers
-        * $etag - version number of release. Trumps $mtime
-        * $mtime - modification time. If new release detected by mismatching $etags, check if file really changed via $mtime
-        * In dev mode use mtime as etag to simulate new version on file change.
-        */
-        $version = ZfExtended_Utils::getAppVersion();
-        $etag = ($version !== 'development') ? $version : strval($publicFile->getMTime());
-        $etagClient = $_SERVER['HTTP_IF_NONE_MATCH'] ?? -1;
-        if($etagClient === $etag){
-            header('HTTP/1.1 304 Not Modified');
-            exit;
-        }
-        // Version has changed, update etag on clientside
-        header('Etag: '.$etag);
 
-        $mtime = $publicFile->getMTime();
-        $mtimeClient = strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? '');
-        if($mtimeClient === $mtime){ // Check if file has changed, not only version
-            header('HTTP/1.1 304 Not Modified');
-            exit;
-        }
-        // File has changed
-        header('Last-Modified: '.gmdate('D, d M Y H:i:s', $mtime).' GMT');
-
-        /* Set caching behaviour.
-        * - Default to 10 hours == 36000s to revalidate daily for new release
-        * - In dev mode revalidate always
-        * - "Never" (== yearly == 31536000s) revalidate immutable resources
-        * Cf. https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching 
-        */
+        // Unset default caching headers here in case we exit early with 304
         header_remove('Cache-Control');
-        $cacheBehaviour = ($version !== 'development') ? 'max-age=36000, must-revalidate' : 'no-cache';
-        $disableCacheParam = ($version === 'development') ? null : $this->getParam('_dc'); // e.g. 5.6.0
-        if (
-            $disableCacheParam // The param will change with a new release and query an updated version
-            ||
-            str_starts_with($requestedType, 'visualReview-t') // The outputs of pdf2HtmlEx will never change, e.g visualReview-t123/VisualReview/bg1.png
-        ) {
-            $cacheBehaviour = ' max-age=31536000, immutable';
-        }
-        header('Cache-Control: ' . $cacheBehaviour);
-
         header_remove('Expires');
         header_remove('Pragma');
-        header_remove('X-Powered-By'); //FIXME: this is configurable in php.ini via 'expose_php = Off'
 
+        $version = ZfExtended_Utils::getAppVersion();
+        if($version === 'development'){
+            $version = $publicFile->getMTime();  // changed file means new version
+        }
+        if($_SERVER['HTTP_IF_NONE_MATCH']??-1 == $version){ // compare Etag. We use version number to fetch file every release.
+            header('HTTP/1.1 304 Not Modified');
+            exit;
+        }
+
+        $isStaticVRFile = (str_starts_with($requestedType, 'visualReview-t') && $extension !== 'html'); // pdfconverter outputs that will never change
+        if($version === 'development' && !$isStaticVRFile){
+            $cacheBehaviour = 'no-cache'; // check for new version always
+        } else if ($isStaticVRFile || $this->getParam('_dc')){ // refreshed through url (plugin js)
+            $cacheBehaviour = 'max-age=31536000, immutable'; // check after 1 year aka 'never'
+        } else {
+            $cacheBehaviour = 'max-age=36000, must-revalidate'; // check after 10 hours (plugin css/png, VR/scroller.js)
+        }
+
+        header('Etag: '.$version);
+        header('Cache-Control: '.$cacheBehaviour);
+        header('Content-Length: '.$publicFile->getSize());
         readfile($publicFile);
         exit;
     }

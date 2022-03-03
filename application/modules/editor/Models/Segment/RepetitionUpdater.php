@@ -103,7 +103,8 @@ class editor_Models_Segment_RepetitionUpdater {
 
         //replace the repeatedSegment tags with the original repetition ones,
         // if the original (mostly target) is empty use the tags from source
-        $useSourceTags = empty($originalContent);
+        // also do that if the repeated segment was pretranslated, since
+        $useSourceTags = ZfExtended_Utils::emptyString($originalContent);
 
         //get only the real tags, we do not consider whitespace tags in repetitions,
         // this is because whitespace belongs to the content and not to the segment (tags instead belong to the segment)
@@ -158,11 +159,12 @@ class editor_Models_Segment_RepetitionUpdater {
 
     /**
      * Updates the target fields in the repeated segment with the content of the original segment with the tags replaced with the previous tags (in the repeated)
+     * @param bool $useSourceTags if true, force usage tags from source instead from target
      * @return bool
      */
-    public function updateTarget(): bool
+    public function updateTarget($useSourceTags = false): bool
     {
-        $originalContent = $this->repeatedSegment->getTarget();
+        $originalContent = $useSourceTags ? '' : $this->repeatedSegment->getTarget();
         $segmentContent = $this->originalSegment->getTargetEdit();
         return $this->updateSegmentContent($originalContent, $segmentContent, function($originalContent, $segmentContent){
             $this->repeatedSegment->setTargetEdit($segmentContent);

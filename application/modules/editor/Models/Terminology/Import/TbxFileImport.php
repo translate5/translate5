@@ -553,11 +553,8 @@ $memLog('Loaded terms:        ');
         $this->setDiscriptGrp($tig,$newTerm,'tig');
 
         $admnStatFound = false;
-        if ($this->termNoteStatus->setTermStatusOnImport($newTerm, $this->bulkAttribute, $admnStatFound)) {
-            $newTerm->processStatus = $this->getProcessStatus($newTerm->termNote);
-        } else {
-            $newTerm->processStatus = $newTerm::TERM_STANDARD_PROCESS_STATUS;
-        }
+        $this->termNoteStatus->setTermStatusOnImport($newTerm, $this->bulkAttribute, $admnStatFound);
+        $newTerm->processStatus = $this->getProcessStatus($newTerm->termNote);
 
         //if no termNote with administrativeStatus was found, we create one
         if(!$admnStatFound) {

@@ -329,8 +329,8 @@ class editor_Plugins_MatchAnalysis_Export_Xml
         $language->addAttribute('lcid', $languagesModel->getLcid());
         $language->addAttribute('name', $languagesModel->getLangName());
         
-        $customer = ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $customer editor_Models_Customer */
+        $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+        /* @var $customer editor_Models_Customer_Customer */
         $customerData = $customer->loadByIds([$task->getCustomerId()]);
         $taskInfo->addChild('customer')->addAttribute('name', $customerData[0]['name']);
         
