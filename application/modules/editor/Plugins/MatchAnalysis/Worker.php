@@ -156,7 +156,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::getWeight()
      */
-    public function getWeight()
+    public function getWeight(): int
     {
         return 92;
     }

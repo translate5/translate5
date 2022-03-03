@@ -75,7 +75,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'autoqaOperation', array($this, 'handleTaskOperation'));
-        $this->eventManager->attach('ZfExtended_Models_Worker', 'updateProgress',array($this, 'handleUpdateProgress'));
+        $this->eventManager->attach('editor_Models_Task_AbstractWorker', 'updateProgress',array($this, 'handleUpdateProgress'));
         $this->eventManager->attach('ZfExtended_Models_Db_Session', 'getValidSessionsSql',array($this, 'handleGetValidSessionsSql'));
 
         //returns information if the configured okapi is alive / reachable
