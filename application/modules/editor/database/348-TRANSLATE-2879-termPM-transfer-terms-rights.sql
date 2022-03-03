@@ -31,3 +31,5 @@ insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('edito
 insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM_allClients','editor_task','pretranslationOperation');
 insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM_allClients','initial_tasktype','termtranslation');
 insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM_allClients','initial_tasktype','project');
+
+insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM_allClients','editor_term','delete');
