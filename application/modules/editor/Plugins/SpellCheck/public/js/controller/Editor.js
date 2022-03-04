@@ -600,9 +600,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             rangeForMatch = rangy.createRange(),
             rangeForMatchBookmark,
             replaceText,
-            bookmarkForCaretOnReplacement;
+            bookmarkForCaret;
         
-        bookmarkForCaretOnReplacement = me.getPositionOfCaret();
+        bookmarkForCaret = me.getPositionOfCaret();
         
         // Find and bookmark the range that belongs to the SpellCheck-Node for the current ToolTip.
         rangeForMatch.selectNodeContents(me.activeMatchNode);
@@ -639,7 +639,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // new DOM after replacement => find and apply the matches again:
         me.startSpellCheck();
         
-        me.setPositionOfCaret(bookmarkForCaretOnReplacement); // TODO: does not land right if the replacement has not the same length as what was replaced
+        me.setPositionOfCaret(bookmarkForCaret); // TODO: does not land right if the replacement has not the same length as what was replaced
     },
     
     // =========================================================================

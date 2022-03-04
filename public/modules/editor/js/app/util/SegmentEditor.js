@@ -355,22 +355,17 @@ Ext.define('Editor.util.SegmentEditor', {
             if(partnerTagImgId != null) {
                 return me.getEditorDoc().getElementById(partnerTagImgId); // getElementById() returns null if it doesn't exist
             }
-        };
+        }
         return null;
     },
     /**
      * Collapse all multiple whitespaces with nothing between them (we delete them anyway on save).
      */
     collapseMultipleWhitespaceInEditor: function() {
-        var me = this,
-            el = me.getEditorBodyExtDomElement(),
-            elContent,
-            bookmarkForCaret = me.getPositionOfCaret();
-        elContent = el.getHtml();
-        elContent = elContent.replace(/&nbsp;+/gi,'  ').replace(/\s\s+/g, '&nbsp;');
-        el.setHtml(elContent);
-        me.getEditorBodyExtDomElement().dom.normalize();
-        me.setPositionOfCaret(bookmarkForCaret);
+        var body = this.getEditorBody(),
+            html = body.innerHTML;
+        body.innerHTML = html.replace(/&nbsp;+/gi, '  ').replace(/\s\s+/g, '&nbsp;');
+        body.normalize();
     },
     /***
      * Remove SpellCheck-Markup in the Editor but keep their content.
@@ -382,34 +377,6 @@ Ext.define('Editor.util.SegmentEditor', {
         Ext.Array.each(allSpellCheckNodes, function(spellCheckNode, index) {
             me.removeMarkupAroundNode(spellCheckNode);
         });
-    },
-    /***
-     * Remove SpellCheck-Markup at a range (e.g. the position of the cursor) but keep the content.
-     */
-    cleanSpellCheckMarkupAtRange:function(range){
-        var me = this,
-            allSpellCheckNodes = [],
-            spellCheckNode,
-            getSpellCheckNode = function(nodeToCheck){
-                while (nodeToCheck) {
-                    if (/\bspellcheck\b/i.test(nodeToCheck.className)) {
-                        return nodeToCheck;
-                    }
-                    nodeToCheck = nodeToCheck.parentNode;
-                }
-                return null;
-            },
-            bookmarkForCaret = me.getPositionOfCaret();
-        allSpellCheckNodes.push(range.commonAncestorContainer);
-        allSpellCheckNodes.push(range.startContainer);
-        allSpellCheckNodes.push(range.endContainer);
-        Ext.Array.each(allSpellCheckNodes, function(node) {
-            spellCheckNode = getSpellCheckNode(node);
-            if (spellCheckNode != null) {
-                me.removeMarkupAroundNode(spellCheckNode);
-            }
-        });
-        me.setPositionOfCaret(bookmarkForCaret);
     },
     /***
      * Clean up Nodes, e.g. remove empty TrackChange-Nodes.

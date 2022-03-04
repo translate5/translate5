@@ -770,50 +770,142 @@ Ext.define('Editor.util.Range', {
     // -------------------------------------------------------------------------
     // Get and set the position of the caret in the Editor
     // -------------------------------------------------------------------------
-    
+
     /**
-     * Returns a bookmark for the current position of the cursor in the Editor.
-    // (Use rangy's bookmark if workaround is not applied).
-     * @returns {Object|null} rangy-bookmark|node|null
+     * Returns a bookmark for the current caret position of the cursor in the Editor.
+     * if a selected range is present, the caret is in the focus node of the element
+     * @returns {Object}
      */
     getPositionOfCaret: function() {
-        var me = this,
-            selectionForCaret = rangy.getSelection(me.getEditorBody()),
-            rangeForCaret = selectionForCaret.rangeCount ? selectionForCaret.getRangeAt(0) : null;
-        if (rangeForCaret == null) { // eg. after the push-event when newly opening a segment: editor is opened, but user is not in there yet.
-            return null;
-        } else if (me.useWorkaroundForBookmark(rangeForCaret)) {
-            return me.getBookmarkUsingTheWorkaround(rangeForCaret);
-        } else {
-            return rangeForCaret.getBookmark();
+        let doc = this.getEditorDoc(),
+            selection = doc.getSelection(),
+            node = (selection.focusNode == null) ? selection.anchorNode : selection.focusNode,
+            offset = (selection.focusNode == null) ? selection.anchorOffset : selection.focusOffset,
+            data = { valid: false };
+        // when nothing useful is selected, we do not save anything
+        // important: when there is a caret already present, this is an superflous call
+        if(!node || doc.getElementById('t5caret') != null){
+            return data;
+        }
+        if(node.nodeName.toLowerCase() !== 'body' && !this.isInBody(node)){
+            return data;
+        }
+        // when the selection points to the bodys first child or to the 0-offset of the bodies first child we ignore to set & restore the position as it can not change on content changes
+        if(offset < 1 && (node.nodeName.toLowerCase() === 'body' || (node.parentNode && node.parentNode.nodeName.toLowerCase() === 'body' && node.parentNode.firstChild === node))){
+            return data;
+        }
+        let caret = doc.createElement('span');
+        caret.id = 't5caret'
+        selection.getRangeAt(0).insertNode(caret);
+
+        data.valid = true;
+        return data;
+    },
+    /**
+     * Set the position of the cursor according to the given bookmark created by getPositionOfCaret
+     * @param {Object|null} data
+     */
+    setPositionOfCaret: function(data) {
+        if(data && data.valid) {
+            let doc = this.getEditorDoc(),
+                caret = doc.getElementById('t5caret');
+            if (caret) {
+
+                // TODO REMOVE
+                console.log('setPositionOfCaret: SELECTION: ', caret);
+
+                let node = null,
+                    offset = 0;
+                if (caret.parentElement.childNodes.length < 2) {
+                    node = caret.parentElement;
+                    // TODO REMOVE
+                    console.log('setPositionOfCaret: CARET ONLY CHILD OF PARENT', caret);
+                } else {
+                    // try to find the left direct neighbouring content node
+                    // we try to find this one because the right neighbour might be joined with the left in case the caret is inbetween two text nodes
+                    node = this.findAdjacentContentNode(caret, false);
+                    if (node) {
+                        // if the node is to the left we need to jump to the right
+                        // TODO REMOVE
+                        console.log('setPositionOfCaret: FOUND LEFT ADJACENT NODE', node);
+                        offset = (node.nodeType === Node.TEXT_NODE) ? node.textContent.length : (node.childNodes ? node.childNodes.length : 0);
+                    } else {
+                        // if to the left did not work, try right
+                        node = this.findAdjacentContentNode(caret, true);
+                        // TODO REMOVE
+                        if(node){ console.log('setPositionOfCaret: FOUND RIGHT ADJACENT NODE', node); }
+                    }
+                    if (!node) {
+                        // per default, we take the parent element and the index of the node
+                        node = caret.parentElement;
+                        for (let i = 0, nodes = caret.parentElement.childNodes, count = nodes.length; i < count; i++) {
+                            // calculating the position to reference to.
+                            // We can assume, that a preceiding and following text-node would already have been captured with findAdjacentContentNode
+                            if (nodes[i] === caret) {
+                                if (i < count - 1) {
+                                    // if there is an element after, we can use the caret's index
+                                    offset = i;
+                                } else if (i > 0) {
+                                    offset = i - 1;
+                                } else {
+                                    i = 0;
+                                }
+                                break;
+                            }
+                        }
+                        // TODO REMOVE
+                        console.log('setPositionOfCaret: NO ADJACENT NODES, used PARENT', node);
+                    }
+                }
+                caret.remove();
+                if (node) {
+                    // set the evaluated caret
+                    let selection = doc.getSelection();
+                    selection.setBaseAndExtent(node, offset, node, offset);
+                }
+            }
         }
     },
     /**
-     * Set the position of the cursor according to the given bookmark or node.
-     * (Use rangy's bookmark if workaround is not applied).
-     * @param {Object|null} rangy-bookmark|node|null
+     *
+     * @param {Node} node
+     * @param {Boolean} rightOf
+     * @returns {Node|null}
      */
-    setPositionOfCaret: function(bookmarkForCaret) {
-        var me = this,
-            selectionForCaret,
-            startNodeOfSelection,
-            rangeForCaret,
-            nodeForBookmark;
-        if (bookmarkForCaret != null) {
-            selectionForCaret = rangy.getSelection(me.getEditorBody());
-            startNodeOfSelection = (selectionForCaret.isBackwards()) ? selectionForCaret.focusNode : selectionForCaret.anchorNode;
-            rangeForCaret = rangy.createRange();
-            if(me.isBookmarkOfWorkaround(bookmarkForCaret)){
-                rangeForCaret = me.applyBookmarkUsingTheWorkaround(rangeForCaret,bookmarkForCaret);
-            } else {
-                rangeForCaret.moveToBookmark(bookmarkForCaret);
+    findAdjacentContentNode: function(node, rightOf){
+        while((node = rightOf ? node.nextSibling : node.previousSibling) != null){
+            if(node.nodeType == Node.TEXT_NODE){
+                // TODO REMOVE
+                // console.log('findAdjacentContentNode: NODE TO THE '+(rightOf?'RIGHT':'LEFT')+' IS TEXT NODE', (rightOf ? node.nextSibling : node.previousSibling));
+                return node;
+            } else if(node.nodeType == Node.ELEMENT_NODE){
+                // TODO REMOVE
+                // console.log('findAdjacentContentNode: NODE TO THE '+(rightOf?'RIGHT':'LEFT')+' IS ELEMENT NODE');
+                if(rightOf && node.firstChild){
+                    // TODO REMOVE
+                    // console.log('findAdjacentContentNode: SEARCH FIRST CHILD', node.firstChild);
+                    return this.findAdjacentContentNode({ previousSibling:node.firstChild }, false); // first argument is trick to get the node itself cheked
+                } else if(!rightOf && node.lastChild) {
+                    // TODO REMOVE
+                    // console.log('findAdjacentContentNode: SEARCH LAST CHILD', node.lastChild);
+                    return this.findAdjacentContentNode({ nextSibling:node.lastChild }, true); // first argument is trick to get the node itself cheked
+                }
+                return node;
             }
-            if (!rangeForCaret.collapsed && startNodeOfSelection.nodeType == 1) {
-                // rangy bug: if the selection starts between a tag and text, the tag will be included even it was not selected
-                // (does not happen at the end of the selection)
-                rangeForCaret = me.cleanBordersOfCharacterbasedRange(rangeForCaret,"fromStart");
-            }
-            selectionForCaret.setSingleRange(rangeForCaret);
         }
+        return null;
+    },
+    /**
+     *
+     * @param {Node} node
+     * @returns {Boolean}
+     */
+    isInBody: function(node){
+        while((node = node.parentNode) != null) {
+            if(node.nodeName.toLowerCase() === 'body'){
+                return true;
+            }
+        }
+        return false;
     }
 });
