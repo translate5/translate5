@@ -457,6 +457,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (me.disableSpellCheckByIdle) {
             me.setEditorDisabled(true);
         }
+        // where is the caret at the moment?
+        me.bookmarkForCaret = me.getPositionOfCaret();
+
         // TrackChanges must remove it's placeholder.
         me.fireEvent('removePlaceholdersInEditor');
         
@@ -473,10 +476,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         spellCheckProcessID = Ext.Date.format(new Date(), 'time');
         me.spellCheckInProgressID = spellCheckProcessID;
         me.consoleLog('me.spellCheckInProgressID: ' + spellCheckProcessID);
-        
-        // where is the caret at the moment?
-        me.bookmarkForCaret = me.getPositionOfCaret();
-        
+
         // "ignore" multiple whitespaces, because we delete them anyway on save.
         me.collapseMultipleWhitespaceInEditor();
         
