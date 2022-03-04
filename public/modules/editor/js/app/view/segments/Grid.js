@@ -525,17 +525,24 @@ Ext.define('Editor.view.segments.Grid', {
     /**
      * Focus the segment in editor (open the segment for editing)
      */
-     focusEditorSegment: function(segmentNrInTask, forEditing, failureEvent) {
+    focusEditorSegment: function(segmentNrInTask, forEditing, failureEventName = '') {
         var me = this;
-        if(!segmentNrInTask || me.locked || me.selection?.get('segmentNrInTask') == segmentNrInTask){
+        if(!segmentNrInTask || me.locked || me.selection?.get('segmentNrInTask') == segmentNrInTask) {
             return;
         }
-        segmentNrInTask  = parseInt(segmentNrInTask);
+        segmentNrInTask = parseInt(segmentNrInTask);
         var segmentIndex = me.getStore().findBy(rec => rec.data.segmentNrInTask === segmentNrInTask); // direct access here for fastest lookup
         if(segmentIndex >= 0) {
-            me.scrollToSegmentInGrid(me,segmentIndex,segmentNrInTask,forEditing);
+            me.scrollToSegmentInGrid(me, segmentIndex, segmentNrInTask, forEditing);
         } else {
-            me.focussedSegmentNotFound(segmentNrInTask,forEditing, failureEvent);
+            me.searchPosition(segmentNrInTask).then(function({index, response}) {
+                if(index >= 0) {
+                    me.scrollToSegmentInGrid(me, index, segmentNrInTask, forEditing);
+                } else {
+                    var notFoundMsg = me.fireEvent(failureEventName, response) && response.status !== 403 && Editor.app.getSegmentsController().messages.noIndexFound;
+                    if(notFoundMsg) Editor.MessageBox.addInfo(notFoundMsg);
+                }
+            });
         }
     },
     /**
@@ -576,33 +583,22 @@ Ext.define('Editor.view.segments.Grid', {
         segmentGrid.unSelectOrFocus();
     },
     /**
-     * If the segment is not loaded in Segments store, try to find the segment index in the database
-     * @param failureEvent - string that is fired as event, for plugins to provide a custom error message
+     * Find the segment index in the database
+     * @returns Ext.promise.Promise that always resolves to {index, response}
      */
-    focussedSegmentNotFound: function(segmentNrInTask, forEditing, failureEvent='') {
-        if(this.locked) return;
-        var me=this,
-            segmentStore=me.getStore(),
-            proxy=segmentStore.getProxy(),
-            params={}, segmentInfoNotFoundMsg;
-
-        params[proxy.getFilterParam()]= proxy.encodeFilters(segmentStore.getFilters().items);
-        params[proxy.getSortParam()]  = proxy.encodeSorters(segmentStore.getSorters().items);
-        me.segInfoConn.request({
+    searchPosition: function(segmentNrInTask) {
+        var store = this.getStore(),
+            proxy = store.getProxy(),
+            params = {};
+        params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
+        params[proxy.getSortParam()] = proxy.encodeSorters(store.getSorters().items);
+        return this.segInfoConn.request({
             segmentNrInTask,
             params,
-            callback: function(request, success, response) {
-                var responseData=Ext.JSON.decode(response.responseText, true)||{};
-                if(responseData.index > -1){
-                    me.scrollToSegmentInGrid(me,responseData.index,responseData.segmentNrInTask,forEditing);
-                } else { // failure
-                    segmentInfoNotFoundMsg = me.fireEvent(failureEvent, response);
-                    if(!Ext.isString(segmentInfoNotFoundMsg) && response.status !== 403){
-                        segmentInfoNotFoundMsg = Editor.app.getSegmentsController().messages.noIndexFound;
-                    }
-                    if(segmentInfoNotFoundMsg) Editor.MessageBox.addInfo(segmentInfoNotFoundMsg);
-                }
-            }
+        }).then(function(response) {
+            return {index: Ext.decode(response.responseText).index, response}
+        }).otherwise(function(response) {
+            return {index: -1, response}
         });
-    },
+    }
 });
