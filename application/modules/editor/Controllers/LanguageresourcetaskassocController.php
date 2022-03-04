@@ -114,8 +114,10 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
      * does some prechecking of the data
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData()
+    {
         parent::decodePutData();
         
         //this flag may not be set via API

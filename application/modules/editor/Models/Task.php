@@ -190,7 +190,31 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return $taskConfig->getTaskConfig($this->getTaskGuid());
     }
-    
+
+    /**
+     * Sets importing tasks to status error if the import was started more then 48 (default; configurable runtimeOptions.import.timeout) hours ago
+     * @throws Zend_Exception
+     */
+    public function cleanupDanglingImports()
+    {
+        $config = Zend_Registry::get('config');
+        $hours = (int) ($config->runtimeOptions->import->timeout ?? 48);
+        $s = $this->db->select()
+            ->where('state = ?', self::STATE_IMPORT)
+            ->where('created < DATE_SUB(NOW(), INTERVAL ? HOUR)', $hours);
+        $danglingTasks = $this->db->fetchAll($s);
+
+        $task = clone $this;
+        foreach ($danglingTasks as $data) {
+            $task->init($data->toArray());
+            $task->logger()->error('E1379', 'The task import was cancelled after {hours} hours.',[
+                'task' => $task,
+                'hours' => $hours,
+            ]);
+            $task->setErroneous();
+        }
+    }
+
     /**
      * access customer instances in a cached way
      * @param int $id

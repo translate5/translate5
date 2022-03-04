@@ -428,9 +428,8 @@ Ext.application({
      */
     onAdminMainSectionChange: function (tabpanel, activatedPanel, task) {
         var me = this,
-            ctrl = activatedPanel.getController(),
-            conf = ctrl && ctrl.defaultConfig,
-            mainRoute = conf && conf.routes && Object.keys(conf.routes)[0];
+            routes = activatedPanel.getController()?.defaultConfig?.routes,
+            mainRoute = Object.keys(routes)[0];
         me.fireEvent('adminSectionChanged', activatedPanel);
 
         if (!mainRoute) {
@@ -552,14 +551,15 @@ Ext.application({
     /***
      * Get segmentNrInTask from the task edit route
      * {Boolean} checkEditTaskRoute : validate if the current route is task edit route
+     * @returns {number} segmentId or 0
      */
     parseSegmentIdFromTaskEditHash: function (checkEditTaskRoute) {
         if (checkEditTaskRoute && !this.isEditTaskRoute()) {
-            return -1;
+            return 0;
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return (h && h.length == 4) ? parseInt(h[2]) : -1;
+        return h?.length == 4 && parseInt(h[2]) || 0;
     },
 
     /***

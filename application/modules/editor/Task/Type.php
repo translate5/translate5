@@ -52,13 +52,13 @@ class editor_Task_Type {
      * The calculated initial taskType for projects
      * @var string
      */
-    protected $importTypeProject = editor_Task_Type_Default::ID;
+    protected string $importTypeProject = editor_Task_Type_Default::ID;
 
     /**
      * The calculated initial taskType for tasks
      * @var string
      */
-    protected $importTypeTask = editor_Task_Type_Default::ID;
+    protected string $importTypeTask = editor_Task_Type_Default::ID;
 
     /**
      * Returns the singleton of the task type manager
@@ -81,7 +81,6 @@ class editor_Task_Type {
 
     /**
      * Adds over overwrites a given task type with the mapped class name
-     * @param string $type
      * @param string $className
      */
     public function registerType(string $className) {
@@ -174,7 +173,7 @@ class editor_Task_Type {
      * returns the task type to be used on import
      * @return string
      */
-    public function getImportTaskType() {
+    public function getImportTaskType(): string {
         return $this->importTypeTask;
     }
 
@@ -182,7 +181,7 @@ class editor_Task_Type {
      * returns the project type to be used on import
      * @return string
      */
-    public function getImportProjectType() {
+    public function getImportProjectType(): string {
         return $this->importTypeProject;
     }
 }

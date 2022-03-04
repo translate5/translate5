@@ -158,6 +158,7 @@ class Translate2417Test extends editor_Test_JsonTest {
      */
     protected function checkTaskState(){
         self::$api->checkTaskStateLoop();
+        sleep(3); //lets wait another 3 seconds, since this test was always failing with 403 due a not found tasl lang res assoc
     }
 
     /***

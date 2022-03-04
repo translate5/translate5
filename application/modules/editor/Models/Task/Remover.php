@@ -202,8 +202,6 @@ class editor_Models_Task_Remover {
      * Also removes the task related term collection
      */
     protected function removeRelatedDbData() {
-        //@todo ask marc if logging tables should also be deleted (no constraint is set)
-        
         $this->task->dropMaterializedView();
         $taskGuid = $this->task->getTaskGuid();
         

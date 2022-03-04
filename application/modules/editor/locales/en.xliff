@@ -4402,13 +4402,13 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.</source>
   <target>All matching bilingual files for this language are removed from the list of the uploaded files.</target>
 </trans-unit>
-<trans-unit id='QXJiZWl0c2RhdGVpKGVuKSBoaW56dWbDvGdlbg=='>
-  <source>Arbeitsdatei(en) hinzufügen</source>
-  <target>Add work file(s)</target>
+<trans-unit id='QXJiZWl0c2RhdGVpKGVuKQ=='>
+  <source>Arbeitsdatei(en)</source>
+  <target>Work file(s)</target>
 </trans-unit>
-<trans-unit id='UGl2b3QtRGF0ZWkoZW4pIGhpbnp1ZsO8Z2Vu'>
-  <source>Pivot-Datei(en) hinzufügen</source>
-  <target>Add pivot file(s)</target>
+<trans-unit id='UGl2b3QtRGF0ZWkoZW4p'>
+  <source>Pivot-Datei(en)</source>
+  <target>Pivot file(s)</target>
 </trans-unit>
 <trans-unit id='RGllIFJlaWhlbmZvbGdlIGRlciBVcmxzIGVudHNwcmljaHQgZGVyIFJlaWhlbmZvbGdlIGRlciBob2NoZ2VsYWRlbmVuIEFyYmVpdHNkYXRlaWVuLg=='>
   <source>Die Reihenfolge der Urls entspricht der Reihenfolge der hochgeladenen Arbeitsdateien.</source>
@@ -4507,9 +4507,17 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Datei(en) hinzufügen</source>
     <target>Add file(s)</target>
 </trans-unit>
+<trans-unit id='SW5zdGFudFRyYW5zbGF0ZVdyaXRlVG0'>
+    <source>InstantTranslateWriteTm</source>
+    <target>Instant-Translate write TM</target>
+</trans-unit>
 <trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbikgaGluenVmw7xnZW4='>
     <source>Referenz-Dateien(en) hinzufügen</source>
     <target>Add reference file(s)</target>
+</trans-unit>
+<trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbik='>
+    <source>Referenz-Dateien(en)</source>
+    <target>Reference file(s)</target>
 </trans-unit>
 <trans-unit id='UmVmZXJlbnotRGF0ZWk='>
     <source>Referenz-Datei</source>

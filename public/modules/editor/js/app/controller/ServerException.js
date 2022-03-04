@@ -57,18 +57,15 @@ Ext.define('Editor.controller.ServerException', {
     },
     
     /**
-     * Can be used in Operation callbacks to trigger the "default ServerException" failure behaviour
-     * handles only failed requests, ignores successfully HTTP 2XX requests
-     * @param {Array} records
-     * @param {Ext.data.Operation} operation
-     * @param {Boolean} success [not yet, ext > 4.0.7]
-     * @return {Boolean} true if request was successfull, false otherwise
+     * Handle unproccessable entities
+     * @param {Ext.form.BasicForm} form
+     * @param {Ext.data.Model} record
+     * @param {Ext.data.Operation} operation with operation.error = {response.status, response.statusText, response}
      */
     handleFormFailure: function(form, record, operation) {
-        var json, resp = operation.error && operation.error.response;
-        if(resp && resp.responseText) {
-            json = Ext.decode(resp.responseText);
-            if(json.errorsTranslated && operation.error && operation.error.status == '422') {
+        if(operation?.error.status === 422) {
+            var json = Ext.decode(operation.error.response.responseText);
+            if(json.errorsTranslated) {
                 form.markInvalid(json.errorsTranslated);
                 return;
             }
@@ -85,14 +82,13 @@ Ext.define('Editor.controller.ServerException', {
      * @return {Boolean} true if request was successfull, false otherwise
      */
     handleCallback: function(records, operation, success) {
-        var resp = operation.getResponse();
         if(operation.success) {
             return true;
         }
+        var resp = operation.getResponse();
         if(resp) {
             this.handleException(resp);
-        }
-        else {
+        } else {
             this.handleFailedRequest(operation.error.status, operation.error.statusText, operation.error.response);
         }
         return false;
@@ -103,9 +99,7 @@ Ext.define('Editor.controller.ServerException', {
      * @returns void
      */
     handleException: function(response){
-        var status = (response && response.status ? response.status : -1),
-            statusText = (response && response.statusText ? response.statusText : '');
-        this.handleFailedRequest(status, statusText, response);
+        this.handleFailedRequest(response.status || -1, response.statusText || '', response);
     },
     /**
      * handles / displays the given error
@@ -279,10 +273,7 @@ Ext.define('Editor.controller.ServerException', {
         Editor.MessageBox.addError(text+tpl.apply([_status, statusText]), errorCode);
     },
     renderHtmlMessage: function(title, response){
-        var me = this,
-            str = me.strings,
-            tpl = new Ext.Template(str.serverMsg),
-            result = '<h1>'+title+'</h1>';
+        var result = '<h1>'+title+'</h1>';
         
         if(response.errorMessage && response.errorMessage.length > 0) {
             result += '<p>'+response.errorMessage+'</p>';
@@ -318,59 +309,41 @@ function() {
     //override Ext.data.proxy.Server
     Ext.data.proxy.Server.override({
         afterRequest: function(request,success) {
-            this.callOverridden(arguments);
-            var mntpnl = Ext.first('maintenancePanel'),
-                viewport = Ext.first('viewport'),
-                response = request._operation._response,
-                version,
-                data = {
-                    appName: Editor.data.app.name
-                },
-                serverException = Editor.controller.ServerException.prototype;
-            if(!response){
+            if(!request._operation._response){
                 return;
             }
-            version = response.getResponseHeader('x-translate5-version');
-            if(!Ext.isEmpty(version) && version != Editor.data.app.version) {
+            var data = request._operation._response.getAllResponseHeaders(),
+                version = data['x-translate5-version'];
+                
+            if(version !== Editor.data.app.version && version) {
+                var exStrings = Editor.controller.ServerException.prototype.strings;
                 Ext.MessageBox.show({
-                     title: serverException.strings.update_title,
-                     msg: Ext.String.format(serverException.strings.update_msg, version),
+                     title: exStrings.update_title,
+                     msg: Ext.String.format(exStrings.update_msg, version),
+                     icon: Ext.MessageBox.WARNING,
                      buttons: Ext.MessageBox.OK,
-                     fn: function(){
-                         return serverException.handleMaintenance();
-                     },
-                     icon: Ext.MessageBox.WARNING
+                     fn: location.reload,
                 });
             }
     		//FIXME neuen WebScoket Issue anlegen, der sammelt was alles auf websockets umgebaut werden kann wenn diese Fix aktiv sind.
     		// Diese Funktionalität gehört da mit dazu!
-    		data.date = response.getResponseHeader('x-translate5-shownotice');
-    		data.msg = response.getResponseHeader('x-translate5-maintenance-message');
+    		data.date = data['x-translate5-shownotice'];
+    		data.msg  = data['x-translate5-maintenance-message'];
 			if(data.date || data.msg){
-	            if(!viewport){
-	                return;
-                }
-				if(mntpnl){
-				    mntpnl.update(data);
-					return;
-				}
-				viewport.add({
-					  xtype:'maintenancePanel',
-					  region:'north',
-					  weight: 100,
-					  data: data
-				});
-				return;
+                (Ext.getCmp('mtpnl') || Ext.first('viewport')?.add({
+                    xtype:'maintenancePanel',
+                    id:'mtpnl',
+                    region:'north',
+                    weight: 100,
+                }))?.update(data);
     		}
-			mntpnl && mntpnl.destroy();
     	},
         constructor: function() {
             this.callOverridden(arguments);
             this.on('exception', function(proxy, resp, op){
                 if(op.preventDefaultHandler){
                     op.response = resp; //Operation does not contain response by default
-                }
-                else {
+                } else {
                     Editor.app.getController('ServerException').handleException(resp);
                 }
             });

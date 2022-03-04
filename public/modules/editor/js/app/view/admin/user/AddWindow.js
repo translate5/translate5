@@ -110,7 +110,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             }
             roles.push({
                 boxLabel: value.label, 
-                name: 'roles_helper', 
+                name: 'roles_helper',
                 value: key,
                 handler: me.roleCheckChange
             });
