@@ -60,8 +60,8 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     public function saveAssocRequest(int $id, array $customers, array $useAsDefault, array $writeAsDefault){
         // Check if (at least one) customer is set and use the 'defaultcustomer' if not
         if (empty($customers)) {
-            $customer = ZfExtended_Factory::get('editor_Models_Customer');
-            /* @var $customer editor_Models_Customer */
+            $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+            /* @var $customer editor_Models_Customer_Customer */
             $customer->loadByDefaultCustomer();
             $customers[] = $customer->getId();
         }

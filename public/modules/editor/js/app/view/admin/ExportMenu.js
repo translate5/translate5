@@ -56,10 +56,14 @@ Ext.define('Editor.view.admin.ExportMenu', {
     var me = this,
         task = me.initialConfig.task;
     
-    if(task.isErroneous()) {
-        me.items = [];
-    }
-    else {
+    if(!task || task.isErroneous()) {
+        me.items = [{
+            itemId: 'exportItemImportArchive',
+            text: me.messages.notAvailable,
+            iconCls: 'x-fa fa-times',
+            disabled: true
+        }];
+    } else {
         me.items = me.initExportOptions();
         me.addExcelExport(task);
     }
@@ -117,7 +121,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
               handler: alertHandler
           },{
               itemId: 'transferItem',
-              hidden:!exportAllowed || !me.task.get('isTransfer'),
+              hidden:!exportAllowed || !me.task.get('taskType').match('termtranslation'),
               text : me.messages.transfer,
               path: me.makePath('task/export/id/{0}?format=transfer'),
               handler: me.transferHandler

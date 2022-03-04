@@ -123,6 +123,20 @@ Ext.define('Editor.util.Util', {
          */
         getFileNameNoExtension:function (filename){
             return filename.substring(0, filename.lastIndexOf('.')) || filename;
+        },
+
+        /***
+         * Compare file names in import style. The files are equal when the names are matching until the first ".".
+         * This is used when comparing if the pivot/workfile are matching.
+         *
+         * ex: my-test-project.de-en.xlf will match my-test-project.de-it.xlf
+         *
+         * @param string workfile
+         * @param string pivotfile
+         * @return boolean
+         */
+        compareImportStyleFileName: function (workfile, pivotfile){
+            return workfile.split('.')[0] === pivotfile.split('.')[0];
         }
     }
     

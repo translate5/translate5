@@ -63,8 +63,10 @@ class editor_TermcollectionController extends ZfExtended_RestController
     /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData()
+    {
         parent::decodePutData();
         unset($this->data->langResUuid);
     }

@@ -395,8 +395,8 @@ class editor_Plugins_TermImport_Services_Import {
 
         $customerNumber=$this->configMap[self::COLLECTION_MAPPING_GROUP][$collectionName];
 
-        $customer = ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $customer editor_Models_Customer */
+        $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+        /* @var $customer editor_Models_Customer_Customer */
         $customer->loadByNumber($customerNumber);
         $customerId = $customer->getId();
 

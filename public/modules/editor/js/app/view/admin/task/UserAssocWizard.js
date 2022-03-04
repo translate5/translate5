@@ -33,8 +33,13 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
+ * This class is extension of user assoc component, and it is rendered in the import wizard as import-wizard step/card. The component layout is slightly changed
+ * to meet the needs of loading the default user associations of the importing tasks.
+ * It will enable the user to assign users to a task based on selected target language(this is only for multitask) alongside with
+ * the default user assignments matched by task customer and task target language.
+ *
  * @class Editor.view.admin.task.UserAssocWizard
- * @extends Ext.form.Panel
+ * @extends Editor.view.admin.user.Assoc
  */
 Ext.define('Editor.view.admin.task.UserAssocWizard', {
     extend:'Editor.view.admin.user.Assoc',
@@ -52,7 +57,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
 
     //card type, used for card display order
     importType:'postimport',
-    task:null,
+    task:null,// this will be project if the current import is project import
     header:false,
     title:null,
 
@@ -157,11 +162,14 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
      * @returns {Editor.model.admin.TaskUserAssoc}
      */
     getDefaultFormRecord:function (){
-        var me=this;
-        return Ext.create('Editor.model.admin.TaskUserAssoc',{
-            sourceLang : me.task.get('sourceLang'), // source language is always the same for projects or single tasks
-            workflow: me.down('#workflowCombo').getValue()
-        });
+        var me=this,
+            task = me.getController().getFormTask(),
+            record = Ext.create('Editor.model.admin.TaskUserAssoc',{
+                sourceLang : task && task.get('sourceLang'), // source language is always the same for projects or single tasks
+                workflow: me.down('#workflowCombo').getValue(),
+                taskGuid: task && task.get('taskGuid')
+            });
+        return record;
     },
 
     /***

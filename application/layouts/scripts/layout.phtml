@@ -71,7 +71,7 @@ $config = Zend_Registry::get('config');
                     <a href="https://www.translate5.net/" target="_blank" class="logo"><img src="<?php echo APPLICATION_RUNDIR;?>/images/translate5-transparent.png" alt="translate5" /></a>
                 </div>
             </header>
-            <?php if($this->getScriptPath('fragments/header-consortium-logos.phtml')) : ?>
+            <?php if($config->runtimeOptions->startup->showConsortiumLogos > 0 && $this->getScriptPath('fragments/header-consortium-logos.phtml')) : ?>
                 <?php echo $this->render('fragments/header-consortium-logos.phtml'); ?>
             <?php endif; ?>
 

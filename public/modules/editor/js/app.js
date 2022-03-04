@@ -246,26 +246,14 @@ Ext.application({
         if (!Editor.data.logoutOnWindowClose) {
             return;
         }
-        var me = this,
-            logout = function (e) {
+        Ext.get(window).on({
+            beforeunload: function (e) {
                 if (!Editor.data.logoutOnWindowClose) {
                     return;
                 }
-                //send logout request, this will destroy the user session
-                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout');
-
-                function sleep(delay) {
-                    const start = new Date().getTime();
-                    while (new Date().getTime() < start + delay) ;
-                }
-
-                //wait 0,5 second for the logout request to be processed
-                //the beforeunload is also triggered with application reload(browser reload)
-                //so we need to give the logout request some time untill the new page reload is requested
-                sleep(500);
-            };
-        Ext.get(window).on({
-            beforeunload: logout
+                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout?noredirect=1'); // destroy the user session
+                Ext.util.Cookies.clear('zfExtended'); // remove now invalid session cookie
+            }
         });
     },
     /**
@@ -440,9 +428,8 @@ Ext.application({
      */
     onAdminMainSectionChange: function (tabpanel, activatedPanel, task) {
         var me = this,
-            ctrl = activatedPanel.getController(),
-            conf = ctrl && ctrl.defaultConfig,
-            mainRoute = conf && conf.routes && Object.keys(conf.routes)[0];
+            routes = activatedPanel.getController()?.defaultConfig?.routes,
+            mainRoute = Object.keys(routes)[0];
         me.fireEvent('adminSectionChanged', activatedPanel);
 
         if (!mainRoute) {
@@ -483,7 +470,7 @@ Ext.application({
             },
             // Create the form
             form = Ext.DomHelper.append(Ext.getBody(), formSpec);
-
+        // disable logoutOnWindowClose when the language is changed
         Editor.data.logoutOnWindowClose = false;
         form.submit();
     },
@@ -502,7 +489,7 @@ Ext.application({
         record.set('value',newTheme);
         record.save({
             callback:function(){
-                // disable logout on windows close when the theme is changed
+                // disable logoutOnWindowClose when the theme is changed
                 Editor.data.logoutOnWindowClose = false;
                 location.reload();
             }
@@ -564,14 +551,15 @@ Ext.application({
     /***
      * Get segmentNrInTask from the task edit route
      * {Boolean} checkEditTaskRoute : validate if the current route is task edit route
+     * @returns {number} segmentId or 0
      */
     parseSegmentIdFromTaskEditHash: function (checkEditTaskRoute) {
         if (checkEditTaskRoute && !this.isEditTaskRoute()) {
-            return -1;
+            return 0;
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return (h && h.length == 4) ? parseInt(h[2]) : -1;
+        return h?.length == 4 && parseInt(h[2]) || 0;
     },
 
     /***

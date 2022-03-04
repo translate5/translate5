@@ -4402,13 +4402,13 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.</source>
   <target>All matching bilingual files for this language are removed from the list of the uploaded files.</target>
 </trans-unit>
-<trans-unit id='QXJiZWl0c2RhdGVpKGVuKSBoaW56dWbDvGdlbg=='>
-  <source>Arbeitsdatei(en) hinzufügen</source>
-  <target>Add work file(s)</target>
+<trans-unit id='QXJiZWl0c2RhdGVpKGVuKQ=='>
+  <source>Arbeitsdatei(en)</source>
+  <target>Work file(s)</target>
 </trans-unit>
-<trans-unit id='UGl2b3QtRGF0ZWkoZW4pIGhpbnp1ZsO8Z2Vu'>
-  <source>Pivot-Datei(en) hinzufügen</source>
-  <target>Add pivot file(s)</target>
+<trans-unit id='UGl2b3QtRGF0ZWkoZW4p'>
+  <source>Pivot-Datei(en)</source>
+  <target>Pivot file(s)</target>
 </trans-unit>
 <trans-unit id='RGllIFJlaWhlbmZvbGdlIGRlciBVcmxzIGVudHNwcmljaHQgZGVyIFJlaWhlbmZvbGdlIGRlciBob2NoZ2VsYWRlbmVuIEFyYmVpdHNkYXRlaWVuLg=='>
   <source>Die Reihenfolge der Urls entspricht der Reihenfolge der hochgeladenen Arbeitsdateien.</source>
@@ -4506,6 +4506,62 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='RGF0ZWkoZW4pIGhpbnp1ZsO8Z2Vu'>
     <source>Datei(en) hinzufügen</source>
     <target>Add file(s)</target>
+</trans-unit>
+<trans-unit id='SW5zdGFudFRyYW5zbGF0ZVdyaXRlVG0'>
+    <source>InstantTranslateWriteTm</source>
+    <target>Instant-Translate write TM</target>
+</trans-unit>
+<trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbikgaGluenVmw7xnZW4='>
+    <source>Referenz-Dateien(en) hinzufügen</source>
+    <target>Add reference file(s)</target>
+</trans-unit>
+<trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbik='>
+    <source>Referenz-Dateien(en)</source>
+    <target>Reference file(s)</target>
+</trans-unit>
+<trans-unit id='UmVmZXJlbnotRGF0ZWk='>
+    <source>Referenz-Datei</source>
+    <target>reference file</target>
+</trans-unit>
+<trans-unit id='S3VuZGVuZWluc3RlbGx1bmdlbiBpbiBkZW4gYWt0dWVsbGVuIEt1bmRlbiDDvGJlcm5laG1lbg=='>
+    <source>Kundeneinstellungen in den aktuellen Kunden übernehmen</source>
+    <target>Copy client settings to current client</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmQtQmVudXR6ZXJ6dXdlaXN1bmdlbiBrb3BpZXJlbiB2b24='>
+    <source>Standard-Benutzerzuweisungen kopieren von</source>
+    <target>Copy default user assignments from</target>
+</trans-unit>
+<trans-unit id='QWxsZSBTdGFuZGFyZC1CZW51dHplcnp1d2Vpc3VuZ2VuIGRlcyBhdXNnZXfDpGhsdGVuIEt1bmRlbiwgZWluc2NobGllw59saWNoIGRlcyBhdXNnZXfDpGhsdGVuIE1laHJiZW51dHplcm1vZHVzIHVuZCBXb3JrZmxvd3MsIGluIGRlbiBha3R1ZWxsZW4gS3VuZGVuIGtvcGllcmVu'>
+    <source>Alle Standard-Benutzerzuweisungen des ausgewählten Kunden, einschließlich des ausgewählten Mehrbenutzermodus und Workflows, in den aktuellen Kunden kopieren</source>
+    <target>Copy all user assignment defaults from the selected client to the current client, including selected multi user mode and selected workflow for this client</target>
+    </trans-unit>
+<trans-unit id='S29uZmlndXJhdGlvbmVuIGtvcGllcmVuIHZvbg=='>
+    <source>Konfigurationen kopieren von</source>
+    <target>Copy configuration from</target>
+</trans-unit>
+<trans-unit id='QWxsZSDDvGJlcnNjaHJpZWJlbmVuIFN5c3RlbWtvbmZpZ3VyYXRpb25lbiBkZXMgYXVzZ2V3w6RobHRlbiBLdW5kZW4gaW4gZGVuIGFrdHVlbGxlbiBLdW5kZW4ga29waWVyZW4sIGF1w59lciA8aT5Jbml0aWFsIHdvcmtmbG93IG9uIHRhc2sgY3JlYXRpb248L2k+IHVuZCA8aT5NdWx0aSB1c2VyIHRhc2sgZWRpdGluZyBtb2RlPC9pPg=='>
+    <source>Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren, außer <i>Initial workflow on task creation</i> und <i>Multi user task editing mode</i></source>
+    <target>Copy all other system configuration overwrites from the selected client to the current client, except <i>Initial workflow on task creation</i> and <i>Multi user task editing mode</i></target>
+</trans-unit>
+<trans-unit id='S29waWVyZW4gZXJmb2xncmVpY2g='>
+    <source>Kopieren erfolgreich</source>
+    <target>Copy successful</target>
+</trans-unit>
+<trans-unit id='S29waWVyZW4gdm9u'>
+    <source>Kopieren von</source>
+    <target>Copy from</target>
+</trans-unit>
+<trans-unit id='RGFkdXJjaCB3ZXJkZW4gYWxsZSB6dXZvciBrb25maWd1cmllcnRlbiBXZXJ0ZSBlbnRmZXJudC4='>
+    <source>Dadurch werden alle zuvor konfigurierten Werte entfernt.</source>
+    <target>This will remove all previously configured values.</target>
+</trans-unit>
+<trans-unit id='QXVzd2FobCBzcGVpY2hlcm4='>
+    <source>Auswahl speichern</source>
+    <target>Save selection</target>
+</trans-unit>
+<trans-unit id='TWluZGVzdGVucyBlaW4gS3VuZGUgbXVzcyBhdXNnZXfDpGhsdCBzZWlu'>
+  <source>Mindestens ein Kunde muss ausgewählt sein</source>
+  <target>At least one customer must be selected</target>
 </trans-unit>
   </file>
 </xliff>

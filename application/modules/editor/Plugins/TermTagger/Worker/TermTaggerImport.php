@@ -39,7 +39,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::getWeight()
      */
-    public function getWeight() {
+    public function getWeight(): int {
         return 15;
     }
 

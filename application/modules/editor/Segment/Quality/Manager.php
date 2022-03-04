@@ -34,7 +34,12 @@ END LICENSE AND COPYRIGHT
  *
  */
 final class editor_Segment_Quality_Manager {
-    
+
+    /**
+     * This can be used to disable the AutoQA processing completely. This does not disable the frontend
+     * DO ONLY USE FOR DEVELOPMENT PURPOSES
+     */
+    const ACTIVE = true;
     /**
      * AutoQA-Operation: Performs a re-evaluation of all qualities for the task, retags all segments
      * This Operation also tag's terms and may needs a while
@@ -197,7 +202,9 @@ final class editor_Segment_Quality_Manager {
      * @param int $parentWorkerId
      */
     public function prepareTagTerms(editor_Models_Task $task, int $parentWorkerId) {
-        $this->prepareOperation(editor_Segment_Processing::TAGTERMS, $task, $parentWorkerId);
+        if(self::ACTIVE) {
+            $this->prepareOperation(editor_Segment_Processing::TAGTERMS, $task, $parentWorkerId);
+        }
     }
     /**
      * Prepares the quality workers depending on the context/processing type
@@ -207,10 +214,12 @@ final class editor_Segment_Quality_Manager {
      * @param array $workerParams
      */
     public function prepareOperation(string $processingMode, editor_Models_Task $task, int $parentWorkerId, array $workerParams=[]){
-        foreach($this->registry as $type => $provider){
-            /* @var $provider editor_Segment_Quality_Provider */
-            if($provider->hasOperationWorker($processingMode)){
-                $provider->addWorker($task, $parentWorkerId, $processingMode, $workerParams);
+        if(self::ACTIVE) {
+            foreach ($this->registry as $type => $provider) {
+                /* @var $provider editor_Segment_Quality_Provider */
+                if ($provider->hasOperationWorker($processingMode)) {
+                    $provider->addWorker($task, $parentWorkerId, $processingMode, $workerParams);
+                }
             }
         }
     }
@@ -219,48 +228,48 @@ final class editor_Segment_Quality_Manager {
      * @param editor_Models_Task $task
      */
     public function finishOperation(string $processingMode, editor_Models_Task $task){
-        
-        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
-        $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
-        /* @var $db editor_Models_Db_Segments */
-        $db->getAdapter()->beginTransaction();
-        $sql = $db->select()
-            ->from($db, ['id'])
-            ->where('taskGuid = ?', $task->getTaskGuid())
-            ->order('id')
-            ->forUpdate(true);
-        $segmentIds = $db->fetchAll($sql)->toArray();
-        $segmentIds = array_column($segmentIds, 'id');
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        $qualities = [];
-        /* @var $segment editor_Models_Segment */
-        foreach($segmentIds as $segmentId){
-            $segment->load($segmentId);
-            $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, editor_Segment_Processing::isOperation($processingMode));
-            // process all quality providers that do not have an import worker
-            foreach($this->registry as $type => $provider){
+        if(self::ACTIVE) {
+            $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+            $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
+            /* @var $db editor_Models_Db_Segments */
+            $db->getAdapter()->beginTransaction();
+            $sql = $db->select()
+                ->from($db, ['id'])
+                ->where('taskGuid = ?', $task->getTaskGuid())
+                ->order('id')
+                ->forUpdate(true);
+            $segmentIds = $db->fetchAll($sql)->toArray();
+            $segmentIds = array_column($segmentIds, 'id');
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            $qualities = [];
+            /* @var $segment editor_Models_Segment */
+            foreach ($segmentIds as $segmentId) {
+                $segment->load($segmentId);
+                $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, editor_Segment_Processing::isOperation($processingMode));
+                // process all quality providers that do not have an import worker
+                foreach ($this->registry as $type => $provider) {
+                    /* @var $provider editor_Segment_Quality_Provider */
+                    if (!$provider->hasOperationWorker($processingMode)) {
+                        $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
+                    }
+                }
+                // we save all qualities at once to reduce db-strain
+                $qualities = array_merge($qualities, $tags->extractNewQualities());
+                // flush the segment tags content back to the segment
+                $tags->flush();
+            }
+            // save qualities
+            editor_Models_Db_SegmentQuality::saveRows($qualities);
+
+            // Append qualities, that can be detected only after all segments are created
+            foreach ($this->registry as $type => $provider) {
                 /* @var $provider editor_Segment_Quality_Provider */
-                if(!$provider->hasOperationWorker($processingMode)){
-                    $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
+                if (!$provider->hasOperationWorker($processingMode)) {
+                    $tags = $provider->postProcessTask($task, $qualityConfig, $processingMode);
                 }
             }
-            // we save all qualities at once to reduce db-strain
-            $qualities = array_merge($qualities, $tags->extractNewQualities());
-            // flush the segment tags content back to the segment
-            $tags->flush();
+            $db->getAdapter()->commit();
         }
-        // save qualities
-        editor_Models_Db_SegmentQuality::saveRows($qualities);
-
-        // Append qualities, that can be detected only after all segments are created
-        foreach($this->registry as $type => $provider){
-            /* @var $provider editor_Segment_Quality_Provider */
-            if (!$provider->hasOperationWorker($processingMode)) {
-                $tags = $provider->postProcessTask($task, $qualityConfig, $processingMode);
-            }
-        }
-
-        $db->getAdapter()->commit();
     }
     /**
      * 
@@ -269,13 +278,15 @@ final class editor_Segment_Quality_Manager {
      * @param string $processingMode
      */
     public function processSegment(editor_Models_Segment $segment, editor_Models_Task $task, string $processingMode){
-        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA; 
-        $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, false);
-        foreach($this->registry as $type => $provider){
-            /* @var $provider editor_Segment_Quality_Provider */
-            $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
+        if(self::ACTIVE) {
+            $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+            $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, false);
+            foreach ($this->registry as $type => $provider) {
+                /* @var $provider editor_Segment_Quality_Provider */
+                $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
+            }
+            $tags->flush();
         }
-        $tags->flush();
     }
     
     /**
@@ -287,10 +298,12 @@ final class editor_Segment_Quality_Manager {
      * @param string $processingMode
      */
     public function preProcessTask(editor_Models_Task $task, string $processingMode) {
-        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
-        foreach ($this->registry as $type => $provider) {
-            /* @var $provider editor_Segment_Quality_Provider */
-            $provider->preProcessTask($task, $qualityConfig, $processingMode);
+        if(self::ACTIVE) {
+            $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+            foreach ($this->registry as $type => $provider) {
+                /* @var $provider editor_Segment_Quality_Provider */
+                $provider->preProcessTask($task, $qualityConfig, $processingMode);
+            }
         }
     }
     
@@ -302,10 +315,12 @@ final class editor_Segment_Quality_Manager {
      * @param string $processingMode
      */
     public function postProcessTask(editor_Models_Task $task, string $processingMode) {
-        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
-        foreach ($this->registry as $type => $provider) {
-            /* @var $provider editor_Segment_Quality_Provider */
-            $provider->postProcessTask($task, $qualityConfig, $processingMode);
+        if(self::ACTIVE){
+            $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+            foreach ($this->registry as $type => $provider) {
+                /* @var $provider editor_Segment_Quality_Provider */
+                $provider->postProcessTask($task, $qualityConfig, $processingMode);
+            }
         }
     }
     
@@ -316,15 +331,17 @@ final class editor_Segment_Quality_Manager {
      * @param editor_Segment_Alike_Qualities $alikeQualities
      */
     public function processAlikeSegment(editor_Models_Segment $segment, editor_Models_Task $task, editor_Segment_Alike_Qualities $alikeQualities){
-        $processingMode = editor_Segment_Processing::ALIKE;
-        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
-        $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, false);
-        $tags->initAlikeQualities($alikeQualities);        
-        foreach($this->registry as $type => $provider){
-            /* @var $provider editor_Segment_Quality_Provider */
-            $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
+        if(self::ACTIVE) {
+            $processingMode = editor_Segment_Processing::ALIKE;
+            $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+            $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, false);
+            $tags->initAlikeQualities($alikeQualities);
+            foreach ($this->registry as $type => $provider) {
+                /* @var $provider editor_Segment_Quality_Provider */
+                $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
+            }
+            $tags->flush();
         }
-        $tags->flush();
     }
     /**
      * The central API to identify the needed Tag class by classnames and attributes
@@ -406,22 +423,10 @@ final class editor_Segment_Quality_Manager {
      * @return bool
      */
     public function hasCategories(string $type) : bool {
-        return $this->getProvider($type)->hasCategories();
-    }
-    /**
-     * Translates a Segment Quality category tooltip
-     * @param string $type
-     * @param string $category
-     * @param editor_Models_Task $task
-     * @throws ZfExtended_Exception
-     * @return string
-     */
-    public function translateQualityCategoryTooltip(string $type, string $category, editor_Models_Task $task) : string {
-        if ($this->hasProvider($type)) {
-            return $this->getProvider($type)->translateCategoryTooltip($this->getTranslate(), $category, $task);
+        if($this->hasProvider($type)) {
+            return $this->getProvider($type)->hasCategories();
         }
-        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
-        return '';
+        return false;
     }
     /**
      * Evaluates, if a quality of the given type renders tags in the tags texts
@@ -429,7 +434,10 @@ final class editor_Segment_Quality_Manager {
      * @return bool
      */
     public function hasSegmentTags(string $type) : bool {
-        return $this->getProvider($type)->hasSegmentTags();
+        if($this->hasProvider($type)) {
+            return $this->getProvider($type)->hasSegmentTags();
+        }
+        return false;
     }
     /**
      * Evaluates, if a quality of the given type is a type that generally should show up in the filter panel and in the task properties
@@ -437,7 +445,10 @@ final class editor_Segment_Quality_Manager {
      * @return bool
      */
     public function isFilterableType(string $type) : bool {
-        return $this->getProvider($type)->isFilterableType();
+        if($this->hasProvider($type)) {
+            return $this->getProvider($type)->isFilterableType();
+        }
+        return false;
     }
     /**
      * Evaluates, if a quality of the given type and category can be false positive
@@ -446,7 +457,10 @@ final class editor_Segment_Quality_Manager {
      * @return bool
      */
     public function canBeFalsePositiveCategory(string $type, string $category) : bool {
-        return $this->getProvider($type)->canBeFalsePositiveCategory($category);
+        if($this->hasProvider($type)) {
+            return $this->getProvider($type)->canBeFalsePositiveCategory($category);
+        }
+        return false;
     }
     /**
      * Evaluates, if the quality of the given type is fully configured/checked
@@ -455,7 +469,9 @@ final class editor_Segment_Quality_Manager {
      * @return bool
      */
     public function isFullyCheckedType(string $type, Zend_Config $taskConfig) : bool {
-        return $this->getProvider($type)->isFullyChecked($taskConfig->runtimeOptions->autoQA, $taskConfig);
+        if($this->hasProvider($type)) {
+            return $this->getProvider($type)->isFullyChecked($taskConfig->runtimeOptions->autoQA, $taskConfig);
+        }
     }
     /**
      * Retrieves all types of qualities we have. By default only those, that should show up in the filter-panel
@@ -487,20 +503,6 @@ final class editor_Segment_Quality_Manager {
             }
         }
         return $blacklist;
-    }
-    /**
-     * Retrieves the types of qualities that have tags in the segment texts
-     * @return string[] hashtable type => cssClass
-     */
-    public function getAllSegmentTagTypeClasses(){
-        $data = [];
-        foreach($this->registry as $type => $provider){
-            /* @var $provider editor_Segment_Quality_Provider */
-            if($provider->hasSegmentTags()){
-                $data[$provider->getType()] = $provider->getTagIndentificationClass();
-            }
-        }
-        return $data;
     }
     /**
      * Retrieves all types that will be exported (with further processing)

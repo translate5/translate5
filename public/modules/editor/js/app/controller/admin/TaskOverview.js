@@ -184,8 +184,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
     listeners: {
         afterTaskDelete: 'onAfterTaskDeleteEventHandler',
-        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler',
-        taskCreated:'onTaskCreated'
+        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler'
     },
     listen: {
         controller: {
@@ -815,8 +814,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             },
             success: app.unmask,
             failure: function (rec, op) {
-                var recs = op.getRecords(),
-                    task = recs && recs[0] || false;
+                var task = op.getRecords()?.[0];
                 task && task.reject();
                 app.unmask();
             }
@@ -924,7 +922,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             failure: function (batch, operation) {
                 task.reject();
                 app.unmask();
-                if (operation.error.status === '405') {
+                if (operation.error.status === 405) {
                     Editor.MessageBox.addError(me.strings.taskNotDestroyed);
                 } else {
                     Editor.app.getController('ServerException').handleException(operation.error.response);
@@ -938,13 +936,18 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      * @param {Editor.model.admin.Task} task
      */
     editorCloneTask: function (task, event) {
-        var me = this;
+        var me = this,
+            isDefaultTask = task.get('taskType') === 'default';
         Ext.Ajax.request({
             url: Editor.data.pathToRunDir + '/editor/task/' + task.getId() + '/clone',
             method: 'post',
-            scope: this,
+            scope: me,
             success: function (response) {
-                if (me.isProjectPanelActive()) {
+                if(isDefaultTask) {
+                    //we have to reload the project overview since the id of the shown project was changing
+                    me.getProjectProjectStore().load();
+                }
+                else if (me.isProjectPanelActive()) {
                     me.getProjectTaskGrid().getStore().load();
                 }
                 me.handleTaskReload();
@@ -1103,6 +1106,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             }
         });
 
+        //ensure that UI always generates projects with projectTasks
+        formData.append('taskType', 'project');
+
         me.fireEvent('beforeCreateTask',params , formData);
 
         //INFO: this will convert array to coma separated values requires additional handling on backend. We do not want that
@@ -1121,13 +1127,16 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 var resp = Ext.decode(response.responseText),
                     task = me.getModel('admin.Task').create(resp.rows);
 
-                me.fireEvent('taskCreated', task);
-                win.setLoading(false);
+                // reload the required data for the import wizard and fire taskCreated event
+                me.notifyTaskCreated(task,function (){
 
-                //call the callback if exist
-                if (successCallback) {
-                    successCallback(task);
-                }
+                    win.setLoading(false);
+
+                    //call the callback if exist
+                    if (successCallback) {
+                        successCallback(task);
+                    }
+                });
             },
             failure: function (response) {
                 var card,
@@ -1264,20 +1273,37 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
 
     /***
-     * On task created event listener
+     * Notify the application that the task is created. The event taskCreated will be fired after the task store and the
+     * project store are reloaded. The store reload is required so there are no entity version conflicts later in the
+     * import wizard
      * @param task
+     * @param callback
      */
-    onTaskCreated:function (task){
+    notifyTaskCreated:function (task, callback){
         var me = this;
 
-        me.getAdminTasksStore().load();
-        me.getProjectGrid().getController().reloadProjects().then(function(){
-            me.handleProjectAfterImport(task);
+        // reload the task store so the new tasks are included inside.
+        me.getAdminTasksStore().load({
+            callback:function (){
+                // reload the project store after the task store is reloaded
+                me.getProjectGrid().getController().reloadProjects().then(function(){
+
+                    // update the project route based on the current task
+                    me.handleProjectAfterImport(task);
+                    //set the store reference to the model(it is missing), it is used later when the task is deleted
+                    task.store = me.getAdminTasksStore();
+
+                    // for each import wizard card, set the project/task object
+                    me.setCardsTask(task);
+
+                    // fire the taskCreated after all stores are reloaded
+                    me.fireEvent('taskCreated', task);
+
+                    if(callback){
+                        callback();
+                    }
+                });
+            }
         });
-
-        //set the store reference to the model(it is missing), it is used later when the task is deleted
-        task.store = me.getAdminTasksStore();
-
-        me.setCardsTask(task);
     }
 });

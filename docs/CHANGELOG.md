@@ -19,6 +19,148 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+
+## [5.6.4] - 2022-03-03
+
+### Important Notes:
+#### [TRANSLATE-2872](https://jira.translate5.net/browse/TRANSLATE-2872)
+For all API users: The task import can now call an URL after finishing a task import and hanging imports are cancelled after (configurable) 48h.
+ 
+
+
+### Added
+**[TRANSLATE-2872](https://jira.translate5.net/browse/TRANSLATE-2872): Import/Export - Implement a URL callback triggered after task import is finished** <br>
+Now a URL can be configured (runtimeOptions.import.callbackUrl) to be called after a task was imported. 
+The URL is called via POST and receives the task object as JSON. So systems creating tasks via API are getting now immediate answer if the task is imported. The status of the task (error on error, or open on success) contains info about the import success. If the task import is running longer as 48 hours, the task is set to error and the callback is called too.
+
+**[TRANSLATE-2860](https://jira.translate5.net/browse/TRANSLATE-2860): TermPortal - Attribute levels should be collapsed by default** <br>
+Entry-level images added to language-level ones in Images-column of Siblings-panel
+
+**[TRANSLATE-2483](https://jira.translate5.net/browse/TRANSLATE-2483): InstantTranslate - Save InstantTranslate translation to TM** <br>
+Enables translation to be saved to "Instant-Translate" TM memory. For more info how this should be used, check this link: https://confluence.translate5.net/display/TAD/InstantTranslate
+
+
+### Bugfixes
+**[TRANSLATE-2882](https://jira.translate5.net/browse/TRANSLATE-2882): Main back-end mechanisms (Worker, Logging, etc.) - Calling updateProgress on export triggers error in the GUI** <br>
+The progress update was also triggered on exports, causing some strange task undefined errors in the GUI.
+
+**[TRANSLATE-2879](https://jira.translate5.net/browse/TRANSLATE-2879): TermPortal - termPM-role have no sufficient rights to transfer terms from TermPortal** <br>
+Fixed: terms transfer was unavailable for termPM-users
+
+**[TRANSLATE-2878](https://jira.translate5.net/browse/TRANSLATE-2878): Editor general - Metadata export error with array type filter** <br>
+Filtered tasks with multiple option filter will no longer produce an error when Export meta data is clicked.
+
+**[TRANSLATE-2876](https://jira.translate5.net/browse/TRANSLATE-2876): Search & Replace (editor) - Search and replace match case search** <br>
+Error will no longer happen when searching with regular expression with match-case on.
+
+**[TRANSLATE-2875](https://jira.translate5.net/browse/TRANSLATE-2875): Import/Export - Task Entity not found message on sending a invalid task setup in upload wizard** <br>
+The message "Task Entity not found" was sometimes poping up when creating a new task with invalid configuration.
+
+**[TRANSLATE-2874](https://jira.translate5.net/browse/TRANSLATE-2874): InstantTranslate, MatchAnalysis & Pretranslation - MT stops pre-translation at first repeated segment** <br>
+On pre-translating against MT only, repetitions are producing an error, preventing the pre-translation to be finshed. 
+
+**[TRANSLATE-2871](https://jira.translate5.net/browse/TRANSLATE-2871): InstantTranslate - Instant-translate result list name problem** <br>
+Problem with listed results in instant translate with multiple resources with same name.
+
+**[TRANSLATE-2870](https://jira.translate5.net/browse/TRANSLATE-2870): Task Management - Deleting a cloned task deletes the complete project** <br>
+This bug affects only projects containing one target task. If this single task is cloned, and the original task was deleted, the whole project was deleted erroneously. This is changed now by implicitly creating a new project for such tasks. 
+
+**[TRANSLATE-2858](https://jira.translate5.net/browse/TRANSLATE-2858): TermPortal - Proposal for Term entries cant be completed** <br>
+Fixed proposal creation when newTermAllLanguagesAvailable config option is Off
+
+**[TRANSLATE-2854](https://jira.translate5.net/browse/TRANSLATE-2854): TermPortal - Term-portal error: join(): Argument #1 ($pieces) must be of type array, string given** <br>
+Fixed bug in loading terms.
+
+
+## [5.6.3] - 2022-02-24
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-2852](https://jira.translate5.net/browse/TRANSLATE-2852): TermPortal - Allow role TermPM to start Term-Translation-Workflow** <br>
+termPM-role is now sifficient for Transfer-button to be shown.
+TermPortal filter window will assume *-query if yet empty.
+
+**[TRANSLATE-2851](https://jira.translate5.net/browse/TRANSLATE-2851): TermPortal - Security dialogue, when deleting something in TermPortal** <br>
+Added confirmation dialogs on term/attribute deletion attempt
+
+
+### Bugfixes
+**[TRANSLATE-2856](https://jira.translate5.net/browse/TRANSLATE-2856): API, Editor general - Login/Logout issues** <br>
+Fixed a race condition on logout that sometimes resulted in HTML being parsed as javascript.
+
+**[TRANSLATE-2853](https://jira.translate5.net/browse/TRANSLATE-2853): Editor general - User association error** <br>
+Solves problem when assigning users in import wizard after a workflow is changed and the current import produces only one task.
+
+**[TRANSLATE-2846](https://jira.translate5.net/browse/TRANSLATE-2846): Task Management - Filter on QA errors column is not working** <br>
+FIX: Sorting/Filtering of column "QS Errors" in task grid now functional
+
+**[TRANSLATE-2818](https://jira.translate5.net/browse/TRANSLATE-2818): Auto-QA - Length-Check must Re-Evaluate also when processing Repititions** <br>
+FIX: AutoQA now re-evaluates the length check for each segment individually when saving repititions
+
+
+## [5.6.2] - 2022-02-17
+
+### Important Notes:
+#### [TRANSLATE-2834](https://jira.translate5.net/browse/TRANSLATE-2834)
+The calculation of the match-rate of repeated and pre-translated fuzzy segments has been changed. More details in the concrete change log entry of that issue.
+
+#### [TRANSLATE-2827](https://jira.translate5.net/browse/TRANSLATE-2827)
+The matching between the workfile and pivot filenames is more easier right now, since the filename is compared now only to the first dot. So file.en-de.xlf matches now file.en-it.xlf and there is no need to rename such pivot files.
+ 
+
+
+### Added
+**[TRANSLATE-2789](https://jira.translate5.net/browse/TRANSLATE-2789): Import/Export - Import: Support specially tagged bilingual pdfs from a certain client** <br>
+FEATURE: Support special bilingual PDFs as source for the Visual
+
+**[TRANSLATE-2717](https://jira.translate5.net/browse/TRANSLATE-2717): Client management, Configuration - Take over client configuration from another client** <br>
+New feature where customer configuration and default user assignments can be copied from one customer to another.
+
+
+### Changed
+**[TRANSLATE-2819](https://jira.translate5.net/browse/TRANSLATE-2819): SpellCheck (LanguageTool integration) - SpellChecker: Add toggle button to activate/deactivate the SpellCheck** <br>
+
+
+**[TRANSLATE-2722](https://jira.translate5.net/browse/TRANSLATE-2722): InstantTranslate, TermPortal - Customizable header for InstantTranslate including custom HTML** <br>
+Enables custom header content configuration in instant-translate and term-portal. For more info see the instant-translate and term-portal header section in this link https://confluence.translate5.net/pages/viewpage.action?pageId=3866712
+
+
+### Bugfixes
+**[TRANSLATE-2841](https://jira.translate5.net/browse/TRANSLATE-2841): Client management - Contents of clients tabs are not updated, when a new client is selected** <br>
+Editing a customer in the customer panel is now possible with just selecting a row.
+
+**[TRANSLATE-2840](https://jira.translate5.net/browse/TRANSLATE-2840): Import/Export - Delete user association if the task import fails** <br>
+Remove all user associations from a task, if the task import fails. So no e-mail will be sent to the users.
+
+**[TRANSLATE-2837](https://jira.translate5.net/browse/TRANSLATE-2837): Okapi integration - Change default segmentation rules to match Trados and MemoQ instead of Okapi and Across** <br>
+So far translate5 (based on Okapi) did not segment after a colon.
+Since Trados and MemoQ do that by default, this is changed now to make translate5 better compatible with the vast majority of TMs out there.
+
+**[TRANSLATE-2834](https://jira.translate5.net/browse/TRANSLATE-2834): MatchAnalysis & Pretranslation - Change repetition behaviour in pre-translation** <br>
+On pre-translations with using fuzzy matches, repeated segments may be filled with different tags / amount of tags as there are tags in the source content. Then the repetition algorithm could not process such segments as repetitions and finally the analysis was not counting them as repetitions.
+Now such segments always count as repetition in the analysis, but it does not get the 102% matchrate (since this may lead the translator to jump over the segment and ignore its content). Therefore such a repeated segment is filled with the fuzzy match content and the fuzzy match-rate. If the translator then edits and fix the fuzzy to be the correct translation , and then uses the repetition editor to fill the repetitions, then it is set to 102% matchrate.
+
+**[TRANSLATE-2832](https://jira.translate5.net/browse/TRANSLATE-2832): LanguageResources - Language filter in language resources overview is wrong** <br>
+Language filter in language resources overview will filter for rfc values instead of language name.
+
+**[TRANSLATE-2828](https://jira.translate5.net/browse/TRANSLATE-2828): Editor general - Pivot language selector for zip uploads** <br>
+Pivot language can now be set when uploading zip in the import wizard.
+
+**[TRANSLATE-2827](https://jira.translate5.net/browse/TRANSLATE-2827): Import/Export, Task Management - Improve workfile and pivot file matching** <br>
+The matching between the workfile and pivot filenames is more easier right now, since the filename is compared now only to the first dot. So file.en-de.xlf matches now file.en-it.xlf and there is no need to rename such pivot files.
+
+**[TRANSLATE-2826](https://jira.translate5.net/browse/TRANSLATE-2826): TermPortal, TermTagger integration - processStatus is not correctly mapped by tbx import** <br>
+processStatus is now set up correctly on processStatus-col in terms_term-table
+
+**[TRANSLATE-2818](https://jira.translate5.net/browse/TRANSLATE-2818): Auto-QA - AutoQA: Length-Check must Re-Evaluate also when processing Repititions** <br>
+FIX: AutoQA now re-evaluates the length check for each segment individually when saving repititions
+
+
 ## [5.6.1] - 2022-02-09
 
 ### Important Notes:

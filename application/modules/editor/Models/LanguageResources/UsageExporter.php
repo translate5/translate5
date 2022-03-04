@@ -104,9 +104,10 @@ class editor_Models_LanguageResources_UsageExporter{
      * Document usage task types
      * @var array
      */
-    protected $documentTaskType = [editor_Models_Task::INITIAL_TASKTYPE_DEFAULT,editor_Models_Task::INITIAL_TASKTYPE_PROJECT_TASK];
+    protected array $documentTaskType;
     
     public function __construct() {
+        $this->documentTaskType = editor_Task_Type::getInstance()->getUsageExportTypes();
         $this->init();
     }
     
@@ -117,8 +118,8 @@ class editor_Models_LanguageResources_UsageExporter{
         /* @var $languages editor_Models_Languages */
         $this->languages = $languages->loadAllKeyCustom('id');
         
-        $customers = ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $customers editor_Models_Customer */
+        $customers = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+        /* @var $customers editor_Models_Customer_Customer */
         $this->customers = $customers->loadAllKeyCustom('id');
 
         $users = ZfExtended_Factory::get('ZfExtended_Models_User');

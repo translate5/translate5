@@ -248,19 +248,19 @@ class editor_Models_Export_Terminology_Tbx {
      * Export collection as a TBX file
      *
      * @param int $collectionId
+     * @param string $userName
      * @param bool $tbxBasicOnly
      * @param bool $exportImages
      * @param int $byTermEntryQty How many termEntries should be processed at once
      * @param int $byImageQty How many image binaries should be processed at once
-     * @param array $selected Bunch of arguments passed by $this->renderRawForTaskImport(). Should look like below: [
+     * @param null $selected Bunch of arguments passed by $this->renderRawForTaskImport(). Should look like below: [
      *    'termEntryIds' => [123, 234],
      *    'language' => ['en-us', 'en-gb'],
      *    'termIds' => [456, 567]
      * ]
-     * @throws Zend_Db_Statement_Exception
      */
-    public function exportCollectionById(int $collectionId, $tbxBasicOnly = false, $exportImages = true,
-                                         $userName, $byTermEntryQty = 1000, $byImageQty = 50, $selected = null) {
+    public function exportCollectionById(int $collectionId, string $userName, $tbxBasicOnly = false, $exportImages = true,
+                                         $byTermEntryQty = 1000, $byImageQty = 50, $selected = null) {
 
         // Setup export file absolute path
         $this->file = editor_Models_LanguageResources_LanguageResource::exportFilename($collectionId);

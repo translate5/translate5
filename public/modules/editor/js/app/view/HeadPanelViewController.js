@@ -47,8 +47,9 @@ Ext.define('Editor.view.HeadPanelViewController', {
         var hp = this.getView();
         hp.down('#applicationInfoPanel').update(hp.down('#applicationInfoPanel').getAdminTplData());
     },
-
-    handleLogout: function() {
+    handleLogout: function(logoutBtn, e) {
+        // disable logoutOnWindowClose when using logout button
+        Editor.data.logoutOnWindowClose = false;
         Editor.app.logout();
     }
 

@@ -288,7 +288,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         //the openid authentication is valid
         if($oidc->isOpenIdCustomerSet()){
             $userSession = new Zend_Session_Namespace('openId');
-            $idToken=$userSession->data->idToken ? $userSession->data->idToken : null;
+            $idToken = $userSession->data->idToken ?: null;
             $userSession=null;
             if($idToken){
                 try {
@@ -322,7 +322,7 @@ class LoginController extends ZfExtended_Controllers_Login {
                     redirecthashField.value=(window.location.hash);
                 }
 
-                if(redirectField != null && (!rgx.test(redirectField.value) && !!redirectField.value)){
+                if(redirectField?.value && !rgx.test(redirectField.value) ){
                     //redirect directly to the open id sso. This is needed, since this is the only way to perserve the hash when we redirect directly to the openid sso
                     redirectField.value = 'openid';
                     //if there is no sso error, submit the form. This case is only when we redirect without showing translate5 login form
@@ -343,15 +343,11 @@ class LoginController extends ZfExtended_Controllers_Login {
 
     /**
      * Parse and adjust the redirect hash when the current request is for terportal/instant-translate
-     * @return mixed|string|null
+     * @return string
      */
-    protected function handleAppsRedirectHash(){
+    protected function handleAppsRedirectHash() : string {
 
-        if(!isset($this->_session->redirecthash)){
-            return null;
-        }
-
-        $hash = $this->_session->redirecthash;
+        $hash = $this->_session->redirecthash ?: '';
         if(preg_match('~^#name=(termportal|instanttranslate)~', $hash, $matches)){
             // Drop redirecthash prop from session
             $this->_session->redirecthash = '';

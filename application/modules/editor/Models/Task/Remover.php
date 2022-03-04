@@ -59,10 +59,10 @@ class editor_Models_Task_Remover {
         if(empty($taskGuid)) {
             return false;
         }
-        if(!$isProject){
-            $this->removeTask($forced);
-        }else{
+        if($isProject && $projectId > 0){
             $this->removeProject($projectId,$forced,true);
+        }else{
+            $this->removeTask($forced);
         }
 
         // on import error project may not be created:
@@ -145,10 +145,6 @@ class editor_Models_Task_Remover {
         if(count($tasks)>1 || empty($tasks)){
             return;
         }
-        $task=reset($tasks);
-        if($task['taskType']!=$model::INITIAL_TASKTYPE_PROJECT){
-            return;
-        }
         $this->task->load($projectId);
         $this->remove(true);
     }
@@ -206,8 +202,6 @@ class editor_Models_Task_Remover {
      * Also removes the task related term collection
      */
     protected function removeRelatedDbData() {
-        //@todo ask marc if logging tables should also be deleted (no constraint is set)
-        
         $this->task->dropMaterializedView();
         $taskGuid = $this->task->getTaskGuid();
         

@@ -73,7 +73,7 @@ END LICENSE AND COPYRIGHT
  * 
  * 
 */
-class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Customer';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Customer';
     
@@ -95,8 +95,8 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
      * @return Zend_Config
      */
     public function getConfig() {
-        $customerConfig = ZfExtended_Factory::get('editor_Models_CustomerConfig');
-        /* @var $customerConfig editor_Models_CustomerConfig */
+        $customerConfig = ZfExtended_Factory::get('editor_Models_Customer_CustomerConfig');
+        /* @var $customerConfig editor_Models_Customer_CustomerConfig */
         return $customerConfig->getCustomerConfig($this->getId());
     }
     
@@ -190,9 +190,9 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Load the default customer and return it
-     * @return editor_Models_Customer
+     * @return editor_Models_Customer_Customer
      */
-    public function loadByDefaultCustomer(): editor_Models_Customer {
+    public function loadByDefaultCustomer(): editor_Models_Customer_Customer {
         $this->loadRow('number=?',self::DEFAULTCUSTOMER_NUMBER);
         return $this;
     }

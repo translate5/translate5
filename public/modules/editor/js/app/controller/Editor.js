@@ -187,7 +187,7 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-g':         ['G',{ctrl: true, alt: false}, me.scrollToSegment, true],
             'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
             'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
-            'ctrl-l':         ['L',{ctrl: true, alt: false}, me.focusSegmentShortcut],
+            'ctrl-l':         ['L',{ctrl: true, alt: false}, me.focusSegmentShortcut, true],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
             'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
@@ -688,7 +688,7 @@ Ext.define('Editor.controller.Editor', {
         var me = this,
             prompt = Ext.Msg.prompt('Go to segment', 'No.:', function(btn, text){
             if (btn === 'ok'){
-                me.focusSegment(text);
+                me.getSegmentGrid().focusEditorSegment(text);
             }
         });
         prompt.down('textfield').focus(200);
@@ -745,7 +745,6 @@ Ext.define('Editor.controller.Editor', {
 	    // New position of cursor?
 	    if (me.eventIsArrowKey()) {
 	    	me.handleAfterCursorMove();
-	    	return;
 	    }
     },
     /**
@@ -1060,11 +1059,10 @@ Ext.define('Editor.controller.Editor', {
     handleChangeState: function(key, e) {
         var param = Number(key) - 48;
         //we ignore 0, since this is no valid state
-        if(param === 0){
-            return false;
+        if(param !== 0){
+            this.fireEvent('changeSegmentState', param);
+            e.stopEvent();
         }
-        this.fireEvent('changeSegmentState', param);
-        e.stopEvent();
         return false;
     },
     /**
@@ -1771,17 +1769,17 @@ Ext.define('Editor.controller.Editor', {
      * Edit task and focus segment route
      */
     onTaskSegmentEditRoute: function(taskId,segmentNrInTask){
-        var me=this,
-            store = Ext.StoreManager.get('Segments'),
-            isLoaded=store.getCount()>0 && store.isLoaded;
-
-        if(!isLoaded){
-            store.on('load',function(){
-                me.focusSegment(segmentNrInTask);
-            },store,{ single : true});
+        var me=this;
+        if(Editor.data.task?.id == taskId){
+            me.getSegmentGrid()?.focusEditorSegment(segmentNrInTask);
+        } else {
+            me.openTask();
+            //FIXME: would be better to get store via segmentsGrid, but this might not exist yet.
+            // Maybe openTask can return a promise after the grid exists.
+            Ext.getStore('Segments').on('load',function(){
+                me.getSegmentGrid().focusEditorSegment(segmentNrInTask);
+            }, undefined, {single : true});
         }
-        me.openTask(taskId);
-        me.focusSegment(segmentNrInTask);
     },
 
     /***
@@ -1789,7 +1787,7 @@ Ext.define('Editor.controller.Editor', {
      */
     openTask: function(taskId){
         //if the task is loaded, do nothing
-        if(Editor.data.task){
+        if(Editor.data.task?.id == taskId){
             return;
         }
         Editor.model.admin.Task.load(taskId, {
@@ -1799,42 +1797,6 @@ Ext.define('Editor.controller.Editor', {
             failure: function(record, op, success) {
                 Editor.app.getController('ServerException').handleException(op.error.response);
             }
-        });
-    },
-
-    /***
-     * Focus segment in the segments grid.
-     */
-    focusSegment: function(segmentNrInTask){
-        var grid=this.getSegmentGrid();
-        //focus only when the segments grid is visible
-        if(!segmentNrInTask || !grid || !grid.isVisible(true)){
-            return;
-        }
-
-        var store= grid.getStore(),
-            selection = grid.getSelection(),
-            segment=store.findRecord('segmentNrInTask',segmentNrInTask,0,false,false,true),
-            index=store.indexOf(segment),
-            row = grid.getView().getRow(index);
-        
-        /***
-         * If the selection exist, and the selection is the current requested segments, and the selected row is visible -> do nothing
-         */
-        if((selection && selection.length>0) && selection[0] == segment && (row && Ext.get(row).isVisible(true))){
-            return;
-        }
-
-        /***
-         * Valid grid index is found -> scroll the grid to the segment
-         */
-        if(index>-1){
-            grid.scrollTo(index);
-            return;
-        }
-        //the segment does not exist in the segments store, try to load the segment index from the db
-        grid.searchPosition(segmentNrInTask).then((idx)=>{
-            grid.scrollTo(Math.max(0,idx));
         });
     },
 
@@ -1850,12 +1812,15 @@ Ext.define('Editor.controller.Editor', {
      */
     onSegmentsStoreLoad: function(store){
         var me=this,
-            segmentIdFromHash = Editor.app.parseSegmentIdFromTaskEditHash(true);
-
+        segmentGrid = me.getSegmentGrid(),
+        jumpToSegmentIndex = 
+            Editor.app.parseSegmentIdFromTaskEditHash(true)
+            || store.proxy.reader.metaData?.jumpToSegmentIndex
+            || 1;
         //check the content editable column visibility
         me.handleNotEditableContentColumn();
-        
-        if(store.getCount() == 0) {
+        // if already selected from other load listener or nothing selectable, return
+        if(segmentGrid.selection || store.getCount() == 0) {
             return;
         }
 
@@ -1863,15 +1828,7 @@ Ext.define('Editor.controller.Editor', {
         // the problem is that in rendering this is done also somewhere, then it happened that this code here was
         // called before the elsewhere deferred rendering code and that was leading to a blank segment grid
         Ext.defer(function() {
-            if (store.proxy.reader.metaData && store.proxy.reader.metaData.jumpToSegmentIndex > -1) {
-                me.getSegmentGrid().scrollTo(store.proxy.reader.metaData.jumpToSegmentIndex);
-                return;
-            }
-            if (segmentIdFromHash > 0) {
-                me.focusSegment(segmentIdFromHash);
-                return;
-            }
-            me.focusSegment(1);
+            segmentGrid.focusEditorSegment(jumpToSegmentIndex);
         },1);
     },
 

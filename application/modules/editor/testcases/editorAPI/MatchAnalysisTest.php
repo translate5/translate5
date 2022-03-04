@@ -141,7 +141,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             unset($a->languageResourceid);
         }
         
-        //file_put_contents($this->api()->getFile('allanalysis.txt', null, false), json_encode($analysis, JSON_PRETTY_PRINT));
+        $this->api()->isCapturing() && file_put_contents($this->api()->getFile('allanalysis.txt', null, false), json_encode($analysis, JSON_PRETTY_PRINT));
         $expected=$this->api()->getFileContent('allanalysis.txt');
         $actual=json_encode($analysis, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
@@ -159,6 +159,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             'targetLang' => self::$targetLangRfc,
             'customerId'=>self::$api->getCustomer()->id,
             'edit100PercentMatch' => true,
+            'wordCount' => 1270,
             'autoStartImport'=>0
         ];
         self::assertLogin('testmanager');
