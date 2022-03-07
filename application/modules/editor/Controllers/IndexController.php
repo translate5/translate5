@@ -396,7 +396,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $rop = $this->config->runtimeOptions;
 
-        $this->view->Php2JsVars()->set('LanguageResources.preloadedSegments', $rop->LanguageResources->preloadedTranslationSegments);
+        $this->view->Php2JsVars()->set('LanguageResources.preloadedSegments', $rop->LanguageResources?->preloadedTranslationSegments);
         $this->view->Php2JsVars()->set('LanguageResources.matchrateTypeChangedState', editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED);
 
         //find all service names and set it to frontend var

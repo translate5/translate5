@@ -65,10 +65,10 @@ class editor_Models_Segment_Iterator implements Iterator {
     }
 
     /**
-     * @return editor_Models_Segment|null
+     * @return ?editor_Models_Segment
      * @see Iterator::current()
      */
-    public function current(): ?editor_Models_Segment {
+    public function current() : mixed {
         return $this->segment;
     }
 

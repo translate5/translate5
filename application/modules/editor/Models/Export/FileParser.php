@@ -214,7 +214,7 @@ abstract class editor_Models_Export_FileParser {
      * - befüllt $this->_exportFile
      */
     protected function parse() {
-        $file = preg_split('#<lekTargetSeg([^>]+)/>#', $this->_skeletonFile, null, PREG_SPLIT_DELIM_CAPTURE);
+        $file = preg_split('#<lekTargetSeg([^>]+)/>#', $this->_skeletonFile, flags: PREG_SPLIT_DELIM_CAPTURE);
 
         $count = count($file) - 1;
         for ($i = 1; $i < $count;) {
