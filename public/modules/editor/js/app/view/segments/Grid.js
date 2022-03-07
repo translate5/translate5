@@ -87,7 +87,7 @@ Ext.define('Editor.view.segments.Grid', {
         autoAbort: true,
         listeners: {
             beforerequest: function(conn, {segmentNrInTask}, eOpts) {
-                if(segmentNrInTask > -1){
+                if(segmentNrInTask > 0){
                     conn.setUrl(Editor.data.restpath + 'segment/' + segmentNrInTask + '/position');
                 } else {
                     return false;
@@ -584,21 +584,26 @@ Ext.define('Editor.view.segments.Grid', {
     },
     /**
      * Find the segment index in the database
-     * @returns Ext.promise.Promise that always resolves to {index, response}
+     * @returns Ext.promise.Promise that always resolves to the segmentIndex, -1 if not found.
      */
-    searchPosition: function(segmentNrInTask) {
-        var store = this.getStore(),
-            proxy = store.getProxy(),
-            params = {};
-        params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
-        params[proxy.getSortParam()] = proxy.encodeSorters(store.getSorters().items);
-        return this.segInfoConn.request({
+    searchPosition: function(segmentNrInTask, failureEventName = '') {
+        var me = this;
+        return me.segInfoConn.request({
             segmentNrInTask,
-            params,
+            params: me.getStore().getParams(),
         }).then(function(response) {
-            return {index: Ext.decode(response.responseText).index, response}
+            return Ext.decode(response.responseText).index;
         }).otherwise(function(response) {
-            return {index: -1, response}
+            if(response.status === undefined) { // beforerequest returned false
+                response = {responseText: '{"index":-1}', status: 404};
+            }
+            var errMsg = me.fireEvent(failureEventName, response) && response.status === 404 && Editor.app.getSegmentsController().messages.noIndexFound;
+            if(errMsg) {
+                Editor.MessageBox.addInfo(errMsg);
+            } else {
+                Editor.app.getController('ServerException').handleException(response);
+            }
+            return -1;
         });
     }
 });
