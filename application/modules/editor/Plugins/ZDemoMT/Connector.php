@@ -100,7 +100,7 @@ class editor_Plugins_ZDemoMT_Connector extends editor_Services_Connector_Abstrac
      * @return string
      */
     public function translateToRot13(string $searchString, bool $isDemo = false): string {
-        $tokens = preg_split('/(<[^>]+>)/i', $searchString, null, PREG_SPLIT_DELIM_CAPTURE);
+        $tokens = preg_split('/(<[^>]+>)/i', $searchString, flags: PREG_SPLIT_DELIM_CAPTURE);
         foreach($tokens as &$token) {
             if(strpos($token, '<') === 0) {
                 continue;

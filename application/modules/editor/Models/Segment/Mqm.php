@@ -58,7 +58,7 @@ class editor_Models_Segment_Mqm {
             return $segment;
         }
         $this->initCaches($task);
-        $parts = preg_split('#(<img[^>]+>)#i', $segment, null, PREG_SPLIT_DELIM_CAPTURE);
+        $parts = preg_split('#(<img[^>]+>)#i', $segment, flags: PREG_SPLIT_DELIM_CAPTURE);
         $tg = $task->getTaskGuid();
         $severities = array_keys(get_object_vars(self::$severityCache[$tg]));
         foreach($parts as $idx => $part) {

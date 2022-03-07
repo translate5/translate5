@@ -75,8 +75,8 @@ class editor_Models_Segment_TermTagTrackChange {
      * @return string
      */
     public function mergeTermsAndTrackChanges($target, $tagged) {
-        $target = preg_split('/(<[^>]+>)|(&#[^;]+;)|(.)/u', $target, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
-        $tagged = preg_split('/(<[^>]+>)|(&#[^;]+;)|(.)/u', $tagged, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+        $target = preg_split('/(<[^>]+>)|(&#[^;]+;)|(.)/u', $target, flags: PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+        $tagged = preg_split('/(<[^>]+>)|(&#[^;]+;)|(.)/u', $tagged, flags: PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
         
         $diff = ZfExtended_Factory::get('ZfExtended_Diff');
         /* @var $diff ZfExtended_Diff */

@@ -90,7 +90,7 @@ class editor_Models_Converter_XmlPairer {
     
     public function pairTags($xmlAllUnpaired) {
         //split up tags and text in nodes
-        $this->nodeList = preg_split('/(<[^>]*>)/i', $xmlAllUnpaired, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+        $this->nodeList = preg_split('/(<[^>]*>)/i', $xmlAllUnpaired, flags: PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
         
         $this->lastNode = null;
         

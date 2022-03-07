@@ -69,7 +69,7 @@ class editor_User {
      * @return int
      */
     public function getId() : int {
-        return $this->session->data->id;
+        return $this->session->data->id ?? 0;
     }
     /**
      * 
