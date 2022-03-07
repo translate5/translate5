@@ -1782,11 +1782,6 @@ Ext.define('Editor.controller.Editor', {
         } else {
             me.openTask(taskId);
         }
-        //FIXME: would be better to get store via segmentsGrid, but this might not exist yet.
-        // Maybe openTask can return a promise after the grid exists.
-        Ext.getStore('Segments').on('load', function() {
-            me.getSegmentGrid().focusSegment(segmentNrInTask);
-        }, undefined, {single: true});
     },
 
     /***
@@ -1818,25 +1813,18 @@ Ext.define('Editor.controller.Editor', {
      * Segments store load event handler
      */
     onSegmentsStoreLoad: function(store){
-        var me=this,
-        segmentGrid = me.getSegmentGrid(),
-        jumpToSegmentIndex = 
+        //check the content editable column visibility
+        this.handleNotEditableContentColumn();
+        
+        // if already selected from other load listener or nothing selectable, return
+        if(!store.getCount() || this.getSegmentGrid().selection) {
+            return;
+        }
+        var jumpToSegmentIndex = 
             Editor.app.parseSegmentIdFromTaskEditHash(true)
             || store.proxy.reader.metaData?.jumpToSegmentIndex
             || 1;
-        //check the content editable column visibility
-        me.handleNotEditableContentColumn();
-        // if already selected from other load listener or nothing selectable, return
-        if(segmentGrid.selection || store.getCount() == 0) {
-            return;
-        }
-
-        //must be deferred, not because of the time, but to put the execution onto the end of the execution queue
-        // the problem is that in rendering this is done also somewhere, then it happened that this code here was
-        // called before the elsewhere deferred rendering code and that was leading to a blank segment grid
-        Ext.defer(function() {
-            segmentGrid.focusSegment(jumpToSegmentIndex);
-        },1);
+        this.getSegmentGrid().focusSegment(jumpToSegmentIndex);
     },
 
     /**
