@@ -87,7 +87,7 @@ Ext.define('Editor.view.segments.Grid', {
         autoAbort: true,
         listeners: {
             beforerequest: function(conn, {segmentNrInTask}, eOpts) {
-                if(segmentNrInTask > -1){
+                if(segmentNrInTask > 0){
                     conn.setUrl(Editor.data.restpath + 'segment/' + segmentNrInTask + '/position');
                 } else {
                     return false;
@@ -410,6 +410,7 @@ Ext.define('Editor.view.segments.Grid', {
      * @param {Object} config, for config see positionRowAfterScroll, its completly given to that method
      */
     scrollTo: function(rowindex, config) {
+        if(rowindex < 0) return;
         var me = this,
             options = {
                 animate: false, //may not be animated, to place the callback at the correct place 
@@ -524,85 +525,63 @@ Ext.define('Editor.view.segments.Grid', {
 
     /**
      * Focus the segment in editor (open the segment for editing)
+    @param forEditing {boolean} - wether to open the segment editor when focused
+    @param failureEventName {string} - event to fire when segmentNrInTask's index cannot be found in the grid
+    @callback afterFocusCallback - to be called when segment is focused
      */
-     focusEditorSegment: function(segmentNrInTask, forEditing, failureEvent) {
-        var me = this;
-        if(!segmentNrInTask || me.locked || me.selection?.get('segmentNrInTask') == segmentNrInTask){
+    focusSegment: function(segmentNrInTask, forEditing = false, failureEventName = '', afterFocusCallback = Ext.emptyFn) {
+        var me = this,
+        segIsInFocusConfig = {};
+        segIsInFocusConfig.callback = segIsInFocusConfig.notScrollCallback = function(){
+            if(forEditing) {
+                me.editingPlugin.startEdit(me.selection, null, me.editingPlugin.self.STARTEDIT_SCROLLUNDER);
+                me.editingPlugin.editor?.reposition();
+            }
+            afterFocusCallback();
+        };
+        if(!segmentNrInTask || me.selection?.get('segmentNrInTask') == segmentNrInTask){
+            segmentNrInTask && segIsInFocusConfig.callback();
             return;
         }
-        segmentNrInTask  = parseInt(segmentNrInTask);
+        segmentNrInTask = parseInt(segmentNrInTask);
         var segmentIndex = me.getStore().findBy(rec => rec.data.segmentNrInTask === segmentNrInTask); // direct access here for fastest lookup
         if(segmentIndex >= 0) {
-            me.scrollToSegmentInGrid(me,segmentIndex,segmentNrInTask,forEditing);
+            me.scrollTo(segmentIndex, segIsInFocusConfig, forEditing);
         } else {
-            me.focussedSegmentNotFound(segmentNrInTask,forEditing, failureEvent);
+            me.searchPosition(segmentNrInTask, failureEventName).then(function scrollTo(segmentIndex) {
+                me.scrollTo(segmentIndex, segIsInFocusConfig, forEditing);
+            });
         }
-    },
-    /**
-     * Scroll the editor grid to a given index
-     */
-    scrollToSegmentInGrid: function(segmentGrid,segmentIndex,segmentNrInTask,forEditing) {
-        if(this.locked) return;
-        var me=this,
-            ed=segmentGrid.editingPlugin,
-            selModel=segmentGrid.getSelectionModel(),
-            callback=function() {
-                var editorMissing=!ed.editor,
-                    sel=selModel.getSelection();
-                // if the user clicked on the layout with add annotation active we have to trigger this on the annotation controller
-                if(sel) {
-                    if(me.wasAddAnnotationClick) {
-                        me.getAnnotationsController().handleSegmentCommentEditing(sel[0],me.segmentDomClientRect);
-                        me.wasAddAnnotationClick=false;
-                    } else {
-                        segmentGrid.selectOrFocus(segmentIndex);
-                        if(forEditing) {
-                            ed.startEdit(sel[0],null,ed.self.STARTEDIT_SCROLLUNDER);
-                            editorMissing&&ed.editor.reposition();
-                        }
-                    }
-                }
-            };
-        segmentGrid.scrollTo(segmentIndex,{
-            callback: callback,
-            notScrollCallback: callback
-        });
     },
     /**
      * UnFocus any focussed segment in the grid
      */
-    unfocusEditorSegment: function() {
+    unfocusSegment: function() {
         if(!this.locked) return;
         segmentGrid.unSelectOrFocus();
     },
     /**
-     * If the segment is not loaded in Segments store, try to find the segment index in the database
-     * @param failureEvent - string that is fired as event, for plugins to provide a custom error message
+     * Find the segment index in the database
+     * @returns Ext.promise.Promise that always resolves to the segmentIndex, -1 if not found.
      */
-    focussedSegmentNotFound: function(segmentNrInTask, forEditing, failureEvent='') {
-        if(this.locked) return;
-        var me=this,
-            segmentStore=me.getStore(),
-            proxy=segmentStore.getProxy(),
-            params={}, segmentInfoNotFoundMsg;
-
-        params[proxy.getFilterParam()]= proxy.encodeFilters(segmentStore.getFilters().items);
-        params[proxy.getSortParam()]  = proxy.encodeSorters(segmentStore.getSorters().items);
-        me.segInfoConn.request({
+    searchPosition: function(segmentNrInTask, failureEventName = '') {
+        var me = this;
+        return me.segInfoConn.request({
             segmentNrInTask,
-            params,
-            callback: function(request, success, response) {
-                var responseData=Ext.JSON.decode(response.responseText, true)||{};
-                if(responseData.index > -1){
-                    me.scrollToSegmentInGrid(me,responseData.index,responseData.segmentNrInTask,forEditing);
-                } else { // failure
-                    segmentInfoNotFoundMsg = me.fireEvent(failureEvent, response);
-                    if(!Ext.isString(segmentInfoNotFoundMsg) && response.status !== 403){
-                        segmentInfoNotFoundMsg = Editor.app.getSegmentsController().messages.noIndexFound;
-                    }
-                    if(segmentInfoNotFoundMsg) Editor.MessageBox.addInfo(segmentInfoNotFoundMsg);
-                }
+            params: me.getStore().getParams(),
+        }).then(function(response) {
+            return Ext.decode(response.responseText).index;
+        }).otherwise(function(response) {
+            if(response.status === undefined) { // beforerequest returned false
+                response = {responseText: '{"index":-1}', status: 404};
             }
+            var errMsg = me.fireEvent(failureEventName, response) && response.status === 404 && Editor.app.getSegmentsController().messages.noIndexFound;
+            if(errMsg) {
+                Editor.MessageBox.addInfo(errMsg);
+            } else {
+                Editor.app.getController('ServerException').handleException(response);
+            }
+            return -1;
         });
-    },
+    }
 });
