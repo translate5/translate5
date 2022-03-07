@@ -688,7 +688,7 @@ Ext.define('Editor.controller.Editor', {
         var me = this,
             prompt = Ext.Msg.prompt('Go to segment', 'No.:', function(btn, text){
             if (btn === 'ok'){
-                me.getSegmentGrid().focusEditorSegment(text);
+                me.getSegmentGrid().focusSegment(text);
             }
         });
         prompt.down('textfield').focus(200);
@@ -1768,18 +1768,25 @@ Ext.define('Editor.controller.Editor', {
     /***
      * Edit task and focus segment route
      */
-    onTaskSegmentEditRoute: function(taskId,segmentNrInTask){
-        var me=this;
-        if(Editor.data.task?.id == taskId){
-            me.getSegmentGrid()?.focusEditorSegment(segmentNrInTask);
-        } else {
-            me.openTask();
-            //FIXME: would be better to get store via segmentsGrid, but this might not exist yet.
-            // Maybe openTask can return a promise after the grid exists.
-            Ext.getStore('Segments').on('load',function(){
-                me.getSegmentGrid().focusEditorSegment(segmentNrInTask);
-            }, undefined, {single : true});
+    onTaskSegmentEditRoute: function(taskId, segmentNrInTask) {
+        var me = this;
+        if(Editor.data.task?.id == taskId) {
+            me.getSegmentGrid()?.focusSegment(segmentNrInTask);
+            return;
         }
+        if(Editor.data.task?.isModel){ // task is active, switch task
+            // QUIRK: Do not prevent task closing when task changes per route
+            Editor.util.TaskActions.close(function(task, app, strings){
+                me.openTask(taskId);
+            });
+        } else {
+            me.openTask(taskId);
+        }
+        //FIXME: would be better to get store via segmentsGrid, but this might not exist yet.
+        // Maybe openTask can return a promise after the grid exists.
+        Ext.getStore('Segments').on('load', function() {
+            me.getSegmentGrid().focusSegment(segmentNrInTask);
+        }, undefined, {single: true});
     },
 
     /***
