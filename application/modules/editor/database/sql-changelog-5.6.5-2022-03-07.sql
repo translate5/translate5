@@ -30,4 +30,5 @@
             
 INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2022-03-07', 'TRANSLATE-2889', 'bugfix', 'API - logoutOnWindowClose does not work', 'If just closing the application window the user is now logged out correctly (if configured).', '15'),
 ('2022-03-07', 'TRANSLATE-2888', 'bugfix', 'Comments, VisualReview / VisualTranslation - Commenting a segment via Visual does not work', 'The creation of comments in Visual by clicking in the Visual window was not working any more.
-', '15');
+', '15'),
+('2022-03-07', 'TRANSLATE-2887', 'bugfix', 'Editor general - Search/Replace is not working sometimes', 'Make Search/Replace work again on tasks with many segments.', '15');
