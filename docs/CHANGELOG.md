@@ -10,16 +10,22 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+## [5.6.5] - 2022-03-07
+
+### Important Notes:
+ 
 
 
+### Bugfixes
+**[TRANSLATE-2889](https://jira.translate5.net/browse/TRANSLATE-2889): API - logoutOnWindowClose does not work** <br>
+If just closing the application window the user is now logged out correctly (if configured).
+
+**[TRANSLATE-2888](https://jira.translate5.net/browse/TRANSLATE-2888): Comments, VisualReview / VisualTranslation - Commenting a segment via Visual does not work** <br>
+The creation of comments in Visual by clicking in the Visual window was not working any more.
 
 
-
-
-
-
-
-
+**[TRANSLATE-2887](https://jira.translate5.net/browse/TRANSLATE-2887): Editor general - Search/Replace is not working sometimes** <br>
+Make Search/Replace work again on tasks with many segments.
 
 
 ## [5.6.4] - 2022-03-03
