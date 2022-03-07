@@ -57,6 +57,7 @@ class editor_Task_Cloner {
         unset($data['locked']);
         unset($data['lockingUser']);
         unset($data['userCount']);
+        unset($data['created']);
 
         $this->handleSingleTask($data);
 
