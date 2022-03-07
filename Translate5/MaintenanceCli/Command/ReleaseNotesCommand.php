@@ -143,7 +143,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
                 passthru('git add library/ZfExtended');
                 passthru('git add '.$md);
                 passthru('git add '.$sql);
-                passthru('git commit -m "change log and submodules release '.$this->releaseVersion->name.'" '.$sql.' '.$md);
+                passthru('git commit -m "change log and submodules release '.$this->releaseVersion->name.'" application/modules/editor/PrivatePlugins library/ZfExtended '.$sql.' '.$md);
                 passthru('git push');
             }
         }
@@ -199,7 +199,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             $unreleasedProjects[$name] = $v;
         }
         
-        $version = $this->io->choice('Choose the version for which the release notes should be created', array_keys($unreleasedProjects));
+        $version = $this->io->choice('Choose the version for which the release notes should be created', array_keys($unreleasedProjects), 0);
         $this->releaseVersion = $unreleasedProjects[$version];
     }
     
