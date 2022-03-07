@@ -136,12 +136,14 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         if($this->io->confirm('Create the SQL and Update the change log (or modify them in JIRA again)?', true)) {
             $sql = $this->createSql();
             $md = $this->updateChangeLog();
-            if($this->io->confirm('git: stage above files and commit them?', true)) {
+            if($this->io->confirm('git: stage above files, submodules and commit them?', true)) {
                 $sql = str_replace(getcwd().'/', '', $sql);
                 $md = str_replace(getcwd().'/', '', $md);
+                passthru('git add application/modules/editor/PrivatePlugins');
+                passthru('git add library/ZfExtended');
                 passthru('git add '.$md);
                 passthru('git add '.$sql);
-                passthru('git commit -m "change log release '.$this->releaseVersion->name.'" '.$sql.' '.$md);
+                passthru('git commit -m "change log and submodules release '.$this->releaseVersion->name.'" '.$sql.' '.$md);
                 passthru('git push');
             }
         }
