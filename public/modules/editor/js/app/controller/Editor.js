@@ -1835,7 +1835,7 @@ Ext.define('Editor.controller.Editor', {
         // the problem is that in rendering this is done also somewhere, then it happened that this code here was
         // called before the elsewhere deferred rendering code and that was leading to a blank segment grid
         Ext.defer(function() {
-            segmentGrid.focusEditorSegment(jumpToSegmentIndex);
+            segmentGrid.focusSegment(jumpToSegmentIndex);
         },1);
     },
 

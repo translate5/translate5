@@ -556,7 +556,7 @@ Ext.define('Editor.view.segments.Grid', {
     /**
      * UnFocus any focussed segment in the grid
      */
-    unfocusEditorSegment: function() {
+    unfocusSegment: function() {
         if(!this.locked) return;
         segmentGrid.unSelectOrFocus();
     },
