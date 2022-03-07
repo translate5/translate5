@@ -60,7 +60,8 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
     {name: 'statusInfo', type: 'string', persist: false},
     {name: 'serviceName', type: 'string'},
     {name: 'serviceType', type: 'string'},
-    {name: 'searchable', type: 'boolean'}
+    {name: 'searchable', type: 'boolean'},
+    {name: 'writeSource', type: 'boolean'},
   ],
 
   /***

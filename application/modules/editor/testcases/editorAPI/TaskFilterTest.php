@@ -50,12 +50,12 @@ class TaskFilterTest extends \ZfExtended_Test_ApiTestcase {
         $api->addImportFile('editorAPI/SegmentWorkflowTest/simple-en-de.zip');
         $api->import($task);
         
-        $api->addUser('testlector','open','reviewer',[
+        $api->addUser('testlector','open','reviewing',[
             'deadlineDate'=>date("Y-m-d 00:00:00", strtotime("+1 day"))
         
         ]);
         $api->reloadTask();
-        $api->addUser('testtranslator', 'waiting', 'translator',[
+        $api->addUser('testtranslator', 'waiting', 'translation',[
             'deadlineDate'=>date("Y-m-d 00:00:00", strtotime("+2 day"))
             
         ]);

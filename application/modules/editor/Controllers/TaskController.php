@@ -914,6 +914,8 @@ class editor_TaskController extends ZfExtended_RestController {
      * clone the given task into a new task
      * @throws BadMethodCallException
      * @throws ZfExtended_Exception
+     * @throws Zend_Db_Statement_Exception
+     * @throws Exception
      */
     public function cloneAction() {
         if(!$this->_request->isPost()) {
@@ -922,32 +924,18 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->getAction();
 
         //the dataprovider has to be created from the old task
+        /** @var editor_Models_Import_DataProvider_Factory $dpFactory */
         $dpFactory = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Factory');
-        /* @var $dpFactory editor_Models_Import_DataProvider_Factory */
         $dataProvider = $dpFactory->createFromTask($this->entity);
 
-        $data = (array) $this->entity->getDataObject();
-        $oldTaskGuid=$data['taskGuid'];
-        unset($data['id']);
-        unset($data['taskGuid']);
-        unset($data['state']);
-        unset($data['workflowStep']);
-        unset($data['locked']);
-        unset($data['lockingUser']);
-        unset($data['userCount']);
-        //is the source task a single project task
-        if($this->entity->getId()==$this->entity->getProjectId()){
-            $data['taskType'] = editor_Task_Type_ProjectTask::ID;
-        }
-        $data['state'] = 'import';
-        $this->entity->init($data);
-        $this->entity->createTaskGuidIfNeeded();
-        $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
+        /** @var editor_Task_Cloner $cloner */
+        $cloner = ZfExtended_Factory::get('editor_Task_Cloner');
+
+        $this->entity = $cloner->clone($this->entity);
 
         if($this->validate()) {
             $this->processUploadedFile($this->entity, $dataProvider);
-            $this->cloneLanguageResources($oldTaskGuid, $this->entity->getTaskGuid());
-            $this->cloneTaskSpecificConfig($oldTaskGuid,$this->entity->getTaskGuid());
+            $cloner->cloneDependencies();
             $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
@@ -1842,55 +1830,18 @@ class editor_TaskController extends ZfExtended_RestController {
         if(empty($taskGuid)){
             throw new editor_Models_Task_Exception('E1339');
         }
-        $this->view->progress = $this->getTaskImportProgres($taskGuid);
+        $this->view->progress = $this->getTaskImportProgress($taskGuid);
     }
 
-    /***
-     * Get/calculate the taskImport progres for given taskGuid
+    /**
+     * Get/calculate the taskImport progress for given taskGuid
      * @param string $taskGuid
-     * @return number]
+     * @return array
      */
-    protected function getTaskImportProgres(string $taskGuid) {
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker ZfExtended_Models_Worker */
-        return $worker->calculateProgress($taskGuid);
-    }
-    /***
-     * Clone existing language resources from oldTaskGuid for newTaskGuid.
-     */
-    protected function cloneLanguageResources(string $oldTaskGuid,string $newTaskGuid){
-        try{
-
-            $model=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-            /* @var $model editor_Models_LanguageResources_Taskassoc */
-            $assocs=$model->loadByTaskGuids([$oldTaskGuid]);
-            if(empty($assocs)){
-                return;
-            }
-            foreach($assocs as $assoc){
-                unset($assoc['id']);
-                if(!empty($assoc['autoCreatedOnImport'])) {
-                    //do not clone such TermCollection associations, since they are recreated through the cloned import package
-                    continue;
-                }
-                $assoc['taskGuid'] = $newTaskGuid;
-                $model->init($assoc);
-                $model->save();
-            }
-        }catch(ZfExtended_Models_Entity_NotFoundException $e){
-            return;
-        }
-    }
-    
-    /***
-     * Clone all values and configs from $oldTaskGuid to $newTaskGuid
-     * @param string $oldTaskGuid
-     * @param string $newTaskGuid
-     */
-    protected function cloneTaskSpecificConfig(string $oldTaskGuid,string $newTaskGuid) {
-        $taskConfig =ZfExtended_Factory::get('editor_Models_TaskConfig');
-        /* @var $taskConfig editor_Models_TaskConfig */
-        $taskConfig->cloneTaskConfig($oldTaskGuid, $newTaskGuid);
+    protected function getTaskImportProgress(string $taskGuid): array {
+        /** @var editor_Models_Task_WorkerProgress $progress */
+        $progress = ZfExtended_Factory::get('editor_Models_Task_WorkerProgress');
+        return $progress->calculateProgress($taskGuid);
     }
 
     /**

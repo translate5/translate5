@@ -292,7 +292,7 @@ Ext.define('Editor.view.admin.config.Grid', {
                 name: 'value',
                 value:record.get('value')
             };
-        if(record.get('isReadOnly') && record.get('isReadOnly')==true){
+        if(record.get('isReadOnly')){
             return false; 
         }
 

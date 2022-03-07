@@ -146,23 +146,14 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
         
         /***
          * On task change, reconfigure the export menu
+         * The old menu will be destroyed by the owner component
          */
-        exportMenuConfig:{
+        exportMenuConfig: {
             get: function(task) {
-                //the old menu will be destroyed by the owner component
-                var hasMqm = task && task.hasMqm(),
-                    menu;
-
-                if(!task){
-                    // avoid menu creation when the vm task is empty
-                    return null;
-                }
-
-                menu = Ext.widget('adminExportMenu', {
+                return Ext.widget('adminExportMenu', {
                     task: task,
-                    fields: hasMqm ? task.segmentFields() : false
+                    fields: task?.hasMqm() && task.segmentFields()
                 });
-                return menu;
             },
             bind: '{task}'
         }

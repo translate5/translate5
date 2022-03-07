@@ -263,10 +263,11 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      * @param string $filter
      */
     public function addFilter($filter) {
+
         $sheet = $this->excelExport->getWorksheetByName($this->sheetNameMetadata);
         switch (true) {
             case is_array($filter->value):
-                $value = implode($filter->value,', ');
+                $value = implode(', ',$filter->value);
             break;
             default:
                 $value = $filter->value;

@@ -69,9 +69,9 @@ class Translate2375Test extends \ZfExtended_Test_ApiTestcase {
         
         $assocParams = ['deadlineDate'=>'default','assignmentDate'=>self::$fixedDate];
         
-        self::$api->addUser('testtranslator','open','reviewer',$assocParams);
+        self::$api->addUser('testtranslator','open','reviewing',$assocParams);
         self::$api->reloadTask();
-        self::$api->addUser('testtranslator','waiting','translator',$assocParams);
+        self::$api->addUser('testtranslator','waiting','translation',$assocParams);
         self::$api->reloadTask();
         self::$api->addUser('testtranslator','waiting','translatorCheck',$assocParams);
         

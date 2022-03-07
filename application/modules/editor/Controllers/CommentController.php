@@ -152,10 +152,11 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
     
     /**
      * removes HTML from comment
-     * (non-PHPdoc)
      * @see ZfExtended_RestController::decodePutData()
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData()
+    {
         parent::decodePutData();
         $this->data->comment = strip_tags($this->data->comment);
     }

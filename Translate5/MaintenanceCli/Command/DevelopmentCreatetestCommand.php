@@ -155,12 +155,12 @@ class '.$name.' extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
-        $task = array(
+        $task = [
             \'sourceLang\' => \'de\',
             \'targetLang\' => \'en\',
             \'edit100PercentMatch\' => true,
             \'lockLocked\' => 1,
-        );
+        ];
         
         $appState = self::assertAppState();
 
@@ -249,8 +249,8 @@ class '.$name.' extends editor_Test_JsonTest {
         $pathToZip = $path.\'export.zip\';
         $this->assertFileExists($pathToZip);
         
-        $exportFileName = \'export-\'.$issue.\'-de-en.xlf\';
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.\'/\'.$issue.\'-de-en.xlf\');
+        $exportFileName = \'export-'.$issue.'-de-en.xlf\';
+        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.\'/'.$issue.'-de-en.xlf\');
 // REMINDER FOR TEST USAGE:
 // This is the manual way to save files when the command-option -c (= capture) was set
         if($this->api()->isCapturing()){
@@ -258,16 +258,16 @@ class '.$name.' extends editor_Test_JsonTest {
         }
         $expectedResult = $this->api()->getFileContent($exportFileName);
         
-        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), \'Exported result does not equal to export-\'.$issue.\'-de-en.xlf\');
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), \'Exported result does not equal to export-'.$issue.'-de-en.xlf\');
     }
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login(\'testlector\');
-        self::$api->requestJson(\'editor/task/\'.$task->id, \'PUT\', array(\'userState\' => \'open\', \'id\' => $task->id));
+        self::$api->cleanup && self::$api->requestJson(\'editor/task/\'.$task->id, \'PUT\', array(\'userState\' => \'open\', \'id\' => $task->id));
         self::$api->login(\'testmanager\');
-        self::$api->requestJson(\'editor/task/\'.$task->id, \'DELETE\');
+        self::$api->cleanup && self::$api->requestJson(\'editor/task/\'.$task->id, \'DELETE\');
     }
 }
 ');
