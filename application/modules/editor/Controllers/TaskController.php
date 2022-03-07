@@ -1934,6 +1934,9 @@ class editor_TaskController extends ZfExtended_RestController {
      * @throws ZfExtended_UnprocessableEntity
      */
     protected function checkUserSessionAllowsOpen(string $taskGuid) {
+        if($this->config?->runtimeOptions?->ignoreE1341 ?? false) {
+            return;
+        }
         $session = new Zend_Session_Namespace();
         $sessionGuid = $session->taskGuid ?? null;
         // if the task is with already active session for the user, ignore the check
