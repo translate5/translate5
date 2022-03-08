@@ -39,8 +39,9 @@ Ext.define('Editor.controller.Editor', {
         'Editor.view.task.ConfirmationWindow',
         'Editor.view.ReferenceFilesInfoMessage'
     ],
-    mixins: ['Editor.util.Event',
-        	 'Editor.util.Range'
+    mixins: [
+        'Editor.util.Event',
+        'Editor.util.Range'
     ],
     messages: {
         segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
@@ -93,7 +94,11 @@ Ext.define('Editor.controller.Editor', {
     sourceTags: null,
     copiedSelectionWithTagHandling: null,
     resetSegmentValueForEditor: null,
-    htmlEditor: null,
+    /**
+     * TODO FIXME: this references the HTML editor and therefore better should be called htmlEditor. The Range mixin though expects "editor"
+     * {Editor.view.segments.HtmlEditor}
+     */
+    editor: null,
     listen: {
         controller: {
             '#Editor.$application': {
@@ -161,7 +166,7 @@ Ext.define('Editor.controller.Editor', {
 
     routes: {
         'task/:id/:segmentNrInTask/edit': 'onTaskSegmentEditRoute',
-        'task/:id/edit': 'onTaskSegmentEditRoute',
+        'task/:id/edit': 'onTaskSegmentEditRoute'
     },
 
     init : function() {
@@ -291,7 +296,7 @@ Ext.define('Editor.controller.Editor', {
             ]
         }));
         //inits the editor iframe directly after loading the application
-        plug.editor = plug.initEditor(); 
+        plug.editor = plug.initEditor();
         
         me.handleReferenceFilesMessage();
 
@@ -516,7 +521,7 @@ Ext.define('Editor.controller.Editor', {
     initEditor: function(editor){
         var me = this,
             docEl = Ext.get(editor.getDoc());
-        this.htmlEditor = editor;
+        this.editor = editor;
         
         if(me.editorKeyMap) {
             me.editorKeyMap.destroy();
@@ -716,11 +721,11 @@ Ext.define('Editor.controller.Editor', {
     },
     
     /**
-     * handleAfterCursorMove: fire deferred change event if still changing
+     * handleDelayedChange: fire deferred change event if still changing
      */    
     handleDelayedChange: function(){
     	if(this.isEditing) {
-    		this.fireEvent('clockedchange', this.htmlEditor, this.getEditPlugin().context); 
+    		this.fireEvent('clockedchange',  this.editor, this.getEditPlugin().context);
         }
     	this.isCapturingChange = false;
     },
@@ -1472,7 +1477,7 @@ Ext.define('Editor.controller.Editor', {
         //if neither the text or html clipboard content matches the internally stored content, 
         // that means that the pasted content comes from outside and we insert just text:
         if(me.copiedSelectionWithTagHandling === null || !textMatch || !htmlMatch) {
-            me.htmlEditor.insertMarkup(Ext.String.htmlEncode(clipboardText));
+            me.editor.insertMarkup(Ext.String.htmlEncode(clipboardText));
             me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
             me.copiedSelectionWithTagHandling = null;
             return;
@@ -1491,7 +1496,7 @@ Ext.define('Editor.controller.Editor', {
         }
 
         // we always use insertMarkup, regardless if it is img or div content
-        me.htmlEditor.insertMarkup(toInsert);
+        me.editor.insertMarkup(toInsert);
         me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
     },
     copySourceToTarget: function() {
@@ -1502,35 +1507,35 @@ Ext.define('Editor.controller.Editor', {
         }
         plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
     },
-    insertWhitespaceNbsp: function(key,e) {
-        this.insertWhitespace(key,e,'nbsp');
+    insertWhitespaceNbsp: function(key, e) {
+        this.insertWhitespace(key, e, 'nbsp');
     },
-    insertWhitespaceNewline: function(key,e) {
-        this.insertWhitespace(key,e,'newline');
+    insertWhitespaceTab: function(key, e) {
+        this.insertWhitespace(key, e, 'tab');
     },
-    insertWhitespaceTab: function(key,e) {
-        this.insertWhitespace(key,e,'tab');
+    insertWhitespaceNewline: function(key, e) {
+        this.insertWhitespace(key, e, 'newline');
     },
-    insertWhitespace: function(key,e,whitespaceType) {
+    insertWhitespace: function(key, e, whitespaceType) {
         var me = this,
             userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
             userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
             tagNr,
-            plug,
-            editor;
+            caret;
         if (!userCanModifyWhitespaceTags || !userCanInsertWhitespaceTags) {
             return;
         }
+        caret = (e === undefined) ? null : me.getPositionOfCaret(); // caret bookmark not neccessary when triggered by event
         tagNr = me.getNextWhitespaceTagNumber();
-        plug = me.getEditPlugin();
-        editor = plug.editor.mainEditor;
-        editor.insertWhitespaceInEditor(whitespaceType, tagNr);
-        if (e === undefined) { // we can use insertWhitespace by firing an event, too
+        me.editor.insertWhitespaceInEditor(whitespaceType, tagNr);
+
+        if (e === undefined) { // MinMaxLength inserts via an event that will not incorporate key data but needs a callback-event to restore the caret on it's own
             me.fireEvent('afterInsertWhitespace');
             return;
         }
+        me.setPositionOfCaret(caret);
         if (e.delegatedTarget.nodeName.toLowerCase() === 'a') {
-            editor.focus();
+            me.editor.focus();
         }
         e.stopEvent();
     },

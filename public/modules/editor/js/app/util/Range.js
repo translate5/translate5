@@ -803,7 +803,7 @@ Ext.define('Editor.util.Range', {
     },
     /**
      * Set the position of the cursor according to the given bookmark created by getPositionOfCaret
-     * @param {Object|null} data
+     * @param {Object|null} data: This is only an historical Artifact that should be removed when the rework of Selection/Range/rangy is complete
      */
     setPositionOfCaret: function(data) {
         if(data && data.valid) {
@@ -815,7 +815,8 @@ Ext.define('Editor.util.Range', {
                 console.log('setPositionOfCaret: SELECTION: ', caret);
 
                 let node = null,
-                    offset = 0;
+                    offset = 0,
+                    after = false;
                 if (caret.parentElement.childNodes.length < 2) {
                     node = caret.parentElement;
                     // TODO REMOVE
@@ -828,6 +829,7 @@ Ext.define('Editor.util.Range', {
                         // if the node is to the left we need to jump to the right
                         // TODO REMOVE
                         console.log('setPositionOfCaret: FOUND LEFT ADJACENT NODE', node);
+                        after = true;
                         offset = (node.nodeType === Node.TEXT_NODE) ? node.textContent.length : (node.childNodes ? node.childNodes.length : 0);
                     } else {
                         // if to the left did not work, try right
@@ -847,6 +849,7 @@ Ext.define('Editor.util.Range', {
                                     offset = i;
                                 } else if (i > 0) {
                                     offset = i - 1;
+                                    after = true;
                                 } else {
                                     i = 0;
                                 }
@@ -859,9 +862,20 @@ Ext.define('Editor.util.Range', {
                 }
                 caret.remove();
                 if (node) {
-                    // set the evaluated caret
                     let selection = doc.getSelection();
-                    selection.setBaseAndExtent(node, offset, node, offset);
+                    if(node.nodeType === Node.ELEMENT_NODE && after){
+                        // setting the caret after an element needs some more efforts
+                        let range = (selection.rangeCount) ? selection.getRangeAt(0).cloneRange() : this.getEditorDoc().createRange();
+                        range.selectNode(node);
+                        range.collapse(false);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+
+                        console.log('setPositionOfCaret: SET AFTER ELEMENT NODE', node);
+                    } else {
+                        // set the evaluated caret after a text-node or before an element node
+                        selection.setBaseAndExtent(node, offset, node, offset);
+                    }
                 }
             }
         }
@@ -878,7 +892,7 @@ Ext.define('Editor.util.Range', {
                 // TODO REMOVE
                 // console.log('findAdjacentContentNode: NODE TO THE '+(rightOf?'RIGHT':'LEFT')+' IS TEXT NODE', (rightOf ? node.nextSibling : node.previousSibling));
                 return node;
-            } else if(node.nodeType == Node.ELEMENT_NODE){
+            } else if(node.nodeType == Node.ELEMENT_NODE && this.isRelevantElement(node)){
                 // TODO REMOVE
                 // console.log('findAdjacentContentNode: NODE TO THE '+(rightOf?'RIGHT':'LEFT')+' IS ELEMENT NODE');
                 if(rightOf && node.firstChild){
@@ -894,6 +908,18 @@ Ext.define('Editor.util.Range', {
             }
         }
         return null;
+    },
+    /**
+     *
+     * @param {Element} element
+     * @returns {boolean}
+     */
+    isRelevantElement: function(element){
+        if((element.nodeName.toLowerCase() == 'img' && element.className.indexOf('duplicatesavecheck') > -1)
+            || (element.nodeName.toLowerCase() == 'span' && element.className.indexOf('rangySelectionBoundary') > -1)) {
+            return false;
+        }
+        return true;
     },
     /**
      *

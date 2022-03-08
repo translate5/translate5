@@ -562,18 +562,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.finishSpellCheck(spellCheckProcessID);
             return;
         }
-        
         me.storeAllMatchesFromTool();
-        me.applySpellCheckResult(spellCheckProcessID);
-    },
-    /**
-     * Apply the results.
-     */
-    applySpellCheckResult: function(spellCheckProcessID) {
-        var me = this;
-        
+
         if (spellCheckProcessID !== me.spellCheckInProgressID) {
-            me.consoleLog('NO applySpellCheckResult, spellCheckProcess is no longer valid (' + spellCheckProcessID + '/' + me.spellCheckInProgressID + ').');
+            me.consoleLog('NO applySpellCheck, spellCheckProcess is no longer valid (' + spellCheckProcessID + '/' + me.spellCheckInProgressID + ').');
             me.finishSpellCheck(spellCheckProcessID);
             return;
         }
