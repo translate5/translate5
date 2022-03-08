@@ -178,7 +178,7 @@ class editor_Models_Segment_TagProtection {
      * ONLY NEEDED FOR XLF BASED FORMATS!
      */
     public function unprotect($segment) {
-        $chunks = preg_split('/(<[^>]*>)/', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $chunks = preg_split('/(<[^>]*>)/', $segment, flags: PREG_SPLIT_DELIM_CAPTURE);
         $count = count($chunks);
         for ($i = 0; $i < $count; $i++) {
             //the imported content contained encoded HTML specialchars and te following characters as encoded entities

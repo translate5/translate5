@@ -104,7 +104,7 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         $seg = $data['original'];
         
         //start tags
-        $split = preg_split('#<mqm:startIssue([^>]+)/>#', $seg, null, PREG_SPLIT_DELIM_CAPTURE);
+        $split = preg_split('#<mqm:startIssue([^>]+)/>#', $seg, flags: PREG_SPLIT_DELIM_CAPTURE);
         $splitCnt = count($split);
         
         //no mqms found
@@ -152,7 +152,7 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         $seg = join('', $split);
         
         //end tags:
-        $split = preg_split('#<mqm:endIssue([^>]+)/>#', $seg, null, PREG_SPLIT_DELIM_CAPTURE);
+        $split = preg_split('#<mqm:endIssue([^>]+)/>#', $seg, flags: PREG_SPLIT_DELIM_CAPTURE);
         $splitCnt = count($split);
         for($i = 1; $i < $splitCnt; $i++) {
             $current = $i++; // save current index and jump over content to next attributes

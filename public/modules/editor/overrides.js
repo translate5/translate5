@@ -1155,7 +1155,9 @@ Ext.override(Ext.panel.Table, {
             var store = this.getStore();
             // skip first load when remote sorters are applied before remote filters (ProjectGrid)
             if(state.storeState?.sorters && store?.getRemoteSort() && store.getRemoteFilter() && this.getPlugin('gridfilters') && !store.getFilters().length){
-                store.on('beforeload', x => false, store, {single:true}); // prevent loading
+                var loadBlocker = function(){return false};
+                store.on('beforeload', loadBlocker); // prevent loading until filters are set, beacuse store loads before are discarded
+                store.on('filterchange', function(store){store.removeListener('beforeload', loadBlocker);}, store, {single:true});
             }
             this.callParent([state]);
         }

@@ -280,7 +280,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         };
         
         $tagString = $protect($tagString);
-        $parts = preg_split('"([^~]*?µ[^>/]*?>)([^~]*?)(~[^~µ]*)"s', $tagString, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $parts = preg_split('"([^~]*?µ[^>/]*?>)([^~]*?)(~[^~µ]*)"s', $tagString, flags: PREG_SPLIT_DELIM_CAPTURE);
         $count = count($parts);
         $shortTagIdentOld = false;
         for($i = 0; $i < $count; $i++) {
