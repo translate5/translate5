@@ -68,10 +68,14 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             $tua->cleanupLocked();
 
             // second clean up tasks, jobs must be before in order to clean also not used multiuser tasks anymore
+            /** @var editor_Models_Task $task */
             $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
             $task->cleanupLockedJobs();
-            $task->cleanupDanglingImports();
+
+            //clean up dangling (hanging) imports
+            $import = ZfExtended_Factory::get('editor_Models_Import');
+            /** @var editor_Models_Import $import */
+            $import->cleanupDanglingImports();
 
             $config = ZfExtended_Factory::get('editor_Models_UserConfig');
             /* @var $config editor_Models_UserConfig */

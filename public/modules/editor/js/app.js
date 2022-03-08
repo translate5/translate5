@@ -251,7 +251,11 @@ Ext.application({
                 if (!Editor.data.logoutOnWindowClose) {
                     return;
                 }
-                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout?noredirect=1'); // destroy the user session
+                var fd = new FormData;
+                fd.append('zfExtended', Ext.util.Cookies.get('zfExtended'));
+                fd.append('noredirect', 1);
+                // destroy the user session and prevent redirect
+                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout', fd);
                 Ext.util.Cookies.clear('zfExtended'); // remove now invalid session cookie
             }
         });

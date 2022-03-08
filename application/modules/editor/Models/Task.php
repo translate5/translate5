@@ -192,30 +192,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * Sets importing tasks to status error if the import was started more then 48 (default; configurable runtimeOptions.import.timeout) hours ago
-     * @throws Zend_Exception
-     */
-    public function cleanupDanglingImports()
-    {
-        $config = Zend_Registry::get('config');
-        $hours = (int) ($config->runtimeOptions->import->timeout ?? 48);
-        $s = $this->db->select()
-            ->where('state = ?', self::STATE_IMPORT)
-            ->where('created < DATE_SUB(NOW(), INTERVAL ? HOUR)', $hours);
-        $danglingTasks = $this->db->fetchAll($s);
-
-        $task = clone $this;
-        foreach ($danglingTasks as $data) {
-            $task->init($data->toArray());
-            $task->logger()->error('E1379', 'The task import was cancelled after {hours} hours.',[
-                'task' => $task,
-                'hours' => $hours,
-            ]);
-            $task->setErroneous();
-        }
-    }
-
-    /**
      * access customer instances in a cached way
      * @param int $id
      * @return editor_Models_Customer_Customer
@@ -1193,7 +1169,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if(empty($workflow)) {
             return;
         }
-        $states = $this->getTaskRoleAutoStates();
+        $states = $this->getTaskRoleAutoStates() ?: [];
         // include blocked autostate in total segments finish count because blocked segments can not be edited and therefore they should count as finished.
         //TODO: with TRANSLATE-2753 this will be changed
         $states[] = editor_Models_Segment_AutoStates::BLOCKED;

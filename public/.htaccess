@@ -3,15 +3,6 @@ Options -Indexes
 RewriteEngine On
 #RewriteRule ^v-[0-9]\.[0-9]\.[0-9]/(.*)$ $1 [NC,L]
 
-#fixing missing ext-6 images for < IE10; toolbar-footer-bg does not exist at all!
-RewriteRule ^(ext-6\..\../build)/classic/theme-(classic|gray)/(resources/images/toolbar/toolbar-footer-bg.gif) /$1/welcome/css/blank.gif [NC,L]
-RewriteRule ^(ext-6\..\../build)/classic/theme-(classic|gray)/(resources/images/menu/menu-item-default-active-bg.gif) /$1/welcome/css/blank.gif [NC,L]
-RewriteRule ^(ext-6\..\../build)/classic/theme-classic/resources/images/btn/btn-default-toolbar-small-focus-sides.gif /$1/examples/kitchensink/gray-en/resources/images/btn/btn-default-toolbar-small-focus-sides.gif [NC,L]
-
-#fixing missing ext-6 images for < IE10
-RewriteCond %{REQUEST_FILENAME} !-f 
-RewriteRule ^(ext-6\..\../build)/classic/theme-(classic|gray)/(.*) /$1/examples/kitchensink/$2-en/$3 [NC,L]
-
 RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]
 RewriteCond %{REQUEST_FILENAME} -d 

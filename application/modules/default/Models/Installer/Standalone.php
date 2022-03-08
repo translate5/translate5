@@ -53,7 +53,7 @@ class Models_Installer_Standalone {
      * Increase this value to force a restart of the updater while updating
      * @var integer
      */
-    const INSTALLER_VERSION = 16;
+    const INSTALLER_VERSION = 17;
     
     /**
      * @var string
@@ -135,7 +135,10 @@ class Models_Installer_Standalone {
         if(empty($this->options['zend'])) {
             $this->options['zend'] = $this->currentWorkingDir.self::ZEND_LIB;
         }
+        define('APPLICATION_ROOT', $this->currentWorkingDir);
+        define('APPLICATION_PATH', $this->currentWorkingDir.DIRECTORY_SEPARATOR.'application');
         //requiering the following hardcoded since, autoloader must be downloaded with Zend Package
+        require_once $this->currentWorkingDir.'/library/ZfExtended/Utils.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/License.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Downloader.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Dependencies.php';
@@ -737,7 +740,6 @@ class Models_Installer_Standalone {
         $_SERVER['REQUEST_URI'] = '/database/forceimportall';
         $_SERVER['SERVER_NAME'] = 'localhost';
         $_SERVER['HTTP_HOST'] = 'localhost';
-        define('APPLICATION_PATH', $this->currentWorkingDir.DIRECTORY_SEPARATOR.'application');
         define('APPLICATION_ENV', 'application');
 
         require_once 'Zend/Session.php';
