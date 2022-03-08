@@ -85,6 +85,14 @@ trait editor_Controllers_Task_ImportTrait {
         foreach($this->data['targetLang'] as $target) {
             $task = clone $this->entity;
 
+            // re-init the task meta for the projectTask
+            $meta = $task->meta(true);
+
+            // set the mapping type for the project if provided
+            if(isset($this->data['mappingType'])){
+                $meta->setMappingType($this->data['mappingType']);
+            }
+
             $task->setProjectId($entityId);
             $task->setTaskType(editor_Task_Type::getInstance()->getImportTaskType());
             $task->setTargetLang($target);
