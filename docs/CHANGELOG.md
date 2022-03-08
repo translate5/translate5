@@ -10,6 +10,18 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.6.6] - 2022-03-08
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-2892](https://jira.translate5.net/browse/TRANSLATE-2892): Import/Export - Visual Mapping source for project uploads** <br>
+Solves problem of visual mapping not set to the correct value for project imports.
+
+
 ## [5.6.5] - 2022-03-07
 
 ### Important Notes:
