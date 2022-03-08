@@ -287,7 +287,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * Finds Elements in the current Markup by Selector
    * @return NodeList|bool: list with elements or false if not found
    */
-  getElementsBySelector(selector){
+  getElementsBySelector: function(selector){
       var body = this.getEditorBody();
       if(!body){
           return false;
