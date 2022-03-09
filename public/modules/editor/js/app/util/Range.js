@@ -797,9 +797,19 @@ Ext.define('Editor.util.Range', {
         let caret = doc.createElement('span');
         caret.id = 't5caret'
         selection.getRangeAt(0).insertNode(caret);
-
         data.valid = true;
         return data;
+    },
+    /**
+     * Returns a bookmark for the current caret position within a range
+     * @param {Range} range
+     * @returns {Object}
+     */
+    getPositionInRange: function(range){
+        let caret = this.getEditorDoc().createElement('span');
+        caret.id = 't5caret'
+        range.insertNode(caret);
+        return { valid: true };
     },
     /**
      * Set the position of the cursor according to the given bookmark created by getPositionOfCaret

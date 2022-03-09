@@ -1459,25 +1459,27 @@ Ext.define('Editor.controller.Editor', {
             clipboard = (e.browserEvent.clipboardData || window.clipboardData),
             clipboardText = clipboard.getData('Text'),
             clipboardHtml = clipboard.getData('text/html'),
-            toInsert, sel,
+            toInsert, sel, caret, range,
             textMatch = clipboardText == internalClip.selDataText,
             //the clipboardHtml adds meta information like charset and so on, so we just check if 
             // the stored one is a substring of the one in the clipboard
             htmlMatch = clipboardHtml.includes(internalClip.selDataHtml);
 
         //remove selected content before pasting the new content
-        sel = rangy.getSelection(this.getEditPlugin().editor.mainEditor.getEditorBody());       
+        sel = me.getEditorDoc().getSelection();
         if(sel.rangeCount) {
-            sel.getRangeAt(0).deleteContents();
-            sel.getRangeAt(0).collapse();
-            sel.getRangeAt(0).select();
+            range = sel.getRangeAt(0);
+            range.deleteContents();
+            caret = me.getPositionInRange(range);
+        } else {
+            caret = me.getPositionOfCaret();
         }
-
         //when making a copy in translate5, we store the content in an internal variable and in the clipboard
         //if neither the text or html clipboard content matches the internally stored content, 
         // that means that the pasted content comes from outside and we insert just text:
         if(me.copiedSelectionWithTagHandling === null || !textMatch || !htmlMatch) {
             me.editor.insertMarkup(Ext.String.htmlEncode(clipboardText));
+            me.setPositionOfCaret(caret);
             me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
             me.copiedSelectionWithTagHandling = null;
             return;
@@ -1497,6 +1499,7 @@ Ext.define('Editor.controller.Editor', {
 
         // we always use insertMarkup, regardless if it is img or div content
         me.editor.insertMarkup(toInsert);
+        me.setPositionOfCaret(caret);
         me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
     },
     copySourceToTarget: function() {
@@ -1568,100 +1571,100 @@ Ext.define('Editor.controller.Editor', {
         })) + 1;
     },
 
-        handleInsertTagShift: function(key, e) {
-            e.shiftKey = true; //somehow a hack, but is doing what it should do
-            this.handleInsertTag(key, e);
-        },
-        handleInsertTag: function(key, e) {
-            var me = this,
-                plug = this.getEditPlugin(),
-                editor = plug.editor.mainEditor,
-                tagIdx = Number(key) - 49, //49 shifts tag nr down to 0 for tag 1
-                sourceTagsForTagIdx,
-                sel,
-                selRange,
-                rangeOpen,
-                bookmarkOpen,
-                rangeClose,
-                insertBothTags;
+    handleInsertTagShift: function(key, e) {
+        e.shiftKey = true; //somehow a hack, but is doing what it should do
+        this.handleInsertTag(key, e);
+    },
+    handleInsertTag: function(key, e) {
+        var me = this,
+            plug = this.getEditPlugin(),
+            editor = plug.editor.mainEditor,
+            tagIdx = Number(key) - 49, //49 shifts tag nr down to 0 for tag 1
+            sourceTagsForTagIdx,
+            sel,
+            selRange,
+            rangeOpen,
+            bookmarkOpen,
+            rangeClose,
+            insertBothTags;
 
-            //key 0 equals to tadIdx -1 and equals to tag nr 10 (which equals to tagIdx 9)
-            if(tagIdx < 0) {
-                tagIdx = 9;
-            }
+        //key 0 equals to tadIdx -1 and equals to tag nr 10 (which equals to tagIdx 9)
+        if(tagIdx < 0) {
+            tagIdx = 9;
+        }
 
-            if(e.shiftKey) {
-                tagIdx = tagIdx + 10;
-            }
-                
-            //do only something when editing targets with tags and tag nrs > 1:
-            if(!me.sourceTags || !me.sourceTags[tagIdx]){
+        if(e.shiftKey) {
+            tagIdx = tagIdx + 10;
+        }
+
+        //do only something when editing targets with tags and tag nrs > 1:
+        if(!me.sourceTags || !me.sourceTags[tagIdx]){
+            return;
+        }
+
+        sourceTagsForTagIdx = [];
+        Ext.Object.each(me.sourceTags[tagIdx], function(id, tag){
+            var tagObject = {'id': id, 'tag': tag};
+            sourceTagsForTagIdx.push(tagObject);
+        });
+
+        // If a text range is marked, this short-cut inserts immediately the opening tag
+        // at the start of the range and the closing tag at the end of the range.
+        insertBothTags = false;
+        sel = rangy.getSelection(editor.getEditorBody());
+        selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
+        if (selRange !== null && !selRange.collapsed) {
+            insertBothTags = true;
+            rangeOpen = selRange.cloneRange();
+            rangeOpen.collapse(true);
+            bookmarkOpen = rangeOpen.getBookmark();
+            rangeClose = selRange.cloneRange();
+            rangeClose.collapse(false);
+            // Make sure to insert closing tag first, otherwise the ranges gets messy.
+            sourceTagsForTagIdx.sort(function(a, b){
+                var x = a.id.toLowerCase();
+                var y = b.id.toLowerCase();
+                if (x < y) {return -1;}
+                if (x > y) {return 1;}
+                return 0;
+            });
+        }
+
+        Ext.Array.each(sourceTagsForTagIdx, function(tagObject){
+            var id = tagObject.id,
+                tag = tagObject.tag,
+                tagInTarget = editor.getDoc().getElementById(id);
+            if(tagInTarget && tagInTarget.parentNode.nodeName.toLowerCase() !== 'del'){
                 return;
             }
-            
-            sourceTagsForTagIdx = [];
-            Ext.Object.each(me.sourceTags[tagIdx], function(id, tag){
-                var tagObject = {'id': id, 'tag': tag}; 
-                sourceTagsForTagIdx.push(tagObject);
-            });
-            
-            // If a text range is marked, this short-cut inserts immediately the opening tag
-            // at the start of the range and the closing tag at the end of the range.
-            insertBothTags = false;
-            sel = rangy.getSelection(editor.getEditorBody());
-            selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
-            if (selRange !== null && !selRange.collapsed) {
-                insertBothTags = true;
-                rangeOpen = selRange.cloneRange();
-                rangeOpen.collapse(true);
-                bookmarkOpen = rangeOpen.getBookmark();
-                rangeClose = selRange.cloneRange();
-                rangeClose.collapse(false);
-                // Make sure to insert closing tag first, otherwise the ranges gets messy.
-                sourceTagsForTagIdx.sort(function(a, b){
-                  var x = a.id.toLowerCase();
-                  var y = b.id.toLowerCase();
-                  if (x < y) {return -1;}
-                  if (x > y) {return 1;}
-                  return 0;
-                });
-            }
-            
-            Ext.Array.each(sourceTagsForTagIdx, function(tagObject){
-                var id = tagObject.id,
-		    tag = tagObject.tag,
-                    tagInTarget = editor.getDoc().getElementById(id);
-                if(tagInTarget && tagInTarget.parentNode.nodeName.toLowerCase() !== 'del'){
-                    return;
-                }
-                if (insertBothTags) {
-                    switch (true) {
-                        case (id.indexOf('-open') !== -1):
-                            // In Firefox, sel.setSingleRange(rangeOpen) does NOT work. No idea why.
-                            // Workaround: use bookmark - THAT works somehow.
-                            selRange.moveToBookmark(bookmarkOpen);
-                            sel.setSingleRange(selRange);
-                        break;
-                        case (id.indexOf('-close') !== -1):
-                            sel.setSingleRange(rangeClose);
-                        break;
-                    }
-                }
-                editor.insertMarkup(tag);
-                if (!insertBothTags) {
-                    return false;
-                }
-            });
-            
             if (insertBothTags) {
-                // place cursor at the end of the formerly selected content
-                sel.removeAllRanges();
-                sel.addRange(rangeClose);
+                switch (true) {
+                    case (id.indexOf('-open') !== -1):
+                        // In Firefox, sel.setSingleRange(rangeOpen) does NOT work. No idea why.
+                        // Workaround: use bookmark - THAT works somehow.
+                        selRange.moveToBookmark(bookmarkOpen);
+                        sel.setSingleRange(selRange);
+                        break;
+                    case (id.indexOf('-close') !== -1):
+                        sel.setSingleRange(rangeClose);
+                        break;
+                }
             }
-            
-            e.stopEvent();
-            return false;
-        },
+            editor.insertMarkup(tag);
+            if (!insertBothTags) {
+                return false;
+            }
+        });
+
+        if (insertBothTags) {
+            // place cursor at the end of the formerly selected content
+            sel.removeAllRanges();
+            sel.addRange(rangeClose);
+        }
+
+        e.stopEvent();
+        return false;
+    },
     /**
      * scrolls to the first segment.
      */
