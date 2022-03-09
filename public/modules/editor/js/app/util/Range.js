@@ -811,31 +811,31 @@ Ext.define('Editor.util.Range', {
                 caret = doc.getElementById('t5caret');
             if (caret) {
 
-                // TODO REMOVE
-                console.log('setPositionOfCaret: SELECTION: ', caret);
+                /*
+                This would be a very easy way to get the real caret to the plaseholder position: setting the selection on it and remove the element
+                Unfortunately this creates errors within rangy, so it's no option for now
+                let selection = doc.getSelection();
+                selection.setBaseAndExtent(caret, 0, caret, 0);
+                caret.remove();
+                return;
+                */
 
                 let node = null,
                     offset = 0,
                     after = false;
                 if (caret.parentElement.childNodes.length < 2) {
                     node = caret.parentElement;
-                    // TODO REMOVE
-                    console.log('setPositionOfCaret: CARET ONLY CHILD OF PARENT', caret);
                 } else {
                     // try to find the left direct neighbouring content node
                     // we try to find this one because the right neighbour might be joined with the left in case the caret is inbetween two text nodes
                     node = this.findAdjacentContentNode(caret, false);
                     if (node) {
                         // if the node is to the left we need to jump to the right
-                        // TODO REMOVE
-                        console.log('setPositionOfCaret: FOUND LEFT ADJACENT NODE', node);
                         after = true;
                         offset = (node.nodeType === Node.TEXT_NODE) ? node.textContent.length : (node.childNodes ? node.childNodes.length : 0);
                     } else {
                         // if to the left did not work, try right
                         node = this.findAdjacentContentNode(caret, true);
-                        // TODO REMOVE
-                        if(node){ console.log('setPositionOfCaret: FOUND RIGHT ADJACENT NODE', node); }
                     }
                     if (!node) {
                         // per default, we take the parent element and the index of the node
@@ -856,8 +856,6 @@ Ext.define('Editor.util.Range', {
                                 break;
                             }
                         }
-                        // TODO REMOVE
-                        console.log('setPositionOfCaret: NO ADJACENT NODES, used PARENT', node);
                     }
                 }
                 caret.remove();
@@ -870,8 +868,6 @@ Ext.define('Editor.util.Range', {
                         range.collapse(false);
                         selection.removeAllRanges();
                         selection.addRange(range);
-
-                        console.log('setPositionOfCaret: SET AFTER ELEMENT NODE', node);
                     } else {
                         // set the evaluated caret after a text-node or before an element node
                         selection.setBaseAndExtent(node, offset, node, offset);
@@ -889,19 +885,11 @@ Ext.define('Editor.util.Range', {
     findAdjacentContentNode: function(node, rightOf){
         while((node = rightOf ? node.nextSibling : node.previousSibling) != null){
             if(node.nodeType == Node.TEXT_NODE){
-                // TODO REMOVE
-                // console.log('findAdjacentContentNode: NODE TO THE '+(rightOf?'RIGHT':'LEFT')+' IS TEXT NODE', (rightOf ? node.nextSibling : node.previousSibling));
                 return node;
             } else if(node.nodeType == Node.ELEMENT_NODE && this.isRelevantElement(node)){
-                // TODO REMOVE
-                // console.log('findAdjacentContentNode: NODE TO THE '+(rightOf?'RIGHT':'LEFT')+' IS ELEMENT NODE');
                 if(rightOf && node.firstChild){
-                    // TODO REMOVE
-                    // console.log('findAdjacentContentNode: SEARCH FIRST CHILD', node.firstChild);
                     return this.findAdjacentContentNode({ previousSibling:node.firstChild }, false); // first argument is trick to get the node itself cheked
                 } else if(!rightOf && node.lastChild) {
-                    // TODO REMOVE
-                    // console.log('findAdjacentContentNode: SEARCH LAST CHILD', node.lastChild);
                     return this.findAdjacentContentNode({ nextSibling:node.lastChild }, true); // first argument is trick to get the node itself cheked
                 }
                 return node;
