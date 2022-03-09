@@ -67,6 +67,13 @@ Ext.define('Editor.view.HeadPanel', {
                     items: [{
                         xtype: 'tbfill'
                     },{
+                        xtype: 'button',
+                        //hidden: !Editor.app.authenticatedUser.hasRoles('erp'),
+                        text:'Back to erp',
+                        handler:function (){
+
+                        }
+                    },{
                         xtype: 'helpButton'
                     },{
                         xtype: 'button',
