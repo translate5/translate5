@@ -30,12 +30,6 @@ END LICENSE AND COPYRIGHT
  * Encapsulates the part of the import logic which is intended to be run in a worker
  */
 class editor_Models_Import_Worker_Import {
-    /***
-     *
-     * @var string
-     */
-    const CONFIG_TEMPLATE = 'task-config.ini';
-    
     /**
      * @var editor_Models_Task
      */
@@ -85,8 +79,6 @@ class editor_Models_Import_Worker_Import {
     public function import(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig) {
         $this->task = $task;
         $this->importConfig = $importConfig;
-        
-        $this->loadConfigTemplate();
         
         $importConfig->isValid($task->getTaskGuid());
         $this->filelist = ZfExtended_Factory::get('editor_Models_Import_FileList', array($this->importConfig, $this->task));
@@ -281,38 +273,5 @@ class editor_Models_Import_Worker_Import {
         //dont update view here, since it is not existing yet!
         $segment->syncFileOrderFromFiles($this->task->getTaskGuid(), true);
         $segment->syncRepetitions($this->task->getTaskGuid(), false);
-    }
-    
-    /***
-     * Load the config template for the task if it is provided in the import package
-     * @throws Exception
-     */
-    protected function loadConfigTemplate() {
-        $template = $this->importConfig->importFolder.'/'.self::CONFIG_TEMPLATE;
-        if (!file_exists($template)) {
-            return;
-        }
-        $logData = [
-            'filename' => self::CONFIG_TEMPLATE,
-            'task' => $this->task,
-        ];
-        $config = parse_ini_file($template);
-        $log = Zend_Registry::get('logger');
-        /* @var $log ZfExtended_Logger */
-        foreach ($config as $name => $value){
-            $taskConfig=ZfExtended_Factory::get('editor_Models_TaskConfig');
-            /* @var $taskConfig editor_Models_TaskConfig */
-            try {
-                $taskConfig->updateInsertConfig($this->task->getTaskGuid(),$name,$value);
-            }
-            catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
-                $logData['name'] = $name;
-                $log->exception(new editor_Models_Import_FileParser_Exception('E1327', $logData), ['level' => $log::LEVEL_WARN]);
-            }
-            catch (Exception $e) {
-                $logData['errorMessage'] = $e->getMessage();
-                throw new editor_Models_Import_FileParser_Exception('E1325', $logData);
-            }
-        }
     }
 }
