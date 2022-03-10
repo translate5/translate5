@@ -107,7 +107,7 @@ class editor_Models_Import_FileParser_XmlParser {
         //    Element names cannot contain spaces                                       => is implicitly checked on parsing the tag chunk below, since spaces are used as separator for the attributes.
 
         // see also the regex in parseList!
-        $this->parseList(preg_split('#(</?[a-zA-Z_][^>]+>)#i', $xml, flags: PREG_SPLIT_DELIM_CAPTURE), $preserveWhitespaceRoot);
+        $this->parseList(preg_split('#(</?[a-zA-Z_][^>]*>)#i', $xml, flags: PREG_SPLIT_DELIM_CAPTURE), $preserveWhitespaceRoot);
         return str_replace(array_keys($this->nonXmlBlocks), array_values($this->nonXmlBlocks), $this->__toString());
     }
     
