@@ -222,7 +222,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
             errors = [];
         me.getStore().each(function(record) {
             if(record.get('type') === Editor.model.admin.projectWizard.File.TYPE_ERROR){
-                errors.push(record);
+                errors.push(record.get('error'));
             }
         });
         return errors;
