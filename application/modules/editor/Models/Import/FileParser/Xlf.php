@@ -174,7 +174,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected $lengthRestriction;
     
     /**
-     * @var editor_Models_Import_FileParser_Xlf_SurroundingTags
+     * @var editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract
      */
     protected $surroundingTags;
     
@@ -199,7 +199,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->lengthRestriction = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_LengthRestriction',[
             $this->task->getConfig()
         ]);
-        $this->surroundingTags = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_SurroundingTags', [$this->config]);
+        $this->surroundingTags = editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract::factory($this->config);
         $this->otherContent = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_OtherContent', [
             $this->contentConverter, $this->segmentBareInstance, $this->task, $fileId
         ]);
