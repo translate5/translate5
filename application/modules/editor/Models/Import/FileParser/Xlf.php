@@ -773,6 +773,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             else {
                 //parse the source chunks
                 $sourceChunksOriginal = $sourceChunks = $this->xmlparser->getRange($currentSource['opener']+1, $currentSource['closer']-1, static::XML_REPARSE_CONTENT);
+
+                if(! $this->sourceValidation($mid, $currentSource, $sourceChunks, $placeHolders)) {
+                    continue;
+                }
+
                 //due XML_REPARSE_CONTENT it can happen that $sourceChunksOriginal will be a string, so we just put it into an array for further processing
                 if(!is_array($sourceChunksOriginal)){
                     $sourceChunksOriginal = [$sourceChunksOriginal];
@@ -937,6 +942,18 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
 
         return $createdSegmentIds;
+    }
+
+    /**
+     * Method Stub: Possibility for additional source validations, return true to process as usual, return false to skip segment import
+     * @param string $mid
+     * @param array $currentSource
+     * @param array $sourceChunks
+     * @param array $placeHolders
+     * @return bool
+     */
+    protected function sourceValidation(string $mid, array $currentSource, array $sourceChunks, array & $placeHolders): bool {
+        return true;
     }
 
     /**
