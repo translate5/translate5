@@ -63,7 +63,7 @@ Ext.define('Editor.controller.ServerException', {
      * @param {Ext.data.Operation} operation with operation.error = {response.status, response.statusText, response}
      */
     handleFormFailure: function(form, record, operation) {
-        if(operation?.error.status === 422) {
+        if(operation && operation.error.status === 422) {
             var json = Ext.decode(operation.error.response.responseText);
             if(json.errorsTranslated) {
                 form.markInvalid(json.errorsTranslated);
@@ -313,7 +313,9 @@ function() {
                 return;
             }
             var data = request._operation._response.getAllResponseHeaders(),
-                version = data['x-translate5-version'];
+                version = data['x-translate5-version'],
+                mntpnl = Ext.first('maintenancePanel'),
+                viewport = Ext.first('viewport');
                 
             if(version !== Editor.data.app.version && version) {
                 var exStrings = Editor.controller.ServerException.prototype.strings;
@@ -330,14 +332,23 @@ function() {
     		data.date = data['x-translate5-shownotice'];
     		data.msg  = data['x-translate5-maintenance-message'];
 			if(data.date || data.msg){
-                (Ext.getCmp('mtpnl') || Ext.first('viewport')?.add({
+                if(!viewport){
+                    return;
+                }
+                if(mntpnl){
+                    mntpnl.update(data);
+                    return;
+                }
+                viewport.add({
                     xtype:'maintenancePanel',
-                    id:'mtpnl',
                     region:'north',
                     weight: 100,
-                }))?.update(data);
+                    data: data
+                });
+                return;
     		}
-    	},
+            mntpnl && mntpnl.destroy();
+        },
         constructor: function() {
             this.callOverridden(arguments);
             this.on('exception', function(proxy, resp, op){

@@ -152,7 +152,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
             get: function(task) {
                 return Ext.widget('adminExportMenu', {
                     task: task,
-                    fields: task?.hasMqm() && task.segmentFields()
+                    fields: (task && task.hasMqm()) ? task.segmentFields() : false
                 });
             },
             bind: '{task}'

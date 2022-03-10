@@ -1769,12 +1769,14 @@ Ext.define('Editor.controller.Editor', {
      * Edit task and focus segment route
      */
     onTaskSegmentEditRoute: function(taskId, segmentNrInTask) {
-        var me = this;
-        if(Editor.data.task?.id == taskId) {
-            me.getSegmentGrid()?.focusSegment(segmentNrInTask);
+        var me = this,
+            dataTask = Editor.data.task;
+
+        if(dataTask && dataTask.id == taskId) {
+            me.getSegmentGrid() && me.getSegmentGrid().focusSegment(segmentNrInTask);
             return;
         }
-        if(Editor.data.task?.isModel){ // task is active, switch task
+        if(dataTask && dataTask.isModel){ // task is active, switch task
             // QUIRK: Do not prevent task closing when task changes per route
             Editor.util.TaskActions.close(function(task, app, strings){
                 me.openTask(taskId);
@@ -1789,7 +1791,7 @@ Ext.define('Editor.controller.Editor', {
      */
     openTask: function(taskId){
         //if the task is loaded, do nothing
-        if(Editor.data.task?.id == taskId){
+        if(Editor.data.task && Editor.data.task.id == taskId){
             return;
         }
         Editor.model.admin.Task.load(taskId, {
@@ -1822,7 +1824,7 @@ Ext.define('Editor.controller.Editor', {
         }
         var jumpToSegmentIndex = 
             Editor.app.parseSegmentIdFromTaskEditHash(true)
-            || store.proxy.reader.metaData?.jumpToSegmentIndex
+            || (store.proxy.reader.metaData && store.proxy.reader.metaData.jumpToSegmentIndex)
             || 1;
         this.getSegmentGrid().focusSegment(jumpToSegmentIndex);
     },
