@@ -277,7 +277,8 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
      */
     setWorkflowStepDefaultDeadline:function(step){
         var me = this,
-            orderDate = me.getFormTask()?.get('orderdate'); // task can be null if created after a faulty task
+            formTask = me.getFormTask(),
+            orderDate = formTask && formTask.get('orderdate'); // task can be null if created after a faulty task
         
         //if order date is not set, no calculation is required
         //if there is no workflow step defined, no calculation is required
@@ -287,7 +288,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
         var workflow = me.getView().down('#workflowCombo').getValue(),
             configName = Ext.String.format('workflow.{0}.{1}.defaultDeadlineDate',workflow,step),
             days = Editor.app.getTaskConfig(configName),
-            deadlineDate = me.lookup('assocForm').formPanel.getForm().findField('deadlineDate'),
+            deadlineDate = me.lookup('assocForm').getForm().findField('deadlineDate'),
             newValue;
 
         // calculate the new date if config exist

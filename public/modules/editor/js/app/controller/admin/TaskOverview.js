@@ -814,7 +814,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             },
             success: app.unmask,
             failure: function (rec, op) {
-                var task = op.getRecords()?.[0];
+                var recs = op.getRecords(),
+                    task = recs && recs[0] || false;
                 task && task.reject();
                 app.unmask();
             }
@@ -1206,21 +1207,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         items.forEach(function (item) {
             item.task = task;
         });
-    },
-
-    /***
-     * Is the given task importing
-     */
-    isImportingCheck: function (task) {
-        if (task.isImporting() || task.isExcelExported()) {
-            return true;
-        }
-        if (task.isCustomState()) {
-            //if one of the triggered handler return false, the fireEvent returns false,
-            // so we have to flip logic here: if one of the events should trigger the reload they have to return false
-            return !this.fireEvent('periodicalTaskReloadIgnore', task);
-        }
-        return false;
     },
 
     /***

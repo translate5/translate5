@@ -432,8 +432,9 @@ Ext.application({
      */
     onAdminMainSectionChange: function (tabpanel, activatedPanel, task) {
         var me = this,
-            routes = activatedPanel.getController()?.defaultConfig?.routes,
-            mainRoute = Object.keys(routes)[0];
+            ctrl = activatedPanel.getController(),
+            conf = ctrl && ctrl.defaultConfig,
+            mainRoute = conf && conf.routes && Object.keys(conf.routes)[0];
         me.fireEvent('adminSectionChanged', activatedPanel);
 
         if (!mainRoute) {
@@ -563,7 +564,7 @@ Ext.application({
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return h?.length == 4 && parseInt(h[2]) || 0;
+        return (h && h.length == 4) ? parseInt(h[2]) : 0;
     },
 
     /***
