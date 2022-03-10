@@ -77,6 +77,8 @@
 		"ext-xmlreader": "*",
 		"ext-sockets" : "*",
 		"ext-iconv" : "*",
+      	"ext-zip": "*",
+      	"ext-fileinfo": "*",
 		"phpunit/phpunit": "^9",
 		"shardj/zf1-future" : "dev-master",
 		"symfony/console" : "^5.0",
@@ -94,7 +96,7 @@
 		"translate5/instanttranslate-roboto-font": "26",
 		"axelbecher/material-design-icons": "^1.0",
 		"wilsonglasser/spout": "^3.0"
-	},
+    },
 	"extra" : {
 		"merge-plugin" : {
 			"include" : [

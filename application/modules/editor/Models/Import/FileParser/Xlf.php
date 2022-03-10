@@ -1028,7 +1028,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         // <count count-type="word count" unit="word">7</count>
         //TODO: this count-type is not xliff 1.2!!! IBM specific? or 1.1?
         if($this->processSegment && !empty($attributes['count-type']) && $attributes['count-type'] == 'word count') {
-            $this->wordCount += trim($this->xmlparser->getNextChunk());
+            $this->wordCount += (int) trim($this->xmlparser->getNextChunk());
         }
     }
     
