@@ -993,10 +993,31 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         }
         vm = menu.getViewModel();
         vm && vm.set('task', selectedTask);
+        if(menuXtype === 'projectActionMenu'){
+            vm && vm.set('hasImportingTasks', me.getProjectImportingTasksCount(selectedTask) > 0);
+        }
         vm && vm.notify();
         menu.showAt(event.getXY());
     },
 
+    /***
+     * Get the number of tasks in state import in the given project
+     * @param project
+     * @returns {number}
+     */
+    getProjectImportingTasksCount:function (project){
+        var projectTasks = Ext.getStore('projectTasks'),
+            projectId = project && project.get('projectId'),
+            importingCount = 0;
+        if(projectTasks && projectId){
+            Ext.getStore('projectTasks').each(function (r){
+                if(r.isImporting()){
+                    importingCount++;
+                }
+            });
+        }
+        return importingCount;
+    },
 
     /**
      * displays the excel re-import fileupload dialog
@@ -1282,27 +1303,22 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     notifyTaskCreated:function (task, callback){
         var me = this;
 
-        // reload the task store so the new tasks are included inside.
-        me.getAdminTasksStore().load({
-            callback:function (){
-                // reload the project store after the task store is reloaded
-                me.getProjectGrid().getController().reloadProjects().then(function(){
+        // reload the project store after the task store is reloaded
+        me.getProjectGrid().getController().reloadProjects().then(function(){
 
-                    // update the project route based on the current task
-                    me.handleProjectAfterImport(task);
-                    //set the store reference to the model(it is missing), it is used later when the task is deleted
-                    task.store = me.getAdminTasksStore();
+            // update the project route based on the current task
+            me.handleProjectAfterImport(task);
+            //set the store reference to the model(it is missing), it is used later when the task is deleted
+            task.store = me.getAdminTasksStore();
 
-                    // for each import wizard card, set the project/task object
-                    me.setCardsTask(task);
+            // for each import wizard card, set the project/task object
+            me.setCardsTask(task);
 
-                    // fire the taskCreated after all stores are reloaded
-                    me.fireEvent('taskCreated', task);
+            // fire the taskCreated after all stores are reloaded
+            me.fireEvent('taskCreated', task);
 
-                    if(callback){
-                        callback();
-                    }
-                });
+            if(callback){
+                callback();
             }
         });
     }
