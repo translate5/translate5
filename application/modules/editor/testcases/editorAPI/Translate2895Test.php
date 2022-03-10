@@ -72,6 +72,12 @@ class Translate2895Test extends ZfExtended_Test_Testcase {
         $this->_testContent($remover, '<1>', 'Ein Test', '</1><10/>');
         $this->_testContent($remover, '<10/><1>', 'Ein Test', '</1>');
 
+        //just a single tag at the start / end
+        $this->_testContent($remover, '<10/>', 'Ein Test', '');
+        $this->_testContent($remover, '', 'Ein Test', '<10/>');
+        $this->_testContent($remover, '', '<1/>Ein Test', '');
+        $this->_testContent($remover, '', 'Ein Test<1/>', '');
+
         //keep tags if not only paired tags
         $this->_testContent($remover, '', '<1>Ein Test</1><2><3/></2>', '');
         $this->_testContent($remover, '', '<1><2/></1><3>Ein Test</3>', '');
@@ -105,6 +111,10 @@ class Translate2895Test extends ZfExtended_Test_Testcase {
         $this->_testContent($remover, '<1>', 'Ein Test', '</1></2>');
         $this->_testContent($remover, '<1/><2>', 'Ein Test', '</2>');
 
+        //just a single tag at the start / end
+        $this->_testContent($remover, '<1/>', 'Ein Test', '');
+        $this->_testContent($remover, '', 'Ein Test', '<1/>');
+
         //keeping the tags if a partner is inside text
         $this->_testContent($remover, '', '<1>Ein</1> Test', '');
         $this->_testContent($remover, '', 'Ein <1>Test</1>', '');
@@ -133,13 +143,10 @@ class Translate2895Test extends ZfExtended_Test_Testcase {
         string $end,
         ?string $middleTarget = null)
     {
-        if(is_null($middleTarget)) {
-            $middleTarget = $middleSource;
-        }
         $source = $start.$middleSource.$end;
         $remover->calculate(false,
             $sourceChunks = $this->prepareContent($source),
-            $this->prepareContent($start.$middleTarget.$end),
+            is_null($middleTarget) ? [] : $this->prepareContent($start.$middleTarget.$end),
             self::$xmlParser);
 
         $this->assertEquals($start, $remover->getLeading(), 'removed leading content is not as expected: '.$source);

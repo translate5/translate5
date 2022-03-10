@@ -83,10 +83,10 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_All extends edit
     private function partnerExists(array $trimmedContent, array $allTags): int {
         $counter = 0;
         foreach($trimmedContent as $chunk) {
-            if($chunk instanceof editor_Models_Import_FileParser_Tag && !$chunk->isSingle()) {
+            if($chunk instanceof editor_Models_Import_FileParser_Tag) {
                 // if we get here, its either an opener or a closer, so check the partner!
-                if(!is_null($chunk->partner) && !in_array($chunk->partner, $allTags)) {
-                    // if we have a partner, which is not in the trimmed content (like <2> in the above content)
+                if(!$chunk->isSingle() && !is_null($chunk->partner) && !in_array($chunk->partner, $allTags)) {
+                    // if we have a partner, which is not in the trimmed content (like </2> in "<1/><2>Text</2> Test")
                     return $counter;
                 }
                 //if come here, it is sure that there is at least one tag to be removed, so we found one
