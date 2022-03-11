@@ -31,7 +31,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Test_Model_VisualSourceFile extends editor_Test_Model_Abstract {
 
-    //FIXME make a black list instead a whitelist here!!!
     protected $compared = [
         'import',
         'fileName',
