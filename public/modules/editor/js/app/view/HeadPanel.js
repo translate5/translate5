@@ -46,7 +46,8 @@ Ext.define('Editor.view.HeadPanel', {
     },
     strings: {
         logout: '#UT# Abmelden',
-        readonly: '#UT# - [LESEMODUS]'
+        readonly: '#UT# - [LESEMODUS]',
+        erpModuleButtonText:'#UT#Zurück zum ERP'
     },
     
     initConfig: function(instanceConfig) {
@@ -68,10 +69,10 @@ Ext.define('Editor.view.HeadPanel', {
                         xtype: 'tbfill'
                     },{
                         xtype: 'button',
-                        //hidden: !Editor.app.authenticatedUser.hasRoles('erp'),
-                        text:'Back to erp',
+                        hidden: !Editor.app.authenticatedUser.hasRoles('erp'),
+                        text:me.strings.erpModuleButtonText,
                         handler:function (){
-
+                            window.location = '/erp';
                         }
                     },{
                         xtype: 'helpButton'
