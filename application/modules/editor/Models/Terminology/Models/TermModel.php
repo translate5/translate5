@@ -2374,7 +2374,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $order = join(', ', $order) ?: '`id`';
 
         // Get raw siblings
-        return $this->db->getAdapter()->query($sql = '
+        $siblings = $this->db->getAdapter()->query($sql = '
             SELECT 
               `id`, 
               `id`, 
@@ -2387,12 +2387,52 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
               `status`,
               `processStatus`,
               `termEntryId`,
-              `termEntryTbxId`
+              `termEntryTbxId`,
+              `updatedBy` as `createdBy`
             FROM `terms_term` 
             WHERE `termEntryId` = :termEntryId
             ORDER BY ' . $order,
             $bind
         )->fetchAll(PDO::FETCH_UNIQUE);
+
+        // Get users who created for each term, from history
+        $createdBy = $this->db->getAdapter()->query('
+            SELECT `termId`, MIN(CONCAT(`updatedAt`, "--", `updatedBy`)) 
+            FROM `terms_term_history` 
+            WHERE `termId` IN (' . join(',', array_keys($siblings)) . ') 
+            GROUP BY `termId`
+        ')->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // For each term having histiry - spoof value of createdBy with the value found in history
+        foreach ($createdBy as $termId => $info) {
+            $siblings[$termId]['createdBy'] = explode('--', $info)[1];
+        }
+
+        // Return siblings having 'createdBy'-prop, containing either
+        // value of `updateBy` prop of a first `terms_term_history`-record, if exists,
+        // or value of `terms_term`.`updatedBy` prop
+        return $siblings;
+    }
+
+    /**
+     * Get id of a user who created this term, either from the oldest history record (if exists), or from current record
+     *
+     * @return string
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getCreatedBy() {
+
+        // Try to find oldest value of `updatedBy`-prop in current term's history
+        $oldest_updatedBy = $this->db->getAdapter()->query('
+            SELECT `updatedBy` 
+            FROM `terms_term_history`
+            WHERE `termId` = ? 
+            ORDER BY `updatedAt` ASC
+            LIMIT 1
+        ', $this->getId())->fetchColumn();
+
+        // If found - return it, else return current value `updatedBy`-prop
+        return $oldest_updatedBy ?: $this->getUpdatedBy();
     }
 
     /**

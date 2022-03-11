@@ -373,6 +373,24 @@ class editor_TermController extends ZfExtended_RestController
             ]
         ]);
 
+        // If current user has none of termPM, termPM_allClients or admin roles, but has termProposer role
+        if (count(array_diff(['termPM', 'termPM_allClients', 'admin'], $this->_session->roles)) == 3
+            && in_array('termProposer', $this->_session->roles)) {
+
+            // Deletion is disabled by default
+            $deletable = false;
+
+            // If current user is the one who created this term
+            // and this term is a proposal or has a proposal
+            if ($this->entity->getCreatedBy() == $this->_session->id
+                && ($this->entity->getProcessStatus() == 'unprocessed' || $this->entity->getProposal())) {
+                $deletable = true;
+            }
+
+            // If this term is not deletable - flush failure
+            if (!$deletable) $this->jflush(false, 'This term is not deletable');
+        }
+
         // If no or only certain collections are accessible - validate collection accessibility
         if ($this->collectionIds !== true) $this->jcheck([
             'collectionId' => [
