@@ -69,7 +69,7 @@ Ext.define('Editor.view.HeadPanel', {
                         xtype: 'tbfill'
                     },{
                         xtype: 'button',
-                        hidden: !Editor.app.authenticatedUser.hasRoles('erp'),
+                        hidden: !Editor.app.authenticatedUser.hasRoles(['erp']),
                         text:me.strings.erpModuleButtonText,
                         handler:function (){
                             window.location = '/erp';
