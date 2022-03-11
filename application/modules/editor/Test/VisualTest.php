@@ -31,7 +31,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Test_VisualTest extends editor_Test_JsonTest
 {
-    const VISUAL_DIR = '';
     /**
      * Retrieves the visual files structure as json
      * @param string $taskGuid
