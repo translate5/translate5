@@ -38,9 +38,7 @@ trait editor_Controllers_Traits_TaskTrait {
      */
     protected function fetchTask() : editor_Models_Task {
         $taskGuid = $this->fetchTaskGuid();
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
+        $task = editor_ModelInstances::taskByGuid($taskGuid);
         return $task;
     }
     /**
@@ -49,7 +47,7 @@ trait editor_Controllers_Traits_TaskTrait {
      * @throws ZfExtended_NotAuthenticatedException
      */
     protected function fetchTaskGuid() : string {
-        $taskGuid = $this->getRequest()->getParam('taskGuid'); //for possiblity to download task outside of editor
+        $taskGuid = $this->getRequest()->getParam('taskGuid'); // enable possiblity to use the API outside of  the current task-context
         if(is_null($taskGuid)){
             $session = new Zend_Session_Namespace();
             $taskGuid = $session->taskGuid;
