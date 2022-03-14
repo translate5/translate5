@@ -63,6 +63,7 @@ class editor_Models_Import {
     /**
      * führt den Import aller Dateien eines Task durch
      * @param string $importFolderPath
+     * @throws Exception
      */
     public function import(editor_Models_Import_DataProvider_Abstract $dataProvider) {
         if(empty($this->task)){
@@ -118,7 +119,11 @@ class editor_Models_Import {
             $dataProvider->handleImportException($e);
             throw $e;
         }
-        
+
+        /** @var editor_Models_Import_TaskConfig $taskConfig */
+        $taskConfig = ZfExtended_factory::get('editor_Models_Import_TaskConfig');
+        $taskConfig->loadConfigTemplate($this->task, $this->importConfig);
+
         $this->queueImportWorkers($dataProvider);
     }
     

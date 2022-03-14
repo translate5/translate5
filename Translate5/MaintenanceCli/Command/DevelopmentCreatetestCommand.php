@@ -68,6 +68,12 @@ class DevelopmentCreatetestCommand extends Translate5AbstractCommand
             'N',
             InputOption::VALUE_REQUIRED,
             'Force a name (must end with Test!) instead of getting it from the branch.');
+
+        $this->addOption(
+            'plugin',
+            'p',
+            InputOption::VALUE_REQUIRED,
+            'Create the test in the given Plugin (give the relative path to the plugin root!).');
     }
 
     /**
@@ -81,9 +87,17 @@ class DevelopmentCreatetestCommand extends Translate5AbstractCommand
         $this->initTranslate5();
         
         $this->writeTitle('Create a new API test from skeleton');
-        
-        $path = APPLICATION_PATH.'/modules/editor/testcases/editorAPI';
-        
+
+        if($plugin = $input->getOption('plugin')) {
+            $path = APPLICATION_ROOT.'/'.$plugin.'/tests';
+            if(!is_dir($path) && !mkdir($path)) {
+                $this->io->error('The given path does not exist or the "tests" folder could not be created: '.$path);
+            }
+        }
+        else {
+            $path = APPLICATION_PATH.'/modules/editor/testcases/editorAPI';
+        }
+
         if($name = $input->getOption('name')) {
             $issue = $name;
         }
@@ -176,7 +190,7 @@ class '.$name.' extends editor_Test_JsonTest {
 //TODO FOR TEST USAGE: check config checks
         $tests = array(
             \'runtimeOptions.import.xlf.preserveWhitespace\' => 0,
-            \'runtimeOptions.import.xlf.ignoreFramingTags\' => 1,
+            \'runtimeOptions.import.xlf.ignoreFramingTags\' => \'all\',
         );
         self::$api->testConfig($tests);
         

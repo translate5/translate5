@@ -63,7 +63,7 @@ class QualityBaseTest extends editor_Test_JsonTest {
         self::$api->testConfig($tests);
         
          
-        $api->addImportFile('editorAPI/MainTest/csv-with-mqm-en-de.zip');
+        $api->addImportFile('MainTest/csv-with-mqm-en-de.zip');
         $api->import($task);
         
         $api->addUser('testlector');
