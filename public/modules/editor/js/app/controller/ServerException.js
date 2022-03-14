@@ -318,13 +318,14 @@ function() {
                 viewport = Ext.first('viewport');
                 
             if(version !== Editor.data.app.version && version) {
-                var exStrings = Editor.controller.ServerException.prototype.strings;
+                var {update_title, update_msg, reload} = Editor.controller.ServerException.prototype.strings;
                 Ext.MessageBox.show({
-                     title: exStrings.update_title,
-                     msg: Ext.String.format(exStrings.update_msg, version),
+                     title: update_title,
+                     msg: Ext.String.format(update_msg, version),
                      icon: Ext.MessageBox.WARNING,
                      buttons: Ext.MessageBox.OK,
-                     fn: location.reload,
+                     buttonText: {ok: reload},
+                     fn: btnId => location.reload(),
                 });
             }
     		//FIXME neuen WebScoket Issue anlegen, der sammelt was alles auf websockets umgebaut werden kann wenn diese Fix aktiv sind.
