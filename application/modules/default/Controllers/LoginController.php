@@ -158,8 +158,7 @@ class LoginController extends ZfExtended_Controllers_Login {
 
         $pluginmanager = Zend_Registry::get('PluginManager');
         /* @var $pluginmanager ZfExtended_Plugin_Manager */
-        $plugins = $pluginmanager->getActive();
-        $termPortalEnabled = in_array('editor_Plugins_TermPortal_Init',$plugins);
+        $termPortalEnabled = $pluginmanager->isActive('TermPortal');
 
         // is term portal allowed when the user has termportal rights and the termportal plugin is enabled
         $isTermPortalAllowed = $isTermPortalAllowed && $termPortalEnabled;
