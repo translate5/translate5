@@ -191,7 +191,7 @@ class LoginController extends ZfExtended_Controllers_Login {
      * login will be redirected to the openid client server
      */
     protected function handleOpenIdRequest() {
-        $oidc = new ZfExtended_OpenIDConnectClient($this->getRequest());
+        $oidc = new Core\OpenId\Client($this->getRequest());
         //the openid authentication is valid
         
         $isCustomerSet=$oidc->isOpenIdCustomerSet();
@@ -280,7 +280,7 @@ class LoginController extends ZfExtended_Controllers_Login {
      * Sign out if the openid provider supports sign out and the end_session_endpoint is defined in the wellknow config,
      */
     protected function handleOpenIdLogout(){
-        $oidc = new ZfExtended_OpenIDConnectClient($this->getRequest());
+        $oidc = new Core\OpenId\Client($this->getRequest());
         //the openid authentication is valid
         if($oidc->isOpenIdCustomerSet()){
             $userSession = new Zend_Session_Namespace('openId');
