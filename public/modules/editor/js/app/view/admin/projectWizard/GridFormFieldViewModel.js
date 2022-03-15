@@ -25,21 +25,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.projectWizard.UploadGridViewModel', {
+Ext.define('Editor.view.admin.projectWizard.GridFormFieldViewModel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.wizardUploadGrid',
+    alias: 'viewmodel.gridFormField',
 
-    stores: {
-        files: {
-            model:'Editor.model.admin.projectWizard.File',
-            sorters: [{
-                sorterFn: function(record1, record2) {
-                    var name1 = Ext.StoreMgr.get('admin.Languages').getRfcById(record1.data.targetLang),
-                        name2 = Ext.StoreMgr.get('admin.Languages').getRfcById(record2.data.targetLang);
-                    return name1 > name2 ? 1 : (name1 === name2) ? 0 : -1;
-                },
-                direction: 'ASC'
-            }]
-        }
+    data:{
+        uploadErrorMsg:null
     }
 });
