@@ -374,8 +374,7 @@ class editor_TermController extends ZfExtended_RestController
         ]);
 
         // If current user has none of termPM, termPM_allClients or admin roles, but has termProposer role
-        if (count(array_diff(['termPM', 'termPM_allClients', 'admin'], $this->_session->roles)) == 3
-            && in_array('termProposer', $this->_session->roles)) {
+        if (!$this->isAllowed('editor_term', 'deleteAny')) {
 
             // Deletion is disabled by default
             $deletable = false;

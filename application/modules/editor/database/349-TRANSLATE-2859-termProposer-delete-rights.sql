@@ -27,3 +27,11 @@
 
 insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termProposer','editor_attribute','delete');
 insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termProposer','editor_term','delete');
+
+insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','admin',            'editor_attribute','deleteAny');
+insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM',           'editor_attribute','deleteAny');
+insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM_allClients','editor_attribute','deleteAny');
+
+insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','admin',            'editor_term','deleteAny');
+insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM',           'editor_term','deleteAny');
+insert into `Zf_acl_rules` (`module`, `role`, `resource`, `right`) values('editor','termPM_allClients','editor_term','deleteAny');

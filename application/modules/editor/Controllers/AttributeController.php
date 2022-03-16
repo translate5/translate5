@@ -565,9 +565,9 @@ class editor_AttributeController extends ZfExtended_RestController
             $dataTypeIdA[$this->entity->getDataTypeId()] = true;
         }
 
-        // If current user has none of termPM, termPM_allClients or admin roles, but has termProposer role
-        if (count(array_diff(['termPM', 'termPM_allClients', 'admin'], $this->_session->roles)) == 3
-            && in_array('termProposer', $this->_session->roles)) {
+        // If current user can't delete any attribute, for example
+        // has none of termPM, termPM_allClients or admin roles, but has termProposer role
+        if (!$this->isAllowed('editor_attribute', 'deleteAny')) {
 
             // Collect termIds where possible
             $termIdByAttrIdA = [];
