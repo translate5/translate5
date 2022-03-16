@@ -32,6 +32,11 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+use MittagQI\Translate5\Authentication\OpenId\{
+    Client as OpenIdClient,
+    ClientException as OpenIdClientException
+};
+
 /**
  * Klasse der Nutzermethoden
  */
@@ -191,7 +196,7 @@ class LoginController extends ZfExtended_Controllers_Login {
      * login will be redirected to the openid client server
      */
     protected function handleOpenIdRequest() {
-        $oidc = new ZfExtended_OpenIDConnectClient($this->getRequest());
+        $oidc = new OpenIdClient($this->getRequest());
         //the openid authentication is valid
         
         $isCustomerSet=$oidc->isOpenIdCustomerSet();
@@ -254,7 +259,7 @@ class LoginController extends ZfExtended_Controllers_Login {
 
                 $this->initDataAndRedirect();
             }
-        } catch (ZfExtended_OpenIDConnectClientException $e) {
+        } catch (OpenIdClientException $e) {
             ZfExtended_Models_LoginLog::addFailed(empty($user) ? 'No User given' : $user->getLogin(), "openid");
 
             $this->view->errors = true;
@@ -280,7 +285,7 @@ class LoginController extends ZfExtended_Controllers_Login {
      * Sign out if the openid provider supports sign out and the end_session_endpoint is defined in the wellknow config,
      */
     protected function handleOpenIdLogout(){
-        $oidc = new ZfExtended_OpenIDConnectClient($this->getRequest());
+        $oidc = new OpenIdClient($this->getRequest());
         //the openid authentication is valid
         if($oidc->isOpenIdCustomerSet()){
             $userSession = new Zend_Session_Namespace('openId');
