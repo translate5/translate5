@@ -88,11 +88,11 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
         self::$api->login('testmanager');
         
         //remove task
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
         //remove the created resources
-        self::$api->removeResources();
+        self::$api->cleanup && self::$api->removeResources();
         //remove the temp customer
-        self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
+        self::$api->cleanup && self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
     }
     
     /***

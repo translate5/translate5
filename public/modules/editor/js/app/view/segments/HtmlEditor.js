@@ -287,7 +287,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * Finds Elements in the current Markup by Selector
    * @return NodeList|bool: list with elements or false if not found
    */
-  getElementsBySelector(selector){
+  getElementsBySelector: function(selector){
       var body = this.getEditorBody();
       if(!body){
           return false;
@@ -302,24 +302,22 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * - prepares content to be edited
    * - resets markupImages (tag map for restoring and tag check)
    * - resets plainContent for checking if plain content was changed
-   * 
+   *
    * @private not for direct usage!
    * @param value {String}
    * @returns {String}
    */
   markupForEditor: function(value) {
     var me = this,
-        tempNode = document.createElement('DIV'),
         plainContent = [],
         result;
     me.contentEdited = false;
     me.markupImages = {};
-    
+
     result = me.markup(value, plainContent);
-    me.plainContent = plainContent; //stores only the text content and content tags for "original content has changed" comparsion
+    me.plainContent = plainContent; //stores only the text content and content tags for "original content has changed" comparision
     return result.join('');
   },
-  
   /**
    * Inserts the given string (containing div/span internal tags) at the cursor position in the editor
    * If second parameter is true, the content is not set in the editor, only the internal tags are stored in an internal markup table (for missing tag check for example)
@@ -336,46 +334,39 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(initMarkupMapOnly) {
           return;
       }
-      
-      if (!window.getSelection) {
-          //FIXME Not supported by your browser message!
-          return;
-      }
       sel = doc.getSelection();
-      if(sel.getRangeAt) {
-        range = sel.getRangeAt(0);
-        el = doc.createElement("div");
-        frag = doc.createDocumentFragment();
-        el.innerHTML = html;
-        while ((node = el.firstChild)) {
-            lastNode = frag.appendChild(node);
-        }
-        // remove term-tag-markup (will be added again after saving where appropriate)
-        termTags = frag.querySelectorAll('span.term');
-        arrLength = termTags.length;
-        for( i=0; i < arrLength; i++ ) {
-            termTageNode = termTags[i];
-            while(termTageNode.firstChild) {
-                if (termTageNode.isSameNode(lastNode)) {
-                    // If this term-tag-node is the lastNode, we must use its content as lastNode before we remove it.
-                    lastNode = termTageNode.firstChild;
-                }
-                termTageNode.parentNode.insertBefore(termTageNode.firstChild,termTageNode);
-            }
-            termTageNode.parentNode.removeChild(termTageNode);
-        }
-        // insert
-        this.fireEvent('beforeInsertMarkup', range);
-        range = sel.getRangeAt(0); // range might have changed during handling the beforeInsertMarkup
-        range.insertNode(frag);
-        rangeForNode = range.cloneRange();
-        if (lastNode !== undefined) {
-        	range.setStartAfter(lastNode);
-        	range.setEndAfter(lastNode);
-        }
-        this.fireEvent('afterInsertMarkup', rangeForNode);
-        this.fireEvent('saveSnapshot'); // Keep a snapshot from the new content
+      range = sel.getRangeAt(0);
+      el = doc.createElement("div");
+      frag = doc.createDocumentFragment();
+      el.innerHTML = html;
+      while ((node = el.firstChild)) {
+          lastNode = frag.appendChild(node);
       }
+      // remove term-tag-markup (will be added again after saving where appropriate)
+      termTags = frag.querySelectorAll('span.term');
+      arrLength = termTags.length;
+      for( i=0; i < arrLength; i++ ) {
+          termTageNode = termTags[i];
+          while(termTageNode.firstChild) {
+              if (termTageNode.isSameNode(lastNode)) {
+                  // If this term-tag-node is the lastNode, we must use its content as lastNode before we remove it.
+                  lastNode = termTageNode.firstChild;
+              }
+              termTageNode.parentNode.insertBefore(termTageNode.firstChild,termTageNode);
+          }
+          termTageNode.parentNode.removeChild(termTageNode);
+      }
+      // insert
+      this.fireEvent('beforeInsertMarkup', range);
+      range = sel.getRangeAt(0); // range might have changed during handling the beforeInsertMarkup
+      range.insertNode(frag);
+      rangeForNode = range.cloneRange();
+      if (lastNode !== undefined) {
+          range.setStartAfter(lastNode);
+          range.setEndAfter(lastNode);
+      }
+      this.fireEvent('afterInsertMarkup', rangeForNode);
+      this.fireEvent('saveSnapshot'); // Keep a snapshot from the new content
   },
   setSegmentSize: function(grid, size, oldSize) {
       var body = Ext.fly(this.getEditorBody());
@@ -393,23 +384,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   markup: function(value, plainContent) {
     var me = this,
-        tempNode = document.createElement('DIV'),
+        tempNode = document.createElement('DIV'), // TODO: is using the main windows document OK here ?
         plainContent = plainContent || [];
 
-    me.measure = Ext.fly(me.getEditorBody()).createChild({
-        //<debug> 
-        // tell the spec runner to ignore this element when checking if the dom is clean  
-        'data-sticky': true,
-        //</debug> 
-        role: 'presentation',
-        cls: Ext.baseCSSPrefix + 'textmetrics'
-    });
- 
-    me.measure.setVisibilityMode(1);
-    me.measure.position('absolute');
-    me.measure.setLocalXY(-1000, -1000);
-    me.measure.hide();
- 
+    me.createRuler();
     me.result = [];
     //tempnode mit inhalt füllen => Browser HTML Parsing
     value = value.replace(/ </g, Editor.TRANSTILDE+'<');
@@ -417,6 +395,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     Ext.fly(tempNode).update(value);
     me.replaceTagToImage(tempNode, plainContent);
     Ext.destroy(me.measure);
+    me.destroyRuler();
     return me.result;
   },
   getInitialData: function() {
@@ -568,12 +547,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       else {
           data.pixellength = 0;
       }
-      
-      //zusammengesetzte img Pfade:
-      this.measure.setHtml(data.text);
-      data.fullWidth = this.measure.getSize().width;
-      this.measure.setHtml(data.shortTag);
-      data.shortWidth = this.measure.getSize().width;
+      // get the dimensions of the inner spans
+      this.measure(data);
       //cache the data to be rendered via svg and the html for unmarkup
       me.markupImages[data.key] = {
           shortTag: data.shortTag,
@@ -1265,5 +1240,36 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           id = ele.getAttribute('data-seq');
       }
       return id;
-  }
+  },
+    /**
+     * Creates the hidden "ruler" div that is used to measure text-length's
+     */
+    createRuler: function(){
+        this.ruler = this.getDoc().createElement('div');
+        this.ruler.classList.add(Ext.baseCSSPrefix + 'textmetrics');
+        this.ruler.setAttribute('role', 'presentation');
+        this.ruler.dataset.sticky = true;
+        this.ruler.style.position = 'absolute';
+        this.ruler.style.left = '-1000px';
+        this.ruler.style.top = '-1000px';
+        this.ruler.style.visibility = 'hidden';
+        this.getEditorBody().append(this.ruler);
+    },
+    /**
+     * Removes the hidden "ruler2 div from our iframe
+     */
+    destroyRuler: function(){
+        this.ruler.remove();
+        delete this.ruler;
+    },
+    /**
+     * Measures the passed internal tag's data evaluating the width of the full apan & short span
+     * @param {Object} data
+     */
+    measure: function(data){
+        this.ruler.innerHTML = data.text;
+        data.fullWidth = Math.ceil(this.ruler.getBoundingClientRect().width);
+        this.ruler.innerHTML = data.shortTag;
+        data.shortWidth = Math.ceil(this.ruler.getBoundingClientRect().width);
+    }
 });

@@ -42,7 +42,7 @@
 .ods	okf_openoffice@translate5
 .odt	okf_openoffice@translate5
 .xlsx	okf_openxml@translate5
-.tbx	okf_xmlstream@translate5-tbx
+.tbx	okf_xml@translate5-tbx-ITS
 .mif	okf_mif
 .dotx	okf_openxml
 .xliff	okf_autoxliff

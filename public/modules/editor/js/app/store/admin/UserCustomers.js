@@ -46,7 +46,7 @@ Ext.define('Editor.store.admin.UserCustomers', {
         Editor.model.admin.User.load(Editor.data.app.user.id, {
             scope: this,
             failure: function(record, operation) {
-                Editor.app.getController('ServerException').handleCallback(arguments);
+                Editor.app.getController('ServerException').handleCallback(record, operation, false);
             },
             success: function(record, operation) {
 

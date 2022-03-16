@@ -78,10 +78,18 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
             ::get('editor_Models_TermCollection_TermCollection')
             ->getCollectionForAuthenticatedUser();
 
+        if(empty($collectionIds)) {
+            throw new ZfExtended_NotFoundException('No collections found for current user!');
+        }
+
         // Get possible attribs as dataTypeId => info pairs
         $attribs = ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_AttributeDataType')
             ->getLocalized($this->_session->locale, $collectionIds);
+
+        if(empty($attribs)) {
+            throw new ZfExtended_NotFoundException('No attributes found!');
+        }
 
         // Flush into response
         $this->view->assign($attribs);

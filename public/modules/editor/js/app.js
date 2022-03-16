@@ -251,7 +251,11 @@ Ext.application({
                 if (!Editor.data.logoutOnWindowClose) {
                     return;
                 }
-                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout?noredirect=1'); // destroy the user session
+                var fd = new FormData;
+                fd.append('zfExtended', Ext.util.Cookies.get('zfExtended'));
+                fd.append('noredirect', 1);
+                // destroy the user session and prevent redirect
+                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout', fd);
                 Ext.util.Cookies.clear('zfExtended'); // remove now invalid session cookie
             }
         });
@@ -552,14 +556,15 @@ Ext.application({
     /***
      * Get segmentNrInTask from the task edit route
      * {Boolean} checkEditTaskRoute : validate if the current route is task edit route
+     * @returns {number} segmentId or 0
      */
     parseSegmentIdFromTaskEditHash: function (checkEditTaskRoute) {
         if (checkEditTaskRoute && !this.isEditTaskRoute()) {
-            return -1;
+            return 0;
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return (h && h.length == 4) ? parseInt(h[2]) : -1;
+        return (h && h.length == 4) ? parseInt(h[2]) : 0;
     },
 
     /***

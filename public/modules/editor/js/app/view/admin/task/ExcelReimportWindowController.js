@@ -76,7 +76,6 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
             form = win.down('form'),
             task = win.task;
         
-        //alert('URL: '+Editor.data.restpath+'task/'+task.get('id')+'/excelreimport');
         if (!form.isValid()) {
             return;
         }
@@ -106,12 +105,11 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
                 task.store && task.load();
             },
             failure: function(form, submit) {
-                var errors;
                 win.setLoading(false);
-                if(submit.result.httpStatus == "422") {
-                    errors = submit.result.errorsTranslated;
+                if(submit.result && submit.result.httpStatus === 422) {
+                    var errors = submit.result.errorsTranslated;
                     form.markInvalid(errors);
-                    if(errors && errors.excelreimportUpload) {
+                    if(errors.excelreimportUpload) {
                         win.down('#feedback').update({msg: errors.excelreimportUpload.join('<br>'), type: 'error'});
                     }
                 }

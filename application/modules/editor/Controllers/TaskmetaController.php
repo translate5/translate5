@@ -54,8 +54,10 @@ class editor_TaskmetaController extends ZfExtended_RestController {
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::decodePutData()
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData()
+    {
         parent::decodePutData();
         //taskGuid may not be overwritten by frontend
         unset($this->data->taskGuid);

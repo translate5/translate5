@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * This component implementsall features regarding minLength & maxLength & maxNumberLines for segments
+ * This component implements all features regarding minLength & maxLength & maxNumberLines for segments
  * IMPORTANT: When opening a segment for editing with a line-number restriction, linebreaks are automatically inserted at positions prone for a linebreak
  */
 Ext.define('Editor.view.segments.MinMaxLength', {
@@ -61,7 +61,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         segmentToLong: 'segmentToLong',
         segmentTooManyLines: 'segmentTooManyLines',
         segmentLinesTooLong: 'segmentLinesTooLong',
-        segmentLinesTooShort: 'segmentLinesTooShort',
+        segmentLinesTooShort: 'segmentLinesTooShort'
     },
     statics: {
         /**
@@ -407,6 +407,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                     // eg if the single word in the line is too long
                     return;
                 }
+                // the caret is saved back when the "insertNewline" event triggered the "afterInsertWhitespace" event
+                // TODO FIXME: we better should create the whitespace tag with an HtmlEditor API and insert it here
                 me.bookmarkForCaret = me.getPositionOfCaret();
                 range = rangy.createRange();
                 range.selectNodeContents(editorBody);
@@ -438,8 +440,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * After a new line is added, we need to restore where the user was currently typing.
      */
     handleAfterInsertWhitespace: function() {
-        var me = this;
-        me.setPositionOfCaret(me.bookmarkForCaret);
+        this.setPositionOfCaret(this.bookmarkForCaret);
     },
     /**
      * Update the minmax status strip label

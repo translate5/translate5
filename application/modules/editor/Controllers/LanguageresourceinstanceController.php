@@ -685,8 +685,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData()
+    {
         parent::decodePutData();
         unset($this->data->langResUuid);
     }
@@ -740,9 +742,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         // Export collection
         ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx')->exportCollectionById(
             $params['collectionId'],
+            (new Zend_Session_Namespace('user'))->data->userName,
             $params['tbxBasicOnly'],
-            $params['exportImages'],
-            (new Zend_Session_Namespace('user'))->data->userName
+            $params['exportImages']
         );
     }
 

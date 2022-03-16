@@ -49,7 +49,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-        $api->addImportFile('editorAPI/SegmentWorkflowTest/simple-en-de.zip');
+        $api->addImportFile('SegmentWorkflowTest/simple-en-de.zip');
         $api->import($task);
         
         //FIXME improve this test by using two lector users to test after all finish with multiple users
