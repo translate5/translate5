@@ -9,7 +9,8 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"Translate5\\" : "Translate5"
+			"MittagQI\\Translate5\\" : "application/modules/editor/src",
+            "Translate5\\MaintenanceCli\\" : "Translate5/MaintenanceCli"
 		}
 	},
 	"repositories" : [{

@@ -21,7 +21,7 @@ https://www.gnu.org/licenses/lgpl-3.0.txt
 
 END LICENSE AND COPYRIGHT
 */
-namespace Core\OpenId;
+namespace MittagQI\Translate5\Authentication\OpenId;
 
 use ZfExtended_ErrorCodeException;
 

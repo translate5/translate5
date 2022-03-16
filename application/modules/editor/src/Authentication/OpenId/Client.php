@@ -22,7 +22,7 @@ https://www.gnu.org/licenses/lgpl-3.0.txt
 END LICENSE AND COPYRIGHT
 */
 
-namespace Core\OpenId;
+namespace MittagQI\Translate5\Authentication\OpenId;
 
 use Bootstrap;
 use editor_Models_Customer_Customer;
@@ -42,7 +42,7 @@ use ZfExtended_Models_User;
 use ZfExtended_Resource_Session;
 use ZfExtended_Utils;
 
-class Client{
+class Client {
 
     /***
      *
