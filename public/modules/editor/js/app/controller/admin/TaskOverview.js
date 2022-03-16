@@ -1289,22 +1289,28 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     notifyTaskCreated:function (task, callback){
         var me = this;
 
-        // reload the project store after the task store is reloaded
-        me.getProjectGrid().getController().reloadProjects().then(function(){
+        // reload the task store so the new tasks are included inside.
+        // in the import wizard, fresh tasks are required
+        me.getAdminTasksStore().load({
+            callback:function (){
+                // reload the project store after the task store is reloaded
+                me.getProjectGrid().getController().reloadProjects().then(function(){
 
-            // update the project route based on the current task
-            me.handleProjectAfterImport(task);
-            //set the store reference to the model(it is missing), it is used later when the task is deleted
-            task.store = me.getAdminTasksStore();
+                    // update the project route based on the current task
+                    me.handleProjectAfterImport(task);
+                    //set the store reference to the model(it is missing), it is used later when the task is deleted
+                    task.store = me.getAdminTasksStore();
 
-            // for each import wizard card, set the project/task object
-            me.setCardsTask(task);
+                    // for each import wizard card, set the project/task object
+                    me.setCardsTask(task);
 
-            // fire the taskCreated after all stores are reloaded
-            me.fireEvent('taskCreated', task);
+                    // fire the taskCreated after all stores are reloaded
+                    me.fireEvent('taskCreated', task);
 
-            if(callback){
-                callback();
+                    if(callback){
+                        callback();
+                    }
+                });
             }
         });
     }
