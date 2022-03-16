@@ -184,7 +184,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
     listeners: {
         afterTaskDelete: 'onAfterTaskDeleteEventHandler',
-        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler'
+        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler',
+        validateImportWizard: 'onValidateImportWizard'
     },
     listen: {
         controller: {
@@ -1113,7 +1114,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             form = me.getTaskAddForm(),
             params = form.getForm().getValues();
 
-        if (!form.isValid()) {
+
+        // import wizard form validation event. Return false in the subscribed event listener to cancel the form submit
+        if(me.fireEvent('validateImportWizard',form) === false){
             return;
         }
 
@@ -1277,6 +1280,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     onAfterTaskDeleteEventHandler: function () {
         Ext.StoreManager.get('admin.Tasks').load();
+    },
+
+    /***
+     * Import wizard validation event handler
+     * @param formPanel
+     * @returns {*}
+     */
+    onValidateImportWizard: function (formPanel){
+        return formPanel.isValid();
     },
 
     /***
