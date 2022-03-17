@@ -1042,8 +1042,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function updateIsTerminologieFlag($taskGuid,$ignoreAssocs=array()){
         $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
         /* @var $service editor_Services_TermCollection_Service */
-        $assoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
+        $assoc=ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $result=$assoc->loadAssocByServiceName($taskGuid, $service->getName(),$ignoreAssocs);
         $this->loadByTaskGuid($taskGuid);
         $this->setTerminologie(!empty($result));
