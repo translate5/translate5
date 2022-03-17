@@ -617,6 +617,10 @@ class editor_AttributeController extends ZfExtended_RestController
                         // If that term is a proposal or has a proposal
                         if (isset($detectedA[$attrId])) {
                             $deletable = true;
+
+                        // If that attr is a draft
+                        } else if ($entity->getIsDraft()) {
+                            $deletable = true;
                         }
 
                     // Else

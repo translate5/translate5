@@ -663,7 +663,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
               IFNULL(`createdBy`, 0) AS `createdBy`, DATE_FORMAT(`createdAt`, "%d.%m.%Y %H:%i:%s") AS `createdAt`,
               IFNULL(`updatedBy`, 0) AS `updatedBy`, DATE_FORMAT(`updatedAt`, "%d.%m.%Y %H:%i:%s") AS `updatedAt`
             FROM `terms_attributes` 
-            WHERE ' . $where . '
+            WHERE ' . $where . ' AND `isDraft` = 0
             ORDER BY `type` = "processStatus" DESC, `id` DESC', $bind
         )->fetchAll(PDO::FETCH_GROUP);
     }
