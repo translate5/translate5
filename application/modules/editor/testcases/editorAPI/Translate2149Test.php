@@ -56,7 +56,7 @@ class Translate2149Test extends editor_Test_JsonTest {
         
         $tests = array(
             'runtimeOptions.import.xlf.preserveWhitespace' => 0,
-            'runtimeOptions.import.xlf.ignoreFramingTags' => 1,
+            'runtimeOptions.import.xlf.ignoreFramingTags' => 'all',
         );
         self::$api->testConfig($tests);
         
