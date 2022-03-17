@@ -300,8 +300,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             listConfig: {
                 loadMask: false
             },
-            store: Ext.create('Ext.data.Store',{
+            store: {
                 autoLoad: true,
+                storeId: 'pmGuidCombo_User',
                 model: 'Editor.model.admin.User',
                 pageSize: 0,
                 proxy : {
@@ -315,7 +316,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                         type : 'json'
                     }
                 }
-            })
+            }
         };
     }
   });

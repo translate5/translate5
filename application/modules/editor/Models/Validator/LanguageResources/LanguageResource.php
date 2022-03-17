@@ -45,5 +45,11 @@ class editor_Models_Validator_LanguageResources_LanguageResource extends ZfExten
         $this->addValidator('serviceName', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('serviceType', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('specificData', 'stringLength', array('min' => 0, 'max' => 1024));
+        $this->addValidator('writeSource', 'int',[],true);
+        $this->addValidator('resourceType', 'inArray',[[
+            editor_Models_Segment_MatchRateType::TYPE_MT,
+            editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION,
+            editor_Models_Segment_MatchRateType::TYPE_TM
+        ]],allowNull: true);
     }
 }

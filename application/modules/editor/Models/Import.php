@@ -63,6 +63,7 @@ class editor_Models_Import {
     /**
      * führt den Import aller Dateien eines Task durch
      * @param string $importFolderPath
+     * @throws Exception
      */
     public function import(editor_Models_Import_DataProvider_Abstract $dataProvider) {
         if(empty($this->task)){
@@ -118,7 +119,11 @@ class editor_Models_Import {
             $dataProvider->handleImportException($e);
             throw $e;
         }
-        
+
+        /** @var editor_Models_Import_TaskConfig $taskConfig */
+        $taskConfig = ZfExtended_factory::get('editor_Models_Import_TaskConfig');
+        $taskConfig->loadConfigTemplate($this->task, $this->importConfig);
+
         $this->queueImportWorkers($dataProvider);
     }
     
@@ -299,5 +304,54 @@ class editor_Models_Import {
      */
     public function getImportConfig() {
         return $this->importConfig;
+    }
+
+    /**
+     * Sets importing tasks to status error if the import was started more then 48 (default; configurable runtimeOptions.import.timeout) hours ago
+     * @throws Zend_Exception
+     */
+    public function cleanupDanglingImports()
+    {
+        /** @var editor_Models_Task $task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+
+        /** @var ZfExtended_Models_Worker $worker */
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+
+        $config = Zend_Registry::get('config');
+        $hours = (int) ($config->runtimeOptions->import->timeout ?? 48);
+        $s = $task->db->select()
+            ->where('state = ?', $task::STATE_IMPORT)
+            ->where('created < DATE_SUB(NOW(), INTERVAL ? HOUR)', $hours);
+        $danglingTasks = $task->db->fetchAll($s);
+
+        $finalStepWorker = 'editor_Models_Import_Worker_FinalStep';
+
+        foreach ($danglingTasks as $data) {
+            $task->init($data->toArray());
+
+            //log the dangling task
+            $task->logger()->error('E1379', 'The task import was cancelled after {hours} hours.',[
+                'task' => $task,
+                'hours' => $hours,
+            ]);
+
+            //set the task to status error
+            $task->setErroneous();
+
+            //if there are still some workers,
+            try {
+                $worker->loadFirstOf($finalStepWorker, $task->getTaskGuid());
+                $worker->defuncRemainingOfGroup([$finalStepWorker], true, true);
+                $worker->wakeupScheduled();
+
+                /** @var ZfExtended_Worker_TriggerByHttp $trigger */
+                $trigger = ZfExtended_Factory::get('ZfExtended_Worker_TriggerByHttp');
+                $trigger->triggerWorker($worker->getId(), $worker->getHash());
+            }
+            catch (ZfExtended_Models_Entity_NotFoundException) {
+                //do nothing
+            }
+        }
     }
 }

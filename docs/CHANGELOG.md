@@ -11,14 +11,85 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+## [5.6.6] - 2022-03-08
+
+### Important Notes:
+ 
 
 
+### Bugfixes
+**[TRANSLATE-2892](https://jira.translate5.net/browse/TRANSLATE-2892): Import/Export - Visual Mapping source for project uploads** <br>
+Solves problem of visual mapping not set to the correct value for project imports.
 
 
+## [5.6.5] - 2022-03-07
+
+### Important Notes:
+ 
 
 
+### Bugfixes
+**[TRANSLATE-2889](https://jira.translate5.net/browse/TRANSLATE-2889): API - logoutOnWindowClose does not work** <br>
+If just closing the application window the user is now logged out correctly (if configured).
+
+**[TRANSLATE-2888](https://jira.translate5.net/browse/TRANSLATE-2888): Comments, VisualReview / VisualTranslation - Commenting a segment via Visual does not work** <br>
+The creation of comments in Visual by clicking in the Visual window was not working any more.
 
 
+**[TRANSLATE-2887](https://jira.translate5.net/browse/TRANSLATE-2887): Editor general - Search/Replace is not working sometimes** <br>
+Make Search/Replace work again on tasks with many segments.
+
+
+## [5.6.4] - 2022-03-03
+
+### Important Notes:
+#### [TRANSLATE-2872](https://jira.translate5.net/browse/TRANSLATE-2872)
+For all API users: The task import can now call an URL after finishing a task import and hanging imports are cancelled after (configurable) 48h.
+ 
+
+
+### Added
+**[TRANSLATE-2872](https://jira.translate5.net/browse/TRANSLATE-2872): Import/Export - Implement a URL callback triggered after task import is finished** <br>
+Now a URL can be configured (runtimeOptions.import.callbackUrl) to be called after a task was imported. 
+The URL is called via POST and receives the task object as JSON. So systems creating tasks via API are getting now immediate answer if the task is imported. The status of the task (error on error, or open on success) contains info about the import success. If the task import is running longer as 48 hours, the task is set to error and the callback is called too.
+
+**[TRANSLATE-2860](https://jira.translate5.net/browse/TRANSLATE-2860): TermPortal - Attribute levels should be collapsed by default** <br>
+Entry-level images added to language-level ones in Images-column of Siblings-panel
+
+**[TRANSLATE-2483](https://jira.translate5.net/browse/TRANSLATE-2483): InstantTranslate - Save InstantTranslate translation to TM** <br>
+Enables translation to be saved to "Instant-Translate" TM memory. For more info how this should be used, check this link: https://confluence.translate5.net/display/TAD/InstantTranslate
+
+
+### Bugfixes
+**[TRANSLATE-2882](https://jira.translate5.net/browse/TRANSLATE-2882): Main back-end mechanisms (Worker, Logging, etc.) - Calling updateProgress on export triggers error in the GUI** <br>
+The progress update was also triggered on exports, causing some strange task undefined errors in the GUI.
+
+**[TRANSLATE-2879](https://jira.translate5.net/browse/TRANSLATE-2879): TermPortal - termPM-role have no sufficient rights to transfer terms from TermPortal** <br>
+Fixed: terms transfer was unavailable for termPM-users
+
+**[TRANSLATE-2878](https://jira.translate5.net/browse/TRANSLATE-2878): Editor general - Metadata export error with array type filter** <br>
+Filtered tasks with multiple option filter will no longer produce an error when Export meta data is clicked.
+
+**[TRANSLATE-2876](https://jira.translate5.net/browse/TRANSLATE-2876): Search & Replace (editor) - Search and replace match case search** <br>
+Error will no longer happen when searching with regular expression with match-case on.
+
+**[TRANSLATE-2875](https://jira.translate5.net/browse/TRANSLATE-2875): Import/Export - Task Entity not found message on sending a invalid task setup in upload wizard** <br>
+The message "Task Entity not found" was sometimes poping up when creating a new task with invalid configuration.
+
+**[TRANSLATE-2874](https://jira.translate5.net/browse/TRANSLATE-2874): InstantTranslate, MatchAnalysis & Pretranslation - MT stops pre-translation at first repeated segment** <br>
+On pre-translating against MT only, repetitions are producing an error, preventing the pre-translation to be finshed. 
+
+**[TRANSLATE-2871](https://jira.translate5.net/browse/TRANSLATE-2871): InstantTranslate - Instant-translate result list name problem** <br>
+Problem with listed results in instant translate with multiple resources with same name.
+
+**[TRANSLATE-2870](https://jira.translate5.net/browse/TRANSLATE-2870): Task Management - Deleting a cloned task deletes the complete project** <br>
+This bug affects only projects containing one target task. If this single task is cloned, and the original task was deleted, the whole project was deleted erroneously. This is changed now by implicitly creating a new project for such tasks. 
+
+**[TRANSLATE-2858](https://jira.translate5.net/browse/TRANSLATE-2858): TermPortal - Proposal for Term entries cant be completed** <br>
+Fixed proposal creation when newTermAllLanguagesAvailable config option is Off
+
+**[TRANSLATE-2854](https://jira.translate5.net/browse/TRANSLATE-2854): TermPortal - Term-portal error: join(): Argument #1 ($pieces) must be of type array, string given** <br>
+Fixed bug in loading terms.
 
 
 ## [5.6.3] - 2022-02-24

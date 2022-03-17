@@ -184,7 +184,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
     listeners: {
         afterTaskDelete: 'onAfterTaskDeleteEventHandler',
-        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler'
+        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler',
+        validateImportWizard: 'onValidateImportWizard'
     },
     listen: {
         controller: {
@@ -923,7 +924,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             failure: function (batch, operation) {
                 task.reject();
                 app.unmask();
-                if (operation.error.status === '405') {
+                if (operation.error.status === 405) {
                     Editor.MessageBox.addError(me.strings.taskNotDestroyed);
                 } else {
                     Editor.app.getController('ServerException').handleException(operation.error.response);
@@ -937,13 +938,18 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      * @param {Editor.model.admin.Task} task
      */
     editorCloneTask: function (task, event) {
-        var me = this;
+        var me = this,
+            isDefaultTask = task.get('taskType') === 'default';
         Ext.Ajax.request({
             url: Editor.data.pathToRunDir + '/editor/task/' + task.getId() + '/clone',
             method: 'post',
-            scope: this,
+            scope: me,
             success: function (response) {
-                if (me.isProjectPanelActive()) {
+                if(isDefaultTask) {
+                    //we have to reload the project overview since the id of the shown project was changing
+                    me.getProjectProjectStore().load();
+                }
+                else if (me.isProjectPanelActive()) {
                     me.getProjectTaskGrid().getStore().load();
                 }
                 me.handleTaskReload();
@@ -989,10 +995,31 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         }
         vm = menu.getViewModel();
         vm && vm.set('task', selectedTask);
+        if(menuXtype === 'projectActionMenu'){
+            vm && vm.set('hasImportingTasks', me.getProjectImportingTasksCount(selectedTask) > 0);
+        }
         vm && vm.notify();
         menu.showAt(event.getXY());
     },
 
+    /***
+     * Get the number of tasks in state import in the given project
+     * @param project
+     * @returns {number}
+     */
+    getProjectImportingTasksCount:function (project){
+        var projectTasks = Ext.getStore('projectTasks'),
+            projectId = project && project.get('projectId'),
+            importingCount = 0;
+        if(projectTasks && projectId){
+            Ext.getStore('projectTasks').each(function (r){
+                if(r.isImporting()){
+                    importingCount++;
+                }
+            });
+        }
+        return importingCount;
+    },
 
     /**
      * displays the excel re-import fileupload dialog
@@ -1087,7 +1114,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             form = me.getTaskAddForm(),
             params = form.getForm().getValues();
 
-        if (!form.isValid()) {
+
+        // import wizard form validation event. Return false in the subscribed event listener to cancel the form submit
+        if(me.fireEvent('validateImportWizard',form) === false){
             return;
         }
 
@@ -1101,6 +1130,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 formData.append('importUpload_type[]', record.get('type'));
             }
         });
+
+        //ensure that UI always generates projects with projectTasks
+        formData.append('taskType', 'project');
 
         me.fireEvent('beforeCreateTask',params , formData);
 
@@ -1202,21 +1234,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
 
     /***
-     * Is the given task importing
-     */
-    isImportingCheck: function (task) {
-        if (task.isImporting() || task.isExcelExported()) {
-            return true;
-        }
-        if (task.isCustomState()) {
-            //if one of the triggered handler return false, the fireEvent returns false,
-            // so we have to flip logic here: if one of the events should trigger the reload they have to return false
-            return !this.fireEvent('periodicalTaskReloadIgnore', task);
-        }
-        return false;
-    },
-
-    /***
      * Close advanced filter window
      */
     closeAdvancedFilterWindow: function () {
@@ -1266,6 +1283,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
 
     /***
+     * Import wizard validation event handler
+     * @param formPanel
+     * @returns {*}
+     */
+    onValidateImportWizard: function (formPanel){
+        return formPanel.isValid();
+    },
+
+    /***
      * Notify the application that the task is created. The event taskCreated will be fired after the task store and the
      * project store are reloaded. The store reload is required so there are no entity version conflicts later in the
      * import wizard
@@ -1276,6 +1302,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         var me = this;
 
         // reload the task store so the new tasks are included inside.
+        // in the import wizard, fresh tasks are required
         me.getAdminTasksStore().load({
             callback:function (){
                 // reload the project store after the task store is reloaded

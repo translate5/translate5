@@ -37,87 +37,79 @@ class editor_Models_Segment_Iterator implements Iterator {
     /**
      * @var string
      */
-    protected $taskGuid;
+    protected string $taskGuid;
     /**
-     * @var editor_Models_Segment
+     * @var ?editor_Models_Segment
      */
-    protected $segment;
+    protected ?editor_Models_Segment $segment;
     
     /**
      * @var boolean
      */
-    protected $isEmpty = false;
+    protected bool $isEmpty = false;
     
     /**
      * If set, iterate only over the segments of the given file Id.
-     * @var integer
+     * @var ?integer
      */
-    protected $fileId = null;
-    
+    protected ?int $fileId = null;
+
     /**
      * @param string $taskGuid
+     * @param int|null $fileId
      */
-    public function __construct($taskGuid, $fileId = null) {
+    public function __construct(string $taskGuid, ?int $fileId = null) {
         $this->fileId = $fileId;
         $this->taskGuid = $taskGuid;
         $this->rewind();
     }
-    
+
     /**
-     * (non-PHPdoc)
+     * @return ?editor_Models_Segment
      * @see Iterator::current()
-     * @return editor_Models_Segment | null
      */
-    public function current() {
+    public function current() : mixed {
         return $this->segment;
     }
-    
+
     /**
-     * (non-PHPdoc)
      * @see Iterator::next()
-     * @return editor_Models_Segment | null
      */
-    public function next() {
+    public function next(): void {
         $this->segment = $this->segment->loadNext($this->taskGuid, $this->key(), $this->fileId);
-        return $this->segment;
     }
     
     /**
-     * (non-PHPdoc)
      * @see Iterator::key()
      * @return integer the segment id
      */
-    public function key() {
+    public function key() : mixed {
         return $this->segment->getId();
     }
-    
+
     /**
-     * Reloads the first segment of task, we assume we have always a first segment. 
+     * Reloads the first segment of task, we assume we have always a first segment.
      * If not a notfound exceptions is thrown.
-     * (non-PHPdoc)
      * @see Iterator::rewind()
-     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function rewind() {
+    public function rewind() : void {
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
         try {
             $this->segment->loadFirst($this->taskGuid, $this->fileId);
             $this->isEmpty = false;
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $noSegments) {
+        } catch(ZfExtended_Models_Entity_NotFoundException $noSegments) {
             $this->isEmpty = true;
         }
     }
     
     /**
-     * (non-PHPdoc)
      * @see Iterator::valid()
      */
-    public function valid() {
-        return !!$this->segment && ($this->key() > 0);
+    public function valid() : bool {
+        return $this->segment && ($this->key() > 0);
     }
-    
-    public function isEmpty() {
+
+    public function isEmpty(): bool {
         return $this->isEmpty;
     }
 }

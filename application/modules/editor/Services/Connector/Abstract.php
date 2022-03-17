@@ -200,6 +200,17 @@ abstract class editor_Services_Connector_Abstract {
         //to be implemented if needed
         $this->log(__METHOD__, ' segment '.$segment->getId());
     }
+
+    /***
+     * Updates translation to the connected service
+     * @param string $source source translation
+     * @param string $target target (translated source) translation
+     * @return void
+     */
+    public function updateTranslation(string $source, string $target){
+        //to be implemented if needed
+        $this->log(__METHOD__, ' source '.$source. ' | target'.$target );
+    }
     
     /***
      * Reset the tm result list data

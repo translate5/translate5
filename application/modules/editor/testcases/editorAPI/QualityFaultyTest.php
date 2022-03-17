@@ -63,8 +63,9 @@ class QualityFaultyTest extends editor_Test_JsonTest {
         self::$api->testConfig($tests);
         
          
-        $api->addImportFile('editorAPI/MainTest/qm-terminology-en-de.zip');
+        $api->addImportFile('MainTest/qm-terminology-en-de.zip');
         $api->import($task);
+        $api->reloadTask();
         
         $api->addUser('testlector');
         

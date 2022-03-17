@@ -221,6 +221,10 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
      */
     public function getLocalized(string $locale, array $collectionIds): array {
 
+        if(empty($collectionIds)) {
+            return [];
+        }
+
         // Fetch from database
         $attributes = $this->db->getAdapter()->query('
             SELECT 

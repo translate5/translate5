@@ -63,7 +63,7 @@ class QualityBaseTest extends editor_Test_JsonTest {
         self::$api->testConfig($tests);
         
          
-        $api->addImportFile('editorAPI/MainTest/csv-with-mqm-en-de.zip');
+        $api->addImportFile('MainTest/csv-with-mqm-en-de.zip');
         $api->import($task);
         
         $api->addUser('testlector');
@@ -187,7 +187,7 @@ class QualityBaseTest extends editor_Test_JsonTest {
         $this->assertModelEqualsJsonFile('FilterQuality', $fileName, $tree);
         
         $fileName = 'expectedTaskQualitiesChanged.json';
-        $tree = $this->api()->getJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid), [], $fileName);
+        $tree = $this->api()->getJson('/editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid), [], $fileName);
         $this->assertModelEqualsJsonFile('TaskQuality', $fileName, $tree);
     }
 
@@ -195,7 +195,7 @@ class QualityBaseTest extends editor_Test_JsonTest {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->requestJson('/editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
         self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }

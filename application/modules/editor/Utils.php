@@ -318,7 +318,7 @@ class editor_Utils {
      * @return array $text
      */
     public static  function tagBreakUp($text,$tagRegex='/(<[^<>]*>|&[^;]+;)/'){
-        return preg_split($tagRegex, $text, NULL,  PREG_SPLIT_DELIM_CAPTURE);
+        return preg_split($tagRegex, $text, flags:  PREG_SPLIT_DELIM_CAPTURE);
     }
     /**
      * Zerlegt die Wortteile des segment-Arrays anhand der Wortgrenzen in ein Array,
@@ -338,7 +338,7 @@ class editor_Utils {
         //this implies that only tagBreakUp may be called before and
         // no other array structure manipulating method may be called between tagBreakUp and wordBreakUp!!!
         for ($i = 0; $i < count($segment); $i++) {
-            $split = preg_split($regexWordBreak, $segment[$i], NULL, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+            $split = preg_split($regexWordBreak, $segment[$i], flags: PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
             array_splice($segment, $i, 1, $split);
             $i = $i + count($split);
         }

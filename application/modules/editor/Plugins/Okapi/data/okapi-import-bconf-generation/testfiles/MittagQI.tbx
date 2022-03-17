@@ -93,6 +93,48 @@
                 </langSet>
             </termEntry>
             <termEntry id="2">
+				<descrip type="Definition">entry Level without descripGrp Continuous development means a continuous cycle of improvement according to the steps development, usage, extension, reusage.</descrip>
+                    <descrip type="context">entry Level without descripGrp sedfasdfgsdfreusage.</descrip>
+                    <descrip type="asydf">entry Level without descripGrp ssssssssssssssss.</descrip>
+                    <descripGrp>
+						<descrip type="definition" xml:lang="de">entry Level within descripGrp Das ist die Definition.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+					</descripGrp>
+					<descripGrp>
+						<descrip type="context" xml:lang="de">entry Level within descripGrp Das ist der Context.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">awsdfsdf</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">asdfsadf</transacNote>
+						</transacGrp>
+					</descripGrp>
+					<descripGrp>
+						<descrip type="asdfasdf" xml:lang="de">entry Level within descripGrp Das ist die asdfasdf.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">sdfsdf</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">ssssss</transacNote>
+						</transacGrp>
+					</descripGrp>
                 <transacGrp>
                     <transac type="transactionType">origination</transac>
                     <transacNote type="responsibility" target="">Marc Mittag</transacNote>
@@ -104,9 +146,48 @@
                     <date>2021-02-03</date>
                 </transacGrp>
                 <langSet xml:lang="de">
-                    <descrip type="Definition">Continuous development means a continuous cycle of improvement according to the steps development, usage, extension, reusage.</descrip>
-                    <descrip type="context">sedfasdfgsdfreusage.</descrip>
-                    <descrip type="asydf">ssssssssssssssss.</descrip>
+                    <descrip type="Definition">language Level without descripGrp Definition Continuous development means a continuous cycle of improvement according to the steps development, usage, extension, reusage.</descrip>
+                    <descrip type="context">language Level without descripGrp context sedfasdfgsdfreusage.</descrip>
+                    <descrip type="irgendwasattribut">language Level without descripGrp irgendwasattribut ssssssssssssssss.</descrip>
+                    <descripGrp>
+						<descrip type="definition" xml:lang="de">language Level within descripGrp Definition auf Sprachebene.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+					</descripGrp>
+					<descripGrp>
+						<descrip type="context" xml:lang="de">language Level within descripGrp Context.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">awsdfsdf</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">asdfsadf</transacNote>
+						</transacGrp>
+					</descripGrp>
+					<descripGrp>
+						<descrip type="asdfasdf" xml:lang="de">language Level within descripGrp asdfasdf.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">sdfsdf</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">ssssss</transacNote>
+						</transacGrp>
+					</descripGrp>
                     <tig>
                         <term id="5">kontinuierliche Weiterentwicklung</term>
                         <termNote type="normativeAuthorization">preferredTerm</termNote>

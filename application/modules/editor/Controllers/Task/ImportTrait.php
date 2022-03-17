@@ -11,7 +11,7 @@ trait editor_Controllers_Task_ImportTrait {
      * @return array
      * @throws Exception
      */
-    public function handleTaskImport(): array
+    protected function handleTaskImport(): array
     {
         //gets and validates the uploaded zip file
         $upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
@@ -48,7 +48,7 @@ trait editor_Controllers_Task_ImportTrait {
      * @return array
      * @throws Zend_Exception
      */
-    public function handleProjectUpload(): array
+    protected function handleProjectUpload(): array
     {
         //gets and validates the uploaded zip file
         $upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
@@ -84,6 +84,14 @@ trait editor_Controllers_Task_ImportTrait {
 
         foreach($this->data['targetLang'] as $target) {
             $task = clone $this->entity;
+
+            // re-init the task meta for the projectTask
+            $meta = $task->meta(true);
+
+            // set the mapping type for the project if provided
+            if(isset($this->data['mappingType'])){
+                $meta->setMappingType($this->data['mappingType']);
+            }
 
             $task->setProjectId($entityId);
             $task->setTaskType(editor_Task_Type::getInstance()->getImportTaskType());
@@ -208,6 +216,7 @@ trait editor_Controllers_Task_ImportTrait {
      * @throws ZfExtended_ErrorCodeException
      */
     protected function handleDataProviderException(editor_Models_Import_DataProvider_Exception $e){
+        //FIXME ZfExtended_Models_Entity_Conflict::addCodes(); is missing / ecode is duplicated!
         throw ZfExtended_Models_Entity_Conflict::createResponse('E1369',[
             'targetLang[]' => 'No work files found for one of the target languages. This happens when the user selects multiple target languages in the dropdown and then imports a bilingual file via drag and drop.',
         ],[],$e);
