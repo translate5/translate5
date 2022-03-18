@@ -102,8 +102,8 @@ class LoginController extends ZfExtended_Controllers_Login {
         /* @var $acl ZfExtended_Acl */
         $roles=editor_User::instance()->getRoles();
 
-        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
-        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
+        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, $acl::INITIAL_PAGE_RESOURCE, 'termPortal');
+        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, $acl::INITIAL_PAGE_RESOURCE, 'instantTranslatePortal');
 
 
         $hash = $this->handleAppsRedirectHash();
@@ -380,11 +380,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         /* @var $acl ZfExtended_Acl */
 
         // get all initial_page acl records for all available user roles
-        $initialPages = $acl->getResourceByRoles('initial_page',editor_User::instance()->getRoles());
-
-        $aclModules = array_column($initialPages,'module');
-        // get only the modules from the user allowed initial page acl
-        $aclModules = array_unique($aclModules);
+        $aclModules = $acl->getInitialPageModulesForRoles(editor_User::instance()->getRoles());
 
         $config = Zend_Registry::get('config');
         $modulesOrder = explode(',',$config->runtimeOptions->modulesOrder);
