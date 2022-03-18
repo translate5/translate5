@@ -30,9 +30,10 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.panel.Panel
  */
 Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
-    extend:'Ext.grid.Panel',
+    extend:'Editor.view.admin.projectWizard.GridFormField',
     alias: 'widget.wizardUploadGrid',
     requires:[
+        'Editor.view.admin.projectWizard.GridFormField',
         'Editor.view.admin.projectWizard.UploadGridViewController',
         'Editor.view.admin.projectWizard.UploadGridViewModel',
         'Editor.view.admin.projectWizard.FileButton',
@@ -134,17 +135,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                         disabled: '{!uploadgrid.selection}'
                     }
                 }],
-                dockedItems:[{
-                    dock: 'top',
-                    xtype:'displayfield',
-                    padding: 10,
-                    fieldLabel:false,
-                    fieldCls:'redTextColumn',
-                    bind:{
-                        value : '{uploadErrorMsg}',
-                        hidden: '{!uploadErrorMsg}'
-                    }
-                }],
                 viewConfig: {
                     emptyText: me.strings.gridEmptyText,
                     markDirty: false,
@@ -192,7 +182,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         return me.callParent([ config ]);
     },
 
-
     /***
      * Custom isValid implementation for the upload grid. With this, the grid is part of the importWizard form validation, and
      * if there are files with error, the form will not be submitted
@@ -200,59 +189,13 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
      */
     isValid: function() {
         var me = this,
-            errors = me.getErrors(),
-            isValid = Ext.isEmpty(errors);
-        if (!me.preventMark) {
-            if (isValid) {
-                me.clearInvalid();
-            } else {
-                me.markInvalid(errors);
-            }
+            isValid = me.callParent(arguments);
+        // focus the tab with errors when the grid is invalid
+        if(isValid === false){
+            var tab = me.up('#uploadTabPanel');
+            tab && tab.setActiveTab(me);
         }
         return isValid;
-    },
-
-    /***
-     * Check if the grid there are files in state error.
-     * This is only used for internal validation
-     * @returns {*[]}
-     */
-    getErrors:function (){
-        var me = this,
-            errors = [];
-        me.getStore().each(function(record) {
-            if(record.get('type') === Editor.model.admin.projectWizard.File.TYPE_ERROR){
-                errors.push(record);
-            }
-        });
-        return errors;
-    },
-
-    /***
-     * Custom implementation for invalid. This will add invalid css class to the grid
-     * @param error
-     */
-    markInvalid: function (error){
-        if(Ext.isEmpty(error)){
-            return;
-        }
-        var me = this,
-            gridview  = me.getView(),
-            tpl = Ext.isArray(error) ? error.join('<br/>') : error;
-
-        gridview.addCls('invalidGridBorder');
-        me.getViewModel().set('uploadErrorMsg',tpl);
-        gridview.refresh();
-    },
-
-    /***
-     * Custom implementation for clear invalid. This will remove the invalid css clss from the grid.
-     */
-    clearInvalid: function() {
-        var me = this,
-            gridview  = me.getView();
-        gridview.removeCls('invalidGridBorder');
-        me.getViewModel().set('uploadErrorMsg',null);
     },
 
     /***

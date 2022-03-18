@@ -47,7 +47,7 @@ class TaskFilterTest extends \ZfExtended_Test_ApiTestcase {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-        $api->addImportFile('editorAPI/SegmentWorkflowTest/simple-en-de.zip');
+        $api->addImportFile('SegmentWorkflowTest/simple-en-de.zip');
         $api->import($task);
         
         $api->addUser('testlector','open','reviewing',[

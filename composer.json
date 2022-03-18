@@ -9,7 +9,8 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"Translate5\\" : "Translate5"
+			"MittagQI\\Translate5\\" : "application/modules/editor/src",
+            "Translate5\\MaintenanceCli\\" : "Translate5/MaintenanceCli"
 		}
 	},
 	"repositories" : [{
@@ -77,6 +78,8 @@
 		"ext-xmlreader": "*",
 		"ext-sockets" : "*",
 		"ext-iconv" : "*",
+      	"ext-zip": "*",
+      	"ext-fileinfo": "*",
 		"phpunit/phpunit": "^9",
 		"shardj/zf1-future" : "dev-master",
 		"symfony/console" : "^5.0",

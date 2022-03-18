@@ -1152,9 +1152,10 @@ Ext.override(Ext.panel.Table, {
             });
         }
         else {
-            var store = this.getStore();
+            var store = this.getStore(),
+                sorters = state.storeState && state.storeState.sorters;
             // skip first load when remote sorters are applied before remote filters (ProjectGrid)
-            if(state.storeState?.sorters && store?.getRemoteSort() && store.getRemoteFilter() && this.getPlugin('gridfilters') && !store.getFilters().length){
+            if(sorters && store && store.getRemoteSort() && store.getRemoteFilter() && this.getPlugin('gridfilters') && !store.getFilters().length){
                 var loadBlocker = function(){return false};
                 store.on('beforeload', loadBlocker); // prevent loading until filters are set, beacuse store loads before are discarded
                 store.on('filterchange', function(store){store.removeListener('beforeload', loadBlocker);}, store, {single:true});

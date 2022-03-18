@@ -43,7 +43,7 @@ class TaskEntityVersionTest extends \ZfExtended_Test_ApiTestcase {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-        $api->addImportFile('editorAPI/MainTest/simple-en-de.zip');
+        $api->addImportFile('MainTest/simple-en-de.zip');
         $api->import($task);
     }
     

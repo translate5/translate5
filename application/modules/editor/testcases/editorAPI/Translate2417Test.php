@@ -140,7 +140,9 @@ class Translate2417Test extends editor_Test_JsonTest {
             'autoStartImport'=>0
         ];
         self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('test-analyse.html'));
+
+        $zipfile = self::$api->zipTestFiles('testfiles/','test.zip');
+        self::$api->addImportFile($zipfile);
         self::$api->import($task,false,false);
         error_log('Task created. '.$this->api()->getTask()->taskName);
     }

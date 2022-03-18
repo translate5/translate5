@@ -178,15 +178,7 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function assertModelsEqualsJsonFile(string $modelName, string $fileToCompare, array $actualModels, string $message=''){
         $expectedModels = self::$api->getFileContent($fileToCompare);
-        $numModels = count($actualModels);
-        if($numModels != count($expectedModels)){
-            $this->assertEquals($numModels, count($expectedModels), $message.' [Number of '.ucfirst($modelName).'s does not match the expectations]');
-        } else {
-            for($i=0; $i < $numModels; $i++){
-                $msg = (empty($message)) ? '' : $message.' ['.ucfirst($modelName).' '.($i + 1).']';
-                $this->assertModelEqualsObject($modelName, $expectedModels[$i], $actualModels[$i], $msg);
-            }
-        }
+        $this->assertModelsEqualsObjects($modelName, $expectedModels, $actualModels, $message);
     }
     /**
      * Compares a model of the given type/name with an expected model encoded as JSON object in a file
@@ -220,6 +212,24 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
     public function assertModelEqualsObject(string $modelName, stdClass $expectedModel, stdClass $actualModel, string $message=''){
         $model = editor_Test_Model_Abstract::create($actualModel, $modelName);
         $model->compare($this, $expectedModel, $message);
+    }
+    /**
+     * Compares expected with actual models of the given type/name
+     * @param string $modelName
+     * @param array $expectedModels
+     * @param array $actualModels
+     * @param string $message
+     */
+    public function assertModelsEqualsObjects(string $modelName, array $expectedModels, array $actualModels, string $message=''){
+        $numModels = count($actualModels);
+        if($numModels != count($expectedModels)){
+            $this->assertEquals($numModels, count($expectedModels), $message.' [Number of '.ucfirst($modelName).'s does not match the expectations]');
+        } else {
+            for($i=0; $i < $numModels; $i++){
+                $msg = (empty($message)) ? '' : $message.' ['.ucfirst($modelName).' '.($i + 1).']';
+                $this->assertModelEqualsObject($modelName, $expectedModels[$i], $actualModels[$i], $msg);
+            }
+        }
     }
     /**
      * Compares an actual stdClass objects with the decoded contents of a file

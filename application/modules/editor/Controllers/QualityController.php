@@ -32,6 +32,8 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_QualityController extends ZfExtended_RestController {
+
+    use editor_Controllers_Traits_TaskTrait;
     
     /**
      * @var string
@@ -171,33 +173,6 @@ class editor_QualityController extends ZfExtended_RestController {
         $task = $this->fetchTask();
         $toolTip = new editor_Models_Quality_TaskTooltip($task, true);
         echo $toolTip->getMarkup();
-    }
-    /**
-     * @throws ZfExtended_Exception
-     * @return editor_Models_Task
-     */
-    private function fetchTask() : editor_Models_Task {
-        $taskGuid = $this->fetchTaskGuid();
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        return $task;
-    }
-    /**
-     *
-     * @throws ZfExtended_NotAuthenticatedException
-     * @return string
-     */
-    private function fetchTaskGuid() : string {
-        $taskGuid = $this->getRequest()->getParam('taskGuid'); //for possiblity to download task outside of editor
-        if(is_null($taskGuid)){
-            $session = new Zend_Session_Namespace();
-            $taskGuid = $session->taskGuid;
-        }
-        if(empty($taskGuid)){
-            throw new ZfExtended_NotAuthenticatedException();
-        }
-        return $taskGuid;
     }
     /**
      *

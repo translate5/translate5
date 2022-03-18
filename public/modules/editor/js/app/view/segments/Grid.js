@@ -410,12 +410,14 @@ Ext.define('Editor.view.segments.Grid', {
      * @param {Object} config, for config see positionRowAfterScroll, its completly given to that method
      */
     scrollTo: function(rowindex, config) {
-        if(rowindex < 0) return;
+        if(rowindex < 0) {
+            return;
+        }
         var me = this,
             options = {
                 animate: false, //may not be animated, to place the callback at the correct place 
                 callback: function(alwaysTrue, model, row) {
-                    if(model?.get('editable')){
+                    if(model && model.get('editable')){
                         me.selectOrFocus(rowindex);
                     }
                     me.positionRowAfterScroll(rowindex, row, config);
@@ -531,15 +533,19 @@ Ext.define('Editor.view.segments.Grid', {
      */
     focusSegment: function(segmentNrInTask, forEditing = false, failureEventName = '', afterFocusCallback = Ext.emptyFn) {
         var me = this,
-        segIsInFocusConfig = {};
+            selectedSegmentNrInTask = me.selection && me.selection.get('segmentNrInTask'),
+            segIsInFocusConfig = {};
+
         segIsInFocusConfig.callback = segIsInFocusConfig.notScrollCallback = function(){
             if(forEditing) {
                 me.editingPlugin.startEdit(me.selection, null, me.editingPlugin.self.STARTEDIT_SCROLLUNDER);
-                me.editingPlugin.editor?.reposition();
+                if(me.editingPlugin.editor){
+                    me.editingPlugin.editor.reposition();
+                }
             }
             afterFocusCallback();
         };
-        if(!segmentNrInTask || me.selection?.get('segmentNrInTask') == segmentNrInTask){
+        if(!segmentNrInTask || selectedSegmentNrInTask == segmentNrInTask){
             segmentNrInTask && segIsInFocusConfig.callback();
             return;
         }
@@ -557,8 +563,7 @@ Ext.define('Editor.view.segments.Grid', {
      * UnFocus any focussed segment in the grid
      */
     unfocusSegment: function() {
-        if(!this.locked) return;
-        segmentGrid.unSelectOrFocus();
+        this.unSelectOrFocus();
     },
     /**
      * Find the segment index in the database

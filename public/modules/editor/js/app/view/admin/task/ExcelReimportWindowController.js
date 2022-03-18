@@ -106,7 +106,7 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
             },
             failure: function(form, submit) {
                 win.setLoading(false);
-                if(submit.result?.httpStatus === 422) {
+                if(submit.result && submit.result.httpStatus === 422) {
                     var errors = submit.result.errorsTranslated;
                     form.markInvalid(errors);
                     if(errors.excelreimportUpload) {
