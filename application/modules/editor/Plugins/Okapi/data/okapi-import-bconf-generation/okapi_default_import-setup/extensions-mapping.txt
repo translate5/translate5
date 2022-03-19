@@ -53,7 +53,7 @@
 .xhtm	okf_html
 .ott	okf_openoffice
 .dita	okf_xmlstream-dita
-.strings	okf_regex-macStrings
+.strings	okf_regex@translate5-macStrings
 .docx	okf_openxml@translate5
 .xini	okf_xini
 .potm	okf_openxml
