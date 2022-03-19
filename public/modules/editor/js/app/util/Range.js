@@ -382,26 +382,6 @@ Ext.define('Editor.util.Range', {
     // Helpers for the content of/in a range
     // =========================================================================
     
-    /** 
-     * Replace whitespace-images in given range with whitespace-text. Returns the new html.
-     * @params {Object} range
-     * @returns {String} html 
-     */
-    getContentWithWhitespaceImagesAsText: function(range) {
-        var allWhitespaceImages,
-            htmlForImage,
-            html = range.toHtml(),
-            rangeForWhitespace = rangy.createRange();
-        allWhitespaceImages = range.getNodes([1], function(node) {
-            return (node.nodeName == 'IMG' && node.classList.contains('whitespace'));
-        });
-        Ext.Array.each(allWhitespaceImages, function(imgNode) {
-            rangeForWhitespace.selectNode(imgNode);
-            htmlForImage = rangeForWhitespace.toHtml();
-            html = html.replace(imgNode.outerHTML, ' ');
-        });
-        return html;
-    },
     /**
      * Fix selections when they start or end in/at an internal tag. 
      * = Workaround because selected tags might not be fully fetched for ranges,
@@ -479,7 +459,7 @@ Ext.define('Editor.util.Range', {
         el.select('.deleted').setStyle('visibility', 'hidden');
         selectedText = rangeForSelection.text();
         selectedContent = rangeForSelection.toHtml();
-        editorContentAsText = me.getEditorContentAsText(false);
+        editorContentAsText = me.getEditorContentAsText();
         el.select('.deleted').setStyle('visibility', 'visible');
         // if the text is not the same in the selection as in the Editor, not everything is selected 
         if (selectedText !== editorContentAsText) {
@@ -768,7 +748,107 @@ Ext.define('Editor.util.Range', {
     },
 
     // -------------------------------------------------------------------------
-    // Get and set the position of the caret in the Editor
+    // Deep Cloning / Text retrieval of Nodes with filtering
+    // -------------------------------------------------------------------------
+
+    /**
+     * @param {Node} source
+     * @param {Node} target
+     * @param {Document} doc
+     * @param {boolean} replaceWhitespace: If set, whitespace tags are replaced with a single blank
+     * @param {boolean} onlyRelevantContent: If set, del-tags, markers & other invisible stuff is skipped
+     */
+    cloneInnerNodesFiltered: function(source, target, doc, replaceWhitespace, onlyRelevantContent){
+        if(source.hasChildNodes()){
+            for(var i=0; i < source.childNodes.length; i++){
+                if(source.childNodes[i].nodeType === Node.ELEMENT_NODE && (!onlyRelevantContent || this.isNodeRelevantContent(source.childNodes[i]))){
+                    if(replaceWhitespace && this.isNodeWhitespace(source.childNodes[i])){
+                        target.appendChild(doc.createTextNode(' '));
+                    } else {
+                        var child = source.childNodes[i].cloneNode(false);
+                        this.cloneInnerNodesFiltered(source.childNodes[i], child, doc, replaceWhitespace, onlyRelevantContent);
+                        target.appendChild(child);
+                    }
+                } else if(source.childNodes[i].nodeType === Node.TEXT_NODE){
+                    target.appendChild(source.childNodes[i].cloneNode(false));
+                }
+            }
+        }
+    },
+    /**
+     * @param {Node} node
+     * @param {boolean} replaceWhitespace: If set, whitespace tags are replaced with a single blank
+     * @param {boolean} onlyRelevantContent: If set, del-tags, markers & other invisible stuff is skipped
+     * @returns {string}
+     */
+    getInnerTextFiltered: function(node, replaceWhitespace, onlyRelevantContent){
+        var txt = '';
+        if(node.hasChildNodes()){
+            for(var i=0; i < node.childNodes.length; i++){
+                if(node.childNodes[i].nodeType === Node.ELEMENT_NODE && (!onlyRelevantContent || this.isNodeRelevantContent(node.childNodes[i]))){
+                    if(replaceWhitespace && this.isNodeWhitespace(node.childNodes[i])){
+                        txt += ' ';
+                    } else {
+                        txt += this.getInnerTextFiltered(node.childNodes[i], replaceWhitespace, onlyRelevantContent);
+                    }
+                } else if(node.childNodes[i].nodeType === Node.TEXT_NODE){
+                    txt += node.childNodes[i].nodeValue;
+                }
+            }
+        }
+        return txt;
+    },
+    /**
+     * Retrieves if a node represents a whitespace tag
+     * @param {Node} node
+     * @returns {boolean}
+     */
+    isNodeWhitespace: function(node){
+        return(node.nodeType === Node.ELEMENT_NODE && node.nodeName.toLowerCase() === 'img' && node.classList.contains('whitespace'));
+    },
+    /**
+     *
+     * @param {Node} node
+     * @returns {boolean}
+     */
+    isNodeRelevantContent: function(node){
+        return (!this.isNodeTrackChangesDelete(node) && this.isNodeRelevant(node));
+    },
+    /**
+     *
+     * @param {Node} node
+     * @returns {boolean}
+     */
+    isNodeRelevant: function(node){
+        if(node.nodeType === Node.ELEMENT_NODE && (
+            node.id === 't5caret'
+            || node.classList.contains('searchreplace-hide-element')
+            || (node.nodeName.toLowerCase() === 'img' && node.classList.contains('duplicatesavecheck'))
+            || (node.nodeName.toLowerCase() === 'span' && node.classList.contains('rangySelectionBoundary'))
+        )) {
+            return false;
+        }
+        return true;
+    },
+    /**
+     *
+     * @param {Node} node
+     * @returns {boolean}
+     */
+    isNodeTrackChanges: function(node){
+        return(node.nodeType === Node.ELEMENT_NODE && (node.nodeName.toLowerCase() === 'del' || node.nodeName.toLowerCase() === 'ins'));
+    },
+    /**
+     *
+     * @param {Node} node
+     * @returns {boolean}
+     */
+    isNodeTrackChangesDelete: function(node){
+        return(node.nodeType === Node.ELEMENT_NODE && node.nodeName.toLowerCase() === 'del');
+    },
+
+    // -------------------------------------------------------------------------
+    // Get and set the position of the caret in the Editor (coded without rangy)
     // -------------------------------------------------------------------------
 
     /**
@@ -820,7 +900,6 @@ Ext.define('Editor.util.Range', {
             let doc = this.getEditorDoc(),
                 caret = doc.getElementById('t5caret');
             if (caret) {
-
                 /*
                 This would be a very easy way to get the real caret to the plaseholder position: setting the selection on it and remove the element
                 Unfortunately this creates errors within rangy, so it's no option for now
@@ -896,7 +975,7 @@ Ext.define('Editor.util.Range', {
         while((node = rightOf ? node.nextSibling : node.previousSibling) != null){
             if(node.nodeType == Node.TEXT_NODE){
                 return node;
-            } else if(node.nodeType == Node.ELEMENT_NODE && this.isRelevantElement(node)){
+            } else if(this.isNodeRelevant(node)){
                 if(rightOf && node.firstChild){
                     return this.findAdjacentContentNode({ previousSibling:node.firstChild }, false); // first argument is trick to get the node itself cheked
                 } else if(!rightOf && node.lastChild) {
@@ -906,18 +985,6 @@ Ext.define('Editor.util.Range', {
             }
         }
         return null;
-    },
-    /**
-     *
-     * @param {Element} element
-     * @returns {boolean}
-     */
-    isRelevantElement: function(element){
-        if((element.nodeName.toLowerCase() == 'img' && element.className.indexOf('duplicatesavecheck') > -1)
-            || (element.nodeName.toLowerCase() == 'span' && element.className.indexOf('rangySelectionBoundary') > -1)) {
-            return false;
-        }
-        return true;
     },
     /**
      *
