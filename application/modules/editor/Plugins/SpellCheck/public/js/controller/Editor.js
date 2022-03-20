@@ -463,10 +463,13 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
 
         // TrackChanges must remove it's placeholder.
         me.fireEvent('removePlaceholdersInEditor');
+
+        // "ignore" multiple whitespaces, because we delete them anyway on save.
+        me.collapseMultipleWhitespaceInEditor();
         
         editorContentAsText = me.getEditorContentAsText();
         
-        if (editorContentAsText.trim() === '') {
+        if (editorContentAsText.split('&nbsp;').join('').trim() === '') {
             me.consoleLog('startSpellCheck stopped because editorContentAsText = ""');
             me.terminateSpellCheck();
             return true;
@@ -477,9 +480,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         spellCheckProcessID = Ext.Date.format(new Date(), 'time');
         me.spellCheckInProgressID = spellCheckProcessID;
         me.consoleLog('me.spellCheckInProgressID: ' + spellCheckProcessID);
-
-        // "ignore" multiple whitespaces, because we delete them anyway on save.
-        me.collapseMultipleWhitespaceInEditor();
 
         me.setPositionOfCaret(bookmarkForCaret);
         
