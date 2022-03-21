@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
+
 /***
  * Language resource controller
  */
@@ -453,7 +455,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if(isset($taskList)){
             if(isset($taskList->value) && is_string($taskList->value)){
                 $resultList=$searchEntity($taskList->value,'editor_Models_Task','taskGuid');
-                $handleFilter($taskList,$resultList,'editor_Models_LanguageResources_Taskassoc','loadByTaskGuids','languageResourceId');
+                $handleFilter($taskList,$resultList,'MittagQI\Translate5\LanguageResource\TaskAssociation','loadByTaskGuids','languageResourceId');
             }
             else {
                 $this->entity->getFilter()->deleteFilter('taskList');
@@ -490,8 +492,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     private function prepareTaskInfo($languageResourceids) {
-        /* @var $assocs editor_Models_LanguageResources_Taskassoc */
-        $assocs = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+
+        /* @var $assocs MittagQI\Translate5\LanguageResource\TaskAssociation */
+        $assocs = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
 
         $taskinfo = $assocs->getTaskInfoForLanguageResources($languageResourceids);
         if(empty($taskinfo)) {
@@ -865,8 +868,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
         }
 
-        $assoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
+        $assoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $taskinfo = $assoc->getTaskInfoForLanguageResources([$this->entity->getId()]);
         //FIXME replace lockingUser guid with concrete username and show it in the frontend!
         $this->view->rows = $taskinfo;
