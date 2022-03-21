@@ -324,9 +324,7 @@ $('.click-starts-translation').click(function(event){
 
 function grabUploadedFiles(event){
     uploadedFiles = event.target.files;
-    if (instantTranslationIsActive) {
-        startFileTranslation();
-    }
+    startFileTranslation();
 }
 
 function startFileTranslation() {
