@@ -635,9 +635,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.collapseMultipleWhitespaceInEditor();
         
         // new DOM after replacement => find and apply the matches again:
+        // TODO FIXME. Why is this done exactly? Should be superflous as the replacements have been suggested by the LanguageTool ?
         me.startSpellCheck();
         
-        me.setPositionOfCaret(bookmarkForCaret); // TODO: does not land right if the replacement has not the same length as what was replaced
+        me.setPositionOfCaret(bookmarkForCaret);
     },
     
     // =========================================================================

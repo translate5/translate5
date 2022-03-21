@@ -456,12 +456,13 @@ Ext.define('Editor.util.Range', {
             return false; // might be true, but we couldn't check with the current code.
         }
         el = me.getEditorBodyExtDomElement();
+        // TODO FIXME: getEditorContentAsText already works without manipulating content, rangeForSelection should also be processed without
         el.select('.deleted').setStyle('visibility', 'hidden');
         selectedText = rangeForSelection.text();
         selectedContent = rangeForSelection.toHtml();
         editorContentAsText = me.getEditorContentAsText();
         el.select('.deleted').setStyle('visibility', 'visible');
-        // if the text is not the same in the selection as in the Editor, not everything is selected 
+        // if the text is not the same in the selection as in the Editor, not everything is selected
         if (selectedText !== editorContentAsText) {
             return false;
         }
@@ -844,7 +845,8 @@ Ext.define('Editor.util.Range', {
      * @returns {boolean}
      */
     isNodeTrackChangesDelete: function(node){
-        return(node.nodeType === Node.ELEMENT_NODE && node.nodeName.toLowerCase() === 'del');
+        // TODO FIXME: Why do trackChanges node have "del" as NodeName AND "deleted" as marker class ? this is madness, unify
+        return(node.nodeType === Node.ELEMENT_NODE && (node.nodeName.toLowerCase() === 'del' || node.classList.contains('deleted')));
     },
 
     // -------------------------------------------------------------------------

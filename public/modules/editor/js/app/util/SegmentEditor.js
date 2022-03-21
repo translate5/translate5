@@ -195,7 +195,10 @@ Ext.define('Editor.util.SegmentEditor', {
      * @returns {String}
      */
     getEditorContentAsText: function() {
-        return this.getInnerTextFiltered(this.getEditorBody(), true, true);
+        var txt = this.getInnerTextFiltered(this.getEditorBody(), true, true);
+        // TODO/QUIRK: the original implementation of this function used rangy, which uses a "visible text" approach, reducing multiple blanks to one.
+        // As long as we use rangy to retrieve the text of selections we have to reflect that but later on it may be neccessary to remove this in an unified codebase
+        return txt.replace(/ +/g, ' ');
     },
     /**
      * Returns the first/last node in the editor that is not of the kind to be ignored.
