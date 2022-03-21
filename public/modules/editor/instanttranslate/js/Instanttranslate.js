@@ -828,7 +828,7 @@ function requestFileTranslate(){
         error: function(jqXHR, textStatus)
         {
             // Handle errors here
-            showSourceError('ERRORS: ' + textStatus);
+            showSourceError(jqXHR);
             $('#sourceFile').val('');
             stopLoadingState();
         }
@@ -1211,8 +1211,24 @@ function showLanguageResourceSelectorError(errorMode) {
 function showTargetError(errorText) {
     $('#targetError').html(errorText).show();
 }
-function showSourceError(errorText) {
-    $('#sourceError').html(errorText).show();
+
+/***
+ * Show the given error in the sourceError container. If the error is xhr response object,
+ * the error will be parsed from there and printed out for the user.
+ *
+ * @param error
+ */
+function showSourceError(error) {
+    // build custom error out of ajax response
+    if(typeof error === 'object' && !Array.isArray(error) && error !== null){
+        var responseJSON = error.responseJSON,
+            errorCode = !Editor.data.errorCodesUrl ? responseJSON.errorCode :
+                '<a href="'+ Editor.data.errorCodesUrl.replace('{0}',responseJSON.errorCode)+'" target="_blank">'+responseJSON.errorCode+'</a>'
+
+        error = '<h1>'+errorCode+': '+responseJSON.message+'</h1><br/>'
+        error += responseJSON.errorMessage;
+    }
+    $('#sourceError').html(error).show();
 }
 function clearAllErrorMessages() {
     $('.instant-translation-error').html('').hide();
