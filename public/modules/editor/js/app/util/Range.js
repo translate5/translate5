@@ -777,6 +777,7 @@ Ext.define('Editor.util.Range', {
         }
     },
     /**
+     * Retrieves the filtered text-contents of a Node. Unwanted Contents (del-tags, rangy & caret markers) and whitespace-tags will be filtered out if set
      * @param {Node} node
      * @param {boolean} replaceWhitespace: If set, whitespace tags are replaced with a single blank
      * @param {boolean} onlyRelevantContent: If set, del-tags, markers & other invisible stuff is skipped
