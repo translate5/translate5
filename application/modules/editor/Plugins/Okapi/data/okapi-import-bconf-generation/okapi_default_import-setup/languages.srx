@@ -4556,10 +4556,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <rule break="no">
 <beforebreak>\b[dD]\.l\.e\.?</beforebreak>
 <afterbreak></afterbreak>
@@ -4583,10 +4579,6 @@
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
 </rule>
 <!-- From ULi http://uli.unicode.org/home/uli-documents -->
 <rule break="no">
@@ -5100,10 +5092,6 @@
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
 </rule>
 <!--titles - DANISH-->
 <rule break="no">
@@ -7689,10 +7677,6 @@
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
 </rule>
 <!-- From ULi http://uli.unicode.org/home/uli-documents -->
 <rule break="no">
@@ -10618,10 +10602,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <!-- From ULi http://uli.unicode.org/home/uli-documents -->
 <rule break="no">
 <beforebreak>\b[Aa][Aa]\.</beforebreak>
@@ -11753,10 +11733,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <!--titles-->
 <rule break="no">
 <beforebreak>\b([Hh]on|[Dd]r|[Mm]r|[Mm]s|[Mm]rs|[Ss]t|[Gg]en|[Cc]ol|[Mm]aj|[Bb]rig|[Ss]gt|[Cc]apt|[Cc]mnd|[Ll]t|[Ss]en|[Rr]ev|[Rr]ep|[Rr]evd|[Pp]r|[Bb]r|[Pp]res|[Pp]rof|JS|[Jj]r|[Ss]r)\.[,|:]?</beforebreak>
@@ -11915,10 +11891,6 @@
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
 </rule>
 <!-- From ULi http://uli.unicode.org/home/uli-documents -->
 <rule break="no">
@@ -12752,10 +12724,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <!--titles - FRENCH-->
 <rule break="no">
 <beforebreak>\b(M|Mme|Prés|Pr)\.</beforebreak>
@@ -13586,10 +13554,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <!--titles - CROATIAN-->
 <rule break="no">
 <beforebreak>\b([Dd]r|[Gg]|[Gg]osp|[Gg]đa|[Gg]đica|[Pp]redsj|[Pp]rof|[Ss])\.[,|:]?</beforebreak>
@@ -13774,10 +13738,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <!--titles - HUNGARIAN-->
 <rule break="no">
 <beforebreak>\b([Dd]r)\.[,|:]?</beforebreak>
@@ -13961,10 +13921,6 @@
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
 </rule>
 <!--titles - ITALIAN - special cases-->
 <rule break="no">
@@ -15454,10 +15410,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <rule break="no">
 <beforebreak>\p{Nd}*[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*\p{Nd}+[:：]\p{Nd}+(－\p{Nd}+)?。</beforebreak>
 <afterbreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]</afterbreak>
@@ -15563,10 +15515,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <rule break="no">
 <beforebreak>[a-zA-z].</beforebreak>
 <afterbreak>[a-zA-Z]</afterbreak>
@@ -15618,10 +15566,6 @@
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
 </rule>
 <!--titles - LITHUANIAN-->
 <rule break="no">
@@ -15796,10 +15740,6 @@
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
 </rule>
 <!--titles - LATVIAN-->
 <rule break="no">
@@ -15984,10 +15924,6 @@
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
 </rule>
 <!--titles - DUTCH-->
 <rule break="no">
@@ -17668,10 +17604,6 @@
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
 </rule>
 <!--titles - POLISH-->
 <rule break="no">
@@ -19957,10 +19889,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <!--titles - PORTUGUESE-->
 <rule break="no">
 <beforebreak>\b([Dd]r|[Ss]ra?|[Ss]rta|[Pp]res|[Pp]rofa?)\.</beforebreak>
@@ -20494,10 +20422,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <!--titles - ROMANIAN-->
 <rule break="no">
 <beforebreak>\b([Dd]r|[Dd]l|[Dd]ra|[Dd]na|[Pp]reş|[Pp]rof)\.</beforebreak>
@@ -20785,10 +20709,6 @@
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
 </rule>
 <rule break="no">
 <beforebreak>и З.</beforebreak>
@@ -21115,10 +21035,6 @@
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
 </rule>
 <!--titles - SLOVAK-->
 <rule break="no">
@@ -22978,10 +22894,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <!--titles - SLOVENIAN-->
 <rule break="no">
 <beforebreak>\b([Dd]r|[Gg]|[Gg]dč|[Gg]a|[Pp]rof)\.</beforebreak>
@@ -23315,10 +23227,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <!--titles - SERBIAN-->
 <rule break="no">
 <beforebreak>\b([Дд]р|[Мм]р|[Гг]ђца|[Гг]ђа|[Пп]ред|[Пп]роф)\.</beforebreak>
@@ -23498,10 +23406,6 @@
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
-</rule>
 <!--titles - TWI-->
 <rule break="no">
 <beforebreak>\b([Tt]ite|[Ɔɔ]benf|[Oo]nuab|[Aa]nua)\.</beforebreak>
@@ -23675,10 +23579,6 @@
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/*T5-IGNORE*/~</afterbreak>
 </rule>
 <rule break="no">
 <beforebreak>\p{Nd}*[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*\p{Nd}+[:：]\p{Nd}+(－\p{Nd}+)?。</beforebreak>
