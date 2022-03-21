@@ -162,9 +162,9 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         }
         me.assocStore.each(function(record){
             var searchable = record.get('searchable'),
-                searchInTm = !me.lastSearch.languageResourceid || (record.get('id') == me.lastSearch.languageResourceid);
+                searchInTm = !me.lastSearch.languageResourceid || (record.get('languageResourceId') == me.lastSearch.languageResourceid);
             if(searchable && searchInTm){
-                me.sendRequest(record.get('id'));
+                me.sendRequest(record.get('languageResourceId'));
             }
         });
     },

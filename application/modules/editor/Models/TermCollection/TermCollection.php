@@ -291,8 +291,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      */
     public function addTermCollectionTaskAssoc($collectionId, string $taskGuid)
     {
-        $model=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $model editor_Models_LanguageResources_Taskassoc */
+        $model=ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $model MittagQI\Translate5\LanguageResource\TaskAssociation */
         $model->setLanguageResourceId($collectionId);
         $model->setTaskGuid($taskGuid);
         $model->setSegmentsUpdateable(false);
@@ -347,8 +347,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     public function checkAndRemoveTaskImported(string $taskGuid)
     {
         //since the reference assoc → langres is not cascade delete, we have to delete them manually
-        $taskAssocTable = ZfExtended_Factory::get('editor_Models_Db_Taskassoc');
-        /* @var $taskAssocTable editor_Models_Db_Taskassoc */
+        $taskAssocTable = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Db\TaskAssociation');
+        /* @var $taskAssocTable MittagQI\Translate5\LanguageResource\Db\TaskAssociation */
         $s = $taskAssocTable->select()->where('autoCreatedOnImport = 1 AND taskGuid = ?', $taskGuid);
         $rows = $this->db->fetchAll($s)->toArray();
         $taskAssocTable->delete(['autoCreatedOnImport = 1 AND taskGuid = ?' => $taskGuid]);

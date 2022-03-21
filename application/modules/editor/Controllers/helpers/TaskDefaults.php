@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
+
 /**
  */
 class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helper_Abstract {
@@ -47,8 +49,8 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
             return;
         }
 
-        $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
+        $taskAssoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $taskAssoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
         /* @var $languages editor_Models_LanguageResources_Languages */
         $language = ZfExtended_Factory::get('editor_Models_Languages');
