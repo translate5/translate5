@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\LanguageResource;
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
 
 /**#@+
  * @author Marc Mittag
@@ -490,8 +490,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      */
     protected function resetTaskTbxHash()
     {
-        $taskassoc = ZfExtended_Factory::get('LanguageResource');
-        /* @var $taskassoc LanguageResource */
+        $taskassoc = ZfExtended_Factory::get('TaskAssociation');
+        /* @var $taskassoc TaskAssociation */
         $assocs = $taskassoc->getAssocTasksByLanguageResourceId($this->termCollection->getId());
         if (empty($assocs)){
             return;
