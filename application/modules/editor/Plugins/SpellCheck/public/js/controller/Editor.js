@@ -447,8 +447,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     startSpellCheck: function() {
         var me = this,
             spellCheckProcessID,
-            editorContentAsText,
-            bookmarkForCaret;
+            editorContentAsText;
         
         if (!me.isSupportedLanguage) { // Should not be the case when we got here already, but that is not enough: it MUST NOT happen.
             me.consoleLog('startSpellCheck failed eg because language is not supported or SpellCheck-Tool does not run.');
@@ -458,18 +457,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (me.disableSpellCheckByIdle) {
             me.setEditorDisabled(true);
         }
-        // where is the caret at the moment?
-        bookmarkForCaret = me.getPositionOfCaret();
-
         // TrackChanges must remove it's placeholder.
         me.fireEvent('removePlaceholdersInEditor');
-
-        // "ignore" multiple whitespaces, because we delete them anyway on save.
-        me.collapseMultipleWhitespaceInEditor();
         
-        editorContentAsText = me.getEditorContentAsText();
+        editorContentAsText = me.getEditorContentAsText(false);
         
-        if (editorContentAsText.split('&nbsp;').join('').trim() === '') {
+        if (editorContentAsText.trim() === '') {
             me.consoleLog('startSpellCheck stopped because editorContentAsText = ""');
             me.terminateSpellCheck();
             return true;
@@ -480,8 +473,13 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         spellCheckProcessID = Ext.Date.format(new Date(), 'time');
         me.spellCheckInProgressID = spellCheckProcessID;
         me.consoleLog('me.spellCheckInProgressID: ' + spellCheckProcessID);
-
-        me.setPositionOfCaret(bookmarkForCaret);
+        
+        // where is the caret at the moment?
+        me.bookmarkForCaret = me.getPositionOfCaret();
+        
+        // "ignore" multiple whitespaces, because we delete them anyway on save.
+        // TODO FIXME: If whitespace is removed, the just captured caret bookmark is invalid and the caret will be inside the next word (if there is a next word)
+        me.collapseMultipleWhitespaceInEditor();
         
         me.allMatches = null;
         me.allMatchesRanges = null;
@@ -491,7 +489,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     /**
      * What to do after the SpellCheck has been run.
      */
-    finishSpellCheck: function(spellCheckProcessID, bookmarkForCaret) {
+    finishSpellCheck: function(spellCheckProcessID) {
         var me = this,
             sourceSearch = me.getConcordenceSourceSearch();
         
@@ -500,15 +498,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             return;
         }
         me.consoleLog('finishSpellCheck...');
-
+        
+        if (me.bookmarkForCaret != null) {
+            me.setPositionOfCaret(me.bookmarkForCaret);
+            me.bookmarkForCaret = null;
+        }
         // if the user opens segment for editing and immediately after this
         // uses f3 to focus on concordence search then ignore the editor focus
         if(!sourceSearch || !sourceSearch.hasFocus){
             me.getEditorBody().focus();
-        }
-        // restore a caret if passed
-        if (bookmarkForCaret) {
-            me.setPositionOfCaret(bookmarkForCaret);
         }
         
         me.spellCheckInProgressID = false;
@@ -550,8 +548,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * Apply the matches found by the SpellCheck (store them and apply the result to the Editor).
      */
     applySpellCheck: function(spellCheckProcessID) {
-        var me = this,
-            bookmarkForCaret;
+        var me = this;
         
         if (spellCheckProcessID !== me.spellCheckInProgressID) {
             me.consoleLog('NO applySpellCheck, spellCheckProcess is no longer valid (' + spellCheckProcessID + '/' + me.spellCheckInProgressID + ').');
@@ -561,15 +558,23 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         if (me.allMatchesOfTool === null || me.allMatchesOfTool.length === 0) {
             me.consoleLog('allMatchesOfTool: no errors.');
-            bookmarkForCaret = me.getPositionOfCaret();
-            me.cleanSpellCheckMarkupInEditor(); // in case there have been errors marked before // TODO FIXME: this will delete the caret !
-            me.finishSpellCheck(spellCheckProcessID, bookmarkForCaret);
+            me.cleanSpellCheckMarkupInEditor(); // in case there have been errors marked before
+            me.bookmarkForCaret = null;
+            me.finishSpellCheck(spellCheckProcessID);
             return;
         }
+        
         me.storeAllMatchesFromTool();
-
+        me.applySpellCheckResult(spellCheckProcessID);
+    },
+    /**
+     * Apply the results.
+     */
+    applySpellCheckResult: function(spellCheckProcessID) {
+        var me = this;
+        
         if (spellCheckProcessID !== me.spellCheckInProgressID) {
-            me.consoleLog('NO applySpellCheck, spellCheckProcess is no longer valid (' + spellCheckProcessID + '/' + me.spellCheckInProgressID + ').');
+            me.consoleLog('NO applySpellCheckResult, spellCheckProcess is no longer valid (' + spellCheckProcessID + '/' + me.spellCheckInProgressID + ').');
             me.finishSpellCheck(spellCheckProcessID);
             return;
         }
@@ -578,8 +583,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.finishSpellCheck(spellCheckProcessID);
             return;
         }
-
-        bookmarkForCaret = me.getPositionOfCaret();
         
         me.cleanSpellCheckMarkupInEditor(); // in case a spellcheck has been run before already
         
@@ -588,7 +591,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.consoleLog('allMatches applied (' + spellCheckProcessID + ').');
         }
         
-        me.finishSpellCheck(spellCheckProcessID, bookmarkForCaret);
+        me.finishSpellCheck(spellCheckProcessID);
     },
     /**
      * Apply replacement as suggested in the ToolTip.
@@ -598,9 +601,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             rangeForMatch = rangy.createRange(),
             rangeForMatchBookmark,
             replaceText,
-            bookmarkForCaret;
+            bookmarkForCaretOnReplacement;
         
-        bookmarkForCaret = me.getPositionOfCaret();
+        bookmarkForCaretOnReplacement = me.getPositionOfCaret();
         
         // Find and bookmark the range that belongs to the SpellCheck-Node for the current ToolTip.
         rangeForMatch.selectNodeContents(me.activeMatchNode);
@@ -635,10 +638,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.collapseMultipleWhitespaceInEditor();
         
         // new DOM after replacement => find and apply the matches again:
-        // TODO FIXME. Why is this done exactly? Should be superflous as the replacements have been suggested by the LanguageTool ?
         me.startSpellCheck();
         
-        me.setPositionOfCaret(bookmarkForCaret);
+        me.setPositionOfCaret(bookmarkForCaretOnReplacement); // TODO: does not land right if the replacement has not the same length as what was replaced
     },
     
     // =========================================================================
