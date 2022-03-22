@@ -12,6 +12,44 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.6.8] - 2022-03-22
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-2915](https://jira.translate5.net/browse/TRANSLATE-2915): Okapi integration - Optimize okapi android xml and ios string settings** <br>
+Settings for android xml and IOs string files were optimized to protect certain tag structures, cdata and special characters
+
+**[TRANSLATE-2907](https://jira.translate5.net/browse/TRANSLATE-2907): InstantTranslate - Improve FileTranslation in InstantTranslate** <br>
+InstantTranslate FileTranslation always starts direct after selecting (or Drag'nDrop) the file no matter what is configed for runtimeOptions.InstantTranslate.instantTranslationIsActive
+
+**[TRANSLATE-2903](https://jira.translate5.net/browse/TRANSLATE-2903): TermPortal - Batch edit for Process Status and Usage Status attrs** <br>
+TermPortal: batch editing is now possible for Process Status and Usage Status attributes
+
+
+### Bugfixes
+**[TRANSLATE-2920](https://jira.translate5.net/browse/TRANSLATE-2920): Editor general - REVERT:  TRANSLATE-2345-fix-jumping-cursor** <br>
+ROLLBACK: Fix for jumping cursor reverted
+
+**[TRANSLATE-2912](https://jira.translate5.net/browse/TRANSLATE-2912): Import/Export - reviewHTML.txt import in zip file does not work anymore** <br>
+Fixes a problem where reviewHTML.txt file in the zip import package is ignored.
+
+**[TRANSLATE-2911](https://jira.translate5.net/browse/TRANSLATE-2911): Editor general - Cursor jumps to start of segment** <br>
+FIX: Cursor Jumps when SpellChecker runs and after navigating with arrow-keys 
+
+**[TRANSLATE-2905](https://jira.translate5.net/browse/TRANSLATE-2905): InstantTranslate - No usable error message on file upload error due php max file size reached** <br>
+Custom error message when uploading larger files as allowed in instant-translate.
+
+**[TRANSLATE-2890](https://jira.translate5.net/browse/TRANSLATE-2890): Main back-end mechanisms (Worker, Logging, etc.) - Module redirect based on initial_page acl** <br>
+Authentication acl improvements
+
+**[TRANSLATE-2848](https://jira.translate5.net/browse/TRANSLATE-2848): Import/Export - TermCollection not listed in import wizard** <br>
+Language resources will be grouped by task in language-resources to task association panel in the import wizard.
+
+
 ## [5.6.7] - 2022-03-17
 
 ### Important Notes:
