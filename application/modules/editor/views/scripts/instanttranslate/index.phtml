@@ -423,7 +423,7 @@ $( function() {
                     e.stopPropagation();
                     /*UPLOAD FILES HERE*/
                     $('#sourceFile').prop('files', e.originalEvent.dataTransfer.files);
-                    $('#sourceFile').trigger('change');
+                    //$('#sourceFile').trigger('change'); // this is not needed. If activated, the same file will be submitted twice
                 }
             }
         }
@@ -466,6 +466,14 @@ $( function() {
         }
         else {
             chosenSourceIsText = !chosenSourceIsText;
+        }
+        
+        // show "translate" button?
+        if ($source === 'text' && !instantTranslationIsActive) {
+            $('#translationSubmit').show();
+        }
+        else {
+            $('#translationSubmit').hide();
         }
         
         clearAllErrorMessages();
