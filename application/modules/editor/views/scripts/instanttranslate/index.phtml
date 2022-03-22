@@ -423,7 +423,7 @@ $( function() {
                     e.stopPropagation();
                     /*UPLOAD FILES HERE*/
                     $('#sourceFile').prop('files', e.originalEvent.dataTransfer.files);
-                    //$('#sourceFile').trigger('change'); // this is not needed. If activated, the same file will be submitted twice
+                    $('#sourceFile').trigger('change');
                 }
             }
         }
