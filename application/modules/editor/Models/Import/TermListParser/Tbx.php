@@ -490,7 +490,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      */
     protected function resetTaskTbxHash()
     {
-        $taskassoc = ZfExtended_Factory::get('TaskAssociation');
+        $taskassoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
         /* @var $taskassoc TaskAssociation */
         $assocs = $taskassoc->getAssocTasksByLanguageResourceId($this->termCollection->getId());
         if (empty($assocs)){
