@@ -382,6 +382,26 @@ Ext.define('Editor.util.Range', {
     // Helpers for the content of/in a range
     // =========================================================================
     
+    /** 
+     * Replace whitespace-images in given range with whitespace-text. Returns the new html.
+     * @params {Object} range
+     * @returns {String} html 
+     */
+    getContentWithWhitespaceImagesAsText: function(range) {
+        var allWhitespaceImages,
+            htmlForImage,
+            html = range.toHtml(),
+            rangeForWhitespace = rangy.createRange();
+        allWhitespaceImages = range.getNodes([1], function(node) {
+            return (node.nodeName == 'IMG' && node.classList.contains('whitespace'));
+        });
+        Ext.Array.each(allWhitespaceImages, function(imgNode) {
+            rangeForWhitespace.selectNode(imgNode);
+            htmlForImage = rangeForWhitespace.toHtml();
+            html = html.replace(imgNode.outerHTML, ' ');
+        });
+        return html;
+    },
     /**
      * Fix selections when they start or end in/at an internal tag. 
      * = Workaround because selected tags might not be fully fetched for ranges,
@@ -456,13 +476,12 @@ Ext.define('Editor.util.Range', {
             return false; // might be true, but we couldn't check with the current code.
         }
         el = me.getEditorBodyExtDomElement();
-        // TODO FIXME: getEditorContentAsText already works without manipulating content, rangeForSelection should also be processed without
         el.select('.deleted').setStyle('visibility', 'hidden');
         selectedText = rangeForSelection.text();
         selectedContent = rangeForSelection.toHtml();
-        editorContentAsText = me.getEditorContentAsText();
+        editorContentAsText = me.getEditorContentAsText(false);
         el.select('.deleted').setStyle('visibility', 'visible');
-        // if the text is not the same in the selection as in the Editor, not everything is selected
+        // if the text is not the same in the selection as in the Editor, not everything is selected 
         if (selectedText !== editorContentAsText) {
             return false;
         }
@@ -749,257 +768,52 @@ Ext.define('Editor.util.Range', {
     },
 
     // -------------------------------------------------------------------------
-    // Deep Cloning / Text retrieval of Nodes with filtering
+    // Get and set the position of the caret in the Editor
     // -------------------------------------------------------------------------
-
+    
     /**
-     * @param {Node} source
-     * @param {Node} target
-     * @param {Document} doc
-     * @param {boolean} replaceWhitespace: If set, whitespace tags are replaced with a single blank
-     * @param {boolean} onlyRelevantContent: If set, del-tags, markers & other invisible stuff is skipped
-     */
-    cloneInnerNodesFiltered: function(source, target, doc, replaceWhitespace, onlyRelevantContent){
-        if(source.hasChildNodes()){
-            for(var i=0; i < source.childNodes.length; i++){
-                if(source.childNodes[i].nodeType === Node.ELEMENT_NODE && (!onlyRelevantContent || this.isNodeRelevantContent(source.childNodes[i]))){
-                    if(replaceWhitespace && this.isNodeWhitespace(source.childNodes[i])){
-                        target.appendChild(doc.createTextNode(' '));
-                    } else {
-                        var child = source.childNodes[i].cloneNode(false);
-                        this.cloneInnerNodesFiltered(source.childNodes[i], child, doc, replaceWhitespace, onlyRelevantContent);
-                        target.appendChild(child);
-                    }
-                } else if(source.childNodes[i].nodeType === Node.TEXT_NODE){
-                    target.appendChild(source.childNodes[i].cloneNode(false));
-                }
-            }
-        }
-    },
-    /**
-     * Retrieves the filtered text-contents of a Node. Unwanted Contents (del-tags, rangy & caret markers) and whitespace-tags will be filtered out if set
-     * @param {Node} node
-     * @param {boolean} replaceWhitespace: If set, whitespace tags are replaced with a single blank
-     * @param {boolean} onlyRelevantContent: If set, del-tags, markers & other invisible stuff is skipped
-     * @returns {string}
-     */
-    getInnerTextFiltered: function(node, replaceWhitespace, onlyRelevantContent){
-        var txt = '';
-        if(node.hasChildNodes()){
-            for(var i=0; i < node.childNodes.length; i++){
-                if(node.childNodes[i].nodeType === Node.ELEMENT_NODE && (!onlyRelevantContent || this.isNodeRelevantContent(node.childNodes[i]))){
-                    if(replaceWhitespace && this.isNodeWhitespace(node.childNodes[i])){
-                        txt += ' ';
-                    } else {
-                        txt += this.getInnerTextFiltered(node.childNodes[i], replaceWhitespace, onlyRelevantContent);
-                    }
-                } else if(node.childNodes[i].nodeType === Node.TEXT_NODE){
-                    txt += node.childNodes[i].nodeValue;
-                }
-            }
-        }
-        return txt;
-    },
-    /**
-     * Retrieves if a node represents a whitespace tag
-     * @param {Node} node
-     * @returns {boolean}
-     */
-    isNodeWhitespace: function(node){
-        return(node.nodeType === Node.ELEMENT_NODE && node.nodeName.toLowerCase() === 'img' && node.classList.contains('whitespace'));
-    },
-    /**
-     *
-     * @param {Node} node
-     * @returns {boolean}
-     */
-    isNodeRelevantContent: function(node){
-        return (!this.isNodeTrackChangesDelete(node) && this.isNodeRelevant(node));
-    },
-    /**
-     *
-     * @param {Node} node
-     * @returns {boolean}
-     */
-    isNodeRelevant: function(node){
-        if(node.nodeType === Node.ELEMENT_NODE && (
-            node.id === 't5caret'
-            || node.classList.contains('searchreplace-hide-element')
-            || (node.nodeName.toLowerCase() === 'img' && node.classList.contains('duplicatesavecheck'))
-            || (node.nodeName.toLowerCase() === 'span' && node.classList.contains('rangySelectionBoundary'))
-        )) {
-            return false;
-        }
-        return true;
-    },
-    /**
-     *
-     * @param {Node} node
-     * @returns {boolean}
-     */
-    isNodeTrackChanges: function(node){
-        return(node.nodeType === Node.ELEMENT_NODE && (node.nodeName.toLowerCase() === 'del' || node.nodeName.toLowerCase() === 'ins'));
-    },
-    /**
-     *
-     * @param {Node} node
-     * @returns {boolean}
-     */
-    isNodeTrackChangesDelete: function(node){
-        // TODO FIXME: Why do trackChanges node have "del" as NodeName AND "deleted" as marker class ? this is madness, unify
-        return(node.nodeType === Node.ELEMENT_NODE && (node.nodeName.toLowerCase() === 'del' || node.classList.contains('deleted')));
-    },
-
-    // -------------------------------------------------------------------------
-    // Get and set the position of the caret in the Editor (coded without rangy)
-    // -------------------------------------------------------------------------
-
-    /**
-     * Returns a bookmark for the current caret position of the cursor in the Editor.
-     * if a selected range is present, the caret is in the focus node of the element
-     * @returns {Object}
+     * Returns a bookmark for the current position of the cursor in the Editor.
+    // (Use rangy's bookmark if workaround is not applied).
+     * @returns {Object|null} rangy-bookmark|node|null
      */
     getPositionOfCaret: function() {
-        let doc = this.getEditorDoc(),
-            selection = doc.getSelection(),
-            node = (selection.focusNode == null) ? selection.anchorNode : selection.focusNode,
-            offset = (selection.focusNode == null) ? selection.anchorOffset : selection.focusOffset,
-            data = { valid: false };
-        // when nothing useful is selected, we do not save anything
-        // important: when there is a caret already present, this is an superflous call
-        if(!node || doc.getElementById('t5caret') != null){
-            return data;
+        var me = this,
+            selectionForCaret = rangy.getSelection(me.getEditorBody()),
+            rangeForCaret = selectionForCaret.rangeCount ? selectionForCaret.getRangeAt(0) : null;
+        if (rangeForCaret == null) { // eg. after the push-event when newly opening a segment: editor is opened, but user is not in there yet.
+            return null;
+        } else if (me.useWorkaroundForBookmark(rangeForCaret)) {
+            return me.getBookmarkUsingTheWorkaround(rangeForCaret);
+        } else {
+            return rangeForCaret.getBookmark();
         }
-        if(node.nodeName.toLowerCase() !== 'body' && !this.isInBody(node)){
-            return data;
-        }
-        // when the selection points to the bodys first child or to the 0-offset of the bodies first child we ignore to set & restore the position as it can not change on content changes
-        if(offset < 1 && (node.nodeName.toLowerCase() === 'body' || (node.parentNode && node.parentNode.nodeName.toLowerCase() === 'body' && node.parentNode.firstChild === node))){
-            return data;
-        }
-        let caret = doc.createElement('span');
-        caret.id = 't5caret'
-        selection.getRangeAt(0).insertNode(caret);
-        data.valid = true;
-        return data;
     },
     /**
-     * Returns a bookmark for the current caret position within a range
-     * @param {Range} range
-     * @returns {Object}
+     * Set the position of the cursor according to the given bookmark or node.
+     * (Use rangy's bookmark if workaround is not applied).
+     * @param {Object|null} rangy-bookmark|node|null
      */
-    getPositionInRange: function(range){
-        let caret = this.getEditorDoc().createElement('span');
-        caret.id = 't5caret'
-        range.insertNode(caret);
-        return { valid: true };
-    },
-    /**
-     * Set the position of the cursor according to the given bookmark created by getPositionOfCaret
-     * @param {Object|null} data: This is only an historical Artifact that should be removed when the rework of Selection/Range/rangy is complete
-     */
-    setPositionOfCaret: function(data) {
-        if(data && data.valid) {
-            let doc = this.getEditorDoc(),
-                caret = doc.getElementById('t5caret');
-            if (caret) {
-                /*
-                This would be a very easy way to get the real caret to the plaseholder position: setting the selection on it and remove the element
-                Unfortunately this creates errors within rangy, so it's no option for now
-                let selection = doc.getSelection();
-                selection.setBaseAndExtent(caret, 0, caret, 0);
-                caret.remove();
-                return;
-                */
-
-                let node = null,
-                    offset = 0,
-                    after = false;
-                if (caret.parentElement.childNodes.length < 2) {
-                    node = caret.parentElement;
-                } else {
-                    // try to find the left direct neighbouring content node
-                    // we try to find this one because the right neighbour might be joined with the left in case the caret is inbetween two text nodes
-                    node = this.findAdjacentContentNode(caret, false);
-                    if (node) {
-                        // if the node is to the left we need to jump to the right
-                        after = true;
-                        offset = (node.nodeType === Node.TEXT_NODE) ? node.textContent.length : (node.childNodes ? node.childNodes.length : 0);
-                    } else {
-                        // if to the left did not work, try right
-                        node = this.findAdjacentContentNode(caret, true);
-                    }
-                    if (!node) {
-                        // per default, we take the parent element and the index of the node
-                        node = caret.parentElement;
-                        for (let i = 0, nodes = caret.parentElement.childNodes, count = nodes.length; i < count; i++) {
-                            // calculating the position to reference to.
-                            // We can assume, that a preceiding and following text-node would already have been captured with findAdjacentContentNode
-                            if (nodes[i] === caret) {
-                                if (i < count - 1) {
-                                    // if there is an element after, we can use the caret's index
-                                    offset = i;
-                                } else if (i > 0) {
-                                    offset = i - 1;
-                                    after = true;
-                                } else {
-                                    i = 0;
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-                caret.remove();
-                if (node) {
-                    let selection = doc.getSelection();
-                    if(node.nodeType === Node.ELEMENT_NODE && after){
-                        // setting the caret after an element needs some more efforts
-                        let range = (selection.rangeCount) ? selection.getRangeAt(0).cloneRange() : this.getEditorDoc().createRange();
-                        range.selectNode(node);
-                        range.collapse(false);
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                    } else {
-                        // set the evaluated caret after a text-node or before an element node
-                        selection.setBaseAndExtent(node, offset, node, offset);
-                    }
-                }
+    setPositionOfCaret: function(bookmarkForCaret) {
+        var me = this,
+            selectionForCaret,
+            startNodeOfSelection,
+            rangeForCaret,
+            nodeForBookmark;
+        if (bookmarkForCaret != null) {
+            selectionForCaret = rangy.getSelection(me.getEditorBody());
+            startNodeOfSelection = (selectionForCaret.isBackwards()) ? selectionForCaret.focusNode : selectionForCaret.anchorNode;
+            rangeForCaret = rangy.createRange();
+            if(me.isBookmarkOfWorkaround(bookmarkForCaret)){
+                rangeForCaret = me.applyBookmarkUsingTheWorkaround(rangeForCaret,bookmarkForCaret);
+            } else {
+                rangeForCaret.moveToBookmark(bookmarkForCaret);
             }
-        }
-    },
-    /**
-     *
-     * @param {Node} node
-     * @param {Boolean} rightOf
-     * @returns {Node|null}
-     */
-    findAdjacentContentNode: function(node, rightOf){
-        while((node = rightOf ? node.nextSibling : node.previousSibling) != null){
-            if(node.nodeType == Node.TEXT_NODE){
-                return node;
-            } else if(this.isNodeRelevant(node)){
-                if(rightOf && node.firstChild){
-                    return this.findAdjacentContentNode({ previousSibling:node.firstChild }, false); // first argument is trick to get the node itself cheked
-                } else if(!rightOf && node.lastChild) {
-                    return this.findAdjacentContentNode({ nextSibling:node.lastChild }, true); // first argument is trick to get the node itself cheked
-                }
-                return node;
+            if (!rangeForCaret.collapsed && startNodeOfSelection.nodeType == 1) {
+                // rangy bug: if the selection starts between a tag and text, the tag will be included even it was not selected
+                // (does not happen at the end of the selection)
+                rangeForCaret = me.cleanBordersOfCharacterbasedRange(rangeForCaret,"fromStart");
             }
+            selectionForCaret.setSingleRange(rangeForCaret);
         }
-        return null;
-    },
-    /**
-     *
-     * @param {Node} node
-     * @returns {Boolean}
-     */
-    isInBody: function(node){
-        while((node = node.parentNode) != null) {
-            if(node.nodeName.toLowerCase() === 'body'){
-                return true;
-            }
-        }
-        return false;
     }
 });
