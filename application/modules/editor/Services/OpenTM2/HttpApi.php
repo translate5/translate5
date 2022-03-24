@@ -186,8 +186,11 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             if($other !== $replaced) {
                 $changeCount++;
                 $tu = $xml->getParent('tu');
-                error_log('TMX Export - TU: '.$xml->getChunk($tu['openerKey'])."\n  OLD: ".$other."\n  NEW: ".$replaced);
-                $xml->replaceChunk($key, $replaced);
+                if(!is_null($tu)) {
+                    // the TU must exist, otherwise we are outside of a TU (like <?xml header)
+                    error_log('TMX Export - TU: '.$xml->getChunk($tu['openerKey'])."\n  OLD: ".$other."\n  NEW: ".$replaced);
+                    $xml->replaceChunk($key, $replaced);
+                }
             }
         });
 
