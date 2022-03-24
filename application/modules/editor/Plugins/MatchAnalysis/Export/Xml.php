@@ -167,7 +167,7 @@ class editor_Plugins_MatchAnalysis_Export_Xml
             }
             //inContextExact are 103%-Matches from translate5
             elseif($row['matchRate'] == 103) {
-                $this->add('inContextExact', $row);
+                $this->add('perfect', $row);
             }
             //exact are 100% and 101% and 104%-Matches from translate5, since Trados does not know our 101 and 104%-Matches
             elseif($row['matchRate'] >= 100) {
@@ -374,7 +374,7 @@ This file was generated with translate5.
   For the following elements all numeric attributes are always set to "0",
   because they currently have no analogon in translate5:
     # locked
-    # perfect
+    # inContextExact
     # repeated (translate5 will only have crossFileRepeated)
     # newBaseline (this is specific to SDL MT)
     # newLearnings (this is specific to SDL MT)
@@ -382,7 +382,7 @@ This file was generated with translate5.
 - all MT matches and matches not listed as fuzzy or better match will always be counted within "new"
 - crossFileRepeated are translate5s repetitions (which are represented by 102% matches)
 - exact are 100% and 101% and 104%-Matches from translate5
-- inContextExact are 103%-Matches from translate5
+- perfect are 103%-Matches from translate5
 - The following attributes will always have the value "0", since translate5 does not support them right now:
   # characters="0"
   # placeables="0"
