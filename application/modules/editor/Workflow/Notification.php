@@ -440,6 +440,10 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         }
     }
 
+    public function notifyNewProjectForPm() {
+
+    }
+
     /**
      * Notifies the tasks PM over the new task, but only if PM != the user who has uploaded the task
      */

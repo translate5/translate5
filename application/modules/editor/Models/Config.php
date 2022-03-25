@@ -379,4 +379,17 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             return $translate->_('config_overwrite_'.$value);
         }, $this->configLabel);
     }
+
+    /**
+     * Get value for given name from main configuration table
+     *
+     * @param string $name
+     * @return string|null
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getCurrentValue(string $name): ?string {
+        return $this->db->getAdapter()
+            ->query('SELECT `value` FROM `Zf_configuration` WHERE `name` = ?', $name)
+            ->fetchColumn();
+    }
 }
