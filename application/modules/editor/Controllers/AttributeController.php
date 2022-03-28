@@ -193,11 +193,11 @@ class editor_AttributeController extends ZfExtended_RestController
                         $this->batch = true;
 
         // Prevent creation of processStatus and administrativeStatus attributes
-        if ($this->batch) $this->jcheck([
+        /*if ($this->batch) $this->jcheck([
             'type' => [
                 'dis' => 'processStatus,administrativeStatus'
             ]
-        ], $_['dataType']);
+        ], $_['dataType']);*/
 
         // If batch-mode was detected
         if ($this->batch) {
@@ -277,7 +277,7 @@ class editor_AttributeController extends ZfExtended_RestController
                     ? array_unique(editor_Utils::ar($this->getParam('termId')))
                     : []) {
 
-                    // Foreach term within current termEntryId
+                    // Foreach term id
                     foreach ($termIdA as $termId) {
 
                         // Use it to spoof 'termEntryId' request-param
@@ -516,8 +516,27 @@ class editor_AttributeController extends ZfExtended_RestController
         // Delete uploaded temporary file
         if ($tmp_name ?? 0) unlink($tmp_name);
 
-        // If draft0-param is given - setup isDraft=0 on attributes identified by that param
-        if ($draft0 = $this->getParam('draft0')) $this->entity->undraftByIds($draft0);
+        // If draft0-param is given
+        if ($draft0 = $this->getParam('draft0')) {
+
+            // Setup isDraft=0 on attributes identified by that param and return array of special attributes ids.
+            // Attribute is considered special if it requires special processing
+            // Currently only processStatus- and definition-attrs are special
+            $attrIdA_special = $this->entity->undraftByIds($draft0);
+
+            // Foreach special attrId
+            foreach ($attrIdA_special as $attrId) {
+
+                // Load attribute model instance
+                $this->entity->load($attrId);
+
+                // Setup value-param for it to be further picked
+                $this->setParam('value', $this->entity->getValue());
+
+                // Call attrupdateAction()
+                $this->attrupdateAction();
+            }
+        }
 
         // Flush response. Actually, $this->responseA is contain responses only if attrId-param is not empty
         if ($attrIdA) $this->view->assign($this->responseA[0]); else if ($draft0) $this->view->assign(['success' => true]);
@@ -554,8 +573,8 @@ class editor_AttributeController extends ZfExtended_RestController
                 ],
             ], $this->entity);
 
-            // Prevent deletion of processStatus and administrativeStatus attributes
-            $this->jcheck([
+            // Prevent deletion of processStatus and administrativeStatus attributes, if those are not drafts
+            if (!$this->entity->getIsDraft()) $this->jcheck([
                 'type' => [
                     'dis' => 'processStatus,administrativeStatus'
                 ]
@@ -597,6 +616,10 @@ class editor_AttributeController extends ZfExtended_RestController
 
                         // If that term is a proposal or has a proposal
                         if (isset($detectedA[$attrId])) {
+                            $deletable = true;
+
+                        // If that attr is a draft
+                        } else if ($entity->getIsDraft()) {
                             $deletable = true;
                         }
 
@@ -824,7 +847,7 @@ class editor_AttributeController extends ZfExtended_RestController
         $data = ['inserted' => $inserted, 'updated' => $updated];
 
         // If term status changed - append new value to json
-        if ($_['level'] == 'term')
+        if ($_['level'] == 'term' && !$this->entity->getIsDraft())
             if ($status = $this->_updateTermStatus($_['termId'], $this->entity))
                 $data['status'] = $status;
 
@@ -988,7 +1011,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Check request params and return an array, containing records
         // fetched from database by dataTypeId-param (and termId-param, if given)
-        $_ = $this->_attrupdateCheck();
+        $_ = $this->_attrupdateCheck($drop ? false : true);
 
         // Default response data to be flushed in case of attribute change
         $data = ['success' => true, 'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s')];
@@ -1016,7 +1039,7 @@ class editor_AttributeController extends ZfExtended_RestController
         }
 
         // If it's a processStatus-attribute
-        if ($this->entity->getType() == 'processStatus') {
+        if ($this->entity->getType() == 'processStatus' && !$this->entity->getIsDraft()) {
 
             // Check whether current user is allowed to change processStatus from it's current value to given value
             $this->_attrupdateCheckProcessStatusChangeIsAllowed($_);
@@ -1051,7 +1074,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // The term status is updated in in anycase (due implicit normativeAuthorization changes above),
         // not only if a attribute is changed mapped to the term status
-        if (isset($_['termId']))
+        if (isset($_['termId']) && !$this->entity->getIsDraft())
             if ($status = $this->_updateTermStatus($_['termId'], $this->entity))
                 $data['status'] = $status;
 
@@ -1120,10 +1143,11 @@ class editor_AttributeController extends ZfExtended_RestController
      * Check request params and return an array, containing records
      * fetched from database by dataTypeId-param (and termId-param, if given)
      *
+     * @param bool $valueRequired
      * @return array
      * @throws ZfExtended_Mismatch
      */
-    protected function _attrupdateCheck() {
+    protected function _attrupdateCheck($valueRequired = true) {
 
         // Get attribute meta load term model instance, if current attr has non-empty termId
         $_ = $this->jcheck([
@@ -1140,7 +1164,7 @@ class editor_AttributeController extends ZfExtended_RestController
         if ($_['dataTypeId']['dataType'] == 'picklist')
             $this->jcheck([
                 'value' => [
-                    'req' => true,
+                    'req' => $valueRequired,
                     'fis' => $_['dataTypeId']['picklistValues'] // FIND_IN_SET
                 ]
             ]);

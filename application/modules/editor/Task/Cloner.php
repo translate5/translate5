@@ -114,8 +114,8 @@ class editor_Task_Cloner {
      * Clone existing language resources from oldTaskGuid for newTaskGuid.
      */
     protected function cloneLanguageResources(){
-        /** @var editor_Models_LanguageResources_Taskassoc $job */
-        $job = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+        /** @var MittagQI\Translate5\LanguageResource\TaskAssociation $job */
+        $job = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
         $jobs = $job->loadByTaskGuids([$this->original->getTaskGuid()]);
         if(empty($jobs)){
             return;

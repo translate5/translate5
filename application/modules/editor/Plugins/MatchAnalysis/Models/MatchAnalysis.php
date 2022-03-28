@@ -222,8 +222,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     //protected function initResultArray($taskGuid,$internalFuzzy){
     protected function initResultArray(array $analysisData): array
     {
-        $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
+        $taskAssoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $taskAssoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $langResTaskAssocs = $taskAssoc->loadByTaskGuids([$analysisData['taskGuid']]);
 
         $isInternalFuzzy = $analysisData['internalFuzzy'] == '1';

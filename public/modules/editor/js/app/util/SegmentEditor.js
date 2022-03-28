@@ -355,17 +355,22 @@ Ext.define('Editor.util.SegmentEditor', {
             if(partnerTagImgId != null) {
                 return me.getEditorDoc().getElementById(partnerTagImgId); // getElementById() returns null if it doesn't exist
             }
-        }
+        };
         return null;
     },
     /**
      * Collapse all multiple whitespaces with nothing between them (we delete them anyway on save).
      */
     collapseMultipleWhitespaceInEditor: function() {
-        var body = this.getEditorBody(),
-            html = body.innerHTML;
-        body.innerHTML = html.replace(/&nbsp;+/gi, '  ').replace(/\s\s+/g, '&nbsp;');
-        body.normalize();
+        var me = this,
+            el = me.getEditorBodyExtDomElement(),
+            elContent,
+            bookmarkForCaret = me.getPositionOfCaret();
+        elContent = el.getHtml();
+        elContent = elContent.replace(/&nbsp;+/gi,'  ').replace(/\s\s+/g, '&nbsp;');
+        el.setHtml(elContent);
+        me.getEditorBodyExtDomElement().dom.normalize();
+        me.setPositionOfCaret(bookmarkForCaret);
     },
     /***
      * Remove SpellCheck-Markup in the Editor but keep their content.

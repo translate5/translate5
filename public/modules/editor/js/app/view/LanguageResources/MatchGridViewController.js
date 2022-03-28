@@ -96,7 +96,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
         var me = this;
         me.editedSegmentId = context.record.id;
         //me.loadCachedDataIntoGrid(context.record.id,-1);
-        me.cacheSegmentIndex = new Array();
+        me.cacheSegmentIndex = [];
         me.cacheSegmentIndex.push(context.rowIdx);
         me.registerDelInsTagTooltip();
     },
@@ -149,7 +149,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     cacheMatchPanelResults:function(languageResource, segment){
         var me = this,
             segmentId = segment.get('id'),
-            languageResourceid = languageResource.get('id'),
+            languageResourceid = languageResource.get('languageResourceId'),
             dummyObj = {
                 rows: [{
                     id: '',
@@ -167,7 +167,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     },
     cacheSingleMatchPanelResults: function(languageResource,segmentId,query){
         var me = this,
-            languageResourceid = languageResource.get('id'),
+            languageResourceid = languageResource.get('languageResourceId'),
             dummyObj = {
                 rows: [{
                     id: '',
@@ -217,8 +217,8 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
             return;
         }
         me.assocStore.each(function(record){
-            if(res.get(record.get('id'))){
-                var rcd =res.get(record.get('id')).rows;
+            if(res.get(record.get('languageResourceId'))){
+                var rcd =res.get(record.get('languageResourceId')).rows;
                 me.getView().getStore('editorquery').loadRawData(rcd,true);
             }else{
                 me.cacheSingleMatchPanelResults(record,segmentId,query);

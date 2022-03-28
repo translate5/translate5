@@ -26,16 +26,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+ 
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- * 
- */
-/**
- * DB Access for Languageresources Assoc
- */
-class editor_Models_Db_Taskassoc extends Zend_Db_Table_Abstract {
-    protected $_name = 'LEK_languageresources_taskassoc';
-    public $_primary = 'id';
+namespace MittagQI\Translate5\LanguageResource\Validator;
+
+use ZfExtended_Models_Validator_Abstract;
+
+class TaskAssociation extends ZfExtended_Models_Validator_Abstract {
+
+    /**
+     * Validators for Task User Assoc Entity
+     */
+    protected function defineValidators() {
+        $this->addValidator('taskGuid', 'guid');
+        $this->addValidator('languageResourceId', 'int');
+        $this->addValidator('segmentsUpdateable', 'boolean');
+    }
 }
