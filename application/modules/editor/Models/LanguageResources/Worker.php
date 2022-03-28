@@ -48,8 +48,8 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Task_Abstract
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $assoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
+        $assoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var MittagQI\Translate5\LanguageResource\TaskAssociation $assoc */
         
         $params = $this->workerModel->getParameters();
         

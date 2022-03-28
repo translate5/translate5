@@ -1224,7 +1224,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     setCardsTask: function (task) {
         var me = this,
             win = me.getTaskAddWindow(),
-            items = win.items.items;
+            items = win && win.items.items;
+
+        if(!win){
+            return;
+        }
 
         win.getViewModel().set('currentTask', task);
         //TODO: use the current task in all other cards

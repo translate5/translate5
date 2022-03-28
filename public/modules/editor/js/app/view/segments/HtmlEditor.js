@@ -287,7 +287,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * Finds Elements in the current Markup by Selector
    * @return NodeList|bool: list with elements or false if not found
    */
-  getElementsBySelector: function(selector){
+  getElementsBySelector(selector){
       var body = this.getEditorBody();
       if(!body){
           return false;
@@ -334,39 +334,46 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(initMarkupMapOnly) {
           return;
       }
+      
+      if (!window.getSelection) {
+          //FIXME Not supported by your browser message!
+          return;
+      }
       sel = doc.getSelection();
-      range = sel.getRangeAt(0);
-      el = doc.createElement("div");
-      frag = doc.createDocumentFragment();
-      el.innerHTML = html;
-      while ((node = el.firstChild)) {
-          lastNode = frag.appendChild(node);
+      if(sel.getRangeAt) {
+        range = sel.getRangeAt(0);
+        el = doc.createElement("div");
+        frag = doc.createDocumentFragment();
+        el.innerHTML = html;
+        while ((node = el.firstChild)) {
+            lastNode = frag.appendChild(node);
+        }
+        // remove term-tag-markup (will be added again after saving where appropriate)
+        termTags = frag.querySelectorAll('span.term');
+        arrLength = termTags.length;
+        for( i=0; i < arrLength; i++ ) {
+            termTageNode = termTags[i];
+            while(termTageNode.firstChild) {
+                if (termTageNode.isSameNode(lastNode)) {
+                    // If this term-tag-node is the lastNode, we must use its content as lastNode before we remove it.
+                    lastNode = termTageNode.firstChild;
+                }
+                termTageNode.parentNode.insertBefore(termTageNode.firstChild,termTageNode);
+            }
+            termTageNode.parentNode.removeChild(termTageNode);
+        }
+        // insert
+        this.fireEvent('beforeInsertMarkup', range);
+        range = sel.getRangeAt(0); // range might have changed during handling the beforeInsertMarkup
+        range.insertNode(frag);
+        rangeForNode = range.cloneRange();
+        if (lastNode !== undefined) {
+        	range.setStartAfter(lastNode);
+        	range.setEndAfter(lastNode);
+        }
+        this.fireEvent('afterInsertMarkup', rangeForNode);
+        this.fireEvent('saveSnapshot'); // Keep a snapshot from the new content
       }
-      // remove term-tag-markup (will be added again after saving where appropriate)
-      termTags = frag.querySelectorAll('span.term');
-      arrLength = termTags.length;
-      for( i=0; i < arrLength; i++ ) {
-          termTageNode = termTags[i];
-          while(termTageNode.firstChild) {
-              if (termTageNode.isSameNode(lastNode)) {
-                  // If this term-tag-node is the lastNode, we must use its content as lastNode before we remove it.
-                  lastNode = termTageNode.firstChild;
-              }
-              termTageNode.parentNode.insertBefore(termTageNode.firstChild,termTageNode);
-          }
-          termTageNode.parentNode.removeChild(termTageNode);
-      }
-      // insert
-      this.fireEvent('beforeInsertMarkup', range);
-      range = sel.getRangeAt(0); // range might have changed during handling the beforeInsertMarkup
-      range.insertNode(frag);
-      rangeForNode = range.cloneRange();
-      if (lastNode !== undefined) {
-          range.setStartAfter(lastNode);
-          range.setEndAfter(lastNode);
-      }
-      this.fireEvent('afterInsertMarkup', rangeForNode);
-      this.fireEvent('saveSnapshot'); // Keep a snapshot from the new content
   },
   setSegmentSize: function(grid, size, oldSize) {
       var body = Ext.fly(this.getEditorBody());

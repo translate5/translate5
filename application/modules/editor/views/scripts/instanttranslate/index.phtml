@@ -468,6 +468,14 @@ $( function() {
             chosenSourceIsText = !chosenSourceIsText;
         }
         
+        // show "translate" button?
+        if ($source === 'text' && !instantTranslationIsActive) {
+            $('#translationSubmit').show();
+        }
+        else {
+            $('#translationSubmit').hide();
+        }
+        
         clearAllErrorMessages();
         document.getElementById("sourceFile").value = "";
         showSource();

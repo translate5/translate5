@@ -11,6 +11,101 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [5.6.8] - 2022-03-22
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-2915](https://jira.translate5.net/browse/TRANSLATE-2915): Okapi integration - Optimize okapi android xml and ios string settings** <br>
+Settings for android xml and IOs string files were optimized to protect certain tag structures, cdata and special characters
+
+**[TRANSLATE-2907](https://jira.translate5.net/browse/TRANSLATE-2907): InstantTranslate - Improve FileTranslation in InstantTranslate** <br>
+InstantTranslate FileTranslation always starts direct after selecting (or Drag'nDrop) the file no matter what is configed for runtimeOptions.InstantTranslate.instantTranslationIsActive
+
+**[TRANSLATE-2903](https://jira.translate5.net/browse/TRANSLATE-2903): TermPortal - Batch edit for Process Status and Usage Status attrs** <br>
+TermPortal: batch editing is now possible for Process Status and Usage Status attributes
+
+
+### Bugfixes
+**[TRANSLATE-2920](https://jira.translate5.net/browse/TRANSLATE-2920): Editor general - REVERT:  TRANSLATE-2345-fix-jumping-cursor** <br>
+ROLLBACK: Fix for jumping cursor reverted
+
+**[TRANSLATE-2912](https://jira.translate5.net/browse/TRANSLATE-2912): Import/Export - reviewHTML.txt import in zip file does not work anymore** <br>
+Fixes a problem where reviewHTML.txt file in the zip import package is ignored.
+
+**[TRANSLATE-2911](https://jira.translate5.net/browse/TRANSLATE-2911): Editor general - Cursor jumps to start of segment** <br>
+FIX: Cursor Jumps when SpellChecker runs and after navigating with arrow-keys 
+
+**[TRANSLATE-2905](https://jira.translate5.net/browse/TRANSLATE-2905): InstantTranslate - No usable error message on file upload error due php max file size reached** <br>
+Custom error message when uploading larger files as allowed in instant-translate.
+
+**[TRANSLATE-2890](https://jira.translate5.net/browse/TRANSLATE-2890): Main back-end mechanisms (Worker, Logging, etc.) - Module redirect based on initial_page acl** <br>
+Authentication acl improvements
+
+**[TRANSLATE-2848](https://jira.translate5.net/browse/TRANSLATE-2848): Import/Export - TermCollection not listed in import wizard** <br>
+Language resources will be grouped by task in language-resources to task association panel in the import wizard.
+
+
+## [5.6.7] - 2022-03-17
+
+### Important Notes:
+#### [TRANSLATE-2906](https://jira.translate5.net/browse/TRANSLATE-2906)
+For users with large amount of terminology: due a DB collation change the SQL file of this fix may run several minutes.
+
+#### [TRANSLATE-2895](https://jira.translate5.net/browse/TRANSLATE-2895)
+For XLF imports the behaviour how and which surrounding tags are ignored is changed! See the details below.
+ 
+
+
+### Added
+**[TRANSLATE-2895](https://jira.translate5.net/browse/TRANSLATE-2895): Import/Export - Optionally remove single tags and bordering tag pairs at segment borders** <br>
+The behaviour how tags are ignored from XLF (not SDLXIFF!) imports has been improved so that all surrounding tags can be ignored right now. The config runtimeOptions.import.xlf.ignoreFramingTags has therefore been changed and has now 3 config values: disabled, paired, all. Where paired ignores only tag pairs at the start and end of a segment, and all ignores all tags before and after plain text. Tags inside of text (and their paired partners) remain always in the segment. The new default is to ignore all tags, not only the paired ones.
+
+**[TRANSLATE-2891](https://jira.translate5.net/browse/TRANSLATE-2891): TermPortal - Choose in TermTranslation Workflow, if definitions are translated** <br>
+It's now possible to choose whether definition-attributes should be exported while exporting terms from TermPortal to main Translate5 app
+
+
+### Changed
+**[TRANSLATE-2899](https://jira.translate5.net/browse/TRANSLATE-2899): VisualReview / VisualTranslation - Base Work for Visual API tests** <br>
+Added capabilities for generating API -tests for the Visual
+
+**[TRANSLATE-2897](https://jira.translate5.net/browse/TRANSLATE-2897): Import/Export - Make XML Parser more standard conform** <br>
+The internal used XML parser was not completly standard conform regarding the naming of tags.
+
+
+### Bugfixes
+**[TRANSLATE-2906](https://jira.translate5.net/browse/TRANSLATE-2906): TBX-Import - Improve slow TBX import of huge TBX files** <br>
+Due a improvement in TBX term ID handling, the import performance for bigger TBX files was reduced. This is repaired now.
+
+**[TRANSLATE-2900](https://jira.translate5.net/browse/TRANSLATE-2900): OpenId Connect - Auto-set roles for sso authentications** <br>
+Auto set roles is respected in SSO created users.
+
+**[TRANSLATE-2898](https://jira.translate5.net/browse/TRANSLATE-2898): Editor general - Disable project deletion while task is importing** <br>
+Now project can not be deleted while there is a running project-task import.
+
+**[TRANSLATE-2896](https://jira.translate5.net/browse/TRANSLATE-2896): Editor general - Remove null safe operator from js code** <br>
+Javascript code improvement.
+
+**[TRANSLATE-2883](https://jira.translate5.net/browse/TRANSLATE-2883): VisualReview / VisualTranslation - Enable visual with source website, html, xml/xslt and images to provide more than 19 pages** <br>
+FIX: The Pager for the visual now shows reviews with more than 9 pages properly.
+
+**[TRANSLATE-2868](https://jira.translate5.net/browse/TRANSLATE-2868): Editor general - Jump to segment on task open: priority change** <br>
+URL links to segments work now. The segment id from the URL hash gets prioritized over the last edited segment id.
+
+**[TRANSLATE-2859](https://jira.translate5.net/browse/TRANSLATE-2859): TermPortal - Change logic, who can edit and delete attributes** <br>
+The rights who can delete terms are finer granulated right now.
+
+**[TRANSLATE-2849](https://jira.translate5.net/browse/TRANSLATE-2849): Import/Export - Disable Filename-Matching for 1:1 Files, it is possible to upload matching-faults** <br>
+File-name matching in visual for single project tasks is disabled and additional import project wizard improvements.
+
+**[TRANSLATE-2345](https://jira.translate5.net/browse/TRANSLATE-2345): Editor general, TrackChanges - Cursor jumps to start of segment, when user enters space and stops typing for a while** <br>
+FIX: Cursor Jumps when inserting Whitespace, SpellChecking and in various other situations
+
+
 ## [5.6.6] - 2022-03-08
 
 ### Important Notes:
