@@ -257,14 +257,6 @@ class editor_TaskController extends ZfExtended_RestController {
         else {
             $this->view->rows = $this->loadAllForTaskOverview();
         }
-        $collect = [];
-        foreach ($this->view->rows as $r){
-            if(in_array($r['taskType'],$collect) === false){
-                $collect[] = $r['taskType'];
-            }
-        }
-        error_log(print_r($collect,1));
-
         $this->view->total = $this->totalCount;
     }
 
