@@ -136,20 +136,17 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
         }
     },
 
-    uploadBconf: function (btn) {
-        var form = btn.up('form');
-        form.submit({
-            url     : Editor.data.restpath + 'plugins_okapi_bconf/importbconf',
-            params: {
-                format: 'jsontext',
-            },
-            scope   : this,
-            success : function(basicForm, action){
-                if(action.result.success){
-                        Ext.getStore('bconfStore').reload();
-                }
-            }
-        });
+    uploadBconf: function (e, input, eOpts) {
+        var data = new FormData()
+        data.append('bconffile', input.files[0]);
+
+        fetch(Editor.data.restpath + 'plugins_okapi_bconf/importbconf', {
+            method: 'POST',
+            body: data
+        }).then(function(response){
+            Ext.getStore('bconfStore').reload();
+        })
+        input.value = ''; // reset file input
     }
 
 });

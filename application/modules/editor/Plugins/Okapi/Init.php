@@ -309,6 +309,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
         //attach to the config after index to check the confgi values
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
+
+        $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
+
         $this->eventManager->attach('editor_Plugins_Okapi_BconfController', 'beforeSetDataInEntity', ['editor_Plugins_Okapi_Controllers_BconfController', 'handleCustomerDefaultBconf']);
     }
     
@@ -331,6 +334,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         } else {
             $config->checkFileType = true;
         }
+    }
+
+    public function initJsTranslations(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
     }
     
     /**
@@ -521,7 +529,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             'fileId' => $fileId,
             'file' => (string) $file,
             'importFolder' => $importFolder,
-            'bconfFilePaths' => $this->bconfFilePaths,
+            'bconfFilePath' => $this->bconfFilePaths,
             'importConfig' => $params['importConfig']
         ];
         

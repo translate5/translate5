@@ -27,7 +27,6 @@ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception
 END LICENSE AND COPYRIGHT
 */
 
-require_once 'RandomAccessFile.php';
 /**
  * Generate new bconf file
  */

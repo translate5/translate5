@@ -297,103 +297,93 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
                 dockedItems: [{
                     xtype: "toolbar",
                     dock: "top",
-                    items: [
-                        {
-                            xtype: 'form',
-                            layout: 'hbox',
-                            border: false,
-                            margin: '0 10px 0 10px',
-                            items: [{
-                                xtype: 'filefield',
-                                name: 'bconffile',
-                                msgTarget: 'side',
-                                regex: new RegExp('\.bconf$', 'i'),
-                                regexText: this.strings.bconfRequired,
-                                allowBlank: false,
-                                anchor: '100%',
-                                width: 300,
-                                buttonText: me.strings.browse,
-                                accept: '.bconf'
-                            }, {
-                                xtype: "button",
-                                margin: '0 10px 0 10px',
-                                glyph: "f093@FontAwesome5FreeSolid",
-                                tooltip: me.strings.addBconf,
-                                text: me.strings.upload,
-                                handler: "uploadBconf",
-                            }]
+                    items: [{
+                        xtype: 'filefield',
+                        name: 'bconffile',
+                        buttonConfig:{
+                            glyph: "f093@FontAwesome5FreeSolid",
+                            text: me.strings.uploadBconf,
                         },
+                        msgTarget: 'side',
+                        anchor: '100%',
+                        width: 'auto',
+                        accept: '.bconf',
+                        buttonOnly: true,
+                        listeners: {
+                            element: 'fileInputEl',
+                            change: "uploadBconf"
+                        }
+                    },
 /*                        {
-                            xtype: "button",
-                            //iconCls: "x-fa fa-reload",
-                            text: "Set as default",
-                            bind: {
-                                disabled: '{!bconfgrid.selection}'//!grid.selection.data.default
-                            },
-                            handler: function(btn) {
-                                var grid = btn.up('grid'),
-                                        store = grid.getStore(),
-                                    oldDefault = store.findRecord('default',true),
-                                    newDefault = grid.selection;
-                                if(oldDefault && oldDefault !== newDefault){
-                                    oldDefault.set('default', false)
-                                    //oldDefault.commit();
-                                    //oldDefault.save();
-                                }
-                                newDefault.set('default', true);
-                               // newDefault.commit();
-                               // newDefault.save();
-                                store.sync();
+                        xtype: "button",
+                        //iconCls: "x-fa fa-reload",
+                        text: "Set as default",
+                        bind: {
+                            disabled: '{!bconfgrid.selection}'//!grid.selection.data.default
+                        },
+                        handler: function(btn) {
+                            var grid = btn.up('grid'),
+                                    store = grid.getStore(),
+                                oldDefault = store.findRecord('default',true),
+                                newDefault = grid.selection;
+                            if(oldDefault && oldDefault !== newDefault){
+                                oldDefault.set('default', false)
+                                //oldDefault.commit();
+                                //oldDefault.save();
+                            }
+                            newDefault.set('default', true);
+                           // newDefault.commit();
+                           // newDefault.save();
+                            store.sync();
 
-                            }
-                        },*/
-                        {
-                            xtype: "button",
-                            //iconCls: "x-fa fa-reload",
-                            text: "Reload",
-                            handler: function(btn) {
-                                btn.up('grid').getStore().getSource().reload();
-                            }
+                        }
+                    },*/
+                    {
+                        xtype: "button",
+                        //iconCls: "x-fa fa-reload",
+                        text: "Reload",
+                        handler: function(btn) {
+                            btn.up('grid').getStore().getSource().reload();
+                        }
+                    },
+                    {
+                        xtype: "textfield",
+                        width: 300,
+                        margin: "0 0 0 20px",
+                        fieldLabel: me.strings.searchText,
+                        emptyText: me.strings.searchEmptyText,
+                        listeners: {
+                            change: 'filterByText'
+                        }
+                    },
+                    {
+                        xtype: "component",
+                        itemId: "srxInput",
+                        hidden: true,
+                        autoEl: {
+                            tag: 'input',
+                            type: 'file',
+                            accept: '.srx'
                         },
-                        {
-                            xtype: "textfield",
-                            width: 300,
-                            margin: "0 0 0 20px",
-                            fieldLabel: me.strings.searchText,
-                            emptyText: me.strings.searchEmptyText,
-                            listeners: {
-                                change: 'filterByText'
-                            }
-                        },
-                        {
-                            xtype: "component",
-                            itemId: "srxInput",
-                            hidden: true,
-                            autoEl: {
-                                tag: 'input',
-                                type: 'file',
-                                accept: '.srx'
-                            },
-                            listeners: {
-                                change: {
-                                    fn: function uploadSrx(e, input, eOpts) {
-                                        var data = new FormData()
-                                        data.append('id', input.recId);
-                                        data.append('srx', input.files[0]);
+                        listeners: {
+                            change: {
+                                fn: function uploadSrx(e, input, eOpts) {
+                                    var data = new FormData()
+                                    data.append('id', input.recId);
+                                    data.append('srx', input.files[0]);
 
-                                        fetch(Editor.data.restpath + 'plugins_okapi_bconf/uploadSRX', {
-                                            method: 'POST',
-                                            body: data
-                                        }).then(function(response){
-                                            debugger;
-                                        })
-                                        input.value = input.recId = ''; // reset file input
-                                    },
-                                    element: 'el'
-                                }
+                                    fetch(Editor.data.restpath + 'plugins_okapi_bconf/uploadSRX', {
+                                        method: 'POST',
+                                        body: data
+                                    }).then(function(response){
+                                        debugger;
+                                    })
+                                    input.value = input.recId = ''; // reset file input
+                                },
+                                element: 'el'
                             }
-                        },
-                    ],
+                        }
+                    },],
                 }, ],
             };
         return me.callParent([Ext.apply(config, instanceConfig)]);

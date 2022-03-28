@@ -123,7 +123,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
         }else{
             $file = $files[self::FILE_UPLOAD_NAME];
         }
-        
+
+        /** @var editor_Plugins_Okapi_Models_Bconf $bconf */
         $bconf = new editor_Plugins_Okapi_Models_Bconf();
 		//TODO get the file name from UI
         $ret = $bconf->importBconf($file);

@@ -4,7 +4,46 @@
 <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
 <file original="php-sourcecode" source-language="ha" target-language="de" datatype="php">
 <body>
-
+<trans-unit id='RGF0ZWlmb3JtYXRrb252ZXJ0aWVydW5n'>
+    <source>Dateiformatkonvertierung</source>
+    <target>Dateiformat- und Segmentierungseinstellungen</target>
+</trans-unit>
+<trans-unit id='TmFtZQ=='>
+    <source>Name</source>
+    <target>Name</target>
+</trans-unit>
+<trans-unit id='RXJ3ZWl0ZXJ1bmdlbg=='>
+    <source>Erweiterungen</source>
+    <target>Erweiterungen</target>
+</trans-unit>
+<trans-unit id='QmVzY2hyZWlidW5n'>
+    <source>Beschreibung</source>
+    <target>Beschreibung</target>
+</trans-unit>
+<trans-unit id='QWt0aW9uZW4='>
+    <source>Aktionen</source>
+    <target>Aktionen</target>
+</trans-unit>
+<trans-unit id='QmNvbmYgaG9jaGxhZGVuLi4u'>
+    <source>Bconf hochladen...</source>
+    <target>Bconf hochladen...</target>
+</trans-unit>
+<trans-unit id='U1JYLURhdGVp'>
+    <source>SRX-Datei</source>
+    <target>SRX-Datei</target>
+</trans-unit>
+<trans-unit id='QmVhcmJlaXRlbg=='>
+    <source>Bearbeiten</source>
+    <target>Bearbeiten</target>
+</trans-unit>
+<trans-unit id='TMO2c2NoZW4='>
+    <source>Löschen</source>
+    <target>Löschen</target>
+</trans-unit>
+<trans-unit id='S29waWVyZW4='>
+    <source>Kopieren</source>
+    <target>Kopieren</target>
+</trans-unit>
 </body>
 </file>
 </xliff>
