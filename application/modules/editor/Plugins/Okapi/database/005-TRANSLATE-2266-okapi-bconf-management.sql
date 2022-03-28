@@ -29,9 +29,9 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('edit
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_okapi_bconf', 'all');
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_okapi_bconffilter', 'all');
 
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('admin', 'pm', 'frontend', 'pluginOkapiBconfPrefs');
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('admin', 'pm', 'editor_plugins_okapi_bconf', 'all');
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('admin', 'pm', 'editor_plugins_okapi_bconffilter', 'all');
+-- INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('admin', 'pm', 'frontend', 'pluginOkapiBconfPrefs');
+-- INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('admin', 'pm', 'editor_plugins_okapi_bconf', 'all');
+-- INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('admin', 'pm', 'editor_plugins_okapi_bconffilter', 'all');
 
 CREATE TABLE `LEK_okapi_bconf` (
     `id` INT (11) NOT NULL AUTO_INCREMENT,
