@@ -1,4 +1,5 @@
 <?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,10 +27,9 @@ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception
 END LICENSE AND COPYRIGHT
 */
 
+require_once 'RandomAccessFile.php';
 /**
- *
  * Generate new bconf file
- *
  */
 class editor_Plugins_Okapi_Bconf_Export
 {
@@ -39,47 +39,50 @@ class editor_Plugins_Okapi_Bconf_Export
     const SIGNATURE = "batchConf";
     const VERSION = 2;
     const NUMPLUGINS = 0;
-    
-    protected $util;
-    public function __construct(){
-        $this->util = new editor_Plugins_Okapi_Bconf_Util();
-    }
     /**
      * Export bconf
      */
-    public function ExportBconf($okapiName, $okapiId, $bconfBasePath)
-    {
+    public function ExportBconf($okapiId, $bconfBasePath)
+    {   
+        chdir($bconfBasePath); // so we can access with file name only
+
+        $descFile = "content.json";
+        $this->content = [ 'refs' => null, 'fprm' => null ];
+
+        if(file_exists($descFile)){
+            $this->content = json_decode(file_get_contents($descFile), (bool)'associative');
+        }
+        $fileName = 'export.bconf';
+        $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
         
-        $bconfFile = fopen($bconfBasePath.$okapiName.'.bconf', "w") or die("Unable to open file!");
-        
-        $this->util->writeUTF(self::SIGNATURE, $bconfFile);
-        $this->util->writeInt(self::VERSION, $bconfFile);
+        $raf->writeUTF(self::SIGNATURE, false);
+        $raf->writeInt(self::VERSION);
         //TODO check the Plugins currentlly not in use
-        $this->util->writeInt(self::NUMPLUGINS, $bconfFile);
+        $raf->writeInt(self::NUMPLUGINS);
         
         //Read the pipeline and extract steps
-        $this->processPipeline($bconfFile,$bconfBasePath);
-        $this->filterConfiguration($okapiId, $bconfFile,$bconfBasePath);
-        $this->extensionsMapping($okapiId, $bconfFile);
-        fclose($bconfFile);
+        $this->processPipeline($raf);
+        $this->filterConfiguration($okapiId, $raf);
+        $this->extensionsMapping($okapiId, $raf);
+        //$raf->fclose();
         
-        if(file_exists($bconfBasePath.$okapiName.'.bconf')){
-            
-            return $bconfBasePath.$okapiName.'.bconf';
-        }
-        else{
+        if(file_exists($fileName)){
+            return $fileName;
+        } else{
             return null;
         }
     }
     
-    protected function processPipeline($bconfFile, $bconfBasePath)
+    protected function processPipeline($raf)
     {
-        $pipeLineFileOpen = fopen($bconfBasePath.'pipeline.pln', 'r') or die("Unable to open file!");
+        $pipelineFile = 'pipeline.pln';
+        $xml2 = file_get_contents($pipelineFile);
+        $pipelineSize = filesize($pipelineFile);
+        $resource = fopen($pipelineFile,'rb');
+        $xml = fread($resource, $pipelineSize);
+        fclose($resource);
         
-        $data = fread($pipeLineFileOpen, self::MAXBUFFERSIZE);
-        //force to add new line
-        
-        $xmlData = new SimpleXMLElement($data);
+        $xmlData = new SimpleXMLElement($xml);
         $id = 0;
         foreach ($xmlData as $key) {
             $methods = explode("\n", $key);
@@ -90,57 +93,48 @@ class editor_Plugins_Okapi_Bconf_Export
                     $path = str_replace('\\\\', '/', $path);
                     $path = str_replace('\\', '/', $path);
                     
-                    $this->harvestReferencedFile($bconfFile, ++$id, basename($path), $bconfBasePath);
+                    $this->harvestReferencedFile($raf, ++$id, basename($path));
                 }
             }
         }
         // Last ID=-1 to mark no more references
-        $this->util->writeInt(-1, $bconfFile);
-        
-        $withOutNewLine = preg_replace('/[\n]{0,}/m', '', $data);
-        $fileSize = strlen($withOutNewLine);
-        //++$fileSize;
-        $r = (int)($fileSize % self::MAXBLOCKLEN);
-        $n = (int)($fileSize / self::MAXBLOCKLEN);
-        // Number of blocks
-        $count = $n + (($r > 0) ? 1 : 0);
-        $this->util->writeInt($count, $bconfFile);
+        $raf->writeInt(-1);
         
         // Write the full blocks
         $pos = 0;
         
         //          for ( $i=0; $i<$n; $i++ ) {
-        //               self::writeUTF(substr($data,$pos, $pos+self::MAXBLOCKLEN),$bconfFile);
+        //               self::writeUTF(substr($xml,$pos, $pos+self::MAXBLOCKLEN),$bconfFile);
         //               $pos +=self::MAXBLOCKLEN;
         //          }
         //
         //          // Write the remaining text
         //          if ( $r > 0 ) {
-        //               self::writeUTF(substr($data,$pos),$bconfFile);
+        //               self::writeUTF(substr($xml,$pos),$bconfFile);
         //          }
         
-        $this->util->writeUTF($withOutNewLine, $bconfFile);
-        fclose($pipeLineFileOpen);
+        $raf->writeInt(1);
+        $raf->writeUTF($xml, false);
     }
     
-    protected function harvestReferencedFile($bconfFile, $id, $fileName, $bconfBasePath)
+    protected function harvestReferencedFile($raf, $id, $fileName)
     {
-        $this->util->writeInt($id, $bconfFile);
-        $this->util->writeUTF($fileName, $bconfFile);
+        $raf->writeInt($id);
+        $raf->writeUTF($fileName, false);
         
         if ($fileName == '') {
-            $this->util->writeLong(0, $bconfFile); // size = 0
+            $raf->writeLong(0); // size = 0
             return false;
         }
         //Open the file and read the content
-        $file = fopen($bconfBasePath.$fileName, "r") or die("Unable to open file!");
+        $file = fopen($fileName, "rb") or die("Unable to open file!");
         
-        $fileSize = filesize($bconfBasePath.$fileName);
+        $fileSize = filesize($fileName);
         $fileContent = fread($file, $fileSize);
        
-        $this->util->writeLong($fileSize, $bconfFile);
+        $raf->writeLong($fileSize);
         if ($fileSize > 0) {
-            fwrite($bconfFile, $fileContent);
+            $raf->fwrite($fileContent);
         }
         fclose($file);
     }
@@ -149,38 +143,64 @@ class editor_Plugins_Okapi_Bconf_Export
     /**
      *
      */
-    protected function filterConfiguration($okapiId, $bconfFile, $bconfBasePath)
-    {
-        
+    protected function filterConfiguration($okapiId, $raf)
+    {   
+        $fprms = $this->content['fprm'] ?? glob("*.fprm");
+        $raf->writeInt(count($fprms));
+        foreach ($fprms as $filterParam) {
+                $filename = $filterParam.(str_ends_with($filterParam,'.fprm') ? '' : '.fprm');
+                $raf->writeUTF($filterParam, false);
+                $raf->writeUTF(file_get_contents($filename), false); //QUIRK: Need additional null byte. Where does it come from in Java?
+        }
+
+
+        return;
+
         $filterConfiguration = new editor_Plugins_Okapi_Models_BconfFilter();
-        $data = $filterConfiguration->getByOkapiId( $okapiId);
+        $data = $filterConfiguration->getByOkapiId($okapiId);
         $count = 0;
         foreach ($data as $filter) {
             if ($filter['default'] == 1) {
                 $count++;
             }
         }
-        $this->util->writeInt($count, $bconfFile);
+        $raf->writeInt($count);
         
         foreach ($data as $filter) {
             if ($filter['default'] == 1) {
                 //TODO get dir path
-                $configFilePath = $bconfBasePath.$filter['configId'].'.fprm';
+                $configFilePath = $filter['configId'].'.fprm';
                 $file = fopen($configFilePath, "r") or die("Unable to open file!");
                 $configData = fread($file, filesize($configFilePath));
-                $this->util->writeUTF($filter['configId'], $bconfFile);
-                $this->util->writeUTF($configData, $bconfFile);
+                $raf->writeUTF($filter['configId']);
+                $raf->writeUTF($configData);
             }
         }
     }
     
     /**Section 5: Mapping extensions -> filter configuration id
      * @param $bconfId
-     * @param $bconfFile
+     * @param $raf
      */
-    protected function extensionsMapping($okapiId, $bconfFile)
+    protected function extensionsMapping($okapiId, $raf)
     {
-        
+        $extMapFile = "extensions-mapping.txt";
+        if(!file_exists($extMapFile)){
+            return;
+        }
+        $extMap = file($extMapFile, FILE_IGNORE_NEW_LINES);
+        $amount = count($extMap);
+        $extMapBinary = ''; // we'll build up the binary format in memory instead of wirting every line itself to file
+        foreach($extMap as $line){
+            $extAndConf = explode("\t", $line);
+            $extMapBinary .= $raf::toUTF($extAndConf[0]);
+            $extMapBinary .= $raf::toUTF($extAndConf[1]);
+        }
+        $raf->writeInt($amount);
+        $raf->fwrite($extMapBinary);
+
+        return;
+
         $filterConfiguration = new editor_Plugins_Okapi_Models_BconfFilter();
         $data = $filterConfiguration->getByOkapiId($okapiId);
         
@@ -202,7 +222,7 @@ class editor_Plugins_Okapi_Bconf_Export
         }
         if ($defaultFiltersData != null && count($defaultFiltersData) > 0) {
             foreach ($defaultFiltersData as $filter) {
-                $extList = explode(",", $filter["extensions"]);
+                $extList = explode(",", $filter["extensions"] ?? '');
                 foreach ($extList as $extension) {
                     if(!empty($extension)) {
                         array_push($extMap, array("ext" => $extension, "id" => $filter["configId"]));
@@ -212,13 +232,13 @@ class editor_Plugins_Okapi_Bconf_Export
             }            
         }
         if(count($extMap) > 0){
-            $this->util->writeInt($count, $bconfFile); // None
+            $raf->writeInt($count); // None
             foreach ($extMap as $item) {
-                $this->util->writeUTF($item["ext"], $bconfFile);
-                $this->util->writeUTF($item["id"], $bconfFile);
+                $raf->writeUTF($item["ext"]);
+                $raf->writeUTF($item["id"]);
             }
         } else {
-            $this->util->writeInt(0, $bconfFile); // None
+            $raf->writeInt(0); // None
         }
     }
     

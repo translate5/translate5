@@ -24,7 +24,9 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
+/**
+ * @class okapiFilterGrid
+ */
 Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
     extend: "Ext.grid.Panel",
     requires: [
@@ -35,13 +37,32 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
     plugins: ["gridfilters"],
     itemId: "okapifilterGrid",
     controller: "bconfGridController",
+    store: 'bconfStore',
     stateId: "okapifilterGrid",
     stateful: true,
+    isCustomerGrid: false,
     cls: "okapifilterGrid",
     title: "#UT#Dateiformatkonvertierung",
     helpSection: "useroverview",
     glyph: "f1c9@FontAwesome5FreeSolid",
     height: "100%",
+    //viewModel: 'viewportEditor',
+    plugins: 'cellediting',
+    config: {
+        customer: null,
+        customerDefault: null
+    },
+    updateCustomer:function(newCustomer){
+        if(!newCustomer){
+            return;
+        }
+        var storeFilters = this.getStore().getFilters(),
+            clientFilter = storeFilters.getByKey('clientFilter');
+        if(clientFilter){
+            clientFilter.customer_id = newCustomer.id;
+            storeFilters.notify('endupdate');
+        }
+    },
     layout: {
         type: "fit",
     },
@@ -64,38 +85,51 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
         searchText: "#UT#Search",
         searchEmptyText: "#UT#Search Bconf",
         export: "#UT#Export",
-        browse:'#UT#Browse',
-        bconfRequired:'#UT#Bconf required'
+        browse: '#UT#Browse',
+        bconfRequired: '#UT#Bconf required'
     },
-    store: {
-        type: "bconfStore",
-    },
+    reference:'bconfgrid',
     viewConfig: {
-        getRowClass: function (bconf) {
-            if (!bconf.get("editable")) {
-                return "not-editable";
+        getRowClass: function(rec) {
+            cls='';
+            if(rec.get("default") && (this.ownerGrid.customerDefault ? this.ownerGrid.customerDefault == rec : true)){
+
+                //cls += "x-tip-default-mc not-editable ";
+                cls += "chosenDefault not-editable ";
             }
-            return "";
+            return cls;
         },
     },
-    initConfig: function (instanceConfig) {
+
+    initConfig: function(instanceConfig) {
         var me = this,
-            itemFilter = function (item) {
+            itemFilter = function(item) {
                 return true;
             },
             config = {
-                columns: [
-                    {
-                        xtype: "gridcolumn",
-                        width: 200,
-                        dataIndex: "name",
-                        stateId: "name",
-                        filter: {
-                            type: "string",
-                        },
-                        text: me.text_cols.name,
+                columns: [{
+                    xtype: "gridcolumn",
+                    width: 200,
+                    dataIndex: "id",
+                    flex: 2,
+                    filter: {
+                        type: "string",
                     },
-                    {
+                    editor: 'textfield',
+                    text: 'id',
+                },{
+                    xtype: "gridcolumn",
+                    width: 200,
+                    dataIndex: "name",
+                    stateId: "name",
+                    flex: 2,
+                    filter: {
+                        type: "string",
+                    },
+                    editor: 'textfield',
+                    text: me.text_cols.name,
+                },
+                   /* {
                         xtype: "gridcolumn",
                         width: 200,
                         dataIndex: "extensions",
@@ -104,45 +138,110 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
                             type: "string",
                         },
                         text: me.text_cols.extensions,
-                    },
+                    },*/
                     {
                         xtype: "gridcolumn",
                         width: 300,
+                        alias:'desc',
                         dataIndex: "description",
                         stateId: "description",
+                        editor: 'textfield',
                         filter: {
                             type: "string",
                         },
                         text: me.text_cols.description,
+                        flex:3
+                    },
+                    {
+                        xtype: 'checkcolumn',
+                        text: 'Customer default',
+                        dataIndex: 'isDefaultForCustomer',
+                        itemId: 'customerDefaultColumn',
+                        hidden: !instanceConfig.isCustomerGrid,
+                        hideable: instanceConfig.isCustomerGrid,
+                        tooltip: '',
+                        renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
+                            var customer = grid.getCustomer();
+                            arguments[0] = customer && record.id == customer.get('defaultBconfId');
+                            return this.defaultRenderer.apply(this, arguments);
+                        },
+                        listeners: {
+                            'beforecheckchange': function (col, recordIndex, checked, bconfRec, e) {
+                                var view = col.getView(),
+                                    grid = view.ownerGrid,
+                                    customer = grid.getCustomer(),
+                                    newDefault = bconfRec.getId(),
+                                    oldDefault = customer.get('defaultBconfId');
+                                bconfRec.set('isDefaultForCustomer', customer.getId());
+                                customer.set('defaultBconfId', newDefault, {silent:true}); // set on customer
+                                if(oldDefault){ // unselect old
+                                    var oldDefaultRec = view.getStore().getById(oldDefault);
+                                    oldDefaultRec.set('isDefaultForCustomer', false, newDefault==oldDefault ? {} : {silent:true, dirty:false});
+                                    view.refreshNode(oldDefaultRec);
+                                }
+                            return false;
+                            }
+                        }
+
+                    },
+                    /** @name checkCol */
+                    {
+                        xtype: 'checkcolumn',
+                        text: 'Global default',
+                        dataIndex: 'default',
+                        itemId: 'globalDefaultColumn',
+                        tooltip: '',
+                        renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
+                            var grid = view.ownerGrid;
+                            if (isDefault && (grid.isCustomerGrid ? (grid.customerDefault && record!=grid.customerDefault) : record.get('customer_id'))){
+                                arguments[0] = false;
+                            }
+                            return this.defaultRenderer.apply(this, arguments);
+                        },
+                        listeners: {
+                            'beforecheckchange': function (col, recordIndex, checked, record, e) {
+                                var view = col.getView(),
+                                    grid = view.ownerGrid,
+                                    store = grid.store,
+                                    oldDefault;
+                                if (checked) { // must uncheck old default
+                                    oldDefault = store.findBy(({data}) => data.default && !data.customer_id);
+                                    if (oldDefault && oldDefault !== record) {
+                                        oldDefault.set('default', false)
+                                    } else if (!checked) {
+                                        return grid.isCustomerGrid; // can't unselect global default
+                                    }
+                                }
+                            }
+                        }
                     },
                     {
                         xtype: "actioncolumn",
                         stateId: "okapiGridActionColumn",
                         align: "center",
                         dataIndex: "default",
-                        width: 200,
+                        width: 3*28+8,
                         text: me.text_cols.action,
-                        items: [
-                            {
+                        items: [/*{
                                 tooltip: me.strings.edit,
                                 isAllowedFor: "bconfEdit",
                                 glyph: "f044@FontAwesome5FreeSolid",
                                 handler: "editbconf",
-                                isDisabled:'getActionStatus'
-                            },
+                                isDisabled: 'getActionStatus',
+                            },*/
                             {
                                 tooltip: me.strings.remove,
                                 isAllowedFor: "bconfDelete",
                                 glyph: "f2ed@FontAwesome5FreeSolid",
                                 handler: "deletebconf",
-                                isDisabled:'getActionStatus'
+                                isDisabled: 'getActionStatus'
                             },
                             {
                                 tooltip: me.strings.copy,
                                 isAllowedFor: "bconfCopy",
                                 margin: "0 0 0 10px",
                                 glyph: "f24d@FontAwesome5FreeSolid",
-                                handler: "copybconf",
+                                handler: "clonebconf",
                             },
                             {
                                 tooltip: me.strings.export,
@@ -156,30 +255,31 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
                         xtype: "actioncolumn",
                         align: "center",
                         text: me.text_cols.srx,
-                        items: [
-                                {
-                                    tooltip: me.strings.upload,
-                                    isAllowedFor: "bconfEdit",
-                                    glyph: "f093@FontAwesome5FreeSolid",
-                                    bind: {
-                                        hidden: '{default}'
-                                    }
+                        width: 2*28+8+28,
+                        items: [{
+                                tooltip: me.strings.upload,
+                                isAllowedFor: "bconfEdit",
+                                glyph: "f093@FontAwesome5FreeSolid",
+                                bind: {
+                                    hidden: '{default}'
                                 },
-                                {
-                                    tooltip: me.strings.export,
-                                    isAllowedFor: "bconfDelete",
-                                    glyph: "f56e@FontAwesome5FreeSolid",
-                                },
-                            ]
+                                handler: "showSRXChooser",
+                            },
+                            {
+                                tooltip: me.strings.export,
+                                isAllowedFor: "bconfDelete",
+                                glyph: "f56e@FontAwesome5FreeSolid",
+                                handler: "downloadSRX"
+                            },
+                        ]
                     },
-                    {
+                   /* {
                         xtype: "actioncolumn",
                         align: "center",
                         width: 150,
                         text: me.text_cols.pipeline,
                         items: Ext.Array.filter(
-                            [
-                                {
+                            [{
                                     tooltip: me.strings.upload,
                                     isAllowedFor: "bconfEdit",
                                     glyph: "f093@FontAwesome5FreeSolid",
@@ -192,59 +292,110 @@ Ext.define("Editor.plugins.Okapi.view.filter.BConfGrid", {
                             ],
                             itemFilter
                         ),
-                    },
+                    },*/
                 ],
-                dockedItems: [
-                    {
-                        xtype: "toolbar",
-                        dock: "top",
-                        items: [
-                            {
-                                xtype: "button",
-                                glyph: "f067@FontAwesome5FreeSolid",
-                                text: me.strings.addBconf,
-                                tooltip: me.strings.addBconf,
-                                handler: "addNewFilterSet",
-                            },
-                            {
-                                xtype:'form',
-                                layout:'hbox',
-                                border: false,
-                                margin:'0 10px 0 10px',
-                                items: [{
-                                    xtype: 'filefield',
-                                    name: 'bconffile',
-                                    msgTarget: 'side',
-                                    regex: new RegExp('\.bconf$', 'i'),
-                                    regexText: this.strings.bconfRequired,
-                                    allowBlank: false,
-                                    anchor: '100%',
-                                    width:300,
-                                    buttonText: me.strings.browse
-                                },{
-                                    xtype: "button",
-                                    margin:'0 10px 0 10px',
-                                    glyph: "f093@FontAwesome5FreeSolid",
-                                    tooltip: me.strings.addBconf,
-                                    text: me.strings.upload,
-                                    handler: "uploadBconf",
-                                    //formBind: true,
-                                }]
-                            },
-                            {
-                                xtype: "textfield",
+                dockedItems: [{
+                    xtype: "toolbar",
+                    dock: "top",
+                    items: [
+                        {
+                            xtype: 'form',
+                            layout: 'hbox',
+                            border: false,
+                            margin: '0 10px 0 10px',
+                            items: [{
+                                xtype: 'filefield',
+                                name: 'bconffile',
+                                msgTarget: 'side',
+                                regex: new RegExp('\.bconf$', 'i'),
+                                regexText: this.strings.bconfRequired,
+                                allowBlank: false,
+                                anchor: '100%',
                                 width: 300,
-                                margin: "0 0 0 20px",
-                                fieldLabel: me.strings.searchText,
-                                emptyText: me.strings.searchEmptyText,
-                                listeners:{
-                                    change:'filterByText'
-                                }
+                                buttonText: me.strings.browse,
+                                accept: '.bconf'
+                            }, {
+                                xtype: "button",
+                                margin: '0 10px 0 10px',
+                                glyph: "f093@FontAwesome5FreeSolid",
+                                tooltip: me.strings.addBconf,
+                                text: me.strings.upload,
+                                handler: "uploadBconf",
+                            }]
+                        },
+/*                        {
+                            xtype: "button",
+                            //iconCls: "x-fa fa-reload",
+                            text: "Set as default",
+                            bind: {
+                                disabled: '{!bconfgrid.selection}'//!grid.selection.data.default
                             },
-                        ],
-                    },
-                ],
+                            handler: function(btn) {
+                                var grid = btn.up('grid'),
+                                        store = grid.getStore(),
+                                    oldDefault = store.findRecord('default',true),
+                                    newDefault = grid.selection;
+                                if(oldDefault && oldDefault !== newDefault){
+                                    oldDefault.set('default', false)
+                                    //oldDefault.commit();
+                                    //oldDefault.save();
+                                }
+                                newDefault.set('default', true);
+                               // newDefault.commit();
+                               // newDefault.save();
+                                store.sync();
+
+                            }
+                        },*/
+                        {
+                            xtype: "button",
+                            //iconCls: "x-fa fa-reload",
+                            text: "Reload",
+                            handler: function(btn) {
+                                btn.up('grid').getStore().getSource().reload();
+                            }
+                        },
+                        {
+                            xtype: "textfield",
+                            width: 300,
+                            margin: "0 0 0 20px",
+                            fieldLabel: me.strings.searchText,
+                            emptyText: me.strings.searchEmptyText,
+                            listeners: {
+                                change: 'filterByText'
+                            }
+                        },
+                        {
+                            xtype: "component",
+                            itemId: "srxInput",
+                            hidden: true,
+                            autoEl: {
+                                tag: 'input',
+                                type: 'file',
+                                accept: '.srx'
+                            },
+                            listeners: {
+                                change: {
+                                    fn: function uploadSrx(e, input, eOpts) {
+                                        var data = new FormData()
+                                        data.append('id', input.recId);
+                                        data.append('srx', input.files[0]);
+
+                                        fetch(Editor.data.restpath + 'plugins_okapi_bconf/uploadSRX', {
+                                            method: 'POST',
+                                            body: data
+                                        }).then(function(response){
+                                            debugger;
+                                        })
+                                        input.value = input.recId = ''; // reset file input
+                                    },
+                                    element: 'el'
+                                }
+                            }
+                        },
+                    ],
+                }, ],
             };
-        return me.callParent([config]);
+        return me.callParent([Ext.apply(config, instanceConfig)]);
     },
 });

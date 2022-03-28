@@ -31,19 +31,15 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.Okapi.view.filter..BConfGridController
+ * @class Editor.plugins.Okapi.view.filter.BConfGridController
  * @extends Ext.app.ViewController
  */
 Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.bconfGridController',
 
-    addnewRecord: function (rec) {
-        var me = this, view = me.getView(), store = view.getStore();
-        store.add(rec);
-    },
     //Add new row at last with default okapi filter
-    addNewFilterSet: function () {
+/*    addNewFilterSet: function () {
         var me = this, view = me.getView(), store = view.getStore();
         var defaultRecord = store.findRecord('default','1');
         if(!defaultRecord){
@@ -54,7 +50,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
         defaultFilterSet['default']=0;
         me.addnewRecord(defaultFilterSet);
     },
-
+*/
     editbconf: function (grid, rowIndex, colIndex) {
         var rec = grid.getStore().getAt(rowIndex);
         var win = Ext.create('Editor.plugins.Okapi.view.filterDetails.BConfFilterWindow', {
@@ -62,18 +58,38 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
         })
         win.show();
     },
-    deletebconf: function (grid, rowIndex, colIndex) {
-        grid.getStore().removeAt(rowIndex);
+
+    deletebconf: function (view, rowIndex, colIndex) {
+        var rec = view.getStore().getAt(rowIndex);
+        rec.drop();
+        //rec.store.sync(); // needed when autoSync:false on the store
     },
 
-    copybconf: function (grid, rowIndex, colIndex) {
-        var rec = grid.getStore().getAt(rowIndex).getData();
-        delete rec['id'];
-        rec['default']=0;
-        this.addnewRecord(rec);
+    clonebconf: function (view, rowIndex, colIndex) {
+                var rec = view.getStore().getAt(rowIndex);
+        Ext.Msg.prompt('New bconf','Name of the new entry?',function(btnId, value, msgConfig){
+            if(!value || value == rec.get('name')){
+                return;
+            }
+                Ext.Ajax.request({
+                    url: Editor.data.restpath + 'plugins_okapi_bconf/clone',
+                    params: {
+                        id: rec.id,
+                        customer_id: view.grid.getCustomer()?.id,
+                        name: value
+                    },
+                    success: function(response){
+                        var data = Ext.decode(response.responseText);
+                        rec.store.add(data);
+                        rec.store.sync();
+                        rec.store.getFilters().notify('endupdate'); // trigger update
+                    },
+                    scope: this
+                });
+        })
     },
 
-    exportbconf: function (grid, rowIndex, colIndex) {
+    exportbconf: function ({grid}, rowIndex, colIndex) {
         var okapiName = grid.getStore().getAt(rowIndex).get('name');
         var okapiId = grid.getStore().getAt(rowIndex).get('id');
         var form = Ext.create('Ext.form.Panel',{
@@ -87,11 +103,23 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
                 okapiName:okapiName,
                 okapiId:okapiId
             },
-            scope   : this,
-            success : function(responseText){
-            },
             target: '_blank'
         });
+    },
+    showSRXChooser: function (view, rowIndex, colIndex) {
+        var rec = view.getStore().getAt(rowIndex),
+            srxInput = view.ownerGrid.down('#srxInput');
+        srxInput.el.dom.recId = rec.id;
+        srxInput.el.dom.click();
+    },
+    downloadSRX: function (view, rowIndex, colIndex) {
+        var dlAnchor = view.dlAnchor || (view.dlAnchor = Ext.DomHelper.createDom({
+            tag: 'a',
+            download: ''
+        }));
+        var rec = view.getStore().getAt(rowIndex);
+        dlAnchor.setAttribute('href', Editor.data.restpath + 'plugins_okapi_bconf/downloadSRX?id='+rec.id)
+        dlAnchor.click();
     },
     getActionStatus:function (view, rowIndex, colIndex, item, record) {
         return record.get('default')=="1";
@@ -116,7 +144,10 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
                 format: 'jsontext',
             },
             scope   : this,
-            success : function(responseText){
+            success : function(basicForm, action){
+                if(action.result.success){
+                        Ext.getStore('bconfStore').reload();
+                }
             }
         });
     }

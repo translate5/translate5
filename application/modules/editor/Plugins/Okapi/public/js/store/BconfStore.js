@@ -34,9 +34,9 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.Okapi.store.BconfStore', {
   extend: 'Ext.data.Store',
   storeId: 'bconfStore',
-  alias: 'store.bconfStore',
   autoLoad: true,
-  pageSize: 15,
+  autoSync: true,
+  pageSize: 0,
   idProperty: 'id',
   proxy: {
     type: 'rest',
@@ -50,5 +50,9 @@ Ext.define('Editor.plugins.Okapi.store.BconfStore', {
       rootProperty: 'data',
       writeAllFields: false
     }
-  }
+  },
+  fields: [{
+    name: 'default',
+    type: 'boolean'
+  }]
 });

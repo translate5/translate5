@@ -79,6 +79,17 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract 
     
     CONST DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
     
+    /**
+     * loads all Entities out of DB
+     * @return array
+     */
+    public function loadAll() {
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from(['customer' => $this->tableName ])
+        ->joinLeft(['meta' => 'LEK_customer_meta'], 'customer.id = meta.customerId', ['defaultBconfId']);
+        return $this->loadFilterdCustom($s);
+    }
 
     public function delete() {
         $customerId = $this->getId();

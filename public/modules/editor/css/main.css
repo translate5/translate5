@@ -932,3 +932,8 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 .disabledButtonTooltip.x-item-disabled, .disabledButtonTooltip.x-item-disabled * {
     pointer-events: auto !important;
 }
+
+.chosenDefault {
+    /* background-color: hsl(87deg 65% 63%); */
+    background-color: hsl(0deg 0% 0% / 20%);
+}

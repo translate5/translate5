@@ -25,9 +25,13 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-DELETE FROM `Zf_acl_rules` WHERE `right` IN ('pluginOkapiBconfPrefs');
-DELETE FROM `Zf_acl_rules` WHERE `resource` = 'editor_plugins_okapi_bconf';
-DELETE FROM `Zf_acl_rules` WHERE `resource` = 'editor_plugins_okapi_bconffilter';
-
-DROP TABLE IF EXISTS `LEK_okapi_bconf`;
-DROP TABLE IF EXISTS `LEK_okapi_bconf_filter`;
+CREATE TABLE `LEK_customer_meta` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `customerId` int(11) NOT NULL COMMENT 'Foreign Key to LEK_customer',
+  `defaultBconfId` int(11) DEFAULT NULL COMMENT 'Foreign Key to LEK_okapi_bconf',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `customerId` (`customerId`),
+  KEY `defaultBconfId` (`defaultBconfId`),
+  CONSTRAINT `fk-customer_meta-customer` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk-customer_meta-okapi_bconf` FOREIGN KEY (`defaultBconfId`) REFERENCES `LEK_okapi_bconf` (`id`) ON DELETE CASCADE
+)

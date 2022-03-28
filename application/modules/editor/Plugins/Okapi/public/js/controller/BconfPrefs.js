@@ -36,20 +36,34 @@ END LICENSE AND COPYRIGHT
  * Main Controller of the Visual Review
  * Defines the Layout of the review Panel and it's controls, listens to the relevant global events and perocesses them
  * 
- * @class Editor.plugins.Okapi.controller.Global
+ * @class BconfPrefs
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
     extend: 'Ext.app.Controller',
 
-    requires: ['Editor.plugins.Okapi.view.filter.BConfGrid'],
+    requires: [
+        'Editor.plugins.Okapi.view.filter.BConfGrid',
+        'Editor.plugins.Okapi.store.BconfStore'
+    ],
+    init: function(){
+        Ext.create('Editor.plugins.Okapi.store.BconfStore'); // needed for customer config
+    },
 
     listen: {
         component: {
             '#preferencesOverviewPanel': {
-                added: 'addBconfToOverviewPanel',
-                beforeshow: 'showBconfInOverviewPanel',
-            }
+                added: 'addBconfToSettingsPanel',
+            },
+            '#displayTabPanel' : { // customerPanel > tabPanel
+                added: 'addBconfToCustomerPanel',
+            },
+            '#taskMainCard': {
+                render: {
+                    fn: 'addBconfComboToTaskMainCard',
+                    priority: 900 // we want after customersCombo has been added
+                }
+            },
         }
     },
     refs: [{
@@ -76,20 +90,102 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         }
     },
     // adds the Font-Prefs-Panel to the Overview Panel if the right is present
-    addBconfToOverviewPanel: function (panel, opts) {
+    addBconfToSettingsPanel: function (panel, opts) {
         if (Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')) {
-            this.bconfPanel = panel.insert(0, { xtype: 'okapiFilterGrid' });
+            b = this.bconfPanel = panel.insert(0, {
+                xtype: 'okapiFilterGrid', store: {
+                    type: 'chained',
+                    source: 'bconfStore',
+                    storeId: 'bconfGlobal',
+                    filters: [function (item) {
+                        return !item.data.customer_id;
+                    }]
+                },
+            });
+            panel.setActiveTab(this.bconfPanel);
         }
     },
-    // shows the bconf-section in the preferences panel if the hash tells so
-    showBconfInOverviewPanel: function (panel, opts) {
+    addBconfToCustomerPanel: function (tabPanel, opts) {
+        window.tp=tabPanel;
+        vm = tabPanel.up('[viewModel]').getViewModel();
+        var vmStores = vm.storeInfo || {};
+        vmStores.bconfCustomer = {
+            source: 'bconfStore',
+            storeId: 'bconfCustomer',
+            filters: [{
+                id: 'clientFilter',
+                property: 'customer_id',
+                value: '{list.selection.id}',
+                filterFn: function ({data}) {
+                    if(window.hlt) debugger;
+                    return !data.customer_id || this._value == data.customer_id;
+                },
+            }],
+            sorters:[{
+                property: 'customer_id',
+                direction:'DESC'
+            },{
+                property: 'name',
+            }]
+        };
+        vm.setStores(vmStores);
 
-        if (window.location.hash == '#reviewbconf' && Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')) {
-            // TODO QUIRK: How can we be instantiated without the overview-Panel not being instatiated ? It happens, when the #reviewbconf hash is set on login
-            var pop = this.getPreferencesOverviewPanel();
-            if (pop) {
-                pop.setActiveItem(this.bconfPanel);
+         grid = tabPanel.insert(2-2, {
+                xtype: 'okapiFilterGrid',
+                bind: {
+                    customer: '{record}',
+                    store: '{bconfCustomer}'
+                },
+                isCustomerGrid: true,
+            });
+        tabPanel.setActiveTab(0);
+    },
+    addBconfComboToTaskMainCard: function(taskMainCard){
+         vm = taskMainCard.up('[viewModel]').getViewModel();
+        var vmStores = vm.storeInfo || {};
+        vmStores.bconfImportWizard = {
+            source: 'bconfStore',
+            autoLoad:true,
+            storeId: 'bconfImportWizard',
+            filters: [{
+                id: 'customerIdFilter',
+                filterFn: function ({data}) {
+                    var include = !data.customer_id || this._value == data.customer_id;
+                    if (window.st) debugger;
+                    return include;
+                },
+                property: 'customer_id',
+                value: '{customer.selection.id}'
+            } ],
+            sorters: [{
+                property: 'customer_id',
+                direction:'DESC'
+            },{
+                property: 'name',
+            }]
+        };
+        vm.setStores(vmStores);
+
+        bconfImportWizardCombo = taskMainCard.down("#taskMainCardContainer").add({
+            xtype: 'combobox',
+            queryMode: 'local',
+            forceSelection: true,
+            displayField: 'name',
+            name: 'bconfId',
+            valueField: 'id',
+            fieldLabel: '#UT#File format and segmentation',
+            listConfig: {
+                getInnerTpl: function(displayField){
+                    return `<span data-qtip="{description}">{${displayField}}</span>`
+                },
+            },
+            bind : {
+                store: '{bconfImportWizard}',
+                disabled: '{!customer.selection}',
+                value: '{defaultBconf}'
             }
-        }
+        });
     }
+
+
 });

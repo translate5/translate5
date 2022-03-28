@@ -34,9 +34,11 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Okapi Bconf Entity Object
- * 
+ *
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
+ * @method void setName(string $name)
+ * @method string getName()
  */
 class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstract {
     
@@ -45,18 +47,36 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     
     protected $dbInstanceClass = 'editor_Plugins_Okapi_Models_Db_Bconf';
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_Bconf';
+
+
     
+    /**
+     * loads all Entities out of DB
+     * @return array
+     */
+    public function loadAll() {
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from(['bconf' => $this->tableName ])
+        ->joinLeft(['meta' => 'LEK_customer_meta'], 'bconf.id = meta.defaultBconfId', ['customerId AS isDefaultForCustomer']);
+        return $this->loadFilterdCustom($s);
+    }
+
      /**
      * Export the Bconf
      */
-    public function exportBconf($okapiName,$okapiId){
+    public function packBconf($okapiId){
         $exportBconf = new editor_Plugins_Okapi_Bconf_Export();
-        $bconfFilesPath= $this->getDataDirectory($okapiId);
-        return $exportBconf->ExportBconf($okapiName,$okapiId,$bconfFilesPath.'/');
+        $bconfFilesPath = $this->getDataDirectory();
+        return $exportBconf->ExportBconf($okapiId, $bconfFilesPath . '/');
     }
-    
+
     /** Unpack the bconf file.
      * @param $bconfFile
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws editor_Plugins_Okapi_Exception
      */
     public function importBconf($bconfFile){
         
@@ -65,26 +85,27 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         $name = $nameWithExt[0];
     
         $this->setName($name);
-        $id = $this->save();
+        $this->save();
     
-        $okapiBconfDir = $this->getDataDirectory($id);
+        $okapiBconfDir = $this->getDataDirectory();
         
         $importBconf = new editor_Plugins_Okapi_Bconf_Import();
         $importBconf->importBconf($bconfFile,$okapiBconfDir);
+        return ["success" => true, "id" => $this->getId()];
     }
-    
+
     /**
      *
-     * @throws editor_Plugins_Okapi_Exception
+     * @param string|null $id
      * @return SplFileInfo
+     * @throws editor_Plugins_Okapi_Exception
      */
-    private function getDataDirectory($okapiId){
-        $okapiBconfDir = '../data/'.self::OKAPI_BCONF_BASE_PATH.'/'.$okapiId.'/';
-        if(!is_dir($okapiBconfDir)){
-            if(!mkdir($okapiBconfDir, 0777, true)){
-                // TODO OKAPI: define proper Event Code
-                throw new editor_Plugins_Okapi_Exception('E9999', ['reason' => 'Could not create Okapi Bconf directory: "'.$okapiBconfDir.'".']);
-            }
+    public function getDataDirectory(?string $id = null) : SplFileInfo {
+        $okapiBconfDir = '../data/'.self::OKAPI_BCONF_BASE_PATH.'/'.($id?:$this->getId()).'/';
+        //$okapiBconfDir = '/ram/'.self::OKAPI_BCONF_BASE_PATH.'/'.$okapiId.'/';
+        if(!is_dir($okapiBconfDir) && !mkdir($okapiBconfDir, 0777, true)){
+            // TODO OKAPI: define proper Event Code
+            throw new editor_Plugins_Okapi_Exception('E9999', ['reason' => 'Could not create Okapi Bconf directory: "'.$okapiBconfDir.'".']);
         }
         $okapiBconfDir = new SplFileInfo($okapiBconfDir);
         if(!$okapiBconfDir->isDir()) {
@@ -97,4 +118,5 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         }
         return $okapiBconfDir;
     }
+
 }

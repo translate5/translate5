@@ -230,7 +230,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             'editor' => array('plugins_okapi_bconf'),
         ));
         $r->addRoute('plugins_okapibconf_restdefault', $restRoute);
-        // New get rought for export the bconf file.
+        // New get route to export the bconf file.
         $exportbconf = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/exportbconf',
             array(
@@ -240,7 +240,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             ));
         $r->addRoute('plugins_okapi_bconf_exportbconf', $exportbconf);
         
-        // New post rought for import the bconf file.
+        // New post route to import the bconf file.
         $importbconf = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/importbconf',
             array(
@@ -249,6 +249,32 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action' => 'importbconf'
             ));
         $r->addRoute('plugins_okapi_bconf_importbconf', $importbconf);
+        // New post route to import the SRX file.
+        $uploadSRX = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/uploadSRX',
+            array(
+                'module' => 'editor',
+                'controller' => 'plugins_okapi_bconf',
+                'action' => 'uploadSRX'
+            ));
+        $r->addRoute('plugins_okapi_bconf_uploadsrx', $uploadSRX);
+        // New route to download the SRX file.
+        $downloadSRX = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/downloadSRX',
+            array(
+                'module' => 'editor',
+                'controller' => 'plugins_okapi_bconf',
+                'action' => 'downloadSRX'
+            ));
+        $r->addRoute('plugins_okapi_bconf_downloadsrx', $downloadSRX);
+        $cloneBconf = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/clone',
+            array(
+                'module' => 'editor',
+                'controller' => 'plugins_okapi_bconf',
+                'action' => 'clone'
+            ));
+        $r->addRoute('plugins_okapi_bconf_clone', $cloneBconf);
         
         // route for bconf filter
         $restRoute = new Zend_Rest_Route($f, array(), array(
@@ -283,6 +309,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
         //attach to the config after index to check the confgi values
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
+        $this->eventManager->attach('editor_Plugins_Okapi_BconfController', 'beforeSetDataInEntity', ['editor_Plugins_Okapi_Controllers_BconfController', 'handleCustomerDefaultBconf']);
     }
     
     /**

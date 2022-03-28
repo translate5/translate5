@@ -39,6 +39,8 @@ class editor_Plugins_Okapi_Models_Validator_Bconf extends ZfExtended_Models_Vali
      */
     protected function defineValidators() {
         $this->addValidator('id', 'int');
+        $this->addValidator('default', 'boolean');
+        $this->addValidator('description', 'stringLength', array('min' => 1, 'max' => 255));
         /*
         $this->addValidator('name', 'stringLength', array('min' => 3, 'max' => 64));
         $this->addValidator('cssname', 'stringLength', array('min' => 3, 'max' => 128));
