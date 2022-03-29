@@ -43,7 +43,7 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstract {
     
     const DATA_DIR = 'editorOkapiBconf';
-    const OKAPI_BCONF_BASE_PATH = 'okapiBconf';
+    const BCONF_BASE_PATH = 'okapiBconf';
     
     protected $dbInstanceClass = 'editor_Plugins_Okapi_Models_Db_Bconf';
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_Bconf';
@@ -65,10 +65,10 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      /**
      * Export the Bconf
      */
-    public function packBconf($okapiId){
+    public function packBconf($bconfId){
         $exportBconf = new editor_Plugins_Okapi_Bconf_Export();
         $bconfFilesPath = $this->getDataDirectory();
-        return $exportBconf->ExportBconf($okapiId, $bconfFilesPath . '/');
+        return $exportBconf->ExportBconf($bconfId, $bconfFilesPath . '/');
     }
 
     /** Unpack the bconf file.
@@ -101,8 +101,8 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws editor_Plugins_Okapi_Exception
      */
     public function getDataDirectory(?string $id = null) : SplFileInfo {
-        $okapiBconfDir = '../data/'.self::OKAPI_BCONF_BASE_PATH.'/'.($id?:$this->getId()).'/';
-        //$okapiBconfDir = '/ram/'.self::OKAPI_BCONF_BASE_PATH.'/'.$okapiId.'/';
+        $okapiBconfDir = '../data/'.self::BCONF_BASE_PATH.'/'.($id?:$this->getId()).'/';
+        //$okapiBconfDir = '/ram/'.self::BCONF_BASE_PATH.'/'.$bconfId.'/';
         if(!is_dir($okapiBconfDir) && !mkdir($okapiBconfDir, 0777, true)){
             // TODO OKAPI: define proper Event Code
             throw new editor_Plugins_Okapi_Exception('E9999', ['reason' => 'Could not create Okapi Bconf directory: "'.$okapiBconfDir.'".']);

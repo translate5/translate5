@@ -226,10 +226,10 @@ class editor_Plugins_Okapi_Bconf_Import
             
 			// Read each one
 			for ($i=0; $i<$count; $i++) {
-				$configId = $content['fprm'][] = $raf->readUTF();
+				$okapiId = $content['fprm'][] = $raf->readUTF();
 				$data = $raf->readUTF();
 				// And create the parameters file
-				file_put_contents("$outputDir/$configId.fprm", $data);
+				file_put_contents("$outputDir/$okapiId.fprm", $data);
 			}
 
 			// Write out any custom filter config overrides
@@ -239,9 +239,9 @@ class editor_Plugins_Okapi_Bconf_Import
 			for (Map.Entry<String, FilterConfigOverride> e : filterParamOverrides.entrySet()) {
 				if (e.getValue().getConfigData() != null) {
 					// Generate a custom classname
-					String overrideConfigId = e.getValue().getFilterName() + "@custom_" + customIdCount++;
-					writeConfig(outputDir, overrideConfigId, e.getValue().getConfigData());
-					extOverrides.put(e.getKey(), overrideConfigId);
+					String overrideOkapiId = e.getValue().getFilterName() + "@custom_" + customIdCount++;
+					writeConfig(outputDir, overrideOkapiId, e.getValue().getConfigData());
+					extOverrides.put(e.getKey(), overrideOkapiId);
 				}
 				else {
 					// Use default configuration of another named filter - for example, when remapping
@@ -259,16 +259,16 @@ class editor_Plugins_Okapi_Bconf_Import
 				$extMap = $this->readExtensionMap($raf);
 				// Apply the overrides
 //				extMap.putAll(extOverrides);
-				foreach ($extMap as $ext => $configId) {
-					$write .= $ext . "\t" . $configId . PHP_EOL;
+				foreach ($extMap as $ext => $okapiId) {
+					$write .= $ext . "\t" . $okapiId . PHP_EOL;
 				}
 				file_put_contents($path, $write);
 			}
             file_put_contents("$outputDir/content.json", json_encode($content, JSON_PRETTY_PRINT));
 	}
 
-	private function writeConfig(String $outputDir, String $configId, String $data) : string {
-		$path = $outputDir + "/" + $configId + ".fprm";
+	private function writeConfig(String $outputDir, String $okapiId, String $data) : string {
+		$path = $outputDir + "/" + $okapiId + ".fprm";
 //		try (PrintWriter pw = new PrintWriter(path, "UTF-8")) {
 			file_put_contents($path, $data);
 //		}
@@ -280,8 +280,8 @@ class editor_Plugins_Okapi_Bconf_Import
 		$count = $raf->readInt();
 		for (  $i=0; $i<$count; $i++ ) {
 			$ext  = $raf->readUTF();
-			$configId = $raf->readUTF();
-			$map[$ext] = $configId;
+            $okapiId = $raf->readUTF();
+			$map[$ext] = $okapiId;
 		}
 		return $map;
 	}

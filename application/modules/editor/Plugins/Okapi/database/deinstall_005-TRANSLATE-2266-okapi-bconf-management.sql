@@ -31,3 +31,4 @@ DELETE FROM `Zf_acl_rules` WHERE `resource` = 'editor_plugins_okapi_bconffilter'
 
 DROP TABLE IF EXISTS `LEK_okapi_bconf`;
 DROP TABLE IF EXISTS `LEK_okapi_bconf_filter`;
+DROP TABLE IF EXISTS `LEK_okapi_bconf_default_filter`;

@@ -29,25 +29,23 @@ END LICENSE AND COPYRIGHT
 /**
  */
 class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
+
     protected static $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
     
     /**
-     * Name of the default okapi config file
+     * @var string
+     */
+    const BCONF_TARGET_IMPORT = 'import';
+    /**
      *
      * @var string
      */
-    const OKAPI_BCONF_EXPORT_NAME='okapi_default_export.bconf';
-    
-    /***
-     * @var string
-     */
-    const OKAPI_BCONF_TARGET_IMPORT = 'import';
-    
-    /***
+    const BCONF_TARGET_EXPORT = 'export';
+    /**
      *
-     * @var string
+     * @var int
      */
-    const OKAPI_BCONF_TARGET_EXPORT = 'export';
+    const BCONF_VERSION_INDEX = 0;
     
     
     private static $bconfExtensions = ['bconf'];
@@ -448,7 +446,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         if(count($this->bconfFilePaths) == 0){
             $this->useCustomBconf = false;
             //use the task-import default file when there is no custom bconf in use
-            $this->bconfFilePaths[] = self::createDefaultBconfPath($this->task,self::OKAPI_BCONF_TARGET_IMPORT);
+            $this->bconfFilePaths[] = self::createDefaultBconfPath($this->task,self::BCONF_TARGET_IMPORT);
         }
     }
     

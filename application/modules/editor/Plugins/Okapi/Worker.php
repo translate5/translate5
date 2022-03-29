@@ -193,7 +193,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         try {
             $api->createProject();
 
-            $api->uploadOkapiConfig([$plugin::createDefaultBconfPath($this->task,$plugin::OKAPI_BCONF_TARGET_EXPORT)]);
+            $api->uploadOkapiConfig([$plugin::createDefaultBconfPath($this->task,$plugin::BCONF_TARGET_EXPORT)]);
             
             $api->uploadInputFile('manifest.rkm', $manifestFile);
             $originalFile = $this->findOriginalFile($fileId);

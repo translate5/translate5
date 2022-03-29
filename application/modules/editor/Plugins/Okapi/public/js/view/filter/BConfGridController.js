@@ -91,7 +91,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
 
     exportbconf: function ({grid}, rowIndex, colIndex) {
         var okapiName = grid.getStore().getAt(rowIndex).get('name');
-        var okapiId = grid.getStore().getAt(rowIndex).get('id');
+        var bconfId = grid.getStore().getAt(rowIndex).get('id');
         var form = Ext.create('Ext.form.Panel',{
             timeout: 60000
         });
@@ -100,8 +100,8 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
             method  : 'GET',
             standardSubmit: true,
             params  : {
-                okapiName:okapiName,
-                okapiId:okapiId
+                okapiName: okapiName,
+                bconfId: bconfId
             },
             target: '_blank'
         });
@@ -122,14 +122,14 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
         dlAnchor.click();
     },
     getActionStatus:function (view, rowIndex, colIndex, item, record) {
-        return record.get('default')=="1";
+        return record.get('default') == "1";
     },
 
     filterByText: function (text){
         var me = this, view = me.getView(), store = view.getStore();
         var searchFilterValue =text.getValue().trim().toLowerCase();
         store.clearFilter();
-        if (searchFilterValue !="") {
+        if (searchFilterValue != "") {
             store.filterBy((item)=>{
                return item.get('name').toLowerCase().indexOf(searchFilterValue)>-1 || item.get('extensions').toLowerCase().indexOf(searchFilterValue)>-1  || item.get('description').toLowerCase().indexOf(searchFilterValue)>-1
             })

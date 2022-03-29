@@ -78,7 +78,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
     public function exportbconfAction()
     {
         $okapiName = $this->getParam('okapiName');
-        $dir = $this->entity->getDataDirectory($this->getParam('okapiId'));
+        $dir = $this->entity->getDataDirectory($this->getParam('bconfId'));
         $exportFile = "$dir/export.bconf";
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
@@ -96,11 +96,11 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
     }
      private function packBconf(){
          $bconf = new editor_Plugins_Okapi_Models_Bconf();
-         $okapiId = $this->getParam('okapiId');
-         if ($okapiId == null || $okapiId == "") {
+         $bconfId = $this->getParam('bconfId');
+         if ($bconfId == null || $bconfId == "") {
              return false;
          }
-         $bconf->packBconf($okapiId);
+         $bconf->packBconf($bconfId);
      }
 	
 	/**

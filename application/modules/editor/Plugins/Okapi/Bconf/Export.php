@@ -41,7 +41,7 @@ class editor_Plugins_Okapi_Bconf_Export
     /**
      * Export bconf
      */
-    public function ExportBconf($okapiId, $bconfBasePath)
+    public function ExportBconf($bconfId, $bconfBasePath)
     {   
         chdir($bconfBasePath); // so we can access with file name only
 
@@ -61,8 +61,8 @@ class editor_Plugins_Okapi_Bconf_Export
         
         //Read the pipeline and extract steps
         $this->processPipeline($raf);
-        $this->filterConfiguration($okapiId, $raf);
-        $this->extensionsMapping($okapiId, $raf);
+        $this->filterConfiguration($bconfId, $raf);
+        $this->extensionsMapping($bconfId, $raf);
         //$raf->fclose();
         
         if(file_exists($fileName)){
@@ -142,7 +142,7 @@ class editor_Plugins_Okapi_Bconf_Export
     /**
      *
      */
-    protected function filterConfiguration($okapiId, $raf)
+    protected function filterConfiguration($bconfId, $raf)
     {   
         $fprms = $this->content['fprm'] ?? glob("*.fprm");
         $raf->writeInt(count($fprms));
@@ -156,7 +156,7 @@ class editor_Plugins_Okapi_Bconf_Export
         return;
 
         $filterConfiguration = new editor_Plugins_Okapi_Models_BconfFilter();
-        $data = $filterConfiguration->getByOkapiId($okapiId);
+        $data = $filterConfiguration->getByBconfId($bconfId);
         $count = 0;
         foreach ($data as $filter) {
             if ($filter['default'] == 1) {
@@ -168,10 +168,10 @@ class editor_Plugins_Okapi_Bconf_Export
         foreach ($data as $filter) {
             if ($filter['default'] == 1) {
                 //TODO get dir path
-                $configFilePath = $filter['configId'].'.fprm';
+                $configFilePath = $filter['okapiId'].'.fprm';
                 $file = fopen($configFilePath, "r") or die("Unable to open file!");
                 $configData = fread($file, filesize($configFilePath));
-                $raf->writeUTF($filter['configId']);
+                $raf->writeUTF($filter['okapiId']);
                 $raf->writeUTF($configData);
             }
         }
@@ -181,7 +181,7 @@ class editor_Plugins_Okapi_Bconf_Export
      * @param $bconfId
      * @param $raf
      */
-    protected function extensionsMapping($okapiId, $raf)
+    protected function extensionsMapping($bconfId, $raf)
     {
         $extMapFile = "extensions-mapping.txt";
         if(!file_exists($extMapFile)){
@@ -201,7 +201,7 @@ class editor_Plugins_Okapi_Bconf_Export
         return;
 
         $filterConfiguration = new editor_Plugins_Okapi_Models_BconfFilter();
-        $data = $filterConfiguration->getByOkapiId($okapiId);
+        $data = $filterConfiguration->getByBconfId($bconfId);
         
         $defaultFilters = new editor_Plugins_Okapi_Models_BconfDefaultFilter();
         $defaultFiltersData = $defaultFilters->loadAll();
@@ -213,7 +213,7 @@ class editor_Plugins_Okapi_Bconf_Export
                 $extList = explode(",", $filter["extensions"]);
                 foreach ($extList as $extension) {
                     if(!empty($extension)) {
-                        array_push($extMap, array("ext" => $extension, "id" => $filter["configId"]));
+                        array_push($extMap, array("ext" => $extension, "id" => $filter["okapiId"]));
                         $count++;
                     }
                 }
@@ -224,7 +224,7 @@ class editor_Plugins_Okapi_Bconf_Export
                 $extList = explode(",", $filter["extensions"] ?? '');
                 foreach ($extList as $extension) {
                     if(!empty($extension)) {
-                        array_push($extMap, array("ext" => $extension, "id" => $filter["configId"]));
+                        array_push($extMap, array("ext" => $extension, "id" => $filter["okapiId"]));
                         $count++;
                     }
                 }
