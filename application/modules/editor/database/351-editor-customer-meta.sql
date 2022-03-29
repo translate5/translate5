@@ -31,7 +31,5 @@ CREATE TABLE `LEK_customer_meta` (
   `defaultBconfId` int(11) DEFAULT NULL COMMENT 'Foreign Key to LEK_okapi_bconf',
   PRIMARY KEY (`id`),
   UNIQUE KEY `customerId` (`customerId`),
-  KEY `defaultBconfId` (`defaultBconfId`),
-  CONSTRAINT `fk-customer_meta-customer` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk-customer_meta-okapi_bconf` FOREIGN KEY (`defaultBconfId`) REFERENCES `LEK_okapi_bconf` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk-customer_meta-customer` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
 )
