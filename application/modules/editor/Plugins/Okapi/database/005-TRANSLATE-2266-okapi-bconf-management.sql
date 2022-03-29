@@ -34,7 +34,6 @@ CREATE TABLE `LEK_okapi_bconf` (
     `customer_id` INT(11) DEFAULT NULL,
     `name` VARCHAR(50),
     `description` TEXT,
-    `inventory` TEXT,
     `default` TINYINT(1) NOT NULL DEFAULT 0,
     `versionIdx` INT(10) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
