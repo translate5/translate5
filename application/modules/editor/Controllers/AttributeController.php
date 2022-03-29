@@ -112,16 +112,16 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
-     * Get 'termEntryId'-param from request
-     * If 'except'-param is given, termEntryId-values of all records found
-     * matching last used search params would be fetched and returned, except the ones given by termEntryId-param
+     * Get 'termId'-param from request
+     * If 'except'-param is given, id-values of all records found matching last used search params
+     * would be fetched and returned, except the ones given by termId-param
      *
      * @return array
      */
-    private function _termEntryIds() {
+    private function _termIds() {
 
-        // Get termEntryId-param from request
-        $termEntryIdA = array_unique(editor_Utils::ar($this->getParam('termEntryId')));
+        // Get termId-param from request
+        $termIdA = array_unique(editor_Utils::ar($this->getParam('termId')));
 
         // If except-param is given as true
         if ($this->getParam('except')) {
@@ -135,24 +135,21 @@ class editor_AttributeController extends ZfExtended_RestController
             $total = false;
 
             // Fetch ids of ALL terms matching last search, excluding ids given by 'except'-param
-            $termEntryIdA = ZfExtended_Factory
+            $termIdA = ZfExtended_Factory
                 ::get('editor_Models_Terminology_Models_TermModel')
                 ->searchTermByParams(
-                    $_SESSION['lastParams'] + [
-                        'except' => join(',', $termEntryIdA),
-                        'column' => 'termEntryId'
-                    ],
+                    $_SESSION['lastParams'] + ['except' => join(',', $termIdA)],
                     $total
                 );
 
             // If nothing found - flush error msg
-            if (!$termEntryIdA) {
+            if (!$termIdA) {
                 $this->jflush(false, 'Nothing to edit');
             }
         }
 
         // Return ids
-        return array_unique($termEntryIdA);
+        return array_unique($termIdA);
     }
 
     /**
@@ -164,17 +161,28 @@ class editor_AttributeController extends ZfExtended_RestController
         // Shortcut
         $dataType = $this->getParam('dataType');
 
-        // Validate dataType-param and load it's model instance
+        // Validate termId-param and also validate dataType-param and load it's model instance
         $_ = $this->jcheck([
+            'termId' => [
+                'req' => true,
+                'rex' => $this->getParam('batch') ? 'int11list' : 'int11'
+            ],
+            'level' => [
+                'req' => true,
+                'fis' => 'entry,language,term'
+            ],
             'dataType' => [
                 'req' => true,
                 'rex' => is_numeric($dataType) ? 'int11' : '~^[a-zA-Z_]+$~',
                 'key' => 'editor_Models_Terminology_Models_AttributeDataType.' . (is_numeric($dataType) ? 'id' : 'type')
+            ],
+            'batch,except' => [
+                'rex' => 'bool'
             ]
         ]);
 
         // Set 'level' prop inside $_ to be passed further
-        $_['level'] = $this->getParam('termId') ? 'term' : ($this->getParam('language') ? 'language' : 'entry');
+        $_['level'] = $this->getParam('level');
 
         // Check that the level we're going to create attr at is allowed for that attr datatype
         $this->jcheck([
@@ -184,133 +192,19 @@ class editor_AttributeController extends ZfExtended_RestController
         ], $_);
 
         // Detect whether we're in batch mode
-        if (!$this->batch = $this->getParam('batch'))
-            foreach (['termEntryId', 'language', 'termId'] as $param)
-                if ($value = $this->getParam($param))
-                    if ($value == 'batch'
-                        || ($param != 'language' && editor_Utils::rexm('int11list',   $value) && !editor_Utils::rexm('int11'  , $value))
-                        || ($param == 'language' && editor_Utils::rexm('rfc5646list', $value) && !editor_Utils::rexm('rfc5646', $value)))
-                        $this->batch = true;
-
-        // Prevent creation of processStatus and administrativeStatus attributes
-        /*if ($this->batch) $this->jcheck([
-            'type' => [
-                'dis' => 'processStatus,administrativeStatus'
-            ]
-        ], $_['dataType']);*/
+        $this->batch = $this->getParam('batch');
 
         // If batch-mode was detected
         if ($this->batch) {
 
-            // If we're going to create an attribute across entry-levels of selected termEntries
-            if ($_['level'] == 'entry') {
+            // Foreach termId
+            foreach ($this->_termIds() as $termId) {
 
-                // Get array of termEntryIds
-                $termEntryIdA = $this->_termEntryIds();
+                // Use it to spoof 'termId' request-param
+                $this->setParam('termId', $termId);
 
-                // Foreach termEntryId
-                foreach ($termEntryIdA as $termEntryId) {
-
-                    // Use it to spoof 'termEntryId' request-param
-                    $this->setParam('termEntryId', $termEntryId);
-
-                    // Validate request params (and pull records if need) as if we would not be in batch-mode
-                    $this->_postCheck($_);
-                }
-
-            // Else if we're going to create an attribute across language-levels of
-            // either selected termEntries within left panel or selected terms in center panel
-            } else if ($_['level'] == 'language') {
-
-                // Get array of termEntryIds
-                $termEntryIdA = $this->_termEntryIds();
-
-                // If language-param is not 'batch' - make sure it's a
-                // comma-separated list of rfc-codes before usage it in sql query
-                if ($this->getParam('language') != 'batch') $this->jcheck(['language' => ['rex' => 'rfc5646list']]);
-
-                // Get term model
-                /** @var editor_Models_Terminology_Models_TermModel $termM */
-                $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-
-                // Setup $certain variable to be used language-col cond. Here we respect comma-separated rfc-codes given by language-param only
-                // in case if termEntryId-param contains single(!) integer value. If termEntryId-param
-                // contains multiple (e.g comma-separated) values, then ALL distinct languages of each
-                // termEntryId will be affected
-                $certain = $this->getParam('language') != 'batch' && count($termEntryIdA) == 1
-                    ? $this->getParam('language')
-                    : false;
-
-                // Foreach termEntryId
-                foreach ($termEntryIdA as $termEntryId) {
-
-                    // Use it to spoof 'termEntryId' request-param
-                    $this->setParam('termEntryId', $termEntryId);
-
-                    // Get distinct languages inside that termEntry
-                    $languageA = $termM->getLanguagesByTermEntryId($termEntryId, $certain);
-
-                    // Foreach language within current termEntryId
-                    foreach ($languageA as $language) {
-
-                        // Use it to spoof 'termEntryId' request-param
-                        $this->setParam('language', $language);
-
-                        // Validate request params (and pull records if need) as if we would not be in batch-mode
-                        $this->_postCheck($_);
-                    }
-                }
-
-            // Else if we're going to create an attribute for ALL terms across
-            // either selected termEntries in left panel or selected terms themselves in center panel
-            } else if ($_['level'] == 'term') {
-
-                // Get array of termEntryIds
-                $termEntryIdA = $this->_termEntryIds();
-
-                // Drop termEntryId and language params, as we don't need them
-                $this->setParam('termEntryId', '');
-                $this->setParam('language', '');
-
-                // If termId-param is given as comma-separated list of integers
-                if ($termIdA = editor_Utils::rexm('int11list', $this->getParam('termId'))
-                    ? array_unique(editor_Utils::ar($this->getParam('termId')))
-                    : []) {
-
-                    // Foreach term id
-                    foreach ($termIdA as $termId) {
-
-                        // Use it to spoof 'termEntryId' request-param
-                        $this->setParam('termId', $termId);
-
-                        // Validate request params (and pull records if need) as if we would not be in batch-mode
-                        $this->_postCheck($_);
-                    }
-
-                // Else if termId-param is 'batch'
-                } else {
-
-                    // Get term model
-                    /** @var editor_Models_Terminology_Models_TermModel $termM */
-                    $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-
-                    // Foreach termEntryId
-                    foreach ($termEntryIdA as $termEntryId) {
-
-                        // Get termIds inside that termEntry
-                        $termIdA = $termM->getIdsByTermEntryId($termEntryId);
-
-                        // Foreach term within current termEntryId
-                        foreach ($termIdA as $termId) {
-
-                            // Use it to spoof 'termEntryId' request-param
-                            $this->setParam('termId', $termId);
-
-                            // Call _postCheck to create an attribute as if we would not be in batch-mode
-                            $this->_postCheck($_);
-                        }
-                    }
-                }
+                // Validate request params (and pull records if need) as if we would not be in batch-mode
+                $this->_postCheck($_);
             }
 
         // Validate request params (and pull records if need)
@@ -323,7 +217,7 @@ class editor_AttributeController extends ZfExtended_RestController
             list ($params['termEntryId'], $params['language'], $params['termId']) = explode(':', $key);
 
             // Spoof params
-            foreach ($params as $name => $value) $this->setParam($name, $value ?: null);
+            foreach ($params as $name => $value) $this->setParam($name, $value);
 
             // Call the appropriate method depend on mode-param
             switch ($_['dataType']->getType()) {
@@ -364,31 +258,19 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Validate other params
         $_ += $this->jcheck([
-            'termEntryId' => [
-                'req' => !$this->getParam('termId'),
-                'rex' => 'int11',
-                'key' => 'terms_term_entry'
-            ],
-            'language' => [
-                'rex' => 'rfc5646',
-                'key' => 'LEK_languages.rfc5646'
-            ],
             'termId' => [
-                'req' => !$this->getParam('termEntryId'),
+                'req' => true,
                 'rex' => 'int11',
                 'key' => 'editor_Models_Terminology_Models_TermModel'
             ],
         ]);
-
-        // Set 'termOrEntry' prop (to have a place where collectionId is accessible)
-        $_['termOrEntry'] = $_['level'] == 'term' ? $_['termId']->toArray() : $_['termEntryId'];
 
         // If no or only certain collections are accessible - validate collection accessibility
         if ($this->collectionIds !== true) $this->jcheck([
             'collectionId' => [
                 'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
             ],
-        ], $_['termOrEntry']);
+        ], $_['termId']);
 
         // If attribute we're going to add is not a part of TBX basic standard
         if (!$_['dataType']->getIsTbxBasic())
@@ -396,10 +278,12 @@ class editor_AttributeController extends ZfExtended_RestController
                 'collectionId' => [
                     'fis' => $_['dataType']->getAllowedCollectionIds() // FIND_IN_SET
                 ]
-            ], $_['termOrEntry']);
+            ], $_['termId']);
 
         // Build params key
-        $key = $this->getParam('termEntryId') . ':' . $this->getParam('language') . ':' . $this->getParam('termId');
+        $key = $_['termId']->getTermEntryId()
+            . ':' . ($_['level'] != 'entry' ? $_['termId']->getLanguage() : '')
+            . ':' . ($_['level'] == 'term'  ? $_['termId']->getId() : '');
 
         // Save jcheck return data
         $this->jchecked[$key] = $_;
@@ -776,9 +660,9 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Get dataTypeId => id pairs of already existing attributes
         $existingA = $_['dataType']->getAlreadyExistingFor(
-            $_['level'] == 'term' ? $_['termId']->getTermEntryId() : $_['termEntryId']['id'],
-            $_['level'] == 'term' ? $_['termId']->getLanguage() : $this->getParam('language'),
-            $_['level'] == 'term' ? $_['termId']->getId() : null
+            $this->getParam('termEntryId') ?: null,
+            $this->getParam('language') ?: null,
+            $this->getParam('termId') ?: null
         );
 
         // If we're going to create attribute with a dataTypeId,
@@ -786,49 +670,22 @@ class editor_AttributeController extends ZfExtended_RestController
         $attrId = $existingA[$_['dataType']->getId()] ?? false;
 
         // If we're not in batch mode - prevent creating attribute with such a dataTypeId
-        if (!$this->batch && $attrId) $this->jcheck([
-            'id' => [
-                'dis' => $_['dataType']->getId()
-            ]
-        ], $_['dataType']);
+        if (!$this->batch && $attrId) $this->jflush(false, 'Duplicates are not allowed');
 
         // Default value for the attribute
         $value = $_['dataType']->getDataType() == 'picklist' ? explode(',', $_['dataType']->getPicklistValues())[0] : null;
 
-        // If $attrId is non-false and execution reached this line it means that
-        // we're in batch mode, and we're going to create an attribute with a dataTypeId
-        // that one of already existing attributes has, so instead of creating new one
-        // we just load the existing one, so the existing one will be used further
-        /*if ($attrId) {
+        // Init attribute model with data
+        $this->_attrInit($_, [
+            'value' => $value,
+            'target' => null,
+        ]);
 
-            // Load existing
-            $this->entity->load($attrId);
-
-            // Overwrite existing value with default value
-            $this->entity->setValue($value);
-            $this->entity->setTarget(null);
-
-            // Save attr and affect transacgrp-records
-            $updated = $this->entity->update($misc = [
-                'userName' => $this->_session->userName,
-                'userGuid' => $this->_session->userGuid
-            ]);
-
-        // Else
-        } else {*/
-
-            // Init attribute model with data
-            $this->_attrInit($_, [
-                'value' => $value,
-                'target' => null,
-            ]);
-
-            // Save attr and affect transacgrp-records
-            $updated = $this->entity->insert($misc = [
-                'userName' => $this->_session->userName,
-                'userGuid' => $this->_session->userGuid
-            ]);
-        //}
+        // Save attr and affect transacgrp-records
+        $updated = $this->entity->insert($misc = [
+            'userName' => $this->_session->userName,
+            'userGuid' => $this->_session->userGuid
+        ]);
 
         // Prepare inserted data to be flushed into response json
         $inserted = [
@@ -1233,17 +1090,17 @@ class editor_AttributeController extends ZfExtended_RestController
             'type'        => $_['dataType']->getType(),
             'elementName' => $_['dataType']->getLabel(),
 
-            'collectionId' => $_['termOrEntry']['collectionId'],
-            'termEntryId'  =>      $this->getParam('termId') ? $_['termId']->getTermEntryId()  : $_['termEntryId']['id'],
-            'language'     => $l = $this->getParam('termId') ? $_['termId']->getLanguage() : $this->getParam('language'),
-            'termId'       => $this->getParam('termId'),
+            'collectionId' => $_['termId']->getCollectionId(),
+            'termEntryId'  => $_['termId']->getTermEntryId(),
+            'language'     => $l = $this->getParam('language') ?: null,
+            'termId'       => $this->getParam('termId') ?: null,
             'termTbxId'    => $this->getParam('termId') ? $_['termId']->getTermTbxId() : null,
             'isCreatedLocally' => 1,
             'createdBy' => $this->_session->id,
             'createdAt' => date('Y-m-d H:i:s'),
             'updatedBy' => $this->_session->id,
             'updatedAt' => date('Y-m-d H:i:s'),
-            'termEntryGuid' => $this->getParam('termId') ? $_['termId']->getTermEntryGuid() : $_['termEntryId']['entryGuid'],
+            'termEntryGuid' => $_['termId']->getTermEntryGuid(),
             //'langSetGuid' => null,
             'termGuid' => $this->getParam('termId') ? $_['termId']->getGuid() : null,
             'guid' => ZfExtended_Utils::uuid(),
