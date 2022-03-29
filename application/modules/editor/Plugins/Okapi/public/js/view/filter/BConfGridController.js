@@ -125,14 +125,13 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
         return record.get('default') == "1";
     },
 
-    filterByText: function (text){
-        var me = this, view = me.getView(), store = view.getStore();
-        var searchFilterValue =text.getValue().trim().toLowerCase();
+    filterByText: function (filterField){
+        var store = this.getView().getStore(),
+            searchFilterValue =filterField.getValue().trim();
         store.clearFilter();
-        if (searchFilterValue != "") {
-            store.filterBy((item)=>{
-               return item.get('name').toLowerCase().indexOf(searchFilterValue)>-1 || item.get('extensions').toLowerCase().indexOf(searchFilterValue)>-1  || item.get('description').toLowerCase().indexOf(searchFilterValue)>-1
-            })
+        if (searchFilterValue) {
+            searchRE = new RegExp(searchFilterValue,'i');
+            store.filterBy(({data}) => searchRE.exec(JSON.stringify(data)));
         }
     },
 

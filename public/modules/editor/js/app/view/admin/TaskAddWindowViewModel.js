@@ -67,7 +67,7 @@ Ext.define('Editor.view.admin.TaskAddWindowViewModel', {
                     return customerDefault;
                 } else {
                     var bconfStore = Ext.getStore('bconfStore'),
-                        globalDefaultIdx = bconfStore.findBy(({data}) => data.default); // there is only one record with default:1
+                        globalDefaultIdx = bconfStore && bconfStore.findBy(({data}) => data.default); // there is only one record with default:1
                     if(globalDefaultIdx > -1) return bconfStore.getAt(globalDefaultIdx).id;
                 }
                 return null;

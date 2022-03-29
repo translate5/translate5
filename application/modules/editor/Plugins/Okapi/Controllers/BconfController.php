@@ -95,14 +95,14 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
 
     }
      private function packBconf(){
-         $bconf = new editor_Plugins_Okapi_Models_Bconf();
+         $bconf = new $this->entityClass();
          $bconfId = $this->getParam('bconfId');
-         if ($bconfId == null || $bconfId == "") {
+         if (!$bconfId) {
              return false;
          }
-         $bconf->packBconf($bconfId);
+         return $bconf->packBconf($bconfId);
      }
-	
+
 	/**
 	 * Import bconf
 	 */
@@ -117,15 +117,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
             ]);
         }
         
-        $file = [];
-        if(array_key_exists('0', $files)){
-            $file = $files[0];
-        }else{
-            $file = $files[self::FILE_UPLOAD_NAME];
-        }
-
-        /** @var editor_Plugins_Okapi_Models_Bconf $bconf */
-        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        $file = $files[self::FILE_UPLOAD_NAME];
+        $bconf = new $this->entityClass();
 		//TODO get the file name from UI
         $ret = $bconf->importBconf($file);
         $id = $ret['id'];
@@ -171,7 +164,6 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
     public function cloneAction()
     {
         $this->entityLoad();
-        $oldId = $this->getParam('id');
         $oldDir = $this->entity->getDataDirectory();
         chdir($oldDir);
 
@@ -199,25 +191,27 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
     }
 
 
-
     /**
      * @param Zend_EventManager_Event $e
      * @return void
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @noinspection PhpRedundantCatchClauseInspection
      */
-    public static function handleCustomerDefaultBconf($e){
+    public static function handleCustomerDefaultBconf(Zend_EventManager_Event $e){
         /** @var array $data */
         $data = $e->getParam('data');
         if(isset($data['isDefaultForCustomer'])){
-            /** @var editor_Models_Customer_Meta $customerMeta */
             $customerMeta = new editor_Models_Customer_Meta();
             $customerId = (int) $data['isDefaultForCustomer'];
             $bconfId = (int) $data['id'];
             if ($customerId) {
                 try {
                     $customerMeta->loadByCustomerId($customerId);
-                } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-                    $customerMeta->init(['customerId' => $customerId]);
-                } // new entity
+                } catch (ZfExtended_Models_Entity_NotFoundException) {
+                    $customerMeta->init(['customerId' => $customerId]); // new entity
+                }
             } else {
                 $customerMeta->loadRow('defaultBconfId = ?', $bconfId);
             }

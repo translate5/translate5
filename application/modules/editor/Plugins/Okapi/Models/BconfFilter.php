@@ -44,11 +44,12 @@ class editor_Plugins_Okapi_Models_BconfFilter extends ZfExtended_Models_Entity_A
     
     protected $dbInstanceClass = 'editor_Plugins_Okapi_Models_Db_BconfFilter';
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_BconfFilter';
-     
-     /** get all the row by bconfId
-      * @param $bconfId
-      */
-     public function getByBconfId($bconfBasePath, $bconfId){
+
+    /** get all the row by $bconfId
+     * @param $bconfId
+     * @return array|null
+     */
+     public function getByBconfId($bconfId): ?array {
           // find all fonts for a task
           $select = $this->db->select()
                ->where('bconfId = ?', $bconfId);

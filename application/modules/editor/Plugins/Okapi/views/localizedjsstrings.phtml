@@ -31,8 +31,11 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-/* @var $this Zend_View */
+/**
+ * @var Zend_View $this
+ * @var ZfExtended_Zendoverwrites_Translate $translate
+ * */
+$translate = $this->translate;
 ?>
 
 Editor.controller.Localizer.addPluginInit('okapi', function() {
@@ -40,28 +43,33 @@ Editor.controller.Localizer.addPluginInit('okapi', function() {
     /** @class okapi_l18n */
     Ext.define("Editor.locale.plugins.Okapi.view.filter.BConfGrid", {
         override: "Editor.plugins.Okapi.view.filter.BConfGrid",
-        title: `<?php echo $this->translate->_('Dateiformatkonvertierung'); ?>`,
+        config: { // configs need direct override
+            title: `<?= $translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>`,
+        },
         text_cols: {
-            name: `<?php echo $this->translate->_('Name'); ?>`,
-            extensions: `<?php echo $this->translate->_('Erweiterungen'); ?>`,
-            description: `<?php echo $this->translate->_('Beschreibung'); ?>`,
-            action: `<?php echo $this->translate->_('Aktionen'); ?>`,
-            uploadBconf: `<?php echo $this->translate->_('Bconf hochladen...'); ?>`,
-            srx: `<?php echo $this->translate->_('SRX-Datei'); ?>`,
-            pipeline: `<?php echo $this->translate->_('Pipeline'); ?>`,
+            name: `<?= $translate->_('Name'); ?>`,
+            extensions: `<?= $translate->_('Erweiterungen'); ?>`,
+            description: `<?= $translate->_('Beschreibung'); ?>`,
+            action: `<?= $translate->_('Aktionen'); ?>`,
+            uploadBconf: `<?= $translate->_('Bconf hochladen...'); ?>`,
+            srx: `<?= $translate->_('SRX-Datei'); ?>`,
+            pipeline: `<?= $translate->_('Pipeline'); ?>`,
+            standard: `<?= $translate->_('Standard'); ?>`,
+            customerStandard: `<?= $translate->_('Kundenstandard'); ?>`,
         },
         strings: {
-            edit: `'<?php echo $this->translate->_('Bearbeiten'); ?>`,
-            remove: `<?php echo $this->translate->_('Löschen'); ?>`,
-            copy: `<?php echo $this->translate->_('Kopieren'); ?>`,
-            upload: `<?php echo $this->translate->_('Hochladen'); ?>`,
-            addBconf: `<?php echo $this->translate->_('Bconf hinzufügen'); ?>`,
-            uploadBconf: `<?php echo $this->translate->_('Bconf hochladen...'); ?>`,
-            searchText: `<?php echo $this->translate->_('Suchen'); ?>`,
-            searchEmptyText: `<?php echo $this->translate->_('Suchen'); ?>`,
-            export: `<?php echo $this->translate->_('Exportieren'); ?>`,
-            browse: `<?php echo $this->translate->_('Durchsuchen...'); ?>'`,
-            bconfRequired: `<?php echo $this->translate->_('wird benötigt'); ?>`
+            edit: `'<?= $translate->_('Bearbeiten'); ?>`,
+            remove: `<?= $translate->_('Löschen'); ?>`,
+            copy: `<?= $translate->_('Kopieren'); ?>`,
+            upload: `<?= $translate->_('Hochladen'); ?>`,
+            addBconf: `<?= $translate->_('Bconf hinzufügen'); ?>`,
+            uploadBconf: `<?= $translate->_('Bconf hochladen...'); ?>`,
+            searchText: `<?= $translate->_('Suchen'); ?>`,
+            searchEmptyText: `<?= $translate->_('Suchen'); ?>`,
+            export: `<?= $translate->_('Exportieren'); ?>`,
+            browse: `<?= $translate->_('Durchsuchen...'); ?>'`,
+            bconfRequired: `<?= $translate->_('wird benötigt'); ?>`,
+            titleLong: `<?= $translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>`,
         },
 
     });

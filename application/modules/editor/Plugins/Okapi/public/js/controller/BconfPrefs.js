@@ -90,10 +90,11 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         }
     },
     // adds the Font-Prefs-Panel to the Overview Panel if the right is present
-    addBconfToSettingsPanel: function (panel, opts) {
+    addBconfToSettingsPanel: function (panel) {
         if (Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')) {
-            b = this.bconfPanel = panel.insert(0, {
-                xtype: 'okapiFilterGrid', store: {
+            this.bconfPanel = panel.insert(0, {
+                xtype: 'okapiFilterGrid',
+                store: {
                     type: 'chained',
                     source: 'bconfStore',
                     storeId: 'bconfGlobal',
@@ -105,9 +106,8 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             panel.setActiveTab(this.bconfPanel);
         }
     },
-    addBconfToCustomerPanel: function (tabPanel, opts) {
-        window.tp=tabPanel;
-        vm = tabPanel.up('[viewModel]').getViewModel();
+    addBconfToCustomerPanel: function (tabPanel) {
+        var vm = tabPanel.up('[viewModel]').getViewModel();
         var vmStores = vm.storeInfo || {};
         vmStores.bconfCustomer = {
             source: 'bconfStore',
@@ -117,7 +117,6 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                 property: 'customer_id',
                 value: '{list.selection.id}',
                 filterFn: function ({data}) {
-                    if(window.hlt) debugger;
                     return !data.customer_id || this._value == data.customer_id;
                 },
             }],
@@ -130,7 +129,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         };
         vm.setStores(vmStores);
 
-         grid = tabPanel.insert(2-2, {
+        tabPanel.insert(2-2, {
                 xtype: 'okapiFilterGrid',
                 bind: {
                     customer: '{record}',
@@ -141,8 +140,8 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         tabPanel.setActiveTab(0);
     },
     addBconfComboToTaskMainCard: function(taskMainCard){
-         vm = taskMainCard.up('[viewModel]').getViewModel();
-        var vmStores = vm.storeInfo || {};
+        var vm = taskMainCard.up('[viewModel]').getViewModel(),
+            vmStores = vm.storeInfo || {};
         vmStores.bconfImportWizard = {
             source: 'bconfStore',
             autoLoad:true,
@@ -150,9 +149,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             filters: [{
                 id: 'customerIdFilter',
                 filterFn: function ({data}) {
-                    var include = !data.customer_id || this._value == data.customer_id;
-                    if (window.st) debugger;
-                    return include;
+                    return !data.customer_id || this._value == data.customer_id;
                 },
                 property: 'customer_id',
                 value: '{customer.selection.id}'
@@ -166,14 +163,14 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         };
         vm.setStores(vmStores);
 
-        bconfImportWizardCombo = taskMainCard.down("#taskMainCardContainer").add({
+        taskMainCard.down("#taskMainCardContainer").add({
             xtype: 'combobox',
             queryMode: 'local',
             forceSelection: true,
             displayField: 'name',
             name: 'bconfId',
             valueField: 'id',
-            fieldLabel: '#UT#File format and segmentation',
+            fieldLabel: Editor.plugins.Okapi.view.filter.BConfGrid.prototype.strings.titleLong,
             listConfig: {
                 getInnerTpl: function(displayField){
                     return `<span data-qtip="{description}">{${displayField}}</span>`

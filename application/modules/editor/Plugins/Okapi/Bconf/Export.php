@@ -32,11 +32,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_Okapi_Bconf_Export
 {
-    
-    const MAXBUFFERSIZE = 1024 * 8;
-    const MAXBLOCKLEN = 45000;
-    const SIGNATURE = "batchConf";
-    const VERSION = 2;
+
     const NUMPLUGINS = 0;
     /**
      * Export bconf
@@ -54,15 +50,15 @@ class editor_Plugins_Okapi_Bconf_Export
         $fileName = 'export.bconf';
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
         
-        $raf->writeUTF(self::SIGNATURE, false);
-        $raf->writeInt(self::VERSION);
+        $raf->writeUTF($raf::SIGNATURE, false);
+        $raf->writeInt($raf::VERSION);
         //TODO check the Plugins currentlly not in use
         $raf->writeInt(self::NUMPLUGINS);
         
         //Read the pipeline and extract steps
         $this->processPipeline($raf);
-        $this->filterConfiguration($bconfId, $raf);
-        $this->extensionsMapping($bconfId, $raf);
+        $this->filterConfiguration($raf);
+        $this->extensionsMapping($raf);
         //$raf->fclose();
         
         if(file_exists($fileName)){
@@ -142,7 +138,7 @@ class editor_Plugins_Okapi_Bconf_Export
     /**
      *
      */
-    protected function filterConfiguration($bconfId, $raf)
+    protected function filterConfiguration($raf)
     {   
         $fprms = $this->content['fprm'] ?? glob("*.fprm");
         $raf->writeInt(count($fprms));
@@ -176,12 +172,11 @@ class editor_Plugins_Okapi_Bconf_Export
             }
         }
     }
-    
+
     /**Section 5: Mapping extensions -> filter configuration id
-     * @param $bconfId
      * @param $raf
      */
-    protected function extensionsMapping($bconfId, $raf)
+    protected function extensionsMapping($raf)
     {
         $extMapFile = "extensions-mapping.txt";
         if(!file_exists($extMapFile)){
@@ -201,7 +196,7 @@ class editor_Plugins_Okapi_Bconf_Export
         return;
 
         $filterConfiguration = new editor_Plugins_Okapi_Models_BconfFilter();
-        $data = $filterConfiguration->getByBconfId($bconfId);
+        $data = $filterConfiguration->getByBconfId();
         
         $defaultFilters = new editor_Plugins_Okapi_Models_BconfDefaultFilter();
         $defaultFiltersData = $defaultFilters->loadAll();

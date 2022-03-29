@@ -25,7 +25,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-CREATE TABLE `LEK_customer_meta` (
+CREATE TABLE IF NOT EXISTS `LEK_customer_meta` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `customerId` int(11) NOT NULL COMMENT 'Foreign Key to LEK_customer',
   `defaultBconfId` int(11) DEFAULT NULL COMMENT 'Foreign Key to LEK_okapi_bconf',
