@@ -1913,7 +1913,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if($projectOnly){
             $filterValues = $taskTypes->getProjectTypes();
         } else {
-            $filterValues = $taskTypes->getTaskTypes();
+            $filterValues = $taskTypes->getNonInternalTaskTypes();
         }
         
         $filter->addFilter((object)[
