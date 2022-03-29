@@ -2102,6 +2102,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RGFkdXJjaCB3ZXJkZW4gYWxsZSB6dXZvciBrb25maWd1cmllcnRlbiBXZXJ0ZSBlbnRmZXJudC4='><source>Dadurch werden alle zuvor konfigurierten Werte entfernt.</source><target>Dadurch werden alle zuvor konfigurierten Werte entfernt.</target></trans-unit>
 <trans-unit id='QXVzd2FobCBzcGVpY2hlcm4='><source>Auswahl speichern</source><target>Auswahl speichern</target></trans-unit>
 <trans-unit id='TWluZGVzdGVucyBlaW4gS3VuZGUgbXVzcyBhdXNnZXfDpGhsdCBzZWlu'><source>Mindestens ein Kunde muss ausgewählt sein</source><target>Mindestens ein Kunde muss ausgewählt sein</target></trans-unit>
+<trans-unit id='WmlwLVVwbG9hZCBpc3QgbnVyIGFscyBBcmJlaXRzZGF0ZWkgbcO2Z2xpY2g='><source>Zip-Upload ist nur als Arbeitsdatei möglich</source><target>Zip-Upload ist nur als Arbeitsdatei möglich</target></trans-unit>
   </body>
  </file>
 </xliff>

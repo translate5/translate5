@@ -42,7 +42,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         sourceNotSame:'#UT#Die Ausgangssprache der Datei ({0}) stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.',
         pivotSourceNotSame:'#UT#Die Quellsprache in der Pivot-Datei ({0}) ist nicht dieselbe wie die aktuelle Quellsprache des Projekts ({1}).',
         additionalRelaisNotSameTarget:'#UT#Die Pivot-Datei ({0}) hat eine andere Zielsprache ({1}) als erwartet ({2}).',
-        pivotNameNotSameAsWorkfile:'#UT#Keine Arbeitsdatei mit gleichem Dateinamen gefunden.'
+        pivotNameNotSameAsWorkfile:'#UT#Keine Arbeitsdatei mit gleichem Dateinamen gefunden.',
+        zipAsWorkfileAllowedMessage:'#UT#Zip-Upload ist nur als Arbeitsdatei möglich'
     },
 
     listeners:{
@@ -124,6 +125,14 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             files = me.zipFileFilter(items),
             store = me.getView().getViewModel().getStore('files');
 
+        // check if the uploaded file is a zip and if a zip is allowed for the type.
+        // zip is only alowed to be dropped as workfile
+        if(me.ignoreZipByType(type)){
+            // reset the zip flag since the uploaded file is ignored
+            me.setIsZipUploadViewModel(false);
+            Editor.MessageBox.addInfo(me.errorMessages.zipAsWorkfileAllowedMessage)
+            return;
+        }
 
         // INFO: workaround when files are dropped in the Add project button in project overview.
         if(store.isEmptyStore){
@@ -488,6 +497,15 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     },
 
     /***
+     * Get the isZipUpload view model value
+     */
+    getIsZipUpload: function (){
+        var me = this,
+            window = me.getView().up('#adminTaskAddWindow');
+        return window && window.getViewModel().get('isZipUpload');
+    },
+
+    /***
      * Parse language from file read search and adjust it to rfc parsable strings
      * @param language
      * @returns {null|*}
@@ -500,5 +518,17 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         language = language[1].trim();
         // replace the _ with - so it can be validated as rfc
         return language.replace('_','-');
+    },
+
+    /***
+     * Check if the zip upload should be ignored because the given upload type (workfile,pivot or reference)
+     * @param type
+     * @returns {false|*|boolean}
+     */
+    ignoreZipByType:function (type) {
+        var me = this;
+        // is zip and not a workfile
+        return me.getIsZipUpload() && Ext.Array.contains([Editor.model.admin.projectWizard.File.TYPE_WORKFILES],type) === false;
     }
+
 });
