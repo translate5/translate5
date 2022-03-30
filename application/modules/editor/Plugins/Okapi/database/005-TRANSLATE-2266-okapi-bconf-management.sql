@@ -45,6 +45,9 @@ CREATE TABLE `LEK_okapi_bconf` (
     PRIMARY KEY (`id`),
     CONSTRAINT FOREIGN KEY (`customer_id`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
 );
+ALTER TABLE LEK_customer_meta ADD CONSTRAINT `fk-customer_meta-okapi_bconf`
+FOREIGN KEY (`defaultBconfId`) REFERENCES LEK_okapi_bconf(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
 
 CREATE TABLE `LEK_okapi_bconf_filter` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,

@@ -59,19 +59,6 @@ Ext.define('Editor.view.admin.TaskAddWindowViewModel', {
         disableImportDefaults:function(get){
             return get('activeItem').disableImportDefaults();
         },
-        defaultBconf: {
-            bind: '{customer.selection}',
-            get: function(record){
-                var customerDefault = record && record.get('defaultBconfId');
-                if(customerDefault) {
-                    return customerDefault;
-                } else {
-                    var bconfStore = Ext.getStore('bconfStore'),
-                        globalDefaultIdx = bconfStore && bconfStore.findBy(({data}) => data.default); // there is only one record with default:1
-                    if(globalDefaultIdx > -1) return bconfStore.getAt(globalDefaultIdx).id;
-                }
-                return null;
-            }
-        }
+
     }
 });

@@ -140,30 +140,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         tabPanel.setActiveTab(0);
     },
     addBconfComboToTaskMainCard: function(taskMainCard){
-        var vm = taskMainCard.up('[viewModel]').getViewModel(),
-            vmStores = vm.storeInfo || {};
-        vmStores.bconfImportWizard = {
-            source: 'bconfStore',
-            autoLoad:true,
-            storeId: 'bconfImportWizard',
-            filters: [{
-                id: 'customerIdFilter',
-                filterFn: function ({data}) {
-                    return !data.customer_id || this._value == data.customer_id;
-                },
-                property: 'customer_id',
-                value: '{customer.selection.id}'
-            } ],
-            sorters: [{
-                property: 'customer_id',
-                direction:'DESC'
-            },{
-                property: 'name',
-            }]
-        };
-        vm.setStores(vmStores);
-
-        taskMainCard.down("#taskMainCardContainer").add({
+        var combo = taskMainCard.down("#taskMainCardContainer").add({
             xtype: 'combobox',
             queryMode: 'local',
             forceSelection: true,
@@ -176,11 +153,44 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                     return `<span data-qtip="{description}">{${displayField}}</span>`
                 },
             },
-            bind : {
+           bind : {
                 store: '{bconfImportWizard}',
                 disabled: '{!customer.selection}',
-                value: '{defaultBconf}'
-            }
+                value: '{defaultBconf}',
+            },
+            viewModel: {
+                alias:  'viewmodel.bconfComboImportWizard',
+                stores:{
+                    bconfImportWizard: {
+                        storeId: 'bconfImportWizard',
+                        source: 'bconfStore',
+                        autoLoad: true,
+                        filters: [{
+                            filterFn: ({data:bconf}) => !bconf.customer_id || this._value == bconf.customer_id,
+                            property: 'customer_id',
+                            value: '{customer.selection.id || -1}'
+                        }],
+                        sorters: [{
+                            property: 'customer_id',
+                            direction:'DESC'
+                        },{
+                            property: 'name',
+                        }],
+                    }
+                },
+                formulas: {
+                    defaultBconf : {
+                        bind: {
+                            customer:'{customer.selection}',
+                            store: '{bconfImportWizard}', // QUIRK: artificial dependency to wait for store being filtered by bound customerId
+                        },
+                        get: function ({customer, store}) {
+                            return customer.get('defaultBconfId') ||  this.globalDefaultId ||
+                                (this.globalDefaultId = store.getData().findBy(({data:bconf}) => bconf.default).id); //FIXME: find better way to calc global default, maybe global variable
+                        }
+                    }
+                }
+            },
         });
     }
 

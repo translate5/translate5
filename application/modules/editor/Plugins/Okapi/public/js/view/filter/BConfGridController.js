@@ -130,7 +130,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
             searchFilterValue =filterField.getValue().trim();
         store.clearFilter();
         if (searchFilterValue) {
-            searchRE = new RegExp(searchFilterValue,'i');
+            var searchRE = new RegExp(searchFilterValue,'i');
             store.filterBy(({data}) => searchRE.exec(JSON.stringify(data)));
         }
     },

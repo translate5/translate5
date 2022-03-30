@@ -29,6 +29,9 @@ DELETE FROM `Zf_acl_rules` WHERE `right` IN ('pluginOkapiBconfPrefs');
 DELETE FROM `Zf_acl_rules` WHERE `resource` = 'editor_plugins_okapi_bconf';
 DELETE FROM `Zf_acl_rules` WHERE `resource` = 'editor_plugins_okapi_bconffilter';
 
+
+ALTER TABLE LEK_customer_meta DROP FOREIGN KEY `fk-customer_meta-okapi_bconf`;
+
 DROP TABLE IF EXISTS `LEK_okapi_bconf_default_filter`;
 DROP TABLE IF EXISTS `LEK_okapi_bconf_filter`;
 DROP TABLE IF EXISTS `LEK_okapi_bconf`; -- last so dependent tables are deleted before

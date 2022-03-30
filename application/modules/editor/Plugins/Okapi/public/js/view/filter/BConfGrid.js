@@ -89,12 +89,23 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
     },
     reference:'bconfgrid',
     viewConfig: {
-        getRowClass: function(rec) {
-            var cls='';
-            if(rec.get('default') && (this.ownerGrid.customerDefault ? this.ownerGrid.customerDefault == rec : true)){
-
-                //cls += 'x-tip-default-mc not-editable ';
-                cls += 'chosenDefault not-editable ';
+        getRowClass: function({data:bconf}) {
+            var cls='', customer = (this.ownerGrid.customer||{}).data;
+            if(customer){
+                if(bconf.customer_id != customer.id) {
+                    cls += 'not-editable ';
+                }
+                if(customer.defaultBconfId){
+                    if(bconf.id == customer.defaultBconfId){
+                        cls += 'chosenDefault ';
+                    }
+                } else if(bconf.default){
+                    cls += 'chosenDefault '
+                }
+            } else { // global grid
+                if (bconf.default) {
+                    cls += 'chosenDefault ';
+                }
             }
             return cls;
         },
@@ -223,6 +234,8 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                         align: 'center',
                         dataIndex: 'default',
                         width: 3*28+8,
+
+
                         text: me.text_cols.action,
                         items: [/*{
                                 tooltip: me.strings.edit,
@@ -331,7 +344,8 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                         margin: '0 0 0 20px',
                         emptyText: me.strings.searchEmptyText,
                         listeners: {
-                            change: 'filterByText'
+                            change: 'filterByText',
+                            buffer: 150
                         }
                     },
                     {
