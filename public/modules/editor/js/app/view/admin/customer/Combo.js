@@ -40,6 +40,7 @@ Ext.define('Editor.view.admin.customer.Combo', {
     typeAhead: true,
     anyMatch: true,
     forceSelection: true,
+    selectOnFocus:true,
     displayField: 'name',
     valueField: 'id',
     store:'customersStore',
