@@ -139,8 +139,8 @@ class editor_TermController extends ZfExtended_RestController
             $diff['attribute'] ++; // processStatus-attr was added for source term
         }
 
-        /* @var $termNoteStatus editor_Models_Terminology_TermNoteStatus */
-        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermNoteStatus');
+        /* @var $termNoteStatus editor_Models_Terminology_TermStatus */
+        $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermStatus');
 
         // Apply data
         $this->_postTermInit([
@@ -372,6 +372,23 @@ class editor_TermController extends ZfExtended_RestController
                 'key' => $this->entity
             ]
         ]);
+
+        // If current user has none of termPM, termPM_allClients or admin roles, but has termProposer role
+        if (!$this->isAllowed('editor_term', 'deleteAny')) {
+
+            // Deletion is disabled by default
+            $deletable = false;
+
+            // If current user is the one who created this term
+            // and this term is a proposal or has a proposal
+            if ($this->entity->getCreatedBy() == $this->_session->id
+                && ($this->entity->getProcessStatus() == 'unprocessed' || $this->entity->getProposal())) {
+                $deletable = true;
+            }
+
+            // If this term is not deletable - flush failure
+            if (!$deletable) $this->jflush(false, 'This term is not deletable');
+        }
 
         // If no or only certain collections are accessible - validate collection accessibility
         if ($this->collectionIds !== true) $this->jcheck([

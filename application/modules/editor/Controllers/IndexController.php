@@ -62,10 +62,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'Fileorder'                     => true,
         'ChangeAlike'                   => true,
         'Comments'                      => true,
-        'CommentNavigation'            => true,
+        'CommentNavigation'             => true,
         'SearchReplace'                 => true,
         'SnapshotHistory'               => true,
-        'Termportal'                    => true,
+        'Termportal'                    => true, //FIXME should be moved into the termportal plugin
         'JsLogger'                      => true,
         'editor.CustomPanel'            => true,
         'admin.TaskOverview'            => ['taskOverviewFrontendController'], //controlled by ACL, enabling frontend rights given here
@@ -301,6 +301,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
         $this->view->Php2JsVars()->set('import.validExtensions', $supportedFiles->getSupportedExtensions());
+        $this->view->Php2JsVars()->set('import.nativeParserExtensions', $supportedFiles->getNativeParserExtensions());
 
         $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float)$rop->editor->columns->widthFactorHeader);
         $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (int)$rop->editor->columns->widthOffsetEditable);
@@ -395,7 +396,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $rop = $this->config->runtimeOptions;
 
-        $this->view->Php2JsVars()->set('LanguageResources.preloadedSegments', $rop->LanguageResources->preloadedTranslationSegments);
+        $this->view->Php2JsVars()->set('LanguageResources.preloadedSegments', $rop->LanguageResources?->preloadedTranslationSegments);
         $this->view->Php2JsVars()->set('LanguageResources.matchrateTypeChangedState', editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED);
 
         //find all service names and set it to frontend var
@@ -652,7 +653,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             'png' => 'image/png',
             'gif' => 'image/gif',
             'webp' => 'image/webp',
-            'svg' => 'image/svg',
+            'svg' => 'image/svg+xml',
             'woff' => 'application/woff',
             'woff2' => 'application/woff2',
             'ttf' => 'application/ttf',
@@ -667,7 +668,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $requestedFile = $this->getParam(2);
         $requestedFileParts = explode($slash, $requestedFile);
         $extension = strtolower(pathinfo($requestedFile, PATHINFO_EXTENSION));
-
+        
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase!
         $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($requestedFileParts)));
@@ -697,34 +698,37 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if (empty($publicFile) || !$publicFile->isFile()) {
             throw new ZfExtended_NotFoundException();
         }
-        if (array_key_exists($extension, $types)) {
-            header('Content-Type: ' . $types[$extension]);
-        } else {
-            // TODO FIXME: it seems by default the content-type text/html is set by apache instead of no content-type
-            // this leads to problems with files without extensions as is often the case with wget downloaded websites
-            header('Content-Type: ');
-        }
-        //FIXME add version URL suffix to plugin.css inclusion
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $publicFile->getMTime()));
-        //with etags we would have to use the values of $_SERVER['HTTP_IF_NONE_MATCH'] too!
-        //makes sense to do so!
-        //header('ETag: '.md5(of file content));
+        // Override default content-type text/html https://www.php.net/manual/en/ini.core.php#ini.default-mimetype
+        // Prevents problems with files without extensions as is often the case with wget downloaded websites
+        header('Content-Type: ' . ($types[$extension] ?? ''));
 
+        // Unset default caching headers here in case we exit early with 304
         header_remove('Cache-Control');
         header_remove('Expires');
         header_remove('Pragma');
-        header_remove('X-Powered-By');
 
-        /*
-        header('Pragma: public');
-        header('Cache-Control: max-age=86400');
-        header('Expires: '. gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
-        header('Content-Type: image/png');
-        */
+        $version = ZfExtended_Utils::getAppVersion();
+        if($version === 'development'){
+            $version = $publicFile->getMTime();  // changed file means new version
+        }
+        if($_SERVER['HTTP_IF_NONE_MATCH']??-1 == $version){ // compare Etag. We use version number to fetch file every release.
+            header('HTTP/1.1 304 Not Modified');
+            exit;
+        }
 
+        $isStaticVRFile = (str_starts_with($requestedType, 'visualReview-t') && $extension !== 'html'); // pdfconverter outputs that will never change
+        if($version === 'development' && !$isStaticVRFile){
+            $cacheBehaviour = 'no-cache'; // check for new version always
+        } else if ($isStaticVRFile || $this->getParam('_dc')){ // refreshed through url (plugin js)
+            $cacheBehaviour = 'max-age=31536000, immutable'; // check after 1 year aka 'never'
+        } else {
+            $cacheBehaviour = 'max-age=36000, must-revalidate'; // check after 10 hours (plugin css/png, VR/scroller.js)
+        }
 
+        header('Etag: '.$version);
+        header('Cache-Control: '.$cacheBehaviour);
+        header('Content-Length: '.$publicFile->getSize());
         readfile($publicFile);
-        //FIXME: Optimierung bei den Plugin Assets: public Dateien die durch die Plugins geroutet werden, sollten chachebar sein und B keine Plugin Inits triggern. Geht letzteres überhaupt wg. VisualReview welches die Dateien ebenfalls hier durchschiebt?
         exit;
     }
 

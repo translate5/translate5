@@ -86,6 +86,11 @@ class editor_ConfigController extends ZfExtended_RestController {
         if(!$type->validateValue($this->entity->getType(), $value, $error)) {
             throw new ZfExtended_UnprocessableEntity('E1363', ['errorMsg' => $error]);
         }
+        if(!$type->isValidInDefaults($this->entity, $value)) {
+            throw new ZfExtended_UnprocessableEntity('E1363', [
+                'errorMsg' => 'The given value(s) is/are not allowed according to the available default values.'
+            ]);
+        }
 
         $userGuid = $this->data->userGuid ?? null;
         if(!empty($userGuid)){
@@ -160,8 +165,8 @@ class editor_ConfigController extends ZfExtended_RestController {
                 ];
                 break;
             case $this->entity::CONFIG_LEVEL_CUSTOMER:
-                $customerConfig=ZfExtended_Factory::get('editor_Models_CustomerConfig');
-                /* @var $customerConfig editor_Models_CustomerConfig */
+                $customerConfig=ZfExtended_Factory::get('editor_Models_Customer_CustomerConfig');
+                /* @var $customerConfig editor_Models_Customer_CustomerConfig */
                 $oldValue = $customerConfig->getCurrentValue($customerId, $this->data->name);
                 $customerConfig->updateInsertConfig($customerId,$this->data->name,$value);
                 //this value may not be saved! It is just for setting the return value to the gui.
@@ -272,7 +277,7 @@ class editor_ConfigController extends ZfExtended_RestController {
             }
             
             //if the requested change is not for project type, throw exception
-            if($task->getState() != $task::INITIAL_TASKTYPE_PROJECT){
+            if($task->getState() != $task::STATE_PROJECT){
                 throw new editor_Models_ConfigException('E1296', [
                     'name' => $this->entity->getName()
                 ]);

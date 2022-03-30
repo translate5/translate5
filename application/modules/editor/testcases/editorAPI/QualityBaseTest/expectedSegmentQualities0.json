@@ -1,7 +1,7 @@
 [
     {
-        "id": "68790",
-        "segmentId": "1118847",
+        "id": "36735",
+        "segmentId": "259754",
         "field": "target",
         "type": "mqm",
         "category": "mqm_16",
@@ -16,8 +16,8 @@
         "cssClass": "qmflag"
     },
     {
-        "id": "68788",
-        "segmentId": "1118847",
+        "id": "36733",
+        "segmentId": "259754",
         "field": "target",
         "type": "mqm",
         "category": "mqm_10",
@@ -32,8 +32,8 @@
         "cssClass": "qmflag"
     },
     {
-        "id": "68789",
-        "segmentId": "1118847",
+        "id": "36734",
+        "segmentId": "259754",
         "field": "target",
         "type": "mqm",
         "category": "mqm_6",
@@ -48,8 +48,8 @@
         "cssClass": "qmflag"
     },
     {
-        "id": "68791",
-        "segmentId": "1118847",
+        "id": "36736",
+        "segmentId": "259754",
         "field": "target",
         "type": "mqm",
         "category": "mqm_6",

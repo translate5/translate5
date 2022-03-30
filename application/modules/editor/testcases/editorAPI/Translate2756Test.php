@@ -68,6 +68,7 @@ class Translate2756Test extends editor_Test_JsonTest {
 
         //create dummy TM
         $api->addDummyTm('DummyTmxData.tmx');
+        sleep(2);
 
         //link task and TM
         $api->addTaskAssoc();

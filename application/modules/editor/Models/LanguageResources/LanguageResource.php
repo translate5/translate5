@@ -45,14 +45,21 @@ END LICENSE AND COPYRIGHT
  * @method void setServiceName() setServiceName(string $resName)
  * @method string getResourceType() getResourceType()  tm or mt
  * @method void setResourceType() setResourceType(string $resourceType)
+ * @method bool getWriteSource() getWriteSource()
+ * @method void setWriteSource() setWriteSource(bool $writeSource)
+ *
  */
 class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract {
     use editor_Models_Entity_SpecificDataTrait;
     
-    // set as match rate type when matchrate was changed
+    /***
+     * set as match rate type when match-rate was changed
+     */
     const MATCH_RATE_TYPE_EDITED = 'matchresourceusage';
     
-    //set by changealike editor
+    /***
+     * set by change alike editor
+     */
     const MATCH_RATE_TYPE_EDITED_AUTO = 'matchresourceusageauto';
     
     protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_LanguageResource';
@@ -83,8 +90,21 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @var String
      */
     public $targetLangCode;
-    
-    
+
+    /***
+     * Init the language resource instance for given editor_Models_LanguageResources_Resource
+     * @param editor_Models_LanguageResources_Resource $resource
+     * @return void
+     */
+    public function initByResource(editor_Models_LanguageResources_Resource $resource){
+        $this->createLangResUuid();
+        $this->setColor($resource->getDefaultColor());
+        $this->setResourceId($resource->getId());
+        $this->setServiceType($resource->getServiceType());
+        $this->setServiceName($resource->getService());
+        $this->setResourceType($resource->getType());
+    }
+
     /***
      * Load all resources for all available services
      *
@@ -144,7 +164,40 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         //merge the data as instanttransalte format
         return $sdl->mergeEngineData($engines,$addArrayId);
     }
-    
+
+    /**
+     * Get info about which language resources can be associated with tasks having $targetLangs languages
+     * Return value would be like below:
+     * [
+     *  'targetLang1Id' => [langResource1Id, langResource2Id],
+     *  'targetLang2Id' => [langResource1Id, langResource3Id],
+     * ]
+     *
+     * @param int $customerId
+     * @param array $targetLangs
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getUseAsDefaultForTaskAssoc(int $customerId, array $targetLangs) {
+
+        // Get editor_Models_LanguageResources_CustomerAssoc model shortcut
+        $lrcaM = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+
+        // Fetch `languageResourceId`-values by $customerId, having `useAsDefault`=1
+        if (!$languageResourceIds = $lrcaM->loadByCustomerIdsUseAsDefault([$customerId], 'languageResourceId')) {
+            return [];
+        }
+
+        // Get info about which language resources can be associated with tasks having $targetLangs languages
+        return $this->db->getAdapter()->query('
+            SELECT DISTINCT `targetLang`, `languageResourceId`
+            FROM `LEK_languageresources_languages` 
+            WHERE 1
+              AND `languageResourceId` IN (' . join(',', $languageResourceIds) . ') 
+              AND `targetLang` IN (' . join(',', $targetLangs) . ')
+        ')->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
+    }
+
     /***
      * Load all resources associated customers of a user
      *
@@ -204,7 +257,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         if(empty($taskGuidList)){
             return [];
         }
-        $assocDb = new editor_Models_Db_Taskassoc();
+        $assocDb = new MittagQI\Translate5\LanguageResource\Db\TaskAssociation();
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
             ->from($this->db, array('*',$assocName.'.taskGuid', $assocName.'.segmentsUpdateable'))
@@ -224,7 +277,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         if(empty($taskGuidList)){
             return $taskGuidList;
         }
-        $assocDb = new editor_Models_Db_Taskassoc();
+        $assocDb = new MittagQI\Translate5\LanguageResource\Db\TaskAssociation();
         $tableName=$this->db->info($assocDb::NAME);
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
@@ -275,8 +328,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function checkTaskAndLanguageResourceAccess(string $taskGuid,int $languageResourceId, editor_Models_Segment $segment = null) {
         
         //checks if the queried languageResource is associated to the task:
-        $languageResourceTaskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $languageResourceTaskAssoc editor_Models_LanguageResources_Taskassoc */
+        $languageResourceTaskAssoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $languageResourceTaskAssoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         try {
             //for security reasons a service can only be queried when a valid task association exists and this task is loaded
             // that means the user has also access to the service. If not then not!

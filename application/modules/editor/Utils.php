@@ -213,6 +213,28 @@ class editor_Utils {
         return trim(preg_replace('/[\-]+/i', '-', $name), '-');
     }
     /**
+     * A replacement for escapeshellarg that does NOT do any locale-specific UTF-8 stripping
+     * 
+     * escapeshellarg() adds single quotes around a string and quotes/escapes any existing single quotes allowing you to pass a string directly to a shell function and having it be treated as a single safe argument. This function should be used to escape individual arguments to shell functions coming from user input.
+     * The shell functions include exec(), system() and the backtick operator.
+     *
+     * On Windows, escapeshellarg() instead replaces percent signs, exclamation marks (delayed variable substitution) and double quotes with spaces and adds double quotes around the string. 
+     * Furthermore, each streak of consecutive backslashes (\) is escaped by one additional backslash. 
+     *
+     * @param string $command
+     * @return string
+     */
+    public static function escapeshellarg(string $command) : string {
+        // Windows specific escaping: remove 
+        if(PHP_OS_FAMILY == 'Windows'){
+            // QUIRK: on windows the PHP implementation is used since I cannot test the result.
+            // TODO/FIXME: Replicate Windows logic if neccessary / if the UTF-8 stripping happens on Windows too
+            return escapeshellarg($command);
+        }
+        // UNIX specific escaping: only Ticks
+        return "'".implode("'\''", explode("'", $command))."'";
+    }
+    /**
      * Generates a websafe filename out of any string
      * The resulting string is lowercase and has all whitespace stripped, blanks are replaced with "-"
      * Take into account the returned string may be empty !
@@ -228,6 +250,21 @@ class editor_Utils {
         $name = preg_replace('/-{2,}/', '-',  $name);
         return $name;
     }
+
+    /***
+     * Compare file names in import style. The files are equal when the names are matching until the first "."
+     * This is used when comparing if the pivot/workfile are matching.
+     * ex: my-test-project.de-en.xlf will match my-test-project.de-it.xlf
+     *
+     * @param string $file1
+     * @param string $file2
+     * @return bool
+     */
+    public static function compareImportStyleFileName(string $file1, string $file2): bool
+    {
+        return explode('.',$file1)[0] === explode('.',$file2)[0];
+    }
+
     /**
      * Normalizes all sequences of whitespace to the given replacement (default: single blank)
      * @param string $text
@@ -281,7 +318,7 @@ class editor_Utils {
      * @return array $text
      */
     public static  function tagBreakUp($text,$tagRegex='/(<[^<>]*>|&[^;]+;)/'){
-        return preg_split($tagRegex, $text, NULL,  PREG_SPLIT_DELIM_CAPTURE);
+        return preg_split($tagRegex, $text, flags:  PREG_SPLIT_DELIM_CAPTURE);
     }
     /**
      * Zerlegt die Wortteile des segment-Arrays anhand der Wortgrenzen in ein Array,
@@ -301,7 +338,7 @@ class editor_Utils {
         //this implies that only tagBreakUp may be called before and
         // no other array structure manipulating method may be called between tagBreakUp and wordBreakUp!!!
         for ($i = 0; $i < count($segment); $i++) {
-            $split = preg_split($regexWordBreak, $segment[$i], NULL, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+            $split = preg_split($regexWordBreak, $segment[$i], flags: PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
             array_splice($segment, $i, 1, $split);
             $i = $i + count($split);
         }
@@ -777,7 +814,7 @@ class editor_Utils {
      * @return bool
      */
     public static function isIE() {
-        return !!preg_match('/(MSIE|Trident|rv:)/', $_SERVER['HTTP_USER_AGENT']);
+        return !!preg_match('/(MSIE|Trident|rv:)/', $ua = $_SERVER['HTTP_USER_AGENT']) && !preg_match('~Firefox~', $ua);
     }
 
 

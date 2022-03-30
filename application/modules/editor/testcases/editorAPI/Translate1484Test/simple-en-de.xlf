@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd" xmlns:translate5="http://www.translate5.net/" translate5:taskname="C:\fakepath\simple-en-de" translate5:taskguid="{86b10bf5-02f3-4f0c-b264-f3877aa15d96}">
+<file original="simple-en-de.sdlxliff" source-language="en" target-language="de" xml:space="preserve" datatype="x-translate5">
+<body>
+
+<trans-unit id="1" translate5:autostateId="3" translate5:autostateText="blocked" minwidth="0" maxwidth="20" size-unit="char">
+<source>This file is a based on a part of the php-online-Documentation. It's translation is done by a pretranslation based on a very fast winalign-Project and is not at all state of the translation art. It's only purpose is the generation of demo-data for translate5.</source>
+</trans-unit>
+
+<trans-unit id="2" translate5:autostateId="3" translate5:autostateText="blocked">
+<source>Apache 2.x on Unix systems - Manual</source>
+</trans-unit>
+
+<trans-unit id="3" translate5:autostateId="3" translate5:autostateText="blocked" minwidth="10" maxwidth="30" size-unit="char">
+<source>PHP Manual</source>
+</trans-unit>
+
+<trans-unit id="4" translate5:autostateId="3" translate5:autostateText="blocked" minwidth="10" maxwidth="0" size-unit="char">
+<source>Installation and Configuration</source>
+</trans-unit>
+
+<trans-unit id="5" translate5:autostateId="3" translate5:autostateText="blocked" maxwidth="0" size-unit="char">
+<source>Installation on Unix systems</source>
+</trans-unit>
+
+<trans-unit id="6" translate5:autostateId="3" translate5:autostateText="blocked" minwidth="0" size-unit="char">
+<source>Apache 1.3.x on Unix systems</source>
+</trans-unit>
+
+<trans-unit id="7" translate5:autostateId="4" translate5:autostateText="not_translated" maxwidth="10" size-unit="char">
+<source>Apache 2.x on Unix systems</source>
+</trans-unit>
+
+<trans-unit id="106" translate5:autostateId="3" translate5:autostateText="blocked">
+<source><g id="343">Note</g>:</source>
+</trans-unit>
+
+<trans-unit id="107" translate5:autostateId="3" translate5:autostateText="blocked">
+<source>The <g id="345">Apache MultiViews FAQ</g> discusses using multiviews &para; und ¶ with PHP.</source>
+</trans-unit>
+
+<trans-unit id="108" translate5:autostateId="3" translate5:autostateText="blocked">
+<source><g id="351">Note</g>:</source>
+</trans-unit>
+
+<trans-unit id="112" translate5:autostateId="3" translate5:autostateText="blocked">
+<source>The recommended setup is to build Apache with the default <g id="353">prefork</g> MPM-Module.</source>
+</trans-unit>
+
+</body>
+</file>
+</xliff>

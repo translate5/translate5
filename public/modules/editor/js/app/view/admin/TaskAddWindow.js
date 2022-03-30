@@ -35,7 +35,9 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.LanguageCombo',
         'Editor.view.admin.config.ConfigWizard',
         'Editor.view.admin.task.UserAssocWizard',
-        'Editor.view.admin.task.UserAssocWizardViewModel'
+        'Editor.view.admin.task.UserAssocWizardViewModel',
+        'Editor.view.admin.projectWizard.UploadTabPanel',
+        'Editor.view.admin.TaskAddWindowViewController'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -46,6 +48,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     viewModel: {
         type: 'adminTaskAddWindow'
     },
+    controller:'adminTaskAddWindow',
     title: '#UT#Projekt erstellen',
     strings: {
         importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (Angabe notwendig)',
@@ -75,7 +78,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         cancelBtn: '#UT#Abbrechen',
         btnSkip:'#UT#Importieren (weitere überspringen)',
         importDefaultsButtonText:'#UT#Importieren (Standards nutzen)',
-        description: '#Projektbeschreibung'
+        description: '#Projektbeschreibung',
+        autoRemovedUploadFilesWarningMessage:'#UT#Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.'
     },
     modal : true,
     layout: 'anchor',
@@ -89,63 +93,21 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     maximizable:true,
 
     listeners:{
-        beforerender:function(win){
-            //insert the taskUpload card in before render
-            win.insertCard({
-                xtype:'taskUpload', 
-                itemId:'taskUploadCard',
-                groupIndex:5
-            },'postimport');
-
-            win.insertCard({
-                xtype:'adminTaskUserAssocWizard',
-                itemId:'adminTaskUserAssocWizard',
-                groupIndex:1//index 2 is language resources assoc
-            },'postimport');
-
-            if(Editor.app.authenticatedUser.isAllowed('taskConfigOverwriteGrid')) {
-                win.insertCard({
-                    xtype: 'adminConfigWizard',
-                    itemId: 'adminConfigWizard',
-                    groupIndex: 3//index 2 is language resources assoc
-                }, 'postimport');
-            }
-
+        beforerender:'onTaskAddWindowBeforeRender',
+        render:'onTaskAddWindowRender',
+        afterrender:'onTaskAddWindowAfterRender',
+        dragenter: {
+            element: 'el',
+            fn: 'onDragEnter'
         },
-        render:function(win){
-            
-            //sort the group by group index
-            win.groupCards['preimport'].sort(function (a, b) {
-                return a.groupIndex - b.groupIndex;
-            });
-            
-            //add all of the cards in the window by order: preimport, import, postimport
-            for(var i=0;i<win.groupCards['preimport'].length;i++){
-                win.add(win.groupCards['preimport'][i]);
-            }
-            
-            //sort the group by group index
-            win.groupCards['import'].sort(function (a, b) {
-                return a.groupIndex - b.groupIndex;
-            });
-            
-            for(i=0;i<win.groupCards['import'].length;i++){
-                win.add(win.groupCards['import'][i]);
-            }
-            //sort the group by group index
-            win.groupCards['postimport'].sort(function (a, b) {
-                return a.groupIndex - b.groupIndex;
-            });
-            
-            for(i=0;i<win.groupCards['postimport'].length;i++){
-                win.add(win.groupCards['postimport'][i]);
-            }
+        dragleave: {
+            element: 'el',
+            fn: 'onDragLeave'
         },
-        afterrender:function(win){
-            var winLayout=win.getLayout(),
-                vm=win.getViewModel();
-          vm.set('activeItem',winLayout.getActiveItem());
-      }
+        drop: {
+            element: 'el',
+            fn: 'onDrop'
+        },
     },
     
     importTaskMessage:"#UT#Hochladen beendet. Import und Vorbereitung laufen.",
@@ -172,25 +134,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         itemId: 'taskMainCard',
                         importType:'import',
                         scrollable:'y',
-                        listeners: {
-                            drop: {
-                                element: 'el',
-                                fn: 'onMainCardDrop'
-                            }
-                        },
-                        onMainCardDrop: function(e) {
-                            var dt = new DataTransfer(),
-                                be = e.browserEvent,
-                                bedt = be && be.dataTransfer,
-                                file =  bedt.files && bedt.files[0],
-                                fileField = this.down('filefield[name="importUpload"]');
-                            if(!file) {
-                                return;
-                            }
-                            dt.items.add(file);
-                            fileField.fileInputEl.dom.files = dt.files;
-                            fileField.onFileChange(null, null, file.name);
-                        },
                         items:[{
                             xtype: 'form',
                             padding: 5,
@@ -200,6 +143,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                 align : 'stretch'
                             },
                             anchor: '100%',
+                            markInvalid:me.handleInvalidSubmitField,
                             items: [{
                                 xtype: 'container',
                                 itemId: 'taskMainCardContainer',
@@ -219,63 +163,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     toolTip: me.strings.taskNameTip,
                                     fieldLabel: me.strings.taskNameLabel
                                 },{
-                                    xtype: 'languagecombo',
-                                    name: 'sourceLang',
-                                    toolTip: me.strings.sourceLangTip,
-                                    fieldLabel: me.strings.sourceLangLabel
-                                },{
-                                    xtype:'tagfield',
-                                    name:'targetLang[]',
-                                    toolTip: me.strings.targetLangTip,
-                                    fieldLabel: me.strings.targetLangLabel,
-                                    //each combo needs its own store instance, see EXT6UPD-8
-                                    store: Ext.create(Editor.store.admin.Languages),
-                                    typeAhead: false,
-                                    autoSelect:true,
-                                    //autoSelectLast:false,
-                                    displayField: 'label',
-                                    forceSelection: true,
-                                    //encodeSubmitValue: true, // → as JSON
-                                    anyMatch: true,
-                                    queryMode: 'local',
-                                    valueField: 'id',
-                                    allowBlank: false
-                                },{
-                                    xtype: 'languagecombo',
-                                    name: 'relaisLang',
-                                    hidden:!Editor.data.frontend.importTask.pivotDropdownVisible, // the default value is system default
-                                    getSubmitValue: function() {
-                                        return this.getValue();
-                                    },
-                                    allowBlank: true,
-                                    toolTip: me.strings.relaisLangTip,
-                                    fieldLabel: me.strings.relaisLangLabel
-                                },{
-                                    xtype: 'filefield',
-                                    name: 'importUpload',
-                                    regex: new RegExp('\.('+Editor.data.import.validExtensions.join('|')+')$', 'i'),
-                                    regexText: me.strings.importUploadType,
-                                    allowBlank: false,
-                                    toolTip: me.strings.importUploadTip,
-                                    fieldLabel: me.strings.importUploadLabel
-                                },{
-                                    xtype: 'container',
-                                    layout: 'auto',
-                                    padding: '0 0 10 0',
-                                    html: Ext.String.format(me.strings.importNews, Editor.data.pathToRunDir)
-                                }]
-                                // + item for assigning customers to the task
-                                // (added dynamically by Editor.controller.admin.TaskPreferences)
-                            },{
-                                xtype: 'container',
-                                itemId: 'taskSecondCardContainer',
-                                flex: 1,
-                                layout: 'anchor',
-                                defaults: {
-                                    labelWidth: 200,
-                                    anchor: '100%'
-                                },
-                                items: [{
                                     xtype: 'textfield',
                                     maxLength: 120,
                                     name: 'taskNr',
@@ -311,6 +198,73 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     name: 'lockLocked',
                                     checked: true,
                                     fieldLabel: me.strings.lockLockedLabel
+                                }]
+                                // + item for assigning customers to the task
+                                // (added dynamically by Editor.controller.admin.TaskPreferences)
+                            },{
+                                xtype: 'container',
+                                itemId: 'taskSecondCardContainer',
+                                flex: 1,
+                                layout: 'anchor',
+                                defaults: {
+                                    labelWidth: 200,
+                                    anchor: '100%'
+                                },
+                                items: [{
+                                    xtype: 'uploadTabPanel',
+                                    margin: '0 0 10 0'
+                                },{
+                                    xtype: 'container',
+                                    layout: 'auto',
+                                    padding: '0 0 10 0',
+                                    html: Ext.String.format(me.strings.importNews, Editor.data.pathToRunDir)
+                                },{
+                                    xtype: 'languagecombo',
+                                    itemId:'sourceLangaugeTaskUploadWizard',
+                                    name: 'sourceLang',
+                                    readOnlyCls:'x-item-disabled', // This will enable using the disabled css when the field is in readOnly mode (readOnly field value is submitted to the server disabled field is not).
+                                    toolTip: me.strings.sourceLangTip,
+                                    fieldLabel: me.strings.sourceLangLabel
+                                },{
+                                    xtype:'tagfield',
+                                    itemId:'targetLangaugeTaskUploadWizard',
+                                    name:'targetLang[]',
+                                    listeners:{
+                                        beforedeselect:'onBeforeTargetLangDeselect'
+                                    },
+                                    toolTip: me.strings.targetLangTip,
+                                    fieldLabel: me.strings.targetLangLabel,
+                                    //each combo needs its own store instance, see EXT6UPD-8
+                                    store: Ext.create(Editor.store.admin.Languages),
+                                    typeAhead: false,
+                                    autoSelect:true,
+                                    //autoSelectLast:false,
+                                    displayField: 'label',
+                                    forceSelection: true,
+                                    //encodeSubmitValue: true, // → as JSON
+                                    anyMatch: true,
+                                    queryMode: 'local',
+                                    valueField: 'id',
+                                    allowBlank: false
+                                },{
+                                    xtype: 'languagecombo',
+                                    itemId:'relaisLangaugeTaskUploadWizard',
+                                    name: 'relaisLang',
+                                    markInvalid:function (error){
+                                        // show error message when the field is marked as invalid from the backend
+                                        // (this field is not visible to the user)
+                                        Editor.MessageBox.addError(error);
+                                    },
+                                    bind:{
+                                        hidden: '{!isZipUpload}'
+                                    },
+                                    allowBlank: true,
+                                    toolTip: me.strings.relaisLangTip,
+                                    fieldLabel: me.strings.relaisLangLabel
+                                },{
+                                    xtype: 'hiddenfield',
+                                    name:'autoStartImport',
+                                    value: 0
                                 }]
                             }]
                         
@@ -447,5 +401,22 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         if(!this.loadMask || !this.loadMask.isVisible()) {
             this.callParent([]);
         }
+    },
+
+    /***
+     * Find and mark the field as invalid from the given field = > error array
+     * @param errors
+     */
+    handleInvalidSubmitField:function (errors){
+        var me = this,
+            form = me.getForm(),
+            field = null;
+
+        Ext.Object.each(errors, function(key, value) {
+            field = form.findField(key) ?form.findField(key) :  me.down('#'+key);
+            if(field && field.markInvalid){
+                field.markInvalid(value);
+            }
+        });
     }
 });

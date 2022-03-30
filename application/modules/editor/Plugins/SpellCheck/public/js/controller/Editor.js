@@ -478,6 +478,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.bookmarkForCaret = me.getPositionOfCaret();
         
         // "ignore" multiple whitespaces, because we delete them anyway on save.
+        // TODO FIXME: If whitespace is removed, the just captured caret bookmark is invalid and the caret will be inside the next word (if there is a next word)
         me.collapseMultipleWhitespaceInEditor();
         
         me.allMatches = null;

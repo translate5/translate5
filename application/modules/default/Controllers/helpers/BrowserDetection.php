@@ -36,8 +36,8 @@ final class BrowserDetection {
      * @return boolean
      */
     public static function isInternetExplorer(){
-        $userAgent = array_key_exists('HTTP_USER_AGENT', $_SERVER) ? htmlentities($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES, 'UTF-8') : null;
-        if (!empty($userAgent) && (preg_match('~MSIE|Internet Explorer~i', $userAgent) || (strpos($userAgent, 'Trident/7.0') !== false && strpos($userAgent, 'rv:11.0') !== false))) {
+        $userAgent = array_key_exists('HTTP_USER_AGENT', $_SERVER) ? htmlentities($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES, 'UTF-8') : '';
+        if ($userAgent && (preg_match('~MSIE|Internet Explorer~i', $userAgent) || (strpos($userAgent, 'Trident/7.0') !== false && strpos($userAgent, 'rv:11.0') !== false))) {
             return true;
         }
         return false;

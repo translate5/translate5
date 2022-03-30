@@ -155,15 +155,19 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $dummyTargetText = self::renderDummyTargetText($this->task->getTaskGuid());
         return str_contains($segmentContent, $dummyTargetText);
     }
-    
+
     /***
      * Use the given TM analyse (or MT if analyse was empty) result to update the segment
      * Update the segment only if it is not TRANSLATED
      *
      * @param editor_Models_Segment $segment
      * @param stdClass $result - match resources result
+     * @param bool $isRepetition
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    protected function updateSegment(editor_Models_Segment $segment, $result){
+    protected function updateSegment(editor_Models_Segment $segment, stdClass $result, bool $isRepetition){
         
         //if the segment target is not empty or best match rate is not found do not pretranslate
         //pretranslation only for editable segments
@@ -201,7 +205,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             $this->saveSegmentAndHistory($segment,$history);
             return;
         }
-        
+
+        $matchType = [];
         $hasText = $this->internalTag->hasText($segment->getSource());
         if($hasText) {
             //if the result language resource is termcollection, set the target result first character to uppercase
@@ -210,8 +215,13 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             }
             $targetResult = $this->internalTag->removeIgnoredTags($targetResult);
             $segment->setMatchRate($result->matchrate);
-            $matchrateType->initPretranslated($languageResource->getResourceType(), $type);
-            //negated explanation is easier: lock the pretranslations if 100 matches in the task are not editable
+            $matchType[] = $languageResource->getResourceType();
+            $matchType[] = $type;
+            if($isRepetition) {
+                $matchType[] = $matchrateType::TYPE_AUTO_PROPAGATED;
+            }
+
+            //negated explanation is easier: lock the pretranslations if 100 matches in the task are not editable,
             $segment->setEditable($result->matchrate < 100 || $this->task->getEdit100PercentMatch());
         }
         else {
@@ -219,10 +229,11 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             // and the segment is not editable
             $targetResult = $segment->getSource();
             $segment->setMatchRate(editor_Services_Connector_FilebasedAbstract::CONTEXT_MATCH_VALUE);
-            $matchrateType->initPretranslated($matchrateType::TYPE_SOURCE);
+            $matchType[] = $matchrateType::TYPE_SOURCE;
             $segment->setEditable(false);
         }
-        
+        $matchrateType->initPretranslated(...$matchType);
+
         $segment->setMatchRateType((string) $matchrateType);
         
         $segment->setAutoStateId($this->autoStates->calculatePretranslationState($segment->isEditable()));
@@ -231,7 +242,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         //check if the result is valid for log
         if($this->isResourceLogValid($languageResource, $segment->getMatchRate())){
-            $this->connectors[$languageResourceid]->logAdapterUsage($segment,$result->isRepetition ?? false);
+            $this->connectors[$languageResourceid]->logAdapterUsage($segment, $isRepetition);
         }
         
         $segment->set($segmentField,$targetResult); //use sfm->getFirstTargetName here
@@ -320,6 +331,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         if(!empty($matchResults)){
             $result=$matchResults[0];
             $result->internalLanguageResourceid=$connector->getLanguageResource()->getId();
+            $result->isMT = true;
             return $result;
         }
         return null;

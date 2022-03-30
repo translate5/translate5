@@ -136,7 +136,8 @@ class editor_Models_Import_SupportedFileTypes {
      * returns a list of supported file extensions (extensions with parser + supported extensions)
      * @return array
      */
-    public function getSupportedExtensions() {
+    public function getSupportedExtensions(): array
+    {
         //array_values needed for later JSON encode (with array_unique there may be gaps in the index, which results in objects instead arrays
         return array_values(array_unique(array_merge(array_keys(self::$extensionsWithParser), self::$extensionsSupported)));
     }
@@ -153,7 +154,6 @@ class editor_Models_Import_SupportedFileTypes {
     /**
      * returns the parser class name to the given extension
      * @param string $ext
-     * @throws editor_Models_Import_FileParser_NoParserException
      * @return array possible parser class names
      */
     public function getParser(string $ext): array {
@@ -162,6 +162,14 @@ class editor_Models_Import_SupportedFileTypes {
             return [];
         }
         return self::$extensionsWithParser[$ext];
+    }
+
+    /***
+     * Return all extensions of the supported native parsers
+     * @return string[]
+     */
+    public function getNativeParserExtensions(){
+        return array_keys(self::$extensionsWithParser);
     }
     
     /**

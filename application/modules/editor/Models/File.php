@@ -64,7 +64,34 @@ class editor_Models_File extends ZfExtended_Models_Entity_Abstract {
     public function cleanupDirectoryIncrements(array $idList) {
         $this->db->delete('`id` in ('.join(',', $idList).')');
     }
-    
+
+    /**
+     * Check the list of $taskGuids and keep only the ones related
+     * to tasks which were created during terms transfer from termportal
+     *
+     * @param array $taskGuids
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getTransfersPerTasks(array $taskGuids) {
+
+        // If $taskGuids arg is empty - return empty array
+        if (!$taskGuids) return [];
+
+        // Enquote and join by comma
+        $taskGuids = $this->db->getAdapter()->quoteInto('?', $taskGuids);
+
+        // Get only the ones which were transferred from termportal
+        return $this->db->getAdapter()->query('
+            SELECT `taskGuid`, 1 
+            FROM `LEK_files` 
+            WHERE 1
+              AND `taskGuid` IN (' . $taskGuids . ')
+              AND `fileName` REGEXP "^TermCollection_[0-9]+_[0-9]+.tbx$" 
+            GROUP BY `taskGuid`
+        ')->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
+
     /**
      * @param array $taskGuids
      * @return array taskGuid => cnt

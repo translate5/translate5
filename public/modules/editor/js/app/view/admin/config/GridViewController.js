@@ -65,11 +65,15 @@ Ext.define('Editor.view.admin.config.GridViewController', {
     },
 
     onCollapseAll: function() {
-        this.groupingFeature.collapseAll();
+        if(this.groupingFeature){
+            this.groupingFeature.collapseAll();
+        }
     },
 
     onExpandAll: function() {
-        this.groupingFeature.expandAll();
+        if(this.groupingFeature){
+            this.groupingFeature.expandAll();
+        }
     },
     
     onSaveClick: function(view, recIndex, cellIndex, item, e, record){
@@ -89,8 +93,14 @@ Ext.define('Editor.view.admin.config.GridViewController', {
      */
     handleHasReadOnly:function(){
         var me=this,
-            store = me.getView().getStore(),
+            view = me.getView(),
+            store = view && view.getStore(),
             hasReadOnly = false;
+
+        if(!view || !store){
+            return;
+        }
+
         store.each(function(rec){
             if(!hasReadOnly && rec.get('isReadOnly')){
                 hasReadOnly = true;

@@ -302,24 +302,22 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * - prepares content to be edited
    * - resets markupImages (tag map for restoring and tag check)
    * - resets plainContent for checking if plain content was changed
-   * 
+   *
    * @private not for direct usage!
    * @param value {String}
    * @returns {String}
    */
   markupForEditor: function(value) {
     var me = this,
-        tempNode = document.createElement('DIV'),
         plainContent = [],
         result;
     me.contentEdited = false;
     me.markupImages = {};
-    
+
     result = me.markup(value, plainContent);
-    me.plainContent = plainContent; //stores only the text content and content tags for "original content has changed" comparsion
+    me.plainContent = plainContent; //stores only the text content and content tags for "original content has changed" comparision
     return result.join('');
   },
-  
   /**
    * Inserts the given string (containing div/span internal tags) at the cursor position in the editor
    * If second parameter is true, the content is not set in the editor, only the internal tags are stored in an internal markup table (for missing tag check for example)
@@ -393,23 +391,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   markup: function(value, plainContent) {
     var me = this,
-        tempNode = document.createElement('DIV'),
+        tempNode = document.createElement('DIV'), // TODO: is using the main windows document OK here ?
         plainContent = plainContent || [];
 
-    me.measure = Ext.fly(me.getEditorBody()).createChild({
-        //<debug> 
-        // tell the spec runner to ignore this element when checking if the dom is clean  
-        'data-sticky': true,
-        //</debug> 
-        role: 'presentation',
-        cls: Ext.baseCSSPrefix + 'textmetrics'
-    });
- 
-    me.measure.setVisibilityMode(1);
-    me.measure.position('absolute');
-    me.measure.setLocalXY(-1000, -1000);
-    me.measure.hide();
- 
+    me.createRuler();
     me.result = [];
     //tempnode mit inhalt füllen => Browser HTML Parsing
     value = value.replace(/ </g, Editor.TRANSTILDE+'<');
@@ -417,6 +402,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     Ext.fly(tempNode).update(value);
     me.replaceTagToImage(tempNode, plainContent);
     Ext.destroy(me.measure);
+    me.destroyRuler();
     return me.result;
   },
   getInitialData: function() {
@@ -435,6 +421,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         me.result.push(Ext.htmlEncode(text));
         plainContent.push(Ext.htmlEncode(text));
         return;
+      }
+      //if somehow an HTML comment is added, this may not be processed.
+      if(item.nodeName === '#comment'){
+          return;
       }
       // INS- & DEL-nodes
       if( (item.tagName.toLowerCase() === 'ins' || item.tagName.toLowerCase() === 'del')){
@@ -564,12 +554,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       else {
           data.pixellength = 0;
       }
-      
-      //zusammengesetzte img Pfade:
-      this.measure.setHtml(data.text);
-      data.fullWidth = this.measure.getSize().width;
-      this.measure.setHtml(data.shortTag);
-      data.shortWidth = this.measure.getSize().width;
+      // get the dimensions of the inner spans
+      this.measure(data);
       //cache the data to be rendered via svg and the html for unmarkup
       me.markupImages[data.key] = {
           shortTag: data.shortTag,
@@ -1261,5 +1247,36 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           id = ele.getAttribute('data-seq');
       }
       return id;
-  }
+  },
+    /**
+     * Creates the hidden "ruler" div that is used to measure text-length's
+     */
+    createRuler: function(){
+        this.ruler = this.getDoc().createElement('div');
+        this.ruler.classList.add(Ext.baseCSSPrefix + 'textmetrics');
+        this.ruler.setAttribute('role', 'presentation');
+        this.ruler.dataset.sticky = true;
+        this.ruler.style.position = 'absolute';
+        this.ruler.style.left = '-1000px';
+        this.ruler.style.top = '-1000px';
+        this.ruler.style.visibility = 'hidden';
+        this.getEditorBody().append(this.ruler);
+    },
+    /**
+     * Removes the hidden "ruler2 div from our iframe
+     */
+    destroyRuler: function(){
+        this.ruler.remove();
+        delete this.ruler;
+    },
+    /**
+     * Measures the passed internal tag's data evaluating the width of the full apan & short span
+     * @param {Object} data
+     */
+    measure: function(data){
+        this.ruler.innerHTML = data.text;
+        data.fullWidth = Math.ceil(this.ruler.getBoundingClientRect().width);
+        this.ruler.innerHTML = data.shortTag;
+        data.shortWidth = Math.ceil(this.ruler.getBoundingClientRect().width);
+    }
 });

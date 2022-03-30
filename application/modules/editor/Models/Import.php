@@ -59,10 +59,11 @@ class editor_Models_Import {
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $this->importConfig = ZfExtended_Factory::get('editor_Models_Import_Configuration');
     }
-    
+
     /**
      * führt den Import aller Dateien eines Task durch
      * @param string $importFolderPath
+     * @throws Exception
      */
     public function import(editor_Models_Import_DataProvider_Abstract $dataProvider) {
         if(empty($this->task)){
@@ -72,7 +73,18 @@ class editor_Models_Import {
         
         //pre import methods:
         try {
+
             $dataProvider->checkAndPrepare($this->task);
+
+            // After the files are moved, set the languages for the import configuration. For project uploads, relais language
+            // is evaluated based on the file name match. If no relais file match for the current workfile is found, the same check will be
+            // done for the following up project tasks
+            $this->setLanguages(
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
+                $this->task->getRelaisLang(),
+                editor_Models_Languages::LANG_TYPE_ID);
+
             // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
             $this->events->trigger("afterUploadPreparation", $this, array('task' => $this->task, 'dataProvider' => $dataProvider));
             
@@ -82,8 +94,6 @@ class editor_Models_Import {
             $this->importConfig->isValid($this->task->getTaskGuid());
             
             if(! $this->importConfig->hasRelaisLanguage()) {
-                //@todo in new rest api and / or new importwizard show ereror, if no relaislang is set, but relais data is given or viceversa (see translate5 featurelist)
-                
                 //reset given relais language value if no relais data is provided / feature is off
                 $this->task->setRelaisLang(0); 
             }
@@ -104,12 +114,16 @@ class editor_Models_Import {
         }
         catch (Exception $e) {
             //the DP exception handler is only needed before we have a valid task in the database, 
-            // after that the clean up is done implicitly by deleting the erroneous task, which is not possible before.
+            // after that the cleanup is done implicitly by deleting the erroneous task, which is not possible before.
             $this->task->setErroneous();
             $dataProvider->handleImportException($e);
             throw $e;
         }
-        
+
+        /** @var editor_Models_Import_TaskConfig $taskConfig */
+        $taskConfig = ZfExtended_factory::get('editor_Models_Import_TaskConfig');
+        $taskConfig->loadConfigTemplate($this->task, $this->importConfig);
+
         $this->queueImportWorkers($dataProvider);
     }
     
@@ -198,7 +212,7 @@ class editor_Models_Import {
         $edit100PercentMatch = (bool) $config->runtimeOptions->frontend->importTask->edit100PercentMatch;
         $task->setEdit100PercentMatch((int) (! empty($params->editFullMatch) && $edit100PercentMatch));
         
-        $task->setCustomerId($params->customerId ?? ZfExtended_Factory::get('editor_Models_Customer')->loadByDefaultCustomer()->getId());
+        $task->setCustomerId($params->customerId ?? ZfExtended_Factory::get('editor_Models_Customer_Customer')->loadByDefaultCustomer()->getId());
         
         $task->validate();
         $this->setTask($task);
@@ -290,5 +304,54 @@ class editor_Models_Import {
      */
     public function getImportConfig() {
         return $this->importConfig;
+    }
+
+    /**
+     * Sets importing tasks to status error if the import was started more then 48 (default; configurable runtimeOptions.import.timeout) hours ago
+     * @throws Zend_Exception
+     */
+    public function cleanupDanglingImports()
+    {
+        /** @var editor_Models_Task $task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+
+        /** @var ZfExtended_Models_Worker $worker */
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+
+        $config = Zend_Registry::get('config');
+        $hours = (int) ($config->runtimeOptions->import->timeout ?? 48);
+        $s = $task->db->select()
+            ->where('state = ?', $task::STATE_IMPORT)
+            ->where('created < DATE_SUB(NOW(), INTERVAL ? HOUR)', $hours);
+        $danglingTasks = $task->db->fetchAll($s);
+
+        $finalStepWorker = 'editor_Models_Import_Worker_FinalStep';
+
+        foreach ($danglingTasks as $data) {
+            $task->init($data->toArray());
+
+            //log the dangling task
+            $task->logger()->error('E1379', 'The task import was cancelled after {hours} hours.',[
+                'task' => $task,
+                'hours' => $hours,
+            ]);
+
+            //set the task to status error
+            $task->setErroneous();
+
+            //if there are still some workers,
+            try {
+                $worker->loadFirstOf($finalStepWorker, $task->getTaskGuid());
+                $worker->defuncRemainingOfGroup([$finalStepWorker], true, true);
+                $worker->wakeupScheduled();
+
+                /** @var ZfExtended_Worker_TriggerByHttp $trigger */
+                $trigger = ZfExtended_Factory::get('ZfExtended_Worker_TriggerByHttp');
+                $trigger->triggerWorker($worker->getId(), $worker->getHash());
+            }
+            catch (ZfExtended_Models_Entity_NotFoundException) {
+                //do nothing
+            }
+        }
     }
 }

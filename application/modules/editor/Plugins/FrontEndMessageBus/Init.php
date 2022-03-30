@@ -75,7 +75,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'autoqaOperation', array($this, 'handleTaskOperation'));
-        $this->eventManager->attach('ZfExtended_Models_Worker', 'updateProgress',array($this, 'handleUpdateProgress'));
+        $this->eventManager->attach('editor_Models_Task_WorkerProgress', 'updateProgress',array($this, 'handleUpdateProgress'));
         $this->eventManager->attach('ZfExtended_Models_Db_Session', 'getValidSessionsSql',array($this, 'handleGetValidSessionsSql'));
 
         //returns information if the configured okapi is alive / reachable
@@ -349,10 +349,10 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         }
         $context = $event->getParam('context');
         
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker ZfExtended_Models_Worker */
-        $progress = $worker->calculateProgress($taskGuid,$context);
-        
+        $taskProcess = ZfExtended_Factory::get('editor_Models_Task_WorkerProgress');
+        /** @var editor_Models_Task_WorkerProgress $taskProcess */
+        $progress = $taskProcess->calculateProgress($taskGuid, $context);
+
         $this->bus->notify(self::CHANNEL_TASK, 'updateProgress', [
             'taskGuid' => $taskGuid,
             'progress' => $progress['progress']
@@ -362,9 +362,9 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     /**
      * @return array
      */
-    public function handleGetValidSessionsSql() {
+    public function handleGetValidSessionsSql(): array {
         $res = $this->bus->getConnectionSessions();
-        return $res->instanceResult ?? [];
+        return (array) ($res->instanceResult ?? []);
     }
 
     /***
@@ -435,39 +435,40 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      * @param Zend_EventManager_Event $event
      */
     public function handleNormalComment(Zend_EventManager_Event $event) {
-        $comment = $event->getParam('entity');
-        /* @var $comment editor_Models_Comment */
-        $taskGuid = $comment->getTaskGuid();
-        $a_comment  = $comment->loadByTaskPlainWithPage($taskGuid, $comment->getId());
+        $entity = $event->getParam('entity');
+        /* @var $entity editor_Models_Comment */
+        $taskGuid = $entity->getTaskGuid();
+        $comments  = $entity->loadByTaskPlain($taskGuid, $entity->getId());
+        $comment = $comments[0];
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         $task->loadByTaskGuid($taskGuid);
-        if($task->anonymizeUsers()){
+        if($task->anonymizeUsers(false)){
             $wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-            $a_comment = $wfAnonymize->anonymizeUserdata($taskGuid, $a_comment['userGuid'], $a_comment);
+            $comment = $wfAnonymize->anonymizeUserdata($taskGuid, $comment['userGuid'], $comment, null, true);
         }
-        $a_comment['type'] = $comment::FRONTEND_ID;
-        $this->triggerCommentNavUpdate($a_comment, $event->getName());
+        $comment['type'] = $entity::FRONTEND_ID;
+        $this->triggerCommentNavUpdate($comment, $event->getName());
     }
 
     /**
      * @param Zend_EventManager_Event $event
      */
     public function handleAnnotation(Zend_EventManager_Event $event) {
-        $anno = $event->getParam('entity');
-        /* @var $anno editor_Plugins_VisualReview_Annotation_Entity */
-        $taskGuid = $anno->getTaskGuid();
-        $a_anno  = $anno->toArray();
+        $entity = $event->getParam('entity');
+        /* @var $entity editor_Plugins_VisualReview_Annotation_Entity */
+        $taskGuid = $entity->getTaskGuid();
+        $annotation  = $entity->toArray();
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         $task->loadByTaskGuid($taskGuid);
-        if($task->anonymizeUsers()){
+        if($task->anonymizeUsers(false)){
             $wfAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-            $a_anno = $wfAnonymize->anonymizeUserdata($taskGuid, $a_anno['userGuid'], $a_anno);
+            $annotation = $wfAnonymize->anonymizeUserdata($taskGuid, $annotation['userGuid'], $annotation, null, true);
         }
-        $a_anno['comment'] = htmlspecialchars($a_anno['text']);
-        $a_anno['type'] = $anno::FRONTEND_ID;
-        $this->triggerCommentNavUpdate($a_anno, $event->getName());
+        $annotation['comment'] = htmlspecialchars($annotation['text']);
+        $annotation['type'] = $entity::FRONTEND_ID;
+        $this->triggerCommentNavUpdate($annotation, $event->getName());
     }
 
     /**

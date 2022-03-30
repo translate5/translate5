@@ -44,8 +44,10 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
         $s = $this->db->select()
         ->from($this->db)
         ->where('label = ?', $labelName);
-        if (!empty($labelType)) {
-            $this->setType($labelType);
+        if (ZfExtended_Utils::emptyString($labelType)) {
+            $s->where('(type = "" or type is null)');
+        }
+        else {
             $s->where('type = ?', $labelType);
         }
         $levelSql = [];
@@ -59,6 +61,8 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
             $this->row = $row;
             return;
         }
+        $this->init();
+        $this->setType(ZfExtended_Utils::emptyString($labelType) ? null : $labelType);
         $this->setLabel($labelName);
         $this->setDataType(editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_DEFAULT_DATATYPE);
         $this->setLevel(implode(',',$level));
@@ -216,6 +220,10 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
      * @throws Zend_Db_Statement_Exception
      */
     public function getLocalized(string $locale, array $collectionIds): array {
+
+        if(empty($collectionIds)) {
+            return [];
+        }
 
         // Fetch from database
         $attributes = $this->db->getAdapter()->query('

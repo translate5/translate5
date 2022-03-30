@@ -69,29 +69,14 @@ END LICENSE AND COPYRIGHT
         $characterLimit = min($allCharacterLimits);
     }
     $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-?>
 
-<div class="loadingSpinnerLayer" xmlns="http://www.w3.org/1999/html"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
-
-<div id="containerHeader">
-    <div class="container container__instanttranslate container__instanttranslateheader">
-    <div id="logo"></div>
-    
-    <div class="buttonContainer">
-<?php
-
-    //check if the user is allowed to access the term portal
-    if ($this->isUserTermportalAllowed) {
-        echo '<div id="termPortalButtonContainer"><a id="termPortalButton" class="">'.$translate->_("TermPortal").'</a></div>';
-    }
-    
     // see View_Helper_LanguageSelector
     $session = new Zend_Session_Namespace();
-    
+
     $availableTranslations = $translate->getAvailableTranslations();
     asort($availableTranslations);
     $languageSelector=[];
-    
+
     //translated strings
     $this->translations=array(
         "clearText"                 => $translate->_("Text zurücksetzen"),
@@ -127,14 +112,14 @@ END LICENSE AND COPYRIGHT
         "translationBasedOn"        => $translate->_("Übersetzt unter Verwendung von:"),
         "singleResultBestMatchrateTooltip"        => $translate->_("Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet."),
         "languageresourceNames"     => [
-                'TermCollection'    => $translate->_("TermCollection"),
-                'OpenTM2'           => $translate->_("OpenTM2"),
-                'GroupShare'        => $translate->_("GroupShare"),
+            'TermCollection'    => $translate->_("TermCollection"),
+            'OpenTM2'           => $translate->_("OpenTM2"),
+            'GroupShare'        => $translate->_("GroupShare"),
         ],
     );
     $this->Php2JsVars()->set('languageresource.translatedStrings', $this->translations);
     $this->Php2JsVars()->set('allDbLanguages', $this->allDbLanguages);
-    
+
     $languageSelector[]='<form action="#" method="post" name="languageSelector" id="languageSelector" class="languageSelector">';
     $languageSelector[]='<select id="locale">';
     foreach ($availableTranslations as $locale => $translation) {
@@ -143,28 +128,43 @@ END LICENSE AND COPYRIGHT
     }
     $languageSelector[]='</select>';
     $languageSelector[]='</form>';
-    echo implode(' ', $languageSelector);
 ?>
 
+<div class="loadingSpinnerLayer" xmlns="http://www.w3.org/1999/html"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
+
+<div id="containerHeader">
+    <div class="container container__instanttranslate container__instanttranslateheader">
+        <?php
+            echo $this->render('instanttranslate/customheader.phtml');
+        ?>
+
+        <div class="buttonContainer">
 <?php
-//if the user is not ip based, show the logout button
-if(!$this->isIpBasedUser){
-    echo '<div id="logoutContainer"><a id="logout" href="#" class="">'.$translate->_('Abmelden').'</a></div>';
-}
+
+    //check if the user is allowed to access the term portal
+    if ($this->isUserTermportalAllowed) {
+        echo '<div id="termPortalButtonContainer"><a id="termPortalButton" class="">'.$translate->_("TermPortal").'</a></div>';
+    }
+    
+    echo implode(' ', $languageSelector);
+
+    //if the user is not ip based, show the logout button
+    if(!$this->isIpBasedUser){
+        echo '<div id="logoutContainer"><a id="logout" href="#" class="">'.$translate->_('Abmelden').'</a></div>';
+    }
+
+    // SBE: tempDev .. setting this value to TRUE will show some Code which can be usefull for development. E.g. a list of all defined icons is shown
+    $isTempDevTemplatesShow = FALSE;
 ?>
+
     </div> <?php // end of buttonContainer ?>
     </div> <?php // end of container container__instanttranslate ?>
 
+</div> <?php // end of container containerHeader ?>
 
-<?php
-// SBE: tempDev .. setting this value to TRUE will show some Code which can be usefull for development. E.g. a list of all defined icons is shown
-$isTempDevTemplatesShow = FALSE;
-?>
-    
-</div>
 <div class="sourceSelector">
-    <span class="sourceSelectorItem sourceSelector__text"><svg class="icon icon-t5_translate_text" /> Translate text</span>
-    <span class="sourceSelectorItem sourceSelector__file"><svg class="icon icon-t5_translate_file" /> Translate file</span>
+    <span class="sourceSelectorItem sourceSelector__text"><svg class="icon icon-t5_translate_text" /> <?= $translate->_('Text übersetzen'); ?> </span>
+    <span class="sourceSelectorItem sourceSelector__file"><svg class="icon icon-t5_translate_file" /> <?= $translate->_('Datei übersetzen'); ?> </span>
 </div>
 
 <div id="containerTranslation" class="container container__instanttranslate container__instanttranslatebody">
@@ -466,6 +466,14 @@ $( function() {
         }
         else {
             chosenSourceIsText = !chosenSourceIsText;
+        }
+        
+        // show "translate" button?
+        if ($source === 'text' && !instantTranslationIsActive) {
+            $('#translationSubmit').show();
+        }
+        else {
+            $('#translationSubmit').hide();
         }
         
         clearAllErrorMessages();

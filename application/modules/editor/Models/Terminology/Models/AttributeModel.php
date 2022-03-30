@@ -663,20 +663,30 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
               IFNULL(`createdBy`, 0) AS `createdBy`, DATE_FORMAT(`createdAt`, "%d.%m.%Y %H:%i:%s") AS `createdAt`,
               IFNULL(`updatedBy`, 0) AS `updatedBy`, DATE_FORMAT(`updatedAt`, "%d.%m.%Y %H:%i:%s") AS `updatedAt`
             FROM `terms_attributes` 
-            WHERE ' . $where . '
+            WHERE ' . $where . ' AND `isDraft` = 0
             ORDER BY `type` = "processStatus" DESC, `id` DESC', $bind
         )->fetchAll(PDO::FETCH_GROUP);
     }
 
     /**
      * Set up `isDraft` = 0 for records identified by comma-separated ids given by $ids arg
+     * Return ids of special attrs among those (e.g. processStatus- and definition-attrs) if any
      *
      * @param $ids
+     * @return array
+     * @throws Zend_Db_Statement_Exception
      */
     public function undraftByIds($ids) {
+
+        // Set up `isDraft` = 0 for records identified by comma-separated ids given by $ids arg
         $this->db->getAdapter()->query('
             UPDATE `terms_attributes` SET `isDraft` = "0" WHERE `id` IN (' . $ids . ')
         ');
+
+        // Return ids of special attrs among those
+        return $this->db->getAdapter()->query('
+            SELECT `id` FROM `terms_attributes` WHERE `id` IN (' . $ids . ') AND FIND_IN_SET(`type`, "processStatus,definition") 
+        ')->fetchAll(PDO::FETCH_COLUMN);
     }
 
     /**

@@ -30,7 +30,6 @@ Ext.define('Editor.view.admin.task.PreferencesViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.editorAdminTaskPreferences',
     data: {
-        userAssocDirty: false,
         userAssocStoreData:[],
         currentTask:null
     },

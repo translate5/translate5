@@ -228,7 +228,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
     getDefaultFormRecord:function (){
         var me=this;
         return Ext.create('Editor.model.admin.UserAssocDefault',{
-            customerId : me.getCustomer().get('id'),
+            customerId : me.getCustomer() && me.getCustomer().get('id'),
             deadlineDate:null,
             workflow: me.down('#workflowCombo').getValue()
         });

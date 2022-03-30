@@ -65,6 +65,31 @@ Ext.ClassManager.onCreated(function (className) {
     }
 });
 
+//Since IE does not support ES6 code, which we have now in the app, we should prevent problems by communicating that in an early stage.
+if(Ext.browser.is.IE) {
+    Ext.application = Ext.emptyFn;
+    Ext.onReady(function() {
+        Ext.Ajax.request({
+            url: Editor.data.pathToRunDir + '/editor/index/logbrowsertype',
+            method: 'post',
+            params: {
+                appVersion: navigator.appVersion,
+                userAgent: navigator.userAgent,
+                browserName: navigator.appName,
+                maxHeight: window.screen.availHeight,
+                maxWidth: window.screen.availWidth,
+                usedHeight: 0,
+                usedWidth: 0
+            }
+        });
+        var loadBox = Ext.select("body > div.loading");
+        if (loadBox) {
+            loadBox.setCls('loading-error');
+            loadBox.update('<div id="head-panel"></div><h1>Internet Explorer is not supported anymore!</h1>');
+        }
+    });
+}
+
 Ext.application({
     name: 'Editor',
     models: ['File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field', 'Config', 'TaskConfig', 'CustomerConfig', 'admin.UserAssocDefault'],
@@ -144,23 +169,7 @@ Ext.application({
     },
 
     launch: function () {
-        var me = this;
-        // if consortium logos should be shown for additional xyz seconds...
-        var showConsortiumLogos = Editor.data.startup.showConsortiumLogos;
-        if (showConsortiumLogos > 0) {
-            setTimeout(function() { me.initViewportLaunch(); }, showConsortiumLogos * 1000);
-        }
-        else {
-            me.initViewportLaunch();
-        }
-    },
-
-    /***
-     * Init and prepare the viewport for application launch
-     */
-    initViewportLaunch: function () {
         var me = this,
-            viewSize = Ext.getBody().getViewSize(),
             initMethod = Editor.data.app.initMethod;
 
         me.windowTitle = Ext.getDoc().dom.title;
@@ -191,6 +200,23 @@ Ext.application({
             initMethod = 'openAdministration';
         }
 
+        // if consortium logos should be shown for additional xyz seconds...
+        var showConsortiumLogos = Editor.data.startup.showConsortiumLogos;
+        showConsortiumLogos = showConsortiumLogos > 0 ? showConsortiumLogos * 1000 : 1;
+        Ext.defer(function() {
+            //we defer always this call, not only if showlogos = on, so that the defer is used stringently not only in some cases.
+            // There is no other technical need for the defer as showing the logos
+            me.initViewportLaunch(initMethod);
+        }, showConsortiumLogos);
+    },
+
+    /***
+     * Init and prepare the viewport for application launch
+     */
+    initViewportLaunch: function (initMethod) {
+        var me = this,
+            viewSize = Ext.getBody().getViewSize();
+
         me[initMethod]();
 
         me.browserAdvice();
@@ -220,26 +246,18 @@ Ext.application({
         if (!Editor.data.logoutOnWindowClose) {
             return;
         }
-        var me = this,
-            logout = function (e) {
+        Ext.get(window).on({
+            beforeunload: function (e) {
                 if (!Editor.data.logoutOnWindowClose) {
                     return;
                 }
-                //send logout request, this will destroy the user session
-                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout');
-
-                function sleep(delay) {
-                    const start = new Date().getTime();
-                    while (new Date().getTime() < start + delay) ;
-                }
-
-                //wait 0,5 second for the logout request to be processed
-                //the beforeunload is also triggered with application reload(browser reload)
-                //so we need to give the logout request some time untill the new page reload is requested
-                sleep(500);
-            };
-        Ext.get(window).on({
-            beforeunload: logout
+                var fd = new FormData;
+                fd.append('zfExtended', Ext.util.Cookies.get('zfExtended'));
+                fd.append('noredirect', 1);
+                // destroy the user session and prevent redirect
+                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout', fd);
+                Ext.util.Cookies.clear('zfExtended'); // remove now invalid session cookie
+            }
         });
     },
     /**
@@ -468,7 +486,7 @@ Ext.application({
             },
             // Create the form
             form = Ext.DomHelper.append(Ext.getBody(), formSpec);
-
+        // disable logoutOnWindowClose when the language is changed
         Editor.data.logoutOnWindowClose = false;
         form.submit();
     },
@@ -487,7 +505,7 @@ Ext.application({
         record.set('value',newTheme);
         record.save({
             callback:function(){
-                // disable logout on windows close when the theme is changed
+                // disable logoutOnWindowClose when the theme is changed
                 Editor.data.logoutOnWindowClose = false;
                 location.reload();
             }
@@ -549,14 +567,15 @@ Ext.application({
     /***
      * Get segmentNrInTask from the task edit route
      * {Boolean} checkEditTaskRoute : validate if the current route is task edit route
+     * @returns {number} segmentId or 0
      */
     parseSegmentIdFromTaskEditHash: function (checkEditTaskRoute) {
         if (checkEditTaskRoute && !this.isEditTaskRoute()) {
-            return -1;
+            return 0;
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return (h && h.length == 4) ? parseInt(h[2]) : -1;
+        return (h && h.length == 4) ? parseInt(h[2]) : 0;
     },
 
     /***
@@ -604,5 +623,12 @@ Ext.application({
         }
         return row.get('value');
     },
+
+    /***
+     * @returns {boolean}
+     */
+    isDevelopmentVersion:function (){
+        return Editor.data.app.version === "development";
+    }
 
 });

@@ -145,7 +145,7 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             '.phpunit.result.cache',
             '--bootstrap',
             self::RELATIVE_TEST_ROOT.'bootstrap.php',
-            $testGiven ?? self::RELATIVE_TEST_DIR
+            $testGiven ?? 'application' // PHP Unit searches recursivly for files named *Test.php
         ]);
 	$this->io->success('Last test result stored in TEST_ROOT/last-test-result.txt');
 

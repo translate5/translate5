@@ -97,7 +97,6 @@ END LICENSE AND COPYRIGHT
  * @method void setSegmentCount() setSegmentCount(int $segmentCount)
  * @method integer getSegmentFinishCount() getSegmentFinishCount()
  * @method void setSegmentFinishCount() setSegmentFinishCount(int $segmentFinishCount)
- * @method string getTaskType() getTaskType()
  * @method void setTaskType() setTaskType(string $taskType)
  * @method int getProjectId() getProjectId()
  * @method void setProjectId() setProjectId(int $projectId)
@@ -109,6 +108,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
     const STATE_END = 'end';
     const STATE_IMPORT = 'import';
+    const STATE_PROJECT = 'project'; //seems to be used as import status for projects!
     const STATE_ERROR = 'error';
     const STATE_UNCONFIRMED = 'unconfirmed';
 
@@ -120,16 +120,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const TABLE_ALIAS = 'LEK_task';
 
     const INTERNAL_LOCK = '*translate5InternalLock*';
-
-    const INITIAL_TASKTYPE_DEFAULT = 'default';
-    const INITIAL_TASKTYPE_PROJECT = 'project';
-    const INITIAL_TASKTYPE_PROJECT_TASK = 'projectTask';
-
-    /**
-     * All tasktypes that editor_Models_Validator_Task will consider as valid.
-     * @var array
-     */
-    public static $validTaskTypes = [self::INITIAL_TASKTYPE_DEFAULT, self::INITIAL_TASKTYPE_PROJECT, self::INITIAL_TASKTYPE_PROJECT_TASK];
 
     /**
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
@@ -174,7 +164,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $this->init($data);
         $this->createTaskGuidIfNeeded();
     }
-    
+
+    /**
+     * returns the task type instance (can be casted to string)
+     * @return editor_Task_Type_Abstract
+     */
+    public function getTaskType(): editor_Task_Type_Abstract {
+        return editor_Task_Type::getInstance()->getType($this->get('taskType'));
+    }
 
     /***
      * Returns all task specific configs for the current task.
@@ -193,32 +190,16 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return $taskConfig->getTaskConfig($this->getTaskGuid());
     }
-    
-    /**
-     * Add a tasktype for the validation.
-     * @param string $taskType
-     */
-    public static function addValidTaskType($taskType) {
-        self::$validTaskTypes[] = $taskType;
-    }
-
-    /**
-     * Return tasktypes for the validation.
-     * @return array
-     */
-    public static function getValidTaskTypes() {
-        return self::$validTaskTypes;
-    }
 
     /**
      * access customer instances in a cached way
      * @param int $id
-     * @return editor_Models_Customer
+     * @return editor_Models_Customer_Customer
      */
-    protected function _getCachedCustomer(int $id): editor_Models_Customer {
+    protected function _getCachedCustomer(int $id): editor_Models_Customer_Customer {
         if(empty(self::$customerCache[$id])) {
-            $customer = ZfExtended_Factory::get('editor_Models_Customer');
-            /* @var $customer editor_Models_Customer */
+            $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+            /* @var $customer editor_Models_Customer_Customer */
             $customer->load($id);
             self::$customerCache[$id] = $customer;
         }
@@ -655,9 +636,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Convenience API
      * @return boolean
      */
-    public function isTranslation() {
+    public function isTranslation(): bool
+    {
         return $this->getEmptyTargets();
     }
+
+    /**
+     * Convenience API
+     * @return boolean
+     */
+    public function isReview(): bool
+    {
+        return !$this->getEmptyTargets();
+    }
+
     /**
      * unlocks all tasks, where the associated session is invalid
      */
@@ -889,27 +881,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * Returns the default initial tasktype.
-     * @return string
-     */
-    public function getDefaultTasktype () {
-        return self::INITIAL_TASKTYPE_DEFAULT;
-    }
-
-    /**
-     * Is the task to be hidden due to its taskType?
-     * (Further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
-     */
-    public function isHiddenTask() {
-        return !in_array($this->getTaskType(), [$this->getDefaultTasktype(),self::INITIAL_TASKTYPE_PROJECT_TASK]);
-    }
-    
-    /**
-     * returns true if current task is a project
-     * @return boolean
+     * returns true if current task is a real project and is never treated as importable task, that means:
+     *   - a project can not be imported directly, only its sub tasks may be processed
+     *   - a project can not be opened / edited, it is only an abstract construction to contain the sub tasks
+     * @return bool
      */
     public function isProject(): bool {
-        return $this->getTaskType() == self::INITIAL_TASKTYPE_PROJECT;
+        return $this->getTaskType()->isProject() && !$this->getTaskType()->isTask();
     }
     
     /**
@@ -1064,8 +1042,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function updateIsTerminologieFlag($taskGuid,$ignoreAssocs=array()){
         $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
         /* @var $service editor_Services_TermCollection_Service */
-        $assoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
+        $assoc=ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $result=$assoc->loadAssocByServiceName($taskGuid, $service->getName(),$ignoreAssocs);
         $this->loadByTaskGuid($taskGuid);
         $this->setTerminologie(!empty($result));
@@ -1077,8 +1055,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return boolean
      */
     public function getTerminologie() {
-        if ($this->isHiddenTask()) {
-            // For hidden tasks, terms don't need to be tagged (= no TermTagger needed).
+        if ($this->getTaskType()->isTerminologyDisabled()) {
+            // For some task types, terms don't need to be tagged (= no TermTagger needed).
             return false;
         }
         return parent::get('terminologie');
@@ -1089,11 +1067,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param bool $flag
      */
     public function setTerminologie($flag) {
-        if ($this->isHiddenTask()) {
-            // For hidden tasks, terms don't need to be tagged (= no TermTagger needed).
+        if ($this->getTaskType()->isTerminologyDisabled()) {
+            // For some task types, terms don't need to be tagged (= no TermTagger needed).
             $flag = false;
         }
-        return parent::set('terminologie', $flag);
+        parent::set('terminologie', $flag);
     }
 
     /**
@@ -1191,7 +1169,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if(empty($workflow)) {
             return;
         }
-        $states = $this->getTaskRoleAutoStates();
+        $states = $this->getTaskRoleAutoStates() ?: [];
         // include blocked autostate in total segments finish count because blocked segments can not be edited and therefore they should count as finished.
         //TODO: with TRANSLATE-2753 this will be changed
         $states[] = editor_Models_Segment_AutoStates::BLOCKED;
@@ -1281,7 +1259,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function loadProjectTasks(int $projectId,bool $tasksOnly=false) : array{
         $s=$this->db->select();
         if($tasksOnly){
-            $s->where('taskType NOT IN(?)',self::INITIAL_TASKTYPE_PROJECT);
+            $s->where('taskType IN (?)', editor_Task_Type::getInstance()->getNonInternalTaskTypes());
         }
         $s->where('projectId=?',$projectId);
         return $this->db->fetchAll($s)->toArray();

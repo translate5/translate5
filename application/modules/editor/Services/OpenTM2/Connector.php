@@ -203,6 +203,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'apiError' => $error,
         ]);
     }
+
+    public function updateTranslation(string $source, string $target){
+        $this->api->updateText($source,$target);
+    }
     
     /**
      * (non-PHPdoc)
@@ -333,7 +337,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $dummySegment=ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $dummySegment editor_Models_Segment */
         $dummySegment->init();
-        
+
+
         if($this->api->lookup($dummySegment, $searchString, 'source')){
             $result = $this->api->getResult();
             if((int)$result->NumOfFoundProposals === 0){

@@ -292,12 +292,11 @@ Ext.define('Editor.view.admin.config.Grid', {
                 name: 'value',
                 value:record.get('value')
             };
-        if(record.get('isReadOnly') && record.get('isReadOnly')==true){
+        if(record.get('isReadOnly')){
             return false; 
         }
 
         if(hasDefaults){
-
             var defaultsData = [];
 
             // check if there is translation for the default values
@@ -328,7 +327,7 @@ Ext.define('Editor.view.admin.config.Grid', {
                     config={
                         xtype: 'combo',
                         name: 'value',
-                        store:defaultsStore,
+                        store: defaultsStore,
                         displayField: 'value',
                         valueField: 'id',
                         value:record.get('value'),
@@ -359,11 +358,13 @@ Ext.define('Editor.view.admin.config.Grid', {
                 };
                 break;
             case 'list':
-                config={
+                config = {
                   xtype: 'tagfield',
                   name: 'value',
-                  store:defaultsStore,
-                  value:record.get('value'),
+                  store: defaultsStore,
+                  value: record.get('value'),
+                  displayField: 'value',
+                  valueField: 'id',
                   typeAhead: true,
                   queryMode: 'local',
                   filterPickList: false,

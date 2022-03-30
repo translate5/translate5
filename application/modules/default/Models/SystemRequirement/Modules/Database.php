@@ -50,6 +50,7 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         $config = Zend_Registry::get('config');
         $db = Zend_Db::factory($config->resources->db);
         
+        $this->checkOpenUpdates();
         $this->checkCharset($db);
         $this->checkTimezones($db);
         $this->checkDbSettings($db);
@@ -198,5 +199,24 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         
         //some other error occured
         throw $e;
+    }
+
+    protected function checkOpenUpdates()
+    {
+        //then we are in installation and no update check is possible
+        if(!class_exists('ZfExtended_Factory')) {
+            return;
+        }
+        $dbUpdater = ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
+        /* @var $dbUpdater ZfExtended_Models_Installer_DbUpdater */
+        $dbUpdater->calculateChanges();
+        $newCount = count($dbUpdater->getNewFiles());
+        $modCount = count($dbUpdater->getModifiedFiles());
+        if($newCount > 0) {
+            $this->result->warning[] = 'Database is not up to date: there are '.$newCount.' DB files to be imported! call "translate5.[sh|bat] database:update"';
+        }
+        if($modCount > 0) {
+            $this->result->warning[] = 'Database is not up to date: there are '.$modCount.' modified DB files! call "translate5.[sh|bat] database:update"';
+        }
     }
 }

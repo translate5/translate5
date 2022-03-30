@@ -506,9 +506,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                             // We use the loader-feature of the qtips
                             return '<span data-qtipurl="' + Editor.data.restpath + 'quality/tasktooltip?taskGuid=' + rec.get('taskGuid') + '">' + val + '</span>';
                         },
-                        filter: {
-                            type: 'numeric'
-                        },
+                        filter: false,
                         text: me.strings.qualityErrorCount
                     }, {
                         xtype: 'gridcolumn',
@@ -742,13 +740,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     itemId: 'reload-task-btn',
                     text: me.strings.reloadBtn,
                     tooltip: me.strings.reloadBtnTip
-                }, {
-                    xtype: 'button',
-                    glyph: 'f067@FontAwesome5FreeSolid',
-                    itemId: 'add-project-btn',
-                    text: me.strings.addProject,
-                    hidden: !Editor.app.authenticatedUser.isAllowed('editorAddTask'),
-                    tooltip: me.strings.addProjectTip
                 }, {
                     xtype: 'button',
                     itemId: 'addAdvanceFilterBtn',

@@ -26,6 +26,20 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * @event userAssocRecordDeleted
+ * Fires before after user assoc record is removed from the store and from the server.
+ *
+ * @param {Editor.store.admin.UserAssoc} store Default user assoc store
+ */
+
+/**
+ * @event addnewassoc
+ * Fires when the user assoc form record is resetted
+ *
+ * @param {Editor.store.admin.UserAssoc} record  Empty user assoc record
+ * @param {Ext.form.Panel} formPanel User assoc form panel
+ */
 Ext.define('Editor.view.admin.user.AssocViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.adminUserAssoc',
@@ -93,8 +107,7 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
         }
         rec.save({
             failure: function(rec, op) {
-                var errorHandler = Editor.app.getController('ServerException');
-                errorHandler.handleFormFailure(form, rec, op);
+                Editor.app.getController('ServerException').handleFormFailure(form, rec, op);
             },
             success: function() {
                 me.getView().down('grid').getStore().load();
@@ -125,9 +138,17 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
                 var record = me.getViewModel().get('selectedAssocRecord'),
                     store = me.getView().down('grid').getStore();
                 record.dropped = true;
-                record.save();
-                store.load();
-                me.onCancelAssocBtnClick();
+                record.save({
+                    callback: function (savedRecord, operation, success){
+                        if(success){
+                            store.load();
+                            me.fireEvent('userAssocRecordDeleted',store);
+                            me.onCancelAssocBtnClick();
+                        } else {
+                            Editor.app.getController('ServerException').handleException(operation.error.response);
+                        }
+                    }
+                });
             }
         });
     },

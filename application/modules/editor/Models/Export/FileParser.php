@@ -214,7 +214,7 @@ abstract class editor_Models_Export_FileParser {
      * - befüllt $this->_exportFile
      */
     protected function parse() {
-        $file = preg_split('#<lekTargetSeg([^>]+)/>#', $this->_skeletonFile, null, PREG_SPLIT_DELIM_CAPTURE);
+        $file = preg_split('#<lekTargetSeg([^>]+)/>#', $this->_skeletonFile, flags: PREG_SPLIT_DELIM_CAPTURE);
 
         $count = count($file) - 1;
         for ($i = 1; $i < $count;) {
@@ -371,7 +371,7 @@ abstract class editor_Models_Export_FileParser {
      * @param string $target
      */
     protected function compareTags(editor_Models_Segment $segment, string $target, string $field) {
-        $isTranslationTask = $this->_task->getEmptyTargets();
+        $isTranslationTask = $this->_task->isTranslation();
         $segmentNotTranslated = $segment->getAutoStateId() == editor_Models_Segment_AutoStates::NOT_TRANSLATED;
         //do the tag compare only if $field is editable (normally source is not)
         $fieldInfo = $this->segmentFieldManager->getByName($field);

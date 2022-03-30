@@ -74,12 +74,7 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
         if(!$restriction->active){
             return $tags;
         }
-        if($processingMode == editor_Segment_Processing::ALIKE){
-            
-            // the only task in an alike process is cloning the qualities ...
-            $tags->cloneAlikeQualitiesByType(static::$type);
-            
-        } else if($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode)) {
+        if($processingMode == editor_Segment_Processing::ALIKE || $processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode)) {
             
             $segment = $tags->getSegment();
             // on Import, check only pretranslated segments

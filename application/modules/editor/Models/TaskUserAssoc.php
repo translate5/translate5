@@ -309,7 +309,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             ->where('tua.isPmOverride = 0')
             ->where('tua.workflow = ?',$workflow)
             ->where('t.projectId = ?',$projectId)
-            ->where('t.taskType != ?',editor_Models_Task::INITIAL_TASKTYPE_PROJECT);
+            ->where('t.taskType not in(?)', editor_Task_Type::getInstance()->getProjectTypes(true));
 
         //default sort:
         if(!$this->filter->hasSort()) {
@@ -423,6 +423,17 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
     }
 
+    /***
+     * Delete all user association for given taskGuid
+     * @return void
+     */
+    public function deleteByTaskGuid(string $taskGuid){
+        $this->db->delete([
+            'taskGuid = ?' => $taskGuid
+        ]);
+        $this->updateTask($taskGuid);
+    }
+
     /**
      * updates the task table count field
      */
@@ -459,7 +470,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $validSessionIds = $sessions->getValidSessionsSql();
 
         //load all used jobs where the usage is not valid anymore
-        $where = array('not usedState is null and (usedInternalSessionUniqId not in ('.$validSessionIds.') or usedInternalSessionUniqId is null)');
+        $where = array('not usedState is null and (usedInternalSessionUniqId not in ('.$validSessionIds.') or usedInternalSessionUniqId is null)' => null);
         if(!empty($taskGuid)) {
             if($forced) {
                 //since with force = true we throw out all users we allow this only with a given taskguid
@@ -469,8 +480,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
 
         $s = $this->db->select()->from($this->db, ['taskGuid', 'userGuid']);
-        foreach($where as $one) {
-            $s->where($one);
+        foreach($where as $condition => $valToQuote) {
+            $s->where($condition, $valToQuote);
         }
         $taskUserAssoc = $this->db->fetchAll($s)->toArray();
 
@@ -492,7 +503,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
 
         //delete all pmEditAll fake entries
         $where3 = $where;
-        $where3[] = 'isPmOverride = 1';
+        $where3['isPmOverride = 1'] = null;
         $this->db->delete($where3);
 
         //unuse the associations where the using sessionId was expired, this update must be performed last on the jobs

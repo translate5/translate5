@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -31,7 +30,37 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Store
  */
 Ext.define('Editor.store.admin.Languages', {
-  extend : 'Ext.data.ArrayStore',
-  fields: ['id', 'label', {name: 'rtl', type: 'boolean'},'rfc5646'],
-  data: Editor.data.languages
+    extend: 'Ext.data.ArrayStore',
+    fields: ['id', 'label', {name: 'rtl', type: 'boolean'}, 'rfc5646'],
+    data: Editor.data.languages,
+
+    /***
+    * Find language id in store by given rfc value
+    * @param rfc
+    * @returns {*}
+    */
+    getIdByRfc: function (rfc) {
+        var rec = this.getByRfc(rfc);
+        return rec !== null ? rec.get('id') : null;
+    },
+
+    /***
+     * Find language in store by given rfc value. Case sensitiv is off when searching.
+     * @param rfc
+     * @returns {*}
+     */
+    getByRfc: function (rfc) {
+        var rec = this.findRecord('rfc5646', rfc, 0, false, false, true);
+        return rec !== null ? rec : null;
+    },
+
+    /***
+     * Return rfc value of a language by given langauge id
+     * @param id
+     * @returns {string|null}
+     */
+    getRfcById: function (id){
+        var rec = this.getById(id);
+        return rec !== null ? rec.get('rfc5646') : '-';
+    }
 });

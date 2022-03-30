@@ -30,14 +30,15 @@ Ext.define('Editor.view.project.ProjectActionMenuViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.projectActionMenu',
     data: {
-        task: false
+        task: false,
+        hasImportingTasks:false
     },
     formulas: {
     	isEditorDeleteProject:{
     		get: function(get) {
-    			return Editor.app.authenticatedUser.isAllowed('editorDeleteProject',this.get('task'));
+    			return Editor.app.authenticatedUser.isAllowed('editorDeleteProject',this.get('task')) && this.get('hasImportingTasks') === false;
             },
-            bind: '{task}'
+            bind: '{hasImportingTasks}'
     	}
     }
 });

@@ -62,7 +62,7 @@ class Editor_CommentnavController extends ZfExtended_RestController {
         $this->task = editor_ModelInstances::taskByGuid($session->taskGuid);
         $this->wfAnonymize = editor_ModelInstances::taskByGuid($session->taskGuid)->anonymizeUsers()
                             ? ZfExtended_Factory::get('editor_Workflow_Anonymize')
-                            : false;
+                            : NULL;
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
 
@@ -72,14 +72,14 @@ class Editor_CommentnavController extends ZfExtended_RestController {
 
     protected function loadSegmentCommentArray(){
         $session = new Zend_Session_Namespace();
-        $comment_entity = ZfExtended_Factory::get('editor_Models_Comment');
-        $comments = $comment_entity->loadByTaskPlainWithPage($session->taskGuid);
+        $commentEntity = ZfExtended_Factory::get('editor_Models_Comment');
+        /* @var $commentEntity editor_Models_Comment */
+        $comments = $commentEntity->loadByTaskPlain($session->taskGuid);
         foreach ($comments as &$row) {
             $row['comment'] = htmlspecialchars($row['comment']);
-            $row['type'] = $comment_entity::FRONTEND_ID;
-            if($this->wfAnonymize) {
-                $row = $this->wfAnonymize->anonymizeUserdata($session->taskGuid, $row['userGuid'], $row);
-            }
+            $row['type'] = $commentEntity::FRONTEND_ID;
+            // the segment mappings segmentPage column  is a Hex-Value and does not qualify for sorting, therefore we add a parsed decimal property
+            $this->getWfAnonymize()?->anonymizeUserdata($session->taskGuid, $row['userGuid'], $row);
         }
         return $comments;
     }

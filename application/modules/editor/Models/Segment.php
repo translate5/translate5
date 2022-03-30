@@ -317,7 +317,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             if (!$matchCase) {
                 return $adapter->quoteIdentifier($searchInField) . ' REGEXP ' . $adapter->quote($queryString);
             }
-            return $adapter->quoteIdentifier($searchInField) . ' REGEXP BINARY ' . $adapter->quote($queryString);
+            return 'CAST('.$adapter->quoteIdentifier($searchInField) . ' AS BINARY) REGEXP BINARY ' . $adapter->quote($queryString);
         }
         //search type regular wildcard
         if ($parameters['searchType'] === 'wildcardsSearch') {
@@ -651,7 +651,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $config = Zend_Registry::get('config');
         $regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
 
-        $words = preg_split($regexWordBreak, $this->prepareForCount($segmentContent), NULL, PREG_SPLIT_NO_EMPTY);
+        $words = preg_split($regexWordBreak, $this->prepareForCount($segmentContent), flags: PREG_SPLIT_NO_EMPTY);
         return count($words);
     }
 
@@ -1052,7 +1052,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     public function getFieldExport(string $field, editor_Models_Task $task, bool $edited=true, bool $fixKnownFaultyTags=true) : editor_Segment_Export {
         //since fields can be merged from different files, data for a field can be empty
         if (empty($this->segmentdata[$field])) {
-            return NULL;
+            return null;
         }
         $fieldTags = ($edited) ?
             new editor_Segment_FieldTags($task, $this->getId(), $this->segmentdata[$field]->edited, $field, $this->segmentFieldManager->getEditIndex($field)) :

@@ -63,8 +63,10 @@ class editor_TermcollectionController extends ZfExtended_RestController
     /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData()
+    {
         parent::decodePutData();
         unset($this->data->langResUuid);
     }
@@ -84,7 +86,7 @@ class editor_TermcollectionController extends ZfExtended_RestController
 
         $data = $term->loadSortedByCollectionAndLanguages([$this->data->collectionId]);
         $export->setData($data);
-        $exportData = $export->export();
+        $exportData = $export->export((bool) $this->getParam('format', false));
 
         $this->view->filedata = $exportData;
     }

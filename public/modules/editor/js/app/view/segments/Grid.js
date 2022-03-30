@@ -64,7 +64,6 @@ Ext.define('Editor.view.segments.Grid', {
     alias: 'widget.segments.grid',
     helpSection: 'editor',
     stateId: 'editor.segmentsGrid',
-    id: 'segment-grid',
     viewModel: {
         type:'segmentsGrid'
     },
@@ -80,6 +79,25 @@ Ext.define('Editor.view.segments.Grid', {
     hasRelaisColumn: false,
     stateData: {},
     qualityData: {},
+
+    /** @var Ext.data.Connection segInfoConn - Used for built in request management via autoAbort*/
+    segInfoConn: new Ext.data.Connection({
+        defaultHeaders: {Accept: 'application/json'},
+        id: 'segmentInfoConnection',
+        autoAbort: true,
+        listeners: {
+            beforerequest: function(conn, {segmentNrInTask}, eOpts) {
+                if(segmentNrInTask > 0){
+                    conn.setUrl(Editor.data.restpath + 'segment/' + segmentNrInTask + '/position');
+                } else {
+                    return false;
+                }
+            }
+        }
+    }),
+    onDestroy: function() {
+        this.segInfoConn.abortAll(); // do not destroy, this is still the same in the next opened task
+    },
 
     currentSegmentSize: null,
 
@@ -137,8 +155,7 @@ Ext.define('Editor.view.segments.Grid', {
      */
     setSegmentSize: function(size, relative, ignorestatechange) {
         var me=this,
-            oldSize = me.currentSegmentSize,
-            sizer;
+            oldSize = me.currentSegmentSize;
         if(ignorestatechange) {
             this.stateful = false;
         }
@@ -146,11 +163,9 @@ Ext.define('Editor.view.segments.Grid', {
             size = oldSize + size;
         }
         size = Math.min(Math.max(size, 1), 6);
-        me.currentSegmentSize = size;
-        me.segmentSize = me.currentSegmentSize;
-        sizer = function(size) {return 'segment-size-'+size};
-        size = sizer(size);
-        oldSize = sizer(oldSize);
+        me.currentSegmentSize = me.segmentSize = size;
+        size = 'segment-size-' + size;
+        oldSize = 'segment-size-' + oldSize;
         Ext.getBody().removeCls(oldSize);
         Ext.getBody().addCls(size);
         me.fireEvent('segmentSizeChanged', me, size, oldSize);
@@ -174,8 +189,7 @@ Ext.define('Editor.view.segments.Grid', {
             firstTargetFound = false,
             fields = Editor.data.task.segmentFields(),
             userPref = Editor.data.task.userPrefs().first(),
-            fieldList = [],
-            fieldClsList;
+            fieldList = [];
 
         if(Editor.app.authenticatedUser.isAllowed('editorCommentsForLockedSegments')) {
             me.addCls('comments-for-locked-segments');
@@ -341,8 +355,6 @@ Ext.define('Editor.view.segments.Grid', {
         });
 
         me.callParent(arguments);
-
-        fieldClsList = me.query('contentEditableColumn').concat(me.query('contentColumn'));
     },
     
     initConfig: function(instanceConfig) {
@@ -350,7 +362,6 @@ Ext.define('Editor.view.segments.Grid', {
             config = {
                 title: me.title, //see EXT6UPD-9
                 viewConfig: {
-                    //FIXME rowParams is marked as deprecated in extjs 6.2 docu
                     getRowClass: function(record, rowIndex, rowParams, store){
                         var newClass = ['segment-font-sizable'],
                             // only on non sorted list we mark last file segments
@@ -399,18 +410,19 @@ Ext.define('Editor.view.segments.Grid', {
      * @param {Object} config, for config see positionRowAfterScroll, its completly given to that method
      */
     scrollTo: function(rowindex, config) {
+        if(rowindex < 0) {
+            return;
+        }
         var me = this,
             options = {
-                animate: false //may not be animated, to place the callback at the correct place 
+                animate: false, //may not be animated, to place the callback at the correct place 
+                callback: function(alwaysTrue, model, row) {
+                    if(model && model.get('editable')){
+                        me.selectOrFocus(rowindex);
+                    }
+                    me.positionRowAfterScroll(rowindex, row, config);
+                }
             };
-        
-        options.callback = function(idx, model, row) {
-            if(model.get('editable')){
-                me.selectOrFocus(rowindex);
-            }
-            me.positionRowAfterScroll(rowindex, row, config);
-        };
-
         me.ensureVisible(rowindex, options);
     },
     /**
@@ -425,7 +437,12 @@ Ext.define('Editor.view.segments.Grid', {
      *   callback: {Function} callback which will be called in every case after final scroll animation
 
      */
-    positionRowAfterScroll: function(rowindex, row, config) {
+    positionRowAfterScroll: function(rowindex, row, config = {}) {
+        config = Ext.applyIf(config, {
+            target: 'editor',
+            notScrollCallback: Ext.emptyFn,
+            callback: Ext.emptyFn
+        });
         var me = this,
             view = me.getView(),
             editor = me.editingPlugin.editor,
@@ -435,11 +452,6 @@ Ext.define('Editor.view.segments.Grid', {
             topMargin = 20,
             viewHeight = view.getHeight(),
             bottomMargin = 20,
-            config = Ext.applyIf(config || {}, {
-                target: 'editor',
-                notScrollCallback: Ext.emptyFn,
-                callback: Ext.emptyFn
-            }),
             target = config.target,
             deltaY;
                     
@@ -475,12 +487,17 @@ Ext.define('Editor.view.segments.Grid', {
             sm = me.getSelectionModel();
         if(sm.isSelected(rowIdx)){
             me.getView().focusRow(rowIdx);
-        }
-        else {
+        } else {
             sm.select(rowIdx);
         }
     },
     
+    /**
+     * unselects and removes the focus of the segment on the given rowindex
+     */
+    unSelectOrFocus: function() {
+        this.getSelectionModel().deselectAll();
+    },
     /***
      * Return visible row indexes in segment grid
      * TODO if needed move this as overide so it can be used for all grids
@@ -508,32 +525,68 @@ Ext.define('Editor.view.segments.Grid', {
         };
     },
 
-    /***
-     * Search for segment position in the current store filtering
+    /**
+     * Focus the segment in editor (open the segment for editing)
+    @param forEditing {boolean} - wether to open the segment editor when focused
+    @param failureEventName {string} - event to fire when segmentNrInTask's index cannot be found in the grid
+    @callback afterFocusCallback - to be called when segment is focused
      */
-    searchPosition:function(segmentNrInTask){
+    focusSegment: function(segmentNrInTask, forEditing = false, failureEventName = '', afterFocusCallback = Ext.emptyFn) {
         var me = this,
-            params = me.getStore().getParams();        
-        return new Promise((res,rej) => {
-            Ext.Ajax.request({
-                url: Editor.data.restpath+'segment/'+segmentNrInTask+'/position',
-                method: 'GET',
-                params: params,
-                scope: me,
-                success: function(response){
-                    var responseData = Ext.JSON.decode(response.responseText),
-                        index = responseData ? responseData.index : -1;
-                    res(index);
-                },
-                failure: function(response){
-                    if(response.status===404 && (response.statusText ==="Nicht gefunden!" || response.statusText ==="Not Found")){
-                        //404 means no index found
-                        res(-1);
-                        return;
-                    }
-                    Editor.app.getController('ServerException').handleException(response);
+            selectedSegmentNrInTask = me.selection && me.selection.get('segmentNrInTask'),
+            segIsInFocusConfig = {};
+
+        segIsInFocusConfig.callback = segIsInFocusConfig.notScrollCallback = function(){
+            if(forEditing) {
+                me.editingPlugin.startEdit(me.selection, null, me.editingPlugin.self.STARTEDIT_SCROLLUNDER);
+                if(me.editingPlugin.editor){
+                    me.editingPlugin.editor.reposition();
                 }
+            }
+            afterFocusCallback();
+        };
+        if(!segmentNrInTask || selectedSegmentNrInTask == segmentNrInTask){
+            segmentNrInTask && segIsInFocusConfig.callback();
+            return;
+        }
+        segmentNrInTask = parseInt(segmentNrInTask);
+        var segmentIndex = me.getStore().findBy(rec => rec.data.segmentNrInTask === segmentNrInTask); // direct access here for fastest lookup
+        if(segmentIndex >= 0) {
+            me.scrollTo(segmentIndex, segIsInFocusConfig, forEditing);
+        } else {
+            me.searchPosition(segmentNrInTask, failureEventName).then(function scrollTo(segmentIndex) {
+                me.scrollTo(segmentIndex, segIsInFocusConfig, forEditing);
             });
+        }
+    },
+    /**
+     * UnFocus any focussed segment in the grid
+     */
+    unfocusSegment: function() {
+        this.unSelectOrFocus();
+    },
+    /**
+     * Find the segment index in the database
+     * @returns Ext.promise.Promise that always resolves to the segmentIndex, -1 if not found.
+     */
+    searchPosition: function(segmentNrInTask, failureEventName = '') {
+        var me = this;
+        return me.segInfoConn.request({
+            segmentNrInTask,
+            params: me.getStore().getParams(),
+        }).then(function(response) {
+            return Ext.decode(response.responseText).index;
+        }).otherwise(function(response) {
+            if(response.status === undefined) { // beforerequest returned false
+                response = {responseText: '{"index":-1}', status: 404};
+            }
+            var errMsg = me.fireEvent(failureEventName, response) && response.status === 404 && Editor.app.getSegmentsController().messages.noIndexFound;
+            if(errMsg) {
+                Editor.MessageBox.addInfo(errMsg);
+            } else {
+                Editor.app.getController('ServerException').handleException(response);
+            }
+            return -1;
         });
     }
 });

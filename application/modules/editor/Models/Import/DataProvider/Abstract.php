@@ -36,6 +36,15 @@ END LICENSE AND COPYRIGHT
  * Provides the import data as an abstract interface to the import process
  */
 abstract class editor_Models_Import_DataProvider_Abstract {
+    /***
+     * Task languages field name in the request when the project upload is used
+     */
+    const IMPORT_UPLOAD_LANGUAGES_NAME = 'importUpload_language';
+    /***
+     * Task type field name in the request when the project upload is used
+     */
+    const IMPORT_UPLOAD_TYPE_NAME = 'importUpload_type';
+
     const TASK_ARCHIV_ZIP_NAME = 'ImportArchiv.zip';
     const TASK_TEMP_IMPORT = '_tempImport';
 
@@ -50,22 +59,13 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     abstract public function checkAndPrepare(editor_Models_Task $task);
 
     /**
-     * sets the internal used task object
-     * @param editor_Models_Task $task
-     */
-    protected function setTask(editor_Models_Task $task){
-        $this->taskPath = $task->getAbsoluteTaskDataPath();
-        $this->task = $task;
-    }
-
-    /**
      * DataProvider specific method to create the import archive
      * @param string $filename optional, provide a different archive file name
      */
     abstract public function archiveImportedData($filename = null);
 
     /**
-     * returns the the absolute import path, mainly used by the import class
+     * returns the absolute import path, mainly used by the import class
      * @return string
      */
     public function getAbsImportPath(){
@@ -107,8 +107,11 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * @param string $path
      * @throws editor_Models_Import_DataProvider_Exception
      */
-    protected function mkdir(string $path) {
-        if(!@mkdir($path)) {
+    public function mkdir(string $path) {
+        if(is_dir($path)){
+            return;
+        }
+        if(!@mkdir($path,0777,true)) {
             //DataProvider: Could not create folder "{path}"
             throw new editor_Models_Import_DataProvider_Exception('E1245', [
                 'task' => $this->task,
@@ -127,6 +130,22 @@ abstract class editor_Models_Import_DataProvider_Abstract {
             return $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_ARCHIV_ZIP_NAME;
         }
         return $this->taskPath.DIRECTORY_SEPARATOR.$filename;
+    }
+
+    /**
+     * sets the internal used task object
+     * @param editor_Models_Task $task
+     */
+    protected function setTask(editor_Models_Task $task){
+        $this->taskPath = $task->getAbsoluteTaskDataPath();
+        $this->task = $task;
+    }
+
+    /***
+     * @return editor_Models_Task
+     */
+    public function getTask(){
+        return $this->task;
     }
 
     /**

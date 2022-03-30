@@ -45,7 +45,10 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController {
     protected $postBlacklist = array('id');
 
 
-    public function decodePutData()
+    /***
+     * @return void
+     */
+    protected function decodePutData()
     {
         parent::decodePutData();
         // check and convert the languages to lek_languages id

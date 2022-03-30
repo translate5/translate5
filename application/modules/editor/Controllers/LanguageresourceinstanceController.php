@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
+
 /***
  * Language resource controller
  */
@@ -430,7 +432,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //check if filtering for useAsDefault should be done
         if(isset($useAsDefault)) {
             if(isset($useAsDefault->value) && is_string($useAsDefault->value)) {
-                $resultList=$searchEntity($useAsDefault->value,'editor_Models_Customer');
+                $resultList=$searchEntity($useAsDefault->value,'editor_Models_Customer_Customer');
                 $handleFilter($useAsDefault,$resultList,'editor_Models_LanguageResources_CustomerAssoc','loadByCustomerIdsUseAsDefault','languageResourceId');
             }
             else {
@@ -441,7 +443,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //check if filtering for writeAsDefault should be done
         if(isset($writeAsDefault)) {
             if(isset($writeAsDefault->value) && is_string($writeAsDefault->value)) {
-                $resultList=$searchEntity($writeAsDefault->value,'editor_Models_Customer');
+                $resultList=$searchEntity($writeAsDefault->value,'editor_Models_Customer_Customer');
                 $handleFilter($writeAsDefault,$resultList,'editor_Models_LanguageResources_CustomerAssoc','loadByCustomerIdsWriteAsDefault','languageResourceId');
             }
             else {
@@ -453,7 +455,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if(isset($taskList)){
             if(isset($taskList->value) && is_string($taskList->value)){
                 $resultList=$searchEntity($taskList->value,'editor_Models_Task','taskGuid');
-                $handleFilter($taskList,$resultList,'editor_Models_LanguageResources_Taskassoc','loadByTaskGuids','languageResourceId');
+                $handleFilter($taskList,$resultList,'MittagQI\Translate5\LanguageResource\TaskAssociation','loadByTaskGuids','languageResourceId');
             }
             else {
                 $this->entity->getFilter()->deleteFilter('taskList');
@@ -490,8 +492,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     private function prepareTaskInfo($languageResourceids) {
-        /* @var $assocs editor_Models_LanguageResources_Taskassoc */
-        $assocs = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+
+        /* @var $assocs MittagQI\Translate5\LanguageResource\TaskAssociation */
+        $assocs = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
 
         $taskinfo = $assocs->getTaskInfoForLanguageResources($languageResourceids);
         if(empty($taskinfo)) {
@@ -685,8 +688,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData()
+    {
         parent::decodePutData();
         unset($this->data->langResUuid);
     }
@@ -740,9 +745,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         // Export collection
         ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx')->exportCollectionById(
             $params['collectionId'],
+            (new Zend_Session_Namespace('user'))->data->userName,
             $params['tbxBasicOnly'],
-            $params['exportImages'],
-            (new Zend_Session_Namespace('user'))->data->userName
+            $params['exportImages']
         );
     }
 
@@ -786,6 +791,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         set_time_limit(0);
 
         // Export collection
+        /** @var editor_Models_Export_Terminology_Xlsx $xlsx */
         $xlsx = ZfExtended_Factory::get('editor_Models_Export_Terminology_Xlsx');
 
         // If session's 'download' flag is set
@@ -862,8 +868,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
         }
 
-        $assoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
+        $assoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $taskinfo = $assoc->getTaskInfoForLanguageResources([$this->entity->getId()]);
         //FIXME replace lockingUser guid with concrete username and show it in the frontend!
         $this->view->rows = $taskinfo;

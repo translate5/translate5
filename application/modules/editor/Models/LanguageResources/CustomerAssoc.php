@@ -60,8 +60,8 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     public function saveAssocRequest(int $id, array $customers, array $useAsDefault, array $writeAsDefault){
         // Check if (at least one) customer is set and use the 'defaultcustomer' if not
         if (empty($customers)) {
-            $customer = ZfExtended_Factory::get('editor_Models_Customer');
-            /* @var $customer editor_Models_Customer */
+            $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+            /* @var $customer editor_Models_Customer_Customer */
             $customer->loadByDefaultCustomer();
             $customers[] = $customer->getId();
         }
@@ -152,12 +152,14 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * If no $customerIds is provided, all results where useAsDefault is set to 1 will be returned.
      * INFO: this function is used by useAsDefault filter in the language resources. Do not change the layout.
      * @param array $customerIds
+     * @param string $column If given, array_column(<returnValue>, $column) will be returned instead of <returnValue>
      * @return array
      */
-    public function loadByCustomerIdsUseAsDefault(array $customerIds = []){
+    public function loadByCustomerIdsUseAsDefault(array $customerIds = [], string $column = ''){
         $s=$this->getCustomerIdsSelect($customerIds);
         $s->where('useAsDefault=1');
-        return $this->db->fetchAll($s)->toArray();
+        $return = $this->db->fetchAll($s)->toArray();
+        return $column ? array_column($return, $column) : $return;
     }
     
     /***
@@ -243,6 +245,25 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
             return [];
         }
         return array_column($result, 'customers');
+    }
+
+    /**
+     * Get customers, having access for all given collections
+     *
+     * @param array $collectionIds
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getSharedCustomers(array $collectionIds) {
+
+        // Get customer ids, grouped by collectionId
+        $customerIdAByCollectionId = $this->db->getAdapter()->query('
+            SELECT `languageResourceId`, `customerId`  
+            FROM `LEK_languageresources_customerassoc` 
+            WHERE FIND_IN_SET(`languageResourceId`, ?) 
+        ', join(',', $collectionIds))->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
+
+        // Get customers, assigned to all given term collections, e.g. shared customers
+        return call_user_func_array('array_intersect', $customerIdAByCollectionId);
     }
 }
 

@@ -119,6 +119,19 @@ EOF;
             $this->output->writeln($key.OutputFormatter::escape((string) $value));
         }
     }
+
+    /**
+     * Writes a table and reads out the assoc keys of the child items as headline
+     * @param array $data
+     */
+    protected function writeTable(array $data) {
+        if(empty($data)) {
+            return;
+        }
+        $headers = array_map('ucfirst', array_keys(reset($data)));
+        $this->io->table($headers, $data);
+    }
+
     
     /***
      * Translate5 licence text to be reused in each command

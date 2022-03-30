@@ -99,6 +99,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },{
         ref:'userAssocGrid',
         selector: '#adminTaskUserAssocGrid'
+    },{
+        ref:'wizardUploadGrid',
+        selector:'#adminTaskAddWindow wizardUploadGrid'
     }],
     alias: 'controller.taskOverviewController',
 
@@ -182,7 +185,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     listeners: {
         afterTaskDelete: 'onAfterTaskDeleteEventHandler',
         beforeTaskDelete: 'onBeforeTaskDeleteEventHandler',
-        taskCreated:'onTaskCreated'
+        validateImportWizard: 'onValidateImportWizard'
     },
     listen: {
         controller: {
@@ -232,9 +235,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             },
             '#adminTaskAddWindow #skip-wizard-btn': {
                 click: 'handleSkipWizardClick'
-            },
-            '#adminTaskAddWindow filefield[name=importUpload]': {
-                change: 'handleChangeImportFile'
             },
             'adminTaskAddWindow panel:not([hidden])': {
                 wizardCardFinished: 'onWizardCardFinished',
@@ -288,61 +288,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     loadTasks: function () {
         this.getAdminTasksStore().load();
     },
-    handleChangeImportFile: function (field, val) {
-        var me = this,
-            name = me.getTaskAddForm().down('textfield[name=taskName]'),
-            srcLang = me.getTaskAddForm().down('combo[name=sourceLang]'),
-            targetLang = me.getTaskAddForm().down('tagfield[name^=targetLang]'),
-            customer = me.getTaskAddForm().down('combo[name=customerId]'),
-            idx,
-            customerId,
-            langs = val.match(/-([a-zA-Z_]{2,5})-([a-zA-Z_]{2,5})\.[^.]+$/);
-        if (name && name.getValue() === '') {
-            name.setValue(val.replace(/\.[^.]+$/, '').replace(/^C:\\fakepath\\/, ''));
-        }
-        //simple algorithmus to get the language from the filename
-        if (langs && langs.length === 3) {
-            //try to convert deDE language to de-DE for searching in the store
-            var regex = /^([a-z]+)_?([A-Z]+)$/;
-            if (regex.test(langs[1])) {
-                langs[1] = langs[1].match(/^([a-z]+)_?([A-Z]+)$/).splice(1).join('-');
-            }
-            if (regex.test(langs[2])) {
-                langs[2] = langs[2].match(/^([a-z]+)_?([A-Z]+)$/).splice(1).join('-');
-            }
-
-            var srcStore = srcLang.store,
-                targetStore = targetLang.store,
-                srcIdx = srcStore.find('label', '(' + langs[1] + ')', 0, true, true),
-                targetIdx = targetStore.find('label', '(' + langs[2] + ')', 0, true, true);
-
-            if (srcIdx >= 0) {
-                srcLang.setValue(srcStore.getAt(srcIdx).get('id'));
-            }
-            if (targetIdx >= 0) {
-                targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
-            }
-            //if we set a language automatically we also assume the default customer
-            idx = customer.store.findExact('name', 'defaultcustomer');
-            if (idx >= 0) {
-                customerId = customer.store.getAt(idx).get('id');
-                customer.setValue(customerId);
-            }
-        }
-    },
-
     /***
      * Import with defaults button handler. After the task is created, and before the import is triggered,
      * wizardCardImportDefaults event is thrown. Everything after task creation and before task import should be done/registered within this event
      */
     handleImportDefaults: function () {
         var me = this;
-        if (me.getTaskAddForm().isValid()) {
-            me.saveTask(function (task) {
-                me.fireEvent('wizardCardImportDefaults',task);
-                me.startImport(task);
-            });
-        }
+
+        me.saveTask(function (task) {
+            me.fireEvent('wizardCardImportDefaults',task);
+            me.startImport(task);
+        });
     },
 
     /**
@@ -424,7 +380,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         if (!me.getTaskAddForm()) {
             return;
         }
-        me.getTaskAddForm().getForm().reset();
         me.getTaskAddWindow().close();
     },
 
@@ -555,10 +510,31 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
 
     handleTaskAddShow: function () {
+        this.showTaskAddWindow();
+    },
+
+    /***
+     * Show the task add window if the user is allowed to
+     */
+    showTaskAddWindow: function (fn){
         if (!this.isAllowed('editorAddTask')) {
             return;
         }
-        Ext.widget('adminTaskAddWindow').show();
+        return Ext.widget('adminTaskAddWindow').show(null,fn);
+    },
+
+    /***
+     * If the users drops files on the add task button, show the task add window, and add those files in the drop zone
+     * @param e
+     */
+    openWindowWithFilesDrop: function (e){
+        var me = this,
+            grid = null;
+
+        me.showTaskAddWindow(function (){
+            grid = me.getWizardUploadGrid();
+            grid && grid.getController().onDrop(e);
+        });
     },
 
     /**
@@ -948,7 +924,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             failure: function (batch, operation) {
                 task.reject();
                 app.unmask();
-                if (operation.error.status === '405') {
+                if (operation.error.status === 405) {
                     Editor.MessageBox.addError(me.strings.taskNotDestroyed);
                 } else {
                     Editor.app.getController('ServerException').handleException(operation.error.response);
@@ -962,13 +938,18 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      * @param {Editor.model.admin.Task} task
      */
     editorCloneTask: function (task, event) {
-        var me = this;
+        var me = this,
+            isDefaultTask = task.get('taskType') === 'default';
         Ext.Ajax.request({
             url: Editor.data.pathToRunDir + '/editor/task/' + task.getId() + '/clone',
             method: 'post',
-            scope: this,
+            scope: me,
             success: function (response) {
-                if (me.isProjectPanelActive()) {
+                if(isDefaultTask) {
+                    //we have to reload the project overview since the id of the shown project was changing
+                    me.getProjectProjectStore().load();
+                }
+                else if (me.isProjectPanelActive()) {
                     me.getProjectTaskGrid().getStore().load();
                 }
                 me.handleTaskReload();
@@ -1014,10 +995,31 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         }
         vm = menu.getViewModel();
         vm && vm.set('task', selectedTask);
+        if(menuXtype === 'projectActionMenu'){
+            vm && vm.set('hasImportingTasks', me.getProjectImportingTasksCount(selectedTask) > 0);
+        }
         vm && vm.notify();
         menu.showAt(event.getXY());
     },
 
+    /***
+     * Get the number of tasks in state import in the given project
+     * @param project
+     * @returns {number}
+     */
+    getProjectImportingTasksCount:function (project){
+        var projectTasks = Ext.getStore('projectTasks'),
+            projectId = project && project.get('projectId'),
+            importingCount = 0;
+        if(projectTasks && projectId){
+            Ext.getStore('projectTasks').each(function (r){
+                if(r.isImporting()){
+                    importingCount++;
+                }
+            });
+        }
+        return importingCount;
+    },
 
     /**
      * displays the excel re-import fileupload dialog
@@ -1107,47 +1109,77 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     saveTask: function (successCallback) {
         var me = this,
             win = me.getTaskAddWindow(),
-            form = this.getTaskAddForm();
+            grid = me.getWizardUploadGrid(),
+            formData = new FormData(),
+            form = me.getTaskAddForm(),
+            params = form.getForm().getValues();
+
+
+        // import wizard form validation event. Return false in the subscribed event listener to cancel the form submit
+        if(me.fireEvent('validateImportWizard',form) === false){
+            return;
+        }
 
         win.setLoading(me.strings.loadingWindowMessage);
 
-        form.submit({
-            //Accept Header of submitted file uploads could not be changed:
-            //http://stackoverflow.com/questions/13344082/fileupload-accept-header
-            //so use format parameter jsontext here, for jsontext see REST_Controller_Action_Helper_ContextSwitch
+        grid.getStore().each(function(record) {
+            if(record.get('type') !== 'error'){
+                // Add file to AJAX request
+                formData.append('importUpload[]', record.get('file'), record.get('name'));
+                formData.append('importUpload_language[]', record.get('targetLang'));
+                formData.append('importUpload_type[]', record.get('type'));
+            }
+        });
 
-            params: {
-                format: 'jsontext',
-                autoStartImport: 0
-            },
-            timeout: 3600,
-            url: Editor.data.restpath + 'task?format=json', //to fix POST_MAX_SIZE problems, see TRANSLATE-1034
-            scope: this,
-            success: function (form, submit) {
-                var task = me.getModel('admin.Task').create(submit.result.rows);
-                me.fireEvent('taskCreated', task);
-                win.setLoading(false);
+        //ensure that UI always generates projects with projectTasks
+        formData.append('taskType', 'project');
 
-                //call the callback if exist
-                if (successCallback) {
-                    successCallback(task);
-                }
-            },
-            failure: function (form, submit) {
-                var card, errorHandler = Editor.app.getController('ServerException');
-                win.setLoading(false);
-                if (submit.failureType === 'server' && submit.result && !submit.result.success) {
-                    if (submit.result.httpStatus === "422") {
-                        win.getLayout().setActiveItem('taskMainCard');
-                        win.getViewModel().set('activeItem', win.down('#taskMainCard'));
-                        form.markInvalid(submit.result.errorsTranslated);
-                    } else {
-                        card = win.down('#taskUploadCard');
-                        if (card.isVisible()) {
-                            card.update(errorHandler.renderHtmlMessage(me.strings.taskError, submit.result));
-                        }
-                        errorHandler.handleException(submit.response);
+        me.fireEvent('beforeCreateTask',params , formData);
+
+        //INFO: this will convert array to coma separated values requires additional handling on backend. We do not want that
+        // Ext.Object.each(form.getForm().getValues(), function(property, value){
+        //     formData.append(property, value);
+        // });
+
+        Ext.Ajax.request({
+            params:params,// send all other form fields as json params to skip the formdata parameter conversions
+            rawData: formData,
+            timeout: 3600000, // set the timeout to 1H to prevent timeouts on video uploads or larger files
+            method:'POST',
+            headers: {'Content-Type':null}, //to use content type of FormData
+            url: Editor.data.restpath + 'task',
+            success: function (response, opts) {
+                var resp = Ext.decode(response.responseText),
+                    task = me.getModel('admin.Task').create(resp.rows);
+
+                // reload the required data for the import wizard and fire taskCreated event
+                me.notifyTaskCreated(task,function (){
+
+                    win.setLoading(false);
+
+                    //call the callback if exist
+                    if (successCallback) {
+                        successCallback(task);
                     }
+                });
+            },
+            failure: function (response) {
+                var card,
+                    errorHandler = Editor.app.getController('ServerException'),
+                    resp = (response.responseText && response.responseText !== "") ? Ext.decode(response.responseText) : {};
+
+                win.setLoading(false);
+
+                if (response.status === 422 || !Ext.isEmpty(resp.errorsTranslated)) {
+                    win.getLayout().setActiveItem('taskMainCard');
+                    win.getViewModel().set('activeItem', win.down('#taskMainCard'));
+                    form.markInvalid(resp.errorsTranslated);
+                } else {
+                    card = win.down('#taskUploadCard');
+                    if (card.isVisible()) {
+                        card.update(errorHandler.renderHtmlMessage(me.strings.taskError, response.statusText));
+                    }
+                    errorHandler.handleException(response);
                 }
             }
         });
@@ -1192,28 +1224,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     setCardsTask: function (task) {
         var me = this,
             win = me.getTaskAddWindow(),
-            items = win.items.items;
+            items = win && win.items.items;
+
+        if(!win){
+            return;
+        }
 
         win.getViewModel().set('currentTask', task);
         //TODO: use the current task in all other cards
         items.forEach(function (item) {
             item.task = task;
         });
-    },
-
-    /***
-     * Is the given task importing
-     */
-    isImportingCheck: function (task) {
-        if (task.isImporting() || task.isExcelExported()) {
-            return true;
-        }
-        if (task.isCustomState()) {
-            //if one of the triggered handler return false, the fireEvent returns false,
-            // so we have to flip logic here: if one of the events should trigger the reload they have to return false
-            return !this.fireEvent('periodicalTaskReloadIgnore', task);
-        }
-        return false;
     },
 
     /***
@@ -1266,20 +1287,47 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
 
     /***
-     * On task created event listener
-     * @param task
+     * Import wizard validation event handler
+     * @param formPanel
+     * @returns {*}
      */
-    onTaskCreated:function (task){
+    onValidateImportWizard: function (formPanel){
+        return formPanel.isValid();
+    },
+
+    /***
+     * Notify the application that the task is created. The event taskCreated will be fired after the task store and the
+     * project store are reloaded. The store reload is required so there are no entity version conflicts later in the
+     * import wizard
+     * @param task
+     * @param callback
+     */
+    notifyTaskCreated:function (task, callback){
         var me = this;
 
-        me.getAdminTasksStore().load();
-        me.getProjectGrid().getController().reloadProjects().then(function(){
-            me.handleProjectAfterImport(task);
+        // reload the task store so the new tasks are included inside.
+        // in the import wizard, fresh tasks are required
+        me.getAdminTasksStore().load({
+            callback:function (){
+                // reload the project store after the task store is reloaded
+                me.getProjectGrid().getController().reloadProjects().then(function(){
+
+                    // update the project route based on the current task
+                    me.handleProjectAfterImport(task);
+                    //set the store reference to the model(it is missing), it is used later when the task is deleted
+                    task.store = me.getAdminTasksStore();
+
+                    // for each import wizard card, set the project/task object
+                    me.setCardsTask(task);
+
+                    // fire the taskCreated after all stores are reloaded
+                    me.fireEvent('taskCreated', task);
+
+                    if(callback){
+                        callback();
+                    }
+                });
+            }
         });
-
-        //set the store reference to the model(it is missing), it is used later when the task is deleted
-        task.store = me.getAdminTasksStore();
-
-        me.setCardsTask(task);
     }
 });

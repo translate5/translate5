@@ -62,7 +62,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
         isEditorOpenTask: {
             get: function(record) {
                 //!error && !import && !pending && (!customState || customState == ExcelExported)
-                return record && this.isMenuAllowed('editorOpenTask',record) && record.isNotErrorImportPending() && (!record.isCustomState() || record.get('state') == 'ExcelExported');
+                return record && this.isMenuAllowed('editorOpenTask',record) && record.isNotErrorImportPending() && (!record.isCustomState() || record.get('state') === 'ExcelExported');
             },
             bind:{bindTo:'{task}',deep:true}
         },
@@ -113,13 +113,13 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
                 if(downloadable && allowed){
                     return true;
                 }
-                return allowed && !task.isImporting() && !task.isPending() && (!task.isCustomState() || task.get('state') == 'ExcelExported');
+                return allowed && !task.isImporting() && !task.isPending() && (!task.isCustomState() || task.get('state') === 'ExcelExported');
             },
             bind: '{task}'
         },
         isEditorExcelreimportTask:{
             get: function(record) {
-                return record && this.isMenuAllowed('editorExcelreimportTask',record) && (record.get('state') == 'ExcelExported');
+                return record && this.isMenuAllowed('editorExcelreimportTask',record) && (record.get('state') === 'ExcelExported');
             },
             bind: '{task}'
         },
@@ -132,13 +132,13 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
         isEditorLogTask:{
             get: function(task) {
                 // !import && !pending && (!customState || customState == ExcelExported)
-                return task && this.isMenuAllowed('editorLogTask',task) && !task.isImporting() && !task.isPending() && (!task.isCustomState() || task.get('state') == 'ExcelExported');
+                return task && this.isMenuAllowed('editorLogTask',task) && !task.isImporting() && !task.isPending() && (!task.isCustomState() || task.get('state') === 'ExcelExported');
             },
             bind: '{task}'
         },
-        //the menu grup lines are only visible for pm users
+        //the menu group lines are only visible for pm users
         isMenuGroupVisible:{
-            get: function(record) {
+            get: function() {
                 return this.get('isEditorPreferencesTask');
             },
             bind: '{task}'
@@ -146,19 +146,14 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
         
         /***
          * On task change, reconfigure the export menu
+         * The old menu will be destroyed by the owner component
          */
-        exportMenuConfig:{
+        exportMenuConfig: {
             get: function(task) {
-                //the old menu will be destroyed by the owner component
-                var me = this,
-                    hasMqm = task.hasMqm(),
-                    menu;
-                
-                menu = Ext.widget('adminExportMenu', {
+                return Ext.widget('adminExportMenu', {
                     task: task,
-                    fields: hasMqm ? task.segmentFields() : false
+                    fields: (task && task.hasMqm()) ? task.segmentFields() : false
                 });
-                return menu;
             },
             bind: '{task}'
         }
@@ -168,7 +163,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
      * Is the menu action allowed for the user for given task
      */
     isMenuAllowed:function(action,task){
-        return Editor.app.authenticatedUser.isAllowed(action,task)
+        return Editor.app.authenticatedUser.isAllowed(action,task);
     }
     
 });

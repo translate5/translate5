@@ -2462,6 +2462,10 @@ A task was associated to you in the task-portal {portalLink}.<br />
     <source>Originalformat, {0}</source>
     <target>Original format, {0}</target>
 </trans-unit>
+<trans-unit id='w5xiZXJzZXR6dGUgVGVybWUgaW4gVGVybUNvbGxlY3Rpb24ocykgw7xiZXJ0cmFnZW4='>
+    <source>Übersetzte Terme in TermCollection(s) übertragen</source>
+    <target>Transfer translated terms to TermCollection(s)</target>
+</trans-unit>
 <trans-unit id="U0RMWExJRkYgbWl0IMOEbmRlcnVuZ3NtYXJraWVydW5nZW4=">
     <source>SDLXLIFF mit Änderungsmarkierungen</source>
     <target>SDLXLIFF with track changes</target>
@@ -2481,6 +2485,10 @@ A task was associated to you in the task-portal {portalLink}.<br />
 <trans-unit id='VGVybVBvcnRhbA=='>
     <source>TermPortal</source>
     <target>TermPortal</target>
+</trans-unit>
+<trans-unit id='VGVybS1Db2xsZWN0aW9uIGltIFRlcm1Qb3J0YWwgw7ZmZm5lbg=='>
+  <source>Term-Collection im TermPortal öffnen</source>
+  <target>Open term-collection in TermPortal</target>
 </trans-unit>
 <trans-unit id='U3VjaGU='><source>Suche</source><target>Search</target></trans-unit>
 <trans-unit id='RmlsdGVy'>
@@ -4390,6 +4398,170 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Import abbrechen</source>
     <target>Cancel import</target>
 </trans-unit>
+<trans-unit id='QWxsZSBwYXNzZW5kZW4gendlaXNwcmFjaGlnZW4gRGF0ZWllbiBmw7xyIGRpZXNlIFNwcmFjaGUgd2VyZGVuIGF1cyBkZXIgTGlzdGUgaG9jaGdlbGFkZW5lciBEYXRlaWVuIGVudGZlcm50Lg=='>
+  <source>Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.</source>
+  <target>All matching bilingual files for this language are removed from the list of the uploaded files.</target>
+</trans-unit>
+<trans-unit id='QXJiZWl0c2RhdGVpKGVuKQ=='>
+  <source>Arbeitsdatei(en)</source>
+  <target>Work file(s)</target>
+</trans-unit>
+<trans-unit id='UGl2b3QtRGF0ZWkoZW4p'>
+  <source>Pivot-Datei(en)</source>
+  <target>Pivot file(s)</target>
+</trans-unit>
+<trans-unit id='RGllIFJlaWhlbmZvbGdlIGRlciBVcmxzIGVudHNwcmljaHQgZGVyIFJlaWhlbmZvbGdlIGRlciBob2NoZ2VsYWRlbmVuIEFyYmVpdHNkYXRlaWVuLg=='>
+  <source>Die Reihenfolge der Urls entspricht der Reihenfolge der hochgeladenen Arbeitsdateien.</source>
+  <target>The order of the urls will match the order of the uploaded work files.</target>
+</trans-unit>
+<trans-unit id='PGEgaHJlZj0iaHR0cHM6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L2Rpc3BsYXkvdmlzdWFsUmV2aWV3L1VwbG9hZCtydWxlcyIgdGFyZ2V0PSJfYmxhbmsiPkxlc2VuIFNpZSBtZWhyIMO8YmVyIGRpZSBadW9yZG51bmcgdm9uIERhdGVpZW4uPC9hPg=='>
+  <source><a href="https://confluence.translate5.net/display/visualReview/Upload+rules" target="_blank">Lesen Sie mehr über die Zuordnung von Dateien.</a></source>
+  <target><a href="https://confluence.translate5.net/display/visualReview/Upload+rules" target="_blank">Read more about files mapping.</a></target>
+</trans-unit>
+<trans-unit id='WmllaGVuIFNpZSBkaWUgRGF0ZWllbiBlbnR3ZWRlciBoaWVyaGVyLCB1bSBzaWUgYWxzIEFyYmVpdHNkYXRlaWVuIGhpbnp1enVmw7xnZW4sIG9kZXIga2xpY2tlbiBTaWUgYXVmIGVpbmUgZGVyIG9iaWdlbiBTY2hhbHRmbMOkY2hlbiwgdW0gYW5kZXJlIERhdGVpdHlwZW4genUgd8OkaGxlbi4='>
+  <source>Ziehen Sie die Dateien entweder hierher, um sie als Arbeitsdateien hinzuzufügen, oder klicken Sie auf eine der obigen Schaltflächen, um andere Dateitypen zu wählen.</source>
+  <target>Either drag and drop files here to add them as work files, or to one of the buttons above to add them as a different type.</target>
+</trans-unit>
 </body>
+<trans-unit id='RGllIERhdGVpICh7MH0pIG1pdCBkZXIgRXJ3ZWl0ZXJ1bmcgKHsxfSkgd2lyZCBuaWNodCB1bnRlcnN0w7x0enQu'>
+  <source>Die Datei ({0}) mit der Erweiterung ({1}) wird nicht unterstützt.</source>
+  <target>The file ({0}) with the extension ({1}) is not supported.</target>
+</trans-unit>
+<trans-unit id='V8OkaGxlbiBTaWUgZW50d2VkZXIgZWluZSBaSVAtRGF0ZWkgb2RlciBtZWhyZXJlIGFuZGVyZSBEYXRlaWVuLiBFaW4gTWl4IGF1cyBaSVAtRGF0ZWllbiB1bmQgYW5kZXJlbiBEYXRlaWVuIGlzdCBuaWNodCBtw7ZnbGljaCE='>
+  <source>Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!</source>
+  <target>Select either one ZIP file or multiple other files. A mix of ZIP files and other files is not possible!</target>
+</trans-unit>
+<trans-unit id='RGllIFBpdm90LURhdGVpIGlzdCBuaWNodCB6d2Vpc3ByYWNoaWcu'>
+  <source>Die Pivot-Datei ist nicht zweisprachig.</source>
+  <target>Pivot file is not bilingual.</target>
+</trans-unit>
+<trans-unit id='UXVlbGxlIHVuZ8O8bHRpZy4='>
+  <source>Quelle ungültig.</source>
+  <target>Source not valid.</target>
+</trans-unit>
+<trans-unit id='WmllbCB1bmfDvGx0aWcu'>
+  <source>Ziel ungültig.</source>
+  <target>Target not valid.</target>
+</trans-unit>
+<trans-unit id='RGllIEF1c2dhbmdzc3ByYWNoZSBzdGltbXQgbmljaHQgbWl0IGRlciBhdXNnZXfDpGhsdGVuIFNwcmFjaGUgw7xiZXJlaW4u'>
+  <source>Die Ausgangssprache stimmt nicht mit der ausgewählten Sprache überein.</source>
+  <target>Source language and selected language do not match.</target>
+</trans-unit>
+<trans-unit id='RGllIFF1ZWxsc3ByYWNoZSBpbiBkZXIgUGl2b3QtRGF0ZWkgKHswfSkgaXN0IG5pY2h0IGRpZXNlbGJlIHdpZSBkaWUgYWt0dWVsbGUgUXVlbGxzcHJhY2hlIGRlcyBQcm9qZWt0cyAoezF9KS4='>
+  <source>Die Quellsprache in der Pivot-Datei ({0}) ist nicht dieselbe wie die aktuelle Quellsprache des Projekts ({1}).</source>
+  <target>The source language in the pivot file ({0}) is not the same as the current source language of the project ({1}).</target>
+</trans-unit>
+<trans-unit id='RGllIFBpdm90LURhdGVpICh7MH0pIGhhdCBlaW5lIGFuZGVyZSBaaWVsc3ByYWNoZSAoezF9KSBhbHMgZXJ3YXJ0ZXQgKHsyfSku'>
+  <source>Die Pivot-Datei ({0}) hat eine andere Zielsprache ({1}) als erwartet ({2}).</source>
+  <target>The pivot file ({0}) has a different target language ({1}) than expected ({2}).</target>
+</trans-unit>
+<trans-unit id='VXJsIGhpbnp1ZsO8Z2Vu'>
+  <source>Url hinzufügen</source>
+  <target>Add url</target>
+</trans-unit>
+<trans-unit id='VXJsIGVudGZlcm5lbg=='>
+  <source>Url entfernen</source>
+  <target>Remove url</target>
+</trans-unit>
+<trans-unit id='VXJs'>
+  <source>Url</source>
+  <target>Url</target>
+</trans-unit>
+<trans-unit id='VW5nw7xsdGlnZSBBdXNnYW5nc3NwcmFjaGUgKHswfSku'>
+  <source>Ungültige Ausgangssprache ({0}).</source>
+  <target>Source language ({0}) is not valid.</target>
+</trans-unit>
+<trans-unit id='VW5nw7xsdGlnZSBaaWVsc3ByYWNoZSAoezB9KS4'>
+  <source>Ungültige Zielsprache ({0}).</source>
+  <target>Target language ({0}) is not valid.</target>
+</trans-unit>
+<trans-unit id='RGllIEF1c2dhbmdzc3ByYWNoZSBkZXIgRGF0ZWkgKHswfSkgc3RpbW10IG5pY2h0IG1pdCBkZXIgYWt0dWVsbCBhdXNnZXfDpGhsdGVuIEF1c2dhbmdzc3ByYWNoZSDDvGJlcmVpbi4='>
+  <source>Die Ausgangssprache der Datei ({0}) stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.</source>
+  <target>The source language ({0}) of the file does not match the currently selected source language.</target>
+</trans-unit>
+<trans-unit id='RGF0ZWk='>
+  <source>Datei</source>
+  <target>File</target>
+</trans-unit>
+<trans-unit id='R3LDtsOfZQ=='>
+  <source>Größe</source>
+  <target>Size</target>
+</trans-unit>
+<trans-unit id='RGF0ZWkgbMO2c2NoZW4='>
+    <source>Datei löschen</source>
+    <target>Remove file</target>
+</trans-unit>
+<trans-unit id='S2VpbmUgQXJiZWl0c2RhdGVpIG1pdCBnbGVpY2hlbSBEYXRlaW5hbWVuIGdlZnVuZGVuLg=='>
+  <source>Keine Arbeitsdatei mit gleichem Dateinamen gefunden.</source>
+  <target>No workfile with same filename found.</target>
+</trans-unit>
+<trans-unit id='QXJiZWl0c2RhdGVp'>
+  <source>Arbeitsdatei</source>
+  <target>work file</target>
+</trans-unit>
+<trans-unit id='UGl2b3QtRGF0ZWk='>
+    <source>Pivot-Datei</source>
+    <target>pivot file</target>
+</trans-unit>
+<trans-unit id='RGF0ZWkoZW4pIGhpbnp1ZsO8Z2Vu'>
+    <source>Datei(en) hinzufügen</source>
+    <target>Add file(s)</target>
+</trans-unit>
+<trans-unit id='SW5zdGFudFRyYW5zbGF0ZVdyaXRlVG0'>
+    <source>InstantTranslateWriteTm</source>
+    <target>Instant-Translate write TM</target>
+</trans-unit>
+<trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbikgaGluenVmw7xnZW4='>
+    <source>Referenz-Dateien(en) hinzufügen</source>
+    <target>Add reference file(s)</target>
+</trans-unit>
+<trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbik='>
+    <source>Referenz-Dateien(en)</source>
+    <target>Reference file(s)</target>
+</trans-unit>
+<trans-unit id='UmVmZXJlbnotRGF0ZWk='>
+    <source>Referenz-Datei</source>
+    <target>reference file</target>
+</trans-unit>
+<trans-unit id='S3VuZGVuZWluc3RlbGx1bmdlbiBpbiBkZW4gYWt0dWVsbGVuIEt1bmRlbiDDvGJlcm5laG1lbg=='>
+    <source>Kundeneinstellungen in den aktuellen Kunden übernehmen</source>
+    <target>Copy client settings to current client</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmQtQmVudXR6ZXJ6dXdlaXN1bmdlbiBrb3BpZXJlbiB2b24='>
+    <source>Standard-Benutzerzuweisungen kopieren von</source>
+    <target>Copy default user assignments from</target>
+</trans-unit>
+<trans-unit id='QWxsZSBTdGFuZGFyZC1CZW51dHplcnp1d2Vpc3VuZ2VuIGRlcyBhdXNnZXfDpGhsdGVuIEt1bmRlbiwgZWluc2NobGllw59saWNoIGRlcyBhdXNnZXfDpGhsdGVuIE1laHJiZW51dHplcm1vZHVzIHVuZCBXb3JrZmxvd3MsIGluIGRlbiBha3R1ZWxsZW4gS3VuZGVuIGtvcGllcmVu'>
+    <source>Alle Standard-Benutzerzuweisungen des ausgewählten Kunden, einschließlich des ausgewählten Mehrbenutzermodus und Workflows, in den aktuellen Kunden kopieren</source>
+    <target>Copy all user assignment defaults from the selected client to the current client, including selected multi user mode and selected workflow for this client</target>
+    </trans-unit>
+<trans-unit id='S29uZmlndXJhdGlvbmVuIGtvcGllcmVuIHZvbg=='>
+    <source>Konfigurationen kopieren von</source>
+    <target>Copy configuration from</target>
+</trans-unit>
+<trans-unit id='QWxsZSDDvGJlcnNjaHJpZWJlbmVuIFN5c3RlbWtvbmZpZ3VyYXRpb25lbiBkZXMgYXVzZ2V3w6RobHRlbiBLdW5kZW4gaW4gZGVuIGFrdHVlbGxlbiBLdW5kZW4ga29waWVyZW4sIGF1w59lciA8aT5Jbml0aWFsIHdvcmtmbG93IG9uIHRhc2sgY3JlYXRpb248L2k+IHVuZCA8aT5NdWx0aSB1c2VyIHRhc2sgZWRpdGluZyBtb2RlPC9pPg=='>
+    <source>Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren, außer <i>Initial workflow on task creation</i> und <i>Multi user task editing mode</i></source>
+    <target>Copy all other system configuration overwrites from the selected client to the current client, except <i>Initial workflow on task creation</i> and <i>Multi user task editing mode</i></target>
+</trans-unit>
+<trans-unit id='S29waWVyZW4gZXJmb2xncmVpY2g='>
+    <source>Kopieren erfolgreich</source>
+    <target>Copy successful</target>
+</trans-unit>
+<trans-unit id='S29waWVyZW4gdm9u'>
+    <source>Kopieren von</source>
+    <target>Copy from</target>
+</trans-unit>
+<trans-unit id='RGFkdXJjaCB3ZXJkZW4gYWxsZSB6dXZvciBrb25maWd1cmllcnRlbiBXZXJ0ZSBlbnRmZXJudC4='>
+    <source>Dadurch werden alle zuvor konfigurierten Werte entfernt.</source>
+    <target>This will remove all previously configured values.</target>
+</trans-unit>
+<trans-unit id='QXVzd2FobCBzcGVpY2hlcm4='>
+    <source>Auswahl speichern</source>
+    <target>Save selection</target>
+</trans-unit>
+<trans-unit id='TWluZGVzdGVucyBlaW4gS3VuZGUgbXVzcyBhdXNnZXfDpGhsdCBzZWlu'>
+  <source>Mindestens ein Kunde muss ausgewählt sein</source>
+  <target>At least one customer must be selected</target>
+</trans-unit>
   </file>
 </xliff>

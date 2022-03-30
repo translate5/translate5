@@ -38,4 +38,35 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Languages extends ZfExtended_Languages {
     protected $dbInstanceClass = 'editor_Models_Db_Languages';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Language';
+
+    /**
+     * Since numeric IDs aren't really sexy to be used for languages in API,
+     *  this method can also deal with rfc5646 strings and LCID numbers. The LCID numbers must be prefixed with 'lcid-' for example lcid-123
+     * Not found / invalid languages are converted to 0, this should then be handled afterwards
+     *
+     * @param mixed $languageParameter IN: the given language ID/rfc/lcid, OUT: the numeric language DB ID
+     * @return editor_Models_Languages
+     */
+    public function convertLanguage(&$languageParameter) {
+        //ignoring if already integer like value or empty
+        try {
+            //if empty a notFound is triggered
+            if(empty($languageParameter) || (int)$languageParameter > 0) {
+                $this->load($languageParameter);
+                return $this;
+            }
+            $matches = [];
+            if(preg_match('/^lcid-([0-9]+)$/i', $languageParameter, $matches)) {
+                $this->loadByLcid($matches[1]);
+            }else {
+                $this->loadByRfc5646($languageParameter);
+            }
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            $languageParameter = 0;
+            return null;
+        }
+        $languageParameter = $this->getId();
+        return $this;
+    }
 }

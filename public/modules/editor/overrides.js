@@ -164,60 +164,6 @@ Ext.override(Ext.grid.filters.filter.TriFilter, {
     }
 });
 
-/**
- * Fix for EXTJS-18481
- * needed for ext-6.0.0
- * should be solved natively with ext-6.0.1
- */
-Ext.define('MyApp.overrides.data.request.Ajax', {
-    override: 'Ext.data.request.Ajax',
-    /** * Overrideing this method as getResponse header does not work * @param xhr * @returns {{request: Egain.overrides.data.request.Ajax, requestId: *, status: *, statusText: *, getResponseHeader: (Ext.data.request.Base.privates._getHeader|Function), getAllResponseHeaders: (Ext.data.request.Base.privates._getHeaders|Function)}|*} */
-    createResponse: function(xhr) {
-        var me = this,
-            isXdr = me.isXdr,
-            headers = {},
-            lines = isXdr ? [] : xhr.getAllResponseHeaders().replace(/\r\n/g, '\n').split('\n'),
-            count = lines.length,
-            line, index, key, response, byteArray;
-        while (count--) {
-            line = lines[count];
-            index = line.indexOf(':');
-            if (index >= 0) {
-                key = line.substr(0, index).toLowerCase();
-                if (line.charAt(index + 1) == ' ') {
-                    ++index;
-                }
-                headers[key] = line.substr(index + 1);
-            }
-        }
-        response = {
-            request: me,
-            requestId: me.id,
-            status: xhr.status,
-            statusText: xhr.statusText,
-            getResponseHeader: function(name) {
-                return headers[name.toLowerCase()];
-            },
-            getAllResponseHeaders: function() {
-                return headers;
-            }
-        };
-        if (isXdr) {
-            me.processXdrResponse(response, xhr);
-        }
-        if (me.binary) {
-            response.responseBytes = me.getByteArray(xhr);
-        } else {
-            // an error is thrown when trying to access responseText or responseXML 
-            // on an xhr object with responseType of 'arraybuffer', so only attempt 
-            // to set these properties in the response if we're not dealing with 
-            // binary data
-            response.responseText = xhr.responseText;
-            response.responseXML = xhr.responseXML;
-        }
-        return response;
-    },
-});
 
 Ext.override(Ext.util.CSS, {
     /***
@@ -291,12 +237,11 @@ Ext.override(Ext.grid.CellContext, {
  * must be rechecked!
  */
 Ext.override(Ext.panel.Table, {
-    ensureVisible: function(record, options) {
+    ensureVisible: function(recordId, options) {
         // record can be integer (segment index or id)
-        if(record === undefined || record === null){
-            return;
+        if(recordId || recordId === 0){
+            this.doEnsureVisible(recordId, options);
         }
-        this.doEnsureVisible(record, options);
     }
 });
 
@@ -1207,6 +1152,14 @@ Ext.override(Ext.panel.Table, {
             });
         }
         else {
+            var store = this.getStore(),
+                sorters = state.storeState && state.storeState.sorters;
+            // skip first load when remote sorters are applied before remote filters (ProjectGrid)
+            if(sorters && store && store.getRemoteSort() && store.getRemoteFilter() && this.getPlugin('gridfilters') && !store.getFilters().length){
+                var loadBlocker = function(){return false};
+                store.on('beforeload', loadBlocker); // prevent loading until filters are set, beacuse store loads before are discarded
+                store.on('filterchange', function(store){store.removeListener('beforeload', loadBlocker);}, store, {single:true});
+            }
             this.callParent([state]);
         }
     },

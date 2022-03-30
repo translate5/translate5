@@ -58,7 +58,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
         
         $api->addUser('testlector');
         $api->reloadTask();
-        $api->addUser('testtranslator', 'waiting', 'translator');
+        $api->addUser('testtranslator', 'waiting', 'translation');
         unlink($zipfile);
     }
     
