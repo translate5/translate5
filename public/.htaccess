@@ -3,16 +3,8 @@ Options -Indexes
 RewriteEngine On
 #RewriteRule ^v-[0-9]\.[0-9]\.[0-9]/(.*)$ $1 [NC,L]
 
-# remove the current opened task from URL, so that resources (JS, CSS) are loaded properly
-RewriteRule ^editor/taskid/([0-9]+)/go/(.*)$ $2?currentTaskId=$1 [NC,L,QSA]
-
-#/currenttask/123/editor
-#remap to
-#/editor
-#should fix above Resource problems.
-#Then the model URLs could be relative too.
-
-#([0-9]+)/(.*) editor/$3?currentTaskId=$2
+# current open task: remove the current opened task from URL (and place it in currentTaskId), so that resources (JS, CSS) are loaded properly
+RewriteRule ^editor/taskid/([0-9]+)/(.*)$ $2?currentTaskId=$1 [NC,L,QSA]
 
 RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]

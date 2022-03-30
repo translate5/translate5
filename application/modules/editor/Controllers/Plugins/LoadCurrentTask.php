@@ -58,7 +58,7 @@ class editor_Controllers_Plugins_LoadCurrentTask extends Zend_Controller_Plugin_
     public function routeStartup(Zend_Controller_Request_Abstract $request)
     {
         $uri = $request->getRequestUri();
-        error_log("IN ".$uri);
+//error_log("IN ".$uri);
         $uri = explode('?', $uri);
         $queryPath = empty($uri[1]) ? '' : ('?'.$uri[1]);
 
@@ -76,11 +76,6 @@ class editor_Controllers_Plugins_LoadCurrentTask extends Zend_Controller_Plugin_
             if($pathPart == 'taskid' && end($pathToUse) == 'editor') {
                 //next part is the ID
                 self::$currentTaskId = (int) array_shift($path);
-                //FIXME instead of the go suffix, we should set the relative endpoint to the taskid itselfm then there is no go needed in the URL!
-                if(array_shift($path) !== 'go') {
-                    //something was wrong with URL, it was not as expected
-                    return;
-                }
                 continue; //do not add taskid to pathToUse
             }
 
@@ -90,6 +85,6 @@ class editor_Controllers_Plugins_LoadCurrentTask extends Zend_Controller_Plugin_
         $bareRestUrl = self::URI_DELIMITER.trim(join(self::URI_DELIMITER, $pathToUse), self::URI_DELIMITER);
         $request->setRequestUri($bareRestUrl.$queryPath);
         $request->setPathInfo($bareRestUrl);
-        error_log("OUT ".$bareRestUrl.$queryPath);
+//error_log("OUT ".$bareRestUrl.$queryPath);
     }
 }
