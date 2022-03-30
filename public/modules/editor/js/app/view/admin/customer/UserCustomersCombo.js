@@ -39,6 +39,7 @@ Ext.define('Editor.view.admin.customer.UserCustomersCombo', {
     displayField: 'name',
     valueField: 'id',
     store:'userCustomers',
+    selectOnFocus:true,
     queryMode: 'local',
     value:null
 });
