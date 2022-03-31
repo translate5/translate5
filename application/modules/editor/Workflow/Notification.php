@@ -109,6 +109,11 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param array $userData
      */
     protected function notify(array $userData) {
+        // Solution nr2. disable workflow mails before the mail is send. All the calculations in the requested notification function will are done to that point
+        // if disabled by config, do not send email
+        if($this->isDisabled()){
+            return;
+        }
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $user->init($userData);
@@ -116,10 +121,15 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
 
     /**
-     * send the latest created notification to the list of users
+     * send the latest created notification to single user
      * @param ZfExtended_Models_User $user
      */
     protected function notifyUser(ZfExtended_Models_User $user) {
+        // Solution nr2. disable workflow mails before the mail is send. All the calculations in the requested notification function will are done to that point
+        // if disabled by config, do not send email
+        if($this->isDisabled()){
+            return;
+        }
         $this->mailer->sendToUser($user);
     }
 
@@ -200,7 +210,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
      * Workflow specific Notification after all users of a role have finished a task
      */
-    public function notifyAllFinishOfARole() {
+    private function notifyAllFinishOfARole() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $workflow = $this->config->workflow;
@@ -263,7 +273,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
      * Workflow specific PM Notification after one users of a role have finished a task
      */
-    public function notifyOneFinishOfARole() {
+    private function notifyOneFinishOfARole() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $workflow = $this->config->workflow;
@@ -311,7 +321,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Sends a notification to users which are removed automatically from the task
      * The Users to be notified must be given in the parameter array key 'deleted'
      */
-    public function notifyCompetitiveDeleted(array $parameter) {
+    private function notifyCompetitiveDeleted(array $parameter) {
         $triggerConfig = $this->initTriggerConfig([$parameter]);
         $this->tua = $this->config->newTua;
         settype($triggerConfig->deleted, 'array');
@@ -351,7 +361,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Sends a notification to users which are attached newly to a task with status open
      * The User to be notified is gathered from the current active TaskUserAssociation
      */
-    public function notifyNewTaskAssigned() {
+    private function notifyNewTaskAssigned() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $this->tua = $tua = $this->config->newTua;
 
@@ -388,7 +398,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Main differences to notifyNewTaskAssigned to a single user:
      *  This notification contains a list of all assigned users.
      */
-    public function notifyAllAssociatedUsers() {
+    private function notifyAllAssociatedUsers() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
 
@@ -443,7 +453,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
      * Notifies the tasks PM over the new task, but only if PM != the user who has uploaded the task
      */
-    public function notifyNewTaskForPm() {
+    private function notifyNewTaskForPm() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $pmGuid = $task->getPmGuid();
@@ -476,7 +486,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /***
      * Notify the task assock when the delivery date is over the defined days in the config
      */
-    public function notifyOverdueDeadline(){
+    private function notifyOverdueDeadline(){
         $this->deadlineNotifier($this->initTriggerConfig(func_get_args()),__FUNCTION__,false);
     }
 
@@ -484,7 +494,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Notify the the associated users when the deadlineDate is approaching.
      * daysOffset config: how many days before the deadline an email is send
      */
-    public function notifyDeadlineApproaching(){
+    private function notifyDeadlineApproaching(){
         $this->deadlineNotifier($this->initTriggerConfig(func_get_args()),__FUNCTION__,true);
     }
 
@@ -492,7 +502,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Sends by default only the summary to the tasks PM if another user has created the task (for example via API)
      * The summary can be send always if set "always": true in the config object
      */
-    public function notifyImportErrorSummary() {
+    private function notifyImportErrorSummary() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $always = $triggerConfig->always ?? false;
         $task = $this->config->task;
@@ -527,7 +537,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Notify the configured user with term and term attribute proposals of the configured or all termcollections
      * The attached export data in the mail will be in excel format.
      */
-    public function notifyTermProposals(){
+    private function notifyTermProposals(){
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         if(!isset($triggerConfig->receiverUser) || empty($triggerConfig->receiverUser)){
             return;
@@ -589,6 +599,17 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         unlink($file);
     }
 
+
+    public function __call(string $method, array $arguments): mixed {
+        if(method_exists($this, $method)) {
+            // Solution nr1, to disable workflow mails right before even calling the function
+            if($this->isDisabled()){
+                return null;
+            }
+            return call_user_func_array([$this, $method], $arguments);
+        }
+        return null;
+    }
 
     /**
      * attaches the segmentList as attachment to the internal mailer object
@@ -763,5 +784,20 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $this->notify($assoc);
             $deadlineHelper->logDeadlineNotified($assoc,$isApproaching);
         }
+    }
+
+    /***
+     * Check if the workflow notifications are disabled by config. If the current request is in task context, task config will be used.
+     * Otherwise, the system config value will be used.
+     * @return bool
+     * @throws editor_Models_ConfigException|Zend_Exception
+     */
+    protected function isDisabled() : bool{
+        if(isset($this->config->task)){
+            $config = $this->config->task->getConfig();
+        }else{
+            $config = Zend_Registry::get('config');
+        }
+        return (bool) $config->runtimeOptions->workflow->disableNotifications;
     }
 }
