@@ -88,7 +88,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
 
         $wfh = $this->_helper->workflow;
         /* @var $wfh Editor_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable();
+        $wfh->checkWorkflowWriteable($task->getTaskGuid(), editor_User::instance()->getGuid());
 
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         //Only default Layout and therefore no relais can be processed:

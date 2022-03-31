@@ -95,7 +95,7 @@ class editor_Models_Loaders_Taskuserassoc {
         $job->init($foundJobs[0]);
         return $job;
     }
-    
+
     /**
      * Return the most appropriate task user assoc result
      * Highest rated result is the user job of the current task workflow step.
@@ -110,8 +110,10 @@ class editor_Models_Loaders_Taskuserassoc {
      * @param string $userGuid
      * @param string $taskGuid
      * @return editor_Models_TaskUserAssoc
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public static function loadByTaskGuid(string $userGuid,string $taskGuid){
+    public static function loadByTaskGuid(string $userGuid,string $taskGuid): editor_Models_TaskUserAssoc
+    {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);

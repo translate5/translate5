@@ -73,7 +73,7 @@ class Editor_FileController extends ZfExtended_RestController {
 
         $wfh = $this->_helper->workflow;
         /* @var $wfh Editor_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable($taskGuid);
+        $wfh->checkWorkflowWriteable($taskGuid, editor_User::instance()->getGuid());
 
         $this->entity->loadByTaskGuid($taskGuid);
         $mover = ZfExtended_Factory::get('editor_Models_Foldertree_Mover', array($this->entity));
