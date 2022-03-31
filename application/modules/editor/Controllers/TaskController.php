@@ -872,6 +872,13 @@ class editor_TaskController extends ZfExtended_RestController {
         //if it is a project, start the import workers for each sub task
         if($task->isProject()) {
             $tasks = $task->loadProjectTasks($task->getProjectId(),true);
+
+            /** @var editor_Workflow_Manager $wfm */
+            ZfExtended_Factory::get('editor_Workflow_Manager')
+                ->getActiveByTask($task)
+                ->hookin()
+                ->doHandleProjectCreated($task);
+
         } else {
             $tasks[] = $task;
         }

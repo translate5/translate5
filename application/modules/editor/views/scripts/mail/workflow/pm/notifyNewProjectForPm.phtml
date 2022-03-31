@@ -26,25 +26,42 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * The termtranslation task type is same as default, but have different ID so
- * that it appears the possibility for distinction between termtranslation- and other tasks
- * Currently it is only used to decide whether reimport back to TermCollection export menu option should be shown
+/**#@+
+ * @author Marc Mittag
+ * @package portal
+ * @version 2.0
+ *
  */
-class editor_Task_Type_TermTranslation extends editor_Task_Type_Project {
 
-    /**
-     * Type ID
-     */
-    const ID = 'termtranslation';
+/* @var $this Zend_View */
+$this->render('general.phtml');
 
-    /**
-     * @param bool $multiTarget
-     * @param string $projectType
-     * @param string $taskType
-     */
-    public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType) {
-        $projectType = editor_Task_Type_TermTranslation::ID;
-        $taskType = editor_Task_Type_TermTranslationTask::ID;
-    }
-}
+// Setup subject
+$this->subject = $this->translate->_('Translate5 - Projekt erstellt')
+    . ' "' . $this->project->getId()
+    .' - ' . $this->project->getTaskName() . '"';
+
+// Prepare data to merged with general.phtml's data
+$data = [
+    'header' => $this->header,
+    'footer' => $this->footer,
+    'role' => $this->translate->_(ucfirst(ACL_ROLE_PM)),
+    'projectId' => $this->project->getId(),
+    'projectName' => $this->project->getTaskName()
+];
+
+// Build mail body
+$mailBody = $this->templateApply('
+{header}
+Im Projektportal {portalLink} neues Projekt über den TermTranslation Workflow erstellt<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName}
+{footer}'
+, $data);
+
+// Prepare text version
+$this->textbody = strip_tags($mailBody);
+
+// Print mail body
+echo $mailBody;
+
