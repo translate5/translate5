@@ -80,14 +80,14 @@ Ext.Loader.setPath('Ext.ux.DateTimePicker', '<?php echo $this->publicModulePath;
 Ext.Loader.setPathIntercepted = Ext.Loader.setPath;
 Ext.Loader.setPath = function(mod, path) {
     if(mod == 'Editor') {
-        return Ext.Loader.setPathIntercepted('Editor', 'modules/editor/js/app');
+        return Ext.Loader.setPathIntercepted('Editor', '<?php echo APPLICATION_RUNDIR; ?>/modules/editor/js/app');
     }
     return Ext.Loader.setPathIntercepted(mod, path);
 };
 
 </script>
-<script src="modules/editor/overrides.js<?php echo $version;?>"></script>
-<script src="modules/editor/js/app.js<?php echo $version;?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/overrides.js<?php echo $version;?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/js/app.js<?php echo $version;?>"></script>
 
 <script src="<?php echo APPLICATION_RUNDIR; ?>/js/rangy/rangy-master/lib/rangy-core.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/js/rangy/rangy-master/external/log4javascript.js"></script>

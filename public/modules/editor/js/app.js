@@ -70,7 +70,7 @@ if(Ext.browser.is.IE) {
     Ext.application = Ext.emptyFn;
     Ext.onReady(function() {
         Ext.Ajax.request({
-            url: Editor.data.pathToRunDir + '/editor/index/logbrowsertype',
+            url: Editor.data.restpath + 'index/logbrowsertype',
             method: 'post',
             params: {
                 appVersion: navigator.appVersion,
@@ -181,12 +181,15 @@ Ext.application({
             Ext.getStore('customersStore').load();
         }
 
-        //Check if it is task route. If yes, use the redirect to task method.
+        //Check if it is task URL or route. If yes, use the redirect to task method.
         //if it is not a task route, open the administration
         //if no route is provided, use the defautl me[Editor.data.app.initMethod]();
-        if (me.isEditTaskRoute()) {
+        var taskId = me.parseTaskIdFromUrl();
+        if (taskId > 0 || me.isEditTaskRoute()) {
             //check if the taskid is provided in the hash
-            var taskId = me.parseTaskIdFromTaskEditHash(false);
+            if(taskId <= 0){
+                taskId = me.parseTaskIdFromTaskEditHash(false);
+            }
             if (taskId > 0 && !Editor.data.task) {
                 Editor.data.task = {};
                 //set the taskId to the task global object
@@ -224,7 +227,7 @@ Ext.application({
 
         //Logs the users userAgent and screen size for usability improvements:
         Ext.Ajax.request({
-            url: Editor.data.pathToRunDir + '/editor/index/logbrowsertype',
+            url: Editor.data.restpath + 'index/logbrowsertype',
             method: 'post',
             params: {
                 appVersion: navigator.appVersion,
@@ -276,19 +279,9 @@ Ext.application({
         }
 
         me.loadEditorConfigData(task, function () {
-
-            //FIXME DUMMY IMPLEMENTATION OF SETTING THE URL
-            var currentLocation = window.location.href,
-                newLocation,
-                matchTask = /\/editor\/taskid\/[0-9]+\//; //a trailing string is needed for working with relative paths
             me.fireEvent('editorConfigLoaded', me, task);
 
-            if(! matchTask.test(currentLocation)) {
-                // current task not given yet, insert it
-                matchTask = /\/editor/;
-            }
-            newLocation = currentLocation.replace(matchTask, '/editor/taskid/'+task.get('id')+'/');
-            window.history.pushState({ additionalInformation: 'Updated the URL with JS' }, "FOO", newLocation);
+            me.addTaskToUrl(task);
 
             Editor.data.task = task;
             Editor.model.Segment.redefine(task.segmentFields());
@@ -389,6 +382,7 @@ Ext.application({
         if (!Editor.controller.admin || !Editor.controller.admin.TaskOverview) {
             return;
         }
+        me.removeTaskFromUrl();
         if (me.viewport) {
             me.getController('ViewModes').deactivate();
             me.viewport.destroy();
@@ -544,7 +538,42 @@ Ext.application({
     },
 
     /**
-     * Check if in the current hash, the edit task route is defined. The edit task route is only valid
+     * The URL of the opened application may contain the taskId
+     */
+    parseTaskIdFromUrl: function() {
+        var match = window.location.href.match(/\/editor\/taskid\/([0-9]+)\//);
+        if(match) {
+            return parseInt(match[1], 10);
+        }
+        return 0;
+    },
+
+    addTaskToUrl: function(task) {
+        var currentLocation = window.location.href,
+            newLocation,
+            matchTask = /\/editor\/taskid\/[0-9]+\//; //a trailing string is needed for working with relative paths
+
+        if(task) {
+            if(! matchTask.test(currentLocation)) {
+                // current task not given yet, insert it
+                matchTask = /\/editor\//;
+            }
+            newLocation = currentLocation.replace(matchTask, '/editor/taskid/'+task.get('id')+'/');
+        }
+        else {
+            //if task is not given or false, we try to remove task fragments from the URL
+            newLocation = currentLocation.replace(matchTask, '/editor/'); //without / at the end here!
+        }
+        window.history.pushState({ additionalInformation: 'Updated the URL with JS' }, "FOO", newLocation);
+        Editor.data.restpath = window.location.pathname; //we set the new task relative location as restpath, so all other requests use it too
+    },
+
+    removeTaskFromUrl: function() {
+        this.addTaskToUrl(false);
+    },
+
+    /**
+     * Check if in the current hash, the edit task route is defined (or the taskId is given via URL at all). The edit task route is only valid
      * when the segments-editor is opened
      */
     isEditTaskRoute: function () {
