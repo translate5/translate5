@@ -1770,7 +1770,7 @@
     <target>Translation</target>
 </trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - task associated</target></trans-unit>
-<trans-unit id='VHJhbnNsYXRlNSAtIFByb2pla3QgZXJzdGVsbHQ='><source>Translate5 - Projekt erstellt</source><target>Translate5 - Project created</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIFRlcm1pbm9sb2dpZcO8YmVyc2V0enVuZ3Nwcm9qZWt0IGVyc3RlbGx0'><source>Translate5 - Terminologieübersetzungsprojekt erstellt</source><target>Translate5 - Terminology translation project created</target></trans-unit>
 
 <trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>The workflow step of the task was changed to "{0}"!</target></trans-unit>
       <trans-unit id='QXV0b21hdGlzY2hlIFp1d2Vpc3VuZw=='>
