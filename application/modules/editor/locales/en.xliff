@@ -4567,5 +4567,21 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Zip-Upload ist nur als Arbeitsdatei möglich</source>
   <target>Zip upload is only possible as a working file</target>
 </trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAoQ2hpbmEp'>
+  <source>Chinesisch (China)</source>
+  <target>Chinese (China)</target>
+</trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAoVGFpd2FuKQ=='>
+  <source>Chinesisch (Taiwan)</source>
+  <target>Chinese (Taiwan)</target>
+</trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAodHJhZGl0aW9uZWxsKQ=='>
+  <source>Chinesisch (traditionell)</source>
+  <target>Chinese (traditional)</target>
+</trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAodmVyZWluZmFjaHQp'>
+  <source>Chinesisch (vereinfacht)</source>
+  <target>Chinese (simplified)</target>
+</trans-unit>
   </file>
 </xliff>
