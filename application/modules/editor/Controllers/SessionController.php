@@ -26,15 +26,32 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Models\Task\Current\NoAccessException;
+use MittagQI\Translate5\Models\Task\TaskContextTrait;
+
 /**
  * Wrapper for ZfExtended_SessionController
  * else RestRoutes, ACL authentication, etc. will not work.
  */
 class editor_SessionController extends ZfExtended_SessionController {
+    use TaskContextTrait;
+
     const AUTH_HASH_DISABLED = 'disabled';
     const AUTH_HASH_DYNAMIC = 'dynamic';
     const AUTH_HASH_STATIC = 'static';
-    
+
+    /**
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     */
+    public function resyncOperation() {
+        try {
+            $this->initCurrentTask();
+        } catch (NoAccessException|ZfExtended_Models_Entity_NotFoundException) {
+            //if task is not available just do nothing, empty current task is evaluated later
+        }
+
+    }
+
     public function indexAction() {
         if(!empty($_REQUEST['authhash'])) {
             $this->hashauth();

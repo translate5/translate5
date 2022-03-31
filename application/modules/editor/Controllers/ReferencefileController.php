@@ -26,8 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class Editor_ReferencefileController extends editor_Controllers_EditorrestController {
+use MittagQI\Translate5\Models\Task\Current\NoAccessException;
+use MittagQI\Translate5\Models\Task\TaskContextTrait;
 
+class Editor_ReferencefileController extends ZfExtended_RestController {
+    use TaskContextTrait;
     protected $entityClass = 'editor_Models_Foldertree';
 
     /**
@@ -36,19 +39,31 @@ class Editor_ReferencefileController extends editor_Controllers_EditorrestContro
     protected $entity;
 
     /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws NoAccessException
+     */
+    public function init()
+    {
+        parent::init();
+        $this->initCurrentTask();
+    }
+
+    /**
      * delivers the requested file to the browser
      * (non-PHPdoc)
+     * @throws Zend_Exception
+     * @throws ZfExtended_NotFoundException
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
      * @see ZfExtended_RestController::getAction()
      */
     public function getAction() {
-        /* @var $task editor_Models_Task */
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        $fileToDisplay = $this->getRequestedFileAbsPath($task);
+        $fileToDisplay = $this->getRequestedFileAbsPath();
         $file = new SplFileInfo($fileToDisplay);
         if (! $file->isFile()) {
             $logger = Zend_Registry::get('logger')->cloneMe('editor.referencefile');
             $logger->warn('E1216','A non existent reference file "{file}" was requested.',[
-                'task' => $task,
+                'task' => $this->getCurrentTask(),
                 'file' => $this->getRequestedFileRelPath(),
             ]);
             throw new ZfExtended_NotFoundException();
@@ -87,16 +102,11 @@ class Editor_ReferencefileController extends editor_Controllers_EditorrestContro
     /**
      * returns the absolute file path to the requested file, checks the given URL on ../ based attacks
      * @return string
+     * @throws Zend_Exception
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
      */
-    protected function getRequestedFileAbsPath(editor_Models_Task $task) {
-        $session = new Zend_Session_Namespace();
-        
-        if(empty($session->taskGuid)){
-            throw new ZfExtended_NotAuthenticatedException('No task registered in session!');
-        }
-        
-        $task->loadByTaskGuid($session->taskGuid);
-
+    protected function getRequestedFileAbsPath() {
+        $task = $this->getCurrentTask();
         $config = Zend_Registry::get('config');
         $taskPath = $task->getAbsoluteTaskDataPath();
         $refDir = $taskPath.DIRECTORY_SEPARATOR.$config->runtimeOptions->import->referenceDirectory;
@@ -122,7 +132,7 @@ class Editor_ReferencefileController extends editor_Controllers_EditorrestContro
         $urlBase = join('/', $urlBase);
         $file = str_replace('!#START'.$urlBase, '', '!#START'.$zcf->getRequest()->getRequestUri());
         $file = str_replace('/', DIRECTORY_SEPARATOR, $file); //URL to file system
-        /* @var localEncoded ZfExtended_Controller_Helper_LocalEncoded */
+        /** @var $localEncoded ZfExtended_Controller_Helper_LocalEncoded */
         $localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'LocalEncoded'
         );
@@ -132,11 +142,11 @@ class Editor_ReferencefileController extends editor_Controllers_EditorrestContro
     /**
      * sends the reference file tree as JSON
      * (non-PHPdoc)
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction() {
-        $session = new Zend_Session_Namespace();
-        $this->entity->loadByTaskGuid($session->taskGuid);
+        $this->entity->loadByTaskGuid($this->getCurrentTask()->getTaskGuid());
         //by passing output handling, output is already JSON
         $contextSwitch = $this->getHelper('ContextSwitch');
         $contextSwitch->setAutoSerialization(false);

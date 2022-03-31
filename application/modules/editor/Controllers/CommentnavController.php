@@ -26,12 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Models\Task\Current\NoAccessException;
+use MittagQI\Translate5\Models\Task\TaskContextTrait;
+
 /**
  * Loads segment comments.
  * Adding further entities can be done via afterIndexAction event.
  * See e.g. editor_Plugins_VisualReview_Init
  */
 class Editor_CommentnavController extends ZfExtended_RestController {
+    use TaskContextTrait;
 
     /**
      * @var editor_Workflow_Anonymize
@@ -40,8 +44,14 @@ class Editor_CommentnavController extends ZfExtended_RestController {
 
     const RESTRICTION = "commentnav supports only GET Action";
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws NoAccessException
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     */
     public function init() {
         $this->initRestControllerSpecific();
+        $this->initCurrentTask();
     }
     
     /**
@@ -51,16 +61,15 @@ class Editor_CommentnavController extends ZfExtended_RestController {
         return $this->wfAnonymize;
     }
 
-/**
- * Loads segment comments in JSON format
- * You can attach listeners to afterIndexAction to add more types.
- * Example:
- * $eventManager->attach('Editor_CommentnavController', 'afterIndexAction, $callback)
- */
+    /**
+     * Loads segment comments in JSON format
+     * You can attach listeners to afterIndexAction to add more types.
+     * Example:
+     * $eventManager->attach('Editor_CommentnavController', 'afterIndexAction, $callback)
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     */
     public function indexAction() {
-        $session = new Zend_Session_Namespace();
-        $this->task = editor_ModelInstances::taskByGuid($session->taskGuid);
-        $this->wfAnonymize = editor_ModelInstances::taskByGuid($session->taskGuid)->anonymizeUsers()
+        $this->wfAnonymize = $this->getCurrentTask()->anonymizeUsers()
                             ? ZfExtended_Factory::get('editor_Workflow_Anonymize')
                             : NULL;
         $this->_helper->layout->disableLayout();
@@ -70,16 +79,19 @@ class Editor_CommentnavController extends ZfExtended_RestController {
         $this->view->total = count($this->view->rows);
     }
 
+    /**
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     */
     protected function loadSegmentCommentArray(){
-        $session = new Zend_Session_Namespace();
+        $taskGuid = $this->getCurrentTask()->getTaskGuid();
         $commentEntity = ZfExtended_Factory::get('editor_Models_Comment');
         /* @var $commentEntity editor_Models_Comment */
-        $comments = $commentEntity->loadByTaskPlain($session->taskGuid);
+        $comments = $commentEntity->loadByTaskPlain($taskGuid);
         foreach ($comments as &$row) {
             $row['comment'] = htmlspecialchars($row['comment']);
             $row['type'] = $commentEntity::FRONTEND_ID;
             // the segment mappings segmentPage column  is a Hex-Value and does not qualify for sorting, therefore we add a parsed decimal property
-            $this->getWfAnonymize()?->anonymizeUserdata($session->taskGuid, $row['userGuid'], $row);
+            $this->getWfAnonymize()?->anonymizeUserdata($taskGuid, $row['userGuid'], $row);
         }
         return $comments;
     }

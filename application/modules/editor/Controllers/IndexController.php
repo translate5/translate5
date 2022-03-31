@@ -34,13 +34,14 @@ END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\Translate5\Models\Task\Current\NoAccessException;
-use MittagQI\Translate5\Models\Task\CurrentTask;
+use MittagQI\Translate5\Models\Task\TaskContextTrait;
 
 /**
  * Dummy Index Controller
  */
 class Editor_IndexController extends ZfExtended_Controllers_Action
 {
+    use TaskContextTrait;
     /**
      * @var ZfExtended_Zendoverwrites_Translate
      */
@@ -245,7 +246,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->Php2JsVars()->set('basePath', APPLICATION_RUNDIR);
         $this->view->Php2JsVars()->set('moduleFolder', $this->view->publicModulePath . '/');
         $this->view->Php2JsVars()->set('appFolder', $this->view->publicModulePath . '/js/app');
-        $this->view->Php2JsVars()->set('pluginFolder', $restPath . 'plugins/js');
+        $this->view->Php2JsVars()->set('pluginFolder', APPLICATION_RUNDIR . '/' . Zend_Registry::get('module') . '/plugins/js');
         $extJs = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'ExtJs'
         );
@@ -504,13 +505,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      * @throws Exception
      */
     protected function loadCurrentTask(ZfExtended_View_Helper_Php2JsVars $php2js, string $userGuid) {
-        if (!CurrentTask::isProvided()) {
+        if (!$this->isTaskProvided()) {
             $php2js->set('app.initMethod', 'openAdministration');
             return;
         }
 
         try {
-            $task = CurrentTask::getInstance();
+            $this->initCurrentTask();
+            $task = $this->getCurrentTask();
             $taskData = $task->getDataObject();
             unset($taskData->qmSubsegmentFlags);
 
@@ -519,9 +521,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $php2js->set('app.initState', $job->getUsedState());
         }
         catch(NoAccessException) {
-            //the task may not opened yet, so just provide the id and use openEditor with edit mode to try to open it for editing via the UI
+            $task = $this->getCurrentTask(); //on no access exception current task is though set
+            //the task may not be opened yet for editing, so just provide the id and use openEditor with edit mode to try to open it for editing via the UI
             $taskData = new stdClass();
-            $taskData->id = CurrentTask::getProvidedId();
+            $taskData->id = $task->getId();
             $php2js->set('app.initState', editor_Workflow_Default::STATE_EDIT);
         }
 
@@ -659,6 +662,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      */
     public function pluginpublicAction()
     {
+        //this may not be done in general in this controller, but on each usage!
+        $this->isTaskProvided() && $this->initCurrentTask();
+
         $types = array(
             'js' => 'text/javascript',
             'css' => 'text/css',

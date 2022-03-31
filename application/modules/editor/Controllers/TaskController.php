@@ -27,12 +27,14 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Models\Task\CurrentTask;
+use MittagQI\Translate5\Models\Task\TaskContextTrait;
 
 /**
  *
  */
 class editor_TaskController extends ZfExtended_RestController {
 
+    use TaskContextTrait;
     use editor_Controllers_Task_ImportTrait;
 
 
@@ -395,7 +397,7 @@ class editor_TaskController extends ZfExtended_RestController {
 
             $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
 
-            $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
+            $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
             $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
 
             $row['fileCount'] = empty($fileCount[$row['taskGuid']]) ? 0 : $fileCount[$row['taskGuid']];
@@ -1084,7 +1086,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj;
         $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
-        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
+        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll, $this->data->userState ?? null);
         $this->view->rows = (object)$row;
 
@@ -1288,7 +1290,6 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         if($this->isOpenTaskRequest()){
             $task->createMaterializedView();
-            $task->registerInSession($this->data->userState);
             $this->events->trigger("afterTaskOpen", $this, array(
                 'task' => $task,
                 'view' => $this->view,
@@ -1333,7 +1334,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * unregisters the task from the session and close all open services
      */
     protected function unregisterTask() {
-        $this->entity->unregisterInSession();
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
         $manager->closeForTask($this->entity);
@@ -1502,7 +1502,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         
         $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $isTaskPm;
-        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
+        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
         $this->addMissingSegmentrangesToResult($row);
         $this->view->rows = (object)$row;

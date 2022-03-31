@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Models\Task\Current\NoAccessException;
+use MittagQI\Translate5\Models\Task\TaskContextTrait;
+
 /**
  * Editor_AlikeSegmentController
  * Stellt PUT und GET Methoden zur Verarbeitung der Alike Segmente bereit.
@@ -35,7 +38,8 @@ END LICENSE AND COPYRIGHT
  *  - Der PUT liefert eine Liste "rows" mit bearbeiteten, kompletten Segment Daten zu den gegebenen IDs zurück.
  *  - Eine Verortung unter der URL /segment/ID/alikes anstatt alikesegment/ID/ wäre imho sauberer, aber mit Zend REST nicht machbar
  */
-class Editor_AlikesegmentController extends editor_Controllers_EditorrestController {
+class Editor_AlikesegmentController extends ZfExtended_RestController {
+    use TaskContextTrait;
 
     protected $entityClass = 'editor_Models_Segment';
 
@@ -48,9 +52,16 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      * @var editor_Models_Segment
      */
     protected $entity;
-    
+
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws NoAccessException
+     * @throws ZfExtended_NoAccessException
+     */
     public function preDispatch() {
         parent::preDispatch();
+        $this->initCurrentTask();
         $this->entity->setEnableWatchlistJoin();
     }
     /**
@@ -61,33 +72,30 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     {
         $this->entity->load((int)$this->_getParam('id'));
 
-        $session = new Zend_Session_Namespace();
-        $this->view->rows = $this->entity->getAlikes($session->taskGuid);
+        $this->view->rows = $this->entity->getAlikes($this->getCurrentTask()->getTaskGuid());
         $this->view->total = count($this->view->rows);
     }
 
     /**
      * Speichert die Daten des Zielsegments (ID in der URL) in die AlikeSegmente. Die IDs der zu bearbeitenden Alike Segmente werden als Array per PUT übergeben.
      * Die Daten der erfolgreich bearbeiteten Segmente werden vollständig gesammelt und als Array an die View übergeben.
+     * @throws NoAccessException
      * @see ZfExtended_RestController::putAction()
      */
     public function putAction() {
-        $session = new Zend_Session_Namespace();
+        $task = $this->getCurrentTask();
         $editedSegmentId = (int)$this->_getParam('id');
 
         $wfh = $this->_helper->workflow;
         /* @var $wfh Editor_Controller_Helper_Workflow */
         $wfh->checkWorkflowWriteable();
 
-        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($session->taskGuid);
+        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         //Only default Layout and therefore no relais can be processed:
         if(!$sfm->isDefaultLayout()) {
             return;
         }
         
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($session->taskGuid);
         $hasher = $this->getHasher($task);
         
         $sourceMeta = $sfm->getByName(editor_Models_SegmentField::TYPE_SOURCE);
@@ -101,6 +109,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         }
 
         $this->entity->load($editedSegmentId);
+        $this->validateTaskAccess($this->entity->getTaskGuid());
         
         $ids = (array) Zend_Json::decode($this->_getParam('alikes', "[]"));
         /* @var $entity editor_Models_Segment */
@@ -145,7 +154,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity->setTimeTrackData($duration, $alikeCount);
                 
                 //Entity auf Editierbarkeit überprüfen
-                if($entity->getTaskGuid() != $session->taskGuid || ! $entity->isEditable() || $editedSegmentId === $id) {
+                if($entity->getTaskGuid() != $task->getTaskGuid() || ! $entity->isEditable() || $editedSegmentId === $id) {
                     continue;
                 }
 

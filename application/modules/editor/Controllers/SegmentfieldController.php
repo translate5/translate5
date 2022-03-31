@@ -26,22 +26,35 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Models\Task\Current\NoAccessException;
+use MittagQI\Translate5\Models\Task\TaskContextTrait;
+
 /**
  * segment fields controller
  */
-class Editor_SegmentfieldController extends editor_Controllers_EditorrestController{
+class Editor_SegmentfieldController extends ZfExtended_RestController {
+    use TaskContextTrait;
     /**
      * @var string
      */
     protected $entityClass = 'editor_Models_SegmentField';
-    /**
-     * @var int
-     */
-    protected $segmentfieldId;
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws NoAccessException
+     */
+    public function init()
+    {
+        parent::init();
+        $this->initCurrentTask();
+    }
+
+    /**
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     */
     public function indexAction() {
-        $session = new Zend_Session_Namespace();
-        $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid);
+        $this->view->rows = $this->entity->loadByTaskGuid($this->getCurrentTask()->getTaskGuid());
         $this->view->total = count($this->view->rows);
     }
 } 
