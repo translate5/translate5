@@ -198,8 +198,8 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
                 }
             });
         }
-        
-        Editor.app.viewport.unmask();
+
+        Editor.app.viewport && Editor.app.viewport.unmask();
         
         if(grid && Editor.data.task) {
             this.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);

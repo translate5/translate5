@@ -250,11 +250,11 @@ Ext.application({
             return;
         }
         Ext.get(window).on({
-            beforeunload: function (e) {
+            beforeunload: function () {
                 if (!Editor.data.logoutOnWindowClose) {
                     return;
                 }
-                var fd = new FormData;
+                var fd = new FormData();
                 fd.append('zfExtended', Ext.util.Cookies.get('zfExtended'));
                 fd.append('noredirect', 1);
                 // destroy the user session and prevent redirect
@@ -290,7 +290,7 @@ Ext.application({
                 source: languages.getById(task.get('sourceLang')),
                 relais: languages.getById(task.get('relaisLang')),
                 target: languages.getById(task.get('targetLang'))
-            }
+            };
 
             if (me.viewport) {
                 //trigger closeEvent depending on which viewport was open
@@ -339,10 +339,10 @@ Ext.application({
             failure: me.handleOpenTaskDirectError
         });
     },
-    handleOpenTaskDirectError: function (record, op, success) {
+    handleOpenTaskDirectError: function (record, op) {
         if (!Editor.data.editor.toolbar.hideLeaveTaskButton) {
             this.openAdministration();
-            if (op.error.status == 404 && record.get('taskGuid') == '') {
+            if (op.error.status === 404 && record.get('taskGuid') === '') {
                 Editor.MessageBox.getInstance().showDirectError('The requested task does not exist anymore.');
             } else {
                 Editor.app.getController('ServerException').handleFailedRequest(op.error.status, op.error.statusText, op.error.response);
@@ -353,7 +353,7 @@ Ext.application({
             title = 'Uups... The requested task could not be opened',
             respText = response && response.responseText;
 
-        if (op.error.status == 404 && record.get('taskGuid') == '') {
+        if (op.error.status === 404 && record.get('taskGuid') === '') {
             this.showInlineError('The requested task does not exist anymore.', title);
         } else if (respText) {
             this.showInlineError(Editor.app.getController('ServerException').renderHtmlMessage(title, Ext.JSON.decode(respText)));
@@ -434,8 +434,9 @@ Ext.application({
      * The first route in a panel is defined as the main route where the redirect should go
      * @param {Ext.tab.Panel} tabpanel
      * @param {Ext.Component} activatedPanel
+     * @param {Editor.model.admin.Task} task
      */
-    onAdminMainSectionChange: function (tabpanel, activatedPanel, task) {
+    onAdminMainSectionChange: function (tabpanel, activatedPanel) {
         var me = this,
             ctrl = activatedPanel.getController(),
             conf = ctrl && ctrl.defaultConfig,
@@ -501,7 +502,7 @@ Ext.application({
             callback:function(){
                 // disable logoutOnWindowClose when the theme is changed
                 Editor.data.logoutOnWindowClose = false;
-                location.reload();
+                window.location.reload();
             }
         });
     },
@@ -514,7 +515,7 @@ Ext.application({
             return;
         }
         Ext.Object.each(Editor.data.supportedBrowsers, function (idx, version) {
-            if (Ext.browser.name == idx && Ext.browser.version.major >= version) {
+            if (Ext.browser.name === idx && Ext.browser.version.major >= version) {
                 supportedBrowser = true;
                 return false;
             }
@@ -590,7 +591,7 @@ Ext.application({
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return (h && h.length > 1) ? parseInt(h[1]) : -1;
+        return (h && h.length > 1) ? parseInt(h[1], 10) : -1;
     },
 
     /***
@@ -604,7 +605,7 @@ Ext.application({
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return (h && h.length == 4) ? parseInt(h[2]) : 0;
+        return (h && h.length === 4) ? parseInt(h[2], 10) : 0;
     },
 
     /***
