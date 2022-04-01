@@ -88,9 +88,17 @@ class editor_Plugins_MatchAnalysis_Export_Xml
     protected SimpleXMLElement $rootNode;
 
     /**
+     * flag if 101% matches should be used as useInContextExact
+     * @var boolean
+     */
+    protected bool $useInContextExact;
+
+    /**
      * @throws editor_Models_ConfigException
      */
     public function __construct(editor_Models_Task $task) {
+
+        $this->useInContextExact = $task->getConfig()->runtimeOptions->plugins->MatchAnalysis->xmlInContextUsage ?? false;
 
         //for XML export we may
         $configuredFuzzies = $task->getConfig()->runtimeOptions->plugins->MatchAnalysis->fuzzyBoundaries;
@@ -149,7 +157,7 @@ class editor_Plugins_MatchAnalysis_Export_Xml
         $hasInternalFuzzy = false;
         
         $this->addEmptyFuzzyNodes();
-        
+
         //llop over data and categorize it
         foreach ($rows as $row) {
             $isMt = $row['type'] == editor_Models_Segment_MatchRateType::TYPE_MT;
@@ -165,11 +173,16 @@ class editor_Plugins_MatchAnalysis_Export_Xml
             elseif($row['matchRate'] == 102) {
                 $this->add('crossFileRepeated', $row);
             }
-            //inContextExact are 103%-Matches from translate5
+            //perfect are 103%-Matches from translate5
             elseif($row['matchRate'] == 103) {
+                $this->add('perfect', $row);
+            }
+            //inContextExact are 101%-Matches from translate5 (if configured)
+            elseif($this->useInContextExact && $row['matchRate'] == 101) {
                 $this->add('inContextExact', $row);
             }
             //exact are 100% and 101% and 104%-Matches from translate5, since Trados does not know our 101 and 104%-Matches
+            // 101 may be configured to be used as inContextExact
             elseif($row['matchRate'] >= 100) {
                 $this->add('exact', $row);
             }
@@ -374,15 +387,15 @@ This file was generated with translate5.
   For the following elements all numeric attributes are always set to "0",
   because they currently have no analogon in translate5:
     # locked
-    # perfect
+    # inContextExact (Exception: if configured xmlInContextUsage then 101% matches are set as inContextExact) 
     # repeated (translate5 will only have crossFileRepeated)
     # newBaseline (this is specific to SDL MT)
     # newLearnings (this is specific to SDL MT)
 - the number and definitions of fuzzy elements will reflect the fuzzy ranges as defined in translate5
 - all MT matches and matches not listed as fuzzy or better match will always be counted within "new"
 - crossFileRepeated are translate5s repetitions (which are represented by 102% matches)
-- exact are 100% and 101% and 104%-Matches from translate5
-- inContextExact are 103%-Matches from translate5
+- exact are 100% and 101% and 104%-Matches from translate5 (101% may also be used as inContextExact if configured)
+- perfect are 103%-Matches from translate5
 - The following attributes will always have the value "0", since translate5 does not support them right now:
   # characters="0"
   # placeables="0"

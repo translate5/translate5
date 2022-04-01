@@ -13,6 +13,52 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.6.9] - 2022-03-30
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-2697](https://jira.translate5.net/browse/TRANSLATE-2697): VisualReview / VisualTranslation - General plugin which parses a visual HTML source from a reference file** <br>
+Added capabilities to download the visual source from an URL embedded in a reference XML file
+
+
+### Changed
+**[TRANSLATE-2923](https://jira.translate5.net/browse/TRANSLATE-2923): MatchAnalysis & Pretranslation - Enable 101% Matches to be shown as <inContextExact in Trados analysis XML export** <br>
+A matchrate of 101% may be mapped to InContextExact matches in the analysis XML export for Trados (if configured: runtimeOptions.plugins.MatchAnalysis.xmlInContextUsage)
+
+
+### Bugfixes
+**[TRANSLATE-2938](https://jira.translate5.net/browse/TRANSLATE-2938): Editor general - Remove the limit from the global customer switch** <br>
+The global customer dropdown has shown only 20 customers, now all are show.
+
+**[TRANSLATE-2937](https://jira.translate5.net/browse/TRANSLATE-2937): Main back-end mechanisms (Worker, Logging, etc.) - Workflow user prefs loading fails on importing task** <br>
+Solves a problem with user preferences in importing tasks.
+
+**[TRANSLATE-2934](https://jira.translate5.net/browse/TRANSLATE-2934): VisualReview / VisualTranslation - Bookmark segment in visual does not work** <br>
+The segment bookmark filter button in the simple view mode of visual review was not working, this is fixed.
+
+**[TRANSLATE-2930](https://jira.translate5.net/browse/TRANSLATE-2930): InstantTranslate - Instant-translate task types listed in task overview** <br>
+Pre-translated files with instant-translate will not be listed anymore as tasks in task overview.
+
+**[TRANSLATE-2922](https://jira.translate5.net/browse/TRANSLATE-2922): MatchAnalysis & Pretranslation - 103%-Matches are shown in wrong category in Trados XML Export** <br>
+A matchrate of 103% must be mapped to perfect matches in the analysis XML export for Trados (was previously mapped to InContextExact).
+
+**[TRANSLATE-2921](https://jira.translate5.net/browse/TRANSLATE-2921): TermPortal - Batch edit should only change all terms on affected level** <br>
+Batch editing was internally changed, so the only selected terms and language- and termEntry- levels of selected terms are affected.
+
+**[TRANSLATE-2844](https://jira.translate5.net/browse/TRANSLATE-2844): Import/Export - upload wizard is blocked by zip-file as reference file** <br>
+Disallow zip files to be uploaded as a reference file via the UI, since they can not be processed and were causing errors.
+
+**[TRANSLATE-2835](https://jira.translate5.net/browse/TRANSLATE-2835): OpenTM2 integration - Repair invalid OpenTM2 TMX export** <br>
+Depending on the content in the TM the exported TMX may result in invalid XML. This is tried to be fixed as best as possible to provide valid XML.
+
+**[TRANSLATE-2766](https://jira.translate5.net/browse/TRANSLATE-2766): Client management - Change client sorting in drop-downs to alphabethically** <br>
+All over the application clients in the drop-downs were sorted by the order, they have been added to the application. Now they are sorted alphabetically.
+
+
 ## [5.6.8] - 2022-03-22
 
 ### Important Notes:

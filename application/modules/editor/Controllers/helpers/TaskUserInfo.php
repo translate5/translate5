@@ -141,7 +141,8 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
         //we load alls fields, if we are in taskOverview and are allowed to edit all
         // or we have no userStep to filter / search by.
         // No userStep means indirectly that we do not have a TUA (pmCheck)
-        if(!$this->isInTaskContext && $isEditAll || empty($row['userStep'])) {
+        // task in state import means in some point there will be no user pref record in the database
+        if(!$this->isInTaskContext && $isEditAll || empty($row['userStep']) || $row['state'] === editor_Models_Task::STATE_IMPORT) {
             $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
             //the pm sees all, so fix userprefs
             $userPref->setNotEditContent(false);
@@ -150,7 +151,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
             $allFields = array_map(function($item) {
                 return $item['name'];
             }, $row['segmentFields']);
-                $userPref->setFields(join(',', $allFields));
+            $userPref->setFields(join(',', $allFields));
         } else {
             $user = new Zend_Session_Namespace('user');
             $userPref->loadByTaskUserAndStep($taskguid, $this->workflow->getName(), $user->data->userGuid, $row['userStep']);
