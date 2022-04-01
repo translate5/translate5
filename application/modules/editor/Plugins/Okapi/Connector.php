@@ -150,18 +150,23 @@ class editor_Plugins_Okapi_Connector {
         $response= $http->request('DELETE');
         $this->processResponse($response);
     }
-    
+
     /**
      * Upload the bconf file
+     * @param string $bconfPath
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
+     * @throws ZfExtended_Exception
+     * @throws editor_Plugins_Okapi_Exception
      */
-    public function uploadOkapiConfig(array $bconfPaths){
-        if(empty($bconfPaths) || empty($bconfPaths[0]) || !file_exists($bconfPaths[0])) {
+    public function uploadOkapiConfig(string $bconfPath){
+        if(empty($bconfPath) || !file_exists($bconfPath)) {
              // 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
-             throw new editor_Plugins_Okapi_Exception('E1055', ['bconfFile' => $bconfPaths[0]]);
+             throw new editor_Plugins_Okapi_Exception('E1055', ['bconfFile' => $bconfPath]);
         }
         $url = $this->projectUrl.'/batchConfiguration';
         $http = $this->getHttpClient($url);
-        $http->setFileUpload($bconfPaths[0], 'batchConfiguration');
+        $http->setFileUpload($bconfPath , 'batchConfiguration');
         $response = $http->request('POST');
         $this->processResponse($response);
     }
@@ -273,7 +278,6 @@ class editor_Plugins_Okapi_Connector {
      * @param string $fileName filename in okapi to get the file
      * @param string $manifestFile
      * @param SplFileInfo $originalFile
-     * @return string the path to the downloaded data file
      */
     public function downloadMergedFile($fileName, SplFileInfo $targetFile){
         $http = $this->getHttpClient($this->projectUrl.'/outputFiles/'.$fileName);
