@@ -140,7 +140,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         tabPanel.setActiveTab(0);
     },
     addBconfComboToTaskMainCard: function(taskMainCard){
-        var combo = taskMainCard.down("#taskMainCardContainer").add({
+        taskMainCard.down("#taskMainCardContainer").add({
             xtype: 'combobox',
             queryMode: 'local',
             forceSelection: true,
@@ -168,7 +168,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                         filters: [{
                             filterFn: ({data:bconf}) => !bconf.customer_id || this._value == bconf.customer_id,
                             property: 'customer_id',
-                            value: '{customer.selection.id || -1}'
+                            value: '{customer.selection.id}'
                         }],
                         sorters: [{
                             property: 'customer_id',

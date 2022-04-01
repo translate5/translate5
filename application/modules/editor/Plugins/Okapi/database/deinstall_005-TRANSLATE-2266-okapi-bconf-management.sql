@@ -29,8 +29,11 @@ DELETE FROM `Zf_acl_rules` WHERE `right` IN ('pluginOkapiBconfPrefs');
 DELETE FROM `Zf_acl_rules` WHERE `resource` = 'editor_plugins_okapi_bconf';
 DELETE FROM `Zf_acl_rules` WHERE `resource` = 'editor_plugins_okapi_bconffilter';
 
-
+-- QUIRK: Only delete references if files are removed, too.
+-- UPDATE LEK_customer_meta SET defaultBconfId = NULL;
+-- UPDATE LEK_task_meta SET bconfId = NULL;
 ALTER TABLE LEK_customer_meta DROP FOREIGN KEY `fk-customer_meta-okapi_bconf`;
+ALTER TABLE LEK_task_meta DROP FOREIGN KEY `fk-task_meta-okapi_bconf`;
 
 DROP TABLE IF EXISTS `LEK_okapi_bconf_default_filter`;
 DROP TABLE IF EXISTS `LEK_okapi_bconf_filter`;

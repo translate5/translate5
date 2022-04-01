@@ -356,7 +356,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         if(Editor.app.isDevelopmentVersion()){
             customer = container.down('#customerId');
             if(Ext.isEmpty(customer.getValue())){
-                customer.setValue(Ext.getStore('userCustomers').getDefaultCustomerId());
+                customer.setValue(Ext.getStore('userCustomers').getDefaultCustomerId.apply(customer.getStore()));
             }
         }
 
@@ -397,7 +397,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
      * @param index
      * @returns {*|string}
      */
-    checkFileName:function (fileName,type,target,index = 0){
+    checkFileName:function (fileName,type,targetLang,index = 0){
         var me = this,
             store = me.getView().store,
             checkName = fileName,
@@ -414,11 +414,11 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
         // check for matching name in the store
         store.each(function(record) {
-            if(record.get('name') === checkName && record.get('type') === type && (record.get('targetLang') === target || Ext.isEmpty(target))){
+            if(record.get('name') === checkName && record.get('type') === type && (record.get('targetLang') === targetLang || Ext.isEmpty(targetLang))){
                 nameExists = true;
             }
         });
-        return nameExists ? me.checkFileName(fileName, type, target,index + 1) : checkName;
+        return nameExists ? me.checkFileName(fileName, type, targetLang,index + 1) : checkName;
     },
 
     /***

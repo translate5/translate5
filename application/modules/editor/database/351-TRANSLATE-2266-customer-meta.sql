@@ -32,4 +32,6 @@ CREATE TABLE IF NOT EXISTS `LEK_customer_meta` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `customerId` (`customerId`),
   CONSTRAINT `fk-customer_meta-customer` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
-)
+);
+
+ALTER TABLE LEK_task_meta ADD COLUMN bconfId int(11) NULL;

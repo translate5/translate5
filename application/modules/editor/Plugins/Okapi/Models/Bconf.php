@@ -48,20 +48,6 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     protected $dbInstanceClass = 'editor_Plugins_Okapi_Models_Db_Bconf';
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_Bconf';
 
-
-    
-    /**
-     * loads all Entities out of DB
-     * @return array
-     */
-    public function loadAll() {
-        $s = $this->db->select()
-        ->setIntegrityCheck(false)
-        ->from(['bconf' => $this->tableName ])
-        ->joinLeft(['meta' => 'LEK_customer_meta'], 'bconf.id = meta.defaultBconfId', ['customerId AS isDefaultForCustomer']);
-        return $this->loadFilterdCustom($s);
-    }
-
      /**
      * Export the Bconf
      */
@@ -95,12 +81,12 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
-     *
+     * Returns the data directory of a given bconfId
      * @param string|null $id
-     * @return SplFileInfo
+     * @return string
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function getDataDirectory(?string $id = null) : SplFileInfo {
+    public function getDataDirectory(?string $id = null) : string {
         $okapiBconfDir = '../data/'.self::BCONF_BASE_PATH.'/'.($id?:$this->getId()).'/';
         //$okapiBconfDir = '/ram/'.self::BCONF_BASE_PATH.'/'.$bconfId.'/';
         if(!is_dir($okapiBconfDir) && !mkdir($okapiBconfDir, 0777, true)){
@@ -116,7 +102,16 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             // TODO OKAPI: define proper Event Code
             throw new editor_Plugins_Okapi_Exception('E9999', ['reason' => 'Okapi Bconf directory is not writeable: "'.$okapiBconfDir->getPathname().'".']);
         }
-        return $okapiBconfDir;
+        return realpath($okapiBconfDir);
+    }
+
+    /**
+     * @return string
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getFilePath(): string
+    {
+        return $this->getDataDirectory() . '/export.bconf';
     }
 
 }

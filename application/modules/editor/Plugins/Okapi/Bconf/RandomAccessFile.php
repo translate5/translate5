@@ -54,7 +54,7 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
     public function readUTF(){
         $utflen = unpack("n", $this->fread(2))[1]; // n -> Big Endian unsigned short (Java)
         // unpack("A"...) strips whitespace!
-        return unpack("a".$utflen, $this->fread($utflen))[1];
+        return $utflen>0 ? unpack("a".$utflen, $this->fread($utflen))[1] : '';
     }
 
      /** Write the UTF-8 value in bconf

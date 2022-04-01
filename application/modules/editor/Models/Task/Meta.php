@@ -32,6 +32,10 @@ END LICENSE AND COPYRIGHT
  * @method void setId() setId(int $id)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $guid)
+ * @method setBconfId(mixed $bconfId)
+ * @method getBconfId()
+ * @method setMappingType(mixed $mappingType)
+ * @method getMappingType()
  */
 class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';

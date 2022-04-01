@@ -29,13 +29,7 @@ INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
 INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_okapi_bconf', 'all');
 INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_okapi_bconffilter', 'all');
 
--- QUIRK: if admin role comes before pm, the rights above will not suffice
-INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'admin', 'frontend', 'pluginOkapiBconfPrefs');
-INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'admin', 'editor_plugins_okapi_bconf', 'all');
-INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'admin', 'editor_plugins_okapi_bconffilter', 'all');
-
-
-CREATE TABLE `LEK_okapi_bconf` (
+CREATE TABLE IF NOT EXISTS `LEK_okapi_bconf` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `customer_id` INT(11) DEFAULT NULL,
     `name` VARCHAR(50),
@@ -45,11 +39,8 @@ CREATE TABLE `LEK_okapi_bconf` (
     PRIMARY KEY (`id`),
     CONSTRAINT FOREIGN KEY (`customer_id`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
 );
-ALTER TABLE LEK_customer_meta ADD CONSTRAINT `fk-customer_meta-okapi_bconf`
-FOREIGN KEY (`defaultBconfId`) REFERENCES LEK_okapi_bconf(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
-
-CREATE TABLE `LEK_okapi_bconf_filter` (
+CREATE TABLE IF NOT EXISTS `LEK_okapi_bconf_filter` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `bconfId` INT(11) NOT NULL,
     `okapiId` VARCHAR(50) NOT NULL,
@@ -62,7 +53,7 @@ CREATE TABLE `LEK_okapi_bconf_filter` (
     CONSTRAINT FOREIGN KEY (`bconfId`) REFERENCES `LEK_okapi_bconf` (`id`) ON DELETE CASCADE
 );
 
-CREATE TABLE `LEK_okapi_bconf_default_filter` (
+CREATE TABLE IF NOT EXISTS `LEK_okapi_bconf_default_filter` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `okapiId` VARCHAR(50) NOT NULL,
   `mimeType` VARCHAR(50) DEFAULT NULL,
@@ -158,3 +149,11 @@ VALUES
     ('okf_xliff',                          'application/x-xliff+',   'XLIFF',                                           'xlf,xliff,mxliff,mqxliff',              'Configuration for XML Localisation Interchange File Format (XLIFF) documents.'),
     ('okf_openoffice',                     'application/x-openof',   'OpenOffice.org Documents',                        'odt,ods,odg,odp,ott,ots,otp,otg',   'OpenOffice.org ODT, ODS, ODP, ODG, OTT, OTS, OTP, OTG documents'),
     ('okf_openxml',                        'text/xml',               'Microsoft Office Document',                       'docx,docm,dotx,dotm,pptx,pptm,ppsx,ppsm,potx,potm,xlsx,xlsm,xltx,xltm,vsdx,vsdm',   'Microsoft Office documents (DOCX, DOCM, DOTX, DOTM, PPTX, PPTM, PPSX, PPSM, POTX, POTM, XLSX, XLSM, XLTX, XLTM, VSDX, VSDM).');
+
+
+-- Add constraints at last, so tables are created even when constraints fail
+ALTER TABLE LEK_customer_meta ADD CONSTRAINT `fk-customer_meta-okapi_bconf`
+FOREIGN KEY (`defaultBconfId`) REFERENCES LEK_okapi_bconf(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE LEK_task_meta ADD CONSTRAINT `fk-task_meta-okapi_bconf`
+FOREIGN KEY (`bconfId`) REFERENCES LEK_okapi_bconf(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

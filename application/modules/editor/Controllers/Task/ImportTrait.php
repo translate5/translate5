@@ -85,12 +85,16 @@ trait editor_Controllers_Task_ImportTrait {
         foreach($this->data['targetLang'] as $target) {
             $task = clone $this->entity;
 
+            // TODO FIXME: add proper Events to enable plugins to set data from Request
             // re-init the task meta for the projectTask
             $meta = $task->meta(true);
-
             // set the mapping type for the project if provided
             if(isset($this->data['mappingType'])){
                 $meta->setMappingType($this->data['mappingType']);
+            }
+            // set the bconfId for the project if provided
+            if(isset($this->data['bconfId'])){
+                $meta->setBconfId($this->data['bconfId']);
             }
 
             $task->setProjectId($entityId);
@@ -130,7 +134,7 @@ trait editor_Controllers_Task_ImportTrait {
 
         try {
             $import->import($dp);
-        }catch (ZfExtended_ErrorCodeException $e){
+        } catch (ZfExtended_ErrorCodeException $e){
             // in case there is task, remove it
             $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
             /* @var $remover editor_Models_Task_Remover */
