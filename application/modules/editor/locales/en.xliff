@@ -4038,6 +4038,17 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='TWF0Y2gtQW5hbHlzZQ=='><source>Match-Analyse</source><target>Match analysis</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Internal tags</target></trans-unit>
 <trans-unit id='TGVlcmUgU2VnbWVudGU='><source>Leere Segmente</source><target>Empty segments</target></trans-unit>
+<trans-unit id='TGVlcnJhdW0gYW0gQW5mYW5nL0VuZGU='><source>Leerraum am Anfang/Ende</source><target>White space at beginning/end</target></trans-unit>
+<trans-unit id='TGVlcnplaWNoZW4gYW0gQW5mYW5n'><source>Leerzeichen am Anfang</source><target>Space at beginning</target></trans-unit>
+<trans-unit id='R2VzY2jDvHR6ZXMgTGVlcnplaWNoZW4gYW0gQW5mYW5n'><source>Geschützes Leerzeichen am Anfang</source><target>Non-breaking space at beginning</target></trans-unit>
+<trans-unit id='VGFiIGFtIEFuZmFuZw=='><source>Tab am Anfang</source><target>Tab at beginning</target></trans-unit>
+<trans-unit id='VW1icnVjaCBhbSBBbmZhbmc='><source>Umbruch am Anfang</source><target>Line break at beginning</target></trans-unit>
+<trans-unit id='TGVlcnplaWNoZW4gYW0gRW5kZQ=='><source>Leerzeichen am Ende</source><target>Space at end</target></trans-unit>
+<trans-unit id='R2VzY2jDvHR6ZXMgTGVlcnplaWNoZW4gYW0gRW5kZQ=='><source>Geschützes Leerzeichen am Ende</source><target>Non-breaking space at end</target></trans-unit>
+<trans-unit id='VGFiIGFtIEVuZGU='><source>Tab am Ende</source><target>Tab at end</target></trans-unit>
+<trans-unit id='VW1icnVjaCBhbSBFbmRl'><source>Umbruch am Ende</source><target>Line break at end</target></trans-unit>
+<trans-unit id='TGVlcnplaWNoZW4gdm9yIFplaWxlbnVtYnJ1Y2g='><source>Leerzeichen vor Zeilenumbruch</source><target>Space before line break</target></trans-unit>
+<trans-unit id='TGVlcnplaWNoZW4gbmFjaCBaZWlsZW51bWJydWNo'><source>Leerzeichen nach Zeilenumbruch</source><target>Space after line break</target></trans-unit>
 <trans-unit id='RGFzIFppZWwgZW50aMOkbHQgbnVyIFRhZ3MsIExlZXJ6ZWljaGVuIG9kZXIgSW50ZXJwdW5rdGlvbiwgZGllIFF1ZWxsZSBqZWRvY2ggbmljaHQu'><source>Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.</source><target>Target only contains tags, spaces or punctuation, but source does not.</target></trans-unit>
 <trans-unit id='RWluaGVpdGxpY2hrZWl0'><source>Einheitlichkeit</source><target>Consistency</target></trans-unit>
 <trans-unit id='VW5laW5oZWl0bGljaGUgUXVlbGxl'><source>Uneinheitliche Quelle</source><target>Inconsistent source</target></trans-unit>

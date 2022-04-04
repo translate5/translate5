@@ -169,6 +169,23 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
     public function isNewline() : bool {
         return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_NEWLINE));
     }
+
+    /**
+     * Evaluates, if the internal tag represents a non-breaking space
+     * @return boolean
+     */
+    public function isNbsp(): bool {
+        return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_NBSP));
+    }
+
+    /**
+     * Evaluates, if the internal tag represents a tab
+     * @return boolean
+     */
+    public function isTab(): bool {
+        return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_TAB));
+    }
+
     /**
      * Retrieves the original index of the internal tag within the segment
      * @return int
