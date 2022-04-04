@@ -656,15 +656,22 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         //$this->_helper->viewRenderer->setNoRender();
     }
 
+    /*
+
+    public function preDispatch(){
+        if($this->_request->getActionName() == 'pluginpublic'){
+
+        }
+        parent::preDispatch();
+    }
+    */
+
     /**
      * To prevent LFI attacks load existing Plugin JS filenames and use them as whitelist
      * Currently this Method is not reusable, its only for JS.
      */
     public function pluginpublicAction()
     {
-        //this may not be done in general in this controller, but on each usage!
-        $this->isTaskProvided() && $this->initCurrentTask();
-
         $types = array(
             'js' => 'text/javascript',
             'css' => 'text/css',
@@ -708,13 +715,19 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if (empty($plugin)) {
             throw new ZfExtended_NotFoundException();
         }
+        // some plugins call their public files from the task-context with /task/1234/plugins/PluginName/... if the requested files are task-dependant and thus need the fetched task
+        $config = [];
+        if($this->isTaskProvided()){
+            $this->initCurrentTask();
+            $config['task'] = $this->getCurrentTask();
+        }
 
         // check if requested "fileType" is allowed
-        if (!$plugin->isPublicSubFolder($requestedType)) {
+        if (!$plugin->isPublicSubFolder($requestedType, $config)) {
             throw new ZfExtended_NotFoundException();
         }
 
-        $publicFile = $plugin->getPublicFile($requestedType, $requestedFileParts);
+        $publicFile = $plugin->getPublicFile($requestedType, $requestedFileParts, $config);
         if (empty($publicFile) || !$publicFile->isFile()) {
             throw new ZfExtended_NotFoundException();
         }
