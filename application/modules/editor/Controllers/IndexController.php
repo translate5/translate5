@@ -371,7 +371,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         
         // show Consortium Logos on application load for xyz seconds [default 3]
         $this->view->Php2JsVars()->set('startup.showConsortiumLogos', $rop->startup->showConsortiumLogos);
-        
+
+        // set special characters list into a front-end view variable. This should be removed after this config is moved to lvl 16
+        $this->view->Php2JsVars()->set('editor.segments.editorSpecialCharacters', $rop->editor->segments?->editorSpecialCharacters ?? '');
+
         $this->setJsAppData();
     }
 
