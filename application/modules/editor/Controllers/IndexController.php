@@ -656,16 +656,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         //$this->_helper->viewRenderer->setNoRender();
     }
 
-    /*
-
-    public function preDispatch(){
-        if($this->_request->getActionName() == 'pluginpublic'){
-
-        }
-        parent::preDispatch();
-    }
-    */
-
     /**
      * To prevent LFI attacks load existing Plugin JS filenames and use them as whitelist
      * Currently this Method is not reusable, its only for JS.
