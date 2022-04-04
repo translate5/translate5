@@ -738,7 +738,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             header('HTTP/1.1 304 Not Modified');
             exit;
         }
-        // TODO FIXME: UGLY: he Proxy-URL is defined in the visual plugin, that might not be active
+        // TODO FIXME: UGLY: the virtual Proxy-dir is defined in the visual plugin, that might not be active
         $isStaticVRFile = ($requestedType == 'T5Proxy' && $extension !== 'html'); // pdfconverter outputs that will never change
         if($version === 'development' && !$isStaticVRFile){
             $cacheBehaviour = 'no-cache'; // check for new version always
