@@ -61,7 +61,7 @@ class editor_Segment_Whitespace_QualityProvider extends editor_Segment_Quality_P
      * @return bool
      */
     public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
-        return $qualityConfig->enableSegmentWhitespaceCheck == 1 || true;
+        return $qualityConfig->enableSegmentWhitespaceCheck == 1;
     }
 
     /**
@@ -74,7 +74,7 @@ class editor_Segment_Whitespace_QualityProvider extends editor_Segment_Quality_P
 
         // If this check is turned Off in config - return $tags
         if (!$qualityConfig->enableSegmentWhitespaceCheck == 1) {
-            //return $tags;
+            return $tags;
         }
 
         // If processing mode is 'alike'
@@ -133,12 +133,12 @@ class editor_Segment_Whitespace_QualityProvider extends editor_Segment_Quality_P
      */
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         switch($category){
-            case editor_Segment_Whitespace_Check::BEG_TAG_SPACE: return $translate->_('Leerzeichen am Anfang');
+            case editor_Segment_Whitespace_Check::BEG_TAG_SPACE: return $translate->_('Segment beginnt mit einem Tag gefolgt von Leerzeichen');
             case editor_Segment_Whitespace_Check::NBSP_BEG: return $translate->_('Geschützes Leerzeichen am Anfang');
             case editor_Segment_Whitespace_Check::TAB_BEG: return $translate->_('Tab am Anfang');
             case editor_Segment_Whitespace_Check::LNBR_BEG: return $translate->_('Umbruch am Anfang');
 
-            case editor_Segment_Whitespace_Check::SPACE_TAG_END: return $translate->_('Leerzeichen am Ende');
+            case editor_Segment_Whitespace_Check::SPACE_TAG_END: return $translate->_('Segment endet mit einem Leerzeichen gefolgt von Tag');
             case editor_Segment_Whitespace_Check::NBSP_END: return $translate->_('Geschützes Leerzeichen am Ende');
             case editor_Segment_Whitespace_Check::TAB_END: return $translate->_('Tab am Ende');
             case editor_Segment_Whitespace_Check::LNBR_END: return $translate->_('Umbruch am Ende');

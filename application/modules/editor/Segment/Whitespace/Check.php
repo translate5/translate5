@@ -67,28 +67,37 @@ class editor_Segment_Whitespace_Check {
         $tags = $fieldTags->cloneWithoutTrackChanges();
 
         // Get end index
-        $endIndex = $tags->getFieldTextLength();
+        $endIndex = $tags->getFieldTextLength() - 1;
 
         // Get field text
         $fieldText = $tags->getFieldText(true, false);
 
+        // Get tags qty
+        $tagsQty = count($tags = $tags->getAll());
+
         // Foreach tag (excluding trackchanges-tags)
         /** @var editor_Segment_Internal_Tag $tag */
-        foreach ($tags->getAll() as $idx => $tag) {
+        foreach ($tags as $idx => $tag) {
 
             // If it's not an internal tag - skip
             if ($tag->getType() != editor_Segment_Tag::TYPE_INTERNAL) continue;
 
             // Check whether tag is located at the beginning and/or ending
             $sideA = [];
-            if ($tag->startIndex === 0)       $sideA['BEG'] = [ 0, self::BEG_TAG_SPACE];
-            if ($tag->endIndex === $endIndex) $sideA['END'] = [-1, self::SPACE_TAG_END];
+            if ($tag->startIndex === 0       && $idx == 0           ) $sideA['BEG'] = [ 0, self::BEG_TAG_SPACE, +1];
+            if ($tag->endIndex === $endIndex && $idx == $tagsQty - 1) $sideA['END'] = [-1, self::SPACE_TAG_END, -1];
 
             // Foreach side
             foreach ($sideA as $side => $info) {
 
-                // If it's a ordinary space
-                if (mb_substr($fieldText, $tag->startIndex + $info[0], 1) == ' ') {
+                // Get neighbour tag, e.g. tag coming after/before current tag, if there is such
+                $neighbour = $tags[$idx + $info[2]] ?? false;
+
+                // Check whether this neighbour comes right after/before current tag
+                if ($neighbour) $neighbour = $neighbour->startIndex === $tag->startIndex;
+
+                // If it's a ordinary space and if there is no neighbour right after/before current tag
+                if (mb_substr($fieldText, $tag->startIndex + $info[0], 1) == ' ' && !$neighbour) {
 
                     // Append quality category
                     $this->states[$info[1]] = $info[1];

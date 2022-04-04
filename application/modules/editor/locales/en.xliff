@@ -4039,11 +4039,11 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Internal tags</target></trans-unit>
 <trans-unit id='TGVlcmUgU2VnbWVudGU='><source>Leere Segmente</source><target>Empty segments</target></trans-unit>
 <trans-unit id='TGVlcnJhdW0gYW0gQW5mYW5nL0VuZGU='><source>Leerraum am Anfang/Ende</source><target>White space at beginning/end</target></trans-unit>
-<trans-unit id='TGVlcnplaWNoZW4gYW0gQW5mYW5n'><source>Leerzeichen am Anfang</source><target>Space at beginning</target></trans-unit>
+<trans-unit id='U2VnbWVudCBiZWdpbm50IG1pdCBlaW5lbSBUYWcgZ2Vmb2xndCB2b24gTGVlcnplaWNoZW4='><source>Segment beginnt mit einem Tag gefolgt von Leerzeichen</source><target>Segment begins with a tag followed by space</target></trans-unit>
 <trans-unit id='R2VzY2jDvHR6ZXMgTGVlcnplaWNoZW4gYW0gQW5mYW5n'><source>Geschützes Leerzeichen am Anfang</source><target>Non-breaking space at beginning</target></trans-unit>
 <trans-unit id='VGFiIGFtIEFuZmFuZw=='><source>Tab am Anfang</source><target>Tab at beginning</target></trans-unit>
 <trans-unit id='VW1icnVjaCBhbSBBbmZhbmc='><source>Umbruch am Anfang</source><target>Line break at beginning</target></trans-unit>
-<trans-unit id='TGVlcnplaWNoZW4gYW0gRW5kZQ=='><source>Leerzeichen am Ende</source><target>Space at end</target></trans-unit>
+<trans-unit id='U2VnbWVudCBlbmRldCBtaXQgZWluZW0gTGVlcnplaWNoZW4gZ2Vmb2xndCB2b24gVGFn'><source>Segment endet mit einem Leerzeichen gefolgt von Tag</source><target>Segment ends with a space followed by tag</target></trans-unit>
 <trans-unit id='R2VzY2jDvHR6ZXMgTGVlcnplaWNoZW4gYW0gRW5kZQ=='><source>Geschützes Leerzeichen am Ende</source><target>Non-breaking space at end</target></trans-unit>
 <trans-unit id='VGFiIGFtIEVuZGU='><source>Tab am Ende</source><target>Tab at end</target></trans-unit>
 <trans-unit id='VW1icnVjaCBhbSBFbmRl'><source>Umbruch am Ende</source><target>Line break at end</target></trans-unit>
