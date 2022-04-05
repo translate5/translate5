@@ -26,35 +26,26 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Models\Task\Current\NoAccessException;
-use MittagQI\Translate5\Models\Task\TaskContextTrait;
-
-/**
- * segment fields controller
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-class Editor_SegmentfieldController extends ZfExtended_RestController {
-    use TaskContextTrait;
+
+namespace MittagQI\Translate5\Models\Task\Current;
+
+class Exception extends \ZfExtended_ErrorCodeException {
     /**
      * @var string
      */
-    protected $entityClass = 'editor_Models_SegmentField';
+    protected $domain = 'editor.currenttask';
 
-    /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
-     * @throws NoAccessException
-     */
-    public function init()
-    {
-        parent::init();
-        $this->initCurrentTask();
-    }
-
-    /**
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
-     */
-    public function indexAction() {
-        $this->view->rows = $this->entity->loadByTaskGuid($this->getCurrentTask()->getTaskGuid());
-        $this->view->total = count($this->view->rows);
-    }
-} 
+    static protected $localErrorCodes = [
+        //Development error: Some PHP code tried to load the currently opened task (identified by the taskid given in the URL)
+        // but no task ID was provided in the URL.
+        // So either the URL producing the request is wrongly created (no Editor.data.restpath prefix),
+        // or its just the wrong context where the CurrentTask was accessed.
+        'E1381' => 'Access to CurrentTask was requested but no task ID was given in the URL.'
+    ];
+}

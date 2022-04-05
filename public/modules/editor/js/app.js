@@ -70,7 +70,7 @@ if(Ext.browser.is.IE) {
     Ext.application = Ext.emptyFn;
     Ext.onReady(function() {
         Ext.Ajax.request({
-            url: Editor.data.pathToRunDir + '/editor/index/logbrowsertype',
+            url: Editor.data.restpath + 'index/logbrowsertype',
             method: 'post',
             params: {
                 appVersion: navigator.appVersion,
@@ -181,12 +181,15 @@ Ext.application({
             Ext.getStore('customersStore').load();
         }
 
-        //Check if it is task route. If yes, use the redirect to task method.
+        //Check if it is task URL or route. If yes, use the redirect to task method.
         //if it is not a task route, open the administration
         //if no route is provided, use the defautl me[Editor.data.app.initMethod]();
-        if (me.isEditTaskRoute()) {
+        var taskId = me.parseTaskIdFromUrl();
+        if (taskId > 0 || me.isEditTaskRoute()) {
             //check if the taskid is provided in the hash
-            var taskId = me.parseTaskIdFromTaskEditHash(false);
+            if(taskId <= 0){
+                taskId = me.parseTaskIdFromTaskEditHash(false);
+            }
             if (taskId > 0 && !Editor.data.task) {
                 Editor.data.task = {};
                 //set the taskId to the task global object
@@ -224,7 +227,7 @@ Ext.application({
 
         //Logs the users userAgent and screen size for usability improvements:
         Ext.Ajax.request({
-            url: Editor.data.pathToRunDir + '/editor/index/logbrowsertype',
+            url: Editor.data.restpath + 'index/logbrowsertype',
             method: 'post',
             params: {
                 appVersion: navigator.appVersion,
@@ -247,11 +250,11 @@ Ext.application({
             return;
         }
         Ext.get(window).on({
-            beforeunload: function (e) {
+            beforeunload: function () {
                 if (!Editor.data.logoutOnWindowClose) {
                     return;
                 }
-                var fd = new FormData;
+                var fd = new FormData();
                 fd.append('zfExtended', Ext.util.Cookies.get('zfExtended'));
                 fd.append('noredirect', 1);
                 // destroy the user session and prevent redirect
@@ -276,8 +279,9 @@ Ext.application({
         }
 
         me.loadEditorConfigData(task, function () {
-
             me.fireEvent('editorConfigLoaded', me, task);
+
+            me.addTaskToUrl(task);
 
             Editor.data.task = task;
             Editor.model.Segment.redefine(task.segmentFields());
@@ -286,7 +290,7 @@ Ext.application({
                 source: languages.getById(task.get('sourceLang')),
                 relais: languages.getById(task.get('relaisLang')),
                 target: languages.getById(task.get('targetLang'))
-            }
+            };
 
             if (me.viewport) {
                 //trigger closeEvent depending on which viewport was open
@@ -335,10 +339,10 @@ Ext.application({
             failure: me.handleOpenTaskDirectError
         });
     },
-    handleOpenTaskDirectError: function (record, op, success) {
+    handleOpenTaskDirectError: function (record, op) {
         if (!Editor.data.editor.toolbar.hideLeaveTaskButton) {
             this.openAdministration();
-            if (op.error.status == 404 && record.get('taskGuid') == '') {
+            if (op.error.status === 404 && record.get('taskGuid') === '') {
                 Editor.MessageBox.getInstance().showDirectError('The requested task does not exist anymore.');
             } else {
                 Editor.app.getController('ServerException').handleFailedRequest(op.error.status, op.error.statusText, op.error.response);
@@ -349,7 +353,7 @@ Ext.application({
             title = 'Uups... The requested task could not be opened',
             respText = response && response.responseText;
 
-        if (op.error.status == 404 && record.get('taskGuid') == '') {
+        if (op.error.status === 404 && record.get('taskGuid') === '') {
             this.showInlineError('The requested task does not exist anymore.', title);
         } else if (respText) {
             this.showInlineError(Editor.app.getController('ServerException').renderHtmlMessage(title, Ext.JSON.decode(respText)));
@@ -378,6 +382,7 @@ Ext.application({
         if (!Editor.controller.admin || !Editor.controller.admin.TaskOverview) {
             return;
         }
+        me.removeTaskFromUrl();
         if (me.viewport) {
             me.getController('ViewModes').deactivate();
             me.viewport.destroy();
@@ -429,8 +434,9 @@ Ext.application({
      * The first route in a panel is defined as the main route where the redirect should go
      * @param {Ext.tab.Panel} tabpanel
      * @param {Ext.Component} activatedPanel
+     * @param {Editor.model.admin.Task} task
      */
-    onAdminMainSectionChange: function (tabpanel, activatedPanel, task) {
+    onAdminMainSectionChange: function (tabpanel, activatedPanel) {
         var me = this,
             ctrl = activatedPanel.getController(),
             conf = ctrl && ctrl.defaultConfig,
@@ -496,7 +502,7 @@ Ext.application({
             callback:function(){
                 // disable logoutOnWindowClose when the theme is changed
                 Editor.data.logoutOnWindowClose = false;
-                location.reload();
+                window.location.reload();
             }
         });
     },
@@ -509,7 +515,7 @@ Ext.application({
             return;
         }
         Ext.Object.each(Editor.data.supportedBrowsers, function (idx, version) {
-            if (Ext.browser.name == idx && Ext.browser.version.major >= version) {
+            if (Ext.browser.name === idx && Ext.browser.version.major >= version) {
                 supportedBrowser = true;
                 return false;
             }
@@ -533,7 +539,42 @@ Ext.application({
     },
 
     /**
-     * Check if in the current hash, the edit task route is defined. The edit task route is only valid
+     * The URL of the opened application may contain the taskId
+     */
+    parseTaskIdFromUrl: function() {
+        var match = window.location.href.match(/\/editor\/taskid\/([0-9]+)\//);
+        if(match) {
+            return parseInt(match[1], 10);
+        }
+        return 0;
+    },
+
+    addTaskToUrl: function(task) {
+        var currentLocation = window.location.href,
+            newLocation,
+            matchTask = /\/editor\/taskid\/[0-9]+\//; //a trailing string is needed for working with relative paths
+
+        if(task) {
+            if(! matchTask.test(currentLocation)) {
+                // current task not given yet, insert it
+                matchTask = /\/editor\//;
+            }
+            newLocation = currentLocation.replace(matchTask, '/editor/taskid/'+task.get('id')+'/');
+        }
+        else {
+            //if task is not given or false, we try to remove task fragments from the URL
+            newLocation = currentLocation.replace(matchTask, '/editor/'); //without / at the end here!
+        }
+        window.history.pushState({ additionalInformation: 'Updated the URL with JS' }, "FOO", newLocation);
+        Editor.data.restpath = window.location.pathname; //we set the new task relative location as restpath, so all other requests use it too
+    },
+
+    removeTaskFromUrl: function() {
+        this.addTaskToUrl(false);
+    },
+
+    /**
+     * Check if in the current hash, the edit task route is defined (or the taskId is given via URL at all). The edit task route is only valid
      * when the segments-editor is opened
      */
     isEditTaskRoute: function () {
@@ -550,7 +591,7 @@ Ext.application({
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return (h && h.length > 1) ? parseInt(h[1]) : -1;
+        return (h && h.length > 1) ? parseInt(h[1], 10) : -1;
     },
 
     /***
@@ -564,7 +605,7 @@ Ext.application({
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return (h && h.length == 4) ? parseInt(h[2]) : 0;
+        return (h && h.length === 4) ? parseInt(h[2], 10) : 0;
     },
 
     /***

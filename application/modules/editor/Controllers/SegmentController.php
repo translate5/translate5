@@ -26,8 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class Editor_SegmentController extends editor_Controllers_EditorrestController
+use MittagQI\Translate5\Models\Task\Current\NoAccessException;
+use MittagQI\Translate5\Models\Task\TaskContextTrait;
+
+class Editor_SegmentController extends ZfExtended_RestController
 {
+    use TaskContextTrait;
+
     protected $entityClass = 'editor_Models_Segment';
 
     /**
@@ -53,10 +58,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
      * @var string[]
      */
     protected $cachedAutostates = NULL;
-    
+
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws NoAccessException
+     * @throws ZfExtended_NoAccessException
+     */
     public function preDispatch(){
         parent::preDispatch();
-        $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
+        $this->initCurrentTask();
+        $sfm = $this->initSegmentFieldManager($this->getCurrentTask()->getTaskGuid());
         //overwrite sortColMap
         $this->_sortColMap = $sfm->getSortColMap();
         $this->entity->setEnableWatchlistJoin();
@@ -77,15 +89,15 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         return editor_Models_SegmentFieldManager::getForTaskGuid($taskGuid);
     }
 
+    /**
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     */
     public function indexAction() {
-        
-        $taskGuid = $this->session->taskGuid;
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
+        $taskGuid = $this->getCurrentTask()->getTaskGuid();
+
         // apply quality filter
         if($this->getRequest()->getParam('qualities', '') != ''){
-            $qualityState = new editor_Models_Quality_RequestState($this->getRequest()->getParam('qualities'), $task);
+            $qualityState = new editor_Models_Quality_RequestState($this->getRequest()->getParam('qualities'), $this->getCurrentTask());
             $filter = $this->entity->getFilter();
             $filter->setQualityFilter($qualityState);
         }
@@ -100,18 +112,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
 
         // ----- Specific handling of rows (start) -----
 
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-
-        $handleSegmentranges = $this->checkAndGetSegmentsRange($task);
+        $handleSegmentranges = $this->checkAndGetSegmentsRange($this->getCurrentTask());
         if (is_array($handleSegmentranges)) {
             $assignedSegments = $handleSegmentranges;
             $handleSegmentranges = true;
         }
 
         // - Anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
-        $handleAnonymizeUsers = $task->anonymizeUsers();
+        $handleAnonymizeUsers = $this->getCurrentTask()->anonymizeUsers();
         if ($handleAnonymizeUsers) {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
             /* @var $workflowAnonymize editor_Workflow_Anonymize */
@@ -131,21 +139,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         // ----- Specific handling of rows (end) -----
     }
 
-    protected function setJsSegmentFlags($type, array $qualityFlags)
-    {
-        $result = [];
-        foreach ($qualityFlags as $key => $value) {
-            if (empty($value)) {
-                continue;
-            }
-            $flag = new stdClass();
-            $flag->id = $key;
-            $flag->label = $this->translate->_($value);
-            $result[] = $flag;
-        }
-
-        $this->view->Php2JsVars()->set($type, $result);
-    }
     /**
      * 
      */
@@ -191,8 +184,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     public function positionAction()
     {
         $segmentNrInTask = (int)$this->_getParam('segmentNrInTask');
-        $session = new Zend_Session_Namespace();
-        $this->entity->loadBySegmentNrInTask($segmentNrInTask, $session->taskGuid);
+        $this->entity->loadBySegmentNrInTask($segmentNrInTask, $this->getCurrentTask()->getTaskGuid());
         //$this->checkTaskGuidAndEditable();
         $index = $this->entity->getIndex();
         if ($index === null) {
@@ -208,11 +200,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     /**
      * returns a list of autoStateIds, belonging to the users role in the currently loaded task
      * is neede for the autostate filter in the frontend
+     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
      */
     protected function getUsersAutoStateIds(){
         if($this->cachedAutostates == NULL){
             $sessionUser = new Zend_Session_Namespace('user');
-            $taskUserAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskGuid($sessionUser->data->userGuid, $this->session->taskGuid);
+            $taskUserAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskGuid($sessionUser->data->userGuid, $this->getCurrentTask()->getTaskGuid());
             if ($taskUserAssoc->getIsPmOverride()) {
                 $userRole = 'pm';
             } else {
@@ -368,11 +361,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
 
     /***
      * Search segment action.
+     * @throws NoAccessException
+     * @throws Zend_Exception
+     * @throws ZfExtended_ValidateException
      */
     public function searchAction()
     {
         $parameters = $this->getAllParams();
-
+        $this->validateTaskAccess($parameters['taskGuid']);
         //set the default search parameters if no values are given
         $parameters = $this->entity->setDefaultSearchParameters($parameters);
 
@@ -402,10 +398,15 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     /***
      * Replace all search matches and save the new segment content to the database.
      * Return the modified segments
+     * @throws NoAccessException
+     * @throws Zend_Exception
+     * @throws ZfExtended_ValidateException
+     * @throws editor_Models_SearchAndReplace_Exception
      */
     public function replaceallAction()
     {
         $parameters = $this->getAllParams();
+        $this->validateTaskAccess($parameters['taskGuid']);
 
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
@@ -598,17 +599,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     /**
      * checks if current session taskguid matches to loaded segment taskguid
      * and if the user is allowed to edit the segment at all
-     * @return editor_Models_Task
      * @throws ZfExtended_Models_Entity_NoAccessException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     protected function checkTaskGuidAndEditable()
     {
         $isTaskGuidAndEditable = true;
 
-        $session = new Zend_Session_Namespace();
         $editable = $this->entity->getEditable();
+        $task = $this->getCurrentTask();
 
-        if (empty($editable) || $session->taskGuid !== $this->entity->getTaskGuid()) {
+        if (empty($editable) || $task->getTaskGuid() !== $this->entity->getTaskGuid()) {
             $isTaskGuidAndEditable = false;
         }
 
@@ -616,11 +617,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
             // if the user can edit only segmentranges, we must also check if s/he is allowed to edit and save this segment
             $sessionUser = new Zend_Session_Namespace('user');
             $sessionUserGuid = $sessionUser->data->userGuid;
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->loadByTaskGuid($this->entity->getTaskGuid());
             $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUserGuid, $task);
-            /* @var $tua editor_Models_TaskUserAssoc */
             $step = $tua->getWorkflowStepName();
             if ($tua->isSegmentrangedTaskForStep($task, $step)) {
                 $assignedSegments = $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $sessionUserGuid, $step);
@@ -660,11 +657,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     
     public function getAction() {
         $this->entity->load($this->_getParam('id'));
-        $session = new Zend_Session_Namespace();
-        if ($session->taskGuid !== $this->entity->getTaskGuid()) {
-            //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
+        $this->validateTaskAccess($this->entity->getTaskGuid());
         //check if the segment range feature is active for the current segment and task,
         //if it is active, calculate the editable state of the segment
         //segment get action is also called by the message bus to refresh the segment content whenever some
@@ -694,8 +687,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     public function filemapAction()
     {
         $result = new stdClass();
-        $session = new Zend_Session_Namespace();
-        $result->rows = $this->entity->getFileMap($session->taskGuid);
+        $result->rows = $this->entity->getFileMap($this->getCurrentTask()->getTaskGuid());
         $result->total = count($result->rows);
         echo Zend_Json::encode($result, Zend_Json::TYPE_OBJECT);
         exit;
@@ -713,11 +705,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         $this->view->linkPortal = $this->isAllowed('editor_termportal') && !empty($plugin);
 
         //Erstellung und Setzen der Nutzdaten:
-        $session = new Zend_Session_Namespace();
+        /** @var editor_Models_Terminology_Models_TermModel $terms */
         $terms = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $terms editor_Models_Terminology_Models_TermModel */
         $this->view->publicModulePath = APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module');
-        $this->view->termGroups = $terms->getByTaskGuidAndSegment($session->taskGuid, (int)$this->_getParam('id'));
+        $this->view->termGroups = $terms->getByTaskGuidAndSegment($this->getCurrentTask()->getTaskGuid(), (int)$this->_getParam('id'));
         $this->view->termStatMap = editor_Models_Terminology_Models_TermModel::getTermStatusMap();
         $this->view->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
@@ -727,7 +718,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
      */
     public function matchratetypesAction()
     {
-        $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
+        $sfm = $this->initSegmentFieldManager($this->getCurrentTask()->getTaskGuid());
         $mv = $sfm->getView();
         /* @var $mv editor_Models_Segment_MaterializedView */
         $db = ZfExtended_Factory::get(get_class($this->entity->db), array(array(), $mv->getName()));
@@ -740,11 +731,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
      */
     public function stateidAction(){
         $this->entity->load($this->_getParam('id'));
-        $session = new Zend_Session_Namespace();
-        if ($session->taskGuid !== $this->entity->getTaskGuid()) {
-            //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
+        $this->validateTaskAccess($this->entity->getTaskGuid());
         $stateId = intval($this->_getParam('stateId', -1));
         if($stateId < 0){
             throw new ZfExtended_Models_Entity_NotFoundException('parameter stateId is required.');
@@ -824,7 +811,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
         if (!isset($task)) {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
-            $task->loadByTaskGuid($this->session->taskGuid);
+            $task->loadByTaskGuid($this->getCurrentTask()->getTaskGuid());
         }
         if ($task->getUsageMode() !== $task::USAGE_MODE_SIMULTANEOUS) {
             return false;
@@ -854,7 +841,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController
     {
         $sessionUser = new Zend_Session_Namespace('user');
         $userGuid = $sessionUser->data->userGuid;
-        $taskGuid = $this->session->taskGuid;
+        $taskGuid = $this->getCurrentTask()->getTaskGuid();
 
         //needed only on first page and if we have rows
         if ($this->offset > 0 || empty($this->view->rows)) {

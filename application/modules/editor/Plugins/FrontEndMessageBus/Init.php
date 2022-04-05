@@ -223,20 +223,16 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         }
         
         //resync task open state
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $session = new Zend_Session_Namespace();
-        if(!empty($session->taskGuid)) {
-            try {
-                $task->loadByTaskGuid($session->taskGuid);
-                $event->setParam('task', $task);
-                $this->handleAfterTaskOpen($event);
-            }
-            catch (ZfExtended_NotFoundException $e) {
-                //if the task is gone, we can not open it and do nothing
-            }
+        try {
+            /** @var editor_SessionController $controller */
+            $controller = $event->getParam('controller');
+            $task = $controller->getCurrentTask();
+            $event->setParam('task', $task);
+            $this->handleAfterTaskOpen($event);
+        } catch (\MittagQI\Translate5\Models\Task\Current\Exception) {
+            //if the task is gone, we can not open it and do nothing
         }
-        
+
         //marks the connection as in sync and trigger processing of queued messages
         $this->bus->resyncDone($this->getHeaderConnId());
     }
@@ -477,10 +473,12 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     public function handleDelete(Zend_EventManager_Event $event) {
         /* @var $ent editor_Plugins_VisualReview_Annotation_Entity|editor_Models_Comment */
         $ent = $event->getParam('entity');
-        /* @var $session Zend_Session_Namespace */
-        $session = new Zend_Session_Namespace();
+
+        $controller = $event->getParam('controller');
+        $task = $controller->getCurrentTask();
+
         $a_ent = [
-            'taskGuid' => $session->taskGuid, //data has already been deleted, get it from session
+            'taskGuid' => $task->getTaskGuid(),
             'type' => $ent::FRONTEND_ID,
             'id' => $event->getParams()['params']['id'],
         ];

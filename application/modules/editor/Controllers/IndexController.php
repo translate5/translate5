@@ -33,11 +33,15 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+use MittagQI\Translate5\Models\Task\Current\NoAccessException;
+use MittagQI\Translate5\Models\Task\TaskContextTrait;
+
 /**
  * Dummy Index Controller
  */
 class Editor_IndexController extends ZfExtended_Controllers_Action
 {
+    use TaskContextTrait;
     /**
      * @var ZfExtended_Zendoverwrites_Translate
      */
@@ -143,7 +147,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $this->view->headLink()->appendStylesheet(APPLICATION_RUNDIR . "/" . $oneCss);
         }
 
-        $this->view->appVersion = $this->getAppVersion();
+        $this->view->appVersion = ZfExtended_Utils::getAppVersion();
         $this->setJsVarsInView();
         $this->setThemeVarsInView($userConfig['runtimeOptions.extJs.theme']['defaults']);
         $this->checkForUpdates($this->view->appVersion);
@@ -237,12 +241,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // Video-recording: If allowed in general, then it can be set by the user after every login.
         $this->view->Php2JsVars()->set('enableJsLoggerVideoConfig', $rop->debug && $rop->debug->enableJsLoggerVideo);
 
-        $restPath = APPLICATION_RUNDIR . '/' . Zend_Registry::get('module') . '/';
-        $this->view->Php2JsVars()->set('restpath', $restPath);
+        //for initial loading we have to set the restpath to empty string to trigger relative paths in the proxy setups
+        $this->view->Php2JsVars()->set('restpath', '');
         $this->view->Php2JsVars()->set('basePath', APPLICATION_RUNDIR);
         $this->view->Php2JsVars()->set('moduleFolder', $this->view->publicModulePath . '/');
         $this->view->Php2JsVars()->set('appFolder', $this->view->publicModulePath . '/js/app');
-        $this->view->Php2JsVars()->set('pluginFolder', $restPath . 'plugins/js');
+        $this->view->Php2JsVars()->set('pluginFolder', APPLICATION_RUNDIR . '/' . Zend_Registry::get('module') . '/plugins/js');
         $extJs = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'ExtJs'
         );
@@ -435,24 +439,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // the list of active controllers: is dynamic, contains only the controllers to be launched
         $php2js->set('app.controllers.active', $this->getActiveFrontendControllers());
 
-        if (empty($this->_session->taskGuid)) {
-            $php2js->set('app.initMethod', 'openAdministration');
-        } else {
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            //FIXME TRANSLATE-55 if a taskguid remains in the session,
-            //the user will be caught in a zend 404 Screen instead of getting the adminpanel.
-            $task->loadByTaskGuid($this->_session->taskGuid);
-            $taskData = $task->getDataObject();
-            unset($taskData->qmSubsegmentFlags);
-
-            $php2js->set('task', $taskData);
-            $openState = $this->_session->taskOpenState ?
-                $this->_session->taskOpenState :
-                editor_Workflow_Default::STATE_WAITING; //in doubt read only
-            $php2js->set('app.initState', $openState);
-            $php2js->set('app.initMethod', 'openEditor');
-        }
+        $this->loadCurrentTask($php2js, $userSession->data->userGuid);
 
         $php2js->set('app.viewport', $ed->editorViewPort);
         $php2js->set('app.startViewMode', $ed->startViewMode);
@@ -512,14 +499,44 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $php2js->set('app.configData', $config->loadAllMerged($user, 'runtimeOptions.frontend.defaultState.%'));
     }
 
-    protected function getAppVersion()
-    {
-        return ZfExtended_Utils::getAppVersion();
+    /**
+     * @param ZfExtended_View_Helper_Php2JsVars $php2js
+     * @param string $userGuid
+     * @throws Exception
+     */
+    protected function loadCurrentTask(ZfExtended_View_Helper_Php2JsVars $php2js, string $userGuid) {
+        if (!$this->isTaskProvided()) {
+            $php2js->set('app.initMethod', 'openAdministration');
+            return;
+        }
+
+        try {
+            $this->initCurrentTask();
+            $task = $this->getCurrentTask();
+            $taskData = $task->getDataObject();
+            unset($taskData->qmSubsegmentFlags);
+
+            // try to load the job of the current user and task, the one with a usedState,
+            $job = editor_Models_Loaders_Taskuserassoc::loadFirstInUse($userGuid, $task);
+            $php2js->set('app.initState', $job->getUsedState());
+        }
+        catch(NoAccessException) {
+            $task = $this->getCurrentTask(); //on no access exception current task is though set
+            //the task may not be opened yet for editing, so just provide the id and use openEditor with edit mode to try to open it for editing via the UI
+            $taskData = new stdClass();
+            $taskData->id = $task->getId();
+            $php2js->set('app.initState', editor_Workflow_Default::STATE_EDIT);
+        }
+
+        $php2js->set('task', $taskData);
+        $php2js->set('app.initMethod', 'openEditor');
     }
 
     /**
      * returns a list with used JS frontend controllers
      * @return array
+     * @throws Zend_Acl_Exception
+     * @throws Zend_Exception
      */
     protected function getActiveFrontendControllers()
     {
@@ -688,13 +705,19 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if (empty($plugin)) {
             throw new ZfExtended_NotFoundException();
         }
+        // some plugins call their public files from the task-context with /task/1234/plugins/PluginName/... if the requested files are task-dependant and thus need the fetched task
+        $config = [];
+        if($this->isTaskProvided()){
+            $this->initCurrentTask();
+            $config['task'] = $this->getCurrentTask();
+        }
 
         // check if requested "fileType" is allowed
-        if (!$plugin->isPublicSubFolder($requestedType)) {
+        if (!$plugin->isPublicSubFolder($requestedType, $config)) {
             throw new ZfExtended_NotFoundException();
         }
 
-        $publicFile = $plugin->getPublicFile($requestedType, $requestedFileParts);
+        $publicFile = $plugin->getPublicFile($requestedType, $requestedFileParts, $config);
         if (empty($publicFile) || !$publicFile->isFile()) {
             throw new ZfExtended_NotFoundException();
         }
@@ -715,8 +738,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             header('HTTP/1.1 304 Not Modified');
             exit;
         }
-
-        $isStaticVRFile = (str_starts_with($requestedType, 'visualReview-t') && $extension !== 'html'); // pdfconverter outputs that will never change
+        // TODO FIXME: UGLY: the virtual Proxy-dir is defined in the visual plugin, that might not be active
+        $isStaticVRFile = ($requestedType == 'T5Proxy' && $extension !== 'html'); // pdfconverter outputs that will never change
         if($version === 'development' && !$isStaticVRFile){
             $cacheBehaviour = 'no-cache'; // check for new version always
         } else if ($isStaticVRFile || $this->getParam('_dc')){ // refreshed through url (plugin js)
