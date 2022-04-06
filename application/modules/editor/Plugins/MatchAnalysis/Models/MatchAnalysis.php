@@ -92,8 +92,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     public function loadByBestMatchRate(string $taskGuid, bool $groupData = true): array
     {
         //load the latest analysis for the given taskGuid
+        /** @var editor_Plugins_MatchAnalysis_Models_TaskAssoc $analysisAssoc */
         $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
-        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($taskGuid);
         if (empty($analysisAssoc)) {
             return [];
@@ -120,6 +120,13 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         $resultArray = $this->db->getAdapter()->query($sqlV3, $bind)->fetchAll();
         if (empty($resultArray)) {
             return [];
+            $resultArray = [[
+                'internalFuzzy' => '0',
+                'languageResourceid' => '0',
+                'matchRate' => '0',
+                'wordCount' => '0',
+                'segCount' => '0',
+            ]];
         }
         if($groupData) {
             return $this->groupByMatchrate($resultArray, $analysisAssoc);
