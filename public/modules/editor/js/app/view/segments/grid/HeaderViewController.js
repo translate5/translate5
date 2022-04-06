@@ -122,17 +122,8 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
         }
     },
     onCloseBtn: function() {
-        Editor.util.TaskActions.close(function(task, app, strings){
-            if(window.opener === null) {
-                app.viewport.destroy();
-                app.unmask();
-                Ext.getBody().setCls('loading');
-                Ext.getBody().update('<div class="loading"></div>');
-                app.showInlineError('But the application window can not be closed automatically!', 'Application left successfully');
-            }
-            else {
-                window.close();
-            }
+        Editor.util.TaskActions.close(function(task, app){
+            app.closeWindow();
         });
     }
 });
