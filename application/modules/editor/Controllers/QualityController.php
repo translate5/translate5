@@ -26,8 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Models\Task\Current\NoAccessException;
-use MittagQI\Translate5\Models\Task\TaskContextTrait;
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
 
 /**
  * The Main Quality Controller
@@ -48,7 +48,7 @@ class editor_QualityController extends ZfExtended_RestController {
 
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws NoAccessException
      */
     public function init()

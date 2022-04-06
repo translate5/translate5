@@ -22,11 +22,11 @@ https://www.gnu.org/licenses/lgpl-3.0.txt
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Models\Task\Current;
+namespace MittagQI\Translate5\Task\Current;
 
 /**
- * We just extend the default entity notfound, since this exception should behave equally,
+ * We just extend the default entity no access, since this exception should behave equally,
  * but we need the possibility to catch it casually
  */
-class NotFoundException extends \ZfExtended_Models_Entity_NotFoundException {
+class NoAccessException extends \ZfExtended_Models_Entity_NoAccessException {
 }

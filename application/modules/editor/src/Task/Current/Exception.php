@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-namespace MittagQI\Translate5\Models\Task\Current;
+namespace MittagQI\Translate5\Task\Current;
 
 class Exception extends \ZfExtended_ErrorCodeException {
     /**

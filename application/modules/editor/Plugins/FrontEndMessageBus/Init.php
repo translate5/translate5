@@ -229,7 +229,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
             $task = $controller->getCurrentTask();
             $event->setParam('task', $task);
             $this->handleAfterTaskOpen($event);
-        } catch (\MittagQI\Translate5\Models\Task\Current\Exception) {
+        } catch (\MittagQI\Translate5\Task\Current\Exception) {
             //if the task is gone, we can not open it and do nothing
         }
 

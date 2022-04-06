@@ -26,8 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Models\Task\Current\NoAccessException;
-use MittagQI\Translate5\Models\Task\TaskContextTrait;
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
 
 class Editor_ReferencefileController extends ZfExtended_RestController {
     use TaskContextTrait;
@@ -40,7 +40,7 @@ class Editor_ReferencefileController extends ZfExtended_RestController {
 
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws NoAccessException
      */
     public function init()
@@ -54,7 +54,7 @@ class Editor_ReferencefileController extends ZfExtended_RestController {
      * (non-PHPdoc)
      * @throws Zend_Exception
      * @throws ZfExtended_NotFoundException
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      * @see ZfExtended_RestController::getAction()
      */
     public function getAction() {
@@ -103,7 +103,7 @@ class Editor_ReferencefileController extends ZfExtended_RestController {
      * returns the absolute file path to the requested file, checks the given URL on ../ based attacks
      * @return string
      * @throws Zend_Exception
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     protected function getRequestedFileAbsPath() {
         $task = $this->getCurrentTask();
@@ -142,7 +142,7 @@ class Editor_ReferencefileController extends ZfExtended_RestController {
     /**
      * sends the reference file tree as JSON
      * (non-PHPdoc)
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction() {

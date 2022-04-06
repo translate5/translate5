@@ -26,8 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Models\Task\Current\NoAccessException;
-use MittagQI\Translate5\Models\Task\TaskContextTrait;
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
 
 class Editor_SegmentController extends ZfExtended_RestController
 {
@@ -61,7 +61,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws NoAccessException
      * @throws ZfExtended_NoAccessException
      */
@@ -90,7 +90,7 @@ class Editor_SegmentController extends ZfExtended_RestController
     }
 
     /**
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function indexAction() {
         $taskGuid = $this->getCurrentTask()->getTaskGuid();
@@ -200,7 +200,7 @@ class Editor_SegmentController extends ZfExtended_RestController
     /**
      * returns a list of autoStateIds, belonging to the users role in the currently loaded task
      * is neede for the autostate filter in the frontend
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     protected function getUsersAutoStateIds(){
         if($this->cachedAutostates == NULL){

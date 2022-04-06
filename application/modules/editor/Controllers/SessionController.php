@@ -26,8 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Models\Task\Current\NoAccessException;
-use MittagQI\Translate5\Models\Task\TaskContextTrait;
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
 
 /**
  * Wrapper for ZfExtended_SessionController
@@ -41,11 +41,13 @@ class editor_SessionController extends ZfExtended_SessionController {
     const AUTH_HASH_STATIC = 'static';
 
     /**
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function resyncOperation() {
         try {
-            $this->initCurrentTask();
+            if($this->isTaskProvided()) {
+                $this->initCurrentTask();
+            }
         } catch (NoAccessException|ZfExtended_Models_Entity_NotFoundException) {
             //if task is not available just do nothing, empty current task is evaluated later
         }

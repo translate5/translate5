@@ -26,8 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Models\Task\Current\NoAccessException;
-use MittagQI\Translate5\Models\Task\TaskContextTrait;
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
 
 class Editor_FileController extends ZfExtended_RestController {
   use TaskContextTrait;
@@ -42,7 +42,7 @@ class Editor_FileController extends ZfExtended_RestController {
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws NoAccessException
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function init()
     {
@@ -51,7 +51,7 @@ class Editor_FileController extends ZfExtended_RestController {
     }
 
     /**
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function indexAction()
     {
@@ -63,7 +63,7 @@ class Editor_FileController extends ZfExtended_RestController {
     }
 
     /**
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws ZfExtended_NoAccessException
      */
     public function putAction()

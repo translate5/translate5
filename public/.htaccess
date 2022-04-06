@@ -16,4 +16,7 @@ RewriteCond %{REQUEST_URI} editor/referencefile/
 RewriteCond %{HTTP_REFERER} editor/referencefile/.*\.html$ 
 RewriteRule ^.*$ - [NC,L]
 
+# Add trailing slash on editor
+RewriteRule ^((.*/)?editor)$ /$1/ [L,R]
+
 RewriteRule ^.*$ index.php [NC,L]
