@@ -119,7 +119,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         
         $resultArray = $this->db->getAdapter()->query($sqlV3, $bind)->fetchAll();
         if (empty($resultArray)) {
-            return [];
+            // we have to set an emoty result here, in order that the result is correctly grouped and displayed in the UI
             $resultArray = [[
                 'internalFuzzy' => '0',
                 'languageResourceid' => '0',
