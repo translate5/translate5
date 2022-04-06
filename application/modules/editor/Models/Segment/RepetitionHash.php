@@ -67,7 +67,7 @@ class editor_Models_Segment_RepetitionHash {
      */
     public function rehashTarget(editor_Models_Segment $segment, ?string $newTarget = null): string {
         $this->segment = $segment;
-        return $this->hashTarget($target ?? $segment->getTargetEdit(), $segment->getSource());
+        return $this->hashTarget($newTarget ?? $segment->getTargetEdit(), $segment->getSource());
     }
 
     /**
