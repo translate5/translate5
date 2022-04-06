@@ -65,11 +65,11 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
             makeButton: function(btnIdx) {
                 var btnId = this.buttonIds[btnIdx],
                     cls='';
-                if(btnId=='no'){
+                if(btnId==='no'){
                     cls='ico-arrow-back';
                 }
                 
-                if(btnId=='yes'){
+                if(btnId==='yes'){
                     cls='ico-finish-task';
                 }
                 return new Ext.button.Button({
@@ -80,7 +80,7 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
                     minWidth: 75,
                     iconCls:cls
                 });
-            },
+            }
         });
         
         mbox.show({
@@ -102,11 +102,11 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
      * Handler for the leave task dialog window.
      */
     handleLeaveTaskButton:function(button){
-        if(button == "cancel"){
-            return false
+        if(button === "cancel"){
+            return false;
         }
         
-        if(button == "yes"){
+        if(button === "yes"){
             Editor.util.TaskActions.finish(function(task, app, strings){
                 app.openAdministration(task);
                 app.unmask();
