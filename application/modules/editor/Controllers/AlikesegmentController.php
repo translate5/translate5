@@ -293,7 +293,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     protected function updateTargetHashAndOriginal(editor_Models_Segment $segment, editor_Models_Segment_RepetitionHash $hasher = null) {
         if($hasher) {
             //FIXME: it is currently in discussion with the community if the setTargetMd5 is done always on segment save!
-            $segment->setTargetMd5($hasher->hashTarget($segment->getTargetEdit(), $segment->getSource()));
+            $segment->setTargetMd5($hasher->rehashTarget($segment));
         }
     }
     
