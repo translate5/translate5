@@ -109,8 +109,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param array $userData
      */
     protected function notify(array $userData) {
-        // Solution nr2. disable workflow mails before the mail is send. All the calculations in the requested notification function will are done to that point
         // if disabled by config, do not send email
+        // TODO: this is a quick solution for the problem. To solve this really, this should be configurable for a workflow
         if($this->isDisabled()){
             return;
         }
@@ -125,8 +125,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param ZfExtended_Models_User $user
      */
     protected function notifyUser(ZfExtended_Models_User $user) {
-        // Solution nr2. disable workflow mails before the mail is send. All the calculations in the requested notification function will are done to that point
         // if disabled by config, do not send email
+        // TODO: this is a quick solution for the problem. To solve this really, this should be configurable for a workflow
         if($this->isDisabled()){
             return;
         }
@@ -210,7 +210,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
      * Workflow specific Notification after all users of a role have finished a task
      */
-    private function notifyAllFinishOfARole() {
+    public function notifyAllFinishOfARole() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $workflow = $this->config->workflow;
@@ -273,7 +273,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
      * Workflow specific PM Notification after one users of a role have finished a task
      */
-    private function notifyOneFinishOfARole() {
+    public function notifyOneFinishOfARole() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $workflow = $this->config->workflow;
@@ -321,7 +321,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Sends a notification to users which are removed automatically from the task
      * The Users to be notified must be given in the parameter array key 'deleted'
      */
-    private function notifyCompetitiveDeleted(array $parameter) {
+    public function notifyCompetitiveDeleted(array $parameter) {
         $triggerConfig = $this->initTriggerConfig([$parameter]);
         $this->tua = $this->config->newTua;
         settype($triggerConfig->deleted, 'array');
@@ -361,7 +361,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Sends a notification to users which are attached newly to a task with status open
      * The User to be notified is gathered from the current active TaskUserAssociation
      */
-    private function notifyNewTaskAssigned() {
+    public function notifyNewTaskAssigned() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $this->tua = $tua = $this->config->newTua;
 
@@ -398,7 +398,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Main differences to notifyNewTaskAssigned to a single user:
      *  This notification contains a list of all assigned users.
      */
-    private function notifyAllAssociatedUsers() {
+    public function notifyAllAssociatedUsers() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
 
@@ -453,7 +453,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
      * Notifies the tasks PM over the new task, but only if PM != the user who has uploaded the task
      */
-    private function notifyNewTaskForPm() {
+    public function notifyNewTaskForPm() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $pmGuid = $task->getPmGuid();
@@ -486,7 +486,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /***
      * Notify the task assock when the delivery date is over the defined days in the config
      */
-    private function notifyOverdueDeadline(){
+    public function notifyOverdueDeadline(){
         $this->deadlineNotifier($this->initTriggerConfig(func_get_args()),__FUNCTION__,false);
     }
 
@@ -494,7 +494,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Notify the the associated users when the deadlineDate is approaching.
      * daysOffset config: how many days before the deadline an email is send
      */
-    private function notifyDeadlineApproaching(){
+    public function notifyDeadlineApproaching(){
         $this->deadlineNotifier($this->initTriggerConfig(func_get_args()),__FUNCTION__,true);
     }
 
@@ -502,7 +502,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Sends by default only the summary to the tasks PM if another user has created the task (for example via API)
      * The summary can be send always if set "always": true in the config object
      */
-    private function notifyImportErrorSummary() {
+    public function notifyImportErrorSummary() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $always = $triggerConfig->always ?? false;
         $task = $this->config->task;
@@ -537,7 +537,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Notify the configured user with term and term attribute proposals of the configured or all termcollections
      * The attached export data in the mail will be in excel format.
      */
-    private function notifyTermProposals(){
+    public function notifyTermProposals(){
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         if(!isset($triggerConfig->receiverUser) || empty($triggerConfig->receiverUser)){
             return;
@@ -597,18 +597,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
 
         //remove the tmp file from the disc
         unlink($file);
-    }
-
-
-    public function __call(string $method, array $arguments): mixed {
-        if(method_exists($this, $method)) {
-            // Solution nr1, to disable workflow mails right before even calling the function
-            if($this->isDisabled()){
-                return null;
-            }
-            return call_user_func_array([$this, $method], $arguments);
-        }
-        return null;
     }
 
     /**
