@@ -31,7 +31,6 @@ END LICENSE AND COPYRIGHT
  * Example <div class="single 123 internal-tag ownttip"><span title="&lt;ph ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte, Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;" class="short">&lt;1/&gt;</span><span data-originalid="6f18ea87a8e0306f7c809cb4f06842eb" data-length="-1" class="full">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;</span></div>
  * The inner Content Tags are stored as special Tags editor_Segment_Internal_ContentTag
  * 
- * @method editor_Segment_Internal_Tag clone(boolean $withDataAttribs)
  * @method editor_Segment_Internal_Tag createBaseClone()
  */
 final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
@@ -317,7 +316,11 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
             $this->addText($tags->getFieldTextPart($this->startIndex, $this->endIndex));
         }
     }
-    
+    /**
+     * @param bool $withDataAttribs
+     * @param bool $withId
+     * @return editor_Segment_Internal_Tag
+     */
     public function clone(bool $withDataAttribs=false, bool $withId=false){
         $clone = parent::clone($withDataAttribs, $withId);
         /* @var $clone editor_Segment_Internal_Tag */

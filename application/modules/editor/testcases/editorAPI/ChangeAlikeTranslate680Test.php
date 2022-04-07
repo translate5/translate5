@@ -198,7 +198,12 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         $api->addImportArray(self::$dummyData);
         $api->addFilePlain('taskConfig', 'runtimeOptions.import.fileparser.options.protectTags = 1', 'text/plain', 'task-config.ini');
         $api->import($task);
-        
+
+        $tests = [
+            'runtimeOptions.alike.segmentMetaFields' => [], // no custom alike calculation may be set here
+        ];
+        self::$api->testConfig($tests);
+
         $task = $api->getTask();
    
         //open task for whole testcase

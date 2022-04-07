@@ -1296,13 +1296,14 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         //get source and target language fuzzies
-        $langs = [];
-        $langs = array_merge($langs,$languageModel->getFuzzyLanguages($task->getSourceLang()));
-        $langs = array_merge($langs,$languageModel->getFuzzyLanguages($task->getTargetLang()));
+        $langs = [
+            $languageModel->getFuzzyLanguages($task->getSourceLang(), includeMajor: true),
+            $languageModel->getFuzzyLanguages($task->getTargetLang(), includeMajor: true),
+        ];
         if ($task->getRelaisLang() > 0) {
-            $langs = array_merge($langs,$languageModel->getFuzzyLanguages($task->getRelaisLang()));
+            $langs[] = $languageModel->getFuzzyLanguages($task->getRelaisLang(), includeMajor: true);
         }
-        $langs = array_unique($langs);
+        $langs = array_unique(array_merge(... $langs));
 
         $data = $this->loadSortedByCollectionAndLanguages($collectionIds, $langs);
         if (!$data) {

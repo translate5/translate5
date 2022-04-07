@@ -62,10 +62,10 @@ Ext.define('Editor.model.admin.projectWizard.File', {
     }],
 
     /***
-     * Get the file xtension from the file name
+     * Get the file Extension from the file name. The returned value always will be lowercase
      * @returns {any|string}
      */
     getExtension:function (){
-        return Editor.util.Util.getFileExtension(this.get('name'));
+        return Editor.util.Util.getFileExtension(this.get('name')).toLowerCase();
     }
 });
