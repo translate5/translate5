@@ -109,6 +109,11 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param array $userData
      */
     protected function notify(array $userData) {
+        // if disabled by config, do not send email
+        // TODO: this is a quick solution for the problem. To solve this really, this should be configurable for a workflow
+        if($this->isDisabled()){
+            return;
+        }
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $user->init($userData);
@@ -116,10 +121,15 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
 
     /**
-     * send the latest created notification to the list of users
+     * send the latest created notification to single user
      * @param ZfExtended_Models_User $user
      */
     protected function notifyUser(ZfExtended_Models_User $user) {
+        // if disabled by config, do not send email
+        // TODO: this is a quick solution for the problem. To solve this really, this should be configurable for a workflow
+        if($this->isDisabled()){
+            return;
+        }
         $this->mailer->sendToUser($user);
     }
 
@@ -589,7 +599,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         unlink($file);
     }
 
-
     /**
      * attaches the segmentList as attachment to the internal mailer object
      * @param string $segmentHash
@@ -763,5 +772,20 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $this->notify($assoc);
             $deadlineHelper->logDeadlineNotified($assoc,$isApproaching);
         }
+    }
+
+    /***
+     * Check if the workflow notifications are disabled by config. If the current request is in task context, task config will be used.
+     * Otherwise, the system config value will be used.
+     * @return bool
+     * @throws editor_Models_ConfigException|Zend_Exception
+     */
+    protected function isDisabled() : bool{
+        if(isset($this->config->task)){
+            $config = $this->config->task->getConfig();
+        }else{
+            $config = Zend_Registry::get('config');
+        }
+        return (bool) $config->runtimeOptions->workflow->disableNotifications;
     }
 }
