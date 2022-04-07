@@ -108,16 +108,12 @@ trait TaskContextTrait {
         $this->_loadCurrentJob();
 
 //FIXME remaining todos:
-// - move task out of models
 // - SECURITY FLAW: look through all controllers used in open task context, and check if a taskGuid comparsion is done or taskGUid is used on data load, to prevent data access of other tasks by guessing IDs
 // - test the new stuff in a embedded editor environment
 // - Team Communication how to use paths, see commit ab8a9f4d
 // - Team Communication how to use CurrenTask
-// - Tests: See TRANSLATE-2874 test what to do
-// - TODO: there is somewhere a mechanism logging a user out (via messagebus?) if another task is opened in a different window, this must be removed!
 // - General Bug?: If a opentm2 resource returns a 502 bad gateway, the whole segment can not be saved! Urgent?
 // - test with application run dir
-// - Repetition Filter Button in neu geöffnetem Task testen!
     }
 
     /**
@@ -127,6 +123,7 @@ trait TaskContextTrait {
     protected function _loadCurrentJob() {
         //load job, if there is no job in usage, throw 403
         $userGuid = editor_User::instance()->getGuid();
+
         $this->_currentJob = editor_Models_Loaders_Taskuserassoc::loadFirstInUse($userGuid, $this->_currentTask);
 
         //TODO if it turns out, that the checking of the jobs to find out if the user is allowed to access the taskid is to error prone,
