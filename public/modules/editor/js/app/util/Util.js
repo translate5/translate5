@@ -137,6 +137,21 @@ Ext.define('Editor.util.Util', {
          */
         compareImportStyleFileName: function (workfile, pivotfile){
             return workfile.split('.')[0] === pivotfile.split('.')[0];
+        },
+
+        /***
+         * Covert the unicode code to real character ready to be displayed in the browser
+         * ECMAScript 6 Unicode code point escapes sequence https://262.ecma-international.org/6.0/#sec-literals-string-literals.
+         * Ex. if the input code is U+1F98A the output will be 🦊
+         * @param code
+         */
+        toUnicodeCodePointEscape: function (code){
+            var regex = /U\+[a-zA-Z0-9]+/g;
+            if(regex.test(code) === false){
+                return code;
+            }
+            var hex = code.replace('U+','');
+            return String.fromCodePoint('0x'+hex);
         }
     }
     

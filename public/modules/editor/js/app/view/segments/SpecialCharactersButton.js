@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,46 +25,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class Editor.model.admin.projectWizard.File
- * @extends Ext.data.Model
- */
-Ext.define('Editor.model.admin.projectWizard.File', {
-    extend: 'Ext.data.Model',
-
-    statics: {
-        TYPE_ERROR: 'error',
-        TYPE_PIVOT: 'pivot',
-        TYPE_WORKFILES: 'workfiles',
-        TYPE_REFERENCE: 'reference',
+Ext.define('Editor.view.segments.SpecialCharactersButton', {
+    extend: 'Ext.button.Button',
+    alias: 'widget.specialCharactersButton',
+    border: 1,
+    style: {
+        borderColor: '#d0d0d0',
+        borderStyle: 'solid'
     },
-
-    fields: [{
-        name: 'file'
-    },{
-        name: 'name'
-    },{
-        name: 'size'
-    },{
-        name: 'type'
-    },{
-        name: 'sourceLang',
-        defaultValue:''
-    },{
-        name: 'targetLang',
-        defaultValue:''
-    },{
-        name: 'error'
-    },{
-        name: 'bilingual',
-        type: 'bool'
-    }],
-
-    /***
-     * Get the file Extension from the file name. The returned value always will be lowercase
-     * @returns {any|string}
-     */
-    getExtension:function (){
-        return Editor.util.Util.getFileExtension(this.get('name')).toLowerCase();
-    }
+    width:28,
+    height:28,
+    padding:0
 });
