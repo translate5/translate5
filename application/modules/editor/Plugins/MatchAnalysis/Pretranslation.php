@@ -258,10 +258,11 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         //$segment->validate();
         
         if($this->task->getWorkflowStep()==1){
+            //TODO move hasher creation out the segment loop
             $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$this->task]);
             /* @var $hasher editor_Models_Segment_RepetitionHash */
             //calculate and set segment hash
-            $segmentHash=$hasher->hashTarget($targetResult, $segment->getSource());
+            $segmentHash = $hasher->rehashTarget($segment, $targetResult);
             $segment->setTargetMd5($segmentHash);
         }
         

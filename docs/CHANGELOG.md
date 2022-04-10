@@ -14,6 +14,46 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.6.10] - 2022-04-07
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-2942](https://jira.translate5.net/browse/TRANSLATE-2942): Repetition editor - Make repetitions more restrict by including segment meta fields into repetition calculation** <br>
+Make repetition calculation more restrict by including segment meta fields (like maxLength) into repetition calculation. Can be defined by new configuration runtimeOptions.alike.segmentMetaFields.
+
+**[TRANSLATE-2842](https://jira.translate5.net/browse/TRANSLATE-2842): Workflows - new configuration to disable workflow mails** <br>
+Workflow mails can be disabled via configuration.
+
+**[TRANSLATE-2386](https://jira.translate5.net/browse/TRANSLATE-2386): Configuration, Editor general - Add language specific special characters in database configuration for usage in editor** <br>
+The current bar in the editor that enables adding special characters (currently non-breaking space, carriage return and tab) can be extended by characters, that can be defined in the configuration.
+Example of the config layout can be found here:
+https://confluence.translate5.net/display/BUS/Special+characters
+
+
+### Bugfixes
+**[TRANSLATE-2946](https://jira.translate5.net/browse/TRANSLATE-2946): Editor general, Editor Length Check - Multiple problems on automatic adding of newlines in to long segments** <br>
+Multiple Problems fixed: add newline or tab when with selected text in editor lead to an error. Multiple newlines were added in some circumstances in multiline segments with to long content. Optionally overwrite the trailing whitespace when newlines are added automatically.
+
+**[TRANSLATE-2943](https://jira.translate5.net/browse/TRANSLATE-2943): MatchAnalysis & Pretranslation - No analysis is shown if all segments were pre-translated and locked for editing** <br>
+No analysis was shown if all segments were locked for editing due successful pre-translation although the analysis was run. Now an empty result is shown.
+
+**[TRANSLATE-2941](https://jira.translate5.net/browse/TRANSLATE-2941): Editor general - Ignore case for imported files extensions** <br>
+The extension validator in the import wizard will no longer be case sensitive.
+
+**[TRANSLATE-2940](https://jira.translate5.net/browse/TRANSLATE-2940): Main back-end mechanisms (Worker, Logging, etc.) - Login redirect routes** <br>
+Instant-translate / Term-portal routes will be evaluated correctly on login.
+
+**[TRANSLATE-2939](https://jira.translate5.net/browse/TRANSLATE-2939): TermTagger integration - Fix language matching on term tagging** <br>
+The language matching between a task and terminology was not correct. Now terms in a major language (de) are also used in tasks with a sub language (de-DE)
+
+**[TRANSLATE-2914](https://jira.translate5.net/browse/TRANSLATE-2914): I10N - Missing localization for Chinese** <br>
+Added missing translations for Chinese languages in the language drop downs.
+
+
 ## [5.6.9] - 2022-03-30
 
 ### Important Notes:
