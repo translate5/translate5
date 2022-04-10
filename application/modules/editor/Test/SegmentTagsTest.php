@@ -31,15 +31,10 @@ END LICENSE AND COPYRIGHT
  * This solves the problem, that Tags in segment text are enriched with quality-id's in some cases that contain auto-increment id's and thus have to be stripped
  * Also, the attributes in tags may be in a different order because historically there have been different attribute orders for differen tags
  */
-abstract class editor_Test_SegmentTagsTest extends \ZfExtended_Test_ApiTestcase {
+abstract class editor_Test_SegmentTagsTest extends editor_Test_MockedTaskTest {
 
     /* Segment Tags helpers to easily create tests for segment tags */
     
-    /**
-     *
-     * @var editor_Models_Task
-     */
-    protected static $testTask = NULL;
     /**
      *
      * @return editor_Segment_FieldTags
@@ -126,29 +121,5 @@ abstract class editor_Test_SegmentTagsTest extends \ZfExtended_Test_ApiTestcase 
         $expectedJSON = $tags->toJson();
         $jsonTags = editor_Segment_FieldTags::fromJson($this->getTestTask(), $expectedJSON);
         $this->assertEquals($expectedJSON, $jsonTags->toJson());
-    }
-    /**
-     * Retrieves a test-tak to init field-tags with
-     * @return editor_Models_Task
-     */
-    protected function getTestTask() : editor_Models_Task {
-        if(static::$testTask == NULL){
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->setId(1234);
-            $task->setEntityVersion(280);
-            $task->setTaskGuid('{c56eadf5-ca66-43ae-931f-a09ff22643ab}');
-            $task->setTaskName('UNIT_TEST_TASK');
-            $task->setForeignName('');
-            $task->setSourceLang(5);
-            $task->setTargetLang(4);
-            $task->setRelaisLang(0);
-            $task->setState('open');
-            $task->setQmSubsegmentFlags('{"qmSubsegmentFlags":[{"text":"Accuracy","id":1,"children":[{"text":"Terminology","id":2},{"text":"Mistranslation","id":3},{"text":"Omission","id":4},{"text":"Untranslated","id":5},{"text":"Addition","id":6}]},{"text":"Fluency","id":7,"children":[{"text":"Content","id":8,"children":[{"text":"Register","id":9},{"text":"Style","id":10},{"text":"Inconsistency","id":11}]},{"text":"Mechanical","id":12,"children":[{"text":"Spelling","id":13},{"text":"Typography","id":14},{"text":"Grammar","id":15},{"text":"Locale violation","id":16}]},{"text":"Unintelligible","id":17}]},{"text":"Verity","id":18,"children":[{"text":"Completeness","id":19},{"text":"Legal requirements","id":20},{"text":"Locale applicability","id":21}]}],"severities":{"critical":"Critical","major":"Major","minor":"Minor"}}');
-            $task->setTaskType('default');
-            $task->setProjectId(1233);
-            static::$testTask = $task;
-        }
-        return static::$testTask;
     }
 }
