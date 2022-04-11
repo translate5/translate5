@@ -112,7 +112,7 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
         Ext.Array.each(record[targetLang.get('rfc5646')], function(rec) {
             items.push({
                 xtype:'specialCharactersButton',
-                text: rec.vizulized,
+                text: rec.visualized,
                 value: Editor.util.Util.toUnicodeCodePointEscape(rec.unicode)
             });
         });
