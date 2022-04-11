@@ -339,12 +339,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $end = strpos($transunit, '</sdl:seg-defs>') + 15; //set end after the end tag
 
         if ($start === false || $end === false) {
-            //<sdl:seg-defs was not found in the current transunit
-            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1005', [
-                'task' => $this->task,
-                'filename' => $this->_fileName,
-                'transunit' => $transunit,
-            ]);
+            //<sdl:seg-defs was not found in the current transunit, nothing can be parsed, attributes are created on next usage
+            return;
         }
 
         $this->previousOrigins = [];
