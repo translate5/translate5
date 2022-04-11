@@ -185,6 +185,11 @@ class editor_Segment_TagRepair_Tag extends editor_Segment_Tag {
         }
         $this->oldStartIndex = $this->startIndex;
         $this->oldEndIndex = $this->endIndex;
+    }
+    /**
+     * unsets our text positions
+     */
+    public function invalidatePosition(){
         $this->startIndex = -1;
         $this->endIndex = -1;
     }
@@ -200,6 +205,7 @@ class editor_Segment_TagRepair_Tag extends editor_Segment_Tag {
         return $tags->countWords($tags->getTextPart($this->startIndex, $this->endIndex));
     }
     /**
+     * Recreates the tag position for a full, non-singular tag
      * @param editor_Segment_TagRepair_Tags $tags
      * @param int $textLength: the new length of the text
      * @param float $wordRatio: the ratio of the number of words
@@ -296,6 +302,7 @@ class editor_Segment_TagRepair_Tag extends editor_Segment_Tag {
         }
     }
     /**
+     * Recreates the tag position for a singular tag
      * @param editor_Segment_TagRepair_Tags $tags
      * @param int $textLength
      * @param float $wordRatio

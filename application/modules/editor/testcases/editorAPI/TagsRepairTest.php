@@ -54,9 +54,6 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
         '<9/>' => '<input name="test" type="text" value="test" />',
     ];
 
-
-    /*
-
     public function testTagRepair0(){
         $markup = '<1><8/>Ein kurzer Satz</1>,<6/> der übersetzt<7/> werden <2>muss<9/></2>';
         $translated = '<1><8/>Ein kurzer Satz</1>,<6/> der übersetzt<7/> werden <2>muss<9/></2>';
@@ -135,21 +132,68 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
         $this->createTagsRepairTest($markup, $expected, $translated);
     }
 
-
-    /**/
-
     public function testTagRepair12(){
         $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt<7/> werden <2>muss<9/></2>';
-        $expected = '<2><1><8/>NOTHING!</1><7/><9/></2>';
+        $expected = '<1><8/></1>NOTHING!<7/><2><9/></2>';
         $translated = 'NOTHING!';
         $this->createTagsRepairTest($markup, $expected, $translated);
     }
 
-    // -'<span class="test"><div class="test" id="ex12345" data-sth="test"><hr />NOTHING!</div><img src="http://www.example.com/image.jpg" /><input name="test" type="text" value="test" /></span>'
-    //+'<div class="test" id="ex12345" data-sth="test"><hr />N</div>OTHING!<img src="http://www.example.com/image.jpg" /><span class="test"><input name="test" type="text" value="test" /></span>'
+    public function testTagRepair13(){
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt<7/> werden <2>muss<9/></2>';
+        $expected = '<1><8/>JUST</1> THREE<7/> WORDS<2><9/></2>';
+        $translated = 'JUST THREE WORDS';
+        $this->createTagsRepairTest($markup, $expected, $translated);
+    }
 
+    public function testTagRepair14(){
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt <7/>werden <2>muss<9/></2>';
+        $expected = '<1><8/>JUST</1> THREE <7/>WORDS<2><9/></2>';
+        $translated = 'JUST THREE WORDS';
+        $this->createTagsRepairTest($markup, $expected, $translated);
+    }
 
+    public function testTagRepair15(){
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt <7/>werden <2>muss<9/></2>';
+        $translated = '<1><8/>This now is a somehow longer sentence,</1> that is <2>really completely changed<9/></2>, as it<7/> can happen';
+        //$translated = 'This now is a somehow longer sentence, that is really completely changed, as it can happen';
+        $this->createTagsRepairTest($markup, $translated, $translated);
+    }
 
+    public function testTagRepair16(){
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt <7/>werden <2>muss<9/></2>';
+        $expected = '<1><8/>This now is a somehow longer sentence,</1> that is <2>really completely<9/></2> changed, as it<7/> can happen';
+        $translated = 'This now is a somehow longer sentence,</1> that is <2>really completely changed, as it<7/> can happen';
+        $this->createTagsRepairTest($markup, $expected, $translated);
+    }
+
+    public function testTagRepair17(){
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt <7/>werden <2>muss<9/></2>';
+        $expected = '<1><8/>This now is a somehow longer sentence,</1> that is <2>really completely<9/></2> <7/>changed, as it can happen';
+        $translated = 'This now is a somehow longer sentence, that is <2>really completely changed, as it can happen';
+        $this->createTagsRepairTest($markup, $expected, $translated);
+    }
+
+    public function testTagRepair18(){
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt <7/>werden <2>muss<9/></2>';
+        $expected = '<1><8/>This now is a somehow longer sentence,</1> that is really completely <7/>changed, as it <2>can happen<9/></2>';
+        $translated = 'This now is a somehow longer sentence, that is really completely changed, as it can happen';
+        $this->createTagsRepairTest($markup, $expected, $translated);
+    }
+
+    public function testTagRepair19(){
+        $markup = ' <1><8/>Ein kurzer Satz,</1> der übersetzt <7/>werden <2>muss<9/></2> ';
+        $expected = '<1><8/> a a a a a a a a a a a a a a a a a a a a a a</1> a a a a a a a a a a a a a a a a a a a <7/>a a a a a a a <2>a a a a a a a a<9/></2> a ';
+        $translated = ' a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a ';
+        $this->createTagsRepairTest($markup, $expected, $translated);
+    }
+
+    public function testTagRepair20(){
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt <7/>werden <2>muss<9/></2>';
+        $expected = '<1><8/>Hier     ist eine      Menge Whitespace</1>     drin,  auch wenn das      <7/>eigentlich <2>nicht vorkommt!<9/></2>';
+        $translated = 'Hier     ist eine      Menge Whitespace     drin,  auch wenn das      eigentlich nicht vorkommt!';
+        $this->createTagsRepairTest($markup, $expected, $translated);
+    }
     /**
      * @param string $originalMarkup
      * @param string $translatedMarkup

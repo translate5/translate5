@@ -47,6 +47,17 @@ class editor_Segment_TagRepair_Tags extends editor_TagSequence {
      * @var string
      */
     private string $requestHtml;
+    /**
+     * Holds the text length of the markup as on instantiation
+     * @var int
+     */
+    private int $originalTextLength;
+    /**
+     * Holds the number of words of the markup as on instantiation
+     * @var int
+     */
+    private int $originalNumWords;
+    
     /* general API */
 
     /**
@@ -72,17 +83,47 @@ class editor_Segment_TagRepair_Tags extends editor_TagSequence {
      * @throws ZfExtended_Exception
      */
     public function recreateTags(string $html) : string {
+        $this->evaluate();
+        $this->invalidate();
         $this->reEvaluate($html);
         try {
             return $this->render();
         } catch (Exception $e) {
-            // TODO: what to do here ?
-            return '';
+            // fallback: recreate original structure from scratch(without any sent tags)
+            $this->invalidate();
+            $this->reEvaluate(strip_tags($html));
+            return $this->render();
         }
     }
 
     /* re-evaluation API */
 
+    /**
+     * Analyses the original word structure and stores them
+     */
+    private function evaluate() {
+        $this->originalTextLength = $this->getTextLength();
+        $this->originalNumWords = $this->countWords($this->text);
+        $numTags = count($this->tags);
+        for($i=0; $i < $numTags; $i++){
+            $this->tags[$i]->capturePosition($this, $this->originalTextLength);
+        }
+        if(self::DO_DEBUG){
+            error_log('RE-EVALUATE: chars before: ' .$this->originalTextLength.', words before: '.$this->originalNumWords.', num tags before: '.$numTags);
+            for($i=0; $i < $numTags; $i++){
+                error_log('RE-EVALUATE before tag '.$i.': ( idx: '.$this->tags[$i]->getTagIndex().' | start: '.$this->tags[$i]->startIndex.' | end: '.$this->tags[$i]->endIndex.' | num words: '.$this->tags[$i]->getNumWords($this).')');
+            }
+        }
+    }
+    /**
+     * Marks all tags as invalid by invalidating their position properties
+     */
+    private function invalidate() {
+        $numTags = count($this->tags);
+        for($i=0; $i < $numTags; $i++){
+            $this->tags[$i]->invalidatePosition();
+        }
+    }
     /**
      * Re-evaluate our tags by the passed markup
      * @param string $html
@@ -92,20 +133,6 @@ class editor_Segment_TagRepair_Tags extends editor_TagSequence {
         if($numTags < 1){
             $this->setText(strip_tags($html));
             return;
-        }
-        // capture the word-positions of our tags and invalidate the text-indices
-        $textLengthBefore = $this->getTextLength();
-        $numWordsBefore = $this->countWords($this->text);
-
-        if(self::DO_DEBUG){
-            error_log('RE-EVALUATE: chars before: ' .$textLengthBefore.', words before: '.$numWordsBefore.', num tags before: '.$numTags);
-            for($i=0; $i < $numTags; $i++){
-                error_log('RE-EVALUATE before tag '.$i.': ( idx: '.$this->tags[$i]->getTagIndex().' | start: '.$this->tags[$i]->startIndex.' | end: '.$this->tags[$i]->endIndex.' | num words: '.$this->tags[$i]->getNumWords($this).')');
-            }
-        }
-
-        for($i=0; $i < $numTags; $i++){
-            $this->tags[$i]->capturePosition($this, $textLengthBefore);
         }
         $text = '';
         $textLength = 0;
@@ -139,8 +166,8 @@ class editor_Segment_TagRepair_Tags extends editor_TagSequence {
         $this->setText($text);
         // re-evaluate the word-positions of our tags and restore the text-indices
         $textLength = $this->getTextLength();
-        $wordRatio = $this->countWords($this->text) / $numWordsBefore;
-        $textRatio = $textLength / $textLengthBefore;
+        $wordRatio = $this->countWords($this->text) / $this->originalNumWords;
+        $textRatio = $textLength / $this->originalTextLength;
         // first the "real" non-singular tags
         for($i=0; $i < $numTags; $i++){
             if(!$this->tags[$i]->isSingular()){
@@ -176,6 +203,9 @@ class editor_Segment_TagRepair_Tags extends editor_TagSequence {
      * @return int
      */
     public function getNextWordsPosition(int $pos, int $words, bool $afterWhitespace=false) : int {
+        if($words === 0){
+            return ($afterWhitespace) ? $this->forwardAfterWhitespace($pos) : $pos;
+        }
         if($pos < $this->getTextLength()){
             // if the start is a whitespace we forward to the next non-whitespace
             while($this->isWhitespaceCharAt($pos) && $pos < $this->getTextLength()){
@@ -190,12 +220,7 @@ class editor_Segment_TagRepair_Tags extends editor_TagSequence {
                     $words--;
                 }
                 if($words === 0){
-                    if($afterWhitespace){
-                        while($this->isWhitespaceCharAt($pos) && $pos < $this->getTextLength()){
-                            $pos++;
-                        }
-                    }
-                    return $pos;
+                    return ($afterWhitespace) ? $this->forwardAfterWhitespace($pos) : $pos;
                 }
                 $wasWhitespace = $isWhitespace;
             }
@@ -210,6 +235,9 @@ class editor_Segment_TagRepair_Tags extends editor_TagSequence {
      * @return int
      */
     public function getPrevWordsPosition(int $pos, int $words, bool $beforeWhitespace=false) : int {
+        if($words === 0){
+            return ($beforeWhitespace) ? $this->rewindBeforeWhitespace($pos) : min($pos + 1, $this->getTextLength());
+        }
         if($pos > 0){
             // if the start is a whitespace we rewind to the next non-whitespace
             while($pos > 0 && $this->isWhitespaceCharAt($pos - 1)){
@@ -223,19 +251,35 @@ class editor_Segment_TagRepair_Tags extends editor_TagSequence {
                 if($isWhitespace && !$wasWhitespace){
                     $words--;
                 }
-                if($words == 0){
-                    if($beforeWhitespace){
-                        while($pos > 0 && $this->isWhitespaceCharAt($pos - 1)){
-                            $pos--;
-                        }
-                        return $pos;
-                    }
-                    return min($pos + 1, $this->getTextLength());
+                if($words === 0){
+                    return ($beforeWhitespace) ? $this->rewindBeforeWhitespace($pos) : min($pos + 1, $this->getTextLength());
                 }
                 $wasWhitespace = $isWhitespace;
             }
         }
         return 0;
+    }
+    /**
+     * Forwards a position that is known to be before whitespace behind it
+     * @param int $position
+     * @return int
+     */
+    private function forwardAfterWhitespace(int $position) : int {
+        while($this->isWhitespaceCharAt($position) && $position < $this->getTextLength()){
+            $position++;
+        }
+        return $position;
+    }
+    /**
+     * Forwards a position that is known to be after whitespace before it
+     * @param int $position
+     * @return int
+     */
+    private function rewindBeforeWhitespace(int $position) : int {
+        while($position > 0 && $this->isWhitespaceCharAt($position - 1)){
+            $position--;
+        }
+        return $position;
     }
     /**
      * Retrieves the closest word-boundry to a position
