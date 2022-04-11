@@ -26,13 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\TagRepair\Tags;
+
 /**
  * Several "classic" PHPUnit tests to check the general tag repair (not to mix up with the segment tags repair)
  * When creating test-data notice, that if a "<" shall be used in the markup it must be followed by a " "
  */
 class TagsRepairTest extends editor_Test_MockedTaskTest {
-
-
 
     /**
      * Some Internal Tags to create Tests with
@@ -201,18 +201,18 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
      */
     protected function createTagsRepairTest(string $originalMarkup, string $expectedMarkup, string $translatedMarkup){
         $markup = $this->replaceInternalTags($originalMarkup);
-        $tags = new editor_Segment_TagRepair_Tags($markup);
+        $tags = new Tags($markup);
         $expected = (empty($expectedMarkup)) ? $tags->render() : $this->replaceInternalTags($expectedMarkup);
         $request = $tags->getRequestHtml();
         $translated = $this->replaceRequestTags($translatedMarkup, $originalMarkup, $request);
         $actual = $tags->recreateTags($translated);
-        $reverted = $this->revertInternalTags($actual);
 
-        if(true){
+        // debugging
+        if(false){
             error_log('===================');
             error_log('ORIGINAL: '.$originalMarkup);
             error_log('TRANSLATED: '.$translatedMarkup);
-            error_log('RECREATED: '.$reverted);
+            error_log('RECREATED: '.$this->revertInternalTags($actual));
             error_log('===================');
         }
         $this->assertEquals($expected, $actual);
