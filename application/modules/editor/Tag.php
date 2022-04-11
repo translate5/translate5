@@ -372,6 +372,11 @@ class editor_Tag {
      */
     protected static $singularTypes = array('img','input','br','hr','wbr','area','col','embed','keygen','link','meta','param','source','track','command'); // TODO: not complete !
     /**
+     * QUIRK: The blank before the space is against the HTML-Spec and superflous BUT termtagger does double img-tags if they do not have a blank before the trailing slash ...
+     * @var string
+     */
+    protected static $selfClosingMarker = ' /';
+    /**
      * @var string
      */
     protected $name;
@@ -1015,8 +1020,7 @@ class editor_Tag {
         }
         $tag = '<'.$this->getName().$this->renderAttributes($withDataAttribs);
         if($this->isSingular()){
-            // QUIRK: The blank before the space is against the HTML-Spec and superflous BUT termtagger does double img-tags if they do not have a blank before the trailing slash ...
-            return $tag.' />';
+            return $tag.static::$selfClosingMarker.'>';
         }
         return $tag.'>';
     }

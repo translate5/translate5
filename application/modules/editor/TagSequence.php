@@ -743,7 +743,7 @@ abstract class editor_TagSequence implements JsonSerializable {
     public function debug(){
         $newline = "\n";
         $debug = 'TEXT: "'.trim($this->text).'"'.$newline;
-          for($i=0; $i < count($this->tags); $i++){
+        for($i=0; $i < count($this->tags); $i++){
               $debug .= 'TAG '.$i.':'.$newline.trim($this->tags[$i]->debug()).$newline;
         }
         return $debug;

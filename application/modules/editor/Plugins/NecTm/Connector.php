@@ -337,13 +337,13 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * {@inheritDoc}
      * @see editor_Services_Connector_BatchTrait::processBatchResult()
      */
-    protected function processBatchResult($segmentResults) {
+    protected function processBatchResult($segmentResults, int $segmentId=-1) {
         $tmResults = $segmentResults->results ?? [];
         foreach ($tmResults as $tmRes){
             $source=$tmRes->tu->source_text ?? "";
             $target = $tmRes->tu->target_text ?? "";
-            $this->resultList->addResult($this->tagHandler->restoreInResult($target), $tmRes->match, $this->getMetaData($tmRes));
-            $this->resultList->setSource($this->tagHandler->restoreInResult($source));
+            $this->resultList->addResult($this->tagHandler->restoreInResult($target, $segmentId), $tmRes->match, $this->getMetaData($tmRes));
+            $this->resultList->setSource($this->tagHandler->restoreInResult($source, $segmentId));
         }
     }
     

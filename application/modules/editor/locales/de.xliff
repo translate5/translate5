@@ -2061,7 +2061,6 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U3RhbmRhcmQgV29ya2Zsb3c='><source>Standard Workflow</source><target>Standard Workflow</target></trans-unit>
 <trans-unit id='Q29tcGxleCBXb3JrZmxvdw=='><source>Complex Workflow</source><target>Complex Workflow</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQgV29ya2Zsb3cgKMOcYmVyc2V0enVuZywgTGVrdG9yYXQsIFp3ZWl0ZXMgTGVrdG9yYXQp'><source>Standard Workflow (Übersetzung, Lektorat, Zweites Lektorat)</source><target>Standard Workflow</target></trans-unit>
-<trans-unit id='SW1wb3J0IGFiYnJlY2hlbg=='><source>Import abbrechen</source><target>Import abbrechen</target></trans-unit>
 <trans-unit id='QWxsZSBwYXNzZW5kZW4gendlaXNwcmFjaGlnZW4gRGF0ZWllbiBmw7xyIGRpZXNlIFNwcmFjaGUgd2VyZGVuIGF1cyBkZXIgTGlzdGUgaG9jaGdlbGFkZW5lciBEYXRlaWVuIGVudGZlcm50Lg=='><source>Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.</source><target>Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.</target></trans-unit>
 <trans-unit id='QXJiZWl0c2RhdGVpKGVuKQ=='><source>Arbeitsdatei(en)</source><target>Arbeitsdatei(en)</target></trans-unit>
 <trans-unit id='UGl2b3QtRGF0ZWkoZW4p'><source>Pivot-Datei(en)</source><target>Pivot-Datei(en)</target></trans-unit>
@@ -2107,7 +2106,24 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='Q2hpbmVzaXNjaCAoVGFpd2FuKQ=='><source>Chinesisch (Taiwan)</source><target>Chinesisch (Taiwan)</target></trans-unit>
 <trans-unit id='Q2hpbmVzaXNjaCAodHJhZGl0aW9uZWxsKQ=='><source>Chinesisch (traditionell)</source><target>Chinesisch (traditionell)</target></trans-unit>
 <trans-unit id='Q2hpbmVzaXNjaCAodmVyZWluZmFjaHQp'><source>Chinesisch (vereinfacht)</source><target>Chinesisch (vereinfacht)</target></trans-unit>
-
+<trans-unit id='U3RhbmRhcmQtV29ya2Zsb3c='><source>Standard-Workflow</source><target>Standard-Workflow</target></trans-unit>
+<trans-unit id='ZGVmYXVsdA=='><source>default</source><target>default</target></trans-unit>
+<trans-unit id='U2VnbWVudC1Lb21tZW50YXI='><source>Segment-Kommentar</source><target>Segment-Kommentar</target></trans-unit>
+<trans-unit id='RGVmYXVsdA=='><source>Default</source><target>Default</target></trans-unit>
+<trans-unit id='RHVua2xlcyBMYXlvdXQgKEFyaWEp'><source>Dunkles Layout (Aria)</source><target>Dunkles Layout (Aria)</target></trans-unit>
+<trans-unit id='U3RhbmRhcmQgTGF5b3V0IChUcml0b24p'><source>Standard Layout (Triton)</source><target>Standard Layout (Triton)</target></trans-unit>
+<trans-unit id='VVJMLUxpc3RlIGbDvHIgVmlzdWFs'><source>URL-Liste für Visual</source><target>URL-Liste für Visual</target></trans-unit>
+<trans-unit id='Q2hhbmdlIFZpc3VhbCBpbXBvcnQgdHlwZQ=='><source>Change Visual import type</source><target>Change Visual import type</target></trans-unit>
+<trans-unit id='U3dpdGNoaW5nIHRvIHRoZSBkaWZmZXJlbnQgaW1wb3J0IHR5cGUgd2lsbCByZW1vdmUgZXZlcnl0aGluZyBmcm9tIHRoZSBjdXJyZW50IHR5cGUuIEFyZSB5b3Ugc3VyZSA/'><source>Switching to the different import type will remove everything from the current type. Are you sure ?</source><target>Switching to the different import type will remove everything from the current type. Are you sure ?</target></trans-unit>
+<trans-unit id='VGhlIG9yZGVyIG9mIHRoZSB1cGxvYWRlZCBmaWxlcy91cmxzIHdpbGwgbWF0Y2ggd2l0aCB0aGUgb3JkZXIgb2YgdGhlIHVwbG9hZGVkIHdvcmsgZmlsZXMu'><source>The order of the uploaded files/urls will match with the order of the uploaded work files.</source><target>The order of the uploaded files/urls will match with the order of the uploaded work files.</target></trans-unit>
+<trans-unit id='VW1mYXNzdCBlaW5lIFFTIHVuZCBUZXJtaW5vbG9naWUgUHLDvGZ1bmc='><source>Umfasst eine QS und Terminologie Prüfung</source><target>Umfasst eine QS und Terminologie Prüfung</target></trans-unit>
+<trans-unit id='VE0gVm9yw7xiZXJzZXR6dW5ncyBNYXRjaC1SYXRl'><source>TM Vorübersetzungs Match-Rate</source><target>TM Vorübersetzungs Match-Rate</target></trans-unit>
+<trans-unit id='RXhwb3J0IGFscyBFeGNlbA=='><source>Export als Excel</source><target>Export als Excel</target></trans-unit>
+<trans-unit id='RXhwb3J0IFRyYWRvcy1saWtlIFhNTA=='><source>Export Trados-like XML</source><target>Export Trados-like XML</target></trans-unit>
+<trans-unit id='RXMgd3VyZGUgYmlzaGVyIGtlaW5lIEFuYWx5c2UgZXJzdGVsbHQuIFN0YXJ0ZW4gU2llIGVpbmUgQW5hbHlzZSBpbSBUYWIg4oCcU3ByYWNocmVzc291cmNlbiB6dXdlaXNlbuKAnA=='><source>Es wurde bisher keine Analyse erstellt. Starten Sie eine Analyse im Tab “Sprachressourcen zuweisen“</source><target>Es wurde bisher keine Analyse erstellt. Starten Sie eine Analyse im Tab “Sprachressourcen zuweisen“</target></trans-unit>
+<trans-unit id='RGF0dW0gZGVyIEFuYWx5c2U='><source>Datum der Analyse</source><target>Datum der Analyse</target></trans-unit>
+<trans-unit id='R2VzcGVycnRlIDEwMCUtTWF0Y2hlcyBzaW5kIG5pY2h0IFRlaWwgZGVyIEFuYWx5c2Uu'><source>Gesperrte 100%-Matches sind nicht Teil der Analyse.</source><target>Gesperrte 100%-Matches sind nicht Teil der Analyse.</target></trans-unit>
+<trans-unit id='SW5zdGFudC1UcmFuc2xhdGUgVE0='><source>Instant-Translate TM</source><target>Instant-Translate TM</target></trans-unit>
   </body>
  </file>
 </xliff>

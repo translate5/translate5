@@ -42,6 +42,12 @@ class Tag extends \editor_Segment_Tag {
     const REQUEST_TAG_TPL = '<img id="t5tag-@TYPE@-@TAGIDX@" src="example.jpg" />';
 
     const REQUEST_TAG_REGEX = '~(<img\s*id="t5tag\-[a-z]+\-[0-9]+"\s*src="[^>]+"\s*/>)~i';
+
+    /**
+     * We need to expand the singular tags to get the "x"-tag of sdxliff on the list
+     * @var string[]
+     */
+    protected static $singularTypes = array('img','input','br','hr','wbr','area','col','embed','keygen','link','meta','param','source','track','command','x');
     
     protected static $type = 'repair';
 
