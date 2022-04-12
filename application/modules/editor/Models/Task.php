@@ -262,11 +262,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param string $tasktype
      * @return array
      */
-    public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype) {
+    public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype): array
+    {
         $s = $this->db->select();
         $s->where('pmGuid = ?', $pmGuid);
         $s->where('tasktype = ?', $tasktype);
-        $s->order('orderdate ASC');
+        $s->order('orderdate DESC');
         return parent::loadFilterdCustom($s);
     }
 
