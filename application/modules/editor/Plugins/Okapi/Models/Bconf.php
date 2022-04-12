@@ -59,11 +59,10 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public static function checkSystemBconf(): void
+    public function checkSystemBconf(): void
     {
-        $bconf = new static();
-        if ($bconf->getTotalCount() === 0) { //
-            $bconf->resetAutoIncrement();
+        $bconf = $this;
+        if ($bconf->getTotalCount() === 0) {
             $defaultImportBconf = editor_Plugins_Okapi_Init::getOkapiDataFilePath() . 'okapi_default_import.bconf';
             $bconf->setDefault(1);
             $bconf->setDescription("The .bconf used for file imports unless another one is configured");
@@ -149,7 +148,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws editor_Plugins_Okapi_Exception
      */
     public function getDefaultBconfId($customerId = null): int {
-        static::checkSystemBconf();
+        $this->checkSystemBconf();
 
         $defaultBconfId = 0;
         if ($customerId) {

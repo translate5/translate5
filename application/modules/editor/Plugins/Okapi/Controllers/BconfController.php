@@ -44,7 +44,6 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
     protected bool $decodePutAssociative = true;
 
     const FILE_UPLOAD_NAME='bconffile';
-    const entityClassStatic = 'editor_Plugins_Okapi_Models_Bconf'; //$entityClass is needed in static contect but cannot
      /**
       * @var string
       */
@@ -59,6 +58,10 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
      {
           $this->view->rows = $this->entity->loadAll();
           $this->view->total = $this->entity->getTotalCount();
+          if($this->view->total === 0){
+              $this->entity->checkSystemBconf();
+              $this->view->total = 1;
+          }
      }
 
     public function deleteAction()
@@ -194,71 +197,42 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
         exit;
     }
 
-
     /**
-     * @param Zend_EventManager_Event $e
+     * Handles isDefaultForCustomer persisted in customer_meta
+     * Exits early if possible
+     * @param array|null $fields
+     * @param $mode
      * @return void
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
-     * @noinspection PhpRedundantCatchClauseInspection
+     * @see ZfExtended_RestController::putAction
+     * @see ZfExtended_RestController::postAction
      */
-    public static function handleCustomerDefaultBconf(Zend_EventManager_Event $e){
-        /** @var array $data */
-        $data = $e->getParam('data');
-        if(isset($data['isDefaultForCustomer'])){
-            $customerMeta = new editor_Models_Customer_Meta();
-            $customerId = (int) $data['isDefaultForCustomer'];
-            $bconfId = (int) $data['id'];
-            if ($customerId) {
-                try {
-                    $customerMeta->loadByCustomerId($customerId);
-                } catch (ZfExtended_Models_Entity_NotFoundException) {
-                    $customerMeta->init(['customerId' => $customerId]); // new entity
-                }
-            } else {
-                $customerMeta->loadRow('defaultBconfId = ?', $bconfId);
+    protected function setDataInEntity(array $fields = null, $mode = self::SET_DATA_BLACKLIST){
+        if(!isset($this->data['isDefaultForCustomer'])) {
+            return parent::setDataInEntity($fields, $mode);
+        }
+        $customerId = (int) $this->data['isDefaultForCustomer'];
+        $customerMeta = new editor_Models_Customer_Meta();
+        $bconfId = (int) $this->data['id'];
+        if ($customerId) {
+            try {
+                $customerMeta->loadByCustomerId($customerId);
+            } catch (ZfExtended_Models_Entity_NotFoundException) {
+                $customerMeta->init(['customerId' => $customerId]); // new entity
             }
+        } else {
+            $customerMeta->loadRow('defaultBconfId = ?', $bconfId);
+        }
+        $newDefault = ($bconfId != $customerMeta->getDefaultBconfId()) ? $bconfId : NULL;
+        $customerMeta->setDefaultBconfId($newDefault);
 
-            $currentCustomerDefault = $customerMeta->getDefaultBconfId();
-            $newCustomerDefault = $bconfId;
-            if($newCustomerDefault != $currentCustomerDefault){
-                $customerMeta->setDefaultBconfId($newCustomerDefault);
-            } else { // bconf was DEselected as customer default
-                $customerMeta->setDefaultBconfId(NULL);
-            }
+        $customerMeta->save();
 
-            $customerMeta->save();
-
-            if(count($data)===2){ // only customerDefault is changed, delete data to skip further proceeding
-
-            }
-
+        if(count($this->data) > 2){ // more than customerDefault is changed, call parent
+            return parent::setDataInEntity($fields, $mode);
         }
     }
 
-    /**
-     * @param Zend_EventManager_Event $event
-     * @see ZfExtended_RestController::afterActionEvent
-     */
-    public static function checkAnLoadBconfs(Zend_EventManager_Event $event) {
-        editor_Plugins_Okapi_Models_Bconf::checkSystemBconf();
-
-        // loadCustomBconfIds
-        /** @var ZfExtended_View $view */
-        $view = $event->getParam('view');
-        $meta = new editor_Models_Db_CustomerMeta();
-        $metas = $meta->fetchAll('defaultBconfId IS NOT NULL')->toArray();
-        $bconfIds = array_column($metas, 'defaultBconfId','customerId');
-        foreach($view->rows as &$customer){
-            $customer['defaultBconfId'] = $bconfIds[$customer['id']] ?? null;
-        }
-    }
-
-    private function getSystemDefaultBconf(){
-
-    }
-     
 }
-// FIXME: plugin controller naming scheme is incoherent with Zend Framework
-class_alias('editor_Plugins_Okapi_BconfController', 'editor_Plugins_Okapi_Controllers_BconfController'); // needed for eventmanager callback

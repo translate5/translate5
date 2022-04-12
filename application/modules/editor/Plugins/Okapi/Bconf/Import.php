@@ -30,21 +30,20 @@ END LICENSE AND COPYRIGHT
 
 class editor_Plugins_Okapi_Bconf_Import
 {
-	protected $util;
-	/**
-	 * Import bconf
-	 * Extracts the parts of a given bconf file in the order
-	 * 1) plug-ins
-	 * 2) references data
-	 * 3) pipeline
-	 * 4) filter configurations
-	 * 5) extensions -> filter configuration id mapping
-	 *
-	 * @param string $bconfFile
-	 * @param string $outputDir
-	 */
-	public function importBconf($bconfFile, $outputDir)
-	{
+    /**
+     * Import bconf
+     * Extracts the parts of a given bconf file in the order
+     * 1) plug-ins
+     * 2) references data
+     * 3) pipeline
+     * 4) filter configurations
+     * 5) extensions -> filter configuration id mapping
+     *
+     * @param string $bconfFilePath
+     * @param string $outputDir
+     * @return false|void
+     */
+	public function importBconf(string $bconfFilePath, string $outputDir){
 		//TODO: sanity check for params, at least dir_exists, file exists etc
 		$outputDir = realpath($outputDir);
 		if (!$outputDir || !is_writable($outputDir)) {
@@ -68,7 +67,7 @@ class editor_Plugins_Okapi_Bconf_Import
 		if (filterParamOverrides == null) {
 			throw new IllegalArgumentException("filterParamOverrides must not be null");
 		}
-*/			$raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($bconfFile['tmp_name'], "rb");
+*/			$raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($bconfFilePath, "rb");
 			$sig = $raf->readUTF(); // signature
 			if (!$raf::SIGNATURE === $sig) {
 				throw new OkapiIOException("Invalid file format.");
@@ -232,9 +231,9 @@ class editor_Plugins_Okapi_Bconf_Import
 				file_put_contents("$outputDir/$okapiId.fprm", $data);
 			}
 
-			// Write out any custom filter config overrides
+/*			// Write out any custom filter config overrides
 			$customIdCount = 1;
-/*			Map<String, String> extOverrides = new HashMap<>();
+			Map<String, String> extOverrides = new HashMap<>();
 
 			for (Map.Entry<String, FilterConfigOverride> e : filterParamOverrides.entrySet()) {
 				if (e.getValue().getConfigData() != null) {
@@ -268,11 +267,11 @@ class editor_Plugins_Okapi_Bconf_Import
 	}
 
 	private function writeConfig(String $outputDir, String $okapiId, String $data) : string {
-		$path = $outputDir + "/" + $okapiId + ".fprm";
+		$path = $outputDir . "/" . $okapiId . ".fprm";
 //		try (PrintWriter pw = new PrintWriter(path, "UTF-8")) {
 			file_put_contents($path, $data);
 //		}
-//		return path;
+		return $path;
 	}
 
 	private function readExtensionMap($raf) : array {
@@ -401,7 +400,7 @@ class editor_Plugins_Okapi_Bconf_Import
 		if ($raf == null || !$path) {
 			return false;
 		}
-		/** @var SplFileObject $fos file output stream */
+		/** @var resource $fos file output stream */
 		$fos = fopen($path, 'wb');
 		if (!$fos) {
 			return false;
@@ -429,7 +428,7 @@ class editor_Plugins_Okapi_Bconf_Import
 	{
 		$doc = new DOMDocument();
 		$doc->loadXML($pipeline['xml']);
-		/** @var NodeList nodes */
+		/** @var DOMNodeList nodes */
 		$nodes = $doc->getElementsByTagName("step");
 		$stepRefs = json_decode(file_get_contents(__DIR__."/StepReferences.json"), associative: true);
 
@@ -474,7 +473,7 @@ class editor_Plugins_Okapi_Bconf_Import
 			}
 */
 			// add the step
-			array_push($pipeline['steps'], $class);
+			$pipeline['steps'][] = $class;
 		}
 
 		return $pipeline;
