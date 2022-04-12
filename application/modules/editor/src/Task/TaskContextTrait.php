@@ -139,7 +139,7 @@ trait TaskContextTrait {
 
     public function getCurrentTask(): editor_Models_Task {
         if(is_null($this->_currentTask)) {
-            throw new Current\Exception('E1381'); //TODO neue nummer! Text: Bitte zuerst init aufrufen!
+            throw new Current\Exception('E1382');
         }
         return $this->_currentTask;
     }

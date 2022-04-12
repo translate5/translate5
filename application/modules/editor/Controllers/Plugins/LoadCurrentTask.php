@@ -84,7 +84,7 @@ class editor_Controllers_Plugins_LoadCurrentTask extends Zend_Controller_Plugin_
         } while (!empty($pathPart));
         $bareRestUrl = self::URI_DELIMITER.trim(join(self::URI_DELIMITER, $pathToUse), self::URI_DELIMITER);
         $request->setRequestUri($bareRestUrl.$queryPath);
-        $request->setPathInfo($bareRestUrl);
+        $request->setPathInfo(); //calculate the path with from the given request URI
 //error_log("OUT ".$bareRestUrl.$queryPath);
     }
 }

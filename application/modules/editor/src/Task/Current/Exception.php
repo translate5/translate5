@@ -46,6 +46,7 @@ class Exception extends \ZfExtended_ErrorCodeException {
         // but no task ID was provided in the URL.
         // So either the URL producing the request is wrongly created (no Editor.data.restpath prefix),
         // or its just the wrong context where the CurrentTask was accessed.
-        'E1381' => 'Access to CurrentTask was requested but no task ID was given in the URL.'
+        'E1381' => 'Access to CurrentTask was requested but no task ID was given in the URL.',
+        'E1382' => 'Access to CurrentTask was requested but it was initialized yet.',
     ];
 }
