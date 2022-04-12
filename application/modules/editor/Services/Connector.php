@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
 /**
  * Language Resource Connector class
  * - provides a connection to a concrete language resource, via the internal adapter (which contains the concrete connector instance)
@@ -142,6 +143,7 @@ class editor_Services_Connector {
     
     /***
      * Invoke search resource action so the MT logger can be used
+     * This is the main entry point for the concordance search
      * @param string $searchString
      * @param string $field
      * @param integer $offset
@@ -154,13 +156,26 @@ class editor_Services_Connector {
     
     /***
      * Invoke the translate resource action so the MT logger can be used
+     * This is the main entry point for InstantTranslate
      * @param string $searchString
      * @return editor_Services_ServiceResult
      */
     protected function _translate(string $searchString){
-        //instant translate calls are always with out tags
-        $searchString = trim(strip_tags($searchString));
-        $serviceResult = $this->adapter->translate($searchString);
+        //instant translate calls are by default always without tags ... only if the adapter supports tags we leave them
+        if($this->adapter->canHandleHtmlTags()){
+            // we use the TagRepair's processor to automatically repair lost or "defect" tags when requesting the translation
+            $processor = new HtmlProcessor();
+            $serviceResult = $this->adapter->translate($processor->prepareRequest(trim($searchString)));
+            // UGLY: The service result holds a list of results (representing the translated texts + metadata) which unfortunately have no defined format
+            $results = $serviceResult->getResult();
+            if(count($results) > 0){
+                $results[0]->target = $processor->restoreResult($results[0]->target);
+                $serviceResult->setResults($results);
+            }
+        } else {
+            $searchString = trim(strip_tags($searchString));
+            $serviceResult = $this->adapter->translate($searchString);
+        }
         //log the instant translate results, when the adapter is of mt type or when the result set
         //contains result with matchrate >=100
         if(!empty($serviceResult) && ($this->isMtAdapter() || $serviceResult->has100PercentMatch())){

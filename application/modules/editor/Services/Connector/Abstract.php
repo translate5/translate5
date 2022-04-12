@@ -144,6 +144,12 @@ abstract class editor_Services_Connector_Abstract {
      * @var bool
      */
     protected $disabled = false;
+
+    /**
+     *  Is the connector generally able to support HTML Tags
+     * @var bool
+     */
+    protected $htmlTagSupport = false;
     
     /**
      * initialises the internal result list
@@ -439,5 +445,13 @@ abstract class editor_Services_Connector_Abstract {
     
     public function disable() {
         $this->disabled = true;
+    }
+    /**
+     * @return bool
+     * Retrieves, if the connector supports handling of HTML tags which then will not be stripped
+     * This currently is only used via the ->translate API by InstantTranslate
+     */
+    public function canHandleHtmlTags() : bool {
+        return $this->htmlTagSupport;
     }
 }
