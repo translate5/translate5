@@ -595,44 +595,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * register this Tasks config and Guid in the session as active Task
-     * @param Zend_Session_Namespace $session optional, if omitted standard SessionNamespace is generated
-     * @param string $openState
-     */
-    public function registerInSession(string $openState,Zend_Session_Namespace $session = null) {
-        if(empty($session)) {
-            $session = new Zend_Session_Namespace();
-        }
-        
-        $session->taskGuid = $this->getTaskGuid();
-        $session->taskOpenState = $openState;
-        $session->taskWorkflow = $this->getWorkflow();
-        $session->taskWorkflowStepNr = $this->getWorkflowStep();
-        $session->taskWorkflowStepName = $this->getWorkflowStepName();
-    }
-
-    /**
-     * deletes this Tasks config and Guid from the session as active Task
-     * @param Zend_Session_Namespace $session optional, if omitted standard SessionNamespace is generated
-     */
-    public function unregisterInSession(Zend_Session_Namespace $session = null) {
-        if(empty($session)) {
-            $session = new Zend_Session_Namespace();
-        }
-        $session->taskGuid = null;
-        $session->taskOpenState = null;
-        $session->taskWorkflowStepNr = null;
-    }
-
-    /**
-     * returns true if the loaded task is registered in the session
-     * @return boolean
-     */
-    public function isRegisteredInSession() {
-        $session = new Zend_Session_Namespace();
-        return !empty($session->taskGuid) && $session->taskGuid == $this->getTaskGuid();
-    }
-    /**
      * Convenience API
      * @return boolean
      */

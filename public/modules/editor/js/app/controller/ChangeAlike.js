@@ -100,7 +100,7 @@ Ext.define('Editor.controller.ChangeAlike', {
   listen: {
       messagebus: {
           '#translate5': {
-              reconnect: 'handleBusReconnect',
+              reconnect: 'handleBusReconnect'
           }
       },
       component: {

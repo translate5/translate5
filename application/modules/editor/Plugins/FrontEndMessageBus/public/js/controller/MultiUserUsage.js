@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.ChangeLog.controller.Changelog
+ * @class Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
@@ -66,8 +66,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
             },
             '#translate5 instance': {
                 pong: 'onMessageBusPong',
-                resyncSession: 'onResyncSession',
-                notifyUser: 'onUserNotification'
+                resyncSession: 'onResyncSession'
             },
             '#translate5 task': {
                 segmentselect:  'onSegmentSelect',
@@ -198,8 +197,8 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
                 }
             });
         }
-        
-        Editor.app.viewport.unmask();
+
+        Editor.app.viewport && Editor.app.viewport.unmask();
         
         if(grid && Editor.data.task) {
             this.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
@@ -300,23 +299,6 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
                 me.markSegmentEdited(segment);
             }
         });
-    },
-    /**
-     * This notifications can be send from the server. 
-     */
-    onUserNotification: function(data) {
-        switch(data.message) {
-            // Currently we just trigger a reload, instead showing a message. Should be fine in that situations 
-            case 'sessionDeleted':
-            case 'taskClosedInOtherWindow':
-                //instead of showing a message, we just trigger a reload of the window (without logout in this special case)
-                Editor.data.logoutOnWindowClose = false;
-                location.reload();
-                break;
-            default:
-                Editor.MessageBox.addInfo(data.message);
-                break;
-        }
     },
     /**
      * render the segment as edited

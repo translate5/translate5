@@ -85,6 +85,8 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
      * @throws Zend_Exception
      */
     public function handleAfterQueryAction(Zend_EventManager_Event $event){
+        /** @var editor_LanguageresourceinstanceController $controller */
+        $controller = $event->getParam('controller');
         $view = $event->getParam('view');
         $resourceType=$view->resourceType ?? null;
         
@@ -98,8 +100,7 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
         }
         
         //For each mt result, calculate the matchrate using modelfront
-        $session = new Zend_Session_Namespace();
-        $risk = $this->getRiskPredictionInstance((string) $session->taskGuid);
+        $risk = $this->getRiskPredictionInstance((string) $controller->getCurrentTask()->getTaskGuid());
         if(empty($risk)){
             return;
         }

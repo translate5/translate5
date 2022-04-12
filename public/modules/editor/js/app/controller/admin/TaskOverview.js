@@ -941,7 +941,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         var me = this,
             isDefaultTask = task.get('taskType') === 'default';
         Ext.Ajax.request({
-            url: Editor.data.pathToRunDir + '/editor/task/' + task.getId() + '/clone',
+            url: Editor.data.restpath + 'task/' + task.getId() + '/clone',
             method: 'post',
             scope: me,
             success: function (response) {
