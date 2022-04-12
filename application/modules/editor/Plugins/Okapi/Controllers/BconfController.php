@@ -44,11 +44,13 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
     protected bool $decodePutAssociative = true;
 
     const FILE_UPLOAD_NAME='bconffile';
+    const entityClassStatic = 'editor_Plugins_Okapi_Models_Bconf'; //$entityClass is needed in static contect but cannot
      /**
       * @var string
       */
      protected $entityClass = 'editor_Plugins_Okapi_Models_Bconf';
-     /**
+
+    /**
       * sends all bconfs as JSON
       * (non-PHPdoc)
       * @see ZfExtended_RestController::indexAction()
@@ -106,9 +108,10 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
 	/**
 	 * Import bconf
 	 */
-	public function importbconfAction()
+	public function     importbconfAction()
 	{
         $upload = new Zend_File_Transfer();
+        /** @see \Zend_File_Transfer_Adapter_Abstract::getFileInfo */
         $files = $upload->getFileInfo();
         
         if(empty($files)){
@@ -118,9 +121,10 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
         }
         
         $file = $files[self::FILE_UPLOAD_NAME];
+        /** @var editor_Plugins_Okapi_Models_Bconf $bconf */
         $bconf = new $this->entityClass();
 		//TODO get the file name from UI
-        $ret = $bconf->importBconf($file);
+        $ret = $bconf->importBconf($file['tmp_name'], $file['name']);
         $id = $ret['id'];
         $dir = $this->entity->getDataDirectory($id);
         move_uploaded_file($file['tmp_name'], "$dir/import.bconf");
@@ -232,6 +236,29 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
 
         }
     }
+
+    /**
+     * @param Zend_EventManager_Event $event
+     * @see ZfExtended_RestController::afterActionEvent
+     */
+    public static function checkAnLoadBconfs(Zend_EventManager_Event $event) {
+        editor_Plugins_Okapi_Models_Bconf::checkSystemBconf();
+
+        // loadCustomBconfIds
+        /** @var ZfExtended_View $view */
+        $view = $event->getParam('view');
+        $meta = new editor_Models_Db_CustomerMeta();
+        $metas = $meta->fetchAll('defaultBconfId IS NOT NULL')->toArray();
+        $bconfIds = array_column($metas, 'defaultBconfId','customerId');
+        foreach($view->rows as &$customer){
+            $customer['defaultBconfId'] = $bconfIds[$customer['id']] ?? null;
+        }
+    }
+
+    private function getSystemDefaultBconf(){
+
+    }
      
 }
+// FIXME: plugin controller naming scheme is incoherent with Zend Framework
 class_alias('editor_Plugins_Okapi_BconfController', 'editor_Plugins_Okapi_Controllers_BconfController'); // needed for eventmanager callback

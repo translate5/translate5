@@ -47,7 +47,10 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         'Editor.plugins.Okapi.store.BconfStore'
     ],
     init: function(){
-        Ext.create('Editor.plugins.Okapi.store.BconfStore'); // needed for customer config
+
+    },
+    onLaunch: function(){
+        Ext.create('Editor.plugins.Okapi.store.BconfStore'); // in onLaunch so customerStore can import default bconf before if needed
     },
 
     listen: {

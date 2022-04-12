@@ -310,10 +310,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
 
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
-        $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', array($this, 'loadCustomBconfIds'));
 
         $this->eventManager->attach('editor_TaskController', 'afterPostAction', array($this, 'addBconfIdToTaskMeta'));
 
+        $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', ['editor_Plugins_Okapi_Controllers_BconfController', 'checkAnLoadBconfs']);
         $this->eventManager->attach('editor_Plugins_Okapi_BconfController', 'beforeSetDataInEntity', ['editor_Plugins_Okapi_Controllers_BconfController', 'handleCustomerDefaultBconf']);
     }
 
@@ -348,27 +348,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      * @see ZfExtended_RestController::afterActionEvent
      */
-    public function loadCustomBconfIds(Zend_EventManager_Event $event) {
-        /** @var Zend_View $view */
-        $view = $event->getParam('view');
-        $meta = new editor_Models_Db_CustomerMeta();
-        $metas = $meta->fetchAll('defaultBconfId IS NOT NULL')->toArray();
-        $bconfIds = array_column($metas, 'defaultBconfId','customerId');
-        foreach($view->rows as &$row){
-            $row['defaultBconfId'] = $bconfIds[$row['id']] ?? null;
-        }
-    }
-
-    /**
-     * @param Zend_EventManager_Event $event
-     * @see ZfExtended_RestController::afterActionEvent
-     */
     public function addBconfIdToTaskMeta(Zend_EventManager_Event $event){
 
         /** @var editor_Models_Task $task */
         $task = $event->getParam('entity');
         $data = $event->getParam('data');
         $meta = $task->meta();
+        if(empty($data['bconfId'])){
+            $data['bconfId'] = (new editor_Plugins_Okapi_Models_Bconf)->getDefaultBconfId($data['customerId']);
+        }
         $meta->setBconfId($data['bconfId']);
         $meta->save();
     }

@@ -35,10 +35,12 @@ END LICENSE AND COPYRIGHT
 /**
  * Okapi Bconf Entity Object
  *
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
+ * @method integer getId()
+ * @method void setId(int $id)
  * @method void setName(string $name)
  * @method string getName()
+ * @method setDefault(int $int)
+ * @method setDescription(string $string)
  */
 class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstract {
     
@@ -48,26 +50,48 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     protected $dbInstanceClass = 'editor_Plugins_Okapi_Models_Db_Bconf';
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_Bconf';
 
-     /**
+    /**
+     * @return void
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws editor_Models_ConfigException
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public static function checkSystemBconf(): void
+    {
+        $bconf = new static();
+        if ($bconf->getTotalCount() === 0) { //
+            $bconf->resetAutoIncrement();
+            $defaultImportBconf = editor_Plugins_Okapi_Init::getOkapiDataFilePath() . 'okapi_default_import.bconf';
+            $bconf->setDefault(1);
+            $bconf->setDescription("The .bconf used for file imports unless another one is configured");
+            $bconf->importBconf($defaultImportBconf, 'Translate5-Standard.bconf');
+        }
+    }
+
+    /**
      * Export the Bconf
      */
-    public function packBconf($bconfId){
+    public function packBconf($bconfId): ?string {
         $exportBconf = new editor_Plugins_Okapi_Bconf_Export();
         $bconfFilesPath = $this->getDataDirectory();
         return $exportBconf->ExportBconf($bconfId, $bconfFilesPath . '/');
     }
 
     /** Unpack the bconf file.
-     * @param $bconfFile
+     * @param string $filePath Path of the .bconf file to import
+     * @param string $name Name under which the bconf will appear in GUI and filesystem
+     * @return array
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function importBconf($bconfFile){
-        
+    public function importBconf(string $filePath, string $name): array {
         //save in database and get the new bconf id to create new directory.
-        $nameWithExt = explode('.',$bconfFile['name']);
+        $nameWithExt = explode('.', $name);
         $name = $nameWithExt[0];
     
         $this->setName($name);
@@ -76,7 +100,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         $okapiBconfDir = $this->getDataDirectory();
         
         $importBconf = new editor_Plugins_Okapi_Bconf_Import();
-        $importBconf->importBconf($bconfFile,$okapiBconfDir);
+        $importBconf->importBconf($filePath, $okapiBconfDir);
         return ["success" => true, "id" => $this->getId()];
     }
 
@@ -112,6 +136,32 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     public function getFilePath(): string
     {
         return $this->getDataDirectory() . '/export.bconf';
+    }
+
+    /**
+     * @param null $customerId
+     * @return int $defaultBconfId
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws editor_Models_ConfigException
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getDefaultBconfId($customerId = null): int {
+        static::checkSystemBconf();
+
+        $defaultBconfId = 0;
+        if ($customerId) {
+            $customerMeta = new editor_Models_Customer_Meta();
+            $customerMeta->loadByCustomerId($customerId);
+            $defaultBconfId = $customerMeta->getDefaultBconfId();
+        }
+        if (!$defaultBconfId) {
+            $this->loadRow('default = 1');
+            $defaultBconfId = $this->getId();
+        }
+        return $defaultBconfId;
     }
 
 }
