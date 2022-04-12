@@ -33,8 +33,8 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-use MittagQI\Translate5\Models\Task\Current\NoAccessException;
-use MittagQI\Translate5\Models\Task\TaskContextTrait;
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
 
 /**
  * Dummy Index Controller

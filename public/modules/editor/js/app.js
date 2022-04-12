@@ -659,6 +659,21 @@ Ext.application({
      */
     isDevelopmentVersion:function (){
         return Editor.data.app.version === "development";
-    }
+    },
 
+    /**
+     * requests the current browser window to be closed, show a message if not possible
+     */
+    closeWindow: function() {
+        if(window.opener === null) {
+            this.viewport.destroy();
+            this.unmask();
+            Ext.getBody().setCls('loading');
+            Ext.getBody().update('<div class="loading"></div>');
+            this.showInlineError('But the application window can not be closed automatically!', 'Application left successfully');
+        }
+        else {
+            window.close();
+        }
+    }
 });

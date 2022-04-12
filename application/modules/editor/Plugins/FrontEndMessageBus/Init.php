@@ -76,7 +76,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'autoqaOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_Models_Task_WorkerProgress', 'updateProgress',array($this, 'handleUpdateProgress'));
-        $this->eventManager->attach('ZfExtended_Models_Db_Session', 'getValidSessionsSql',array($this, 'handleGetValidSessionsSql'));
+        $this->eventManager->attach('ZfExtended_Models_Db_Session', 'getStalledSessions',array($this, 'handleGetStalledSessions'));
 
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
@@ -229,7 +229,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
             $task = $controller->getCurrentTask();
             $event->setParam('task', $task);
             $this->handleAfterTaskOpen($event);
-        } catch (\MittagQI\Translate5\Models\Task\Current\Exception) {
+        } catch (\MittagQI\Translate5\Task\Current\Exception) {
             //if the task is gone, we can not open it and do nothing
         }
 
@@ -356,10 +356,11 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     }
 
     /**
+     * returns the sessionIDs which were connected to the messagebus but now have no active connection anymore
      * @return array
      */
-    public function handleGetValidSessionsSql(): array {
-        $res = $this->bus->getConnectionSessions();
+    public function handleGetStalledSessions(): array {
+        $res = $this->bus->getStalledSessions();
         return (array) ($res->instanceResult ?? []);
     }
 

@@ -27,8 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
-use MittagQI\Translate5\Models\Task\Current\NoAccessException;
-use MittagQI\Translate5\Models\Task\TaskContextTrait;
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
 
 /***
  * Language resource controller
@@ -68,7 +68,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws NoAccessException
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function init() {
         //add filter type for languages
@@ -1184,7 +1184,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * performs a languageResource query
      * @throws ZfExtended_Models_Entity_NoAccessException
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws editor_Models_ConfigException
      */
     public function queryAction() {
@@ -1225,7 +1225,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * Since the GUI is dynamically loading additional content no traditional paging can be used here
      * @throws ZfExtended_Models_Entity_NoAccessException
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws editor_Models_ConfigException
      * @throws editor_Services_Exceptions_NoService
      */
@@ -1261,7 +1261,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * returns the connector to be used
      * @return editor_Services_Connector
      * @throws editor_Models_ConfigException
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     protected function getConnector() {
         $manager = ZfExtended_Factory::get('editor_Services_Manager');

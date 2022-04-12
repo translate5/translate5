@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Models\Task;
+namespace MittagQI\Translate5\Task;
 
-use MittagQI\Translate5\Models\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\Current\NoAccessException;
 use editor_Controllers_Plugins_LoadCurrentTask;
 use editor_Models_Loaders_Taskuserassoc;
 use editor_Models_Task;
@@ -108,14 +108,11 @@ trait TaskContextTrait {
         $this->_loadCurrentJob();
 
 //FIXME remaining todos:
-// - only the session->taskGuid usages were replaced. So test through all of the application and find usages where the taskGuid was got differently ($s->taskGuid or so)
 // - SECURITY FLAW: look through all controllers used in open task context, and check if a taskGuid comparsion is done or taskGUid is used on data load, to prevent data access of other tasks by guessing IDs
 // - test the new stuff in a embedded editor environment
-// - introduce a new TaskContext trait or Controller base class, where the loading is done, the CurrentTask is then just storage and does not contain loading logic
-            // → this could be all handled in the ControllerPlugin, except the try catch in the indexController.
-            // → CurrentTask stuff must be a trait, since otherwise multiple inheritance would be needed
 // - Team Communication how to use paths, see commit ab8a9f4d
 // - Team Communication how to use CurrenTask
+// - General Bug?: If a opentm2 resource returns a 502 bad gateway, the whole segment can not be saved! Urgent?
     }
 
     /**
@@ -125,6 +122,7 @@ trait TaskContextTrait {
     protected function _loadCurrentJob() {
         //load job, if there is no job in usage, throw 403
         $userGuid = editor_User::instance()->getGuid();
+
         $this->_currentJob = editor_Models_Loaders_Taskuserassoc::loadFirstInUse($userGuid, $this->_currentTask);
 
         //TODO if it turns out, that the checking of the jobs to find out if the user is allowed to access the taskid is to error prone,
@@ -140,7 +138,7 @@ trait TaskContextTrait {
 
     public function getCurrentTask(): editor_Models_Task {
         if(is_null($this->_currentTask)) {
-            throw new Current\Exception('E1381'); //TODO neue nummer! Text: Bitte zuerst init aufrufen!
+            throw new Current\Exception('E1382');
         }
         return $this->_currentTask;
     }

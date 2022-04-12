@@ -26,8 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Models\Task\Current\NoAccessException;
-use MittagQI\Translate5\Models\Task\TaskContextTrait;
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
 
 /**
  * Loads segment comments.
@@ -47,7 +47,7 @@ class Editor_CommentnavController extends ZfExtended_RestController {
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws NoAccessException
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function init() {
         $this->initRestControllerSpecific();
@@ -66,7 +66,7 @@ class Editor_CommentnavController extends ZfExtended_RestController {
      * You can attach listeners to afterIndexAction to add more types.
      * Example:
      * $eventManager->attach('Editor_CommentnavController', 'afterIndexAction, $callback)
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function indexAction() {
         $this->wfAnonymize = $this->getCurrentTask()->anonymizeUsers()
@@ -80,7 +80,7 @@ class Editor_CommentnavController extends ZfExtended_RestController {
     }
 
     /**
-     * @throws \MittagQI\Translate5\Models\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     protected function loadSegmentCommentArray(){
         $taskGuid = $this->getCurrentTask()->getTaskGuid();
