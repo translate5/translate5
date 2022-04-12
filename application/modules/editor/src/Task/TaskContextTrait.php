@@ -113,7 +113,6 @@ trait TaskContextTrait {
 // - Team Communication how to use paths, see commit ab8a9f4d
 // - Team Communication how to use CurrenTask
 // - General Bug?: If a opentm2 resource returns a 502 bad gateway, the whole segment can not be saved! Urgent?
-// - test with application run dir
     }
 
     /**
