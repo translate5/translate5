@@ -413,9 +413,9 @@ function terminateTranslation() {
  * INFO: in the current implementation only result from sdlcloud language will be returned
  * @returns
  */
-function translateText(textToTranslate,translationInProgressID){
+function translateText(textToTranslate, translationInProgressID){
     startLoadingSign();
-    var translateRequest = $.ajax({
+    $.ajax({
         statusCode: {
             500: function() {
                 hideTranslations();
@@ -434,7 +434,7 @@ function translateText(textToTranslate,translationInProgressID){
             if (translationInProgressID != latestTranslationInProgressID) {
                 return;
             }
-            if (result.errors != undefined && result.errors != '') {
+            if (result.errors !== undefined && result.errors !== '') {
                 showTargetError(result.errors);
             } else {
                 clearAllErrorMessages();
@@ -443,8 +443,8 @@ function translateText(textToTranslate,translationInProgressID){
             }
             stopLoadingSign();
         },
-        error: function(jqXHR, textStatus) {
-            showSourceError('ERRORS: ' + textStatus);
+        error: function(jqXHR, textStatus, errorThrown) {
+            showSourceError(createJqXhrError(jqXHR, textStatus, errorThrown));
             stopLoadingSign();
         },
         fail: function(xhr, textStatus, errorThrown){
@@ -815,7 +815,7 @@ function requestFileTranslate(){
         success: function(result){
             if(typeof result.error === 'undefined' && result.taskId !== ''){
                 getDownloads();
-            }else{
+            } else {
                 // Handle errors here
                 var error = (result.taskId === '') ? Editor.data.languageresource.translatedStrings['error'] : result.error;
                 showSourceError('ERRORS: ' + error);
@@ -823,10 +823,8 @@ function requestFileTranslate(){
                 stopLoadingState();
             }
         },
-        error: function(jqXHR, textStatus)
-        {
-            // Handle errors here
-            showSourceError(jqXHR);
+        error: function(jqXHR, textStatus, errorThrown) {
+            showSourceError(createJqXhrError(jqXHR, textStatus, errorThrown));
             $('#sourceFile').val('');
             stopLoadingState();
         }
@@ -855,10 +853,8 @@ function getDownloads(){
             showDownloads(result.allPretranslatedFiles, result.dateAsOf);
             stopLoadingState();
         },
-        error: function(jqXHR, textStatus)
-        {
-            // Handle errors here
-            showSourceError('ERRORS: ' + textStatus);
+        error: function(jqXHR, textStatus, errorThrown){
+            showSourceError(createJqXhrError(jqXHR, textStatus, errorThrown));
             $('#sourceFile').val('');
             $('#pretranslatedfiles').html('');
             stopLoadingState();
@@ -1206,28 +1202,34 @@ function showInstantTranslationOffOn() {
 function showLanguageResourceSelectorError(errorMode) {
     $('#languageResourceSelectorError').html(Editor.data.languageresource.translatedStrings[errorMode]).show();
 }
+/***
+ * Show the given error in the targetError container.
+ * @param string error
+ */
 function showTargetError(errorText) {
     $('#targetError').html(errorText).show();
 }
-
 /***
- * Show the given error in the sourceError container. If the error is xhr response object,
- * the error will be parsed from there and printed out for the user.
- *
- * @param error
+ * Show the given error in the sourceError container.
+ * @param string error
  */
-function showSourceError(error) {
-    // build custom error out of ajax response
-    if(typeof error === 'object' && !Array.isArray(error) && error !== null){
-        var responseJSON = error.responseJSON,
-            errorCode = !Editor.data.errorCodesUrl ? responseJSON.errorCode :
-                '<a href="'+ Editor.data.errorCodesUrl.replace('{0}',responseJSON.errorCode)+'" target="_blank">'+responseJSON.errorCode+'</a>'
-
-        error = '<h1>'+errorCode+': '+responseJSON.message+'</h1><br/>'
-        error += responseJSON.errorMessage;
-    }
-    $('#sourceError').html(error).show();
+function showSourceError(errorText) {
+    $('#sourceError').html(errorText).show();
 }
+/***
+ * Creates an error out of an jqXHR error Object defaulting to the other texts passed to an ajax error-handler
+ * @param Object jqXHR
+ */
+function createJqXhrError(jqXHR, textStatus, errorThrown) {
+    if(jqXHR.responseJSON && jqXHR.responseJSON.errorCode && jqXHR.responseJSON.errorMessage){
+        return '<strong>Error ' + jqXHR.responseJSON.errorCode + '</strong><br/>' + jqXHR.responseJSON.errorMessage;
+    }
+    if(errorThrown){
+        return '<strong>Error:</strong> ' + textStatus;
+    }
+    return '<strong>Error:</strong> ' + textStatus;
+}
+
 function clearAllErrorMessages() {
     $('.instant-translation-error').html('').hide();
     $("#sourceIsText").removeClass('source-text-error');
