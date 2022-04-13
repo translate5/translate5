@@ -35,7 +35,7 @@ class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
      */
     protected $domain = 'plugin.okapi';
     
-    static protected $localErrorCodes = [
+    static protected array $localErrorCodes = [
         'E1055' => 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
         'E1056' => 'Okapi Plug-In: tikal fallback can not be used, workfile does not contain the XLF suffix: {workfile}',
         'E1057' => 'Okapi Plug-In: Data dir not writeable: {okapiDataDir}',

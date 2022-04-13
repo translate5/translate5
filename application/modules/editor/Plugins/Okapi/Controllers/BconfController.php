@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * @property editor_Plugins_Okapi_Models_Bconf $entity
+ * @method editor_Plugins_Okapi_Models_Bconf entityLoad()
  */
 class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
 {
@@ -50,18 +51,18 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
      protected $entityClass = 'editor_Plugins_Okapi_Models_Bconf';
 
     /**
-      * sends all bconfs as JSON
-      * (non-PHPdoc)
-      * @see ZfExtended_RestController::indexAction()
-      */
+     * sends all bconfs as JSON
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::indexAction()
+     */
      public function indexAction()
      {
-          $this->view->rows = $this->entity->loadAll();
           $this->view->total = $this->entity->getTotalCount();
           if($this->view->total === 0){
-              $this->entity->checkSystemBconf();
+              $this->entity->importDefaultWhenNeeded(true);
               $this->view->total = 1;
           }
+          $this->view->rows = $this->entity->loadAll();
      }
 
     public function deleteAction()
@@ -80,11 +81,12 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
      /**
       * Export bconf
       */
-    public function exportbconfAction()
+    public function downloadbconfAction()
     {
         $okapiName = $this->getParam('okapiName');
-        $dir = $this->entity->getDataDirectory($this->getParam('bconfId'));
-        $exportFile = "$dir/export.bconf";
+        $id = (int) $this->getParam('bconfId'); // file traversal mitigation
+        $dir = $this->entity->getDataDirectory($id);
+        $exportFile = "$dir/$id.bconf";
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename=' . $okapiName . '.bconf');
@@ -99,65 +101,47 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
         exit;
 
     }
-     private function packBconf(){
-         $bconf = new $this->entityClass();
-         $bconfId = $this->getParam('bconfId');
-         if (!$bconfId) {
-             return false;
-         }
-         return $bconf->packBconf($bconfId);
-     }
 
-	/**
-	 * Import bconf
-	 */
-	public function     importbconfAction()
+	public function uploadbconfAction()
 	{
-        $upload = new Zend_File_Transfer();
-        /** @see \Zend_File_Transfer_Adapter_Abstract::getFileInfo */
-        $files = $upload->getFileInfo();
-        
-        if(empty($files)){
-            throw new exception('E1212', [
+        $bconf = NULL;
+        $ret = new stdClass();
+
+        try {
+            empty($_FILES) && throw new ZfExtended_ErrorCodeException('E1212', [
                 'msg' => "No upload files were found. Please try again. If the error persists, please contact support."
             ]);
+            $bconf = new editor_Plugins_Okapi_Models_Bconf($_FILES[self::FILE_UPLOAD_NAME]);
+        } catch(ZfExtended_Exception){
+            //TODO add excpetion message to $ret
         }
-        
-        $file = $files[self::FILE_UPLOAD_NAME];
-        /** @var editor_Plugins_Okapi_Models_Bconf $bconf */
-        $bconf = new $this->entityClass();
-		//TODO get the file name from UI
-        $ret = $bconf->importBconf($file['tmp_name'], $file['name']);
-        $id = $ret['id'];
-        $dir = $this->entity->getDataDirectory($id);
-        move_uploaded_file($file['tmp_name'], "$dir/import.bconf");
-        $bconf->packBconf($id);
+
+        $ret->success = is_object($bconf);
+        $ret->id      = $bconf?->getId();
+
         echo json_encode($ret);
     }
 
+    /**
+     * @throws editor_Plugins_Okapi_Exception|Zend_Exception
+     */
     public function uploadsrxAction()
 	{
-        $upload = new Zend_File_Transfer();
-        $files = $upload->getFileInfo();
-        
-        if(empty($files)){
-            throw new exception('E1212', [
-                'msg' => "No upload files were found. Please try again. If the error persists, please contact support."
-            ]);
-        }
-        $this->entityLoad();
-        $dir = $this->entity->getDataDirectory();
-        move_uploaded_file($files['srx']['tmp_name'], "$dir/languages.srx");
-        $this->entity->packBconf($this->entity->getId());
+        empty($_FILES) && throw new editor_Plugins_Okapi_Exception('E1212', [
+            'msg' => "No upload files were found. Please try again. If the error persists, please contact support."
+        ]);
+
+        $bconf = $this->entityLoad();
+
+        move_uploaded_file($_FILES['srx']['tmp_name'], "{$bconf->getDataDirectory()}/languages.srx");
+        $bconf->file->pack();
 	}
 
     public function downloadsrxAction()
     {
-        $this->entityLoad();
-        $bconf = $this->entity;
-        $dir = $bconf->getDataDirectory();
-        $file = "$dir/languages.srx";
-        $dlName = $bconf->getId() . '~' . $bconf->getName() . '~languages.srx';
+        $bconf = $this->entityLoad();
+        $file = "{$bconf->getDataDirectory()}/languages.srx";
+        $dlName = $bconf->getName() . '-languages.srx';
         header('Content-Type: text/xml');
         header('Content-Disposition: attachment; filename="'.$dlName.'"');
         header('Cache-Control: no-store');
@@ -170,27 +154,16 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
 
     public function cloneAction()
     {
-        $this->entityLoad();
-        $oldDir = $this->entity->getDataDirectory();
-        chdir($oldDir);
+        /** @var string $id */
+        /** @var ?string $customer_id */
+        /** @var string $name */
+        extract($this->getAllParams(),EXTR_SKIP); // ['id', 'customer_id', 'name']
+        $sourceDir = $this->entity->getDataDirectory($id);
 
-        $data = $this->entity->toArray();
-        unset($data['id']);
-
-        /** @var editor_Plugins_Okapi_Models_Bconf $clone */
-        $clone = new $this->entityClass();
-        $data['name'] = $this->getParam('name') ?? 'Copy of '. $data['name'];
-        $data['default'] = 0;
-        $data['customer_id'] =  $data['customer_id'] ?: $this->getParam('customer_id');
-        $clone->init($data);
-        $clone->save();
-        $newId = $clone->getId();
-        $newDir = "../$newId";
-        mkdir($newDir);
-
-        $files = glob("*");
-        foreach ($files as $file){
-            copy($file,"$newDir/$file");
+        $clone = new editor_Plugins_Okapi_Models_Bconf(['tmp_name'=>"$sourceDir/$id.bconf", 'name' => $name]);
+        if($customer_id){
+            $clone->setCustomer_id($customer_id);
+            $clone->save();
         }
 
         echo json_encode($clone->toArray());
@@ -198,40 +171,33 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
     }
 
     /**
-     * Handles isDefaultForCustomer persisted in customer_meta
-     * Exits early if possible
+     * Persists isDefaultForCustomer to customer_meta
      * @param array|null $fields
-     * @param $mode
-     * @return void
-     * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
-     * @see ZfExtended_RestController::putAction
-     * @see ZfExtended_RestController::postAction
+     * @param bool $mode
+     * @throws Zend_Db_Statement_Exception|ZfExtended_Models_Entity_Exceptions_IntegrityConstraint|ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey|ZfExtended_Models_Entity_NotFoundException
+     * @see ZfExtended_RestController::putAction, ZfExtended_RestController::postAction
      */
     protected function setDataInEntity(array $fields = null, $mode = self::SET_DATA_BLACKLIST){
-        if(!isset($this->data['isDefaultForCustomer'])) {
-            return parent::setDataInEntity($fields, $mode);
-        }
-        $customerId = (int) $this->data['isDefaultForCustomer'];
-        $customerMeta = new editor_Models_Customer_Meta();
-        $bconfId = (int) $this->data['id'];
-        if ($customerId) {
-            try {
+        if(isset($this->data['isDefaultForCustomer'])) {
+            $bconfId    = (int)$this->data['id'];
+            $customerId = (int)$this->data['isDefaultForCustomer'];
+
+            $customerMeta = new editor_Models_Customer_Meta();
+            if(!$customerId) {
+                $customerMeta->loadRow('defaultBconfId = ?', $bconfId);
+            } else try {
                 $customerMeta->loadByCustomerId($customerId);
             } catch (ZfExtended_Models_Entity_NotFoundException) {
                 $customerMeta->init(['customerId' => $customerId]); // new entity
             }
-        } else {
-            $customerMeta->loadRow('defaultBconfId = ?', $bconfId);
+
+            $newDefault = ($bconfId != $customerMeta->getDefaultBconfId()) ? $bconfId : NULL;
+            $customerMeta->setDefaultBconfId($newDefault);
+
+            $customerMeta->save();
         }
-        $newDefault = ($bconfId != $customerMeta->getDefaultBconfId()) ? $bconfId : NULL;
-        $customerMeta->setDefaultBconfId($newDefault);
-
-        $customerMeta->save();
-
         if(count($this->data) > 2){ // more than customerDefault is changed, call parent
-            return parent::setDataInEntity($fields, $mode);
+            parent::setDataInEntity($fields, $mode);
         }
     }
 

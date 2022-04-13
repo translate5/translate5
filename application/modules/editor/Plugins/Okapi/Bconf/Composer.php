@@ -30,24 +30,22 @@ END LICENSE AND COPYRIGHT
 /**
  * Generate new bconf file
  */
-class editor_Plugins_Okapi_Bconf_Export
+class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_File
 {
 
-    const NUMPLUGINS = 0;
     /**
      * Export bconf
      */
-    public function ExportBconf($bconfId, $bconfBasePath)
-    {   
-        chdir($bconfBasePath); // so we can access with file name only
+    protected static function doPack($bconfId)
+    {
+        chdir(self::$dataDir); // so we can access with file name only
 
-        $descFile = "content.json";
-        $this->content = [ 'refs' => null, 'fprm' => null ];
+        $content = [ 'refs' => null, 'fprm' => null ];
 
-        if(file_exists($descFile)){
-            $this->content = json_decode(file_get_contents($descFile), (bool)'associative');
+        if(file_exists(self::descFile)){
+            $content = json_decode(file_get_contents(self::descFile), associative: true);
         }
-        $fileName = 'export.bconf';
+        $fileName = "$bconfId.bconf";
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
         
         $raf->writeUTF($raf::SIGNATURE, false);
@@ -56,9 +54,9 @@ class editor_Plugins_Okapi_Bconf_Export
         $raf->writeInt(self::NUMPLUGINS);
         
         //Read the pipeline and extract steps
-        $this->processPipeline($raf);
-        $this->filterConfiguration($raf);
-        $this->extensionsMapping($raf);
+        self::processPipeline($raf);
+        self::filterConfiguration($raf);
+        self::extensionsMapping($raf);
         //$raf->fclose();
         
         if(file_exists($fileName)){
@@ -67,8 +65,8 @@ class editor_Plugins_Okapi_Bconf_Export
             return null;
         }
     }
-    
-    protected function processPipeline($raf)
+
+    protected static function processPipeline($raf)
     {
         $pipelineFile = 'pipeline.pln';
         $xml2 = file_get_contents($pipelineFile);
@@ -88,7 +86,7 @@ class editor_Plugins_Okapi_Bconf_Export
                     $path = str_replace('\\\\', '/', $path);
                     $path = str_replace('\\', '/', $path);
                     
-                    $this->harvestReferencedFile($raf, ++$id, basename($path));
+                    editor_Plugins_Okapi_Bconf_Composer::harvestReferencedFile($raf, ++$id, basename($path));
                 }
             }
         }
@@ -111,8 +109,8 @@ class editor_Plugins_Okapi_Bconf_Export
         $raf->writeInt(1);
         $raf->writeUTF($xml, false);
     }
-    
-    protected function harvestReferencedFile($raf, $id, $fileName)
+
+    protected static function harvestReferencedFile($raf, $id, $fileName)
     {
         $raf->writeInt($id);
         $raf->writeUTF($fileName, false);
@@ -134,13 +132,13 @@ class editor_Plugins_Okapi_Bconf_Export
         fclose($file);
     }
     //=== Section 4: The filter configurations
-    
+
     /**
-     *
+     * @param $raf
      */
-    protected function filterConfiguration($raf)
+    protected static function filterConfiguration($raf)
     {   
-        $fprms = $this->content['fprm'] ?? glob("*.fprm");
+        $fprms = $content['fprm'] ?? glob("*.fprm");
         $raf->writeInt(count($fprms));
         foreach ($fprms as $filterParam) {
                 $filename = $filterParam.(str_ends_with($filterParam,'.fprm') ? '' : '.fprm');
@@ -176,7 +174,7 @@ class editor_Plugins_Okapi_Bconf_Export
     /**Section 5: Mapping extensions -> filter configuration id
      * @param $raf
      */
-    protected function extensionsMapping($raf)
+    protected static function extensionsMapping($raf)
     {
         $extMapFile = "extensions-mapping.txt";
         if(!file_exists($extMapFile)){

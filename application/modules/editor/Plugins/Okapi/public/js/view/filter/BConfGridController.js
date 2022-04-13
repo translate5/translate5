@@ -3,18 +3,18 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.Okapi.view.filter.BConfGridController
+ * @class BConfGridController
  * @extends Ext.app.ViewController
  */
 Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
@@ -66,26 +66,27 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
     },
 
     clonebconf: function (view, rowIndex, colIndex) {
-                var rec = view.getStore().getAt(rowIndex);
-        Ext.Msg.prompt('New bconf','Name of the new entry?',function(btnId, value, msgConfig){
-            if(!value || value == rec.get('name')){
+        var rec = view.getStore().getAt(rowIndex);
+        Ext.Msg.prompt('New bconf', 'Name of the new entry?', function (btnId, prompt, msgConfig) {
+            if (!prompt || prompt == rec.get('name')) { // invalid name
                 return;
             }
-                Ext.Ajax.request({
-                    url: Editor.data.restpath + 'plugins_okapi_bconf/clone',
-                    params: {
-                        id: rec.id,
-                        customer_id: view.grid.getCustomer()?.id,
-                        name: value
-                    },
-                    success: function(response){
-                        var data = Ext.decode(response.responseText);
-                        rec.store.add(data);
-                        rec.store.sync();
-                        rec.store.getFilters().notify('endupdate'); // trigger update
-                    },
-                    scope: this
-                });
+            var customer = view.grid.getCustomer();
+            Ext.Ajax.request({
+                url: Editor.data.restpath + 'plugins_okapi_bconf/clone',
+                params: {
+                    id: rec.id,
+                    customer_id: customer ? customer.id : null,
+                    name: prompt
+                },
+                success: function (response) {
+                    var data = Ext.decode(response.responseText);
+                    rec.store.add(data);
+                    rec.store.sync();
+                    rec.store.getFilters().notify('endupdate'); // trigger update
+                },
+                scope: this
+            });
         })
     },
 
@@ -96,7 +97,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
             timeout: 60000
         });
         form.submit({
-            url     : Editor.data.restpath + 'plugins_okapi_bconf/exportbconf',
+            url     : Editor.data.restpath + 'plugins_okapi_bconf/downloadbconf',
             method  : 'GET',
             standardSubmit: true,
             params  : {
@@ -139,10 +140,11 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
         var data = new FormData()
         data.append('bconffile', input.files[0]);
 
-        fetch(Editor.data.restpath + 'plugins_okapi_bconf/importbconf', {
+        fetch(Editor.data.restpath + 'plugins_okapi_bconf/uploadbconf', {
             method: 'POST',
             body: data
         }).then(function(response){
+            //TODO error handling
             Ext.getStore('bconfStore').reload();
         })
         input.value = ''; // reset file input

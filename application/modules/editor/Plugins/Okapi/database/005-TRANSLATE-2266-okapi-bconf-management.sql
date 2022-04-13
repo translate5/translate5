@@ -29,6 +29,10 @@ INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
 INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_okapi_bconf', 'all');
 INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_okapi_bconffilter', 'all');
 
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
+ ('runtimeOptions.plugins.Okapi.dataDir', 1, 'editor', 'system', '../data/editorOkapiBconf', '../data/editorOkapiBconf', '', 'absolutepath', 'Pfad zu einem vom WebServer beschreibbaren, über htdocs nicht erreichbaren Verzeichnis, in diesem werden die Bconf-Dateien für Task-Importe gehalten.');
+
 CREATE TABLE IF NOT EXISTS `LEK_okapi_bconf` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `customer_id` INT(11) DEFAULT NULL,

@@ -29,6 +29,10 @@ DELETE FROM `Zf_acl_rules` WHERE `right` IN ('pluginOkapiBconfPrefs');
 DELETE FROM `Zf_acl_rules` WHERE `resource` = 'editor_plugins_okapi_bconf';
 DELETE FROM `Zf_acl_rules` WHERE `resource` = 'editor_plugins_okapi_bconffilter';
 
+
+DELETE FROM `Zf_configuration`
+WHERE `name` IN('runtimeOptions.plugins.Okapi.dataDir');
+
 -- QUIRK: Only delete references if files are removed, too.
 -- UPDATE LEK_customer_meta SET defaultBconfId = NULL;
 -- UPDATE LEK_task_meta SET bconfId = NULL;

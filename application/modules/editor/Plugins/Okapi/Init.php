@@ -83,7 +83,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     }
 
     /***
-     * Return the okapi data directory file path.
+     * Return the okapi data directory file path with trailing slash.
      * @return string
      * @throws editor_Plugins_Okapi_Exception|editor_Models_ConfigException
      */
@@ -246,25 +246,25 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         ));
         $r->addRoute('plugins_okapibconf_restdefault', $restRoute);
         // New get route to export the bconf file.
-        $exportbconf = new ZfExtended_Controller_RestLikeRoute(
-            'editor/plugins_okapi_bconf/exportbconf',
+        $downloadbconf = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/downloadbconf',
             array(
                 'module' => 'editor',
                 'controller' => 'plugins_okapi_bconf',
-                'action' => 'exportBconf'
+                'action' => 'downloadBconf'
             ));
-        $r->addRoute('plugins_okapi_bconf_exportbconf', $exportbconf);
+        $r->addRoute('plugins_okapi_bconf_downloadbconf', $downloadbconf);
         
-        // New post route to import the bconf file.
-        $importbconf = new ZfExtended_Controller_RestLikeRoute(
-            'editor/plugins_okapi_bconf/importbconf',
+        // New post route to upload a bconf file.
+        $uploadbconf = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/uploadbconf',
             array(
                 'module' => 'editor',
                 'controller' => 'plugins_okapi_bconf',
-                'action' => 'importbconf'
+                'action' => 'uploadbconf'
             ));
-        $r->addRoute('plugins_okapi_bconf_importbconf', $importbconf);
-        // New post route to import the SRX file.
+        $r->addRoute('plugins_okapi_bconf_uploadbconf', $uploadbconf);
+        // New post route to upload the SRX file.
         $uploadSRX = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/uploadSRX',
             array(

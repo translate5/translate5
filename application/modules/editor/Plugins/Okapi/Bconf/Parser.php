@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 
 
-class editor_Plugins_Okapi_Bconf_Import
+class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File
 {
     /**
      * Import bconf
@@ -43,9 +43,9 @@ class editor_Plugins_Okapi_Bconf_Import
      * @param string $outputDir
      * @return false|void
      */
-	public function importBconf(string $bconfFilePath, string $outputDir){
+	public static function doUnpack(string $bconfFilePath){
 		//TODO: sanity check for params, at least dir_exists, file exists etc
-		$outputDir = realpath($outputDir);
+		$outputDir = self::$dataDir;
 		if (!$outputDir || !is_writable($outputDir)) {
 			return false;
 		}
@@ -90,7 +90,7 @@ class editor_Plugins_Okapi_Bconf_Import
 					$raf->readUTF(); // Skip original full filename
 					$size = $raf->readLong();
 					$path = "$outputDir/$relPath";
-					$this->createReferencedFile($raf, $size, $path);
+					self::createReferencedFile($raf, $size, $path);
 				}
 
 /*				PluginsManager pm = new PluginsManager();
@@ -118,7 +118,7 @@ class editor_Plugins_Okapi_Bconf_Import
 				$size = $raf->readLong();
 				if ($size > 0) {
 					$path = "$outputDir/$filename";
-					$this->createReferencedFile($raf, $size, $path);
+					self::createReferencedFile($raf, $size, $path);
 
 					//$raf->fseek($raf->ftell() + $size);
 				}
@@ -142,7 +142,7 @@ class editor_Plugins_Okapi_Bconf_Import
 			];
 			// reads in the given path
             $content['refs'] = $refNames;
-			$this->parsePipeline($pipeline, $refNames, $outputDir);
+			self::parsePipeline($pipeline, $refNames, $outputDir);
 			//validate the step param overrides
 			//checkStepParamOverrides(pipeline.getSteps(), stepParamOverrides);
 /*
@@ -255,7 +255,7 @@ class editor_Plugins_Okapi_Bconf_Import
 			$path = $outputDir . '/' . "extensions-mapping.txt";
 			{
 				$write = '';
-				$extMap = $this->readExtensionMap($raf);
+				$extMap = self::readExtensionMap($raf);
 				// Apply the overrides
 //				extMap.putAll(extOverrides);
 				foreach ($extMap as $ext => $okapiId) {
@@ -266,24 +266,24 @@ class editor_Plugins_Okapi_Bconf_Import
             file_put_contents("$outputDir/content.json", json_encode($content, JSON_PRETTY_PRINT));
 	}
 
-	private function writeConfig(String $outputDir, String $okapiId, String $data) : string {
-		$path = $outputDir . "/" . $okapiId . ".fprm";
+    private static function writeConfig(String $outputDir, String $okapiId, String $data) : string {
+        $path = $outputDir . "/" . $okapiId . ".fprm";
 //		try (PrintWriter pw = new PrintWriter(path, "UTF-8")) {
-			file_put_contents($path, $data);
+            file_put_contents($path, $data);
 //		}
-		return $path;
-	}
+        return $path;
+    }
 
-	private function readExtensionMap($raf) : array {
-		$map = array();
-		$count = $raf->readInt();
-		for (  $i=0; $i<$count; $i++ ) {
-			$ext  = $raf->readUTF();
-            $okapiId = $raf->readUTF();
-			$map[$ext] = $okapiId;
-		}
-		return $map;
-	}
+    private static function readExtensionMap($raf) : array {
+        $map = array();
+        $count = $raf->readInt();
+        for (  $i=0; $i<$count; $i++ ) {
+            $ext  = $raf->readUTF();
+$okapiId = $raf->readUTF();
+            $map[$ext] = $okapiId;
+        }
+        return $map;
+    }
 /*
 	private void checkStepParamOverrides(List<IPipelineStep> steps,
 			Map<String, String> stepParamOverrides) {
@@ -390,92 +390,95 @@ class editor_Plugins_Okapi_Bconf_Import
 		$bconfModel->save();
 	}
 
-	/**
-	 * Writes out part of an opened file as separate file
-	 * @return boolean
-	 * @throws IOException
-	 */
-	private function createReferencedFile(SplFileObject $raf, int $size, string $path)
-	{
-		if ($raf == null || !$path) {
-			return false;
-		}
-		/** @var resource $fos file output stream */
-		$fos = fopen($path, 'wb');
-		if (!$fos) {
-			return false;
-		}
-		// FIXME: when stream_copy_to_stream suppoerts SplFileObjects use that
-		// $written = stream_copy_to_stream($raf->getFp(), $fos, $size);
-		$written = 0;
-		$toWrite = $size;
-		$buffer = min(65536, $toWrite); // 16 pages à 4K
-		while ($toWrite > $buffer && $written !== false) {
-			$written += fwrite($fos, $raf->fread($buffer));
-			$toWrite -= $buffer;
-		}
-		$written += fwrite($fos, $raf->fread($toWrite));
-		fclose($fos);
-		if ($written === $size) {
-			return true;
-		} else {
-			//FIXME throw exception
-			return false;
-		}
-	}
+    /**
+     * Writes out part of an opened file as separate file
+     * @param SplFileObject $raf
+     * @param int $size
+     * @param string $path
+     * @return boolean
+     * @throws IOException
+     */
+    private static function createReferencedFile(SplFileObject $raf, int $size, string $path)
+    {
+        if ($raf == null || !$path) {
+            return false;
+        }
+        /** @var resource $fos file output stream */
+        $fos = fopen($path, 'wb');
+        if (!$fos) {
+            return false;
+        }
+        // FIXME: when stream_copy_to_stream suppoerts SplFileObjects use that
+        // $written = stream_copy_to_stream($raf->getFp(), $fos, $size);
+        $written = 0;
+        $toWrite = $size;
+        $buffer = min(65536, $toWrite); // 16 pages à 4K
+        while ($toWrite > $buffer && $written !== false) {
+            $written += fwrite($fos, $raf->fread($buffer));
+            $toWrite -= $buffer;
+        }
+        $written += fwrite($fos, $raf->fread($toWrite));
+        fclose($fos);
+        if ($written === $size) {
+            return true;
+        } else {
+            //FIXME throw exception
+            return false;
+        }
+    }
 
-	private function parsePipeline(&$pipeline, $refMap, $outputDir)
-	{
-		$doc = new DOMDocument();
-		$doc->loadXML($pipeline['xml']);
-		/** @var DOMNodeList nodes */
-		$nodes = $doc->getElementsByTagName("step");
-		$stepRefs = json_decode(file_get_contents(__DIR__."/StepReferences.json"), associative: true);
+    private static function parsePipeline(&$pipeline, $refMap, $outputDir)
+    {
+        $doc = new DOMDocument();
+        $doc->loadXML($pipeline['xml']);
+        /** @var DOMNodeList nodes */
+        $nodes = $doc->getElementsByTagName("step");
+        $stepRefs = json_decode(file_get_contents(__DIR__."/StepReferences.json"), associative: true);
 
-		foreach ($nodes as $elem) {
-			$class = $elem->getAttribute("class");
-			if ($class == null) {
-				throw new OkapiException("The attribute 'class' is missing.");
-			}
-            $classParts = explode('.', $class);
-			$stepName = end($classParts);
-			$pathParams = $stepRefs[$stepName] ?? [];
-			foreach ($pathParams as $param) {
-				$param = lcfirst($param);
-				$path = $outputDir."/".array_shift($refMap);
-				$pipeline['xml'] = preg_replace("/^($param=).*$/m", "$1$path", $pipeline['xml']);
-			}
-			/* FIXME: Needed for plugin support
-			// Check if we can use the available steps (and their loaders)
-			StepInfo stepInfo = availableSteps.get(className);
-			if ( stepInfo == null ) {
-				// The pipeline has a step that is not currently in the available steps
-				LOGGER.warn(String.format(
-					"The step '%s' is not among the steps currently available. " +
-					"It will be removed from the loaded pipeline.",
-					className));
-				continue;
-			}
-			IPipelineStep step;
+        foreach ($nodes as $elem) {
+            $class = $elem->getAttribute("class");
+            if ($class == null) {
+                throw new OkapiException("The attribute 'class' is missing.");
+            }
+$classParts = explode('.', $class);
+            $stepName = end($classParts);
+            $pathParams = $stepRefs[$stepName] ?? [];
+            foreach ($pathParams as $param) {
+                $param = lcfirst($param);
+                $path = $outputDir."/".array_shift($refMap);
+                $pipeline['xml'] = preg_replace("/^($param=).*$/m", "$1$path", $pipeline['xml']);
+            }
+            /* FIXME: Needed for plugin support
+            // Check if we can use the available steps (and their loaders)
+            StepInfo stepInfo = availableSteps.get(className);
+            if ( stepInfo == null ) {
+                // The pipeline has a step that is not currently in the available steps
+                LOGGER.warn(String.format(
+                    "The step '%s' is not among the steps currently available. " +
+                    "It will be removed from the loaded pipeline.",
+                    className));
+                continue;
+            }
+            IPipelineStep step;
 
-			if ( stepInfo.loader == null ) {
-				step = (IPipelineStep)Class.forName(stepInfo.stepClass).newInstance();
-			}
-			else {
+            if ( stepInfo.loader == null ) {
+                step = (IPipelineStep)Class.forName(stepInfo.stepClass).newInstance();
+            }
+            else {
 */
 
 /*
-			step = (IPipelineStep)Class.forName(stepInfo.stepClass, true, stepInfo.loader).newInstance();
-			// Load the parameters if needed
-			IParameters params = step.getParameters();
-			if ( params != null ) {
-			params.fromString(Util.getTextContent(elem));
-			}
+            step = (IPipelineStep)Class.forName(stepInfo.stepClass, true, stepInfo.loader).newInstance();
+            // Load the parameters if needed
+            IParameters params = step.getParameters();
+            if ( params != null ) {
+            params.fromString(Util.getTextContent(elem));
+            }
 */
-			// add the step
-			$pipeline['steps'][] = $class;
-		}
+            // add the step
+            $pipeline['steps'][] = $class;
+        }
 
-		return $pipeline;
-	}
+        return $pipeline;
+    }
 }
