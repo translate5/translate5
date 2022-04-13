@@ -40,6 +40,22 @@
             <source>Das ausgewählte Segment wird von einem anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.</source>
             <target>Das ausgewählte Segment wird von einem anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.</target>
         </trans-unit>
+        <trans-unit id='QXVmZ2FiZSBpbiBhbmRlcmVtIEZlbnN0ZXIgZ2VzY2hsb3NzZW4='>
+            <source>Aufgabe in anderem Fenster geschlossen</source>
+            <target>Aufgabe in anderem Fenster geschlossen</target>
+        </trans-unit>
+        <trans-unit id='U2llIGhhYmVuIGRpZSBBdWZnYWJlIGluIGFuZGVyZW0gRmVuc3RlciBnZXNjaGxvc3Nlbi4gU2NobGllw59lbiBTaWUgZGllc2VzIEZlbnN0ZXIgZWJlbmZhbGxzLCBvZGVyIGxhZGVuIFNpZSBkYXMgRmVuc3RlciBuZXUgdW0gZGllIEF1ZmdhYmUgZXJuZXV0IHp1IMO2ZmZuZW4u'>
+            <source>Sie haben die Aufgabe in anderem Fenster geschlossen. Schließen Sie dieses Fenster ebenfalls, oder laden Sie das Fenster neu um die Aufgabe erneut zu öffnen.</source>
+            <target>Sie haben die Aufgabe in anderem Fenster geschlossen. Schließen Sie dieses Fenster ebenfalls, oder laden Sie das Fenster neu um die Aufgabe erneut zu öffnen.</target>
+        </trans-unit>
+        <trans-unit id='U2NobGllw59lbg=='>
+            <source>Schließen</source>
+            <target>Schließen</target>
+        </trans-unit>
+        <trans-unit id='RXJuZXV0IMO2ZmZuZW4='>
+            <source>Erneut öffnen</source>
+            <target>Erneut öffnen</target>
+        </trans-unit>
     </body>
   </file>
 </xliff>

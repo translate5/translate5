@@ -181,7 +181,7 @@ class LoginController extends ZfExtended_Controllers_Login {
      */
     protected function editorRedirect(){
         $redirecthash = $this->_session->redirecthash ?? null;
-        $redirectHeader = 'Location: '.APPLICATION_RUNDIR.'/editor';
+        $redirectHeader = 'Location: '.APPLICATION_RUNDIR.'/editor/';
         if(!empty($redirecthash)){
             //remove the redirect hash from the session. The rout handling is done by extjs
             unset($this->_session->redirecthash);

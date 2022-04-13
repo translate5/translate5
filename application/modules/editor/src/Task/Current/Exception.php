@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,27 +26,27 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * The store for the quality filter panel
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-Ext.define('Editor.store.quality.Filter', {
-    extend : 'Ext.data.TreeStore',
-    model: 'Editor.model.quality.Filter',
-    storeId: 'FilterQualities',
-    autoLoad: false,
-    autoSync: false,
-    folderSort: false,
-    root: {
-        expanded: true,
-        text: 'ROOT',
-        children: []
-    },
-    proxy : {
-        type : 'ajax',
-        reader : {
-            type : 'json',
-            rootProperty: 'children'
-        },
-        url: Editor.data.restpath+'quality'
-    }
-});
+
+namespace MittagQI\Translate5\Task\Current;
+
+class Exception extends \ZfExtended_ErrorCodeException {
+    /**
+     * @var string
+     */
+    protected $domain = 'editor.currenttask';
+
+    static protected $localErrorCodes = [
+        //Development error: Some PHP code tried to load the currently opened task (identified by the taskid given in the URL)
+        // but no task ID was provided in the URL.
+        // So either the URL producing the request is wrongly created (no Editor.data.restpath prefix),
+        // or its just the wrong context where the CurrentTask was accessed.
+        'E1381' => 'Access to CurrentTask was requested but no task ID was given in the URL.',
+        'E1382' => 'Access to CurrentTask was requested but it was initialized yet.',
+    ];
+}
