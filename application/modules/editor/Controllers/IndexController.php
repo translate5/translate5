@@ -439,7 +439,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // the list of active controllers: is dynamic, contains only the controllers to be launched
         $php2js->set('app.controllers.active', $this->getActiveFrontendControllers());
 
-        $this->loadCurrentTask($php2js, $userSession->data->userGuid);
+        $this->loadCurrentTask($php2js);
 
         $php2js->set('app.viewport', $ed->editorViewPort);
         $php2js->set('app.startViewMode', $ed->startViewMode);
@@ -501,10 +501,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
     /**
      * @param ZfExtended_View_Helper_Php2JsVars $php2js
-     * @param string $userGuid
      * @throws Exception
      */
-    protected function loadCurrentTask(ZfExtended_View_Helper_Php2JsVars $php2js, string $userGuid) {
+    protected function loadCurrentTask(ZfExtended_View_Helper_Php2JsVars $php2js) {
         if (!$this->isTaskProvided()) {
             $php2js->set('app.initMethod', 'openAdministration');
             return;
@@ -512,24 +511,39 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         try {
             $this->initCurrentTask();
-            $task = $this->getCurrentTask();
-            $taskData = $task->getDataObject();
-            unset($taskData->qmSubsegmentFlags);
-
-            // try to load the job of the current user and task, the one with a usedState,
-            $job = editor_Models_Loaders_Taskuserassoc::loadFirstInUse($userGuid, $task);
-            $php2js->set('app.initState', $job->getUsedState());
+            // try to use the job of the current user and task, the one with a usedState,
         }
+        // NoAccess is thrown here only of no job with used state was found, this is handled later on getting the initState
         catch(NoAccessException) {
-            $task = $this->getCurrentTask(); //on no access exception current task is though set
-            //the task may not be opened yet for editing, so just provide the id and use openEditor with edit mode to try to open it for editing via the UI
-            $taskData = new stdClass();
-            $taskData->id = $task->getId();
-            $php2js->set('app.initState', editor_Workflow_Default::STATE_EDIT);
         }
+
+        $task = $this->getCurrentTask();  //on no access exception above current task is though set
+        $taskData = $task->getDataObject();
+        unset($taskData->qmSubsegmentFlags);
 
         $php2js->set('task', $taskData);
+        $php2js->set('app.initState', $this->getInitialTaskUsedState());
         $php2js->set('app.initMethod', 'openEditor');
+    }
+
+    /**
+     * returns the initial used state for the current task and job
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
+    protected function getInitialTaskUsedState(): string {
+        $job = $this->getCurrentJob(); //currentJob is null if no
+        if(!is_null($job)) {
+            // we use the used state if a used job was found
+            return $job->getUsedState();
+        }
+        // we try to load the first suitable job
+        try {
+            $job = editor_Models_Loaders_Taskuserassoc::loadByTask(editor_User::instance()->getGuid(), $this->getCurrentTask());
+            return $this->getCurrentTask()->getTaskActiveWorkflow()->getInitialUsageState($job);
+        }
+        catch (ZfExtended_Models_Entity_NotFoundException ) {
+            return editor_Workflow_Default::STATE_EDIT;
+        }
     }
 
     /**

@@ -128,16 +128,21 @@ trait TaskContextTrait {
         //TODO if it turns out, that the checking of the jobs to find out if the user is allowed to access the taskid is to error prone,
         // then change to a taskid list of opened tasks in the session
         if(is_null($this->_currentJob)) {
-            throw new NoAccessException();
+            throw new NoAccessException(); //ensures that no segments for example can be loaded if task was not opened properly
         }
     }
 
-    public function getCurrentJob(): editor_Models_TaskUserAssoc {
+    /**
+     * Returns the currently USED job, null if none used (though jobs may exist for that user and task!)
+     * @return editor_Models_TaskUserAssoc|null
+     */
+    public function getCurrentJob(): ?editor_Models_TaskUserAssoc {
         return $this->_currentJob;
     }
 
     public function getCurrentTask(): editor_Models_Task {
         if(is_null($this->_currentTask)) {
+            //Access to CurrentTask was requested but it was NOT initialized yet.
             throw new Current\Exception('E1382');
         }
         return $this->_currentTask;
