@@ -50,6 +50,10 @@ class Editor_CustomerController extends ZfExtended_RestController {
     }
     
     public function indexAction(){
+        if($this->entity->getFilter()->hasSort() === false){
+            // add default alphabetical sort
+            $this->entity->getFilter()->addSort('name');
+        }
         parent::indexAction();
         $this->cleanUpOpenIdForDefault();
     }

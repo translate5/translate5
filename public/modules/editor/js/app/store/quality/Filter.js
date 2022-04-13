@@ -36,18 +36,17 @@ Ext.define('Editor.store.quality.Filter', {
     autoLoad: false,
     autoSync: false,
     folderSort: false,
-    defaultRootId: 'quality',
     root: {
         expanded: true,
         text: 'ROOT',
         children: []
     },
     proxy : {
-        type : 'rest',        
+        type : 'ajax',
         reader : {
             type : 'json',
             rootProperty: 'children'
         },
-        url: Editor.data.restpath
+        url: Editor.data.restpath+'quality'
     }
 });

@@ -13,6 +13,92 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [5.6.10] - 2022-04-07
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-2942](https://jira.translate5.net/browse/TRANSLATE-2942): Repetition editor - Make repetitions more restrict by including segment meta fields into repetition calculation** <br>
+Make repetition calculation more restrict by including segment meta fields (like maxLength) into repetition calculation. Can be defined by new configuration runtimeOptions.alike.segmentMetaFields.
+
+**[TRANSLATE-2842](https://jira.translate5.net/browse/TRANSLATE-2842): Workflows - new configuration to disable workflow mails** <br>
+Workflow mails can be disabled via configuration.
+
+**[TRANSLATE-2386](https://jira.translate5.net/browse/TRANSLATE-2386): Configuration, Editor general - Add language specific special characters in database configuration for usage in editor** <br>
+The current bar in the editor that enables adding special characters (currently non-breaking space, carriage return and tab) can be extended by characters, that can be defined in the configuration.
+Example of the config layout can be found here:
+https://confluence.translate5.net/display/BUS/Special+characters
+
+
+### Bugfixes
+**[TRANSLATE-2946](https://jira.translate5.net/browse/TRANSLATE-2946): Editor general, Editor Length Check - Multiple problems on automatic adding of newlines in to long segments** <br>
+Multiple Problems fixed: add newline or tab when with selected text in editor lead to an error. Multiple newlines were added in some circumstances in multiline segments with to long content. Optionally overwrite the trailing whitespace when newlines are added automatically.
+
+**[TRANSLATE-2943](https://jira.translate5.net/browse/TRANSLATE-2943): MatchAnalysis & Pretranslation - No analysis is shown if all segments were pre-translated and locked for editing** <br>
+No analysis was shown if all segments were locked for editing due successful pre-translation although the analysis was run. Now an empty result is shown.
+
+**[TRANSLATE-2941](https://jira.translate5.net/browse/TRANSLATE-2941): Editor general - Ignore case for imported files extensions** <br>
+The extension validator in the import wizard will no longer be case sensitive.
+
+**[TRANSLATE-2940](https://jira.translate5.net/browse/TRANSLATE-2940): Main back-end mechanisms (Worker, Logging, etc.) - Login redirect routes** <br>
+Instant-translate / Term-portal routes will be evaluated correctly on login.
+
+**[TRANSLATE-2939](https://jira.translate5.net/browse/TRANSLATE-2939): TermTagger integration - Fix language matching on term tagging** <br>
+The language matching between a task and terminology was not correct. Now terms in a major language (de) are also used in tasks with a sub language (de-DE)
+
+**[TRANSLATE-2914](https://jira.translate5.net/browse/TRANSLATE-2914): I10N - Missing localization for Chinese** <br>
+Added missing translations for Chinese languages in the language drop downs.
+
+
+## [5.6.9] - 2022-03-30
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-2697](https://jira.translate5.net/browse/TRANSLATE-2697): VisualReview / VisualTranslation - General plugin which parses a visual HTML source from a reference file** <br>
+Added capabilities to download the visual source from an URL embedded in a reference XML file
+
+
+### Changed
+**[TRANSLATE-2923](https://jira.translate5.net/browse/TRANSLATE-2923): MatchAnalysis & Pretranslation - Enable 101% Matches to be shown as <inContextExact in Trados analysis XML export** <br>
+A matchrate of 101% may be mapped to InContextExact matches in the analysis XML export for Trados (if configured: runtimeOptions.plugins.MatchAnalysis.xmlInContextUsage)
+
+
+### Bugfixes
+**[TRANSLATE-2938](https://jira.translate5.net/browse/TRANSLATE-2938): Editor general - Remove the limit from the global customer switch** <br>
+The global customer dropdown has shown only 20 customers, now all are show.
+
+**[TRANSLATE-2937](https://jira.translate5.net/browse/TRANSLATE-2937): Main back-end mechanisms (Worker, Logging, etc.) - Workflow user prefs loading fails on importing task** <br>
+Solves a problem with user preferences in importing tasks.
+
+**[TRANSLATE-2934](https://jira.translate5.net/browse/TRANSLATE-2934): VisualReview / VisualTranslation - Bookmark segment in visual does not work** <br>
+The segment bookmark filter button in the simple view mode of visual review was not working, this is fixed.
+
+**[TRANSLATE-2930](https://jira.translate5.net/browse/TRANSLATE-2930): InstantTranslate - Instant-translate task types listed in task overview** <br>
+Pre-translated files with instant-translate will not be listed anymore as tasks in task overview.
+
+**[TRANSLATE-2922](https://jira.translate5.net/browse/TRANSLATE-2922): MatchAnalysis & Pretranslation - 103%-Matches are shown in wrong category in Trados XML Export** <br>
+A matchrate of 103% must be mapped to perfect matches in the analysis XML export for Trados (was previously mapped to InContextExact).
+
+**[TRANSLATE-2921](https://jira.translate5.net/browse/TRANSLATE-2921): TermPortal - Batch edit should only change all terms on affected level** <br>
+Batch editing was internally changed, so the only selected terms and language- and termEntry- levels of selected terms are affected.
+
+**[TRANSLATE-2844](https://jira.translate5.net/browse/TRANSLATE-2844): Import/Export - upload wizard is blocked by zip-file as reference file** <br>
+Disallow zip files to be uploaded as a reference file via the UI, since they can not be processed and were causing errors.
+
+**[TRANSLATE-2835](https://jira.translate5.net/browse/TRANSLATE-2835): OpenTM2 integration - Repair invalid OpenTM2 TMX export** <br>
+Depending on the content in the TM the exported TMX may result in invalid XML. This is tried to be fixed as best as possible to provide valid XML.
+
+**[TRANSLATE-2766](https://jira.translate5.net/browse/TRANSLATE-2766): Client management - Change client sorting in drop-downs to alphabethically** <br>
+All over the application clients in the drop-downs were sorted by the order, they have been added to the application. Now they are sorted alphabetically.
+
+
 ## [5.6.8] - 2022-03-22
 
 ### Important Notes:

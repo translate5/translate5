@@ -164,12 +164,54 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             if($mime == "application/xml"){
                 $targetLang = $this->languageResource->targetLangCode;
                 $sourceLang = $this->languageResource->sourceLangCode;
-                $this->result = $this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result);
+                $this->result = $this->fixInvalidOpenTM2XML($this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result));
             }
             return true;
         }
         
         return $this->processResponse($response);
+    }
+
+    protected function fixInvalidOpenTM2XML(string $tmxData): string
+    {
+        if($this->isT5Memory) {
+            return $tmxData;
+        }
+        $changeCount = 0;
+        $newLineCount = 0;
+
+        $xml = new \editor_Models_Import_FileParser_XmlParser();
+        $xml->registerOther(function($other, $key) use ($xml, &$changeCount) {
+            $replaced = htmlentities($other, flags: ENT_XML1, double_encode: false);
+            if($other !== $replaced) {
+                $changeCount++;
+                $tu = $xml->getParent('tu');
+                if(!is_null($tu)) {
+                    // the TU must exist, otherwise we are outside of a TU (like <?xml header)
+                    error_log('TMX Export - TU: '.$xml->getChunk($tu['openerKey'])."\n  OLD: ".$other."\n  NEW: ".$replaced);
+                    $xml->replaceChunk($key, $replaced);
+                }
+            }
+        });
+
+        $xml->registerElement('ph', function($tag, $attr, $key, $isSingle) use ($xml, &$newLineCount){
+            if($isSingle && $xml->getAttribute($attr, 'type') === 'lb') {
+                $newLineCount++;
+                $xml->replaceChunk($key, "\n");
+            }
+        });
+
+        $tmxTags = ['body', 'header', 'map', 'note', 'prop', 'seg', 'tmx', 'tu', 'tuv', 'ude', 'bpt', 'ept', 'hi', 'it', 'ph', 'sub', 'ut'];
+        $replaced = $xml->parse($tmxData, validTags: $tmxTags);
+        if($changeCount > 0 || $newLineCount > 0) {
+            $logger = Zend_Registry::get('logger');
+            $logger->warn('E9999', 'TMX Export: Entities in {changeCount} text parts repaired (see raw php error log), {newLineCount} new line tags restored.', [
+                'languageResource' => $this->languageResource,
+                'changeCount' => $changeCount,
+                'newLineCount' => $newLineCount,
+            ]);
+        }
+        return $replaced;
     }
     
     /**
