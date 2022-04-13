@@ -124,7 +124,7 @@ class DeepLLanguageResourceApiTest extends editor_Test_JsonTest {
     protected $expectedInstantTranslations = [
         [
             'source' => '[<i>Datum</i>] PHP Handbuch',
-            'translation' => '[date] PHP manual'
+            'translation' => '[Date] PHP Manual'
         ],[
             'source' => 'Das Haus ist <b>blau</b>',
             'translation' => 'The house is blue'
