@@ -98,7 +98,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         return false;
     }
 
-    public function load($id): ?Zend_Db_Table_Row_Abstract {
+    public function load($id) {
         $ret = parent::load($id);
         $this->file = new editor_Plugins_Okapi_Bconf_File($this);
         return $ret;
