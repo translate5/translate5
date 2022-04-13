@@ -37,12 +37,13 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Customer_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_CustomerMeta';
-    
+
     /**
      * @param int $customerId
      * @return Zend_Db_Table_Row_Abstract
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function loadByCustomerId(int $customerId) {
+    public function loadByCustomerId(int $customerId): Zend_Db_Table_Row_Abstract {
         return $this->loadRow('customerId = ?', $customerId);
     }
     

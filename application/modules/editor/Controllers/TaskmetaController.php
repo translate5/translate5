@@ -42,13 +42,14 @@ class editor_TaskmetaController extends ZfExtended_RestController {
     
     /**
      * encapsulating the entity load for simpler overwritting purposes
+     * @return editor_Models_Task_Meta
      */
     protected function entityLoad() {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->_getParam('id'));
         //using the meta() method instead a direct meta::loadByTaskGuid ensures that a empty taskmeta instance is given, also if nothing exists in DB
-        $this->entity = $task->meta(); 
+        return $this->entity = $task->meta();
     }
     
     /**

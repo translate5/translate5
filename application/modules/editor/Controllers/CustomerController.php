@@ -185,6 +185,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
     
     /**
      * Protect the default customer from being edited or deleted.
+     * @return editor_Models_Customer_Customer
      */
     protected function entityLoad() {
         $this->entity->load($this->_getParam('id'));
@@ -192,6 +193,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
         if($isModification && $this->entity->isDefaultCustomer()) {
             throw new ZfExtended_Models_Entity_NoAccessException('The default client must not be edited or deleted.');
         }
+        return $this->entity;
     }
     
     /**
