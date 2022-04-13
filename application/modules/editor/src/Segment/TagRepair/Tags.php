@@ -68,7 +68,7 @@ class Tags extends \editor_TagSequence {
      */
     public function __construct(string $markup) {
         $this->_setMarkup($markup);
-        // quirk: when no markup is contained, unparse(9 will not be called and thus requestHtml remains empty
+        // quirk: when no markup is contained, unparse will not be called and thus requestHtml remains empty
         if(count($this->tags) == 0){
             $this->requestHtml = $this->text;
         }

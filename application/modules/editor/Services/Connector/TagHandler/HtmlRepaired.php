@@ -57,8 +57,15 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
             throw new ZfExtended_Exception('editor_Services_Connector_TagHandler_HtmlRepaired::prepareQuery: A segmentId must be provided per query to use this tag-handler');
         }
         $key = 'rt'.$segmentId;
-        $this->repairTags[$key] = new Tags($queryString);
-        return $this->repairTags[$key]->getRequestHtml();
+        try {
+            // this tries to load the segment's
+            $this->repairTags[$key] = new Tags($queryString);
+            return $this->repairTags[$key]->getRequestHtml();
+        } catch(Exception $e) {
+            // if this is not possible this means the markup is heavily broken and we have no chance but to dismiss the tags
+            $this->repairTags[$key] = NULL;
+            return strip_tags($queryString);
+        }
     }
     /**
      * restores the tags from the sent image-tags and repairs lost tags or tag fragments

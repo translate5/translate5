@@ -40,6 +40,14 @@ class HtmlProcessor {
      * @var Tags
      */
     private Tags $tagRepair;
+    /**
+     * @var bool
+     */
+    private bool $preparationFault = false;
+    /**
+     * @var bool
+     */
+    private bool $recreationFault = false;
 
     /**
      * Retrieves the HTML to be used for requesting the service API
@@ -48,8 +56,13 @@ class HtmlProcessor {
      * @throws \ZfExtended_Exception
      */
     public function prepareRequest(string $html) : string {
-        $this->tags = new Tags($html);
-        return $this->tags->getRequestHtml();
+        try {
+            $this->tags = new Tags($html);
+            return $this->tags->getRequestHtml();
+        } catch (Exception $e) {
+            $this->preparationFault = true;
+            return strip_tags($html);
+        }
     }
 
     /**
@@ -59,10 +72,38 @@ class HtmlProcessor {
      * @return string
      */
     public function restoreResult(string $resultHtml) : string {
+        if($this->preparationFault){
+            return strip_tags($resultHtml);
+        }
         try {
             return $this->tags->recreateTags($resultHtml);
         } catch (Exception $e) {
+            $this->recreationFault = true;
             return strip_tags($resultHtml);
         }
+    }
+
+    /**
+     * Retrieves if generally an error occured
+     * @return bool
+     */
+    public function hasError() : bool {
+        return ($this->preparationFault || $this->recreationFault);
+    }
+
+    /**
+     * Retrieves if generally an error occured while parsing the passed text
+     * @return bool
+     */
+    public function hasPreparationError() : bool {
+        return $this->preparationFault;
+    }
+
+    /**
+     * Retrieves if generally an error occured while re-applying the requested translation
+     * @return bool
+     */
+    public function hasRecreationError() : bool {
+        return $this->recreationFault;
     }
 }

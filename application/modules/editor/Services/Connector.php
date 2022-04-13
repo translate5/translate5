@@ -44,21 +44,31 @@ class editor_Services_Connector {
      * The request source when language resources is used is InstantTranslate
      * @var string
      */
-    const REQUEST_SOURCE_INSTANT_TRANSLATE='instanttranslate';
+    const REQUEST_SOURCE_INSTANT_TRANSLATE = 'instanttranslate';
     
     /***
      * The request source when language resource is used is the editor
      * @var string
      */
-    const REQUEST_SOURCE_EDITOR='editor';
-    
-    
+    const REQUEST_SOURCE_EDITOR = 'editor';
+
+    /***
+     * An error with markup tags when parsing it for request
+     * @var string
+     */
+    const TAG_ERROR_PREPARE = 'tagprepare';
+
+    /***
+     * An error with markup tags when re-applying the request
+     * @var string
+     */
+    const TAG_ERROR_RECREATE = 'tagrecreate';
+
     /***
      * The real service connector
      * @var editor_Services_Connector_Abstract
      */
     protected $adapter;
-    
     
     /***
      *
@@ -66,13 +76,11 @@ class editor_Services_Connector {
      */
     protected $languageResource;
     
-    
     /***
      * Requested source language id
      * @var integer
      */
     protected $sourceLang;
-    
     
     /***
      * Requested target language id
@@ -163,6 +171,7 @@ class editor_Services_Connector {
     protected function _translate(string $searchString){
         //instant translate calls are by default always without tags ... only if the adapter supports tags we leave them
         if($this->adapter->canHandleHtmlTags()){
+
             // we use the TagRepair's processor to automatically repair lost or "defect" tags when requesting the translation
             $processor = new HtmlProcessor();
             $serviceResult = $this->adapter->translate($processor->prepareRequest(trim($searchString)));
@@ -170,6 +179,11 @@ class editor_Services_Connector {
             $results = $serviceResult->getResult();
             if(count($results) > 0){
                 $results[0]->target = $processor->restoreResult($results[0]->target);
+                if($processor->hasPreparationError()){
+                    $results[0]->tagError = self::TAG_ERROR_PREPARE;
+                } else if($processor->hasRecreationError()){
+                    $results[0]->tagError = self::TAG_ERROR_RECREATE;
+                }
                 $serviceResult->setResults($results);
             }
         } else {
