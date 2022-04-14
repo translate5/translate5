@@ -685,7 +685,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
         // Return ids of special attrs among those
         return $this->db->getAdapter()->query('
-            SELECT `id` FROM `terms_attributes` WHERE `id` IN (' . $ids . ') AND FIND_IN_SET(`type`, "processStatus,definition") 
+            SELECT `id` FROM `terms_attributes` WHERE `id` IN (' . $ids . ') AND FIND_IN_SET(`type`, "processStatus,definition,administrativeStatus") 
         ')->fetchAll(PDO::FETCH_COLUMN);
     }
 

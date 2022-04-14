@@ -379,6 +379,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         //sets a list of url hashes to their redirects, shortcut to the applets
         $this->view->Php2JsVars()->set('directRedirects', Dispatcher::getInstance()->getHashPathMap());
+        
+        // set special characters list into a front-end view variable. This should be removed after this config is moved to lvl 16
+        $this->view->Php2JsVars()->set('editor.segments.editorSpecialCharacters', $rop->editor->segments?->editorSpecialCharacters ?? '');
 
         $this->setJsAppData();
     }

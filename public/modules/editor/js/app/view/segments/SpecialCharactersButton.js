@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,25 +25,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * The termtranslation task type is same as default, but have different ID so
- * that it appears the possibility for distinction between termtranslation- and other tasks
- * Currently it is only used to decide whether reimport back to TermCollection export menu option should be shown
- */
-class editor_Task_Type_TermTranslation extends editor_Task_Type_Project {
-
-    /**
-     * Type ID
-     */
-    const ID = 'termtranslation';
-
-    /**
-     * @param bool $multiTarget
-     * @param string $projectType
-     * @param string $taskType
-     */
-    public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType) {
-        $projectType = editor_Task_Type_TermTranslation::ID;
-        $taskType = editor_Task_Type_TermTranslationTask::ID;
-    }
-}
+Ext.define('Editor.view.segments.SpecialCharactersButton', {
+    extend: 'Ext.button.Button',
+    alias: 'widget.specialCharactersButton',
+    border: 1,
+    style: {
+        borderColor: '#d0d0d0',
+        borderStyle: 'solid'
+    },
+    width:28,
+    height:28,
+    padding:0
+});

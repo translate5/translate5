@@ -284,7 +284,7 @@ If you did not send the request yourself, please inform us of this.
 <trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{TaskOverviewYoutubeVideoGuideDescriptionContent}</source>
 <target><br/>
 <figure>
-    <figcaption><b>Übersicht:</b></figcaption>
+    <figcaption><b>Overview:</b></figcaption>
       <a target="youtubevideoframe" href="https://www.youtube.com/embed/flQOCo6AgXA?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
       <a target="youtubevideoframe" href="https://www.youtube.com/embed/flQOCo6AgXA?start=11&amp;autoplay=1" dir="auto">0:11</a> Task overview<br/>
       <a target="youtubevideoframe" href="https://www.youtube.com/embed/flQOCo6AgXA?start=25&amp;autoplay=1" dir="auto">0:25</a> Status header<br/>
@@ -295,6 +295,24 @@ If you did not send the request yourself, please inform us of this.
       <a target="youtubevideoframe" href="https://www.youtube.com/embed/flQOCo6AgXA?start=101&amp;autoplay=1" dir="auto">1:41</a> Contact information<br/>
 </figure>
 </target></trans-unit>
-        </body>
-    </file>
-<!-- ids are base64-encoded --></xliff>
+<trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVVcmx9'>
+  <source>{CustomerYoutubeVideoGuideUrl}</source>
+  <target>https://www.youtube.com/embed/9SsDaKilP6w
+  </target>
+</trans-unit>
+<trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'><source>{CustomerYoutubeVideoGuideDescriptionContent}</source>
+<target><br/>
+                <figure>
+                    <figcaption><b>Overview:</b></figcaption>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/9SsDaKilP6w?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/9SsDaKilP6w?start=25&amp;autoplay=1" dir="auto">0:25</a> User assignment defaults<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/9SsDaKilP6w?start=213&amp;autoplay=1" dir="auto">3:33</a> User management<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/9SsDaKilP6w?start=233&amp;autoplay=1" dir="auto">3:53</a> Automated user assignment<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/9SsDaKilP6w?start=383&amp;autoplay=1" dir="auto">6:23</a> Language resource assignment<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/9SsDaKilP6w?start=477&amp;autoplay=1" dir="auto">7:57</a> Contact information<br/>
+                </figure>
+</target>
+</trans-unit>
+</body>
+</file>
+</xliff>

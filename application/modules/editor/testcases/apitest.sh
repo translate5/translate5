@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 CONFIG='./apitest.conf'
 #check config file exists
 if [ ! -f "${CONFIG}" ]; then
