@@ -2,6 +2,7 @@
 application/config/installation.ini
 data/editorImportedTasks*
 data/editorVisualReviewFonts*
+data/editorOkapiBconf*
 data/tbx-import/*
 !data/tbx-import/term-images-public
 data/dummyTm_*
