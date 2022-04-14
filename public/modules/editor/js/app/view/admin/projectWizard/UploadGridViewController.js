@@ -256,7 +256,9 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         }else if(Ext.isEmpty(rec.get('sourceLang'))){
             errorMsg = Ext.String.format(msg.sourceNotValid,fileSourceLang);
         }else if(Ext.isEmpty(rec.get('targetLang'))){
-            errorMsg = Ext.String.format(msg.targetNotValid,fileTargetLang);
+            // is source language is detected but there is no target language, and it is not pivot,
+            // this is xml based file where the target langauge is not defined
+            // According to the xliff specification, the target language in xliff file is only optional, not required.
         }else if(!Ext.isEmpty(sourceField.getValue()) && sourceField.getValue() !== rec.get('sourceLang')){
 
                 errorMsg = isPivotType ?
