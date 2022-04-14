@@ -1,0 +1,6 @@
+{
+      "SegmentationStep":	[ "SourceSrxPath", "TargetSrxPath" ]
+    , "TermExtractionStep":	[ "StopWordsPath", "NotStartWordsPath", "NotEndWordsPath" ]
+    , "XMLValidationStep":	[ "SchemaPath" ]
+    , "XSLTransformStep":	[ "XsltPath" ]
+}
