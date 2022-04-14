@@ -315,42 +315,34 @@ function() {
             if(!request._operation._response){
                 return;
             }
-            var data = request._operation._response.getAllResponseHeaders(),
-                version = data['x-translate5-version'],
-                mntpnl = Ext.first('maintenancePanel'),
-                viewport = Ext.first('viewport');
-                
+            var headers = request._operation._response.getAllResponseHeaders(),
+                version = headers['x-translate5-version'];
+
             if(version !== Editor.data.app.version && version) {
-                var exStrings = Editor.controller.ServerException.prototype.strings;
+                var {update_title, update_msg, reload} = Editor.controller.ServerException.prototype.strings;
                 Ext.MessageBox.show({
-                     title: exStrings.update_title,
-                     msg: Ext.String.format(exStrings.update_msg, version),
+                     title: update_title,
+                     msg: Ext.String.format(update_msg, version),
                      icon: Ext.MessageBox.WARNING,
                      buttons: Ext.MessageBox.OK,
-                     fn: location.reload,
+                     buttonText: {ok: reload},
+                     fn: btnId => location.reload(),
                 });
             }
-    		//FIXME neuen WebScoket Issue anlegen, der sammelt was alles auf websockets umgebaut werden kann wenn diese Fix aktiv sind.
+    		//FIXME neuen WebSocket Issue anlegen, der sammelt was alles auf websockets umgebaut werden kann wenn diese Fix aktiv sind.
     		// Diese Funktionalität gehört da mit dazu!
-    		data.date = data['x-translate5-shownotice'];
-    		data.msg  = data['x-translate5-maintenance-message'];
-			if(data.date || data.msg){
-                if(!viewport){
-                    return;
-                }
-                if(mntpnl){
-                    mntpnl.update(data);
-                    return;
-                }
-                viewport.add({
+			if(headers['x-translate5-shownotice'] || headers['x-translate5-maintenance-message']){
+                var mntpnl = Ext.getCmp('maintenancePanel') || Ext.first('viewport')?.add({ // create if not exists
                     xtype:'maintenancePanel',
+                    id:'maintenancePanel',
                     region:'north',
                     weight: 100,
-                    data: data
                 });
-                return;
+                mntpnl && mntpnl.update({
+                    date: headers['x-translate5-shownotice'],
+                    msg : headers['x-translate5-maintenance-message']
+                });
     		}
-            mntpnl && mntpnl.destroy();
         },
         constructor: function() {
             this.callOverridden(arguments);
