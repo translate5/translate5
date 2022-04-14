@@ -67,7 +67,11 @@ class Dispatcher {
         $this->applets[$name] = $applet;
     }
 
-    public function getHashPathMap() {
+    /**
+     * returns a mapping of a hash key to the underlying pathPart
+     * @return array
+     */
+    public function getHashPathMap(): array {
         $map = [];
         foreach($this->applets as $hash => $applet) {
             if($applet->hasAsInitialPage()) {
@@ -88,7 +92,7 @@ class Dispatcher {
         });
 
         //defaulting to editor applet if nothing given as target
-        $this->call($target ?? 'editor');
+        $this->call($target ?? 'editor', false);
 
         //if we are still here (so not redirected away by above call),
         // we try to load the last used app
@@ -98,29 +102,30 @@ class Dispatcher {
         if($meta->getId() != null && !empty($meta->getLastUsedApp())){
             $this->call($meta->getLastUsedApp());
         }
+        $this->call(); //fallback if no lastUsedApp configured
     }
 
     /**
      * Call the desired applet by the given URL hash, which is tried to be used as name for the applet
-     * @param string $hash
+     * @param string|null $hash
+     * @param bool $useFallbackLoop
      */
-    public function call(string $hash)
+    public function call(string $hash = null, bool $useFallbackLoop = true)
     {
         //if the requested app could be used, then use it
         $applet = $this->getApplet($hash);
-        error_log("Found initial applet to call: ".$hash);
         if(!is_null($applet) && $applet->hasAsInitialPage()) {
-            error_log("redirected: ".$hash.' '.$applet->getUrlPathPart());
-            $this->redirect($applet, $hash);
+            $this->redirect($applet);
         }
 
-        error_log(print_r($this->applets, 1));
+        if(!$useFallbackLoop) {
+            return;
+        }
 
         //if not, loop over all available and check for usage
         foreach($this->applets as $applet) {
             if($applet->hasAsInitialPage()) {
-                error_log("redirected: ".$hash.' '.$applet->getUrlPathPart());
-                $this->redirect($applet, $hash);
+                $this->redirect($applet);
             }
         }
 
@@ -137,16 +142,10 @@ class Dispatcher {
         return $this->applets[$name] ?? null;
     }
 
-    #[NoReturn] private function redirect(AppletAbstract $app, string $hash)
+    #[NoReturn] private function redirect(AppletAbstract $app)
     {
-        $path = $app->getUrlPathPart();
-
-        //if no hash was provided from the applet, we add the given one
-        if(!str_contains($path, '#')) {
-            //$path .= '#'.$hash;
-        }
         header ('HTTP/1.1 302 Moved Temporarily');
-        header ('Location: '.$path);
+        header ('Location: '.$app->getUrlPathPart());
         exit;
     }
 

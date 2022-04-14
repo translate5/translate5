@@ -36,7 +36,7 @@ class Editor_AppsController extends ZfExtended_Controllers_Action {
      */
     public function indexAction(){
         \MittagQI\Translate5\Applet\Dispatcher::getInstance()
-            ->call($this->getParam('name', ''));
+            ->call($this->getParam('name', null));
 
         //either we are redirected, or if no redirect target found, we trigger a notfound:
         throw new ZfExtended_NotFoundException;
