@@ -6,6 +6,7 @@ class editor_Plugins_Okapi_Bconf_File
     public const descFile = "content.json";
 
     protected static string $dataDir;
+    protected static string $fileName;
 
     /**
      * @var mixed|null[]
@@ -20,7 +21,9 @@ class editor_Plugins_Okapi_Bconf_File
     public function __construct(editor_Plugins_Okapi_Models_Bconf $entity)
     {
         $this->entity = $entity;
-        self::$dataDir = $entity->getDataDirectory();
+        $filepath = $entity->getFilePath($entity->getId());
+        self::$dataDir = dirname($filepath);
+        self::$fileName = basename($filepath);
     }
 
     public function pack(): mixed

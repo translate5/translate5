@@ -85,8 +85,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
     {
         $okapiName = $this->getParam('okapiName');
         $id = (int) $this->getParam('bconfId'); // file traversal mitigation
-        $dir = $this->entity->getDataDirectory($id);
-        $exportFile = "$dir/$id.bconf";
+        $downloadFile = $this->entity->getFilePath($id);
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename=' . $okapiName . '.bconf');
@@ -94,10 +93,10 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Pragma: public');
-        header('Content-Length: ' . filesize($exportFile));
+        header('Content-Length: ' . filesize($downloadFile));
         ob_clean();
         flush();
-        readfile($exportFile);
+        readfile($downloadFile);
         exit;
 
     }
@@ -111,8 +110,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
             empty($_FILES) && throw new ZfExtended_ErrorCodeException('E1212', [
                 'msg' => "No upload files were found. Please try again. If the error persists, please contact support."
             ]);
-            $bconf = new editor_Plugins_Okapi_Models_Bconf($_FILES[self::FILE_UPLOAD_NAME]);
-        } catch(ZfExtended_Exception){
+            $bconf = new editor_Plugins_Okapi_Models_Bconf($_FILES[self::FILE_UPLOAD_NAME], $this->getAllParams());
+        } catch(editor_Plugins_Okapi_Exception $e){
             //TODO add excpetion message to $ret
         }
 
@@ -152,19 +151,20 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
         exit;
     }
 
+    /**
+     * @return void
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws editor_Plugins_Okapi_Exception
+     */
     public function cloneAction()
     {
-        /** @var string $id */
-        /** @var ?string $customer_id */
-        /** @var string $name */
-        extract($this->getAllParams(),EXTR_SKIP); // ['id', 'customer_id', 'name']
-        $sourceDir = $this->entity->getDataDirectory($id);
-
-        $clone = new editor_Plugins_Okapi_Models_Bconf(['tmp_name'=>"$sourceDir/$id.bconf", 'name' => $name]);
-        if($customer_id){
-            $clone->setCustomer_id($customer_id);
-            $clone->save();
-        }
+        $clone = new editor_Plugins_Okapi_Models_Bconf(
+            ['tmp_name' => $this->entity->getFilePath($this->getParam('id'))],
+            $this->getAllParams()
+        );
 
         echo json_encode($clone->toArray());
         exit;
@@ -196,7 +196,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
 
             $customerMeta->save();
         }
-        if(count($this->data) > 2){ // more than customerDefault is changed, call parent
+        if(count($this->data) > 2 || !isset($this->data['isDefaultForCustomer'])){ // more than customerDefault is changed, call parent
             parent::setDataInEntity($fields, $mode);
         }
     }

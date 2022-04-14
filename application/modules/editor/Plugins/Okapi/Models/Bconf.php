@@ -60,16 +60,19 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     /**
      * Creates new Bconf_Model instance
      * @param ?array $postFile - see https://www.php.net/manual/features.file-upload.post-method.php
+     * @param array $data - data to initialize the record, usually the POST params
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function __construct(array $postFile = null)
+    public function __construct(array $postFile = null, array $data = [])
     {
         parent::__construct();
         if($postFile){ // create new entity from file
-            $this->setName($postFile['name']);
-            $this->save(); // generates id for Bconf_File
+            empty($data['name']) && ($data['name'] = $postFile['name']);
+            unset($data['id']); // auto gernerated
+            $this->init($data);
+            $this->save();
 
             $this->file = new editor_Plugins_Okapi_Bconf_File($this);
             $this->file->unpack($postFile['tmp_name']);
@@ -98,6 +101,11 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         return false;
     }
 
+    /**
+     * @param $id
+     * @return Zend_Db_Table_Row_Abstract|null
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
     public function load($id) {
         $ret = parent::load($id);
         $this->file = new editor_Plugins_Okapi_Bconf_File($this);
@@ -132,12 +140,14 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
-     * @return string
-     * @throws editor_Plugins_Okapi_Exception|Zend_Exception
+     * @param $id
+     * @return string path - the absolute path of the bconf
+     * @throws Zend_Exception|editor_Plugins_Okapi_Exception
      */
-    public function getFilePath(): string
-    {
-        return $this->getDataDirectory() . '/export.bconf';
+    public function getFilePath(string $id): string {
+        if(!$id) throw new editor_Plugins_Okapi_Exception('E1026', ['Missing parameter "id"!']);
+
+        return $this->getDataDirectory($id).DIRECTORY_SEPARATOR.'bconf-'.$id.'.bconf';
     }
 
     /**

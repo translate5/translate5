@@ -142,9 +142,13 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
     },
 
     uploadBconf: function (e, input, eOpts) {
-        var data = new FormData()
+        var grid = this.getView();
+        var data = new FormData();
         data.append('bconffile', input.files[0]);
-
+        if(grid.isCustomerGrid) {
+            var customer = grid.getCustomer() || {};
+            data.append('customer_id', customer.id);
+        }
         fetch(Editor.data.restpath + 'plugins_okapi_bconf/uploadbconf', {
             method: 'POST',
             body: data

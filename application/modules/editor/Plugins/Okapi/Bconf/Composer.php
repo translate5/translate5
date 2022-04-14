@@ -45,7 +45,7 @@ class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_Fil
         if(file_exists(self::descFile)){
             $content = json_decode(file_get_contents(self::descFile), associative: true);
         }
-        $fileName = "$bconfId.bconf";
+        $fileName = self::$fileName;
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
         
         $raf->writeUTF($raf::SIGNATURE, false);

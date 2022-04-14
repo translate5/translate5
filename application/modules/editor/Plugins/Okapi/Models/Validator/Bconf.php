@@ -38,19 +38,12 @@ class editor_Plugins_Okapi_Models_Validator_Bconf extends ZfExtended_Models_Vali
      * Validators for Okapi Bconf Entity
      */
     protected function defineValidators() {
+        $db = $this->entity->db;
+        $dbName = $db->info(constant("$db"."::name"));
         $this->addValidator('id', 'int');
         $this->addValidator('default', 'boolean');
+        $this->addValidator('customer_id', 'int');
+        $this->addValidator('name', 'stringLength', array('min' => 1, 'max' => 255));
         $this->addValidator('description', 'stringLength', array('min' => 1, 'max' => 255));
-        /*
-        $this->addValidator('name', 'stringLength', array('min' => 3, 'max' => 64));
-        $this->addValidator('cssname', 'stringLength', array('min' => 3, 'max' => 128));
-        $this->addValidator('filename', 'stringLength', array('min' => 5, 'max' => 64));
-        $this->addValidator('formats', 'stringLength', array('min' => 3, 'max' => 32));
-        $this->addValidator('weight', 'int');
-        $this->addValidator('weightname', 'stringLength', array('min' => 0, 'max' => 32));
-        $this->addValidator('style', 'stringLength', array('min' => 0, 'max' => 32));
-        $this->addValidator('available', 'int');
-        $this->addValidator('created', 'date', array('Y-m-d H:i:s'));
-        */
     }
 }
