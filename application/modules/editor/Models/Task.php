@@ -294,11 +294,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function loadUserList(string $userGuid) {
+        /** @var ZfExtended_Models_User $userModel */
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
 
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $loadAll = $userModel->isAllowed('backend', 'loadAllTasks');
+        $loadAll = editor_User::instance()->isAllowed('backend', 'loadAllTasks');
         $ignoreAnonStuff = $this->rolesAllowReadAnonymizedUsers();
 
         $anonSql = '';

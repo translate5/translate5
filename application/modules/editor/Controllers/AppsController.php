@@ -29,26 +29,17 @@ END LICENSE AND COPYRIGHT
 /***
  */
 class Editor_AppsController extends ZfExtended_Controllers_Action {
-    
+
+    /**
+     * @deprecated for legacy users of this action (old links etc) the dispatching to termportal / instanttranslate is done in the corresponding plugins
+     * @throws Zend_Exception
+     */
     public function indexAction(){
-        Zend_Layout::getMvcInstance()->setLayout('apps');
-        Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
-        $config = Zend_Registry::get('config');
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        \MittagQI\Translate5\Applet\Dispatcher::getInstance()
+            ->call($this->getParam('name', null));
 
-        $this->view->headTitle($translate->_('translate5-termportal'));
-        $this->view->appVersion = ZfExtended_Utils::getAppVersion();
-
-
-        $this->view->Php2JsVars()->set('restpath',APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
-        $this->view->Php2JsVars()->set('apps.appName',$this->getRequest()->getParam('name'));
-        $this->view->Php2JsVars()->set('apps.apiUrl',$this->getRequest()->getParam('apiUrl'));
-        
-        $this->view->Php2JsVars()->set('apps.title',$translate->_('translate5-apps'));
-        $this->view->Php2JsVars()->set('apps.instanttranslate.title',$translate->_('translate5-instanttranslate'));
-        $this->view->Php2JsVars()->set('apps.termportal.title',$translate->_('translate5-termportal'));
-        
-        $this->view->Php2JsVars()->set('apps.loginUrl', APPLICATION_RUNDIR.$config->runtimeOptions->loginUrl);
+        //either we are redirected, or if no redirect target found, we trigger a notfound:
+        throw new ZfExtended_NotFoundException;
     }
     
     /***
@@ -61,9 +52,8 @@ class Editor_AppsController extends ZfExtended_Controllers_Action {
         if(empty($appName)){
             return;
         }
-        
-        //TODO: when more apps, create service classes
-        $validApps=['instanttranslate','termportal'];
+
+        $validApps = array_keys(\MittagQI\Translate5\Applet\Dispatcher::getInstance()->getHashPathMap());
         if(!in_array($appName, $validApps)){
             return;
         }
