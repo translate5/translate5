@@ -37,8 +37,8 @@ class editor_Workflow_Default_Hooks {
     
     const HANDLE_CRON_DAILY       = 'doCronDaily';
     const HANDLE_CRON_PERIODICAL  = 'doCronPeriodical';
-    
-    
+
+    const HANDLE_PROJECT_CREATED  = 'handleProjectCreated';
     /**
      * @var editor_Workflow_Default
      */
@@ -267,6 +267,17 @@ class editor_Workflow_Default_Hooks {
         $this->callActions(self::HANDLE_IMPORT_AFTER);
     }
     
+    /**
+     * Is called after project has been created but before import workers started
+     *
+     * @param editor_Models_Task $project
+     */
+    public function doHandleProjectCreated(editor_Models_Task $project) {
+        $this->newTask = $project;
+        $this->doDebug(self::HANDLE_PROJECT_CREATED);
+        $this->callActions(self::HANDLE_PROJECT_CREATED);
+    }
+
     /**
      * can be triggered via API, valid triggers are currently
      * @param editor_Models_Task $task
