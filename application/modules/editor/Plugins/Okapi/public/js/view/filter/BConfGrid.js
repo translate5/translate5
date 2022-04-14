@@ -166,7 +166,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                     {
                         xtype: 'checkcolumn',
                         text: me.text_cols.customerStandard,
-                        width: 130,
+                        width: 150,
                         dataIndex: 'isDefaultForCustomer',
                         itemId: 'customerDefaultColumn',
                         hidden: !instanceConfig.isCustomerGrid,
@@ -203,7 +203,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                         dataIndex: 'default',
                         itemId: 'globalDefaultColumn',
                         tooltip: '',
-                        width: 80,
+                        width: 95,
                         renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
                             var grid = view.ownerGrid;
                             if (isDefault && (grid.isCustomerGrid ? (grid.customerDefault && record!=grid.customerDefault) : record.get('customer_id'))){
@@ -249,7 +249,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                                 isAllowedFor: 'bconfDelete',
                                 glyph: 'f2ed@FontAwesome5FreeSolid',
                                 handler: 'deletebconf',
-                                isDisabled: 'getActionStatus'
+                                isDisabled: 'isDeleteDisabled'
                             },
                             {
                                 tooltip: me.strings.copy,
@@ -261,7 +261,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                             {
                                 tooltip: me.strings.export,
                                 isAllowedFor: 'bconfDelete',
-                                glyph: 'f56e@FontAwesome5FreeSolid',
+                                glyph: 'f019@FontAwesome5FreeSolid',
                                 handler: 'exportbconf',
                             },
                         ],
@@ -275,15 +275,13 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                                 tooltip: me.strings.upload,
                                 isAllowedFor: 'bconfEdit',
                                 glyph: 'f093@FontAwesome5FreeSolid',
-                                bind: {
-                                    hidden: '{default}'
-                                },
+                                isDisabled: 'isSRXUploadDisabled',
                                 handler: 'showSRXChooser',
                             },
                             {
                                 tooltip: me.strings.export,
                                 isAllowedFor: 'bconfDelete',
-                                glyph: 'f56e@FontAwesome5FreeSolid',
+                                glyph: 'f019@FontAwesome5FreeSolid',
                                 handler: 'downloadSRX'
                             },
                         ]

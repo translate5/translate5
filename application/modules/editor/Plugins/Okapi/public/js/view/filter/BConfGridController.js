@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -122,8 +121,11 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
         dlAnchor.setAttribute('href', Editor.data.restpath + 'plugins_okapi_bconf/downloadSRX?id='+rec.id)
         dlAnchor.click();
     },
-    getActionStatus:function (view, rowIndex, colIndex, item, record) {
-        return record.get('default') == "1";
+    isDeleteDisabled:function (view, rowIndex, colIndex, item, record) {
+        return record.get('default') == "1" || view.ownerGrid.isCustomerGrid && !record.get('customer_id');
+    },
+    isSRXUploadDisabled:function (view, rowIndex, colIndex, item, record) {
+        return view.ownerGrid.isCustomerGrid && !record.get('customer_id');
     },
 
     filterByText: function (filterField){
