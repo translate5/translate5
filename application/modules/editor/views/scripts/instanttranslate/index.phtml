@@ -438,7 +438,12 @@ $( function() {
 
 <script type="text/javascript">
     // show list of available files
-    showDownloads(<?php echo json_encode($this->allPretranslatedFiles); ?>, <?php echo json_encode($this->dateAsOf); ?>);
+    <?php
+        // remove the array keys because of the sorting.
+        $fileList = array_values($this->allPretranslatedFiles);
+        $fileList = json_encode($fileList)
+    ?>;
+    showDownloads(<?php echo $fileList; ?>,<?php echo json_encode($this->dateAsOf); ?>);
     
     // "toggle" source (text/file)
     $(document).on('click', '.source-toggle .change-source-type' , function() {toggleSourceTextFile();});
