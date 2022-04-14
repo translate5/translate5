@@ -85,7 +85,10 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
         searchEmptyText: '#UT#Search Bconf',
         export: '#UT#Export',
         browse: '#UT#Browse',
-        bconfRequired: '#UT#Bconf required'
+        bconfRequired: '#UT#Bconf required',
+        confirmDeleteTitle:'#UT#Bconf löschen',
+        confirmDeleteMessage:'#UT#Möchten Sie diese Bconf-Datei wirklich löschen?',
+        deleteSuccess:'#UT#Bconf-Datei gelöscht'
     },
     reference:'bconfgrid',
     viewConfig: {

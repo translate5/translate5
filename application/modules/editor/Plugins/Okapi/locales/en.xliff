@@ -56,6 +56,18 @@
     <source>Kundenstandard</source>
     <target>Customer default</target>
 </trans-unit>
+<trans-unit id='QmNvbmYgbMO2c2NoZW4='>
+    <source>Bconf löschen</source>
+    <target>Delete Bconf</target>
+</trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRpZXNlIEJjb25mLURhdGVpIHdpcmtsaWNoIGzDtnNjaGVuPw=='>
+    <source>Möchten Sie diese Bconf-Datei wirklich löschen?</source>
+    <target>Do you really want to delete this Bconf file?</target>
+</trans-unit>
+<trans-unit id='QmNvbmYtRGF0ZWkgZ2Vsw7ZzY2h0'>
+    <source>Bconf-Datei gelöscht</source>
+    <target>Bconf file deleted</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

@@ -59,9 +59,12 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGridController', {
     },
 
     deletebconf: function (view, rowIndex, colIndex) {
-        var rec = view.getStore().getAt(rowIndex);
-        rec.drop();
-        //rec.store.sync(); // needed when autoSync:false on the store
+        Ext.Msg.confirm(view.grid.strings.confirmDeleteTitle, view.grid.strings.confirmDeleteMessage, function(btnId){
+            if(btnId === 'yes'){
+                var rec = view.getStore().getAt(rowIndex);
+                rec.drop();
+            }
+        });
     },
 
     clonebconf: function (view, rowIndex, colIndex) {

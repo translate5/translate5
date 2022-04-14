@@ -58,7 +58,7 @@ Editor.controller.Localizer.addPluginInit('okapi', function() {
             customerStandard: `<?= $translate->_('Kundenstandard'); ?>`,
         },
         strings: {
-            edit: `'<?= $translate->_('Bearbeiten'); ?>`,
+            edit: `<?= $translate->_('Bearbeiten'); ?>`,
             remove: `<?= $translate->_('Löschen'); ?>`,
             copy: `<?= $translate->_('Kopieren'); ?>`,
             upload: `<?= $translate->_('Hochladen'); ?>`,
@@ -67,9 +67,12 @@ Editor.controller.Localizer.addPluginInit('okapi', function() {
             searchText: `<?= $translate->_('Suchen'); ?>`,
             searchEmptyText: `<?= $translate->_('Suchen'); ?>`,
             export: `<?= $translate->_('Exportieren'); ?>`,
-            browse: `<?= $translate->_('Durchsuchen...'); ?>'`,
+            browse: `<?= $translate->_('Durchsuchen...'); ?>`,
             bconfRequired: `<?= $translate->_('wird benötigt'); ?>`,
             titleLong: `<?= $translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>`,
+            confirmDeleteTitle: `<?= $translate->_('Bconf löschen'); ?>`,
+            confirmDeleteMessage: `<?= $translate->_('Möchten Sie diese Bconf-Datei wirklich löschen?'); ?>`,
+            deleteSuccess: `<?= $translate->_('Bconf-Datei gelöscht'); ?>`,
         },
 
     });

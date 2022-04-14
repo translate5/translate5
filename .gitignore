@@ -1,5 +1,5 @@
 /client-specific
-application/config/installation.ini
+application/config/installation*
 data/editorImportedTasks*
 data/editorVisualReviewFonts*
 data/tbx-import/*
@@ -23,4 +23,4 @@ _mails
 /.idea
 .idea
 .jshintrc
-data/okapiBconf/
+/data/editorOkapiBconf/
