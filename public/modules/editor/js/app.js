@@ -164,6 +164,7 @@ Ext.application({
         // the init of the QuickTips has to be done here otherwise it's too late to set the internal tip class
         Ext.tip.QuickTipManager.init(true, {className: 'Editor.view.QuickTip'});
 
+        this.handleMissingSlash();
         this.callParent(arguments);
         this.logoutOnWindowClose();
     },
@@ -455,7 +456,7 @@ Ext.application({
         this.appMask.wait(msg, title);
     },
     unmask: function () {
-        //no "this" usage, so we can use this method directly as failure handler 
+        //no "this" usage, so we can use this method directly as failure handler
         Editor.app.appMask && Editor.app.appMask.close();
     },
     logout: function () {
@@ -539,10 +540,21 @@ Ext.application({
     },
 
     /**
+     * Our URLs need a trailing slash for proper working:
+     */
+    handleMissingSlash: function() {
+        let loc = window.location,
+            path = loc.pathname;
+        if(path.substr(-1) !== '/') {
+            window.history.pushState({}, "", loc.href.replace(path, path+'/'));
+        }
+    },
+
+    /**
      * The URL of the opened application may contain the taskId
      */
     parseTaskIdFromUrl: function() {
-        var match = window.location.href.match(/\/editor\/taskid\/([0-9]+)\//);
+        var match = window.location.pathname.match(/^\/editor\/taskid\/([0-9]+)\/$/);
         if(match) {
             return parseInt(match[1], 10);
         }
@@ -563,9 +575,9 @@ Ext.application({
         }
         else {
             //if task is not given or false, we try to remove task fragments from the URL
-            newLocation = currentLocation.replace(matchTask, '/editor/'); //without / at the end here!
+            newLocation = currentLocation.replace(matchTask, '/editor/');
         }
-        window.history.pushState({ additionalInformation: 'Updated the URL with JS' }, "FOO", newLocation);
+        window.history.pushState({}, "", newLocation);
         Editor.data.restpath = window.location.pathname; //we set the new task relative location as restpath, so all other requests use it too
     },
 
