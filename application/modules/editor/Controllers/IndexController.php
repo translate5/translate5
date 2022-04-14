@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
@@ -376,6 +377,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // show Consortium Logos on application load for xyz seconds [default 3]
         $this->view->Php2JsVars()->set('startup.showConsortiumLogos', $rop->startup->showConsortiumLogos);
 
+        //sets a list of url hashes to their redirects, shortcut to the applets
+        $this->view->Php2JsVars()->set('directRedirects', Dispatcher::getInstance()->getHashPathMap());
+        
         // set special characters list into a front-end view variable. This should be removed after this config is moved to lvl 16
         $this->view->Php2JsVars()->set('editor.segments.editorSpecialCharacters', $rop->editor->segments?->editorSpecialCharacters ?? '');
 

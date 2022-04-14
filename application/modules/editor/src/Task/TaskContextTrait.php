@@ -106,13 +106,6 @@ trait TaskContextTrait {
         $this->_currentTask->load($taskId);
 
         $this->_loadCurrentJob();
-
-//FIXME remaining todos:
-// - SECURITY FLAW: look through all controllers used in open task context, and check if a taskGuid comparsion is done or taskGUid is used on data load, to prevent data access of other tasks by guessing IDs
-// - test the new stuff in a embedded editor environment
-// - Team Communication how to use paths, see commit ab8a9f4d
-// - Team Communication how to use CurrenTask
-// - General Bug?: If a opentm2 resource returns a 502 bad gateway, the whole segment can not be saved! Urgent?
     }
 
     /**

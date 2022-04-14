@@ -26,7 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-if (window.parent.location.hash.match(/itranslate|termportal/)) {
+//if we are in a frame, then disable the logout button
+if (window.parent.location !== window.location) {
     $('body').addClass('noheader');
     $('#containerHeader').hide();
 }

@@ -488,7 +488,7 @@ class editor_Workflow_Default {
      */
     public function getUsableSteps(): array {
         $steps = $this->getAssignableSteps();
-        if(editor_User::instance()->getModel()->isAllowed('frontend', 'editorChangeUserAssocTask')) {
+        if(editor_User::instance()->isAllowed('frontend', 'editorChangeUserAssocTask')) {
             return $steps;
         }
         return [];
