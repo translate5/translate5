@@ -146,6 +146,9 @@ Ext.define('Editor.controller.ServerException', {
             //if there is no valid JSON, the error is probably not from us. With 0 we pass by the below switch and just print the error
             status = 0; 
         }
+        if(json && json.errorCode === 'E1381') {
+            Ext.Logger.error("E1381 error on the backend");
+        }
             
         //it can happen on submit requests, that we receive the content in XML instead JSON:
         if(response && (!response.responseText || response.responseText.length == 0) && Ext.DomQuery.isXml(response.responseXML)) {

@@ -58,7 +58,6 @@ class editor_Models_Import_TaskConfig {
         $config = parse_ini_file($template);
         $log = Zend_Registry::get('logger');
         /* @var $log ZfExtended_Logger */
-        error_log("UPDATE CONFIG");
         foreach ($config as $name => $value){
             $taskConfig=ZfExtended_Factory::get('editor_Models_TaskConfig');
             /* @var $taskConfig editor_Models_TaskConfig */

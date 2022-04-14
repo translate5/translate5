@@ -184,7 +184,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
     listeners: {
         afterTaskDelete: 'onAfterTaskDeleteEventHandler',
-        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler'
+        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler',
+        validateImportWizard: 'onValidateImportWizard'
     },
     listen: {
         controller: {
@@ -940,7 +941,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         var me = this,
             isDefaultTask = task.get('taskType') === 'default';
         Ext.Ajax.request({
-            url: Editor.data.pathToRunDir + '/editor/task/' + task.getId() + '/clone',
+            url: Editor.data.restpath + 'task/' + task.getId() + '/clone',
             method: 'post',
             scope: me,
             success: function (response) {
@@ -1113,7 +1114,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             form = me.getTaskAddForm(),
             params = form.getForm().getValues();
 
-        if (!form.isValid()) {
+
+        // import wizard form validation event. Return false in the subscribed event listener to cancel the form submit
+        if(me.fireEvent('validateImportWizard',form) === false){
             return;
         }
 
@@ -1221,7 +1224,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     setCardsTask: function (task) {
         var me = this,
             win = me.getTaskAddWindow(),
-            items = win.items.items;
+            items = win && win.items.items;
+
+        if(!win){
+            return;
+        }
 
         win.getViewModel().set('currentTask', task);
         //TODO: use the current task in all other cards
@@ -1280,6 +1287,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
 
     /***
+     * Import wizard validation event handler
+     * @param formPanel
+     * @returns {*}
+     */
+    onValidateImportWizard: function (formPanel){
+        return formPanel.isValid();
+    },
+
+    /***
      * Notify the application that the task is created. The event taskCreated will be fired after the task store and the
      * project store are reloaded. The store reload is required so there are no entity version conflicts later in the
      * import wizard
@@ -1289,22 +1305,28 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     notifyTaskCreated:function (task, callback){
         var me = this;
 
-        // reload the project store after the task store is reloaded
-        me.getProjectGrid().getController().reloadProjects().then(function(){
+        // reload the task store so the new tasks are included inside.
+        // in the import wizard, fresh tasks are required
+        me.getAdminTasksStore().load({
+            callback:function (){
+                // reload the project store after the task store is reloaded
+                me.getProjectGrid().getController().reloadProjects().then(function(){
 
-            // update the project route based on the current task
-            me.handleProjectAfterImport(task);
-            //set the store reference to the model(it is missing), it is used later when the task is deleted
-            task.store = me.getAdminTasksStore();
+                    // update the project route based on the current task
+                    me.handleProjectAfterImport(task);
+                    //set the store reference to the model(it is missing), it is used later when the task is deleted
+                    task.store = me.getAdminTasksStore();
 
-            // for each import wizard card, set the project/task object
-            me.setCardsTask(task);
+                    // for each import wizard card, set the project/task object
+                    me.setCardsTask(task);
 
-            // fire the taskCreated after all stores are reloaded
-            me.fireEvent('taskCreated', task);
+                    // fire the taskCreated after all stores are reloaded
+                    me.fireEvent('taskCreated', task);
 
-            if(callback){
-                callback();
+                    if(callback){
+                        callback();
+                    }
+                });
             }
         });
     }

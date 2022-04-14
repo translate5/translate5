@@ -234,7 +234,7 @@ class editor_Models_Terminology_BulkOperation_Term extends editor_Models_Termino
         //fetch the newly inserted IDs
         $s = $this->model->db->select()
             ->from($this->model->db, ['id', 'termTbxId','guid'])
-            ->where('BINARY termTbxId in ("'.$keys.'")')
+            ->where('termTbxId in ("'.$keys.'")')
             ->where('collectionId = ?', $collectionId);
         $ids = $this->model->db->fetchAll($s)->toArray();
 

@@ -26,6 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\LanguageResource;
+
+use Zend_Db_Expr;
+use Zend_Db_Table_Row_Abstract;
+use ZfExtended_Factory;
+use ZfExtended_Models_Entity_Abstract;
+
 /**
  * LanguageResource TaskAssoc Entity Object
  *
@@ -40,9 +47,10 @@ END LICENSE AND COPYRIGHT
  * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
  * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(int $autoCreatedOnImport)
  */
-class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_Taskassoc';
-    protected $validatorInstanceClass = 'editor_Models_Validator_Taskassoc'; //→ here the new validator class
+class TaskAssociation extends ZfExtended_Models_Entity_Abstract {
+
+    protected $dbInstanceClass = 'MittagQI\Translate5\LanguageResource\Db\TaskAssociation';
+    protected $validatorInstanceClass = 'MittagQI\Translate5\LanguageResource\Validator\TaskAssociation'; //→ here the new validator class
     /**
      * loads one assoc entry, returns the loaded row as array
      *
@@ -102,7 +110,6 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
                 $result=array_merge($result,$this->loadByAssociatedTaskAndLanguage($pg));
             }
             return array_filter(array_values($result));
-            //return array_filter(array_values(array_merge(array_map([$this,'loadByAssociatedTaskAndLanguage'],array_column($task->loadProjectTasks($task->getProjectId(),true), 'taskGuid')))));
         }
         //this ensures that taskGuid does not contain evil content from userland
         $taskGuid = $task->getTaskGuid();
@@ -125,7 +132,16 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         $this->filter->addTableForField('taskGuid', 'ta');
         $s = $db->select()
         ->setIntegrityCheck(false)
-        ->from(array("languageResource" => "LEK_languageresources"), array(new Zend_Db_Expr($adapter->quote($task->getTaskName()).' as taskName'),new Zend_Db_Expr($adapter->quote($taskGuid).' as taskGuid'),"languageResource.id AS languageResourceId","languageResource.*","ta.id AS taskassocid", "ta.segmentsUpdateable"))
+        ->from(array("languageResource" => "LEK_languageresources"),
+            array(
+                new Zend_Db_Expr($adapter->quote($task->getTaskName()).' as taskName'),
+                new Zend_Db_Expr($adapter->quote($taskGuid).' as taskGuid'),
+                "languageResource.id AS languageResourceId","languageResource.langResUuid", "languageResource.name",
+                "languageResource.color","languageResource.resourceId", "languageResource.serviceType",
+                "languageResource.serviceName","languageResource.specificData", "languageResource.timestamp",
+                "languageResource.resourceType", "languageResource.writeSource",
+                "ta.id AS taskassocid",
+                "ta.segmentsUpdateable"))
         ->join(array("la"=>"LEK_languageresources_languages"), 'languageResource.id=la.languageResourceId',array('la.sourceLang AS sourceLang','la.targetlang AS targetLang'))
         ->where('la.sourceLang IN(?)',$sourceLangs)
         ->where('la.targetLang IN(?)',$targetLangs)
@@ -204,7 +220,7 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
     public function getAssocTasksWithResources($taskGuid){
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
-        
+
         $resources = [];
         
         $getResource = function(string $serviceType, string $id) use ($resources, $serviceManager) {

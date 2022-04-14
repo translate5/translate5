@@ -595,44 +595,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * register this Tasks config and Guid in the session as active Task
-     * @param Zend_Session_Namespace $session optional, if omitted standard SessionNamespace is generated
-     * @param string $openState
-     */
-    public function registerInSession(string $openState,Zend_Session_Namespace $session = null) {
-        if(empty($session)) {
-            $session = new Zend_Session_Namespace();
-        }
-        
-        $session->taskGuid = $this->getTaskGuid();
-        $session->taskOpenState = $openState;
-        $session->taskWorkflow = $this->getWorkflow();
-        $session->taskWorkflowStepNr = $this->getWorkflowStep();
-        $session->taskWorkflowStepName = $this->getWorkflowStepName();
-    }
-
-    /**
-     * deletes this Tasks config and Guid from the session as active Task
-     * @param Zend_Session_Namespace $session optional, if omitted standard SessionNamespace is generated
-     */
-    public function unregisterInSession(Zend_Session_Namespace $session = null) {
-        if(empty($session)) {
-            $session = new Zend_Session_Namespace();
-        }
-        $session->taskGuid = null;
-        $session->taskOpenState = null;
-        $session->taskWorkflowStepNr = null;
-    }
-
-    /**
-     * returns true if the loaded task is registered in the session
-     * @return boolean
-     */
-    public function isRegisteredInSession() {
-        $session = new Zend_Session_Namespace();
-        return !empty($session->taskGuid) && $session->taskGuid == $this->getTaskGuid();
-    }
-    /**
      * Convenience API
      * @return boolean
      */
@@ -1042,8 +1004,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function updateIsTerminologieFlag($taskGuid,$ignoreAssocs=array()){
         $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
         /* @var $service editor_Services_TermCollection_Service */
-        $assoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
+        $assoc=ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $result=$assoc->loadAssocByServiceName($taskGuid, $service->getName(),$ignoreAssocs);
         $this->loadByTaskGuid($taskGuid);
         $this->setTerminologie(!empty($result));

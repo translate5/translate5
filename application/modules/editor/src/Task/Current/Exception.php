@@ -26,14 +26,27 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_Taskassoc extends ZfExtended_Models_Validator_Abstract {
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
 
+namespace MittagQI\Translate5\Task\Current;
+
+class Exception extends \ZfExtended_ErrorCodeException {
     /**
-     * Validators for Task User Assoc Entity
+     * @var string
      */
-    protected function defineValidators() {
-        $this->addValidator('taskGuid', 'guid');
-        $this->addValidator('languageResourceId', 'int');
-        $this->addValidator('segmentsUpdateable', 'boolean');
-    }
+    protected $domain = 'editor.currenttask';
+
+    static protected $localErrorCodes = [
+        //Development error: Some PHP code tried to load the currently opened task (identified by the taskid given in the URL)
+        // but no task ID was provided in the URL.
+        // So either the URL producing the request is wrongly created (no Editor.data.restpath prefix),
+        // or its just the wrong context where the CurrentTask was accessed.
+        'E1381' => 'Access to CurrentTask was requested but no task ID was given in the URL.',
+        'E1382' => 'Access to CurrentTask was requested but it was initialized yet.',
+    ];
 }

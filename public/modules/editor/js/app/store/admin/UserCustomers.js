@@ -37,6 +37,7 @@ Ext.define('Editor.store.admin.UserCustomers', {
     model: 'Editor.model.admin.Customer',
     autoLoad: false,
     storeId:'userCustomers',
+    pageSize: 0,
     /**
      * Load the customers assigned to the user
      */

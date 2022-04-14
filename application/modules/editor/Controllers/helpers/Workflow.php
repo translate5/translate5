@@ -35,18 +35,10 @@ class Editor_Controller_Helper_Workflow extends Zend_Controller_Action_Helper_Ab
      * throws a ZfExtended_NoAccessException if user is not allowed to write to the loaded task
      * @param string $taskGuid optional, if omitted we take the curently opened task from session
      * @param string $userGuid optional, if omitted we take the logged in user
-     * @param editor_Workflow_Default $workflow optional, if omitted the configured workflow for task stored in the session is created
+     * @param editor_Workflow_Default|null $workflow optional, if omitted the configured workflow for task stored in the session is created
      * @throws ZfExtended_NoAccessException
      */
-    public function checkWorkflowWriteable($taskGuid = null, $userGuid = null, editor_Workflow_Default $workflow = null) {
-        if(empty($taskGuid)) {
-            $s = new Zend_Session_Namespace();
-            $taskGuid = $s->taskGuid;
-        }
-        if(empty($userGuid)) {
-            $su = new Zend_Session_Namespace('user');
-            $userGuid = $su->data->userGuid;
-        }
+    public function checkWorkflowWriteable(string $taskGuid, string $userGuid, editor_Workflow_Default $workflow = null) {
         if(empty($workflow)) {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
@@ -62,7 +54,7 @@ class Editor_Controller_Helper_Workflow extends Zend_Controller_Action_Helper_Ab
         try {
             $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskGuid($userGuid,$taskGuid);
         }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+        catch(ZfExtended_Models_Entity_NotFoundException) {
         }
         if(empty($tua) || ! $workflow->isWritingAllowedForState($tua->getUsedState())) {
             $e = new ZfExtended_NoAccessException();

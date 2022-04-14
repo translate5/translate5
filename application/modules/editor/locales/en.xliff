@@ -3590,9 +3590,9 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Ausloggen</source>
     <target>Log out</target>
 </trans-unit>
-<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='>
-    <source>Sonderzeichen hinzufügen:</source>
-    <target>Add special characters:</target>
+<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbg=='>
+    <source>Sonderzeichen hinzufügen</source>
+    <target>Add special characters</target>
 </trans-unit>
 <trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZW7DvGJlcnNpY2h0'>
     <source>Zurück zur Aufgabenübersicht</source>
@@ -3645,7 +3645,7 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Delete proposals older than current import</target></trans-unit>
 <trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Log out</target></trans-unit>
-<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Add special characters:</target></trans-unit>
+<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbg=='><source>Sonderzeichen hinzufügen</source><target>Add special characters</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Show only bookmarked segments</target></trans-unit>
 <trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
 <trans-unit id='S2V5IFBlcmZvcm1hbmNlIEluZGljYXRvcnM='><source>Key Performance Indicators</source><target>Key Performance Indicators</target></trans-unit>
@@ -4566,6 +4566,26 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='TWluZGVzdGVucyBlaW4gS3VuZGUgbXVzcyBhdXNnZXfDpGhsdCBzZWlu'>
   <source>Mindestens ein Kunde muss ausgewählt sein</source>
   <target>At least one customer must be selected</target>
+</trans-unit>
+<trans-unit id='WmlwLVVwbG9hZCBpc3QgbnVyIGFscyBBcmJlaXRzZGF0ZWkgbcO2Z2xpY2g='>
+  <source>Zip-Upload ist nur als Arbeitsdatei möglich</source>
+  <target>Zip upload is only possible as a working file</target>
+</trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAoQ2hpbmEp'>
+  <source>Chinesisch (China)</source>
+  <target>Chinese (China)</target>
+</trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAoVGFpd2FuKQ=='>
+  <source>Chinesisch (Taiwan)</source>
+  <target>Chinese (Taiwan)</target>
+</trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAodHJhZGl0aW9uZWxsKQ=='>
+  <source>Chinesisch (traditionell)</source>
+  <target>Chinese (traditional)</target>
+</trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAodmVyZWluZmFjaHQp'>
+  <source>Chinesisch (vereinfacht)</source>
+  <target>Chinese (simplified)</target>
 </trans-unit>
   </file>
 </xliff>

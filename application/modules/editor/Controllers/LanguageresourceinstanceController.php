@@ -26,10 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
+
 /***
  * Language resource controller
  */
 class editor_LanguageresourceinstanceController extends ZfExtended_RestController {
+    use TaskContextTrait;
 
     const FILE_UPLOAD_NAME = 'tmUpload';
 
@@ -60,6 +65,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected $categories;
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
     public function init() {
         //add filter type for languages
         $finalTableForAssoc = new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId');
@@ -453,7 +463,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if(isset($taskList)){
             if(isset($taskList->value) && is_string($taskList->value)){
                 $resultList=$searchEntity($taskList->value,'editor_Models_Task','taskGuid');
-                $handleFilter($taskList,$resultList,'editor_Models_LanguageResources_Taskassoc','loadByTaskGuids','languageResourceId');
+                $handleFilter($taskList,$resultList,'MittagQI\Translate5\LanguageResource\TaskAssociation','loadByTaskGuids','languageResourceId');
             }
             else {
                 $this->entity->getFilter()->deleteFilter('taskList');
@@ -490,8 +500,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     private function prepareTaskInfo($languageResourceids) {
-        /* @var $assocs editor_Models_LanguageResources_Taskassoc */
-        $assocs = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+
+        /* @var $assocs MittagQI\Translate5\LanguageResource\TaskAssociation */
+        $assocs = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
 
         $taskinfo = $assocs->getTaskInfoForLanguageResources($languageResourceids);
         if(empty($taskinfo)) {
@@ -865,8 +876,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
         }
 
-        $assoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
+        $assoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $taskinfo = $assoc->getTaskInfoForLanguageResources([$this->entity->getId()]);
         //FIXME replace lockingUser guid with concrete username and show it in the frontend!
         $this->view->rows = $taskinfo;
@@ -1171,9 +1182,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     /**
      * performs a languageResource query
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws editor_Models_ConfigException
      */
     public function queryAction() {
-        $session = new Zend_Session_Namespace();
+        $this->initCurrentTask();
         $languageResourceId = (int) $this->_getParam('languageResourceId');
 
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
@@ -1182,7 +1197,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         //check taskGuid of segment against loaded taskguid for security reasons
         //checks if the current task is associated to the languageResource
-        $this->entity->checkTaskAndLanguageResourceAccess((string) $session->taskGuid,$languageResourceId, $segment);
+        $this->entity->checkTaskAndLanguageResourceAccess($this->getCurrentTask()->getTaskGuid(),$languageResourceId, $segment);
 
         $this->entity->load($languageResourceId);
 
@@ -1208,9 +1223,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      *  field: source or target
      *  offset: the offset from where the next search should start
      * Since the GUI is dynamically loading additional content no traditional paging can be used here
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws editor_Models_ConfigException
+     * @throws editor_Services_Exceptions_NoService
      */
     public function searchAction() {
-        $session = new Zend_Session_Namespace();
+        $this->initCurrentTask();
         $query = $this->_getParam('query');
         $languageResourceId = (int) $this->_getParam('languageResourceId');
         $field = $this->_getParam('field');
@@ -1222,7 +1242,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         //checks if the current task is associated to the languageResource
-        $this->entity->checkTaskAndLanguageResourceAccess($session->taskGuid,$languageResourceId);
+        $this->entity->checkTaskAndLanguageResourceAccess($this->getCurrentTask()->getTaskGuid(), $languageResourceId);
 
         $this->entity->load($languageResourceId);
 
@@ -1240,15 +1260,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * returns the connector to be used
      * @return editor_Services_Connector
+     * @throws editor_Models_ConfigException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     protected function getConnector() {
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
-        $session = new Zend_Session_Namespace();
-        $task=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($session->taskGuid);
-        return $manager->getConnector($this->entity,$task->getSourceLang(),$task->getTargetLang(),$task->getConfig());
+        $task = $this->getCurrentTask();
+        return $manager->getConnector($this->entity, $task->getSourceLang(), $task->getTargetLang(), $task->getConfig());
     }
 
     /***

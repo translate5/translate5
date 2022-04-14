@@ -35,7 +35,7 @@ Ext.define('Editor.model.admin.task.Log', {
         "4": 'warn',
         "8": 'info',
         "16": 'debug',
-        "32": 'trace',
+        "32": 'trace'
     },
     fields: [
         {name: 'id', type: 'int', persist: false},

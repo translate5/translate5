@@ -56,6 +56,10 @@ class editor_Models_Import_SegmentProcessor_RepetitionHash extends editor_Models
      * @see editor_Models_Import_SegmentProcessor::process()
      */
     public function process(editor_Models_Import_FileParser $parser){
+        $attributes = $parser->getSegmentAttributes($parser->getMid());
+
+        $this->hasher->setSegmentAttributes($attributes);
+
         $allFields = &$parser->getFieldContents();
         if(!$this->sfm->isDefaultLayout()) {
             foreach($allFields as $field => &$data) {

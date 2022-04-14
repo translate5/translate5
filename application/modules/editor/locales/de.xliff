@@ -1622,7 +1622,7 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Sehr geehrte(r)</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Vorschläge löschen älter als aktueller Import</target></trans-unit>
 <trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Ausloggen</target></trans-unit>
-<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Sonderzeichen hinzufügen:</target></trans-unit>
+<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbg=='><source>Sonderzeichen hinzufügen</source><target>Sonderzeichen hinzufügen</target></trans-unit>
 <trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZW7DvGJlcnNpY2h0'><source>Zurück zur Aufgabenübersicht</source><target>Zurück zur Aufgabenübersicht</target></trans-unit>
 <trans-unit id='QWxsZXMgZmVydGlnIC0gQXVmZ2FiZSBhYnNjaGxpZcOfZW4='><source>Alles fertig - Aufgabe abschließen</source><target>Alles fertig - Aufgabe abschließen</target></trans-unit>
 <trans-unit id='TcO2Y2h0ZW4gU2llIHNww6R0ZXIgd2VpdGVybWFjaGVuPw=='><source>Möchten Sie später weitermachen?</source><target>Möchten Sie später weitermachen?</target></trans-unit>
@@ -2103,6 +2103,12 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RGFkdXJjaCB3ZXJkZW4gYWxsZSB6dXZvciBrb25maWd1cmllcnRlbiBXZXJ0ZSBlbnRmZXJudC4='><source>Dadurch werden alle zuvor konfigurierten Werte entfernt.</source><target>Dadurch werden alle zuvor konfigurierten Werte entfernt.</target></trans-unit>
 <trans-unit id='QXVzd2FobCBzcGVpY2hlcm4='><source>Auswahl speichern</source><target>Auswahl speichern</target></trans-unit>
 <trans-unit id='TWluZGVzdGVucyBlaW4gS3VuZGUgbXVzcyBhdXNnZXfDpGhsdCBzZWlu'><source>Mindestens ein Kunde muss ausgewählt sein</source><target>Mindestens ein Kunde muss ausgewählt sein</target></trans-unit>
+<trans-unit id='WmlwLVVwbG9hZCBpc3QgbnVyIGFscyBBcmJlaXRzZGF0ZWkgbcO2Z2xpY2g='><source>Zip-Upload ist nur als Arbeitsdatei möglich</source><target>Zip-Upload ist nur als Arbeitsdatei möglich</target></trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAoQ2hpbmEp'><source>Chinesisch (China)</source><target>Chinesisch (China)</target></trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAoVGFpd2FuKQ=='><source>Chinesisch (Taiwan)</source><target>Chinesisch (Taiwan)</target></trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAodHJhZGl0aW9uZWxsKQ=='><source>Chinesisch (traditionell)</source><target>Chinesisch (traditionell)</target></trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAodmVyZWluZmFjaHQp'><source>Chinesisch (vereinfacht)</source><target>Chinesisch (vereinfacht)</target></trans-unit>
+
   </body>
  </file>
 </xliff>

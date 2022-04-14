@@ -163,8 +163,8 @@ END LICENSE AND COPYRIGHT
 </div> <?php // end of container containerHeader ?>
 
 <div class="sourceSelector">
-    <span class="sourceSelectorItem sourceSelector__text"><svg class="icon icon-t5_translate_text" /> Translate text</span>
-    <span class="sourceSelectorItem sourceSelector__file"><svg class="icon icon-t5_translate_file" /> Translate file</span>
+    <span class="sourceSelectorItem sourceSelector__text"><svg class="icon icon-t5_translate_text" /> <?= $translate->_('Text übersetzen'); ?> </span>
+    <span class="sourceSelectorItem sourceSelector__file"><svg class="icon icon-t5_translate_file" /> <?= $translate->_('Datei übersetzen'); ?> </span>
 </div>
 
 <div id="containerTranslation" class="container container__instanttranslate container__instanttranslatebody">
@@ -466,6 +466,14 @@ $( function() {
         }
         else {
             chosenSourceIsText = !chosenSourceIsText;
+        }
+        
+        // show "translate" button?
+        if ($source === 'text' && !instantTranslationIsActive) {
+            $('#translationSubmit').show();
+        }
+        else {
+            $('#translationSubmit').hide();
         }
         
         clearAllErrorMessages();

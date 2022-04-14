@@ -86,7 +86,7 @@ class editor_Models_Logger_LanguageResources extends ZfExtended_Models_Entity_Ab
         $s = $this->db->select()
         ->from('LEK_languageresources_log',array('count(*) as logCount','languageResourceId'))
         ->where('languageResourceId IN(?)', $languageResourcesIds)
-        ->where('level < ?',ZfExtended_Logger::LEVEL_INFO)
+        ->where('level <= ?',ZfExtended_Logger::LEVEL_INFO)
         ->where('created >= NOW() - INTERVAL 2 month')
         ->group('languageResourceId');
 

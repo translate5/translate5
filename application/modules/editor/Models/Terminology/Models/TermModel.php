@@ -1296,13 +1296,14 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         //get source and target language fuzzies
-        $langs = [];
-        $langs = array_merge($langs,$languageModel->getFuzzyLanguages($task->getSourceLang()));
-        $langs = array_merge($langs,$languageModel->getFuzzyLanguages($task->getTargetLang()));
+        $langs = [
+            $languageModel->getFuzzyLanguages($task->getSourceLang(), includeMajor: true),
+            $languageModel->getFuzzyLanguages($task->getTargetLang(), includeMajor: true),
+        ];
         if ($task->getRelaisLang() > 0) {
-            $langs = array_merge($langs,$languageModel->getFuzzyLanguages($task->getRelaisLang()));
+            $langs[] = $languageModel->getFuzzyLanguages($task->getRelaisLang(), includeMajor: true);
         }
-        $langs = array_unique($langs);
+        $langs = array_unique(array_merge(... $langs));
 
         $data = $this->loadSortedByCollectionAndLanguages($collectionIds, $langs);
         if (!$data) {
@@ -2374,7 +2375,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $order = join(', ', $order) ?: '`id`';
 
         // Get raw siblings
-        return $this->db->getAdapter()->query($sql = '
+        $siblings = $this->db->getAdapter()->query($sql = '
             SELECT 
               `id`, 
               `id`, 
@@ -2387,12 +2388,52 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
               `status`,
               `processStatus`,
               `termEntryId`,
-              `termEntryTbxId`
+              `termEntryTbxId`,
+              `updatedBy` as `createdBy`
             FROM `terms_term` 
             WHERE `termEntryId` = :termEntryId
             ORDER BY ' . $order,
             $bind
         )->fetchAll(PDO::FETCH_UNIQUE);
+
+        // Get users who created for each term, from history
+        $createdBy = $this->db->getAdapter()->query('
+            SELECT `termId`, MIN(CONCAT(`updatedAt`, "--", `updatedBy`)) 
+            FROM `terms_term_history` 
+            WHERE `termId` IN (' . join(',', array_keys($siblings)) . ') 
+            GROUP BY `termId`
+        ')->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // For each term having histiry - spoof value of createdBy with the value found in history
+        foreach ($createdBy as $termId => $info) {
+            $siblings[$termId]['createdBy'] = explode('--', $info)[1];
+        }
+
+        // Return siblings having 'createdBy'-prop, containing either
+        // value of `updateBy` prop of a first `terms_term_history`-record, if exists,
+        // or value of `terms_term`.`updatedBy` prop
+        return $siblings;
+    }
+
+    /**
+     * Get id of a user who created this term, either from the oldest history record (if exists), or from current record
+     *
+     * @return string
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getCreatedBy() {
+
+        // Try to find oldest value of `updatedBy`-prop in current term's history
+        $oldest_updatedBy = $this->db->getAdapter()->query('
+            SELECT `updatedBy` 
+            FROM `terms_term_history`
+            WHERE `termId` = ? 
+            ORDER BY `updatedAt` ASC
+            LIMIT 1
+        ', $this->getId())->fetchColumn();
+
+        // If found - return it, else return current value `updatedBy`-prop
+        return $oldest_updatedBy ?: $this->getUpdatedBy();
     }
 
     /**
@@ -2486,5 +2527,37 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Return collected
         return $distinct;
+    }
+
+    /**
+     * Remove items from $termIdByAttrIdA, for which no proposals were detected,
+     * so only the ones for which they were detected would be kept and returned
+     */
+    public function detectProposals(array $termIdByAttrIdA) {
+
+        // If first arg is empty array - return empty array
+        if (!$termIdByAttrIdA) return [];
+
+        // Build where clause for `id`-column
+        $idWHERE = $this->db->getAdapter()->quoteInto('`id` IN (?)', array_unique($termIdByAttrIdA));
+
+        // Get termIds (as keys), for which proposals are detected
+        $detected = $this->db->getAdapter()->query('
+            SELECT `id`, 1 
+            FROM `terms_term` 
+            WHERE 1
+              AND ' . $idWHERE . '
+              AND (`processStatus` = "unprocessed" OR `proposal` != "") 
+        ')->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // Unset those items from $termIdByAttrIdA for which no proposals were detected
+        foreach ($termIdByAttrIdA as $attrId => $termId) {
+            if (!isset($detected[$termId])) {
+                unset($termIdByAttrIdA[$attrId]);
+            }
+        }
+
+        // Return
+        return $termIdByAttrIdA;
     }
 }

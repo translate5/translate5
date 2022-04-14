@@ -11,6 +11,187 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+
+
+## [5.6.10] - 2022-04-07
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-2942](https://jira.translate5.net/browse/TRANSLATE-2942): Repetition editor - Make repetitions more restrict by including segment meta fields into repetition calculation** <br>
+Make repetition calculation more restrict by including segment meta fields (like maxLength) into repetition calculation. Can be defined by new configuration runtimeOptions.alike.segmentMetaFields.
+
+**[TRANSLATE-2842](https://jira.translate5.net/browse/TRANSLATE-2842): Workflows - new configuration to disable workflow mails** <br>
+Workflow mails can be disabled via configuration.
+
+**[TRANSLATE-2386](https://jira.translate5.net/browse/TRANSLATE-2386): Configuration, Editor general - Add language specific special characters in database configuration for usage in editor** <br>
+The current bar in the editor that enables adding special characters (currently non-breaking space, carriage return and tab) can be extended by characters, that can be defined in the configuration.
+Example of the config layout can be found here:
+https://confluence.translate5.net/display/BUS/Special+characters
+
+
+### Bugfixes
+**[TRANSLATE-2946](https://jira.translate5.net/browse/TRANSLATE-2946): Editor general, Editor Length Check - Multiple problems on automatic adding of newlines in to long segments** <br>
+Multiple Problems fixed: add newline or tab when with selected text in editor lead to an error. Multiple newlines were added in some circumstances in multiline segments with to long content. Optionally overwrite the trailing whitespace when newlines are added automatically.
+
+**[TRANSLATE-2943](https://jira.translate5.net/browse/TRANSLATE-2943): MatchAnalysis & Pretranslation - No analysis is shown if all segments were pre-translated and locked for editing** <br>
+No analysis was shown if all segments were locked for editing due successful pre-translation although the analysis was run. Now an empty result is shown.
+
+**[TRANSLATE-2941](https://jira.translate5.net/browse/TRANSLATE-2941): Editor general - Ignore case for imported files extensions** <br>
+The extension validator in the import wizard will no longer be case sensitive.
+
+**[TRANSLATE-2940](https://jira.translate5.net/browse/TRANSLATE-2940): Main back-end mechanisms (Worker, Logging, etc.) - Login redirect routes** <br>
+Instant-translate / Term-portal routes will be evaluated correctly on login.
+
+**[TRANSLATE-2939](https://jira.translate5.net/browse/TRANSLATE-2939): TermTagger integration - Fix language matching on term tagging** <br>
+The language matching between a task and terminology was not correct. Now terms in a major language (de) are also used in tasks with a sub language (de-DE)
+
+**[TRANSLATE-2914](https://jira.translate5.net/browse/TRANSLATE-2914): I10N - Missing localization for Chinese** <br>
+Added missing translations for Chinese languages in the language drop downs.
+
+
+## [5.6.9] - 2022-03-30
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-2697](https://jira.translate5.net/browse/TRANSLATE-2697): VisualReview / VisualTranslation - General plugin which parses a visual HTML source from a reference file** <br>
+Added capabilities to download the visual source from an URL embedded in a reference XML file
+
+
+### Changed
+**[TRANSLATE-2923](https://jira.translate5.net/browse/TRANSLATE-2923): MatchAnalysis & Pretranslation - Enable 101% Matches to be shown as <inContextExact in Trados analysis XML export** <br>
+A matchrate of 101% may be mapped to InContextExact matches in the analysis XML export for Trados (if configured: runtimeOptions.plugins.MatchAnalysis.xmlInContextUsage)
+
+
+### Bugfixes
+**[TRANSLATE-2938](https://jira.translate5.net/browse/TRANSLATE-2938): Editor general - Remove the limit from the global customer switch** <br>
+The global customer dropdown has shown only 20 customers, now all are show.
+
+**[TRANSLATE-2937](https://jira.translate5.net/browse/TRANSLATE-2937): Main back-end mechanisms (Worker, Logging, etc.) - Workflow user prefs loading fails on importing task** <br>
+Solves a problem with user preferences in importing tasks.
+
+**[TRANSLATE-2934](https://jira.translate5.net/browse/TRANSLATE-2934): VisualReview / VisualTranslation - Bookmark segment in visual does not work** <br>
+The segment bookmark filter button in the simple view mode of visual review was not working, this is fixed.
+
+**[TRANSLATE-2930](https://jira.translate5.net/browse/TRANSLATE-2930): InstantTranslate - Instant-translate task types listed in task overview** <br>
+Pre-translated files with instant-translate will not be listed anymore as tasks in task overview.
+
+**[TRANSLATE-2922](https://jira.translate5.net/browse/TRANSLATE-2922): MatchAnalysis & Pretranslation - 103%-Matches are shown in wrong category in Trados XML Export** <br>
+A matchrate of 103% must be mapped to perfect matches in the analysis XML export for Trados (was previously mapped to InContextExact).
+
+**[TRANSLATE-2921](https://jira.translate5.net/browse/TRANSLATE-2921): TermPortal - Batch edit should only change all terms on affected level** <br>
+Batch editing was internally changed, so the only selected terms and language- and termEntry- levels of selected terms are affected.
+
+**[TRANSLATE-2844](https://jira.translate5.net/browse/TRANSLATE-2844): Import/Export - upload wizard is blocked by zip-file as reference file** <br>
+Disallow zip files to be uploaded as a reference file via the UI, since they can not be processed and were causing errors.
+
+**[TRANSLATE-2835](https://jira.translate5.net/browse/TRANSLATE-2835): OpenTM2 integration - Repair invalid OpenTM2 TMX export** <br>
+Depending on the content in the TM the exported TMX may result in invalid XML. This is tried to be fixed as best as possible to provide valid XML.
+
+**[TRANSLATE-2766](https://jira.translate5.net/browse/TRANSLATE-2766): Client management - Change client sorting in drop-downs to alphabethically** <br>
+All over the application clients in the drop-downs were sorted by the order, they have been added to the application. Now they are sorted alphabetically.
+
+
+## [5.6.8] - 2022-03-22
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-2915](https://jira.translate5.net/browse/TRANSLATE-2915): Okapi integration - Optimize okapi android xml and ios string settings** <br>
+Settings for android xml and IOs string files were optimized to protect certain tag structures, cdata and special characters
+
+**[TRANSLATE-2907](https://jira.translate5.net/browse/TRANSLATE-2907): InstantTranslate - Improve FileTranslation in InstantTranslate** <br>
+InstantTranslate FileTranslation always starts direct after selecting (or Drag'nDrop) the file no matter what is configed for runtimeOptions.InstantTranslate.instantTranslationIsActive
+
+**[TRANSLATE-2903](https://jira.translate5.net/browse/TRANSLATE-2903): TermPortal - Batch edit for Process Status and Usage Status attrs** <br>
+TermPortal: batch editing is now possible for Process Status and Usage Status attributes
+
+
+### Bugfixes
+**[TRANSLATE-2920](https://jira.translate5.net/browse/TRANSLATE-2920): Editor general - REVERT:  TRANSLATE-2345-fix-jumping-cursor** <br>
+ROLLBACK: Fix for jumping cursor reverted
+
+**[TRANSLATE-2912](https://jira.translate5.net/browse/TRANSLATE-2912): Import/Export - reviewHTML.txt import in zip file does not work anymore** <br>
+Fixes a problem where reviewHTML.txt file in the zip import package is ignored.
+
+**[TRANSLATE-2911](https://jira.translate5.net/browse/TRANSLATE-2911): Editor general - Cursor jumps to start of segment** <br>
+FIX: Cursor Jumps when SpellChecker runs and after navigating with arrow-keys 
+
+**[TRANSLATE-2905](https://jira.translate5.net/browse/TRANSLATE-2905): InstantTranslate - No usable error message on file upload error due php max file size reached** <br>
+Custom error message when uploading larger files as allowed in instant-translate.
+
+**[TRANSLATE-2890](https://jira.translate5.net/browse/TRANSLATE-2890): Main back-end mechanisms (Worker, Logging, etc.) - Module redirect based on initial_page acl** <br>
+Authentication acl improvements
+
+**[TRANSLATE-2848](https://jira.translate5.net/browse/TRANSLATE-2848): Import/Export - TermCollection not listed in import wizard** <br>
+Language resources will be grouped by task in language-resources to task association panel in the import wizard.
+
+
+## [5.6.7] - 2022-03-17
+
+### Important Notes:
+#### [TRANSLATE-2906](https://jira.translate5.net/browse/TRANSLATE-2906)
+For users with large amount of terminology: due a DB collation change the SQL file of this fix may run several minutes.
+
+#### [TRANSLATE-2895](https://jira.translate5.net/browse/TRANSLATE-2895)
+For XLF imports the behaviour how and which surrounding tags are ignored is changed! See the details below.
+ 
+
+
+### Added
+**[TRANSLATE-2895](https://jira.translate5.net/browse/TRANSLATE-2895): Import/Export - Optionally remove single tags and bordering tag pairs at segment borders** <br>
+The behaviour how tags are ignored from XLF (not SDLXIFF!) imports has been improved so that all surrounding tags can be ignored right now. The config runtimeOptions.import.xlf.ignoreFramingTags has therefore been changed and has now 3 config values: disabled, paired, all. Where paired ignores only tag pairs at the start and end of a segment, and all ignores all tags before and after plain text. Tags inside of text (and their paired partners) remain always in the segment. The new default is to ignore all tags, not only the paired ones.
+
+**[TRANSLATE-2891](https://jira.translate5.net/browse/TRANSLATE-2891): TermPortal - Choose in TermTranslation Workflow, if definitions are translated** <br>
+It's now possible to choose whether definition-attributes should be exported while exporting terms from TermPortal to main Translate5 app
+
+
+### Changed
+**[TRANSLATE-2899](https://jira.translate5.net/browse/TRANSLATE-2899): VisualReview / VisualTranslation - Base Work for Visual API tests** <br>
+Added capabilities for generating API -tests for the Visual
+
+**[TRANSLATE-2897](https://jira.translate5.net/browse/TRANSLATE-2897): Import/Export - Make XML Parser more standard conform** <br>
+The internal used XML parser was not completly standard conform regarding the naming of tags.
+
+
+### Bugfixes
+**[TRANSLATE-2906](https://jira.translate5.net/browse/TRANSLATE-2906): TBX-Import - Improve slow TBX import of huge TBX files** <br>
+Due a improvement in TBX term ID handling, the import performance for bigger TBX files was reduced. This is repaired now.
+
+**[TRANSLATE-2900](https://jira.translate5.net/browse/TRANSLATE-2900): OpenId Connect - Auto-set roles for sso authentications** <br>
+Auto set roles is respected in SSO created users.
+
+**[TRANSLATE-2898](https://jira.translate5.net/browse/TRANSLATE-2898): Editor general - Disable project deletion while task is importing** <br>
+Now project can not be deleted while there is a running project-task import.
+
+**[TRANSLATE-2896](https://jira.translate5.net/browse/TRANSLATE-2896): Editor general - Remove null safe operator from js code** <br>
+Javascript code improvement.
+
+**[TRANSLATE-2883](https://jira.translate5.net/browse/TRANSLATE-2883): VisualReview / VisualTranslation - Enable visual with source website, html, xml/xslt and images to provide more than 19 pages** <br>
+FIX: The Pager for the visual now shows reviews with more than 9 pages properly.
+
+**[TRANSLATE-2868](https://jira.translate5.net/browse/TRANSLATE-2868): Editor general - Jump to segment on task open: priority change** <br>
+URL links to segments work now. The segment id from the URL hash gets prioritized over the last edited segment id.
+
+**[TRANSLATE-2859](https://jira.translate5.net/browse/TRANSLATE-2859): TermPortal - Change logic, who can edit and delete attributes** <br>
+The rights who can delete terms are finer granulated right now.
+
+**[TRANSLATE-2849](https://jira.translate5.net/browse/TRANSLATE-2849): Import/Export - Disable Filename-Matching for 1:1 Files, it is possible to upload matching-faults** <br>
+File-name matching in visual for single project tasks is disabled and additional import project wizard improvements.
+
+**[TRANSLATE-2345](https://jira.translate5.net/browse/TRANSLATE-2345): Editor general, TrackChanges - Cursor jumps to start of segment, when user enters space and stops typing for a while** <br>
+FIX: Cursor Jumps when inserting Whitespace, SpellChecking and in various other situations
+
+
 ## [5.6.6] - 2022-03-08
 
 ### Important Notes:
