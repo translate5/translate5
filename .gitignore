@@ -7,7 +7,7 @@
 
 # Dirs
 /.idea/
-/client-specific/
+/client-specific
 /nbproject/
 /vendor/
 
