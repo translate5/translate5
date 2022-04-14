@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 CMD_PHP="${CMD_PHP:-/usr/bin/php}"
 CMD_MYSQL="${CMD_MYSQL:-/usr/bin/mysql}"
 

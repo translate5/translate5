@@ -47,6 +47,15 @@ class editor_Controllers_Plugins_LoadCurrentTask extends Zend_Controller_Plugin_
     }
 
     /**
+     * returns the URL path part to the task for the given ID
+     * @param int $id
+     * @return string
+     */
+    public static function makeUrlPath(int $id): string {
+        return APPLICATION_RUNDIR . '/editor/taskid/'.$id.'/';
+    }
+
+    /**
      * invoked in routing startup so that the request can be parsed and modified for further processing without currenttask/ID
      * Example URI:
      * http://translate5.localdev/editor/taskid/1234/go/segment?_dc=1643116609168&page=2&start=200&limit=200

@@ -451,6 +451,29 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
 
     /**
+     * Notify project PM about that project was just created
+     */
+    public function notifyNewProjectForPm() {
+
+        /** @var ZfExtended_Models_User $user */
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        $user->loadByGuid($this->config->task->getPmGuid());
+
+        // Create notification
+        $this->createNotification(ACL_ROLE_PM, __FUNCTION__, [
+            'project' => $this->config->task,
+            'user' => (array) $user->getDataObject(),
+        ]);
+
+        // Do we need this ?
+        //$triggerConfig = $this->initTriggerConfig(func_get_args());
+        //$this->addCopyReceivers($triggerConfig, editor_Workflow_Default::STEP_PM_CHECK);
+
+        // Do notify
+        $this->notifyUser($user);
+    }
+
+    /**
      * Notifies the tasks PM over the new task, but only if PM != the user who has uploaded the task
      */
     public function notifyNewTaskForPm() {

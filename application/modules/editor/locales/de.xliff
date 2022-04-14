@@ -86,6 +86,7 @@
 <trans-unit id='RmVobGVy'><source>Fehler</source><target>Fehler</target></trans-unit>
 <trans-unit id='RmVobGVyIGJlaW0gU3BlaWNoZXJuIG9kZXIgYmVpbSBBdXNsZXNlbiB2b24gRGF0ZW4uIEJpdHRlIHdlbmRlbiBTaWUgc2ljaCBhbiB1bnNlcmVuIFN1cHBvcnQh'><source>Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!</source><target>Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!</target></trans-unit>
 <trans-unit id='PGJyIC8+TWVsZHVuZyB2b20gU2VydmVyOiA8aT57MH0gezF9PC9pPg=='><source><br />Meldung vom Server: <i>{0} {1}</i></source><target><br />Meldung vom Server: <i>{0} {1}</i></target></trans-unit>
+<trans-unit id='TmV1IGxhZGVu'><source>Neu laden</source><target>Neu laden</target></trans-unit>
 <trans-unit id='RGllIERhdGVpIHp1bSBWb3JhdXNsYWRlbiBkZXIgVGFnZ3JhZmlrZW4gd3VyZGUgbmljaHQgZ2VmdW5kZW4uIERhaGVyIGvDtm5uZW4gZGllIFRhZ2dyYWZpa2VuIGVyc3QgYmVpbSDDlmZmbmVuIGRlcyBqZXdlaWxpZ2VuIFNlZ21lbnRzIGdlbGFkZW4gd2VyZGVuLg=='><source>Die Datei zum Vorausladen der Taggrafiken wurde nicht gefunden. Daher können die Taggrafiken erst beim Öffnen des jeweiligen Segments geladen werden.</source><target>Die Datei zum Vorausladen der Taggrafiken wurde nicht gefunden. Daher können die Taggrafiken erst beim Öffnen des jeweiligen Segments geladen werden.</target></trans-unit>
 <trans-unit id='b2s='><source>ok</source><target>ok</target></trans-unit>
 <trans-unit id='ZXJyb3I='><source>error</source><target>error</target></trans-unit>
@@ -862,6 +863,7 @@
 <trans-unit id='QmVudXR6ZXIgb2RlciBQYXNzd29ydCBzaW5kIG5pY2h0IHZhbGlkZS4='><source>Benutzer oder Passwort sind nicht valide.</source><target>Benutzer oder Passwort sind nicht valide.</target></trans-unit>
 <trans-unit id='TGFkZW4='><source>Laden</source><target>Laden</target></trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - Aufgabe zugewiesen</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIFRlcm1pbm9sb2dpZcO8YmVyc2V0enVuZ3Nwcm9qZWt0IGVyc3RlbGx0'><source>Translate5 - Terminologieübersetzungsprojekt erstellt</source><target>Translate5 - Terminologieübersetzungsprojekt erstellt</target></trans-unit>
 <trans-unit id='WndlaXRlciBMZWt0b3I='><source>Zweiter Lektor</source><target>Zweiter Lektor</target></trans-unit>
 <trans-unit id='V29ya2Zsb3cgYWJnZXNjaGxvc3Nlbg=='><source>Workflow abgeschlossen</source><target>Workflow abgeschlossen</target></trans-unit>
 <trans-unit id='w5xiZXJzZXR6dW5n'><source>Übersetzung</source><target>Übersetzung</target></trans-unit>

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Translate5 may be run under windows in a bash, so if this is the case use the PHP conf from there
 if [ -f "windows-installer-config.ini" ]; then
