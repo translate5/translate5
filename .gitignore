@@ -1,8 +1,8 @@
 # /data dir
-/data/editorImportedTasks/
-/data/editorOkapiBconf/
-/data/editorVisualReviewFonts/
-/data/tbx-import/
+/data/editorImportedTasks*
+/data/editorOkapiBconf*
+/data/editorVisualReviewFonts*
+/data/tbx-import*
 /data/dummyTm_*
 
 # Dirs
