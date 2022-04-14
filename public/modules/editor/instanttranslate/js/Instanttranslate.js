@@ -31,9 +31,10 @@ if (window.parent.location !== window.location) {
     $('body').addClass('noheader');
     $('#containerHeader').hide();
 }
+
 var editIdleTimer = null,
     NOT_AVAILABLE_CLS = 'notavailable', // css if a (source-/target-)locale is not available in combination with the other (target-/source-)locale that is set
-    uploadedFiles,//Variable to store uploaded files
+    uploadedFiles = [],//Variable to store uploaded files
     translateTextResponse = '',
     latestTranslationInProgressID = false,
     latestTextToTranslate = '',
@@ -41,12 +42,160 @@ var editIdleTimer = null,
     chosenSourceIsText = true,
     fileTypesAllowed = [],
     fileUploadLanguageCombinationsAvailable = [],
-    langugaeInformationData = [];
+    langugaeInformationData = [],
+    characterLimit = 0;
 
 
-// hide translate-button if instantTranslationIsActive is active
-if (instantTranslationIsActive) {
-    $('#translationSubmit').hide();
+/**
+ * Initializes the application when the DOM is ready
+ * @param {string} characterLimit
+ * @param {array} pretranslatedFiles
+ * @param {string} dateAsOf
+ */
+function initGui(characterLimit, pretranslatedFiles, dateAsOf){
+
+    characterLimit = characterLimit;
+
+    // hide translate-button if instantTranslationIsActive is active
+    if (instantTranslationIsActive) {
+        $('#translationSubmit').hide();
+    }
+
+    $('#logout a').mouseover(function(){
+        $(this).removeClass("ui-state-active");
+    });
+    $('#logout a').mouseout(function(){
+        $(this).addClass("ui-state-active");
+    });
+    $('#logout').on("click",function(){
+        var loginUrl=Editor.data.loginUrl || Editor.data.apps.loginUrl;
+        //check if it is used from iframe
+        if(window.parent != undefined){
+            window.parent.location = loginUrl;
+        }else{
+            window.location =loginUrl;
+        }
+    });
+    $('#locale').selectmenu({
+        change: function() {
+            var action = $(this).val();
+            $("#languageSelector").attr("action", "?locale=" + action);
+            $("#languageSelector").submit();
+        }
+    });
+
+    $('#sourceLocale').selectmenu({
+        appendTo: "#source",
+        open: function() {
+            updateLocalesSelectLists($(this));
+        },
+        change: function() {
+            checkInstantTranslation();
+        }
+    }).selectmenu("menuWidget").addClass("overflow localesSelectList");
+    $('#targetLocale').selectmenu({
+        appendTo: "#target",
+        open: function() {
+            updateLocalesSelectLists($(this));
+        },
+        change: function() {
+            checkInstantTranslation();
+        }
+    }).selectmenu("menuWidget").addClass("overflow localesSelectList");
+    // cause the select-menuWidget will not re-size and re-postition itself on windows resize, we just close it.
+    $(window).resize(function() {
+        $('.selectSourceTarget').selectmenu('close');
+    });
+
+    $('#sourceFile').button();
+    $('#translationSubmit').button();
+
+    // activate jQuery-UI tooltip to show title in styled box
+    $( document ).tooltip({
+        position: {
+            my: "center top",
+            at: "center bottom+14",
+            using: function( position, feedback ) {
+                $( this ).css( position );
+                $( "<div>" )
+                    .addClass( "arrow" )
+                    .addClass( "top" )
+                    .addClass( feedback.vertical )
+                    .addClass( feedback.horizontal )
+                    .appendTo( this );
+            }
+        }
+    });
+
+    //check if the source and the target are the same
+    if($('#sourceLocale').val() == $('#targetLocale').val()){
+        setTargetFirstAvailable($('#sourceLocale').val());
+    }
+    // start with checking according to the locales as stored for user
+    checkInstantTranslation($('#targetLocale'));
+    $("#sourceText").attr('maxlength', characterLimit);
+    clearAllErrorMessages();
+    setAllowedFileTypes();
+    setfileUploadLanguageCombinationsAvailable();
+    setTextForSource();
+    showSource();
+
+    // press the button to swap source-/target-language
+    $('.switchSourceTarget').on("click", function() {
+        // detect old languages
+        var $oldSourceLang = $('#sourceLocale').val();
+        var $oldTargetLang = $('#targetLocale').val();
+
+        // now swap the language selections
+        $("#sourceLocale").val($oldTargetLang);
+        $("#targetLocale").val($oldSourceLang);
+        $("#sourceLocale").selectmenu("refresh");
+        $("#targetLocale").selectmenu("refresh");
+
+        // renew the results, if there are any
+        var results=$('div.translation-result');
+        checkInstantTranslation();
+        if(results.length>0) {
+            $('#sourceText').val(results[0].textContent);
+        }
+        $('#translations').hide();
+        startTranslation();
+    });
+
+    //$('.dropSourceFile').droppable();
+    // $("input[type='file']").prop("files", e.dataTransfer.files);
+
+    // prefent funny behaviour of some browsers
+    $('.dropSourceFile').on('dragover', function(e) {e.preventDefault(); e.stopPropagation();});
+    $('.dropSourceFile').on('dragenter', function(e) {e.preventDefault(); e.stopPropagation();});
+    // add a special class "dargover" and remove it on dragleave
+    $('.dropSourceFile').on('dragover', function() {$(this).addClass('dragover');});
+    $('.dropSourceFile').on('dragleave', function() {$(this).removeClass('dragover')});
+
+    // do actual "file-dropping"
+    $('.dropSourceFile').on(
+        'drop',
+        function(e) {
+            $(this).removeClass('dragover');
+            if(e.originalEvent.dataTransfer){
+                if(e.originalEvent.dataTransfer.files.length) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    /*UPLOAD FILES HERE*/
+                    $('#sourceFile').prop('files', e.originalEvent.dataTransfer.files);
+                    $('#sourceFile').trigger('change');
+                }
+            }
+        }
+    );
+    // route click event to the input #sourceFile for normal file-select
+    $('.dropSourceFile').on('click', function(e) {e.preventDefault(); e.stopPropagation(); $('#sourceFile').click();});
+    $(document).on('click', '.source-toggle .change-source-type' , function() {toggleSourceTextFile();});
+    $(document).on('click', '.sourceSelector__text' , function() {toggleSourceTextFile('text');});
+    $(document).on('click', '.sourceSelector__file' , function() {toggleSourceTextFile('file');});
+    $('body').addClass('sourceIsText');
+
+    showDownloads(pretranslatedFiles, dateAsOf);
 }
 
 /**
@@ -868,7 +1017,8 @@ function getDownloads(){
  * @param array allPretranslatedFiles
  * @param string dateAsOf
  */
-function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = array(taskName, downloadUrl, removeDate)
+function showDownloads(allPretranslatedFiles, dateAsOf){
+    // array[taskId] = array(taskName, downloadUrl, removeDate)
     var pretranslatedFiles = [],
         html = '',
         importProgressUpdate = false;
@@ -1270,4 +1420,44 @@ function stopLoadingState() {
  */
 function getInputTextValueTrim(){
     return $('#sourceText').val().trim();
+}
+
+function toggleSourceTextFile($source, $hardset = false) {
+    // do nothing if:
+    // want to change to source "text" and is already "text"
+    if (!$hardset && $source === 'text' && chosenSourceIsText) {return;}
+    // want to change to source "file" and is already "file"
+    if (!$hardset && $source === 'file' && !chosenSourceIsText) {return;}
+    // want to change to source "file" and file upload is not aavailable (e.g. for this language combination)
+    if ($source === 'file' && !isFileUploadAvailable()) {return;}
+
+    $('.source-toggle').toggle();
+    if ($hardset) {
+        if ($source === 'file') {
+            chosenSourceIsText = false;
+        } else {
+            chosenSourceIsText = true;
+        }
+    } else {
+        chosenSourceIsText = !chosenSourceIsText;
+    }
+
+    // show "translate" button?
+    if ($source === 'text' && !instantTranslationIsActive) {
+        $('#translationSubmit').show();
+    } else {
+        $('#translationSubmit').hide();
+    }
+
+    clearAllErrorMessages();
+    document.getElementById("sourceFile").value = "";
+    showSource();
+    $('body').removeClass('sourceIsText');
+    $('body').removeClass('sourceIsFile');
+
+    if(chosenSourceIsText) {
+        $('body').addClass('sourceIsText');
+    } else {
+        $('body').addClass('sourceIsFile');
+    }
 }
