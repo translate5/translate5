@@ -175,14 +175,19 @@ class editor_Utils_Dom extends DOMDocument {
     }
     /**
      * Evaluates, if a loaded Document had no fatal errors and therefore can be seen as "valid"
-     * @return boolean
+     * If the evaluation has to be more strict you have to use the options
      */
-    public function isValid(){
+    /**
+     * @param bool $allowErrors
+     * @param bool $allowWarnings
+     * @return bool
+     */
+    public function isValid(bool $allowErrors=true){
         if(count($this->domErrors) == 0){
             return true;
         }
         foreach($this->domErrors as $error){ /* @var $error libXMLError */
-            if($error->level == LIBXML_ERR_FATAL){
+            if($error->level == LIBXML_ERR_FATAL || (!$allowErrors && $error->level == LIBXML_ERR_ERROR)){
                 return false;
             }
         }

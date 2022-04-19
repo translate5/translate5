@@ -39,7 +39,6 @@ class Markup {
     public static function isMarkup(string $text) : bool{
         return (strip_tags($text) != $text);
     }
-
     /**
      * Check if the text is valid markup i.e. can be parsed with our Markup-Parsers
      * Note, that this is tolerant against smaller Problems like <img src="SOMESOURCE"> -> missing self-closing delimiter
@@ -51,11 +50,10 @@ class Markup {
         if(strip_tags($markup) != $markup){
             $domDocument = new \editor_Utils_Dom();
             $domDocument->loadUnicodeMarkup($markup);
-            return $domDocument->isValid();
+            return $domDocument->isValid(false);
         }
         return true;
     }
-
     /**
      * escapes markup, leaves the tags alive but escape any text inbetween tags to XML standards
      * Obviously this expect the markup to be valid!

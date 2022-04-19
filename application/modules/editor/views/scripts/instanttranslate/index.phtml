@@ -26,9 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-?>
+    // DEV OPTION: setting this value to TRUE will show some Code which can be usefull for development. E.g. a list of all defined icons is shown
+    $devShowAllIconsTemplate = FALSE;
+    // DEV OPTION: Will disable the instant translation so the user must submit a button to translate (normally set via Zf_config)
+    $devPreventInstantTranslate = FALSE;
 
-<?php
     /* @var $this Zend_View */
     $version = '?v='.$this->appVersion;
 
@@ -152,8 +154,6 @@ END LICENSE AND COPYRIGHT
         echo '<div id="logoutContainer"><a id="logout" href="#" class="">'.$translate->_('Abmelden').'</a></div>';
     }
 
-    // SBE: tempDev .. setting this value to TRUE will show some Code which can be usefull for development. E.g. a list of all defined icons is shown
-    $isTempDevTemplatesShow = FALSE;
 ?>
 
     </div> <?php // end of buttonContainer ?>
@@ -236,7 +236,7 @@ END LICENSE AND COPYRIGHT
         <div id="pretranslatedfiles" class="show-if-source-is-file"><!-- inject file-translations here  --></div>
 
 
-        <?php if ($isTempDevTemplatesShow) : ?>
+        <?php if ($devShowAllIconsTemplate) : ?>
             <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
             <p>SBE-DEV: Test-Ausgabe</p>
             <div class="box box__result__header box__result__header__green font-size-big">
@@ -301,7 +301,8 @@ END LICENSE AND COPYRIGHT
         initGui(
             '<?php echo $characterLimit;?>',
             <?php echo json_encode(array_values($this->allPretranslatedFiles)); ?>,
-            <?php echo json_encode($this->dateAsOf); ?>
+            <?php echo json_encode($this->dateAsOf); ?>,
+            <?php echo ($devPreventInstantTranslate) ? 'true' : 'false'; ?>
         );
 
     });
