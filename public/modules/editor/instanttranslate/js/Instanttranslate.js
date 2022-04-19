@@ -482,9 +482,6 @@ function updateLocalesSelectLists(el) {
  */
 function checkInstantTranslation() {
 
-    // TODO REMOVE
-    console.log('checkInstantTranslation', );
-
     // show file-translation as disabled with errors  when there re no available services
     if(!chosenSourceIsText && !isFileUploadAvailable()){
         showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
