@@ -52,7 +52,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfStore', {
     }
   },
   fields: [{
-    name: 'default',
+    name: 'isDefault',
     type: 'boolean'
   }]
 });

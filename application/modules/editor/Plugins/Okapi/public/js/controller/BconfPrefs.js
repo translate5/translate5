@@ -43,7 +43,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
     extend: 'Ext.app.Controller',
 
     requires: [
-        'Editor.plugins.Okapi.view.filter.BConfGrid',
+        'Editor.plugins.Okapi.view.BconfGrid',
         'Editor.plugins.Okapi.store.BconfStore'
     ],
     init: function(){
@@ -96,13 +96,13 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
     addBconfToSettingsPanel: function (panel) {
         if (Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')) {
             this.bconfPanel = panel.insert(0, {
-                xtype: 'okapiFilterGrid',
+                xtype: 'okapiBconfGrid',
                 store: {
                     type: 'chained',
                     source: 'bconfStore',
                     storeId: 'bconfGlobal',
                     filters: [function (item) {
-                        return !item.data.customer_id;
+                        return !item.data.customerId;
                     }]
                 },
             });
@@ -117,14 +117,14 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             storeId: 'bconfCustomer',
             filters: [{
                 id: 'clientFilter',
-                property: 'customer_id',
+                property: 'customerId',
                 value: '{list.selection.id}',
                 filterFn: function ({data}) {
-                    return !data.customer_id || this._value == data.customer_id;
+                    return !data.customerId || this._value == data.customerId;
                 },
             }],
             sorters:[{
-                property: 'customer_id',
+                property: 'customerId',
                 direction:'DESC'
             },{
                 property: 'name',
@@ -133,7 +133,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         vm.setStores(vmStores);
 
         tabPanel.insert(2-2, {
-                xtype: 'okapiFilterGrid',
+                xtype: 'okapiBconfGrid',
                 bind: {
                     customer: '{record}',
                     store: '{bconfCustomer}'
@@ -150,7 +150,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             displayField: 'name',
             name: 'bconfId',
             valueField: 'id',
-            fieldLabel: Editor.plugins.Okapi.view.filter.BConfGrid.prototype.strings.titleLong,
+            fieldLabel: Editor.plugins.Okapi.view.BconfGrid.prototype.strings.titleLong,
             listConfig: {
                 getInnerTpl: function(displayField){
                     return `<span data-qtip="{description}">{${displayField}}</span>`
@@ -169,12 +169,12 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                         source: 'bconfStore',
                         autoLoad: true,
                         filters: [{
-                            filterFn: ({data:bconf}) => !bconf.customer_id || this._value == bconf.customer_id,
-                            property: 'customer_id',
+                            filterFn: ({data:bconf}) => !bconf.customerId || this._value == bconf.customerId,
+                            property: 'customerId',
                             value: '{customer.selection.id}'
                         }],
                         sorters: [{
-                            property: 'customer_id',
+                            property: 'customerId',
                             direction:'DESC'
                         },{
                             property: 'name',
@@ -189,7 +189,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                         },
                         get: function ({customer, store}) {
                             return customer.get('defaultBconfId') ||  this.globalDefaultId ||
-                                (this.globalDefaultId = store.getData().findBy(({data:bconf}) => bconf.default).id); //FIXME: find better way to calc global default, maybe global variable
+                                (this.globalDefaultId = store.getData().findBy(({data:bconf}) => bconf.isDefault).id); //FIXME: find better way to calc global default, maybe global variable
                         }
                     }
                 }

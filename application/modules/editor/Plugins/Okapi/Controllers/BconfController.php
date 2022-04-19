@@ -44,7 +44,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
      */
     protected bool $decodePutAssociative = true;
 
-    const FILE_UPLOAD_NAME='bconffile';
+    const FILE_UPLOAD_NAME = 'bconffile';
      /**
       * @var string
       */

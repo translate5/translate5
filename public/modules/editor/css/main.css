@@ -103,10 +103,6 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
 .segment-tag-column div.x-grid-cell-inner div.internal-tag,
 .segment-tag-column div.x-grid-cell-inner div.internal-tag span {
     user-select: none;
-    -o-user-select: none;
-    -ms-user-select: none;
-    -moz-user-select: -moz-none;
-    -webkit-user-select: none;
 }
 
 /* this css is used in visual review tooltip, for displaying the internal tags, terminologie */
@@ -407,7 +403,7 @@ table.message-box-data .error {}
 
 .comment {margin-bottom:5px;}
 #segment-grid .comment {margin-bottom:0px; padding-right: 16px;}
-#segment-grid .comment .ellipsis {font-size:7pt;line-hight:3pt;display:block;line-height:10pt;}
+#segment-grid .comment .ellipsis {font-size:7pt;display:block;line-height:10pt;}
 
 #segment-grid .editor-comment-display .x-form-item-body {
     display: block;
@@ -898,7 +894,6 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 
 #commentNavList>div::before{
     display: inline-block;
-    width: 1.28571em;
     width: 25px;
     text-align: center;
     border-radius: 3px;
@@ -916,13 +911,14 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 #commentNavList>div.usernr8::before {background-color: var(--color-usernr8);}
 #commentNavList>div.usernrX::before {background-color: var(--color-usernrX);}
 
-/* BCONF management */
-.okapifilterGrid .x-action-col-icon{
-    margin: 5px !important;
+.actionColGrid .x-action-col-icon {
+    margin: 5px;
 }
-.customFilterGrid .x-action-col-icon{
-    margin: 5px !important;
+
+.pointer {
+    cursor: pointer;
 }
+
 .invalidGridBorder{
     border-color: #cf4c35;
     border-style: solid;

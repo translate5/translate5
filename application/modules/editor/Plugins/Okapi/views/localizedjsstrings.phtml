@@ -41,8 +41,8 @@ $translate = $this->translate;
 Editor.controller.Localizer.addPluginInit('okapi', function() {
 
     /** @class okapi_l18n */
-    Ext.define("Editor.locale.plugins.Okapi.view.filter.BConfGrid", {
-        override: "Editor.plugins.Okapi.view.filter.BConfGrid",
+    Ext.define("Editor.locale.plugins.Okapi.view.BconfGrid", {
+        override: "Editor.plugins.Okapi.view.BconfGrid",
         config: { // configs need direct override
             title: `<?= $translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>`,
         },

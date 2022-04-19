@@ -39,17 +39,15 @@ END LICENSE AND COPYRIGHT
  * @method void setId(int $id)
  * @method void setName(string $name)
  * @method string getName()
- * @method setDefault(int $int)
+ * @method setIsDefault(int $int)
  * @method setDescription(string $string)
- * @method setCustomer_id(mixed $customer_id)
+ * @method setCustomerId(mixed $customerId)
  */
 class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstract {
-    
-    public editor_Plugins_Okapi_Bconf_File $file;
 
-    /**
-     * @param editor_Plugins_Okapi_Bconf_File $file
-     */
+    const SYSTEM_BCONF_VERSION = 1;
+
+    public editor_Plugins_Okapi_Bconf_File $file;
     public function setFile(editor_Plugins_Okapi_Bconf_File $file): void {
         $this->file = $file;
     }
@@ -69,7 +67,9 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     {
         parent::__construct();
         if($postFile){ // create new entity from file
-            empty($data['name']) && ($data['name'] = $postFile['name']);
+            if(empty($data['name'])){
+                $data['name'] = pathinfo($postFile['name'])['filename']; // strip '.bconf'
+            }
             unset($data['id']); // auto gernerated
             $this->init($data);
             $this->save();
@@ -93,7 +93,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         if ($skipCheck || $this->getTotalCount() === 0) {
             $defaultImportBconf = editor_Plugins_Okapi_Init::getOkapiDataFilePath() . 'okapi_default_import.bconf';
             $bconf = new editor_Plugins_Okapi_Models_Bconf(['tmp_name'=>$defaultImportBconf, 'name'=>'Translate5-Standard.bconf']);
-            $bconf->setDefault(1);
+            $bconf->setIsDefault(1);
             $bconf->setDescription("The .bconf used for file imports unless another one is configured");
             $bconf->save();
             return true;

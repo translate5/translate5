@@ -38,11 +38,9 @@ class editor_Plugins_Okapi_Models_Validator_Bconf extends ZfExtended_Models_Vali
      * Validators for Okapi Bconf Entity
      */
     protected function defineValidators() {
-        $db = $this->entity->db;
-        $dbName = $db->info(constant("$db"."::name"));
         $this->addValidator('id', 'int');
-        $this->addValidator('default', 'boolean');
-        $this->addValidator('customer_id', 'int');
+        $this->addValidator('isDefault', 'boolean');
+        $this->addValidator('customerId', 'int');
         $this->addValidator('name', 'stringLength', array('min' => 1, 'max' => 255));
         $this->addValidator('description', 'stringLength', array('min' => 1, 'max' => 255));
     }

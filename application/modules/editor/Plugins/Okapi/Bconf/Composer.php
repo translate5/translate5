@@ -153,14 +153,14 @@ class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_Fil
         $data = $filterConfiguration->getByBconfId($bconfId);
         $count = 0;
         foreach ($data as $filter) {
-            if ($filter['default'] == 1) {
+            if ($filter['isDefault'] == 1) {
                 $count++;
             }
         }
         $raf->writeInt($count);
         
         foreach ($data as $filter) {
-            if ($filter['default'] == 1) {
+            if ($filter['isDefault'] == 1) {
                 //TODO get dir path
                 $configFilePath = $filter['okapiId'].'.fprm';
                 $file = fopen($configFilePath, "r") or die("Unable to open file!");

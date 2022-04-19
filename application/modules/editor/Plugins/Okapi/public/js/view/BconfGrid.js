@@ -25,23 +25,24 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 /**
- * @class okapiFilterGrid
+ * @class okapiBconfGrid
  */
-Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
+Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     extend: 'Ext.grid.Panel',
     requires: [
-        'Editor.plugins.Okapi.view.filter.BConfGridController',
+        'Editor.plugins.Okapi.view.BconfGridController',
         'Editor.plugins.Okapi.store.BconfStore',
     ],
-    alias: 'widget.okapiFilterGrid',
+    alias: 'widget.okapiBconfGrid',
     plugins: ['gridfilters', 'cellediting'],
-    itemId: 'okapifilterGrid',
+    itemId: 'okapiBconfGrid',
+    SYSTEM_BCONF_NAME: 'Translate5-Standard',
     controller: 'bconfGridController',
     store: 'bconfStore',
-    stateId: 'okapifilterGrid',
+    stateId: 'okapiBconfGrid',
     stateful: true,
     isCustomerGrid: false,
-    cls: 'okapifilterGrid',
+    userCls: 'actionColGrid',
     title: '#UT#Dateiformatkonvertierung',
     helpSection: 'useroverview',
     glyph: 'f1c9@FontAwesome5FreeSolid',
@@ -58,7 +59,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
         var storeFilters = this.getStore().getFilters(),
             clientFilter = storeFilters.getByKey('clientFilter');
         if(clientFilter){
-            clientFilter.customer_id = newCustomer.id;
+            clientFilter.customerId = newCustomer.id;
             storeFilters.notify('endupdate');
         }
     },
@@ -73,6 +74,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
         upload: '#UT#upload',
         srx: '#UT#SRX',
         pipeline: '#UT#Pipeline',
+        customerStandard: '#UT#Kundenstandard'
     },
     strings: {
         edit: '#UT#Edit',
@@ -93,23 +95,13 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
     reference:'bconfgrid',
     viewConfig: {
         getRowClass: function({data:bconf}) {
-            var cls='', customer = (this.ownerGrid.customer||{}).data;
-            if(customer){
-                if(bconf.customer_id != customer.id) {
+            var cls='', customer = (this.ownerGrid.customer||{}).data || {};
+                if(bconf.customerId != customer.id || bconf.name === this.grid.SYSTEM_BCONF_NAME) {
                     cls += 'not-editable ';
                 }
-                if(customer.defaultBconfId){
-                    if(bconf.id == customer.defaultBconfId){
-                        cls += 'chosenDefault ';
-                    }
-                } else if(bconf.default){
+                if(bconf.isDefault || customer.defaultBconfId == bconf.id){
                     cls += 'chosenDefault '
                 }
-            } else { // global grid
-                if (bconf.default) {
-                    cls += 'chosenDefault ';
-                }
-            }
             return cls;
         },
     },
@@ -127,7 +119,6 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                     filter: {
                         type: 'string',
                     },
-                    editor: 'textfield',
                     text: 'Id',
                     hidden: true,
                 },
@@ -140,7 +131,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                     filter: {
                         type: 'string',
                     },
-                    editor: 'textfield',
+                    //editor: 'textfield',
                     text: me.text_cols.name,
                 },
                    /* {
@@ -159,10 +150,17 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                         alias:'desc',
                         dataIndex: 'description',
                         stateId: 'description',
-                        editor: 'textfield',
+                        editor: {
+                            field: {
+                                xtype: 'textfield',
+                                allowBlank: false,
+                                emptyText: me.text_cols.description
+                            }
+                        },
                         filter: {
                             type: 'string',
                         },
+                        tdCls: 'pointer',
                         text: me.text_cols.description,
                         flex:3
                     },
@@ -174,6 +172,7 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                         itemId: 'customerDefaultColumn',
                         hidden: !instanceConfig.isCustomerGrid,
                         hideable: instanceConfig.isCustomerGrid,
+                        tdCls: 'pointer',
                         tooltip: '',
                         renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
                             var customer = view.ownerGrid.getCustomer();
@@ -187,8 +186,11 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                                     customer = grid.getCustomer(),
                                     newDefault = bconfRec.getId(),
                                     oldDefault = customer.get('defaultBconfId');
+                                if(newDefault == oldDefault){ // deselect customer default
+                                    newDefault = null;
+                                }
                                 bconfRec.set('isDefaultForCustomer', customer.getId());
-                                customer.set('defaultBconfId', newDefault, {silent:true}); // set on customer
+                                customer.set('defaultBconfId', newDefault, {silent: true}); // set on customer
                                 if(oldDefault){ // unselect old
                                     var oldDefaultRec = view.getStore().getById(oldDefault);
                                     oldDefaultRec.set('isDefaultForCustomer', false, newDefault==oldDefault ? {} : {silent:true, dirty:false});
@@ -203,14 +205,15 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                     {
                         xtype: 'checkcolumn',
                         text: me.text_cols.standard,
-                        dataIndex: 'default',
+                        dataIndex: 'isDefault',
                         itemId: 'globalDefaultColumn',
                         tooltip: '',
+                        disabled: instanceConfig.isCustomerGrid,
                         width: 95,
                         renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
                             var grid = view.ownerGrid;
-                            if (isDefault && (grid.isCustomerGrid ? (grid.customerDefault && record!=grid.customerDefault) : record.get('customer_id'))){
-                                arguments[0] = false;
+                            if (!isDefault && !grid.isCustomerGrid){
+                                metaData.tdCls += ' pointer ';
                             }
                             return this.defaultRenderer.apply(this, arguments);
                         },
@@ -220,13 +223,13 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                                     grid = view.ownerGrid,
                                     store = grid.store,
                                     oldDefault;
-                                if (checked) { // must uncheck old default
-                                    oldDefault = store.getAt(store.findBy(({data}) => data.default && !data.customer_id));
+                                if(grid.isCustomerGrid || !checked){ // Cannot set in customerGrid, cannot deselect global default
+                                    return false;
+                                } else if (checked) { // must uncheck old default
+                                    oldDefault = store.getAt(store.findBy(({data}) => data.isDefault && !data.customerId));
                                     if (oldDefault && oldDefault !== record) {
-                                        oldDefault.set('default', false)
+                                        oldDefault.set('isDefault', false)
                                     }
-                                } else if (!checked) {
-                                    return grid.isCustomerGrid; // can't unselect global default
                                 }
                             }
                         }
@@ -235,11 +238,10 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                         xtype: 'actioncolumn',
                         stateId: 'okapiGridActionColumn',
                         align: 'center',
-                        dataIndex: 'default',
+                        dataIndex: 'isDefault',
                         width: 3*28+8,
-
-
                         text: me.text_cols.action,
+                        iconCls: 'margin5', // applies to all items
                         items: [/*{
                                 tooltip: me.strings.edit,
                                 isAllowedFor: 'bconfEdit',
@@ -314,21 +316,14 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                     xtype: 'toolbar',
                     dock: 'top',
                     items: [{
-                        xtype: 'filefield',
-                        name: 'bconffile',
-                        buttonConfig:{
-                            glyph: 'f093@FontAwesome5FreeSolid',
-                            text: me.strings.uploadBconf,
-                            ui: 'default-toolbar-small'
-                        },
-                        msgTarget: 'side',
+                        xtype: 'button',
+                        glyph: 'f093@FontAwesome5FreeSolid',
+                        text: me.strings.uploadBconf,
+                        ui: 'default-toolbar-small',
                         width: 'auto',
-                        margin: 0,
-                        accept: '.bconf',
-                        buttonOnly: true,
-                        listeners: {
-                            element: 'fileInputEl',
-                            change: 'uploadBconf'
+                        handler: function(btn){
+                            Editor.util.Util.chooseFile('.bconf')
+                                .then(files => btn.up('grid').getController().uploadBconf(files[0]))
                         }
                     },
                     {
@@ -342,41 +337,26 @@ Ext.define('Editor.plugins.Okapi.view.filter.BConfGrid', {
                     {
                         xtype: 'textfield',
                         width: 300,
+                        flex: 2,
                         margin: '0 0 0 20px',
                         emptyText: me.strings.searchEmptyText,
+                        triggers: {
+                            clear: {
+                                cls: Ext.baseCSSPrefix + 'form-clear-trigger',
+                                handler: field => field.setValue(null) || field.focus(),
+                                hidden: true
+                            }
+                        },
                         listeners: {
                             change: 'filterByText',
                             buffer: 150
                         }
                     },
                     {
-                        xtype: 'component',
-                        itemId: 'srxInput',
-                        hidden: true,
-                        autoEl: {
-                            tag: 'input',
-                            type: 'file',
-                            accept: '.srx'
-                        },
-                        listeners: {
-                            change: {
-                                fn: function uploadSrx(e, input) {
-                                    var data = new FormData()
-                                    data.append('id', input.recId);
-                                    data.append('srx', input.files[0]);
-
-                                    fetch(Editor.data.restpath + 'plugins_okapi_bconf/uploadSRX', {
-                                        method: 'POST',
-                                        body: data
-                                    }).then(function(response){
-                                        debugger;
-                                    })
-                                    input.value = input.recId = ''; // reset file input
-                                },
-                                element: 'el'
-                            }
-                        }
-                    },],
+                        xtype: 'tbseparator',
+                        flex: 3,
+                    },
+                    ],
                 }, ],
             };
         return me.callParent([Ext.apply(config, instanceConfig)]);

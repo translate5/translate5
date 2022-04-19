@@ -35,13 +35,14 @@ INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `valu
 
 CREATE TABLE IF NOT EXISTS `LEK_okapi_bconf` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
-    `customer_id` INT(11) DEFAULT NULL,
+    `customerId` INT(11) DEFAULT NULL,
     `name` VARCHAR(50),
     `description` TEXT,
-    `default` TINYINT(1) NOT NULL DEFAULT 0,
+    `isDefault` TINYINT(1) NOT NULL DEFAULT 0,
     `versionIdx` INT(10) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`customer_id`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
+    UNIQUE(`name`),
+    CONSTRAINT FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `LEK_okapi_bconf_filter` (

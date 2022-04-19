@@ -34,7 +34,7 @@ Ext.define('Editor.plugins.Okapi.view.filterDetails.BConfFilterGrid', {
     alias: 'widget.bconfFilterGrid',
     plugins: ['gridfilters'],
     helpSection: 'useroverview',
-    cls: 'customFilterGrid',
+    cls: 'actionColGrid',
     text_cols: {
         customFilterName: '#UT#Customized Okapi Filter Type',
         name: '#UT#Name',
