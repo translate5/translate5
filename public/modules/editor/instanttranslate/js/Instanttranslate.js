@@ -152,10 +152,11 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
         $("#targetLocale").selectmenu("refresh");
 
         // renew the results, if there are any
-        var results=$('div.translation-result');
+        var results = $('div.translation-result');
         checkInstantTranslation();
         if(results.length > 0) {
-            $('#sourceText').val(results[0].textContent);
+            // set the source textarea text, therfore markup must be removed and breaktags restored
+            $('#sourceText').val(markupToText(results.first().html()));
         }
         $('#translations').hide();
         startTranslation();
@@ -276,11 +277,7 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
     /* --------------- copy translation ----------------------------------------- */
     $('#translations').on('touchstart click','.copyable-copy',function(){
         // we can not use text() because we need to turn <br/> into blanks
-        var textToCopy = $(this).closest('.copyable').find('.translation-result').html();
-        // break-tags to blanks
-        textToCopy = textToCopy.replace(/<br\s*\/{0,1}>/ig, ' ');
-        // remove tags
-        textToCopy = textToCopy.replace(/<\/{0,1}[a-zA-Z][^>]*\/{0,1}>/ig, '');
+        var textToCopy = markupToText($(this).closest('.copyable').find('.translation-result').html(), ' ');
         // https://stackoverflow.com/a/33928558
         if (window.clipboardData && window.clipboardData.setData) {
             // IE specific code path to prevent textarea being shown while dialog is visible.
@@ -339,6 +336,17 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
     setTextForSource();
     showSource();
     showDownloads(pretranslatedFiles, dateAsOf);
+}
+
+/**
+ * Removes all markup from a text and converts break-tags to the given string
+ * @param {string} text
+ * @param {string} breakTagReplacement
+ * @returns {string}
+ */
+function markupToText(text, breakTagReplacement){
+    text = text.replace(/<br\s*\/{0,1}>/ig, breakTagReplacement);
+    return text.replace(/<\/{0,1}[a-zA-Z][^>]*\/{0,1}>/ig, '');
 }
 
 /**
@@ -1319,7 +1327,7 @@ function drawTermPortalIntegration(termToPropose) {
  * @returns {*}
  */
 function sanitizeTranslatedText(translatedText){
-    translatedText = translatedText.replace(/(\r\n|\n|\r)/gm, '<br>');
+    translatedText = translatedText.split("\r\n").join('<br/>').split("\n").join('<br/>');
     return translatedText;
 }
 
