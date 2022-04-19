@@ -113,7 +113,17 @@ Ext.define('Editor.util.Util', {
          * @returns {any|string}
          */
         getFileExtension:function (name){
-            return name ? name.split('.').pop() : '';
+            return name ? name.split('.').pop().toLowerCase() : '';
+        },
+
+        /***
+         * Check if the given file name has archive type extension
+         * @param fileName
+         * @returns {*}
+         */
+        isZipFile: function (fileName){
+            //TODO: the backend only supports zip
+            return this.getFileExtension(fileName) === 'zip';
         },
 
         /***
