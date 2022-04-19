@@ -4588,5 +4588,9 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Chinesisch (vereinfacht)</source>
   <target>Chinese (simplified)</target>
 </trans-unit>
+<trans-unit id='QXJiZWl0c2RhdGVpKGVuKSBzaW5kIG9ibGlnYXRvcmlzY2g='>
+  <source>Arbeitsdatei(en) sind obligatorisch</source>
+  <target>Workfile(s) are mandatory</target>
+</trans-unit>
   </file>
 </xliff>
