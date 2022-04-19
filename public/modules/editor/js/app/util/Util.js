@@ -152,6 +152,38 @@ Ext.define('Editor.util.Util', {
             }
             var hex = code.replace('U+','');
             return String.fromCodePoint('0x'+hex);
+        },
+
+        /***
+         * Find all rfx fuzzy languages for a given langauge code.
+         *
+         * de     will match de, de-DE, de-CH, de-AT etc..
+         * de-DE  will match de and de-DE
+         *
+         * @param rfc
+         * @returns {*[]}
+         */
+        getFuzzyLanguagesForCode:function (rfc){
+            var isMajor = rfc.includes("-") === false,
+                collected = [],
+                checkLowerRfc = rfc.toLowerCase();
+
+            Ext.getStore('admin.Languages').each(function(r){
+                var lowerRfc = r.get('rfc5646').toLowerCase();
+
+                if(lowerRfc === checkLowerRfc){
+                    // direct match
+                    collected.push(r.get('rfc5646'));
+                }else if(isMajor && lowerRfc.startsWith(checkLowerRfc+'-')){
+                    // de will match de-DE, de-AT, de-CH
+                    collected.push(r.get('rfc5646'));
+                }else if( !isMajor && (checkLowerRfc.includes('-') && checkLowerRfc.split('-')[0] === lowerRfc)){
+                    // de-DE will match de and de-DE
+                    collected.push(r.get('rfc5646'));
+                }
+            });
+
+            return collected;
         }
     }
     
