@@ -208,7 +208,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $this->row = $row;
         return $this->row->toArray();
     }
-    
+
     /**
      * Returns the task user assoc matching a step, or if nothing found the one with the most useful state.
      * The state loading order is: edit, view, unconfirmed, open, waiting, finished
@@ -216,6 +216,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @param string $taskGuid
      * @param string $workflowStepName
      * @return array
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function loadByStepOrSortedState(string $userGuid, string $taskGuid, string $workflowStepName): array {
         
@@ -540,14 +541,19 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     /**
      * loads and returns the currently used associations of the given taskGuid.
      * @param string $taskGuid
+     * @param string|null $userGuid
      * @return array
+     * @throws Zend_Db_Statement_Exception
      */
-    public function loadUsed(string $taskGuid) : array {
+    public function loadUsed(string $taskGuid, string $userGuid = null) : array {
         $this->cleanupLocked($taskGuid);
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
             ->where('usedState IS NOT NULL')
             ->where('usedInternalSessionUniqId IS NOT NULL');
+        if(!empty($userGuid)) {
+            $s->where('userGuid = ?', $userGuid);
+        }
         return $this->db->fetchAll($s)->toArray();
     }
     

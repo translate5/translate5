@@ -108,6 +108,10 @@
         <source>Es ist ein Fehler aufgetreten!</source>
         <target>An error occurred!</target>
       </trans-unit>
+      <trans-unit id="TmV1IGxhZGVu">
+        <source>Neu laden</source>
+        <target>Reload</target>
+      </trans-unit>
       <trans-unit id="YmVhcmJlaXRldCBiZWk=">
         <source>bearbeitet bei</source>
         <target>edited at</target>
@@ -1770,6 +1774,7 @@
     <target>Translation</target>
 </trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - task associated</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIFRlcm1pbm9sb2dpZcO8YmVyc2V0enVuZ3Nwcm9qZWt0IGVyc3RlbGx0'><source>Translate5 - Terminologieübersetzungsprojekt erstellt</source><target>Translate5 - Terminology translation project created</target></trans-unit>
 
 <trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>The workflow step of the task was changed to "{0}"!</target></trans-unit>
       <trans-unit id='QXV0b21hdGlzY2hlIFp1d2Vpc3VuZw=='>
@@ -3586,9 +3591,9 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Ausloggen</source>
     <target>Log out</target>
 </trans-unit>
-<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='>
-    <source>Sonderzeichen hinzufügen:</source>
-    <target>Add special characters:</target>
+<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbg=='>
+    <source>Sonderzeichen hinzufügen</source>
+    <target>Add special characters</target>
 </trans-unit>
 <trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZW7DvGJlcnNpY2h0'>
     <source>Zurück zur Aufgabenübersicht</source>
@@ -3641,7 +3646,7 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Delete proposals older than current import</target></trans-unit>
 <trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Log out</target></trans-unit>
-<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Add special characters:</target></trans-unit>
+<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbg=='><source>Sonderzeichen hinzufügen</source><target>Add special characters</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Show only bookmarked segments</target></trans-unit>
 <trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
 <trans-unit id='S2V5IFBlcmZvcm1hbmNlIEluZGljYXRvcnM='><source>Key Performance Indicators</source><target>Key Performance Indicators</target></trans-unit>
@@ -4593,6 +4598,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='Q2hpbmVzaXNjaCAodmVyZWluZmFjaHQp'>
   <source>Chinesisch (vereinfacht)</source>
   <target>Chinese (simplified)</target>
+</trans-unit>
+<trans-unit id='QXJiZWl0c2RhdGVpKGVuKSBzaW5kIG9ibGlnYXRvcmlzY2g='>
+  <source>Arbeitsdatei(en) sind obligatorisch</source>
+  <target>Workfile(s) are mandatory</target>
 </trans-unit>
   </file>
 </xliff>

@@ -285,7 +285,8 @@ Ext.define('Editor.view.admin.config.Grid', {
     getEditorConfig:function(record){
         var me=this,
             grid = me.up('grid'),
-            hasDefaults = record.get('defaults').length>0,
+            defaults = record.get('defaults'),
+            hasDefaults = defaults.length>0,
             defaultsStore = [],
             config={
                 xtype: 'textfield',
@@ -299,13 +300,30 @@ Ext.define('Editor.view.admin.config.Grid', {
         if(hasDefaults){
             var defaultsData = [];
 
-            // check if there is translation for the default values
-            Ext.Array.each(record.get('defaults'), function(name) {
-                defaultsData.push({
-                    "id" : name,
-                    "value" : grid.strings.configLocales[name] !== undefined ? grid.strings.configLocales[name] : name
+            // If defaults list is a json-text
+            if (defaults.join(',').match('^{[^{}]*?}$')) {
+
+                // Decode json
+                var json = Ext.JSON.decode(defaults.join(','));
+
+                // Foreach prop inside json
+                for (var prop in json) {
+                    defaultsData.push({
+                        "id" : prop,
+                        "value" : json[prop]
+                    });
+                };
+
+            // Else
+            } else {
+                // check if there is translation for the default values
+                Ext.Array.each(record.get('defaults'), function(name) {
+                    defaultsData.push({
+                        "id" : name,
+                        "value" : grid.strings.configLocales[name] !== undefined ? grid.strings.configLocales[name] : name
+                    });
                 });
-            });
+            }
 
             defaultsStore = Ext.create('Ext.data.Store', {
                 fields: ['id', 'value'],
@@ -406,6 +424,10 @@ Ext.define('Editor.view.admin.config.Grid', {
                     returnValue = me.strings.configDeactiveColumn;
                 }
             break;
+            case 'string':
+                if (record.get('defaults').join(',').match('^{[^{}]*?}$')) {
+                    returnValue = Ext.JSON.decode(record.get('defaults').join(','))[value];
+                }
             case 'map':
                 if(Ext.isObject(value)) {
                     returnValue = Ext.JSON.encode(value);

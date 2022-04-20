@@ -95,6 +95,23 @@ $this->htmlOnly = $this->translate->_('- Die Daten sind nur in der HTML-Ansicht 
 if(!empty($this->pm)) {
     $data['pm'] = $this->pm->getDataObject();
 }
+if(!empty($this->project)) {
+
+    // Build project focus url
+    $urlPart = '/editor#project/' . $this->project->getId() . '/' . ($this->project->getId() + 1) . '/focus';
+
+    /** @var editor_Models_Customer_Customer $customer */
+    $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+    $customer->load($this->project->getCustomerId());
+
+    // If the customer domain is set, use this domain as portal url and link
+    if (empty($customer->getDomain())) {
+        $data['portalLink']='<a href="' . $portal . $urlPart . '">' . $portal . '</a>';
+    } else {
+        $data['portalUrl'] = $customer->getDomain();
+        $data['portalLink'] = '<a href="' . $data['portalUrl'] . $urlPart . '">' . $customer->getDomain() . '</a>';
+    }
+}
 if(!empty($this->task)) {
     $taskData = $this->workflowNotifyMail()->getTaskLanguages($this->task);
     $taskData['task'] = $this->task->getDataObject();

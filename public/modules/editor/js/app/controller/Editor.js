@@ -148,6 +148,9 @@ Ext.define('Editor.controller.Editor', {
             '#naviToolbar #btnInsertWhitespaceTab': {
                 click: 'insertWhitespaceTab'
             },
+            '#naviToolbar specialCharactersButton': {
+                click: 'insertSpecialCharacter'
+            },
             '#segmentMinMaxLength': {
                 insertNewline: 'insertWhitespaceNewline'
             }
@@ -1511,6 +1514,27 @@ Ext.define('Editor.controller.Editor', {
     insertWhitespaceTab: function(key,e) {
         this.insertWhitespace(key,e,'tab');
     },
+
+    /***
+     * Button handler for special characters buttons.
+     * @param button
+     * @param e
+     */
+    insertSpecialCharacter: function (button, e){
+        var me = this,
+            plug = me.getEditPlugin(),
+            editor = plug && plug.editor.mainEditor;
+
+        if(editor){
+            editor.insertMarkup(button.value);
+            if (e.delegatedTarget.nodeName.toLowerCase() === 'a') {
+                editor.focus();
+            }
+            e.stopEvent();
+        }
+    },
+
+
     insertWhitespace: function(key,e,whitespaceType) {
         var me = this,
             userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),

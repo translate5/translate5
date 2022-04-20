@@ -138,7 +138,7 @@ class editor_Models_Segment_Updater {
         if($this->task->getWorkflowStep() == 1 && $this->task->isTranslation()){
             $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$this->task]);
             /* @var $hasher editor_Models_Segment_RepetitionHash */
-            $this->segment->setTargetMd5($hasher->hashTarget($this->segment->getTargetEdit(), $this->segment->getSource()));
+            $this->segment->setTargetMd5($hasher->rehashTarget($this->segment));
         }
     }
     

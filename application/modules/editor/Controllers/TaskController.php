@@ -26,11 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\CurrentTask;
+use MittagQI\Translate5\Task\TaskContextTrait;
+
 /**
  *
  */
 class editor_TaskController extends ZfExtended_RestController {
 
+    use TaskContextTrait;
     use editor_Controllers_Task_ImportTrait;
 
 
@@ -393,7 +397,7 @@ class editor_TaskController extends ZfExtended_RestController {
 
             $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
 
-            $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
+            $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
             $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
 
             $row['fileCount'] = empty($fileCount[$row['taskGuid']]) ? 0 : $fileCount[$row['taskGuid']];
@@ -872,6 +876,13 @@ class editor_TaskController extends ZfExtended_RestController {
         //if it is a project, start the import workers for each sub task
         if($task->isProject()) {
             $tasks = $task->loadProjectTasks($task->getProjectId(),true);
+
+            /** @var editor_Workflow_Manager $wfm */
+            ZfExtended_Factory::get('editor_Workflow_Manager')
+                ->getActiveByTask($task)
+                ->hookin()
+                ->doHandleProjectCreated($task);
+
         } else {
             $tasks[] = $task;
         }
@@ -995,7 +1006,6 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         
         // check if the user is allowed to open the task based on the session. The user is not able to open 2 different task in same time.
-        $this->checkUserSessionAllowsOpen($this->entity->getTaskGuid());
         $this->decodePutData();
 
         $this->handleCancelImport();
@@ -1083,7 +1093,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj;
         $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
-        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
+        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll, $this->data->userState ?? null);
         $this->view->rows = (object)$row;
 
@@ -1287,7 +1297,6 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         if($this->isOpenTaskRequest()){
             $task->createMaterializedView();
-            $task->registerInSession($this->data->userState);
             $this->events->trigger("afterTaskOpen", $this, array(
                 'task' => $task,
                 'view' => $this->view,
@@ -1332,7 +1341,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * unregisters the task from the session and close all open services
      */
     protected function unregisterTask() {
-        $this->entity->unregisterInSession();
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
         $manager->closeForTask($this->entity);
@@ -1501,7 +1509,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         
         $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $isTaskPm;
-        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
+        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
         $this->addMissingSegmentrangesToResult($row);
         $this->view->rows = (object)$row;
@@ -1923,44 +1931,6 @@ class editor_TaskController extends ZfExtended_RestController {
             'comparison' => 'in'
         ]);
         return $projectOnly;
-    }
-
-    /***
-     * Check if the session allows the task to be opened for editing by the current user.
-     * If the user tries to open different task then the one in the session, exception is thrown
-     * INFO: the pmOverride is counted as opened editor
-     *       the user is not able to edit task properties if he already edits different task
-     * @param string $taskGuid
-     * @throws ZfExtended_UnprocessableEntity
-     */
-    protected function checkUserSessionAllowsOpen(string $taskGuid) {
-        if($this->config?->runtimeOptions?->ignoreE1341 ?? false) {
-            return;
-        }
-        $session = new Zend_Session_Namespace();
-        $sessionGuid = $session->taskGuid ?? null;
-        // if the task is with already active session for the user, ignore the check
-        if($sessionGuid == $taskGuid){
-            return;
-        }
-        $assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $assoc editor_Models_TaskUserAssoc */
-
-        $tuas = $assoc->isUserInUse($this->user->data->userGuid);
-        //check if for the current user, there are task in use
-        if(empty($tuas)){
-            return;
-        }
-        ZfExtended_UnprocessableEntity::addCodes([
-            'E1341' => 'You tried to open or edit another task, but you have already opened another one in another window. Please press F5 to open the previous one here, or close this message to stay in the Taskoverview.'
-        ], 'editor.task');
-        throw new ZfExtended_UnprocessableEntity('E1341',[
-            'task' =>$this->entity, //TODO: is this really required ?,
-            'sessionGuid'=>$sessionGuid,
-            'taskGuid'=>$taskGuid,
-            'tuas' => $tuas,
-            'internalSessionUniqId' => $session->internalSessionUniqId
-        ]);
     }
 
     /***

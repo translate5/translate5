@@ -30,6 +30,16 @@ END LICENSE AND COPYRIGHT
 ?>
   
 Editor.controller.Localizer.addPluginInit('frontEndMessageBus', function() {
+    Ext.define("Editor.locale.plugins.FrontEndMessageBus.controller.MessageBus", {
+        override: "Editor.plugins.FrontEndMessageBus.controller.MessageBus",
+        strings: {
+            taskCloseTitle: '<?php echo $this->translate->_('Aufgabe in anderem Fenster geschlossen');?>',
+            taskCloseMsg: '<?php echo $this->translate->_('Sie haben die Aufgabe in anderem Fenster geschlossen. Schließen Sie dieses Fenster ebenfalls, oder laden Sie das Fenster neu um die Aufgabe erneut zu öffnen.');?>',
+            taskCloseClose: '<?php echo $this->translate->_('Schließen');?>',
+            taskCloseReload: '<?php echo $this->translate->_('Erneut öffnen');?>'
+        }
+    });
+
     Ext.define("Editor.locale.plugins.FrontEndMessageBus.controller.MultiUserUsage", {
         override: "Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage",
         strings: {

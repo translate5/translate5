@@ -38,13 +38,38 @@ class editor_Models_Segment_RepetitionHash {
      * @var boolean
      */
     protected $isSourceEditing;
-    
+
+    protected ?editor_Models_Segment $segment = null;
+    protected ?editor_Models_Import_FileParser_SegmentAttributes $attributes = null;
+
+    /**
+     * A list of meta fields where the values should be added to the repetition calculation of each segment
+     * the used fields must exist as segment meta and as SegmentAttributes itself or as SegmentAttribute custom attribute.
+     * @var array
+     */
+    protected $metaFieldsToAdd = [];
+
     public function __construct(editor_Models_Task $task) {
         $this->isSourceEditing = (bool) $task->getEnableSourceEditing();
-        
         $this->util = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        $this->metaFieldsToAdd = $task->getConfig()->runtimeOptions->alike->segmentMetaFields->toArray() ?? [];
     }
-    
+
+    public function setSegmentAttributes(editor_Models_Import_FileParser_SegmentAttributes $attributes) {
+        $this->attributes = $attributes;
+    }
+
+    /**
+     * rehashes the target of the given segment (assuming the segments targetEdit is already up-to-date) alternatively a new target can be given as string
+     * @param editor_Models_Segment $segment
+     * @param string|null $newTarget
+     * @return string
+     */
+    public function rehashTarget(editor_Models_Segment $segment, ?string $newTarget = null): string {
+        $this->segment = $segment;
+        return $this->hashTarget($newTarget ?? $segment->getTargetEdit(), $segment->getSource());
+    }
+
     /**
      * Creates the hash out of the target string, adds source tag count if source editing is enabled
      * @param string $target
@@ -86,15 +111,23 @@ class editor_Models_Segment_RepetitionHash {
     public function hashAlternateTarget($alternative) {
         return $this->generateHash($alternative, '');
     }
-    
+
     /**
      * Creates the segment value hash for the repetition editor
      *
      * @param string $value
      * @param string $additionalValue
      * @return string
+     * @throws Zend_Exception
      */
-    protected function generateHash($value, $additionalValue) {
+    protected function generateHash(string $value, string $additionalValue): string {
+        if(is_null($this->attributes) && is_null($this->segment)) {
+            // crucial: both fields are needed in some class overwrites in private plugins, but not in the general code.
+            // On import attributes must be set before calling the hash functions
+            // On rehashTarget the needed information is given via the segment itself
+            throw new LogicException('No segment or segment attributes are given!');
+        }
+
         $value = $this->util->internalTag->replace($value, function($match) {
             //whitespace tags and real tags can not replaced by each other, so they must be different in the hash,
             // so: "Das<x>Haus" may not be a repetition anymore of "DasTABHaus", even TAB and <x> are both replaced with an internal tag
@@ -106,6 +139,24 @@ class editor_Models_Segment_RepetitionHash {
         
         if(!empty($additionalValue)) {
             $value .= '#'.$additionalValue;
+        }
+
+        //we may only add custom fields to the hash calculation if the value is not empty.
+        // Reason: empty content is per definition not repeatable, and we check that via a constant containing the md5 hash of the empty string
+        // if we now add additional stuff here, the empty string segment gets repeatable since the hash does not match anymore the empty string hash
+        // therefore we may not add additional stuff if the value was previously empty
+        if($value != '' && !empty($this->metaFieldsToAdd)) {
+            // loop through the configured additional data and add them the hash calculation
+            foreach($this->metaFieldsToAdd as $field) {
+                if(empty($this->segment)) {
+                    //TODO check customAttributes too if no native found!
+                    $toAdd = $this->attributes->$field;
+                }
+                else {
+                    $toAdd = $this->segment->meta()->__call('get'.ucfirst($field), []);
+                }
+                $value .= '#'.$toAdd;
+            }
         }
         return md5($value);
     }

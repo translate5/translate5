@@ -68,6 +68,13 @@ class editor_AttributeController extends ZfExtended_RestController
     public $responseA = [];
 
     /**
+     * Info about new values of processStatus and administrativeStatus for terms, affected by attribs batch editing
+     *
+     * @var array
+     */
+    public $affectedA = [];
+
+    /**
      * Return values of $this->jcheck() calls for each termEntryId-language-termId params combination
      *
      * @var array
@@ -405,7 +412,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Setup isDraft=0 on attributes identified by that param and return array of special attributes ids.
             // Attribute is considered special if it requires special processing
-            // Currently only processStatus- and definition-attrs are special
+            // Currently only processStatus-, definition- and administrativeStatus-attrs are special
             $attrIdA_special = $this->entity->undraftByIds($draft0);
 
             // Foreach special attrId
@@ -424,6 +431,11 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Flush response. Actually, $this->responseA is contain responses only if attrId-param is not empty
         if ($attrIdA) $this->view->assign($this->responseA[0]); else if ($draft0) $this->view->assign(['success' => true]);
+
+        // Add into response
+        if ($this->affectedA['icons'] ?? 0) {
+            $this->view->assign('icons', $this->affectedA['icons']);
+        }
     }
 
     /**
@@ -910,6 +922,10 @@ class editor_AttributeController extends ZfExtended_RestController
                 $this->entity
             );
 
+            // Collect data to be merged into response, so client app will be able
+            // to update (administrative|process)Status-icons within left and center panels
+            $this->affectedA['icons'][$_['termId']->getId()]['processStatus'] = $value;
+
         // Else
         } else {
 
@@ -932,8 +948,10 @@ class editor_AttributeController extends ZfExtended_RestController
         // The term status is updated in in anycase (due implicit normativeAuthorization changes above),
         // not only if a attribute is changed mapped to the term status
         if (isset($_['termId']) && !$this->entity->getIsDraft())
-            if ($status = $this->_updateTermStatus($_['termId'], $this->entity))
+            if ($status = $this->_updateTermStatus($_['termId'], $this->entity)) {
                 $data['status'] = $status;
+                $this->affectedA['icons'][$_['termId']->getId()]['status'] = $status['status'];
+            }
 
         // Update `date` and `transacNote` of 'modification'-records
         // for all levels starting from term-level and up to top

@@ -87,7 +87,8 @@ Ext.define('Editor.controller.Localizer', {
         title: '<?php echo $this->translate->_('Fehler');?>',
         text: '<?php echo $this->translate->_('Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!');?>',
         timeout: '<?php echo $this->translate->_('Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.');?>',
-        serverMsg: '<?php echo $this->translate->_('<br />Meldung vom Server: <i>{0} {1}</i>');?>'
+        serverMsg: '<?php echo $this->translate->_('<br />Meldung vom Server: <i>{0} {1}</i>');?>',
+        reload: '<?php echo $this->translate->_('Neu laden');?>',
     };
 
     Editor.MessageBox.prototype.self.SUCCESS = '<?php echo $this->translate->_('ok');?>';
@@ -357,12 +358,18 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_whitespaceButtonGroup= '<?php echo $this->translate->_('Sonderzeichen hinzufügen:');?>';
 
    Ext.define("Editor.locale.de.view.segments.MetaPanel", {
         override: "Editor.view.segments.MetaPanel",
         strings: {
             title: '<?php echo $this->translate->_('Segment-Metadaten');?>',
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.segments.SpecialCharacters", {
+        override: "Editor.view.segments.SpecialCharacters",
+        strings: {
+            title: '<?php echo $this->translate->_('Sonderzeichen hinzufügen');?>',
         }
     });
 
@@ -815,6 +822,7 @@ Ext.define('Editor.controller.Localizer', {
             fileMix: '<?php echo $this->translate->_('Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!');?>',
             referenceFilesFilesButton: '<?php echo $this->translate->_('Referenz-Dateien(en)');?>',
             referenceFilesTypeText: '<?php echo $this->translate->_('Referenz-Datei');?>',
+            workfilesAreRequired: '<?php echo $this->translate->_('Arbeitsdatei(en) sind obligatorisch');?>'
         }
     });
 

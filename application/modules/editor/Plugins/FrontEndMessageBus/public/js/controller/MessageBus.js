@@ -38,10 +38,21 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     extend: 'Ext.app.Controller',
+    strings: {
+        taskCloseTitle: '#UT#Aufgabe in anderem Fenster geschlossen',
+        taskCloseMsg: '#UT#Sie haben die Aufgabe in anderem Fenster geschlossen. Schließen Sie dieses Fenster ebenfalls, oder laden Sie das Fenster neu um die Aufgabe erneut zu öffnen.',
+        taskCloseClose: '#UT#Schließen',
+        taskCloseReload: '#UT#Erneut öffnen'
+    },
     listen: {
+        messagebus: {
+            '#translate5 instance': {
+                notifyUser: 'onUserNotification'
+            }
+        },
         component: {
             '#segmentgrid' : {
-                render: 'onSegmentGridRender',
+                render: 'onSegmentGridRender'
             }
         }
     },
@@ -53,6 +64,56 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         }
         else {
             bus.deactivate();
+        }
+    },
+    /**
+     * This notifications can be send from the server.
+     */
+    onUserNotification: function(data) {
+        var str = this.strings;
+        switch(data.message) {
+            // We have to ask the user what to do:
+            case 'taskClosedInOtherWindow':          
+                if(!Editor.data.task || !Editor.data.task.isModel || Editor.data.task.get('id') !== data.taskId) {
+                    //notify the user only if the currently opened task was closed
+                    return;
+                }
+
+                Ext.Msg.show({
+                    title: str.taskCloseTitle,
+                    message: str.taskCloseMsg,
+                    buttons: Ext.Msg.YESNO,
+                    icon: Ext.Msg.QUESTION,
+                    closable: false,
+                    buttonText: {
+                        yes: str.taskCloseClose,
+                        no: str.taskCloseReload
+                    },
+                    fn: function (btn) {
+                        //yes -> try to close the window
+                        //no  -> reopen the task
+                        if (btn === 'yes') {
+                            Editor.app.closeWindow();
+                        } else {
+                            //reload to reopen the task!
+                            Editor.data.logoutOnWindowClose = false;
+                            window.location.reload();
+                        }
+                    }
+                });
+                break;
+
+            // Currently we just trigger a reload, instead showing a message. Should be fine in that situations
+            case 'sessionDeleted':
+                //instead of showing a message, we just trigger a reload of the window (without logout in this special case)
+                Editor.data.logoutOnWindowClose = false;
+                window.location.reload();
+                break;
+
+            //possibility to notify the users via messagebus
+            default:
+                Editor.MessageBox.addInfo(data.message);
+                break;
         }
     }
 });

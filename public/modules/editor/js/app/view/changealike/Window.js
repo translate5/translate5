@@ -230,7 +230,7 @@ Ext.define('Editor.view.changealike.Window', {
       bodyPadding: 5,
       width:400,
       loader: {
-        url: Editor.data.pathToRunDir+'/editor/index/wdhehelp',
+        url: Editor.data.restpath+'index/wdhehelp',
         autoLoad: true
       }
     });
