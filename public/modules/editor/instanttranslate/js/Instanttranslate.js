@@ -62,9 +62,6 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
     if(disableInstantTranslate){
         // dev-option may disables instant translation
         instantTranslationIsActive = false;
-    } else if (instantTranslationIsActive) {
-        // hide translate-button if instantTranslationIsActive is active
-        $('#translationSubmit').hide();
     }
 
     $('#logout a').mouseover(function(){
@@ -74,9 +71,9 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
         $(this).addClass("ui-state-active");
     });
     $('#logout').on("click",function(){
-        var loginUrl=Editor.data.loginUrl || Editor.data.apps.loginUrl;
+        var loginUrl = Editor.data.loginUrl || Editor.data.apps.loginUrl;
         //check if it is used from iframe
-        if(window.parent != undefined){
+        if(window.parent !== undefined){
             window.parent.location = loginUrl;
         } else {
             window.location =loginUrl;
@@ -96,7 +93,7 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
             updateLocalesSelectLists($(this));
         },
         change: function() {
-            checkInstantTranslation();
+            changeLanguage();
         }
     }).selectmenu("menuWidget").addClass("overflow localesSelectList");
     $('#targetLocale').selectmenu({
@@ -105,7 +102,7 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
             updateLocalesSelectLists($(this));
         },
         change: function() {
-            checkInstantTranslation();
+            changeLanguage();
         }
     }).selectmenu("menuWidget").addClass("overflow localesSelectList");
     // cause the select-menuWidget will not re-size and re-postition itself on windows resize, we just close it.
@@ -134,46 +131,28 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
     });
 
     //check if the source and the target are the same
-    if($('#sourceLocale').val() == $('#targetLocale').val()){
+    if($('#sourceLocale').val() === $('#targetLocale').val()){
         setTargetFirstAvailable($('#sourceLocale').val());
     }
     $("#sourceText").attr('maxlength', characterLimit);
 
     // press the button to swap source-/target-language
     $('.switchSourceTarget').on("click", function() {
-        // detect old languages
-        var $oldSourceLang = $('#sourceLocale').val();
-        var $oldTargetLang = $('#targetLocale').val();
-
-        // now swap the language selections
-        $("#sourceLocale").val($oldTargetLang);
-        $("#targetLocale").val($oldSourceLang);
-        $("#sourceLocale").selectmenu("refresh");
-        $("#targetLocale").selectmenu("refresh");
-
-        // renew the results, if there are any
-        var results = $('div.translation-result');
-        checkInstantTranslation();
-        if(results.length > 0) {
-            // set the source textarea text, therfore markup must be removed and breaktags restored
-            $('#sourceText').val(markupToText(results.first().html()));
-        }
-        $('#translations').hide();
-        startTranslation();
+        swapLanguages();
     });
 
-    //$('.dropSourceFile').droppable();
+    //$('#dropSourceFile').droppable();
     // $("input[type='file']").prop("files", e.dataTransfer.files);
 
     // prefent funny behaviour of some browsers
-    $('.dropSourceFile').on('dragover', function(e) {e.preventDefault(); e.stopPropagation();});
-    $('.dropSourceFile').on('dragenter', function(e) {e.preventDefault(); e.stopPropagation();});
+    $('#dropSourceFile').on('dragover', function(e) { e.preventDefault(); e.stopPropagation(); });
+    $('#dropSourceFile').on('dragenter', function(e) { e.preventDefault(); e.stopPropagation(); });
     // add a special class "dargover" and remove it on dragleave
-    $('.dropSourceFile').on('dragover', function() {$(this).addClass('dragover');});
-    $('.dropSourceFile').on('dragleave', function() {$(this).removeClass('dragover')});
+    $('#dropSourceFile').on('dragover', function() { $(this).addClass('dragover'); });
+    $('#dropSourceFile').on('dragleave', function() { $(this).removeClass('dragover'); });
 
     // do actual "file-dropping"
-    $('.dropSourceFile').on(
+    $('#dropSourceFile').on(
         'drop',
         function(e) {
             $(this).removeClass('dragover');
@@ -189,18 +168,16 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
         }
     );
     // route click event to the input #sourceFile for normal file-select
-    $('.dropSourceFile').on('click', function(e) {e.preventDefault(); e.stopPropagation(); $('#sourceFile').click();});
-    $(document).on('click', '.sourceSelector__text' , function() {toggleSourceTextFile('text');});
-    $(document).on('click', '.sourceSelector__file' , function() {toggleSourceTextFile('file');});
+    $('#dropSourceFile').on('click', function(e) { e.preventDefault(); e.stopPropagation(); $('#sourceFile').click(); });
+    $(document).on('click', '.sourceSelector__text' , function() { toggleSource('text'); });
+    $(document).on('click', '.sourceSelector__file' , function() { toggleSource('file'); });
 
     $(document).on('click', '.term-proposal' , function() {
         var text = getInputTextValueTrim(),
             lang = $("#sourceLocale").val(),
             textProposal = $(this).attr('data-term'),
             langProposal = $("#targetLocale").val(),
-            isTermProposalFromInstantTranslate = 'true',
-            isMT = $(this).parents('.copyable').find('.translation-result').data('languageresource-type') == 'mt',
-            params = "text="+text+"&lang="+lang+"&textProposal="+textProposal+"&langProposal="+langProposal+"&isTermProposalFromInstantTranslate="+isTermProposalFromInstantTranslate;
+            isMT = $(this).parents('.copyable').find('.translation-result').data('languageresource-type') === 'mt';
 
         var q = top.window.Ext.ComponentQuery.query,
             vm = q('main').pop().getViewModel(),
@@ -209,7 +186,9 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
 
         // If termId-param is not given, it means that source termEntry is not known,
         // so we append data for trying to find it
-        if (!location.search.match(/termId/)) itranslate.source = {lang: lang, term: text};
+        if (!location.search.match(/termId/)) {
+            itranslate.source = {lang: lang, term: text};
+        }
 
         // Set main viewModel's itranslate-prop
         vm.set('itranslate', itranslate);
@@ -325,16 +304,18 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
         getDownloads();
         return false;
     });
+    // initially, we appear as text translation
+    showSourceIsText();
 
-    $('body').addClass('sourceIsText');
-
-    // start with checking according to the locales as stored for user
-    checkInstantTranslation();
     clearAllErrorMessages();
     setAllowedFileTypes();
     setfileUploadLanguageCombinationsAvailable();
     setTextForSource();
-    showSource();
+
+    // start with checking according to the locales as stored for user
+    checkInstantTranslation();
+
+    // we show any downloads that may are pretranslated
     showDownloads(pretranslatedFiles, dateAsOf);
 }
 
@@ -475,7 +456,7 @@ function updateLocalesSelectLists(el) {
     accordingToReference = (referenceList === 'sourceLocale') ? 'accordingToSourceLocale' : 'accordingToTargetLocale';
     selectedLocaleInReference = $("#"+referenceList).val();
     localesAvailable = getLocalesAccordingToReference(accordingToReference,selectedLocaleInReference);
-    $('#'+elId+'-menu li.ui-menu-item').each(function(i){
+    $('#'+elId+'-menu li.ui-menu-item').each(function(){
         if (localesAvailable.indexOf($(this).text()) === -1) {
             $(this).addClass(NOT_AVAILABLE_CLS);
         } else {
@@ -483,56 +464,20 @@ function updateLocalesSelectLists(el) {
         }
     });
 }
-
-/**
- * Every change in the language-selection starts a check if any lnguageResources
- * are available. If yes and text is already entered, the translation starts.
- */
-function checkInstantTranslation() {
-
-    // show file-translation as disabled with errors  when there re no available services
-    if(!chosenSourceIsText && !isFileUploadAvailable()){
-        showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
-        hideTranslations();
-        return;
-    }
-    // When the language-combination changes, former translations are not valid any longer (= the text hasn't been translated already):
-    latestTextToTranslate = '';
-    $('#translations').html('');
-    // Neither are former error-messages valid any longer:
-    clearAllErrorMessages();
-    // If fileUpload is possible for currently chosen languages, show text accordingly:
-    setTextForSource();
-    // Check if any engines are available for that language-combination.
-    if (!hasEnginesForLanguageCombination()) {
-        hideTranslations();
-        showTargetError(Editor.data.languageresource.translatedStrings.noLanguageResource);
-        return;
-    }
-    if(getInputTextValueTrim().length > 0 && getInputTextValueTrim() === latestTextToTranslate) {
-        return;
-    }
-    // Translations can be submitted:
-    showTranslations();
-    // When instantTranslation is not active; hide former translations and wait.
-    if (!instantTranslationIsActive) {
-        hideTranslations();
-        return;
-    }
-    // Start translation:
-    startTimerForInstantTranslation();
-}
-
 /**
  * Check if any engines are available for the current language-combination.
  * @returns {Boolean}
  */
 function hasEnginesForLanguageCombination() {
-	var returnValue=isSourceTargetAvailable($("#sourceLocale").val(),$("#targetLocale").val()),
-		isDisableButton=!isSourceTargetAvailable($("#targetLocale").val(),$("#sourceLocale").val());//switch source and target so the other way arround is checked
+	var returnValue = isSourceTargetAvailable($("#sourceLocale").val(), $("#targetLocale").val()),
+		isDisableButton = !isSourceTargetAvailable($("#targetLocale").val(), $("#sourceLocale").val());//switch source and target so the other way arround is checked
 	//the button is disabled when for the target as source there is no source as target
 	$("#switchSourceTarget").prop("disabled", isDisableButton);
-	isDisableButton ?$("#switchSourceTarget").addClass( "switchSourceTargetDisabled" ) :  $("#switchSourceTarget").removeClass( "switchSourceTargetDisabled" );
+    if(isDisableButton){
+        $("#switchSourceTarget").addClass( "switchSourceTargetDisabled" );
+    } else {
+        $("#switchSourceTarget").removeClass( "switchSourceTargetDisabled" );
+    }
     return returnValue;
 }
 
@@ -588,7 +533,7 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
         $.each(allToAdd, function(index, toAdd) {
             // TermCollections can translate in all combinations of their source- and target-languages,
             // but not from the source to the SAME target-language.
-            var isSame = toAdd == selectedLocale,
+            var isSame = toAdd === selectedLocale,
                 //prevent duplicates
                 notAdded = ($.inArray(toAdd, localesAvailable) === -1);
             
@@ -660,7 +605,7 @@ function startTranslation() {
         }
         if(uploadedFiles && uploadedFiles.length > 0){
             startLoadingState();
-            requestFileTranslate();terminateTranslation
+            requestFileTranslate();
         }
         return;
     }
@@ -716,7 +661,7 @@ function translateText(textToTranslate, translationInProgressID){
             'text':textToTranslate
         },
         success: function(result){
-            if (translationInProgressID != latestTranslationInProgressID) {
+            if (translationInProgressID !== latestTranslationInProgressID) {
                 return;
             }
             if (result.errors !== undefined && result.errors !== '') {
@@ -736,7 +681,7 @@ function translateText(textToTranslate, translationInProgressID){
             }
             currentRequest = null;
         },
-        fail: function(xhr, textStatus, errorThrown){
+        fail: function(){
             currentRequest = null;
             debugger;
         }
@@ -758,8 +703,8 @@ function fillTranslation() {
         translationHtml = renderMatchesByResource(translateTextResponse);
     }
     
-    if (translationHtml == '') {
-        showTargetError(Editor.data.languageresource.translatedStrings['noResultsFound']);
+    if (translationHtml === '') {
+        showTargetError(Editor.data.languageresource.translatedStrings.noResultsFound);
     }
     $('#translations').html(translationHtml);
     showTranslations();
@@ -769,32 +714,30 @@ function fillTranslation() {
 }
 
 function renderSingleMatchAndResources (translateTextResponse) {
-    var translationHtml = '',
-        resultHtml = '',
-        resultData,
+    var resultHtml = '',
         translationText = translateTextResponse.translationForSegmentedText,
-        usedResources = translateTextResponse.usedResources;
-    resultData = {'languageResourceHeadline': Editor.data.languageresource.translatedStrings['translationBasedOn'] + ' ' + usedResources,
-                  'languageResourceId': '',
-                  'languageResourceType': '',
-                  'fuzzyMatch': '',
-                  'infoText': '',
-                  'term': '',
-                  'termStatus': '',
-                  'translationText': translationText,
-                  'processStatusAttribute':'',
-                  'processStatusAttributeValue':'',
-                  'languageRfc':'',
-                  'alternativeTranslations':'',
-                  'singleResultBestMatchrateTooltip':Editor.data.languageresource.translatedStrings['singleResultBestMatchrateTooltip']
-                  };
+        usedResources = translateTextResponse.usedResources,
+        resultData = {
+            'languageResourceHeadline':           Editor.data.languageresource.translatedStrings.translationBasedOn + ' ' + usedResources,
+            'languageResourceId':                 '',
+            'languageResourceType':               '',
+            'fuzzyMatch':                         '',
+            'infoText':                           '',
+            'term':                               '',
+            'termStatus':                         '',
+            'translationText':                    translationText,
+            'processStatusAttribute':             '',
+            'processStatusAttributeValue':        '',
+            'languageRfc':                        '',
+            'alternativeTranslations':            '',
+            'singleResultBestMatchrateTooltip':   Editor.data.languageresource.translatedStrings.singleResultBestMatchrateTooltip
+        };
     resultHtml += renderTranslationContainer(resultData);
     return resultHtml;
 }
 
 function renderMatchesByResource (translateTextResponse) {
-    var translationHtml = '',
-        resultHtml = '',
+    var resultHtml = '',
         fuzzyMatch,
         infoText,
         term,
@@ -814,7 +757,7 @@ function renderMatchesByResource (translateTextResponse) {
                 result.serviceName = serviceName;
                 result.resourceName = resourceName;
                 // check if result is a fuzzyMatch
-                if (result.sourceDiff != undefined) {
+                if (result.sourceDiff !== undefined) {
                     $fuzzyResults.push(result);
                 }
                 else {
@@ -830,7 +773,7 @@ function renderMatchesByResource (translateTextResponse) {
     $.each($orderedResults, function(key, result){
         if (result.target !== '') {
             fuzzyMatch = {};
-            if (result.sourceDiff != undefined) {
+            if (result.sourceDiff !== undefined) {
                 fuzzyMatch = {'matchRate': result.matchrate,
                               'sourceDiff': result.sourceDiff};
             }
@@ -841,30 +784,30 @@ function renderMatchesByResource (translateTextResponse) {
             processStatusAttribute = '';
             processStatusAttributeValue = '';
             alternativeTranslations=[];
-            if (result['metaData'] != undefined) {
-                metaData = result['metaData'];
-                if(metaData['definitions'] != undefined && metaData['definitions'].length>0) {
+            if (result.metaData) {
+                metaData = result.metaData;
+                if(metaData.definitions && metaData.definitions.length > 0) {
                     //add all available definitions as separate row
-                    for(var i=0;i<metaData['definitions'].length;i++){
-                        infoText.push(metaData['definitions'][i]);
+                    for(var i = 0; i < metaData.definitions.length; i++){
+                        infoText.push(metaData.definitions[i]);
                     }
                 }
-                if(metaData.term != undefined) {
+                if(metaData.term !== undefined) {
                     term = metaData.term;
                 }
-                if(metaData.languageRfc != undefined) {
+                if(metaData.languageRfc !== undefined) {
                     languageRfc = metaData.languageRfc;
                 }
-                if(metaData.status != undefined) {
+                if(metaData.status !== undefined) {
                     termStatus = metaData.status;
                 }
-                if(metaData.processStatusAttribute != undefined) {
+                if(metaData.processStatusAttribute !== undefined) {
                     processStatusAttribute = metaData.processStatusAttribute;
                 }
-                if(metaData.processStatusAttributeValue != undefined) {
+                if(metaData.processStatusAttributeValue !== undefined) {
                     processStatusAttributeValue = metaData.processStatusAttributeValue;
                 }
-                if(metaData.alternativeTranslations != undefined) {
+                if(metaData.alternativeTranslations !== undefined) {
                     alternativeTranslations = metaData.alternativeTranslations;
                 }
             }
@@ -929,8 +872,8 @@ function renderTranslationContainer(resultData) {
     if (resultData.fuzzyMatch.sourceDiff !== undefined) {
         $isFuzzyMatch = true;
         $additionalHeaderClass = 'box__result__header__red';
-        var fuzzyMatchTranslatedString = Editor.data.languageresource.translatedStrings['attentionFuzzyMatch'].replace("{0}", resultData.fuzzyMatch.matchRate);
-        $fuzzyContainer += '<div class="translation-sourcediff" title="'+Editor.data.languageresource.translatedStrings['differenceIsHighlighted']+'">';
+        var fuzzyMatchTranslatedString = Editor.data.languageresource.translatedStrings.attentionFuzzyMatch.replace("{0}", resultData.fuzzyMatch.matchRate);
+        $fuzzyContainer += '<div class="translation-sourcediff" title="'+Editor.data.languageresource.translatedStrings.differenceIsHighlighted+'">';
         $fuzzyContainer += '<svg class="icon icon-t5_attention" /><span class="error">'+fuzzyMatchTranslatedString+'</span><br>';
         $fuzzyContainer += '    <span class="translation-sourcediff-content">' + resultData.fuzzyMatch.sourceDiff + '</span>';
         $fuzzyContainer += '</div>';
@@ -989,19 +932,19 @@ function renderTranslationContainerResultIcons (resultData) {
     }
 
     // render usage-status icon
-    if (resultData.termStatus != '') {
+    if (resultData.termStatus !== '') {
         tempHtml += renderTermUsageStatusIcon(resultData.termStatus);
     }
 
     // render info-icon
-    if (resultData.term != '' && Editor.data.isUserTermportalAllowed) {
+    if (resultData.term !== '' && Editor.data.isUserTermportalAllowed) {
         //check if for the current term the rfc language value is set, if yes set data property so the language is used in the term portal
         var languageRfc=resultData.languageRfc ? ('data-languageRfc="'+resultData.languageRfc+'"') : '';
-        tempHtml += '<span class="term-info" id="'+resultData.term+'" '+languageRfc+' title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><svg class="icon icon-t5_info" /></span>';
+        tempHtml += '<span class="term-info" id="'+resultData.term+'" '+languageRfc+' title="'+Editor.data.languageresource.translatedStrings.openInTermPortal+'"><svg class="icon icon-t5_info" /></span>';
     }
 
     // render "copy to clipboard"
-    tempHtml += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><svg class="icon icon-t5_copy" /></span>';
+    tempHtml += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings.copy+'"><svg class="icon icon-t5_copy" /></span>';
 
 
     return tempHtml;
@@ -1014,8 +957,8 @@ function renderTranslationContainerResultIcons (resultData) {
  * @returns {string}
  */
 function renderTranslationContainerResultAlternativeTranslations (resultData) {
-    if (resultData.alternativeTranslations != undefined) {
-        var at=resultData.alternativeTranslations,
+    if (resultData.alternativeTranslations !== undefined) {
+        var at = resultData.alternativeTranslations,
             highestConfidenceTranslation='',
             atHtmlTableResultPosTag = '',
             atHtmlTableStart = '',
@@ -1030,35 +973,34 @@ function renderTranslationContainerResultAlternativeTranslations (resultData) {
         atHtmlTableEnd = '</table>';
 
         $.each(at, function(key, result){
-            if (atHtmlTableResultPosTag == '') {
+            if (atHtmlTableResultPosTag === '') {
                 // This assumes that result['posTag'] is the same for all results!
-                atHtmlTableResultPosTag = '<tr><td colspan="2"><strong>'+result['posTag']+'</strong></td></tr>';
+                atHtmlTableResultPosTag = '<tr><td colspan="2"><strong>'+result.posTag+'</strong></td></tr>';
             }
             atHtmlTable += '<tr>';
             //atHtmlTable += '<td><progress value="'+result['confidence']+'" max="1"></progress></td>';
             // we need th &nbsp; to get the correct vertical position of the progress bar
-            atHtmlTable += '<td><div class="progress bg-grey_02" style="width: 50px;"><div class="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: '+100*result['confidence']+'%"></div></div>&nbsp;&nbsp;&nbsp;</td>';
-            atHtmlTable += '<td><b>'+result['displayTarget']+':</b><br>';
+            atHtmlTable += '<td><div class="progress bg-grey_02" style="width: 50px;"><div class="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: '+ (100 * result.confidence) + '%"></div></div>&nbsp;&nbsp;&nbsp;</td>';
+            atHtmlTable += '<td><b>'+result.displayTarget+':</b><br>';
             atHtmlBt=[];
             $.each(result.backTranslations, function(keyBt, resultBt){
-                if(highestConfidenceTranslation==''){
-                    highestConfidenceTranslation = Editor.data.languageresource.translatedStrings['translationsForLabel']+'<strong class="displayTarget"> '+result['displayTarget']+'</strong>';
+                if(highestConfidenceTranslation === ''){
+                    highestConfidenceTranslation = Editor.data.languageresource.translatedStrings.translationsForLabel+'<strong class="displayTarget"> '+result.displayTarget+'</strong>';
                 }
                 atHtmlBt.push(resultBt.displayText);
             });
             atHtmlTable += atHtmlBt.join(', ')+'</td>';
             atHtmlTable += '</tr>';
         });
+        $return = '';
+        $return += highestConfidenceTranslation;
+        $return += atHtmlTableStart;
+        $return += atHtmlTableResultPosTag;
+        $return += atHtmlTable;
+        $return += atHtmlTableEnd;
+        return $return;
     }
-
-    $return = '';
-    $return += highestConfidenceTranslation;
-    $return += atHtmlTableStart;
-    $return += atHtmlTableResultPosTag;
-    $return += atHtmlTable;
-    $return += atHtmlTableEnd;
-
-    return $return;
+    return '';
 }
 
 /***
@@ -1112,7 +1054,7 @@ function requestFileTranslate(){
                 getDownloads();
             } else {
                 // Handle errors here
-                var error = (result.taskId === '') ? Editor.data.languageresource.translatedStrings['error'] : result.error;
+                var error = (result.taskId === '') ? Editor.data.languageresource.translatedStrings.error : result.error;
                 showSourceError('ERRORS: ' + error);
                 $('#sourceFile').val('');
                 stopLoadingState();
@@ -1169,19 +1111,19 @@ function showDownloads(allPretranslatedFiles, dateAsOf){
         importProgressUpdate = false;
     $.each(allPretranslatedFiles, function(index, taskData) {
         var $htmlFile = '';
-        var $headerContent = '<h2>'+taskData['taskName']+'</h2>';
+        var $headerContent = '<h2>'+taskData.taskName+'</h2>';
         var $headerClassAddition = '';
         var $progressBar = '';
         var $innerContent = getLanguageName(taskData.sourceLang)+' &ndash; '+getLanguageName(taskData.targetLang)+'<br>';
 
-        switch(taskData['downloadUrl']) {
+        switch(taskData.downloadUrl) {
             case 'isImporting':
                 $headerClassAddition = '';
                 $headerContent = '<h2 class="color-grey_06">'+taskData.taskName+'<span id="importProgressLabel_'+taskData.taskId+'" class="floatRight"></span></h2>';
                 importProgressUpdate = true;
-                $innerContent += Editor.data.languageresource.translatedStrings['noDownloadWhileImport'];
+                $innerContent += Editor.data.languageresource.translatedStrings.noDownloadWhileImport;
                 //add import progress html. For each task separate progress component and progress label.
-                if(taskData['importProgress']){
+                if(taskData.importProgress){
                     $progressBar += '<div className="progress" style="margin-top: -3px;">';
                     $progressBar += '    <div id="progressBar_'+taskData.taskId+'" class="progressBar progressBarThin" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>';
                     $progressBar += '</div>';
@@ -1197,9 +1139,10 @@ function showDownloads(allPretranslatedFiles, dateAsOf){
                 break;
             default:
                 $headerClassAddition = 'box__result__header__green';
-                $headerContent = '<a href="' + taskData.downloadUrl + '" class="color-grey_09" target="_blank" title="Download">'
-                    +'<h2>'+taskData.taskName+' <small class="color-grey_06">('+taskData.orderDate+')</small><svg class="icon icon-t5_download floatRight" /></h2>'
-                    +'</a>';
+                $headerContent =
+                    '<a href="' + taskData.downloadUrl + '" class="color-grey_09" target="_blank" title="Download">'
+                    + '<h2>'+taskData.taskName+' <small class="color-grey_06">('+taskData.orderDate+')</small><svg class="icon icon-t5_download floatRight" /></h2>'
+                    + '</a>';
                 $innerContent += '(' + Editor.data.languageresource.translatedStrings.availableUntil+' '+taskData.removeDate+')';
                 break;
         }
@@ -1235,7 +1178,7 @@ function showDownloads(allPretranslatedFiles, dateAsOf){
 function getLanguageName($shortCode) {
     if (Editor.data.allDbLanguages[$shortCode]) {
         return Editor.data.allDbLanguages[$shortCode][1];
-    };
+    }
     // fallback: return original posted short language Code
     return $shortCode;
 }
@@ -1250,17 +1193,15 @@ function updateImportProgressBar(taskData){
         return;
     }
 
-    $.each(taskData, function(index, taskData) {
-        var taskProgressData = taskData['importProgress'];
-        
+    $.each(taskData, function() {
+        var taskProgressData = taskData.importProgress;
         if(!taskProgressData || taskProgressData.length < 1){
             return true;
         }
-
         //console.log(taskProgressData);
-        setProgressBar('progressBar_'+taskData.taskId, taskProgressData['progress']);
+        setProgressBar('progressBar_'+taskData.taskId, taskProgressData.progress);
         var label = $('#importProgressLabel_'+taskData.taskId);
-        label.text(Math.round(taskProgressData['progress']) + "%" );
+        label.text(Math.round(taskProgressData.progress) + "%" );
     });
 }
 
@@ -1268,7 +1209,7 @@ function setProgressBar($id, $value) {
     $('#'+$id)
         .css("width", $value + "%")
         .attr("aria-valuenow", $value);
-};
+}
 
 /* --------------- open TermPortal ------------------------------------------ */
 
@@ -1291,7 +1232,7 @@ function checkTermPortalIntegration() {
     $('#translations [data-languageresource-type="mt"]').each(function() {
         searchTerms.push({'text' : $(this).text(), 'id' : $(this).attr('id')});
     });
-    if(searchTerms.length == 0) {
+    if(searchTerms.length === 0) {
         return;
     }
     $.ajax({
@@ -1317,7 +1258,7 @@ function checkTermPortalIntegration() {
  * @params {Object}
  */
 function drawTermPortalIntegration(termToPropose) {
-    var html = '<span class="term-proposal" title="'+Editor.data.languageresource.translatedStrings['termProposalIconTooltip']+'" data-id="'+termToPropose.id+'" data-term="'+termToPropose.text+'"><svg class="icon icon-t5_circle_plus_grey" /></span>';
+    var html = '<span class="term-proposal" title="'+Editor.data.languageresource.translatedStrings.termProposalIconTooltip+'" data-id="'+termToPropose.id+'" data-term="'+termToPropose.text+'"><svg class="icon icon-t5_circle_plus_grey" /></span>';
     $('#'+termToPropose.id+'.translation-result').prev('.floatRight').children('.copyable-copy').prepend(html);
 }
 
@@ -1349,39 +1290,14 @@ function openTermPortal (params) {
 
 /* --------------- show/hide: helpers --------------------------------------- */
 
-function showSource() {
-    $('#sourceContent').show();
-    showInstantTranslationOffOn();
-    if (chosenSourceIsText) {
-        $('.show-if-source-is-text').show();
-        $('.show-if-source-is-file').hide();
-        $('#translations').show();
-        $("#sourceIsText").removeClass('source-text-error');
-        $('#sourceText').focus();
-    } else {
-        $('.show-if-source-is-text').hide();
-        $('.show-if-source-is-file').show();
-        $('#translations').hide();
-    }
-}
 function showTranslations() {
     if (getInputTextValueTrim().length === 0) {
         $('#translations').html('');
     }
     $('#translations').show();
-    showInstantTranslationOffOn();
 }
 function hideTranslations() {
     $('#translations').hide();
-}
-function showInstantTranslationOffOn() {
-    if (instantTranslationIsActive) {
-        $('#instantTranslationIsOn').show();
-        $('#instantTranslationIsOff').hide();
-    } else {
-        $('#instantTranslationIsOn').hide();
-        $('#instantTranslationIsOff').show();
-    }
 }
 /* --------------- show/hide: errors --------------------------------------- */
 function showLanguageResourceSelectorError(errorMode) {
@@ -1401,6 +1317,10 @@ function showTargetError(errorText) {
 function showSourceError(errorText) {
     $('#sourceError').html(errorText).show();
 }
+
+function hideSourceError() {
+    $('#sourceError').html('').hide();
+}
 /***
  * Creates an error out of an jqXHR error Object defaulting to the other texts passed to an ajax error-handler
  * @param Object jqXHR
@@ -1408,7 +1328,7 @@ function showSourceError(errorText) {
 function createJqXhrError(jqXHR, textStatus, errorThrown) {
     if(jqXHR.responseJSON && jqXHR.responseJSON.errorCode && jqXHR.responseJSON.errorMessage){
         // QUIRK: if the Error-Code is "E1383" this is just a slight problem with the user-input like invalid markup and we will not like to see a error-code
-        if(jqXHR.responseJSON.errorCode == 'E1383'){
+        if(jqXHR.responseJSON.errorCode === 'E1383'){
             return jqXHR.responseJSON.errorMessage;
         }
         return '<strong>Error ' + jqXHR.responseJSON.errorCode + '</strong><br/>' + jqXHR.responseJSON.errorMessage;
@@ -1427,15 +1347,15 @@ function clearAllErrorMessages() {
     // ALWAYS: Check if any engines are available for that language-combination.
     if (!hasEnginesForLanguageCombination()) {
         hideTranslations();
-        showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
+        showTargetError(Editor.data.languageresource.translatedStrings.noLanguageResource);
         return;
-    };
+    }
 }
 /* --------------- show/hide: loading spinner ------------------------------- */
 // 'sign' = show indicator in addition to content (currently used for text-translations)
 // 'state' = shown layer upon content (currently used for file-translations)
 function startLoadingSign() {
-	if ($('#translations').is(":visible") && $('#translations').html()!='') {
+	if ($('#translations').is(":visible") && $('#translations').html() !== '') {
         $('#translations').find('.loadingSpinnerIndicator').show();
     } else {
     	$('#target').children('.loadingSpinnerIndicator').show();
@@ -1459,33 +1379,140 @@ function stopLoadingState() {
 function getInputTextValueTrim(){
     return $('#sourceText').val().trim();
 }
-
-function toggleSourceTextFile($source) {
+/**
+ * Toggles the main GUI between text / file mode
+ * @param $source
+ */
+function toggleSource($source) {
     // do nothing if the chosen source is already selected
     if ($source === 'text' && chosenSourceIsText || $source === 'file' && !chosenSourceIsText) {
         return;
     }
     chosenSourceIsText = !chosenSourceIsText;
-    // show "translate" button?
-    if ($source === 'text' && !instantTranslationIsActive) {
-        $('#translationSubmit').show();
+    showGui();
+}
+
+function changeLanguage(){
+    if(chosenSourceIsText){
+        checkInstantTranslation();
+        startTranslation();
     } else {
-        $('#translationSubmit').hide();
+        checkFileTranslation();
     }
+}
+
+function swapLanguages(){
+    // detect old languages
+    var $oldSourceLang = $('#sourceLocale').val();
+    var $oldTargetLang = $('#targetLocale').val();
+
+    // now swap the language selections
+    $("#sourceLocale").val($oldTargetLang);
+    $("#targetLocale").val($oldSourceLang);
+    $("#sourceLocale").selectmenu("refresh");
+    $("#targetLocale").selectmenu("refresh");
+
+    // renew the results, if there are any
+    var results = $('div.translation-result');
+    if(results.length > 0) {
+        // set the source textarea text, therfore markup must be removed and breaktags restored
+        $('#sourceText').val(markupToText(results.first().html()));
+    }
+    $('#translations').hide();
+    changeLanguage();
+}
+
+/**
+ * Shows the GUI as neccessary for the current app-state
+ */
+function showGui(){
+    resetTextAndFile();
+    if(chosenSourceIsText) {
+        showSourceIsText();
+    } else {
+        showSourceIsFile();
+        checkFileTranslation();
+    }
+}
+/**
+ * Resets any running request & removes the error-messages
+ */
+function resetTextAndFile(){
     abortTranslateText();
     clearAllErrorMessages();
     document.getElementById("sourceFile").value = "";
-    showSource();
-    $('body').removeClass('sourceIsText');
+}
+/**
+ * Shows the text-translation GUI
+ */
+function showSourceIsText(){
+    $('.show-if-source-is-text').show();
+    $('.show-if-source-is-file').hide();
+    $('#translations').show();
+    $("#sourceIsText").removeClass('source-text-error');
+    $('#sourceText').focus();
     $('body').removeClass('sourceIsFile');
-
-    if(chosenSourceIsText) {
-        $('body').addClass('sourceIsText');
+    $('body').addClass('sourceIsText');
+    // show "translate" button?
+    if (instantTranslationIsActive) {
+        $('#translationSubmit').hide();
     } else {
-        $('body').addClass('sourceIsFile');
-        if(!isFileUploadAvailable()){
-            showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
-            hideTranslations();
-        }
+        $('#translationSubmit').show();
     }
+}
+/**
+ * Shows the file-translation GUI
+ */
+function showSourceIsFile(){
+    $('.show-if-source-is-text').hide();
+    $('.show-if-source-is-file').show();
+    $('#translations').hide();
+    $('body').removeClass('sourceIsText');
+    $('body').addClass('sourceIsFile');
+    $('#translationSubmit').hide();
+}
+/**
+ * Checks, if file-translation is available and adjusts the GUI accordingly
+ */
+function checkFileTranslation(){
+    if(!isFileUploadAvailable()){
+        showSourceError(Editor.data.languageresource.translatedStrings.noLanguageResource);
+        hideTranslations();
+        $('#dropSourceFile').hide();
+    } else {
+        hideSourceError();
+        showTranslations();
+        $('#dropSourceFile').show();
+    }
+}
+/**
+ * Every change in the language-selection starts a check if any languageResources
+ * are available. If yes and text is already entered, the translation starts.
+ */
+function checkInstantTranslation() {
+    // When the language-combination changes, former translations are not valid any longer (= the text hasn't been translated already):
+    latestTextToTranslate = '';
+    $('#translations').html('');
+    // Neither are former error-messages valid any longer:
+    clearAllErrorMessages();
+    // If fileUpload is possible for currently chosen languages, show text accordingly:
+    setTextForSource();
+    // Check if any engines are available for that language-combination.
+    if (!hasEnginesForLanguageCombination()) {
+        hideTranslations();
+        showTargetError(Editor.data.languageresource.translatedStrings.noLanguageResource);
+        return;
+    }
+    if(getInputTextValueTrim().length > 0 && getInputTextValueTrim() === latestTextToTranslate) {
+        return;
+    }
+    // Translations can be submitted:
+    showTranslations();
+    // When instantTranslation is not active; hide former translations and wait.
+    if (!instantTranslationIsActive) {
+        hideTranslations();
+        return;
+    }
+    // Start translation:
+    startTimerForInstantTranslation();
 }

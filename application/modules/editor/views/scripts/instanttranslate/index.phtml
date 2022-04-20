@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
     // DEV OPTION: setting this value to TRUE will show some Code which can be usefull for development. E.g. a list of all defined icons is shown
     $devShowAllIconsTemplate = FALSE;
     // DEV OPTION: Will disable the instant translation so the user must submit a button to translate (normally set via Zf_config)
-    $devPreventInstantTranslate = FALSE;
+    $devPreventInstantTranslate = true;
 
     /* @var $this Zend_View */
     $version = '?v='.$this->appVersion;
@@ -191,12 +191,12 @@ END LICENSE AND COPYRIGHT
                 ?>
             </select>
             
-            <div id="sourceContent" class="textinput clearable box marginTop show-if-source-is-text">
+            <div class="textinput clearable box marginTop show-if-source-is-text">
                 <textarea id="sourceText" name="sourceText" wrap="SOFT" class="" placeholder="<?= $translate->_("Geben Sie Text ein"); ?>"><?php echo htmlspecialchars($this->text); ?></textarea>
                 <svg class="icon icon-t5_close clearTextinput clearable-clear" title="<?php echo $this->translations["clearText"];?>" />
                 <span id="countedCharacters" class="countedCharacters_">0</span>
             </div>
-            <div class="dropSourceFile box marginTop show-if-source-is-file font-size-big">
+            <div id="dropSourceFile" class="dropSourceFile box marginTop show-if-source-is-file font-size-big">
                 <svg class="icon icon-t5_upload iconsize-giant" /><br>
                 <?= $translate->_('Drag and Drop oder anklicken zum hochladen einer Datei'); ?>
             </div>
