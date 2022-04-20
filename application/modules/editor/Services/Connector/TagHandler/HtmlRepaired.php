@@ -31,7 +31,7 @@ use MittagQI\Translate5\Segment\TagRepair\Tags;
 
 /**
  * Protects the translate5 internal tags as singular img tags to send them to a request based API
- * To better be able to re-establich incomplete tags paired tags are turned into singular ones (all img-tags)
+ * To better be able to re-establish incomplete tags paired tags are turned into singular ones (all img-tags)
  */
 class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_Connector_TagHandler_Abstract {
 

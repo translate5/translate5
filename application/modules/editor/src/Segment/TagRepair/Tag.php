@@ -30,8 +30,9 @@ namespace MittagQI\Translate5\Segment\TagRepair;
 
 /**
  * Abstraction for a "repair tag" used with the automatic tag repair
- * The main use for this class is for testing purposes
- * In "real life" there should be no unknown segment tags and we could add error logging here to detect such mishaps
+ * This Tag is able to evaluate & store additional information about the tags position regarding words in the text, it can represent any kind of tag
+ * this information then is used to restore lost or incomplete tags
+ * it has capabilities to be rendered as a "request" tag (that will be sent to the service); these request tag render two image-tags instead of an opening & closing tag to increase the chances to be able to restore incomplete tags
  *
  * @method Tag clone(bool $withDataAttribs=false, bool $withId=false)
  * @method Tag cloneProps(\editor_Tag $tag, bool $withDataAttribs=false, bool $withId=false)
@@ -44,10 +45,10 @@ class Tag extends \editor_Segment_Tag {
     const REQUEST_TAG_REGEX = '~(<img\s*id="t5tag\-[a-z]+\-[0-9]+"\s*src="[^>]+"\s*/>)~i';
 
     /**
-     * We need to expand the singular tags to get the "x"-tag of sdxliff on the list
+     * We need to expand the singular tags to cover the xliff tags
      * @var string[]
      */
-    protected static $singularTypes = array('img','input','br','hr','wbr','area','col','embed','keygen','link','meta','param','source','track','command','x');
+    protected static $singularTypes = array('img','input','br','hr','wbr','area','col','embed','keygen','link','meta','param','source','track','command','x','bx','ex');
     
     protected static $type = 'repair';
 

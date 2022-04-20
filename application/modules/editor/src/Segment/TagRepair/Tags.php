@@ -29,7 +29,17 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Segment\TagRepair;
 
 /**
- * General Extension to use te FieldTags Model for a general Tag-Repair (not specific to internal or xliff tags)
+ * General Extension to use te FieldTags Model for a general Tag-Repair (not specific for internal or xliff tags)
+ * The (nested) tags of a text (segment) will be converted to a sequence of simple image-tags representing the opening/closing tags of the original markup
+ * This increases the chances to restore a tag where only the closing tag is returned by the service (DeepL)
+ * Afterwards the original tags will be restored from the (potentially incomplete) markup sent back, lost tags will be attempted to insert/restored at their "scaled" word-position
+ * In a worst-case scenario the pure text of the original markup will be restored (although until now there is no test/example for such scenario; it is a more theoretical case)
+ *
+ * Diagram of usage:
+ * Create instance from original, valid markup     ->      Send "request markup" to the service [::getRequestHtml()]     ->     Restore original markup from service-result [::recreateTags($returnedMarkup)]
+ *
+ * Logic of restoration:
+ * Try to restore from service-result    -> fails     Restore from stripped service-result     -> fails     Return stripped service-result
  *
  * @method Tag unparseHtml(string $html)
  * @property Tag[] $tags

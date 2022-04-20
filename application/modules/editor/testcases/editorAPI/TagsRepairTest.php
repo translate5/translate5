@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Segment\TagRepair\Tags;
 
 /**
- * Several "classic" PHPUnit tests to check the general tag repair (not to mix up with the segment tags repair)
+ * Several "classic" PHPUnit tests to check the general tag repair (not to mix up with the internal tags repair)
  * When creating test-data notice, that if a "<" shall be used in the markup it must be followed by a " "
  */
 class TagsRepairTest extends editor_Test_MockedTaskTest {
@@ -156,7 +156,6 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
     public function testTagRepair15(){
         $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt <7/>werden <2>muss<9/></2>';
         $translated = '<1><8/>This now is a somehow longer sentence,</1> that is <2>really completely changed<9/></2>, as it<7/> can happen';
-        //$translated = 'This now is a somehow longer sentence, that is really completely changed, as it can happen';
         $this->createTagsRepairTest($markup, $translated, $translated);
     }
 

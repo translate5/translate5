@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\Segment\TagRepair;
  * Helper class that processes a single String with the automatic tag-repair
  * It is tailored to work with HTML Markup, that is processed with a Service based translation
  * It will presumably not work with G-tags from a xliff etc.
- * This is a use-once class only that expects to be used sequentially
+ * This is a use-once class only that expects to be instanciated per text/segment
  */
 class HtmlProcessor {
 
