@@ -1900,7 +1900,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='R2VzY2jDvHR6ZXMgTGVlcnplaWNoZW4gYW0gQW5mYW5n'><source>Geschützes Leerzeichen am Anfang</source><target>Geschützes Leerzeichen am Anfang</target></trans-unit>
 <trans-unit id='VGFiIGFtIEFuZmFuZw=='><source>Tab am Anfang</source><target>Tab am Anfang</target></trans-unit>
 <trans-unit id='VW1icnVjaCBhbSBBbmZhbmc='><source>Umbruch am Anfang</source><target>Umbruch am Anfang</target></trans-unit>
-<trans-unit id='U2VnbWVudCBlbmRldCBtaXQgZWluZW0gTGVlcnplaWNoZW4gZ2Vmb2xndCB2b24gVGFn'><source>Segment endet mit einem Leerzeichen gefolgt von Tag</source><target>Segment endet mit einem Leerzeichen gefolgt von Tag</target></trans-unit>
+<trans-unit id='U2VnbWVudCBlbmRldCBtaXQgZWluZW0gTGVlcnplaWNoZW4gZ2Vmb2xndCB2b24gZWluZW0gVGFn'><source>Segment endet mit einem Leerzeichen gefolgt von einem Tag</source><target>Segment endet mit einem Leerzeichen gefolgt von einem Tag</target></trans-unit>
 <trans-unit id='R2VzY2jDvHR6ZXMgTGVlcnplaWNoZW4gYW0gRW5kZQ=='><source>Geschützes Leerzeichen am Ende</source><target>Geschützes Leerzeichen am Ende</target></trans-unit>
 <trans-unit id='VGFiIGFtIEVuZGU='><source>Tab am Ende</source><target>Tab am Ende</target></trans-unit>
 <trans-unit id='VW1icnVjaCBhbSBFbmRl'><source>Umbruch am Ende</source><target>Umbruch am Ende</target></trans-unit>

@@ -34,10 +34,10 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Segment_Whitespace_Check {
 
-    const BEG_TAG_SPACE = 'beg_tag_space';
-    const NBSP_BEG  = 'nbsp_beg';
-    const TAB_BEG   = 'tab_beg';
-    const LNBR_BEG  = 'lnbr_beg';
+    const TAG_SPACE_BEG = 'tag_space_begin';
+    const NBSP_BEG  = 'nbsp_begin';
+    const TAB_BEG   = 'tab_begin';
+    const LNBR_BEG  = 'lnbr_begin';
 
     const SPACE_TAG_END = 'space_tag_end';
     const NBSP_END  = 'nbsp_end';
@@ -80,12 +80,18 @@ class editor_Segment_Whitespace_Check {
         foreach ($tags as $idx => $tag) {
 
             // If it's not an internal tag - skip
-            if ($tag->getType() != editor_Segment_Tag::TYPE_INTERNAL) continue;
+            if ($tag->getType() != editor_Segment_Tag::TYPE_INTERNAL) {
+                continue;
+            }
 
             // Check whether tag is located at the beginning and/or ending
             $sideA = [];
-            if ($tag->startIndex === 0       && $idx == 0           ) $sideA['BEG'] = [ 0, self::BEG_TAG_SPACE, +1];
-            if ($tag->endIndex === $endIndex && $idx == $tagsQty - 1) $sideA['END'] = [-1, self::SPACE_TAG_END, -1];
+            if ($tag->startIndex === 0 && $idx == 0) {
+                $sideA['BEG'] = [ 0, self::TAG_SPACE_BEG, +1];
+            }
+            if ($tag->endIndex === $endIndex && $idx == $tagsQty - 1) {
+                $sideA['END'] = [-1, self::SPACE_TAG_END, -1];
+            }
 
             // Foreach side
             foreach ($sideA as $side => $info) {
@@ -94,7 +100,9 @@ class editor_Segment_Whitespace_Check {
                 $neighbour = $tags[$idx + $info[2]] ?? false;
 
                 // Check whether this neighbour comes right after/before current tag
-                if ($neighbour) $neighbour = $neighbour->startIndex === $tag->startIndex;
+                if ($neighbour) {
+                    $neighbour = $neighbour->startIndex === $tag->startIndex;
+                }
 
                 // If it's a ordinary space and if there is no neighbour right after/before current tag
                 if (mb_substr($fieldText, $tag->startIndex + $info[0], 1) == ' ' && !$neighbour) {
@@ -113,7 +121,7 @@ class editor_Segment_Whitespace_Check {
             // If kind is detected
             if ($kind) {
 
-                // If tag location at the beginning and/or ending detected
+                // If tag location at the beginning and/or ending detectedbegin
                 foreach ($sideA as $side => $info) {
 
                     // Get quality category by referring to a correct constant
