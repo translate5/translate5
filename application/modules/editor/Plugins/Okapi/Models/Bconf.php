@@ -42,10 +42,12 @@ END LICENSE AND COPYRIGHT
  * @method setIsDefault(int $int)
  * @method setDescription(string $string)
  * @method setCustomerId(mixed $customerId)
+ * @method setVersionIdx(int $versionIdx)
  */
 class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstract {
 
     const SYSTEM_BCONF_VERSION = 1;
+    const SYSTEM_BCONF_NAME = 'Translate5-Standard';
 
     public editor_Plugins_Okapi_Bconf_File $file;
     public function setFile(editor_Plugins_Okapi_Bconf_File $file): void {
@@ -70,7 +72,10 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             if(empty($data['name'])){
                 $data['name'] = pathinfo($postFile['name'])['filename']; // strip '.bconf'
             }
-            unset($data['id']); // auto gernerated
+            unset($data['id']); // auto generated
+            if(!$data['versionIdx']){
+                $data['versionIdx'] = self::SYSTEM_BCONF_VERSION;
+            }
             $this->init($data);
             $this->save();
 
@@ -90,11 +95,12 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      */
     public function importDefaultWhenNeeded(bool $skipCheck = false): bool
     {
+        // TODO: check wether system bconf has been updated and if so import updated one
         if ($skipCheck || $this->getTotalCount() === 0) {
             $defaultImportBconf = editor_Plugins_Okapi_Init::getOkapiDataFilePath() . 'okapi_default_import.bconf';
             $bconf = new editor_Plugins_Okapi_Models_Bconf(['tmp_name'=>$defaultImportBconf, 'name'=>'Translate5-Standard.bconf']);
             $bconf->setIsDefault(1);
-            $bconf->setDescription("The .bconf used for file imports unless another one is configured");
+            $bconf->setDescription("The default .bconf used for file imports unless another one is configured");
             $bconf->save();
             return true;
         }

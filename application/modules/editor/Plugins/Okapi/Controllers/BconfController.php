@@ -67,7 +67,13 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
 
     public function deleteAction()
     {
-        $dir = $this->entity->getDataDirectory($this->getParam('id'));
+        $idToDelete = $this->getParam('id');
+        $systemBconf_row = $this->entity->loadRow('name = ?', $this->entity::SYSTEM_BCONF_NAME);
+        if($idToDelete == $systemBconf_row['id']){
+            throw new ZfExtended_NoAccessException();
+        }
+
+        $dir = $this->entity->getDataDirectory($idToDelete);
         parent::deleteAction();
         if (preg_match('/\d+$/', $dir)) { // just to be safe
             /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
