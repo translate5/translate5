@@ -1895,6 +1895,17 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='UVMgU3RhdGlzdGlr'><source>QS Statistik</source><target>QS Statistik</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Interne Tags</target></trans-unit>
 <trans-unit id='TGVlcmUgU2VnbWVudGU='><source>Leere Segmente</source><target>Leere Segmente</target></trans-unit>
+<trans-unit id='TGVlcnJhdW0gYW0gQW5mYW5nL0VuZGU='><source>Leerraum am Anfang/Ende</source><target>Leerraum am Anfang/Ende</target></trans-unit>
+<trans-unit id='U2VnbWVudCBiZWdpbm50IG1pdCBlaW5lbSBUYWcgZ2Vmb2xndCB2b24gTGVlcnplaWNoZW4='><source>Segment beginnt mit einem Tag gefolgt von Leerzeichen</source><target>Segment beginnt mit einem Tag gefolgt von Leerzeichen</target></trans-unit>
+<trans-unit id='R2VzY2jDvHR6ZXMgTGVlcnplaWNoZW4gYW0gQW5mYW5n'><source>Geschützes Leerzeichen am Anfang</source><target>Geschützes Leerzeichen am Anfang</target></trans-unit>
+<trans-unit id='VGFiIGFtIEFuZmFuZw=='><source>Tab am Anfang</source><target>Tab am Anfang</target></trans-unit>
+<trans-unit id='VW1icnVjaCBhbSBBbmZhbmc='><source>Umbruch am Anfang</source><target>Umbruch am Anfang</target></trans-unit>
+<trans-unit id='U2VnbWVudCBlbmRldCBtaXQgZWluZW0gTGVlcnplaWNoZW4gZ2Vmb2xndCB2b24gZWluZW0gVGFn'><source>Segment endet mit einem Leerzeichen gefolgt von einem Tag</source><target>Segment endet mit einem Leerzeichen gefolgt von einem Tag</target></trans-unit>
+<trans-unit id='R2VzY2jDvHR6ZXMgTGVlcnplaWNoZW4gYW0gRW5kZQ=='><source>Geschützes Leerzeichen am Ende</source><target>Geschützes Leerzeichen am Ende</target></trans-unit>
+<trans-unit id='VGFiIGFtIEVuZGU='><source>Tab am Ende</source><target>Tab am Ende</target></trans-unit>
+<trans-unit id='VW1icnVjaCBhbSBFbmRl'><source>Umbruch am Ende</source><target>Umbruch am Ende</target></trans-unit>
+<trans-unit id='TGVlcnplaWNoZW4gdm9yIFplaWxlbnVtYnJ1Y2g='><source>Leerzeichen vor Zeilenumbruch</source><target>Leerzeichen vor Zeilenumbruch</target></trans-unit>
+<trans-unit id='TGVlcnplaWNoZW4gbmFjaCBaZWlsZW51bWJydWNo'><source>Leerzeichen nach Zeilenumbruch</source><target>Leerzeichen nach Zeilenumbruch</target></trans-unit>
 <trans-unit id='RGFzIFppZWwgZW50aMOkbHQgbnVyIFRhZ3MsIExlZXJ6ZWljaGVuIG9kZXIgSW50ZXJwdW5rdGlvbiwgZGllIFF1ZWxsZSBqZWRvY2ggbmljaHQu'><source>Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.</source><target>Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.</target></trans-unit>
 <trans-unit id='RWluaGVpdGxpY2hrZWl0'><source>Einheitlichkeit</source><target>Einheitlichkeit</target></trans-unit>
 <trans-unit id='VW5laW5oZWl0bGljaGUgUXVlbGxl'><source>Uneinheitliche Quelle</source><target>Uneinheitliche Quelle</target></trans-unit>
