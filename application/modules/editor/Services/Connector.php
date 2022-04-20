@@ -195,6 +195,10 @@ class editor_Services_Connector {
             }
         } catch (ZfExtended_BadGateway $toThrow) {
             //handle legacy BadGateway messages, see below
+
+            //FIXME a connector should not throw Http Exceptions (since we can not know here on handling if the connector uses HTTP or some other raw connector
+            // conclusion: the connectors themself have to convert the Http exceptions to editor_Services_Connector_Exception exceptions
+            // with the below error codes (best directly in the abstract HttpApi)
         } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $e) {
                 //'E1311' => 'Could not connect to language resource {service}: server not reachable',
                 $ecode = 'E1311';
