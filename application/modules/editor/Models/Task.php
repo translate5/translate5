@@ -262,11 +262,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param string $tasktype
      * @return array
      */
-    public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype) {
+    public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype): array
+    {
         $s = $this->db->select();
         $s->where('pmGuid = ?', $pmGuid);
         $s->where('tasktype = ?', $tasktype);
-        $s->order('orderdate ASC');
+        $s->order('orderdate DESC');
         return parent::loadFilterdCustom($s);
     }
 
@@ -293,11 +294,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function loadUserList(string $userGuid) {
+        /** @var ZfExtended_Models_User $userModel */
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
 
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $loadAll = $userModel->isAllowed('backend', 'loadAllTasks');
+        $loadAll = editor_User::instance()->isAllowed('backend', 'loadAllTasks');
         $ignoreAnonStuff = $this->rolesAllowReadAnonymizedUsers();
 
         $anonSql = '';

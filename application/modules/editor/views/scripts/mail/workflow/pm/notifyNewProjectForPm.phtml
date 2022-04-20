@@ -26,29 +26,42 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-$config = Zend_Registry::get('config');
-/* @var $config Zend_Config */
+/**#@+
+ * @author Marc Mittag
+ * @package portal
+ * @version 2.0
+ *
+ */
 
-echo $this->doctype();
-$version = '?v='.$this->appVersion;
-$this->headLink()->prependStylesheet(APPLICATION_RUNDIR.'/modules/editor/apps/css/apps.css'.$version);
-$jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui';
-$this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css'.$version);
-?>
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <?php echo $this->headTitle() ?>
-        <?php echo $this->headMeta() ?>
-        <?php echo $this->headLink() ?>
-        <?php echo $this->headStyle() ?>
-        <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR . $config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
-<?php echo $this->headScript() ?>
-        <script src="<?php echo $jqueryPath; ?>/external/jquery/jquery.js<?php echo $version; ?>"></script>
-        <script src="<?php echo $jqueryPath; ?>/jquery-ui.min.js<?php echo $version; ?>"></script>
-    </head>
-    <body>
-        <?php
-            echo $this->layout()->content;
-        ?>
-    </body>
-</html>
+/* @var $this Zend_View */
+$this->render('general.phtml');
+
+// Setup subject
+$this->subject = $this->translate->_('Translate5 - Projekt erstellt')
+    . ' "' . $this->project->getId()
+    .' - ' . $this->project->getTaskName() . '"';
+
+// Prepare data to merged with general.phtml's data
+$data = [
+    'header' => $this->header,
+    'footer' => $this->footer,
+    'role' => $this->translate->_(ucfirst(ACL_ROLE_PM)),
+    'projectId' => $this->project->getId(),
+    'projectName' => $this->project->getTaskName()
+];
+
+// Build mail body
+$mailBody = $this->templateApply('
+{header}
+Im Projektportal {portalLink} wurde ein neues Terminologieübersetzungsprojekt erstellt.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName}
+{footer}'
+, $data);
+
+// Prepare text version
+$this->textbody = strip_tags($mailBody);
+
+// Print mail body
+echo $mailBody;
+

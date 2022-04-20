@@ -1449,8 +1449,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     {
         $lang = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $lang editor_Models_Languages */
-        $sourceLanguages = $lang->getFuzzyLanguages($sourceLang);
-        $targetLanguages = $lang->getFuzzyLanguages($targetLang);
+        $sourceLanguages = $lang->getFuzzyLanguages($sourceLang, includeMajor: true);
+        $targetLanguages = $lang->getFuzzyLanguages($targetLang, includeMajor: true);
         $allLanguages = array_unique(array_merge($sourceLanguages, $targetLanguages));
         $sourceIds = array_column($termIds['source'], 1);
         $targetIds = array_column($termIds['target'], 1);

@@ -26,25 +26,55 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Applet;
+
 /**
- * The termtranslation task type is same as default, but have different ID so
- * that it appears the possibility for distinction between termtranslation- and other tasks
- * Currently it is only used to decide whether reimport back to TermCollection export menu option should be shown
+ * Abstract Applet to configure applets like (termportal, instanttranslate, etc)
  */
-class editor_Task_Type_TermTranslation extends editor_Task_Type_Project {
+abstract class AppletAbstract {
+    /**
+     * The URL path part of the application
+     * @var string
+     */
+    protected string $urlPathPart;
 
     /**
-     * Type ID
+     * The initial page ACL for the applet
+     * @var string
      */
-    const ID = 'termtranslation';
+    protected string $initialPage;
 
     /**
-     * @param bool $multiTarget
-     * @param string $projectType
-     * @param string $taskType
+     * Used for sorting which applet should be loaded if all are allowed; higher weight is used first
+     * @var int
      */
-    public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType) {
-        $projectType = editor_Task_Type_TermTranslation::ID;
-        $taskType = editor_Task_Type_TermTranslationTask::ID;
+    protected int $weight = 0;
+
+    /**
+     * returns the URL path part, may contain also a hash component!
+     * @return string
+     */
+    public function getUrlPathPart(): string
+    {
+        return $this->urlPathPart;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInitialPage(): string {
+        return $this->initialPage;
+    }
+
+    /**
+     * returns true if the current user has this applet in his initial_page ACLs
+     */
+    public function hasAsInitialPage(): bool {
+        return \editor_User::instance()->isAllowed('initial_page', $this->initialPage);
+    }
+
+    public function getWeight(): int
+    {
+        return $this->weight;
     }
 }

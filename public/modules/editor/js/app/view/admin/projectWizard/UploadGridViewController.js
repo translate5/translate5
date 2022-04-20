@@ -104,7 +104,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
         // update isZipUpload view model after the files are removed
         items = store.queryBy(function (rec){
-            return Editor.util.Util.getFileExtension(rec.get('name')) === 'zip';
+            return Editor.util.Util.isZipFile(rec.get('name'));
         });
         me.setIsZipUploadViewModel(items.length > 0);
 
@@ -130,7 +130,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         if(me.ignoreZipByType(type)){
             // reset the zip flag since the uploaded file is ignored
             me.setIsZipUploadViewModel(false);
-            Editor.MessageBox.addInfo(me.errorMessages.zipAsWorkfileAllowedMessage)
+            Editor.MessageBox.addInfo(me.errorMessages.zipAsWorkfileAllowedMessage);
             return;
         }
 
@@ -256,7 +256,9 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         }else if(Ext.isEmpty(rec.get('sourceLang'))){
             errorMsg = Ext.String.format(msg.sourceNotValid,fileSourceLang);
         }else if(Ext.isEmpty(rec.get('targetLang'))){
-            errorMsg = Ext.String.format(msg.targetNotValid,fileTargetLang);
+            // is source language is detected but there is no target language, and it is not pivot,
+            // this is xml based file where the target langauge is not defined
+            // According to the xliff specification, the target language in xliff file is only optional, not required.
         }else if(!Ext.isEmpty(sourceField.getValue()) && sourceField.getValue() !== rec.get('sourceLang')){
 
                 errorMsg = isPivotType ?
@@ -369,7 +371,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             }
         }
 
-        if(rec.getExtension() !== 'zip' || !langs || langs.length !== 3){
+        if( !Editor.util.Util.isZipFile(rec.getExtension()) || !langs || langs.length !== 3){
             return;
         }
 
@@ -460,12 +462,12 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     zipFileFilter:function (items) {
         var me = this,
             filesStore = me.getView().getStore(),
-            existing = filesStore && filesStore.queryBy(function (rec){ return Editor.util.Util.getFileExtension(rec.get('name')) === 'zip';}),
+            existing = filesStore && filesStore.queryBy(function (rec){ return Editor.util.Util.isZipFile(rec.getExtension());}),
             files = Ext.Array.from(items),
             filtered = [];
 
         Ext.Array.forEach(Ext.Array.from(files), function (file) {
-            if(Editor.util.Util.getFileExtension(file.name) === 'zip'){
+            if(Editor.util.Util.isZipFile(file.name)){
                 filtered.push(file);
             }
         });

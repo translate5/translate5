@@ -92,6 +92,24 @@ class editor_User {
     public function getRoles() : array {
         return $this->session->data->roles;
     }
+
+    /**
+     * Check if currently logged in user is allowed to access the given ressource and right
+     *
+     * @param string $resource
+     * @param string $right
+     *
+     * @return boolean
+     */
+    public function isAllowed(string $resource, string $right): bool {
+        try {
+            return ZfExtended_Acl::getInstance()->isInAllowedRoles($this->getRoles(), $resource, $right);
+        }
+        catch (Zend_Acl_Exception) {
+            return false;
+        }
+    }
+
     /**
      *
      * @return stdClass

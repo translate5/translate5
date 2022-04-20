@@ -108,6 +108,10 @@
         <source>Es ist ein Fehler aufgetreten!</source>
         <target>An error occurred!</target>
       </trans-unit>
+      <trans-unit id="TmV1IGxhZGVu">
+        <source>Neu laden</source>
+        <target>Reload</target>
+      </trans-unit>
       <trans-unit id="YmVhcmJlaXRldCBiZWk=">
         <source>bearbeitet bei</source>
         <target>edited at</target>
@@ -1770,6 +1774,7 @@
     <target>Translation</target>
 </trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - task associated</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIFRlcm1pbm9sb2dpZcO8YmVyc2V0enVuZ3Nwcm9qZWt0IGVyc3RlbGx0'><source>Translate5 - Terminologieübersetzungsprojekt erstellt</source><target>Translate5 - Terminology translation project created</target></trans-unit>
 
 <trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>The workflow step of the task was changed to "{0}"!</target></trans-unit>
       <trans-unit id='QXV0b21hdGlzY2hlIFp1d2Vpc3VuZw=='>
@@ -4582,6 +4587,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='Q2hpbmVzaXNjaCAodmVyZWluZmFjaHQp'>
   <source>Chinesisch (vereinfacht)</source>
   <target>Chinese (simplified)</target>
+</trans-unit>
+<trans-unit id='QXJiZWl0c2RhdGVpKGVuKSBzaW5kIG9ibGlnYXRvcmlzY2g='>
+  <source>Arbeitsdatei(en) sind obligatorisch</source>
+  <target>Workfile(s) are mandatory</target>
 </trans-unit>
   </file>
 </xliff>

@@ -102,19 +102,26 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
      * @param items
      */
     addSpecialCharactersButtonConfig: function (specialCharacters,items){
-        var record = Ext.JSON.decode(specialCharacters,true),
+        var specialCharactersJosn = Ext.JSON.decode(specialCharacters,true),
             targetLang = Editor.data.task && Ext.getStore('admin.Languages').getById(Editor.data.task.get('targetLang'));
 
         // get the configured values only for the matching task-target language
-        if(!record || !targetLang || record[targetLang.get('rfc5646')] === undefined){
+        if(!specialCharactersJosn || !targetLang){
             return;
         }
-        Ext.Array.each(record[targetLang.get('rfc5646')], function(rec) {
-            items.push({
-                xtype:'specialCharactersButton',
-                text: rec.visualized,
-                value: Editor.util.Util.toUnicodeCodePointEscape(rec.unicode)
-            });
+        var matches =  Editor.util.Util.getFuzzyLanguagesForCode(targetLang.get('rfc5646'));
+
+        Ext.Array.each(matches, function(rec) {
+            if(specialCharactersJosn[rec] !== undefined){
+                Ext.Array.each(specialCharactersJosn[rec], function(r) {
+                    items.push({
+                        xtype:'specialCharactersButton',
+                        text: r.visualized,
+                        value: Editor.util.Util.toUnicodeCodePointEscape(r.unicode)
+                    });
+                });
+            }
         });
+
     }
 });

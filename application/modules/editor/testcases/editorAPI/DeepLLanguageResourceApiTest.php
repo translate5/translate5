@@ -69,10 +69,8 @@ class DeepLLanguageResourceApiTest extends editor_Test_JsonTest {
     /**
      * "Settings" for translations.
      */
-    const SOURCE_LANG = 'de';
-    const SOURCE_LANG_CODE = 4;
-    const TARGET_LANG = 'en';
-    const TARGET_LANG_CODE = 5;
+    const SOURCE_LANG = 'DE';
+    const TARGET_LANG = 'EN-GB';
     /**
      *
      */
@@ -126,7 +124,7 @@ class DeepLLanguageResourceApiTest extends editor_Test_JsonTest {
     protected $expectedInstantTranslations = [
         [
             'source' => '[<i>Datum</i>] PHP Handbuch',
-            'translation' => '[date] PHP manual'
+            'translation' => '[Date] PHP Manual'
         ],[
             'source' => 'Das Haus ist <b>blau</b>',
             'translation' => 'The house is blue'
@@ -174,8 +172,8 @@ class DeepLLanguageResourceApiTest extends editor_Test_JsonTest {
         $params = [];
         $params['resourceId']  = static::RESOURCE_ID;
         $params['name'] = static::LANGUAGERESOURCE_NAME;
-        $params['sourceLang'] = static::SOURCE_LANG_CODE;
-        $params['targetLang'] = static::TARGET_LANG_CODE;
+        $params['sourceLang'] = static::SOURCE_LANG;
+        $params['targetLang'] = static::TARGET_LANG;
         $params['serviceType'] = static::SERVICE_TYPE;
         $params['serviceName'] = static::SERVICE_NAME;
         $params['customerIds'] = [$customer->id];
