@@ -1310,6 +1310,9 @@ function showLanguageResourceSelectorError(errorMode) {
 function showTargetError(errorText) {
     $('#targetError').html(errorText).show();
 }
+function hideTargetError() {
+    $('#targetError').html('').hide();
+}
 /***
  * Show the given error in the sourceError container.
  * @param string error
@@ -1317,7 +1320,6 @@ function showTargetError(errorText) {
 function showSourceError(errorText) {
     $('#sourceError').html(errorText).show();
 }
-
 function hideSourceError() {
     $('#sourceError').html('').hide();
 }
@@ -1426,21 +1428,15 @@ function swapLanguages(){
  * Shows the GUI as neccessary for the current app-state
  */
 function showGui(){
-    resetTextAndFile();
+    abortTranslateText();
+    clearAllErrorMessages();
+    document.getElementById("sourceFile").value = "";
     if(chosenSourceIsText) {
         showSourceIsText();
     } else {
         showSourceIsFile();
         checkFileTranslation();
     }
-}
-/**
- * Resets any running request & removes the error-messages
- */
-function resetTextAndFile(){
-    abortTranslateText();
-    clearAllErrorMessages();
-    document.getElementById("sourceFile").value = "";
 }
 /**
  * Shows the text-translation GUI
@@ -1464,6 +1460,7 @@ function showSourceIsText(){
  * Shows the file-translation GUI
  */
 function showSourceIsFile(){
+    hideSourceError();
     $('.show-if-source-is-text').hide();
     $('.show-if-source-is-file').show();
     $('#translations').hide();
@@ -1475,6 +1472,7 @@ function showSourceIsFile(){
  * Checks, if file-translation is available and adjusts the GUI accordingly
  */
 function checkFileTranslation(){
+    hideTargetError();
     if(!isFileUploadAvailable()){
         showSourceError(Editor.data.languageresource.translatedStrings.noLanguageResource);
         hideTranslations();
