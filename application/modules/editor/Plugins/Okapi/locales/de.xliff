@@ -68,6 +68,14 @@
     <source>Bconf-Datei gelöscht</source>
     <target>Bconf-Datei gelöscht</target>
 </trans-unit>
+<trans-unit id='VW5nw7xsdGlnZSBTUlgtRGF0ZWk='>
+    <source>Ungültige SRX-Datei</source>
+    <target>Ungültige SRX-Datei</target>
+</trans-unit>
+<trans-unit id='RGllIGhvY2hnZWxhZGVuZSBEYXRlaSBpc3Qga2VpbmUgZ8O8bHRpZ2UgU1JYLURhdGVpLg=='>
+    <source>Die hochgeladene Datei ist keine gültige SRX-Datei.</source>
+    <target>Die hochgeladene Datei ist keine gültige SRX-Datei.</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

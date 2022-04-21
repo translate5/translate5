@@ -107,21 +107,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
 
     },
 
-    exportbconf: function ({grid}, rowIndex, /* colIndex */) {
-        var okapiName = grid.getStore().getAt(rowIndex).get('name');
-        var bconfId = grid.getStore().getAt(rowIndex).get('id');
-        var form = Ext.create('Ext.form.Panel',{
-            timeout: 60000
-        });
-        form.submit({
-            url     : Editor.data.restpath + 'plugins_okapi_bconf/downloadbconf',
-            method  : 'GET',
-            standardSubmit: true,
-            params  : {
-                okapiName: okapiName,
-                bconfId: bconfId
-            },
-            target: '_blank'
+    exportbconf: function (view, rowIndex, /* colIndex */) {
+        view.select(rowIndex);
+        Editor.util.Util.download('plugins_okapi_bconf/downloadbconf', {
+            bconfId: view.selection.id,
+            okapiName: view.selection.get('name'),
         });
     },
     showSRXChooser: function (view, rowIndex, /* colIndex */) {
@@ -133,30 +123,34 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         });
     },
     downloadSRX: function (view, rowIndex, /* colIndex */) {
-        var dlAnchor = view.dlAnchor || (view.dlAnchor = Ext.DomHelper.createDom({
-            tag: 'a',
-            download: ''
-        }));
-        var rec = view.getStore().getAt(rowIndex);
-        dlAnchor.setAttribute('href', Editor.data.restpath + 'plugins_okapi_bconf/downloadSRX?id='+rec.id)
-        dlAnchor.click();
+        view.select(rowIndex);
+        Editor.util.Util.download(Editor.data.restpath + 'plugins_okapi_bconf/downloadsrx?id='+view.selection.id)
     },
     uploadSRX: function(id, file){
-        var data = new FormData()
-        data.append('id', id);
-        data.append('srx', file);
+        var grid = this.getView();
+        Editor.util.Util.fetchXHRLike(Editor.data.restpath + 'plugins_okapi_bconf/uploadsrx/?id='+id, {
+            method: 'POST', formData : { srx: file }
+        }).then(function({status, responseJson: json}){
+            if(status === 422){
 
-        Editor.util.Util.fetchXHRLike(Editor.data.restpath + 'plugins_okapi_bconf/uploadSRX', {
-            method: 'POST',
-            body: data
-        }).then(function(response){
-            if(response.status === 200) {
 
-            } else {
-                Editor.app.getController('ServerException').handleException(response);
+                var extraInfo = '';
+                if(json.errors && json.errors.length){
+                    extraInfo = ' ' + Ext.DomHelper.createHtml({
+                        tag: 'span',
+                        class: 'x-fa fa-question-circle pointer',
+                        'data-qtip': '<code><ul><li>' + json.errors.join('<li></li>') + '</li></ul>',
+                        'data-hide': 'user',
+                        'data-qwidth': '500',
+                    });
+                }
+                Ext.Msg.show({
+                    title: grid.strings.invalidSrxTitle,
+                    message: grid.strings.invalidSrxMsg + extraInfo,
+                    icon: Ext.Msg.WARNING
+                });
             }
         })
-        input.value = input.recId = ''; // reset file input
     },
     isDeleteDisabled:function ({grid}, rowIndex, colIndex, item, {data:bconf}) {
         return bconf.isDefault || grid.isCustomerGrid && !rec.customerId || bconf.name === grid.SYSTEM_BCONF_NAME;

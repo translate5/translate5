@@ -209,6 +209,26 @@ Ext.define('Editor.util.Util', {
             });
         },
 
+        download: function(url, params = null){
+            var baseUrl = undefined;
+            if(!url.startsWith('http')){
+                url = Editor.data.restpath + url;
+                baseUrl = location.origin;
+            }
+            if(params){
+                var urlObj = new URL(url, baseUrl);
+                var searchParams = new URLSearchParams(urlObj.search);
+                for(const [param, value] of Object.entries(params)) searchParams.set(param, value);
+                urlObj.search = searchParams;
+                url = urlObj.toString();
+            }
+            Ext.DomHelper.createDom({
+                tag: 'a',
+                download: '',
+                href: url
+            }).click();
+        },
+
         /**
          * A wrapper around fetch to return Ext.Ajax-like response objects to use with existing APIs
          * @param {string} url
@@ -256,6 +276,10 @@ Ext.define('Editor.util.Util', {
                 var headers = options.headers || (options.headers = new Headers());
                 if(!headers.has('Accept')){
                     headers.append('Accept', 'application/json')
+                }
+                if(options.formData){
+                    var body = options.body = new FormData();
+                    Object.entries(options.formData).forEach(([name, value]) => body.append(name, value));
                 }
                 fetch(url, options)
                     .then(responseHandler)

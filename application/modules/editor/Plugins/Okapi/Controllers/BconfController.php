@@ -135,10 +135,26 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
         empty($_FILES) && throw new editor_Plugins_Okapi_Exception('E1212', [
             'msg' => "No upload files were found. Please try again. If the error persists, please contact support."
         ]);
+        $filePath = $_FILES['srx']['tmp_name'];
+        $errorDetails = '';
+        libxml_use_internal_errors(use_errors: true);
+        $errorType = [LIBXML_ERR_WARNING => 'warning', LIBXML_ERR_ERROR => 'error', LIBXML_ERR_FATAL => 'fatal'];
+
+        $xml = simplexml_load_file($filePath);
+        $xmlErrors = libxml_get_errors();
+        if($xmlErrors){
+            $messages = '';
+            foreach ($xmlErrors as /** @var LibXMLError $err */ $err){
+                $messages .= "{$errorType[$err->level]}@$err->line,$err->column: $err->message\n";
+            }
+            $messages && $errorDetails = "Error".(count($xmlErrors)>1 ? 's' : '').": <pre>$messages</pre>";
+        }
+        $rootTag = $xml ? $xml->getName() : 'srx';
+        strtolower($rootTag) !== 'srx' && $errorDetails .= " Invalid root tag '$rootTag'.";
+        $errorDetails && throw new ZfExtended_UnprocessableEntity('E1026', ['errors' => [[$messages]]]);
 
         $bconf = $this->entityLoad();
-
-        move_uploaded_file($_FILES['srx']['tmp_name'], "{$bconf->getDataDirectory()}/languages.srx");
+        move_uploaded_file($filePath, "{$bconf->getDataDirectory()}/languages.srx");
         $bconf->file->pack();
 	}
 
@@ -202,7 +218,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
 
             $customerMeta->save();
         }
-        if(count($this->data) > 2 || !isset($this->data['isDefaultForCustomer'])){ // more than customerDefault is changed, call parent
+        if($this->data && count($this->data) > 2 || !isset($this->data['isDefaultForCustomer'])){ // more than customerDefault is changed, call parent
             parent::setDataInEntity($fields, $mode);
         }
     }

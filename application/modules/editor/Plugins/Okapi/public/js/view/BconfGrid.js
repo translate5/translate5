@@ -47,7 +47,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     helpSection: 'useroverview',
     glyph: 'f1c9@FontAwesome5FreeSolid',
     height: '100%',
-    //viewModel: 'viewportEditor',
     config: {
         customer: null,
         customerDefault: null
@@ -90,7 +89,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         bconfRequired: '#UT#Bconf required',
         confirmDeleteTitle:'#UT#Bconf löschen',
         confirmDeleteMessage:'#UT#Möchten Sie diese Bconf-Datei wirklich löschen?',
-        deleteSuccess:'#UT#Bconf-Datei gelöscht'
+        deleteSuccess:'#UT#Bconf-Datei gelöscht',
+        invalidSrxTitle:"#UT#Ungültige SRX-Datei",
+        invalidSrxMsg:"#UT#Die hochgeladene Datei ist keine gültige SRX-Datei.",
     },
     reference:'bconfgrid',
     viewConfig: {

@@ -21,7 +21,7 @@ class editor_Plugins_Okapi_Bconf_File
     public function __construct(editor_Plugins_Okapi_Models_Bconf $entity)
     {
         $this->entity = $entity;
-        $filepath = $entity->getFilePath($entity->getId());
+        $filepath = $entity->getFilePath();
         self::$dataDir = dirname($filepath);
         self::$fileName = basename($filepath);
     }

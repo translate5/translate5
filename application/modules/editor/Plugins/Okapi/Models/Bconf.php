@@ -58,7 +58,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_Bconf';
 
     /**
-     * Creates new Bconf_Model instance
+     * Creates new bconf record in DB and directory on disk
      * @param ?array $postFile - see https://www.php.net/manual/features.file-upload.post-method.php
      * @param array $data - data to initialize the record, usually the POST params
      * @throws Zend_Db_Statement_Exception
@@ -77,6 +77,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
                 $data['versionIdx'] = self::SYSTEM_BCONF_VERSION;
             }
             $this->init($data);
+            $this->getDataDirectory(1); // Ensures directory is valid QUIRK: id 1 is an assumption. Creates empty dir if AUTO_INCREMENT != 1
             $this->save();
 
             $this->file = new editor_Plugins_Okapi_Bconf_File($this);
@@ -119,30 +120,42 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
-     * Returns the data directory of the given bconfId/loaded entity without trailing slash
+     * Returns the data directory of the given bconfId/loaded entity without trailing slash, creating it if neccessary
      * @param string|null $id
      * @return string
      * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
     public function getDataDirectory(?string $id = null) : string {
-        $id = $id ?: $this->getId();
+        !$id && $id = $this->getId();
+        !$id && $id = (int) $_REQUEST['id'];
+        !$id && throw new ZfExtended_UnprocessableEntity('E1025', ['errors' => [["No 'id' parameter given."]]]);
+
         /** @var Zend_Config $config */
         $config = Zend_Registry::get('config');
-        $okapiBconfDir = "{$config->runtimeOptions->plugins->Okapi->dataDir}/$id/";
-        if(!is_dir($okapiBconfDir) && !mkdir($okapiBconfDir, 0755, true)){
-            // TODO OKAPI: define proper Event Code
-            throw new editor_Plugins_Okapi_Exception('E9999', ['reason' => 'Could not create Okapi Bconf directory: "'.$okapiBconfDir.'".']);
+        $dataDir = $config->runtimeOptions->plugins->Okapi->dataDir;
+        $this->checkDirectory($dataDir);
+
+        $okapiBconfDir = realpath($dataDir) .'/'.$id;
+        $this->checkDirectory($okapiBconfDir);
+        return $okapiBconfDir;
+    }
+
+    /**
+     * @param $dir
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function checkDirectory($dir){
+        $errorMsg = '';
+        if(!is_dir($dir)){
+            if(is_file($dir)){
+                $errorMsg = "'$dir' is actually a file!";
+            } else if(!mkdir($dir, 0755, true)){
+                $errorMsg = "Could not create directory '$dir'!";
+            }
+        } else if(!is_writable($dir)){
+            $errorMsg = $dir;
         }
-        $okapiBconfDir = new SplFileInfo(realpath($okapiBconfDir));
-        if(!$okapiBconfDir->isDir()) {
-            // TODO OKAPI: define proper Event Code
-            throw new editor_Plugins_Okapi_Exception('E9999', ['reason' => 'Okapi Bconf directory does not exist: "'.$okapiBconfDir->getPathname().'".']);
-        }
-        if(!$okapiBconfDir->isWritable()) {
-            // TODO OKAPI: define proper Event Code
-            throw new editor_Plugins_Okapi_Exception('E9999', ['reason' => 'Okapi Bconf directory is not writeable: "'.$okapiBconfDir->getPathname().'".']);
-        }
-        return (string) $okapiBconfDir;
+        $errorMsg && throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $errorMsg]);
     }
 
     /**
@@ -150,10 +163,11 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @return string path - the absolute path of the bconf
      * @throws Zend_Exception|editor_Plugins_Okapi_Exception
      */
-    public function getFilePath(string $id): string {
-        if(!$id) throw new editor_Plugins_Okapi_Exception('E1026', ['Missing parameter "id"!']);
+    public function getFilePath(string $id = null): string {
+        $dataDirectory = $this->getDataDirectory($id);
+        !$id && $id = $this->getId();
+        return $dataDirectory.DIRECTORY_SEPARATOR.'bconf-'.$id.'.bconf';
 
-        return $this->getDataDirectory($id).DIRECTORY_SEPARATOR.'bconf-'.$id.'.bconf';
     }
 
     /**

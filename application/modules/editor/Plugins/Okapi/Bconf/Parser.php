@@ -445,7 +445,7 @@ $classParts = explode('.', $class);
             $pathParams = $stepRefs[$stepName] ?? [];
             foreach ($pathParams as $param) {
                 $param = lcfirst($param);
-                $path = $outputDir."/".array_shift($refMap);
+                $path = array_shift($refMap); // QUIRK: Do not include directory name $outputDir to not leak server data
                 $pipeline['xml'] = preg_replace("/^($param=).*$/m", "$1$path", $pipeline['xml']);
             }
             /* FIXME: Needed for plugin support

@@ -241,61 +241,61 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $r = $f->getRouter();
         
         // route for bconf
-        $restRoute = new Zend_Rest_Route($f, [], array(
+        $route = new Zend_Rest_Route($f, [], array(
             'editor' => ['plugins_okapi_bconf'],
         ));
-        $r->addRoute('plugins_okapibconf_restdefault', $restRoute);
+        $r->addRoute('plugins_okapibconf_restdefault', $route);
         // New get route to export the bconf file.
-        $downloadbconf = new ZfExtended_Controller_RestLikeRoute(
+        $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/downloadbconf',
             array(
                 'module' => 'editor',
                 'controller' => 'plugins_okapi_bconf',
-                'action' => 'downloadBconf'
+                'action' => 'downloadbconf'
             ));
-        $r->addRoute('plugins_okapi_bconf_downloadbconf', $downloadbconf);
+        $r->addRoute('plugins_okapi_bconf_downloadbconf', $route);
         
         // New post route to upload a bconf file.
-        $uploadbconf = new ZfExtended_Controller_RestLikeRoute(
+        $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/uploadbconf',
             array(
                 'module' => 'editor',
                 'controller' => 'plugins_okapi_bconf',
                 'action' => 'uploadbconf'
             ));
-        $r->addRoute('plugins_okapi_bconf_uploadbconf', $uploadbconf);
+        $r->addRoute('plugins_okapi_bconf_uploadbconf', $route);
         // New post route to upload the SRX file.
-        $uploadSRX = new ZfExtended_Controller_RestLikeRoute(
-            'editor/plugins_okapi_bconf/uploadSRX',
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/uploadsrx',
             array(
                 'module' => 'editor',
                 'controller' => 'plugins_okapi_bconf',
-                'action' => 'uploadSRX'
+                'action' => 'uploadsrx'
             ));
-        $r->addRoute('plugins_okapi_bconf_uploadsrx', $uploadSRX);
+        $r->addRoute('plugins_okapi_bconf_uploadsrx', $route);
         // New route to download the SRX file.
-        $downloadSRX = new ZfExtended_Controller_RestLikeRoute(
-            'editor/plugins_okapi_bconf/downloadSRX',
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/downloadsrx',
             array(
                 'module' => 'editor',
                 'controller' => 'plugins_okapi_bconf',
-                'action' => 'downloadSRX'
+                'action' => 'downloadsrx'
             ));
-        $r->addRoute('plugins_okapi_bconf_downloadsrx', $downloadSRX);
-        $cloneBconf = new ZfExtended_Controller_RestLikeRoute(
+        $r->addRoute('plugins_okapi_bconf_downloadsrx', $route);
+        $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/clone',
             array(
                 'module' => 'editor',
                 'controller' => 'plugins_okapi_bconf',
                 'action' => 'clone'
             ));
-        $r->addRoute('plugins_okapi_bconf_clone', $cloneBconf);
+        $r->addRoute('plugins_okapi_bconf_clone', $route);
         
         // route for bconf filter
-        $restRoute = new Zend_Rest_Route($f, [], array(
+        $route = new Zend_Rest_Route($f, [], array(
             'editor' => ['plugins_okapi_bconffilter'],
         ));
-        $r->addRoute('plugins_okapibconffilter_restdefault', $restRoute);
+        $r->addRoute('plugins_okapibconffilter_restdefault', $route);
     }
     
     public function getFrontendControllers(): array {
