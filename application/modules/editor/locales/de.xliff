@@ -1419,10 +1419,10 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='w5xiZXJ0cmFndW5nc2tvbW1lbnRhcg=='><source>Übertragungskommentar</source><target>Übertragungskommentar</target></trans-unit>
 <trans-unit id='UXVlbGxlIGRlcyBFaW50cmFncw=='><source>Quelle des Eintrags</source><target>Quelle des Eintrags</target></trans-unit>
 <trans-unit id='U29sbHRlIGRlciBUYXNrIGdlbMO2c2NodCBvZGVyIG1pdCBkZW4gYWt0dWVsbGVuIEVpbnN0ZWxsdW5nZW4gaW1wb3J0aWVydCB3ZXJkZW4/'><source>Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?</source><target>Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?</target></trans-unit>
-<trans-unit id='QXVmZ2FiZSBsw7ZzY2hlbg=='><source>Aufgabe löschen</source><target>Delete task</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSBsw7ZzY2hlbg=='><source>Aufgabe löschen</source><target>Aufgabe löschen</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSBpbXBvcnRpZXJlbg=='><source>Aufgabe importieren</source><target>Aufgabe importieren</target></trans-unit>
 <trans-unit id='VW50ZXJzY2hpZWQgenUgUXVlbGxzZWdtZW50'><source>Unterschied zu Quellsegment</source><target>Unterschied zu Quellsegment</target></trans-unit>
-<trans-unit id='RGllc2UgUmVzc291cmNlIHdpcmQgZW50ZmVybnQ='><source>Diese Ressource wird entfernt</source><target>This resource is removed</target></trans-unit>
+<trans-unit id='RGllc2UgUmVzc291cmNlIHdpcmQgZW50ZmVybnQ='><source>Diese Ressource wird entfernt</source><target>Diese Ressource wird entfernt</target></trans-unit>
 <trans-unit id='VHJlZmZlcmFuYWx5c2U='><source>Trefferanalyse</source><target>Trefferanalyse</target></trans-unit>
 <trans-unit id='VGVybUNvbGxlY3Rpb24gVHJlZmZlciAoMTA0JSk='><source>TermCollection Treffer (104%)</source><target>TermCollection Treffer (104%)</target></trans-unit>
 <trans-unit id='S29udGV4dCBUcmVmZmVyICgxMDMlKQ=='><source>Kontext Treffer (103%)</source><target>Kontext Treffer (103%)</target></trans-unit>
@@ -1448,7 +1448,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='RGllIFp1d2Vpc3VuZyB6d2lzY2hlbiBBdWZnYWJlIHVuZCBCZW51dHplciBrYW5uIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIGRhIGRlciBCZW51dHplciBkaWVzZSBha3R1ZWxsIGJlbnV0enQu'><source>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.</source><target>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.</target></trans-unit>
 <trans-unit id='RGllIFp1d2Vpc3VuZyB6d2lzY2hlbiBBdWZnYWJlIHVuZCBCZW51dHplciBrYW5uIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIGRhIGRpZSBBdWZnYWJlIGR1cmNoIGRlbiBCZW51dHplciBnZXNwZXJydCBpc3Qu'><source>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.</source><target>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.</target></trans-unit>
 <trans-unit id='RGllc2UgS3VuZGVubnVtbWVyIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'><source>Diese Kundennummer wird bereits verwendet.</source><target>Diese Kundennummer wird bereits verwendet.</target></trans-unit>
-<trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKe+7vy4='><source>Der referenzierte Kunde existiert nicht (mehr)﻿.</source><target>Der referenzierte Kunde existiert nicht (mehr)﻿.</target></trans-unit>
+<trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKQ=='><source>Der referenzierte Kunde existiert nicht (mehr).</source><target>Der referenzierte Kunde existiert nicht (mehr).</target></trans-unit>
 <trans-unit id='QW5zaWNodA=='><source>Ansicht</source><target>Ansicht</target></trans-unit>
 <trans-unit id='VW5iZWthbm50ZXIgVGVybSBTdGF0dXM='><source>Unbekannter Term Status</source><target>Unbekannter Term Status</target></trans-unit>
 <trans-unit id='RXJzdGVsbHVuZw=='><source>Erstellung</source><target>Erstellung</target></trans-unit>

@@ -3332,8 +3332,8 @@ A task was associated to you in the task-portal {portalLink}.<br />
     <source>Diese Kundennummer wird bereits verwendet.</source>
     <target>This client-number is already in use.</target>
 </trans-unit>
-<trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKe+7vy4='>
-    <source>Der referenzierte Kunde existiert nicht (mehr)﻿.</source>
+<trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKQ=='>
+    <source>Der referenzierte Kunde existiert nicht (mehr).</source>
     <target>The referenced customer does not exist (anymore).</target>
 </trans-unit>
 <trans-unit id='QW5zaWNodA=='>
