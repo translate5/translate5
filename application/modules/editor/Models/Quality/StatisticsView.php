@@ -220,8 +220,10 @@ class editor_Models_Quality_StatisticsView {
         $this->tree = $storage->issues;
         
     }
+
     /**
-     * @return array array() {[categoryIndex]=>  array(4) { ["categoryIndex"]=> "asdf", ["severity1"]=> (int)count, ["severity2"]=> (int)count, ... ,["sum"]=>  int()sum of severities }
+     * @param string|null $field
+     * @return array
      */
     private function fetchStatisticsData(string $field=NULL) : array {
         $select = $this->table->getAdapter()->select()
