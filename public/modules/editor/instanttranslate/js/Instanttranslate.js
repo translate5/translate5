@@ -1105,11 +1105,6 @@ function getDownloads(){
  * @param string dateAsOf
  */
 function showDownloads(allPretranslatedFiles, dateAsOf){
-
-
-    console.log('showDownloads: ', allPretranslatedFiles, dateAsOf);
-
-    // array[taskId] = array(taskName, downloadUrl, removeDate)
     var pretranslatedFiles = [],
         html = '',
         importProgressUpdate = false;
