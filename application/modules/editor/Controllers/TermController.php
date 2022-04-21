@@ -336,6 +336,26 @@ class editor_TermController extends ZfExtended_RestController
             ],
         ], $this->entity);
 
+        // If current user can't change any term, for example
+        // has none of termPM, termPM_allClients or admin roles,
+        // but has other roles allowed to change terms only in certain curcumstances
+        if (!$this->isAllowed('editor_term', 'putAny')) {
+
+            // Status shortcuts
+            $isUnprocessed = $this->entity->getProposal() || $this->entity->getProcessStatus() == 'unprocessed';
+            $isProvisionallyProcessed = !$this->entity->getProposal() && $this->entity->getProcessStatus() == 'provisionallyProcessed';
+
+            // Roles shortcuts
+            $termReviewer  = in_array('termReviewer' , $this->_session->roles);
+            $termFinalizer = in_array('termFinalizer', $this->_session->roles);
+
+            // Allowed?
+            $allowed = ($isUnprocessed && $termReviewer) || ($isProvisionallyProcessed && $termFinalizer);
+
+            // If not allowed - flush failure
+            if (!$allowed) $this->jflush(false, 'This term is not editable');
+        }
+
         // Get request params
         $params = $this->getRequest()->getParams();
 

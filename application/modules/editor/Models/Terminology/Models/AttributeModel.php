@@ -747,7 +747,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
                `language`, 
                `termId`, 
                `createdBy`,
-               IF (`termId`, "term", IF (`language`, "language", "entry")) AS `level`  
+               IF (`termId`, "term", IF (`language` != "", "language", "entry")) AS `level`
             FROM `terms_attributes` 
             WHERE `id` IN (' . join(',', $attrIds) . ') 
         ')->fetchAll(PDO::FETCH_UNIQUE) : [];
@@ -757,9 +757,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         foreach ($_attrA as $attrId => $attr)
             $attrA[$attr['termEntryId']][$attrId] = $attr;
 
-        //d($attrA);
-        //exit;
-
         // As long as editing and deletion of language- and entry-level attributes is only allowed for cases when
         //  - ALL terms within given language, or
         //  - ALL terms within given entry
@@ -768,7 +765,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             SELECT
               `termEntryId`, 
               `language`,
-              GROUP_CONCAT(DISTINCT IF(`proposal`, "unprocessed", `processStatus`)) AS `distinct`
+              GROUP_CONCAT(DISTINCT IF(`proposal` != "", "unprocessed", `processStatus`)) AS `distinct`
             FROM `terms_term` 
             WHERE `termEntryId` IN (' . join(',', array_keys($attrA)) . ')
             GROUP BY CONCAT(`termEntryId`, "-", `language`)'
