@@ -1263,6 +1263,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='WExJRkYgMi4x'><source>XLIFF 2.1</source><target>XLIFF 2.1</target></trans-unit>
 <trans-unit id="U0RMWExJRkYgbWl0IMOEbmRlcnVuZ3NtYXJraWVydW5nZW4="><source>SDLXLIFF mit Änderungsmarkierungen</source><target>SDLXLIFF mit Änderungsmarkierungen</target></trans-unit>
 <trans-unit id='RXh0ZXJuZSBCZWFyYmVpdHVuZyBhbHMgRXhjZWw='><source>Externe Bearbeitung als Excel</source><target>Externe Bearbeitung als Excel</target></trans-unit>
+<trans-unit id='RXhwb3J0IGRlciBCZWFyYmVpdHVuZ2VuIHBybyBXb3JrZmxvd3NjaHJpdHQgYWxzIEV4Y2Vs'><source>Export der Bearbeitungen pro Workflowschritt als Excel</source><target>Export der Bearbeitungen pro Workflowschritt als Excel</target></trans-unit>
 <trans-unit id='S3VuZGVu'><source>Kunden</source><target>Kunden</target></trans-unit>
 <trans-unit id="QWxsZSBLdW5kZW4="><source>Alle Kunden</source><target>Alle Kunden</target></trans-unit>
 <trans-unit id='SGluenVmw7xnZW4='><source>Hinzufügen</source><target>Hinzufügen</target></trans-unit>

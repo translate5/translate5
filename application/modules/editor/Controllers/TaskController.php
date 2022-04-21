@@ -212,23 +212,12 @@ class editor_TaskController extends ZfExtended_RestController {
             ]
         ])
         ->addActionContext('kpi', 'xlsx')
-
-
-        /*
-        ->addContext('excel', [
+        ->addContext('excelhistory', [
             'headers' => [
-                'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // TODO Content-Type prüfen
             ]
         ])
-        ->addActionContext('export', 'excel')
-
-        ->addContext('excelReimport', [
-            'headers' => [
-                'Content-Type'          => 'text/xml',
-            ]
-        ])
-        ->addActionContext('export', 'excelReimport')
-        */
+        ->addActionContext('export', 'excelhistory')
 
         ->initContext();
     }
@@ -1557,6 +1546,13 @@ class editor_TaskController extends ZfExtended_RestController {
             case 'importArchive':
                 $this->logInfo('Task import archive downloaded');
                 $this->downloadImportArchive();
+                return;
+
+            case 'excelhistory':
+                // run history excel export
+                /** @var editor_Models_Export_TaskHistoryExcel $exportExcel */
+                $exportExcel = ZfExtended_Factory::get('editor_Models_Export_TaskHistoryExcel', [$this->entity]);
+                $exportExcel->exportAsDownload();
                 return;
 
             case 'xliff2':
