@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
     // DEV OPTION: setting this value to TRUE will show some Code which can be usefull for development. E.g. a list of all defined icons is shown
     $devShowAllIconsTemplate = FALSE;
     // DEV OPTION: Will disable the instant translation so the user must submit a button to translate (normally set via Zf_config)
-    $devPreventInstantTranslate = true;
+    $devPreventInstantTranslate = FALSE;
 
     /* @var $this Zend_View */
     $version = '?v='.$this->appVersion;
@@ -300,7 +300,7 @@ END LICENSE AND COPYRIGHT
     $(document).ready(function(){
         initGui(
             '<?php echo $characterLimit;?>',
-            <?php echo json_encode(array_values($this->allPretranslatedFiles)); ?>,
+            <?php echo json_encode($this->allPretranslatedFiles); ?>,
             <?php echo json_encode($this->dateAsOf); ?>,
             <?php echo ($devPreventInstantTranslate) ? 'true' : 'false'; ?>
         );

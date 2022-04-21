@@ -1080,7 +1080,7 @@ function getDownloads(){
             500: function() {
                 hideTranslations();
                 showLanguageResourceSelectorError('serverErrorMsg500');
-                }
+            }
         },
         url: Editor.data.restpath+'instanttranslateapi/filelist',
         dataType: 'json',
@@ -1105,6 +1105,10 @@ function getDownloads(){
  * @param string dateAsOf
  */
 function showDownloads(allPretranslatedFiles, dateAsOf){
+
+
+    console.log('showDownloads: ', allPretranslatedFiles, dateAsOf);
+
     // array[taskId] = array(taskName, downloadUrl, removeDate)
     var pretranslatedFiles = [],
         html = '',
