@@ -97,17 +97,15 @@ class editor_Models_Export_TaskHistoryExcel {
         $sheet->getColumnDimension('A')->setWidth(5);
         $sheet->getColumnDimension('B')->setWidth(30);
         $sheet->getColumnDimension('C')->setWidth(30);
-        $sheet->getColumnDimension('D')->setWidth(20);
-        $sheet->getColumnDimension('E')->setWidth(50);
+        $sheet->getColumnDimension('D')->setWidth(50);
 
         // write fieldnames in header
         $sheet->setCellValue('A1', 'Nr');
         $sheet->setCellValue('B1', 'LanguageResource Type ID');
         $sheet->setCellValue('C1', 'LanguageResource Name');
-        $sheet->setCellValue('D1', 'MT Engine');
-        $sheet->setCellValue('E1', 'Source');
+        $sheet->setCellValue('D1', 'Source');
 
-        $col = 'F';
+        $col = 'E';
         $idx = 1;
         foreach($this->toBeUsedSteps as $step) {
             if($step == $this->workflow::STEP_NO_WORKFLOW) {
@@ -165,10 +163,6 @@ class editor_Models_Export_TaskHistoryExcel {
                 $setString($col++, $row, $langRes->getResourceId());
                 $setString($col++, $row, $langRes->getName());
             }
-
-            //FIXME OPEN Fourth column: EngineID of MT engine, in case it exists in translate5, else empty.
-            // there is currently no unified interface to query the used engine from the used language resource!!!
-            $setString($col++, $row, '');
 
             // Fifth column: Source
             $setString($col++, $row, $internalTag->toExcel($segment->getSource()));
