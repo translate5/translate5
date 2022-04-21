@@ -26,11 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tools\Markup;
 use MittagQI\Translate5\Segment\TagRepair\Tags;
+use MittagQI\Translate5\Segment\TagRepair\Tag;
 
 /**
  * Several "classic" PHPUnit tests to check the general tag repair (not to mix up with the internal tags repair)
  * When creating test-data notice, that if a "<" shall be used in the markup it must be followed by a " "
+ * TODO FIXME: The ::replaceRequestTags to transform the translated request is not able to transform all kinds of tag-combinations
  */
 class TagsRepairTest extends editor_Test_MockedTaskTest {
 
@@ -52,7 +55,25 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
         '<7/>' => '<img src="http://www.example.com/image.jpg" />',
         '<8/>' => '<hr />',
         '<9/>' => '<input name="test" type="text" value="test" />',
+        '<10/>' => '<!-- Some Comment with some special characters: > " \' -->',
+        '<11/>' => '<!-- Some Comment with inner markup: <div><b> ... </b></div>  </span> -->',
+        '<12/>' => "<!-- Some multiline Comment which\nspans multiple lines\r\nand contains \r other\t\twhitespace -->"
+
     ];
+
+    public function testMarkupEscape0(){
+        $unescaped = ' what <span>seven is > six</span>  <a href="http://www.google.de">Some < Link</a> <!-- some comment with <b>markup</b> --> AND OTHER " TEXT';
+        $escaped = ' what <span>seven is &gt; six</span>  <a href="http://www.google.de">Some &lt; Link</a> <!-- some comment with <b>markup</b> --> AND OTHER &quot; TEXT';
+        $this->assertEquals($escaped, Markup::escape($unescaped));
+        $this->assertEquals($unescaped, Markup::unescape($escaped));
+    }
+
+    public function testMarkupEscape1(){
+        $unescaped = ' < ? " < (\') '.$this->tags['<10/>'].' > ? " < (\') '.$this->tags['<11/>'].' < ? " > (") '.$this->tags['<12/>'].' > ? " > (!) ';
+        $escaped = ' &lt; ? &quot; &lt; (\') '.$this->tags['<10/>'].' &gt; ? &quot; &lt; (\') '.$this->tags['<11/>'].' &lt; ? &quot; &gt; (&quot;) '.$this->tags['<12/>'].' &gt; ? &quot; &gt; (!) ';
+        $this->assertEquals($escaped, Markup::escape($unescaped));
+        $this->assertEquals($unescaped, Markup::unescape($escaped));
+    }
 
     public function testTagRepair0(){
         $markup = '<1><8/>Ein kurzer Satz</1>,<6/> der übersetzt<7/> werden <2>muss<9/></2>';
@@ -193,14 +214,60 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
         $translated = 'Hier     ist eine      Menge Whitespace     drin,  auch wenn das      eigentlich nicht vorkommt!';
         $this->createTagsRepairTest($markup, $expected, $translated);
     }
+
+    public function testTagCommentRepair0(){
+        $markup = '<1><8/>Ein kurzer Satz,</1><10/><6/> der übersetzt<7/> <11/>werden <2><12/>muss<9/></2>';
+        $this->createCommentStripTest($markup);
+    }
+
+    public function testTagCommentRepair1(){
+        $markup = '<1><8/>Ein kurzer Satz,</1><10/><6/> der übersetzt<7/> <11/>werden <2><12/>muss<9/></2>';
+        $this->createCommentStripTest($markup);
+    }
+
+    public function testTagCommentRepair2(){
+        $markup = '<1><8/>Ein kurzer Satz,</1><10/><6/> der übersetzt<7/> <11/>werden <2><12/>muss<9/></2>';
+        $this->createTagsRepairTest($markup, $markup, $markup, true);
+    }
+
+    public function testTagCommentRepair3(){
+        $markup = '<1><8/>Ein kurzer Satz,</1><10/><6/> der übersetzt<7/> <11/>werden <2><12/>muss<9/></2>';
+        $expected = '<1><8/>Ein kurzer Satz,</1><10/><6/> der übersetzt<7/> <11/>werden <2><12/>muss<9/></2>';
+        $translated = 'Ein kurzer Satz, der übersetzt werden muss';
+        $this->createTagsRepairTest($markup, $expected, $translated, true);
+    }
+
+    public function testTagCommentRepair4(){
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt<7/> werden <2><12/>muss<9/></2>';
+        $expected = '<1><8/>A short sentence,</1> that has to <2><12/>be<9/></2> translated<7/>';
+        $translated = '<1>A short sentence,</1> that has to be</2> translated<7/>';
+        $this->createTagsRepairTest($markup, $expected, $translated, true);
+    }
+
+    public function testTagCommentRepair5(){
+        $markup = '<1><8/>Ein kurzer Satz,</1> der übersetzt<7/> werden <2><12/>muss<9/></2>';
+        $expected = '<1><8/>A short sentence,</1> that has to <2><12/>be<9/></2> translated<7/>';
+        $translated = '<1>A short sentence,</1> that has to be</2><12/> translated<7/>';
+        $this->createTagsRepairTest($markup, $expected, $translated, true);
+    }
+
+    public function testTagCommentRepair6(){
+        $markup = 'Ein <1>kurzer Satz<12/>, der übersetzt<11/> werden</1> muss';
+        $expected = 'A <1>short sentence<12/>, that has to<11/> be </1>translated';
+        $translated = 'A short sentence<12/>, that has to be translated';
+        $this->createTagsRepairTest($markup, $expected, $translated, true);
+    }
+
     /**
      * @param string $originalMarkup
+     * @param string $expectedMarkup
      * @param string $translatedMarkup
+     * @param bool $preserveComments
      * @throws ZfExtended_Exception
      */
-    protected function createTagsRepairTest(string $originalMarkup, string $expectedMarkup, string $translatedMarkup){
+    protected function createTagsRepairTest(string $originalMarkup, string $expectedMarkup, string $translatedMarkup, bool $preserveComments=false){
         $markup = $this->replaceInternalTags($originalMarkup);
-        $tags = new Tags($markup);
+        $tags = new Tags($markup, $preserveComments);
         $expected = (empty($expectedMarkup)) ? $tags->render() : $this->replaceInternalTags($expectedMarkup);
         $request = $tags->getRequestHtml();
         $translated = $this->replaceRequestTags($translatedMarkup, $originalMarkup, $request);
@@ -215,6 +282,14 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
             error_log('===================');
         }
         $this->assertEquals($expected, $actual);
+    }
+    /**
+     * @param string $originalMarkup
+     */
+    protected function createCommentStripTest(string $originalMarkup){
+        $markup = $this->replaceInternalTags($originalMarkup);
+        $strippedMarkup = $this->replaceInternalTags(preg_replace('~<(10|11|12)/>~i', '', $originalMarkup));
+        $this->assertEquals($strippedMarkup, Tag::stripComments($markup));
     }
     /**
      * Replaces short tags with real internal tags

@@ -46,6 +46,9 @@ namespace MittagQI\Translate5\Segment\TagRepair;
  */
 class Tags extends \editor_TagSequence {
 
+    /**
+     * @var bool
+     */
     const DO_DEBUG = false;
     /**
      * Each tag must have a unique id to be re-identifyable
@@ -74,9 +77,15 @@ class Tags extends \editor_TagSequence {
      * Creates a new tag-repair for the given markup
      * The given markup must be syntactically valid markup !
      * @param string $markup
+     * @param bool $preserveComents: if set, HTML comments are preserved and will survive untouched
      * @throws \ZfExtended_Exception
      */
-    public function __construct(string $markup) {
+    public function __construct(string $markup, bool $preserveComents=false) {
+        if($preserveComents){
+            $markup = Tag::replaceComments($markup);
+        } else {
+            $markup = Tag::stripComments($markup);
+        }
         $this->_setMarkup($markup);
         // quirk: when no markup is contained, unparse will not be called and thus requestHtml remains empty
         if(count($this->tags) == 0){
@@ -437,7 +446,7 @@ class Tags extends \editor_TagSequence {
      * @param int $startIndex
      * @return Tag
      */
-    private  function createRepairTag(array $classNames, array $attributes, string $nodeName, int $startIndex) : Tag {
+    private function createRepairTag(array $classNames, array $attributes, string $nodeName, int $startIndex) : Tag {
         $tag = new Tag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
         $this->tagIdxCount++;
         if(count($classNames) > 0){

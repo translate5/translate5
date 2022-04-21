@@ -40,15 +40,48 @@ namespace MittagQI\Translate5\Segment\TagRepair;
  */
 class Tag extends \editor_Segment_Tag {
 
+    /**
+     * @var string
+     */
     const REQUEST_TAG_TPL = '<img id="t5tag-@TYPE@-@TAGIDX@" src="example.jpg" />';
-
+    /**
+     * @var string
+     */
     const REQUEST_TAG_REGEX = '~(<img\s*id="t5tag\-[a-z]+\-[0-9]+"\s*src="[^>]+"\s*/>)~i';
+    /**
+     * @var string
+     */
+    const COMMENT_NODE_NAME = 't5comment';
+    /**
+     * @var string
+     */
+    const COMMENTS_REPLACE_REGEX = '~<!--(.*)-->~Us';
+
+    /**
+     * Prepares comments to be parsed as comment-tags
+     * @param string $markup
+     * @return string
+     */
+    public static function replaceComments(string $markup) : string {
+        return preg_replace_callback(static::COMMENTS_REPLACE_REGEX, function($matches){
+            // crucial: since we are turning the comment into "normal" markup we have to make sure, markup in comments is protected which is also neccessary to make this a proper attribute
+            return '<'.self::COMMENT_NODE_NAME.' comment="'.htmlspecialchars($matches[1], ENT_COMPAT, null, true).'" />';
+        }, $markup);
+    }
+    /**
+     * Strips all comments out of the markup
+     * @param string $markup
+     * @return string
+     */
+    public static function stripComments(string $markup) : string {
+        return preg_replace(self::COMMENTS_REPLACE_REGEX, '', $markup);
+    }
 
     /**
      * We need to expand the singular tags to cover the xliff tags
      * @var string[]
      */
-    protected static $singularTypes = array('img','input','br','hr','wbr','area','col','embed','keygen','link','meta','param','source','track','command','x','bx','ex');
+    protected static $singularTypes = array('img','input','br','hr','wbr','area','col','embed','keygen','link','meta','param','source','track','command','x','bx','ex', self::COMMENT_NODE_NAME);
     
     protected static $type = 'repair';
 
@@ -152,6 +185,23 @@ class Tag extends \editor_Segment_Tag {
      */
     public function isEqualType(\editor_Tag $tag) : bool {
         return false;
+    }
+
+    public function addAttribute($name, $val=null) : Tag {
+        // crucial: comment tags must have the unescaped value as comment-text (stored in the ::replaceComments prop)
+        if($this->isComment() && $name === 'comment'){
+            // we have to revert the escaping applied in Tags::replaceComments
+            $this->afterStartMarkup = htmlspecialchars_decode($val, ENT_COMPAT);
+        }
+        parent::addAttribute($name, $val);
+        return $this;
+    }
+    /**
+     * Repair tags that represent an comment will act specially, e.g. render a comment instead of tags
+     * @return bool
+     */
+    private function isComment(){
+        return ($this->name === self::COMMENT_NODE_NAME);
     }
 
     /* re-evaluation API */
@@ -445,6 +495,9 @@ class Tag extends \editor_Segment_Tag {
     /* Rendering API */
 
     protected function renderStart(bool $withDataAttribs=true) : string {
+        if($this->isComment()){
+            return '<!--'.$this->afterStartMarkup.'-->';
+        }
         return parent::renderStart($withDataAttribs).$this->afterStartMarkup;
     }
 

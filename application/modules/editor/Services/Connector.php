@@ -173,7 +173,8 @@ class editor_Services_Connector {
         if($this->adapter->canHandleHtmlTags()){
 
             // we use the TagRepair's processor to automatically repair lost or "defect" tags when requesting the translation
-            $processor = new HtmlProcessor();
+            // InstantTranslate will preserve HTML comments which otherwise have no meaning in T5
+            $processor = new HtmlProcessor(true);
             $serviceResult = $this->adapter->translate($processor->prepareRequest(trim($searchString)));
             // UGLY: The service result holds a list of results (representing the translated texts + metadata) which unfortunately have no defined format
             $results = $serviceResult->getResult();

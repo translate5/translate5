@@ -32,6 +32,15 @@ namespace MittagQI\Translate5\Tools;
 class Markup {
 
     /**
+     * @var string
+     */
+    const PATTERN = '~(</{0,1}[a-zA-Z][^>]*/{0,1}>)~';
+    /**
+     * works only if ungreedy !
+     * @var string
+     */
+    const COMMENT_PATTERN = '~(<!--.*-->)~';
+    /**
      * Evaluates if a text contains Markup
      * @param string $text
      * @return bool
@@ -55,34 +64,71 @@ class Markup {
         return true;
     }
     /**
-     * escapes markup, leaves the tags alive but escape any text inbetween tags to XML standards
-     * Obviously this expect the markup to be valid!
+     * escapes markup, leaves the tags and comments alive but escape any text inbetween to XML standards
+     * Obviously this expect the markup to be valid...
      * @param string $markup
      * @return string
      */
     public static function escape(string $markup) : string {
-        $parts = preg_split('~(</{0,1}[a-zA-Z][^>]*/{0,1}>)~U', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        // first we need to escape comments as they would be destroyed by the next step otherwise
+        $parts = preg_split(self::COMMENT_PATTERN.'Us', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         $result = '';
         foreach($parts as $part){
-            if(preg_match('~(</{0,1}[a-zA-Z][^>]*/{0,1}>)~', $part) === 1){
+            if(preg_match(self::COMMENT_PATTERN.'s', $part) === 1){
                 $result .= $part;
             } else {
-                $result .= self::escapeText($part);
+                $result .= self::escapePureMarkup($part);
             }
         }
         return $result;
     }
+   /**
+     * Escapes Markup that is expected to contain no comments
+     * @param string $markup
+     * @return string
+     */
+   private static function escapePureMarkup(string $markup) : string {
+      $parts = preg_split(self::PATTERN.'U', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+       $result = '';
+       foreach($parts as $part){
+           if(preg_match(self::PATTERN, $part) === 1){
+               $result .= $part;
+           } else {
+               $result .= self::escapeText($part);
+           }
+       }
+       return $result;
+   }
+   /**
+    * Unescapes markup escaped with ::escape
+    * Be aware that this may creates invalid Markup !
+    * @param string $markup
+    * @return string
+    */
+   public static function unescape(string $markup) : string {
+       // first we need to unescape comments as they would be destroyed by the next step otherwise
+       $parts = preg_split(self::COMMENT_PATTERN.'Us', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+       $result = '';
+       foreach($parts as $part){
+           if(preg_match(self::COMMENT_PATTERN.'s', $part) === 1){
+               $result .= $part;
+           } else {
+               $result .= self::unescapePureMarkup($part);
+           }
+       }
+       return $result;
+   }
     /**
      * Unescapes markup escaped with ::escape
      * Be aware that this may creates invalid Markup !
      * @param string $markup
      * @return string
      */
-    public static function unescape(string $markup) : string {
-        $parts = preg_split('~(</{0,1}[a-zA-Z][^>]*/{0,1}>)~U', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+    private static function unescapePureMarkup(string $markup) : string {
+        $parts = preg_split(self::PATTERN.'U', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         $result = '';
         foreach($parts as $part){
-            if(preg_match('~(</{0,1}[a-zA-Z][^>]*/{0,1}>)~', $part) === 1){
+            if(preg_match(self::PATTERN, $part) === 1){
                 $result .= $part;
             } else {
                 $result .= self::unescapeText($part);
@@ -90,22 +136,20 @@ class Markup {
         }
         return $result;
     }
-
-    /**
-     * Escapes text to XML conformity that is known to contain no tags
-     * @param string $textWithoutTags
-     * @return string
-     */
-    public static function escapeText(string $textWithoutTags) : string {
-        return htmlspecialchars($textWithoutTags, ENT_XML1 | ENT_NOQUOTES, null, false);
-    }
-
-    /**
-     * Unescapes text that was escaped with our ::escape API
-     * @param string $text
-     * @return string
-     */
-    public static function unescapeText(string $text) : string {
-        return htmlspecialchars_decode($text, ENT_XML1);
-    }
+   /**
+    * Escapes text to XML conformity that is known to contain no tags
+    * @param string $textWithoutTags
+    * @return string
+    */
+   public static function escapeText(string $textWithoutTags) : string {
+       return htmlspecialchars($textWithoutTags, ENT_XML1 | ENT_COMPAT, null, false);
+   }
+   /**
+    * Unescapes text that was escaped with our ::escape API
+    * @param string $text
+    * @return string
+    */
+   public static function unescapeText(string $text) : string {
+       return htmlspecialchars_decode($text, ENT_XML1 | ENT_COMPAT);
+   }
 }

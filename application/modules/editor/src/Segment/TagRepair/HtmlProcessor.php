@@ -48,7 +48,17 @@ class HtmlProcessor {
      * @var bool
      */
     private bool $recreationFault = false;
+    /**
+     * @var bool
+     */
+    private bool $preserveComments;
 
+    /**
+     * @param bool $preserveComments: if set, HTML comments will be preserved and remain untranslated. Otherwise, they will be stripped
+     */
+    public function __construct(bool $preserveComments=false){
+        $this->preserveComments = $preserveComments;
+    }
     /**
      * Retrieves the HTML to be used for requesting the service API
      * @param string $html
@@ -57,7 +67,7 @@ class HtmlProcessor {
      */
     public function prepareRequest(string $html) : string {
         try {
-            $this->tags = new Tags($html);
+            $this->tags = new Tags($html, $this->preserveComments);
             return $this->tags->getRequestHtml();
         } catch (Exception $e) {
             $this->preparationFault = true;
