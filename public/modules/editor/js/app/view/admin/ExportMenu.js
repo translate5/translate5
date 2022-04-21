@@ -148,6 +148,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
                 itemId: 'exportExcelHistory',
                 hrefTarget: '_blank',
                 href: me.makePath('task/export/id/{0}?format=excelhistory'),
+                hidden: !Editor.app.authenticatedUser.isAllowed('editorExportExcelhistory', me.task),
                 text: me.messages.exportExcelHistory,
                 handler: alertHandler
             }];

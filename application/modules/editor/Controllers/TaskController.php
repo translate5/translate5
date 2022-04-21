@@ -1549,6 +1549,9 @@ class editor_TaskController extends ZfExtended_RestController {
                 return;
 
             case 'excelhistory':
+                if(!$this->isAllowed('frontend', 'editorExportExcelhistory')) {
+                    throw new ZfExtended_NoAccessException();
+                }
                 // run history excel export
                 /** @var editor_Models_Export_TaskHistoryExcel $exportExcel */
                 $exportExcel = ZfExtended_Factory::get('editor_Models_Export_TaskHistoryExcel', [$this->entity]);
