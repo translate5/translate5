@@ -1,4 +1,4 @@
-
+<?php
 /*
  * START LICENSE AND COPYRIGHT
  *
@@ -25,40 +25,31 @@
  *
  * END LICENSE AND COPYRIGHT
  */
+namespace MittagQI\Translate5\Segment;
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * @class Editor.plugins.MatchAnalysis.model.MatchAnalysis
- * @extends Ext.data.Model
- */
-Ext.define('Editor.plugins.MatchAnalysis.model.MatchAnalysis', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'int'},
-    {name: 'created'},
-      // WARNING the fields for the numbered data fields are missing here
-      // they are set automatically via metaData from the request,
-      // since the setup is fluent and depends on the underlying configuration!
-    {name: 'noMatch'},
-    {name: 'unitCountTotal', type: 'int'}
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest', 
-    url: Editor.data.restpath+'plugins_matchanalysis_matchanalysis',
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
-    },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+use editor_Models_Segment;
+
+class CharacterCount
+{
+
+    protected editor_Models_Segment $segment;
+
+    /***
+     * @param editor_Models_Segment $segment
+     * @return void
+     */
+    public function setSegment(editor_Models_Segment $segment): void
+    {
+        $this->segment = $segment;
     }
-  }
-});
+
+    /***
+     * @return bool|int
+     */
+    public function getCharacterCount(): bool|int
+    {
+        $content = $this->segment->get('sourceEditToSort') ?? $this->segment->get('sourceToSort');
+        return mb_strlen($content);
+    }
+
+}

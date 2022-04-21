@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
-
- This file is part of translate5
- 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
-
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
-
- This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
- to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/agpl.html
-  
- There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
-  
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
-
-END LICENSE AND COPYRIGHT
-*/
+ * START LICENSE AND COPYRIGHT
+ *
+ *  This file is part of translate5
+ *
+ *  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ *
+ *  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ *
+ *  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ *  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ *  included in the packaging of this file.  Please review the following information
+ *  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ *  http://www.gnu.org/licenses/agpl.html
+ *
+ *  There is a plugin exception available for use with this release of translate5 for
+ *  translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ *  plugin-exception.txt in the root folder of translate5.
+ *
+ *  @copyright  Marc Mittag, MittagQI - Quality Informatics
+ *  @author     MittagQI - Quality Informatics
+ *  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ * 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ *
+ * END LICENSE AND COPYRIGHT
+ */
 
 /**
  * Class editor_Plugins_MatchAnalysis_Export_ExportExcel
@@ -107,7 +107,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
         //add to all groups 'Group' sufix, php excel does not handle integer keys
         $result = [];
         foreach ($rows as $row){
-            $wordCountTotal = 0;
+            $unitCountTotal = 0;
 
             //the order in the newRows array defines the result order in the spreadsheet
             $newRow = [
@@ -120,11 +120,11 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
                     //change the key to $key+Group, since the Excel export does not accept numerical keys
                     $key = is_numeric($begin) ? $begin.'Group' : $begin;
                     $newRow[$key] = $row[$begin];
-                    $wordCountTotal += $row[$begin];
+                    $unitCountTotal += $row[$begin];
                 }
             }
 
-            $newRow['wordCountTotal'] = $wordCountTotal;
+            $newRow['unitCountTotal'] = $unitCountTotal;
             $newRow['internalFuzzy'] = $row['internalFuzzy'];
             $newRow['created'] = $row['created'];
 
@@ -161,7 +161,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
             $spreadsheet->setLabel($begin, $label);
         }
 
-        $spreadsheet->setLabel('wordCountTotal', $this->translate->_("Summe Wörter"));
+        $spreadsheet->setLabel('unitCountTotal', $this->translate->_("Summe"));
         $spreadsheet->setLabel('created', $this->translate->_("Erstellungsdatum"));
         $spreadsheet->setLabel('internalFuzzy', $this->translate->_("Interner Fuzzy aktiv"));
     }

@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
-
- This file is part of translate5
- 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
-
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
-
- This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
- to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/agpl.html
-  
- There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
-  
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
-
-END LICENSE AND COPYRIGHT
-*/
+ * START LICENSE AND COPYRIGHT
+ *
+ *  This file is part of translate5
+ *
+ *  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ *
+ *  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ *
+ *  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ *  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ *  included in the packaging of this file.  Please review the following information
+ *  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ *  http://www.gnu.org/licenses/agpl.html
+ *
+ *  There is a plugin exception available for use with this release of translate5 for
+ *  translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ *  plugin-exception.txt in the root folder of translate5.
+ *
+ *  @copyright  Marc Mittag, MittagQI - Quality Informatics
+ *  @author     MittagQI - Quality Informatics
+ *  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ * 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ *
+ * END LICENSE AND COPYRIGHT
+ */
 
 /**
  */
@@ -61,7 +61,9 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
             $this->view->rows = $this->entity->loadLastByTaskGuid($taskGuid);
             return;
         }
-        $this->view->rows = $this->entity->loadByBestMatchRate($taskGuid);
+
+        // based on a request parameter, set the analysis calculation unit
+        $this->view->rows = $this->entity->loadByBestMatchRate($taskGuid,unitType: $this->getParam('unitType'));
 
         $fieldConfig = [[
             'name' => 'id',
@@ -69,7 +71,7 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         ],[
             'name' => 'created',
         ],[
-            'name' => 'wordCountTotal',
+            'name' => 'unitCountTotal',
             'type' => 'int'
         ]];
         foreach($this->entity->getFuzzyRanges() as $begin => $end) {
@@ -102,18 +104,21 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         if(!empty($taskNr)) {
             $fileName = $fileName . ' - ('.$taskNr.')';
         }
-        
+
         switch ($params["type"]) {
             case "exportExcel":
-                $rows = $this->entity->loadByBestMatchRate($params['taskGuid']);
+                $rows = $this->entity->loadByBestMatchRate($params['taskGuid'],unitType: $this->getParam('unitType'));
                 $exporter = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_ExportExcel');
                 /* @var $exporter editor_Plugins_MatchAnalysis_Export_ExportExcel */
                 $exporter->generateExcelAndProvideDownload($task, $rows, $fileName);
                 break;
             case "exportXml":
-                $rows = $this->entity->loadByBestMatchRate($params['taskGuid'], false);
+                $rows = $this->entity->loadByBestMatchRate($params['taskGuid'], false, $this->getParam('unitType'));
                 $exporter = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_Xml', [$task]);
                 /* @var $exporter editor_Plugins_MatchAnalysis_Export_Xml */
+
+                $exporter->setIsCharacterBased($this->getParam('unitType') === 'character');
+
                 $x = $exporter->generateXML($rows, $params['taskGuid']);
 
                 $fileName = $fileName.' '.date('- Y-m-d').'.xml';
