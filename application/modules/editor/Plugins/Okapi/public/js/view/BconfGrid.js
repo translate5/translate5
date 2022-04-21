@@ -47,6 +47,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     helpSection: 'useroverview',
     glyph: 'f1c9@FontAwesome5FreeSolid',
     height: '100%',
+    listeners: {
+        beforeedit: 'handleBeforeedit'
+    },
     config: {
         customer: null,
         customerDefault: null
@@ -92,16 +95,23 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         deleteSuccess:'#UT#Bconf-Datei gelöscht',
         invalidSrxTitle:"#UT#Ungültige SRX-Datei",
         invalidSrxMsg:"#UT#Die hochgeladene Datei ist keine gültige SRX-Datei.",
+        name:"#UT#Name",
+        nameUnique:"#UT#Name darf nur einmal vorkommen!",
+        newBconf: "#UT#Neue Bconf-Datei",
+        editBconf: "#UT#Bconf-Datei bearbeiten",
     },
     reference:'bconfgrid',
     viewConfig: {
+        enableTextSelection: true, // neccessary for pointer class to have effect on whole row
         getRowClass: function({data:bconf}) {
             var cls='', customer = (this.ownerGrid.customer||{}).data || {};
                 if(bconf.customerId != customer.id || bconf.name === this.grid.SYSTEM_BCONF_NAME) {
                     cls += 'not-editable ';
+                } else {
+                    cls += 'pointer ';
                 }
                 if(bconf.isDefault || customer.defaultBconfId == bconf.id){
-                    cls += 'chosenDefault '
+                    cls += ' chosenDefault'
                 }
             return cls;
         },
@@ -132,7 +142,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     filter: {
                         type: 'string',
                     },
-                    //editor: 'textfield',
+                    editor: 'textfield',
                     text: me.text_cols.name,
                 },
                    /* {
@@ -161,7 +171,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         filter: {
                             type: 'string',
                         },
-                        tdCls: 'pointer',
                         text: me.text_cols.description,
                         flex:3
                     },
@@ -268,7 +277,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                                 tooltip: me.strings.export,
                                 isAllowedFor: 'bconfDelete',
                                 glyph: 'f019@FontAwesome5FreeSolid',
-                                handler: 'exportbconf',
+                                handler: 'downloadBconf',
                             },
                         ],
                     },

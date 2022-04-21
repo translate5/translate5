@@ -1300,6 +1300,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='U3ByYWNocmVzc291cmNlIGhpbnp1ZsO8Z2Vu'><source>Sprachressource hinzufügen</source><target>Sprachressource hinzufügen</target></trans-unit>
 <trans-unit id='UmVzc291cmNl'><source>Ressource</source><target>Ressource</target></trans-unit>
 <trans-unit id='TmFtZQ=='><source>Name</source><target>Name</target></trans-unit>
+<trans-unit id='TmFtZSBkYXJmIG51ciBlaW5tYWwgdm9ya29tbWVuIQ=='><source>Name darf nur einmal vorkommen!</source><target>Name darf nur einmal vorkommen!</target></trans-unit>
 <trans-unit id='VE0tRGF0ZWk='><source>TM-Datei</source><target>TM-Datei</target></trans-unit>
 <trans-unit id='RmFyYmUgZGllc2VyIFNwcmFjaHJlc3NvdXJjZQ=='><source>Farbe dieser Sprachressource</source><target>Farbe dieser Sprachressource</target></trans-unit>
 <trans-unit id='S29ua29yZGFuenN1Y2hl'><source>Konkordanzsuche</source><target>Konkordanzsuche</target></trans-unit>

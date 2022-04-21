@@ -76,6 +76,14 @@
     <source>Die hochgeladene Datei ist keine gültige SRX-Datei.</source>
     <target>The uploaded file is not a valid SRX file.</target>
 </trans-unit>
+<trans-unit id='TmV1ZSBCY29uZi1EYXRlaQ=='>
+    <source>Neue Bconf-Datei</source>
+    <target>New Bconf file/target>
+</trans-unit>
+<trans-unit id='QmNvbmYtRGF0ZWkgYmVhcmJlaXRlbg=='>
+    <source>Bconf-Datei bearbeiten</source>
+    <target>Edit Bconf file</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

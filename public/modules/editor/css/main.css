@@ -915,7 +915,9 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
     margin: 5px;
 }
 
-.pointer {
+td.x-grid-cell.pointer,
+tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"] /* Only enable for normal, especially disable for action and check columns */
+{
     cursor: pointer;
 }
 

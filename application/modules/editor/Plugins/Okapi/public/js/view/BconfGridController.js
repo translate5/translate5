@@ -69,45 +69,39 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         });
     },
 
-    clonebconf: function (view, rowIndex, /* colIndex */) {
+    clonebconf: async function (view, rowIndex, /* colIndex */) {
         view.select(rowIndex);
         var rec = view.selection;
-        var input = Ext.Msg.down('textfield');
-        input.on('focus', x=>input.selectText(), this, {single:true, delay: 100});
-        Ext.Msg.prompt('New bconf', 'Name of the new entry?', function (btnId, prompt) {
-            if (!prompt || prompt == rec.get('name')) { // invalid name
-                return;
-            }
-            var params =  {
-                id: rec.id,
-                name: prompt
-            };
-            var customer = view.ownerGrid.getCustomer();
-            if(customer){
-                params.customerId = customer.id;
-            }
-            Ext.Ajax.request({
-                url: Editor.data.restpath + 'plugins_okapi_bconf/clone',
-                params,
-                callback: function (reqOpts, success, response) {
-                    var data = Ext.decode(response.responseText);
-                    if (success) {
-                        rec.store.add(data);
-                        rec.store.sync();
-                        rec.store.getFilters().notify('endupdate'); // trigger update
+        try {
+            var name = await this.promptUniqueBconfName(rec.get('name'));
+        } catch(e){
+            return
+        }
+        var params = {id: rec.id, name};
+        var customer = view.ownerGrid.getCustomer();
+        if(customer){
+            params.customerId = customer.id;
+        }
+        Ext.Ajax.request({
+            url: Editor.data.restpath + 'plugins_okapi_bconf/clone',
+            params,
+            callback: function(reqOpts, success, response){
+                var data = Ext.decode(response.responseText);
+                if(success){
+                    rec.store.add(data);
+                    rec.store.sync();
+                    rec.store.getFilters().notify('endupdate'); // trigger update
 
-                        this.startEditDescription(data.id);
-                    } else {
-                        Editor.app.getController('ServerException').handleException(response);
-                    }
-                },
-                scope: this,
-            });
-        }, /* scope */ this, /*multiline*/ false, rec.get('name'));
-
+                    this.startEditDescription(data.id);
+                } else {
+                    Editor.app.getController('ServerException').handleException(response);
+                }
+            },
+            scope: this,
+        });
     },
 
-    exportbconf: function (view, rowIndex, /* colIndex */) {
+    downloadBconf: function (view, rowIndex, /* colIndex */) {
         view.select(rowIndex);
         Editor.util.Util.download('plugins_okapi_bconf/downloadbconf', {
             bconfId: view.selection.id,
@@ -153,7 +147,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         })
     },
     isDeleteDisabled:function ({grid}, rowIndex, colIndex, item, {data:bconf}) {
-        return bconf.isDefault || grid.isCustomerGrid && !rec.customerId || bconf.name === grid.SYSTEM_BCONF_NAME;
+        return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === grid.SYSTEM_BCONF_NAME;
     },
     isSRXUploadDisabled:function (view, rowIndex, colIndex, item, record) {
         return view.ownerGrid.isCustomerGrid && !record.get('customerId');
@@ -170,10 +164,19 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         field.getTrigger('clear').setVisible(searchFilterValue);
     },
 
-    uploadBconf: function (file){
+    uploadBconf: async function (file){
+        var fileName = file.name.split('.').slice(0,-1).join('.').trim(); // remove .bconf
+        if(!fileName || Ext.getStore('bconfStore').getData().find('name', fileName, 0, true, true, true)){ //...start, startsWith, endsWith, ignoreCase
+            try {
+                fileName = await this.promptUniqueBconfName(fileName);
+            } catch(e){
+                return
+            }
+        }
         var controller = this;
         var grid = this.getView();
         var data = new FormData();
+        data.append('name', fileName);
         data.append(this.FILE_UPLOAD_NAME, file);
         if(grid.isCustomerGrid) {
             var customer = grid.getCustomer() || {};
@@ -204,6 +207,66 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             descCol = grid.getColumnManager().getHeaderByDataIndex('description');
         // trigger description editing
         grid.editingPlugin.activateCell(grid.getView().getPosition(rec, descCol), /* skipBeforeCheck */ true, /* doFocus*/ true);
+    },
+
+    promptUniqueBconfName: function(nameToPrefill = '', allowedRec = null){
+        var grid = this.getView(),
+            {name, nameUnique, newBconf, editBconf} = grid.strings,
+            bconfs =  Ext.getStore('bconfStore').getData();
+        return new Promise(function(resolve, reject){
+            var panel = new Ext.form.Panel({
+                floating: true,
+                title: allowedRec ? editBconf : newBconf,
+                defaultFocus: 'textfield',
+                modal:true,
+                closable: true,
+                bodyPadding: 15,
+                buttonAlign: 'center', // for fbar
+                iconCls: allowedRec ? 'fa fa-edit' : 'fa fa-plus',
+                listeners: {
+                    close: form => form.isValid() ? resolve(form.down('textfield').value) : reject(),
+                },
+                items: [{
+                    xtype: 'textfield',
+                    fieldLabel: name,
+                    width: 300,
+                    selectOnFocus: true,
+                    labelSeparator: '?',
+                    labelWidth: 70,
+                    lastVal:['', false],
+                    value: nameToPrefill,
+                    name: 'bconfName',
+                    allowOnlyWhitespace: false, // trims before validation
+                    validator: function(v){
+                        if(this.lastVal[0] === v){ // already validated
+                            return this.lastVal[1];
+                        }
+                        var existingRec = v && bconfs.find('name', v, 0, true, true, true);
+                        var ret = !existingRec || existingRec===allowedRec || nameUnique //...start, startsWith, endsWith, ignoreCase
+                        this.lastVal = [v, ret]; // cache validation result
+                    },
+                    listeners: {specialkey(field, e){ [e.ENTER,e.ESC].includes(e.keyCode) && panel.close()}},
+                },],
+                    fbar: [{xtype: 'button', text: 'OK', formBind: true, handler:()=>panel.close() }]
+            }).show()
+            panel.isValid(); // trigger display of red border when invalid
+        })
+    },
+
+    handleBeforeedit: function(cellEditPlugin, cellContext){
+        var grid = this.getView(),
+            {name, customerId} = cellContext.record.getData();
+        grid.view.select(cellContext.record);
+        if(name === grid.SYSTEM_BCONF_NAME || grid.isCustomerGrid && !customerId){
+            return false // Can't change system default and globals bconfs in customer view
+        }
+        if(cellContext.field === 'name'){
+            this.promptUniqueBconfName(name, cellContext.record).then(function(changedName){
+                cellContext.record.set('name', changedName);
+            }).catch();
+            return false;
+        }
     }
+
 
 });
