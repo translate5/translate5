@@ -45,9 +45,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      * @see ZfExtended_RestController::afterActionEvent
      */
-    public static function loadBconfIds(Zend_EventManager_Event $event)
+    public static function addCustomersDefaultBconfIds(Zend_EventManager_Event $event)
     {
-        // loadCustomBconfIds
         /** @var ZfExtended_View $view */
         $view = $event->getParam('view');
         $meta = new editor_Models_Db_CustomerMeta();
@@ -332,7 +331,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
         $this->eventManager->attach('editor_TaskController', 'afterPostAction', [$this, 'addBconfIdToTaskMeta']);
 
-        $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', [$this, 'loadBconfIds']);
+        $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', [$this, 'addCustomersDefaultBconfIds']);
     }
 
     /**
