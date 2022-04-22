@@ -198,7 +198,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             } else {
                 Editor.app.getController('ServerException').handleException(response);
             }
-        })
+        });
     },
 
     startEditDescription: function(id){
