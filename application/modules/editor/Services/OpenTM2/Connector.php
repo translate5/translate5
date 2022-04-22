@@ -635,9 +635,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 return -1;
             }
             if ($item1->matchrate == $item2->matchrate){
-                return date($resultlist->getMetaValue($item2->metaData, 'timestamp')) - date($resultlist->getMetaValue($item1->metaData, 'timestamp'));
+                return date($resultlist->getMetaValue($item1->metaData, 'timestamp'))<date($resultlist->getMetaValue($item2->metaData, 'timestamp')) ? 1 : -1;
             }
-            return $item2->matchrate - $item1->matchrate;
+            return ($item1->matchrate < $item2->matchrate) ? 1 : -1;
         });
         
         if(!empty($filterArray)){

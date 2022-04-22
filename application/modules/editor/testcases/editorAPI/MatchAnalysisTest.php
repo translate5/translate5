@@ -69,13 +69,33 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $this->startImport();
         $this->checkTaskState();
     }
-    
+
+    /***
+     * @depends testSetupData
+     * @return void
+     */
+    public function testExportXmlResultsWord(): void
+    {
+        $this->exportXmlResults();
+    }
+
+    /***
+     * @depends testSetupData
+     * @return void
+     */
+    public function testExportXmlResultsCharacter(): void
+    {
+        $this->exportXmlResults(true);
+    }
+
     /***
      * Test the xml analysis summary
-     * @depends testSetupData
      */
-    public function testExportXmlResults()
+    public function exportXmlResults(bool $characterBased = false): void
     {
+
+        $unitType = $characterBased ? 'character' : 'word';
+
         $taskGuid = self::$api->getTask()->taskGuid;
         $response = self::$api->request('editor/plugins_matchanalysis_matchanalysis/export', 'GET', [
             'taskGuid' => $taskGuid,
@@ -94,8 +114,8 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             '<taskInfo taskId="UNTESTABLECONTENT" runAt="UNTESTABLECONTENT" runTime="UNTESTABLECONTENT">',
             $actual);
         
-        self::$api->isCapturing() && file_put_contents($this->api()->getFile('exportResults.xml', null, false), $actual);
-        $expected = self::$api->getFileContent('exportResults.xml');
+        self::$api->isCapturing() && file_put_contents($this->api()->getFile('exportResults-'.$unitType.'.xml', null, false), $actual);
+        $expected = self::$api->getFileContent('exportResults-'.$unitType.'.xml');
         
         //check for differences between the expected and the actual content
         self::assertEquals($expected, $actual, "The expected file(exportResults) an the result file does not match.");
