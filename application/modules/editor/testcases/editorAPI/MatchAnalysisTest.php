@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
- This file is part of translate5
- 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+  This file is part of translate5
 
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
- This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
- to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/agpl.html
-  
- There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
-  
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
-END LICENSE AND COPYRIGHT
-*/
+  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+  included in the packaging of this file.  Please review the following information
+  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+  http://www.gnu.org/licenses/agpl.html
+
+  There is a plugin exception available for use with this release of translate5 for
+  translate5: Please see http://www.translate5.net/plugin-exception.txt or
+  plugin-exception.txt in the root folder of translate5.
+
+  @copyright  Marc Mittag, MittagQI - Quality Informatics
+  @author     MittagQI - Quality Informatics
+  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+ END LICENSE AND COPYRIGHT
+ */
 
 /**
  * Match analysis tests.
@@ -100,16 +100,43 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         //check for differences between the expected and the actual content
         self::assertEquals($expected, $actual, "The expected file(exportResults) an the result file does not match.");
     }
-    
+
     /***
+     *
      * @depends testSetupData
+     * @return void
+     */
+    public function testWordBasedResults(): void
+    {
+        $this->validateResults();
+    }
+
+    /***
+     *
+     * @depends testSetupData
+     * @return void
+     */
+    public function testCharacterBasedResults(): void
+    {
+        $this->validateResults(true);
+    }
+
+    /***
      * Validate the analysis results.
      * 1. the first validation will validate the grouped results for the analysis
-     * 2. the second validation will validate the all existing results for the analyis
+     * 2. the second validation will validate the all existing results for the analysis
+     *
+     * @param bool $characterBased
+     * @return void
      */
-    public function testValidateResults(){
+    public function validateResults(bool $characterBased = false): void
+    {
+
+        $unitType = $characterBased ? 'character' : 'word';
+
         $analysis=$this->api()->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
-            'taskGuid'=> $this->api()->getTask()->taskGuid
+            'taskGuid'=> $this->api()->getTask()->taskGuid,
+            'unitType' => $unitType
         ]);
         
         $this->assertNotEmpty($analysis,'No results found for the matchanalysis.');
@@ -119,8 +146,8 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         }
         
         //this is to recreate the file from the api response
-        //file_put_contents($this->api()->getFile('analysis.txt', null, false), json_encode($analysis, JSON_PRETTY_PRINT));
-        $expected=$this->api()->getFileContent('analysis.txt');
+        $this->api()->isCapturing() && file_put_contents($this->api()->getFile('analysis-'.$unitType.'.txt', null, false), json_encode($analysis, JSON_PRETTY_PRINT));
+        $expected=$this->api()->getFileContent('analysis-'.$unitType.'.txt');
         $actual=json_encode($analysis, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file an the result file does not match.");
@@ -140,9 +167,9 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             unset($a->segmentId);
             unset($a->languageResourceid);
         }
-        
-        $this->api()->isCapturing() && file_put_contents($this->api()->getFile('allanalysis.txt', null, false), json_encode($analysis, JSON_PRETTY_PRINT));
-        $expected=$this->api()->getFileContent('allanalysis.txt');
+
+        $this->api()->isCapturing() && file_put_contents($this->api()->getFile('allanalysis-'.$unitType.'.txt', null, false), json_encode($analysis, JSON_PRETTY_PRINT));
+        $expected=$this->api()->getFileContent('allanalysis-'.$unitType.'.txt');
         $actual=json_encode($analysis, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file(allanalysis) an the result file does not match.");
