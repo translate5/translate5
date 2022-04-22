@@ -76,6 +76,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
     /**
      * Retrieves the database-based path to the default import bconf
+     * TODO FIXME: add version check here
      * @param editor_Models_Task $task
      * @return string
      * @throws Zend_Exception
@@ -85,7 +86,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     public static function getDefaultImportBconfPath(editor_Models_Task $task): string {
         $meta = $task->meta(true);
         $bconfId = $meta->getBconfId();
-
         $bconf = new editor_Plugins_Okapi_Models_Bconf();
         $bconf->load($bconfId);
         return $bconf->getFilePath();
