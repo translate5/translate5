@@ -31,87 +31,71 @@ END LICENSE AND COPYRIGHT
  * Common util class for bconf export and import
  *
  */
-class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
-    
-    const SIGNATURE = "batchConf";
-	const VERSION   = 2;
-    const NUMPLUGINS = 0; // FIXME: Implement plugin support
-    const PHP_INT32_MAX  = 0x7FFFFFFF;
-    const PHP_UINT32_MAX = 0xFFFFFFFF;
-    const OVERFLOW_SUB   =0x100000000; // == PHP_UINT32_MAX +1
-    
-    public $context;
+class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
+{
 
-    public function __construct(string $filename, string $mode = "r", bool $useIncludePath = false, ?object $context = null){
-       /* if(str_starts_with($mode, 'w') && !file_exists($filename)){
-             touch($filename);
-        }*/
+    const SIGNATURE = "batchConf";
+    const VERSION = 2;
+    const NUMPLUGINS = 0; // FIXME: Implement plugin support
+    const PHP_INT32_MAX = 0x7FFFFFFF;
+    const PHP_UINT32_MAX = 0xFFFFFFFF;
+    const OVERFLOW_SUB = 0x100000000; // == PHP_UINT32_MAX +1
+
+    public function __construct(string $filename, string $mode = "r", bool $useIncludePath = false, ?object $context = null) {
         return parent::__construct($filename, $mode, $useIncludePath, $context);
     }
+
     /**
      * Read next UTF-8 value
      */
-    public function readUTF(){
+    public function readUTF() {
         $utflen = unpack("n", $this->fread(2))[1]; // n -> Big Endian unsigned short (Java)
         // unpack("A"...) strips whitespace!
-        return $utflen>0 ? unpack("a".$utflen, $this->fread($utflen))[1] : '';
+        return $utflen > 0 ? unpack("a" . $utflen, $this->fread($utflen))[1] : '';
     }
 
-     /** Write the UTF-8 value in bconf
-      * @param $string
-      * @param $bconfFile
-      */
-     public function writeUTF($string, $withNullByte = true){
-     //
-          $length = strlen($string);
-          $this->fwrite(pack("n", $length));
-          $this->fwrite($string.($withNullByte?"\0":''));
-     }
-/** Convert $string to binary as it would be written */
-     public static function toUTF($string){
-     
+    /** Write the UTF-8 value in bconf
+     * @param $string
+     * @param bool $withNullByte
+     */
+    public function writeUTF($string, bool $withNullByte = true) {
+        $length = strlen($string);
+        $this->fwrite(pack("n", $length));
+        $this->fwrite($string . ($withNullByte ? "\0" : ''));
+    }
+
+    /** Convert $string to binary as it would be written */
+    public static function toUTF($string): string {
         $length = strlen($string);
         return pack("n", $length) . $string;
-   }
-     
-     /** Read the Integer value in bconf
-      * @param $intValue
-      * @param $bconfFile
-      */
-     public function readInt()
-     {
+    }
+
+    /** Read the Integer value in bconf
+     * @return int|mixed
+     */
+    public function readInt(): mixed {
         $uint32 = unpack("N", $this->fread(4))[1]; // N -> UInt32.BE but we want Int32
         return $uint32 <= self::PHP_INT32_MAX ? $uint32 : $uint32 - self::OVERFLOW_SUB;
     }
 
-     /** Write the Integer value in bconf
-      * @param $intValue
-      * @param $bconfFile
-      */
-     public function writeInt($intValue)
-     {
+    /** Write the Integer value in bconf
+     * @param $intValue
+     */
+    public function writeInt($intValue) {
         $this->fwrite(pack("N", $intValue));
-     }
-     
-     /** Write the Long  value in bconf
-      * @param $pipeLine
-      * @param $bconfFile
-      */
-     public function readLong()
-     {
+    }
+
+    /** Write the Long  value in bconf
+     * @return mixed
+     */
+    public function readLong(): mixed {
         return unpack("J", $this->fread(8))[1];
-     }
+    }
 
-     /** Write the Long  value in bconf
-      * @param $pipeLine
-      * @param $bconfFile
-      */
-     public function writeLong($longValue)
-     {
+    /** Write the Long  value in bconf
+     * @param $longValue
+     */
+    public function writeLong($longValue) {
         $this->fwrite(pack("J", $longValue));
-     }
-
-     
-     
-     
+    }
 }

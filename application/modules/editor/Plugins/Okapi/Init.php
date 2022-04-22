@@ -116,8 +116,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     private array $okapiFileTypes = array(
         'okapi', //currently needed, see TRANSLATE-1019
-        
-        
+
         'c',
         'catkeys',
         //'csv' => ['text/csv'], disabled due our own importer
@@ -169,7 +168,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         'ttx',
         'txml',
         'txp',
-        'txt',
         'txt',
         'vrsz',
         'vsdm',

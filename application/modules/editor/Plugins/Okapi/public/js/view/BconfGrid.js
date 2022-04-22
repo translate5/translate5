@@ -96,7 +96,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         invalidSrxTitle:"#UT#Ungültige SRX-Datei",
         invalidSrxMsg:"#UT#Die hochgeladene Datei ist keine gültige SRX-Datei.",
         name:"#UT#Name",
-        nameUnique:"#UT#Name darf nur einmal vorkommen!",
+        nameUnique:"#UT#Der Name ist schon vergeben!",
         newBconf: "#UT#Neue Bconf-Datei",
         editBconf: "#UT#Bconf-Datei bearbeiten",
     },

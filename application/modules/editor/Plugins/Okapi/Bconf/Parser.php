@@ -427,22 +427,21 @@ $okapiId = $raf->readUTF();
         }
     }
 
-    private static function parsePipeline(&$pipeline, $refMap, $outputDir)
+    private static function parsePipeline(&$pipeline, $refMap)
     {
         $doc = new DOMDocument();
         $doc->loadXML($pipeline['xml']);
         /** @var DOMNodeList nodes */
         $nodes = $doc->getElementsByTagName("step");
-        $stepRefs = json_decode(file_get_contents(__DIR__."/StepReferences.json"), associative: true);
 
         foreach ($nodes as $elem) {
             $class = $elem->getAttribute("class");
             if ($class == null) {
                 throw new OkapiException("The attribute 'class' is missing.");
             }
-$classParts = explode('.', $class);
+            $classParts = explode('.', $class);
             $stepName = end($classParts);
-            $pathParams = $stepRefs[$stepName] ?? [];
+            $pathParams =  self::STEP_REFERENCES[$stepName] ?? [];
             foreach ($pathParams as $param) {
                 $param = lcfirst($param);
                 $path = array_shift($refMap); // QUIRK: Do not include directory name $outputDir to not leak server data

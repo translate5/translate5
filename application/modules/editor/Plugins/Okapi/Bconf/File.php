@@ -4,6 +4,12 @@ class editor_Plugins_Okapi_Bconf_File
 {
     public const NUMPLUGINS = 0;
     public const descFile = "content.json";
+    public const STEP_REFERENCES = [
+        "SegmentationStep" => ["SourceSrxPath", "TargetSrxPath"]
+        , "TermExtractionStep" => ["StopWordsPath", "NotStartWordsPath", "NotEndWordsPath"]
+        , "XMLValidationStep" => ["SchemaPath"]
+        , "XSLTransformStep" => ["XsltPath"]
+    ];
 
     protected static string $dataDir;
     protected static string $fileName;

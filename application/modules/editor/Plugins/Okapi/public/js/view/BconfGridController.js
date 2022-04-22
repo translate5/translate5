@@ -201,7 +201,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         })
     },
 
-    startEditDescription(id){
+    startEditDescription: function(id){
         var grid = this.getView(),
             rec = grid.getStore().getById(id),
             descCol = grid.getColumnManager().getHeaderByDataIndex('description');

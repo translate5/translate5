@@ -149,7 +149,6 @@ VALUES
     ('okf_xmlstream',                      'text/xml',               'XML Stream',                                       NULL,               'Large XML Documents'),
     ('okf_xmlstream-dita',                 'text/xml',               'DITA',                                            'dita,ditamap',    'DITA XML'),
     ('okf_xmlstream-JavaPropertiesHTML',   'text/xml',               'Java Properties XML + HTML',                       NULL,               'Java Properties XML with Embedded HTML'),
-    ('okf_openoffice@copy-of-default',     'application/x-openof',   'okf_openoffice@copy-of-default',                   NULL,               'Configuration okf_openoffice@copy-of-default'),
     ('okf_doxygen',                        'text/x-doxygen-txt',     'Doxygen-commented Text',                          'h,c,cpp,java,py,m',                   'Doxygen-commented Text Documents'),
     ('okf_xliff',                          'application/x-xliff+',   'XLIFF',                                           'xlf,xliff,mxliff,mqxliff',              'Configuration for XML Localisation Interchange File Format (XLIFF) documents.'),
     ('okf_openoffice',                     'application/x-openof',   'OpenOffice.org Documents',                        'odt,ods,odg,odp,ott,ots,otp,otg',   'OpenOffice.org ODT, ODS, ODP, ODG, OTT, OTS, OTP, OTG documents'),
