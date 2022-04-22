@@ -65,7 +65,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public static function getDefaultExportBconfPath(editor_Models_Task $task): string {
+    public static function getExportBconfPath(editor_Models_Task $task): string {
         $config = $task->getConfig();
         $defaultExportBconf = $config->runtimeOptions->plugins->Okapi->export->okapiBconfDefaultName ?? null;
         if(empty($defaultExportBconf)){
@@ -83,7 +83,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public static function getDefaultImportBconfPath(editor_Models_Task $task): string {
+    public static function getImportBconfPath(editor_Models_Task $task): string {
         $meta = $task->meta(true);
         $bconfId = $meta->getBconfId();
         $bconf = new editor_Plugins_Okapi_Models_Bconf();
@@ -547,7 +547,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         /** @var editor_Models_Task $task */
         $task = $params['task'];
         $workerParentId = $params['workerParentId'];
-        $bconfFilePath = static::getDefaultImportBconfPath($task);
+        $bconfFilePath = static::getImportBconfPath($task);
 
         $params = [
             'type' => editor_Plugins_Okapi_Worker::TYPE_IMPORT,
