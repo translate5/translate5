@@ -1,9 +1,7 @@
 -- /*
--- START LICENSE AND COPYRIGHT
 --
 --  This file is part of translate5
 --
---  Copyright (c) 2013 - '.(date('Y')).' Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 --
 --  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 --
@@ -17,16 +15,15 @@
 --  translate5: Please see http://www.translate5.net/plugin-exception.txt or
 --  plugin-exception.txt in the root folder of translate5.
 --
---  @copyright  Marc Mittag, MittagQI - Quality Informatics
 --  @author     MittagQI - Quality Informatics
 --  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
 -- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 --
--- END LICENSE AND COPYRIGHT
 -- */
 
 ALTER TABLE `LEK_match_analysis` 
 ADD COLUMN `characterCount` INT NULL AFTER `wordCount`;
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `typeClass`, `description`, `level`, `guiName`, `guiGroup`) VALUES ('runtimeOptions.plugins.MatchAnalysis.calculateBasedOn', '1', 'editor', 'plugins', 'word', 'word', 'word,character', 'string', NULL, 'Define the base of the analysis calculation. It can be word or character based.', '2', 'Analysis calculation base', 'Match analysis: defaults');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `typeClass`, `description`, `level`, `guiName`, `guiGroup`)
+VALUES ('runtimeOptions.plugins.MatchAnalysis.calculateBasedOn', '1', 'editor', 'plugins', 'word', 'word', 'word,character', 'string', NULL, 'Define the base of the analysis calculation. It can be word or character based.', '2', 'Analysis calculation base', 'Match analysis: defaults');
 
