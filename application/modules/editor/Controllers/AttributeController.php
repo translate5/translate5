@@ -321,6 +321,25 @@ class editor_AttributeController extends ZfExtended_RestController
         // Get attr ids array
         $attrIdA = editor_Utils::ar($this->getParam('attrId'));
 
+        // If current user can't edit any attribute, for example
+        // has none of termPM, termPM_allClients or admin roles,
+        // but has other roles allowed to delete attributes only in certain curcumstances
+        if (!$this->isAllowed('editor_attribute', 'putAny')) {
+
+            // Get [attrId => readonly] pairs
+            $readonlyA = $this->entity->getReadonlyByIds(
+                $attrIdA,
+                $this->_session->id, // here we're inside putAction, so we do have access
+                $this->_session->roles
+            );
+
+            // If at least one is readonly - flush failure
+            foreach ($readonlyA as $attrId => $readonly)
+                if ($readonly) $this->jflush(false, count($attrIdA) == 1
+                    ? 'This attribute is not editable'
+                    : 'Some of the attributes are not editable');
+        }
+
         // If dropId-param is given
         if ($dropId = $this->getParam('dropId')) {
 

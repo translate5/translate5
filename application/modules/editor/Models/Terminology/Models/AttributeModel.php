@@ -747,6 +747,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
                `language`, 
                `termId`, 
                `createdBy`,
+               `isDraft`,    
                IF (`termId`, "term", IF (`language` != "", "language", "entry")) AS `level`
             FROM `terms_attributes` 
             WHERE `id` IN (' . join(',', $attrIds) . ') 
@@ -797,6 +798,16 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
                 // Set up readonly flag to be true by default
                 $readonly[$attrId] = true;
+
+                // If it is a draft attribute
+                if ($attr['isDraft']) {
+
+                    // Setup readonly flag to be false
+                    $readonly[$attrId] = false;
+
+                    // Goto next
+                    continue;
+                }
 
                 // Shortcuts
                 $level = $attr['level']; $language = $attr['language']; $termId = $attr['termId'];
