@@ -734,7 +734,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         $processStatusA = $termIds ? $this->db->getAdapter()->query('
             SELECT
               `id`,
-              IF (`proposal`, "unprocessed", `processStatus`) AS `processStatus`
+              IF (`proposal` != "", "unprocessed", `processStatus`) AS `processStatus`
             FROM `terms_term`
             WHERE `id` IN (' . join(',', $termIds) . ')
         ')->fetchAll(PDO::FETCH_KEY_PAIR) : [];
