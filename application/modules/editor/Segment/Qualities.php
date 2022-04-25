@@ -107,7 +107,7 @@ final class editor_Segment_Qualities {
         // we can not compare the text indices because qualities added vie ->add() are qualities that relate to the whole segment content !
         $quality = $this->findExistingByProps($field, $type, $category, $additionalData);
         if($quality == NULL){
-            $quality = $this->table->createRow();
+            $quality = $this->table->createRow([], Zend_Db_Table_Abstract::DEFAULT_DB);
             /* @var $quality editor_Models_Db_SegmentQualityRow */
             $quality->segmentId = $this->segmentId;
             $quality->taskGuid = $this->taskGuid;
@@ -164,7 +164,7 @@ final class editor_Segment_Qualities {
         $quality = ($quality == NULL) ? $this->findExistingByTag($tag, $field) : $quality;
         if($quality == NULL){
             // add new quality
-            $quality = $this->table->createRow();
+            $quality = $this->table->createRow([], Zend_Db_Table_Abstract::DEFAULT_DB);
             /* @var $quality editor_Models_Db_SegmentQualityRow */
             $quality->segmentId = $this->segmentId;
             $quality->taskGuid = $this->taskGuid;

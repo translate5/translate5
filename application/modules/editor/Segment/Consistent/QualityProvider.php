@@ -149,6 +149,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
             // Get SegmentQuality model shortcut
             $qualityM = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
+            /* @var editor_Models_Db_SegmentQuality $qualityM */
 
             // Get [segmentNrInTask => id] pairs
             $segmentIdA = Zend_Db_Table_Abstract::getDefaultAdapter()->query('
@@ -162,7 +163,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
                 // If there is smth to be inserted - do insert
                 foreach ($categoriesByAction['ins'] ?? [] as $insCategoryI) {
-                    $qualityR = $qualityM->createRow();
+                    $qualityR = $qualityM->createRow([], Zend_Db_Table_Abstract::DEFAULT_DB);
                     $qualityR->segmentId = $segmentIdA[$segmentNr];
                     $qualityR->taskGuid = $task->getTaskGuid();
                     $qualityR->field = 'target';

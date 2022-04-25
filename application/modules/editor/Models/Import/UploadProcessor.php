@@ -41,6 +41,7 @@ class editor_Models_Import_UploadProcessor {
 
     const ERROR_INVALID_FILE = 'noValidUploadFile';
     const ERROR_EMPTY_FILE = 'emptyUploadFile';
+    const ERROR_NO_WORKFILES = 'fileUploadErrorIniSize';
 
     /**
      * Is set to true if there are some unknown upload errors (mostly POST size exceed ini size, which must be handled by the admin)
@@ -110,8 +111,8 @@ class editor_Models_Import_UploadProcessor {
         foreach(self::$singleUploadProcessors as $up) {
             /* @var $up editor_Models_Import_UploadProcessor_GenericUpload */
             $up->initAndValidate($this->upload, function(array $errors) use ($up){
-                foreach($errors as $error) {
-                    $this->addUploadError($up->getFieldName(), $error);
+                foreach($errors as $type => $error) {
+                    $this->addUploadError($up->getFieldName(),$type, $error);
                 }
             });
         }
@@ -164,9 +165,12 @@ class editor_Models_Import_UploadProcessor {
             case self::ERROR_EMPTY_FILE:
                 $msg = $msg ?? 'Die ausgewählte Datei war leer!';
                 break;
+            case self::ERROR_NO_WORKFILES:
+                $msg = 'Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.';
+                break;
             default:
                 $this->hasUnknownErrors = true;
-                $msg = $errorType;
+                $msg = $msg ?? $errorType;
                 break;
         }
         $this->uploadErrors[$fileField][$errorType] = $msg;
