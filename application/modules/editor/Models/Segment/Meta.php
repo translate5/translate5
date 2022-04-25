@@ -59,6 +59,8 @@ END LICENSE AND COPYRIGHT
  * @method void setLocked() setLocked(int $locked)
  * @method integer getSourceWordCount() getSourceWordCount()
  * @method void setSourceWordCount() setSourceWordCount(int $count)
+ * @method integer getSourceCharacterCount() getSourceCharacterCount()
+ * @method void setSourceCharacterCount() setSourceCharacterCount(int $count)
  * @method string getPreTransLangResUuid() getPreTransLangResUuid()
  * @method void setPreTransLangResUuid() setPreTransLangResUuid(string $uuid)
  */

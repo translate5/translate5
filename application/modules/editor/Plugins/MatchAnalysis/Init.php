@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
- This file is part of translate5
- 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+  This file is part of translate5
 
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
- This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
- to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/agpl.html
-  
- There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
-  
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
-END LICENSE AND COPYRIGHT
-*/
+  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+  included in the packaging of this file.  Please review the following information
+  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+  http://www.gnu.org/licenses/agpl.html
+
+  There is a plugin exception available for use with this release of translate5 for
+  translate5: Please see http://www.translate5.net/plugin-exception.txt or
+  plugin-exception.txt in the root folder of translate5.
+
+  @copyright  Marc Mittag, MittagQI - Quality Informatics
+  @author     MittagQI - Quality Informatics
+  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+ END LICENSE AND COPYRIGHT
+ */
 
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     protected static $description = 'Provides the match-analysis and pre-translation against language-resources.';
@@ -99,6 +99,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $view = $event->getParam('view');
         /* @var $view Zend_View_Interface */
         $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
+        $config = $this->getConfig();
+        $view->Php2JsVars()->set('plugins.MatchAnalysis.calculateBasedOn', $config->calculateBasedOn);
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {
@@ -119,7 +121,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     }
     
     /***
-     * Cron controller dayily action
+     * Cron controller daily action
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterDailyAction(Zend_EventManager_Event $event){
