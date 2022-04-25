@@ -144,6 +144,12 @@ abstract class editor_Services_Connector_Abstract {
      * @var bool
      */
     protected $disabled = false;
+
+    /**
+     *  Is the connector generally able to support HTML Tags in the ->translate() API
+     * @var bool
+     */
+    protected $htmlTagSupport = false;
     
     /**
      * initialises the internal result list
@@ -439,5 +445,14 @@ abstract class editor_Services_Connector_Abstract {
     
     public function disable() {
         $this->disabled = true;
+    }
+    /**
+     * @return bool
+     * Retrieves, if the connector supports handling of HTML tags in the ->translate() API which then will not be stripped
+     * This API currently is only used by InstantTranslate
+     * The general in the pretranslation Tag-Repair is configured via the tag-handler!
+     */
+    public function canHandleHtmlTags() : bool {
+        return $this->htmlTagSupport;
     }
 }
