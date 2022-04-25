@@ -223,7 +223,11 @@ class editor_Services_Manager {
             $connector->close();
         });
     }
-    
+
+    /**
+     * @throws Zend_Exception
+     * @throws editor_Models_ConfigException
+     */
     public function updateSegment(editor_Models_Segment $segment) {
         if(empty($segment->getTargetEdit())&&$segment->getTargetEdit()!=="0"){
             return;
@@ -235,32 +239,57 @@ class editor_Services_Manager {
             if(!empty($assoc['segmentsUpdateable'])) {
                 $connector->update($segment);
             }
+        }, function(Exception $e, editor_Models_LanguageResources_LanguageResource $languageResource, ZfExtended_Logger_Event $event) {
+            /** @var ZfExtended_Models_Messages $messages */
+            $messages = Zend_Registry::get('rest_messages');
+            $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren Sie Ihren Administrator! <br />Gemeldete Fehler:';
+            $messages->addError($msg, data: [
+                'type' => $event->eventCode,
+                'error' => $event->message,
+            ]);
         });
     }
-    
-    protected function visitAllAssociatedTms(editor_Models_Task $task, Closure $todo) {
+
+    /**
+     * The todo callback is called on each visited TM and receives the following parameters:
+     *   editor_Services_Connector $connector
+     *   editor_Models_LanguageResources_LanguageResource $languageResource
+     *   array $data the lang res data
+     * The optional exceptionHandler callback is called on exceptions in the todo call, and receives the parameters:
+     *   Exception $e
+     *   editor_Models_LanguageResources_LanguageResource $languageResource
+     *
+     * @param editor_Models_Task $task
+     * @param Closure $todo
+     * @param Closure|null $exceptionHandler
+     * @throws Zend_Exception
+     * @throws editor_Models_ConfigException
+     */
+    protected function visitAllAssociatedTms(editor_Models_Task $task, Closure $todo, Closure $exceptionHandler = null) {
         $languageResources = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
         $list = $languageResources->loadByAssociatedTaskGuid($task->getTaskGuid());
         foreach($list as $one){
+            /** @var editor_Models_LanguageResources_LanguageResource $languageResource */
             $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-            /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
             $languageResource->init($one);
             try {
                 $connector = $this->getConnector($languageResource,null,null,$task->getConfig());
-                /* @var $connector editor_Services_Connector */
                 $todo($connector, $languageResource, $one);
             }
-            catch(editor_Services_Exceptions_NoService $e) {
+            catch(editor_Services_Exceptions_NoService | editor_Services_Connector_Exception | ZfExtended_BadGateway $e) {
                 $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource.service');
                 /* @var $logger ZfExtended_Logger */
-                $e->addExtraData(['task' => $task]);
-                $logger->exception($e,[
-                    'level' => $logger::LEVEL_WARN
+                $e->addExtraData([
+                    'languageResource' => $languageResource,
+                    'task' => $task,
                 ]);
-                continue;
-            }
-            catch(ZfExtended_BadGateway $e) {
+                $event = $logger->exception($e,[
+                    'level' => $logger::LEVEL_WARN
+                ], true);
+                if(!is_null($exceptionHandler)) {
+                    $exceptionHandler($e, $languageResource, $event);
+                }
                 continue;
             }
         }
