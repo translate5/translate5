@@ -30,105 +30,81 @@
 /**
  * Generate new bconf file
  */
-class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_File
-{
+class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_File {
 
     /**
      * Export bconf
      */
 
-    protected static function doPack(editor_Plugins_Okapi_Models_Bconf $entity)
-    {
-        $bconfId = $entity->getId();
+    protected static function doPack(editor_Plugins_Okapi_Models_Bconf $entity): string {
         chdir($entity->getDataDirectory()); // so we can access with file name only
 
-        $content = [ 'refs' => null, 'fprm' => null ];
+        $content = ['refs' => null, 'fprm' => null];
 
         if(file_exists(self::DESCRIPTION_FILE)){
             $content = json_decode(file_get_contents(self::DESCRIPTION_FILE), associative: true);
         }
         $fileName = basename($entity->getFilePath());
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
-        
+
         $raf->writeUTF($raf::SIGNATURE, false);
         $raf->writeInt($raf::VERSION);
         //TODO check the Plugins currentlly not in use
         $raf->writeInt(self::NUMPLUGINS);
-        
+
         //Read the pipeline and extract steps
         self::processPipeline($raf);
         self::filterConfiguration($raf, $content);
         self::extensionsMapping($raf);
-        //$raf->fclose();
-        
-        if(file_exists($fileName)){
-            return $fileName;
-        } else{
-            return null;
-        }
+
+        return (string)$raf;
     }
 
-    private static function processPipeline($raf)
-    {
+    private static function processPipeline($raf) {
         $pipelineFile = 'pipeline.pln';
-        $xml2 = file_get_contents($pipelineFile);
         $pipelineSize = filesize($pipelineFile);
-        $resource = fopen($pipelineFile,'rb');
+        $resource = fopen($pipelineFile, 'rb');
         $xml = fread($resource, $pipelineSize);
         fclose($resource);
-        
+
         $xmlData = new SimpleXMLElement($xml);
         $id = 0;
-        foreach ($xmlData as $key) {
+        foreach($xmlData as $key){
             $methods = explode("\n", $key);
-            foreach ($methods as $method) {
-                if (str_contains($method, 'Path')) {
-                    
+            foreach($methods as $method){
+                if(str_contains($method, 'Path')){
+
                     $path = explode("=", $method)[1];
                     $path = str_replace('\\\\', '/', $path);
                     $path = str_replace('\\', '/', $path);
-                    
+
                     editor_Plugins_Okapi_Bconf_Composer::harvestReferencedFile($raf, ++$id, basename($path));
                 }
             }
         }
         // Last ID=-1 to mark no more references
         $raf->writeInt(-1);
-        
-        // Write the full blocks
-        $pos = 0;
-        
-        //          for ( $i=0; $i<$n; $i++ ) {
-        //               self::writeUTF(substr($xml,$pos, $pos+self::MAXBLOCKLEN),$bconfFile);
-        //               $pos +=self::MAXBLOCKLEN;
-        //          }
-        //
-        //          // Write the remaining text
-        //          if ( $r > 0 ) {
-        //               self::writeUTF(substr($xml,$pos),$bconfFile);
-        //          }
-        
+
         $raf->writeInt(1);
         $raf->writeUTF($xml, false);
     }
 
-    private static function harvestReferencedFile($raf, $id, $fileName)
-    {
+    private static function harvestReferencedFile($raf, $id, $fileName) {
         $raf->writeInt($id);
         $raf->writeUTF($fileName, false);
-        
-        if ($fileName == '') {
+
+        if($fileName == ''){
             $raf->writeLong(0); // size = 0
             return;
         }
         //Open the file and read the content
         $file = fopen($fileName, "rb") or die("Unable to open file!");
-        
+
         $fileSize = filesize($fileName);
         $fileContent = fread($file, $fileSize);
-       
+
         $raf->writeLong($fileSize);
-        if ($fileSize > 0) {
+        if($fileSize > 0){
             $raf->fwrite($fileContent);
         }
         fclose($file);
@@ -136,12 +112,13 @@ class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_Fil
     //=== Section 4: The filter configurations
 
     /**
-     * @param $raf
+     * @param editor_Plugins_Okapi_Bconf_RandomAccessFile $raf
+     * @param array $content Ordered bconf contents
      */
-    private static function filterConfiguration($raf, array $content) {
+    private static function filterConfiguration(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf, array $content) {
         $fprms = $content['fprm'] ?? glob("*.fprm");
         $raf->writeInt(count($fprms));
-        foreach ($fprms as $filterParam) {
+        foreach($fprms as $filterParam){
             $filename = $filterParam . (str_ends_with($filterParam, '.fprm') ? '' : '.fprm');
             $raf->writeUTF($filterParam, false);
             $raf->writeUTF(file_get_contents($filename), false); //QUIRK: Need additional null byte. Where does it come from in Java?
@@ -149,10 +126,9 @@ class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_Fil
     }
 
     /**Section 5: Mapping extensions -> filter configuration id
-     * @param $raf
+     * @param editor_Plugins_Okapi_Bconf_RandomAccessFile $raf
      */
-    private static function extensionsMapping($raf)
-    {
+    private static function extensionsMapping(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf) {
         if(!file_exists(self::EXTENSIONMAP_FILE)){
             return;
         }
@@ -166,7 +142,6 @@ class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_Fil
         }
         $raf->writeInt($amount);
         $raf->fwrite($extMapBinary);
-
     }
-    
+
 }

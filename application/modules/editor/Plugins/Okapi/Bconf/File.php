@@ -47,7 +47,7 @@ class editor_Plugins_Okapi_Bconf_File {
         $this->entity = $entity;
     }
 
-    public function pack(): mixed {
+    public function pack(): string {
         return editor_Plugins_Okapi_Bconf_Composer::doPack($this->entity);
     }
 

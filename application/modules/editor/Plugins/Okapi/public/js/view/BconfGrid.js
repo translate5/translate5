@@ -120,9 +120,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
 
     initConfig: function(instanceConfig) {
         var me = this,
-            itemFilter = function(item) {
-                return true;
-            },
             config = {
                 columns: [{
                     xtype: 'gridcolumn',
@@ -146,16 +143,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     editor: 'textfield',
                     text: me.text_cols.name,
                 },
-                   /* {
-                        xtype: 'gridcolumn',
-                        width: 200,
-                        dataIndex: 'extensions',
-                        stateId: 'extensions',
-                        filter: {
-                            type: 'string',
-                        },
-                        text: me.text_cols.extensions,
-                    },*/
+
                     {
                         xtype: 'gridcolumn',
                         width: 300,
@@ -302,26 +290,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                             },
                         ]
                     },
-                   /* {
-                        xtype: 'actioncolumn',
-                        align: 'center',
-                        width: 150,
-                        text: me.text_cols.pipeline,
-                        items: Ext.Array.filter(
-                            [{
-                                    tooltip: me.strings.upload,
-                                    isAllowedFor: 'bconfEdit',
-                                    glyph: 'f093@FontAwesome5FreeSolid',
-                                },
-                                {
-                                    tooltip: me.strings.export,
-                                    isAllowedFor: 'bconfDelete',
-                                    glyph: 'f56e@FontAwesome5FreeSolid',
-                                },
-                            ],
-                            itemFilter
-                        ),
-                    },*/
+
                 ],
                 dockedItems: [{
                     xtype: 'toolbar',
