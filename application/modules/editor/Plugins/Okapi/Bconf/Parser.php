@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
-This file is part of translate5
+ This file is part of translate5
 
-Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
-Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
-This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
-as published by the Free Software Foundation and appearing in the file agpl3-license.txt
-included in the packaging of this file.  Please review the following information
-to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
-http://www.gnu.org/licenses/agpl.html
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
 
-There is a plugin exception available for use with this release of translate5 for
-translate5: Please see http://www.translate5.net/plugin-exception.txt or
-plugin-exception.txt in the root folder of translate5.
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
 
-@copyright  Marc Mittag, MittagQI - Quality Informatics
-@author	 MittagQI - Quality Informatics
-@license	GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
-END LICENSE AND COPYRIGHT
-*/
+ END LICENSE AND COPYRIGHT
+ */
 
 
 
@@ -39,16 +39,13 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File
      * 4) filter configurations
      * 5) extensions -> filter configuration id mapping
      *
-     * @param string $bconfFilePath
-     * @param string $outputDir
+     * @param string $pathToParse
      * @return false|void
+     * @throws ZfExtended_UnprocessableEntity
      */
-	public static function doUnpack(string $bconfFilePath){
-		//TODO: sanity check for params, at least dir_exists, file exists etc
-		$outputDir = self::$dataDir;
-		if (!$outputDir || !is_writable($outputDir)) {
-			return false;
-		}
+	public static function doUnpack(string $pathToParse, editor_Plugins_Okapi_Models_Bconf $entity){
+        chdir($entity->getDataDirectory());
+
         $content = [
             'refs' => [],
             'fprm' => [],
@@ -67,21 +64,20 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File
 		if (filterParamOverrides == null) {
 			throw new IllegalArgumentException("filterParamOverrides must not be null");
 		}
-*/			$raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($bconfFilePath, "rb");
+*/			$raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($pathToParse, "rb");
 			$sig = $raf->readUTF(); // signature
 			if (!$raf::SIGNATURE === $sig) {
-				throw new OkapiIOException("Invalid file format.");
+				throw new ZfExtended_UnprocessableEntity("Invalid file format.");
 			}
 			$version = $raf->readInt(); // Version info
 			if (!($version >= 1 && $version <= $raf::VERSION)) {
-				throw new OkapiIOException("Invalid version.");
+				throw new ZfExtended_UnprocessableEntity("Invalid version.");
 			}
 			//TODO make dir if not exists
 			//Util.createDirectories(outputDir+File.separator);
 
 			//=== Section 1: plug-ins
 			if ($version > 1) { // Remain compatible with v.1 bconf files
-				$pluginsDir = $outputDir;
 
 				$numPlugins = $raf->readInt();
 				for ($i = 0; $i < $numPlugins; $i++) {
@@ -89,8 +85,7 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File
 					$raf->readInt(); // Skip ID
 					$raf->readUTF(); // Skip original full filename
 					$size = $raf->readLong();
-					$path = "$outputDir/$relPath";
-					self::createReferencedFile($raf, $size, $path);
+					self::createReferencedFile($raf, $size, $relPath);
 				}
 
 /*				PluginsManager pm = new PluginsManager();
@@ -117,10 +112,7 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File
 				// Skip over the data to move to the next reference
 				$size = $raf->readLong();
 				if ($size > 0) {
-					$path = "$outputDir/$filename";
-					self::createReferencedFile($raf, $size, $path);
-
-					//$raf->fseek($raf->ftell() + $size);
+					self::createReferencedFile($raf, $size, $filename);
 				}
 				// Then get the information for next entry
 				$id = $raf->readInt(); // ID
@@ -142,7 +134,7 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File
 			];
 			// reads in the given path
             $content['refs'] = $refNames;
-			self::parsePipeline($pipeline, $refNames, $outputDir);
+			self::parsePipeline($pipeline, $refNames);
 			//validate the step param overrides
 			//checkStepParamOverrides(pipeline.getSteps(), stepParamOverrides);
 /*
@@ -214,8 +206,7 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File
 			}
 */
 			// Write out the pipeline file
-			$path = "$outputDir/pipeline.pln";
-			file_put_contents($path, $pipeline['xml']);
+			file_put_contents(self::PIPELINE_FILE, $pipeline['xml']);
 
 			//=== Section 4 : the filter configurations
 
@@ -228,7 +219,7 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File
 				$okapiId = $content['fprm'][] = $raf->readUTF();
 				$data = $raf->readUTF();
 				// And create the parameters file
-				file_put_contents("$outputDir/$okapiId.fprm", $data);
+				file_put_contents("$okapiId.fprm", $data);
 			}
 
 /*			// Write out any custom filter config overrides
@@ -252,7 +243,6 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File
 			//=== Section 5: the extensions -> filter configuration id mapping
 
 			// Get the number of mappings
-			$path = $outputDir . '/' . "extensions-mapping.txt";
 			{
 				$write = '';
 				$extMap = self::readExtensionMap($raf);
@@ -261,9 +251,9 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File
 				foreach ($extMap as $ext => $okapiId) {
 					$write .= $ext . "\t" . $okapiId . PHP_EOL;
 				}
-				file_put_contents($path, $write);
+				file_put_contents(self::EXTENSIONMAP_FILE, $write);
 			}
-            file_put_contents("$outputDir/content.json", json_encode($content, JSON_PRETTY_PRINT));
+            file_put_contents(self::DESCRIPTION_FILE, json_encode($content, JSON_PRETTY_PRINT));
 	}
 
     private static function writeConfig(String $outputDir, String $okapiId, String $data) : string {
@@ -384,7 +374,7 @@ $okapiId = $raf->readUTF();
 		return tmp.toString();
 	}
 */
-	protected function initBconfFile()
+	private function initBconfFile()
 	{
 		$bconfModel = new editor_Plugins_Okapi_Models_Bconf();
 		$bconfModel->save();
@@ -396,7 +386,6 @@ $okapiId = $raf->readUTF();
      * @param int $size
      * @param string $path
      * @return boolean
-     * @throws IOException
      */
     private static function createReferencedFile(SplFileObject $raf, int $size, string $path)
     {
@@ -437,7 +426,7 @@ $okapiId = $raf->readUTF();
         foreach ($nodes as $elem) {
             $class = $elem->getAttribute("class");
             if ($class == null) {
-                throw new OkapiException("The attribute 'class' is missing.");
+                throw new ZfExtended_UnprocessableEntity("The attribute 'class' is missing.");
             }
             $classParts = explode('.', $class);
             $stepName = end($classParts);

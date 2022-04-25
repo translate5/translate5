@@ -186,7 +186,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             method: 'POST',
             body: data
         }).then(function(response){
-            if(response.status === 200) {
+            if(response.status === 200 && response.responseJson) {
                 var id = response.responseJson.id;
                 var store = Ext.getStore('bconfStore');
                 new store.model({id}).load({

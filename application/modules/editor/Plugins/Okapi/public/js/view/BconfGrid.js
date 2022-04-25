@@ -83,6 +83,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         remove: '#UT#Remove',
         copy: '#UT#Copy',
         upload: '#UT#Upload',
+        refresh:'#UT#Aktualisieren',
         addBconf: '#UT#Add Bconf',
         uploadBconf: '#UT#Upload Bconf',
         searchText: '#UT#Search',
@@ -104,13 +105,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     viewConfig: {
         enableTextSelection: true, // neccessary for pointer class to have effect on whole row
         getRowClass: function({data:bconf}) {
-            var cls='', customer = (this.ownerGrid.customer||{}).data || {};
+            var cls='', customer = this.grid.customer?.getData() || {};
                 if(bconf.customerId != customer.id || bconf.name === this.grid.SYSTEM_BCONF_NAME) {
                     cls += 'not-editable ';
                 } else {
                     cls += 'pointer ';
                 }
-                if(bconf.isDefault || customer.defaultBconfId == bconf.id){
+                if(customer.defaultBconfId ? customer.defaultBconfId == bconf.id : bconf.isDefault){
                     cls += ' chosenDefault'
                 }
             return cls;
@@ -199,12 +200,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                                 if(newDefault == oldDefault){ // deselect customer default
                                     newDefault = null;
                                 }
+                                customer.set('defaultBconfId', newDefault, {commit: false}); // set on customer
                                 bconfRec.set('isDefaultForCustomer', customer.getId());
-                                customer.set('defaultBconfId', newDefault, {silent: true}); // set on customer
                                 if(oldDefault){ // unselect old
                                     var oldDefaultRec = view.getStore().getById(oldDefault);
                                     oldDefaultRec.set('isDefaultForCustomer', false, newDefault==oldDefault ? {} : {silent:true, dirty:false});
-                                    view.refreshNode(oldDefaultRec);
+                                    view.refreshNode(oldDefaultRec)
                                 }
                             return false;
                             }
@@ -339,7 +340,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     {
                         xtype: 'button',
                         iconCls: 'x-fa fa-undo',
-                        text: 'Reload',
+                        text: me.strings.refresh,
                         handler: function(btn) {
                             btn.up('grid').getStore().getSource().reload();
                         }
@@ -347,8 +348,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     {
                         xtype: 'textfield',
                         width: 300,
-                        flex: 2,
-                        margin: '0 0 0 20px',
+                        flex: 1,
                         emptyText: me.strings.searchEmptyText,
                         triggers: {
                             clear: {
@@ -363,8 +363,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         }
                     },
                     {
-                        xtype: 'tbseparator',
-                        flex: 3,
+                        xtype: 'tbspacer',
+                        flex: 1.6,
                     },
                     ],
                 }, ],

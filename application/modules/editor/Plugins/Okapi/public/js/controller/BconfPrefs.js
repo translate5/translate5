@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -35,7 +34,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Main Controller of the Visual Review
  * Defines the Layout of the review Panel and it's controls, listens to the relevant global events and perocesses them
- * 
+ *
  * @class BconfPrefs
  * @extends Ext.app.Controller
  */
@@ -44,10 +43,11 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
 
     requires: [
         'Editor.plugins.Okapi.view.BconfGrid',
-        'Editor.plugins.Okapi.store.BconfStore'
+        'Editor.plugins.Okapi.store.BconfStore',
+        'Editor.model.admin.Customer'
     ],
     init: function(){
-
+        Editor.model.admin.Customer.addFields({type: 'int', name: 'defaultBconfId', persist: false})
     },
     onLaunch: function(){
         Ext.create('Editor.plugins.Okapi.store.BconfStore'); // in onLaunch so customerStore can import default bconf before if needed
@@ -58,7 +58,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             '#preferencesOverviewPanel': {
                 added: 'addBconfToSettingsPanel',
             },
-            '#displayTabPanel' : { // customerPanel > tabPanel
+            '#displayTabPanel': { // customerPanel > tabPanel
                 added: 'addBconfToCustomerPanel',
             },
             '#taskMainCard': {
@@ -79,37 +79,36 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
     // just a reference to our view
     bconfPanel: null,
     // shows the preference panel in the preferences (bconf-section is shown via 'showBconfInOverviewPanel' afterwards)
-    onBconfRoute: function () {
+    onBconfRoute: function(){
 
         console.log('onBconfRoute');
 
 
-        if (Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')) {
+        if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
             // QUIRK: just to make sure, not the same thing can happen as with Quirk in ::showBconfInOverviewPanel
             var pop = this.getPreferencesOverviewPanel();
-            if (pop) {
+            if(pop){
                 Editor.app.openAdministrationSection(pop, 'reviewbconf');
             }
         }
     },
     // adds the Font-Prefs-Panel to the Overview Panel if the right is present
-    addBconfToSettingsPanel: function (panel) {
-        if (Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')) {
-            this.bconfPanel = panel.insert(0, {
+    addBconfToSettingsPanel: function(panel){
+        if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
+            this.bconfPanel = panel.insert(2, {
                 xtype: 'okapiBconfGrid',
                 store: {
                     type: 'chained',
                     source: 'bconfStore',
                     storeId: 'bconfGlobal',
-                    filters: [function (item) {
+                    filters: [function(item){
                         return !item.data.customerId;
                     }]
                 },
             });
-            panel.setActiveTab(this.bconfPanel);
         }
     },
-    addBconfToCustomerPanel: function (tabPanel) {
+    addBconfToCustomerPanel: function(tabPanel){
         var vm = tabPanel.up('[viewModel]').getViewModel();
         var vmStores = vm.storeInfo || {};
         vmStores.bconfCustomer = {
@@ -119,31 +118,31 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                 id: 'clientFilter',
                 property: 'customerId',
                 value: '{list.selection.id}',
-                filterFn: function ({data}) {
+                filterFn: function({data}){
                     return !data.customerId || this._value == data.customerId;
                 },
             }],
-            sorters:[{
+            sorters: [{
                 property: 'customerId',
-                direction:'DESC'
-            },{
+                direction: 'DESC'
+            }, {
                 property: 'name',
             }]
         };
         vm.setStores(vmStores);
 
-        tabPanel.insert(2-2, {
-                xtype: 'okapiBconfGrid',
-                bind: {
-                    customer: '{record}',
-                    store: '{bconfCustomer}'
-                },
-                isCustomerGrid: true,
-            });
+        tabPanel.insert(2, {
+            xtype: 'okapiBconfGrid',
+            bind: {
+                customer: '{list.selection}', // list is reference name of customerGrid
+                store: '{bconfCustomer}'
+            },
+            isCustomerGrid: true,
+        });
         tabPanel.setActiveTab(0);
     },
     addBconfComboToTaskMainCard: function(taskMainCard){
-        taskMainCard.down("#taskMainCardContainer").add({
+        taskMainCard.down('#taskMainCardContainer').add({
             xtype: 'combobox',
             queryMode: 'local',
             forceSelection: true,
@@ -156,44 +155,45 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                     return `<span data-qtip="{description}">{${displayField}}</span>`
                 },
             },
-           bind : {
+            bind: {
                 store: '{bconfImportWizard}',
                 disabled: '{!customer.selection}',
                 value: '{defaultBconf}',
             },
             viewModel: {
-                alias:  'viewmodel.bconfComboImportWizard',
-                stores:{
+                alias: 'viewmodel.bconfComboImportWizard',
+                stores: {
                     bconfImportWizard: {
                         storeId: 'bconfImportWizard',
                         source: 'bconfStore',
                         autoLoad: true,
                         filters: [{
-                            filterFn: ({data:bconf}) => !bconf.customerId || this._value == bconf.customerId,
+                            filterFn: ({data: bconf}) => !bconf.customerId || this._value == bconf.customerId,
                             property: 'customerId',
                             value: '{customer.selection.id}'
                         }],
                         sorters: [{
                             property: 'customerId',
-                            direction:'DESC'
-                        },{
+                            direction: 'DESC'
+                        }, {
                             property: 'name',
                         }],
                     }
                 },
                 formulas: {
-                    defaultBconf : {
+                    defaultBconf: {
                         bind: {
-                            customer:'{customer.selection}',
+                            customer: '{customer.selection}',
                             store: '{bconfImportWizard}', // QUIRK: artificial dependency to wait for store being filtered by bound customerId
                         },
-                        get: function ({customer, store}) {
-                            return customer.get('defaultBconfId') ||  this.globalDefaultId ||
-                                (this.globalDefaultId = store.getData().findBy(({data:bconf}) => bconf.isDefault).id); //FIXME: find better way to calc global default, maybe global variable
+                        get: function({customer, store}){
+                            return customer.get('defaultBconfId') || this.globalDefaultId ||
+                                //FIXME: find better way to (pre)calculate global default, maybe global variable
+                                (this.globalDefaultId = store.getData().findBy(({data: bconf}) => bconf.isDefault).id);
                         }
                     }
                 }
-            },
+            }
         });
     }
 

@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -31,43 +30,37 @@ Ext.define('Editor.model.admin.Customer', {
     alias: 'model.customer',
 
     statics: {
-    	DEFAULTCUSTOMER_NUMBER:'default for legacy data'
+        DEFAULTCUSTOMER_NUMBER: 'default for legacy data',
     },
-    
+
     fields: [
-        {type: 'int',name: 'id',persist: false},
-        {type: 'string',name: 'name',validations: [{type: 'presence'},{type: 'length',max: 255,min: 3}]},
-        {type: 'string',name: 'number',validations: [{type: 'presence'},{type: 'length',max: 255}]},
-        {type: 'string',name: 'domain',validations: [{type: 'presence'},{type: 'length',max: 255}]},
-        {type: 'string',name: 'openIdServer',validations: [{type: 'presence'},{type: 'length',max: 255}]},
-        {type: 'string',name: 'openIdIssuer',validations: [{type: 'presence'},{type: 'length',max: 255}]},
-        {type: 'string',name: 'openIdServerRoles',validations: [{type: 'presence'},{type: 'length',max: 255}]},
-        {type: 'string',name: 'openIdDefaultServerRoles',validations: [{type: 'presence'},{type: 'length',max: 255}]},
-        {type: 'string',name: 'openIdAuth2Url',validations: [{type: 'presence'},{type: 'length',max: 255}]},
-        {type: 'string',name: 'openIdClientId',validations: [{type: 'presence'},{type: 'length',max: 1024}]},
-        {type: 'string',name: 'openIdClientSecret',validations: [{type: 'presence'},{type: 'length',max: 1024}]},
-        {type: 'string',name: 'openIdRedirectLabel',validations: [{type: 'presence'},{type: 'length',max: 1024}]},
-        {
-            type: 'auto',
-            name: 'openIdRedirectCheckbox',
-            serialize: function(value) {
-                return value ? '1' : '0';
-            }
-        }
+        {type: 'int', name: 'id', persist: false},
+        {type: 'string', name: 'name', validations: [{type: 'presence'}, {type: 'length', max: 255, min: 3}]},
+        {type: 'string', name: 'number', validations: [{type: 'presence'}, {type: 'length', max: 255}]},
+        {type: 'string', name: 'domain', validations: [{type: 'presence'}, {type: 'length', max: 255}]},
+        {type: 'string', name: 'openIdServer', validations: [{type: 'presence'}, {type: 'length', max: 255}]},
+        {type: 'string', name: 'openIdIssuer', validations: [{type: 'presence'}, {type: 'length', max: 255}]},
+        {type: 'string', name: 'openIdServerRoles', validations: [{type: 'presence'}, {type: 'length', max: 255}]},
+        {type: 'string', name: 'openIdDefaultServerRoles', validations: [{type: 'presence'}, {type: 'length', max: 255}]},
+        {type: 'string', name: 'openIdAuth2Url', validations: [{type: 'presence'}, {type: 'length', max: 255}]},
+        {type: 'string', name: 'openIdClientId', validations: [{type: 'presence'}, {type: 'length', max: 1024}]},
+        {type: 'string', name: 'openIdClientSecret', validations: [{type: 'presence'}, {type: 'length', max: 1024}]},
+        {type: 'string', name: 'openIdRedirectLabel', validations: [{type: 'presence'}, {type: 'length', max: 1024}]},
+        {type: 'auto', name: 'openIdRedirectCheckbox', serialize: function(value){return value ? '1' : '0';}},
     ],
 
     idProperty: 'id',
-    proxy : {
-      type : 'rest',
-      url: Editor.data.restpath+'customer',
-      reader : {
-        rootProperty: 'rows',
-        type : 'json'
-      },
-      writer: {
-        encode: true,
-        rootProperty: 'data',
-        writeAllFields: false
-      }
-    }
+    proxy: {
+        type: 'rest',
+        url: Editor.data.restpath + 'customer',
+        reader: {
+            rootProperty: 'rows',
+            type: 'json',
+        },
+        writer: {
+            encode: true,
+            rootProperty: 'data',
+            writeAllFields: false,
+        },
+    },
 });

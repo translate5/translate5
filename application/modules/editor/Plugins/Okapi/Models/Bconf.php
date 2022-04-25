@@ -48,8 +48,13 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
 
     const SYSTEM_BCONF_VERSION = 1;
     const SYSTEM_BCONF_NAME = 'Translate5-Standard';
+    const SYSTEM_BCONF_IMPORTFILE = 'okapi_default_import.bconf';
 
     public editor_Plugins_Okapi_Bconf_File $file;
+
+    private string $dir = ''; // for caching the results of expensive filesystem checks
+    private bool $isNewRecord = false; //flag for newly created entities
+
     public function setFile(editor_Plugins_Okapi_Bconf_File $file): void {
         $this->file = $file;
     }
@@ -62,11 +67,12 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @param ?array $postFile - see https://www.php.net/manual/features.file-upload.post-method.php
      * @param array $data - data to initialize the record, usually the POST params
      * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws editor_Plugins_Okapi_Exception
      */
-    public function __construct(array $postFile = null, array $data = [])
-    {
+    public function __construct(array $postFile = null, array $data = []) {
         parent::__construct();
         if($postFile){ // create new entity from file
             if(empty($data['name'])){
@@ -76,9 +82,11 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             if(!$data['versionIdx']){
                 $data['versionIdx'] = self::SYSTEM_BCONF_VERSION;
             }
+            $this->isNewRecord = true;
             $this->init($data);
-            $this->getDataDirectory(1); // Ensures directory is valid QUIRK: id 1 is an assumption. Creates empty dir if AUTO_INCREMENT != 1
-            $this->save();
+            $this->save(); // Generates id needed for directory
+
+            $this->getDataDirectory(); // Creates directory
 
             $this->file = new editor_Plugins_Okapi_Bconf_File($this);
             $this->file->unpack($postFile['tmp_name']);
@@ -92,14 +100,13 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
-    public function importDefaultWhenNeeded(bool $skipCheck = false): bool
-    {
+    public function importDefaultWhenNeeded(int $totalCount = -1): bool {
         // TODO: check wether system bconf has been updated and if so import updated one
-        if ($skipCheck || $this->getTotalCount() === 0) {
-            $defaultImportBconf = editor_Plugins_Okapi_Init::getOkapiDataFilePath() . 'okapi_default_import.bconf';
-            $bconf = new editor_Plugins_Okapi_Models_Bconf(['tmp_name'=>$defaultImportBconf, 'name'=>'Translate5-Standard.bconf']);
+        if($totalCount === 0 || $this->getTotalCount() === 0){
+            $defaultImportBconf = editor_Plugins_Okapi_Init::getOkapiDataFilePath() . self::SYSTEM_BCONF_IMPORTFILE;
+            $bconf = new editor_Plugins_Okapi_Models_Bconf(['tmp_name' => $defaultImportBconf, 'name' => 'Translate5-Standard.bconf']);
             $bconf->setIsDefault(1);
             $bconf->setDescription("The default .bconf used for file imports unless another one is configured");
             $bconf->save();
@@ -121,52 +128,68 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
 
     /**
      * Returns the data directory of the given bconfId/loaded entity without trailing slash, creating it if neccessary
-     * @param string|null $id
+     * @param string $id
+     * @param bool $check can be used to disable file system checks
      * @return string
-     * @throws editor_Plugins_Okapi_Exception|Zend_Exception
+     * @throws ZfExtended_UnprocessableEntity|editor_Plugins_Okapi_Exception|Zend_Exception
      */
-    public function getDataDirectory(?string $id = null) : string {
+    public function getDataDirectory(string $id = '', bool $check = true): string {
         !$id && $id = $this->getId();
-        !$id && $id = (int) $_REQUEST['id'];
+        !$id && $id = (int)$_REQUEST['id'];
         !$id && throw new ZfExtended_UnprocessableEntity('E1025', ['errors' => [["No 'id' parameter given."]]]);
-
+        if(str_ends_with($this->dir, $id)){
+            return $this->dir; // return cached result
+        }
         /** @var Zend_Config $config */
         $config = Zend_Registry::get('config');
-        $dataDir = $config->runtimeOptions->plugins->Okapi->dataDir;
-        $this->checkDirectory($dataDir);
+        $okapiDataDir = $config->runtimeOptions->plugins->Okapi->dataDir;
+        $check && $this->checkDirectory($okapiDataDir);
 
-        $okapiBconfDir = realpath($dataDir) .'/'.$id;
-        $this->checkDirectory($okapiBconfDir);
-        return $okapiBconfDir;
+        $this->dir = $bconfDir = realpath($okapiDataDir) . DIRECTORY_SEPARATOR . $id; // cache result
+        $check && $this->checkDirectory($bconfDir);
+        return $bconfDir;
     }
 
     /**
-     * @param $dir
+     * Checks if a directory exists and is writable
+     * @param string $dir The directory path to check
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function checkDirectory($dir){
+    public function checkDirectory(string $dir) {
         $errorMsg = '';
         if(!is_dir($dir)){
             if(is_file($dir)){
-                $errorMsg = "'$dir' is actually a file!";
-            } else if(!mkdir($dir, 0755, true)){
-                $errorMsg = "Could not create directory '$dir'!";
+                $errorMsg = "'$dir' is a file!";
+            } else if(!$this->isNewRecord){
+                $errorMsg = "Directory '$dir' is missing";
+            } else if(!mkdir($dir, 0755, true)){ // new record
+                $errorMsg = "Could not create directory '$dir'";
             }
-        } else if(!is_writable($dir)){
-            $errorMsg = $dir;
+        } else {
+            $permissions = fileperms($dir);
+            $rwx = 7;
+            $user = 6; // number of bytes to shift
+            if($permissions >> $user !== $rwx && !chmod($dir, $permissions | $rwx << $user)){
+                $errorMsg = $dir;
+            }
         }
-        $errorMsg && throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $errorMsg]);
+        if($errorMsg){
+            if($this->isNewRecord){ // new bconf or clone
+                $this->delete();
+            }
+            throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $errorMsg]);
+        }
     }
 
     /**
-     * @param $id
+     * @param string $id
      * @return string path - the absolute path of the bconf
      * @throws Zend_Exception|editor_Plugins_Okapi_Exception
      */
-    public function getFilePath(string $id = null): string {
+    public function getFilePath(string $id = ''): string {
         $dataDirectory = $this->getDataDirectory($id);
         !$id && $id = $this->getId();
-        return $dataDirectory.DIRECTORY_SEPARATOR.'bconf-'.$id.'.bconf';
+        return $dataDirectory . DIRECTORY_SEPARATOR . 'bconf-' . $id . '.bconf';
 
     }
 
@@ -178,22 +201,44 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception|ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Plugins_Okapi_Exception|ZfExtended_Models_Entity_NotFoundException|Zend_Exception
      */
     public function getDefaultBconfId($customerId = null): int {
         $this->importDefaultWhenNeeded();
 
         $defaultBconfId = 0;
-        if ($customerId) {
+        if($customerId){
             $customerMeta = new editor_Models_Customer_Meta();
             $customerMeta->loadByCustomerId($customerId);
             $defaultBconfId = $customerMeta->getDefaultBconfId();
         }
-        if (!$defaultBconfId) {
+        if(!$defaultBconfId){
             $this->loadRow('default = 1');
             $defaultBconfId = $this->getId();
         }
         return $defaultBconfId;
+    }
+
+    /**
+     * @param string $bconfId
+     * @return void
+     * @throws Zend_Exception
+     * @throws ZfExtended_NoAccessException
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function deleteDirectory(string $bconfId): void {
+        $bconfId = (int)$bconfId;  // directory traversal mitigation
+        $systemBconf_row = $this->db->fetchRow(['name = ?' => $this::SYSTEM_BCONF_NAME]);
+        if($bconfId == $systemBconf_row['id'] && !$this->isNewRecord){
+            throw new ZfExtended_NoAccessException();
+        }
+        chdir(Zend_Registry::get('config')->runtimeOptions->plugins->Okapi->dataDir);
+        if(is_dir($bconfId)){ // just to be safe
+            $this->dir = ""; // remove cached valid dir
+            /** @var ZfExtended_Controller_Helper_Recursivedircleaner $cleaner */
+            $cleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
+            $cleaner->delete($bconfId);
+        }
     }
 
 }

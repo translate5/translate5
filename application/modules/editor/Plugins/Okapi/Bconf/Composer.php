@@ -1,31 +1,31 @@
 <?php
 
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
-This file is part of translate5
+ This file is part of translate5
 
-Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
-Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
-This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
-as published by the Free Software Foundation and appearing in the file agpl3-license.txt
-included in the packaging of this file.  Please review the following information
-to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
-http://www.gnu.org/licenses/agpl.html
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
 
-There is a plugin exception available for use with this release of translate5 for
-translate5: Please see http://www.translate5.net/plugin-exception.txt or
-plugin-exception.txt in the root folder of translate5.
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
 
-@copyright  Marc Mittag, MittagQI - Quality Informatics
-@author     MittagQI - Quality Informatics
-@license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
-END LICENSE AND COPYRIGHT
-*/
+ END LICENSE AND COPYRIGHT
+ */
 
 /**
  * Generate new bconf file
@@ -36,16 +36,18 @@ class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_Fil
     /**
      * Export bconf
      */
-    protected static function doPack($bconfId)
+
+    protected static function doPack(editor_Plugins_Okapi_Models_Bconf $entity)
     {
-        chdir(self::$dataDir); // so we can access with file name only
+        $bconfId = $entity->getId();
+        chdir($entity->getDataDirectory()); // so we can access with file name only
 
         $content = [ 'refs' => null, 'fprm' => null ];
 
-        if(file_exists(self::descFile)){
-            $content = json_decode(file_get_contents(self::descFile), associative: true);
+        if(file_exists(self::DESCRIPTION_FILE)){
+            $content = json_decode(file_get_contents(self::DESCRIPTION_FILE), associative: true);
         }
-        $fileName = self::$fileName;
+        $fileName = basename($entity->getFilePath());
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
         
         $raf->writeUTF($raf::SIGNATURE, false);
@@ -55,7 +57,7 @@ class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_Fil
         
         //Read the pipeline and extract steps
         self::processPipeline($raf);
-        self::filterConfiguration($raf);
+        self::filterConfiguration($raf, $content);
         self::extensionsMapping($raf);
         //$raf->fclose();
         
@@ -66,7 +68,7 @@ class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_Fil
         }
     }
 
-    protected static function processPipeline($raf)
+    private static function processPipeline($raf)
     {
         $pipelineFile = 'pipeline.pln';
         $xml2 = file_get_contents($pipelineFile);
@@ -110,14 +112,14 @@ class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_Fil
         $raf->writeUTF($xml, false);
     }
 
-    protected static function harvestReferencedFile($raf, $id, $fileName)
+    private static function harvestReferencedFile($raf, $id, $fileName)
     {
         $raf->writeInt($id);
         $raf->writeUTF($fileName, false);
         
         if ($fileName == '') {
             $raf->writeLong(0); // size = 0
-            return false;
+            return;
         }
         //Open the file and read the content
         $file = fopen($fileName, "rb") or die("Unable to open file!");
@@ -136,51 +138,25 @@ class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_Fil
     /**
      * @param $raf
      */
-    protected static function filterConfiguration($raf)
-    {   
+    private static function filterConfiguration($raf, array $content) {
         $fprms = $content['fprm'] ?? glob("*.fprm");
         $raf->writeInt(count($fprms));
         foreach ($fprms as $filterParam) {
-                $filename = $filterParam.(str_ends_with($filterParam,'.fprm') ? '' : '.fprm');
-                $raf->writeUTF($filterParam, false);
-                $raf->writeUTF(file_get_contents($filename), false); //QUIRK: Need additional null byte. Where does it come from in Java?
-        }
-
-
-        return;
-
-        $filterConfiguration = new editor_Plugins_Okapi_Models_BconfFilter();
-        $data = $filterConfiguration->getByBconfId($bconfId);
-        $count = 0;
-        foreach ($data as $filter) {
-            if ($filter['isDefault'] == 1) {
-                $count++;
-            }
-        }
-        $raf->writeInt($count);
-        
-        foreach ($data as $filter) {
-            if ($filter['isDefault'] == 1) {
-                //TODO get dir path
-                $configFilePath = $filter['okapiId'].'.fprm';
-                $file = fopen($configFilePath, "r") or die("Unable to open file!");
-                $configData = fread($file, filesize($configFilePath));
-                $raf->writeUTF($filter['okapiId']);
-                $raf->writeUTF($configData);
-            }
+            $filename = $filterParam . (str_ends_with($filterParam, '.fprm') ? '' : '.fprm');
+            $raf->writeUTF($filterParam, false);
+            $raf->writeUTF(file_get_contents($filename), false); //QUIRK: Need additional null byte. Where does it come from in Java?
         }
     }
 
     /**Section 5: Mapping extensions -> filter configuration id
      * @param $raf
      */
-    protected static function extensionsMapping($raf)
+    private static function extensionsMapping($raf)
     {
-        $extMapFile = "extensions-mapping.txt";
-        if(!file_exists($extMapFile)){
+        if(!file_exists(self::EXTENSIONMAP_FILE)){
             return;
         }
-        $extMap = file($extMapFile, FILE_IGNORE_NEW_LINES);
+        $extMap = file(self::EXTENSIONMAP_FILE, FILE_IGNORE_NEW_LINES);
         $amount = count($extMap);
         $extMapBinary = ''; // we'll build up the binary format in memory instead of wirting every line itself to file
         foreach($extMap as $line){
@@ -191,47 +167,6 @@ class editor_Plugins_Okapi_Bconf_Composer extends editor_Plugins_Okapi_Bconf_Fil
         $raf->writeInt($amount);
         $raf->fwrite($extMapBinary);
 
-        return;
-
-        $filterConfiguration = new editor_Plugins_Okapi_Models_BconfFilter();
-        $data = $filterConfiguration->getByBconfId();
-        
-        $defaultFilters = new editor_Plugins_Okapi_Models_BconfDefaultFilter();
-        $defaultFiltersData = $defaultFilters->loadAll();
-        
-        $extMap = [];
-        $count = 0;
-        if ($data != null && count($data) > 0) {
-            foreach ($data as $filter) {
-                $extList = explode(",", $filter["extensions"]);
-                foreach ($extList as $extension) {
-                    if(!empty($extension)) {
-                        array_push($extMap, array("ext" => $extension, "id" => $filter["okapiId"]));
-                        $count++;
-                    }
-                }
-            }
-        }
-        if ($defaultFiltersData != null && count($defaultFiltersData) > 0) {
-            foreach ($defaultFiltersData as $filter) {
-                $extList = explode(",", $filter["extensions"] ?? '');
-                foreach ($extList as $extension) {
-                    if(!empty($extension)) {
-                        array_push($extMap, array("ext" => $extension, "id" => $filter["okapiId"]));
-                        $count++;
-                    }
-                }
-            }            
-        }
-        if(count($extMap) > 0){
-            $raf->writeInt($count); // None
-            foreach ($extMap as $item) {
-                $raf->writeUTF($item["ext"]);
-                $raf->writeUTF($item["id"]);
-            }
-        } else {
-            $raf->writeInt(0); // None
-        }
     }
     
 }
