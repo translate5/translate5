@@ -68,6 +68,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         parent::connectTo($languageResource, $sourceLang, $targetLang);
         $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
+
+        //t5 memory is not needing the OpenTM2 specific Xliff TagHandler, the default XLIFF TagHandler is sufficient
+        if(!$this->api->isOpenTM2() && $this->tagHandler instanceof editor_Services_Connector_TagHandler_OpenTM2Xliff) {
+            $this->tagHandler = ZfExtended_Factory::get('editor_Services_Connector_TagHandler_Xliff');
+        }
     }
     
     /**

@@ -450,12 +450,13 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function setResource(editor_Models_LanguageResources_Resource $resource)
     {
         parent::setResource($resource);
-        $this->isT5Memory != strstr($resource->getUrl(), '/otmmemoryservice');
+        $this->isT5Memory = !str_contains($resource->getUrl(), '/otmmemoryservice');
         $this->fixLanguages->setDisabled($this->isT5Memory);
     }
 
     /**
      * returns true if the target system is OpenTM2, false if isT5Memory
+     * @deprecated check all usages and remove them if OpenTM2 is replaced with t5memory
      * @return bool
      */
     public function isOpenTM2(): bool {
