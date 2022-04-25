@@ -42,6 +42,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
         export2Def: '#UT#XLIFF 2.1',
         exportQmField: '#UT#Export QS-Statistik (XML) für Feld: {0}',
         exportExcel: '#UT#Externe Bearbeitung als Excel',
+        exportExcelHistory: '#UT#Export der Bearbeitungen pro Workflowschritt als Excel',
         downloadImportArchive: '#UT#Importarchiv herunterladen',
         faultyQualityAlertTitle: '#UT#Warnung',
         faultyQualityAlertText: '#UT#Es gibt in dieser Aufgabe interne Tag Fehler, die für einen fehlerfreien Export automatisch korrigiert wurden',
@@ -142,6 +143,13 @@ Ext.define('Editor.view.admin.ExportMenu', {
                 hrefTarget: '_blank',
                 href: me.makePath('task/export/id/{0}?format=xliff2'),
                 text: me.messages.export2Def,
+                handler: alertHandler
+            },{
+                itemId: 'exportExcelHistory',
+                hrefTarget: '_blank',
+                href: me.makePath('task/export/id/{0}?format=excelhistory'),
+                hidden: !Editor.app.authenticatedUser.isAllowed('editorExportExcelhistory', me.task),
+                text: me.messages.exportExcelHistory,
                 handler: alertHandler
             }];
 
