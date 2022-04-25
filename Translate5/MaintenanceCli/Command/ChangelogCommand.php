@@ -91,7 +91,7 @@ class ChangelogCommand extends Translate5AbstractCommand
         $firstPos = mb_strpos($content, "\n## [");
         $nextPos = mb_strpos($content, "\n## [", $firstPos + 5);
         $content = substr($content, $firstPos, $nextPos - $firstPos);
-        $chunks = preg_split('/^(#[#]+)\s*(.*)$/m', $content, null, PREG_SPLIT_DELIM_CAPTURE);
+        $chunks = preg_split('/^(#[#]+)\s*(.*)$/m', $content, flags: PREG_SPLIT_DELIM_CAPTURE);
         $chunk = array_shift($chunks);
         $isImportant = false;
         while(!is_null($chunk)) {

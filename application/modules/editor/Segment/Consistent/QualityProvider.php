@@ -84,11 +84,6 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
             return $tags;
         }
 
-        // If processing mode is 'alike' - the only task in an alike process is cloning the qualities
-        if ($processingMode == editor_Segment_Processing::ALIKE) {
-            $tags->cloneAlikeQualitiesByType(static::$type);
-        }
-
         // Force existing qualities to be kept
         foreach ($tags->getQualities()->getExisting() as $quality) {
             if ($quality->type == self::$type) {
@@ -114,7 +109,8 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
         }
 
         // Else
-        if (!($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode))) {
+        if (!(in_array($processingMode, [editor_Segment_Processing::EDIT, editor_Segment_Processing::ALIKE])
+            || editor_Segment_Processing::isOperation($processingMode))) {
             return;
         }
 
@@ -153,6 +149,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
             // Get SegmentQuality model shortcut
             $qualityM = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
+            /* @var editor_Models_Db_SegmentQuality $qualityM */
 
             // Get [segmentNrInTask => id] pairs
             $segmentIdA = Zend_Db_Table_Abstract::getDefaultAdapter()->query('
@@ -166,7 +163,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
                 // If there is smth to be inserted - do insert
                 foreach ($categoriesByAction['ins'] ?? [] as $insCategoryI) {
-                    $qualityR = $qualityM->createRow();
+                    $qualityR = $qualityM->createRow([], Zend_Db_Table_Abstract::DEFAULT_DB);
                     $qualityR->segmentId = $segmentIdA[$segmentNr];
                     $qualityR->taskGuid = $task->getTaskGuid();
                     $qualityR->field = 'target';
@@ -200,15 +197,15 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
         }
 
         // Else
-        if (!($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode))) {
-            return;
+        if (in_array($processingMode, [editor_Segment_Processing::EDIT, editor_Segment_Processing::ALIKE])
+            || editor_Segment_Processing::isOperation($processingMode)) {
+
+            // Get check object, containing detected quality categories
+            $check = new editor_Segment_Consistent_Check($task);
+
+            // Remember active states before segment saved
+            static::$was = $check->getStates();
         }
-
-        // Get check object, containing detected quality categories
-        $check = new editor_Segment_Consistent_Check($task);
-
-        // Remember active states before segment saved
-        static::$was = $check->getStates();
     }
 
     /**

@@ -34,7 +34,6 @@ END LICENSE AND COPYRIGHT
  * To identify the Types of Internal tags a general API editor_Segment_TagCreator is provided
  * 
  * @method editor_Segment_Tag clone(bool $withDataAttribs, bool $withId)
- * @method editor_Segment_Tag createBaseClone()
  */
 class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     
@@ -420,7 +419,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return $this;
     }
 
-    public function jsonSerialize(){
+    public function jsonSerialize() : mixed {
         $data = new stdClass();
         $data->type = static::$type;
         $data->name = $this->getName();

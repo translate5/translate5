@@ -26,7 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-if (window.parent.location.hash.match(/itranslate|termportal/)) {
+//if we are in a frame, then disable the logout button
+if (window.parent.location !== window.location) {
     $('body').addClass('noheader');
     $('#containerHeader').hide();
 }
@@ -324,9 +325,7 @@ $('.click-starts-translation').click(function(event){
 
 function grabUploadedFiles(event){
     uploadedFiles = event.target.files;
-    if (instantTranslationIsActive) {
-        startFileTranslation();
-    }
+    startFileTranslation();
 }
 
 function startFileTranslation() {
@@ -828,7 +827,7 @@ function requestFileTranslate(){
         error: function(jqXHR, textStatus)
         {
             // Handle errors here
-            showSourceError('ERRORS: ' + textStatus);
+            showSourceError(jqXHR);
             $('#sourceFile').val('');
             stopLoadingState();
         }
@@ -877,7 +876,7 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
     var pretranslatedFiles = [],
         html = '',
         importProgressUpdate = false;
-    $.each(allPretranslatedFiles, function(taskId, taskData) {
+    $.each(allPretranslatedFiles, function(index, taskData) {
         var $htmlFile = '';
         var $headerContent = '<h2>'+taskData['taskName']+'</h2>';
         var $headerClassAddition = '';
@@ -887,13 +886,13 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
         switch(taskData['downloadUrl']) {
             case 'isImporting':
                 $headerClassAddition = '';
-                $headerContent = '<h2 class="color-grey_06">'+taskData.taskName+'<span id="importProgressLabel_'+taskId+'" class="floatRight"></span></h2>';
+                $headerContent = '<h2 class="color-grey_06">'+taskData.taskName+'<span id="importProgressLabel_'+taskData.taskId+'" class="floatRight"></span></h2>';
                 importProgressUpdate = true;
                 $innerContent += Editor.data.languageresource.translatedStrings['noDownloadWhileImport'];
                 //add import progress html. For each task separate progress component and progress label.
                 if(taskData['importProgress']){
                     $progressBar += '<div className="progress" style="margin-top: -3px;">';
-                    $progressBar += '    <div id="progressBar_'+taskId+'" class="progressBar progressBarThin" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>';
+                    $progressBar += '    <div id="progressBar_'+taskData.taskId+'" class="progressBar progressBarThin" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>';
                     $progressBar += '</div>';
                 }
                 break;
@@ -960,7 +959,7 @@ function updateImportProgressBar(taskData){
         return;
     }
 
-    $.each(taskData, function(taskId, taskData) {
+    $.each(taskData, function(index, taskData) {
         var taskProgressData = taskData['importProgress'];
         
         if(!taskProgressData || taskProgressData.length < 1){
@@ -968,8 +967,8 @@ function updateImportProgressBar(taskData){
         }
         
         //console.log(taskProgressData);
-        setProgressBar('progressBar_'+taskId, taskProgressData['progress']);
-        var label = $('#importProgressLabel_'+taskId);
+        setProgressBar('progressBar_'+taskData.taskId, taskProgressData['progress']);
+        var label = $('#importProgressLabel_'+taskData.taskId);
         label.text(Math.round(taskProgressData['progress']) + "%" );
     });
 }
@@ -1211,8 +1210,24 @@ function showLanguageResourceSelectorError(errorMode) {
 function showTargetError(errorText) {
     $('#targetError').html(errorText).show();
 }
-function showSourceError(errorText) {
-    $('#sourceError').html(errorText).show();
+
+/***
+ * Show the given error in the sourceError container. If the error is xhr response object,
+ * the error will be parsed from there and printed out for the user.
+ *
+ * @param error
+ */
+function showSourceError(error) {
+    // build custom error out of ajax response
+    if(typeof error === 'object' && !Array.isArray(error) && error !== null){
+        var responseJSON = error.responseJSON,
+            errorCode = !Editor.data.errorCodesUrl ? responseJSON.errorCode :
+                '<a href="'+ Editor.data.errorCodesUrl.replace('{0}',responseJSON.errorCode)+'" target="_blank">'+responseJSON.errorCode+'</a>'
+
+        error = '<h1>'+errorCode+': '+responseJSON.message+'</h1><br/>'
+        error += responseJSON.errorMessage;
+    }
+    $('#sourceError').html(error).show();
 }
 function clearAllErrorMessages() {
     $('.instant-translation-error').html('').hide();

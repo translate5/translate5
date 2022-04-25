@@ -1,25 +1,31 @@
+# /data dir
+/data/editorImportedTasks*
+/data/editorOkapiBconf*
+/data/editorVisualReviewFonts*
+/data/tbx-import*
+/data/dummyTm_*
+
+# Dirs
+/.idea/
 /client-specific
-application/config/installation.ini
-data/editorImportedTasks*
-data/editorVisualReviewFonts*
-data/tbx-import/*
-!data/tbx-import/term-images-public
-data/dummyTm_*
 /nbproject/
-.buildpath
-.project
-.metadata
-.settings/
-.vscode/*
-#needed for automated tests on server:
-public/scheduled-tests-trigger.php
-public/scheduled-tests/*
-/vendor
+/vendor/
+
+# Files
+/.jshintrc
+/application/config/installation.ini
+/cghooks.lock
 /composer.phar
 # needed for ./translate5.sh release:notes
 /jira-cookie.txt
-cghooks.lock
-_mails
-/.idea
-.idea
-.jshintrc
+
+# Special
+# needed for automated tests on server:
+/public/scheduled-tests/
+/public/scheduled-tests-trigger.php
+
+# Eclipse
+/.metadata/
+/.settings/
+/.buildpath
+/.project

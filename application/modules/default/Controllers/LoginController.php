@@ -32,6 +32,11 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+use MittagQI\Translate5\Authentication\OpenId\{
+    Client as OpenIdClient,
+    ClientException as OpenIdClientException
+};
+
 /**
  * Klasse der Nutzermethoden
  */
@@ -56,13 +61,9 @@ class LoginController extends ZfExtended_Controllers_Login {
         /* @var $lock ZfExtended_Models_Db_SessionUserLock */
         $this->view->lockedUsers = $lock->getLocked();
        
-        //set the redirecthash value in the session if it is provided by the login form submit
-        //Info: bacause of the multiple redirects (sso authentication), we save the hash in the session, and reaply it when
-        //we redirect to the editor module
-        $redirecthash = $this->getRequest()->getParam('redirecthash','');
-        if(!empty($redirecthash)){
-            $this->_session->redirecthash = $redirecthash;
-        }
+        //add the redirecthash from loginform to the stored origin
+        $this->getHelper('Access')->addHashToOrigin($this->getRequest()->getParam('redirecthash',''));
+
         parent::indexAction();
         //if the login status is required, try to authenticate with openid connect
         if($this->view->loginStatus==ZfExtended_Models_SessionUserInterface::LOGIN_STATUS_OPENID){
@@ -91,108 +92,27 @@ class LoginController extends ZfExtended_Controllers_Login {
         }
         
         $this->localeSetup();
-        
-        $sessionUser = new Zend_Session_Namespace('user');
-        $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-        $roles=$sessionUser->data->roles;
 
-        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
-        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
-
-        $hash = $this->handleAppsRedirectHash();
-
-        // If user was not logged in during the attempt to load termportal, but now is logged and allowed to do that
-        //TODO: after itranslate route is changed to itranslate to instanttranslate here
-        if (preg_match('~^#(termportal|itranslate)~', $hash) && $isTermPortalAllowed) {
-            // Do redirect
-            $this->applicationRedirect(substr($hash, 1), true);
-        }
-
-        if($acl->isInAllowedRoles($roles, 'initial_page','editor')) {
-            $this->editorRedirect();
-        }
-
-        //the user has termportal and instantranslate roles
-        if($isTermPortalAllowed && $isInstantTranslateAllowed){
-            //find the last used app, if none use the instantranslate as default
-            $meta=ZfExtended_Factory::get('editor_Models_UserMeta');
-            /* @var $meta editor_Models_UserMeta */
-            $meta->loadOrSet($sessionUser->data->id);
-            $rdr='instanttranslate';
-            if($meta->getId()!=null && $meta->getLastUsedApp()!=''){
-                $rdr=$meta->getLastUsedApp();
-            }
-            $this->applicationRedirect($rdr, $isTermPortalAllowed);
-        }
-        
-        //is instanttranslate allowed
-        if($isInstantTranslateAllowed){
-            $this->applicationRedirect('instanttranslate');
-        }
-        
-        //is termportal allowed
-        if($isTermPortalAllowed){
-            $this->applicationRedirect('termportal');
-        }
-        
-        if($sessionUser->data->login == Zfextended_Models_User::SYSTEM_LOGIN) {
+        if(editor_User::instance()->getLogin() == Zfextended_Models_User::SYSTEM_LOGIN) {
             $this->logoutAction();
         }
-        
+
+        // Redirect to the stored redirectTo target - if any
+        $this->getHelper('Access')->redirectToOrigin();
+
+        //if we are not redirected, then we try to load the possible applet:
+        \MittagQI\Translate5\Applet\Dispatcher::getInstance()->dispatch(); //no redirection was given, so dispatch by default
+
+        //if the applet dispatcher is not redirecting us, we trigger NoAccess
         throw new ZfExtended_NoAccessException("No initial_page resource is found.");
-        exit;
     }
 
-    /***
-     * Redirect to one of the existing applications (termportal or instanttranslate)
-     *
-     * @param string $applicationName application name
-     * @param null $isTermPortalAllowed is the user allowed to see termportal by acl
-     * @throws Zend_Exception
-     */
-    protected function applicationRedirect(string $applicationName, $isTermPortalAllowed = null){
-
-        $pluginmanager = Zend_Registry::get('PluginManager');
-        /* @var $pluginmanager ZfExtended_Plugin_Manager */
-        $plugins = array_keys($pluginmanager->getAvailable());
-        $termPortalEnabled = in_array('TermPortal',$plugins);
-
-
-        // is term portal allowed when the user has termportal rights and the termportal plugin is enabled
-        $isTermPortalAllowed = $isTermPortalAllowed && $termPortalEnabled;
-
-        header ('HTTP/1.1 302 Moved Temporarily');
-        $apiUrl=APPLICATION_RUNDIR.'/editor/'.$applicationName;
-        $url = $applicationName == 'termportal' || $isTermPortalAllowed
-            ? APPLICATION_RUNDIR.'/editor/termportal#'.$applicationName
-            : APPLICATION_RUNDIR.'/editor/apps?name='.$applicationName.'&apiUrl='.$apiUrl;
-        header ('Location: '.$url);
-        exit;
-    }
-
-    /***
-     * Redirect to the editor module (append the hash if exist).
-     */
-    protected function editorRedirect(){
-        $redirecthash = isset($this->_session->redirecthash) ? $this->_session->redirecthash : null;
-        $redirectHeader = 'Location: '.APPLICATION_RUNDIR.'/editor';
-        if(!empty($redirecthash)){
-            //remove the redirect hash from the session. The rout handling is done by extjs
-            unset($this->_session->redirecthash);
-            $redirectHeader.=$redirecthash;
-        }
-        header ('HTTP/1.1 302 Moved Temporarily');
-        header ($redirectHeader);
-        exit;
-    }
-    
     /***
      * Check if the current request is valid for the openid. If it is a valid openid request, the user
      * login will be redirected to the openid client server
      */
     protected function handleOpenIdRequest() {
-        $oidc = new ZfExtended_OpenIDConnectClient($this->getRequest());
+        $oidc = new OpenIdClient($this->getRequest());
         //the openid authentication is valid
         
         $isCustomerSet=$oidc->isOpenIdCustomerSet();
@@ -255,7 +175,7 @@ class LoginController extends ZfExtended_Controllers_Login {
 
                 $this->initDataAndRedirect();
             }
-        } catch (ZfExtended_OpenIDConnectClientException $e) {
+        } catch (OpenIdClientException $e) {
             ZfExtended_Models_LoginLog::addFailed(empty($user) ? 'No User given' : $user->getLogin(), "openid");
 
             $this->view->errors = true;
@@ -281,11 +201,11 @@ class LoginController extends ZfExtended_Controllers_Login {
      * Sign out if the openid provider supports sign out and the end_session_endpoint is defined in the wellknow config,
      */
     protected function handleOpenIdLogout(){
-        $oidc = new ZfExtended_OpenIDConnectClient($this->getRequest());
+        $oidc = new OpenIdClient($this->getRequest());
         //the openid authentication is valid
         if($oidc->isOpenIdCustomerSet()){
             $userSession = new Zend_Session_Namespace('openId');
-            $idToken=$userSession->data->idToken ? $userSession->data->idToken : null;
+            $idToken = $userSession->data->idToken ?: null;
             $userSession=null;
             if($idToken){
                 try {
@@ -315,11 +235,11 @@ class LoginController extends ZfExtended_Controllers_Login {
                 loginForm.action+=(window.location.hash);
 
                 if(redirecthashField){
-                    //store the hash in field, it is required for the openid
+                    //transmit the hash to the server for proper redirect after login
                     redirecthashField.value=(window.location.hash);
                 }
 
-                if(redirectField != null && (!rgx.test(redirectField.value) && !!redirectField.value)){
+                if(redirectField?.value && !rgx.test(redirectField.value) ){
                     //redirect directly to the open id sso. This is needed, since this is the only way to perserve the hash when we redirect directly to the openid sso
                     redirectField.value = 'openid';
                     //if there is no sso error, submit the form. This case is only when we redirect without showing translate5 login form
@@ -336,30 +256,5 @@ class LoginController extends ZfExtended_Controllers_Login {
             'ViewRenderer'
         );
         $renderer->view->headScript()->appendScript($openIdScript);
-    }
-
-    /**
-     * Parse and adjust the redirect hash when the current request is for terportal/instant-translate
-     * @return mixed|string|null
-     */
-    protected function handleAppsRedirectHash(){
-
-        if(!isset($this->_session->redirecthash)){
-            return null;
-        }
-
-        $hash = $this->_session->redirecthash;
-        if(preg_match('~^#name=(termportal|instanttranslate)~', $hash, $matches)){
-            // Drop redirecthash prop from session
-            $this->_session->redirecthash = '';
-            $hash = $matches[1];
-            //TODO: after itranslate route is changed to instanttranslate this should be removed
-            if($hash === 'instanttranslate'){
-                $hash = 'itranslate';
-            }
-            return '#'.$hash;
-        }
-
-        return $hash;
     }
 }

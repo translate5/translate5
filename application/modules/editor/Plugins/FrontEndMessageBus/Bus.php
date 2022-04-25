@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
  * @method void stopSession() stopSession(string $sessionId, string $connectionId)
  * @method bool sessionHasConnection() sessionHasConnection(string $sessionId)
  * @method array getConnectionSessions() getConnectionSessions() returns the sessionIds with an active connection
+ * @method array getStalledSessions() getStalledSessions() returns the sessionIds with no active connection anymore
  * @method void ping() ping()
  * @method void resyncDone() resyncDone(string $connectionId)
  * @method void garbageCollection() garbageCollection(array $existingSessionIds)

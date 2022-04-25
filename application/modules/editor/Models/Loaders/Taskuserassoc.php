@@ -76,14 +76,26 @@ class editor_Models_Loaders_Taskuserassoc {
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @return editor_Models_TaskUserAssoc
      */
-    public static function loadByTask(string $userGuid, editor_Models_Task $task){
+    public static function loadByTask(string $userGuid, editor_Models_Task $task): editor_Models_TaskUserAssoc {
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         $tua->loadByStepOrSortedState($userGuid, $task->getTaskGuid(), $task->getWorkflowStepName());
         
         return $tua;
     }
-    
+
+    public static function loadFirstInUse(string $userGuid, editor_Models_Task $task): ?editor_Models_TaskUserAssoc {
+        $job = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $job editor_Models_TaskUserAssoc */
+        $foundJobs = $job->loadUsed($task->getTaskGuid(), $userGuid);
+
+        if(empty($foundJobs)) {
+            return null;
+        }
+        $job->init($foundJobs[0]);
+        return $job;
+    }
+
     /**
      * Return the most appropriate task user assoc result
      * Highest rated result is the user job of the current task workflow step.
@@ -98,8 +110,10 @@ class editor_Models_Loaders_Taskuserassoc {
      * @param string $userGuid
      * @param string $taskGuid
      * @return editor_Models_TaskUserAssoc
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public static function loadByTaskGuid(string $userGuid,string $taskGuid){
+    public static function loadByTaskGuid(string $userGuid,string $taskGuid): editor_Models_TaskUserAssoc
+    {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);

@@ -17,7 +17,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "37220",
+                    "qid": "78486",
                     "qtype": "consistent",
                     "qcount": 2,
                     "qcomplete": true,
@@ -34,7 +34,7 @@
                     "qcomplete": true,
                     "qcategory": "target",
                     "text": "Inconsistent target",
-                    "textTooltip": "Finds segments with same source, but different target (tags ignored)",
+                    "textTooltip": "Finds segments with the same source, but different target (tags ignored)",
                     "leaf": true,
                     "checked": false
                 }
@@ -268,7 +268,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "36866",
+                            "qid": "78080",
                             "qtype": "mqm",
                             "qcount": 171,
                             "qcomplete": true,
@@ -280,7 +280,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "37120",
+                            "qid": "78337",
                             "qtype": "mqm",
                             "qcount": 105,
                             "qcomplete": true,
@@ -292,7 +292,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "37121",
+                            "qid": "78342",
                             "qtype": "mqm",
                             "qcount": 12,
                             "qcomplete": true,
@@ -304,7 +304,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "36929",
+                            "qid": "78195",
                             "qtype": "mqm",
                             "qcount": 3,
                             "qcomplete": true,
@@ -316,7 +316,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "37175",
+                            "qid": "78125",
                             "qtype": "mqm",
                             "qcount": 13,
                             "qcomplete": true,
@@ -342,7 +342,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "36869",
+                            "qid": "78336",
                             "qtype": "mqm",
                             "qcount": 21,
                             "qcomplete": true,
@@ -354,13 +354,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "36874",
+                            "qid": "78140",
                             "qtype": "mqm",
                             "qcount": 6,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "37124",
+                                    "qid": "78345",
                                     "qtype": "mqm",
                                     "qcount": 12,
                                     "qcomplete": true,
@@ -380,13 +380,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "36768",
+                            "qid": "78034",
                             "qtype": "mqm",
                             "qcount": 2,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "37129",
+                                    "qid": "78395",
                                     "qtype": "mqm",
                                     "qcount": 4,
                                     "qcomplete": true,
@@ -406,7 +406,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "36905",
+                            "qid": "78085",
                             "qtype": "mqm",
                             "qcount": 10,
                             "qcomplete": true,
@@ -436,7 +436,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "36867",
+                                    "qid": "78344",
                                     "qtype": "mqm",
                                     "qcount": 32,
                                     "qcomplete": true,
@@ -448,7 +448,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "37123",
+                                    "qid": "78084",
                                     "qtype": "mqm",
                                     "qcount": 28,
                                     "qcomplete": true,
@@ -460,7 +460,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "36864",
+                                    "qid": "78090",
                                     "qtype": "mqm",
                                     "qcount": 51,
                                     "qcomplete": true,
@@ -472,7 +472,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "37138",
+                                    "qid": "78338",
                                     "qtype": "mqm",
                                     "qcount": 17,
                                     "qcomplete": true,
@@ -609,6 +609,130 @@
             "qcategory": null,
             "qtooltip": "",
             "text": "Usage of TM-matches",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "whitespace",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "lnbr_begin",
+                    "text": "Line break at the beginning",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "lnbr_end",
+                    "text": "Line break at the end",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "lnbr_space",
+                    "text": "Space after line break",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "nbsp_begin",
+                    "text": "Non-breaking space at the beginning",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "nbsp_end",
+                    "text": "Non-breaking space at the end",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "space_lnbr",
+                    "text": "Space before line break",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "space_tag_end",
+                    "text": "Segment ends with a space followed by a tag",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "tab_begin",
+                    "text": "Tab at the beginning",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "tab_end",
+                    "text": "Tab at the end",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "tag_space_begin",
+                    "text": "Segment begins with a tag followed by a space",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "White space at the beginning\/end",
             "qtotal": 0,
             "expanded": false,
             "checked": false

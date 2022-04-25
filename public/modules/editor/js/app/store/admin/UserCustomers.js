@@ -37,6 +37,7 @@ Ext.define('Editor.store.admin.UserCustomers', {
     model: 'Editor.model.admin.Customer',
     autoLoad: false,
     storeId:'userCustomers',
+    pageSize: 0,
     /**
      * Load the customers assigned to the user
      */
@@ -46,7 +47,7 @@ Ext.define('Editor.store.admin.UserCustomers', {
         Editor.model.admin.User.load(Editor.data.app.user.id, {
             scope: this,
             failure: function(record, operation) {
-                Editor.app.getController('ServerException').handleCallback(arguments);
+                Editor.app.getController('ServerException').handleCallback(record, operation, false);
             },
             success: function(record, operation) {
 

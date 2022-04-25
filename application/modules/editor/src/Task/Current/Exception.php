@@ -26,29 +26,27 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-$config = Zend_Registry::get('config');
-/* @var $config Zend_Config */
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
 
-echo $this->doctype();
-$version = '?v='.$this->appVersion;
-$this->headLink()->prependStylesheet(APPLICATION_RUNDIR.'/modules/editor/apps/css/apps.css'.$version);
-$jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui';
-$this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css'.$version);
-?>
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <?php echo $this->headTitle() ?>
-        <?php echo $this->headMeta() ?>
-        <?php echo $this->headLink() ?>
-        <?php echo $this->headStyle() ?>
-        <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR . $config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
-<?php echo $this->headScript() ?>
-        <script src="<?php echo $jqueryPath; ?>/external/jquery/jquery.js<?php echo $version; ?>"></script>
-        <script src="<?php echo $jqueryPath; ?>/jquery-ui.min.js<?php echo $version; ?>"></script>
-    </head>
-    <body>
-        <?php
-            echo $this->layout()->content;
-        ?>
-    </body>
-</html>
+namespace MittagQI\Translate5\Task\Current;
+
+class Exception extends \ZfExtended_ErrorCodeException {
+    /**
+     * @var string
+     */
+    protected $domain = 'editor.currenttask';
+
+    static protected $localErrorCodes = [
+        //Development error: Some PHP code tried to load the currently opened task (identified by the taskid given in the URL)
+        // but no task ID was provided in the URL.
+        // So either the URL producing the request is wrongly created (no Editor.data.restpath prefix),
+        // or its just the wrong context where the CurrentTask was accessed.
+        'E1381' => 'Access to CurrentTask was requested but no task ID was given in the URL.',
+        'E1382' => 'Access to CurrentTask was requested but it was NOT initialized yet.',
+    ];
+}

@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  *
  * The task based worker, is able to load a different behaviour, depending on a non mandatory worker parameter workerBehaviour.
  */
-abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstract {
+abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstract implements editor_Models_Task_WorkerProgressInterface {
     /**
      * @var editor_Models_Task
      */
@@ -84,7 +84,26 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
             $this->behaviour->setTask($this->task);
         }
     }
-    
+
+    /**
+     * Update the progress for the current worker model. The progress value needs to be calculated in the worker class.
+     * Additionally, trigger the update progress event for tasks
+     */
+    public function updateProgress(float $progress = 1){
+        parent::updateProgress($progress);
+        $this->triggerUpdateProgressEvent($progress);
+    }
+
+    /**
+     * updateProgress event trigger - can be overriden (disabled) per Worker
+     * @param float $progress
+     */
+    protected function triggerUpdateProgressEvent(float $progress) {
+        /** @var editor_Models_Task_WorkerProgress $progress */
+        $progress = ZfExtended_Factory::get('editor_Models_Task_WorkerProgress');
+        $progress->updateProgress($this->task, $progress, $this->workerModel);
+    }
+
     /**
      * extend the exception handler with task logging
      * {@inheritDoc}
@@ -110,5 +129,14 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
                 'task' => $this->task
             ],
         ]);
+    }
+
+    /**
+     * Worker weight/percent of the total import proccess.
+     * @return integer
+     */
+    public function getWeight(): int
+    {
+        return 1;
     }
 }

@@ -87,7 +87,8 @@ Ext.define('Editor.controller.Localizer', {
         title: '<?php echo $this->translate->_('Fehler');?>',
         text: '<?php echo $this->translate->_('Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!');?>',
         timeout: '<?php echo $this->translate->_('Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.');?>',
-        serverMsg: '<?php echo $this->translate->_('<br />Meldung vom Server: <i>{0} {1}</i>');?>'
+        serverMsg: '<?php echo $this->translate->_('<br />Meldung vom Server: <i>{0} {1}</i>');?>',
+        reload: '<?php echo $this->translate->_('Neu laden');?>',
     };
 
     Editor.MessageBox.prototype.self.SUCCESS = '<?php echo $this->translate->_('ok');?>';
@@ -357,12 +358,18 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_whitespaceButtonGroup= '<?php echo $this->translate->_('Sonderzeichen hinzufügen:');?>';
 
    Ext.define("Editor.locale.de.view.segments.MetaPanel", {
         override: "Editor.view.segments.MetaPanel",
         strings: {
             title: '<?php echo $this->translate->_('Segment-Metadaten');?>',
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.segments.SpecialCharacters", {
+        override: "Editor.view.segments.SpecialCharacters",
+        strings: {
+            title: '<?php echo $this->translate->_('Sonderzeichen hinzufügen');?>',
         }
     });
 
@@ -802,8 +809,8 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.projectWizard.UploadGrid",
         strings: {
             gridEmptyText: '<?php echo $this->translate->_('Ziehen Sie die Dateien entweder hierher, um sie als Arbeitsdateien hinzuzufügen, oder klicken Sie auf eine der obigen Schaltflächen, um andere Dateitypen zu wählen.');?>',
-            workFilesFilesButton: '<?php echo $this->translate->_('Arbeitsdatei(en) hinzufügen');?>',
-            pivotFilesFilesButton: '<?php echo $this->translate->_('Pivot-Datei(en) hinzufügen');?>',
+            workFilesFilesButton: '<?php echo $this->translate->_('Arbeitsdatei(en)');?>',
+            pivotFilesFilesButton: '<?php echo $this->translate->_('Pivot-Datei(en)');?>',
             removeFilesFilesButton: '<?php echo $this->translate->_('Datei löschen');?>',
             targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
             file: '<?php echo $this->translate->_('Datei');?>',
@@ -813,8 +820,9 @@ Ext.define('Editor.controller.Localizer', {
             workFilesTypeText: '<?php echo $this->translate->_('Arbeitsdatei');?>',
             pivotFilesTypeText: '<?php echo $this->translate->_('Pivot-Datei');?>',
             fileMix: '<?php echo $this->translate->_('Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!');?>',
-            referenceFilesFilesButton: '<?php echo $this->translate->_('Referenz-Dateien(en) hinzufügen');?>',
+            referenceFilesFilesButton: '<?php echo $this->translate->_('Referenz-Dateien(en)');?>',
             referenceFilesTypeText: '<?php echo $this->translate->_('Referenz-Datei');?>',
+            workfilesAreRequired: '<?php echo $this->translate->_('Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.');?>'
         }
     });
 
@@ -828,7 +836,8 @@ Ext.define('Editor.controller.Localizer', {
             sourceNotSame:'<?php echo $this->translate->_('Die Ausgangssprache der Datei ({0}) stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.');?>',
             pivotSourceNotSame:'<?php echo $this->translate->_('Die Quellsprache in der Pivot-Datei ({0}) ist nicht dieselbe wie die aktuelle Quellsprache des Projekts ({1}).');?>',
             additionalRelaisNotSameTarget:'<?php echo $this->translate->_('Die Pivot-Datei ({0}) hat eine andere Zielsprache ({1}) als erwartet ({2}).');?>',
-            pivotNameNotSameAsWorkfile:'<?php echo $this->translate->_('Keine Arbeitsdatei mit gleichem Dateinamen gefunden.');?>'
+            pivotNameNotSameAsWorkfile:'<?php echo $this->translate->_('Keine Arbeitsdatei mit gleichem Dateinamen gefunden.');?>',
+            zipAsWorkfileAllowedMessage:'<?php echo $this->translate->_('Zip-Upload ist nur als Arbeitsdatei möglich');?>'
         }
     });
 
@@ -909,6 +918,7 @@ Ext.define('Editor.controller.Localizer', {
             exportReview: '<?php echo $this->translate->_('lektoriert');?>',
             faultyQualityAlertTitle: '<?php echo $this->translate->_('Achtung');?>',
             faultyQualityAlertText: '<?php echo $this->translate->_('Es gibt in dieser Aufgabe interne Tag Fehler, die für einen fehlerfreien Export automatisch korrigiert wurden');?>',
+            notAvailable: '<?php echo $this->translate->_('nicht vorhanden');?>',
         }
     });
 

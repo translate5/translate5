@@ -81,7 +81,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
         //replace short tag div span construct to a simple span
         $content = preg_replace('#<div[^>]+>[\s]*<span([^>]+)class="short"([^>]*)>([^<]*)</span>[\s]*</div>#mi', '<span $1 $2 style="background-color:#39ffa3;">$3</span>', $content);
         //replace term divs by breaking apart to replace the class
-        $parts = preg_split('#(<div[^>]+>)#i', $content, null, PREG_SPLIT_DELIM_CAPTURE);
+        $parts = preg_split('#(<div[^>]+>)#i', $content, flags: PREG_SPLIT_DELIM_CAPTURE);
         foreach($parts as $idx => $part) {
             if(! ($idx % 2)) {
                 continue;

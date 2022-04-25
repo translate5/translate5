@@ -26,15 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
+
 /**
  * Controller for the LanguageResources Associations
  */
 class editor_LanguageresourcetaskassocController extends ZfExtended_RestController {
 
-    protected $entityClass = 'editor_Models_LanguageResources_Taskassoc'; //→ _Taskassoc
+    protected $entityClass = 'MittagQI\Translate5\LanguageResource\TaskAssociation'; //→ _Taskassoc
 
     /**
-     * @var editor_Models_LanguageResources_Taskassoc
+     * @var MittagQI\Translate5\LanguageResource\TaskAssociation;
      */
     protected $entity;
     
@@ -114,8 +116,10 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
      * does some prechecking of the data
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData()
+    {
         parent::decodePutData();
         
         //this flag may not be set via API
@@ -136,18 +140,18 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
         //segments can only be updated when resource is writable:
         $this->data->segmentsUpdateable = $resource->getWritable() && $this->data->segmentsUpdateable;
     }
-    
+
     /***
      * Fire after post/delete special event with language resources service name in it.
      * The event and the service name will be separated with #
      * ex: afterPost#OpenTM2
      *     afterDelete#TermCollection
-     *     
+     *
      * @param string $action
-     * @param editor_Models_LanguageResources_Taskassoc
+     * @param TaskAssociation $entity
      * @return editor_Models_LanguageResources_LanguageResource
      */
-    protected function fireAfterAssocChangeEvent($action,editor_Models_LanguageResources_Taskassoc $entity): editor_Models_LanguageResources_LanguageResource{
+    protected function fireAfterAssocChangeEvent($action,TaskAssociation $entity): editor_Models_LanguageResources_LanguageResource{
         $lr = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $lr editor_Models_LanguageResources_LanguageResource */
         $lr->load($entity->getLanguageResourceId());

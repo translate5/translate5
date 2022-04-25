@@ -92,8 +92,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     public function loadByBestMatchRate(string $taskGuid, bool $groupData = true): array
     {
         //load the latest analysis for the given taskGuid
+        /** @var editor_Plugins_MatchAnalysis_Models_TaskAssoc $analysisAssoc */
         $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
-        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($taskGuid);
         if (empty($analysisAssoc)) {
             return [];
@@ -119,7 +119,14 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         
         $resultArray = $this->db->getAdapter()->query($sqlV3, $bind)->fetchAll();
         if (empty($resultArray)) {
-            return [];
+            // we have to set an emoty result here, in order that the result is correctly grouped and displayed in the UI
+            $resultArray = [[
+                'internalFuzzy' => '0',
+                'languageResourceid' => '0',
+                'matchRate' => '0',
+                'wordCount' => '0',
+                'segCount' => '0',
+            ]];
         }
         if($groupData) {
             return $this->groupByMatchrate($resultArray, $analysisAssoc);
@@ -222,8 +229,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     //protected function initResultArray($taskGuid,$internalFuzzy){
     protected function initResultArray(array $analysisData): array
     {
-        $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
+        $taskAssoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $taskAssoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $langResTaskAssocs = $taskAssoc->loadByTaskGuids([$analysisData['taskGuid']]);
 
         $isInternalFuzzy = $analysisData['internalFuzzy'] == '1';

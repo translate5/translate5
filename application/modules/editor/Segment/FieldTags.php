@@ -534,7 +534,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
     
-    public function jsonSerialize(){
+    public function jsonSerialize() : mixed {
         $data = new stdClass();
         $this->sort();
         $data->tags = [];

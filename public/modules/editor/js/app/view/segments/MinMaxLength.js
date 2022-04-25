@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * This component implementsall features regarding minLength & maxLength & maxNumberLines for segments
+ * This component implements all features regarding minLength & maxLength & maxNumberLines for segments
  * IMPORTANT: When opening a segment for editing with a line-number restriction, linebreaks are automatically inserted at positions prone for a linebreak
  */
 Ext.define('Editor.view.segments.MinMaxLength', {
@@ -61,7 +61,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         segmentToLong: 'segmentToLong',
         segmentTooManyLines: 'segmentTooManyLines',
         segmentLinesTooLong: 'segmentLinesTooLong',
-        segmentLinesTooShort: 'segmentLinesTooShort',
+        segmentLinesTooShort: 'segmentLinesTooShort'
     },
     statics: {
         /**
@@ -160,6 +160,11 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * @var {Editor.util.HtmlCleanup}
      */
     cleanUpHelper: null,
+
+    /**
+     * flag to prevent recursive calls
+     */
+    preventRecursion: null,
 
     /**
      * 
@@ -380,7 +385,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             options,
             sel;
         
-        if (lineWidth <= maxWidthPerLine) {
+        if (me.preventRecursion || lineWidth <= maxWidthPerLine) {
             return;
         }
 
@@ -390,6 +395,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             return;
         }
 
+        me.preventRecursion = true;
         div = document.createElement('div');
         div.innerHTML = htmlInLine;
         textInLine = div.textContent || div.innerText || "";
@@ -405,8 +411,12 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 }
                 if(me.editor.getLength(textForLine, me.segmentMeta, me.segmentFileId) > maxWidthPerLine) {
                     // eg if the single word in the line is too long
+                    me.preventRecursion = false;
                     return;
                 }
+                // the caret is saved back when the "insertNewline" event triggered the "afterInsertWhitespace" event
+                //TODO FIXME: we better should create the whitespace tag with an HtmlEditor API and insert it here (this would also solve the recursion problem)
+                // ??? will that whole code work when containing <del> tags of track changes or duplicated strings, since it is just a text search ???
                 me.bookmarkForCaret = me.getPositionOfCaret();
                 range = rangy.createRange();
                 range.selectNodeContents(editorBody);
@@ -422,24 +432,41 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                     // => try again without the whitespace at the beginning:
                     range.findText(textForLine.trim(), options);
                     if (textForLine.trim() !== range.toString()) {
+                        me.preventRecursion = false;
                         return;
                     }
                 }
-                range.collapse(false);
+
+                if(Editor.app.getTaskConfig('lengthRestriction.newLineReplaceWhitespace')) {
+                    //find the text without trailing whitespace, select its end and use that as sel start
+                    var range2 = rangy.createRange();
+                    range2.selectNodeContents(editorBody);
+                    range2.findText(textForLine.trim(), options);
+                    range.setStart(range2.endContainer, range2.endOffset);
+                }
+                else {
+                    // just add the newline at the end of the found line
+                    range.collapse(false);
+                }
+
                 sel = rangy.getSelection(editorBody);
                 sel.setSingleRange(range);
+
+                //this event triggers down deep a editor change event which then triggers this whole code again,
+                // therefore the preventRecursion flag was added as workaround!
                 me.fireEvent('insertNewline');
+                me.preventRecursion = false;
                 return;
             }
         }
+        me.preventRecursion = false;
     },
 
     /**
      * After a new line is added, we need to restore where the user was currently typing.
      */
     handleAfterInsertWhitespace: function() {
-        var me = this;
-        me.setPositionOfCaret(me.bookmarkForCaret);
+        this.setPositionOfCaret(this.bookmarkForCaret);
     },
     /**
      * Update the minmax status strip label

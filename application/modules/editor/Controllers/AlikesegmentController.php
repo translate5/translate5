@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
+
 /**
  * Editor_AlikeSegmentController
  * Stellt PUT und GET Methoden zur Verarbeitung der Alike Segmente bereit.
@@ -35,7 +38,8 @@ END LICENSE AND COPYRIGHT
  *  - Der PUT liefert eine Liste "rows" mit bearbeiteten, kompletten Segment Daten zu den gegebenen IDs zurück.
  *  - Eine Verortung unter der URL /segment/ID/alikes anstatt alikesegment/ID/ wäre imho sauberer, aber mit Zend REST nicht machbar
  */
-class Editor_AlikesegmentController extends editor_Controllers_EditorrestController {
+class Editor_AlikesegmentController extends ZfExtended_RestController {
+    use TaskContextTrait;
 
     protected $entityClass = 'editor_Models_Segment';
 
@@ -48,9 +52,16 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      * @var editor_Models_Segment
      */
     protected $entity;
-    
+
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws NoAccessException
+     * @throws ZfExtended_NoAccessException
+     */
     public function preDispatch() {
         parent::preDispatch();
+        $this->initCurrentTask();
         $this->entity->setEnableWatchlistJoin();
     }
     /**
@@ -61,33 +72,30 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     {
         $this->entity->load((int)$this->_getParam('id'));
 
-        $session = new Zend_Session_Namespace();
-        $this->view->rows = $this->entity->getAlikes($session->taskGuid);
+        $this->view->rows = $this->entity->getAlikes($this->getCurrentTask()->getTaskGuid());
         $this->view->total = count($this->view->rows);
     }
 
     /**
      * Speichert die Daten des Zielsegments (ID in der URL) in die AlikeSegmente. Die IDs der zu bearbeitenden Alike Segmente werden als Array per PUT übergeben.
      * Die Daten der erfolgreich bearbeiteten Segmente werden vollständig gesammelt und als Array an die View übergeben.
+     * @throws NoAccessException
      * @see ZfExtended_RestController::putAction()
      */
     public function putAction() {
-        $session = new Zend_Session_Namespace();
+        $task = $this->getCurrentTask();
         $editedSegmentId = (int)$this->_getParam('id');
 
         $wfh = $this->_helper->workflow;
         /* @var $wfh Editor_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable();
+        $wfh->checkWorkflowWriteable($task->getTaskGuid(), editor_User::instance()->getGuid());
 
-        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($session->taskGuid);
+        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         //Only default Layout and therefore no relais can be processed:
         if(!$sfm->isDefaultLayout()) {
             return;
         }
         
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($session->taskGuid);
         $hasher = $this->getHasher($task);
         
         $sourceMeta = $sfm->getByName(editor_Models_SegmentField::TYPE_SOURCE);
@@ -101,6 +109,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         }
 
         $this->entity->load($editedSegmentId);
+        $this->validateTaskAccess($this->entity->getTaskGuid());
         
         $ids = (array) Zend_Json::decode($this->_getParam('alikes', "[]"));
         /* @var $entity editor_Models_Segment */
@@ -118,6 +127,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
 
         $alikeQualities = new editor_Segment_Alike_Qualities($this->entity->getId());
 
+        // Do preparations for cases when we need full list of task's segments to be analysed for quality detection
+        // Currently it is used only for consistency-check to detect consistency qualities BEFORE segment is saved,
+        // so that it would be possible to do the same AFTER segment is saved, calculate the difference and insert/delete
+        // qualities on segments where needed
+        editor_Segment_Quality_Manager::instance()->preProcessTask($task, editor_Segment_Processing::ALIKE);
 
         $alikeCount = count($ids);
         foreach($ids as $id) {
@@ -129,7 +143,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity->load($id);
                 $oldHash = $entity->getTargetMd5();
                 
-                //if neither source nor target hashes are matching,
+                // if neither source nor target hashes are matching,
                 // then the segment is no alike of the edited segment => we ignore and log it
                 if(! $this->isValidSegment($entity, $editedSegmentId, $hasher)) {
                     error_log('Falsche Segmente per WDHE bearbeitet: MasterSegment:'.$editedSegmentId.' per PUT übergebene Ids:'.print_r($ids, 1).' IP:'.$_SERVER['REMOTE_ADDR']);
@@ -140,19 +154,19 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity->setTimeTrackData($duration, $alikeCount);
                 
                 //Entity auf Editierbarkeit überprüfen
-                if($entity->getTaskGuid() != $session->taskGuid || ! $entity->isEditable() || $editedSegmentId === $id) {
+                if($entity->getTaskGuid() != $task->getTaskGuid() || ! $entity->isEditable() || $editedSegmentId === $id) {
                     continue;
                 }
 
                 $repetitionUpdater->setRepetition($entity);
 
-                //updateSegmentContent does replace the masters tags with the original repetition ones
-                //if there was an error in taking over the segment content into the repetition (returning false) the segment must be ignored
+                // updateSegmentContent does replace the masters tags with the original repetition ones
+                // if there was an error in taking over the segment content into the repetition (returning false) the segment must be ignored
 
                 $sourceSuccess = true;
                 $isSourceRepetition = $this->entity->getSourceMd5() === $entity->getSourceMd5();
-                //if isSourceEditable, then update also the source field
-                //if $isSourceRepetition, then update also the source field to overtake changed terms in the source
+                //  if isSourceEditable, then update also the source field
+                // if $isSourceRepetition, then update also the source field to overtake changed terms in the source
                 if($this->isSourceEditable || $isSourceRepetition) {
                     $sourceSuccess = $repetitionUpdater->updateSource($this->isSourceEditable);
                 }
@@ -164,16 +178,6 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 if(!$sourceSuccess || !$repetitionUpdater->updateTarget($task->isTranslation())) {
                     //the segment has to be ignored!
                     continue;
-                }
-
-                // process all quality related stuff
-                if($this->isSourceEditable || $isSourceRepetition) {
-                    //the source was updated by the repetition updater, process them as alike qualities
-                    editor_Segment_Quality_Manager::instance()->processAlikeSegment($entity, $task, $alikeQualities);
-                }
-                else {
-                    //since the source was not processed, we have to trigger here the quality processing as it was a sole segment (this also triggers retagging via termtagger)
-                    editor_Segment_Quality_Manager::instance()->processSegment($entity, $task, editor_Segment_Processing::EDIT);
                 }
 
                 if(!is_null($this->entity->getStateId())) {
@@ -204,15 +208,25 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     $matchRateType->add($matchRateType::TYPE_AUTO_PROPAGATED);
                     $entity->setMatchRateType((string) $matchRateType);
                 }
-                
+
                 //is called before save the alike to the DB, after doing all alike data handling (include recalc of the autostate)
                 $this->events->trigger('beforeSaveAlike', $this, array(
-                        'masterSegment' => $this->entity,
-                        'alikeSegment' => $entity,
-                        'isSourceEditable' => $this->isSourceEditable,
+                    'masterSegment' => $this->entity,
+                    'alikeSegment' => $entity,
+                    'isSourceEditable' => $this->isSourceEditable,
                 ));
-                
-                $entity->validate();
+
+                // validate the segment after the repitition updater did it's work and states are set
+                 $entity->validate();
+
+                // Quality processing / AutoQA: must be done after validation to not overwrite invalid contents
+                if($this->isSourceEditable || $isSourceRepetition) {
+                    //the source was updated by the repetition updater, process them as alike qualities
+                    editor_Segment_Quality_Manager::instance()->processAlikeSegment($entity, $task, $alikeQualities);
+                } else {
+                    //since the source was not processed, we have to trigger here the quality processing as it was a sole segment (this also triggers retagging via termtagger)
+                    editor_Segment_Quality_Manager::instance()->processSegment($entity, $task, editor_Segment_Processing::EDIT);
+                }
 
                 //must be called after validation, since validation does not allow original and originalMd5 updates
                 $this->updateTargetHashAndOriginal($entity, $hasher);
@@ -221,7 +235,6 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity->setTimestamp(NOW_ISO); //see TRANSLATE-922
                 $entity->save();
                 $entity->updateIsTargetRepeated($entity->getTargetMd5(), $oldHash);
-
             }
             catch (Exception $e) {
                 /**
@@ -263,6 +276,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $this->view->segmentFinishCount=$task->getSegmentFinishCount();
         
         $this->view->total = count($result);
+
+        // Update qualities for cases when we need full list of task's segments to be analysed for quality detection
+        editor_Segment_Quality_Manager::instance()->postProcessTask($task, editor_Segment_Processing::ALIKE);
     }
     
     /**
@@ -286,7 +302,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     protected function updateTargetHashAndOriginal(editor_Models_Segment $segment, editor_Models_Segment_RepetitionHash $hasher = null) {
         if($hasher) {
             //FIXME: it is currently in discussion with the community if the setTargetMd5 is done always on segment save!
-            $segment->setTargetMd5($hasher->hashTarget($segment->getTargetEdit(), $segment->getSource()));
+            $segment->setTargetMd5($hasher->rehashTarget($segment));
         }
     }
     

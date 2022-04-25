@@ -273,7 +273,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         }
         return $result;
     }
-    
+
     /**
      * Returns the level integer value to a named level value
      * @param string $level
@@ -288,7 +288,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     }
     
     /**
-     * Merges the ini config values into the DB result
+     * Merges the ini config values into the DB result (tree based!)
      * @param array $root
      * @param array $path
      * @param array $row given as reference, the ini values are set in here
@@ -310,7 +310,22 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             $row['value'] = json_encode($row['value'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
     }
-    
+
+    /**
+     * merges the ini values into the given array (rows of config entries)
+     * @param array $rows
+     * @return array
+     * @throws Zend_Exception
+     */
+    public function mergeIniValues(array $rows): array
+    {
+        $iniOptions = Zend_Registry::get('bootstrap')->getApplication()->getOptions();
+        foreach($rows as &$row) {
+            $this->mergeWithIni($iniOptions, explode('.', $row['name']), $row);
+        }
+        return $rows;
+    }
+
     /**
      * @param string $filter
      * @return array values are all constant values which names match filter
@@ -332,12 +347,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      * @see ZfExtended_Models_Config::loadListByNamePart()
      */
     public function loadListByNamePart(string $name) {
-        $result = parent::loadListByNamePart($name);
-        $iniOptions = Zend_Registry::get('bootstrap')->getApplication()->getOptions();
-        foreach($result as &$row) {
-            $this->mergeWithIni($iniOptions, explode('.', $row['name']), $row);
-        }
-        return $result;
+        return $this->mergeIniValues(parent::loadListByNamePart($name));
     }
     
     public function getConfigLevelLabel(int $level){
@@ -368,5 +378,18 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             //prefix is requred so we do not overwrite the original translation
             return $translate->_('config_overwrite_'.$value);
         }, $this->configLabel);
+    }
+
+    /**
+     * Get value for given name from main configuration table
+     *
+     * @param string $name
+     * @return string|null
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getCurrentValue(string $name): ?string {
+        return $this->db->getAdapter()
+            ->query('SELECT `value` FROM `Zf_configuration` WHERE `name` = ?', $name)
+            ->fetchColumn();
     }
 }

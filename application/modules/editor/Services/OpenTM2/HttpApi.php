@@ -164,12 +164,54 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             if($mime == "application/xml"){
                 $targetLang = $this->languageResource->targetLangCode;
                 $sourceLang = $this->languageResource->sourceLangCode;
-                $this->result = $this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result);
+                $this->result = $this->fixInvalidOpenTM2XML($this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result));
             }
             return true;
         }
         
         return $this->processResponse($response);
+    }
+
+    protected function fixInvalidOpenTM2XML(string $tmxData): string
+    {
+        if($this->isT5Memory) {
+            return $tmxData;
+        }
+        $changeCount = 0;
+        $newLineCount = 0;
+
+        $xml = new \editor_Models_Import_FileParser_XmlParser();
+        $xml->registerOther(function($other, $key) use ($xml, &$changeCount) {
+            $replaced = htmlentities($other, flags: ENT_XML1, double_encode: false);
+            if($other !== $replaced) {
+                $changeCount++;
+                $tu = $xml->getParent('tu');
+                if(!is_null($tu)) {
+                    // the TU must exist, otherwise we are outside of a TU (like <?xml header)
+                    error_log('TMX Export - TU: '.$xml->getChunk($tu['openerKey'])."\n  OLD: ".$other."\n  NEW: ".$replaced);
+                    $xml->replaceChunk($key, $replaced);
+                }
+            }
+        });
+
+        $xml->registerElement('ph', function($tag, $attr, $key, $isSingle) use ($xml, &$newLineCount){
+            if($isSingle && $xml->getAttribute($attr, 'type') === 'lb') {
+                $newLineCount++;
+                $xml->replaceChunk($key, "\n");
+            }
+        });
+
+        $tmxTags = ['body', 'header', 'map', 'note', 'prop', 'seg', 'tmx', 'tu', 'tuv', 'ude', 'bpt', 'ept', 'hi', 'it', 'ph', 'sub', 'ut'];
+        $replaced = $xml->parse($tmxData, validTags: $tmxTags);
+        if($changeCount > 0 || $newLineCount > 0) {
+            $logger = Zend_Registry::get('logger');
+            $logger->warn('E9999', 'TMX Export: Entities in {changeCount} text parts repaired (see raw php error log), {newLineCount} new line tags restored.', [
+                'languageResource' => $this->languageResource,
+                'changeCount' => $changeCount,
+                'newLineCount' => $newLineCount,
+            ]);
+        }
+        return $replaced;
     }
     
     /**
@@ -268,56 +310,86 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      * This method updates (or adds) a memory proposal in the memory.
      * Note: This method updates an existing proposal when a proposal with the same key information (source text, language, segment number, and document name) exists.
      *
+     * @param string $source
+     * @param string $target
      * @param editor_Models_Segment $segment
+     * @param $filename
      * @return boolean
+     * @throws Zend_Http_Client_Exception
      */
-    public function update(string $source, string $target, editor_Models_Segment $segment, $filename) {
-        /*
-         * In:{ "Method":"update", "Memory": "TestMemory", "Proposal": {
-         *  "Source": "This is the source text",
-         *  "Target": "This is the translated text",
-         *  "Segment":231,
-         *  "DocumentName":"Anothertest.txt",
-         *  "SourceLanguage":"en-US",
-         *  "TargetLanguage":"de-de",
-         *  "Type":"Manual",
-         *  "Author":"A.Nonymous",
-         *  "DateTime":"20161013T152948Z",
-         *  "Markup":"EQFHTML3",
-         *  "Context":"",
-         *  "AddInfo":"" }  }
-         */
-        //Out: { "ReturnValue":0, "ErrorMsg":"" }
-        $json = $this->json(__FUNCTION__);
+    public function update(string $source, string $target, editor_Models_Segment $segment, $filename): bool
+    {
         $http = $this->getHttpWithMemory('POST', 'entry');
-        
+        $json = $this->getUpdateJson(__FUNCTION__,$source,$target);
+        if(!is_null($this->error)){
+            return false;
+        }
+
+        $json->documentName = $filename; // 101 doc match
+        $json->author = $segment->getUserName();
+        $json->timeStamp = $this->nowDate();
+        $json->context = $segment->getMid(); //INFO: this is segment stuff
+
+        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+        return $this->processResponse($http->request());
+    }
+
+    /***
+     * Update text values ($source/$target) to the current tm memory
+     * @param string $source
+     * @param string $target
+     * @return bool
+     * @throws Zend_Http_Client_Exception
+     */
+    public function updateText(string $source, string $target): bool
+    {
+
+        $http = $this->getHttpWithMemory('POST', 'entry');
+        $json = $this->getUpdateJson(__FUNCTION__,$source,$target);
+        if(!is_null($this->error)){
+            return false;
+        }
+
+        $json->documentName = 'source';
+        $userData = editor_User::instance()->getData();
+        $json->author = $userData->firstName . ' '. $userData->surName;
+        $json->context = '';
+        $json->addInfo = $json->documentName;
+
+        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+
+        return $this->processResponse($http->request());
+    }
+
+    /***
+     * Get the default update memory json
+     * @param string $function
+     * @param string $source
+     * @param string $target
+     * @return stdClass
+     */
+    private function getUpdateJson(string $function,string $source, string $target): stdClass
+    {
+
         if($this->isToLong($source) || $this->isToLong($target)) {
             $this->error = new stdClass();
             $this->error->method = $this->httpMethod;
             $this->error->url = $this->http->getUri(true);
             $this->error->type = 'TO_LONG';
             $this->error->error = 'The given segment data is to long and would crash OpenTM2 on saving it.';
-            return false;
+            return new stdClass();
         }
-        
+
+        $json = $this->json($function);
         $json->source = $source;
         $json->target = $target;
-
-        //$json->segmentNumber = $segment->getSegmentNrInTask(); FIXME TRANSLATE-793 must be implemented first, since this is not segment in task, but segment in file
-        $json->documentName = $filename; // 101 doc match
-        $json->author = $segment->getUserName();
-        $json->timeStamp = $this->nowDate();
-        $json->context = $segment->getMid();
-        
         $json->type = "Manual";
         $json->markupTable = "OTMXUXLF"; //fixed markup table for our XLIFF subset
-        
         $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
         $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
-        
-        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+        $json->timeStamp = $this->nowDate();
 
-        return $this->processResponse($http->request());
+        return $json;
     }
     
     /**

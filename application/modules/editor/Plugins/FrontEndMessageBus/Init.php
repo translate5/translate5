@@ -75,8 +75,8 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'autoqaOperation', array($this, 'handleTaskOperation'));
-        $this->eventManager->attach('ZfExtended_Models_Worker', 'updateProgress',array($this, 'handleUpdateProgress'));
-        $this->eventManager->attach('ZfExtended_Models_Db_Session', 'getValidSessionsSql',array($this, 'handleGetValidSessionsSql'));
+        $this->eventManager->attach('editor_Models_Task_WorkerProgress', 'updateProgress',array($this, 'handleUpdateProgress'));
+        $this->eventManager->attach('ZfExtended_Models_Db_Session', 'getStalledSessions',array($this, 'handleGetStalledSessions'));
 
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
@@ -223,20 +223,16 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         }
         
         //resync task open state
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $session = new Zend_Session_Namespace();
-        if(!empty($session->taskGuid)) {
-            try {
-                $task->loadByTaskGuid($session->taskGuid);
-                $event->setParam('task', $task);
-                $this->handleAfterTaskOpen($event);
-            }
-            catch (ZfExtended_NotFoundException $e) {
-                //if the task is gone, we can not open it and do nothing
-            }
+        try {
+            /** @var editor_SessionController $controller */
+            $controller = $event->getParam('controller');
+            $task = $controller->getCurrentTask();
+            $event->setParam('task', $task);
+            $this->handleAfterTaskOpen($event);
+        } catch (\MittagQI\Translate5\Task\Current\Exception) {
+            //if the task is gone, we can not open it and do nothing
         }
-        
+
         //marks the connection as in sync and trigger processing of queued messages
         $this->bus->resyncDone($this->getHeaderConnId());
     }
@@ -349,10 +345,10 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         }
         $context = $event->getParam('context');
         
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker ZfExtended_Models_Worker */
-        $progress = $worker->calculateProgress($taskGuid,$context);
-        
+        $taskProcess = ZfExtended_Factory::get('editor_Models_Task_WorkerProgress');
+        /** @var editor_Models_Task_WorkerProgress $taskProcess */
+        $progress = $taskProcess->calculateProgress($taskGuid, $context);
+
         $this->bus->notify(self::CHANNEL_TASK, 'updateProgress', [
             'taskGuid' => $taskGuid,
             'progress' => $progress['progress']
@@ -360,10 +356,11 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     }
 
     /**
+     * returns the sessionIDs which were connected to the messagebus but now have no active connection anymore
      * @return array
      */
-    public function handleGetValidSessionsSql(): array {
-        $res = $this->bus->getConnectionSessions();
+    public function handleGetStalledSessions(): array {
+        $res = $this->bus->getStalledSessions();
         return (array) ($res->instanceResult ?? []);
     }
 
@@ -477,10 +474,12 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     public function handleDelete(Zend_EventManager_Event $event) {
         /* @var $ent editor_Plugins_VisualReview_Annotation_Entity|editor_Models_Comment */
         $ent = $event->getParam('entity');
-        /* @var $session Zend_Session_Namespace */
-        $session = new Zend_Session_Namespace();
+
+        $controller = $event->getParam('controller');
+        $task = $controller->getCurrentTask();
+
         $a_ent = [
-            'taskGuid' => $session->taskGuid, //data has already been deleted, get it from session
+            'taskGuid' => $task->getTaskGuid(),
             'type' => $ent::FRONTEND_ID,
             'id' => $event->getParams()['params']['id'],
         ];

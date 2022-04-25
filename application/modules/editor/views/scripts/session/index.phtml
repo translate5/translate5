@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded usage authentication test page</title>
+    <script src="<?php echo APPLICATION_RUNDIR;?>/js/jquery-ui/external/jquery/jquery.js"></script>
+    <script src="<?php echo APPLICATION_RUNDIR;?>/js/jquery-ui/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR;?>/js/jquery-ui/jquery-ui.min.css">
+</head>
+<body>
+    <h1>Translate5 embedded usage authentication test page</h1>
+        <h2>Current User:
+            <i><?php
+            $userSession = new Zend_Session_Namespace('user');
+            print_r($userSession->data->login ?? null);
+            ?></i>
+        </h2>
+
+    <form id="logout" method="POST" action="<?php echo APPLICATION_RUNDIR; ?>/login/logout/">
+        <input type="submit" value="Logout"/>
+    </form>
+    <script>
+        $("#logout").submit(function(e) {
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+            var form = $(this), actionUrl = form.attr('action');
+            $.ajax({
+                type: "POST",
+                url: actionUrl,
+                error: function(data) {
+                    window.location.reload();
+                },
+                success: function(data)
+                {
+                    window.location.reload();
+                }
+            });
+        });
+    </script>
+
+
+        <h2>Testing plain login via session controller</h2>
+        <form id="plainlogin" method="POST" action="<?php echo APPLICATION_RUNDIR; ?>/editor/session/">
+            <input type="text" name="login" value="login"/><br />
+            <input type="text" name="passwd" value="passwd"/><br />
+            <input type="text" name="taskGuid" value="taskGuid (optional, task to be opened)"/><br />
+            <input type="submit" value="POST"/>
+        </form>
+        <script>
+            $("#plainlogin").submit(function(e) {
+                e.preventDefault(); // avoid to execute the actual submit of the form.
+                var form = $(this), actionUrl = form.attr('action');
+                $.ajax({
+                    type: "POST",
+                    url: actionUrl,
+                    dataType: 'json',
+                    data: form.serialize(), // serializes the form's elements.
+                    error: function(data) {
+                        $('<div />').html(data.responseText).dialog({title: 'FAILED', width: 600});
+                    },
+                    success: function(data)
+                    {
+                        let getLink = '<a href="'+actionUrl+data.sessionId+'" target="_blank">get session in new tab</a>',
+                            url = actionUrl.replace(/\/session\/$/, '/'),
+                            taskUrl = data.taskUrlPath ? data.taskUrlPath : url;
+                        getLink = getLink + '<br/><a href="'+taskUrl+'?sessionToken='+data.sessionToken+'" target="_blank">Open via session Token: '+taskUrl+'?sessionToken='+data.sessionToken+'</a>'
+                        let dialog1 = $('<div />').html(getLink).dialog({title: 'SUCCESS', width: 800});
+
+                        $.ajax({
+                            type: "GET",
+                            url: url+'task?limit=5',
+                            dataType: 'json',
+                            success: function(data) {
+                                if(data && data.rows && data.rows.length) {
+                                    let tpl = '<a href="#task#" target="_blank">#task#</a>',
+                                        content = '';
+                                    for (let j = 0; j < data.rows.length; j++) {
+                                        let id = data.rows[j].id;
+                                        content = content + 'old: ' + tpl.replace(/#task#/g, '/editor#task/'+id+'/3/edit') + ' new:';
+                                        content = content + tpl.replace(/#task#/g, url+'taskid/'+id+'/#task/'+id+'/3/edit') + '<br>';
+                                    }
+                                    $('<div />').html(content).dialog({title: 'TASKS', width: 600,position: { my: "left top", at: "left bottom", of: dialog1 }});
+                                }
+                                else {
+                                    $('<div />').html('NO TASKS').dialog({title: 'TASKS', width: 600,position: { my: "left top", at: "left bottom", of: dialog1 }});
+                                }
+                            }
+                        })
+                    }
+                });
+
+            });
+        </script>
+        <h2>Job based Single Click Authentication</h2>
+        <p>Test with enabled debug plugin in user association panel!</p>
+        <h2>Testing session impersonate </h2>
+        <ul>
+            <li>you must be an API user to use that.</li>
+            <li>The successful POST does not return any result.</li>
+            <li>Just reload the application where you was logged in as API admin, after the reload you are the impersonated user.</li>
+        </ul>
+        <form method="POST" action="<?php echo APPLICATION_RUNDIR; ?>/editor/session/impersonate">
+            <input type="text" name="login" value="login"/>
+            <input type="submit" value="POST"/>
+        </form>
+    </body>
+</html>

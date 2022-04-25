@@ -93,8 +93,14 @@ Ext.define('Editor.view.admin.config.GridViewController', {
      */
     handleHasReadOnly:function(){
         var me=this,
-            store = me.getView().getStore(),
+            view = me.getView(),
+            store = view && view.getStore(),
             hasReadOnly = false;
+
+        if(!view || !store){
+            return;
+        }
+
         store.each(function(rec){
             if(!hasReadOnly && rec.get('isReadOnly')){
                 hasReadOnly = true;

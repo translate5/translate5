@@ -203,6 +203,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'apiError' => $error,
         ]);
     }
+
+    public function updateTranslation(string $source, string $target){
+        $this->api->updateText($source,$target);
+    }
     
     /**
      * (non-PHPdoc)
@@ -333,7 +337,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $dummySegment=ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $dummySegment editor_Models_Segment */
         $dummySegment->init();
-        
+
+
         if($this->api->lookup($dummySegment, $searchString, 'source')){
             $result = $this->api->getResult();
             if((int)$result->NumOfFoundProposals === 0){
@@ -616,10 +621,23 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         //sort by highes matchrate from the >=100 match results, when same matchrate sort by timestamp
         usort($filterArray,function($item1,$item2) use($resultlist){
-            if ($item1->matchrate == $item2->matchrate){
-                return date($resultlist->getMetaValue($item1->metaData, 'timestamp'))<date($resultlist->getMetaValue($item2->metaData, 'timestamp')) ? 1 : -1;
+            //FIXME UGLY UGLY
+            // the whole existing code of reducing double 100% matches (getResultListGrouped) must be moved to the processing of the search results for the UI usage of matches
+            // this is nothing which should be handled so deep inside of the connector
+            // the connector should not make any decision about sorting or so, this is business logic on a higher level, a connector should be only about connecting...
+            // if this is moved, there is no need to contain the isFuzzy check anymore since there is then no fuzzy usage anymore.
+            $item1IsFuzzy = preg_match('#^translate5-unique-id\[[^\]]+\]$#', $item1->target);
+            $item2IsFuzzy = preg_match('#^translate5-unique-id\[[^\]]+\]$#', $item2->target);
+            if($item1IsFuzzy && !$item2IsFuzzy) {
+                return 1;
             }
-            return ($item1->matchrate < $item2->matchrate) ? 1 : -1;
+            if(!$item1IsFuzzy && $item2IsFuzzy) {
+                return -1;
+            }
+            if ($item1->matchrate == $item2->matchrate){
+                return date($resultlist->getMetaValue($item2->metaData, 'timestamp')) - date($resultlist->getMetaValue($item1->metaData, 'timestamp'));
+            }
+            return $item2->matchrate - $item1->matchrate;
         });
         
         if(!empty($filterArray)){

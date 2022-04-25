@@ -174,7 +174,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected $lengthRestriction;
     
     /**
-     * @var editor_Models_Import_FileParser_Xlf_SurroundingTags
+     * @var editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract
      */
     protected $surroundingTags;
     
@@ -199,7 +199,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->lengthRestriction = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_LengthRestriction',[
             $this->task->getConfig()
         ]);
-        $this->surroundingTags = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_SurroundingTags', [$this->config]);
+        $this->surroundingTags = editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract::factory($this->config);
         $this->otherContent = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_OtherContent', [
             $this->contentConverter, $this->segmentBareInstance, $this->task, $fileId
         ]);
@@ -773,10 +773,16 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             else {
                 //parse the source chunks
                 $sourceChunksOriginal = $sourceChunks = $this->xmlparser->getRange($currentSource['opener']+1, $currentSource['closer']-1, static::XML_REPARSE_CONTENT);
+
                 //due XML_REPARSE_CONTENT it can happen that $sourceChunksOriginal will be a string, so we just put it into an array for further processing
                 if(!is_array($sourceChunksOriginal)){
                     $sourceChunksOriginal = [$sourceChunksOriginal];
                 }
+
+                if(! $this->sourceValidation($mid, $currentSource, $sourceChunksOriginal, $placeHolders)) {
+                    continue;
+                }
+
                 $sourceChunks = $this->contentConverter->convert($sourceChunks, true, $currentSource['openerMeta']['preserveWhitespace']);
                 $sourceSegment = $this->xmlparser->join($sourceChunks);
                 
@@ -940,6 +946,18 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     }
 
     /**
+     * Method Stub: Possibility for additional source validations, return true to process as usual, return false to skip segment import
+     * @param string $mid
+     * @param array $currentSource
+     * @param array $sourceChunks
+     * @param array $placeHolders
+     * @return bool
+     */
+    protected function sourceValidation(string $mid, array $currentSource, array $sourceChunks, array & $placeHolders): bool {
+        return true;
+    }
+
+    /**
      * returns true if the source is segmented with MRKs, but target not, may happen with translate=no segments from acr*
      * DOES NOT CHECK IF TARGET IS EMPTY! MUST BE DONE BEFORE!
      * @return bool
@@ -1011,7 +1029,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         // <count count-type="word count" unit="word">7</count>
         //TODO: this count-type is not xliff 1.2!!! IBM specific? or 1.1?
         if($this->processSegment && !empty($attributes['count-type']) && $attributes['count-type'] == 'word count') {
-            $this->wordCount += trim($this->xmlparser->getNextChunk());
+            $this->wordCount += (int) trim($this->xmlparser->getNextChunk());
         }
     }
     

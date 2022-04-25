@@ -81,7 +81,7 @@ Ext.define('Editor.controller.CommentNavigation', {
         switch(remarkRecord.get('type')){
             
             case 'segmentComment':
-                Ext.getCmp('segment-grid').focusEditorSegment(remarkRecord.get('segmentNrInTask'));
+                Ext.getCmp('segment-grid').focusSegment(remarkRecord.get('segmentNrInTask'));
                 break;  
 
             case 'visualAnnotation':

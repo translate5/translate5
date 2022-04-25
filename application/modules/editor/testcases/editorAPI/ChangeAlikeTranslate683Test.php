@@ -95,9 +95,14 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-        
-        $api->addImportFile('editorAPI/TRANSLATE-683/TRANSLATE-683-de-en.csv');
-        $api->addImportTbx('editorAPI/TRANSLATE-683/TRANSLATE-683-de-en.tbx');
+
+        $tests = [
+            'runtimeOptions.alike.segmentMetaFields' => [], // no custom alike calculation may be set here
+        ];
+        self::$api->testConfig($tests);
+
+        $api->addImportFile('TRANSLATE-683/TRANSLATE-683-de-en.csv');
+        $api->addImportTbx('TRANSLATE-683/TRANSLATE-683-de-en.tbx');
         $api->import($task);
         
         $task = $api->getTask();

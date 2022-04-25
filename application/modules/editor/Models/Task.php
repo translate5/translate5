@@ -190,7 +190,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return $taskConfig->getTaskConfig($this->getTaskGuid());
     }
-    
+
     /**
      * access customer instances in a cached way
      * @param int $id
@@ -262,11 +262,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param string $tasktype
      * @return array
      */
-    public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype) {
+    public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype): array
+    {
         $s = $this->db->select();
         $s->where('pmGuid = ?', $pmGuid);
         $s->where('tasktype = ?', $tasktype);
-        $s->order('orderdate ASC');
+        $s->order('orderdate DESC');
         return parent::loadFilterdCustom($s);
     }
 
@@ -293,11 +294,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function loadUserList(string $userGuid) {
+        /** @var ZfExtended_Models_User $userModel */
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
 
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $loadAll = $userModel->isAllowed('backend', 'loadAllTasks');
+        $loadAll = editor_User::instance()->isAllowed('backend', 'loadAllTasks');
         $ignoreAnonStuff = $this->rolesAllowReadAnonymizedUsers();
 
         $anonSql = '';
@@ -594,44 +595,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         throw new BadMethodCallException('setWorkflowStepName may not be called directly. Either via Task::updateWorkflowStep or in Workflow Context via Workflow::setNextStep');
     }
 
-    /**
-     * register this Tasks config and Guid in the session as active Task
-     * @param Zend_Session_Namespace $session optional, if omitted standard SessionNamespace is generated
-     * @param string $openState
-     */
-    public function registerInSession(string $openState,Zend_Session_Namespace $session = null) {
-        if(empty($session)) {
-            $session = new Zend_Session_Namespace();
-        }
-        
-        $session->taskGuid = $this->getTaskGuid();
-        $session->taskOpenState = $openState;
-        $session->taskWorkflow = $this->getWorkflow();
-        $session->taskWorkflowStepNr = $this->getWorkflowStep();
-        $session->taskWorkflowStepName = $this->getWorkflowStepName();
-    }
-
-    /**
-     * deletes this Tasks config and Guid from the session as active Task
-     * @param Zend_Session_Namespace $session optional, if omitted standard SessionNamespace is generated
-     */
-    public function unregisterInSession(Zend_Session_Namespace $session = null) {
-        if(empty($session)) {
-            $session = new Zend_Session_Namespace();
-        }
-        $session->taskGuid = null;
-        $session->taskOpenState = null;
-        $session->taskWorkflowStepNr = null;
-    }
-
-    /**
-     * returns true if the loaded task is registered in the session
-     * @return boolean
-     */
-    public function isRegisteredInSession() {
-        $session = new Zend_Session_Namespace();
-        return !empty($session->taskGuid) && $session->taskGuid == $this->getTaskGuid();
-    }
     /**
      * Convenience API
      * @return boolean
@@ -1042,8 +1005,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function updateIsTerminologieFlag($taskGuid,$ignoreAssocs=array()){
         $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
         /* @var $service editor_Services_TermCollection_Service */
-        $assoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
+        $assoc=ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $result=$assoc->loadAssocByServiceName($taskGuid, $service->getName(),$ignoreAssocs);
         $this->loadByTaskGuid($taskGuid);
         $this->setTerminologie(!empty($result));
@@ -1169,7 +1132,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if(empty($workflow)) {
             return;
         }
-        $states = $this->getTaskRoleAutoStates();
+        $states = $this->getTaskRoleAutoStates() ?: [];
         // include blocked autostate in total segments finish count because blocked segments can not be edited and therefore they should count as finished.
         //TODO: with TRANSLATE-2753 this will be changed
         $states[] = editor_Models_Segment_AutoStates::BLOCKED;

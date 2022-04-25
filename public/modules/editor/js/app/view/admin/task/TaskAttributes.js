@@ -225,7 +225,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
     setUsageModeConfig: function(items) {
         var me=this,
             auth = Editor.app.authenticatedUser,
-            infoTpl = new Ext.Template('{0} <img src="modules/editor/images/information.png" data-qtip="{1}" />');
+            infoTpl = new Ext.Template('{0} <img src="'+Editor.data.pathToRunDir+'/modules/editor/images/information.png" data-qtip="{1}" />');
         //without task user assoc view, this setting may also not be visible 
         if(!auth.isAllowed('editorChangeUserAssocTask')) {
             return;
@@ -300,8 +300,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             listConfig: {
                 loadMask: false
             },
-            store: Ext.create('Ext.data.Store',{
+            store: {
                 autoLoad: true,
+                storeId: 'pmGuidCombo_User',
                 model: 'Editor.model.admin.User',
                 pageSize: 0,
                 proxy : {
@@ -315,7 +316,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                         type : 'json'
                     }
                 }
-            })
+            }
         };
     }
   });

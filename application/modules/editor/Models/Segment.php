@@ -238,20 +238,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     public function search(array $parameters)
     {
-        $session = new Zend_Session_Namespace();
-        $taskGuid = $session->taskGuid;
-        if ($session->taskGuid !== $parameters['taskGuid']) {
-            //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
-
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         /* @var $mv editor_Models_Segment_MaterializedView */
-        $mv->setTaskGuid($taskGuid);
+        $mv->setTaskGuid($parameters['taskGuid']);
         $viewName = $mv->getName();
 
-        $this->reInitDb($taskGuid);
-        $this->segmentFieldManager->initFields($taskGuid);
+        $this->reInitDb($parameters['taskGuid']);
+        $this->segmentFieldManager->initFields($parameters['taskGuid']);
 
         //set the default search params when no values are given
         $parameters = $this->setDefaultSearchParameters($parameters);
@@ -317,7 +310,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             if (!$matchCase) {
                 return $adapter->quoteIdentifier($searchInField) . ' REGEXP ' . $adapter->quote($queryString);
             }
-            return $adapter->quoteIdentifier($searchInField) . ' REGEXP BINARY ' . $adapter->quote($queryString);
+            return 'CAST('.$adapter->quoteIdentifier($searchInField) . ' AS BINARY) REGEXP BINARY ' . $adapter->quote($queryString);
         }
         //search type regular wildcard
         if ($parameters['searchType'] === 'wildcardsSearch') {
@@ -651,7 +644,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $config = Zend_Registry::get('config');
         $regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
 
-        $words = preg_split($regexWordBreak, $this->prepareForCount($segmentContent), NULL, PREG_SPLIT_NO_EMPTY);
+        $words = preg_split($regexWordBreak, $this->prepareForCount($segmentContent), flags: PREG_SPLIT_NO_EMPTY);
         return count($words);
     }
 
@@ -1049,7 +1042,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @param bool $fixKnownFaultyTags: If set (default) Tag-faults are repaired automatically (usually these tags are removed)
      * @return editor_Segment_Export
      */
-    public function getFieldExport(string $field, editor_Models_Task $task, bool $edited=true, bool $fixKnownFaultyTags=true) : editor_Segment_Export {
+    public function getFieldExport(string $field, editor_Models_Task $task, bool $edited=true, bool $fixKnownFaultyTags=true) : ?editor_Segment_Export {
         //since fields can be merged from different files, data for a field can be empty
         if (empty($this->segmentdata[$field])) {
             return null;

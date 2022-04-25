@@ -142,7 +142,10 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         self::$taskIds[$taskNameSuffix] = $task->id;
         
         //add user to the task
-        $tua=$this->api()->addUser('testlector');
+        $tua=$this->api()->addUser('testlector',params: [
+            'workflow'=>'default',
+            'workflowStepName'=>'reviewing'
+        ]);
         
         self::$taskUserAssocMap[$task->id]=$tua->id;
     }

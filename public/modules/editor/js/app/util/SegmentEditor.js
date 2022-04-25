@@ -384,34 +384,6 @@ Ext.define('Editor.util.SegmentEditor', {
         });
     },
     /***
-     * Remove SpellCheck-Markup at a range (e.g. the position of the cursor) but keep the content.
-     */
-    cleanSpellCheckMarkupAtRange:function(range){
-        var me = this,
-            allSpellCheckNodes = [],
-            spellCheckNode,
-            getSpellCheckNode = function(nodeToCheck){
-                while (nodeToCheck) {
-                    if (/\bspellcheck\b/i.test(nodeToCheck.className)) {
-                        return nodeToCheck;
-                    }
-                    nodeToCheck = nodeToCheck.parentNode;
-                }
-                return null;
-            },
-            bookmarkForCaret = me.getPositionOfCaret();
-        allSpellCheckNodes.push(range.commonAncestorContainer);
-        allSpellCheckNodes.push(range.startContainer);
-        allSpellCheckNodes.push(range.endContainer);
-        Ext.Array.each(allSpellCheckNodes, function(node) {
-            spellCheckNode = getSpellCheckNode(node);
-            if (spellCheckNode != null) {
-                me.removeMarkupAroundNode(spellCheckNode);
-            }
-        });
-        me.setPositionOfCaret(bookmarkForCaret);
-    },
-    /***
      * Clean up Nodes, e.g. remove empty TrackChange-Nodes.
      */
     cleanUpNode:function(node){

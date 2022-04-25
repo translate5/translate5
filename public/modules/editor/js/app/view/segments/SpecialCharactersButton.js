@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,14 +25,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-#appContainer{
-	margin: 0;
-    overflow: hidden;
-}
-.iframeApp{
-    position:absolute;
-    left: 0px;
-    width: 100%;
-    top: 0px;
-    height: 100%;
-}
+Ext.define('Editor.view.segments.SpecialCharactersButton', {
+    extend: 'Ext.button.Button',
+    alias: 'widget.specialCharactersButton',
+    border: 1,
+    style: {
+        borderColor: '#d0d0d0',
+        borderStyle: 'solid'
+    },
+    width:28,
+    height:28,
+    padding:0
+});

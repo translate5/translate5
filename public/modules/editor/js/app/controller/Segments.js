@@ -414,7 +414,7 @@ Ext.define('Editor.controller.Segments', {
       }
       me.lastFileMapParams = encoded;
       Ext.Ajax.request({
-          url: Editor.data.pathToRunDir+'/editor/segment/filemap',
+          url: Editor.data.restpath+'segment/filemap',
           method: 'get',
           params: params,
           scope: me,

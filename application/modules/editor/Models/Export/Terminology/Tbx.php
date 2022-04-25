@@ -76,6 +76,13 @@ class editor_Models_Export_Terminology_Tbx {
      */
     protected string $file = '';
 
+    /**
+     * Flag, indicating whether definition-attrs should be skipped while exporting tbx contents
+     *
+     * @var bool
+     */
+    public bool $skipDefinition = false;
+
     public function __construct()
     {
         $tbxImport = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
@@ -248,19 +255,19 @@ class editor_Models_Export_Terminology_Tbx {
      * Export collection as a TBX file
      *
      * @param int $collectionId
+     * @param string $userName
      * @param bool $tbxBasicOnly
      * @param bool $exportImages
      * @param int $byTermEntryQty How many termEntries should be processed at once
      * @param int $byImageQty How many image binaries should be processed at once
-     * @param array $selected Bunch of arguments passed by $this->renderRawForTaskImport(). Should look like below: [
+     * @param null $selected Bunch of arguments passed by $this->renderRawForTaskImport(). Should look like below: [
      *    'termEntryIds' => [123, 234],
      *    'language' => ['en-us', 'en-gb'],
      *    'termIds' => [456, 567]
      * ]
-     * @throws Zend_Db_Statement_Exception
      */
-    public function exportCollectionById(int $collectionId, $tbxBasicOnly = false, $exportImages = true,
-                                         $userName, $byTermEntryQty = 1000, $byImageQty = 50, $selected = null) {
+    public function exportCollectionById(int $collectionId, string $userName, $tbxBasicOnly = false, $exportImages = true,
+                                         $byTermEntryQty = 1000, $byImageQty = 50, $selected = null) {
 
         // Setup export file absolute path
         $this->file = editor_Models_LanguageResources_LanguageResource::exportFilename($collectionId);
@@ -331,6 +338,13 @@ class editor_Models_Export_Terminology_Tbx {
         $line []= $this->tabs[1] . '<text>';
         $line []= $this->tabs[2] . '<body>';
         $this->write($line, $selected ? null : $collectionName);
+
+        // While in normal use - skipDefinition flag is false,
+        // so definitions ARE NOT skipped while exporting tbx contents
+        // But if $selected arg is given, then skipDefinition param can be set to true
+        if (isset($selected['skipDefinition'])) {
+            $this->skipDefinition = $selected['skipDefinition'];
+        }
 
         // Fetch usages by $byTermEntryQty at a time
         for ($p = 1; $p <= ceil($qty / $byTermEntryQty); $p++) {
@@ -486,6 +500,11 @@ class editor_Models_Export_Terminology_Tbx {
         // Foreach level-attr
         foreach ($attrA[$termEntryId][$language][$termId] ?? [] as $attr) {
 
+            // If skipDefinition flag is set - skip
+            if ($this->skipDefinition && $attr['type'] == 'definition') {
+                continue;
+            }
+
             // Node attributes
             $_attr = [];
 
@@ -555,8 +574,9 @@ class editor_Models_Export_Terminology_Tbx {
      *
      * @param array $termIds
      * @param string $noTranslationForLanguage
+     * @param bool $skipDefinition Flag, indicating whether definition-attrs should be skipped while creating tbx-contents
      */
-    public function renderRawForTaskImport(array $termIds, $userName = '') {
+    public function renderRawForTaskImport(array $termIds, $userName = '', $skipDefinition = true) {
 
         // If $termIds arg is an empty array - return empty string
         if (!$termIds) return '';
@@ -580,6 +600,7 @@ class editor_Models_Export_Terminology_Tbx {
                 'termEntryIds' => $termEntryId,
                 'languages' => $language,
                 'termIds' => $termIds,
+                'skipDefinition' => $skipDefinition
             ]
         );
 

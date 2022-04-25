@@ -339,12 +339,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $end = strpos($transunit, '</sdl:seg-defs>') + 15; //set end after the end tag
 
         if ($start === false || $end === false) {
-            //<sdl:seg-defs was not found in the current transunit
-            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1005', [
-                'task' => $this->task,
-                'filename' => $this->_fileName,
-                'transunit' => $transunit,
-            ]);
+            //<sdl:seg-defs was not found in the current transunit, nothing can be parsed, attributes are created on next usage
+            return;
         }
 
         $this->previousOrigins = [];
@@ -726,7 +722,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         }
         $segment = $this->parseSegmentUnifyInternalTags($segment);
         $data = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData');
-        $data->segment = preg_split('"(<[^>]*>)"', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $data->segment = preg_split('"(<[^>]*>)"', $segment, flags: PREG_SPLIT_DELIM_CAPTURE);
         $data->segmentCount = count($data->segment);
 
         //parse nur die ungeraden Arrayelemente, den dies sind die Rückgaben von PREG_SPLIT_DELIM_CAPTURE

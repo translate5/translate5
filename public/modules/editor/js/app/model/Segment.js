@@ -92,7 +92,7 @@ Ext.define('Editor.model.Segment', {
     idProperty: 'id',
     proxy : {
         type : 'rest',
-        url: Editor.data.restpath+'segment',
+        url: Editor.data.restpath+'segment', //use relative path for REST calls in opened task context
         reader : {
             rootProperty: 'rows',
             type : 'json'

@@ -141,8 +141,10 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData()
+    {
         parent::decodePutData();
         
         $this->data = (object) $this->data;
@@ -369,9 +371,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     protected function applyEditableAndDeletable(){
         $userSession = new Zend_Session_Namespace('user');
         $userData=$userSession->data;
-        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        $seeAllUsersAllowed=$userModel->isAllowed("backend","seeAllUsers");
+        /** @var ZfExtended_Models_User $userModel */
+        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
+        $seeAllUsersAllowed = $this->isAllowed("backend","seeAllUsers");
         
         if(is_array($this->view->rows)) {
             foreach ($this->view->rows as &$row){

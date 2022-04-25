@@ -74,7 +74,7 @@ class editor_Models_Import_FileParser_XmlParser {
     protected $preserveWhitespace;
     
     protected $nonXmlBlocks = [];
-    
+
     /**
      * walks through the given XML string and fires the registered callbacks for each found node
      * Preserving whitespace in XML is defined by the xml:space attribute on each node.
@@ -82,9 +82,10 @@ class editor_Models_Import_FileParser_XmlParser {
      *  The initial root value (preserve or ignore) is given here as boolean parameter
      * @param string $xml
      * @param bool $preserveWhitespaceRoot
+     * @param array $validTags optional, if given only the listed tags are considered to be tags, all other tag like contents are then considered as text and the entities are ecnoded properly
      * @return string the parsed string with all callbacks applied
      */
-    public function parse($xml, $preserveWhitespaceRoot = false) {
+    public function parse(string $xml, bool $preserveWhitespaceRoot = false, array $validTags = []): string {
         $this->nonXmlBlocks = [];
         $xml = preg_replace_callback('/(<!\[CDATA\[.*?\]\]>)|(<!--.*?-->)/s', function($item){
             $id = count($this->nonXmlBlocks);
@@ -97,7 +98,46 @@ class editor_Models_Import_FileParser_XmlParser {
             $this->nonXmlBlocks[$key] = $item[0];
             return $key;
         }, $xml);
-        $this->parseList(preg_split('/(<[^>]+>)/i', $xml, null, PREG_SPLIT_DELIM_CAPTURE), $preserveWhitespaceRoot);
+
+        // General XML Element Naming Rules
+        //    Element names are case-sensitive                                          => we handle them case in sensitive, this might be a problem but is not as easy to fix
+        //    Element names must start with a letter or underscore                      => DONE: is checked and important
+        //    Element names cannot start with the letters xml (or XML, or Xml, etc)     => not checked, some internal temp tags are used with starting xml-
+        //    Element names can contain letters (a-zA-Z), digits(0-9), hyphens (-),
+        //          underscores (_), and periods (.)                                    => not explicitly checked
+        //    Element names cannot contain spaces                                       => is implicitly checked on parsing the tag chunk below, since spaces are used as separator for the attributes.
+
+        // see also the regex in parseList!
+        if(empty($validTags)) {
+            $regex = '#(</?[a-zA-Z_][^>]*>)#i';
+        }
+        else {
+            $regex = '#(</?('.join('|', $validTags).')[^>]*>)#i';
+        }
+        $chunks = preg_split($regex, $xml, flags: PREG_SPLIT_DELIM_CAPTURE);
+        if(!empty($validTags)) {
+            //with validTags we have a 2nd pair of parentheses, we have to clean the captured content then:
+/*
+ *             Array
+                (
+                    [0] =>
+                    [1] => <foo>
+                    [2] => foo                  → to be removed
+                    [3] =>  & <test &amp;
+                    [4] => <ph type="lb"/>
+                    [5] => ph                   → to be removed
+                    [6] =>
+                    [7] => </foo>
+                    [8] => foo                  → to be removed
+                    [9] =>
+                )
+*/
+            $chunks = array_values(array_filter($chunks, function ($key){
+                //if key modulo 3 is 2, then this is the second regex parenthesis content and can be ignored!
+                return $key % 3 !== 2;
+            },  ARRAY_FILTER_USE_KEY));
+        }
+        $this->parseList($chunks, $preserveWhitespaceRoot);
         return str_replace(array_keys($this->nonXmlBlocks), array_values($this->nonXmlBlocks), $this->__toString());
     }
     
@@ -113,7 +153,8 @@ class editor_Models_Import_FileParser_XmlParser {
         $this->disableHandlerCount = 0;
         foreach($this->xmlChunks as $key => $chunk) {
             $this->currentOffset = $key;
-            if(!empty($chunk) && $chunk[0] === '<') {
+            //ensure that chunk is a tag (see XML naming rules in parse() ):
+            if(!empty($chunk) && $chunk[0] === '<' && preg_match('#^</?[a-zA-Z_]#i', $chunk)) {
                 $isSingle = mb_substr($chunk, -2) === '/>';
                 $parts = explode(' ', trim($chunk,'</> '));
                 $tag = trim(reset($parts));
@@ -488,7 +529,10 @@ class editor_Models_Import_FileParser_XmlParser {
             $attribute = $filter;
             $operator = 'has';
         }
-        
+
+        //since the attributes are stored normalized (lower case), the filter attribute must also be lowercase
+        $attribute = $this->normalizeTag($attribute);
+
         if(!array_key_exists($attribute, $attributes)) {
             return false;
         }

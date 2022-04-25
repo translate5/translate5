@@ -48,10 +48,12 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController {
     
     /**
      * overridden to prepare data
-     * (non-PHPdoc)
+     *
      * @see ZfExtended_RestController::decodePutData()
+     * @return void
      */
-    protected function decodePutData() {
+    protected function decodePutData()
+    {
         parent::decodePutData();
         if($this->_request->isPost()) {
             unset($this->data->id); //don't set the ID from client side

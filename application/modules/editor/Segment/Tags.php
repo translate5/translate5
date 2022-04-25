@@ -610,7 +610,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * {@inheritDoc}
      * @see JsonSerializable::jsonSerialize()
      */
-    public function jsonSerialize(){
+    public function jsonSerialize() : mixed {
         $data = new stdClass(); 
         $data->taskGuid = $this->task->getTaskGuid();
         $data->segmentId = $this->segmentId;

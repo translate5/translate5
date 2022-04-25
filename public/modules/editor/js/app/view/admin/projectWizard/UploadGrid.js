@@ -30,9 +30,10 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.panel.Panel
  */
 Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
-    extend:'Ext.grid.Panel',
+    extend:'Editor.view.admin.projectWizard.GridFormField',
     alias: 'widget.wizardUploadGrid',
     requires:[
+        'Editor.view.admin.projectWizard.GridFormField',
         'Editor.view.admin.projectWizard.UploadGridViewController',
         'Editor.view.admin.projectWizard.UploadGridViewModel',
         'Editor.view.admin.projectWizard.FileButton',
@@ -64,8 +65,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
 
     strings:{
         gridEmptyText:'#UT#Ziehen Sie die Dateien entweder hierher, um sie als Arbeitsdateien hinzuzufügen, oder klicken Sie auf eine der obigen Schaltflächen, um andere Dateitypen zu wählen.',
-        workFilesFilesButton:'#UT#Arbeitsdatei(en) hinzufügen',
-        pivotFilesFilesButton:'#UT#Pivot-Datei(en) hinzufügen',
+        workFilesFilesButton:'#UT#Arbeitsdatei(en)',
+        pivotFilesFilesButton:'#UT#Pivot-Datei(en)',
         removeFilesFilesButton:'#UT#Datei löschen',
         targetLang:'#UT#Zielsprache',
         file:'#UT#Datei',
@@ -74,10 +75,10 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         errorColumnText:'#UT#Fehler',
         workFilesTypeText:'#UT#Arbeitsdatei',
         pivotFilesTypeText:'#UT#Pivot-Datei',
-        addFilesDefaultTooltip: '#UT#Datei(en) hinzufügen',
         fileMix:'#UT#Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!',
-        referenceFilesFilesButton:'#UT#Referenz-Dateien(en) hinzufügen',
-        referenceFilesTypeText:'#UT#Referenz-Datei'
+        referenceFilesFilesButton:'#UT#Referenz-Dateien(en)',
+        referenceFilesTypeText:'#UT#Referenz-Datei',
+        workfilesAreRequired:'#UT#Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.'
     },
 
     initConfig: function(instanceConfig) {
@@ -88,6 +89,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                 sortableColumns:false,
                 tbar: [{
                     xtype: 'wizardFileButton',
+                    glyph: 'f067@FontAwesome5FreeSolid',
                     text: me.strings.workFilesFilesButton,
                     name:'workFilesFilesButton',
                     tooltip:me.strings.fileMix,
@@ -100,6 +102,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     }
                 },{
                     xtype: 'wizardFileButton',
+                    glyph: 'f067@FontAwesome5FreeSolid',
                     text: me.strings.pivotFilesFilesButton,
                     name:'pivotFilesFilesButton',
                     tooltip:me.strings.fileMix,
@@ -112,6 +115,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     }
                 },{
                     xtype: 'wizardFileButton',
+                    glyph: 'f067@FontAwesome5FreeSolid',
                     text: me.strings.referenceFilesFilesButton,
                     name:'referenceFilesFilesButton',
                     tooltip:me.strings.fileMix,
@@ -130,14 +134,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     handler: 'removeFiles',
                     bind: {
                         disabled: '{!uploadgrid.selection}'
-                    }
-                },{
-                    xtype:'displayfield',
-                    fieldLabel:false,
-                    fieldCls:'redTextColumn',
-                    bind:{
-                        value : '{uploadErrorMsg}',
-                        hidden: '{!uploadErrorMsg}'
                     }
                 }],
                 viewConfig: {
@@ -187,6 +183,21 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         return me.callParent([ config ]);
     },
 
+    /***
+     * Check if the grid there are files in state error.
+     * This is only used for internal validation
+     * @returns {*[]}
+     * @override
+     */
+    getErrors:function (){
+        var me = this,
+            errors = me.callParent(arguments);
+
+        if(me.getStore().getCount() < 1){
+            errors.push(me.strings.workfilesAreRequired);
+        }
+        return errors;
+    },
 
     /***
      * Custom isValid implementation for the upload grid. With this, the grid is part of the importWizard form validation, and
@@ -195,59 +206,13 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
      */
     isValid: function() {
         var me = this,
-            errors = me.getErrors(),
-            isValid = Ext.isEmpty(errors);
-        if (!me.preventMark) {
-            if (isValid) {
-                me.clearInvalid();
-            } else {
-                me.markInvalid(errors);
-            }
+            isValid = me.callParent(arguments);
+        // focus the tab with errors when the grid is invalid
+        if(isValid === false){
+            var tab = me.up('#uploadTabPanel');
+            tab && tab.setActiveTab(me);
         }
         return isValid;
-    },
-
-    /***
-     * Check if the grid there are files in state error.
-     * This is only used for internal validation
-     * @returns {*[]}
-     */
-    getErrors:function (){
-        var me = this,
-            errors = [];
-        me.getStore().each(function(record) {
-            if(record.get('type') === Editor.model.admin.projectWizard.File.TYPE_ERROR){
-                errors.push(record);
-            }
-        });
-        return errors;
-    },
-
-    /***
-     * Custom implementation for invalid. This will add invalid css class to the grid
-     * @param error
-     */
-    markInvalid: function (error){
-        if(Ext.isEmpty(error)){
-            return;
-        }
-        var me = this,
-            gridview  = me.getView(),
-            tpl = Ext.isArray(error) ? error.join('<br/>') : error;
-
-        gridview.addCls('invalidGridBorder');
-        me.getViewModel().set('uploadErrorMsg',tpl);
-        gridview.refresh();
-    },
-
-    /***
-     * Custom implementation for clear invalid. This will remove the invalid css clss from the grid.
-     */
-    clearInvalid: function() {
-        var me = this,
-            gridview  = me.getView();
-        gridview.removeCls('invalidGridBorder');
-        me.getViewModel().set('uploadErrorMsg',null);
     },
 
     /***
