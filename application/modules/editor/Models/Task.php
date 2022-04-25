@@ -1200,11 +1200,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return $stateMap[$roleOfStep] ?? false;
     }
 
-    /***
+    /**
      * Get the active workflow for the current task
-     * @return editor_Workflow_Default|null if task is configured with a non existent workflow
+     * @return editor_Workflow_Default
      */
-    public function getTaskActiveWorkflow(): ?editor_Workflow_Default {
+    public function getTaskActiveWorkflow(): editor_Workflow_Default {
         //get the current task active workflow
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */

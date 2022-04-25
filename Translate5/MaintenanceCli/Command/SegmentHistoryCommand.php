@@ -96,11 +96,11 @@ The single versions are showing only the values different to the current one! Th
         $historyEntries = array_reverse($history->loadBySegmentId($segment->getId()));
         $historyData = \ZfExtended_Factory::get('editor_Models_SegmentHistoryData');
         /* @var $historyData \editor_Models_SegmentHistoryData */
-        $historyDataEntries = $historyData->loadBySegmentId($segment->getId());
+        $historyDataEntries = $historyData->loadBySegmentId($segment->getId(), \editor_Models_SegmentField::TYPE_TARGET);
         
         $ids = array_column($historyDataEntries, 'segmentHistoryId');
         $historyDataEntries = array_combine($ids, $historyDataEntries);
-        
+
         $this->io->section("General segment information");
         $this->io->text([
             '<info>Segment ID:</info> <options=bold>'.$segment->getId().'</>',
