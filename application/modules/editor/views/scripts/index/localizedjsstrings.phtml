@@ -822,7 +822,7 @@ Ext.define('Editor.controller.Localizer', {
             fileMix: '<?php echo $this->translate->_('Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!');?>',
             referenceFilesFilesButton: '<?php echo $this->translate->_('Referenz-Dateien(en)');?>',
             referenceFilesTypeText: '<?php echo $this->translate->_('Referenz-Datei');?>',
-            workfilesAreRequired: '<?php echo $this->translate->_('Arbeitsdatei(en) sind obligatorisch');?>'
+            workfilesAreRequired: '<?php echo $this->translate->_('Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.');?>'
         }
     });
 
@@ -913,6 +913,7 @@ Ext.define('Editor.controller.Localizer', {
             export2Def: '<?php echo $this->translate->_('XLIFF 2.1');?>',
             exportQmField: '<?php echo $this->translate->_('Export QS-Statistik (XML) für Feld: {0}');?>',
             exportExcel: '<?php echo $this->translate->_('Externe Bearbeitung als Excel');?>',
+            exportExcelHistory: '<?php echo $this->translate->_('Export der Bearbeitungen pro Workflowschritt als Excel');?>',
             downloadImportArchive: '<?php echo $this->translate->_('Importarchiv herunterladen');?>',
             exportTranslation: '<?php echo $this->translate->_('übersetzt');?>',
             exportReview: '<?php echo $this->translate->_('lektoriert');?>',

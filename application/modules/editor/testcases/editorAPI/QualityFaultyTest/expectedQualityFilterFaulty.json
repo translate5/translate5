@@ -17,7 +17,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "35796",
+                    "qid": "79012",
                     "qtype": "consistent",
                     "qcount": 3,
                     "qcomplete": true,
@@ -34,7 +34,7 @@
                     "qcomplete": true,
                     "qcategory": "target",
                     "text": "Inconsistent target",
-                    "textTooltip": "Finds segments with same source, but different target (tags ignored)",
+                    "textTooltip": "Finds segments with the same source, but different target (tags ignored)",
                     "leaf": true,
                     "checked": false
                 }
@@ -65,7 +65,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "35794",
+                    "qid": "79010",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -88,7 +88,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "35795",
+                    "qid": "79011",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -549,7 +549,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "35787",
+                    "qid": "79003",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -560,7 +560,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "35783",
+                    "qid": "78999",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -571,7 +571,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "35789",
+                    "qid": "79005",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
@@ -621,6 +621,130 @@
             "qcategory": null,
             "qtooltip": "",
             "text": "Usage of TM-matches",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "whitespace",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "lnbr_begin",
+                    "text": "Line break at the beginning",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "lnbr_end",
+                    "text": "Line break at the end",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "lnbr_space",
+                    "text": "Space after line break",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "nbsp_begin",
+                    "text": "Non-breaking space at the beginning",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "nbsp_end",
+                    "text": "Non-breaking space at the end",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "space_lnbr",
+                    "text": "Space before line break",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "space_tag_end",
+                    "text": "Segment ends with a space followed by a tag",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "tab_begin",
+                    "text": "Tab at the beginning",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "tab_end",
+                    "text": "Tab at the end",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "tag_space_begin",
+                    "text": "Segment begins with a tag followed by a space",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "White space at the beginning\/end",
             "qtotal": 0,
             "expanded": false,
             "checked": false

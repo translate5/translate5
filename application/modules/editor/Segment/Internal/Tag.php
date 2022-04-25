@@ -168,6 +168,23 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
     public function isNewline() : bool {
         return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_NEWLINE));
     }
+
+    /**
+     * Evaluates, if the internal tag represents a non-breaking space
+     * @return boolean
+     */
+    public function isNbsp(): bool {
+        return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_NBSP));
+    }
+
+    /**
+     * Evaluates, if the internal tag represents a tab
+     * @return boolean
+     */
+    public function isTab(): bool {
+        return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_TAB));
+    }
+
     /**
      * Retrieves the original index of the internal tag within the segment
      * @return int
@@ -299,7 +316,7 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * {@inheritDoc}
      * @see editor_Segment_Tag::sequenceChildren()
      */
-    public function sequenceChildren(editor_Segment_FieldTags $tags, int $parentOrder=-1){
+    public function sequenceChildren(editor_TagSequence $tags, int $parentOrder=-1){
         if($this->hasChildren()){
             foreach($this->children as $child){
                 $this->addContentTag(editor_Segment_Internal_ContentTag::fromTag($child));
@@ -311,9 +328,9 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * {@inheritDoc}
      * @see editor_Segment_Tag::addSegmentText()
      */
-    public function addSegmentText(editor_Segment_FieldTags $tags){
+    public function addSegmentText(editor_TagSequence $tags){
         if($this->startIndex < $this->endIndex){
-            $this->addText($tags->getFieldTextPart($this->startIndex, $this->endIndex));
+            $this->addText($tags->getTextPart($this->startIndex, $this->endIndex));
         }
     }
     /**

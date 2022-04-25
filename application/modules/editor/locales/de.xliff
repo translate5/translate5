@@ -1263,6 +1263,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='WExJRkYgMi4x'><source>XLIFF 2.1</source><target>XLIFF 2.1</target></trans-unit>
 <trans-unit id="U0RMWExJRkYgbWl0IMOEbmRlcnVuZ3NtYXJraWVydW5nZW4="><source>SDLXLIFF mit Änderungsmarkierungen</source><target>SDLXLIFF mit Änderungsmarkierungen</target></trans-unit>
 <trans-unit id='RXh0ZXJuZSBCZWFyYmVpdHVuZyBhbHMgRXhjZWw='><source>Externe Bearbeitung als Excel</source><target>Externe Bearbeitung als Excel</target></trans-unit>
+<trans-unit id='RXhwb3J0IGRlciBCZWFyYmVpdHVuZ2VuIHBybyBXb3JrZmxvd3NjaHJpdHQgYWxzIEV4Y2Vs'><source>Export der Bearbeitungen pro Workflowschritt als Excel</source><target>Export der Bearbeitungen pro Workflowschritt als Excel</target></trans-unit>
 <trans-unit id='S3VuZGVu'><source>Kunden</source><target>Kunden</target></trans-unit>
 <trans-unit id="QWxsZSBLdW5kZW4="><source>Alle Kunden</source><target>Alle Kunden</target></trans-unit>
 <trans-unit id='SGluenVmw7xnZW4='><source>Hinzufügen</source><target>Hinzufügen</target></trans-unit>
@@ -1419,10 +1420,10 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='w5xiZXJ0cmFndW5nc2tvbW1lbnRhcg=='><source>Übertragungskommentar</source><target>Übertragungskommentar</target></trans-unit>
 <trans-unit id='UXVlbGxlIGRlcyBFaW50cmFncw=='><source>Quelle des Eintrags</source><target>Quelle des Eintrags</target></trans-unit>
 <trans-unit id='U29sbHRlIGRlciBUYXNrIGdlbMO2c2NodCBvZGVyIG1pdCBkZW4gYWt0dWVsbGVuIEVpbnN0ZWxsdW5nZW4gaW1wb3J0aWVydCB3ZXJkZW4/'><source>Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?</source><target>Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?</target></trans-unit>
-<trans-unit id='QXVmZ2FiZSBsw7ZzY2hlbg=='><source>Aufgabe löschen</source><target>Delete task</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSBsw7ZzY2hlbg=='><source>Aufgabe löschen</source><target>Aufgabe löschen</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSBpbXBvcnRpZXJlbg=='><source>Aufgabe importieren</source><target>Aufgabe importieren</target></trans-unit>
 <trans-unit id='VW50ZXJzY2hpZWQgenUgUXVlbGxzZWdtZW50'><source>Unterschied zu Quellsegment</source><target>Unterschied zu Quellsegment</target></trans-unit>
-<trans-unit id='RGllc2UgUmVzc291cmNlIHdpcmQgZW50ZmVybnQ='><source>Diese Ressource wird entfernt</source><target>This resource is removed</target></trans-unit>
+<trans-unit id='RGllc2UgUmVzc291cmNlIHdpcmQgZW50ZmVybnQ='><source>Diese Ressource wird entfernt</source><target>Diese Ressource wird entfernt</target></trans-unit>
 <trans-unit id='VHJlZmZlcmFuYWx5c2U='><source>Trefferanalyse</source><target>Trefferanalyse</target></trans-unit>
 <trans-unit id='VGVybUNvbGxlY3Rpb24gVHJlZmZlciAoMTA0JSk='><source>TermCollection Treffer (104%)</source><target>TermCollection Treffer (104%)</target></trans-unit>
 <trans-unit id='S29udGV4dCBUcmVmZmVyICgxMDMlKQ=='><source>Kontext Treffer (103%)</source><target>Kontext Treffer (103%)</target></trans-unit>
@@ -1448,7 +1449,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='RGllIFp1d2Vpc3VuZyB6d2lzY2hlbiBBdWZnYWJlIHVuZCBCZW51dHplciBrYW5uIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIGRhIGRlciBCZW51dHplciBkaWVzZSBha3R1ZWxsIGJlbnV0enQu'><source>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.</source><target>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.</target></trans-unit>
 <trans-unit id='RGllIFp1d2Vpc3VuZyB6d2lzY2hlbiBBdWZnYWJlIHVuZCBCZW51dHplciBrYW5uIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIGRhIGRpZSBBdWZnYWJlIGR1cmNoIGRlbiBCZW51dHplciBnZXNwZXJydCBpc3Qu'><source>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.</source><target>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.</target></trans-unit>
 <trans-unit id='RGllc2UgS3VuZGVubnVtbWVyIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'><source>Diese Kundennummer wird bereits verwendet.</source><target>Diese Kundennummer wird bereits verwendet.</target></trans-unit>
-<trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKe+7vy4='><source>Der referenzierte Kunde existiert nicht (mehr)﻿.</source><target>Der referenzierte Kunde existiert nicht (mehr)﻿.</target></trans-unit>
+<trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKQ=='><source>Der referenzierte Kunde existiert nicht (mehr).</source><target>Der referenzierte Kunde existiert nicht (mehr).</target></trans-unit>
 <trans-unit id='QW5zaWNodA=='><source>Ansicht</source><target>Ansicht</target></trans-unit>
 <trans-unit id='VW5iZWthbm50ZXIgVGVybSBTdGF0dXM='><source>Unbekannter Term Status</source><target>Unbekannter Term Status</target></trans-unit>
 <trans-unit id='RXJzdGVsbHVuZw=='><source>Erstellung</source><target>Erstellung</target></trans-unit>
@@ -1895,6 +1896,17 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='UVMgU3RhdGlzdGlr'><source>QS Statistik</source><target>QS Statistik</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Interne Tags</target></trans-unit>
 <trans-unit id='TGVlcmUgU2VnbWVudGU='><source>Leere Segmente</source><target>Leere Segmente</target></trans-unit>
+<trans-unit id='TGVlcnJhdW0gYW0gQW5mYW5nL0VuZGU='><source>Leerraum am Anfang/Ende</source><target>Leerraum am Anfang/Ende</target></trans-unit>
+<trans-unit id='U2VnbWVudCBiZWdpbm50IG1pdCBlaW5lbSBUYWcgZ2Vmb2xndCB2b24gTGVlcnplaWNoZW4='><source>Segment beginnt mit einem Tag gefolgt von Leerzeichen</source><target>Segment beginnt mit einem Tag gefolgt von Leerzeichen</target></trans-unit>
+<trans-unit id='R2VzY2jDvHR6ZXMgTGVlcnplaWNoZW4gYW0gQW5mYW5n'><source>Geschützes Leerzeichen am Anfang</source><target>Geschützes Leerzeichen am Anfang</target></trans-unit>
+<trans-unit id='VGFiIGFtIEFuZmFuZw=='><source>Tab am Anfang</source><target>Tab am Anfang</target></trans-unit>
+<trans-unit id='VW1icnVjaCBhbSBBbmZhbmc='><source>Umbruch am Anfang</source><target>Umbruch am Anfang</target></trans-unit>
+<trans-unit id='U2VnbWVudCBlbmRldCBtaXQgZWluZW0gTGVlcnplaWNoZW4gZ2Vmb2xndCB2b24gZWluZW0gVGFn'><source>Segment endet mit einem Leerzeichen gefolgt von einem Tag</source><target>Segment endet mit einem Leerzeichen gefolgt von einem Tag</target></trans-unit>
+<trans-unit id='R2VzY2jDvHR6ZXMgTGVlcnplaWNoZW4gYW0gRW5kZQ=='><source>Geschützes Leerzeichen am Ende</source><target>Geschützes Leerzeichen am Ende</target></trans-unit>
+<trans-unit id='VGFiIGFtIEVuZGU='><source>Tab am Ende</source><target>Tab am Ende</target></trans-unit>
+<trans-unit id='VW1icnVjaCBhbSBFbmRl'><source>Umbruch am Ende</source><target>Umbruch am Ende</target></trans-unit>
+<trans-unit id='TGVlcnplaWNoZW4gdm9yIFplaWxlbnVtYnJ1Y2g='><source>Leerzeichen vor Zeilenumbruch</source><target>Leerzeichen vor Zeilenumbruch</target></trans-unit>
+<trans-unit id='TGVlcnplaWNoZW4gbmFjaCBaZWlsZW51bWJydWNo'><source>Leerzeichen nach Zeilenumbruch</source><target>Leerzeichen nach Zeilenumbruch</target></trans-unit>
 <trans-unit id='RGFzIFppZWwgZW50aMOkbHQgbnVyIFRhZ3MsIExlZXJ6ZWljaGVuIG9kZXIgSW50ZXJwdW5rdGlvbiwgZGllIFF1ZWxsZSBqZWRvY2ggbmljaHQu'><source>Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.</source><target>Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.</target></trans-unit>
 <trans-unit id='RWluaGVpdGxpY2hrZWl0'><source>Einheitlichkeit</source><target>Einheitlichkeit</target></trans-unit>
 <trans-unit id='VW5laW5oZWl0bGljaGUgUXVlbGxl'><source>Uneinheitliche Quelle</source><target>Uneinheitliche Quelle</target></trans-unit>
@@ -2109,7 +2121,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='Q2hpbmVzaXNjaCAoVGFpd2FuKQ=='><source>Chinesisch (Taiwan)</source><target>Chinesisch (Taiwan)</target></trans-unit>
 <trans-unit id='Q2hpbmVzaXNjaCAodHJhZGl0aW9uZWxsKQ=='><source>Chinesisch (traditionell)</source><target>Chinesisch (traditionell)</target></trans-unit>
 <trans-unit id='Q2hpbmVzaXNjaCAodmVyZWluZmFjaHQp'><source>Chinesisch (vereinfacht)</source><target>Chinesisch (vereinfacht)</target></trans-unit>
-<trans-unit id='QXJiZWl0c2RhdGVpKGVuKSBzaW5kIG9ibGlnYXRvcmlzY2g='><source>Arbeitsdatei(en) sind obligatorisch</source><target>Arbeitsdatei(en) sind obligatorisch</target></trans-unit>
+<trans-unit id='RXMgd3VyZGVuIGtlaW5lIGhvY2hnZWxhZGVuZW4gQXJiZWl0c2RhdGVpZW4gZ2VmdW5kZW4gb2RlciBkaWUgaG9jaGdlbGFkZW5lbiBEYXRlaWVuIMO8YmVyc2NocmVpdGVuIGRpZSBtYXhpbWFsIHp1bMOkc3NpZ2UgR3LDtsOfZS4='><source>Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.</source><target>Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.</target></trans-unit>
 
   </body>
  </file>

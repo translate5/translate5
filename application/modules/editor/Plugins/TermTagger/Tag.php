@@ -68,7 +68,7 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
      * {@inheritDoc}
      * @see editor_Segment_Tag::finalize()
      */
-    public function finalize(editor_Segment_FieldTags $tags, editor_Models_task $task){
+    public function finalize(editor_TagSequence $tags, editor_Models_task $task){
         $this->category = editor_Plugins_TermTagger_SegmentProcessor::getQualityState($this->classes, $tags->isSourceField());
     }
     /**

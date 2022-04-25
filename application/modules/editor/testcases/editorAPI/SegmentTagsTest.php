@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Several "classic" PHPUnit tests to check the OOP Tag-Parsing API againsted selected test data
  */
 class SegmentTagsTest extends editor_Test_SegmentTagsTest {
-    
+
     public function testUnicodeTag(){
         $expected = '<div><p>イリノイ州シカゴにて、アイルランド系の家庭に、</p></div>';
         $dom = new editor_Utils_Dom();

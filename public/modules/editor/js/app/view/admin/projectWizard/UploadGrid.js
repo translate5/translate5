@@ -78,7 +78,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
         fileMix:'#UT#Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!',
         referenceFilesFilesButton:'#UT#Referenz-Dateien(en)',
         referenceFilesTypeText:'#UT#Referenz-Datei',
-        workfilesAreRequired:'#UT#Arbeitsdatei(en) sind obligatorisch'
+        workfilesAreRequired:'#UT#Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.'
     },
 
     initConfig: function(instanceConfig) {

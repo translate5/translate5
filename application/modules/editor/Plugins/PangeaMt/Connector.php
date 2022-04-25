@@ -133,12 +133,12 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
      * {@inheritDoc}
      * @see editor_Services_Connector_BatchTrait::processBatchResult()
      */
-    protected function processBatchResult($segmentResults) {
+    protected function processBatchResult($segmentResults, int $segmentId=-1) {
         foreach ($segmentResults as $result) {
             $target = $result->tgt ?? "";
             $source=$result->src ?? "";
-            $this->resultList->addResult($this->tagHandler->restoreInResult($target), $this->defaultMatchRate);
-            $this->resultList->setSource($this->tagHandler->restoreInResult($source));
+            $this->resultList->addResult($this->tagHandler->restoreInResult($target, $segmentId), $this->defaultMatchRate);
+            $this->resultList->setSource($this->tagHandler->restoreInResult($source, $segmentId));
         }
     }
     
