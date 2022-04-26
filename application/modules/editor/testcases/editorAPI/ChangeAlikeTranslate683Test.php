@@ -97,7 +97,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         self::assertLogin('testmanager');
 
         $tests = [
-            'runtimeOptions.alike.segmentMetaFields' => [], // no custom alike calculation may be set here
+            'runtimeOptions.alike.segmentMetaFields' => '[]', // no custom alike calculation may be set here
         ];
         self::$api->testConfig($tests);
 
