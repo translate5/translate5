@@ -4,6 +4,7 @@
         "internalFuzzy": "0",
         "matchRate": "101",
         "wordCount": "3",
+        "characterCount": "22",
         "type": "tm"
     },
     {
@@ -11,6 +12,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "22",
         "type": "tm"
     },
     {
@@ -18,6 +20,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "22",
         "type": "termcollection"
     },
     {
@@ -25,6 +28,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "4",
+        "characterCount": "35",
         "type": "tm"
     },
     {
@@ -32,6 +36,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "4",
+        "characterCount": "35",
         "type": "tm"
     },
     {
@@ -39,6 +44,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "35",
         "type": "termcollection"
     },
     {
@@ -46,6 +52,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "20",
+        "characterCount": "169",
         "type": "tm"
     },
     {
@@ -53,6 +60,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "20",
+        "characterCount": "169",
         "type": "tm"
     },
     {
@@ -60,6 +68,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "20",
+        "characterCount": "169",
         "type": "termcollection"
     },
     {
@@ -67,6 +76,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "29",
+        "characterCount": "204",
         "type": "tm"
     },
     {
@@ -74,6 +84,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "29",
+        "characterCount": "204",
         "type": "tm"
     },
     {
@@ -81,6 +92,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "29",
+        "characterCount": "204",
         "type": "termcollection"
     },
     {
@@ -88,6 +100,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "26",
+        "characterCount": "212",
         "type": "tm"
     },
     {
@@ -95,6 +108,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "26",
+        "characterCount": "212",
         "type": "tm"
     },
     {
@@ -102,20 +116,23 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "26",
+        "characterCount": "212",
         "type": "termcollection"
     },
     {
         "segmentNrInTask": "6",
         "internalFuzzy": "0",
-        "matchRate": "87",
+        "matchRate": "100",
         "wordCount": "26",
+        "characterCount": "228",
         "type": "tm"
     },
     {
         "segmentNrInTask": "6",
         "internalFuzzy": "0",
-        "matchRate": "87",
+        "matchRate": "100",
         "wordCount": "26",
+        "characterCount": "228",
         "type": "tm"
     },
     {
@@ -123,6 +140,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "26",
+        "characterCount": "228",
         "type": "termcollection"
     },
     {
@@ -130,6 +148,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "28",
+        "characterCount": "182",
         "type": "tm"
     },
     {
@@ -137,6 +156,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "28",
+        "characterCount": "182",
         "type": "tm"
     },
     {
@@ -144,6 +164,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "28",
+        "characterCount": "182",
         "type": "termcollection"
     },
     {
@@ -151,6 +172,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "16",
+        "characterCount": "113",
         "type": "tm"
     },
     {
@@ -158,6 +180,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "16",
+        "characterCount": "113",
         "type": "tm"
     },
     {
@@ -165,6 +188,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "16",
+        "characterCount": "113",
         "type": "termcollection"
     },
     {
@@ -172,6 +196,7 @@
         "internalFuzzy": "0",
         "matchRate": "88",
         "wordCount": "21",
+        "characterCount": "135",
         "type": "tm"
     },
     {
@@ -179,6 +204,7 @@
         "internalFuzzy": "0",
         "matchRate": "88",
         "wordCount": "21",
+        "characterCount": "135",
         "type": "tm"
     },
     {
@@ -186,20 +212,23 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "21",
+        "characterCount": "135",
         "type": "termcollection"
     },
     {
         "segmentNrInTask": "10",
         "internalFuzzy": "0",
-        "matchRate": "83",
+        "matchRate": "100",
         "wordCount": "15",
+        "characterCount": "117",
         "type": "tm"
     },
     {
         "segmentNrInTask": "10",
         "internalFuzzy": "0",
-        "matchRate": "83",
+        "matchRate": "100",
         "wordCount": "15",
+        "characterCount": "117",
         "type": "tm"
     },
     {
@@ -207,6 +236,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "15",
+        "characterCount": "117",
         "type": "termcollection"
     },
     {
@@ -214,6 +244,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "13",
+        "characterCount": "92",
         "type": "tm"
     },
     {
@@ -221,6 +252,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "13",
+        "characterCount": "92",
         "type": "tm"
     },
     {
@@ -228,6 +260,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "13",
+        "characterCount": "92",
         "type": "termcollection"
     },
     {
@@ -235,6 +268,7 @@
         "internalFuzzy": "0",
         "matchRate": "90",
         "wordCount": "30",
+        "characterCount": "228",
         "type": "tm"
     },
     {
@@ -242,6 +276,7 @@
         "internalFuzzy": "0",
         "matchRate": "90",
         "wordCount": "30",
+        "characterCount": "228",
         "type": "tm"
     },
     {
@@ -249,6 +284,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "30",
+        "characterCount": "228",
         "type": "termcollection"
     },
     {
@@ -256,6 +292,7 @@
         "internalFuzzy": "0",
         "matchRate": "39",
         "wordCount": "8",
+        "characterCount": "42",
         "type": "tm"
     },
     {
@@ -263,6 +300,7 @@
         "internalFuzzy": "0",
         "matchRate": "39",
         "wordCount": "8",
+        "characterCount": "42",
         "type": "tm"
     },
     {
@@ -270,6 +308,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "8",
+        "characterCount": "42",
         "type": "termcollection"
     },
     {
@@ -277,6 +316,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "50",
         "type": "tm"
     },
     {
@@ -284,6 +324,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "50",
         "type": "tm"
     },
     {
@@ -291,6 +332,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "50",
         "type": "termcollection"
     },
     {
@@ -298,6 +340,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "18",
+        "characterCount": "151",
         "type": "tm"
     },
     {
@@ -305,6 +348,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "18",
+        "characterCount": "151",
         "type": "tm"
     },
     {
@@ -312,6 +356,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "18",
+        "characterCount": "151",
         "type": "termcollection"
     },
     {
@@ -319,6 +364,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "15",
+        "characterCount": "114",
         "type": "tm"
     },
     {
@@ -326,6 +372,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "15",
+        "characterCount": "114",
         "type": "tm"
     },
     {
@@ -333,6 +380,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "15",
+        "characterCount": "114",
         "type": "termcollection"
     },
     {
@@ -340,6 +388,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "56",
         "type": "tm"
     },
     {
@@ -347,6 +396,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "56",
         "type": "tm"
     },
     {
@@ -354,6 +404,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "56",
         "type": "termcollection"
     },
     {
@@ -361,6 +412,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "10",
+        "characterCount": "61",
         "type": "tm"
     },
     {
@@ -368,6 +420,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "10",
+        "characterCount": "61",
         "type": "tm"
     },
     {
@@ -375,6 +428,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "10",
+        "characterCount": "61",
         "type": "termcollection"
     },
     {
@@ -382,6 +436,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "13",
+        "characterCount": "102",
         "type": "tm"
     },
     {
@@ -389,6 +444,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "13",
+        "characterCount": "102",
         "type": "tm"
     },
     {
@@ -396,6 +452,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "13",
+        "characterCount": "102",
         "type": "termcollection"
     },
     {
@@ -403,6 +460,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "143",
         "type": "tm"
     },
     {
@@ -410,6 +468,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "143",
         "type": "tm"
     },
     {
@@ -417,6 +476,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "143",
         "type": "termcollection"
     },
     {
@@ -424,6 +484,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "21",
+        "characterCount": "151",
         "type": "tm"
     },
     {
@@ -431,6 +492,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "21",
+        "characterCount": "151",
         "type": "tm"
     },
     {
@@ -438,6 +500,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "21",
+        "characterCount": "151",
         "type": "termcollection"
     },
     {
@@ -445,6 +508,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "tm"
     },
     {
@@ -452,6 +516,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "tm"
     },
     {
@@ -459,6 +524,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "termcollection"
     },
     {
@@ -466,6 +532,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "49",
         "type": "tm"
     },
     {
@@ -473,6 +540,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "49",
         "type": "tm"
     },
     {
@@ -480,6 +548,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "49",
         "type": "termcollection"
     },
     {
@@ -487,6 +556,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "17",
+        "characterCount": "110",
         "type": "tm"
     },
     {
@@ -494,6 +564,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "17",
+        "characterCount": "110",
         "type": "tm"
     },
     {
@@ -501,6 +572,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "110",
         "type": "termcollection"
     },
     {
@@ -508,6 +580,7 @@
         "internalFuzzy": "0",
         "matchRate": "63",
         "wordCount": "20",
+        "characterCount": "138",
         "type": "tm"
     },
     {
@@ -515,6 +588,7 @@
         "internalFuzzy": "0",
         "matchRate": "63",
         "wordCount": "20",
+        "characterCount": "138",
         "type": "tm"
     },
     {
@@ -522,6 +596,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "20",
+        "characterCount": "138",
         "type": "termcollection"
     },
     {
@@ -529,6 +604,7 @@
         "internalFuzzy": "0",
         "matchRate": "68",
         "wordCount": "22",
+        "characterCount": "147",
         "type": "tm"
     },
     {
@@ -536,6 +612,7 @@
         "internalFuzzy": "0",
         "matchRate": "68",
         "wordCount": "22",
+        "characterCount": "147",
         "type": "tm"
     },
     {
@@ -543,6 +620,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "22",
+        "characterCount": "147",
         "type": "termcollection"
     },
     {
@@ -550,6 +628,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "6",
+        "characterCount": "38",
         "type": "tm"
     },
     {
@@ -557,6 +636,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "6",
+        "characterCount": "38",
         "type": "tm"
     },
     {
@@ -564,6 +644,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "6",
+        "characterCount": "38",
         "type": "termcollection"
     },
     {
@@ -571,6 +652,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "6",
+        "characterCount": "49",
         "type": "tm"
     },
     {
@@ -578,6 +660,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "6",
+        "characterCount": "49",
         "type": "tm"
     },
     {
@@ -585,6 +668,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "6",
+        "characterCount": "49",
         "type": "termcollection"
     },
     {
@@ -592,6 +676,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "3",
+        "characterCount": "22",
         "type": "auto-propagated"
     },
     {
@@ -599,6 +684,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "17",
         "type": "tm"
     },
     {
@@ -606,6 +692,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "17",
         "type": "tm"
     },
     {
@@ -613,6 +700,7 @@
         "internalFuzzy": "0",
         "matchRate": "104",
         "wordCount": "3",
+        "characterCount": "17",
         "type": "termcollection"
     },
     {
@@ -620,6 +708,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "37",
         "type": "tm"
     },
     {
@@ -627,6 +716,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "37",
         "type": "tm"
     },
     {
@@ -634,6 +724,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "37",
         "type": "termcollection"
     },
     {
@@ -641,6 +732,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "121",
         "type": "tm"
     },
     {
@@ -648,6 +740,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "121",
         "type": "tm"
     },
     {
@@ -655,6 +748,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "121",
         "type": "termcollection"
     },
     {
@@ -662,6 +756,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "119",
         "type": "tm"
     },
     {
@@ -669,6 +764,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "119",
         "type": "tm"
     },
     {
@@ -676,6 +772,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "119",
         "type": "termcollection"
     },
     {
@@ -683,6 +780,7 @@
         "internalFuzzy": "1",
         "matchRate": "38",
         "wordCount": "10",
+        "characterCount": "64",
         "type": "tm"
     },
     {
@@ -690,6 +788,7 @@
         "internalFuzzy": "1",
         "matchRate": "38",
         "wordCount": "10",
+        "characterCount": "64",
         "type": "tm"
     },
     {
@@ -697,6 +796,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "10",
+        "characterCount": "64",
         "type": "termcollection"
     },
     {
@@ -704,6 +804,7 @@
         "internalFuzzy": "0",
         "matchRate": "57",
         "wordCount": "4",
+        "characterCount": "44",
         "type": "tm"
     },
     {
@@ -711,6 +812,7 @@
         "internalFuzzy": "0",
         "matchRate": "57",
         "wordCount": "4",
+        "characterCount": "44",
         "type": "tm"
     },
     {
@@ -718,20 +820,23 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "44",
         "type": "termcollection"
     },
     {
         "segmentNrInTask": "36",
         "internalFuzzy": "0",
-        "matchRate": "30",
+        "matchRate": "42",
         "wordCount": "3",
+        "characterCount": "26",
         "type": "tm"
     },
     {
         "segmentNrInTask": "36",
         "internalFuzzy": "0",
-        "matchRate": "30",
+        "matchRate": "42",
         "wordCount": "3",
+        "characterCount": "26",
         "type": "tm"
     },
     {
@@ -739,6 +844,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "26",
         "type": "termcollection"
     },
     {
@@ -746,6 +852,7 @@
         "internalFuzzy": "0",
         "matchRate": "66",
         "wordCount": "3",
+        "characterCount": "31",
         "type": "tm"
     },
     {
@@ -753,6 +860,7 @@
         "internalFuzzy": "0",
         "matchRate": "66",
         "wordCount": "3",
+        "characterCount": "31",
         "type": "tm"
     },
     {
@@ -760,6 +868,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "31",
         "type": "termcollection"
     },
     {
@@ -767,6 +876,7 @@
         "internalFuzzy": "0",
         "matchRate": "44",
         "wordCount": "7",
+        "characterCount": "44",
         "type": "tm"
     },
     {
@@ -774,6 +884,7 @@
         "internalFuzzy": "0",
         "matchRate": "44",
         "wordCount": "7",
+        "characterCount": "44",
         "type": "tm"
     },
     {
@@ -781,6 +892,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "44",
         "type": "termcollection"
     },
     {
@@ -788,6 +900,7 @@
         "internalFuzzy": "0",
         "matchRate": "104",
         "wordCount": "3",
+        "characterCount": "17",
         "type": "auto-propagated"
     },
     {
@@ -795,6 +908,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "18",
+        "characterCount": "149",
         "type": "tm"
     },
     {
@@ -802,6 +916,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "18",
+        "characterCount": "149",
         "type": "tm"
     },
     {
@@ -809,6 +924,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "18",
+        "characterCount": "149",
         "type": "termcollection"
     },
     {
@@ -816,6 +932,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "27",
+        "characterCount": "190",
         "type": "tm"
     },
     {
@@ -823,6 +940,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "27",
+        "characterCount": "190",
         "type": "tm"
     },
     {
@@ -830,6 +948,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "27",
+        "characterCount": "190",
         "type": "termcollection"
     },
     {
@@ -837,6 +956,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "23",
         "type": "tm"
     },
     {
@@ -844,6 +964,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "23",
         "type": "tm"
     },
     {
@@ -851,6 +972,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "23",
         "type": "termcollection"
     },
     {
@@ -858,6 +980,7 @@
         "internalFuzzy": "0",
         "matchRate": "90",
         "wordCount": "8",
+        "characterCount": "92",
         "type": "tm"
     },
     {
@@ -865,6 +988,7 @@
         "internalFuzzy": "0",
         "matchRate": "90",
         "wordCount": "8",
+        "characterCount": "92",
         "type": "tm"
     },
     {
@@ -872,20 +996,23 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "8",
+        "characterCount": "92",
         "type": "termcollection"
     },
     {
         "segmentNrInTask": "44",
         "internalFuzzy": "0",
-        "matchRate": "88",
+        "matchRate": "100",
         "wordCount": "19",
+        "characterCount": "141",
         "type": "tm"
     },
     {
         "segmentNrInTask": "44",
         "internalFuzzy": "0",
-        "matchRate": "88",
+        "matchRate": "100",
         "wordCount": "19",
+        "characterCount": "141",
         "type": "tm"
     },
     {
@@ -893,6 +1020,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "19",
+        "characterCount": "141",
         "type": "termcollection"
     },
     {
@@ -900,6 +1028,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "17",
+        "characterCount": "86",
         "type": "tm"
     },
     {
@@ -907,6 +1036,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "17",
+        "characterCount": "86",
         "type": "tm"
     },
     {
@@ -914,6 +1044,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "86",
         "type": "termcollection"
     },
     {
@@ -921,6 +1052,7 @@
         "internalFuzzy": "0",
         "matchRate": "90",
         "wordCount": "7",
+        "characterCount": "115",
         "type": "tm"
     },
     {
@@ -928,6 +1060,7 @@
         "internalFuzzy": "0",
         "matchRate": "90",
         "wordCount": "7",
+        "characterCount": "115",
         "type": "tm"
     },
     {
@@ -935,6 +1068,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "115",
         "type": "termcollection"
     },
     {
@@ -942,6 +1076,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "31",
         "type": "tm"
     },
     {
@@ -949,6 +1084,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "31",
         "type": "tm"
     },
     {
@@ -956,6 +1092,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "31",
         "type": "termcollection"
     },
     {
@@ -963,6 +1100,7 @@
         "internalFuzzy": "0",
         "matchRate": "88",
         "wordCount": "18",
+        "characterCount": "166",
         "type": "tm"
     },
     {
@@ -970,6 +1108,7 @@
         "internalFuzzy": "0",
         "matchRate": "88",
         "wordCount": "18",
+        "characterCount": "166",
         "type": "tm"
     },
     {
@@ -977,6 +1116,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "18",
+        "characterCount": "166",
         "type": "termcollection"
     },
     {
@@ -984,6 +1124,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "4",
+        "characterCount": "37",
         "type": "tm"
     },
     {
@@ -991,6 +1132,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "4",
+        "characterCount": "37",
         "type": "tm"
     },
     {
@@ -998,6 +1140,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "37",
         "type": "termcollection"
     },
     {
@@ -1005,6 +1148,7 @@
         "internalFuzzy": "0",
         "matchRate": "86",
         "wordCount": "16",
+        "characterCount": "132",
         "type": "tm"
     },
     {
@@ -1012,6 +1156,7 @@
         "internalFuzzy": "0",
         "matchRate": "86",
         "wordCount": "16",
+        "characterCount": "132",
         "type": "tm"
     },
     {
@@ -1019,6 +1164,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "16",
+        "characterCount": "132",
         "type": "termcollection"
     },
     {
@@ -1026,6 +1172,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "20",
         "type": "tm"
     },
     {
@@ -1033,6 +1180,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "20",
         "type": "tm"
     },
     {
@@ -1040,20 +1188,23 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "20",
         "type": "termcollection"
     },
     {
         "segmentNrInTask": "52",
         "internalFuzzy": "0",
-        "matchRate": "73",
+        "matchRate": "83",
         "wordCount": "11",
+        "characterCount": "77",
         "type": "tm"
     },
     {
         "segmentNrInTask": "52",
         "internalFuzzy": "0",
-        "matchRate": "73",
+        "matchRate": "83",
         "wordCount": "11",
+        "characterCount": "77",
         "type": "tm"
     },
     {
@@ -1061,6 +1212,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "11",
+        "characterCount": "77",
         "type": "termcollection"
     },
     {
@@ -1068,6 +1220,7 @@
         "internalFuzzy": "0",
         "matchRate": "101",
         "wordCount": "7",
+        "characterCount": "62",
         "type": "tm"
     },
     {
@@ -1075,6 +1228,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "7",
+        "characterCount": "62",
         "type": "tm"
     },
     {
@@ -1082,6 +1236,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "62",
         "type": "termcollection"
     },
     {
@@ -1089,6 +1244,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "7",
+        "characterCount": "62",
         "type": "auto-propagated"
     },
     {
@@ -1096,6 +1252,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "8",
+        "characterCount": "68",
         "type": "tm"
     },
     {
@@ -1103,6 +1260,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "8",
+        "characterCount": "68",
         "type": "tm"
     },
     {
@@ -1110,6 +1268,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "8",
+        "characterCount": "68",
         "type": "termcollection"
     },
     {
@@ -1117,6 +1276,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "4",
+        "characterCount": "23",
         "type": "tm"
     },
     {
@@ -1124,6 +1284,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "4",
+        "characterCount": "23",
         "type": "tm"
     },
     {
@@ -1131,6 +1292,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "23",
         "type": "termcollection"
     },
     {
@@ -1138,6 +1300,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "48",
         "type": "tm"
     },
     {
@@ -1145,6 +1308,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "48",
         "type": "tm"
     },
     {
@@ -1152,6 +1316,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "48",
         "type": "termcollection"
     },
     {
@@ -1159,6 +1324,7 @@
         "internalFuzzy": "0",
         "matchRate": "90",
         "wordCount": "10",
+        "characterCount": "102",
         "type": "tm"
     },
     {
@@ -1166,6 +1332,7 @@
         "internalFuzzy": "0",
         "matchRate": "90",
         "wordCount": "10",
+        "characterCount": "102",
         "type": "tm"
     },
     {
@@ -1173,6 +1340,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "10",
+        "characterCount": "102",
         "type": "termcollection"
     },
     {
@@ -1180,6 +1348,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "21",
+        "characterCount": "167",
         "type": "tm"
     },
     {
@@ -1187,6 +1356,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "21",
+        "characterCount": "167",
         "type": "tm"
     },
     {
@@ -1194,6 +1364,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "21",
+        "characterCount": "167",
         "type": "termcollection"
     },
     {
@@ -1201,6 +1372,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "24",
         "type": "tm"
     },
     {
@@ -1208,6 +1380,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "24",
         "type": "tm"
     },
     {
@@ -1215,6 +1388,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "24",
         "type": "termcollection"
     },
     {
@@ -1222,6 +1396,7 @@
         "internalFuzzy": "0",
         "matchRate": "66",
         "wordCount": "16",
+        "characterCount": "117",
         "type": "tm"
     },
     {
@@ -1229,6 +1404,7 @@
         "internalFuzzy": "0",
         "matchRate": "66",
         "wordCount": "16",
+        "characterCount": "117",
         "type": "tm"
     },
     {
@@ -1236,6 +1412,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "16",
+        "characterCount": "117",
         "type": "termcollection"
     },
     {
@@ -1243,6 +1420,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "21",
         "type": "tm"
     },
     {
@@ -1250,6 +1428,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "21",
         "type": "tm"
     },
     {
@@ -1257,6 +1436,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "21",
         "type": "termcollection"
     },
     {
@@ -1264,6 +1444,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "38",
         "type": "tm"
     },
     {
@@ -1271,6 +1452,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "38",
         "type": "tm"
     },
     {
@@ -1278,6 +1460,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "38",
         "type": "termcollection"
     },
     {
@@ -1285,6 +1468,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "5",
+        "characterCount": "38",
         "type": "auto-propagated"
     },
     {
@@ -1292,6 +1476,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "54",
         "type": "tm"
     },
     {
@@ -1299,6 +1484,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "54",
         "type": "tm"
     },
     {
@@ -1306,6 +1492,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "54",
         "type": "termcollection"
     },
     {
@@ -1313,6 +1500,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "37",
         "type": "tm"
     },
     {
@@ -1320,6 +1508,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "37",
         "type": "tm"
     },
     {
@@ -1327,6 +1516,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "37",
         "type": "termcollection"
     },
     {
@@ -1334,6 +1524,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "16",
         "type": "tm"
     },
     {
@@ -1341,6 +1532,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "16",
         "type": "tm"
     },
     {
@@ -1348,6 +1540,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "16",
         "type": "termcollection"
     },
     {
@@ -1355,6 +1548,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "9",
         "type": "tm"
     },
     {
@@ -1362,6 +1556,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "9",
         "type": "tm"
     },
     {
@@ -1369,6 +1564,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "9",
         "type": "termcollection"
     },
     {
@@ -1376,6 +1572,7 @@
         "internalFuzzy": "0",
         "matchRate": "40",
         "wordCount": "5",
+        "characterCount": "31",
         "type": "tm"
     },
     {
@@ -1383,6 +1580,7 @@
         "internalFuzzy": "0",
         "matchRate": "40",
         "wordCount": "5",
+        "characterCount": "31",
         "type": "tm"
     },
     {
@@ -1390,20 +1588,23 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "31",
         "type": "termcollection"
     },
     {
         "segmentNrInTask": "70",
-        "internalFuzzy": "1",
-        "matchRate": "101",
+        "internalFuzzy": "0",
+        "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "21",
         "type": "tm"
     },
     {
         "segmentNrInTask": "70",
-        "internalFuzzy": "1",
-        "matchRate": "101",
+        "internalFuzzy": "0",
+        "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "21",
         "type": "tm"
     },
     {
@@ -1411,6 +1612,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "21",
         "type": "termcollection"
     },
     {
@@ -1418,6 +1620,7 @@
         "internalFuzzy": "0",
         "matchRate": "57",
         "wordCount": "5",
+        "characterCount": "43",
         "type": "tm"
     },
     {
@@ -1425,6 +1628,7 @@
         "internalFuzzy": "0",
         "matchRate": "57",
         "wordCount": "5",
+        "characterCount": "43",
         "type": "tm"
     },
     {
@@ -1432,6 +1636,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "43",
         "type": "termcollection"
     },
     {
@@ -1439,6 +1644,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "21",
+        "characterCount": "153",
         "type": "tm"
     },
     {
@@ -1446,6 +1652,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "21",
+        "characterCount": "153",
         "type": "tm"
     },
     {
@@ -1453,6 +1660,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "21",
+        "characterCount": "153",
         "type": "termcollection"
     },
     {
@@ -1460,6 +1668,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "24",
+        "characterCount": "163",
         "type": "tm"
     },
     {
@@ -1467,6 +1676,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "24",
+        "characterCount": "163",
         "type": "tm"
     },
     {
@@ -1474,6 +1684,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "24",
+        "characterCount": "163",
         "type": "termcollection"
     },
     {
@@ -1481,6 +1692,7 @@
         "internalFuzzy": "0",
         "matchRate": "92",
         "wordCount": "36",
+        "characterCount": "316",
         "type": "tm"
     },
     {
@@ -1488,6 +1700,7 @@
         "internalFuzzy": "0",
         "matchRate": "92",
         "wordCount": "36",
+        "characterCount": "316",
         "type": "tm"
     },
     {
@@ -1495,6 +1708,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "36",
+        "characterCount": "316",
         "type": "termcollection"
     },
     {
@@ -1502,34 +1716,23 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "3",
+        "characterCount": "22",
         "type": "auto-propagated"
     },
     {
         "segmentNrInTask": "76",
-        "internalFuzzy": "1",
-        "matchRate": "63",
-        "wordCount": "4",
-        "type": "tm"
-    },
-    {
-        "segmentNrInTask": "76",
-        "internalFuzzy": "1",
-        "matchRate": "63",
-        "wordCount": "4",
-        "type": "tm"
-    },
-    {
-        "segmentNrInTask": "76",
         "internalFuzzy": "0",
-        "matchRate": "0",
+        "matchRate": "102",
         "wordCount": "4",
-        "type": "termcollection"
+        "characterCount": "37",
+        "type": "auto-propagated"
     },
     {
         "segmentNrInTask": "77",
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "23",
         "type": "tm"
     },
     {
@@ -1537,6 +1740,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "23",
         "type": "tm"
     },
     {
@@ -1544,6 +1748,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "23",
         "type": "termcollection"
     },
     {
@@ -1551,6 +1756,7 @@
         "internalFuzzy": "0",
         "matchRate": "42",
         "wordCount": "3",
+        "characterCount": "28",
         "type": "tm"
     },
     {
@@ -1558,6 +1764,7 @@
         "internalFuzzy": "0",
         "matchRate": "42",
         "wordCount": "3",
+        "characterCount": "28",
         "type": "tm"
     },
     {
@@ -1565,6 +1772,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "28",
         "type": "termcollection"
     },
     {
@@ -1572,6 +1780,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "24",
         "type": "tm"
     },
     {
@@ -1579,6 +1788,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "24",
         "type": "tm"
     },
     {
@@ -1586,6 +1796,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "24",
         "type": "termcollection"
     },
     {
@@ -1593,6 +1804,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "auto-propagated"
     },
     {
@@ -1600,6 +1812,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "11",
         "type": "tm"
     },
     {
@@ -1607,6 +1820,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "11",
         "type": "tm"
     },
     {
@@ -1614,6 +1828,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "11",
         "type": "termcollection"
     },
     {
@@ -1621,6 +1836,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "35",
         "type": "tm"
     },
     {
@@ -1628,6 +1844,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "35",
         "type": "tm"
     },
     {
@@ -1635,6 +1852,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "35",
         "type": "termcollection"
     },
     {
@@ -1642,6 +1860,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "20",
         "type": "tm"
     },
     {
@@ -1649,6 +1868,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "20",
         "type": "tm"
     },
     {
@@ -1656,6 +1876,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "20",
         "type": "termcollection"
     },
     {
@@ -1663,6 +1884,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "5",
+        "characterCount": "38",
         "type": "auto-propagated"
     },
     {
@@ -1670,6 +1892,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "37",
         "type": "tm"
     },
     {
@@ -1677,6 +1900,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "37",
         "type": "tm"
     },
     {
@@ -1684,6 +1908,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "37",
         "type": "termcollection"
     },
     {
@@ -1691,6 +1916,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "11",
         "type": "tm"
     },
     {
@@ -1698,6 +1924,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "11",
         "type": "tm"
     },
     {
@@ -1705,6 +1932,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "11",
         "type": "termcollection"
     },
     {
@@ -1712,6 +1940,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "1",
+        "characterCount": "9",
         "type": "auto-propagated"
     },
     {
@@ -1719,6 +1948,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "5",
+        "characterCount": "31",
         "type": "auto-propagated"
     },
     {
@@ -1726,6 +1956,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "9",
         "type": "tm"
     },
     {
@@ -1733,6 +1964,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "9",
         "type": "tm"
     },
     {
@@ -1740,6 +1972,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "9",
         "type": "termcollection"
     },
     {
@@ -1747,6 +1980,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "26",
         "type": "tm"
     },
     {
@@ -1754,6 +1988,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "26",
         "type": "tm"
     },
     {
@@ -1761,6 +1996,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "26",
         "type": "termcollection"
     },
     {
@@ -1768,6 +2004,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "17",
         "type": "tm"
     },
     {
@@ -1775,6 +2012,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "17",
         "type": "tm"
     },
     {
@@ -1782,6 +2020,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "17",
         "type": "termcollection"
     },
     {
@@ -1789,6 +2028,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "39",
         "type": "tm"
     },
     {
@@ -1796,6 +2036,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "39",
         "type": "tm"
     },
     {
@@ -1803,6 +2044,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "39",
         "type": "termcollection"
     },
     {
@@ -1810,6 +2052,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "27",
         "type": "tm"
     },
     {
@@ -1817,6 +2060,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "27",
         "type": "tm"
     },
     {
@@ -1824,6 +2068,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "27",
         "type": "termcollection"
     },
     {
@@ -1831,6 +2076,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "4",
+        "characterCount": "25",
         "type": "tm"
     },
     {
@@ -1838,6 +2084,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "4",
+        "characterCount": "25",
         "type": "tm"
     },
     {
@@ -1845,6 +2092,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "25",
         "type": "termcollection"
     },
     {
@@ -1852,6 +2100,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "2",
+        "characterCount": "31",
         "type": "auto-propagated"
     },
     {
@@ -1859,6 +2108,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "14",
         "type": "tm"
     },
     {
@@ -1866,6 +2116,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "14",
         "type": "tm"
     },
     {
@@ -1873,6 +2124,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "14",
         "type": "termcollection"
     },
     {
@@ -1880,6 +2132,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "tm"
     },
     {
@@ -1887,6 +2140,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "tm"
     },
     {
@@ -1894,6 +2148,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "termcollection"
     },
     {
@@ -1901,6 +2156,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "3",
+        "characterCount": "31",
         "type": "auto-propagated"
     },
     {
@@ -1908,6 +2164,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "19",
         "type": "tm"
     },
     {
@@ -1915,6 +2172,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "19",
         "type": "tm"
     },
     {
@@ -1922,6 +2180,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "19",
         "type": "termcollection"
     },
     {
@@ -1929,6 +2188,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "27",
         "type": "tm"
     },
     {
@@ -1936,6 +2196,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "27",
         "type": "tm"
     },
     {
@@ -1943,34 +2204,23 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "27",
         "type": "termcollection"
-    },
-    {
-        "segmentNrInTask": "101",
-        "internalFuzzy": "1",
-        "matchRate": "47",
-        "wordCount": "2",
-        "type": "tm"
-    },
-    {
-        "segmentNrInTask": "101",
-        "internalFuzzy": "1",
-        "matchRate": "47",
-        "wordCount": "2",
-        "type": "tm"
     },
     {
         "segmentNrInTask": "101",
         "internalFuzzy": "0",
-        "matchRate": "0",
+        "matchRate": "102",
         "wordCount": "2",
-        "type": "termcollection"
+        "characterCount": "16",
+        "type": "auto-propagated"
     },
     {
         "segmentNrInTask": "102",
         "internalFuzzy": "1",
         "matchRate": "57",
         "wordCount": "4",
+        "characterCount": "33",
         "type": "tm"
     },
     {
@@ -1978,6 +2228,7 @@
         "internalFuzzy": "1",
         "matchRate": "57",
         "wordCount": "4",
+        "characterCount": "33",
         "type": "tm"
     },
     {
@@ -1985,6 +2236,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "33",
         "type": "termcollection"
     },
     {
@@ -1992,6 +2244,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "18",
         "type": "tm"
     },
     {
@@ -1999,6 +2252,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "18",
         "type": "tm"
     },
     {
@@ -2006,6 +2260,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "18",
         "type": "termcollection"
     },
     {
@@ -2013,6 +2268,7 @@
         "internalFuzzy": "0",
         "matchRate": "104",
         "wordCount": "3",
+        "characterCount": "17",
         "type": "auto-propagated"
     },
     {
@@ -2020,6 +2276,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "20",
         "type": "tm"
     },
     {
@@ -2027,6 +2284,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "20",
         "type": "tm"
     },
     {
@@ -2034,6 +2292,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "20",
         "type": "termcollection"
     },
     {
@@ -2041,6 +2300,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "2",
+        "characterCount": "21",
         "type": "auto-propagated"
     },
     {
@@ -2048,6 +2308,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "27",
         "type": "tm"
     },
     {
@@ -2055,6 +2316,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "27",
         "type": "tm"
     },
     {
@@ -2062,6 +2324,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "27",
         "type": "termcollection"
     },
     {
@@ -2069,6 +2332,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "tm"
     },
     {
@@ -2076,6 +2340,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "tm"
     },
     {
@@ -2083,6 +2348,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "termcollection"
     },
     {
@@ -2090,6 +2356,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "tm"
     },
     {
@@ -2097,6 +2364,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "tm"
     },
     {
@@ -2104,6 +2372,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "10",
         "type": "termcollection"
     },
     {
@@ -2111,6 +2380,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "16",
         "type": "tm"
     },
     {
@@ -2118,6 +2388,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "16",
         "type": "tm"
     },
     {
@@ -2125,6 +2396,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "16",
         "type": "termcollection"
     },
     {
@@ -2132,6 +2404,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "13",
         "type": "tm"
     },
     {
@@ -2139,6 +2412,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "13",
         "type": "tm"
     },
     {
@@ -2146,6 +2420,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "13",
         "type": "termcollection"
     },
     {
@@ -2153,6 +2428,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "25",
         "type": "tm"
     },
     {
@@ -2160,6 +2436,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "25",
         "type": "tm"
     },
     {
@@ -2167,6 +2444,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "25",
         "type": "termcollection"
     },
     {
@@ -2174,6 +2452,7 @@
         "internalFuzzy": "0",
         "matchRate": "101",
         "wordCount": "1",
+        "characterCount": "9",
         "type": "tm"
     },
     {
@@ -2181,6 +2460,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "9",
         "type": "tm"
     },
     {
@@ -2188,6 +2468,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "9",
         "type": "termcollection"
     },
     {
@@ -2195,6 +2476,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "22",
         "type": "tm"
     },
     {
@@ -2202,6 +2484,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "22",
         "type": "tm"
     },
     {
@@ -2209,6 +2492,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "22",
         "type": "termcollection"
     },
     {
@@ -2216,6 +2500,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "38",
         "type": "tm"
     },
     {
@@ -2223,6 +2508,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "38",
         "type": "tm"
     },
     {
@@ -2230,6 +2516,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "38",
         "type": "termcollection"
     },
     {
@@ -2237,6 +2524,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "17",
         "type": "tm"
     },
     {
@@ -2244,6 +2532,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "17",
         "type": "tm"
     },
     {
@@ -2251,6 +2540,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "17",
         "type": "termcollection"
     },
     {
@@ -2258,6 +2548,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "12",
         "type": "tm"
     },
     {
@@ -2265,6 +2556,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "1",
+        "characterCount": "12",
         "type": "tm"
     },
     {
@@ -2272,6 +2564,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "12",
         "type": "termcollection"
     },
     {
@@ -2279,6 +2572,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "11",
         "type": "tm"
     },
     {
@@ -2286,6 +2580,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "2",
+        "characterCount": "11",
         "type": "tm"
     },
     {
@@ -2293,6 +2588,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "11",
         "type": "termcollection"
     },
     {
@@ -2300,6 +2596,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "9",
+        "characterCount": "68",
         "type": "tm"
     },
     {
@@ -2307,6 +2604,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "9",
+        "characterCount": "68",
         "type": "tm"
     },
     {
@@ -2314,6 +2612,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "9",
+        "characterCount": "68",
         "type": "termcollection"
     },
     {
@@ -2321,6 +2620,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "11",
+        "characterCount": "74",
         "type": "tm"
     },
     {
@@ -2328,6 +2628,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "11",
+        "characterCount": "74",
         "type": "tm"
     },
     {
@@ -2335,6 +2636,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "11",
+        "characterCount": "74",
         "type": "termcollection"
     },
     {
@@ -2342,6 +2644,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "42",
         "type": "tm"
     },
     {
@@ -2349,6 +2652,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "42",
         "type": "tm"
     },
     {
@@ -2356,6 +2660,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "42",
         "type": "termcollection"
     },
     {
@@ -2363,6 +2668,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "19",
+        "characterCount": "141",
         "type": "tm"
     },
     {
@@ -2370,6 +2676,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "19",
+        "characterCount": "141",
         "type": "tm"
     },
     {
@@ -2377,6 +2684,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "19",
+        "characterCount": "141",
         "type": "termcollection"
     },
     {
@@ -2384,6 +2692,7 @@
         "internalFuzzy": "0",
         "matchRate": "92",
         "wordCount": "19",
+        "characterCount": "152",
         "type": "tm"
     },
     {
@@ -2391,6 +2700,7 @@
         "internalFuzzy": "0",
         "matchRate": "92",
         "wordCount": "19",
+        "characterCount": "152",
         "type": "tm"
     },
     {
@@ -2398,6 +2708,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "19",
+        "characterCount": "152",
         "type": "termcollection"
     },
     {
@@ -2405,6 +2716,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "15",
         "type": "tm"
     },
     {
@@ -2412,6 +2724,7 @@
         "internalFuzzy": "0",
         "matchRate": "100",
         "wordCount": "3",
+        "characterCount": "15",
         "type": "tm"
     },
     {
@@ -2419,6 +2732,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "15",
         "type": "termcollection"
     },
     {
@@ -2426,6 +2740,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "10",
         "type": "tm"
     },
     {
@@ -2433,6 +2748,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "10",
         "type": "tm"
     },
     {
@@ -2440,20 +2756,23 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "10",
         "type": "termcollection"
     },
     {
         "segmentNrInTask": "126",
         "internalFuzzy": "0",
-        "matchRate": "11",
+        "matchRate": "13",
         "wordCount": "6",
+        "characterCount": "48",
         "type": "tm"
     },
     {
         "segmentNrInTask": "126",
         "internalFuzzy": "0",
-        "matchRate": "11",
+        "matchRate": "13",
         "wordCount": "6",
+        "characterCount": "48",
         "type": "tm"
     },
     {
@@ -2461,6 +2780,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "6",
+        "characterCount": "48",
         "type": "termcollection"
     },
     {
@@ -2468,6 +2788,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "29",
         "type": "tm"
     },
     {
@@ -2475,6 +2796,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "29",
         "type": "tm"
     },
     {
@@ -2482,6 +2804,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "29",
         "type": "termcollection"
     },
     {
@@ -2489,6 +2812,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "33",
         "type": "tm"
     },
     {
@@ -2496,6 +2820,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "33",
         "type": "tm"
     },
     {
@@ -2503,20 +2828,23 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "33",
         "type": "termcollection"
     },
     {
         "segmentNrInTask": "129",
         "internalFuzzy": "1",
-        "matchRate": "77",
+        "matchRate": "71",
         "wordCount": "3",
+        "characterCount": "34",
         "type": "tm"
     },
     {
         "segmentNrInTask": "129",
         "internalFuzzy": "1",
-        "matchRate": "77",
+        "matchRate": "71",
         "wordCount": "3",
+        "characterCount": "34",
         "type": "tm"
     },
     {
@@ -2524,6 +2852,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "34",
         "type": "termcollection"
     },
     {
@@ -2531,6 +2860,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "34",
         "type": "tm"
     },
     {
@@ -2538,6 +2868,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "34",
         "type": "tm"
     },
     {
@@ -2545,6 +2876,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "34",
         "type": "termcollection"
     },
     {
@@ -2552,6 +2884,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "19",
+        "characterCount": "173",
         "type": "tm"
     },
     {
@@ -2559,6 +2892,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "19",
+        "characterCount": "173",
         "type": "tm"
     },
     {
@@ -2566,6 +2900,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "19",
+        "characterCount": "173",
         "type": "termcollection"
     },
     {
@@ -2573,6 +2908,7 @@
         "internalFuzzy": "1",
         "matchRate": "85",
         "wordCount": "6",
+        "characterCount": "48",
         "type": "tm"
     },
     {
@@ -2580,6 +2916,7 @@
         "internalFuzzy": "1",
         "matchRate": "85",
         "wordCount": "6",
+        "characterCount": "48",
         "type": "tm"
     },
     {
@@ -2587,6 +2924,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "6",
+        "characterCount": "48",
         "type": "termcollection"
     },
     {
@@ -2594,6 +2932,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "14",
+        "characterCount": "98",
         "type": "tm"
     },
     {
@@ -2601,6 +2940,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "14",
+        "characterCount": "98",
         "type": "tm"
     },
     {
@@ -2608,6 +2948,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "14",
+        "characterCount": "98",
         "type": "termcollection"
     },
     {
@@ -2615,6 +2956,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "13",
+        "characterCount": "93",
         "type": "tm"
     },
     {
@@ -2622,6 +2964,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "13",
+        "characterCount": "93",
         "type": "tm"
     },
     {
@@ -2629,20 +2972,23 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "13",
+        "characterCount": "93",
         "type": "termcollection"
     },
     {
         "segmentNrInTask": "135",
         "internalFuzzy": "0",
-        "matchRate": "37",
+        "matchRate": "66",
         "wordCount": "3",
+        "characterCount": "33",
         "type": "tm"
     },
     {
         "segmentNrInTask": "135",
         "internalFuzzy": "0",
-        "matchRate": "37",
+        "matchRate": "66",
         "wordCount": "3",
+        "characterCount": "33",
         "type": "tm"
     },
     {
@@ -2650,6 +2996,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "33",
         "type": "termcollection"
     },
     {
@@ -2657,6 +3004,7 @@
         "internalFuzzy": "0",
         "matchRate": "33",
         "wordCount": "3",
+        "characterCount": "39",
         "type": "tm"
     },
     {
@@ -2664,6 +3012,7 @@
         "internalFuzzy": "0",
         "matchRate": "33",
         "wordCount": "3",
+        "characterCount": "39",
         "type": "tm"
     },
     {
@@ -2671,6 +3020,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "39",
         "type": "termcollection"
     },
     {
@@ -2678,6 +3028,7 @@
         "internalFuzzy": "1",
         "matchRate": "28",
         "wordCount": "5",
+        "characterCount": "43",
         "type": "tm"
     },
     {
@@ -2685,6 +3036,7 @@
         "internalFuzzy": "1",
         "matchRate": "28",
         "wordCount": "5",
+        "characterCount": "43",
         "type": "tm"
     },
     {
@@ -2692,6 +3044,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "43",
         "type": "termcollection"
     },
     {
@@ -2699,6 +3052,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "28",
         "type": "tm"
     },
     {
@@ -2706,6 +3060,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "28",
         "type": "tm"
     },
     {
@@ -2713,6 +3068,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "28",
         "type": "termcollection"
     },
     {
@@ -2720,6 +3076,7 @@
         "internalFuzzy": "1",
         "matchRate": "66",
         "wordCount": "4",
+        "characterCount": "39",
         "type": "tm"
     },
     {
@@ -2727,6 +3084,7 @@
         "internalFuzzy": "1",
         "matchRate": "66",
         "wordCount": "4",
+        "characterCount": "39",
         "type": "tm"
     },
     {
@@ -2734,6 +3092,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "39",
         "type": "termcollection"
     },
     {
@@ -2741,6 +3100,7 @@
         "internalFuzzy": "1",
         "matchRate": "66",
         "wordCount": "2",
+        "characterCount": "22",
         "type": "tm"
     },
     {
@@ -2748,6 +3108,7 @@
         "internalFuzzy": "1",
         "matchRate": "66",
         "wordCount": "2",
+        "characterCount": "22",
         "type": "tm"
     },
     {
@@ -2755,6 +3116,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "22",
         "type": "termcollection"
     },
     {
@@ -2762,6 +3124,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "31",
         "type": "tm"
     },
     {
@@ -2769,6 +3132,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "31",
         "type": "tm"
     },
     {
@@ -2776,6 +3140,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "31",
         "type": "termcollection"
     },
     {
@@ -2783,6 +3148,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "8",
+        "characterCount": "71",
         "type": "tm"
     },
     {
@@ -2790,6 +3156,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "8",
+        "characterCount": "71",
         "type": "tm"
     },
     {
@@ -2797,6 +3164,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "8",
+        "characterCount": "71",
         "type": "termcollection"
     },
     {
@@ -2804,6 +3172,7 @@
         "internalFuzzy": "1",
         "matchRate": "33",
         "wordCount": "7",
+        "characterCount": "75",
         "type": "tm"
     },
     {
@@ -2811,6 +3180,7 @@
         "internalFuzzy": "1",
         "matchRate": "33",
         "wordCount": "7",
+        "characterCount": "75",
         "type": "tm"
     },
     {
@@ -2818,6 +3188,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "75",
         "type": "termcollection"
     },
     {
@@ -2825,6 +3196,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "69",
         "type": "tm"
     },
     {
@@ -2832,6 +3204,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "69",
         "type": "tm"
     },
     {
@@ -2839,6 +3212,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "69",
         "type": "termcollection"
     },
     {
@@ -2846,6 +3220,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "44",
         "type": "tm"
     },
     {
@@ -2853,6 +3228,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "44",
         "type": "tm"
     },
     {
@@ -2860,6 +3236,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "5",
+        "characterCount": "44",
         "type": "termcollection"
     },
     {
@@ -2867,6 +3244,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "45",
         "type": "tm"
     },
     {
@@ -2874,6 +3252,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "45",
         "type": "tm"
     },
     {
@@ -2881,6 +3260,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "45",
         "type": "termcollection"
     },
     {
@@ -2888,6 +3268,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "153",
         "type": "tm"
     },
     {
@@ -2895,6 +3276,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "153",
         "type": "tm"
     },
     {
@@ -2902,6 +3284,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "17",
+        "characterCount": "153",
         "type": "termcollection"
     },
     {
@@ -2909,6 +3292,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "30",
         "type": "tm"
     },
     {
@@ -2916,6 +3300,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "30",
         "type": "tm"
     },
     {
@@ -2923,6 +3308,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "30",
         "type": "termcollection"
     },
     {
@@ -2930,6 +3316,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "14",
+        "characterCount": "122",
         "type": "tm"
     },
     {
@@ -2937,6 +3324,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "14",
+        "characterCount": "122",
         "type": "tm"
     },
     {
@@ -2944,6 +3332,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "14",
+        "characterCount": "122",
         "type": "termcollection"
     },
     {
@@ -2951,6 +3340,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "18",
         "type": "tm"
     },
     {
@@ -2958,6 +3348,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "18",
         "type": "tm"
     },
     {
@@ -2965,6 +3356,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "18",
         "type": "termcollection"
     },
     {
@@ -2972,6 +3364,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "18",
         "type": "tm"
     },
     {
@@ -2979,6 +3372,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "18",
         "type": "tm"
     },
     {
@@ -2986,6 +3380,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "18",
         "type": "termcollection"
     },
     {
@@ -2993,6 +3388,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "10",
+        "characterCount": "101",
         "type": "tm"
     },
     {
@@ -3000,6 +3396,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "10",
+        "characterCount": "101",
         "type": "tm"
     },
     {
@@ -3007,6 +3404,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "10",
+        "characterCount": "101",
         "type": "termcollection"
     },
     {
@@ -3014,6 +3412,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "72",
         "type": "tm"
     },
     {
@@ -3021,6 +3420,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "72",
         "type": "tm"
     },
     {
@@ -3028,6 +3428,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7",
+        "characterCount": "72",
         "type": "termcollection"
     },
     {
@@ -3035,6 +3436,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "6",
+        "characterCount": "37",
         "type": "tm"
     },
     {
@@ -3042,6 +3444,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "6",
+        "characterCount": "37",
         "type": "tm"
     },
     {
@@ -3049,6 +3452,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "6",
+        "characterCount": "37",
         "type": "termcollection"
     },
     {
@@ -3056,6 +3460,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "19",
         "type": "tm"
     },
     {
@@ -3063,6 +3468,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "19",
         "type": "tm"
     },
     {
@@ -3070,6 +3476,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "19",
         "type": "termcollection"
     },
     {
@@ -3077,6 +3484,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "41",
         "type": "tm"
     },
     {
@@ -3084,6 +3492,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "41",
         "type": "tm"
     },
     {
@@ -3091,6 +3500,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "4",
+        "characterCount": "41",
         "type": "termcollection"
     },
     {
@@ -3098,6 +3508,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "11",
+        "characterCount": "105",
         "type": "tm"
     },
     {
@@ -3105,6 +3516,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "11",
+        "characterCount": "105",
         "type": "tm"
     },
     {
@@ -3112,6 +3524,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "11",
+        "characterCount": "105",
         "type": "termcollection"
     },
     {
@@ -3119,6 +3532,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "6",
+        "characterCount": "40",
         "type": "tm"
     },
     {
@@ -3126,6 +3540,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "6",
+        "characterCount": "40",
         "type": "tm"
     },
     {
@@ -3133,6 +3548,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "6",
+        "characterCount": "40",
         "type": "termcollection"
     },
     {
@@ -3140,6 +3556,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "14",
+        "characterCount": "113",
         "type": "tm"
     },
     {
@@ -3147,6 +3564,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "14",
+        "characterCount": "113",
         "type": "tm"
     },
     {
@@ -3154,6 +3572,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "14",
+        "characterCount": "113",
         "type": "termcollection"
     },
     {
@@ -3161,6 +3580,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "40",
         "type": "tm"
     },
     {
@@ -3168,6 +3588,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "40",
         "type": "tm"
     },
     {
@@ -3175,6 +3596,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "40",
         "type": "termcollection"
     },
     {
@@ -3182,6 +3604,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "1",
+        "characterCount": "17",
         "type": "auto-propagated"
     },
     {
@@ -3189,6 +3612,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "4",
+        "characterCount": "39",
         "type": "auto-propagated"
     },
     {
@@ -3196,6 +3620,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "5",
+        "characterCount": "43",
         "type": "auto-propagated"
     },
     {
@@ -3203,6 +3628,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "2",
+        "characterCount": "28",
         "type": "auto-propagated"
     },
     {
@@ -3210,6 +3636,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "4",
+        "characterCount": "39",
         "type": "auto-propagated"
     },
     {
@@ -3217,6 +3644,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "20",
         "type": "tm"
     },
     {
@@ -3224,6 +3652,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "20",
         "type": "tm"
     },
     {
@@ -3231,6 +3660,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "2",
+        "characterCount": "20",
         "type": "termcollection"
     },
     {
@@ -3238,6 +3668,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "23",
         "type": "tm"
     },
     {
@@ -3245,6 +3676,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "23",
         "type": "tm"
     },
     {
@@ -3252,6 +3684,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "1",
+        "characterCount": "23",
         "type": "termcollection"
     },
     {
@@ -3259,6 +3692,7 @@
         "internalFuzzy": "1",
         "matchRate": "80",
         "wordCount": "12",
+        "characterCount": "118",
         "type": "tm"
     },
     {
@@ -3266,6 +3700,7 @@
         "internalFuzzy": "1",
         "matchRate": "80",
         "wordCount": "12",
+        "characterCount": "118",
         "type": "tm"
     },
     {
@@ -3273,6 +3708,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "12",
+        "characterCount": "118",
         "type": "termcollection"
     },
     {
@@ -3280,6 +3716,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "2",
+        "characterCount": "22",
         "type": "auto-propagated"
     },
     {
@@ -3287,6 +3724,7 @@
         "internalFuzzy": "1",
         "matchRate": "66",
         "wordCount": "3",
+        "characterCount": "32",
         "type": "tm"
     },
     {
@@ -3294,6 +3732,7 @@
         "internalFuzzy": "1",
         "matchRate": "66",
         "wordCount": "3",
+        "characterCount": "32",
         "type": "tm"
     },
     {
@@ -3301,6 +3740,7 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "3",
+        "characterCount": "32",
         "type": "termcollection"
     },
     {
@@ -3308,6 +3748,7 @@
         "internalFuzzy": "0",
         "matchRate": "102",
         "wordCount": "8",
+        "characterCount": "71",
         "type": "auto-propagated"
     }
 ]

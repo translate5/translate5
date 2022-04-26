@@ -1,30 +1,30 @@
 
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
- This file is part of translate5
- 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+  This file is part of translate5
 
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
- This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
- to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/agpl.html
-  
- There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
-  
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
-END LICENSE AND COPYRIGHT
-*/
+  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+  included in the packaging of this file.  Please review the following information
+  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+  http://www.gnu.org/licenses/agpl.html
+
+  There is a plugin exception available for use with this release of translate5 for
+  translate5: Please see http://www.translate5.net/plugin-exception.txt or
+  plugin-exception.txt in the root folder of translate5.
+
+  @copyright  Marc Mittag, MittagQI - Quality Informatics
+  @author     MittagQI - Quality Informatics
+  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+ END LICENSE AND COPYRIGHT
+ */
 
 /**#@++
  * @author Marc Mittag
@@ -54,7 +54,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
 
     strings: {
         noMatch: '#UT#Keine Treffer',
-        matchCount: '#UT#Gesamtzahl der Wörter',
+        matchCount: '#UT#Summe',
         tabTitle: "#UT#Datum der Analyse",
         exportAnalysis: '#UT#Export als Excel',
         exportAnalysisXML: '#UT#Export Trados-like XML',
@@ -66,7 +66,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
         totalSum: '#UT#Summe',
         internalFuzzy: "#UT#Interne Fuzzy verwendet",
         matchRate: "#UT#Match-Rate",
-        edit100PercentMatchDisabledMessage: '#UT#Gesperrte 100%-Matches sind nicht Teil der Analyse.'
+        edit100PercentMatchDisabledMessage: '#UT#Gesperrte 100%-Matches sind nicht Teil der Analyse.',
+        wordBased:"#UT#Wortbasiert",
+        characterBased:"#UT#Zeichenbasiert",
+        basedOn:'#Basiert auf'
     },
 
     listeners: {
@@ -113,7 +116,27 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                             '<tpl else>',
                                 '{strings.noAnalysis}',
                             '</tpl>'
-                        ]
+                        ],
+                        items:[{
+                            xtype: 'combo',
+                            name:'unitType',
+                            itemId:'unitType',
+                            fieldLabel: me.strings.basedOn,
+                            store: Ext.create('Ext.data.Store', {
+                                fields: ['id', 'type'],
+                                data : [
+                                    {"id":"word", "type":me.strings.wordBased},
+                                    {"id":"character", "type":me.strings.characterBased}
+                                ]
+                            }),
+                            listeners: {
+                                select: 'onUnitTypeSelect'
+                            },
+                            queryMode: 'local',
+                            displayField: 'type',
+                            value: Editor.data.plugins.MatchAnalysis.calculateBasedOn,
+                            valueField: 'id'
+                        }]
                     },{
                         xtype: 'container',
                         dock: 'bottom',
@@ -211,7 +234,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
         columns.push({
             xtype: 'gridcolumn',
             flex: 4,
-            dataIndex: 'wordCountTotal',
+            dataIndex: 'unitCountTotal',
             cellWrap: true,
             summaryType: 'sum',
             summaryRenderer: function (value) {

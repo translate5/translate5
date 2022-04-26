@@ -85,7 +85,8 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
                 $model = editor_Test_Model_Abstract::create($segment, 'segment');
                 $segments[$idx] = $model->getComparableData();
             }
-            file_put_contents($this->api()->getFile($fileToCompare), json_encode($segments,JSON_PRETTY_PRINT));
+            // on capturing we disable assert existence
+            file_put_contents($this->api()->getFile($fileToCompare, assert: false), json_encode($segments,JSON_PRETTY_PRINT));
         }
         $expectations = self::$api->getFileContent($fileToCompare);
         $numSegments = count($segments);

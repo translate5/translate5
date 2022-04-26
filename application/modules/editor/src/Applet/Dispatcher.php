@@ -134,10 +134,10 @@ class Dispatcher {
 
     /**
      * get the applet to a given name
-     * @param string $name
+     * @param string|null $name
      * @return AppletAbstract|null
      */
-    public function getApplet(string $name): ?AppletAbstract
+    public function getApplet(string|null $name): ?AppletAbstract
     {
         return $this->applets[$name] ?? null;
     }

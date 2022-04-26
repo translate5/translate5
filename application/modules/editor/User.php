@@ -57,11 +57,18 @@ class editor_User {
      * @var Zend_Session_Namespace
      */
     private $session;
-    
+
+    /**
+     * @throws ZfExtended_NotAuthenticatedException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
     private function __construct(){
         $this->session = new Zend_Session_Namespace('user');
         // TODO FIXME: add some validation to catch an inexisting session or an invalid user
         self::$modelInstance = ZfExtended_Factory::get('ZfExtended_Models_User');
+        if($this->getId() === 0) {
+            throw new ZfExtended_NotAuthenticatedException();
+        }
         self::$modelInstance->load($this->getId());
     }
     /**

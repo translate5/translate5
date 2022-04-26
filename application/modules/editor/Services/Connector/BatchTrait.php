@@ -97,7 +97,7 @@ trait editor_Services_Connector_BatchTrait {
                 //set the query string to segment map. Later it will be used to reapply the taks
                 'segment' => clone $segment,
                 //collect the source text
-                'query' => $this->tagHandler->prepareQuery($this->getQueryString($segment)),
+                'query' => $this->tagHandler->prepareQuery($this->getQueryString($segment), $segment->getId()),
                 'tagMap' => $this->tagHandler->getTagMap(),
             ];
             
@@ -153,15 +153,14 @@ trait editor_Services_Connector_BatchTrait {
             //get the segment from the beginning of the cache
             //we assume that for each requested query string, we get one response back
             $query = array_shift($batchQuery);
-            /* @var $segment editor_Models_Segment */
-            
+            $segmentId = $query['segment']->getId();
             $this->getQueryStringAndSetAsDefault($query['segment']);
             $this->tagHandler->setTagMap($query['tagMap']);
-            $this->processBatchResult($segmentResults);
+            $this->processBatchResult($segmentResults, $segmentId);
             
             $this->logForSegment($query['segment']);
             
-            $this->saveBatchResults($query['segment']->getId());
+            $this->saveBatchResults($segmentId);
 
             //log the adapter usage for the batch query segment
             $this->logAdapterUsage($query['segment']);
@@ -182,8 +181,9 @@ trait editor_Services_Connector_BatchTrait {
     /**
      * process (add to the result list and decode) results from the language resource
      * @param mixed $segmentResults
+     * @param int $segmentId: only needed by same tag handlers
      */
-    abstract protected function processBatchResult($segmentResults);
+    abstract protected function processBatchResult($segmentResults, int $segmentId=-1);
     
     /**
      * @param int $segmentId
