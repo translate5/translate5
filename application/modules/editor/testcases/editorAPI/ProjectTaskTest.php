@@ -112,7 +112,7 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         $fileName = str_replace(['/','::'],'_',$task->taskName.'.json');
         
         // load all segments for the current opened task
-        $segments = self::$api->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = self::$api->requestJson('editor/task/'.$task->id.'/segment?page=1&start=0&limit=200');
         
         // compare segments (this API will strip/adjust segment contents)
         $this->assertSegmentsEqualsJsonFile($fileName, $segments, 'Imported segments are not as expected in '.basename($fileName).'!');
