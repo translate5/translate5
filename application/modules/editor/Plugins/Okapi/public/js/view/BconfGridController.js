@@ -108,34 +108,34 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             okapiName: view.selection.get('name'),
         });
     },
-    showSRXChooser: function (view, rowIndex, /* colIndex */) {
+    showSRXChooser: function (view, rowIndex, colIndex, actionItem) {
         var controller = this;
         view.select(rowIndex);
         var bconfId = view.selection.id;
         Editor.util.Util.chooseFile( '.srx').then(function(files){
-            controller.uploadSRX(bconfId, files[0]);
+            controller.uploadSRX(bconfId, files[0], actionItem.purpose);
         });
     },
-    downloadSRX: function (view, rowIndex, /* colIndex */) {
+    downloadSRX: function (view, rowIndex, colIndex, /* actionItem */ {purpose}, e, /* record */ {id}) {
         view.select(rowIndex);
-        Editor.util.Util.download(Editor.data.restpath + 'plugins_okapi_bconf/downloadsrx?id='+view.selection.id)
+        Editor.util.Util.download('plugins_okapi_bconf/downloadsrx',{id, purpose})
     },
-    uploadSRX: function(id, file){
+    uploadSRX: function(id, srx, purpose){
         var grid = this.getView();
         Editor.util.Util.fetchXHRLike(Editor.data.restpath + 'plugins_okapi_bconf/uploadsrx/?id='+id, {
-            method: 'POST', formData : { srx: file }
+            method: 'POST', formData : {purpose, srx}
         }).then(function({status, responseJson: json}){
             if(status === 422){
-
-
                 var extraInfo = '';
                 if(json.errors && json.errors.length){
                     extraInfo = ' ' + Ext.DomHelper.createHtml({
                         tag: 'span',
                         class: 'x-fa fa-question-circle pointer',
-                        'data-qtip': '<code><ul><li>' + json.errors.join('<li></li>') + '</li></ul>',
                         'data-hide': 'user',
-                        'data-qwidth': '500',
+                        'data-qwidth': '800',
+                        'data-qtip': '<code><ul><li>'
+                            + json.errors.join('\n').trim().split('\n').map(Ext.htmlEncode).join('</li><li>')
+                            + '</li></ul>',
                     });
                 }
                 Ext.Msg.show({

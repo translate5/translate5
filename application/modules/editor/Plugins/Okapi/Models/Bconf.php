@@ -183,14 +183,17 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
 
     /**
      * @param string $id
-     * @return string path - the absolute path of the bconf
-     * @throws Zend_Exception|editor_Plugins_Okapi_Exception
+     * @param string $fileName Appended to the bconf's data directory, defaults to the bconf file itself
+     * @return string path The absolute path of the bconf
+     * @throws Zend_Exception
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
      */
-    public function getFilePath(string $id = ''): string {
+    public function getFilePath(string $id = '', string $fileName = ''): string {
         $dataDirectory = $this->getDataDirectory($id);
         !$id && $id = $this->getId();
-        return $dataDirectory . DIRECTORY_SEPARATOR . 'bconf-' . $id . '.bconf';
-
+        !$fileName && ($fileName = 'bconf-' . $id . '.bconf');
+        return $dataDirectory . DIRECTORY_SEPARATOR . $fileName;
     }
 
     /**
@@ -239,6 +242,34 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             $cleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
             $cleaner->delete($bconfId);
         }
+    }
+
+    /**
+     * Reads the name of one contained srx file from the pipeline
+     * @param string $purpose Which srx name to extract, one of 'source' or 'target'
+     * @return string
+     * @throws Zend_Exception
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function srxNameFromPipeline(string $purpose): string {
+        $purpose .= 'SrxPath';
+        $pipelineFile = $this->getFilePath(fileName: $this->file::PIPELINE_FILE);
+
+        $pipeline = new editor_Utils_Dom();
+        $xmlErrors = $pipeline->load($pipelineFile) ? $pipeline->getErrorMsg('', true) : '';
+        $step = $pipeline->query('/*/step[@class="net.sf.okapi.steps.segmentation.SegmentationStep"]')->item(0);
+        preg_match("/^$purpose=(.*)$/m", $step?->nodeValue ?? '', $matches);
+
+        $srxFileName = $matches[1] ?? '';
+        if(!$srxFileName){
+            $xmlErrors .= "\nNo SegmentationStep with attribute $purpose in " . $this->file::PIPELINE_FILE . "on server";
+        }
+
+        $xmlErrors && throw new ZfExtended_UnprocessableEntity('E1026',
+            ['errors' => [[$xmlErrors]]]
+        );
+        return $srxFileName;
     }
 
 }

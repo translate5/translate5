@@ -73,8 +73,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         extensions: '#UT#Extensions',
         description: '#UT#Description',
         action: '#UT#Actions',
-        upload: '#UT#upload',
+        uploadBconf: '#UT#upload',
+        _file: '#UT#-Datei',
+        fileDlTemplate:'#UT#{0}{1} herunterladen',
+        fileUpTemplate:'#UT#{0}{1} hochladen',
         srx: '#UT#SRX',
+        sourceSrx: '#UT#SourceSRX',
+        targetSrx: '#UT#TargetSRX',
         pipeline: '#UT#Pipeline',
         customerStandard: '#UT#Kundenstandard'
     },
@@ -238,17 +243,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         stateId: 'okapiGridActionColumn',
                         align: 'center',
                         dataIndex: 'isDefault',
-                        width: 3*28+8,
+                        width: 3*28+8+28,
                         text: me.text_cols.action,
-                        iconCls: 'margin5', // applies to all items
-                        items: [/*{
-                                tooltip: me.strings.edit,
-                                isAllowedFor: 'bconfEdit',
-                                glyph: 'f044@FontAwesome5FreeSolid',
-                                handler: 'editbconf',
-                                isDisabled: 'getActionStatus',
-                            },*/
-                            {
+                        menuDisabled: true,
+                        items: [{
                                 tooltip: me.strings.remove,
                                 isAllowedFor: 'bconfDelete',
                                 glyph: 'f2ed@FontAwesome5FreeSolid',
@@ -273,19 +271,49 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     {
                         xtype: 'actioncolumn',
                         align: 'center',
-                        text: me.text_cols.srx,
+                        text: me.text_cols.sourceSrx,
                         width: 2*28+8+28,
+                        menuDisabled: true,
                         items: [{
-                                tooltip: me.strings.upload,
                                 isAllowedFor: 'bconfEdit',
                                 glyph: 'f093@FontAwesome5FreeSolid',
                                 isDisabled: 'isSRXUploadDisabled',
+                                purpose: 'source',
+                                tooltip: new Ext.Template(me.text_cols.fileUpTemplate)
+                                    .apply(['SourceSRX', me.text_cols._file]),
                                 handler: 'showSRXChooser',
                             },
                             {
-                                tooltip: me.strings.export,
                                 isAllowedFor: 'bconfDelete',
                                 glyph: 'f019@FontAwesome5FreeSolid',
+                                purpose: 'source',
+                                tooltip: new Ext.Template(me.text_cols.fileDlTemplate)
+                                    .apply(['SourceSRX', me.text_cols._file]),
+                                handler: 'downloadSRX'
+                            },
+                        ]
+                    },
+                    {
+                        xtype: 'actioncolumn',
+                        align: 'center',
+                        text: me.text_cols.targetSrx,
+                        width: 2*28+8+28,
+                        menuDisabled: true,
+                        items: [{
+                            isAllowedFor: 'bconfEdit',
+                            glyph: 'f093@FontAwesome5FreeSolid',
+                            isDisabled: 'isSRXUploadDisabled',
+                            purpose: 'target',
+                            tooltip: new Ext.Template(me.text_cols.fileUpTemplate)
+                                .apply(['TargetSRX', me.text_cols._file]),
+                            handler: 'showSRXChooser',
+                        },
+                            {
+                                isAllowedFor: 'bconfDelete',
+                                glyph: 'f019@FontAwesome5FreeSolid',
+                                purpose: 'target',
+                                tooltip: new Ext.Template(me.text_cols.fileDlTemplate)
+                                    .apply(['TargetSRX', me.text_cols._file]),
                                 handler: 'downloadSRX'
                             },
                         ]

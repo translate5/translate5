@@ -86,7 +86,6 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     }
 
     public function uploadbconfAction() {
-        $bconf = NULL;
         $ret = new stdClass();
 
         empty($_FILES) && throw new ZfExtended_ErrorCodeException('E1212', [
@@ -95,7 +94,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         $bconf = new editor_Plugins_Okapi_Models_Bconf($_FILES[self::FILE_UPLOAD_NAME], $this->getAllParams());
 
         $ret->success = is_object($bconf);
-        $ret->id = $bconf?->getId();
+        $ret->id = $bconf->getId();
 
         echo json_encode($ret);
     }
@@ -107,33 +106,32 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         empty($_FILES) && throw new editor_Plugins_Okapi_Exception('E1212', [
             'msg' => "No upload files were found. Please try again. If the error persists, please contact support.",
         ]);
-        $filePath = $_FILES['srx']['tmp_name'];
-        $errorDetails = '';
-        libxml_use_internal_errors(use_errors: true);
-        $errorType = [LIBXML_ERR_WARNING => 'warning', LIBXML_ERR_ERROR => 'error', LIBXML_ERR_FATAL => 'fatal'];
+        $this->entityLoad();
+        $bconf = $this->entity;
+        $this->getParam('id');
 
-        $xml = simplexml_load_file($filePath);
-        $xmlErrors = libxml_get_errors();
-        if($xmlErrors){
-            $messages = '';
-            foreach($xmlErrors as /** @var LibXMLError $err */ $err){
-                $messages .= "{$errorType[$err->level]}@$err->line,$err->column: $err->message\n";
-            }
-            $messages && $errorDetails = "Error" . (count($xmlErrors) > 1 ? 's' : '') . ": <pre>$messages</pre>";
-        }
-        $rootTag = $xml ? $xml->getName() : 'srx';
-        strtolower($rootTag) !== 'srx' && $errorDetails .= " Invalid root tag '$rootTag'.";
-        $errorDetails && throw new ZfExtended_UnprocessableEntity('E1026', ['errors' => [[$messages]]]);
+        $srxUploadFile = $_FILES['srx']['tmp_name'];
+        $srx = new editor_Utils_Dom();
+        $xmlErrors = $srx->load($srxUploadFile) ? $srx->getErrorMsg('', true) : '';
 
-        $bconf = $this->entityLoad();
-        move_uploaded_file($filePath, "{$bconf->getDataDirectory()}/languages.srx");
+        $rootTag = strtolower($srx->firstChild?->tagName);
+        $rootTag !== 'srx' && $xmlErrors .= "\n Invalid root tag '$rootTag'.";
+
+        $xmlErrors && throw new ZfExtended_UnprocessableEntity('E1026',
+            ['errors' => [[$xmlErrors]]]
+        );
+
+        $srxNameToBe = $bconf->srxNameFromPipeline($this->getParam('purpose'));
+        move_uploaded_file($srxUploadFile, $bconf->getFilePath(fileName: $srxNameToBe));
         $bconf->file->pack();
     }
 
     public function downloadsrxAction() {
         $bconf = $this->entityLoad();
-        $file = "{$bconf->getDataDirectory()}/languages.srx";
-        $dlName = $bconf->getName() . '-languages.srx';
+        $fileName = $bconf->srxNameFromPipeline($this->getParam('purpose'));
+        $file = $bconf->getFilePath(fileName: $fileName);
+
+        $dlName = $bconf->getName() . '-' . $fileName;
         header('Content-Type: text/xml');
         header('Content-Disposition: attachment; filename="' . $dlName . '"');
         header('Cache-Control: no-store');

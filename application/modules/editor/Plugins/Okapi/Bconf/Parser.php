@@ -175,54 +175,25 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File 
         }
     }
 
-    private static function parsePipeline(&$pipeline, $refMap)
-    {
+    private static function parsePipeline(&$pipeline, $refMap) {
         $doc = new DOMDocument();
         $doc->loadXML($pipeline['xml']);
         /** @var DOMNodeList nodes */
         $nodes = $doc->getElementsByTagName("step");
 
-        foreach ($nodes as $elem) {
+        foreach($nodes as $elem){
             $class = $elem->getAttribute("class");
-            if ($class == null) {
+            if($class == null){
                 throw new ZfExtended_UnprocessableEntity("The attribute 'class' is missing.");
             }
             $classParts = explode('.', $class);
             $stepName = end($classParts);
-            $pathParams =  self::STEP_REFERENCES[$stepName] ?? [];
-            foreach ($pathParams as $param) {
+            $pathParams = self::STEP_REFERENCES[$stepName] ?? [];
+            foreach($pathParams as $param){
                 $param = lcfirst($param);
-                $path = array_shift($refMap); // QUIRK: Do not include directory name $outputDir to not leak server data
+                $path = array_shift($refMap); // QUIRK: Original code includes absolute path in place of filename
                 $pipeline['xml'] = preg_replace("/^($param=).*$/m", "$1$path", $pipeline['xml']);
             }
-            /* FIXME: Needed for plugin support
-            // Check if we can use the available steps (and their loaders)
-            StepInfo stepInfo = availableSteps.get(className);
-            if ( stepInfo == null ) {
-                // The pipeline has a step that is not currently in the available steps
-                LOGGER.warn(String.format(
-                    "The step '%s' is not among the steps currently available. " +
-                    "It will be removed from the loaded pipeline.",
-                    className));
-                continue;
-            }
-            IPipelineStep step;
-
-            if ( stepInfo.loader == null ) {
-                step = (IPipelineStep)Class.forName(stepInfo.stepClass).newInstance();
-            }
-            else {
-*/
-
-/*
-            step = (IPipelineStep)Class.forName(stepInfo.stepClass, true, stepInfo.loader).newInstance();
-            // Load the parameters if needed
-            IParameters params = step.getParameters();
-            if ( params != null ) {
-            params.fromString(Util.getTextContent(elem));
-            }
-*/
-            // add the step
             $pipeline['steps'][] = $class;
         }
 

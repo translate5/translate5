@@ -36,6 +36,14 @@
     <source>SRX-Datei</source>
     <target>SRX file</target>
 </trans-unit>
+<trans-unit id='U291cmNlU1JY'>
+    <source>SourceSRX</source>
+    <target>SourceSRX</target>
+</trans-unit>
+<trans-unit id='VGFyZ2V0U1JY'>
+    <source>TargetSRX</source>
+    <target>TargetSRX</target>
+</trans-unit>
 <trans-unit id='QmVhcmJlaXRlbg=='>
     <source>Bearbeiten</source>
     <target>Edit</target>
@@ -83,6 +91,18 @@
 <trans-unit id='QmNvbmYtRGF0ZWkgYmVhcmJlaXRlbg=='>
     <source>Bconf-Datei bearbeiten</source>
     <target>Edit Bconf file</target>
+</trans-unit>
+<trans-unit id='LURhdGVp'>
+    <source>-Datei</source>
+    <target> file</target>
+</trans-unit>
+<trans-unit id='ezB9ezF9IGhlcnVudGVybGFkZW4='>
+    <source>{0}{1} herunterladen</source>
+    <target>Download {0}{1}</target>
+</trans-unit>
+<trans-unit id='ezB9ezF9IGhvY2hsYWRlbg=='>
+    <source>{0}{1} hochladen</source>
+    <target>Upload {0}{1}</target>
 </trans-unit>
 </body>
 </file>
