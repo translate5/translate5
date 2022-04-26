@@ -39,7 +39,12 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';
-    
+
+    /**
+     * @param $taskGuid
+     * @return Zend_Db_Table_Row_Abstract
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
     public function loadByTaskGuid($taskGuid) {
         return $this->loadRow('taskGuid = ?', $taskGuid);
     }

@@ -144,4 +144,27 @@ class editor_Task_Cloner {
         /* @var $taskConfig editor_Models_TaskConfig */
         $taskConfig->cloneTaskConfig($this->original->getTaskGuid(), $this->clone->getTaskGuid());
     }
+
+    /**
+     * @return void
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function cloneMeta(): void {
+        $data = $this->original->meta()->toArray();
+        unset($data['id']);
+        $newMeta = $this->clone->meta();
+        try {
+            $newMeta->loadByTaskGuid($this->clone->getTaskGuid());
+            unset($data['taskGuid']);
+            foreach($data as $field => $value){
+                call_user_func_array([$newMeta, 'set' . ucfirst($field)], [$value]);
+            }
+        } catch(ZfExtended_Models_Entity_NotFoundException){
+            $newMeta->init($data);
+        }
+        $newMeta->save();
+    }
+
 }
