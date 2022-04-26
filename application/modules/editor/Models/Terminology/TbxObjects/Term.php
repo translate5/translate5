@@ -73,7 +73,7 @@ class editor_Models_Terminology_TbxObjects_Term extends editor_Models_Terminolog
     const CSS_TERM_IDENTIFIER = 'term';
 
     public ?int $id = null;
-    public int $updatedBy = 0;
+    public ?int $updatedBy = 0;
     public string $updatedAt = '';
     public int $collectionId = 0;
     public int $termEntryId = 0;
