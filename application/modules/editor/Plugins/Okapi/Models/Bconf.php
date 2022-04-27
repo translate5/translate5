@@ -46,7 +46,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstract {
 
-    const SYSTEM_BCONF_VERSION = 1;
+    const SYSTEM_BCONF_VERSION = 9;
     const SYSTEM_BCONF_NAME = 'Translate5-Standard';
     const SYSTEM_BCONF_IMPORTFILE = 'okapi_default_import.bconf';
 
@@ -103,16 +103,35 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
     public function importDefaultWhenNeeded(int $totalCount = -1): bool {
-        // TODO: check wether system bconf has been updated and if so import updated one
-        if($totalCount === 0 || $this->getTotalCount() === 0){
-            $defaultImportBconf = editor_Plugins_Okapi_Init::getOkapiDataFilePath() . self::SYSTEM_BCONF_IMPORTFILE;
-            $bconf = new editor_Plugins_Okapi_Models_Bconf(['tmp_name' => $defaultImportBconf, 'name' => 'Translate5-Standard.bconf']);
+        $t5ProvidedImportBconf = editor_Plugins_Okapi_Init::getOkapiDataFilePath() . $this::SYSTEM_BCONF_IMPORTFILE;
+        $updateNeeded = false;
+        $insertNeeded = $totalCount === 0 || $this->getTotalCount() === 0;
+        if(!$insertNeeded){
+            $s = $this->db->select();
+            $versionSelect = $s->from($s->getTable(), ['id', 'versionIdx'])->where('name = ?', $this::SYSTEM_BCONF_NAME);
+            [$id, $systemVersion] = $versionSelect->limit(1)->query()->fetch(PDO::FETCH_NUM);
+
+            $insertNeeded = !$systemVersion; // there are bconfs, but not the t5 provided one
+            $updateNeeded = !$insertNeeded && $systemVersion < $this::SYSTEM_BCONF_VERSION;
+            if($updateNeeded){
+                $bconf = new self();
+                $bconf->load($id);
+                $bconf->file->unpack($t5ProvidedImportBconf);
+                $bconf->file->pack();
+            }
+        }
+        if(!$insertNeeded && !$updateNeeded){
+            return false;
+        }
+        if($insertNeeded){
+            $bconf = new self(['tmp_name' => $t5ProvidedImportBconf, 'name' => 'Translate5-Standard.bconf']);
             $bconf->setIsDefault(1);
             $bconf->setDescription("The default .bconf used for file imports unless another one is configured");
-            $bconf->save();
-            return true;
         }
-        return false;
+        $bconf->setVersionIdx($bconf::SYSTEM_BCONF_VERSION);
+
+        $bconf->save();
+        return true;
     }
 
     /**
@@ -128,7 +147,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
 
     /**
      * Returns the data directory of the given bconfId/loaded entity without trailing slash, creating it if neccessary
-     * @param string $id
+     * @param string $id If not given, retrieved from entity and request parameters
      * @param bool $check can be used to disable file system checks
      * @return string
      * @throws ZfExtended_UnprocessableEntity|editor_Plugins_Okapi_Exception|Zend_Exception
