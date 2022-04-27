@@ -105,7 +105,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     public function importDefaultWhenNeeded(int $totalCount = -1): bool {
         $t5ProvidedImportBconf = editor_Plugins_Okapi_Init::getOkapiDataFilePath() . $this::SYSTEM_BCONF_IMPORTFILE;
         $updateNeeded = false;
-        $insertNeeded = $totalCount === 0 || $this->getTotalCount() === 0;
+        $insertNeeded = $totalCount === 0 || !$totalCount === -1 && $this->getTotalCount() === 0;
         if(!$insertNeeded){
             $s = $this->db->select();
             $versionSelect = $s->from($s->getTable(), ['id', 'versionIdx'])->where('name = ?', $this::SYSTEM_BCONF_NAME);
