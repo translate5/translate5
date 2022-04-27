@@ -36,7 +36,6 @@ END LICENSE AND COPYRIGHT
  * this tag is represented by two image-tags in the markup which will be paired to a single tag in the unparsing process
  * In the rendering phase an instance will be cloned and act's as two seperate single image tags again !
  * 
- * @method editor_Segment_Mqm_Tag clone(boolean $withDataAttribs)
  * @method editor_Segment_Mqm_Tag createBaseClone()
  * @method editor_Segment_Mqm_Tag cloneForRendering()
  */
@@ -69,14 +68,6 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      */
     public static function createCategoryVal(int $categoryIndex) : string {
         return editor_Segment_Tag::TYPE_MQM.'_'.strval($categoryIndex);
-    }
-    
-    public static function getSeverityFromCssClasses(array $classes){
-        
-    }
-    
-    public static function getPositionFromCssClasses(array $classes){
-        
     }
 
     protected static $type = editor_Segment_Tag::TYPE_MQM;
@@ -350,7 +341,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         if($this->getQualityId() == null || $tag->getQualityId() != $this->getQualityId()){
             return false;
         }
-        if(editor_Segment_FieldTags::VALIDATION_MODE && $this->endIndex != $this->startIndex || $tag->endIndex != $tag->startIndex){
+        if(editor_TagSequence::VALIDATION_MODE && $this->endIndex != $this->startIndex || $tag->endIndex != $tag->startIndex){
             error_log("\n##### MQM TAG: INVALID INDEXES FOUND [open: (".$this->startIndex."|".$this->endIndex.") close: (".$tag->startIndex."|".$tag->endIndex.")] #####\n");
         }
         $this->paired = true;
@@ -367,11 +358,15 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         return true;
     }
     
-    public function finalize(editor_Segment_FieldTags $tags, editor_Models_task $task){
+    public function finalize(editor_TagSequence $tags, editor_Models_task $task){
         // finds our severity in our cclasses via the tasks MQM configuration
         $this->severity = editor_Segment_Mqm_Configuration::instance($task)->findMqmSeverity($this->classes, '');
     }
-    
+    /**
+     * @param bool $withDataAttribs
+     * @param bool $withId
+     * @return editor_Segment_Mqm_Tag|editor_Segment_Tag
+     */
     public function clone(bool $withDataAttribs=false, bool $withId=false){
         $clone = parent::clone($withDataAttribs, $withId);
         /* @var $clone editor_Segment_Mqm_Tag */

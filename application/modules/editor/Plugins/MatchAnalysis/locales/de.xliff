@@ -148,6 +148,21 @@
             <target>Export Trados-like XML</target>
         </trans-unit>
 
+        <trans-unit id='V29ydGJhc2llcnQ='>
+            <source>Wortbasiert</source>
+            <target>Wortbasiert</target>
+        </trans-unit>
+
+        <trans-unit id='WmVpY2hlbmJhc2llcnQ='>
+          <source>Zeichenbasiert</source>
+          <target>Zeichenbasiert</target>
+        </trans-unit>
+
+        <trans-unit id='QmFzaWVydCBhdWY='>
+          <source>Basiert auf</source>
+          <target>Basiert auf</target>
+        </trans-unit>
+
     </body>
   </file>
 </xliff>

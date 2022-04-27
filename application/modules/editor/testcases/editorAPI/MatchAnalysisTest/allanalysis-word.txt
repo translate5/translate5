@@ -1,0 +1,3754 @@
+[
+    {
+        "segmentNrInTask": "1",
+        "internalFuzzy": "0",
+        "matchRate": "101",
+        "wordCount": "3",
+        "characterCount": "22",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "1",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "22",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "1",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "22",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "2",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4",
+        "characterCount": "35",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "2",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4",
+        "characterCount": "35",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "2",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "35",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "3",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "20",
+        "characterCount": "169",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "3",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "20",
+        "characterCount": "169",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "3",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "20",
+        "characterCount": "169",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "4",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "29",
+        "characterCount": "204",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "4",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "29",
+        "characterCount": "204",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "4",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "29",
+        "characterCount": "204",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "5",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "26",
+        "characterCount": "212",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "5",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "26",
+        "characterCount": "212",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "5",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "26",
+        "characterCount": "212",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "6",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "26",
+        "characterCount": "228",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "6",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "26",
+        "characterCount": "228",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "6",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "26",
+        "characterCount": "228",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "7",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "28",
+        "characterCount": "182",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "7",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "28",
+        "characterCount": "182",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "7",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "28",
+        "characterCount": "182",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "8",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "16",
+        "characterCount": "113",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "8",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "16",
+        "characterCount": "113",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "8",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "16",
+        "characterCount": "113",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "9",
+        "internalFuzzy": "0",
+        "matchRate": "88",
+        "wordCount": "21",
+        "characterCount": "135",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "9",
+        "internalFuzzy": "0",
+        "matchRate": "88",
+        "wordCount": "21",
+        "characterCount": "135",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "9",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21",
+        "characterCount": "135",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "10",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "15",
+        "characterCount": "117",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "10",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "15",
+        "characterCount": "117",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "10",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "15",
+        "characterCount": "117",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "11",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "13",
+        "characterCount": "92",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "11",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "13",
+        "characterCount": "92",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "11",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13",
+        "characterCount": "92",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "12",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "30",
+        "characterCount": "228",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "12",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "30",
+        "characterCount": "228",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "12",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "30",
+        "characterCount": "228",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "13",
+        "internalFuzzy": "0",
+        "matchRate": "39",
+        "wordCount": "8",
+        "characterCount": "42",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "13",
+        "internalFuzzy": "0",
+        "matchRate": "39",
+        "wordCount": "8",
+        "characterCount": "42",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "13",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8",
+        "characterCount": "42",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "14",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "50",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "14",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "50",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "14",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "50",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "15",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "18",
+        "characterCount": "151",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "15",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "18",
+        "characterCount": "151",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "15",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "18",
+        "characterCount": "151",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "16",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "15",
+        "characterCount": "114",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "16",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "15",
+        "characterCount": "114",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "16",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "15",
+        "characterCount": "114",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "17",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "56",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "17",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "56",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "17",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "56",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "18",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10",
+        "characterCount": "61",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "18",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10",
+        "characterCount": "61",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "18",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10",
+        "characterCount": "61",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "19",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13",
+        "characterCount": "102",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "19",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13",
+        "characterCount": "102",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "19",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13",
+        "characterCount": "102",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "20",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "143",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "20",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "143",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "20",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "143",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "21",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21",
+        "characterCount": "151",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "21",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21",
+        "characterCount": "151",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "21",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21",
+        "characterCount": "151",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "22",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "22",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "22",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "23",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "49",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "23",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "49",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "23",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "49",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "24",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "17",
+        "characterCount": "110",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "24",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "17",
+        "characterCount": "110",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "24",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "110",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "25",
+        "internalFuzzy": "0",
+        "matchRate": "63",
+        "wordCount": "20",
+        "characterCount": "138",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "25",
+        "internalFuzzy": "0",
+        "matchRate": "63",
+        "wordCount": "20",
+        "characterCount": "138",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "25",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "20",
+        "characterCount": "138",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "26",
+        "internalFuzzy": "0",
+        "matchRate": "68",
+        "wordCount": "22",
+        "characterCount": "147",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "26",
+        "internalFuzzy": "0",
+        "matchRate": "68",
+        "wordCount": "22",
+        "characterCount": "147",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "26",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "22",
+        "characterCount": "147",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "27",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "6",
+        "characterCount": "38",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "27",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "6",
+        "characterCount": "38",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "27",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6",
+        "characterCount": "38",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "28",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6",
+        "characterCount": "49",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "28",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6",
+        "characterCount": "49",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "28",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6",
+        "characterCount": "49",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "29",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "3",
+        "characterCount": "22",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "30",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "17",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "30",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "17",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "30",
+        "internalFuzzy": "0",
+        "matchRate": "104",
+        "wordCount": "3",
+        "characterCount": "17",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "31",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "37",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "31",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "37",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "31",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "37",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "32",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "121",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "32",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "121",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "32",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "121",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "33",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "119",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "33",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "119",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "33",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "119",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "34",
+        "internalFuzzy": "1",
+        "matchRate": "38",
+        "wordCount": "10",
+        "characterCount": "64",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "34",
+        "internalFuzzy": "1",
+        "matchRate": "38",
+        "wordCount": "10",
+        "characterCount": "64",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "34",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10",
+        "characterCount": "64",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "35",
+        "internalFuzzy": "0",
+        "matchRate": "57",
+        "wordCount": "4",
+        "characterCount": "44",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "35",
+        "internalFuzzy": "0",
+        "matchRate": "57",
+        "wordCount": "4",
+        "characterCount": "44",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "35",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "44",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "36",
+        "internalFuzzy": "0",
+        "matchRate": "42",
+        "wordCount": "3",
+        "characterCount": "26",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "36",
+        "internalFuzzy": "0",
+        "matchRate": "42",
+        "wordCount": "3",
+        "characterCount": "26",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "36",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "26",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "37",
+        "internalFuzzy": "0",
+        "matchRate": "66",
+        "wordCount": "3",
+        "characterCount": "31",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "37",
+        "internalFuzzy": "0",
+        "matchRate": "66",
+        "wordCount": "3",
+        "characterCount": "31",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "37",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "31",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "38",
+        "internalFuzzy": "0",
+        "matchRate": "44",
+        "wordCount": "7",
+        "characterCount": "44",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "38",
+        "internalFuzzy": "0",
+        "matchRate": "44",
+        "wordCount": "7",
+        "characterCount": "44",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "38",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "44",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "39",
+        "internalFuzzy": "0",
+        "matchRate": "104",
+        "wordCount": "3",
+        "characterCount": "17",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "40",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "18",
+        "characterCount": "149",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "40",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "18",
+        "characterCount": "149",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "40",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "18",
+        "characterCount": "149",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "41",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "27",
+        "characterCount": "190",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "41",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "27",
+        "characterCount": "190",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "41",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "27",
+        "characterCount": "190",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "42",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "23",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "42",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "23",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "42",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "23",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "43",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "8",
+        "characterCount": "92",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "43",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "8",
+        "characterCount": "92",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "43",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8",
+        "characterCount": "92",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "44",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "19",
+        "characterCount": "141",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "44",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "19",
+        "characterCount": "141",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "44",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "19",
+        "characterCount": "141",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "45",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "17",
+        "characterCount": "86",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "45",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "17",
+        "characterCount": "86",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "45",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "86",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "46",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "7",
+        "characterCount": "115",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "46",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "7",
+        "characterCount": "115",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "46",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "115",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "47",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "31",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "47",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "31",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "47",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "31",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "48",
+        "internalFuzzy": "0",
+        "matchRate": "88",
+        "wordCount": "18",
+        "characterCount": "166",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "48",
+        "internalFuzzy": "0",
+        "matchRate": "88",
+        "wordCount": "18",
+        "characterCount": "166",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "48",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "18",
+        "characterCount": "166",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "49",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4",
+        "characterCount": "37",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "49",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4",
+        "characterCount": "37",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "49",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "37",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "50",
+        "internalFuzzy": "0",
+        "matchRate": "86",
+        "wordCount": "16",
+        "characterCount": "132",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "50",
+        "internalFuzzy": "0",
+        "matchRate": "86",
+        "wordCount": "16",
+        "characterCount": "132",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "50",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "16",
+        "characterCount": "132",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "51",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "20",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "51",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "20",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "51",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "20",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "52",
+        "internalFuzzy": "0",
+        "matchRate": "83",
+        "wordCount": "11",
+        "characterCount": "77",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "52",
+        "internalFuzzy": "0",
+        "matchRate": "83",
+        "wordCount": "11",
+        "characterCount": "77",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "52",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "11",
+        "characterCount": "77",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "53",
+        "internalFuzzy": "0",
+        "matchRate": "101",
+        "wordCount": "7",
+        "characterCount": "62",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "53",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "7",
+        "characterCount": "62",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "53",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "62",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "54",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "7",
+        "characterCount": "62",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "55",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "8",
+        "characterCount": "68",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "55",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "8",
+        "characterCount": "68",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "55",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8",
+        "characterCount": "68",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "56",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4",
+        "characterCount": "23",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "56",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4",
+        "characterCount": "23",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "56",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "23",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "57",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "48",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "57",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "48",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "57",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "48",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "58",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "10",
+        "characterCount": "102",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "58",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "10",
+        "characterCount": "102",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "58",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10",
+        "characterCount": "102",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "59",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21",
+        "characterCount": "167",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "59",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21",
+        "characterCount": "167",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "59",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21",
+        "characterCount": "167",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "60",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "24",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "60",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "24",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "60",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "24",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "61",
+        "internalFuzzy": "0",
+        "matchRate": "66",
+        "wordCount": "16",
+        "characterCount": "117",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "61",
+        "internalFuzzy": "0",
+        "matchRate": "66",
+        "wordCount": "16",
+        "characterCount": "117",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "61",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "16",
+        "characterCount": "117",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "62",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "21",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "62",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "21",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "62",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "21",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "63",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "38",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "63",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "38",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "63",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "38",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "64",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "5",
+        "characterCount": "38",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "65",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "54",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "65",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "54",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "65",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "54",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "66",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "37",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "66",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "37",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "66",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "37",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "67",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "16",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "67",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "16",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "67",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "16",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "68",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "9",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "68",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "9",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "68",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "9",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "69",
+        "internalFuzzy": "0",
+        "matchRate": "40",
+        "wordCount": "5",
+        "characterCount": "31",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "69",
+        "internalFuzzy": "0",
+        "matchRate": "40",
+        "wordCount": "5",
+        "characterCount": "31",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "69",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "31",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "70",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "21",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "70",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "21",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "70",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "21",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "71",
+        "internalFuzzy": "0",
+        "matchRate": "57",
+        "wordCount": "5",
+        "characterCount": "43",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "71",
+        "internalFuzzy": "0",
+        "matchRate": "57",
+        "wordCount": "5",
+        "characterCount": "43",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "71",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "43",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "72",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "21",
+        "characterCount": "153",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "72",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "21",
+        "characterCount": "153",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "72",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21",
+        "characterCount": "153",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "73",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "24",
+        "characterCount": "163",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "73",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "24",
+        "characterCount": "163",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "73",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "24",
+        "characterCount": "163",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "74",
+        "internalFuzzy": "0",
+        "matchRate": "92",
+        "wordCount": "36",
+        "characterCount": "316",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "74",
+        "internalFuzzy": "0",
+        "matchRate": "92",
+        "wordCount": "36",
+        "characterCount": "316",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "74",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "36",
+        "characterCount": "316",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "75",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "3",
+        "characterCount": "22",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "76",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "4",
+        "characterCount": "37",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "77",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "23",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "77",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "23",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "77",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "23",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "78",
+        "internalFuzzy": "0",
+        "matchRate": "42",
+        "wordCount": "3",
+        "characterCount": "28",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "78",
+        "internalFuzzy": "0",
+        "matchRate": "42",
+        "wordCount": "3",
+        "characterCount": "28",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "78",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "28",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "79",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "24",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "79",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "24",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "79",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "24",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "80",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "81",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "11",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "81",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "11",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "81",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "11",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "82",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "35",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "82",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "35",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "82",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "35",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "83",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "20",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "83",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "20",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "83",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "20",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "84",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "5",
+        "characterCount": "38",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "85",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "37",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "85",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "37",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "85",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "37",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "86",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "11",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "86",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "11",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "86",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "11",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "87",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "1",
+        "characterCount": "9",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "88",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "5",
+        "characterCount": "31",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "89",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "9",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "89",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "9",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "89",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "9",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "90",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "26",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "90",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "26",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "90",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "26",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "91",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "17",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "91",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "17",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "91",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "17",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "92",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "39",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "92",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "39",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "92",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "39",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "93",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "27",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "93",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "27",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "93",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "27",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "94",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4",
+        "characterCount": "25",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "94",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4",
+        "characterCount": "25",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "94",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "25",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "95",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "2",
+        "characterCount": "31",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "96",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "14",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "96",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "14",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "96",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "14",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "97",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "97",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "97",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "98",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "3",
+        "characterCount": "31",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "99",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "19",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "99",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "19",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "99",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "19",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "100",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "27",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "100",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "27",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "100",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "27",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "101",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "2",
+        "characterCount": "16",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "102",
+        "internalFuzzy": "1",
+        "matchRate": "57",
+        "wordCount": "4",
+        "characterCount": "33",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "102",
+        "internalFuzzy": "1",
+        "matchRate": "57",
+        "wordCount": "4",
+        "characterCount": "33",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "102",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "33",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "103",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "18",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "103",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "18",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "103",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "18",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "104",
+        "internalFuzzy": "0",
+        "matchRate": "104",
+        "wordCount": "3",
+        "characterCount": "17",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "105",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "20",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "105",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "20",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "105",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "20",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "106",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "2",
+        "characterCount": "21",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "107",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "27",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "107",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "27",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "107",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "27",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "108",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "108",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "108",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "109",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "109",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "109",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "10",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "110",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "16",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "110",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "16",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "110",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "16",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "111",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "13",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "111",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "13",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "111",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "13",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "112",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "25",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "112",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "25",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "112",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "25",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "113",
+        "internalFuzzy": "0",
+        "matchRate": "101",
+        "wordCount": "1",
+        "characterCount": "9",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "113",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "9",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "113",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "9",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "114",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "22",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "114",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "22",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "114",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "22",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "115",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "38",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "115",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "38",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "115",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "38",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "116",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "17",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "116",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "17",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "116",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "17",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "117",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "12",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "117",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1",
+        "characterCount": "12",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "117",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "12",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "118",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "11",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "118",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2",
+        "characterCount": "11",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "118",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "11",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "119",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "9",
+        "characterCount": "68",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "119",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "9",
+        "characterCount": "68",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "119",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "9",
+        "characterCount": "68",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "120",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "11",
+        "characterCount": "74",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "120",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "11",
+        "characterCount": "74",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "120",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "11",
+        "characterCount": "74",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "121",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "42",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "121",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "42",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "121",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "42",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "122",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "19",
+        "characterCount": "141",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "122",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "19",
+        "characterCount": "141",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "122",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "19",
+        "characterCount": "141",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "123",
+        "internalFuzzy": "0",
+        "matchRate": "92",
+        "wordCount": "19",
+        "characterCount": "152",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "123",
+        "internalFuzzy": "0",
+        "matchRate": "92",
+        "wordCount": "19",
+        "characterCount": "152",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "123",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "19",
+        "characterCount": "152",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "124",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "15",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "124",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3",
+        "characterCount": "15",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "124",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "15",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "125",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "10",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "125",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "10",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "125",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "10",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "126",
+        "internalFuzzy": "0",
+        "matchRate": "13",
+        "wordCount": "6",
+        "characterCount": "48",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "126",
+        "internalFuzzy": "0",
+        "matchRate": "13",
+        "wordCount": "6",
+        "characterCount": "48",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "126",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6",
+        "characterCount": "48",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "127",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "29",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "127",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "29",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "127",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "29",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "128",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "33",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "128",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "33",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "128",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "33",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "129",
+        "internalFuzzy": "1",
+        "matchRate": "71",
+        "wordCount": "3",
+        "characterCount": "34",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "129",
+        "internalFuzzy": "1",
+        "matchRate": "71",
+        "wordCount": "3",
+        "characterCount": "34",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "129",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "34",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "130",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "34",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "130",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "34",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "130",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "34",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "131",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "19",
+        "characterCount": "173",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "131",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "19",
+        "characterCount": "173",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "131",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "19",
+        "characterCount": "173",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "132",
+        "internalFuzzy": "1",
+        "matchRate": "85",
+        "wordCount": "6",
+        "characterCount": "48",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "132",
+        "internalFuzzy": "1",
+        "matchRate": "85",
+        "wordCount": "6",
+        "characterCount": "48",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "132",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6",
+        "characterCount": "48",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "133",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14",
+        "characterCount": "98",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "133",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14",
+        "characterCount": "98",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "133",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14",
+        "characterCount": "98",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "134",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13",
+        "characterCount": "93",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "134",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13",
+        "characterCount": "93",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "134",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13",
+        "characterCount": "93",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "135",
+        "internalFuzzy": "0",
+        "matchRate": "66",
+        "wordCount": "3",
+        "characterCount": "33",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "135",
+        "internalFuzzy": "0",
+        "matchRate": "66",
+        "wordCount": "3",
+        "characterCount": "33",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "135",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "33",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "136",
+        "internalFuzzy": "0",
+        "matchRate": "33",
+        "wordCount": "3",
+        "characterCount": "39",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "136",
+        "internalFuzzy": "0",
+        "matchRate": "33",
+        "wordCount": "3",
+        "characterCount": "39",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "136",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "39",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "137",
+        "internalFuzzy": "1",
+        "matchRate": "28",
+        "wordCount": "5",
+        "characterCount": "43",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "137",
+        "internalFuzzy": "1",
+        "matchRate": "28",
+        "wordCount": "5",
+        "characterCount": "43",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "137",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "43",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "138",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "28",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "138",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "28",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "138",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "28",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "139",
+        "internalFuzzy": "1",
+        "matchRate": "66",
+        "wordCount": "4",
+        "characterCount": "39",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "139",
+        "internalFuzzy": "1",
+        "matchRate": "66",
+        "wordCount": "4",
+        "characterCount": "39",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "139",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "39",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "140",
+        "internalFuzzy": "1",
+        "matchRate": "66",
+        "wordCount": "2",
+        "characterCount": "22",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "140",
+        "internalFuzzy": "1",
+        "matchRate": "66",
+        "wordCount": "2",
+        "characterCount": "22",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "140",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "22",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "141",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "31",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "141",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "31",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "141",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "31",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "142",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8",
+        "characterCount": "71",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "142",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8",
+        "characterCount": "71",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "142",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8",
+        "characterCount": "71",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "143",
+        "internalFuzzy": "1",
+        "matchRate": "33",
+        "wordCount": "7",
+        "characterCount": "75",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "143",
+        "internalFuzzy": "1",
+        "matchRate": "33",
+        "wordCount": "7",
+        "characterCount": "75",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "143",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "75",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "144",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "69",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "144",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "69",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "144",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "69",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "145",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "44",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "145",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "44",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "145",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5",
+        "characterCount": "44",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "146",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "45",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "146",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "45",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "146",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "45",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "147",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "153",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "147",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "153",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "147",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17",
+        "characterCount": "153",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "148",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "30",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "148",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "30",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "148",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "30",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "149",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14",
+        "characterCount": "122",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "149",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14",
+        "characterCount": "122",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "149",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14",
+        "characterCount": "122",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "150",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "18",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "150",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "18",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "150",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "18",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "151",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "18",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "151",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "18",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "151",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "18",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "152",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10",
+        "characterCount": "101",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "152",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10",
+        "characterCount": "101",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "152",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10",
+        "characterCount": "101",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "153",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "72",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "153",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "72",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "153",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7",
+        "characterCount": "72",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "154",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6",
+        "characterCount": "37",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "154",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6",
+        "characterCount": "37",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "154",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6",
+        "characterCount": "37",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "155",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "19",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "155",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "19",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "155",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "19",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "156",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "41",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "156",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "41",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "156",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4",
+        "characterCount": "41",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "157",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "11",
+        "characterCount": "105",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "157",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "11",
+        "characterCount": "105",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "157",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "11",
+        "characterCount": "105",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "158",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6",
+        "characterCount": "40",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "158",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6",
+        "characterCount": "40",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "158",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6",
+        "characterCount": "40",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "159",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14",
+        "characterCount": "113",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "159",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14",
+        "characterCount": "113",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "159",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14",
+        "characterCount": "113",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "160",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "40",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "160",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "40",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "160",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "40",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "161",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "1",
+        "characterCount": "17",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "162",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "4",
+        "characterCount": "39",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "163",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "5",
+        "characterCount": "43",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "164",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "2",
+        "characterCount": "28",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "165",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "4",
+        "characterCount": "39",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "166",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "20",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "166",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "20",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "166",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2",
+        "characterCount": "20",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "167",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "23",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "167",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "23",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "167",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1",
+        "characterCount": "23",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "168",
+        "internalFuzzy": "1",
+        "matchRate": "80",
+        "wordCount": "12",
+        "characterCount": "118",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "168",
+        "internalFuzzy": "1",
+        "matchRate": "80",
+        "wordCount": "12",
+        "characterCount": "118",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "168",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "12",
+        "characterCount": "118",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "169",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "2",
+        "characterCount": "22",
+        "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "170",
+        "internalFuzzy": "1",
+        "matchRate": "66",
+        "wordCount": "3",
+        "characterCount": "32",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "170",
+        "internalFuzzy": "1",
+        "matchRate": "66",
+        "wordCount": "3",
+        "characterCount": "32",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "170",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3",
+        "characterCount": "32",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "171",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "8",
+        "characterCount": "71",
+        "type": "auto-propagated"
+    }
+]

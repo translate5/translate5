@@ -1,0 +1,32 @@
+[
+    {
+        "source": "Das ist das Haus des Nikolaus",
+        "sourceEdit": null,
+        "target": "That was the castle of St. Nicholas",
+        "targetEdit": "That was the castle of St. Nicholas",
+        "comments": null,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":35}}}}",
+        "segmentNrInTask": "1",
+        "mid": "1_1",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "stateId": "0",
+        "autoStateId": "0",
+        "fileOrder": "0",
+        "workflowStepNr": "0",
+        "workflowStep": null,
+        "isRepeated": "0",
+        "sourceMd5": "86d2e0a1d2367ae96fdb4d91908050dd",
+        "sourceToSort": "Das ist das Haus des Nikolaus",
+        "targetMd5": "ba3bb9e5ddb2e1d7a393cb4c0ef11de1",
+        "targetToSort": "That was the castle of St. Nicholas",
+        "targetEditToSort": "That was the castle of St. Nicholas",
+        "isWatched": false,
+        "segmentUserAssocId": null,
+        "matchRateType": "import;none",
+        "isFirstofFile": null
+    }
+]

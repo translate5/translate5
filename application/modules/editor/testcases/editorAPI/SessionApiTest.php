@@ -116,9 +116,14 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
             'passwd' => 'asdfasdf',
         ];
         
-        $taskGuid = $this->api()->getTask()->taskGuid;
+        $task = $this->api()->getTask();
+        $taskGuid = $task->taskGuid;
         if($withTask) {
             $loginData['taskGuid'] = $taskGuid;
+        }
+        else {
+            //remove internal task to prevent adding to the URL
+            $this->api()->setTask(null);
         }
         
         $response = $this->api()->requestJson('editor/session', 'POST', $loginData);
@@ -132,7 +137,11 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertNotFalse($response, 'JSON Login request was not successful!');
         $this->assertMatchesRegularExpression('/[a-zA-Z0-9]{26}/', $sessionId, 'Login call does not return a valid sessionId!');
         $this->assertMatchesRegularExpression('/[0-9a-fA-F]{32}/', $sessionToken, 'Login call does not return a valid sessionToken!');
-        
+
+        if($withTask) {
+            $this->assertEquals('/editor/taskid/'.$this->api()->getTask()->id.'/', $response->taskUrlPath, 'Login call does return a valid task URL!');
+        }
+
         $response = $this->api()->request('editor/?sessionToken='.$sessionToken.'&APItest=true');
         $this->assertNotFalse(strpos($response->getBody(), '<div id="loading-indicator-text"></div>'), 'The editor page does not contain the expected content.');
         if($withTask) {
@@ -158,6 +167,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals(json_decode($expected), $sessionData, 'User was not properly authenticated via ');
         
         $this->api()->logout();
+        $this->api()->setTask($task);
     }
     
     public function testSingleClickAuthentication() {

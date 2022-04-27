@@ -59,8 +59,10 @@ END LICENSE AND COPYRIGHT
  * @method void setLocked() setLocked(int $locked)
  * @method integer getSourceWordCount() getSourceWordCount()
  * @method void setSourceWordCount() setSourceWordCount(int $count)
- * @method string getPreTransLangResUuid() getPreTranslangResUuid()
- * @method void setPreTransLangResUuid() setPreTranslangResUuid(string $uuid)
+ * @method integer getSourceCharacterCount() getSourceCharacterCount()
+ * @method void setSourceCharacterCount() setSourceCharacterCount(int $count)
+ * @method string getPreTransLangResUuid() getPreTransLangResUuid()
+ * @method void setPreTransLangResUuid() setPreTransLangResUuid(string $uuid)
  */
 class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';

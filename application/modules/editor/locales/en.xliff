@@ -2483,6 +2483,10 @@ A task was associated to you in the task-portal {portalLink}.<br />
     <source>Externe Bearbeitung als Excel</source>
     <target>External editing as Excel</target>
 </trans-unit>
+  <trans-unit id='RXhwb3J0IGRlciBCZWFyYmVpdHVuZ2VuIHBybyBXb3JrZmxvd3NjaHJpdHQgYWxzIEV4Y2Vs'>
+    <source>Export der Bearbeitungen pro Workflowschritt als Excel</source>
+    <target>Export editing history per workflow-step as Excel</target>
+  </trans-unit>
 <trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='>
     <source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source>
     <target>Re-import chosen tasks into current TM</target>

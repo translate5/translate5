@@ -1,0 +1,32 @@
+[
+    {
+        "source": "Software Entwicklung macht Spa\u00df!",
+        "sourceEdit": null,
+        "target": "Software development makes fun!",
+        "targetEdit": "Software development makes fun!",
+        "comments": null,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":31}}}}",
+        "segmentNrInTask": "1",
+        "mid": "1_1",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "stateId": "0",
+        "autoStateId": "0",
+        "fileOrder": "0",
+        "workflowStepNr": "0",
+        "workflowStep": null,
+        "isRepeated": "0",
+        "sourceMd5": "d67483e8ef405b75965e57c8e552b95f",
+        "sourceToSort": "Software Entwicklung macht Spa\u00df!",
+        "targetMd5": "447ae90b7bd4751b22cd0c371c343e33",
+        "targetToSort": "Software development makes fun!",
+        "targetEditToSort": "Software development makes fun!",
+        "isWatched": false,
+        "segmentUserAssocId": null,
+        "matchRateType": "import;none",
+        "isFirstofFile": null
+    }
+]
