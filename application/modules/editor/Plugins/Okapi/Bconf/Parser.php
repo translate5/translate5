@@ -54,11 +54,11 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File 
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($pathToParse, "rb");
         $sig = $raf->readUTF(); // signature
         if(!$raf::SIGNATURE === $sig){
-            throw new ZfExtended_UnprocessableEntity("Invalid file format.");
+            throw new ZfExtended_UnprocessableEntity('E1026', ['errors' => [["Invalid signature '".htmlspecialchars($sig)."' in file header. Must be ".$raf::SIGNATURE ]]]);
         }
         $version = $raf->readInt(); // Version info
         if(!($version >= 1 && $version <= $raf::VERSION)){
-            throw new ZfExtended_UnprocessableEntity("Invalid version.");
+            throw new ZfExtended_UnprocessableEntity('E1026', ['errors' => [["Invalid version '$version' in file header. Must be in range 1-".$raf::VERSION]]]);
         }
 
         //=== Section 1: plug-ins
@@ -80,7 +80,7 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File 
         // Build a lookup table to the references
         $refNames = [];
         $id = $raf->readInt(); // First ID or end of section marker
-        while($id != -1) {
+        while($id != -1 && !is_null($id)) {
             $filename = $refNames[] = $raf->readUTF(); // Skip filename
             // Skip over the data to move to the next reference
             $size = $raf->readLong();
@@ -88,7 +88,10 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File 
                 self::createReferencedFile($raf, $size, $filename);
             }
             // Then get the information for next entry
-            $id = $raf->readInt(); // ID
+            $id = $raf->readInt();
+        }
+        if($id === NULL){
+            throw new ZfExtended_UnprocessableEntity('E1026', ['errors' => [["Malformed references list. Read NULL instead of integer."]]]);
         }
 
         //=== Section 3 : the pipeline itself
