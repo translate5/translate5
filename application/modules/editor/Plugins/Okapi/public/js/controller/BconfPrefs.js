@@ -168,7 +168,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                         source: 'bconfStore',
                         autoLoad: true,
                         filters: [{
-                            filterFn: ({data: bconf}) => !bconf.customerId || this._value == bconf.customerId,
+                            filterFn: function({data: bconf}){return !bconf.customerId || this._value == bconf.customerId},
                             property: 'customerId',
                             value: '{customer.selection.id}'
                         }],
