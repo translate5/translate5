@@ -330,6 +330,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_TaskController', 'afterPostAction', [$this, 'addBconfIdToTaskMeta']);
 
         $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', [$this, 'addCustomersDefaultBconfIds']);
+        $this->eventManager->attach('Editor_CustomerController', 'beforePutAction', [$this, 'handleCustomerMeta']);
     }
 
     /**
@@ -644,4 +645,27 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $event->getParam('view')->rows[$index]['defaults'] = $files;
         }
     }
+
+    /**
+     * @see ZfExtended_RestController::beforeActionEvent
+     * @param Zend_EventManager_Event $event
+     * @return void
+     */
+    public static function handleCustomerMeta(Zend_EventManager_Event $event) {
+        $data = json_decode($event->getParam('params')['data'],true);
+        @['id' =>$customerId, 'defaultBconfId' => $bconfId] = $data;
+
+        if($bconfId){
+            $customerMeta = new editor_Models_Customer_Meta();
+            try {
+                $customerMeta->loadByCustomerId($customerId);
+            } catch(ZfExtended_Models_Entity_NotFoundException){
+                $customerMeta->init(['customerId' => $customerId]); // new entity
+            }
+            $customerMeta->setDefaultBconfId($bconfId);
+            $customerMeta->save(); // QUIRK: triggers SELECT after UPDATE
+            if(count($data) === 2) exit;
+        }
+    }
+
 }

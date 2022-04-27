@@ -160,35 +160,4 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         exit;
     }
 
-    /**
-     * Persists isDefaultForCustomer to customer_meta
-     * @param array|null $fields
-     * @param bool $mode
-     * @throws Zend_Db_Statement_Exception|ZfExtended_Models_Entity_Exceptions_IntegrityConstraint|ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey|ZfExtended_Models_Entity_NotFoundException
-     * @see ZfExtended_RestController::putAction, ZfExtended_RestController::postAction
-     */
-    protected function setDataInEntity(array $fields = null, $mode = self::SET_DATA_BLACKLIST) {
-        if(isset($this->data['isDefaultForCustomer'])){
-            $bconfId = (int)$this->data['id'];
-            $customerId = (int)$this->data['isDefaultForCustomer'];
-
-            $customerMeta = new editor_Models_Customer_Meta();
-            if(!$customerId){
-                $customerMeta->loadRow('defaultBconfId = ?', $bconfId);
-            } else try {
-                $customerMeta->loadByCustomerId($customerId);
-            } catch(ZfExtended_Models_Entity_NotFoundException){
-                $customerMeta->init(['customerId' => $customerId]); // new entity
-            }
-
-            $newDefault = ($bconfId != $customerMeta->getDefaultBconfId()) ? $bconfId : NULL;
-            $customerMeta->setDefaultBconfId($newDefault);
-
-            $customerMeta->save();
-        }
-        if($this->data && count($this->data) > 2 || !isset($this->data['isDefaultForCustomer'])){ // more than customerDefault is changed, call parent
-            parent::setDataInEntity($fields, $mode);
-        }
-    }
-
 }

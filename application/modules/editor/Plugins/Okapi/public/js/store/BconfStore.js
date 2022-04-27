@@ -54,7 +54,9 @@ Ext.define('Editor.plugins.Okapi.store.BconfStore', {
   fields: [{
     name: 'id',
     type: 'int',
-    persist: false
+  }, {
+    name: 'customerId',
+    type: 'int'
   }, {
     name: 'isDefault',
     type: 'boolean'

@@ -47,7 +47,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         'Editor.model.admin.Customer'
     ],
     init: function(){
-        Editor.model.admin.Customer.addFields({type: 'int', name: 'defaultBconfId', persist: false})
+        Editor.model.admin.Customer.addFields([{type: 'int', name: 'defaultBconfId', persist:true}])
     },
     onLaunch: function(){
         Ext.create('Editor.plugins.Okapi.store.BconfStore'); // in onLaunch so customerStore can import default bconf before if needed
