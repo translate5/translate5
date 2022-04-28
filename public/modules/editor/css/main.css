@@ -932,6 +932,5 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"] /* Only enable for 
 }
 
 .chosenDefault {
-    /* background-color: hsl(87deg 65% 63%); */
     background-color: hsl(0deg 0% 0% / 20%);
 }
