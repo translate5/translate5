@@ -111,13 +111,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         enableTextSelection: true, // neccessary for pointer class to have effect on whole row
         getRowClass: function({data: bconf}){
             var cls = '', customer = this.grid.customer?.getData() || {};
-            if(bconf.customerId != customer.id || bconf.name === this.grid.SYSTEM_BCONF_NAME){
-                cls += 'not-editable ';
-            } else {
-                cls += 'pointer ';
-            }
+            if(bconf.customerId == customer.id){
+                cls += ' pointer '
+            } //else not editable
             if(customer.defaultBconfId ? customer.defaultBconfId == bconf.id : bconf.isDefault){
-                cls += ' chosenDefault'
+                cls += ' chosenDefault '
             }
             return cls;
         },
@@ -172,12 +170,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         xtype: 'checkcolumn',
                         text: me.text_cols.customerStandard,
                         width: 150,
-                        dataIndex: 'isDefaultForCustomer',
                         itemId: 'customerDefaultColumn',
                         hidden: !instanceConfig.isCustomerGrid,
                         hideable: instanceConfig.isCustomerGrid,
                         tdCls: 'pointer',
                         tooltip: '',
+                        // QUIRK: This is a purely synthetic column that renders based on the associated customer, so no dataIndex is set
+                        // This is way easier than trying to model this dynamic relation canonically
                         renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
                             arguments[0] = record.id == view.grid.customer.get('defaultBconfId'); // customer is always set, else panel wouldn't be active
                             return this.defaultRenderer.apply(this, arguments);
@@ -188,23 +187,24 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                              * The exception is, when system default is (de)selected as customer default - then don't refresh old
                              * @param col
                              * @param recordIndex
-                             * @param checked
+                             * @param {boolean} checked the status of the checkbox
                              * @param clicked the record whose row was clicked
                              * @returns {boolean}
                              */
                             'beforecheckchange': function(col, recordIndex, checked, clicked){
                                 var view = col.getView(),
                                     store = view.getStore(),
-                                    customer = view.grid.getCustomer(), // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
-                                    oldId = customer.get('defaultBconfId') || store.find('name', view.grid.SYSTEM_BCONF_NAME, 0, false, true, true).id,
-                                    isDeselect = clicked.id == oldId,
-                                    effectiveId = isDeselect ? 0 : clicked.id;
-                                customer.set('defaultBconfId', effectiveId); // TODO: why doesn't {commit:true} trigger save but even prevent it?!
+                                    customer = view.grid.getCustomer(),
+                                    oldDefaultId = customer.get('defaultBconfId'),
+                                    isSelect = oldDefaultId !== clicked.id, // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
+                                    id2Refresh = isSelect && oldDefaultId ? customer.get('defaultBconfId')
+                                        : store.findRecord('name', view.grid.SYSTEM_BCONF_NAME, 0, false, true, true).id;
+                                customer.set('defaultBconfId', isSelect ? clicked.id : 0); // TODO: why doesn't {commit:true} trigger save but even prevent it?!
                                 customer.save();
-                                view.refreshNode(clicked);
-                                var oldDefaultRec = store.getById(oldId);
-                                oldDefaultRec && view.refreshNode(oldDefaultRec)
-                                return false;
+                                if(id2Refresh !== clicked.id){
+                                    var oldDefaultRec = store.getById(id2Refresh);
+                                    oldDefaultRec && view.refreshNode(oldDefaultRec)
+                                }
                             }
                         }
                     },

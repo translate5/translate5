@@ -56,9 +56,10 @@ Ext.define('Editor.plugins.Okapi.store.BconfStore', {
     type: 'int',
   }, {
     name: 'customerId',
-    type: 'int'
+    type: 'int',
+    reference: 'customer',
   }, {
-    name: 'isDefault',
+    name: 'isDefault', // global setting
     type: 'boolean'
   }]
 });
