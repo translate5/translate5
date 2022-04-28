@@ -34,7 +34,6 @@ END LICENSE AND COPYRIGHT
 
 /**
  * @property editor_Plugins_Okapi_Models_Bconf $entity
- * @method editor_Plugins_Okapi_Models_Bconf entityLoad()
  */
 class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     /***
@@ -127,7 +126,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     }
 
     public function downloadsrxAction() {
-        $bconf = $this->entityLoad();
+        $this->entityLoad();
+        $bconf = $this->entity;
         $fileName = $bconf->srxNameFromPipeline($this->getParam('purpose'));
         $file = $bconf->getFilePath(fileName: $fileName);
 
