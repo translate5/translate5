@@ -235,7 +235,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             $defaultBconfId = $customerMeta->getDefaultBconfId();
         }
         if(!$defaultBconfId){
-            $this->loadRow('default = 1');
+            $this->loadRow('isDefault = 1');
             $defaultBconfId = $this->getId();
         }
         return $defaultBconfId;
