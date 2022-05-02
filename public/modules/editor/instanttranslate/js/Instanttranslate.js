@@ -1404,12 +1404,53 @@ function changeLanguage(){
 
 function swapLanguages(){
     // detect old languages
-    var $oldSourceLang = $('#sourceLocale').val();
-    var $oldTargetLang = $('#targetLocale').val();
-
+    var $oldSourceLang = $('#sourceLocale').val(),
+        $oldTargetLang = $('#targetLocale').val(),
+        allSourceLangs = $.map($("#sourceLocale option[value]"), function(option) {
+            return $(option).attr("value");
+        }),
+        allTargetLangs = $.map($("#targetLocale option[value]"), function(option) {
+            return $(option).attr("value");
+        });
+        
+    //check if oldLangs are missing in other language, if yes try fuzzying, 
+    // if still nothing found keep logic as it was (use the last one of the select)
+    
+    if($.inArray($oldSourceLang, allTargetLangs) < 0) {
+        if(/[-_]/.test($oldSourceLang)) {
+            //if old source is sublanguage, use main language of it
+            $oldSourceLang = $oldSourceLang.split(/[-_]/)[0];
+        }        
+        else {
+            //if it is a main language, use the first matchin sub language
+            $.each(allTargetLangs, function(idx,target){
+                if((new RegExp($oldSourceLang+'[-_]')).test(target)) {
+                    $oldSourceLang = target;
+                    return false;
+                }
+            });
+        }
+    }
+    if($.inArray($oldTargetLang, allSourceLangs) < 0) {
+        if(/[-_]/.test($oldTargetLang)) {
+            //if old source is sublanguage, use main language of it
+            $oldTargetLang = $oldTargetLang.split(/[-_]/)[0];
+        }
+        else {
+            //if it is a main language, use the first matchin sub language
+            $.each(allSourceLangs, function(idx,source){
+                if((new RegExp($oldTargetLang+'[-_]')).test(source)) {
+                    $oldTargetLang = source;
+                    return false;
+                }
+            });
+        }
+    }
+    
     // now swap the language selections
     $("#sourceLocale").val($oldTargetLang);
     $("#targetLocale").val($oldSourceLang);
+    
     $("#sourceLocale").selectmenu("refresh");
     $("#targetLocale").selectmenu("refresh");
 
