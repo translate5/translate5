@@ -85,6 +85,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     public static function getImportBconfPath(editor_Models_Task $task): string {
         $meta = $task->meta(true);
         $bconfId = $meta->getBconfId();
+        !$bconfId && throw new editor_Plugins_Okapi_Exception("E1384");
         $bconf = new editor_Plugins_Okapi_Models_Bconf();
         $bconf->load($bconfId);
         return $bconf->getFilePath();
@@ -327,7 +328,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', [$this, 'initJsTranslations']);
 
-        $this->eventManager->attach('editor_TaskController', 'afterPostAction', [$this, 'addBconfIdToTaskMeta']);
+        $this->eventManager->attach('editor_TaskController', 'beforeProcessUploadedFile', [$this, 'addBconfIdToTaskMeta']);
 
         $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', [$this, 'addCustomersDefaultBconfIds']);
         $this->eventManager->attach('Editor_CustomerController', 'beforePutAction', [$this, 'handleCustomerMeta']);
@@ -346,9 +347,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         if(empty($this->task)) {
             $this->task = $event->getParam('task');
         }
+        $defaultImportBconfName = editor_Plugins_Okapi_Models_Bconf::SYSTEM_BCONF_NAME;
         $bconfId = $this->task->meta()->getBconfId();
-        $bconfName = (new editor_Plugins_Okapi_Models_Bconf())->load($bconfId)['name'];
-        $this->useCustomBconf = $bconfName != editor_Plugins_Okapi_Models_Bconf::SYSTEM_BCONF_NAME;
+        $bconfName = $bconfId ? (new editor_Plugins_Okapi_Models_Bconf())->load($bconfId)['name'] : $defaultImportBconfName;
+        $this->useCustomBconf = $bconfName != $defaultImportBconfName;
         // TODO: use extension mapping from bconf
         if($this->useCustomBconf){
             $config->checkFileType = false;
@@ -368,16 +370,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @see ZfExtended_RestController::afterActionEvent
      */
     public function addBconfIdToTaskMeta(Zend_EventManager_Event $event){
-
-        /** @var editor_Models_Task $task */
-        $task = $event->getParam('entity');
-        $data = $event->getParam('data');
-        $meta = $task->meta();
-        if(empty($data['bconfId'])){
-            $data['bconfId'] = (new editor_Plugins_Okapi_Models_Bconf)->getDefaultBconfId($data['customerId']);
-        }
-        $meta->setBconfId($data['bconfId']);
-        $meta->save();
+        /** @var editor_Models_Task_Meta $meta */
+        @['data' => $data, 'meta' => $meta] = $event->getParams();
+        $bconfId = ($data['bconfId']??null) ?: (new editor_Plugins_Okapi_Models_Bconf)->getDefaultBconfId($data['customerId']);
+        $meta->setBconfId($bconfId);
     }
     
     /**

@@ -938,9 +938,14 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity = $cloner->clone($this->entity);
 
         if($this->validate()) {
+            // set meta data in controller as in post request
+            $metaData = $this->entity->meta()->toArray();
+            unset($metaData['id'], $metaData['taskGuid']);
+            foreach($metaData as $field => $value){
+                $this->data[$field] = $value;
+            }
             $this->processUploadedFile($this->entity, $dataProvider); //creates task_meta via editor_Models_Import::import
             $cloner->cloneDependencies();
-            $cloner->cloneMeta();
             $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());

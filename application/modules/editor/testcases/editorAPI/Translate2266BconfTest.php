@@ -42,6 +42,8 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
 
         self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case');
 
+        self::assertNeededUsers();
+
         //self::assertLogin('testapiuser');
         self::$api->login('testmanager');
         self::assertLogin('testmanager');
@@ -116,7 +118,6 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
     /***
      * Verify Task Import using Okapi is working with the LEK_okapi_bconf based Bconf management
      */
-    // TODO: works when xdebug is set, not when not
     public function test_OkapiTaskImport() {
         try {
             $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . self::$okapi->api->url . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
@@ -130,8 +131,10 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         $task = [
             'sourceLang' => 'de',
             'targetLang' => 'en',
+            'bconfId' => self::$bconf->getDefaultBconfId()
         ];
         $api->addImportFile($api->getFile('testfiles/workfiles/TRANSLATE-2266-de-en.txt'));
+        //$api->addImportFile($api->getFile('testfiles/workfiles/TRANSLATE-2266-2-de-en.txt'));
         $api->import($task);
     }
 

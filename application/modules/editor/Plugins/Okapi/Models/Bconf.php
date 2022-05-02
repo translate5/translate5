@@ -235,7 +235,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             $defaultBconfId = $customerMeta->getDefaultBconfId();
         }
         if(!$defaultBconfId){
-            $this->loadRow('isDefault = 1');
+            $this->loadRow('name = ? ', $this::SYSTEM_BCONF_NAME);
             $defaultBconfId = $this->getId();
         }
         return $defaultBconfId;
@@ -282,7 +282,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
 
         $srxFileName = $matches[1] ?? '';
         if(!$srxFileName){
-            $xmlErrors .= "\nNo SegmentationStep with attribute $purpose in " . $this->file::PIPELINE_FILE . "on server";
+            $xmlErrors .= "\nNo SegmentationStep with attribute $purpose in " . $this->file::PIPELINE_FILE . " on server";
         }
 
         $xmlErrors && throw new ZfExtended_UnprocessableEntity('E1026',
