@@ -274,12 +274,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     protected function getMetaData($found) {
         $nameToShow = [
             "documentName",
-            "documentShortName",
-            "type",
             "matchType",
             "author",
             "timestamp",
-            "markupTable",
             "context",
             "additionalInfo",
         ];

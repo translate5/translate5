@@ -80,13 +80,6 @@ class editor_SessionController extends ZfExtended_SessionController {
         $userModel = ZfExtended_Factory::get($config->authentication->userEntityClass);
         /* @var $userModel \ZfExtended_Models_User */
         $userModel->setUserSessionNamespaceWithoutPwCheck($login);
-
-        $userSession = new Zend_Session_Namespace('user');
-        
-        $session = ZfExtended_Factory::get('ZfExtended_Session');
-        /* @var $session ZfExtended_Session */
-        // remove the old session (if exist) for the impersonated user
-        $session->cleanForUser($userSession->data->id);
     }
     
     public function postAction() {

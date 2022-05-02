@@ -275,8 +275,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         // so we take only the single filename at the moment
         $json->documentName = $filename;
         
-        $json->segmentNumber = ''; //TODO can be used after implementing TRANSLATE-793
-        $json->markupTable = 'OTMXUXLF';
         $json->context = $segment->getMid(); // here MID (context was designed for dialog keys/numbers on translateable strings software)
         
         $http = $this->getHttpWithMemory('POST', 'fuzzysearch');
