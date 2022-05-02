@@ -313,6 +313,10 @@ If you did not send the request yourself, please inform us of this.
                 </figure>
 </target>
 </trans-unit>
+<trans-unit id='U1NPLVVtbGVpdHVuZy4uLg=='>
+  <source>SSO-Umleitung...</source>
+  <target>SSO redirecting...</target>
+</trans-unit>
 </body>
 </file>
 </xliff>
