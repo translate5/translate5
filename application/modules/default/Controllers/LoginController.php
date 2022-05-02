@@ -145,13 +145,14 @@ class LoginController extends ZfExtended_Controllers_Login {
                     
                 )
             ));
+
             $link->setOrder(4);
             $this->_form->addElement($link);
         }else{
             // Add overlay to the login page only when the user is automatically redirected to the SSO auth provider
             $overlay = new Zend_Form_Element_Note([
                 'name' => 'overlay',
-                'value' => '<div style="position: absolute;top: 50%;left: 50%;font-size: 50px;color: white;transform: translate(-50%,-50%);-ms-transform: translate(-50%,-50%);">'.$this->_translate->_('SSO-Umleitung...').'</div>',
+                'value' => '<div style="position: absolute;top: 50%;left: 50%;font-size: 50px;color: white;transform: translate(-50%,-50%);-ms-transform: translate(-50%,-50%);">'.$this->_translate->_('Redirect to login...').'</div>',
                 'decorators' => [
                     ['ViewHelper'],
                     ['HtmlTag', [
