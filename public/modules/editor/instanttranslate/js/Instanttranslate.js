@@ -1446,7 +1446,13 @@ function swapLanguages(){
             });
         }
     }
-    
+
+    // if after all checks, still no source or target language is found, show the error about "no language resources" found
+    if($.inArray($oldTargetLang, allSourceLangs) < 0 || $.inArray($oldSourceLang, allTargetLangs) < 0) {
+        showTargetError(Editor.data.languageresource.translatedStrings.noLanguageResource);
+        return;
+    }
+
     // now swap the language selections
     $("#sourceLocale").val($oldTargetLang);
     $("#targetLocale").val($oldSourceLang);
