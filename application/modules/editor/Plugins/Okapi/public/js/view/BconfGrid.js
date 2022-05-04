@@ -84,22 +84,22 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         invalidTitle: '#UT#Ungültige {}-Datei',
         invalidMsg: '#UT#Die hochgeladene Datei ist keine gültige {}-Datei.',
         name: '#UT#Name',
-        nameUnique: '#UT#Der Name ist schon vergeben!',
+        nameUnique: '#UT#Dieser Name ist schon vergeben',
         newBconf: '#UT#Neue Bconf-Datei',
-        editBconf: '#UT#Bconf-Datei bearbeiten',
+        editBconf: '#UT#Bconf-Datei bearbeiten'
     },
     viewConfig: {
         enableTextSelection: true, // neccessary for pointer class to have effect on whole row
         getRowClass: function({data: bconf}){
             var cls = '', customer = this.grid.customer?.getData() || {};
             if(bconf.customerId == customer.id){
-                cls += ' pointer '
+                cls += ' pointer ';
             } //else not editable
             if(customer.defaultBconfId ? customer.defaultBconfId == bconf.id : bconf.isDefault){
                 cls += ' chosenDefault '
             }
             return cls;
-        },
+        }
     },
     initConfig: function(instanceConfig){
         var me = this,
