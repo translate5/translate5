@@ -54,7 +54,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         customer: null,
         customerDefault: null
     },
-    updateCustomer: function(newCustomer){
+    notupdateCustomer: function(newCustomer){
         if(!newCustomer){
             return;
         }
@@ -201,10 +201,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                                         : store.findRecord('name', view.grid.SYSTEM_BCONF_NAME, 0, false, true, true).id;
                                 customer.set('defaultBconfId', isSelect ? clicked.id : 0); // TODO: why doesn't {commit:true} trigger save but even prevent it?!
                                 customer.save();
+                                view.refresh(clicked);
                                 if(id2Refresh !== clicked.id){
                                     var oldDefaultRec = store.getById(id2Refresh);
                                     oldDefaultRec && view.refreshNode(oldDefaultRec)
                                 }
+                                return false; // checked state handled manually via view.refresh
                             }
                         }
                     },
@@ -224,11 +226,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                                 metaData.tdCls += ' pointer ';
                             }
                             return this.defaultRenderer.apply(this, arguments);
-                        }
-                        ,
+                        },
                         listeners: {
                             'beforecheckchange':
-
                                 function(col, recordIndex, checked, record){
                                     var view = col.getView(),
                                         grid = view.ownerGrid,
