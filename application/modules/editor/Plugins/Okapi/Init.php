@@ -232,7 +232,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         $this->initEvents();
         $this->addController('BconfController');
-        $this->addController('BconfFilterController');
         $this->initRoutes();
     }
     

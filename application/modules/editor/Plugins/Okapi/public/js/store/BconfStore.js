@@ -1,10 +1,9 @@
-
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -21,10 +20,10 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
-END LICENSE AND COPYRIGHT
-*/
+ END LICENSE AND COPYRIGHT
+ */
 
 /**
  * Store for the visual review fonts endpoint
@@ -32,34 +31,34 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Store
  */
 Ext.define('Editor.plugins.Okapi.store.BconfStore', {
-  extend: 'Ext.data.Store',
-  storeId: 'bconfStore',
-  autoLoad: true,
-  autoSync: true,
-  pageSize: 0,
-  idProperty: 'id',
-  proxy: {
-    type: 'rest',
-    url: Editor.data.restpath + 'plugins_okapi_bconf',
-    reader: {
-      rootProperty: 'rows',
-      type: 'json'
+    extend: 'Ext.data.Store',
+    storeId: 'bconfStore',
+    autoLoad: true,
+    autoSync: true,
+    pageSize: 0,
+    idProperty: 'id',
+    proxy: {
+        type: 'rest',
+        url: Editor.data.restpath + 'plugins_okapi_bconf',
+        reader: {
+            rootProperty: 'rows',
+            type: 'json'
+        },
+        writer: {
+            encode: true,
+            rootProperty: 'data',
+            writeAllFields: false
+        }
     },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
-    }
-  },
-  fields: [{
-    name: 'id',
-    type: 'int',
-  }, {
-    name: 'customerId',
-    type: 'int',
-    reference: 'customer',
-  }, {
-    name: 'isDefault', // global setting
-    type: 'boolean'
-  }]
+    fields: [{
+        name: 'id',
+        type: 'int',
+    }, {
+        name: 'customerId',
+        type: 'int',
+        reference: 'customer',
+    }, {
+        name: 'isDefault', // global setting
+        type: 'boolean'
+    }]
 });
