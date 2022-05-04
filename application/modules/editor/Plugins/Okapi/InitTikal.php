@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -33,7 +33,7 @@ class editor_Plugins_Okapi_InitTikal extends ZfExtended_Plugin_Abstract {
     
     public function init() {
         throw new Exception("Not tested this plugin since refactored the file import!");
-        $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'afterDirectoryParsing', array($this, 'handleBeforeImport'));
+        //$this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'afterDirectoryParsing', array($this, 'handleBeforeImport'));
     }
     
     public function handleBeforeImport(Zend_EventManager_Event $event) {
