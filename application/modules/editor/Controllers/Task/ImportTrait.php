@@ -115,14 +115,13 @@ trait editor_Controllers_Task_ImportTrait {
      * @throws Exception
      */
     protected function processUploadedFile(editor_Models_Task $task, editor_Models_Import_DataProvider_Abstract $dp) {
-        // Create Task_meta, which is saved before import queues workers
-        /* @see editor_Models_Import::import */
-        $meta = $task->meta(true, true);
-        $this->events->trigger('beforeProcessUploadedFile', $this, array(
+        /* @see editor_Models_Import::import Saves $meta after task */
+        $meta = $task->createMeta();
+        $this->events->trigger('beforeProcessUploadedFile', $this, [
             'task' => $task,
+            'meta' => $meta,
             'data' => $this->data,
-            'meta' => $meta
-        ));
+        ]);
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
         $import->setUserInfos($this->user->data->userGuid, $this->user->data->userName);

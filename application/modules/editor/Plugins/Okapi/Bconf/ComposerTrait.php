@@ -33,7 +33,7 @@
  */
 trait editor_Plugins_Okapi_Bconf_ComposerTrait {
 
-    public function pack(): string {
+    public function pack(): void {
         chdir($this->entity->getDataDirectory()); // so we can access with file name only
 
         $content = ['refs' => null, 'fprm' => null];
@@ -53,8 +53,6 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
         self::processPipeline($raf);
         self::filterConfiguration($raf, $content);
         self::extensionsMapping($raf);
-
-        return (string) $raf;
     }
 
     private function processPipeline($raf): void {

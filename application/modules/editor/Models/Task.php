@@ -879,25 +879,33 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * convenient method to get the task meta data
-     * @param bool $reinit if true reinits the internal meta object completely (after adding a field for example)
-     * @param bool $noQuery If set, do not try to load via taskGuid but initialize directly
+     * Explicitly creates a new meta entity to mark the beginnig of its lifecycle.
+     * @param array $data
      * @return editor_Models_Task_Meta
      */
-    public function meta(bool $reinit = false, bool $noQuery = false) {
-        if(empty($this->meta) || $reinit) {
-            $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
-        }
-        elseif($this->getTaskGuid() == $this->meta->getTaskGuid()) {
-            return $this->meta;
-        }
-        try {
-            $noQuery && throw new ZfExtended_Models_Entity_NotFoundException();
-            $this->meta->loadByTaskGuid($this->getTaskGuid());
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            $this->meta->init(array('taskGuid' => $this->getTaskGuid()));
-        }
+    public function createMeta(array $data = []): editor_Models_Task_Meta {
+        $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
+        $data['taskGuid'] = $this->getTaskGuid();
+        $this->meta->init($data);
         return $this->meta;
+    }
+
+    /**
+     * convenient method to get the task meta data
+     * @param bool $reinit if true reinits the internal meta object completely (after adding a field for example)
+     * @return editor_Models_Task_Meta
+     */
+    public function meta(bool $reinit = false) {
+        $meta = $this->meta ?? $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
+        $taskGuid = $this->getTaskGuid();
+        if($meta->getTaskGuid() != $taskGuid || $reinit){
+            try {
+                $meta->loadByTaskGuid($taskGuid);
+            } catch(ZfExtended_Models_Entity_NotFoundException){
+                $meta->init(['taskGuid' => $taskGuid]);
+            }
+        }
+        return $meta;
     }
 
     /**

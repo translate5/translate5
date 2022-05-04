@@ -652,7 +652,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->entity->setTargetLang(reset($this->data['targetLang']));
         }
 
-        if(!$this->data['relaisLang']){
+        if(empty($this->data['relaisLang'])){
             $this->data['relaisLang'] = 0;
         } else {
             $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);

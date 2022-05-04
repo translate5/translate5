@@ -29,60 +29,40 @@ END LICENSE AND COPYRIGHT
 /**
  * Testcase for TRANSLATE-2266 Mixing XLF id and rid values led to wrong tag numbering
  * For details see the issue.
+ * TODO @see Translate2432Test Update/Unify
  */
 class Translate2266BconfTest extends editor_Test_JsonTest {
-    private static ?editor_Plugins_Okapi_Models_Bconf $bconf;
+    private static editor_Plugins_Okapi_Models_Bconf $bconf;
     private static int $bconfId = 0;
-    private static ?Zend_Config $okapi;
+    private static Zend_Config $okapi;
     public final const OKAPI_CONFIG = 'runtimeOptions.plugins.Okapi';
 
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-
-        if(!Zend_Registry::isRegistered('Zend_Locale')){
-            Zend_Registry::set('Zend_Locale', new Zend_Locale('en')); // Needed for localized error messages like ZfExtended_NoAccessException
-        }
-
-        $appState = self::assertAppState();
-
-        self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case');
-
-        self::assertNeededUsers();
-
-        //self::assertLogin('testapiuser');
         self::$api->login('testmanager');
         self::assertLogin('testmanager');
+        $appState = self::$api->requestJson('editor/index/applicationstate');
+        self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case');
 
-        self::$okapi = null;
-        self::$bconf = null;
-
-        self::assertTrue(self::assertConfigsAndDefaults());
-    }
-
-    public static function assertConfigsAndDefaults(): bool {
+        // Test essential configs
         $okapi = self::$okapi = Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
-        $neededConfigs = [
-            self::OKAPI_CONFIG . ".dataDir" => $okapi?->dataDir, // QUIRK cannot read via $api->testConfig()
-            self::OKAPI_CONFIG . ".api.url" => $okapi?->api?->url,
-        ];
-        foreach($neededConfigs as $name => $value){
-            !$value && self::fail("Needed config '$name' is not set");
-        }
+        self::assertNotEmpty($okapi->dataDir, self::OKAPI_CONFIG . ".dataDir not set");
+        self::assertNotEmpty($okapi->api->url, self::OKAPI_CONFIG . ".api.url not set");
 
         $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getOkapiDataFilePath(), 'okapi_default_import.bconf');
-
         self::assertFileExists($t5defaultImportBconf,
             "File '$t5defaultImportBconf' missing. As the Translate5 provided default import .bconf file for Okapi Task Imports it must exist!");
 
-        return true;
-
+        // Needed for localized error messages in Unit Test like ZfExtended_NoAccessException
+        if(!Zend_Registry::isRegistered('Zend_Locale')){
+            Zend_Registry::set('Zend_Locale', new Zend_Locale('en'));
+        }
     }
 
     /***
      * Unpack, Pack a Bconf to verify the Bconf Parser and Packer
      */
     public function test_BconfImportExport() {
-
         $input = new SplFileInfo(self::$api->getFile('testfiles/minimal/batchConfiguration.t5.bconf'));
         $postFile = [ // loose definition https://www.php.net/manual/features.file-upload.post-method.php
             "name"     => 'Translate2266BconfTest-' . time() . '.bconf',
@@ -260,7 +240,6 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
                 self::assertNotNull($e, "Did not reject ${invalid}$file with ZfExtended_UnprocessableEntity.");
             }
         }
-
     }
 
     /**

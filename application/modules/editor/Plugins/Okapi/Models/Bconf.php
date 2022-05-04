@@ -229,7 +229,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception|ZfExtended_Models_Entity_NotFoundException|Zend_Exception
+     * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
     public function getDefaultBconfId($customerId = null): int {
         $this->importDefaultWhenNeeded();
@@ -237,8 +237,11 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         $defaultBconfId = 0;
         if($customerId){
             $customerMeta = new editor_Models_Customer_Meta();
-            $customerMeta->loadByCustomerId($customerId);
-            $defaultBconfId = $customerMeta->getDefaultBconfId();
+            try {
+                $customerMeta->loadByCustomerId($customerId);
+                $defaultBconfId = $customerMeta->getDefaultBconfId();
+            } catch(ZfExtended_Models_Entity_NotFoundException){
+            }
         }
         if(!$defaultBconfId){
             $this->loadRow('name = ? ', $this::SYSTEM_BCONF_NAME);
