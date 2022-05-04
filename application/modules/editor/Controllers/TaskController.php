@@ -1281,7 +1281,6 @@ class editor_TaskController extends ZfExtended_RestController {
             //if no multiuser, try to lock for user
             //if multiuser, try a system lock
             if($unconfirmed || !($isMultiUser ? $task->lock($this->now, $task::USAGE_MODE_SIMULTANEOUS) : $task->lockForSessionUser($this->now))){
-                error_log("HERE");
                 $this->data->userState = $this->workflow::STATE_VIEW;
             }
         }
