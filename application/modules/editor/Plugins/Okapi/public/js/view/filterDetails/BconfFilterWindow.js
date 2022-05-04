@@ -26,11 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.plugins.Okapi.view.filterDetails.BConfFilterWindow', {
+Ext.define('Editor.plugins.Okapi.view.filterDetails.BconfFilterWindow', {
     extend: 'Ext.window.Window',
     requires: [
-        'Editor.plugins.Okapi.view.filterDetails.BConfFilterWindowController',
-        'Editor.plugins.Okapi.view.filterDetails.BConfFilterGrid'
+        'Editor.plugins.Okapi.view.filterDetails.BconfFilterWindowController',
+        'Editor.plugins.Okapi.view.filterDetails.BconfFilterGrid'
     ],
     autoDestroy: true,
     controller: 'bconfFilterWindowController',

@@ -56,7 +56,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         var rec = grid.getStore().getAt(rowIndex);
         var win = Ext.create('Editor.plugins.Okapi.view.filterDetails.BConfFilterWindow', {
             title: 'Filter Configuration -' + rec.get('name'),
-        })
+        });
         win.show();
     },
 
@@ -71,13 +71,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
 
     clonebconf: async function (view, rowIndex, /* colIndex */) {
         view.select(rowIndex);
-        var rec = view.selection;
+        var name, rec = view.selection;
         try {
-            var name = await this.promptUniqueBconfName(rec.get('name'));
+            name = await this.promptUniqueBconfName(rec.get('name'));
         } catch(e){
-            return
+            return;
         }
-        var params = {id: rec.id, name};
+        var params = { id: rec.id, name: name };
         var customer = view.ownerGrid.getCustomer();
         if(customer){
             params.customerId = customer.id;
@@ -118,7 +118,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
     downloadSRX: function (view, rowIndex, colIndex, /* actionItem */ {purpose}, e, /* record */ {id}) {
         view.select(rowIndex);
-        Editor.util.Util.download('plugins_okapi_bconf/downloadsrx',{id, purpose})
+        Editor.util.Util.download('plugins_okapi_bconf/downloadsrx',{id, purpose});
     },
     uploadSRX: function(id, srx, purpose){
         var controller = this;
@@ -135,7 +135,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                     icon: Ext.Msg.WARNING
                 });
             }
-        })
+        });
     },
     isDeleteDisabled:function ({grid}, rowIndex, colIndex, item, {data:bconf}) {
         return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === grid.SYSTEM_BCONF_NAME;
@@ -161,7 +161,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             try {
                 fileName = await this.promptUniqueBconfName(fileName);
             } catch(e){
-                return
+                return;
             }
         }
         var controller = this;
@@ -241,15 +241,15 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                             return this.lastVal[1];
                         }
                         var existingRec = v && bconfs.find('name', v, 0, true, true, true);
-                        var ret = !existingRec || existingRec===allowedRec || nameUnique //...start, startsWith, endsWith, ignoreCase
+                        var ret = !existingRec || existingRec === allowedRec || nameUnique; //...start, startsWith, endsWith, ignoreCase
                         this.lastVal = [v, ret]; // cache validation result
                     },
-                    listeners: {specialkey(field, e){ [e.ENTER,e.ESC].includes(e.keyCode) && panel.close()}},
+                    listeners: { specialkey(field, e){ [e.ENTER,e.ESC].includes(e.keyCode) && panel.close() }},
                 },],
-                    fbar: [{xtype: 'button', text: 'OK', formBind: true, handler:()=>panel.close() }]
-            }).show()
+                fbar: [{xtype: 'button', text: 'OK', formBind: true, handler:()=>panel.close() }]
+            }).show();
             panel.isValid(); // trigger display of red border when invalid
-        })
+        });
     },
 
     handleBeforeedit: function(cellEditPlugin, cellContext){
@@ -257,7 +257,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             {name, customerId} = cellContext.record.getData();
         grid.view.select(cellContext.record);
         if(name === grid.SYSTEM_BCONF_NAME || grid.isCustomerGrid && !customerId){
-            return false // Can't change system default and globals bconfs in customer view
+            return false; // Can't change system default and globals bconfs in customer view
         }
         if(cellContext.field === 'name'){
             this.promptUniqueBconfName(name, cellContext.record).then(function(changedName){

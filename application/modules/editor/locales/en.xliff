@@ -2815,9 +2815,9 @@ A task was associated to you in the task-portal {portalLink}.<br />
   <source>Name</source>
   <target>Name</target>
 </trans-unit>
-<trans-unit id='RGVyIE5hbWUgaXN0IHNjaG9uIHZlcmdlYmVuIQ=='>
-  <source>Der Name ist schon vergeben!</source>
-  <target>The name is already taken!</target>
+<trans-unit id='RGllc2VyIE5hbWUgaXN0IHNjaG9uIHZlcmdlYmVu'>
+  <source>Dieser Name ist schon vergeben</source>
+  <target>This name is already taken</target>
 </trans-unit>
 <trans-unit id='VE0tRGF0ZWk='>
   <source>TM-Datei</source>

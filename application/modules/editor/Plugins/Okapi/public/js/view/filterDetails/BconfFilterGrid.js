@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.plugins.Okapi.view.filterDetails.BConfFilterGrid', {
+Ext.define('Editor.plugins.Okapi.view.filterDetails.BconfFilterGrid', {
     extend: 'Ext.grid.Panel',
     requires: [
         'Editor.plugins.Okapi.store.BconfFilterStore'

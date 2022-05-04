@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.view.admin.okapi.filter.BConfFilterWindowController
+ * @class Editor.view.admin.okapi.filter.BconfFilterWindowController
  * @extends Ext.app.ViewController
  */
-Ext.define('Editor.plugins.Okapi.view.filterDetails.BConfFilterWindowController', {
+Ext.define('Editor.plugins.Okapi.view.filterDetails.BconfFilterWindowController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.bconfFilterWindowController',
 
@@ -48,7 +48,7 @@ Ext.define('Editor.plugins.Okapi.view.filterDetails.BConfFilterWindowController'
     addNewFilterSet: function () {
         var me = this, view = me.getView(), store = view.getStore();
         var defaultFilterSet = store.getAt(0).getData();
-        delete defaultFilterSet['id'];
+        delete defaultFilterSet.id;
         me.addnewRecord(defaultFilterSet);
     },
 
@@ -63,7 +63,7 @@ Ext.define('Editor.plugins.Okapi.view.filterDetails.BConfFilterWindowController'
 
     copybconf: function (grid, rowIndex, colIndex) {
         var rec = grid.getStore().getAt(rowIndex);
-        delete rec['id'];
+        delete rec.id;
         this.addnewRecord(rec);
     },
 

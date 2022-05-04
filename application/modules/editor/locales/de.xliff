@@ -1301,7 +1301,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='U3ByYWNocmVzc291cmNlIGhpbnp1ZsO8Z2Vu'><source>Sprachressource hinzufügen</source><target>Sprachressource hinzufügen</target></trans-unit>
 <trans-unit id='UmVzc291cmNl'><source>Ressource</source><target>Ressource</target></trans-unit>
 <trans-unit id='TmFtZQ=='><source>Name</source><target>Name</target></trans-unit>
-<trans-unit id='RGVyIE5hbWUgaXN0IHNjaG9uIHZlcmdlYmVuIQ=='><source>Der Name ist schon vergeben!</source><target>Der Name ist schon vergeben!</target></trans-unit>
+<trans-unit id='RGllc2VyIE5hbWUgaXN0IHNjaG9uIHZlcmdlYmVu'><source>Dieser Name ist schon vergeben</source><target>Dieser Name ist schon vergeben</target></trans-unit>
 <trans-unit id='VE0tRGF0ZWk='><source>TM-Datei</source><target>TM-Datei</target></trans-unit>
 <trans-unit id='RmFyYmUgZGllc2VyIFNwcmFjaHJlc3NvdXJjZQ=='><source>Farbe dieser Sprachressource</source><target>Farbe dieser Sprachressource</target></trans-unit>
 <trans-unit id='S29ua29yZGFuenN1Y2hl'><source>Konkordanzsuche</source><target>Konkordanzsuche</target></trans-unit>

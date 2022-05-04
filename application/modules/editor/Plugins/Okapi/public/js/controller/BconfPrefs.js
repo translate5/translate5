@@ -47,7 +47,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         'Editor.model.admin.Customer'
     ],
     init: function(){
-        Editor.model.admin.Customer.addFields([{type: 'int', name: 'defaultBconfId', persist:true}])
+        Editor.model.admin.Customer.addFields([{type: 'int', name: 'defaultBconfId', persist:true}]);
     },
     onLaunch: function(){
         Ext.create('Editor.plugins.Okapi.store.BconfStore'); // in onLaunch so customerStore can import default bconf before if needed
@@ -152,7 +152,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             fieldLabel: Editor.plugins.Okapi.view.BconfGrid.prototype.strings.titleLong,
             listConfig: {
                 getInnerTpl: function(displayField){
-                    return `<span data-qtip="{description}">{${displayField}}</span>`
+                    return `<span data-qtip="{description}">{${displayField}}</span>`;
                 },
             },
             bind: {
@@ -168,7 +168,9 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                         source: 'bconfStore',
                         autoLoad: true,
                         filters: [{
-                            filterFn: function({data: bconf}){return !bconf.customerId || this._value == bconf.customerId},
+                            filterFn: function({data: bconf}){
+                                return !bconf.customerId || this._value == bconf.customerId;
+                            },
                             property: 'customerId',
                             value: '{customer.selection.id}'
                         }],
