@@ -225,8 +225,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                         var ret = !existingRec || existingRec === allowedRec || nameUnique; //...start, startsWith, endsWith, ignoreCase
                         this.lastVal = [v, ret]; // cache validation result
                     },
-                    listeners: { specialkey(field, e){ [e.ENTER,e.ESC].includes(e.keyCode) && panel.close() }},
-                },],
+                    listeners: {
+                        specialkey: function(field, e){
+                            if([e.ENTER,e.ESC].includes(e.keyCode)){
+                                panel.close();
+                            }
+                        }
+                    }
+                }],
                 fbar: [{xtype: 'button', text: 'OK', formBind: true, handler:()=>panel.close() }]
             }).show();
             panel.isValid(); // trigger display of red border when invalid
