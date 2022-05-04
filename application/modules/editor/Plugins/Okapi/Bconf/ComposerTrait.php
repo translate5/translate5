@@ -54,7 +54,7 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
         self::filterConfiguration($raf, $content);
         self::extensionsMapping($raf);
 
-        return (string)$raf;
+        return (string) $raf;
     }
 
     private function processPipeline($raf): void {

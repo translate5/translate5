@@ -53,7 +53,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $metas = $meta->fetchAll('defaultBconfId IS NOT NULL')->toArray();
         $bconfIds = array_column($metas, 'defaultBconfId', 'customerId');
         foreach ($view->rows as &$customer) {
-            $customer['defaultBconfId'] = (int)$bconfIds[$customer['id']] ?? null;
+            if(array_key_exists($customer['id'], $bconfIds)){
+                $customer['defaultBconfId'] = (int) $bconfIds[$customer['id']];
+            } else {
+                $customer['defaultBconfId'] = NULL;
+            }
         }
     }
 

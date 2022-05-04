@@ -81,7 +81,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
                 $data['name'] = pathinfo($postFile['name'])['filename']; // strip '.bconf'
             }
             unset($data['id']); // auto generated
-            if(!$data['versionIdx']){
+            if(!array_key_exists('versionIdx', $data)){
                 $data['versionIdx'] = self::SYSTEM_BCONF_VERSION;
             }
             $this->isNewRecord = true;
