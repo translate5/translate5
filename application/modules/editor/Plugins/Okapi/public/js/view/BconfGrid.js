@@ -52,18 +52,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     },
     config: {
         customer: null,
-        customerDefault: null
-    },
-    notupdateCustomer: function(newCustomer){
-        if(!newCustomer){
-            return;
-        }
-        var storeFilters = this.getStore().getFilters(),
-            clientFilter = storeFilters.getByKey('clientFilter');
-        if(clientFilter){
-            clientFilter.customerId = newCustomer.id;
-            storeFilters.notify('endupdate');
-        }
     },
     layout: {
         type: 'fit',
