@@ -37,11 +37,15 @@ END LICENSE AND COPYRIGHT
  *
  * @method integer getId()
  * @method void setId(int $id)
- * @method void setName(string $name)
  * @method string getName()
+ * @method void setName(string $name)
+ * @method string getIsDefault()
  * @method setIsDefault(int $int)
+ * @method string getDescription()
  * @method setDescription(string $string)
+ * @method string getCustomerId()
  * @method setCustomerId(mixed $customerId)
+ * @method string getVersionIdx()
  * @method setVersionIdx(int $versionIdx)
  */
 class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstract {
@@ -53,7 +57,11 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     public editor_Plugins_Okapi_Bconf_File $file;
 
     private string $dir = ''; // for caching the results of expensive filesystem checks
-    private bool $isNewRecord = false; //flag for newly created entities
+    private bool $isNewRecord = false; // flag for newly created entities
+
+    public function isNewRecord(): bool {
+        return $this->isNewRecord;
+    }
 
     public function setFile(editor_Plugins_Okapi_Bconf_File $file): void {
         $this->file = $file;
@@ -103,9 +111,12 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
     public function importDefaultWhenNeeded(int $totalCount = -1): bool {
+        $totalCount === -1 && ($totalCount = $this->getTotalCount());
         $t5ProvidedImportBconf = editor_Plugins_Okapi_Init::getOkapiDataFilePath() . $this::SYSTEM_BCONF_IMPORTFILE;
         $updateNeeded = false;
-        $insertNeeded = $totalCount === 0 || !$totalCount === -1 && $this->getTotalCount() === 0;
+        $insertNeeded = $totalCount === 0;
+        $bconf = null;
+        $id = 0;
         if(!$insertNeeded){
             $s = $this->db->select();
             $versionSelect = $s->from($s->getTable(), ['id', 'versionIdx'])->where('name = ?', $this::SYSTEM_BCONF_NAME);
@@ -113,19 +124,20 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
 
             $insertNeeded = !$systemVersion; // there are bconfs, but not the t5 provided one
             $updateNeeded = !$insertNeeded && $systemVersion < $this::SYSTEM_BCONF_VERSION;
-            if($updateNeeded){
-                $bconf = new self();
-                $bconf->load($id);
-                $bconf->file->unpack($t5ProvidedImportBconf);
-                $bconf->file->pack();
-            }
         }
         if(!$insertNeeded && !$updateNeeded){
             return false;
         }
-        if($insertNeeded){
+        if($updateNeeded){
+            $bconf = new self();
+            $bconf->load($id);
+            $bconf->file->unpack($t5ProvidedImportBconf);
+            $bconf->file->pack();
+        } else if($insertNeeded){
             $bconf = new self(['tmp_name' => $t5ProvidedImportBconf, 'name' => 'Translate5-Standard.bconf']);
-            $bconf->setIsDefault(1);
+            if(!$this->db->fetchRow(['isDefault = 1'])){
+                $bconf->setIsDefault(1);
+            }
             $bconf->setDescription("The default .bconf used for file imports unless another one is configured");
         }
         $bconf->setVersionIdx($bconf::SYSTEM_BCONF_VERSION);
@@ -271,23 +283,13 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function srxNameFromPipeline(string $purpose): string {
+    public function srxNameFor(string $purpose): string {
         $purpose .= 'SrxPath';
-        $pipelineFile = $this->getFilePath(fileName: $this->file::PIPELINE_FILE);
+        $descFile = $this->getFilePath(fileName: $this->file::DESCRIPTION_FILE);
+        $content = json_decode(file_get_contents($descFile), true);
 
-        $pipeline = new editor_Utils_Dom();
-        $xmlErrors = $pipeline->load($pipelineFile) ? $pipeline->getErrorMsg('', true) : '';
-        $step = $pipeline->query('/*/step[@class="net.sf.okapi.steps.segmentation.SegmentationStep"]')->item(0);
-        preg_match("/^$purpose=(.*)$/m", $step?->nodeValue ?? '', $matches);
-
-        $srxFileName = $matches[1] ?? '';
-        if(!$srxFileName){
-            $xmlErrors .= "\nNo SegmentationStep with attribute $purpose in " . $this->file::PIPELINE_FILE . " on server";
-        }
-
-        $xmlErrors && throw new ZfExtended_UnprocessableEntity('E1026',
-            ['errors' => [[$xmlErrors]]]
-        );
+        $srxFileName = $content['refs'][$purpose] ?? '';
+        !$srxFileName && throw new ZfExtended_Exception("Corrupt bconf record: Could not get '$purpose' from '$descFile'.");
         return $srxFileName;
     }
 

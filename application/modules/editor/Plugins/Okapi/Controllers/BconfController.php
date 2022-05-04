@@ -56,7 +56,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     public function indexAction() {
         $this->view->total = $this->entity->getTotalCount();
         if($this->entity->importDefaultWhenNeeded($this->view->total)){
-            $this->view->total = 1;
+            $this->view->total += 1;
         }
         $this->view->rows = $this->entity->loadAll();
     }
@@ -120,7 +120,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
             ['errors' => [[$xmlErrors]]]
         );
 
-        $srxNameToBe = $bconf->srxNameFromPipeline($this->getParam('purpose'));
+        $srxNameToBe = $bconf->srxNameFor($this->getParam('purpose'));
         move_uploaded_file($srxUploadFile, $bconf->getFilePath(fileName: $srxNameToBe));
         $bconf->file->pack();
     }
@@ -128,7 +128,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     public function downloadsrxAction() {
         $this->entityLoad();
         $bconf = $this->entity;
-        $fileName = $bconf->srxNameFromPipeline($this->getParam('purpose'));
+        $fileName = $bconf->srxNameFor($this->getParam('purpose'));
         $file = $bconf->getFilePath(fileName: $fileName);
 
         $dlName = $bconf->getName() . '-' . $fileName;

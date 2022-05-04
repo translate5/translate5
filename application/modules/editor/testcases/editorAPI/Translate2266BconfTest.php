@@ -32,11 +32,16 @@ END LICENSE AND COPYRIGHT
  */
 class Translate2266BconfTest extends editor_Test_JsonTest {
     private static ?editor_Plugins_Okapi_Models_Bconf $bconf;
+    private static int $bconfId = 0;
     private static ?Zend_Config $okapi;
     public final const OKAPI_CONFIG = 'runtimeOptions.plugins.Okapi';
 
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
+
+        if(!Zend_Registry::isRegistered('Zend_Locale')){
+            Zend_Registry::set('Zend_Locale', new Zend_Locale('en')); // Needed for localized error messages like ZfExtended_NoAccessException
+        }
 
         $appState = self::assertAppState();
 
@@ -51,10 +56,10 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         self::$okapi = null;
         self::$bconf = null;
 
+        self::assertTrue(self::assertConfigsAndDefaults());
     }
 
-    // TODO: Abort whole testcase when this one fails.
-    public function test_ConfigsAndDefaults() {
+    public static function assertConfigsAndDefaults(): bool {
         $okapi = self::$okapi = Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
         $neededConfigs = [
             self::OKAPI_CONFIG . ".dataDir" => $okapi?->dataDir, // QUIRK cannot read via $api->testConfig()
@@ -69,6 +74,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         self::assertFileExists($t5defaultImportBconf,
             "File '$t5defaultImportBconf' missing. As the Translate5 provided default import .bconf file for Okapi Task Imports it must exist!");
 
+        return true;
 
     }
 
@@ -77,15 +83,16 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
      */
     public function test_BconfImportExport() {
 
-        $input = new SplFileInfo(self::$api->getFile('testfiles/minimal/batchConfiguration.bconf'));
+        $input = new SplFileInfo(self::$api->getFile('testfiles/minimal/batchConfiguration.t5.bconf'));
         $postFile = [ // loose definition https://www.php.net/manual/features.file-upload.post-method.php
-            "name"     => time() . '.bconf',
+            "name"     => 'Translate2266BconfTest-' . time() . '.bconf',
             "tmp_name" => $input->getPathname(),
         ];
         $params = [];
 
         // unpack and pack
         self::$bconf = new editor_Plugins_Okapi_Models_Bconf($postFile, $params);
+        self::$bconfId = self::$bconf->getId();
         $output = self::$bconf->getFilePath();
 
         $failureMsg = "Original and repackaged Bconfs do not match\nInput was '$input', Output was '$output";
@@ -97,8 +104,8 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
      */
     public function test_SrxUpload() {
         $bconf = self::$bconf;
-        $sourceSrx = $bconf->srxNameFromPipeline('source');
-        $targetSrx = $bconf->srxNameFromPipeline('target');
+        $sourceSrx = $bconf->srxNameFor('source');
+        $targetSrx = $bconf->srxNameFor('target');
 
         $sourceSrxInput = new SplFileInfo(self::$api->getFile('testfiles/srx/idSource.srx'));
         $targetSrxInput = new SplFileInfo(self::$api->getFile('testfiles/srx/idTarget.srx'));
@@ -113,6 +120,69 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         self::assertStringContainsString(file_get_contents($sourceSrxInput), $bconfAfterUpload, "sourceSrx update failed in '$bconfPath'");
         self::assertStringContainsString(file_get_contents($targetSrxInput), $bconfAfterUpload, "targetSrx update failed in '$bconfPath'");
 
+    }
+
+    public function test_AutoImportAndVersionUpdate() {
+        $bconf = self::$bconf;
+        $bconf->importDefaultWhenNeeded();
+
+        $systemBconf = new editor_Plugins_Okapi_Models_Bconf();
+        $systemBconf->loadRow('name = ? ', $bconf::SYSTEM_BCONF_NAME);
+        $systemBconf->setName('NotSystemBconfAnymore-' . time() . rand()); // Unmark as system bconf
+        $systemBconf->save();
+
+        // Ensure system bconf is imported when not present
+        $total = $systemBconf->getTotalCount();
+        $bconf->importDefaultWhenNeeded();
+        $newTotal = $systemBconf->getTotalCount();
+
+        $autoImportFailureMsg = 'AutoImport of missing system bconf failed.';
+        self::assertEquals($total + 1, $newTotal, $autoImportFailureMsg . ' Totalcount not increased');
+        $newSystemBconf = new editor_Plugins_Okapi_Models_Bconf();
+        $newSystemBconf->loadRow('name = ? ', $bconf::SYSTEM_BCONF_NAME);
+        self::assertEquals($newSystemBconf->getName(), $bconf::SYSTEM_BCONF_NAME, $autoImportFailureMsg . " No record name matches '" . $bconf::SYSTEM_BCONF_NAME . "'");
+        $newBconfFile = $newSystemBconf->getFilePath();
+        self::assertFileExists($newBconfFile, $autoImportFailureMsg . " File '$newBconfFile' does not exist");
+
+        // Ensure system bconf dir can't be deleted
+        $e = null;
+        try {
+            $newSystemBconf->deleteDirectory($newSystemBconf->getId());
+        } catch(ZfExtended_NoAccessException $e){
+        } finally {
+            self::assertNotNull($e, 'Deleting the system bconf directory was not prevented by ZfExtended_NoAccessException');
+        }
+
+        // Ensure system bconf is updated on version mismatch
+        $version = (int)$newSystemBconf->getVersionIdx();
+        self::assertGreaterThan(0, $version, 'Bconf version is 0');
+        $newSystemBconf->setVersionIdx($version - 1);
+        $newSystemBconf->save();
+
+        unlink($newBconfFile);
+        self::assertFileDoesNotExist($newBconfFile, "Could not delete '$newBconfFile' for testing purpose");
+        $bconf->importDefaultWhenNeeded();
+        self::assertFileExists($newBconfFile, $autoImportFailureMsg . " Version Auto Update failed. File '$newBconfFile' does not exist.");
+
+        // Reset to initial system bconf, delete  newly imported
+        $newSystemBconfId = $newSystemBconf->getId();
+        $newSystemBconfDir = $newSystemBconf->getDataDirectory();
+        $newSystemBconf->setName('ToDelete-' . time() . rand());
+        $newSystemBconf->save();
+        $systemBconf->setName($bconf::SYSTEM_BCONF_NAME);
+        $systemBconf->save();
+
+        $newSystemBconf->deleteDirectory($newSystemBconf->getId());
+        self::assertDirectoryDoesNotExist($newSystemBconfDir, "Could not delete directory'$newSystemBconfDir' for testing purpose");
+
+        $newSystemBconf->delete();
+        $e = null;
+        try {
+            $newSystemBconf->load($newSystemBconfId);
+        } catch(ZfExtended_Models_Entity_NotFoundException $e){
+        } finally {
+            self::assertNotNull($e, "Deleting the bconf with id '$newSystemBconfId' did not work");
+        }
     }
 
     /***
@@ -131,18 +201,66 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         $task = [
             'sourceLang' => 'de',
             'targetLang' => 'en',
-            'bconfId' => self::$bconf->getDefaultBconfId()
         ];
         $api->addImportFile($api->getFile('testfiles/workfiles/TRANSLATE-2266-de-en.txt'));
-        //$api->addImportFile($api->getFile('testfiles/workfiles/TRANSLATE-2266-2-de-en.txt'));
+        $api->import($task);
+        /** @var editor_Models_Task $realTask */
+        $realTask = ZfExtended_Factory::get('editor_Models_Task');
+        $realTask->load($api->getTask()->id);
+        /** @var editor_Models_Task_Remover $remover */
+        $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', [$realTask]);
+        $remover->removeForced();
+    }
+
+    /***
+     * Verify Task Import using Okapi is working with the LEK_okapi_bconf based Bconf management
+     */
+    public function test_OkapiTaskImportWithBconfIdAndMultipleFiles() {
+        try {
+            $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . self::$okapi->api->url . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
+            $longHornResponse = (new Zend_Http_Client($this::$okapi->api->url))->request();
+            self::assertTrue($longHornResponse->getStatus() === 200, $msg);
+        } catch(Exception $e){
+            self::fail($msg . "\n" . $e->getMessage());
+        }
+
+        $api = self::$api;
+        $task = [
+            'sourceLang' => 'de',
+            'targetLang' => 'en',
+            'bconfId'    => self::$bconf->getDefaultBconfId(),
+        ];
+        $api->addImportFile($api->getFile('testfiles/workfiles/TRANSLATE-2266-de-en.txt'));
+        $api->addImportFile($api->getFile('testfiles/workfiles/TRANSLATE-2266-de-en-2.txt'));
         $api->import($task);
     }
 
     /***
      * Provoke Exceptions via invalid inputs
+     * @depends test_BconfImportExport
      */
     public function test_InvalidFiles() {
-        self::assertTrue(true);
+        $bconf = self::$bconf;
+        $api = self::$api;
+        $invalid = 'testfiles/invalid/';
+        $filesToTest = [
+            'Signature.bconf',
+            'Version.bconf',
+            'MalformedReferences.bconf',
+            'NoReferences.bconf',
+            'NoPipeline.bconf',
+            'NoExtMapping.bconf',
+        ];
+        foreach($filesToTest as $file){
+            $e = null;
+            try {
+                $bconf->file->unpack($api->getFile($invalid.$file ));
+            } catch(ZfExtended_UnprocessableEntity $e){
+            } finally {
+                self::assertNotNull($e, "Did not reject ${invalid}$file with ZfExtended_UnprocessableEntity.");
+            }
+        }
+
     }
 
     /**
@@ -150,12 +268,15 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
      */
     public function test_DeleteBconf() {
         $bconf = self::$bconf;
+        $bconf->load(self::$bconfId);
 
         $bconfDir = $bconf->getDataDirectory();
-        $bconf->deleteDirectory($bconf->getId());
+        $bconf->deleteDirectory(self::$bconfId);
         $bconf->delete(); // delete record
         self::assertDirectoryDoesNotExist($bconfDir);
     }
 
-    public static function tearDownAfterClass(): void {}
+    public static function tearDownAfterClass(): void {
+        parent::tearDownAfterClass();
+    }
 }

@@ -30,6 +30,9 @@
  * Class representing a .bconf file and associated operations
  */
 class editor_Plugins_Okapi_Bconf_File {
+    use editor_Plugins_Okapi_Bconf_ParserTrait;
+    use editor_Plugins_Okapi_Bconf_ComposerTrait;
+
     public const NUMPLUGINS = 0;
     public const DESCRIPTION_FILE = "content.json";
     public const PIPELINE_FILE = "pipeline.pln";
@@ -47,12 +50,32 @@ class editor_Plugins_Okapi_Bconf_File {
         $this->entity = $entity;
     }
 
-    public function pack(): string {
-        return editor_Plugins_Okapi_Bconf_Composer::doPack($this->entity);
-    }
-
-    public function unpack(string $filePath): mixed {
-        return editor_Plugins_Okapi_Bconf_Parser::doUnpack($filePath, $this->entity);
+    /**
+     * @param $msg
+     * @param string $errorCode
+     * @param string[] $detail
+     * @return void // TODO Add as return type on PHP8.1
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    protected function invalid(string $msg = '', string $errorCode = 'E1026'): void {
+        $errors = [[$msg]];
+        if($this->entity->isNewRecord()){
+            try {
+                $this->entity->deleteDirectory($this->entity->getId());
+                $this->entity->delete();
+            } catch(Exception $e){
+                if($errorCode === 'E1026'){
+                    $errors[] = [$e->getMessage()];
+                } else {
+                    $msg .= " " . $e->getMessage();
+                }
+            }
+        }
+        throw match ($errorCode) {
+            'E1057' => new editor_Plugins_Okapi_Exception($errorCode, ['okapiDataDir' => $msg]),
+            'E1026' => new ZfExtended_UnprocessableEntity($errorCode, ['errors' => $errors]),
+        };
     }
 
 }

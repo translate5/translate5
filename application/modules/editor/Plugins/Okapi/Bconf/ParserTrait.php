@@ -26,8 +26,11 @@
  END LICENSE AND COPYRIGHT
  */
 
+/**
+ * @var editor_Plugins_Okapi_Models_Bconf $entity
+ */
+trait editor_Plugins_Okapi_Bconf_ParserTrait {
 
-class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File {
     /**
      * Import bconf
      * Extracts the parts of a given bconf file in the order
@@ -38,28 +41,27 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File 
      * 5) extensions -> filter configuration id mapping
      *
      * @param string $pathToParse
-     * @param editor_Plugins_Okapi_Models_Bconf $entity
      * @throws Zend_Exception
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    public static function doUnpack(string $pathToParse, editor_Plugins_Okapi_Models_Bconf $entity) {
-        chdir($entity->getDataDirectory());
+    public function unpack(string $pathToParse): void {
+        chdir($this->entity->getDataDirectory());
 
         $content = [
             'refs' => [],
+            'step' => [],
             'fprm' => [],
         ];
 
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($pathToParse, "rb");
-        $sig = $raf->readUTF(); // signature
-        if(!$raf::SIGNATURE === $sig){
-            throw new ZfExtended_UnprocessableEntity('E1026', ['errors' => [["Invalid signature '".htmlspecialchars($sig)."' in file header. Must be ".$raf::SIGNATURE ]]]);
-        }
-        $version = $raf->readInt(); // Version info
-        if(!($version >= 1 && $version <= $raf::VERSION)){
-            throw new ZfExtended_UnprocessableEntity('E1026', ['errors' => [["Invalid version '$version' in file header. Must be in range 1-".$raf::VERSION]]]);
-        }
+        $sig = $raf->readUTF();
+        $sig !== $raf::SIGNATURE && $this->invalid(
+            "Invalid signature '" . htmlspecialchars($sig) . "' in file header before byte " . $raf->ftell() . ". Must be '" . $raf::SIGNATURE . "'");
+
+        $version = $raf->readInt();
+        !($version >= 1 && $version <= $raf::VERSION) && $this->invalid(
+            "Invalid version '$version' in file header before byte " . $raf->ftell() . ". Must be in range 1-" . $raf::VERSION);
 
         //=== Section 1: plug-ins
         if($version > 1){ // Remain compatible with v.1 bconf files
@@ -75,24 +77,21 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File 
 
         }
 
-        //=== Section 2: references data
+        //=== Section 2: Read contained reference files
 
-        // Build a lookup table to the references
-        $refNames = [];
-        $id = $raf->readInt(); // First ID or end of section marker
-        while($id != -1 && !is_null($id)) {
-            $filename = $refNames[] = $raf->readUTF(); // Skip filename
+        $refMap = []; // numeric indices are read from the bconf, starting with 1
+
+        while(($refIndex = $raf->readInt()) != -1 && !is_null($refIndex)) {
+            $filename = $refMap[$refIndex] = $raf->readUTF();
             // Skip over the data to move to the next reference
             $size = $raf->readLong();
             if($size > 0){
                 self::createReferencedFile($raf, $size, $filename);
             }
-            // Then get the information for next entry
-            $id = $raf->readInt();
         }
-        if($id === NULL){
-            throw new ZfExtended_UnprocessableEntity('E1026', ['errors' => [["Malformed references list. Read NULL instead of integer."]]]);
-        }
+
+        $refIndex === NULL && $this->invalid("Malformed references list. Read NULL instead of integer before byte " . $raf->ftell());
+        ($refCount = count($refMap)) < 2 && $this->invalid("Only $refCount reference" . ($refCount ? '' : 's') . " included. Need sourceSRX and targetSRX.");
 
         //=== Section 3 : the pipeline itself
         $xmlWordCount = $raf->readInt();
@@ -106,10 +105,8 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File 
         $pipeline = [
             'xml' => $pipelineXml,
         ];
-        // reads in the given path
-        $content['refs'] = $refNames;
 
-        self::parsePipeline($pipeline, $refNames);
+        self::parsePipeline($pipeline, $refMap, $content);
 
         file_put_contents(self::PIPELINE_FILE, $pipeline['xml']);
 
@@ -136,9 +133,11 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File 
         file_put_contents(self::DESCRIPTION_FILE, json_encode($content, JSON_PRETTY_PRINT));
     }
 
-    private static function readExtensionMap($raf): array {
+    private function readExtensionMap($raf): array {
         $map = [];
         $count = $raf->readInt();
+        !$count && $this->invalid("No extensions-mapping present in bconf.");
+
         for($i = 0; $i < $count; $i++){
             $ext = $raf->readUTF();
             $okapiId = $raf->readUTF();
@@ -154,14 +153,14 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File 
      * @param string $path
      * @throws editor_Plugins_Okapi_Exception
      */
-    private static function createReferencedFile(SplFileObject $raf, int $size, string $path) {
+    private function createReferencedFile(SplFileObject $raf, int $size, string $path): void {
         /** @var resource $fos file output stream */
         $fos = fopen($path, 'wb');
-        if(!$fos){
-            throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => "Could not create '$path'"]);
-        }
+        !$fos && $this->invalid("Could not create '$path'", 'E1057');
         // FIXME: when stream_copy_to_stream supports SplFileObjects use that
         // $written = stream_copy_to_stream($raf->getFp(), $fos, $size);
+
+        /** @var int|bool $written */
         $written = 0;
         $toWrite = $size;
         $buffer = min(65536, $toWrite); // 16 pages à 4K
@@ -171,34 +170,35 @@ class editor_Plugins_Okapi_Bconf_Parser extends editor_Plugins_Okapi_Bconf_File 
         }
         $written += fwrite($fos, $raf->fread($toWrite));
         fclose($fos);
-        if($written !== $size){
-            throw new editor_Plugins_Okapi_Exception('E1057', [
-                'okapiDataDir' => "Could " . ($written ? "only write $written bytes of " : "not write") . "'$path'",
-            ]);
-        }
+        $written !== $size && $this->invalid(
+            "Could " . ($written !== false ? "only write $written bytes of " : "not write") . "'$path'", 'E1057');
     }
 
-    private static function parsePipeline(&$pipeline, $refMap) {
-        $doc = new DOMDocument();
-        $doc->loadXML($pipeline['xml']);
-        /** @var DOMNodeList nodes */
-        $nodes = $doc->getElementsByTagName("step");
+    public function parsePipeline(&$pipeline, &$refMap, &$content): array {
+        $doc = new editor_Utils_Dom();
+        $pipeline['xml'] && $doc->loadXML($pipeline['xml']);
+        (!$pipeline['xml'] || !$doc->isValid()) && $this->invalid(
+            "Invalid Pipeline inside bconf. " . $doc->getErrorMsg('', true));
 
-        foreach($nodes as $elem){
-            $class = $elem->getAttribute("class");
-            if($class == null){
-                throw new ZfExtended_UnprocessableEntity("The attribute 'class' is missing.");
-            }
+        foreach($doc->getElementsByTagName("step") as $i => $step){
+            $class = $step->getAttribute("class");
+            $class == null && $this->invalid("The attribute 'class' is missing on step #$i.");
+
+            $pipeline['steps'][] = $content['step'][] = $class;
             $classParts = explode('.', $class);
             $stepName = end($classParts);
             $pathParams = self::STEP_REFERENCES[$stepName] ?? [];
-            foreach($pathParams as $param){
-                $param = lcfirst($param);
-                $path = array_shift($refMap); // QUIRK: Original code includes absolute path in place of filename
-                $pipeline['xml'] = preg_replace("/^($param=).*$/m", "$1$path", $pipeline['xml']);
+            foreach($pathParams as $pathType){
+                $pathType = lcfirst($pathType);
+                $filename = $content['refs'][$pathType] = array_shift($refMap);
+                $pathRegex = "/^($pathType=).*$/m";
+                $pipeline['xml'] = preg_replace($pathRegex, "$1$filename", $pipeline['xml']); // QUIRK: Original code includes absolute path in place of filename
             }
-            $pipeline['steps'][] = $class;
         }
+
+        $refs = &$content['refs'];
+        !isset($refs['sourceSrxPath'], $refs['targetSrxPath']) && $this->invalid(
+            "Reference files missing. Need sourceSRX and targetSRX. Got " . print_r($refs, true));
 
         return $pipeline;
     }

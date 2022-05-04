@@ -121,26 +121,17 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         Editor.util.Util.download('plugins_okapi_bconf/downloadsrx',{id, purpose})
     },
     uploadSRX: function(id, srx, purpose){
-        var grid = this.getView();
+        var controller = this;
+        var {invalidTitle, invalidMsg} = this.getView().strings;
+
         Editor.util.Util.fetchXHRLike(Editor.data.restpath + 'plugins_okapi_bconf/uploadsrx/?id='+id, {
             method: 'POST', formData : {purpose, srx}
         }).then(function({status, responseJson: json}){
             if(status === 422){
-                var extraInfo = '';
-                if(json.errors && json.errors.length){
-                    extraInfo = ' ' + Ext.DomHelper.createHtml({
-                        tag: 'span',
-                        class: 'x-fa fa-question-circle pointer',
-                        'data-hide': 'user',
-                        'data-qwidth': '800',
-                        'data-qtip': '<code><ul><li>'
-                            + json.errors.join('\n').trim().split('\n').map(Ext.htmlEncode).join('</li><li>')
-                            + '</li></ul>',
-                    });
-                }
+                var extraInfo = controller.createInfoSpan(json);
                 Ext.Msg.show({
-                    title: grid.strings.invalidSrxTitle,
-                    message: grid.strings.invalidSrxMsg + extraInfo,
+                    title: invalidTitle.replace('{}','SRX'),
+                    message: invalidMsg.replace('{}','SRX') + extraInfo,
                     icon: Ext.Msg.WARNING
                 });
             }
@@ -175,6 +166,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         }
         var controller = this;
         var grid = this.getView();
+        var {invalidTitle, invalidMsg} = grid.strings;
         var data = new FormData();
         data.append('name', fileName);
         data.append(this.FILE_UPLOAD_NAME, file);
@@ -194,6 +186,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                         store.add(rec);
                         controller.startEditDescription();
                     }
+                });
+            } else if(response.status === 422){
+                var extraInfo = controller.createInfoSpan(response.responseJson);
+                Ext.Msg.show({
+                    title: invalidTitle.replace('{}','Bconf'),
+                    message: invalidMsg.replace('{}','Bconf') + extraInfo,
+                    icon: Ext.Msg.WARNING
                 });
             } else {
                 Editor.app.getController('ServerException').handleException(response);
@@ -266,7 +265,23 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             }).catch();
             return false;
         }
-    }
+    },
 
+
+    createInfoSpan: function(json){
+        var extraInfo = '';
+        if(json.errors && json.errors.length){
+            extraInfo = ' ' + Ext.DomHelper.createHtml({
+                tag: 'span',
+                class: 'x-fa fa-question-circle pointer',
+                'data-hide': 'user',
+                'data-qwidth': '800',
+                'data-qtip': '<code><ul><li>'
+                    + json.errors.join('\n').trim().split('\n').map(Ext.htmlEncode).join('</li><li>')
+                    + '</li></ul>',
+            });
+        }
+        return extraInfo;
+    },
 
 });
