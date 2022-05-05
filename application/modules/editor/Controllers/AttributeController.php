@@ -333,11 +333,16 @@ class editor_AttributeController extends ZfExtended_RestController
                 $this->_session->roles
             );
 
+            // Prepare error msg
+            $msg = count($attrIdA) == 1
+                ? 'This attribute is not editable'
+                : 'Some of the attributes are not editable';
+
             // If at least one is readonly - flush failure
             foreach ($readonlyA as $attrId => $readonly)
-                if ($readonly) $this->jflush(false, count($attrIdA) == 1
-                    ? 'This attribute is not editable'
-                    : 'Some of the attributes are not editable');
+                if ($readonly) {
+                    $this->jflush(false, $msg);
+                }
         }
 
         // If dropId-param is given
