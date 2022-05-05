@@ -169,13 +169,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         $workFile = new SplFileInfo($params['file']);
         
         $manifestFile = new SplFileInfo($this->getDataDir().'/'.$this->getManifestFile($fileId));
-        //if we don't have a manifest.rkm file, the import was before we changed the export,
-        // so use tikal export there again
-        if(!$manifestFile->isFile()) {
-            $this->doTikalFallback($workFile); //should be removed in the future
-            return true;
-        }
-        
+
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
         $plugin = $pm->get($pm->classToName(get_class($this)));
@@ -358,20 +352,6 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $okapiDataDir]);
         }
         return $okapiDataDir;
-    }
-    
-    /**
-     * uses tikal export / merge as fallback for imports started before the okapi export usage
-     * @param SplFileInfo $workfile
-     */
-    protected function doTikalFallback(SplFileInfo $workfile) {
-        if(strtolower($workfile->getExtension()) !== 'xlf') {
-            // Okapi Plug-In: tikal fallback can not be used, workfile does not contain the XLF suffix',
-            throw new editor_Plugins_Okapi_Exception('E1056', ['workfile' => $workfile]);
-        }
-        $tikal = ZfExtended_Factory::get('editor_Plugins_Okapi_Tikal_Connector', [$this->task]);
-        /* @var $tikal editor_Plugins_Okapi_Tikal_Connector */
-        $tikal->merge($workfile->__toString());
     }
     
     /***
