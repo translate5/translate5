@@ -85,7 +85,7 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
                 items: configSections,
                 hidden: true //is enabled if there are children
             };
-        
+
         if(user.isAllowed('userPrefFrontendController')) {
             configSections.push({xtype: 'preferencesUser'});
         }

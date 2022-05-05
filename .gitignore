@@ -13,7 +13,7 @@
 
 # Files
 /.jshintrc
-/application/config/installation.ini
+/application/config/installation*
 /cghooks.lock
 /composer.phar
 # needed for ./translate5.sh release:notes

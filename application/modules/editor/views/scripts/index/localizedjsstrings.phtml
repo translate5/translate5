@@ -556,7 +556,7 @@ Ext.define('Editor.controller.Localizer', {
             "editorUnfinishAllTask":  {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?');?>"},
             "editorEndTask":          {title: "<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>"},
             "editorReopenTask":       {title: "<?php echo $this->translate->_('Beendete Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die beendete Aufgabe wirklich wieder öffnen?');?>"},
-            "editorDeleteTask":       {title: "<?php echo $this->translate->_('Aufgabe "{0}" komplett löschen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
+            "editorDeleteTask":       {title: `<?php echo $this->translate->_('Aufgabe "{0}" komplett löschen?');?>`, msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
         }
     });
 
@@ -581,7 +581,7 @@ Ext.define('Editor.controller.Localizer', {
             locked: '<?php echo $this->translate->_('in Arbeit');?>',
             lockedBy: '<?php echo $this->translate->_('Bearbeitet und Gesperrt durch {0}');?>',
             lockedMultiUser: '<?php echo $this->translate->_('In Bearbeitung durch:');?>',
-            lockedSystem: '<?php echo $this->translate->_('Durch das System gesperrt mit dem Status \'{0}\'');?>',
+            lockedSystem: `<?php echo $this->translate->_('Durch das System gesperrt mit dem Status \'{0}\'');?>`,
             addProject: '<?php echo $this->translate->_('Projekt hinzufügen');?>',
             addProjectTip: '<?php echo $this->translate->_('Neues Projekt hinzufügen');?>',
             exportMetaDataBtn: '<?php echo $this->translate->_('Meta-Daten exportieren');?>',
@@ -1308,7 +1308,7 @@ Ext.define('Editor.controller.Localizer', {
             characterLimitError: '<?php echo $this->translate->_('Der Suchstring ist zu groß');?>',
             noIndexFound: '<?php echo $this->translate->_('Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.');?>',
             searchAndReplaceMenuItem: '<?php echo $this->translate->_('Suchen und ersetzen');?>',
-            replaceAllErrors: '<?php echo $this->translate->_('Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.');?>',
+            replaceAllErrors: `<?php echo $this->translate->_('Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.');?>`,
             searchReplaceToolbarBtn: '<?php echo $this->translate->_('Suche');?>'
         }
     });

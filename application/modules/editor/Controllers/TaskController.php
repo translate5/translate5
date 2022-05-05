@@ -652,7 +652,11 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->entity->setTargetLang(reset($this->data['targetLang']));
         }
 
-        $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
+        if(empty($this->data['relaisLang'])){
+            $this->data['relaisLang'] = 0;
+        } else {
+            $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
+        }
         $this->entity->setRelaisLang($this->data['relaisLang']);
 
         return $targetLangCount;
@@ -934,7 +938,13 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity = $cloner->clone($this->entity);
 
         if($this->validate()) {
-            $this->processUploadedFile($this->entity, $dataProvider);
+            // set meta data in controller as in post request
+            $metaData = $this->entity->meta()->toArray();
+            unset($metaData['id'], $metaData['taskGuid']);
+            foreach($metaData as $field => $value){
+                $this->data[$field] = $value;
+            }
+            $this->processUploadedFile($this->entity, $dataProvider); //creates task_meta via editor_Models_Import::import
             $cloner->cloneDependencies();
             $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere

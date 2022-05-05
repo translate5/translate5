@@ -32,10 +32,19 @@ END LICENSE AND COPYRIGHT
  * @method void setId() setId(int $id)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $guid)
+ * @method setBconfId(mixed $bconfId)
+ * @method getBconfId()
+ * @method setMappingType(mixed $mappingType)
+ * @method getMappingType()
  */
 class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';
-    
+
+    /**
+     * @param $taskGuid
+     * @return Zend_Db_Table_Row_Abstract
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
     public function loadByTaskGuid($taskGuid) {
         return $this->loadRow('taskGuid = ?', $taskGuid);
     }
@@ -52,7 +61,6 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
         catch(Zend_Db_Statement_Exception $e) {
             try {
                 $this->handleIntegrityConstraintException($e);
-                throw $e;
             }
             catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
                 //"duplicate entry" errors are ignored.

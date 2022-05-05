@@ -51,6 +51,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     protected $task;
     protected $taskPath;
     protected $importFolder;
+    protected array $additionalArchiveFiles = [];
 
     /**
      * DataProvider specific Checks (throwing Exceptions) and actions to prepare import data
@@ -133,6 +134,21 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     }
 
     /**
+     * Adds an additional file that shall go into the archive (directly into the base dir)
+     * Must obviously be called before the archive is created
+     * Be aware that this will delete existing files if they already exist !
+     * @param string $filePath
+     * @return bool
+     */
+    public function addAdditonalFileToArchive(string $filePath) : bool {
+        if(file_exists($filePath) && !in_array($filePath, $this->additionalArchiveFiles)){
+            $this->additionalArchiveFiles[] = $filePath;
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * sets the internal used task object
      * @param editor_Models_Task $task
      */
@@ -180,5 +196,36 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     public function __sleep() {
         $this->taskPath = (string) $this->taskPath;
         return ['importFolder', 'taskPath'];
+    }
+
+    /**
+     * base functionality to create an import archive from directory-based data
+     * @param string $zipFilename
+     * @throws editor_Models_Import_DataProvider_Exception
+     */
+    protected function createImportedDataArchive(string $zipFilename) {
+        $filter = new Zend_Filter_Compress(array(
+            'adapter' => 'Zip',
+            'options' => array(
+                'archive' => $zipFilename
+            ),
+        ));
+        // process the additional files by temporarily adding them to the importFolder
+        $deletions = [];
+        foreach($this->additionalArchiveFiles as $file){
+            $dest = rtrim($this->importFolder, '/').'/'.basename($file);
+            @copy($file, $dest);
+            $deletions[] = $dest;
+        }
+        if(!$filter->filter($this->importFolder)){
+            //DataProvider Directory: Could not create archive-zip
+            throw new editor_Models_Import_DataProvider_Exception('E1247', [
+                'task' => $this->task,
+            ]);
+        }
+        // cleanup additional files
+        foreach($deletions as $file){
+            @unlink($file);
+        }
     }
 }

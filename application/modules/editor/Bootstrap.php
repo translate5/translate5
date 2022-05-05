@@ -51,8 +51,8 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         
         //Binding the worker clean up to the after import event, since import
         // is currently the main use case for workers
+        /** @var Zend_EventManager_StaticEventManager $eventManager */
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
-        /* @var $eventManager Zend_EventManager_StaticEventManager */
         
         $eventManager->attach('editor_Models_Import', 'afterImport', function(){
             $worker = ZfExtended_Factory::get('ZfExtended_Worker_GarbageCleaner');

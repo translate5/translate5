@@ -1,0 +1,6 @@
+<rainbowPipeline>
+<step class="net.sf.okapi.steps.segmentation.SegmentationStep">#v1
+sourceSrxPath=s.srx
+targetSrxPath=t.srx
+</step>
+</rainbowPipeline>
