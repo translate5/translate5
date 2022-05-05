@@ -59,7 +59,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
                 $bconfRootDir = $config->runtimeOptions->plugins->Okapi->dataDir;
                 // if the directory does not exist, we create it
                 if(!is_dir($bconfRootDir)){
-                    mkdir($bconfRootDir, 0777, true);
+                    @mkdir($bconfRootDir, 0777, true);
                 }
                 $errorMsg = self::checkDirectory($bconfRootDir);
                 if(!$errorMsg && $bconfRootDir){
