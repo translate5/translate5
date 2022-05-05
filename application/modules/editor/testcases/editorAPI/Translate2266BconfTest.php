@@ -35,7 +35,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
     private static editor_Plugins_Okapi_Models_Bconf $bconf;
     private static int $bconfId = 0;
     private static Zend_Config $okapi;
-    public final const OKAPI_CONFIG = 'runtimeOptions.plugins.Okapi';
+    public const OKAPI_CONFIG = 'runtimeOptions.plugins.Okapi';
 
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
