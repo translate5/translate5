@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS `LEK_okapi_bconf_default_filter` (
   `name` VARCHAR(50) DEFAULT NULL,
   `extensions` VARCHAR(200) DEFAULT NULL,
   `description` text DEFAULT NULL,
+  `hasGui` TINYINT(1) NOT NULL DEFAULT 0,
    PRIMARY KEY (`id`)
 );
 
