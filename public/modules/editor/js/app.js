@@ -164,7 +164,7 @@ Ext.application({
      */
     onUnmatchedRoute : function(hash) {
         if(this.unmatchedRoute === null) {
-            this.unmatchedRoute = hash;
+            this.unmatchedRoute = Ext.util.History.getToken(); //we have to store the whole token here
         }
     },
     init: function () {
@@ -399,7 +399,7 @@ Ext.application({
      * firing the editorViewportClosed event
      */
     openAdministration: function (task) {
-        var me = this, tabPanel;
+        let me = this, tabPanel;
         if (!Editor.controller.admin || !Editor.controller.admin.TaskOverview) {
             return;
         }
@@ -429,7 +429,7 @@ Ext.application({
         tabPanel = me.viewport.down('#adminMainSection');
 
         // on intial load we have to trigger the opening of the desired tab manually:
-        me.redirectTo(me.unmatchedRoute ? me.unmatchedRoute : tabpanel.getActiveTabDefaultRoute(), true);
+        me.redirectTo(me.unmatchedRoute ? me.unmatchedRoute : tabPanel.getActiveTabDefaultRoute(), true);
         me.unmatchedRoute = false; //we disable unmatchedRoute handling after first usage
 
         //set the value used for displaying the help pages
@@ -450,7 +450,7 @@ Ext.application({
         mainTabs.disableRouteHandling = true;
         mainTabs.setActiveTab(panel);
         mainTabs.disableRouteHandling = false;
-        me.redirectTo(redirectRoute);
+        me.redirectTo(redirectRoute || Ext.util.History.getToken());
 
         //if we are in a task, we have to stop routing, leave it, and resume routing after the task was closed (a new one was loaded, for routing open tasks)
     },

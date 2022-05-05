@@ -31,7 +31,8 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
     requires: [
         'Editor.view.admin.preferences.OverviewPanelViewController',
         'Editor.view.admin.preferences.User',
-        'Editor.view.admin.config.Grid'
+        'Editor.view.admin.config.Grid',
+        'Editor.view.admin.log.SystemGrid'
     ],
     alias: 'widget.preferencesOverviewPanel',
     itemId: 'preferencesOverviewPanel',
@@ -48,6 +49,7 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
     tabRotation: 0,
     glyph: 'xf085@FontAwesome5FreeSolid',
     listeners:{
+        tabchange: 'onTabChange',
         beforeshow: function(view, opts){
             this.forwardActiveTabEvent('beforeshow');
         },
@@ -93,7 +95,13 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
                 xtype: 'adminConfigGrid'
             });
         }
-        
+
+        if(user.isAllowed('systemLog')) {
+            configSections.push({
+                xtype: 'editorSystemLogGrid'
+            });
+        }
+
         /**
          * Other planned config sections:
          * [{
