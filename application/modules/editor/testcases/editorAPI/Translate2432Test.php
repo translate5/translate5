@@ -40,7 +40,7 @@ class Translate2432Test extends \ZfExtended_Test_ApiTestcase {
      * Currently available bconf files for okapi import/export
      * @var array
      */
-    protected static $validBconfFiles = ['okapi_default_export.bconf', editor_Plugins_Okapi_Models_Bconf::SYSTEM_BCONF_IMPORTFILE];
+    protected static $validExportFile = 'okapi_default_export.bconf';
         
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
@@ -61,27 +61,14 @@ class Translate2432Test extends \ZfExtended_Test_ApiTestcase {
         
         $result = json_decode(json_encode($result), true);
         
-        $indexes = [];
-        //find the default import/export configs
-        $indexes[] = array_search('runtimeOptions.plugins.Okapi.import.okapiBconfDefaultName', array_column($result, 'name'));
-        $indexes[] = array_search('runtimeOptions.plugins.Okapi.export.okapiBconfDefaultName', array_column($result, 'name'));
+        //find the default export configs
+        $index = array_search('runtimeOptions.plugins.Okapi.export.okapiBconfDefaultName', array_column($result, 'name'));
+        $this->assertEquals(true, ($index !== false), 'Missing okapiBconfDefaultName config.');
         
-        $this->assertEquals(2, count($indexes), 'Missing okapiBconfDefaultName config.');
-        
-        // sort the expected array and convert it to string
-        sort(self::$validBconfFiles);
-        $bconfToString = implode(',', self::$validBconfFiles);
-        
-        foreach ($indexes as $index){
-            // sort the defaults and convert it back to string
-            $defaults = explode(',',$result[$index]['defaults']);
-            sort($defaults);
-            $defaults = implode(',', $defaults);
-            
-            $this->assertEquals($bconfToString,$defaults, 'The defaults for config ['.$result[$index]['name'].'] are not as expected');
-        }
+        $default = $result[$index]['default'];
+
+        $this->assertEquals(self::$validExportFile, $default, 'The defaults for config ['.$result[$index]['name'].'] are not as expected');
     }
-    
 
     public static function tearDownAfterClass(): void {
         //not needed

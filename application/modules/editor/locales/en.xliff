@@ -4611,5 +4611,13 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.</source>
   <target>There were no uploaded workfiles found or the uploaded files are exceeding the maximum allowed size.</target>
 </trans-unit>
+<trans-unit id='U2luZ2xlIFNpZ24tb24='>
+  <source>Single Sign-on</source>
+  <target>Single Sign-on</target>
+</trans-unit>
+<trans-unit id='RGllc2VzIEZlbGQgZGFyZiBuaWNodCBsZWVyIHNlaW4='>
+  <source>Dieses Feld darf nicht leer sein</source>
+  <target>This field can not be empty</target>
+</trans-unit>
   </file>
 </xliff>
