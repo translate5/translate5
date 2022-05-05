@@ -57,7 +57,7 @@ Ext.define('Editor.view.admin.user.GridViewController', {
         'user': 'onUserRoute'
     },
     onUserRoute: function() {
-        Editor.app.openAdministrationSection(this.getView(), 'user');
+        Editor.app.openAdministrationSection(this.getView());
     },
     
     /**

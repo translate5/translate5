@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,41 +25,51 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.model.admin.task.Log', {
+Ext.define('Editor.model.admin.Log', {
     extend: 'Ext.data.Model',
-    alias: 'model.taskLog',
+    alias: 'model.log',
     fields: [
         {name: 'id', type: 'int', persist: false},
+        {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+        {name: 'last', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+        {name: 'duplicates', type: 'int'},
         {name: 'level', type: 'int'},
-        {name: 'state', type: 'string'},
-        {name: 'eventCode', type: 'string'},
         {name: 'domain', type: 'string'},
+        {name: 'worker', type: 'string'},
+        {name: 'eventCode', type: 'string'},
         {name: 'message', type: 'string'},
-        {name: 'authUser', type: 'string'},
-        {name: 'extra', convert: function(val) {
-            if(Ext.isObject(val)){
-                return val;
+        {name: 'appVersion', type: 'string'},
+        {name: 'file', type: 'string'},
+        {name: 'line', type: 'string'},
+        {name: 'trace', type: 'string'},
+        {name: 'httpHost', type: 'string'},
+        {name: 'url', type: 'string'},
+        {name: 'method', type: 'string'},
+        {name: 'userLogin', type: 'string'},
+        {
+            name: 'extra',
+            type: 'string',
+            convert: function(val) {
+                if(!val){
+                    return '';
+                }
+                if(Ext.isString(val)){
+                    try {
+                        val = Ext.JSON.decode(val);
+                    }
+                    catch(e) {
+                        console.log(e);
+                        return 'jsonError: JSON could not be decoded, probably extra data is to long!';
+                    }
+                }
+                return JSON.stringify(val, undefined, 2);
             }
-            if(!val || val===""){
-                return null;
-            }
-            try {
-                return Ext.JSON.decode(val);
-            }
-            catch(e) {
-                console.log(e);
-                return {
-                    'jsonError': 'JSON could not be decoded, probably to much logged data!'
-                };
-            }
-        }},
-        {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT}
+        }
     ],
-
     idProperty: 'id',
     proxy : {
       type : 'rest',
-      url: Editor.data.restpath+'event',
+      url: Editor.data.restpath+'log',
       reader : {
         rootProperty: 'rows',
         type : 'json'
