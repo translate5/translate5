@@ -1,17 +1,15 @@
 {
     "channels": {
-        "RELEASE": "https:\/\/downloads.translate5.net\/",
-        "DEVELOPMENT": "http://127.0.0.1/"
+        "RELEASE": "https:\/\/downloads.translate5.net\/"
     },
-    "md5hashtable": "../client-specific/hashtable",
-    "versionfile": "",
+    "md5hashtable": "RELEASE:md5hashtable",
+    "versionfile": "RELEASE:version",
     "application": {
         "name": "translate5",
         "label": "Translate5 - latest version",
-        "url": "http://translate5.test/"
+        "url": "RELEASE:translate5.zip"
     },
-    "dependencies": [],
-    "dependenciesRELEASE": [
+    "dependencies": [
         {
             "name": "translate5-DB-init",
             "label": "translate5 DB init",
