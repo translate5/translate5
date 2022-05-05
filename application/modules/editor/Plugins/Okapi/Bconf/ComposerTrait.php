@@ -29,12 +29,13 @@
 
 /**
  * Generate new bconf file
+ * @see editor_Plugins_Okapi_Bconf_File
  * @var editor_Plugins_Okapi_Models_Bconf $entity
  */
 trait editor_Plugins_Okapi_Bconf_ComposerTrait {
 
     public function pack(): void {
-        chdir($this->entity->getDataDirectory()); // so we can access with file name only
+        chdir($this->entity->getDir()); // so we can access with file name only
 
         $content = ['refs' => null, 'fprm' => null];
 

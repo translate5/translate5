@@ -27,9 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Testcase for TRANSLATE-2266 Mixing XLF id and rid values led to wrong tag numbering
+ * Testcase for TRANSLATE-2266 Custom file filter configuration with GUI / BCONF Management
  * For details see the issue.
- * TODO @see Translate2432Test Update/Unify
+ * @see Translate2432Test
  */
 class Translate2266BconfTest extends editor_Test_JsonTest {
     private static editor_Plugins_Okapi_Models_Bconf $bconf;
@@ -49,7 +49,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         self::assertNotEmpty($okapi->dataDir, self::OKAPI_CONFIG . ".dataDir not set");
         self::assertNotEmpty($okapi->api->url, self::OKAPI_CONFIG . ".api.url not set");
 
-        $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getOkapiDataFilePath(), 'okapi_default_import.bconf');
+        $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getOkapiDataFilePath(), editor_Plugins_Okapi_Models_Bconf::SYSTEM_BCONF_IMPORTFILE);
         self::assertFileExists($t5defaultImportBconf,
             "File '$t5defaultImportBconf' missing. As the Translate5 provided default import .bconf file for Okapi Task Imports it must exist!");
 
@@ -77,10 +77,12 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
 
         $failureMsg = "Original and repackaged Bconfs do not match\nInput was '$input', Output was '$output";
         self::assertFileEquals($input, $output, $failureMsg);
+
     }
 
     /***
      * Test if new srx files are packed into bconf.
+     * @depends test_BconfImportExport
      */
     public function test_SrxUpload() {
         $bconf = self::$bconf;
@@ -102,6 +104,9 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
 
     }
 
+    /**
+     * @depends test_BconfImportExport
+     */
     public function test_AutoImportAndVersionUpdate() {
         $bconf = self::$bconf;
         $bconf->importDefaultWhenNeeded();
@@ -146,7 +151,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
 
         // Reset to initial system bconf, delete  newly imported
         $newSystemBconfId = $newSystemBconf->getId();
-        $newSystemBconfDir = $newSystemBconf->getDataDirectory();
+        $newSystemBconfDir = $newSystemBconf->getDir();
         $newSystemBconf->setName('ToDelete-' . time() . rand());
         $newSystemBconf->save();
         $systemBconf->setName($bconf::SYSTEM_BCONF_NAME);
@@ -167,6 +172,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
 
     /***
      * Verify Task Import using Okapi is working with the LEK_okapi_bconf based Bconf management
+     * @depends test_AutoImportAndVersionUpdate AutoImport must work for initializing LEK_okapi_bconf after installation
      */
     public function test_OkapiTaskImport() {
         try {
@@ -181,6 +187,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         $task = [
             'sourceLang' => 'de',
             'targetLang' => 'en',
+          //'bconfId' omitted to test fallback to Okapi_Models_Bconf::getDefaultBconfId
         ];
         $api->addImportFile($api->getFile('testfiles/workfiles/TRANSLATE-2266-de-en.txt'));
         $api->import($task);
@@ -194,6 +201,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
 
     /***
      * Verify Task Import using Okapi is working with the LEK_okapi_bconf based Bconf management
+     * @depends test_OkapiTaskImport
      */
     public function test_OkapiTaskImportWithBconfIdAndMultipleFiles() {
         try {
@@ -249,7 +257,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         $bconf = self::$bconf;
         $bconf->load(self::$bconfId);
 
-        $bconfDir = $bconf->getDataDirectory();
+        $bconfDir = $bconf->getDir();
         $bconf->deleteDirectory(self::$bconfId);
         $bconf->delete(); // delete record
         self::assertDirectoryDoesNotExist($bconfDir);

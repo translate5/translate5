@@ -54,7 +54,7 @@ class editor_Plugins_Okapi_Bconf_File {
      * @param $msg
      * @param string $errorCode
      * @param string[] $detail
-     * @return void // TODO Add as return type on PHP8.1
+     * @return never // TODO Add as return type on PHP8.1
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */

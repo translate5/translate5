@@ -27,6 +27,7 @@
  */
 
 /**
+ * @see editor_Plugins_Okapi_Bconf_File
  * @var editor_Plugins_Okapi_Models_Bconf $entity
  */
 trait editor_Plugins_Okapi_Bconf_ParserTrait {
@@ -46,7 +47,7 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
      * @throws editor_Plugins_Okapi_Exception
      */
     public function unpack(string $pathToParse): void {
-        chdir($this->entity->getDataDirectory());
+        chdir($this->entity->getDir());
 
         $content = [
             'refs' => [],

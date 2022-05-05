@@ -31,8 +31,7 @@
  * Common util class for bconf export and import
  *
  */
-class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
-{
+class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
 
     const SIGNATURE = "batchConf";
     const VERSION = 2;
@@ -49,9 +48,13 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
      * Read next UTF-8 value
      */
     public function readUTF() {
-        $utflen = unpack("n", $this->fread(2))[1]; // n -> Big Endian unsigned short (Java)
-        // unpack("A"...) strips whitespace!
-        return $utflen > 0 ? unpack("a" . $utflen, $this->fread($utflen))[1] : '';
+        try {
+            $utflen = unpack("n", $this->fread(2))[1]; // n -> Big Endian unsigned short (Java)
+            // unpack("A"...) strips whitespace!
+            return $utflen > 0 ? unpack("a" . $utflen, $this->fread($utflen))[1] : '';
+        } catch(Exception $e){
+            throw new ZfExtended_UnprocessableEntity('E1026', ['errors' =>  [[$e]]]);
+        }
     }
 
     /** Write the UTF-8 value in bconf
@@ -74,8 +77,12 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
      * @return int|mixed
      */
     public function readInt(): mixed {
-        $uint32 = unpack("N", $this->fread(4))[1]; // N -> UInt32.BE but we want Int32
-        return $uint32 <= self::PHP_INT32_MAX ? $uint32 : $uint32 - self::OVERFLOW_SUB;
+        try {
+            $uint32 = unpack("N", $this->fread(4))[1]; // N -> UInt32.BE but we want Int32
+            return $uint32 <= self::PHP_INT32_MAX ? $uint32 : $uint32 - self::OVERFLOW_SUB;
+        } catch(Exception $e){
+            throw new ZfExtended_UnprocessableEntity('E1026', ['errors' =>  [[$e]]]);
+        }
     }
 
     /** Write the Integer value in bconf
@@ -89,7 +96,11 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
      * @return mixed
      */
     public function readLong(): mixed {
-        return unpack("J", $this->fread(8))[1];
+        try {
+            return unpack("J", $this->fread(8))[1];
+        } catch(Exception $e){
+            throw new ZfExtended_UnprocessableEntity('E1026', ['errors' =>  [[$e]]]);
+        }
     }
 
     /** Write the Long  value in bconf

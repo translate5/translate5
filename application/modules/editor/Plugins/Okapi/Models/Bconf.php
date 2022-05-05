@@ -50,8 +50,9 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
 
     public editor_Plugins_Okapi_Bconf_File $file;
 
-    private string $dir = ''; // for caching the results of expensive filesystem checks
+    private string $dir = '';
     private bool $isNewRecord = false; // flag for newly created entities
+    private static ?string $bconfRootDir = null;
 
     public function isNewRecord(): bool {
         return $this->isNewRecord;
@@ -76,7 +77,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      */
     public function __construct(array $postFile = null, array $data = []) {
         parent::__construct();
-        if($postFile){ // create new entity from file
+        if($postFile && self::getBconfRootDir()){ // create new entity from file
             if(empty($data['name'])){
                 $data['name'] = pathinfo($postFile['name'])['filename']; // strip '.bconf'
             }
@@ -87,12 +88,16 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             $this->isNewRecord = true;
             $this->init($data);
             $this->save(); // Generates id needed for directory
-
-            $this->getDataDirectory(); // Creates directory
-
+            $dir = $this->getDir();
+            if(self::checkDirectory($dir) && !mkdir($dir, 0755, true)){
+                $this->delete();
+                $errorMsg = "Could not create directory for bconf (in runtimeOptions.plugins.Okapi.dataDir)";
+                throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $errorMsg]);
+            }
             $this->file = new editor_Plugins_Okapi_Bconf_File($this);
             $this->file->unpack($postFile['tmp_name']);
             $this->file->pack();
+            $this->isNewRecord = false;
         }
     }
 
@@ -151,74 +156,76 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         return $ret;
     }
 
-    /**
-     * Returns the data directory of the given bconfId/loaded entity without trailing slash, creating it if neccessary
-     * @param string $id If not given, retrieved from entity and request parameters
-     * @param bool $check can be used to disable file system checks
-     * @return string
-     * @throws ZfExtended_UnprocessableEntity|editor_Plugins_Okapi_Exception|Zend_Exception
-     */
-    public function getDataDirectory(string $id = '', bool $check = true): string {
-        !$id && $id = $this->getId();
-        !$id && $id = (int)$_REQUEST['id'];
-        !$id && throw new ZfExtended_UnprocessableEntity('E1025', ['errors' => [["No 'id' parameter given."]]]);
-        if(str_ends_with($this->dir, $id)){
-            return $this->dir; // return cached result
+    public static function getBconfRootDir(): string {
+        if(!self::$bconfRootDir){
+            try {
+                $errorMsg = '';
+                /** @var Zend_Config $config */
+                $config = Zend_Registry::get('config');
+                $bconfRootDir = $config->runtimeOptions->plugins->Okapi->dataDir;
+                $errorMsg = self::checkDirectory($bconfRootDir);
+                if(!$errorMsg && $bconfRootDir){
+                    $bconfRootDir = realpath($bconfRootDir);
+                }
+            } catch(Exception $e){
+                $errorMsg = $e->__toString();
+            } finally {
+                if($errorMsg || empty($bconfRootDir)){
+                    throw new editor_Plugins_Okapi_Exception('E1057',
+                        ['okapiDataDir' => $errorMsg . "\n(checking runtimeOptions.plugins.Okapi.dataDir)"]);
+                } else {
+                    self::$bconfRootDir = $bconfRootDir;
+                }
+            }
         }
-        /** @var Zend_Config $config */
-        $config = Zend_Registry::get('config');
-        $okapiDataDir = $config->runtimeOptions->plugins->Okapi->dataDir;
-        $check && $this->checkDirectory($okapiDataDir);
+        return self::$bconfRootDir;
+    }
 
-        $this->dir = $bconfDir = realpath($okapiDataDir) . DIRECTORY_SEPARATOR . $id; // cache result
-        $check && $this->checkDirectory($bconfDir);
-        return $bconfDir;
+    /**
+     * @param string $id If given, gets the directory without loaded entity
+     * @return string
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getDir(string $id = ''): string {
+        return match ((bool)$id) {
+            true => self::getBconfRootDir() . DIRECTORY_SEPARATOR . $id,
+            false => $this->dir ?: $this->dir = self::getBconfRootDir() . DIRECTORY_SEPARATOR . $this->getId(),
+        };
     }
 
     /**
      * Checks if a directory exists and is writable
      * @param string $dir The directory path to check
-     * @throws editor_Plugins_Okapi_Exception
      */
-    public function checkDirectory(string $dir) {
-        $errorMsg = '';
+    public static function checkDirectory(string $dir): string {
         if(!is_dir($dir)){
             if(is_file($dir)){
-                $errorMsg = "'$dir' is a file!";
-            } else if(!$this->isNewRecord){
-                $errorMsg = "Directory '$dir' is missing";
-            } else if(!mkdir($dir, 0755, true)){ // new record
-                $errorMsg = "Could not create directory '$dir'";
+                return "The directory is a file!";
+            } else {
+                return "The directory is missing!";
             }
         } else {
             $permissions = fileperms($dir);
             $rwx = 7;
             $user = 6; // number of bytes to shift
             if($permissions >> $user !== $rwx && !chmod($dir, $permissions | $rwx << $user)){
-                $errorMsg = $dir;
+                return "The directory has wrong permissions";
             }
         }
-        if($errorMsg){
-            if($this->isNewRecord){ // new bconf or clone
-                $this->delete();
-            }
-            throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $errorMsg]);
-        }
+        return '';
     }
 
     /**
      * @param string $id
      * @param string $fileName Appended to the bconf's data directory, defaults to the bconf file itself
      * @return string path The absolute path of the bconf
-     * @throws Zend_Exception
-     * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
     public function getFilePath(string $id = '', string $fileName = ''): string {
-        $dataDirectory = $this->getDataDirectory($id);
-        !$id && $id = $this->getId();
-        !$fileName && ($fileName = 'bconf-' . $id . '.bconf');
-        return $dataDirectory . DIRECTORY_SEPARATOR . $fileName;
+        if(!$fileName){
+            $fileName = 'bconf-' . ($id ?: $this->getId()) . '.bconf';
+        }
+        return $this->getDir($id) . DIRECTORY_SEPARATOR . $fileName;
     }
 
     /**
@@ -263,7 +270,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         if($bconfId == $systemBconf_row['id'] && !$this->isNewRecord){
             throw new ZfExtended_NoAccessException();
         }
-        chdir(Zend_Registry::get('config')->runtimeOptions->plugins->Okapi->dataDir);
+        chdir(self::getBconfRootDir());
         if(is_dir($bconfId)){ // just to be safe
             $this->dir = ""; // remove cached valid dir
             /** @var ZfExtended_Controller_Helper_Recursivedircleaner $cleaner */

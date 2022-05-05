@@ -40,7 +40,7 @@ class Translate2432Test extends \ZfExtended_Test_ApiTestcase {
      * Currently available bconf files for okapi import/export
      * @var array
      */
-    protected static $validBconfFiles = ['okapi_default_export.bconf','okapi_default_import.bconf'];
+    protected static $validBconfFiles = ['okapi_default_export.bconf', editor_Plugins_Okapi_Models_Bconf::SYSTEM_BCONF_IMPORTFILE];
         
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
