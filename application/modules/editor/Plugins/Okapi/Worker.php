@@ -135,6 +135,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
             /* @var $api editor_Plugins_Okapi_Connector */
             $api->createProject();
+            // upload the BCONF set by worker-params
             $api->uploadOkapiConfig($params['bconfFilePath']);
             $api->uploadInputFile($fileName, $file);
             $api->executeTask($sourceLang, $targetLang);
@@ -152,7 +153,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             /* @var $fileFilter editor_Models_File_FilterManager */
             $fileFilter->addFilter($fileFilter::TYPE_IMPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
             $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
-        }catch (Exception $e){
+        } catch (Exception $e){
             $this->handleException($e, $file, $fileId, true);
         } finally {
             $api->removeProject();
