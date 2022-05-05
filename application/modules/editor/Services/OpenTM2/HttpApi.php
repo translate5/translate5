@@ -274,7 +274,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         // But we hold the filepaths in the FileTree JSON, so this value is not easily accessible,
         // so we take only the single filename at the moment
         $json->documentName = $filename;
-        
+
+        $json->markupTable = 'OTMXUXLF'; //NEEDED otherwise t5memory crashes
         $json->context = $segment->getMid(); // here MID (context was designed for dialog keys/numbers on translateable strings software)
         
         $http = $this->getHttpWithMemory('POST', 'fuzzysearch');
