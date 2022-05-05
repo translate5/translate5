@@ -47,7 +47,7 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     },
 
     onClientRoute: function() {
-        Editor.app.openAdministrationSection(this.getView(), 'client');
+        Editor.app.openAdministrationSection(this.getView());
     },
 
     /**

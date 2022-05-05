@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,18 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class Editor.view.LanguageResources.TmOverviewViewController
- * @extends Ext.app.ViewController
- */
-Ext.define('Editor.view.LanguageResources.TmOverviewViewController', {
-    extend: 'Ext.app.ViewController',
-    alias: 'controller.tmOverviewPanel',
-    routes: {
-        'languageresource': 'onTmOverviewRoute'
-    },
-    
-    onTmOverviewRoute: function() {
-        Editor.app.openAdministrationSection(this.getView());
-    }
-});
+class Editor_LogController extends ZfExtended_LogController {
+
+}

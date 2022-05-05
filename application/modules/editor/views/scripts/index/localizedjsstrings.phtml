@@ -1048,6 +1048,28 @@ Ext.define('Editor.controller.Localizer', {
             message: '<?php echo $this->translate->_('Ereignis');?>',
             created: '<?php echo $this->translate->_('Zeitpunkt');?>',
             moreInfo: '<?php echo $this->translate->_('Mehr Info');?>',
+            eventCodeInfoText: '<?php echo $this->translate->_('Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken.<br/>Nicht alle Fehler können hier aufgelistet werden, bitte beachten Sie daher auch das <a href="#preferences/adminSystemLog">generelle System Log</a>!');?>'
+        }
+    });
+    Ext.define("Editor.locale.de.view.admin.log.SystemGrid", {
+        override: "Editor.view.admin.log.SystemGrid",
+        strings: {
+            title: '<?php echo $this->translate->_('System Log');?>',
+            reload: '<?php echo $this->translate->_('Aktualisieren');?>',
+            level: '<?php echo $this->translate->_('Typ');?>',
+            level_fatal: '<?php echo $this->translate->_('Schwerer Fehler');?>',
+            level_error: '<?php echo $this->translate->_('Fehler');?>',
+            level_warn: '<?php echo $this->translate->_('Warnung');?>',
+            level_info: '<?php echo $this->translate->_('Info');?>',
+            level_debug: '<?php echo $this->translate->_('Debug');?>',
+            level_trace: '<?php echo $this->translate->_('Trace');?>',
+            colUsername: '<?php echo $this->translate->_('Benutzer');?>',
+            eventCode: '<?php echo $this->translate->_('Code');?>',
+            eventCodeLong: '<?php echo $this->translate->_('Ereignis- bzw. Fehlercode');?>',
+            domain: '<?php echo $this->translate->_('Bereich');?>',
+            message: '<?php echo $this->translate->_('Ereignis');?>',
+            created: '<?php echo $this->translate->_('Zeitpunkt');?>',
+            moreInfo: '<?php echo $this->translate->_('Mehr Info');?>',
             eventCodeInfoText: '<?php echo $this->translate->_('Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken');?>'
         }
     });

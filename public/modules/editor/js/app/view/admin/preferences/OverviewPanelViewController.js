@@ -26,13 +26,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * @class Editor.view.admin.preferences.OverviewPanelViewController
+ * @extends Ext.app.ViewController
+ */
 Ext.define('Editor.view.admin.preferences.OverviewPanelViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.preferencesOverviewPanel',
     routes: {
-        'preferences': 'onPreferencesRoute'
+        'preferences': 'onPreferencesRoute',
+        'preferences/:tab' :'onPreferencesRoute',
     },
-    onPreferencesRoute: function() {
-        Editor.app.openAdministrationSection(this.getView(), 'preferences');
+    onPreferencesRoute: function(tab) {
+        var v = this.getView();
+        if(tab) {
+            Editor.app.openAdministrationSection(this.getView());
+            v.setActiveTab(v.down('#'+tab));
+        }
+        else {
+            Editor.app.openAdministrationSection(this.getView());
+        }
+    },
+    /**
+     * Sets the url hash to the current choosen preferences tab (itemID needed therefore to be configured!)
+     * @param tabpanel {Ext.tab.Panel}
+     * @param newCard {Ext.panel.Panel}
+     */
+    onTabChange: function(tabpanel, newCard) {
+        this.redirectTo('preferences/'+newCard.getItemId());
     }
 });

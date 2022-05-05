@@ -164,7 +164,7 @@ Ext.application({
      */
     onUnmatchedRoute : function(hash) {
         if(this.unmatchedRoute === null) {
-            this.unmatchedRoute = hash;
+            this.unmatchedRoute = Ext.util.History.getToken(); //we have to store the whole token here
         }
     },
     init: function () {
@@ -399,7 +399,7 @@ Ext.application({
      * firing the editorViewportClosed event
      */
     openAdministration: function (task) {
-        var me = this, tabPanel;
+        let me = this, tabPanel;
         if (!Editor.controller.admin || !Editor.controller.admin.TaskOverview) {
             return;
         }
@@ -450,7 +450,7 @@ Ext.application({
         mainTabs.disableRouteHandling = true;
         mainTabs.setActiveTab(panel);
         mainTabs.disableRouteHandling = false;
-        me.redirectTo(redirectRoute);
+        me.redirectTo(redirectRoute || Ext.util.History.getToken());
 
         //if we are in a task, we have to stop routing, leave it, and resume routing after the task was closed (a new one was loaded, for routing open tasks)
     },

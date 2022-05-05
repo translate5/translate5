@@ -31,7 +31,14 @@ END LICENSE AND COPYRIGHT
  * @class Editor.util.Util
  */
 Ext.define('Editor.util.Util', {
-    
+    errorLevel: {
+        "1": 'fatal',
+        "2": 'error',
+        "4": 'warn',
+        "8": 'info',
+        "16": 'debug',
+        "32": 'trace'
+    },
     statics:{
         
         /***
@@ -194,6 +201,15 @@ Ext.define('Editor.util.Util', {
             });
 
             return collected;
+        },
+        getErrorLevelName: function(level) {
+            if(!level) {
+                level = this.prototype.get('level');
+            }
+            if(this.prototype.errorLevel[level]) {
+                return this.prototype.errorLevel[level];
+            }
+            return '';
         },
         /**
          * Shows a 'Choose file' dialogue
