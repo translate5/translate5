@@ -51,8 +51,8 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         
         //Binding the worker clean up to the after import event, since import
         // is currently the main use case for workers
+        /** @var Zend_EventManager_StaticEventManager $eventManager */
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
-        /* @var $eventManager Zend_EventManager_StaticEventManager */
         
         $eventManager->attach('editor_Models_Import', 'afterImport', function(){
             $worker = ZfExtended_Factory::get('ZfExtended_Worker_GarbageCleaner');
@@ -117,10 +117,13 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     {
         
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
-            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'comment', 'attributedatatype',
-                                'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
-                                'config', 'segmentuserassoc', 'session', 'language','termcollection','languageresourceresource','languageresourcetaskassoc',
-                                'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category', 'quality','userassocdefault'
+            'editor' => [
+                'file', 'segment', 'alikesegment', 'customer', 'referencefile', 'comment', 'attributedatatype',
+                'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
+                'config', 'segmentuserassoc', 'session', 'language','termcollection',
+                'languageresourceresource','languageresourcetaskassoc',
+                'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category',
+                'quality','userassocdefault', 'log'
             ],
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);

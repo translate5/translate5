@@ -32,6 +32,11 @@ END LICENSE AND COPYRIGHT
  * Also an added API makes it simpler to load Unicode HTML (only XML will be loaded as UTF-8 by default) properly
  */
 class editor_Utils_Dom extends DOMDocument {
+    const LIBXML_LEVEL_NAME = [
+        LIBXML_ERR_WARNING => 'warning',
+        LIBXML_ERR_ERROR   => 'error',
+        LIBXML_ERR_FATAL   => 'fatal',
+    ];
     
     /**
      * Used to set UTF-8 encoding for Documents
@@ -66,6 +71,15 @@ class editor_Utils_Dom extends DOMDocument {
      * @var boolean
      */
     private $traceDomErrors = false;
+
+    private DOMXPath $xpath;
+
+    /**
+     * @return DOMXPath
+     */
+    public function getXpath(): DOMXPath {
+        return $this->xpath ?? ($this->xpath = new DOMXPath($this));
+    }
     
     public function __construct($version=null, $encoding=null){
         parent::__construct($version, $encoding);
@@ -73,7 +87,7 @@ class editor_Utils_Dom extends DOMDocument {
         $this->strictErrorChecking = false;
     }
 
-    public function load ($filename, $options=NULL){
+    public function load ($filename, $options=NULL): bool { // returns bool when called dynamic
         $filename = realpath($filename);
         $this->domErrors = [];
         libxml_clear_errors();
@@ -227,13 +241,19 @@ class editor_Utils_Dom extends DOMDocument {
     /**
      * Retrieves the fatals, errors and warmings as a concatenated string
      * @param string $glue
+     * @param bool $verbose enables column and line number
      * @return string
      */
-    public function getErrorMsg(string $glue=', '): string{
+    public function getErrorMsg(string $glue=', ', bool $verbose = false): string{
+        $errors = [];
         if(count($this->domErrors) > 0){
-            $errors = [];
             foreach($this->domErrors as $error){ /* @var $error libXMLError */
-                $errors[] = $this->createLibXmlErrorMsg($error);
+                if($verbose){
+                    $errorName = $this::LIBXML_LEVEL_NAME[$error->level];
+                    $errors[] .= "$errorName@$error->line,$error->column: $error->message";
+                } else {
+                    $errors[] = $this->createLibXmlErrorMsg($error);
+                }
             }
         }
         return implode($glue, $errors);
@@ -270,5 +290,9 @@ class editor_Utils_Dom extends DOMDocument {
         $error->file = $file;
         $error->level = $level;
         return $error;
+    }
+
+    public function query(string $selector) {
+        return $this->getXpath()->query($selector);
     }
 }

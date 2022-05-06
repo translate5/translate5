@@ -708,6 +708,17 @@ class editor_Utils {
     }
 
     /**
+     * Create correctly formatted path from many parts
+     * Corrects any slashes to match the OS, won't remove a leading slash, and cleans up and multiple slashes in a row.
+     * @see https://stackoverflow.com/a/7641174
+     * @param string ...$parts
+     * @return string
+     */
+    public static function joinPath(string ...$parts): string {
+        return preg_replace('~[/\\\\]+~', DIRECTORY_SEPARATOR, implode(DIRECTORY_SEPARATOR, $parts));
+    }
+
+    /**
      * @return Zend_Db_Adapter_Abstract
      */
     public static function db() {
@@ -772,7 +783,7 @@ class editor_Utils {
             $text, $match, PREG_OFFSET_CAPTURE, $position)) {
 
             // Extract $url and $urlPosition from match
-            list($url, $urlPosition) = $match[0];
+            [$url, $urlPosition] = $match[0];
 
             // Print the text leading up to the URL.
             print(htmlspecialchars(substr($text, $position, $urlPosition - $position)));

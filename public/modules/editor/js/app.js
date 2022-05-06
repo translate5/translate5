@@ -110,6 +110,11 @@ Ext.application({
     appFolder: Editor.data.appFolder,
     windowTitle: '',
     viewport: null,
+    /**
+     * Storing the unmatched route on app init for further processing after all handling views were loaded
+     * @var {String}
+     */
+    unmatchedRoute: null, //null means the further handlers are not loaded. If set to false, the handlers are through
     //***********************************************************************************
     //Begin Events
     //***********************************************************************************
@@ -144,10 +149,25 @@ Ext.application({
             'viewport > #adminMainSection': {
                 tabchange: 'onAdminMainSectionChange'
             }
+        },
+        controller : {
+            '#' : {
+                unmatchedroute : 'onUnmatchedRoute'
+            }
+        }
+
+    },
+    /**
+     * Since the route handlers are brought in by view controllers, all routes handled by them are initially caught as unmatched route
+     * Therefore we store it and handle it after rendering of all of the views able to handle them
+     * @param hash
+     */
+    onUnmatchedRoute : function(hash) {
+        if(this.unmatchedRoute === null) {
+            this.unmatchedRoute = Ext.util.History.getToken(); //we have to store the whole token here
         }
     },
     init: function () {
-
         //enable json in our REST interface
         Ext.Ajax.setDefaultHeaders({
             'Accept': 'application/json'
@@ -379,7 +399,7 @@ Ext.application({
      * firing the editorViewportClosed event
      */
     openAdministration: function (task) {
-        var me = this, tabPanel;
+        let me = this, tabPanel;
         if (!Editor.controller.admin || !Editor.controller.admin.TaskOverview) {
             return;
         }
@@ -408,8 +428,9 @@ Ext.application({
         me.fireEvent('adminViewportOpened');
         tabPanel = me.viewport.down('#adminMainSection');
 
-        // on intial load we have to trigger the change manually
-        me.onAdminMainSectionChange(tabPanel, tabPanel.getActiveTab(), task);
+        // on intial load we have to trigger the opening of the desired tab manually:
+        me.redirectTo(me.unmatchedRoute ? me.unmatchedRoute : tabPanel.getActiveTabDefaultRoute(), true);
+        me.unmatchedRoute = false; //we disable unmatchedRoute handling after first usage
 
         //set the value used for displaying the help pages
         Ext.getDoc().dom.title = me.windowTitle;
@@ -424,9 +445,12 @@ Ext.application({
         if (Ext.isString(panel)) {
             panel = me.viewport.down(panel);
         }
-        //what  happens if panel does not belong to the tabpanel?
+
+        //do nothing if already active
+        mainTabs.disableRouteHandling = true;
         mainTabs.setActiveTab(panel);
-        me.redirectTo(redirectRoute);
+        mainTabs.disableRouteHandling = false;
+        me.redirectTo(redirectRoute || Ext.util.History.getToken());
 
         //if we are in a task, we have to stop routing, leave it, and resume routing after the task was closed (a new one was loaded, for routing open tasks)
     },
@@ -439,12 +463,10 @@ Ext.application({
      */
     onAdminMainSectionChange: function (tabpanel, activatedPanel) {
         var me = this,
-            ctrl = activatedPanel.getController(),
-            conf = ctrl && ctrl.defaultConfig,
-            mainRoute = conf && conf.routes && Object.keys(conf.routes)[0];
+            mainRoute = tabpanel.getActiveTabDefaultRoute();
         me.fireEvent('adminSectionChanged', activatedPanel);
 
-        if (!mainRoute) {
+        if (!mainRoute || tabpanel.disableRouteHandling) {
             return;
         }
         me.redirectTo(mainRoute);

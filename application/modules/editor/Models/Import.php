@@ -99,12 +99,8 @@ class editor_Models_Import {
             }
             
             $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
-            
-            //if the task meta exist, save it
-            if($this->task->meta()){
-                $this->task->meta()->save();
-            }
-            
+            $this->task->meta()->save(); /** @see editor_Controllers_Task_ImportTrait::processUploadedFile Creates meta */
+
             $this->task->lock(NOW_ISO, $this->task::STATE_IMPORT); //locks the task
             
             $this->events->trigger('beforeImport', $this, array(

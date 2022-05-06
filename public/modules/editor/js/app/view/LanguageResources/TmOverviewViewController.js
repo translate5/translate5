@@ -38,6 +38,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewViewController', {
     },
     
     onTmOverviewRoute: function() {
-        Editor.app.openAdministrationSection(this.getView(), 'languageresource');
+        Editor.app.openAdministrationSection(this.getView());
     }
 });

@@ -64,7 +64,6 @@ class editor_Models_Comment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
         catch(Zend_Db_Statement_Exception $e) {
             try {
                 $this->handleIntegrityConstraintException($e);
-                throw $e;
             }
             catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
                 //"duplicate entry" errors are ignored. 

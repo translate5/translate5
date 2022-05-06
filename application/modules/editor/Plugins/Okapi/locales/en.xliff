@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+<!-- the transunit-ID should contain the base64-encoded source-string als used in the php source-code. This ID is used for matching. -->
+<!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
+<file original="php-sourcecode" source-language="de" target-language="en" datatype="php">
+<body>
+<trans-unit id='RGF0ZWlmb3JtYXRrb252ZXJ0aWVydW5n'>
+    <source>Dateiformatkonvertierung</source>
+    <target>File conversion</target>
+</trans-unit>
+<trans-unit id='RGF0ZWlmb3JtYXQtIHVuZCBTZWdtZW50aWVydW5nc2VpbnN0ZWxsdW5nZW4='>
+    <source>Dateiformat- und Segmentierungseinstellungen</source>
+    <target>File format and segmentation settings</target>
+</trans-unit>
+<trans-unit id='TmFtZQ=='>
+    <source>Name</source>
+    <target>Name</target>
+</trans-unit>
+<trans-unit id='RXJ3ZWl0ZXJ1bmdlbg=='>
+    <source>Erweiterungen</source>
+    <target>Extensions</target>
+</trans-unit>
+<trans-unit id='QmVzY2hyZWlidW5n'>
+    <source>Beschreibung</source>
+    <target>Description</target>
+</trans-unit>
+<trans-unit id='QWt0aW9uZW4='>
+    <source>Aktionen</source>
+    <target>Actions</target>
+</trans-unit>
+<trans-unit id='QmNvbmYgaG9jaGxhZGVuLi4u'>
+    <source>Bconf hochladen...</source>
+    <target>Upload Bconf...</target>
+</trans-unit>
+<trans-unit id='U1JYLURhdGVp'>
+    <source>SRX-Datei</source>
+    <target>SRX file</target>
+</trans-unit>
+<trans-unit id='U291cmNlU1JY'>
+    <source>SourceSRX</source>
+    <target>SourceSRX</target>
+</trans-unit>
+<trans-unit id='VGFyZ2V0U1JY'>
+    <source>TargetSRX</source>
+    <target>TargetSRX</target>
+</trans-unit>
+<trans-unit id='QmVhcmJlaXRlbg=='>
+    <source>Bearbeiten</source>
+    <target>Edit</target>
+</trans-unit>
+<trans-unit id='TMO2c2NoZW4='>
+    <source>Löschen</source>
+    <target>Delete</target>
+</trans-unit>
+<trans-unit id='S29waWVyZW4='>
+    <source>Kopieren</source>
+    <target>Copy</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmQ='>
+    <source>Standard</source>
+    <target>Default</target>
+</trans-unit>
+<trans-unit id='S3VuZGVuc3RhbmRhcmQ='>
+    <source>Kundenstandard</source>
+    <target>Customer default</target>
+</trans-unit>
+<trans-unit id='QmNvbmYgbMO2c2NoZW4='>
+    <source>Bconf löschen</source>
+    <target>Delete Bconf</target>
+</trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRpZXNlIEJjb25mLURhdGVpIHdpcmtsaWNoIGzDtnNjaGVuPw=='>
+    <source>Möchten Sie diese Bconf-Datei wirklich löschen?</source>
+    <target>Do you really want to delete this Bconf file?</target>
+</trans-unit>
+<trans-unit id='QmNvbmYtRGF0ZWkgZ2Vsw7ZzY2h0'>
+    <source>Bconf-Datei gelöscht</source>
+    <target>Bconf file deleted</target>
+</trans-unit>
+<trans-unit id='VW5nw7xsdGlnZSB7fS1EYXRlaQ=='>
+    <source>Ungültige {}-Datei</source>
+    <target>Invalid {} file</target>
+</trans-unit>
+<trans-unit id='RGllIGhvY2hnZWxhZGVuZSBEYXRlaSBpc3Qga2VpbmUgZ8O8bHRpZ2Uge30tRGF0ZWku'>
+    <source>Die hochgeladene Datei ist keine gültige {}-Datei.</source>
+    <target>The uploaded file is not a valid {} file.</target>
+</trans-unit>
+<trans-unit id='TmV1ZSBCY29uZi1EYXRlaQ=='>
+    <source>Neue Bconf-Datei</source>
+    <target>New Bconf file</target>
+</trans-unit>
+<trans-unit id='QmNvbmYtRGF0ZWkgYmVhcmJlaXRlbg=='>
+    <source>Bconf-Datei bearbeiten</source>
+    <target>Edit Bconf file</target>
+</trans-unit>
+<trans-unit id='LURhdGVp'>
+    <source>-Datei</source>
+    <target> file</target>
+</trans-unit>
+<trans-unit id='ezB9ezF9IGhlcnVudGVybGFkZW4='>
+    <source>{0}{1} herunterladen</source>
+    <target>Download {0}{1}</target>
+</trans-unit>
+<trans-unit id='ezB9ezF9IGhvY2hsYWRlbg=='>
+    <source>{0}{1} hochladen</source>
+    <target>Upload {0}{1}</target>
+</trans-unit>
+</body>
+</file>
+</xliff>
