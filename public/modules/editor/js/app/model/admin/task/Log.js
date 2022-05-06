@@ -29,14 +29,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.model.admin.task.Log', {
     extend: 'Ext.data.Model',
     alias: 'model.taskLog',
-    errorLevel: {
-        "1": 'fatal',
-        "2": 'error',
-        "4": 'warn',
-        "8": 'info',
-        "16": 'debug',
-        "32": 'trace'
-    },
     fields: [
         {name: 'id', type: 'int', persist: false},
         {name: 'level', type: 'int'},
@@ -73,14 +65,5 @@ Ext.define('Editor.model.admin.task.Log', {
         rootProperty: 'rows',
         type : 'json'
       }
-    },
-    getLevelName: function(level) {
-        if(!level) {
-            level = this.get('level');
-        }
-        if(this.errorLevel[level]) {
-            return this.errorLevel[level];
-        }
-        return '';
     }
 });

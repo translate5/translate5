@@ -103,10 +103,6 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
 .segment-tag-column div.x-grid-cell-inner div.internal-tag,
 .segment-tag-column div.x-grid-cell-inner div.internal-tag span {
     user-select: none;
-    -o-user-select: none;
-    -ms-user-select: none;
-    -moz-user-select: -moz-none;
-    -webkit-user-select: none;
 }
 
 /* this css is used in visual review tooltip, for displaying the internal tags, terminologie */
@@ -161,7 +157,7 @@ div.single + div {
 }
 
 .x-grid-row-editor {
-    box-shadow: -6px 0px 25px 0px rgba(0,0,0,0.75);
+    box-shadow: -6px 0 25px 0 rgba(0,0,0,0.75);
 }
 
 #segment-grid .x-grid-cell-inner {
@@ -233,7 +229,7 @@ div.single + div {
 /* END - Headpanel */
 
 /*Terminology:*/
-.metaTermPanel .term-group {padding:2px 0px; text-align:left;vertical-align: top;}
+.metaTermPanel .term-group {padding:2px 0; text-align:left;vertical-align: top;}
 .metaTermPanel .term-group > div {padding: 2px 1px;}
 .metaTermPanel .term-group > div.target-terms {padding-left: 14px;}
 .metaTermPanel .target-terms {border-top:1px dotted #BFC2C2;}
@@ -285,7 +281,7 @@ div.single + div {
 /*qmflags*/
 #segment-grid-body img.qmflag { width: auto !important;height: 14px !important; vertical-align:middle;margin-left:1px;margin-right:1px; }
 .qmflag-menu .x-menu-item-link {padding-right:2px; padding-left:22px;margin-right:36px;}
-.qmflag-menu .x-menu-item-link .x-menu-item-text {padding: 0px !important; margin: 0px 17px 0px 0px !important; width: auto !important; height: auto !important}
+.qmflag-menu .x-menu-item-link .x-menu-item-text {padding: 0 !important; margin: 0 17px 0 0 !important; width: auto !important; height: auto !important}
 .qmflag-menu .x-menu-item-icon {right:2px;left:auto;height:14px;width: 22px !important}
 .qmflag-menu .x-menu-icon-separator {right:34px;left:auto;}
 /* false positive qmflags */
@@ -406,8 +402,8 @@ table.message-box-data .error {}
 .comments-grid .readonly .x-action-col-icon {display:none;}
 
 .comment {margin-bottom:5px;}
-#segment-grid .comment {margin-bottom:0px; padding-right: 16px;}
-#segment-grid .comment .ellipsis {font-size:7pt;line-hight:3pt;display:block;line-height:10pt;}
+#segment-grid .comment {margin-bottom:0; padding-right: 16px;}
+#segment-grid .comment .ellipsis {font-size:7pt;display:block;line-height:10pt;}
 
 #segment-grid .editor-comment-display .x-form-item-body {
     display: block;
@@ -526,11 +522,11 @@ div.loading div#loading-indicator-text {
 .adminTaskGrid .x-grid-header-ct .fullMatchEdit.ux-filtered-column span,
 .adminTaskGrid .x-grid-header-ct .terminologie.ux-filtered-column span,
 .adminTaskGrid .x-grid-header-ct .ref-files.ux-filtered-column span,
-.adminTaskGrid .x-grid-header-ct .task-users.ux-filtered-column span {background:url("../images/funnel-small.png") no-repeat 12px 0px;}
-.adminTaskGrid .x-grid-header-ct .source-edit.ux-filtered-column span {background:url("../images/funnel-small.png") no-repeat 22px 0px;}
+.adminTaskGrid .x-grid-header-ct .task-users.ux-filtered-column span {background:url("../images/funnel-small.png") no-repeat 12px 0;}
+.adminTaskGrid .x-grid-header-ct .source-edit.ux-filtered-column span {background:url("../images/funnel-small.png") no-repeat 22px 0;}
 .adminTaskGrid .x-grid-header-ct .relais-lang.ux-filtered-column span,
 .adminTaskGrid .x-grid-header-ct .target-lang.ux-filtered-column span,
-.adminTaskGrid .x-grid-header-ct .source-lang.ux-filtered-column span {background:url("../images/funnel-small.png") no-repeat 33px 0px;}
+.adminTaskGrid .x-grid-header-ct .source-lang.ux-filtered-column span {background:url("../images/funnel-small.png") no-repeat 33px 0;}
 
 .adminTaskGrid .x-grid-header-ct .segmentsUpdateable span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .taskAssocChecked span.x-column-header-text-inner,
@@ -898,7 +894,6 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 
 #commentNavList>div::before{
     display: inline-block;
-    width: 1.28571em;
     width: 25px;
     text-align: center;
     border-radius: 3px;
@@ -916,6 +911,16 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 #commentNavList>div.usernr8::before {background-color: var(--color-usernr8);}
 #commentNavList>div.usernrX::before {background-color: var(--color-usernrX);}
 
+.actionColGrid .x-action-col-icon {
+    margin: 5px;
+}
+
+td.x-grid-cell.pointer,
+tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"] /* Only enable for normal, especially disable for action and check columns */
+{
+    cursor: pointer;
+}
+
 .invalidGridBorder{
     border-color: #cf4c35;
     border-style: solid;
@@ -924,4 +929,8 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 
 .disabledButtonTooltip.x-item-disabled, .disabledButtonTooltip.x-item-disabled * {
     pointer-events: auto !important;
+}
+
+.chosenDefault {
+    background-color: hsl(0deg 0% 0% / 20%);
 }

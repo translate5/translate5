@@ -136,20 +136,47 @@ class Markup {
         }
         return $result;
     }
-   /**
-    * Escapes text to XML conformity that is known to contain no tags
-    * @param string $textWithoutTags
-    * @return string
-    */
-   public static function escapeText(string $textWithoutTags) : string {
-       return htmlspecialchars($textWithoutTags, ENT_XML1 | ENT_COMPAT, null, false);
-   }
-   /**
-    * Unescapes text that was escaped with our ::escape API
-    * @param string $text
-    * @return string
-    */
-   public static function unescapeText(string $text) : string {
-       return htmlspecialchars_decode($text, ENT_XML1 | ENT_COMPAT);
-   }
+    /**
+     * Escapes text to XML conformity that is known to contain no tags
+     * @param string $textWithoutTags
+     * @return string
+     */
+    public static function escapeText(string $textWithoutTags) : string {
+        return htmlspecialchars($textWithoutTags, ENT_XML1 | ENT_COMPAT, null, false);
+    }
+    /**
+     * Unescapes text that was escaped with our ::escape API
+     * @param string $text
+     * @return string
+     */
+    public static function unescapeText(string $text) : string {
+        return htmlspecialchars_decode($text, ENT_XML1 | ENT_COMPAT);
+    }
+    /**
+     * @param string $markup
+     * @param string $newline
+     * @return string
+     */
+    public static function strip(string $markup, string $newline="\n") : string {
+        $markup = self::breaksToNewlines($markup, $newline);
+        return strip_tags($markup);
+    }
+    /**
+     * @param string $markup
+     * @param string $newline
+     * @return string
+     */
+    public static function breaksToNewlines(string $markup, string $newline="\n") : string {
+        return preg_replace('~<br\s*/{0,1}>~i', "\n", $markup);
+    }
+    /**
+     * @param string $text
+     * @param string $breaktag
+     * @return string
+     */
+    public static function newlinesToBreak(string $text, string $breaktag='<br/>') : string {
+        $text = str_replace("\r\n", "\n", $text);
+        $text = str_replace("\r", "\n", $text);
+        return str_replace("\n", $breaktag, $text);
+    }
 }

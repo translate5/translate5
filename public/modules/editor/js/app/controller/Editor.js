@@ -953,7 +953,13 @@ Ext.define('Editor.controller.Editor', {
             callback,
             sel,
             scrollMode = ed.self.STARTEDIT_MOVEEDITOR;
-        
+
+        // do not try to open the editor if there is nothing to be opened.
+        // this can happen in some rare cases when repetitions are saved via repetition editor
+        if(!rowMeta){
+            return;
+        }
+
         //if the editor should be scrolled or moved
         if(!rowMeta.isMoveEditor){
         	scrollMode = ed.self.STARTEDIT_SCROLLUNDER;

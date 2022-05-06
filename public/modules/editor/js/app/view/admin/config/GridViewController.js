@@ -29,7 +29,11 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.config.GridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.adminConfigGrid',
-    
+
+    routes: {
+        'config/:name' :'filterConfigByRoute',
+    },
+
     listen:{
         component:{
             '#searchField':{
@@ -42,6 +46,11 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         controller: {
             'taskGrid': {
                 taskImportFinished: 'onTaskImportFinished'
+            }
+        },
+        store: {
+            '#admin.Config':{
+                load:'onStoreLoad'
             }
         }
     },
@@ -139,7 +148,12 @@ Ext.define('Editor.view.admin.config.GridViewController', {
     onConfigEdit : function(editor,context){
         this.saveRecord(context.record);
     },
-    
+
+    filterConfigByRoute: function(filterValue) {
+        this.searchField.setValue(filterValue);
+        this.groupingFeature.expandAll();
+    },
+
     /**
      * @return {String} The value to process or null if the searchField value is blank or invalid.
      * @private
@@ -162,6 +176,8 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         view.refresh();
 
         me.searchValue = me.getSearchValue();
+        //TODO UGLY: is there another generic way to do such a thing? Otherwise we would have to implement a parser which gets and changes only the desired part of the hash instead of setting the whole one(here the config value)
+        me.redirectTo('preferences/adminConfigGrid|config/'+me.searchValue);
         
         if(me.searchValue == null){
             store.clearFilter();
@@ -175,6 +191,13 @@ Ext.define('Editor.view.admin.config.GridViewController', {
 
         //mark the matched searchValue
         me.markMatches();
+    },
+
+    onStoreLoad: function() {
+        //if we have a searchValue already on initial store load we have to expand all so that the results are visible
+        if(this.searchValue) {
+            this.groupingFeature.expandAll();
+        }
     },
     
     onShowReadOnlyChange:function(field, newValue, oldValue, eOpts ){

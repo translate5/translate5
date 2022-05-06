@@ -2815,6 +2815,10 @@ A task was associated to you in the task-portal {portalLink}.<br />
   <source>Name</source>
   <target>Name</target>
 </trans-unit>
+<trans-unit id='RGllc2VyIE5hbWUgaXN0IHNjaG9uIHZlcmdlYmVu'>
+  <source>Dieser Name ist schon vergeben</source>
+  <target>This name is already taken</target>
+</trans-unit>
 <trans-unit id='VE0tRGF0ZWk='>
   <source>TM-Datei</source>
   <target>TM-file</target>
@@ -3865,7 +3869,18 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</source>
     <target>Choose the resource to get more information.</target>
 </trans-unit>
-<trans-unit id='RsO8ciB6dXPDpHR6bGljaGUgSW5mb3JtYXRpb24genUgZWluZW0gRXJlaWduaXMgYml0dGUgYXVmIGRlbiBDb2RlIGtsaWNrZW4='><source>Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken</source><target>For more information about the event click on the event code.<br/>Not all errors can be associated to a task, so keep an eye on the <a href="https://confluence.translate5.net/pages/viewpage.action?pageId=192020493" target="_blank">general system log</a> too!</target></trans-unit>
+<trans-unit id='U3lzdGVtIExvZw=='>
+  <source>System Log</source>
+  <target>System Log</target>
+</trans-unit>
+<trans-unit id='RsO8ciB6dXPDpHR6bGljaGUgSW5mb3JtYXRpb24genUgZWluZW0gRXJlaWduaXMgYml0dGUgYXVmIGRlbiBDb2RlIGtsaWNrZW4='>
+  <source>Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken</source>
+  <target>For more information about the event click on the event code.</target>
+</trans-unit>
+<trans-unit id='RsO8ciB6dXPDpHR6bGljaGUgSW5mb3JtYXRpb24genUgZWluZW0gRXJlaWduaXMgYml0dGUgYXVmIGRlbiBDb2RlIGtsaWNrZW4uPGJyLz5OaWNodCBhbGxlIEZlaGxlciBrw7ZubmVuIGhpZXIgYXVmZ2VsaXN0ZXQgd2VyZGVuLCBiaXR0ZSBiZWFjaHRlbiBTaWUgZGFoZXIgYXVjaCBkYXMgPGEgaHJlZj0iI3ByZWZlcmVuY2VzL2FkbWluU3lzdGVtTG9nIj5nZW5lcmVsbGUgU3lzdGVtIExvZzwvYT4h'>
+  <source>Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken.<br/>Nicht alle Fehler können hier aufgelistet werden, bitte beachten Sie daher auch das <a href="#preferences/adminSystemLog">generelle System Log</a>!</source>
+  <target>For more information about the event click on the event code.<br/>Not all errors can be listed here, so keep an eye on the <a href="#preferences/adminSystemLog">general system log</a> too!</target>
+</trans-unit>
 <trans-unit id='QW5nZXBhc3N0'><source>Angepasst</source><target>Customized</target></trans-unit>
 <trans-unit id='R2VzcGVycnQgZGEgYWxzIEV4Y2VsIGV4cG9ydGllcnQuIFp1bSBFbnRzcGVycmVuIEV4Y2VsIHJlLWltcG9ydGllcmVuLiBGYWxscyBFeGNlbCBuaWNodCB6dXIgSGFuZDogTmV1IGV4cG9ydGllcmVuLg=='><source>Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.</source><target>Locked because exported as Excel. Re-import Excel to unlock. If Excel is not at hand: export again.</target></trans-unit>
 <trans-unit id='PGI+S2VpbmUgRXJnZWJuaXNzZSBnZWZ1bmRlbjwvYj48YnIvPkbDvHIgSWhyZSBTdWNoZSBnaWJ0IGVzIGtlaW5lIEVpbnRyw6RnZSBpbiBkZXIgVGVybWlub2xvZ2llIHVuZCBkZW0gVHJhbnNsYXRpb24gTWVtb3J5IHVuZCBmw7xyIGRpZSBnZXfDpGhsdGUgU3ByYWNoa29tYmluYXRpb24gc3RlaHQga2VpbmUgbWFzY2hpbmVsbGUgw5xiZXJzZXR6dW5nIHp1ciBWZXJmw7xndW5nLg=='><source><b>Keine Ergebnisse gefunden</b><br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.</source><target><b>No results found</b><br/>There are no entries for your search in the terminology and the translation memory and there is no machine translation available for your language combination.</target></trans-unit>
@@ -4606,6 +4621,14 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='RXMgd3VyZGVuIGtlaW5lIGhvY2hnZWxhZGVuZW4gQXJiZWl0c2RhdGVpZW4gZ2VmdW5kZW4gb2RlciBkaWUgaG9jaGdlbGFkZW5lbiBEYXRlaWVuIMO8YmVyc2NocmVpdGVuIGRpZSBtYXhpbWFsIHp1bMOkc3NpZ2UgR3LDtsOfZS4='>
   <source>Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.</source>
   <target>There were no uploaded workfiles found or the uploaded files are exceeding the maximum allowed size.</target>
+</trans-unit>
+<trans-unit id='U2luZ2xlIFNpZ24tb24='>
+  <source>Single Sign-on</source>
+  <target>Single Sign-on</target>
+</trans-unit>
+<trans-unit id='RGllc2VzIEZlbGQgZGFyZiBuaWNodCBsZWVyIHNlaW4='>
+  <source>Dieses Feld darf nicht leer sein</source>
+  <target>This field can not be empty</target>
 </trans-unit>
   </file>
 </xliff>

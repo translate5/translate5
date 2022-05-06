@@ -35,10 +35,9 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         noProjectTaskMessage:'#UT#Die angeforderte Projektaufgabe existiert nicht',
         noProjectInFilter:'#UT#Projekt im aktuellen Filter nicht gefunden'
     },
-    rootRoute:'#project',
 
     routes:{
-        'project':'onProjectRoute',
+        'project':'onProjectBaseRoute',
         'project/:id/focus' :'onProjectFocusRoute',
         'project/:id/:taskId/focus' :'onProjectTaskFocusRoute'
     },
@@ -89,19 +88,25 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         route.push(action);
         route = route.join('/');
 
-        Editor.app.openAdministrationSection(me.getView(),route);
+        //do only a focusRedirect if we are already in project panel!
+        if(Ext.util.History.getToken().split('/')[0] === 'project') {
+            me.redirectTo(route);
+        }
     },
 
-    /***
-     * On project rute
+    /**
+     * if no project is selected in route we get here
      */
-    onProjectRoute:function(){
-        var me=this;
-        //if it is not the default route, ignore it
-        if(window.location.hash!=me.rootRoute){
+    onProjectBaseRoute:function(){
+        var store = this.lookup('projectGrid').store;
+        if(store.hasPendingLoad()) {
+            //do nothing since will be handled in the load handler then
             return;
         }
-        me.checkAndReloadStores();
+
+        //if no project selected in route we just choose the first one and try to select that
+        //no selected record is found, use the first in the store
+        this.redirectFocus(store.getAt(0), false);
     },
 
 
@@ -189,7 +194,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
 
     /***
-     * On project store load
+     * On project store initial load or reload
      */
     onProjectStoreLoad:function(store){
         //if the project panel is not active, ignore the redirect,
@@ -207,16 +212,8 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             me.redirectFocus(Editor.data.task,true);
             return;
         }
-
-        //if selected record already exist, use it
-        if(record){
-            task = store.getById(record.get('id'));
-        }
-        //no selected record is found, use the first in the store
-        if(!task){
-            task = store.getAt(0);
-        }
-        me.redirectFocus(task,false);
+        //force rerouting to the desired project/task in the hash (this contains also a selected one!)
+        me.redirectTo(Ext.util.History.getToken(), true);
     },
 
     onReloadProjectBtnClick:function(){
@@ -274,9 +271,12 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
         //search for the task store record index
         me.searchIndex(id,grid).then(function(index){
+            var store = grid.getStore();
             //do not scroll on empty store
-            if(grid.getStore().getTotalCount()==0){
-                Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
+            if(store.getTotalCount() === 0){
+                if(!store.hasPendingLoad()) {
+                    Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
+                }
                 return;
             }
             grid.bufferedRenderer.scrollTo(index,{
@@ -418,15 +418,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
 
     /***
-     * Set the default route
-     */
-    resetRoute:function(){
-        var me=this;
-        Editor.app.openAdministrationSection(me.getView(),me.rootRoute);
-        me.redirectTo(me.rootRoute);
-    },
-
-    /***
      * Reset view model selections
      */
     resetSelection:function(){
@@ -446,6 +437,5 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     reset:function(){
         this.resetSelection();
-        this.resetRoute();
     }
 });
