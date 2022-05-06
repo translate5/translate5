@@ -298,7 +298,23 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $s = $this->db->select()->where('resourceId = ?', $serviceResourceId);
         return $this->db->fetchAll($s)->toArray();
     }
-    
+
+    /**
+     * loads the language resources to a specific service resource ID (language resource to a specific server (=resource))
+     * @param string $uuid
+     * @return Zend_Db_Table_Row_Abstract|null
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function loadByUuid(string $uuid): ?Zend_Db_Table_Row_Abstract
+    {
+        $s = $this->db->select()->where('langResUuid = ?', $uuid);
+        $this->row = $this->db->fetchRow($s);
+        if(empty($this->row)){
+            $this->notFound('#langResUuid '.$uuid);
+        }
+        return $this->row;
+    }
+
     /**
      * returns the resource used by this languageResource instance
      * @return editor_Models_LanguageResources_Resource

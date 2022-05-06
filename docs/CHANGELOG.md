@@ -15,6 +15,137 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [5.7.1] - 2022-05-05
+
+### Important Notes:
+#### [TRANSLATE-2931](https://jira.translate5.net/browse/TRANSLATE-2931)
+Remove Support for bconf files included in Import Archives
+
+#### [TRANSLATE-2884](https://jira.translate5.net/browse/TRANSLATE-2884)
+A new role systemadmin is added, to be used only for technical people and translate5 system administrators. Read below the details for usage and what it enables.
+ 
+
+
+### Changed
+**[TRANSLATE-2960](https://jira.translate5.net/browse/TRANSLATE-2960): VisualReview / VisualTranslation - Enable Markup processing in Subtitle Import parsers** <br>
+Visual Video: Enable markup protection in internal tags as well as whitespace  for the import
+
+**[TRANSLATE-2931](https://jira.translate5.net/browse/TRANSLATE-2931): Okapi integration, Task Management - Import file format and segmentation settings - Bconf Management (Milestone 1)** <br>
+Translate5 can now manage Okapi BatchConfiguration files - needed for configuring the import file filters. Admins and PMs can upload, download, rename Bconfs and upload and download contained SRX files in the new 'File format and segmentation settings' grid under 'Preferences'. It is also available under 'Clients' to easily handle specific requirements of different customers. You can also set a default there, which overrides the one from the global perspective. During Project Creation a dropdown menu presents the available Bconf files for the chosen client, preset with the configured default. The selected one is then passed to Okapi on import.
+
+**[TRANSLATE-2901](https://jira.translate5.net/browse/TRANSLATE-2901): InstantTranslate - Languageresource type filter in instanttranslate API** <br>
+ENHANCEMENT: Added filters to filter InstantTranslate API for language resource types and id's. See https://confluence.translate5.net/display/TAD/InstantTranslate for details
+
+FIX: fixed whitespace-rendering in translations when Translation Memories were requested and text to translate was segmented therefore
+
+**[TRANSLATE-2884](https://jira.translate5.net/browse/TRANSLATE-2884): Main back-end mechanisms (Worker, Logging, etc.) - Further restrict nightly error mail summaries** <br>
+A new role systemadmin is added, to be used only for technical people and translate5 system administrators. 
+Only users with that role will receive the nightly error summary e-mail in the future (currently all admins). Only systemadmins can set the role systemadmin and api.
+For hosted clients: contact us so that we can enable the right for desired users.
+For on premise clients: the role must be added manually in the DB to one user. With that user the role can then be set on other users.
+
+
+### Bugfixes
+**[TRANSLATE-2961](https://jira.translate5.net/browse/TRANSLATE-2961): Editor general - Error on repetition save** <br>
+Solves a problem where an error happens in the UI after saving repetitions with repetition editor.
+
+**[TRANSLATE-2959](https://jira.translate5.net/browse/TRANSLATE-2959): OpenId Connect - Overlay for SSO login auto-redirect** <br>
+Adds overlay when auto-redirecting with SSO authentication.
+
+**[TRANSLATE-2957](https://jira.translate5.net/browse/TRANSLATE-2957): OpenId Connect - Missing default text on SSO button** <br>
+When configuring SSO via OpenID no default button text is provided, therefore the SSO Login button may occur as button without text - not recognizable as button then.
+
+**[TRANSLATE-2910](https://jira.translate5.net/browse/TRANSLATE-2910): TermPortal, User Management - Role rights for approval workflow of terms in the TermPortal** <br>
+Terms/attributes editing/deletion access logic reworked for Term Proposer, Term Reviewer and Term Finalizer roles
+
+**[TRANSLATE-2558](https://jira.translate5.net/browse/TRANSLATE-2558): Editor general - Task focus after login** <br>
+On application load always the first project was selected, instead the one given in the URL. This is fixed now. Other application parts (like preferences or clients) can now also opened directly after application start by passing its section in the URL.
+
+
+## [5.7.0] - 2022-04-26
+
+### Important Notes:
+#### [TRANSLATE-2949](https://jira.translate5.net/browse/TRANSLATE-2949)
+Update the config in the corresponding client instance according to TS-1664.
+
+#### [TRANSLATE-2799](https://jira.translate5.net/browse/TRANSLATE-2799)
+All EN and PT DeepL language resources must be changed to EN-GB and PT-PT
+
+#### [TRANSLATE-2762](https://jira.translate5.net/browse/TRANSLATE-2762)
+Enable HTML Markup in InstantTranslate
+
+#### [TRANSLATE-2534](https://jira.translate5.net/browse/TRANSLATE-2534)
+Update / restart of message bus required after Update!
+API users using /editor/session endpoint: providing a taskGuid on session API login is obsolete. Just login and open the task by putting the task ID in the URL: /editor/taskid/123/ - the auth call returns the URL for convenience.
+ 
+
+
+### Added
+**[TRANSLATE-2949](https://jira.translate5.net/browse/TRANSLATE-2949): Configuration, User Management - Make settings for new users pre-configurable** <br>
+Enable setting default pre-selected source and target languages in instant translate. For more info how this can be configured, please check the config option runtimeOptions.InstantTranslate.user.defaultLanguages in this link
+https://confluence.translate5.net/display/TAD/InstantTranslate
+
+**[TRANSLATE-2869](https://jira.translate5.net/browse/TRANSLATE-2869): Import/Export, Task Management - Export of editing history of a task** <br>
+Provide for PMs the possibility to download the tasks content as spreadsheet containing all segments, with the pre-translated target and the target content after each workflow step.
+
+**[TRANSLATE-2822](https://jira.translate5.net/browse/TRANSLATE-2822): MatchAnalysis & Pretranslation - Match Analysis on a character basis** <br>
+Match analysis now can be displayed on character or word base.
+
+**[TRANSLATE-2779](https://jira.translate5.net/browse/TRANSLATE-2779): Auto-QA - QA check for leading/trailing white space in segments** <br>
+Added check for 3 different kinds of leading/trailing whitespaces within a segment
+
+**[TRANSLATE-2762](https://jira.translate5.net/browse/TRANSLATE-2762): InstantTranslate - Enable tags in InstantTranslate text field** <br>
+Instant Translate now supports using HTML markup in the text to translate. Tag-errors maybe caused by the used services (e.g. DeepL) are automatically repaired when markup is submitted. Please note, that for the time, the typed markup is incomplete or the markup is syntactically incorrect, an error hinting at the invalidity of the markup is shown.
+
+
+### Changed
+**[TRANSLATE-2952](https://jira.translate5.net/browse/TRANSLATE-2952): Editor general - Automated workflow and user roles video** <br>
+Integrates the automated workflow and user roles in translate5 help page.
+
+**[TRANSLATE-2902](https://jira.translate5.net/browse/TRANSLATE-2902): Configuration, Task Management, TermPortal - Send e-mail to specific PM on creation of project through TermTranslation Workflow** <br>
+Added system config to specify user to be assigned as PM for termtranslation-projects by default, and to send an email notification to that user on termtranslation-project creation
+
+
+### Bugfixes
+**[TRANSLATE-2958](https://jira.translate5.net/browse/TRANSLATE-2958): TermPortal - TermCollection not updateable after deleting the initial import user** <br>
+If a user was deleted, and this user has imported a TBX, the resulting term collection could no be updated by re-importing a TBX anymore. This is fixed.
+
+**[TRANSLATE-2955](https://jira.translate5.net/browse/TRANSLATE-2955): LanguageResources, OpenTM2 integration - Segment can not be saved if language resource is writable and not available** <br>
+If a language resource is assigned writable to a task and the same language resource is not available, the segment can not be saved.
+
+**[TRANSLATE-2954](https://jira.translate5.net/browse/TRANSLATE-2954): Import/Export - If Import reaches PHP max_file_uploads limit there is no understandable error message** <br>
+If the amount of files reaches the configured max_file_uploads in PHP there is no understandable error message for the user what is the underlying reason why the upload is failing. 
+
+**[TRANSLATE-2953](https://jira.translate5.net/browse/TRANSLATE-2953): Import/Export - Create task without selecting file** <br>
+Fixes a problem where the import wizard form could be submitted without selecting a valid workfile.
+
+**[TRANSLATE-2951](https://jira.translate5.net/browse/TRANSLATE-2951): API, InstantTranslate - Instant-translate filelist does not return the taskId** <br>
+Fixes a problem where the task-id was not returned as parameter in the instant-translate filelist api call.
+
+**[TRANSLATE-2947](https://jira.translate5.net/browse/TRANSLATE-2947): Import/Export - Can not import SDLXLIFF where sdl-def tags are missing** <br>
+For historical reasons sdl-def tags were mandatory in SDLXLIFF trans-units, which is not necessary anymore.
+
+**[TRANSLATE-2924](https://jira.translate5.net/browse/TRANSLATE-2924): InstantTranslate - translate file not usable in InstantTranslate** <br>
+Improved GUI behaviour, file translation is always selectable and shows an Error-message if no translation service is available for the selected languages. Also, when changing languages the mode is not automatically reset to "text translation" anymore
+
+**[TRANSLATE-2862](https://jira.translate5.net/browse/TRANSLATE-2862): InstantTranslate - Issue with the usage of "<" in InstantTranslate** <br>
+BUGFIX InstantTranslate Plugin: Translated text is not terminated anymore after a single "<" in the original text
+
+**[TRANSLATE-2850](https://jira.translate5.net/browse/TRANSLATE-2850): Import/Export - File review.html created in import-zip, even if not necessary** <br>
+reviewHtml.txt will be no longer created when there are no visual-urls defined on import.
+
+**[TRANSLATE-2843](https://jira.translate5.net/browse/TRANSLATE-2843): Import/Export - translate5 requires target language in xliff-file** <br>
+Xml based files where no target language is detected on import(import wizard), will be imported as non-bilingual files.
+
+**[TRANSLATE-2799](https://jira.translate5.net/browse/TRANSLATE-2799): LanguageResources - DeepL API - some languages missing compared to https://www.deepl.com/translator** <br>
+All DeepL resources where the target language is EN or PT, will be changed from EN -> EN-GB and PT to PT-PT. The reason for this is a recent DeepL api change.
+
+**[TRANSLATE-2534](https://jira.translate5.net/browse/TRANSLATE-2534): Editor general - Enable opening multiple tasks in multiple tabs** <br>
+Multiple tasks can now be opened in different browser tabs within the same user session at the same time. This is especially interesting for embedded usage of translate5 where tasks are opened via custom links instead of the translate5 internal task overview.
+
+
 ## [5.6.10] - 2022-04-07
 
 ### Important Notes:

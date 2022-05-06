@@ -210,6 +210,7 @@ For Details see https://fonts.google.com/attribution
     overflow: hidden;
     text-overflow: ellipsis;
 }
+textarea {font-family: 'Roboto', sans-serif;}
 
 /* --------------- container --------------- */
 

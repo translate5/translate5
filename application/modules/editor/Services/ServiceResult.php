@@ -147,11 +147,11 @@ class editor_Services_ServiceResult {
     }
     
     public function setResults($results){
-        $this->results=$results;
+        $this->results = $results;
     }
     
     public function resetResult(){
-        $this->results=[];
+        $this->results = [];
     }
     
     /**
@@ -172,7 +172,7 @@ class editor_Services_ServiceResult {
             return null;
         }
         foreach ($metaData as $data) {
-            if($data->name==$fieldName){
+            if($data->name == $fieldName){
                 return $data->value;
             }
         }

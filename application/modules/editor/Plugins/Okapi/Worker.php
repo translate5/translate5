@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -135,7 +135,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
             /* @var $api editor_Plugins_Okapi_Connector */
             $api->createProject();
-            $api->uploadOkapiConfig($params['bconfFilePaths']);
+            // upload the BCONF set by worker-params
+            $api->uploadOkapiConfig($params['bconfFilePath']);
             $api->uploadInputFile($fileName, $file);
             $api->executeTask($sourceLang, $targetLang);
             $convertedFile = $api->downloadFile($fileName, $manifestFile, $okapiDataDir);
@@ -152,7 +153,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             /* @var $fileFilter editor_Models_File_FilterManager */
             $fileFilter->addFilter($fileFilter::TYPE_IMPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
             $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
-        }catch (Exception $e){
+        } catch (Exception $e){
             $this->handleException($e, $file, $fileId, true);
         } finally {
             $api->removeProject();
@@ -169,13 +170,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         $workFile = new SplFileInfo($params['file']);
         
         $manifestFile = new SplFileInfo($this->getDataDir().'/'.$this->getManifestFile($fileId));
-        //if we don't have a manifest.rkm file, the import was before we changed the export,
-        // so use tikal export there again
-        if(!$manifestFile->isFile()) {
-            $this->doTikalFallback($workFile); //should be removed in the future
-            return true;
-        }
-        
+
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
         $plugin = $pm->get($pm->classToName(get_class($this)));
@@ -193,7 +188,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         try {
             $api->createProject();
 
-            $api->uploadOkapiConfig([$plugin::createDefaultBconfPath($this->task,$plugin::OKAPI_BCONF_TARGET_EXPORT)]);
+            $api->uploadOkapiConfig($plugin::getExportBconfPath($this->task));
             
             $api->uploadInputFile('manifest.rkm', $manifestFile);
             $originalFile = $this->findOriginalFile($fileId);
@@ -358,20 +353,6 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $okapiDataDir]);
         }
         return $okapiDataDir;
-    }
-    
-    /**
-     * uses tikal export / merge as fallback for imports started before the okapi export usage
-     * @param SplFileInfo $workfile
-     */
-    protected function doTikalFallback(SplFileInfo $workfile) {
-        if(strtolower($workfile->getExtension()) !== 'xlf') {
-            // Okapi Plug-In: tikal fallback can not be used, workfile does not contain the XLF suffix',
-            throw new editor_Plugins_Okapi_Exception('E1056', ['workfile' => $workfile]);
-        }
-        $tikal = ZfExtended_Factory::get('editor_Plugins_Okapi_Tikal_Connector', [$this->task]);
-        /* @var $tikal editor_Plugins_Okapi_Tikal_Connector */
-        $tikal->merge($workfile->__toString());
     }
     
     /***

@@ -144,4 +144,5 @@ class editor_Task_Cloner {
         /* @var $taskConfig editor_Models_TaskConfig */
         $taskConfig->cloneTaskConfig($this->original->getTaskGuid(), $this->clone->getTaskGuid());
     }
+
 }

@@ -212,23 +212,12 @@ class editor_TaskController extends ZfExtended_RestController {
             ]
         ])
         ->addActionContext('kpi', 'xlsx')
-
-
-        /*
-        ->addContext('excel', [
+        ->addContext('excelhistory', [
             'headers' => [
-                'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // TODO Content-Type prüfen
             ]
         ])
-        ->addActionContext('export', 'excel')
-
-        ->addContext('excelReimport', [
-            'headers' => [
-                'Content-Type'          => 'text/xml',
-            ]
-        ])
-        ->addActionContext('export', 'excelReimport')
-        */
+        ->addActionContext('export', 'excelhistory')
 
         ->initContext();
     }
@@ -663,7 +652,11 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->entity->setTargetLang(reset($this->data['targetLang']));
         }
 
-        $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
+        if(empty($this->data['relaisLang'])){
+            $this->data['relaisLang'] = 0;
+        } else {
+            $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
+        }
         $this->entity->setRelaisLang($this->data['relaisLang']);
 
         return $targetLangCount;
@@ -945,7 +938,13 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity = $cloner->clone($this->entity);
 
         if($this->validate()) {
-            $this->processUploadedFile($this->entity, $dataProvider);
+            // set meta data in controller as in post request
+            $metaData = $this->entity->meta()->toArray();
+            unset($metaData['id'], $metaData['taskGuid']);
+            foreach($metaData as $field => $value){
+                $this->data[$field] = $value;
+            }
+            $this->processUploadedFile($this->entity, $dataProvider); //creates task_meta via editor_Models_Import::import
             $cloner->cloneDependencies();
             $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere
@@ -1557,6 +1556,16 @@ class editor_TaskController extends ZfExtended_RestController {
             case 'importArchive':
                 $this->logInfo('Task import archive downloaded');
                 $this->downloadImportArchive();
+                return;
+
+            case 'excelhistory':
+                if(!$this->isAllowed('frontend', 'editorExportExcelhistory')) {
+                    throw new ZfExtended_NoAccessException();
+                }
+                // run history excel export
+                /** @var editor_Models_Export_TaskHistoryExcel $exportExcel */
+                $exportExcel = ZfExtended_Factory::get('editor_Models_Export_TaskHistoryExcel', [$this->entity]);
+                $exportExcel->exportAsDownload();
                 return;
 
             case 'xliff2':

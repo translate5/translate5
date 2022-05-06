@@ -85,13 +85,6 @@ trait editor_Controllers_Task_ImportTrait {
         foreach($this->data['targetLang'] as $target) {
             $task = clone $this->entity;
 
-            // re-init the task meta for the projectTask
-            $meta = $task->meta(true);
-
-            // set the mapping type for the project if provided
-            if(isset($this->data['mappingType'])){
-                $meta->setMappingType($this->data['mappingType']);
-            }
 
             $task->setProjectId($entityId);
             $task->setTaskType(editor_Task_Type::getInstance()->getImportTaskType());
@@ -116,12 +109,19 @@ trait editor_Controllers_Task_ImportTrait {
     }
 
     /**
-     * imports the uploaded file into the given task
+     * imports the uploaded file into the given task and creates the associated Task_Meta entity
      * @param editor_Models_Task $task
      * @param editor_Models_Import_DataProvider_Abstract $dp
      * @throws Exception
      */
     protected function processUploadedFile(editor_Models_Task $task, editor_Models_Import_DataProvider_Abstract $dp) {
+        /* @see editor_Models_Import::import Saves $meta after task */
+        $meta = $task->createMeta();
+        $this->events->trigger('beforeProcessUploadedFile', $this, [
+            'task' => $task,
+            'meta' => $meta,
+            'data' => $this->data,
+        ]);
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
         $import->setUserInfos($this->user->data->userGuid, $this->user->data->userName);
@@ -130,7 +130,7 @@ trait editor_Controllers_Task_ImportTrait {
 
         try {
             $import->import($dp);
-        }catch (ZfExtended_ErrorCodeException $e){
+        } catch (ZfExtended_ErrorCodeException $e){
             // in case there is task, remove it
             $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
             /* @var $remover editor_Models_Task_Remover */

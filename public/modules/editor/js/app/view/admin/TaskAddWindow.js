@@ -50,6 +50,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     },
     controller:'adminTaskAddWindow',
     title: '#UT#Projekt erstellen',
+    defaultFocus: '#customerId',
     strings: {
         importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (Angabe notwendig)',
         importUploadLabel: '#UT#Import Datei¹',
@@ -126,7 +127,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         config = {
                 title: me.title, //see EXT6UPD-9
                 layout: 'card',
-                height: parseInt(Editor.app.viewport.getHeight() * 0.70),
+                height: parseInt(Editor.app.viewport.getHeight() * 0.80),
                 width: parseInt(Editor.app.viewport.getWidth() * 0.70),
                 items:[
                     {

@@ -107,6 +107,7 @@ class Translate2491Test extends editor_Test_JsonTest {
             'projectName' => '2 terms selected',
             'targetLang' =>  $german->id,
             'translated' =>  0,
+            'definition' =>  1,
             'clientId' =>  $this->api()->getCustomer()->id,
             'sourceLang' =>  $english->id,
             'terms' => 'all',
@@ -114,12 +115,16 @@ class Translate2491Test extends editor_Test_JsonTest {
         ]);
 
         // Wait for import
-        $this->api()->setTask($task = $transfer->step1->rows->projectTasks);
-        $this->api()->getTask()->originalSourceLang = $taskCfg['sourceLang'];
-        $this->api()->getTask()->originalTargetLang = $taskCfg['targetLang'];
-        $this->api()->getTask()->taskType == ZfExtended_Test_ApiHelper::INITIAL_TASKTYPE_PROJECT
-            ? $this->api()->checkProjectTasksStateLoop()
-            : $this->api()->checkTaskStateLoop();
+        $this->api()->setTask($task = $transfer->step1->rows->projectTasks[0]);
+        $task->originalSourceLang = $taskCfg['sourceLang'];
+        $task->originalTargetLang = $taskCfg['targetLang'];
+
+        if($task->taskType == ZfExtended_Test_ApiHelper::INITIAL_TASKTYPE_PROJECT) {
+            $this->api()->checkProjectTasksStateLoop();
+        }
+        else {
+            $this->api()->checkTaskStateLoop();
+        }
 
         // Open task for whole testcase
         $this->api()->requestJson('editor/task/' . $task->id, 'PUT', ['userState' => 'edit', 'id' => $task->id]);
@@ -159,9 +164,9 @@ class Translate2491Test extends editor_Test_JsonTest {
     public static function tearDownAfterClass(): void {
 
         // Get task
-        self::$api->requestJson('editor/task/' . self::$api->getTask()->id, 'DELETE');
+        self::$api->cleanup && self::$api->requestJson('editor/task/' . self::$api->getTask()->id, 'DELETE');
 
         // Drop termCollection
-        self::$api->requestJson('editor/termcollection/' . self::$collectionId, 'DELETE');
+        self::$api->cleanup && self::$api->requestJson('editor/termcollection/' . self::$collectionId, 'DELETE');
     }
 }

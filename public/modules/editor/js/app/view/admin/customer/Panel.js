@@ -120,11 +120,6 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 ptype: 'gridfilters'
                             }
                         ],
-                        viewConfig: {
-                            listeners: {
-                                beforerefresh: 'onViewBeforeRefresh'
-                            }
-                        },
                         columns: [{
                                 xtype: 'gridcolumn',
                                 dataIndex: 'id',
@@ -340,8 +335,4 @@ Ext.define('Editor.view.admin.customer.Panel', {
         return me.callParent([config]);
     },
 
-    onViewBeforeRefresh: function(dataview) {
-        //workaround / fix for TMUE-11
-        dataview.getSelectionModel().deselectAll();
-    }
 });

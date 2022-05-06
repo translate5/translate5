@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -35,7 +35,7 @@ class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
      */
     protected $domain = 'plugin.okapi';
     
-    static protected $localErrorCodes = [
+    static protected array $localErrorCodes = [
         'E1055' => 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
         'E1056' => 'Okapi Plug-In: tikal fallback can not be used, workfile does not contain the XLF suffix: {workfile}',
         'E1057' => 'Okapi Plug-In: Data dir not writeable: {okapiDataDir}',
@@ -43,5 +43,8 @@ class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
         'E1059' => 'Okapi Plug-In: Configuration error - no Okapi server URL is configured!',
         'E1150' => 'Okapi Plug-In: The exported XLIFF contains empty targets, the Okapi process will probably fail then.',
         'E1340' => 'Okapi Plug-In: The default bconf configuration file-name is not set.',
+        'E1384' => 'Okapi Import called without bconfId!',
+        'E9999' => 'Okapi Plug-In: The SRX file is not valid. {details}',
+
     ];
 }
