@@ -34,42 +34,6 @@ END LICENSE AND COPYRIGHT
     /* @var $this Zend_View */
     $version = '?v='.$this->appVersion;
 
-    // Which languages are available according to the LanguageResources?
-    // (We only the need the single lists here, not in which combination they work.)
-    // In order to save time we use this loop to calculate the characterLimit, too.
-    $allCharacterLimits = array();
-    $allSourceLanguageLocales = array();
-    $allTargetLanguageLocales = array();
-    
-    foreach ($this->allLanguageResources as $languageResource) {
-        $allCharacterLimits[] = $languageResource['characterLimit'];
-        foreach ($languageResource['source'] as $sourceLocale) {
-            //are the sublanguages used as dropdown selections
-            $useLanguage=strpos($sourceLocale, '-') === false || $this->showSublanguages;
-            if (!in_array($sourceLocale, $allSourceLanguageLocales) && $useLanguage) {
-                $allSourceLanguageLocales[$sourceLocale] = ($this->allDbLanguages[$sourceLocale][1] ?? $sourceLocale);
-            }
-        }
-        foreach ($languageResource['target']as $key => $targetLocale) {
-            //are the sublanguages used as dropdown selections
-            $useLanguage=strpos($targetLocale, '-') === false || $this->showSublanguages;
-            if (!in_array($targetLocale, $allTargetLanguageLocales) && $useLanguage) {
-                $allTargetLanguageLocales[$targetLocale] = ($this->allDbLanguages[$targetLocale][1] ?? $targetLocale);
-            }
-        }
-    }
-    // sort the languages by their speaking names
-    asort($allSourceLanguageLocales);
-    asort($allTargetLanguageLocales);
-    
-    // the lowest number of characters that any of the LanguageResources can handle
-    // is our limit for what the user is allowed to enter:
-    if(empty($allCharacterLimits)) {
-        $characterLimit = 3;
-    }
-    else {
-        $characterLimit = min($allCharacterLimits);
-    }
     $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
     // see View_Helper_LanguageSelector
@@ -183,7 +147,7 @@ END LICENSE AND COPYRIGHT
                 }
                 $optionValues=[];
                 $sourceLangSelected=strtolower($sourceLangSelected);
-                foreach ($allSourceLanguageLocales as $sourceLangLocale => $displayLanguage) {
+                foreach ($this->allSourceLanguageLocales as $sourceLangLocale => $displayLanguage) {
                     $selected = ($sourceLangSelected != false && $sourceLangSelected == strtolower($sourceLangLocale)) ? ' selected="selected"' : '';
                     $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$displayLanguage.'</option>';
                 }
@@ -221,7 +185,7 @@ END LICENSE AND COPYRIGHT
                 }
                 $optionValues=[];
                 $targetLangSelected=strtolower($targetLangSelected);
-                foreach ($allTargetLanguageLocales as $targetLangLocale => $displayLanguage) {
+                foreach ($this->allTargetLanguageLocales as $targetLangLocale => $displayLanguage) {
                     $selected = ($targetLangSelected != false && $targetLangSelected == strtolower($targetLangLocale)) ? ' selected="selected"' : '';
                     $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$displayLanguage.'</option>';
                 }
@@ -299,7 +263,7 @@ END LICENSE AND COPYRIGHT
 
     $(document).ready(function(){
         initGui(
-            '<?php echo $characterLimit;?>',
+            '<?php echo $this->characterLimit;?>',
             <?php echo json_encode($this->allPretranslatedFiles); ?>,
             <?php echo json_encode($this->dateAsOf); ?>,
             <?php echo ($devPreventInstantTranslate) ? 'true' : 'false'; ?>

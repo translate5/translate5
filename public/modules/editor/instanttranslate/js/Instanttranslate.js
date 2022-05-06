@@ -517,7 +517,6 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
         languageResourceId,
         toCheck,
         langSet,
-        useSub = Editor.data.instanttranslate.showSublanguages,
         allToAdd;
 
     for (languageResourceId in Editor.data.apps.instanttranslate.allLanguageResources) {
@@ -537,8 +536,7 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
                 //prevent duplicates
                 notAdded = ($.inArray(toAdd, localesAvailable) === -1);
             
-            //respect showSublanguages config too
-            if (!isSame && notAdded && (useSub || !/-/.test(toAdd))) {
+            if (!isSame && notAdded) {
                 localesAvailable.push(toAdd);
             }
         });
