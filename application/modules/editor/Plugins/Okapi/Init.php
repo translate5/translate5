@@ -339,7 +339,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_TaskController', 'beforeProcessUploadedFile', [$this, 'addBconfIdToTaskMeta']);
 
         $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', [$this, 'handleCustomerAfterIndex']);
-        $this->eventManager->attach('Editor_CustomerController', 'beforePutAction', [$this, 'handleCustomerBeforePut']);
+        $this->eventManager->attach('Editor_CustomerController', 'afterPutAction', [$this, 'handleCustomerAfterPut']);
     }
 
     /**
@@ -690,8 +690,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      * @return void
      */
-    public function handleCustomerBeforePut(Zend_EventManager_Event $event) {
-        $data = json_decode($event->getParam('params')['data'],true);
+    public function handleCustomerAfterPut(Zend_EventManager_Event $event) {
+        /** @var Zend_Controller_Request_Abstract $request */
+        $request = $event->getParam('request');
+        $data = json_decode($request->getParam('data'),true);
         @['id' => $customerId, 'defaultBconfId' => $bconfId] = $data;
         if($customerId && $bconfId){
             $customerMeta = new editor_Models_Customer_Meta();
@@ -701,7 +703,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 $customerMeta->init(['customerId' => $customerId]); // new entity
             }
             $customerMeta->setDefaultBconfId($bconfId);
-            $customerMeta->save(); // QUIRK: triggers SELECT after UPDATE
+            $customerMeta->save();
         }
     }
 

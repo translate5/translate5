@@ -99,38 +99,40 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         }
     },
     addBconfToCustomerPanel: function(tabPanel){
-        // create filtered store from bconfStore & apply it to the grid's view-model
-        var vm = tabPanel.up('[viewModel]').getViewModel();
-        var vmStores = vm.storeInfo || {};
-        vmStores.customersBconfStore = {
-            source: 'bconfStore',
-            storeId: 'customersBconfStore',
-            filters: [{
-                id: 'clientFilter',
-                property: 'customerId',
-                value: '{list.selection}',
-                filterFn: function({data}){
-                    return !data.customerId || (this._value && this._value.id === data.customerId);
+        if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
+            // create filtered store from bconfStore & apply it to the grid's view-model
+            var vm = tabPanel.up('[viewModel]').getViewModel();
+            var vmStores = vm.storeInfo || {};
+            vmStores.customersBconfStore = {
+                source: 'bconfStore',
+                storeId: 'customersBconfStore',
+                filters: [{
+                    id: 'clientFilter',
+                    property: 'customerId',
+                    value: '{list.selection}',
+                    filterFn: function ({data}) {
+                        return !data.customerId || (this._value && this._value.id === data.customerId);
+                    },
+                }],
+                sorters: [{
+                    property: 'customerId',
+                    direction: 'DESC'
+                }, {
+                    property: 'name',
+                }]
+            };
+            vm.setStores(vmStores);
+            // add the bconf grid to the tabPanel and bind it to the customer
+            tabPanel.insert(2, {
+                xtype: 'okapiBconfGrid',
+                bind: {
+                    customer: '{list.selection}', // list is reference name of customerGrid
+                    store: '{customersBconfStore}'
                 },
-            }],
-            sorters: [{
-                property: 'customerId',
-                direction: 'DESC'
-            }, {
-                property: 'name',
-            }]
-        };
-        vm.setStores(vmStores);
-        // add the bconf grid to the tabPanel and bind it to the customer
-        tabPanel.insert(2, {
-            xtype: 'okapiBconfGrid',
-            bind: {
-                customer: '{list.selection}', // list is reference name of customerGrid
-                store: '{customersBconfStore}'
-            },
-            isCustomerGrid: true,
-        });
-        tabPanel.setActiveTab(0);
+                isCustomerGrid: true,
+            });
+            tabPanel.setActiveTab(0);
+        }
     },
     addBconfComboToTaskMainCard: function(taskMainCard){
         taskMainCard.down('#taskMainCardContainer').add({
