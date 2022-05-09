@@ -357,7 +357,22 @@ function getLanguageCombinations(languageResource) {
  * @returns boolean
  */
 function isAvailableLocale(localeToCheck, allLocalesAvailable) {
-    return $.inArray(localeToCheck, allLocalesAvailable) !== -1;
+    var useSub = Editor.data.instanttranslate.showSublanguages,
+        hasLang = false;
+
+    if(useSub){
+        return $.inArray(localeToCheck, allLocalesAvailable) !== -1;
+    }
+
+    // when no sublangauges are used, use fuzzy matching on localeToCheck, since in the backend fuzzy latching will be used as well
+    $.each(allLocalesAvailable, function(index) {
+        var locale = allLocalesAvailable[index];
+        hasLang = localeToCheck === locale.split('-')[0];
+        if(hasLang){
+            return false;
+        }
+    });
+    return hasLang;
 }
 /**
  * Which fileTypes are allowed?
@@ -488,8 +503,21 @@ function hasEnginesForLanguageCombination() {
  * @returns {Boolean}
  */
 function isSourceTargetAvailable(sourceRfc,targetRfc){
-    var targetLocalesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceRfc);
-    return targetLocalesAvailable.indexOf(targetRfc) !== -1;
+    var targetLocalesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceRfc),
+        useSub = Editor.data.instanttranslate.showSublanguages,
+        hasLang = false;
+    if(useSub){
+        return targetLocalesAvailable.indexOf(targetRfc) !== -1;
+    }
+    // when no sublangauges are used, use fuzzy matching on localeToCheck, since in the backend fuzzy latching will be used as well
+    $.each(targetLocalesAvailable, function(index) {
+        var locale = targetLocalesAvailable[index];
+        hasLang = targetRfc === locale.split('-')[0];
+        if(hasLang){
+            return false;
+        }
+    });
+    return hasLang;
 }
 
 /***
@@ -525,7 +553,7 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
         }
         toCheck = Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId];
         langSet = (accordingTo === 'accordingToSourceLocale') ? toCheck.source : toCheck.target;
-        if (!isAvailableLocale(selectedLocale, langSet)) {
+        if (!isAvailableLocale(selectedLocale, langSet)){
             continue;
         }
         allToAdd = (accordingTo === 'accordingToSourceLocale') ? toCheck.target : toCheck.source;
