@@ -183,7 +183,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                             store: '{bconfImportWizard}', // QUIRK: artificial dependency to wait for store being filtered by bound customerId
                         },
                         get: function({customer, store}){
-                            return customer && customer.get('defaultBconfId') || this.globalDefaultId ||
+                            return (customer && customer.get('defaultBconfId')) || this.globalDefaultId ||
                                 //FIXME: find better way to (pre)calculate global default, maybe global variable
                                 (this.globalDefaultId = store.getData().findBy(({data: bconf}) => bconf.isDefault).id);
                         }

@@ -531,9 +531,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
                 fieldLabel: me.strings.customerLabel + '¹'
             });
         }
-        comboBox.on('focus', function(){
-            comboBox.getTrigger('picker').el.dom.click();
-        }, null, {single:true, delay: 100});
     },
 
     onEditorAdminTaskPreferencesRender: function (component) {
