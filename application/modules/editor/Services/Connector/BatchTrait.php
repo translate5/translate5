@@ -109,20 +109,39 @@ trait editor_Services_Connector_BatchTrait {
                 'tagMap' => $this->tagHandler->getTagMap(),
             ];
 
-            $bufferSize+= $this->getQuerySegmentSize($querySegment);
+            // collect the segment size in bytes in temporary variable
+            $bufferSize += $this->getQuerySegmentSize($querySegment);
+            // is the collected buffer size above the allowed limit (if the buffer size limit is not allowed for the resource, this will return true)
+            $allowByContent = $this->isAllowedByContentSize($bufferSize);
 
-            if(++$tmpBuffer != $this->batchQueryBuffer && $this->isAllowedByContentSize($bufferSize)){
+            if(++$tmpBuffer != $this->batchQueryBuffer && $allowByContent){
                 continue;
             }
 
-            //send batch query request, and save the results to the batch cache
-            $this->handleBatchQuerys($batchQuery);
-            
-            $progressCallback && $progressCallback($progress);
+            // if the content is above the allowed buffer, remove the last segment from the batchQuery, and save it for the next loop
+            if($allowByContent === false){
+                // get the last query segment
+                $resetBuffer = $batchQuery[count($batchQuery)-1];
+                // remove the last query segment from the array (since the size is over the allowed limit)
+                array_pop($batchQuery);
+                //send batch query request, and save the results to the batch cache
+                $this->handleBatchQuerys($batchQuery);
+                $progressCallback && $progressCallback($progress);
+                $batchQuery = [];
+                $batchQuery[] = $resetBuffer;
 
-            $batchQuery = [];
-            $tmpBuffer=0;
-            $bufferSize = 0;
+                // set the current buffer size to the last segment size
+                $bufferSize = $this->getQuerySegmentSize($querySegment);
+            }else{
+                //send batch query request, and save the results to the batch cache
+                $this->handleBatchQuerys($batchQuery);
+
+                $progressCallback && $progressCallback($progress);
+
+                $batchQuery = [];
+                $bufferSize = 0;
+            }
+            $tmpBuffer = 0;
         }
         
         //query the rest, if there are any:
