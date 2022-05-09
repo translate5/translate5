@@ -119,7 +119,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         });
     },
     isDeleteDisabled: function({grid}, rowIndex, colIndex, item, {data: bconf}){
-        return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === grid.SYSTEM_BCONF_NAME;
+        return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === Editor.data.plugins.Okapi.systemDefaultBconfName;
     },
     isSRXUploadDisabled: function(view, rowIndex, colIndex, item, record){
         return view.ownerGrid.isCustomerGrid && !record.get('customerId');
@@ -243,7 +243,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         var grid = this.getView(),
             {name, customerId} = cellContext.record.getData();
         grid.view.select(cellContext.record);
-        if(name === grid.SYSTEM_BCONF_NAME || grid.isCustomerGrid && !customerId){
+        if(name === Editor.data.plugins.Okapi.systemDefaultBconfName || grid.isCustomerGrid && !customerId){
             return false; // Can't change system default and globals bconfs in customer view
         }
         if(cellContext.field === 'name'){

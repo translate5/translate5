@@ -74,10 +74,6 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
     bconfPanel: null,
     // shows the preference panel in the preferences (bconf-section is shown via 'showBconfInOverviewPanel' afterwards)
     onBconfRoute: function(){
-
-        console.log('onBconfRoute');
-
-
         if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
             // QUIRK: just to make sure, not the same thing can happen as with Quirk in ::showBconfInOverviewPanel
             var pop = this.getPreferencesOverviewPanel();
@@ -103,17 +99,18 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         }
     },
     addBconfToCustomerPanel: function(tabPanel){
+        // create filtered store from bconfStore & apply it to the grid's view-model
         var vm = tabPanel.up('[viewModel]').getViewModel();
         var vmStores = vm.storeInfo || {};
-        vmStores.bconfCustomer = {
+        vmStores.customersBconfStore = {
             source: 'bconfStore',
-            storeId: 'bconfCustomer',
+            storeId: 'customersBconfStore',
             filters: [{
                 id: 'clientFilter',
                 property: 'customerId',
-                value: '{list.selection.id}',
+                value: '{list.selection}',
                 filterFn: function({data}){
-                    return !data.customerId || this._value == data.customerId;
+                    return !data.customerId || (this._value && this._value.id === data.customerId);
                 },
             }],
             sorters: [{
@@ -124,12 +121,12 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             }]
         };
         vm.setStores(vmStores);
-
+        // add the bconf grid to the tabPanel and bind it to the customer
         tabPanel.insert(2, {
             xtype: 'okapiBconfGrid',
             bind: {
                 customer: '{list.selection}', // list is reference name of customerGrid
-                store: '{bconfCustomer}'
+                store: '{customersBconfStore}'
             },
             isCustomerGrid: true,
         });
@@ -163,10 +160,10 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                         autoLoad: true,
                         filters: [{
                             filterFn: function({data: bconf}){
-                                return !bconf.customerId || this._value == bconf.customerId;
+                                return !bconf.customerId || (this._value && this._value.id === bconf.customerId);
                             },
                             property: 'customerId',
-                            value: '{customer.selection.id}'
+                            value: '{customer.selection}'
                         }],
                         sorters: [{
                             property: 'customerId',
@@ -179,13 +176,14 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                 formulas: {
                     defaultBconf: {
                         bind: {
-                            customer: '{customer.selection}',
-                            store: '{bconfImportWizard}', // QUIRK: artificial dependency to wait for store being filtered by bound customerId
+                            customer: '{customer.selection}'
                         },
-                        get: function({customer, store}){
-                            return (customer && customer.get('defaultBconfId')) || this.globalDefaultId ||
-                                //FIXME: find better way to (pre)calculate global default, maybe global variable
-                                (this.globalDefaultId = store.getData().findBy(({data: bconf}) => bconf.isDefault).id);
+                        get: function({customer}){
+                            if(customer && customer.get('defaultBconfId')){
+                                return customer.get('defaultBconfId');
+                            }
+                            // the system default bconf id is part of the global data
+                            return Editor.data.plugins.Okapi.systemDefaultBconfId;
                         }
                     }
                 }
