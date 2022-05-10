@@ -239,6 +239,9 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     name: 'name',
                                     allowBlank: false,
                                     maxLength: 255,
+                                    bind:{
+                                        readOnly: '{record.isDefaultCustomer}'
+                                    },
                                     minLength: 1
                                 },
                                 {
@@ -246,6 +249,9 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     fieldLabel: me.strings.customerNumber,
                                     name: 'number',
                                     allowBlank: false,
+                                    bind:{
+                                        readOnly: '{record.isDefaultCustomer}'
+                                    },
                                     maxLength: 255
                                 },{
                                     xtype:'textfield',
@@ -254,7 +260,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     reference:'customerDomain',
                                     publishes:'value',
                                     bind:{
-                                        visible:'{!isOpenIdHidden}'
+                                        visible: '{!isOpenIdHidden}'
                                     },
                                     itemId:'openIdDomain'
                                 }]

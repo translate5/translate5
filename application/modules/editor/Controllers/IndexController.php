@@ -327,6 +327,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $this->view->Php2JsVars()->set('frontend.changeUserThemeVisible', (bool)$rop->frontend->changeUserThemeVisible);
 
+        // to identify the default customer in the frontend
+        $this->view->Php2JsVars()->set('customers.defaultCustomerName', 'defaultcustomer');
         //is the openid data visible for the default customer
         $this->view->Php2JsVars()->set('customers.openid.showOpenIdDefaultCustomerData', (boolean)$rop->customers->openid->showOpenIdDefaultCustomerData);
 

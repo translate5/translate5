@@ -16,6 +16,10 @@
     <source>Name</source>
     <target>Name</target>
 </trans-unit>
+<trans-unit id='RWluZGV1dGlnZXIgTmFtZQ=='>
+    <source>Eindeutiger Name</source>
+    <target>Unique name</target>
+</trans-unit>
 <trans-unit id='RXJ3ZWl0ZXJ1bmdlbg=='>
     <source>Erweiterungen</source>
     <target>Extensions</target>
