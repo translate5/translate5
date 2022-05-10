@@ -112,7 +112,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         $bconf->importDefaultWhenNeeded();
 
         $systemBconf = new editor_Plugins_Okapi_Models_Bconf();
-        $systemBconf->loadRow('name = ? ', $bconf::SYSTEM_BCONF_NAME);
+        $systemBconf->loadRow('name = ? ', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
         $systemBconf->setName('NotSystemBconfAnymore-' . time() . rand()); // Unmark as system bconf
         $systemBconf->save();
 
@@ -124,8 +124,8 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         $autoImportFailureMsg = 'AutoImport of missing system bconf failed.';
         self::assertEquals($total + 1, $newTotal, $autoImportFailureMsg . ' Totalcount not increased');
         $newSystemBconf = new editor_Plugins_Okapi_Models_Bconf();
-        $newSystemBconf->loadRow('name = ? ', $bconf::SYSTEM_BCONF_NAME);
-        self::assertEquals($newSystemBconf->getName(), $bconf::SYSTEM_BCONF_NAME, $autoImportFailureMsg . " No record name matches '" . $bconf::SYSTEM_BCONF_NAME . "'");
+        $newSystemBconf->loadRow('name = ? ', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
+        self::assertEquals($newSystemBconf->getName(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME, $autoImportFailureMsg . " No record name matches '" . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME . "'");
         $newBconfFile = $newSystemBconf->getFilePath();
         self::assertFileExists($newBconfFile, $autoImportFailureMsg . " File '$newBconfFile' does not exist");
 
@@ -154,7 +154,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         $newSystemBconfDir = $newSystemBconf->getDir();
         $newSystemBconf->setName('ToDelete-' . time() . rand());
         $newSystemBconf->save();
-        $systemBconf->setName($bconf::SYSTEM_BCONF_NAME);
+        $systemBconf->setName(editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
         $systemBconf->save();
 
         $newSystemBconf->deleteDirectory($newSystemBconf->getId());

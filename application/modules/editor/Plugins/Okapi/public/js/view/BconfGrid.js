@@ -36,8 +36,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     alias: 'widget.okapiBconfGrid',
     plugins: ['cellediting'],
     itemId: 'okapiBconfGrid',
-    /** @const {string} SYSTEM_BCONF_NAME */
-    SYSTEM_BCONF_NAME: 'Translate5-Standard',
     controller: 'bconfGridController',
     store: 'bconfStore',
     isCustomerGrid: false,
@@ -48,7 +46,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         beforeedit: 'handleBeforeedit'
     },
     config: {
-        customer: null,
+        customer: null
     },
     text_cols: {
         name: '#UT#Name',
@@ -84,19 +82,21 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         invalidTitle: '#UT#Ungültige {}-Datei',
         invalidMsg: '#UT#Die hochgeladene Datei ist keine gültige {}-Datei.',
         name: '#UT#Name',
-        nameUnique: '#UT#Dieser Name ist schon vergeben',
+        uniqueName: '#UT#Eindeutiger Name',
+        nameExists: '#UT#Dieser Name ist schon vergeben',
         newBconf: '#UT#Neue Bconf-Datei',
         editBconf: '#UT#Bconf-Datei bearbeiten'
     },
     viewConfig: {
         enableTextSelection: true, // neccessary for pointer class to have effect on whole row
         getRowClass: function({data: bconf}){
-            var cls = '', customer = this.grid.customer?.getData() || {};
-            if(bconf.customerId == customer.id){
+            var cls = '',
+                customer = this.grid.customer;
+            if(customer && customer.get('id') === bconf.customerId){
                 cls += ' pointer ';
             } //else not editable
-            if(customer.defaultBconfId ? customer.defaultBconfId == bconf.id : bconf.isDefault){
-                cls += ' chosenDefault '
+            if((customer && customer.get('defaultBconfId')) ? (customer.get('defaultBconfId') === bconf.id) : bconf.isDefault){
+                cls += ' chosenDefault ';
             }
             return cls;
         }
@@ -149,7 +149,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 // QUIRK: This is a purely synthetic column that renders based on the associated customer, so no dataIndex is set
                 // This is way easier than trying to model this dynamic relation canonically
                 renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
-                    arguments[0] = record.id == view.grid.customer.get('defaultBconfId'); // customer is always set, else panel wouldn't be active
+                    this.disabled = view.grid.customer.get('isDefaultCustomer');
+                    arguments[0] = (record.id === view.grid.customer.get('defaultBconfId')); // customer is always set, else panel wouldn't be active
                     return this.defaultRenderer.apply(this, arguments);
                 },
                 listeners: {
@@ -168,14 +169,15 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                             customer = view.grid.getCustomer(),
                             oldDefaultId = customer.get('defaultBconfId'),
                             isSelect = oldDefaultId !== clicked.id, // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
-                            id2Refresh = isSelect && oldDefaultId ? customer.get('defaultBconfId')
-                                : store.findRecord('name', view.grid.SYSTEM_BCONF_NAME, 0, false, true, true).id;
+                            id2Refresh = (isSelect && oldDefaultId) ? customer.get('defaultBconfId') : Editor.data.plugins.Okapi.systemDefaultBconfId;
                         customer.set('defaultBconfId', isSelect ? clicked.id : 0); // TODO: why doesn't {commit:true} trigger save but even prevent it?!
                         customer.save();
                         view.refresh(clicked);
                         if(id2Refresh !== clicked.id){
                             var oldDefaultRec = store.getById(id2Refresh);
-                            oldDefaultRec && view.refreshNode(oldDefaultRec)
+                            if(oldDefaultRec){
+                                view.refreshNode(oldDefaultRec);
+                             }
                         }
                         return false; // checked state handled manually via view.refresh
                     }
@@ -189,8 +191,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 tooltip: '', // QUIRK: needed to work
                 disabled: instanceConfig.isCustomerGrid,
                 width: 95,
-                renderer: function
-                    (isDefault, metaData, record, rowIdx, colIdx, store, view){
+                renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
                     var grid = view.ownerGrid;
                     if(!isDefault && !grid.isCustomerGrid){
                         metaData.tdCls += ' pointer ';
@@ -209,7 +210,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                             } else if(checked){ // must uncheck old default
                                 oldDefault = store.getAt(store.findBy(({data}) => data.isDefault && !data.customerId));
                                 if(oldDefault && oldDefault !== record){
-                                    oldDefault.set('isDefault', false)
+                                    oldDefault.set('isDefault', false);
                                 }
                             }
                         }
@@ -315,7 +316,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     width: 'auto',
                     handler: function(btn){
                         Editor.util.Util.chooseFile('.bconf')
-                            .then(files => btn.up('grid').getController().uploadBconf(files[0]))
+                            .then(files => btn.up('grid').getController().uploadBconf(files[0]));
                     }
                 },
                 {

@@ -119,7 +119,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         });
     },
     isDeleteDisabled: function({grid}, rowIndex, colIndex, item, {data: bconf}){
-        return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === grid.SYSTEM_BCONF_NAME;
+        return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === Editor.data.plugins.Okapi.systemDefaultBconfName;
     },
     isSRXUploadDisabled: function(view, rowIndex, colIndex, item, record){
         return view.ownerGrid.isCustomerGrid && !record.get('customerId');
@@ -191,7 +191,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
 
     promptUniqueBconfName: function(nameToPrefill = '', allowedRec = null){
         var grid = this.getView(),
-            {name, nameUnique, newBconf, editBconf} = grid.strings,
+            {uniqueName, nameExists, newBconf, editBconf} = grid.strings,
             bconfs = Ext.getStore('bconfStore').getData();
         return new Promise(function(resolve, reject){
             var panel = new Ext.form.Panel({
@@ -208,10 +208,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                 },
                 items: [{
                     xtype: 'textfield',
-                    fieldLabel: name,
+                    fieldLabel: uniqueName,
                     width: 300,
                     selectOnFocus: true,
-                    labelSeparator: '?',
+                    labelSeparator: ':',
                     labelWidth: 70,
                     lastVal: ['', false],
                     value: nameToPrefill,
@@ -222,7 +222,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                             return this.lastVal[1];
                         }
                         var existingRec = v && bconfs.find('name', v, 0, true, true, true);
-                        var ret = !existingRec || existingRec === allowedRec || nameUnique; //...start, startsWith, endsWith, ignoreCase
+                        var ret = !existingRec || existingRec === allowedRec || nameExists; //...start, startsWith, endsWith, ignoreCase
                         this.lastVal = [v, ret]; // cache validation result
                     },
                     listeners: {
@@ -243,7 +243,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         var grid = this.getView(),
             {name, customerId} = cellContext.record.getData();
         grid.view.select(cellContext.record);
-        if(name === grid.SYSTEM_BCONF_NAME || grid.isCustomerGrid && !customerId){
+        if(name === Editor.data.plugins.Okapi.systemDefaultBconfName || grid.isCustomerGrid && !customerId){
             return false; // Can't change system default and globals bconfs in customer view
         }
         if(cellContext.field === 'name'){
