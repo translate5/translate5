@@ -82,7 +82,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         invalidTitle: '#UT#Ungültige {}-Datei',
         invalidMsg: '#UT#Die hochgeladene Datei ist keine gültige {}-Datei.',
         name: '#UT#Name',
-        nameUnique: '#UT#Dieser Name ist schon vergeben',
+        uniqueName: '#UT#Eindeutiger Name',
+        nameExists: '#UT#Dieser Name ist schon vergeben',
         newBconf: '#UT#Neue Bconf-Datei',
         editBconf: '#UT#Bconf-Datei bearbeiten'
     },
