@@ -10,60 +10,6 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
-
-
-
-
-
-
-
-## [5.7.1] - 2022-05-05
-
-### Important Notes:
-#### [TRANSLATE-2931](https://jira.translate5.net/browse/TRANSLATE-2931)
-Remove Support for bconf files included in Import Archives
-
-#### [TRANSLATE-2884](https://jira.translate5.net/browse/TRANSLATE-2884)
-A new role systemadmin is added, to be used only for technical people and translate5 system administrators. Read below the details for usage and what it enables.
- 
-
-
-### Changed
-**[TRANSLATE-2960](https://jira.translate5.net/browse/TRANSLATE-2960): VisualReview / VisualTranslation - Enable Markup processing in Subtitle Import parsers** <br>
-Visual Video: Enable markup protection in internal tags as well as whitespace  for the import
-
-**[TRANSLATE-2931](https://jira.translate5.net/browse/TRANSLATE-2931): Okapi integration, Task Management - Import file format and segmentation settings - Bconf Management (Milestone 1)** <br>
-Translate5 can now manage Okapi BatchConfiguration files - needed for configuring the import file filters. Admins and PMs can upload, download, rename Bconfs and upload and download contained SRX files in the new 'File format and segmentation settings' grid under 'Preferences'. It is also available under 'Clients' to easily handle specific requirements of different customers. You can also set a default there, which overrides the one from the global perspective. During Project Creation a dropdown menu presents the available Bconf files for the chosen client, preset with the configured default. The selected one is then passed to Okapi on import.
-
-**[TRANSLATE-2901](https://jira.translate5.net/browse/TRANSLATE-2901): InstantTranslate - Languageresource type filter in instanttranslate API** <br>
-ENHANCEMENT: Added filters to filter InstantTranslate API for language resource types and id's. See https://confluence.translate5.net/display/TAD/InstantTranslate for details
-
-FIX: fixed whitespace-rendering in translations when Translation Memories were requested and text to translate was segmented therefore
-
-**[TRANSLATE-2884](https://jira.translate5.net/browse/TRANSLATE-2884): Main back-end mechanisms (Worker, Logging, etc.) - Further restrict nightly error mail summaries** <br>
-A new role systemadmin is added, to be used only for technical people and translate5 system administrators. 
-Only users with that role will receive the nightly error summary e-mail in the future (currently all admins). Only systemadmins can set the role systemadmin and api.
-For hosted clients: contact us so that we can enable the right for desired users.
-For on premise clients: the role must be added manually in the DB to one user. With that user the role can then be set on other users.
-
-
-### Bugfixes
-**[TRANSLATE-2961](https://jira.translate5.net/browse/TRANSLATE-2961): Editor general - Error on repetition save** <br>
-Solves a problem where an error happens in the UI after saving repetitions with repetition editor.
-
-**[TRANSLATE-2959](https://jira.translate5.net/browse/TRANSLATE-2959): OpenId Connect - Overlay for SSO login auto-redirect** <br>
-Adds overlay when auto-redirecting with SSO authentication.
-
-**[TRANSLATE-2957](https://jira.translate5.net/browse/TRANSLATE-2957): OpenId Connect - Missing default text on SSO button** <br>
-When configuring SSO via OpenID no default button text is provided, therefore the SSO Login button may occur as button without text - not recognizable as button then.
-
-**[TRANSLATE-2910](https://jira.translate5.net/browse/TRANSLATE-2910): TermPortal, User Management - Role rights for approval workflow of terms in the TermPortal** <br>
-Terms/attributes editing/deletion access logic reworked for Term Proposer, Term Reviewer and Term Finalizer roles
-
-**[TRANSLATE-2558](https://jira.translate5.net/browse/TRANSLATE-2558): Editor general - Task focus after login** <br>
-On application load always the first project was selected, instead the one given in the URL. This is fixed now. Other application parts (like preferences or clients) can now also opened directly after application start by passing its section in the URL.
-
-
 ## [5.7.0] - 2022-04-26
 
 ### Important Notes:
