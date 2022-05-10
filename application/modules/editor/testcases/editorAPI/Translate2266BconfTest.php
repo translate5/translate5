@@ -49,7 +49,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         self::assertNotEmpty($okapi->dataDir, self::OKAPI_CONFIG . ".dataDir not set");
         self::assertNotEmpty($okapi->api->url, self::OKAPI_CONFIG . ".api.url not set");
 
-        $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getBconfStaticDataDir(), editor_Plugins_Okapi_Models_Bconf::SYSTEM_BCONF_IMPORTFILE);
+        $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getBconfStaticDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
         self::assertFileExists($t5defaultImportBconf,
             "File '$t5defaultImportBconf' missing. As the Translate5 provided default import .bconf file for Okapi Task Imports it must exist!");
 
