@@ -1,3 +1,0 @@
-Das ist ein Satz.
-Das ist ein Test.
-Das ist der Rest.
