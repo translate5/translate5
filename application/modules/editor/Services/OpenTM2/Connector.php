@@ -47,6 +47,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @var editor_Services_Connector_TagHandler_Xliff
      */
     protected $tagHandler;
+
+    /**
+     *  Is the connector generally able to support internal Tags for the translate-API
+     * @var bool
+     */
+    protected $internalTagSupport = true;
     
     public function __construct() {
         editor_Services_Connector_Exception::addCodes([
@@ -329,6 +335,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_Abstract::translate()
      */
     public function translate(string $searchString){
+
         //return empty result when no search string
         if(empty($searchString) && $searchString !== "0") {
             return $this->resultList;
@@ -340,7 +347,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         /* @var $dummySegment editor_Models_Segment */
         $dummySegment->init();
 
-        if($this->api->lookup($dummySegment, $this->tagHandler->prepareQuery($searchString), 'source')){
+        $query = $this->tagHandler->prepareQuery($searchString);
+
+        if($this->api->lookup($dummySegment, $query, 'source')){
             $result = $this->api->getResult();
             if((int)$result->NumOfFoundProposals === 0){
                 return $this->resultList;
