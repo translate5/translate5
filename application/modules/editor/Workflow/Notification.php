@@ -461,13 +461,20 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
 
         // Create notification
         $this->createNotification(ACL_ROLE_PM, __FUNCTION__, [
-            'project' => $this->config->task,
+            'project' => $project = $this->config->task,
             'user' => (array) $user->getDataObject(),
         ]);
 
-        // Do we need this ?
-        //$triggerConfig = $this->initTriggerConfig(func_get_args());
-        //$this->addCopyReceivers($triggerConfig, editor_Workflow_Default::STEP_PM_CHECK);
+        // Get trigger config
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
+
+        // If notification should be sent only for specific project types, but current one is not like that
+        if (is_array($triggerConfig->projectTypes ?? null)
+            && !in_array($project->getTaskType()->id(), $triggerConfig->projectTypes)) {
+
+            // Prevent notification from being sent
+            return;
+        }
 
         // Do notify
         $this->notifyUser($user);
