@@ -1492,7 +1492,6 @@ function swapLanguages(){
     if(results.length > 0) {
         // set the source textarea text, therfore markup must be removed and breaktags restored
         var text = unescapeHtml(results.first().html());
-        console.log('RESULT', text);
         $('#sourceText').val(text);
     }
     $('#translations').hide();
