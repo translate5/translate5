@@ -191,7 +191,7 @@ class editor_Services_Connector {
             }
         } else if($this->adapter->canTranslateInternalTags()) {
 
-            // when the connector is able to process the internal T% format for segment text we convert the raw markup and reconvert it after translation
+            // when the connector is able to process the internal T5 format for segment text we convert the raw markup and reconvert it after translation
             // we use the utilities broker that is already instantiated in the concrete connector
             $utilities = $this->adapter->getTagHandler()->getUtilities();
             // protect tags to t5 internal tags & convert whitespace to t5 whitespace tags, which then can be processed by the resource
