@@ -99,8 +99,17 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         return '';
     }
 
-    public editor_Plugins_Okapi_Bconf_File $file;
+    /**
+     * @var editor_Plugins_Okapi_Bconf_File
+     */
+    public $file = NULL;
+    /**
+     * @var string
+     */
     private string $dir = '';
+    /**
+     * @var bool
+     */
     private bool $isNewRecord = false; // flag for newly created entities
 
     protected $dbInstanceClass = 'editor_Plugins_Okapi_Models_Db_Bconf';
@@ -137,9 +146,8 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
                 $errorMsg = "Could not create directory for bconf (in runtimeOptions.plugins.Okapi.dataDir)";
                 throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $errorMsg]);
             }
-            $this->file = new editor_Plugins_Okapi_Bconf_File($this);
-            $this->file->unpack($postFile['tmp_name']);
-            $this->file->pack();
+            $this->getFile()->unpack($postFile['tmp_name']);
+            $this->getFile()->pack();
             $this->isNewRecord = false;
         }
     }
@@ -152,66 +160,70 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
-     * @param editor_Plugins_Okapi_Bconf_File $file
+     * Retrieves if the bconf is the system default bconf
+     * @return bool
      */
-    public function setFile(editor_Plugins_Okapi_Bconf_File $file): void {
-        $this->file = $file;
+    public function isSystemDefault(): bool {
+        return ($this->getName() === editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
     }
 
     /**
-     * @return bool - true when system bconf was imported
+     * Retrieves, if a bconf is outdated and needs to be recompiled
+     * @return bool
+     */
+    public function isOutdated(): bool {
+        return ($this->getVersionIdx() < editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
+    }
+
+    /**
+     * Updates a bconf if the version-index is outdated with potentially changed default settings
+     */
+    public function repackIfOutdated() {
+        // TODO MILESTONE 2: We then need to re-pack every outdated bconf when accessing it -> remove sys-default check, change mechanic
+        if($this->isSystemDefault() && $this->isOutdated()){
+            $t5ProvidedImportBconf = editor_Plugins_Okapi_Init::getBconfStaticDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT;
+            $this->getFile()->unpack($t5ProvidedImportBconf);
+            $this->getFile()->pack();
+            $this->setVersionIdx(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
+            $this->save();
+        }
+    }
+
+    /**
+     * Lazy accessor for our file wrapper
+     * @return editor_Plugins_Okapi_Bconf_File
+     */
+    private function getFile(): editor_Plugins_Okapi_Bconf_File {
+        if($this->file == NULL){
+            $this->file = new editor_Plugins_Okapi_Bconf_File($this);
+        }
+        return $this->file;
+    }
+
+    /**
+     * @return editor_Plugins_Okapi_Models_Bconf|null
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
-    public function importDefaultWhenNeeded(int $totalCount = -1): bool {
-        if($totalCount === -1){
-            $totalCount = $this->getTotalCount();
-        }
-        $t5ProvidedImportBconf = editor_Plugins_Okapi_Init::getBconfStaticDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT;
-        $updateNeeded = false;
-        $insertNeeded = $totalCount === 0;
-        $bconf = null;
-        $id = 0;
-        if(!$insertNeeded){
-            $s = $this->db->select();
-            $versionSelect = $s->from($s->getTable(), ['id', 'versionIdx'])->where('name = ?', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
-            [$id, $systemVersion] = $versionSelect->limit(1)->query()->fetch(PDO::FETCH_NUM);
-            $insertNeeded = !$id; // there are bconfs, but not the t5 provided one
-            $updateNeeded = !$insertNeeded && $systemVersion < editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX;
-        }
-        if($updateNeeded){
-            $bconf = new self();
-            $bconf->load($id);
-            $bconf->file->unpack($t5ProvidedImportBconf);
-            $bconf->file->pack();
-        } else if($insertNeeded){
-            $bconf = new self(['tmp_name' => $t5ProvidedImportBconf, 'name' => 'Translate5-Standard.bconf']);
+    public function importDefaultWhenNeeded() {
+        $sysBconfRow = $this->db->fetchRow($this->db->select()->where('name = ?', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME));
+        // when the system default bconf does not exist we have to generate it
+        if($sysBconfRow == NULL){
+            $t5ProvidedImportBconf = editor_Plugins_Okapi_Init::getBconfStaticDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT;
+            $sysBconf = new self(['tmp_name' => $t5ProvidedImportBconf, 'name' => 'Translate5-Standard.bconf']);
+            $sysBconf->setDescription("The default .bconf used for file imports unless another one is configured");
+            $sysBconf->setVersionIdx(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
             if(!$this->db->fetchRow(['isDefault = 1'])){
-                $bconf->setIsDefault(1);
+                $sysBconf->setIsDefault(1);
             }
-            $bconf->setDescription("The default .bconf used for file imports unless another one is configured");
-        } else {
-            return false;
+            $sysBconf->save();
+            return $sysBconf;
         }
-        $bconf->setVersionIdx(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
-        $bconf->save();
-        return true;
+        return NULL;
     }
-
-    /**
-     * @param $id
-     * @return Zend_Db_Table_Row_Abstract|null
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     */
-    public function load($id) {
-        $ret = parent::load($id);
-        $this->file = new editor_Plugins_Okapi_Bconf_File($this);
-        return $ret;
-    }
-
     /**
      * @param string $id If given, gets the directory without loaded entity
      * @return string
@@ -238,7 +250,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
-     * @param null $customerId
+     * @param int $customerId
      * @return int $defaultBconfId
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_ErrorCodeException
@@ -248,24 +260,24 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
     public function getDefaultBconfId($customerId = null): int {
-        $this->importDefaultWhenNeeded();
-
-        $defaultBconfId = 0;
+        // if customer given, try to load customer-specific default bconf
         if($customerId){
             $customerMeta = new editor_Models_Customer_Meta();
             try {
                 $customerMeta->loadByCustomerId($customerId);
-                $defaultBconfId = $customerMeta->getDefaultBconfId();
+                return $customerMeta->getDefaultBconfId();
             } catch(ZfExtended_Models_Entity_NotFoundException){
             }
         }
-        if(!$defaultBconfId){
+        // try to load system default bconf
+        try {
             $this->loadRow('name = ? ', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
-            $defaultBconfId = $this->getId();
+            return $this->getId();
+        } catch(ZfExtended_Models_Entity_NotFoundException){
         }
-        return $defaultBconfId;
+        // if not found, generate it
+        return $this->importDefaultWhenNeeded()->getId();
     }
-
     /**
      * @param string $bconfId
      * @return void
@@ -298,7 +310,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      */
     public function srxNameFor(string $purpose): string {
         $purpose .= 'SrxPath';
-        $descFile = $this->getFilePath(fileName: $this->file::DESCRIPTION_FILE);
+        $descFile = $this->getFilePath(fileName: editor_Plugins_Okapi_Bconf_File::DESCRIPTION_FILE);
         $content = json_decode(file_get_contents($descFile), true);
 
         $srxFileName = $content['refs'][$purpose] ?? '';
