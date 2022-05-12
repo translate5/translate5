@@ -270,6 +270,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
+        $this->view->Php2JsVars()->set('segments.autoStates', $states->getStateMap());
         $this->view->Php2JsVars()->set('segments.roleAutoStateMap', $states->getRoleToStateMap());
 
         $tagPath = APPLICATION_RUNDIR . '/' . $rop->dir->tagImagesBasePath . '/';

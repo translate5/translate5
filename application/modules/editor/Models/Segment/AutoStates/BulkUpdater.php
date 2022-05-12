@@ -221,15 +221,9 @@ class editor_Models_Segment_AutoStates_BulkUpdater {
      * @param bool $edit100PercentMatch
      */
     public function updateSegmentsEdit100PercentMatch(editor_Models_Task $task, bool $edit100PercentMatch){
-        $segmentHistory = ZfExtended_Factory::get('editor_Models_SegmentHistory');
-        /* @var $segmentHistory editor_Models_SegmentHistory */
-        
         $autoState = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $autoState editor_Models_Segment_AutoStates */
-        
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $internalTag editor_Models_Segment_InternalTag */
-        
+
         // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
         //  since the first segment is loaded on construction, the construction must be directly before usage!
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$task->getTaskGuid()]);
@@ -237,67 +231,33 @@ class editor_Models_Segment_AutoStates_BulkUpdater {
         
         foreach ($segments as $segment){
             //we can ignore segments where the editable state is already as the desired $edit100PercentMatch state
-            // or where the matchrate is lower as 100% since such segments should always be editable and no blocked change is needed
+            // or where the matchrate is lower as 100% since such segments should always be editable and no locked change is needed
             if($segment->getEditable() == $edit100PercentMatch || $segment->getMatchRate() < 100){
                 continue;
             }
             
             //is locked config has precendence over all other calculations!
-            $isLocked = $segment->meta()->getLocked() && (bool) $task->getLockLocked();
             $history = $segment->getNewHistoryEntity();
-            $hasText = $internalTag->hasText($segment->getSource());
-            
-            //if we want editable 100% matches, the segment should be not ediable before, which is checked in the foreach head
-            // and not explicitly locked, and if source contains text:
-            if($edit100PercentMatch && !$isLocked && $hasText) {
 
-                // BLOCKED → to all previous non blocked and non untranslated states possible from history
-                $latest = $segmentHistory->loadLatestForSegment($segment->getId(), [
-                    'editable != ?' => 0,
-                    'autoStateId != ?' => $autoState::BLOCKED,
-                    'autoStateId != ?' => $autoState::NOT_TRANSLATED,
-                ]);
-                
-                //if nothing found in history, re calculate it
-                if(empty($latest)) {
-                    // BLOCKED → TRANSLATED     if target.length > 0 and pretrans = 0 (false)
-                    // BLOCKED → NOT_TRANSLATED if target.length == 0
-                    // BLOCKED → PRETRANSLATED  if target.length > 0 and pretrans > 0 (true)
-                    $isPretrans = (int) $segment->getPretrans() !== $segment::PRETRANS_NOTDONE;
-                    $autoStateId = $autoState->recalculateUnBlocked($segment->isTargetTranslated(), $isPretrans);
+            //if we want editable 100% matches, the segment should be not ediable before, which is checked in the foreach head
+            $changed = false;
+            if($edit100PercentMatch) {
+                if($autoState->recalculateAndSetOnUnlock($segment)) {
+                    $changed = true;
+                    $segment->setEditable(1);
                 }
-                else {
-                    $autoStateId = $latest['autoStateId'];
+            }
+            else {
+                if($autoState->recalculateAndSetOnLock($segment)) {
+                    $changed = true;
+                    $segment->setEditable($segment->getAutoStateId() != $autoState::LOCKED);
                 }
-                $segment->setAutoStateId($autoStateId);
-                $segment->setEditable(1);
             }
-            
-            //all other pretrans values mean that it was either modified (PRETRANS_TRANSLATED) or it was not pre-translated at all so it could not be a 100% match
-            $initialPretrans = $segment->getPretrans() == $segment::PRETRANS_INITIAL;
-            
-            $wasFromTM = editor_Models_Segment_MatchRateType::isFromTM($segment->getMatchRateType());
-            
-            //if we do NOT want editable 100% matches, the segment should be editable before, which is checked in the foreach head
-            // and not explicitly unlocked with autopropagation:
-            $allowToBlock = (!$segment->meta()->getAutopropagated() || $isLocked);
-            if(!$edit100PercentMatch && $allowToBlock && $initialPretrans && $wasFromTM) {
-                //if segment.pretrans = 1 and matchrate >= 100% (checked in head) and matchtype ^= import;tm
-                // then
-                // TRANSLATED → BLOCKED
-                // REVIEWED_UNTOUCHED → BLOCKED
-                // REVIEWED_UNCHANGED → BLOCKED
-                // REVIEWED_UNCHANGED_AUTO → BLOCKED
-                // REVIEWED_PM_UNCHANGED → BLOCKED
-                // REVIEWED_PM_UNCHANGED_AUTO → BLOCKED
-                // PRETRANSLATED → BLOCKED
-                $autoStateId = $autoState->recalculateBlocked($segment->getAutoStateId());
-                $segment->setAutoStateId($autoStateId);
-                $segment->setEditable($autoStateId != $autoState::BLOCKED);
+
+            if($changed) {
+                $history->save();
+                $segment->save();
             }
-            
-            $history->save();
-            $segment->save();
         }
         
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');

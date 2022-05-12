@@ -34,8 +34,18 @@ Ext.define('Editor.view.segments.GridViewController', {
         component: {
             '#toggleTaskDesc':{
                 toggle:'onToggleTaskDesc'
+            },
+            '#segmentgrid': {
+                select:'onSegmentGridSelect',
             }
         }
+    },
+    /**
+     * @param {Ext.selection.RowModel} rowmodel
+     * @param {Editor.model.Segment} segment
+     */
+    onSegmentGridSelect: function(rowmodel, segment) {
+        this.getViewModel().set('selectedSegment', segment);
     },
     onToggleTaskDesc: function(btn, toggled) {
         btn.setText(toggled ? btn.hideText : btn.showText);

@@ -680,6 +680,47 @@ class Editor_SegmentController extends ZfExtended_RestController
         throw new ZfExtended_BadMethodCallException(__CLASS__ . '->post');
     }
 
+    public function lockOperation() {
+        $this->getAction();
+        $this->toggleEditable(false);
+    }
+
+    public function unlockOperation() {
+        $this->getAction();
+        $this->toggleEditable(true);
+    }
+
+    /**
+     * lock / unlocks a segment
+     * @param bool $editable
+     * @throws editor_Models_Segment_Exception
+     */
+    protected function toggleEditable(bool $editable) {
+        $history = $this->entity->getNewHistoryEntity();
+        $task = editor_ModelInstances::taskByGuid($this->entity->getTaskGuid());
+
+        //if a segment is locked and lockLocked is set, the editable flag may not be changed
+        if($this->entity->meta()->getLocked() && (bool)$task->getLockLocked()) {
+            return;
+        }
+        $this->entity->setEditable($editable);
+
+        /* @var editor_Models_Segment_AutoStates $autoState */
+        $autoState = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        if($editable) {
+            $autoState->recalculateAndSetOnUnlock($this->entity);
+        }
+        else {
+            $autoState->recalculateAndSetOnLock($this->entity);
+        }
+
+        $history->save();
+        $this->entity->save();
+
+        //update the already flushed (on load outside) object
+        $this->view->rows = $this->entity->getDataObject();
+    }
+
     /**
      * returns the mapping between fileIds and segment row indizes
      * @return array

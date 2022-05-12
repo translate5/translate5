@@ -219,27 +219,6 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-zoomIn':    [[187, Ext.EventObjectImpl.NUM_PLUS],{ctrl: true, alt: false, shift: false}, me.handleZoomIn, true],
             'ctrl-zoomOut':   [[189, Ext.EventObjectImpl.NUM_MINUS],{ctrl: true, alt: false, shift: false}, me.handleZoomOut, true]
         };
-        
-        //FIXME let me come from the server out of AutoStates.php
-        Editor.data.segments.autoStates = {
-            'TRANSLATED': 0,
-            'REVIEWED': 1,
-            'REVIEWED_AUTO': 2,
-            'BLOCKED': 3,
-            'NOT_TRANSLATED': 4,
-            'REVIEWED_UNTOUCHED': 5,
-            'REVIEWED_UNCHANGED': 6,
-            'REVIEWED_UNCHANGED_AUTO': 7,
-            'REVIEWED_TRANSLATOR': 8,
-            'REVIEWED_TRANSLATOR_AUTO': 9,
-            'REVIEWED_PM': 10,
-            'REVIEWED_PM_AUTO': 11,
-            'REVIEWED_PM_UNCHANGED': 12,
-            'REVIEWED_PM_UNCHANGED_AUTO': 13,
-            'TRANSLATED_AUTO': 14,
-            'EDITING_BY_USER': 998,
-            'PENDING': 999
-        };
     },
     /**
      * track isEditing state 

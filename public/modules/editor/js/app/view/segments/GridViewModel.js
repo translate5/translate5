@@ -30,7 +30,8 @@ Ext.define('Editor.view.segments.GridViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.segmentsGrid',
     data: {
-        segmentFinishCount: null
+        segmentFinishCount: null,
+        selectedSegment: null
     },
     formulas: {
         taskDescription: function(){

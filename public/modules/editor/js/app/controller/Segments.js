@@ -146,6 +146,9 @@ Ext.define('Editor.controller.Segments', {
           '#clearSortAndFilterBtn': {
               click: 'clearSortAndFilter'
           },
+          'segmentsToolbar #segmentLockBtn': {
+              click: 'onToggleLockBtn'
+          },
           'segmentsToolbar #watchListFilterBtn': {
               click: 'watchListFilter'
           },
@@ -320,6 +323,19 @@ Ext.define('Editor.controller.Segments', {
       if (btn.pressed && otherFound) {
           Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
       }
+  },
+
+  onToggleLockBtn: function (button) {
+      let segment = button.lookupViewModel().get('selectedSegment'),
+          operation = segment.get('editable') ? 'lock' : 'unlock',
+          appendId = segment.proxy.appendId;
+
+      segment.proxy.appendId = false;
+      segment.load({
+          url: segment.proxy.url+'/'+segment.get('id')+'/'+operation+'/operation',
+          appendId: false
+      });
+      segment.proxy.appendId = appendId;
   },
   
   repeatedFilter: function (btn) {
