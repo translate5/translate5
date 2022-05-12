@@ -54,11 +54,15 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction() {
-        $this->view->total = $this->entity->getTotalCount();
-        if($this->entity->importDefaultWhenNeeded($this->view->total)){
-            $this->view->total += 1;
-        }
         $this->view->rows = $this->entity->loadAll();
+        $this->view->total = count($this->view->rows);
+        // auto-import of default-bconf: when there are no rows we can assume the feature was just installed and the DB is empty
+        // then we automatically add the system default bconf
+        if($this->view->total < 1){
+            $this->entity->importDefaultWhenNeeded();
+            $this->view->rows = $this->entity->loadAll();
+            $this->view->total = count($this->view->rows);
+        }
     }
 
     public function deleteAction() {

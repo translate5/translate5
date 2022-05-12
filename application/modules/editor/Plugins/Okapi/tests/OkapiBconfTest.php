@@ -137,16 +137,14 @@ class OkapiBconfTest extends editor_Test_JsonTest {
             self::assertNotNull($e, 'Deleting the system bconf directory was not prevented by ZfExtended_NoAccessException');
         }
 
-        // Ensure system bconf is updated on version mismatch
+        // Ensure system bconf is updated on version mismatch when using it
         $version = (int)$newSystemBconf->getVersionIdx();
         self::assertGreaterThan(0, $version, 'Bconf version is 0');
         $newSystemBconf->setVersionIdx($version - 1);
         $newSystemBconf->save();
-
-        unlink($newBconfFile);
-        self::assertFileDoesNotExist($newBconfFile, "Could not delete '$newBconfFile' for testing purpose");
-        $bconf->importDefaultWhenNeeded();
-        self::assertFileExists($newBconfFile, $autoImportFailureMsg . " Version Auto Update failed. File '$newBconfFile' does not exist.");
+        $newSystemBconf->repackIfOutdated();
+        self::assertEquals(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX, $newSystemBconf->getVersionIdx(), 'Bconf version was not updated after being outdated');
+        self::assertFileExists($newSystemBconf->getFilePath(), $autoImportFailureMsg . " Version Auto Update failed. File '$newBconfFile' does not exist.");
 
         // Reset to initial system bconf, delete  newly imported
         $newSystemBconfId = $newSystemBconf->getId();

@@ -91,9 +91,13 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     public static function getImportBconfPath(editor_Models_Task $task): string {
         $meta = $task->meta(true);
         $bconfId = $meta->getBconfId();
-        !$bconfId && throw new editor_Plugins_Okapi_Exception("E1384");
+        if(!$bconfId){
+            throw new editor_Plugins_Okapi_Exception("E1384");
+        }
         $bconf = new editor_Plugins_Okapi_Models_Bconf();
         $bconf->load($bconfId);
+        // we update outdated bconfs when accessing them
+        $bconf->repackIfOutdated();
         return $bconf->getFilePath();
     }
 
