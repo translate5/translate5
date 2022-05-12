@@ -29,25 +29,25 @@ END LICENSE AND COPYRIGHT
 /**
  * Testcase for TRANSLATE-2266 Custom file filter configuration with GUI / BCONF Management
  * For details see the issue.
- * @see Translate2432Test
  */
-class Translate2266BconfTest extends editor_Test_JsonTest {
+class OkapiBconfTest extends editor_Test_JsonTest {
     private static editor_Plugins_Okapi_Models_Bconf $bconf;
     private static int $bconfId = 0;
-    private static Zend_Config $okapi;
+    private static Zend_Config $okapiConf;
     public const OKAPI_CONFIG = 'runtimeOptions.plugins.Okapi';
 
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
         self::$api->login('testmanager');
         self::assertLogin('testmanager');
+
         $appState = self::$api->requestJson('editor/index/applicationstate');
         self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case');
 
         // Test essential configs
-        $okapi = self::$okapi = Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
-        self::assertNotEmpty($okapi->dataDir, self::OKAPI_CONFIG . ".dataDir not set");
-        self::assertNotEmpty($okapi->api->url, self::OKAPI_CONFIG . ".api.url not set");
+        $okapiConf = self::$okapiConf = Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
+        self::assertNotEmpty($okapiConf->dataDir, self::OKAPI_CONFIG . ".dataDir not set");
+        self::assertNotEmpty($okapiConf->api->url, self::OKAPI_CONFIG . ".api.url not set");
 
         $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getBconfStaticDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
         self::assertFileExists($t5defaultImportBconf,
@@ -63,7 +63,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
      * Unpack, Pack a Bconf to verify the Bconf Parser and Packer
      */
     public function test_BconfImportExport() {
-        $input = new SplFileInfo(self::$api->getFile('testfiles/minimal/batchConfiguration.t5.bconf'));
+        $input = new SplFileInfo(self::$api->getFile('minimal/batchConfiguration.t5.bconf'));
         $postFile = [ // loose definition https://www.php.net/manual/features.file-upload.post-method.php
             "name"     => 'Translate2266BconfTest-' . time() . '.bconf',
             "tmp_name" => $input->getPathname(),
@@ -77,7 +77,6 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
 
         $failureMsg = "Original and repackaged Bconfs do not match\nInput was '$input', Output was '$output";
         self::assertFileEquals($input, $output, $failureMsg);
-
     }
 
     /***
@@ -89,8 +88,8 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
         $sourceSrx = $bconf->srxNameFor('source');
         $targetSrx = $bconf->srxNameFor('target');
 
-        $sourceSrxInput = new SplFileInfo(self::$api->getFile('testfiles/srx/idSource.srx'));
-        $targetSrxInput = new SplFileInfo(self::$api->getFile('testfiles/srx/idTarget.srx'));
+        $sourceSrxInput = new SplFileInfo(self::$api->getFile('srx/idSource.srx'));
+        $targetSrxInput = new SplFileInfo(self::$api->getFile('srx/idTarget.srx'));
 
         copy($sourceSrxInput, $bconf->getFilePath(fileName: $sourceSrx));
         copy($targetSrxInput, $bconf->getFilePath(fileName: $targetSrx));
@@ -176,8 +175,8 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
      */
     public function test_OkapiTaskImport() {
         try {
-            $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . self::$okapi->api->url . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
-            $longHornResponse = (new Zend_Http_Client($this::$okapi->api->url))->request();
+            $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . self::$okapiConf->api->url . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
+            $longHornResponse = (new Zend_Http_Client($this::$okapiConf->api->url))->request();
             self::assertTrue($longHornResponse->getStatus() === 200, $msg);
         } catch(Exception $e){
             self::fail($msg . "\n" . $e->getMessage());
@@ -189,7 +188,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
             'targetLang' => 'en',
           //'bconfId' omitted to test fallback to Okapi_Models_Bconf::getDefaultBconfId
         ];
-        $api->addImportFile($api->getFile('testfiles/workfiles/TRANSLATE-2266-de-en.txt'));
+        $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en.txt'));
         $api->import($task);
         /** @var editor_Models_Task $realTask */
         $realTask = ZfExtended_Factory::get('editor_Models_Task');
@@ -205,8 +204,8 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
      */
     public function test_OkapiTaskImportWithBconfIdAndMultipleFiles() {
         try {
-            $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . self::$okapi->api->url . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
-            $longHornResponse = (new Zend_Http_Client($this::$okapi->api->url))->request();
+            $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . self::$okapiConf->api->url . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
+            $longHornResponse = (new Zend_Http_Client($this::$okapiConf->api->url))->request();
             self::assertTrue($longHornResponse->getStatus() === 200, $msg);
         } catch(Exception $e){
             self::fail($msg . "\n" . $e->getMessage());
@@ -218,8 +217,8 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
             'targetLang' => 'en',
             'bconfId'    => self::$bconf->getDefaultBconfId(),
         ];
-        $api->addImportFile($api->getFile('testfiles/workfiles/TRANSLATE-2266-de-en.txt'));
-        $api->addImportFile($api->getFile('testfiles/workfiles/TRANSLATE-2266-de-en-2.txt'));
+        $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en.txt'));
+        $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en-2.txt'));
         $api->import($task);
     }
 
@@ -230,7 +229,7 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
     public function test_InvalidFiles() {
         $bconf = self::$bconf;
         $api = self::$api;
-        $invalid = 'testfiles/invalid/';
+        $invalid = 'invalid/';
         $filesToTest = [
             'Signature.bconf',
             'Version.bconf',
@@ -264,6 +263,17 @@ class Translate2266BconfTest extends editor_Test_JsonTest {
     }
 
     public static function tearDownAfterClass(): void {
+
+        // cleanup: if we created data, we'll have to clean it up
+        $table = new editor_Plugins_Okapi_Models_Db_Bconf();
+        $table->delete([]);
+
+        // remove data-dir
+        $cleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
+        $cleaner->delete(editor_Plugins_Okapi_Models_Bconf::getBconfRootDir());
+
+        // rmdir(editor_Plugins_Okapi_Models_Bconf::getBconfRootDir());
+
         parent::tearDownAfterClass();
     }
 }

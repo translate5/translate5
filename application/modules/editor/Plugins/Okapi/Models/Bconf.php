@@ -167,7 +167,9 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
     public function importDefaultWhenNeeded(int $totalCount = -1): bool {
-        $totalCount === -1 && ($totalCount = $this->getTotalCount());
+        if($totalCount === -1){
+            $totalCount = $this->getTotalCount();
+        }
         $t5ProvidedImportBconf = editor_Plugins_Okapi_Init::getBconfStaticDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT;
         $updateNeeded = false;
         $insertNeeded = $totalCount === 0;
@@ -177,12 +179,8 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             $s = $this->db->select();
             $versionSelect = $s->from($s->getTable(), ['id', 'versionIdx'])->where('name = ?', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
             [$id, $systemVersion] = $versionSelect->limit(1)->query()->fetch(PDO::FETCH_NUM);
-
-            $insertNeeded = !$systemVersion; // there are bconfs, but not the t5 provided one
+            $insertNeeded = !$id; // there are bconfs, but not the t5 provided one
             $updateNeeded = !$insertNeeded && $systemVersion < editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX;
-        }
-        if(!$insertNeeded && !$updateNeeded){
-            return false;
         }
         if($updateNeeded){
             $bconf = new self();
@@ -195,9 +193,10 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
                 $bconf->setIsDefault(1);
             }
             $bconf->setDescription("The default .bconf used for file imports unless another one is configured");
+        } else {
+            return false;
         }
         $bconf->setVersionIdx(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
-
         $bconf->save();
         return true;
     }
