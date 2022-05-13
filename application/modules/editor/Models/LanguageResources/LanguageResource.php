@@ -92,6 +92,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public $targetLangCode;
 
     /***
+     * @var array
+     */
+    protected array $customers;
+
+    /***
      * Init the language resource instance for given editor_Models_LanguageResources_Resource
      * @param editor_Models_LanguageResources_Resource $resource
      * @return void
@@ -439,6 +444,20 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             $this->targetLang=$this->getLanguageByField('targetLang');
         }
         return $this->targetLang;
+    }
+
+    /***
+     * Get the customers of the current langauge resource
+     * @return array
+     */
+    public function getCustomers(): array
+    {
+        if(empty($this->customers)){
+            /** @var editor_Models_LanguageResources_CustomerAssoc $model */
+            $model = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+            $this->customers = array_column($model->loadByLanguageResourceId($this->getId()),'customerId');
+        }
+        return $this->customers;
     }
     
     /**

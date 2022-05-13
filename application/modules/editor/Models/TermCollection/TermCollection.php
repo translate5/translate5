@@ -422,6 +422,35 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         return $this->db->fetchAll($s)->toArray();
     }
 
+
+    /***
+     * Get term translations (source/target) for given term collection and source/target language.
+     * @param int $collection
+     * @param int $source
+     * @param int $target
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getTermTranslationsForLanguageCombo(int $collection, int $source, int $target): array
+    {
+        /** @var editor_Models_Languages $fuzzyModel */
+        $fuzzyModel = ZfExtended_Factory::get('editor_Models_Languages');
+
+        $sourceLanguages = $fuzzyModel->getFuzzyLanguages($source,includeMajor: true);
+        $targetLanguages = $fuzzyModel->getFuzzyLanguages($target,includeMajor: true);
+
+        // INFO: when using CONCAT(s.term,'\t',t.term) directly, it seems like it is mysql bug since the results are concatenated with double tabs
+        $s = $this->db->select()
+            ->setIntegrityCheck(false)
+            ->from(['s' => 'terms_term'],['s.term as source'])
+            ->join(['t' => 'terms_term'], 's.termEntryId = t.termEntryId AND t.collectionId = s.collectionId', ['t.term AS target'])
+            ->where('s.languageId IN(?)', $sourceLanguages)
+            ->where('t.languageId IN(?)', $targetLanguages)
+            ->where('s.collectionId = ?', $collection)
+            ->group('s.term');
+        return $this->db->fetchAll($s)->toArray();
+    }
+
     /***
      * Remove recursive the given directory path
      *
