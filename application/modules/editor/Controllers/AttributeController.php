@@ -410,7 +410,7 @@ class editor_AttributeController extends ZfExtended_RestController
         }
 
         // Check that all attributes belong to the same dataTypeId
-        if (!isset($dropId)) $this->jcheck(['qty' => ['eql' => 1]], ['qty' => count($dataTypeIdA)]);
+        if (!isset($dropId) && $attrIdA) $this->jcheck(['qty' => ['eql' => 1]], ['qty' => count($dataTypeIdA)]);
 
         // Foreach attribute model instance
         foreach ($attrA as $attrId => $entity) {
