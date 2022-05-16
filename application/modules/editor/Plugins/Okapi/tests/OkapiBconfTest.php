@@ -64,15 +64,17 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      */
     public function test_BconfImportExport() {
         $input = new SplFileInfo(self::$api->getFile('minimal/batchConfiguration.t5.bconf'));
-        $postFile = [ // loose definition https://www.php.net/manual/features.file-upload.post-method.php
-            "name"     => 'Translate2266BconfTest-' . time() . '.bconf',
-            "tmp_name" => $input->getPathname(),
-        ];
-        $params = [];
-
-        // unpack and pack
-        self::$bconf = new editor_Plugins_Okapi_Models_Bconf($postFile, $params);
-        self::$bconfId = self::$bconf->getId();
+        $bconfName = 'Translate2266BconfTest-' . time() . '.bconf';
+        self::$api->addFile('bconffile', $input->getPathname(), 'application/octet-stream');
+        // Run as api test that if case runtimeOptions.plugins.Okapi.dataDir is missing it's created as webserver user
+        $res = $this->api()->requestJson('editor/plugins_okapi_bconf/uploadbconf', 'POST', [
+            'name' => $bconfName,
+        ]);
+        self::assertEquals(true, $res?->success, 'uploadbconf did not respond with success:true');
+        self::$bconfId = $res->id;
+        self::$bconf = new editor_Plugins_Okapi_Models_Bconf();
+        self::$bconf->load(self::$bconfId);
+        self::assertEquals(self::$bconf->getName(),$bconfName, "Imported bconf's name is not '$bconfName' but '".self::$bconf->getName()."'");
         $output = self::$bconf->getFilePath();
 
         $failureMsg = "Original and repackaged Bconfs do not match\nInput was '$input', Output was '$output";
@@ -94,7 +96,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         copy($sourceSrxInput, $bconf->getFilePath(fileName: $sourceSrx));
         copy($targetSrxInput, $bconf->getFilePath(fileName: $targetSrx));
 
-        $bconf->file->pack();
+        $bconf->getFile()->pack();
 
         $bconfPath = $bconf->getFilePath();
         $bconfAfterUpload = file_get_contents($bconfPath);
@@ -107,6 +109,11 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      * @depends test_BconfImportExport
      */
     public function test_AutoImportAndVersionUpdate() {
+        if (!self::isMasterTest()) {
+            self::assertTrue(true);
+            fwrite(STDERR, "\n".__FUNCTION__ ." runs only in master test to not mess with important default bconf.\n");
+            return;
+        }
         $bconf = self::$bconf;
         $bconf->importDefaultWhenNeeded();
 
@@ -261,17 +268,6 @@ class OkapiBconfTest extends editor_Test_JsonTest {
     }
 
     public static function tearDownAfterClass(): void {
-
-        // cleanup: if we created data, we'll have to clean it up
-        $table = new editor_Plugins_Okapi_Models_Db_Bconf();
-        $table->delete([]);
-
-        // remove data-dir
-        $cleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
-        $cleaner->delete(editor_Plugins_Okapi_Models_Bconf::getBconfRootDir());
-
-        // rmdir(editor_Plugins_Okapi_Models_Bconf::getBconfRootDir());
-
         parent::tearDownAfterClass();
     }
 }
