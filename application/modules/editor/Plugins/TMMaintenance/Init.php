@@ -28,10 +28,82 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract {
-    protected static $description = '';
+use MittagQI\Translate5\Applet\AppletAbstract;
+use MittagQI\Translate5\Applet\Dispatcher;
 
-    public function init() {
+class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
+{
+    protected static $description = 'Provides a functionality of managing t5memory TM';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $frontendControllers = array(
+        'pluginTMMaintenanceTMMaintenance' => 'Editor.plugins.TMMaintenance.app.controller.TMMaintenance'
+    );
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        $this->addController('TMMaintenanceController');
+        $this->addController('ApiController');
+        $this->initApplet();
+        $this->initRoutes();
+    }
+
+    private function initApplet()
+    {
+        // Register the plugin as an applet
+        Dispatcher::getInstance()->registerApplet('tmmaintenance', new class extends AppletAbstract {
+            protected string $urlPathPart = '/editor/tmmaintenance';
+            protected string $initialPage = 'tmMaintenance';
+        });
+    }
+
+    /**
+     * defines all URL routes of this plug-in
+     */
+    protected function initRoutes()
+    {
+        /* @var $frontController Zend_Controller_Front */
+        $frontController = Zend_Registry::get('frontController');
+        $router = $frontController->getRouter();
+
+        if (null === $router) {
+            // TODO do something
+            throw new \Error('No router');
+        }
+
+        $restRoute = new Zend_Rest_Route(
+            $frontController,
+            [],
+            [
+                'editor' => ['plugins_tmmaintenance_api'],
+            ]
+        );
+        $router->addRoute('plugins_tmmaintenance_restdefault', $restRoute);
+
+        $route = new ZfExtended_Controller_RestLikeRoute('editor/plugins_tmmaintenance_api/locale/list', [
+            'module' => 'editor',
+            'controller' => 'plugins_tmmaintenance_api',
+            'action' => 'locales'
+        ]);
+        $router->addRoute('plugins_tmmaintenance_locales', $route);
+
+        $route = new ZfExtended_Controller_RestLikeRoute('editor/plugins_tmmaintenance_api/tm/list', [
+            'module' => 'editor',
+            'controller' => 'plugins_tmmaintenance_api',
+            'action' => 'tms'
+        ]);
+        $router->addRoute('plugins_tmmaintenance_tms', $route);
+
+        $route = new ZfExtended_Controller_RestLikeRoute('editor/plugins_tmmaintenance_api/segment/search', [
+            'module' => 'editor',
+            'controller' => 'plugins_tmmaintenance_api',
+            'action' => 'search'
+        ]);
+        $router->addRoute('plugins_tmmaintenance_segments', $route);
     }
 }
-

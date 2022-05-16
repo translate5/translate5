@@ -1,0 +1,7 @@
+{
+  "logout":"Logout",
+  "localeStore": [
+    { "locale": "en", "name": "English" },
+    { "locale": "de", "name": "German"  }
+  ]
+}
