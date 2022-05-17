@@ -58,6 +58,7 @@ Ext.define('Editor.view.admin.TaskAddWindowViewModel', {
 
         disableImportDefaults:function(get){
             return get('activeItem').disableImportDefaults();
-        }
+        },
+
     }
 });

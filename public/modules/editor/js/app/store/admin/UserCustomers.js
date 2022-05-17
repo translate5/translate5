@@ -72,11 +72,11 @@ Ext.define('Editor.store.admin.UserCustomers', {
     },
 
     /***
-     * Return the default customer id. If there is no default customer in the current store, the first record in the store is returned.
+     * Return the default customer id. If there is no default customer in the current store, the first record's id in the store is returned.
      * @returns {*|null}
      */
     getDefaultCustomerId:function (){
-       var rec = this.findRecord( 'number', Editor.model.admin.Customer.DEFAULTCUSTOMER_NUMBER, 0, false, true, true);
+       var rec = this.findRecord( 'name', Editor.data.customers.defaultCustomerName, 0, false, true, true);
        if(!rec){
            rec = this.getAt(0);
        }

@@ -78,7 +78,6 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract 
     protected $validatorInstanceClass   = 'editor_Models_Validator_Customer';
     
     CONST DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
-    
 
     public function delete() {
         $customerId = $this->getId();

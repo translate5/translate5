@@ -95,7 +95,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
     listen: {
         component: {
             '#taskMainCard': {
-                render: 'onTaskMainCardRender'
+                added: 'onTaskMainCardAdded'
             }
         }
     },
@@ -502,16 +502,17 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
      * If there is only one customer filtered (eg by the CustomerSwitch),
      * this customer is preselected.
      */
-    onTaskMainCardRender: function (taskMainCard, eOpts) {
+    onTaskMainCardAdded: function (taskMainCard, eOpts) {
         var me = this, store,
             auth = Editor.app.authenticatedUser,
-            taskMainCardContainer = taskMainCard.down('#taskMainCardContainer');
-
+            taskMainCardContainer = taskMainCard.down('#taskMainCardContainer'),
+            comboBox;
         // add the customer field to the taskUpload window
         if (auth.isAllowed('editorCustomerSwitch')) {
-            taskMainCardContainer.insert(0, {
+            comboBox = taskMainCardContainer.insert(0, {
                 xtype: 'customersCombo', // user is allowed to see the CustomerSwitch => show all customers
                 name: 'customerId',
+                reference: 'customer',
                 itemId: 'customerId',
                 toolTip: me.strings.customerTip,
                 fieldLabel: me.strings.customerLabel + '¹'
@@ -521,9 +522,10 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
             if (!store.isLoaded()) {
                 store.load();
             }
-            taskMainCardContainer.insert(0, {
+            comboBox = taskMainCardContainer.insert(0, {
                 xtype: 'usercustomerscombo', // show only those customers that are assigned to the user
                 name: 'customerId',
+                reference: 'customer',
                 itemId: 'customerId',
                 toolTip: me.strings.customerTip,
                 fieldLabel: me.strings.customerLabel + '¹'

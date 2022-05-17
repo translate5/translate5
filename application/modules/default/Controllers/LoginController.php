@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
- This file is part of translate5
- 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+  This file is part of translate5
 
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
- This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
- to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/agpl.html
-  
- There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
-  
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
-END LICENSE AND COPYRIGHT
-*/
+  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+  included in the packaging of this file.  Please review the following information
+  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+  http://www.gnu.org/licenses/agpl.html
+
+  There is a plugin exception available for use with this release of translate5 for
+  translate5: Please see http://www.translate5.net/plugin-exception.txt or
+  plugin-exception.txt in the root folder of translate5.
+
+  @copyright  Marc Mittag, MittagQI - Quality Informatics
+  @author     MittagQI - Quality Informatics
+  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+ END LICENSE AND COPYRIGHT
+ */
 
 /**#@+
  * @author Marc Mittag
@@ -120,7 +120,7 @@ class LoginController extends ZfExtended_Controllers_Login {
             return;
         }
 
-        //add form hidden field, which is used when redirec to openid is needed
+        //add form hidden field, which is used when redirect to openid is needed
         $redirect = new Zend_Form_Element_Hidden([
             'name' => 'openidredirect',
             'value' => $oidc->getCustomer()->getOpenIdRedirectCheckbox()
@@ -145,10 +145,27 @@ class LoginController extends ZfExtended_Controllers_Login {
                     
                 )
             ));
+
             $link->setOrder(4);
             $this->_form->addElement($link);
+        }else{
+            // Add overlay to the login page only when the user is automatically redirected to the SSO auth provider
+            $overlay = new Zend_Form_Element_Note([
+                'name' => 'overlay',
+                'value' => '<div style="position: absolute;top: 50%;left: 50%;font-size: 50px;color: white;transform: translate(-50%,-50%);-ms-transform: translate(-50%,-50%);">'.$this->_translate->_('Redirect to login...').'</div>',
+                'decorators' => [
+                    ['ViewHelper'],
+                    ['HtmlTag', [
+                        'tag' => 'div',
+                        'id' => 'overlay',
+                        'style' => 'position: fixed;display: block;width: 100%;height: 100%;top: 0;left: 0;right: 0;bottom: 0;background-color: rgba(175,175,175,1);z-index: 10001;'
+                    ]],
+
+                ]
+            ]);
+            $this->_form->addElement($overlay);
         }
-        
+
         try {
             //authenticate with the configured openid client
             if($oidc->authenticate()){

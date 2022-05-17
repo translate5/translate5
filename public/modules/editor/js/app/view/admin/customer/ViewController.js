@@ -47,7 +47,7 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     },
 
     onClientRoute: function() {
-        Editor.app.openAdministrationSection(this.getView(), 'client');
+        Editor.app.openAdministrationSection(this.getView());
     },
 
     /**
@@ -217,8 +217,7 @@ Ext.define('Editor.view.admin.customer.ViewController', {
      * Refresh the customers store
      */
     refresh: function(button, e, eOpts) {
-        this.getReferences().list.getSelectionModel().deselectAll();
-        Ext.StoreManager.get('customersStore').load();
+        Ext.StoreManager.get('customersStore').reload();
     },
 
     /**

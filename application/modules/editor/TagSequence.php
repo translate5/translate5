@@ -138,7 +138,7 @@ abstract class editor_TagSequence implements JsonSerializable {
      * @param string $text
      * @throws ZfExtended_Exception
      */
-    protected function _setMarkup(string $text){
+    protected function _setMarkup(string $text=NULL){
         if(!empty($text) && $text != editor_Segment_Tag::strip($text)){
             $this->unparse($text);
             // This debug can be used to evaluate the quality of the DOM parsing

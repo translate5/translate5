@@ -1,0 +1,86 @@
+<?php
+/*
+ START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+ END LICENSE AND COPYRIGHT
+ */
+/**
+ * @var Zend_View $this
+ * @var ZfExtended_Zendoverwrites_Translate $translate
+ * */
+$translate = $this->translate;
+?>
+
+Editor.controller.Localizer.addPluginInit('okapi', function() {
+
+    /** @class okapi_l18n */
+    Ext.define("Editor.locale.plugins.Okapi.view.BconfGrid", {
+        override: "Editor.plugins.Okapi.view.BconfGrid",
+        config: { // configs need direct override
+            title: `<?= $translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>`,
+        },
+        text_cols: {
+            name: `<?= $translate->_('Name'); ?>`,
+            extensions: `<?= $translate->_('Erweiterungen'); ?>`,
+            description: `<?= $translate->_('Beschreibung'); ?>`,
+            action: `<?= $translate->_('Aktionen'); ?>`,
+            uploadBconf: `<?= $translate->_('Bconf hochladen...'); ?>`,
+            _file: `<?= $translate->_('-Datei'); ?>`,
+            fileDlTemplate: `<?= $translate->_('{0}{1} herunterladen'); ?>`,
+            fileUpTemplate:`<?= $translate->_('{0}{1} hochladen'); ?>`,
+            srx: `<?= $translate->_('SRX-Datei'); ?>`,
+            sourceSrx: `<?= $translate->_('SourceSRX'); ?>`,
+            targetSrx: `<?= $translate->_('TargetSRX'); ?>`,
+            pipeline: `<?= $translate->_('Pipeline'); ?>`,
+            standard: `<?= $translate->_('Standard'); ?>`,
+            customerStandard: `<?= $translate->_('Kundenstandard'); ?>`,
+        },
+        strings: {
+            edit: `<?= $translate->_('Bearbeiten'); ?>`,
+            remove: `<?= $translate->_('Löschen'); ?>`,
+            copy: `<?= $translate->_('Kopieren'); ?>`,
+            upload: `<?= $translate->_('Hochladen'); ?>`,
+            refresh: `<?= $translate->_('Aktualisieren'); ?>`,
+            addBconf: `<?= $translate->_('Bconf hinzufügen'); ?>`,
+            uploadBconf: `<?= $translate->_('Bconf hochladen...'); ?>`,
+            searchText: `<?= $translate->_('Suchen'); ?>`,
+            searchEmptyText: `<?= $translate->_('Suchen'); ?>`,
+            export: `<?= $translate->_('Exportieren'); ?>`,
+            browse: `<?= $translate->_('Durchsuchen...'); ?>`,
+            bconfRequired: `<?= $translate->_('wird benötigt'); ?>`,
+            titleLong: `<?= $translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>`,
+            confirmDeleteTitle: `<?= $translate->_('Bconf löschen'); ?>`,
+            confirmDeleteMessage: `<?= $translate->_('Möchten Sie diese Bconf-Datei wirklich löschen?'); ?>`,
+            deleteSuccess: `<?= $translate->_('Bconf-Datei gelöscht'); ?>`,
+            invalidTitle: `<?= $translate->_('Ungültige {}-Datei'); ?>`,
+            invalidMsg: `<?= $translate->_('Die hochgeladene Datei ist keine gültige {}-Datei.'); ?>`,
+            name:`<?= $translate->_('Name'); ?>`,
+            uniqueName:`<?= $translate->_('Eindeutiger Name'); ?>`,
+            nameExists:`<?= $translate->_('Dieser Name ist schon vergeben'); ?>`,
+            newBconf: `<?= $translate->_('Neue Bconf-Datei'); ?>`,
+            editBconf: `<?= $translate->_('Bconf-Datei bearbeiten'); ?>`,
+        },
+
+    });
+});

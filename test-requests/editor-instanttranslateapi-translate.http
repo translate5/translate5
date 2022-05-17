@@ -1,0 +1,34 @@
+
+# a simple translation with all available services
+POST {{baseurl}}/editor/instanttranslateapi/translate
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Accept: application/json
+
+source=en&target=de&text=Some+text+to+translate
+
+###
+
+# a simple translation with google
+POST {{baseurl}}/editor/instanttranslateapi/translate
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Accept: application/json
+
+source=en&target=de&langresType=google&text=Some+text+to+translate
+
+###
+
+# markup with google and DeepL
+POST {{baseurl}}/editor/instanttranslateapi/translate
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Accept: application/json
+
+source=en&target=de&langresType=google,deepl&text=%3Cp%3E%3Cem%3ECan%3C%2Fem%3E+I+translate+a+%3Cstrong%3Eformatted+text%3C%2Fstrong%3E%3F%3C%2Fp%3E+%3Cp%3EAnd+another+sentence.%3C%2Fp%3E+%3Cp%3EAnd+a+%3Ca+href%3D%22https%3A%2F%2Fwww.google.de%22%3Ethird%3C%2Fa%3E+sentence.%3C%2Fp%3E
+
+###
+
+# segmented markup with OpenTM2
+POST {{baseurl}}/editor/instanttranslateapi/translate
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Accept: application/json
+
+source=en&target=de&langresType=opentm2&text=%3Cp%3E%3Cem%3ECan%3C%2Fem%3E+I+translate+a+%3Cstrong%3Eformatted+text%3C%2Fstrong%3E%3F%3C%2Fp%3E%0A+%3Cp%3EAnd+%3Cb%3Eanother%3C%2Fb%3E+sentence.%3C%2Fp%3E+%3Cp%3EAnd+a+%3Ca+href%3D%22https%3A%2F%2Fwww.google.com%22%3Ethird%3C%2Fa%3E+sentence.%3C%2Fp%3E

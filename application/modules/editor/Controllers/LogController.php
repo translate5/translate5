@@ -26,23 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Use Okapi via Tikal
- */
-class editor_Plugins_Okapi_InitTikal extends ZfExtended_Plugin_Abstract {
-    
-    public function init() {
-        throw new Exception("Not tested this plugin since refactored the file import!");
-        $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'afterDirectoryParsing', array($this, 'handleBeforeImport'));
-    }
-    
-    public function handleBeforeImport(Zend_EventManager_Event $event) {
-        $params = $event->getParams();
-        
-        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
-        /* @var $fileFilter editor_Models_File_FilterManager */
-        foreach($params['filelist'] as $fileId => $relName) {
-            $fileFilter->addFilter($fileFilter::TYPE_IMPORT, $params['task']->getTaskGuid(), $fileId, 'editor_Plugins_Okapi_Tikal_Filter');
-        }
-    }
+class Editor_LogController extends ZfExtended_LogController {
+
 }

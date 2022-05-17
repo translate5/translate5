@@ -29,7 +29,11 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.config.GridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.adminConfigGrid',
-    
+
+    routes: {
+        'config/:name' :'filterConfigByRoute',
+    },
+
     listen:{
         component:{
             '#searchField':{
@@ -42,6 +46,11 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         controller: {
             'taskGrid': {
                 taskImportFinished: 'onTaskImportFinished'
+            }
+        },
+        store: {
+            '#admin.Config':{
+                load:'onStoreLoad'
             }
         }
     },
@@ -139,7 +148,16 @@ Ext.define('Editor.view.admin.config.GridViewController', {
     onConfigEdit : function(editor,context){
         this.saveRecord(context.record);
     },
-    
+
+    filterConfigByRoute: function(filterValue) {
+        //update searchvalue only from route if it was different
+        if(filterValue !== this.searchValue) {
+            this.searchField.setValue(filterValue);
+            this.searchValue = filterValue;
+            this.groupingFeature.expandAll();
+        }
+    },
+
     /**
      * @return {String} The value to process or null if the searchField value is blank or invalid.
      * @private
@@ -175,6 +193,13 @@ Ext.define('Editor.view.admin.config.GridViewController', {
 
         //mark the matched searchValue
         me.markMatches();
+    },
+
+    onStoreLoad: function() {
+        //if we have a searchValue already on initial store load we have to expand all so that the results are visible
+        if(this.searchValue) {
+            this.groupingFeature.expandAll();
+        }
     },
     
     onShowReadOnlyChange:function(field, newValue, oldValue, eOpts ){
