@@ -90,7 +90,8 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
         $raf->writeUTF($fileName, false);
 
         if($fileName == ''){
-            $raf->writeLong(0); // size = 0
+            $raf->writeInt(0); // QUIRK Skip 4 bytes limiting size to 4GB
+            $raf->writeInt(0);
             return;
         }
         //Open the file and read the content
@@ -99,7 +100,8 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
         $fileSize = filesize($fileName);
         $fileContent = fread($file, $fileSize);
 
-        $raf->writeLong($fileSize);
+        $raf->writeInt(0); // QUIRK Skip 4 bytes limiting size to 4GB
+        $raf->writeInt($fileSize);
         if($fileSize > 0){
             $raf->fwrite($fileContent);
         }

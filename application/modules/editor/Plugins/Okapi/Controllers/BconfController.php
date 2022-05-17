@@ -126,7 +126,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
 
         $srxNameToBe = $bconf->srxNameFor($this->getParam('purpose'));
         move_uploaded_file($srxUploadFile, $bconf->getFilePath(fileName: $srxNameToBe));
-        $bconf->file->pack();
+        $bconf->getFile()->pack();
     }
 
     public function downloadsrxAction() {

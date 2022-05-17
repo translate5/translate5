@@ -62,19 +62,19 @@ class OkapiBconfTest extends editor_Test_JsonTest {
     /***
      * Unpack, Pack a Bconf to verify the Bconf Parser and Packer
      */
-    public function test_BconfImportExport() {
+    public function test10_BconfImportExport() {
         $input = new SplFileInfo(self::$api->getFile('minimal/batchConfiguration.t5.bconf'));
         $bconfName = 'Translate2266BconfTest-' . time() . '.bconf';
         self::$api->addFile('bconffile', $input->getPathname(), 'application/octet-stream');
         // Run as api test that if case runtimeOptions.plugins.Okapi.dataDir is missing it's created as webserver user
-        $res = $this->api()->requestJson('editor/plugins_okapi_bconf/uploadbconf', 'POST', [
+        $res = self::$api->requestJson('editor/plugins_okapi_bconf/uploadbconf', 'POST', [
             'name' => $bconfName,
         ]);
         self::assertEquals(true, $res?->success, 'uploadbconf did not respond with success:true');
         self::$bconfId = $res->id;
         self::$bconf = new editor_Plugins_Okapi_Models_Bconf();
         self::$bconf->load(self::$bconfId);
-        self::assertEquals(self::$bconf->getName(),$bconfName, "Imported bconf's name is not '$bconfName' but '".self::$bconf->getName()."'");
+        self::assertEquals(self::$bconf->getName(), $bconfName, "Imported bconf's name is not '$bconfName' but '" . self::$bconf->getName() . "'");
         $output = self::$bconf->getFilePath();
 
         $failureMsg = "Original and repackaged Bconfs do not match\nInput was '$input', Output was '$output";
@@ -85,33 +85,44 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      * Test if new srx files are packed into bconf.
      * @depends test_BconfImportExport
      */
-    public function test_SrxUpload() {
+    public function test20_SrxUpload() {
+        $api = self::$api;
         $bconf = self::$bconf;
-        $sourceSrx = $bconf->srxNameFor('source');
-        $targetSrx = $bconf->srxNameFor('target');
+        $id = $bconf->getId();
 
-        $sourceSrxInput = new SplFileInfo(self::$api->getFile('srx/idSource.srx'));
-        $targetSrxInput = new SplFileInfo(self::$api->getFile('srx/idTarget.srx'));
+        // Upload sourceSRX
+        $api->addFile('srx', $api->getFile('srx/idSource.srx'), 'application/octet-stream');
+        $res = $api->request("editor/plugins_okapi_bconf/uploadsrx?id=$id", 'POST', [
+            'purpose' => 'source',
+        ]);
+        self::assertEquals(200, $res->getStatus());
+        // Upload targetSRX
+        $api->addFile('srx', $api->getFile('srx/idTarget.srx'), 'application/octet-stream');
+        $res = $api->request("editor/plugins_okapi_bconf/uploadsrx?id=$id", 'POST', [
+            'purpose' => 'target',
+        ]);
+        self::assertEquals(200, $res->getStatus());
 
-        copy($sourceSrxInput, $bconf->getFilePath(fileName: $sourceSrx));
-        copy($targetSrxInput, $bconf->getFilePath(fileName: $targetSrx));
+        $res = $api->request("editor/plugins_okapi_bconf/downloadbconf?bconfId=$id");
+        self::assertEquals(200, $res->getStatus());
+        $bconfString = $res->getBody();
 
-        $bconf->getFile()->pack();
+        $res = $api->request("editor/plugins_okapi_bconf/downloadsrx?id=$id&purpose=source");
+        self::assertEquals(200, $res->getStatus());
+        $sourceSrx = $res->getBody();
+        self::assertStringContainsString($sourceSrx, $bconfString, "sourceSrx update failed for bconf #$id");
 
-        $bconfPath = $bconf->getFilePath();
-        $bconfAfterUpload = file_get_contents($bconfPath);
-        self::assertStringContainsString(file_get_contents($sourceSrxInput), $bconfAfterUpload, "sourceSrx update failed in '$bconfPath'");
-        self::assertStringContainsString(file_get_contents($targetSrxInput), $bconfAfterUpload, "targetSrx update failed in '$bconfPath'");
-
+        $targetSrx = $api->request("editor/plugins_okapi_bconf/downloadsrx?id=$id&purpose=target")->getBody();
+        self::assertStringContainsString($targetSrx, $bconfString, "targetSrx update failed for bconf #$id");
     }
 
     /**
-     * @depends test_BconfImportExport
+     * @depends test10_BconfImportExport
      */
-    public function test_AutoImportAndVersionUpdate() {
-        if (!self::isMasterTest()) {
+    public function test30_AutoImportAndVersionUpdate() {
+        if(!self::isMasterTest()){
             self::assertTrue(true);
-            fwrite(STDERR, "\n".__FUNCTION__ ." runs only in master test to not mess with important default bconf.\n");
+            fwrite(STDERR, "\n" . __FUNCTION__ . " runs only in master test to not mess with important default bconf.\n");
             return;
         }
         $bconf = self::$bconf;
@@ -130,8 +141,9 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $autoImportFailureMsg = 'AutoImport of missing system bconf failed.';
         self::assertEquals($total + 1, $newTotal, $autoImportFailureMsg . ' Totalcount not increased');
         $newSystemBconf = new editor_Plugins_Okapi_Models_Bconf();
-        $newSystemBconf->loadRow('name = ? ', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
-        self::assertEquals($newSystemBconf->getName(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME, $autoImportFailureMsg . " No record name matches '" . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME . "'");
+        $newSystemBconf->loadRow('name = ? ');
+        $expectedName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
+        self::assertEquals($expectedName, $newSystemBconf->getName(), $autoImportFailureMsg . " No record name matches '$expectedName'");
         $newBconfFile = $newSystemBconf->getFilePath();
         self::assertFileExists($newBconfFile, $autoImportFailureMsg . " File '$newBconfFile' does not exist");
 
@@ -176,9 +188,9 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
     /***
      * Verify Task Import using Okapi is working with the LEK_okapi_bconf based Bconf management
-     * @depends test_AutoImportAndVersionUpdate AutoImport must work for initializing LEK_okapi_bconf after installation
+     * @depends test30_AutoImportAndVersionUpdate AutoImport must work for initializing LEK_okapi_bconf after installation
      */
-    public function test_OkapiTaskImport() {
+    public function test40_OkapiTaskImport() {
         try {
             $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . self::$okapiConf->api->url . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
             $longHornResponse = (new Zend_Http_Client($this::$okapiConf->api->url))->request();
@@ -191,7 +203,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $task = [
             'sourceLang' => 'de',
             'targetLang' => 'en',
-          //'bconfId' omitted to test fallback to Okapi_Models_Bconf::getDefaultBconfId
+            //'bconfId' omitted to test fallback to Okapi_Models_Bconf::getDefaultBconfId
         ];
         $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en.txt'));
         $api->import($task);
@@ -205,9 +217,9 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
     /***
      * Verify Task Import using Okapi is working with the LEK_okapi_bconf based Bconf management
-     * @depends test_OkapiTaskImport
+     * @depends test30_OkapiTaskImport
      */
-    public function test_OkapiTaskImportWithBconfIdAndMultipleFiles() {
+    public function test50_OkapiTaskImportWithBconfIdAndMultipleFiles() {
         try {
             $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . self::$okapiConf->api->url . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
             $longHornResponse = (new Zend_Http_Client($this::$okapiConf->api->url))->request();
@@ -229,35 +241,46 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
     /***
      * Provoke Exceptions via invalid inputs
-     * @depends test_BconfImportExport
+     * @depends test10_BconfImportExport
      */
-    public function test_InvalidFiles() {
-        $bconf = self::$bconf;
-        $api = self::$api;
-        $invalid = 'invalid/';
-        $filesToTest = [
-            'Signature.bconf',
-            'Version.bconf',
-            'MalformedReferences.bconf',
-            'NoReferences.bconf',
-            'NoPipeline.bconf',
-            'NoExtMapping.bconf',
-        ];
-        foreach($filesToTest as $file){
-            $e = null;
-            try {
-                $bconf->file->unpack($api->getFile($invalid.$file ));
-            } catch(ZfExtended_UnprocessableEntity $e){
-            } finally {
-                self::assertNotNull($e, "Did not reject ${invalid}$file with ZfExtended_UnprocessableEntity.");
+    public function test60_InvalidFiles() {
+        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        try {
+            $bconf->setId(0);
+            $testDir = $bconf->getDir();
+            if(!is_dir($testDir)){
+                mkdir($testDir); // Created as test user for unit test. Make sure to remove in every circumstance!
+            }
+            $bconffile = new editor_Plugins_Okapi_Bconf_File($bconf);
+            $filesToTest = [
+                'Signature.bconf',
+                'Version.bconf',
+                'MalformedReferences.bconf',
+                'NoReferences.bconf',
+                'NoPipeline.bconf',
+                'NoExtMapping.bconf',
+            ];
+            foreach($filesToTest as $file){
+                $e = null;
+                try {
+                    $bconffile->unpack(self::$api->getFile("invalid/$file"));
+                } catch(ZfExtended_UnprocessableEntity $e){
+                    self::assertNotNull($e, "Did not reject invalid/$file with ZfExtended_UnprocessableEntity.");
+                }
+            }
+        } catch(Exception $outerEx){
+        } finally {
+            $bconf->deleteDirectory(0); // Make sure to delete directory
+            if(!empty($outerEx)){
+                throw $outerEx;
             }
         }
     }
 
     /**
-     * @depends test_BconfImportExport
+     * @depends test10_BconfImportExport
      */
-    public function test_DeleteBconf() {
+    public function test70_DeleteBconf() {
         $bconf = self::$bconf;
         $bconf->load(self::$bconfId);
 
