@@ -72,7 +72,8 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
                 $relPath = $raf->readUTF();
                 $raf->readInt(); // Skip ID
                 $raf->readUTF(); // Skip original full filename
-                $size = $raf->readLong();
+                $raf->readInt(); // QUIRK Skip 4 bytes limiting size to 4GB
+                $size = $raf->readInt();
                 self::createReferencedFile($raf, $size, $relPath);
             }
 
@@ -85,7 +86,8 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
         while(($refIndex = $raf->readInt()) != -1 && !is_null($refIndex)) {
             $filename = $refMap[$refIndex] = $raf->readUTF();
             // Skip over the data to move to the next reference
-            $size = $raf->readLong();
+            $raf->readInt(); // QUIRK Skip 4 bytes limiting size to 4GB
+            $size = $raf->readInt();
             if($size > 0){
                 self::createReferencedFile($raf, $size, $filename);
             }
