@@ -91,9 +91,12 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     public function uploadbconfAction() {
         $ret = new stdClass();
 
-        empty($_FILES) && throw new ZfExtended_ErrorCodeException('E1212', [
-            'msg' => "No upload files were found. Please try again. If the error persists, please contact support.",
-        ]);
+        if(empty($_FILES)){
+            throw new ZfExtended_ErrorCodeException('E1212', [
+                'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
+            ]);
+        }
+
         $bconf = new editor_Plugins_Okapi_Models_Bconf($_FILES[self::FILE_UPLOAD_NAME], $this->getAllParams());
 
         $ret->success = is_object($bconf);
@@ -106,9 +109,11 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
     public function uploadsrxAction() {
-        empty($_FILES) && throw new editor_Plugins_Okapi_Exception('E1212', [
-            'msg' => "No upload files were found. Please try again. If the error persists, please contact support.",
-        ]);
+        if(empty($_FILES)){
+            throw new editor_Plugins_Okapi_Exception('E1212', [
+                'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
+            ]);
+        }
         $this->entityLoad();
         $bconf = $this->entity;
         $this->getParam('id');
@@ -120,9 +125,9 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         $rootTag = strtolower($srx->firstChild?->tagName);
         $rootTag !== 'srx' && $xmlErrors .= "\n Invalid root tag '$rootTag'.";
 
-        $xmlErrors && throw new ZfExtended_UnprocessableEntity('E1026',
-            ['errors' => [[$xmlErrors]]]
-        );
+        if(!empty($xmlErrors)){
+            throw new editor_Plugins_Okapi_Exception('E1390', ['details' => $xmlErrors]);
+        }
 
         $srxNameToBe = $bconf->srxNameFor($this->getParam('purpose'));
         move_uploaded_file($srxUploadFile, $bconf->getFilePath(fileName: $srxNameToBe));

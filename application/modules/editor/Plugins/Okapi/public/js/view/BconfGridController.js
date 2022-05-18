@@ -122,7 +122,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === Editor.data.plugins.Okapi.systemDefaultBconfName;
     },
     isSRXUploadDisabled: function(view, rowIndex, colIndex, item, record){
-        return view.ownerGrid.isCustomerGrid && !record.get('customerId');
+        return ((view.ownerGrid.isCustomerGrid && !record.get('customerId')) || (record.get('name') === Editor.data.plugins.Okapi.systemDefaultBconfName));
     },
 
     filterByText: function(field, searchString){

@@ -81,18 +81,17 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
     /**
      * Retrieves the database-based path to the default import bconf
-     * TODO FIXME: add version check here
      * @param editor_Models_Task $task
      * @return string
      * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws ZfExtended_Mismatch
      */
     public static function getImportBconfPath(editor_Models_Task $task): string {
         $meta = $task->meta(true);
         $bconfId = $meta->getBconfId();
         if(!$bconfId){
-            throw new editor_Plugins_Okapi_Exception("E1384");
+            throw new ZfExtended_Mismatch('E2000', ['bconfId']);
         }
         $bconf = new editor_Plugins_Okapi_Models_Bconf();
         $bconf->load($bconfId);
