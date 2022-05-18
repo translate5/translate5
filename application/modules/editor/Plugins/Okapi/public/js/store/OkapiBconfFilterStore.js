@@ -26,29 +26,29 @@
  */
 
 /**
- * Store for the Bconfs og the translate5 installation
- * @class Editor.plugins.Okapi.store.BconfStore
+ * Store for the Okapi and Translate5 filters
+ * @class Editor.plugins.Okapi.store.OkapiBconfFilterStore
  * @extends Ext.data.Store
  */
-Ext.define('Editor.plugins.Okapi.store.BconfStore', {
+Ext.define('Editor.plugins.Okapi.store.OkapiBconfFilterStore', {
     extend: 'Ext.data.Store',
-    requires: ['Editor.plugins.Okapi.model.BconfModel'],
-    storeId: 'bconfStore',
-    model: 'Editor.plugins.Okapi.model.BconfModel',
+    storeId: 'bconfFilterStore',
+    alias: 'model.okapiBconfFilterStore',
+    model: 'Editor.plugins.Okapi.model.BconfFilterModel',
     autoLoad: true,
-    autoSync: true,
     pageSize: 0,
+    idProperty: 'id',
     proxy: {
         type: 'rest',
-        url: Editor.data.restpath + 'plugins_okapi_bconf',
+        url: Editor.data.restpath + 'plugins_okapi_bconffilter/okapi',
         reader: {
             rootProperty: 'rows',
             type: 'json'
-        },
-        writer: {
-            encode: true,
-            rootProperty: 'data',
-            writeAllFields: false
         }
     },
+    data: [{
+        name: 'okapi',
+        extensions: 'doc',
+        description: 'new filter'
+    }]
 });

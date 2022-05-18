@@ -1,3 +1,4 @@
+
 /*
  START LICENSE AND COPYRIGHT
 
@@ -26,29 +27,35 @@
  */
 
 /**
- * Store for the Bconfs og the translate5 installation
- * @class Editor.plugins.Okapi.store.BconfStore
+ * Store for the Filters inside a bconf
+ * @class Editor.plugins.Okapi.store.BconfFilterStore
  * @extends Ext.data.Store
  */
-Ext.define('Editor.plugins.Okapi.store.BconfStore', {
-    extend: 'Ext.data.Store',
-    requires: ['Editor.plugins.Okapi.model.BconfModel'],
-    storeId: 'bconfStore',
-    model: 'Editor.plugins.Okapi.model.BconfModel',
-    autoLoad: true,
-    autoSync: true,
-    pageSize: 0,
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath + 'plugins_okapi_bconf',
-        reader: {
-            rootProperty: 'rows',
-            type: 'json'
-        },
-        writer: {
-            encode: true,
-            rootProperty: 'data',
-            writeAllFields: false
-        }
+Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
+  extend: 'Ext.data.Store',
+  requires: ['Editor.plugins.Okapi.store.OkapiBconfFilterStore'], // for Okapi and Translate5 filters
+  storeId: 'bconfFilterStore',
+  alias: 'store.bconfFilterStore',
+  model: 'Editor.plugins.Okapi.model.BconfFilterModel',
+  autoLoad: false,
+  pageSize: 0,
+  idProperty: 'id',
+  proxy: {
+    type: 'rest',
+    url: Editor.data.restpath + 'plugins_okapi_bconffilter',
+    reader: {
+      rootProperty: 'rows',
+      type: 'json'
     },
+    writer: {
+      encode: true,
+      rootProperty: 'data',
+      writeAllFields: false
+    }
+  },
+  data:[{
+    name:'okapi',
+    extensions:'doc',
+    description:'new filter'
+  }]
 });

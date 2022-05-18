@@ -1,3 +1,4 @@
+<?php
 /*
  START LICENSE AND COPYRIGHT
 
@@ -25,30 +26,19 @@
  END LICENSE AND COPYRIGHT
  */
 
-/**
- * Store for the Bconfs og the translate5 installation
- * @class Editor.plugins.Okapi.store.BconfStore
- * @extends Ext.data.Store
- */
-Ext.define('Editor.plugins.Okapi.store.BconfStore', {
-    extend: 'Ext.data.Store',
-    requires: ['Editor.plugins.Okapi.model.BconfModel'],
-    storeId: 'bconfStore',
-    model: 'Editor.plugins.Okapi.model.BconfModel',
-    autoLoad: true,
-    autoSync: true,
-    pageSize: 0,
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath + 'plugins_okapi_bconf',
-        reader: {
-            rootProperty: 'rows',
-            type: 'json'
-        },
-        writer: {
-            encode: true,
-            rootProperty: 'data',
-            writeAllFields: false
-        }
-    },
-});
+class editor_Plugins_Okapi_Models_Validator_BconfFilter extends ZfExtended_Models_Validator_Abstract {
+
+    /**
+     * Validators for Okapi Bconf Filter Entity
+     */
+    protected function defineValidators() {
+        $this->addValidator('id', 'int');
+        $this->addValidator('bconfId', 'int');
+        $this->addValidator('okapiId', 'stringLength', array('min' => 1, 'max' => 50));
+        $this->addValidator('okapiName', 'stringLength', array('min' => 1, 'max' => 50));
+        $this->addValidator('mimeType', 'stringLength', array('min' => 1, 'max' => 20));
+        $this->addValidator('name', 'stringLength', array('min' => 1, 'max' => 50));
+        $this->addValidator('notes', 'stringLength', array('min' => 1, 'max' => 200));
+        $this->addValidator('extensions', 'stringLength', array('min' => 1, 'max' => 200));
+    }
+}

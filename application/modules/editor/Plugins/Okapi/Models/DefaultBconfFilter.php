@@ -1,3 +1,4 @@
+<?php
 /*
  START LICENSE AND COPYRIGHT
 
@@ -26,29 +27,15 @@
  */
 
 /**
- * Store for the Bconfs og the translate5 installation
- * @class Editor.plugins.Okapi.store.BconfStore
- * @extends Ext.data.Store
+ * Okapi Bconf Filter Entity Object
+ *
+ * @method integer getId() getId()
+ * @method void setId() setId(int $id)
  */
-Ext.define('Editor.plugins.Okapi.store.BconfStore', {
-    extend: 'Ext.data.Store',
-    requires: ['Editor.plugins.Okapi.model.BconfModel'],
-    storeId: 'bconfStore',
-    model: 'Editor.plugins.Okapi.model.BconfModel',
-    autoLoad: true,
-    autoSync: true,
-    pageSize: 0,
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath + 'plugins_okapi_bconf',
-        reader: {
-            rootProperty: 'rows',
-            type: 'json'
-        },
-        writer: {
-            encode: true,
-            rootProperty: 'data',
-            writeAllFields: false
-        }
-    },
-});
+class editor_Plugins_Okapi_Models_DefaultBconfFilter extends ZfExtended_Models_Entity_Abstract {
+    
+    const DATA_DIR = 'editorOkapiBconf';
+    
+    protected $dbInstanceClass = 'editor_Plugins_Okapi_Models_Db_DefaultBconfFilter';
+    
+}

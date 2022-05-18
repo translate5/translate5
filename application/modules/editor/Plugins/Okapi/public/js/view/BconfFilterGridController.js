@@ -1,3 +1,4 @@
+
 /*
  START LICENSE AND COPYRIGHT
 
@@ -25,30 +26,18 @@
  END LICENSE AND COPYRIGHT
  */
 
-/**
- * Store for the Bconfs og the translate5 installation
- * @class Editor.plugins.Okapi.store.BconfStore
- * @extends Ext.data.Store
+/**#@++
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-Ext.define('Editor.plugins.Okapi.store.BconfStore', {
-    extend: 'Ext.data.Store',
-    requires: ['Editor.plugins.Okapi.model.BconfModel'],
-    storeId: 'bconfStore',
-    model: 'Editor.plugins.Okapi.model.BconfModel',
-    autoLoad: true,
-    autoSync: true,
-    pageSize: 0,
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath + 'plugins_okapi_bconf',
-        reader: {
-            rootProperty: 'rows',
-            type: 'json'
-        },
-        writer: {
-            encode: true,
-            rootProperty: 'data',
-            writeAllFields: false
-        }
-    },
+/**
+ * @class Editor.view.admin.okapi.filter.BconfFilterGridController
+ * @extends Ext.app.ViewController
+ */
+Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.bconfFilterGridController',
+
 });

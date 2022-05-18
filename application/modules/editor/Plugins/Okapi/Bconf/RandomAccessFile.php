@@ -29,7 +29,7 @@
 /**
  *
  * Common util class for bconf export and import
- *
+ * Java reads/writes/represents in BigEndian
  */
 class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
 
@@ -74,6 +74,7 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
     }
 
     /** Read the Integer value in bconf
+     * QUIRK: PHP unpack has no option for signed 32bit Integer, so we have to convert after reading
      * @return int|mixed
      */
     public function readInt(): mixed {

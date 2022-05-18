@@ -31,6 +31,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     extend: 'Ext.grid.Panel',
     requires: [
         'Editor.plugins.Okapi.view.BconfGridController',
+        'Editor.plugins.Okapi.view.BconfFilterGrid',
         'Editor.plugins.Okapi.store.BconfStore',
     ],
     alias: 'widget.okapiBconfGrid',
@@ -43,7 +44,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     title: '#UT#Dateiformatkonvertierung',
     glyph: 'f1c9@FontAwesome5FreeSolid',
     listeners: {
-        beforeedit: 'handleBeforeedit'
+        beforeedit: 'handleBeforeedit',
+        show: 'loadOkapiFilters'
     },
     config: {
         customer: null
@@ -57,6 +59,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         _file: '#UT#-Datei',
         fileDlTemplate: '#UT#{0}{1} herunterladen',
         fileUpTemplate: '#UT#{0}{1} hochladen',
+        filters: '#UT#Filter',
         srx: '#UT#SRX',
         sourceSrx: '#UT#SourceSRX',
         targetSrx: '#UT#TargetSRX',
@@ -121,6 +124,16 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 editor: 'textfield',
                 text: me.text_cols.name,
             },
+            /*{
+                xtype: 'gridcolumn',
+                width: 200,
+                dataIndex: 'extensions',
+                stateId: 'extensions',
+                filter: {
+                    type: 'string',
+                },
+                text: me.text_cols.extensions,
+            },*/
             {
                 xtype: 'gridcolumn',
                 width: 300,
@@ -215,6 +228,23 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                             }
                         }
                 }
+            },
+            {
+                xtype: 'actioncolumn',
+                align: 'center',
+                menuDisabled: true,
+                width: 60,
+                text: 'Filters',//me.text_cols.filters,
+                menuText:'Filters',//me.text_cols.filters,
+                items: [
+                    {
+                        tooltip: 'Configure filters.<br>Currently set: .to,.be,.done', //me.strings.edit,
+                        isAllowedFor: 'bconfEdit',
+                        glyph: 'f0b0@FontAwesome5FreeSolid',
+                        handler: 'showFilterGrid',
+                        width:50
+                    },
+                    ]
             },
             {
                 xtype: 'actioncolumn',

@@ -26,8 +26,8 @@
  */
 
 /**
- * Main Controller of the Visual Review
- * Defines the Layout of the review Panel and it's controls, listens to the relevant global events and perocesses them
+ * Main Controller of the Okapi Plugin
+ * Adds the BconfGrids and BconfCombo
  *
  * @class BconfPrefs
  * @extends Ext.app.Controller

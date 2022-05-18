@@ -24,31 +24,17 @@
 
  END LICENSE AND COPYRIGHT
  */
-
-/**
- * Store for the Bconfs og the translate5 installation
- * @class Editor.plugins.Okapi.store.BconfStore
- * @extends Ext.data.Store
- */
-Ext.define('Editor.plugins.Okapi.store.BconfStore', {
-    extend: 'Ext.data.Store',
-    requires: ['Editor.plugins.Okapi.model.BconfModel'],
-    storeId: 'bconfStore',
-    model: 'Editor.plugins.Okapi.model.BconfModel',
-    autoLoad: true,
-    autoSync: true,
-    pageSize: 0,
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath + 'plugins_okapi_bconf',
-        reader: {
-            rootProperty: 'rows',
-            type: 'json'
-        },
-        writer: {
-            encode: true,
-            rootProperty: 'data',
-            writeAllFields: false
-        }
-    },
+Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
+    extend: 'Ext.data.Model',
+    storeId: 'bconfFilterStore',
+    alias: 'model.bconfFilterModel',
+    fields: [{
+        name: 'id',
+        type: 'int',
+    }, {
+        name: 'bconfId',
+        type: 'int',
+        reference: 'bconfmodel',
+    }
+    ]
 });

@@ -241,6 +241,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         $this->initEvents();
         $this->addController('BconfController');
+        $this->addController('BconfFilterController');
         $this->initRoutes();
     }
     
@@ -249,11 +250,16 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         /* @var $f Zend_Controller_Front */
         $r = $f->getRouter();
         
-        // route for bconf
+        // route for bconfs
         $route = new Zend_Rest_Route($f, [], array(
             'editor' => ['plugins_okapi_bconf'],
         ));
-        $r->addRoute('plugins_okapibconf_restdefault', $route);
+        $r->addRoute('plugins_okapi_bconf_restdefault', $route);
+        // route for filters
+        $route = new Zend_Rest_Route($f, [], array(
+            'editor' => ['plugins_okapi_bconffilter'],
+        ));
+        $r->addRoute('plugins_okapi_bconffilter_restdefault', $route);
         // New get route to export the bconf file.
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/downloadbconf',
@@ -304,7 +310,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $route = new Zend_Rest_Route($f, [], array(
             'editor' => ['plugins_okapi_bconffilter'],
         ));
-        $r->addRoute('plugins_okapibconffilter_restdefault', $route);
+        $r->addRoute('plugins_okapifilter_restdefault', $route);
     }
     
     public function getFrontendControllers(): array {

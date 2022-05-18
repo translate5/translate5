@@ -32,7 +32,7 @@
  *
  */
 /**
- * @class BConfGridController
+ * @class BconfGridController
  * @extends Ext.app.ViewController
  */
 Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
@@ -58,7 +58,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         } catch(e){
             return;
         }
-        var params = { id: rec.id, name: name };
+        var params = {id: rec.id, name: name};
         var customer = view.ownerGrid.getCustomer();
         if(customer){
             params.customerId = customer.id;
@@ -89,6 +89,43 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             okapiName: view.selection.get('name'),
         });
     },
+
+    showFilterGrid: function(){
+        Ext.create('Ext.window.Window', {
+            constrain: true,
+            title: 'Okapi Filters',
+            tools: [{
+                xtype: 'button',
+                enableToggle: true,
+                toggleHandler: function(btn, toggled){
+                    var filterGrid = btn.up('window').down('filtergrid'),
+                        filterProxy = filterGrid.getStore().getProxy();
+                    var extraParams = filterProxy.getExtraParams() || {};
+                    if(toggled){
+                        extraParams.defaults = 1;
+                    } else {
+                        delete extraParams.defaults;
+                    }
+                    filterProxy.setExtraParams(extraParams);
+                    filterGrid.getStore().reload();
+                },
+                text: '#UT#Show Okapi Defaults Filters',
+            }, {
+                xtype: 'tbspacer',
+                flex: 9
+            }],
+            modal: true,
+            height: window.innerHeight - 50,
+            width: window.innerWidth - 50,
+            resizable: true,
+            layout: 'fit',
+            //height: '95%',
+            //width: '95%',
+            resizable: true,
+            items: [Ext.create('Editor.plugins.Okapi.view.BconfFilterGrid', {})]
+        }).show();
+    },
+
     showSRXChooser: function(view, rowIndex, colIndex, actionItem){
         var controller = this;
         view.select(rowIndex);
@@ -99,7 +136,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
     downloadSRX: function(view, rowIndex, colIndex, /* actionItem */ {purpose}, e, /* record */ {id}){
         view.select(rowIndex);
-        Editor.util.Util.download('plugins_okapi_bconf/downloadsrx',{id, purpose});
+        Editor.util.Util.download('plugins_okapi_bconf/downloadsrx', {id, purpose});
     },
     uploadSRX: function(id, srx, purpose){
         var controller = this;
@@ -227,13 +264,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                     },
                     listeners: {
                         specialkey: function(field, e){
-                            if([e.ENTER,e.ESC].includes(e.keyCode)){
+                            if([e.ENTER, e.ESC].includes(e.keyCode)){
                                 panel.close();
                             }
                         }
                     }
                 }],
-                fbar: [{xtype: 'button', text: 'OK', formBind: true, handler:()=>panel.close() }]
+                fbar: [{xtype: 'button', text: 'OK', formBind: true, handler: () => panel.close()}]
             }).show();
             panel.isValid(); // trigger display of red border when invalid
         });
@@ -252,6 +289,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             }).catch();
             return false;
         }
+    },
+
+    loadOkapiFilters: function(bconfGrid){
+        debugger;
+        Ext.create('Editor.plugins.Okapi.store.OkapiBconfFilterStore');
     },
 
     createInfoSpan: function(json){
