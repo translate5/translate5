@@ -90,7 +90,8 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
         $raf->writeUTF($fileName, false);
 
         if($fileName == ''){
-            $raf->writeInt(0); // QUIRK Skip 4 bytes limiting size to 4GB
+            // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf. En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we write 2 32bit Ints here
+            $raf->writeInt(0);
             $raf->writeInt(0);
             return;
         }
@@ -99,8 +100,8 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
 
         $fileSize = filesize($fileName);
         $fileContent = fread($file, $fileSize);
-
-        $raf->writeInt(0); // QUIRK Skip 4 bytes limiting size to 4GB
+        // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf. En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we write 2 32bit Ints here (limiting the encodable size to 4GB...)
+        $raf->writeInt(0);
         $raf->writeInt($fileSize);
         if($fileSize > 0){
             $raf->fwrite($fileContent);
