@@ -324,10 +324,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', [$this, 'handleJsTranslations']);
 
         //checks if import contains files for okapi:
+        $this->eventManager->attach('editor_Models_Import', 'afterUploadPreparation', [$this, 'handleAfterUploadPreparation']);
         $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'beforeDirectoryParsing', [$this, 'handleBeforeDirectoryParsing']);
         $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'afterDirectoryParsing', [$this, 'handleAfterDirectoryParsing']);
-        $this->eventManager->attach('editor_Models_Import', 'afterUploadPreparation', [$this, 'handleAfterUploadPreparation']);
-        
+
         //invokes in the handleFile method of the relais filename match check.
         // Needed since relais files are bilingual (ending on .xlf) and the
         // imported files for Okapi are in the source format and do not end on .xlf.
@@ -389,19 +389,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $dataProvider = $event->getParam('dataProvider');
         // UGLY: this replicates the logic in ::handleBeforeDirectoryParsing. But it's too late to add sth. to the archive there
         $bconfInZip = self::findImportBconfFileinDir($dataProvider->getAbsImportPath());
+        // if a bconf is provided it will be part of the archive anyway
         if($bconfInZip == NULL){
             // normal behaviour: bconf via task-meta
-
             $bconfPath = $this->getBconfPathForTask($event->getParam('task'));
             $dataProvider->addAdditonalFileToArchive($bconfPath);
-        } else {
-            // DEPRECATED import of BCONF via ZIP
-            // create a warning about using the deprecated API
-            /* @var $task editor_Models_Task */
-            $task = $event->getParam('task');
-            $task->logger('plugin.okapi')->warn('E1387', 'Okapi Plug-In: Providing the BCONF to use in the import ZIP is deprecated', [
-                  'bconf' => basename($bconfInZip),
-            ]);
         }
     }
 
@@ -418,7 +410,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         // DEPRECATED compatibility code: enabling import BCONF to be supplied via import folder
         $this->bconfInZip = self::findImportBconfFileinDir($event->getParam('importFolder'));
         if($this->bconfInZip != NULL){
+            // DEPRECATED import of BCONF via ZIP
             $this->useCustomBconf = true;
+            // create a warning about using the deprecated API
+            /* @var $task editor_Models_Task */
+            $task = $event->getParam('task');
+            $task->logger('editor.task.okapi')->warn('E1387', 'Okapi Plug-In: Providing the BCONF to use in the import ZIP is deprecated', [
+                'bconf' => basename($this->bconfInZip),
+            ]);
         } else {
             // the normal behaviour: bconf is defined via task and set in import wizard
             $bconfPath = $this->getBconfPathForTask($event->getParam('task'));
