@@ -129,12 +129,22 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
         //this is not standard controller action route
-        //when this route is triggered, a coresponding event from the given controller will be fired
+        //when this route is triggered, a corresponding event from the given controller will be fired
         //ex: editor/task/123/analysis/operation
         //    - an event called analysisOperation will be fired from task controller(task entity with id 123)
         $this->front->getRouter()->addRoute('editorOperationHandler', new ZfExtended_Controller_RestLikeRoute(
             //'editor/:entity/:id/:operation/operation',
             'editor/:controller/:id/:operation/operation',
+            array(
+                'module' => 'editor',
+                'action' => '',
+            )
+        ));
+
+        // same as above operation definition, expect here the entity is not mandatory
+        $this->front->getRouter()->addRoute('editorOperationHandlerNoEntity', new ZfExtended_Controller_RestLikeRoute(
+        //'editor/:entity/:id/:operation/operation',
+            'editor/:controller/:operation/operation',
             array(
                 'module' => 'editor',
                 'action' => '',

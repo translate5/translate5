@@ -70,7 +70,7 @@ trait editor_Models_Entity_SpecificDataTrait {
     }
     
     /***
-     * Add specific data by propert name and value. The result will be encoded back to json
+     * Add specific data by property name and value. The result will be encoded back to json
      * @param string $propertyName
      * @param mixed $value
      * @return boolean
@@ -85,6 +85,19 @@ trait editor_Models_Entity_SpecificDataTrait {
         $specificData->$propertyName=$value;
         $this->setSpecificData($specificData);
         return true;
+    }
+
+    /***
+     * @param string $propertyName
+     * @return void
+     */
+    public function removeSpecificData(string $propertyName): void
+    {
+        $specificData=$this->getSpecificData();
+        if(property_exists($specificData,$propertyName)){
+            unset($specificData->$propertyName);
+        }
+        $this->setSpecificData($specificData);
     }
    
 }

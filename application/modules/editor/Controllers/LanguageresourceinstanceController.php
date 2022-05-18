@@ -1068,7 +1068,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @param array $importInfo
      * @param boolean $addNew
      */
-    protected function queueServiceImportWorker(array $importInfo, bool $addNew){
+    protected function queueServiceImportWorker(array $importInfo, bool $addNew)
+    {
         $worker=ZfExtended_Factory::get('editor_Services_ImportWorker');
         /* @var $worker editor_Services_ImportWorker */
 
@@ -1095,7 +1096,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->addSpecificData('status',editor_Services_Connector_FilebasedAbstract::STATUS_IMPORT);
         $this->entity->save();
 
-        $worker->queue();
+        $workerId = $worker->queue();
+
+        $this->events->trigger('serviceImportWorkerQueued',argv: [
+            'entity' => $this->entity,
+            'workerId' => $workerId
+        ]);
     }
 
     /***
