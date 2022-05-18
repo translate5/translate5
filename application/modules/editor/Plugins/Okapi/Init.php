@@ -385,12 +385,13 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @throws editor_Plugins_Okapi_Exception
      */
     public function handleAfterUploadPreparation(Zend_EventManager_Event $event) {
+        /* @var $dataProvider editor_Models_Import_DataProvider_Abstract */
+        $dataProvider = $event->getParam('dataProvider');
         // UGLY: this replicates the logic in ::handleBeforeDirectoryParsing. But it's too late to add sth. to the archive there
         $bconfInZip = self::findImportBconfFileinDir($dataProvider->getAbsImportPath());
         if($bconfInZip == NULL){
             // normal behaviour: bconf via task-meta
-            /* @var $dataProvider editor_Models_Import_DataProvider_Abstract */
-            $dataProvider = $event->getParam('dataProvider');
+
             $bconfPath = $this->getBconfPathForTask($event->getParam('task'));
             $dataProvider->addAdditonalFileToArchive($bconfPath);
         } else {
