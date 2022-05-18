@@ -226,7 +226,12 @@ Ext.define('Editor.controller.Editor', {
     initEditPluginHandler: function (segmentsGrid) {
         var me = this,
             plug = me.getEditPlugin(),
-            disableEditing = function(){me.isEditing = false;};
+            disableEditing = function(){
+                let vm = me.getSegmentGrid().lookupViewModel();
+                    //if needed add current edited segment here too
+                    vm.set('isEditingSegment', false);
+                me.isEditing = false;
+            };
             
         plug.on('beforestartedit', me.handleBeforeStartEdit, me);
         plug.on('beforeedit', me.handleStartEdit, me);
@@ -353,9 +358,9 @@ Ext.define('Editor.controller.Editor', {
             // we just make a loop to check if the segment state is not pending anymore 
             me.getSegmentGrid().setLoading(me.messages.segmentStillSaving);
             deferInterval = Ext.interval(function(){
-                var skip = i++ > 12, 
-                    pending = segment.get('autoStateId') == Editor.data.segments.autoStates.PENDING;
                 //skip after 6 seconds, with can not edit message
+                var skip = i++ > 12,
+                    pending = segment.get('autoStateId') == Editor.data.segments.autoStates.PENDING;
                 if(skip) {
                     Editor.MessageBox.addInfo(me.messages.f2Readonly);
                 }
@@ -378,8 +383,11 @@ Ext.define('Editor.controller.Editor', {
         return true;
     },
     handleStartEdit: function(plugin, context) {
-        var me = this;
+        let me = this,
+            vm = me.getSegmentGrid().lookupViewModel();
         me.isEditing = true;
+        //if needed add current edited segment here too
+        vm.set('isEditingSegment', true);
         me.prevNextSegment.calculateRows(context); //context.record, context.rowIdx TODO
         me.getSourceTags(context);
     },
@@ -1678,33 +1686,24 @@ Ext.define('Editor.controller.Editor', {
      */
     watchSegment: function() {
         if(!this.isEditing){
+            let segment = this.getSegmentGrid()?.getViewModel()?.get('selectedSegment');
+            /** @var {Editor.model.Segment} segment */
+            segment && segment.toogleBookmark();
             return;
         }
         var me = this,
-            model, config,
             ed = me.getEditPlugin(),
             record = ed.context.record,
-            segmentId = record.get('id'),
             isWatched = Boolean(record.get('isWatched')),
-            segmentUserAssocId = record.get('segmentUserAssocId'),
             navi = me.getNavi(),
             startText = navi.item_startWatchingSegment,
             stopText = navi.item_stopWatchingSegment,
             but = navi.down('#watchSegmentBtn'),
-            success = function(rec, op) {
+            success = function() {
                 var displayfield = ed.editor.down('displayfield[name="autoStateId"]'),
                     autoStateCell = ed.context && Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
-                //isWatched
-                record.set('isWatched', !isWatched);
-                record.set('segmentUserAssocId', isWatched ? null : rec.data['id']);
                 but.setTooltip(isWatched ? startText : stopText);
                 but.toggle(!isWatched, true);
-                if(op.action === 'create') {
-                    me.fireEvent('watchlistAdded', record, me, rec);
-                }
-                else {
-                    me.fireEvent('watchlistRemoved', record, me, rec);
-                }
                 //update autostate displayfield, since the displayfields are getting the rendered content, we have to fetch it here from rendered HTML too
                 autoStateCell && displayfield.setValue(autoStateCell.getHtml());
             },
@@ -1712,26 +1711,10 @@ Ext.define('Editor.controller.Editor', {
                 but.setTooltip(isWatched ? stopText : startText);
                 but.toggle(isWatched, true);
             };
-        
-        if (isWatched) {
-            config = {
-                id: segmentUserAssocId
-            };
-            model = Ext.create('Editor.model.SegmentUserAssoc', config);
-            model.getProxy().setAppendId(true);
-            model.erase({
-                success: success,
-                failure: failure
-            });
-        } else {
-            model = Ext.create('Editor.model.SegmentUserAssoc', {'segmentId': segmentId});
-            model.save({
-                success: success,
-                failure: failure
-            });
-        }
+
+        record.toogleBookmark(success, failure);
     },
-    
+
     /**
      * In textareas ExtJS 6.2 enter keys are not bubbling up, but they are triggering a specialkey event
      *  we listen to that event and process our own keys then. 

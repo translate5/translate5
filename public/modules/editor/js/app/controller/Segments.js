@@ -117,8 +117,7 @@ Ext.define('Editor.controller.Segments', {
         	  editorViewportOpened: 'onOpenEditorViewport'
           },
           '#Editor': {
-              saveSegment: 'saveChainStart',
-              watchlistRemoved: 'handleWatchlistRemoved'
+              saveSegment: 'saveChainStart'
           },
           '#ChangeAlike': {
               //called after currently loaded segment data is not used anymore by the save chain / change alike handling
@@ -148,6 +147,9 @@ Ext.define('Editor.controller.Segments', {
           },
           'segmentsToolbar #segmentLockBtn': {
               click: 'onToggleLockBtn'
+          },
+          'segmentsToolbar #bookmarkBtn': {
+              click: 'onToggleBookmarkBtn'
           },
           'segmentsToolbar #watchListFilterBtn': {
               click: 'watchListFilter'
@@ -325,15 +327,25 @@ Ext.define('Editor.controller.Segments', {
       }
   },
 
+    onToggleBookmarkBtn: function(button){
+        let vm = button.up('#segmentgrid').getViewModel(),
+            /** @var {Editor.model.Segment} segment */
+            segment = vm.get('selectedSegment');
+        segment && segment.toogleBookmark();
+    },
+
   onToggleLockBtn: function (button) {
-      let segment = button.lookupViewModel().get('selectedSegment'),
+      let vm = button.up('#segmentgrid').getViewModel(),
+          segment = vm.get('selectedSegment'),
           operation = segment.get('editable') ? 'lock' : 'unlock',
           appendId = segment.proxy.appendId;
 
       segment.proxy.appendId = false;
       segment.load({
           url: segment.proxy.url+'/'+segment.get('id')+'/'+operation+'/operation',
-          appendId: false
+          success: function(seg) {
+              vm.set('selectedSegment', seg);
+          }
       });
       segment.proxy.appendId = appendId;
   },
@@ -352,16 +364,6 @@ Ext.define('Editor.controller.Segments', {
           else {
               column.filter.setActive(false);
           }
-      }
-  },
-  /**
-   * removes the segment from the grid if removed from the watchlist and watchlist filter is set
-   */
-  handleWatchlistRemoved: function(rec) {
-      var me = this, 
-          btn = me.getWatchListFilterBtn();
-      if(!btn.pressed) {
-          return;
       }
   },
   /**

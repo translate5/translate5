@@ -680,12 +680,25 @@ class Editor_SegmentController extends ZfExtended_RestController
         throw new ZfExtended_BadMethodCallException(__CLASS__ . '->post');
     }
 
+    /**
+     * @throws ZfExtended_NoAccessException
+     * @throws editor_Models_Segment_Exception
+     */
     public function lockOperation() {
+        //the amount of new ACL rules would be huge to handle that lock/unlock Batch/Operations with
+        // ordinary controller right handling since currently role editor has access to all methods here.
+        // So its easier to double access to that functions for PM users then
+        $this->checkAccess('frontend', 'lockSegmentOperation', __CLASS__.'::'.__FUNCTION__);
         $this->getAction();
         $this->toggleEditable(false);
     }
 
+    /**
+     * @throws ZfExtended_NoAccessException
+     * @throws editor_Models_Segment_Exception
+     */
     public function unlockOperation() {
+        $this->checkAccess('frontend', 'unlockSegmentOperation', __CLASS__.'::'.__FUNCTION__);
         $this->getAction();
         $this->toggleEditable(true);
     }

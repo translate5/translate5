@@ -146,25 +146,32 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-  	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
-  	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansicht');?>';
-  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Zu Detailansicht zurücksetzen');?>';
-  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Zu normaler Ansicht zurücksetzen');?>';
-  	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>';
-  	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
-  	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
-  	gridToolbar.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>';
-  	gridToolbar.item_zoomIn = '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>';
-  	gridToolbar.item_zoomOut = '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>';
-  	gridToolbar.item_clearSortAndFilterBtn = '<?php echo $this->translate->_('Tabelle zurücksetzen');?>';
-  	gridToolbar.item_clearSortAndFilterTooltip = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>';
-  	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Lesezeichen');?>';
-  	gridToolbar.item_helpTooltip = '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>';
-  	gridToolbar.item_showBookmarkedSegments = '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>';
-  	gridToolbar.item_repeatedFilterBtn = '<?php echo $this->translate->_('Nur wiederholt');?>';
-  	gridToolbar.item_showRepeatedSegments = '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>';
-    gridToolbar.strings.interfaceTranslation = '<?php echo $this->translate->_('Oberfläche');?>';
-    gridToolbar.item_themeMenuConfigText = '<?php echo $this->translate->_('Layout');?>';
+    Ext.define("Editor.locale.view.segments.grid.Toolbar", {
+        override: "Editor.view.segments.grid.Toolbar",
+        item_viewModesMenu: '<?php echo $this->translate->_('Ansicht');?>',
+        item_editModeBtn: '<?php echo $this->translate->_('Zu Detailansicht zurücksetzen');?>',
+        item_ergonomicModeBtn: '<?php echo $this->translate->_('Zu normaler Ansicht zurücksetzen');?>',
+        item_hideTagBtn: '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>',
+        item_shortTagBtn: '<?php echo $this->translate->_('Tag-Kurzansicht');?>',
+        item_fullTagBtn: '<?php echo $this->translate->_('Tag-Vollansicht');?>',
+        item_optionsTagBtn: '<?php echo $this->translate->_('Einstellungen');?>',
+        item_zoomIn: '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>',
+        item_zoomOut: '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>',
+        item_clearSortAndFilterBtn: '<?php echo $this->translate->_('Tabelle zurücksetzen');?>',
+        item_clearSortAndFilterTooltip: '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>',
+        item_watchListFilterBtn: '<?php echo $this->translate->_('Lesezeichen');?>',
+        item_helpTooltip: '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>',
+        item_showBookmarkedSegments: '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>',
+        item_repeatedFilterBtn: '<?php echo $this->translate->_('Nur wiederholt');?>',
+        item_showRepeatedSegments: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>',
+        item_themeMenuConfigText: '<?php echo $this->translate->_('Layout');?>',
+        strings: {
+            interfaceTranslation: '<?php echo $this->translate->_('Oberfläche');?>',
+            toggleBookmark: '<?php echo $this->translate->_('Segment als Favorit (Bookmark) markieren bzw. Markierung entfernen');?>',
+            toggleLock: '<?php echo $this->translate->_('Segment sperren bzw. entsperren');?>'
+        }
+    });
+
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
 

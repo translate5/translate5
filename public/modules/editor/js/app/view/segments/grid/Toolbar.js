@@ -65,7 +65,9 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_showRepeatedSegments: '#UT#Nur Segmente mit Wiederholungen anzeigen',
     item_themeMenuConfigText:'#UT#Layout',
     strings:{
-        interfaceTranslation:'#UT#Oberfläche'
+        interfaceTranslation:'#UT#Oberfläche',
+        toggleBookmark: '#UT#Segment als Favorit (Bookmark) markieren bzw. Markierung entfernen',
+        toggleLock: '#UT#Segment sperren bzw. entsperren'
     },
     viewModel: {
         type:'segmentsToolbar'
@@ -184,7 +186,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     itemId: 'watchListFilterBtn',
                     cls: 'watchListFilterBtn',
                     enableToggle: true,
-                    text: me.item_watchListFilterBtn,
                     tooltip: {
                         text: me.item_showBookmarkedSegments,
                         showDelay: 0
@@ -194,7 +195,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'button',
                     glyph: 'f0c5@FontAwesome5FreeSolid',
                     itemId: 'filterBtnRepeated',
-                    text: me.item_repeatedFilterBtn,
                     bind: {
                         hidden: '{!taskHasDefaultLayout}'
                     },
@@ -205,7 +205,36 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     },
                 },{
                     xtype: 'tbseparator',
-                    hidden: !Editor.data.task.hasMqm()
+                },{
+                    xtype: 'button',
+                    itemId: 'bookmarkBtn',
+                    enableToggle: true,
+                    bind: {
+                        pressed: '{segmentIsWatched}',
+                        //if a segment is edited the button in the meta panel must be used
+                        disabled: '{isEditingSegment || !selectedSegment}',
+                        icon: Editor.data.moduleFolder+'images/{segmentIsWatched ? "star_remove" : "star_add"}.png',
+                    },
+                    tooltip: {
+                        text: me.strings.toggleBookmark,
+                        showDelay: 0
+                    }
+                },{
+                    xtype: 'button',
+                    itemId: 'segmentLockBtn',
+                    hidden: !Editor.app.authenticatedUser.isAllowed('lockSegmentOperation') || !Editor.app.authenticatedUser.isAllowed('unlockSegmentOperation'),
+                    enableToggle: true,
+                    bind: {
+                        icon: Editor.data.moduleFolder+'images/{segmentIsEditable ? "lock_open" : "lock"}.png',
+                        pressed: '{! segmentIsEditable}',
+                        // to reduce problems of update the opened segment we just prohibit usage if a segment is in editing
+                        disabled: '{isEditingSegment || !selectedSegment || segmentIsBlocked}'
+                    },
+                    tooltip: {
+                        text: me.strings.toggleLock,
+                        showDelay: 0
+                    }
+                
                 },{
                 	xtype: 'tbfill'
                 },{

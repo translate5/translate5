@@ -30,17 +30,32 @@ Ext.define('Editor.view.segments.grid.ToolbarViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.segmentsToolbar',
     formulas: {
-        segmentIsWatched: function(get) {
-            let seg = get('selectedSegment');
-            return seg && seg.get('isWatched');
+        segmentIsWatched: {
+            bind: {
+                bindTo: '{selectedSegment}',
+                deep: true
+            },
+            get: function(seg) {
+                return seg && seg.get('isWatched');
+            }
         },
-        segmentIsBlocked: function(get) {
-            let seg = get('selectedSegment');
-            return seg && seg.get('autoStateId') === Editor.data.segments.autoStates.BLOCKED;
+        segmentIsBlocked: {
+            bind: {
+                bindTo: '{selectedSegment}',
+                deep: true
+            },
+            get: function(seg) {
+                return seg && seg.get('autoStateId') === Editor.data.segments.autoStates.BLOCKED;
+            }
         },
-        segmentIsEditable: function(get) {
-            let seg = get('selectedSegment');
-            return seg && seg.get('editable');
+        segmentIsEditable: {
+            bind: {
+                bindTo: '{selectedSegment}',
+                deep: true
+            },
+            get: function(seg) {
+                return seg && seg.get('editable');
+            }
         },
         isNormalEdit: function(get) {
             return get('viewmodeIsEdit') && !get('editorIsReadonly');
