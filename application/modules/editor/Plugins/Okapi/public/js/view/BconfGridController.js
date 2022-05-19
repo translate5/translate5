@@ -116,6 +116,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                 Ext.Msg.show({
                     title: invalidTitle,
                     message: invalidMsg + extraInfo,
+                    buttons: Ext.MessageBox.OK,
                     icon: Ext.Msg.WARNING
                 });
             } else if(status !== 200){
