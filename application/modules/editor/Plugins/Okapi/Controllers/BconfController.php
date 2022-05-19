@@ -120,10 +120,16 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
 
         $srxUploadFile = $_FILES['srx']['tmp_name'];
         $srx = new editor_Utils_Dom();
-        $xmlErrors = $srx->load($srxUploadFile) ? $srx->getErrorMsg('', true) : '';
+        $xmlErrors = '';
+        if($srx->load($srxUploadFile)){
+            $rootTag = strtolower($srx->firstChild?->tagName);
+            if($rootTag !== 'srx'){
+                $xmlErrors .= "\nInvalid root tag '$rootTag'.";
+            }
+        } else {
+            $xmlErrors .= "\n".$srx->getErrorMsg('', true);
+        }
 
-        $rootTag = strtolower($srx->firstChild?->tagName);
-        $rootTag !== 'srx' && $xmlErrors .= "\n Invalid root tag '$rootTag'.";
 
         if(!empty($xmlErrors)){
             throw new editor_Plugins_Okapi_Exception('E1390', ['details' => $xmlErrors]);
