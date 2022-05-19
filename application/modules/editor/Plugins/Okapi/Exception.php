@@ -43,8 +43,7 @@ class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
         'E1059' => 'Okapi Plug-In: Configuration error - no Okapi server URL is configured!',
         'E1150' => 'Okapi Plug-In: The exported XLIFF contains empty targets, the Okapi process will probably fail then.',
         'E1340' => 'Okapi Plug-In: The default bconf configuration file-name is not set.',
-        'E1384' => 'Okapi Import called without bconfId!',
-        'E9999' => 'Okapi Plug-In: The SRX file is not valid. {details}',
-
+        'E1387' => 'Okapi Plug-In: Providing the BCONF to use in the import ZIP is deprecated',
+        'E1390' => 'Okapi Plug-In: The SRX file is not valid. {details}',
     ];
 }

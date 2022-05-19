@@ -88,7 +88,7 @@ class Markup {
      * @return string
      */
    private static function escapePureMarkup(string $markup) : string {
-      $parts = preg_split(self::PATTERN.'U', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+       $parts = preg_split(self::PATTERN.'U', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
        $result = '';
        foreach($parts as $part){
            if(preg_match(self::PATTERN, $part) === 1){

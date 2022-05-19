@@ -174,7 +174,7 @@ trait editor_Services_Connector_BatchTrait {
         if(is_numeric($this->batchQueryBufferSize) === false){
             return 0;
         }
-        return strlen($querySegment) / 1024;
+        return strlen(urlencode($querySegment)) / 1024;
     }
     
     /**

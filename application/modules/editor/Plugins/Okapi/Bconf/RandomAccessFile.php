@@ -93,21 +93,4 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
         $this->fwrite(pack("N", $intValue));
     }
 
-    /** Write the Long  value in bconf
-     * @return mixed
-     */
-    public function readLong(): mixed {
-        try {
-            return unpack("J", $this->fread(8))[1];
-        } catch(Exception $e){
-            throw new ZfExtended_UnprocessableEntity('E1026', ['errors' =>  [[$e]]]);
-        }
-    }
-
-    /** Write the Long  value in bconf
-     * @param $longValue
-     */
-    public function writeLong($longValue) {
-        $this->fwrite(pack("J", $longValue));
-    }
 }

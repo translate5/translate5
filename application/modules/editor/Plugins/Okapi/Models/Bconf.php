@@ -44,8 +44,6 @@
  */
 class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstract {
 
-    const SYSTEM_BCONF_VERSION = 9;
-
     private static ?string $bconfRootDir = null;
 
     public static function getBconfRootDir(): string {
@@ -193,7 +191,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * Lazy accessor for our file wrapper
      * @return editor_Plugins_Okapi_Bconf_File
      */
-    private function getFile(): editor_Plugins_Okapi_Bconf_File {
+    public function getFile(): editor_Plugins_Okapi_Bconf_File {
         if($this->file == NULL){
             $this->file = new editor_Plugins_Okapi_Bconf_File($this);
         }
