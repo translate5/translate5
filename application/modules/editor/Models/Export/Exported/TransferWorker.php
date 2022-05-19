@@ -97,14 +97,26 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
         // Responses
         $json = [];
 
+        // Get target language rfc5646-code
+        $targetLangId = $task->getTargetLang();
+        $targetLangRfc = ZfExtended_Factory::get('editor_Models_Languages')->load($targetLangId)->rfc5646;
+
         // Foreach exported tbx file
         foreach ($tbxA as $idx => $tbx) {
 
             // If exported tbx file name does not match the pattern - skip
-            if (!preg_match('~TermCollection_([0-9]+)_[0-9]+\.tbx$~', $tbx, $m)) continue;
+            if (!preg_match('~TermCollection_([0-9]+)_[0-9]+\.tbx$~', $tbx, $m)) {
+                continue;
+            }
+
+            // Get raw tbx contents
+            $raw = file_get_contents($tbx);
+
+            // Spoof rfc5646-code of source language with target language one
+            $raw = preg_replace('~(<langSet.+?xml:lang=")([^"]+)(".*?>)~', '$1' . $targetLangRfc . '$3', $raw);
 
             // Add file upload
-            $api->addFilePlain('tmUpload', file_get_contents($tbx), 'text/xml', $m[0]);
+            $api->addFilePlain('tmUpload', $raw, 'text/xml', $m[0]);
 
             // Make request to imitate language resource tbx import dialog submit
             $json[$idx] = $api->requestJson($url . 'languageresourceinstance/' . $m[1] . '/import/', 'POST', $data);
