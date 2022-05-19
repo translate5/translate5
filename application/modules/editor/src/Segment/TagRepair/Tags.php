@@ -190,7 +190,7 @@ class Tags extends \editor_TagSequence {
         // re-evaluate the word-positions of our tags and restore the text-indices
         $textLength = $this->getTextLength();
         $wordRatio = $this->countWords($this->text) / $this->originalNumWords;
-        $textRatio = $textLength / $this->originalTextLength;
+        $textRatio = ($this->originalTextLength === 0) ? 1 : $textLength / $this->originalTextLength;
         // first the "real" non-singular tags
         for($i=0; $i < $numTags; $i++){
             if(!$this->tags[$i]->isSingular()){

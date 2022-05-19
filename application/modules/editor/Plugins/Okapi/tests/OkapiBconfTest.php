@@ -207,27 +207,14 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         ];
         $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en.txt'));
         $api->import($task);
-        /** @var editor_Models_Task $realTask */
-        $realTask = ZfExtended_Factory::get('editor_Models_Task');
-        $realTask->load($api->getTask()->id);
-        /** @var editor_Models_Task_Remover $remover */
-        $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', [$realTask]);
-        $remover->removeForced();
+        $this->cleanupTask($api);
     }
 
     /***
      * Verify Task Import using Okapi is working with the LEK_okapi_bconf based Bconf management
-     * @depends test30_OkapiTaskImport
+     * @depends test40_OkapiTaskImport
      */
     public function test50_OkapiTaskImportWithBconfIdAndMultipleFiles() {
-        try {
-            $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . self::$okapiConf->api->url . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
-            $longHornResponse = (new Zend_Http_Client($this::$okapiConf->api->url))->request();
-            self::assertTrue($longHornResponse->getStatus() === 200, $msg);
-        } catch(Exception $e){
-            self::fail($msg . "\n" . $e->getMessage());
-        }
-
         $api = self::$api;
         $task = [
             'sourceLang' => 'de',
@@ -237,6 +224,29 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en.txt'));
         $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en-2.txt'));
         $api->import($task);
+        $this->cleanupTask($api);
+    }
+
+    /***
+     * Verify ImportArchives with bconfs are supported
+     * @depends test50_OkapiTaskImportWithBconfIdAndMultipleFiles
+     */
+    public function test55_BconfInImportArchive() {
+        $api = self::$api;
+        $task = [
+            'sourceLang' => 'de',
+            'targetLang' => 'en',
+        ];
+        $api->addImportFile($api->getFile('workfiles/BconfWithin.zip'));
+        $api->import($task);
+        $task = $api->getTask();
+        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $segments= $api->requestJson('editor/segment?page=1&start=0&limit=3');
+        // Leave task so it becomes deleteable
+        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+
+        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
+        $this->cleanupTask();
     }
 
     /***
@@ -292,5 +302,18 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
     public static function tearDownAfterClass(): void {
         parent::tearDownAfterClass();
+    }
+
+    /**
+     * Delete and cleanup the current active task.
+     * Needed because this Test does multiple task imports.
+     */
+    public function cleanupTask(): void {
+        /** @var editor_Models_Task $realTask */
+        $realTask = ZfExtended_Factory::get('editor_Models_Task');
+        $realTask->load(self::$api->getTask()->id);
+        /** @var editor_Models_Task_Remover $remover */
+        $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', [$realTask]);
+        $remover->removeForced();
     }
 }
