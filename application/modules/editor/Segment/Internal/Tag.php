@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use PHPHtmlParser\Dom\Node\HtmlNode;
+use PHPHtmlParser\Dom\Node\AbstractNode;
+
 /**
  * Represents an Internal tag
  * Example <div class="single 123 internal-tag ownttip"><span title="&lt;ph ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte, Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;" class="short">&lt;1/&gt;</span><span data-originalid="6f18ea87a8e0306f7c809cb4f06842eb" data-length="-1" class="full">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;</span></div>
@@ -76,12 +79,48 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * @var string
      */
     const CSS_CLASS_TAB = 'tab';
-    
+
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
 
     protected static $nodeName = 'div';
     
     protected static $identificationClass = self::CSS_CLASS;
+
+    /**
+     * Provides validating a list of DOMchildren to be the inner elements of a proper internal tag
+     * @param DOMNodeList|null $domChildren
+     * @return bool
+     */
+    public static function domElementChildrenAreInternalTagChildren(\DOMNodeList $domChildren=NULL){
+        if($domChildren === NULL || $domChildren->count() != 2){
+            return false;
+        }
+        $item0 = $domChildren->item(0);
+        $item1 = $domChildren->item(1);
+        if($item0 == NULL || $item0->nodeType !== XML_ELEMENT_NODE || strtolower($item0->nodeName) !== 'span'){
+            return false;
+        }
+        if($item1 == NULL || $item1->nodeType !== XML_ELEMENT_NODE || strtolower($item1->nodeName) !== 'span'){
+            return false;
+        }
+        return true;
+    }
+    /**
+     * Provides validating an array of HtmlNode children to be the inner elements of a proper internal tag
+     * @param AbstractNode[]|null $htmlChildren
+     */
+    public static function htmlNodeChildrenAreInternalTagChildren(array $htmlChildren=NULL){
+        if($htmlChildren === NULL || count($htmlChildren) != 2){
+            return false;
+        }
+        $tag0Tag = (is_a($htmlChildren[0], 'PHPHtmlParser\Dom\Node\HtmlNode')) ? $htmlChildren[0]->getTag() : NULL;
+        $tag1Tag = (is_a($htmlChildren[1], 'PHPHtmlParser\Dom\Node\HtmlNode')) ? $htmlChildren[0]->getTag() : NULL;
+        if($tag0Tag != NULL && $tag1Tag != NULL && strtolower($tag0Tag->name()) === 'span' && strtolower($tag1Tag->name()) === 'span'){
+            return true;
+        }
+        return false;
+    }
+
     /**
      * 
      * @var editor_Segment_Internal_ContentTag[]

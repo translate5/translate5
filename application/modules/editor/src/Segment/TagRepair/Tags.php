@@ -399,13 +399,13 @@ class Tags extends \editor_TagSequence {
     /* Creation API */
 
     /**
-     *
      * @param \PHPHtmlParser\Dom\Node\HtmlNode $node
      * @param int $startIndex
+     * @param array|null $children
      * @return \editor_Segment_Tag
      * @throws \stringEncode\Exception
      */
-    protected function createFromHtmlNode(\PHPHtmlParser\Dom\Node\HtmlNode $node, int $startIndex) : \editor_Segment_Tag {
+    protected function createFromHtmlNode(\PHPHtmlParser\Dom\Node\HtmlNode $node, int $startIndex, array $children=NULL) : \editor_Segment_Tag {
         $classNames = [];
         $attributes = [];
         $domTag = $node->getTag();
@@ -417,15 +417,15 @@ class Tags extends \editor_TagSequence {
                 $attributes[$name] = $attrib->getValue();
             }
         }
-        return $this->createRepairTag($classNames, $attributes, $domTag->name(), $startIndex);
+        return $this->createRepairTag($classNames, $attributes, $domTag->name(), $startIndex, NULL, $children);
     }
     /**
-     *
      * @param \DOMElement $element
      * @param int $startIndex
+     * @param \DOMNodeList|null $children
      * @return \editor_Segment_Tag
      */
-    protected function createFromDomElement(\DOMElement $element, int $startIndex) : \editor_Segment_Tag {
+    protected function createFromDomElement(\DOMElement $element, int $startIndex, \DOMNodeList $children=NULL) : \editor_Segment_Tag {
         $classNames = [];
         $attributes = [];
         if($element->hasAttributes()){
@@ -437,7 +437,7 @@ class Tags extends \editor_TagSequence {
                 }
             }
         }
-        return $this->createRepairTag($classNames, $attributes, $element->nodeName, $startIndex);
+        return $this->createRepairTag($classNames, $attributes, $element->nodeName, $startIndex, $children, NULL);
     }
     /**
      * @param array $classNames
@@ -446,8 +446,13 @@ class Tags extends \editor_TagSequence {
      * @param int $startIndex
      * @return Tag
      */
-    private function createRepairTag(array $classNames, array $attributes, string $nodeName, int $startIndex) : Tag {
-        $tag = new Tag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
+    private function createRepairTag(array $classNames, array $attributes, string $nodeName, int $startIndex, \DOMNodeList $domChildren=NULL, array $htmlChildren=NULL) : Tag {
+        if(in_array(\editor_Segment_Internal_Tag::CSS_CLASS, $classNames) && \editor_Segment_Internal_Tag::hasNodeName($nodeName)
+                && (\editor_Segment_Internal_Tag::domElementChildrenAreInternalTagChildren($domChildren) || \editor_Segment_Internal_Tag::htmlNodeChildrenAreInternalTagChildren($htmlChildren))){
+            $tag = new InternalTag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
+        } else {
+            $tag = new Tag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
+        }
         $this->tagIdxCount++;
         if(count($classNames) > 0){
             foreach($classNames as $cname){

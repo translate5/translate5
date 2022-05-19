@@ -367,17 +367,19 @@ class editor_Segment_FieldTags extends editor_TagSequence {
     /**
      * @param HtmlNode $node
      * @param int $startIndex
+     * @param array|null $children
      * @return editor_Segment_Tag
      */
-    protected function createFromHtmlNode(HtmlNode $node, int $startIndex) : editor_Segment_Tag {
+    protected function createFromHtmlNode(HtmlNode $node, int $startIndex, array $children=NULL) : editor_Segment_Tag {
         return editor_Segment_TagCreator::instance()->fromHtmlNode($node, $startIndex);
     }
     /**
      * @param DOMElement $element
      * @param int $startIndex
+     * @param DOMNodeList|null $children
      * @return editor_Segment_Tag
      */
-    protected function createFromDomElement(DOMElement $element, int $startIndex) : editor_Segment_Tag {
+    protected function createFromDomElement(DOMElement $element, int $startIndex, DOMNodeList $children=NULL) : editor_Segment_Tag {
         return editor_Segment_TagCreator::instance()->fromDomElement($element, $startIndex);
     }
 

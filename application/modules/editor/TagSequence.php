@@ -521,9 +521,10 @@ abstract class editor_TagSequence implements JsonSerializable {
      * @return editor_Segment_Tag
      */
     protected function fromHtmlNode(HtmlNode $node, int $startIndex){
-        $tag = $this->createFromHtmlNode($node, $startIndex);
-        if($node->hasChildren()){
-            foreach($node->getChildren() as $childNode){
+        $children = $node->hasChildren() ? $node->getChildren() : NULL;
+        $tag = $this->createFromHtmlNode($node, $startIndex, $children);
+        if($children !== NULL && !$tag->handleHtmlNodeChildrenInternally($children, $this)){
+            foreach($children as $childNode){
                 if($childNode->isTextNode()){
                     if($tag->addText($childNode->text())){
                         $startIndex += $tag->getLastChildsTextLength();
@@ -543,9 +544,18 @@ abstract class editor_TagSequence implements JsonSerializable {
     /**
      * @param HtmlNode $node
      * @param int $startIndex
+     * @param array|null $children
      * @return editor_Segment_Tag
      */
-    abstract protected function createFromHtmlNode(HtmlNode $node, int $startIndex) : editor_Segment_Tag;
+    abstract protected function createFromHtmlNode(HtmlNode $node, int $startIndex, array $children=NULL) : editor_Segment_Tag;
+    /**
+     * Creates a segment tag without adding it to our sequence
+     * @param HtmlNode $node
+     * @return editor_Segment_Tag
+     */
+    public function createUnchainedTagFromHtmlNode(HtmlNode $node) : editor_Segment_Tag {
+        return $this->createFromHtmlNode($node, 0, NULL);
+    }
     /**
      * Creates a nested structure of Internal tags & text-nodes recursively out of a DOMElement structure
      * This is an alternative implementation using PHP DOM
@@ -555,10 +565,11 @@ abstract class editor_TagSequence implements JsonSerializable {
      * @return editor_Segment_Tag
      */
     protected function fromDomElement(DOMElement $element, int $startIndex){
-        $tag = $this->createFromDomElement($element, $startIndex);
-        if($element->hasChildNodes()){
-            for($i = 0; $i < $element->childNodes->length; $i++){
-                $child = $element->childNodes->item($i);
+        $children = $element->hasChildNodes() ? $element->childNodes : NULL;
+        $tag = $this->createFromDomElement($element, $startIndex, $children);
+        if($children !== NULL && !$tag->handleDomElementChildrenInternally($children, $this)){
+            for($i = 0; $i < $children->length; $i++){
+                $child = $children->item($i);
                 if($child->nodeType == XML_TEXT_NODE){
                     if($tag->addText(editor_Tag::convertDOMText($child->nodeValue))){
                         $startIndex += $tag->getLastChildsTextLength();
@@ -578,9 +589,18 @@ abstract class editor_TagSequence implements JsonSerializable {
     /**
      * @param DOMElement $element
      * @param int $startIndex
+     * @param DOMNodeList|null $children
      * @return editor_Segment_Tag
      */
-    abstract protected function createFromDomElement(DOMElement $element, int $startIndex) : editor_Segment_Tag;
+    abstract protected function createFromDomElement(DOMElement $element, int $startIndex, DOMNodeList $children=NULL) : editor_Segment_Tag;
+    /**
+     * Creates a segment tag without adding it to our sequence
+     * @param DOMElement $element
+     * @return editor_Segment_Tag
+     */
+    public function createUnchainedTagFromDomElement(DOMElement $element) : editor_Segment_Tag {
+        return $this->createFromDomElement($element, 0, NULL);
+    }
     /**
      * Joins Tags that are equal and directly beneath each other
      * Also removes any internal connections between the tags

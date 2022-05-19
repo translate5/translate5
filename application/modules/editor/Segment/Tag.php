@@ -631,6 +631,31 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
             }
         }
     }
+
+    /* Unparsing API */
+
+    /**
+     * This is a special API that can be used to intercept the unparsing to prevent adding children to the tags-list
+     * Be aware, that this API is only called, if there are children
+     * CRUCIAL: Tags intercepting successfully here must have a text-length of 0 / startIndex = endIndex !
+     * @param DOMNodeList $domChildren
+     * @param editor_TagSequence $tagSequence
+     * @return bool
+     */
+    public function handleDomElementChildrenInternally(DOMNodeList $domChildren, editor_TagSequence $tagSequence) : bool {
+        return false;
+    }
+    /**editor_TagSequence
+     * This is a special API that can be used to intercept the unparsing to prevent adding children to the tags-list
+     * Be aware, that this API is only called, if there are children
+     * CRUCIAL: Tags intercepting successfully here must have a text-length of 0 / startIndex = endIndex !
+     * @param array|null $htmlNodeChildren
+     * @param editor_TagSequence $tagSequence
+     * @return bool
+     */
+    public function handleHtmlNodeChildrenInternally(array $htmlNodeChildren, editor_TagSequence $tagSequence) : bool {
+        return false;
+    }
     /**
      * Adds us and all our children to the segment tags
      * @param int $parentOrder
@@ -662,6 +687,9 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     public function finalize(editor_TagSequence $tags, editor_Models_task $task){
         
     }
+
+    /* Debugging API */
+
     /**
      * Debug output
      * @return string
